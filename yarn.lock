@@ -1135,6 +1135,15 @@
     loader-utils "^2.0.0"
     schema-utils "^3.0.0"
 
+"@symfony/ux-autocomplete@file:vendor/symfony/ux-autocomplete/assets":
+  version "1.0.0"
+
+"@symfony/ux-chartjs@file:vendor/symfony/ux-chartjs/assets":
+  version "1.1.0"
+
+"@symfony/ux-toggle-password@file:vendor/symfony/ux-toggle-password/assets":
+  version "1.0.0"
+
 "@symfony/webpack-encore@^4.0.0":
   version "4.4.0"
   resolved "https://registry.yarnpkg.com/@symfony/webpack-encore/-/webpack-encore-4.4.0.tgz#9cc67e360ed19206d05cd50b706b7d68aaa424c4"
@@ -2557,6 +2566,11 @@ forwarded@0.2.0:
   version "0.2.0"
   resolved "https://registry.yarnpkg.com/forwarded/-/forwarded-0.2.0.tgz#2269936428aad4c15c7ebe9779a84bf0b2a81811"
   integrity sha512-buRG0fpBtRHSTCOASe6hD258tEubFoRLb4ZNA6NxMVHNw2gOcwHo9wyablzMzOA5z9xA9L1KNjk/Nt6MT9aYow==
+
+fos-router@./vendor/friendsofsymfony/jsrouting-bundle/Resources/:
+  version "2.5.0"
+  dependencies:
+    "@bpnetguy/webpack-inject-plugin" "^2.0.4"
 
 fresh@0.5.2:
   version "0.5.2"
