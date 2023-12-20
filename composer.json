@@ -126,6 +126,11 @@
         "symfony": {
             "allow-contrib": false,
             "require": "6.4.*"
+        },
+        "paas": {
+            "compile": [
+                "php bin/console assets:install --env=dev --no-debug"
+            ]
         }
     },
     "require-dev": {
