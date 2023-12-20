@@ -1,5 +1,6 @@
 {
     "devDependencies": {
+        "@symfony/ux-autocomplete": "file:vendor/symfony/ux-autocomplete/assets"
     },
     "license": "UNLICENSED",
     "private": true,
@@ -36,9 +37,5 @@
         "jquery": "^3.7.0",
         "remixicon": "^3.5.0",
         "trumbowyg": "^2.27.3"
-    },
-    "engines": {
-        "node": "18.17.1",
-        "yarn": "1.22.19"
     }
 }
