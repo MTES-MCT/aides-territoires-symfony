@@ -37,5 +37,8 @@
         "jquery": "^3.7.0",
         "remixicon": "^3.5.0",
         "trumbowyg": "^2.27.3"
+    },
+    "engines": {
+        "node": "18.17.1"
     }
 }
