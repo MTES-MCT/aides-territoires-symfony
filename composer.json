@@ -129,9 +129,8 @@
         },
         "paas": {
             "compile": [
-                "composer dump-env prod",
-                "npm install yarn",
-                "yarn install",
+                "npm install --global yarn",
+                "yarn install --force",
                 "php bin/console fos:js-routing:dump --format=json --target=public/js/fos_js_routes.json",
                 "yarn encore production"
             ],
