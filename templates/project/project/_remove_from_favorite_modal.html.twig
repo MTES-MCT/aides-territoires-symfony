@@ -1,0 +1,24 @@
+<dialog aria-labelledby="fr-modal-title-remove-from-favorite--{{ project.id }}" role="dialog" id="remove-from-favorite-modal--{{ project.id }}" class="fr-modal">
+    <div class="fr-container fr-container--fluid fr-container-md">
+        <div class="fr-grid-row fr-grid-row--center">
+            <div class="fr-col-12 fr-col-md-8 fr-col-lg-6">
+                <div class="fr-modal__body">
+                    <div class="fr-modal__header">
+                        <button class="fr-btn fr-btn--close" title="Fermer la fenêtre modale" aria-controls="remove-from-favorite-modal--{{ project.id }}">Fermer</button>
+                    </div>
+                    <div class="fr-modal__content">
+                        <h2 id="fr-modal-title-remove-from-favorite--{{ project.id }}" class="fr-modal__title fr-mt-0"><span class="fr-icon-arrow-right-line fr-icon--lg"></span>Retirer ce projet de mes favoris</h2>
+                        {% if app.user and formRemoveFromFavorite is defined %}
+                            {{ form_start(formRemoveFromFavorite)}}
+                                <button class="btn-block fr-btn fr-mt-2w" type="submit">
+                                    Retirer ce projet
+                                </button>
+                                <button class="btn-block fr-btn fr-btn--secondary" type="button" title="Fermer la fenêtre modale" aria-controls="remove-from-favorite-modal--{{ project.id }}">Annuler</button>                            
+                            {{ form_end(formRemoveFromFavorite)}}
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</dialog>

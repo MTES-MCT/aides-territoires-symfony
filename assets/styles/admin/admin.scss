@@ -1,0 +1,41 @@
+@import '../_variables';
+@import '../_mixins';
+
+.table{
+    &.datagrid {
+        tbody{
+            td.actions {
+                a{
+                    @include is-bigger-than-mobile {
+                        display: block;
+                        white-space: nowrap;
+                    }
+                }
+            }
+        }
+    }
+}
+
+.accordion{
+    .card-header{
+        cursor: pointer;
+    }
+    pre{
+        position: relative;
+        padding: 0.5rem 1.5rem;
+        code{
+            color: black;
+        }
+        .btn-copy-clipboard{
+            position: absolute;
+            left: 0;
+            top: 0;
+            font-size: 1.5rem;
+            color: blue;
+            background: none;
+            border: none;
+            padding: 0;
+        }
+    }
+}
+

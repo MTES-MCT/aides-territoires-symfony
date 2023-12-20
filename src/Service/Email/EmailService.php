@@ -1,0 +1,203 @@
+<?php
+
+namespace App\Service\Email;
+
+use App\Entity\User\User;
+use App\Service\Various\ParamService;
+use Brevo\Client\Api\ContactsApi;
+use Brevo\Client\Api\TransactionalEmailsApi;
+use Brevo\Client\Configuration;
+use Brevo\Client\Model\CreateContact;
+use Brevo\Client\Model\CreateDoiContact;
+use Brevo\Client\Model\SendSmtpEmail;
+use Brevo\Client\Model\UpdateContact;
+use GuzzleHttp\Client;
+use Symfony\Bridge\Twig\Mime\TemplatedEmail;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Routing\RouterInterface;
+
+class EmailService
+{
+    public function __construct(
+        protected MailerInterface $mailerInterface,
+        protected ParamService $paramService,
+        protected RouterInterface $routerInterface
+    )
+    {
+        
+    }
+
+    /**
+     * Envoi un email
+     *
+     * @param string $email
+     * @param string $subject
+     * @param string $template
+     * @param array|null $datas
+     * @param array|null $options
+     * @return boolean
+     */
+    public function sendEmail(
+        string $email,
+        string $subject,
+        string $template = 'emails/base.html.twig',
+        ?array $datas = null,
+        ?array $options = null
+    ): bool
+    {
+        $form = $options['forceFrom'] ?? $this->paramService->get('email_from');
+        $datas['subject'] = $datas['subject'] ?? $subject;
+
+        try {
+            $email = (new TemplatedEmail())
+            ->from($form )
+            ->to($email)
+            ->subject($subject)
+            ->htmlTemplate($template)
+            ->context($datas);
+    
+            $this->mailerInterface->send($email);
+
+            return true;
+        } catch (\Exception $e) {
+            dd($e);
+            return false;
+        }
+    }
+
+    public function sendEmailViaApi(
+        string $emailTo,
+        ?string $nameTo = null,
+        ?int $templateId = 0,
+        ?array $params = null,
+        ?array $headers = null,
+        ?array $tags = null
+    ) : bool
+    {
+        // Configure API key authorization: api-key
+        $config = Configuration::getDefaultConfiguration()->setApiKey('api-key', $this->paramService->get('sib_api_key'));
+
+        // Uncomment below line to configure authorization using: partner-key
+        // $config = SendinBlue\Client\Configuration::getDefaultConfiguration()->setApiKey('partner-key', 'YOUR_API_KEY');
+
+        $apiInstance = new TransactionalEmailsApi(
+            // If you want use custom http client, pass your client which implements `GuzzleHttp\ClientInterface`.
+            // This is optional, `GuzzleHttp\Client` will be used as default.
+            new Client(),
+            $config
+        );
+        $sendSmtpEmail = new SendSmtpEmail(); // \SendinBlue\Client\Model\SendSmtpEmail | Values to send a transactional email
+        $sendSmtpEmail['sender'] = [
+            'name' => $this->paramService->get('email_from_name'),
+            'email' => $this->paramService->get('email_from')
+        ];
+        // gestion du destinataire
+        $to = [
+            'email' => $emailTo
+        ];
+        if ($nameTo) {
+            $to['name'] = $nameTo;
+        }
+        $sendSmtpEmail['to'] = [
+            $to
+        ];
+
+        // si template
+        if ($templateId) {
+            $sendSmtpEmail['templateId'] = $templateId;
+        }
+
+        // si parametres
+        if (is_array($params) && count($params) > 0) {
+            $sendSmtpEmail['params'] = $params;
+        }
+
+        if (is_array($headers) && count($headers) > 0) {
+            $sendSmtpEmail['headers'] = $headers;
+        }
+
+        if (is_array($tags) && count($tags) > 0) {
+            $sendSmtpEmail['tags'] = $tags;
+        }
+
+        try {
+            $result = $apiInstance->sendTransacEmail($sendSmtpEmail);
+            return true;
+        } catch (\Exception $e) {
+            return false;
+        }
+    }
+
+    /**
+     * Désinscrit un utilisateur sur le service d'email
+     *
+     * @param User $user
+     * @return boolean
+     */
+    public function unsubscribeUser(
+        User $user
+    ): bool
+    {
+        // Configure API key authorization: api-key
+        $config = Configuration::getDefaultConfiguration()->setApiKey('api-key', $this->paramService->get('sib_api_key'));
+
+
+        $apiInstance = new ContactsApi(
+            // If you want use custom http client, pass your client which implements `GuzzleHttp\ClientInterface`.
+            // This is optional, `GuzzleHttp\Client` will be used as default.
+            new Client(),
+            $config
+        );
+
+        $updateContact = new UpdateContact();
+        $newsletterListIds = explode(',', $this->paramService->get('sib_newsletter_list_ids'));
+        foreach ($newsletterListIds as $key => $value) {
+            $newsletterListIds[$key] = (int) $value;
+        }
+        $updateContact['unlinkListIds'] = $newsletterListIds;
+        
+
+        try {
+            $apiInstance->updateContact($user->getEmail(), $updateContact);
+            return true;
+        } catch (\Exception $e) {
+            return false;
+        }
+    }
+
+    public function subscribeUser(User $user): bool
+    {
+        // Configure API key authorization: api-key
+        $config = Configuration::getDefaultConfiguration()->setApiKey('api-key', $this->paramService->get('sib_api_key'));
+
+
+        $apiInstance = new ContactsApi(
+            // If you want use custom http client, pass your client which implements `GuzzleHttp\ClientInterface`.
+            // This is optional, `GuzzleHttp\Client` will be used as default.
+            new Client(),
+            $config
+        );
+        
+        $newsletterListIds = explode(',', $this->paramService->get('sib_newsletter_list_ids'));
+        foreach ($newsletterListIds as $key => $value) {
+            $newsletterListIds[$key] = (int) $value;
+        }
+
+        $doubleOptin = new CreateDoiContact();
+        $doubleOptin['attributes'] = [
+            'DOUBLE_OPT_IN' => 1
+        ];
+        $doubleOptin['includeListIds'] = $newsletterListIds;
+        $doubleOptin['email'] = $user->getEmail();
+        $doubleOptin['templateId'] = (int) $this->paramService->get('sib_newsletter_confirm_template_id');
+        $doubleOptin['redirectionUrl'] = $this->routerInterface->generate('app_newsletter_register_success', [], UrlGeneratorInterface::ABSOLUTE_URL);
+
+        try {
+            $apiInstance->createDoiContact($doubleOptin);
+            return true;
+        } catch (\Exception $e) {
+            return false;
+        }
+    }
+}

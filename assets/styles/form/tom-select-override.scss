@@ -1,0 +1,64 @@
+.ts-wrapper,
+.ts-wrapper.single,
+.ts-wrapper.single.input-active {
+    padding: 3px 0 4px 8px;
+    margin: 0.5rem 0 0 0;
+    .ts-control {   
+        background-color: transparent;    
+        background-image: none;
+        box-shadow: none;
+        border: none;
+        color: var(--text-label-grey);
+        > input {
+            min-width: 0;
+            font-size: 1rem;
+        }
+
+        &:after{
+            display: none;
+        }
+    }
+}
+
+.ts-dropdown, .ts-control, .ts-control input {
+    font-size: 1rem;
+}
+
+.ts-wrapper.multi .ts-control{
+    flex-direction: column;
+}
+.ts-wrapper.multi .ts-control [data-value] {
+    text-shadow: none;
+    border-radius: none;
+    background-color: transparent;
+    background-image: none;
+    background-repeat: no-repeat;
+    box-shadow: none;
+    border: none;
+    color: var(--text-label-grey);
+    width: 85%;
+    // .item{
+    //     width: 85%;
+    // }
+}
+
+.ts-wrapper.plugin-remove_button:not(.rtl) .item .remove {
+    border-left: none;
+    background-image: none;
+}
+
+.ts-wrapper.multi .ts-control [data-value].active {
+    background-color: transparent;
+    background-image: none;
+    background-repeat: no-repeat;
+    color: var(--text-label-grey);
+    
+}
+
+.ts-control{
+    .item{
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+}

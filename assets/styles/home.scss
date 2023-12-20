@@ -1,0 +1,39 @@
+@import 'remixicon/fonts/remixicon.css';
+@import '_variables';
+@import '_mixins';
+@import 'form/entity-checkbox-absolute-type';
+@import 'form/tom-select-override';
+@import 'component/at-deadline.scss';
+
+#intro {
+    background: var(--background-alt-green-menthe) url("../images/home/home_search.svg?c1a83bca7000") bottom/100% no-repeat;
+
+    .at-tab-message {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        margin-left: 1em;
+        color: var(--text-title-blue-france);
+        font-weight: bold;
+    }
+
+    #top-tabs{
+        overflow: visible;
+        --tabs-height: 273px;
+
+        &.classic{
+            overflow: hidden;
+        }
+
+        >.fr-tabs__list{
+            --tab-list-height: 48px;
+        }
+    }
+}
+
+#home-partners img, #home-programs img {
+    width: auto;
+    height: auto;
+    max-width: 10rem;
+    max-height: 4rem;
+}

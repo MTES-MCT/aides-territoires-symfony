@@ -1,0 +1,15 @@
+{% extends 'emails/base.html.twig' %}
+
+{% block body %}
+<p>Bonjour {{ organizationInvitation.author.firstname }} {{ organizationInvitation.author.lastname }},</p>
+
+<p>{{ organizationInvitation.firstname }} {{ organizationInvitation.lastname }} a décliné votre invitation et ne rejoint donc pas votre structure.</p>
+
+<p>Si vous pensez qu’il s’agit d’une erreur, nous vous invitons à contacter directement cette personne, avant de recommencer l’opération.</p>
+
+<p>
+Cordialement,
+<br />
+L’équipe d’Aides-territoires.
+</p>
+{% endblock %}

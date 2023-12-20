@@ -1,0 +1,17 @@
+{% block text_length_count_type_row %}
+{%  set field = form.vars.ea_vars.field %}
+<div class="{{ field.columns ?? field.defaultColumns ?? '' }}">
+  <div class="field-text form-group">
+    {{ form_label(form) }}
+    <div class="form-widget input-group">
+      <div class="input-group-text"><span class="current-count">{{ form.vars.value|length }}</span>/{{ form.vars.attr.maxlength }}</div>
+      {{ form_widget(form) }}
+    </div>
+    {{ form_help(form) }}
+    {{ form_errors(form) }}
+  </div>
+</div>
+    {% if field.columns|default(null) is null %}
+        <div class="flex-fill"></div>
+    {% endif %}
+{% endblock %}

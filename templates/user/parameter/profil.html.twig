@@ -1,0 +1,58 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Votre profil | {{ parent() }}{% endblock %}
+
+{% block body %}
+
+
+<div class="fr-container fr-mb-5w fr-mt-0">
+    <div class="fr-grid-row">
+
+       {% include "user/_menu_user.html.twig" with { user_parameter:true, user_profile:true } %}
+
+        <div class="fr-col-12 fr-col-md-9">
+            <h1 class="fr-h3">Votre profil</h1>
+      
+            <p>Les champs marqués d’un astérisque (*) sont obligatoires.</p>
+            {{ form_start(form) }}
+            {{ form_row(form.firstname )}}
+            {{ form_row(form.lastname )}}
+            {{ form_row(form.email )}}
+            {{ form_row(form.beneficiaryFunction )}}
+            {{ form_row(form.beneficiaryRole )}}
+            <div class="fr-form-group fr-mb-2w">
+                <fieldset class="fr-fieldset fr-fieldset--inline">
+                    <legend class="fr-fieldset__legend fr-text--regular" id='checkboxes-inline-legend'>
+                        Vous souhaitez utiliser Aides-territoires pour :
+                    </legend>
+                    <div class="fr-fieldset__content">
+                        <div class="checkbox-item">
+                            {{ form_row(form.isBeneficiary) }}
+                        </div>
+                        <div class="checkbox-item fr-ml-3w"> <!-- ou autre valeur ml-* selon vos besoins -->
+                            {{ form_row(form.isContributor) }}
+                        </div>
+                    </div>
+                </fieldset>
+            </div>
+            {{ form_row(form.oldPassword )}}
+            {{ form_row(form.newPassword )}}
+                <ul class="fr-btns-group fr-btns-group--inline fr-btns-group--center fr-btns-group--icon-left">
+                    <li>
+                        <button type="submit" class="fr-btn fr-fi-edit-line">Mettre à jour mes données</button>
+                    </li>
+                    <li>
+                        <a class="fr-btn fr-btn--secondary fr-fi-delete-line" href="{{ path('app_user_parameter_delete') }}">
+                            Supprimer mon compte
+                        </a>
+                    </li>
+                </ul>
+            {{ form_end(form) }}
+          
+        </div>
+    </div>
+</div>
+
+
+
+{% endblock %}

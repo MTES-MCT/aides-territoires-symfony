@@ -1,0 +1,54 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Connectez-vous | Aides-territoires{% endblock %}
+{% block meta_description %}🔍 Trouvez des aides pour financer et accompagner les projets de votre collectivité en France métropolitaine et en Outre-mer{% endblock %}
+
+{% block body %}
+	<main role="main" class="fr-container-fluid" id="at-main">
+		<div id="login-form" class="main-content">
+			<div class="fr-container fr-my-5w">
+				<div class="fr-grid-row fr-grid-row--center">
+					<div class="fr-col-md-8">
+						<h1>
+						{% if loginAdmin is defined %}
+							Connexion à l'administration
+							{% else %}
+							Connexion à votre compte
+						{% endif %}
+						</h1>
+
+						<div class="fr-mt-2w at-align-end">
+							<a href="{{ path('app_user_user_register') }}" class="fr-tag">
+								Pas encore inscrit ? Créer un compte
+							</a>
+						</div>
+
+						<p>Les champs marqués d’un astérisque (*) sont obligatoires.</p>
+
+						{% if error %}
+							<div class="fr-alert fr-alert--error fr-alert--sm fr-mt-2w fr-background-main">{{ error.messageKey|trans(error.messageData, 'security')|raw }}</div>
+						{% endif %}
+
+                        {{ form_start(formLogin, {'attr': {'class': 'fr-mt-5w'}})}}
+                            {{ form_row(formLogin._username) }}
+                            {{ form_row(formLogin._password) }}
+                            {{ form_row(formLogin._remember_me) }}
+                            {{ form_row(formLogin._target_path) }}
+							<button type="submit" class="fr-btn">Connectez-vous</button>
+                        {{ form_end(formLogin) }}
+
+						<div class="fr-col-12 fr-mt-3w">
+							<div class="fr-alert fr-alert--info fr-alert--sm">
+								<p>
+									Avez-vous oublié votre mot de passe ?
+									<a href="{{ path('app_forgot_password_request') }}">
+										Vous pouvez en demander un nouveau.</a>
+								</p>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</main>
+{% endblock %}

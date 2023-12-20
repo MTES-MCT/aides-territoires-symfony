@@ -1,0 +1,195 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Supprimer mon compte | {{ parent() }}{% endblock %}
+
+{% block body %}
+
+
+<div class="fr-container fr-mb-5w fr-mt-0">
+    <div class="fr-grid-row">
+
+        {% include "user/_menu_user.html.twig" with { user_parameter: true } %}
+
+        <div class="fr-col-12 fr-col-md-9">
+            <h1 class="fr-h3">Supprimer mon compte</h1> 
+
+            <div class="fr-alert fr-alert--warning fr-alert--sm fr-mb-5w">
+                <p>
+                    Vous vous apprêtez à supprimer votre compte. Cette action est définitive !
+                    Merci de prendre le temps de vérifier les informations qui vont être supprimées lors de la suppression du compte.
+                </p>
+            </div>
+
+            <h2 class="fr-h2">Structure{% if user.organizations|length > 1 %}s{% endif %}</h2>
+            {% for organization in user.organizations %}
+                <h3 class="fr-h3">{{ organization.name }}</h2>
+
+                {% if organization.beneficiairies|length > 0 %}
+                    <p>
+                        La structure « <strong>{{ organization.name }}</strong> » compte d’autres membres que vous : elle ne sera donc pas supprimée.
+                    </p>
+                {% else %}
+                    <p>
+                        Vous êtes la seule personne appartenant à la structure « <strong>{{ organization.name }}</strong> ».
+                        Si vous supprimez votre compte elle sera donc également supprimée.
+                    </p>
+                {% endif %}
+
+                {% if organization.projectsOfUser(user)|length > 0 %}
+                    <h3 id="projects" class="fr-h3">Projets</h3>
+                    {% if organization.beneficiairies|length > 0 %}
+                        <p>Vous pouvez transférer la propriété
+                        {% if organization.projectsOfUser(user)|length == 1 %}du projet suivant{% else %}des projets suivants{% endif %}
+                        à un autre membre de votre structure  « {{ organization }} ».</p>
+                        {% if organization.beneficiairies|length > 1 %}
+                        <p>Sinon ils seront <strong>supprimés</strong>.</p>
+                        {% else %}
+                        <p>Sinon il sera <strong>supprimé.</strong></p>
+                        {% endif %}
+                    {% else %}
+                        <p>
+                            {% if organization.projectsOfUser(user)|length == 1 %}Le projet suivant sera supprimé{% else %}Les projets suivants seront supprimés{% endif %}.
+                            Si vous voulez {% if organization.projectsOfUser(user)|length == 1 %}le{% else %}les{% endif %} transférer à un autre utilisateur,
+                            vous pouvez l’inviter à rejoindre votre structure ou demander à ce qu’il vous invite.
+                            Vous pourrez alors transférer la propriété de
+                            {% if organization.projectsOfUser(user)|length == 1 %}ce projet{% else %}ces projets{% endif %} à cette personne.
+                        </p>
+
+                    {% endif %}
+
+                    <div class="fr-table at-table--fullwidth">
+                        <table class="data-table" aria-describedby="projects">
+                            <thead>
+                                <tr>
+                                    <th scope="col" class="fr-text">Nom</th>
+                                    <th scope="col" class="fr-text">Nombre d’aides ajoutées</th>
+                                    <th scope="col" class="fr-text">Date création</th>
+                                    <th scope="col" class="fr-text">Date d’échéance</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for project in organization.projectsOfUser(user) %}
+                                    <tr>
+                                        <td class="fr-text">
+                                            <a href="{{ path('app_user_project_details_fiche_projet', {'id': project.id, 'slug': project.slug}) }}">
+                                                {{ project.name }}
+                                            </a>
+                                        </td>
+                                        <td class="fr-text">
+                                            {{ project.aidProjects|length }}
+                                        </td>
+                                        <td class="fr-text">{% if project.dateCreate %}{{ project.dateCreate|date('d/m/y') }}{% endif %}</td>
+                                        <td class="fr-text">{% if project.dueDate %}{{ project.dueDate|date('d/m/y') }}{% endif %}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    {% if organization.beneficiairies|length > 1 %}                     
+                        {% if formTransfertProjects['project-'~organization.id] is defined %}
+                            {% set formTransfertProject = formTransfertProjects['project-'~organization.id].createView %}
+                            {{ form_start(formTransfertProject) }}
+                                {{ form_row(formTransfertProject.user) }}
+                                {{ form_row(formTransfertProject.idOrganization) }}
+                                <div class="fr-input-group">
+                                    <button type="submit" class="fr-btn fr-btn--secondary">
+                                        Transférer la propriété
+                                        {% if organization.projectsOfUser(user)|length == 1 %}du projet{% else %}des projets{% endif %}
+                                    </button>
+                                </div>
+                            {{ form_end(formTransfertProject) }}
+                        {% endif %}
+                    {% endif %}
+                {% endif %}
+
+                {% if organization.aidsOfUser(user)|length > 0 %}
+                    <h3 id="aids" class="fr-h3">Aides</h3>
+                    <p>{% if organization.aidsOfUser(user)|length == 1 %}L’aide suivante va être détachée
+                    {% else %}Les aides suivantes vont être détachées{% endif %} de votre compte :</p>
+
+                    <div class="fr-table at-table--fullwidth">
+                        <table class="data-table" aria-describedby="aids">
+                            <caption class="fr-sr-only">
+                                Liste de vos aides publiées
+                            </caption>
+                            <thead>
+                                <tr>
+                                    <th scope="col">Nom de l’aide</th>
+                                    <th scope="col">Périmètre</th>
+                                    <th scope="col">Créée le</th>
+                                    <th scope="col">Modifiée le</th>
+                                    <th scope="col">Échéance</th>
+                                    <th scope="col">Visibilité sur le site</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for aid in organization.aidsOfUser(user) %}
+                                    <tr>
+                                        <td>
+                                            <a href="{{ aid.url }}">
+                                                {{ aid.name }}
+                                            </a>
+                                            {% if aid.isLive %}
+                                                <p class="fr-badge fr-badge--success fr-badge--sm">Affichée</p>
+                                            {% endif %}
+                                        </td>
+                                        <td>{% if aid.perimeter %}{{ aid.perimeter.name }}{% endif %}</td>
+                                        <td>{{ aid.timeCreate|date('d/m/Y') }}</td>
+                                        <td>{{ aid.timeUpdate|date('d/m/Y') }}</td>
+                                        <td class="nowrap-cell">
+                                            <span>{{ aid.dateSubmissionDeadline|date('d/m/Y') }}</span>
+                                            {% if aid.isOngoing %}
+                                                <p class="fr-badge fr-badge--info fr-badge--sm">Permanente</p>
+                                            {% elseif aid.isApproachingDeadline %}
+                                                <p class="fr-badge fr-badge--new fr-badge--sm">Échéance proche</p>
+                                            {% elseif aid.hasExpired %}
+                                                <p class="fr-badge fr-badge--warning fr-badge--sm">Expirée</p>
+                                            {% endif %}
+                                        </td>
+                                        <td class="nowrap-cell"><a href="{{ aid.url }}">{{ aid.status|aidStatusDisplay }}</a></td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    {% if organization.beneficiairies|length > 0 %}
+                        {% if formTransfertAids['aid-'~organization.id] is defined %}
+                            {% set formTransfertAid = formTransfertAids['aid-'~organization.id].createView %}
+                            {{ form_start(formTransfertAid) }}
+                                {{ form_row(formTransfertAid.user) }}
+                                {{ form_row(formTransfertAid.idOrganization) }}
+                                <div class="fr-input-group">
+                                    <button type="submit" class="fr-btn fr-btn--secondary">
+                                        Transférer la propriété
+                                        {% if organization.aidsOfUser(user)|length == 1 %}de l'aide{% else %}des aides{% endif %}
+                                    </button>
+                                </div>
+                            {{ form_end(formTransfertAid) }}
+                        {% endif %}
+                    {% endif %}
+
+                {% endif %}
+            {% endfor %}
+
+            <h2 class="fr-h2">Alertes</h2>
+            <p>Les alertes liées à votre email seront supprimées.</p>
+
+            <h2 class="fr-h2">Suppression</h2>
+            {{ form_start(formDelete) }}
+                {{ form_row(formDelete.password) }}
+                {{ form_row(formDelete.accept) }}
+                <div class="fr-input-group">
+                    <button type="submit" class="fr-btn">
+                        Supprimer mon compte
+                    </button>
+                </div>
+            {{ form_end(formDelete) }}
+        </div>
+    </div>
+</div>
+
+
+
+{% endblock %}

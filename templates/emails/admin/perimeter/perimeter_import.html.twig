@@ -1,0 +1,15 @@
+{% extends 'emails/base.html.twig' %}
+
+{% block body %}
+<p>Bonjour,</p>
+
+<p>L'import du périmètre <strong>{{ perimeterImport.adhocPerimeter.name }}</strong> est terminé.</p>
+{% if notFound|length > 0 %}
+<p>Les codes Insee suivant ne correspondait à aucun périmètre dans la base :</p>
+<ul>
+    {% for insseCode in notFound %}
+    <li>{{ insseCode }}</li>
+    {% endfor %}
+</ul>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,35 @@
+<div class="fr-header__tools">
+    <div class="fr-header__tools-links" data-fr-js-header-links="true">
+        <ul class="fr-btns-group">
+            {% if app.user %}
+            <li>
+                <a class="fr-btn fr-icon-account-line" href="{{ path('app_user_dashboard') }}">
+                    <span class="at-username">{% if app.user.firstname and app.user.lastname %}{{ app.user.firstname }} {{ app.user.lastname }}{% else %}{{ app.user.email }}{% endif %}</span>
+                </a>
+            </li>
+            {% if isUserGranted(app.user, constant('App\\Entity\\User\\User::ROLE_ADMIN')) %}
+            <li>
+                <a href="{{ path('admin') }}" class="fr-btn fr-icon-lock-line">Administration</a>
+            </li>
+            {% endif %}
+            <li>
+                <a href="{{ path('app_user_user_notification') }}" class="at-notification-icon fr-tag fr-icon-notification-3-line fr-tag--icon-left at-notification-icon-no-unread" target="_self" title="Voir la page des notifications"></a>
+            </li>        
+            {% else %}
+                <li>
+                    <a class="fr-btn fr-icon-lock-line" href="{{ path('app_login') }}" title="Se connecter">Se connecter</a>
+                </li>
+                <li>
+                    <a class="fr-btn fr-icon-account-line" href="{{ path('app_user_user_register') }}" title="S'inscrire">S’inscrire</a>
+                </li>
+            {% endif %}
+            
+            <li>
+                <a class="fr-btn fr-btn--secondary fr-icon-edit-box-line" href="{{ path('app_user_aid_publications') }}" title="Diffuser une aide">Diffuser une aide</a>
+            </li>
+            <li>
+                <a class="fr-btn at-btn--primary fr-icon-search-line" href="{{ path('app_aid_aid') }}" title="Trouver des aides">Trouver des aides</a>
+            </li>
+        </ul>
+    </div>
+</div>

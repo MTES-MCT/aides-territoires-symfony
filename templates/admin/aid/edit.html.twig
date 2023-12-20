@@ -1,0 +1,90 @@
+{% extends '@EasyAdmin/crud/edit.html.twig' %}
+
+{% block main %}
+	<div class="container">
+		<div class="row">
+			<div class="{% if pendingUpdates is defined %}col-md-6{% else %}col-md-12{% endif %}">
+				{{ parent() }}
+
+				<div class="form-fieldset  field-form_fieldset">
+					<fieldset>
+						<div class="form-fieldset-header collapsible ">
+							<div class="form-fieldset-title">
+
+								<a href="#content-ea_form_fieldset_01HF47A4QDW5B3P1C6AVD3TGBQ" data-bs-toggle="collapse" class="form-fieldset-title-content form-fieldset-collapse collapsed" aria-expanded="false" aria-controls="content-ea_form_fieldset_01HF47A4QDW5B3P1C6AVD3TGBQ">
+									<i class="fas fw fa-chevron-right form-fieldset-collapse-marker"></i>
+									Projets rattachés à l’aide
+								</a>
+							</div>
+						</div>
+
+						<div id="content-ea_form_fieldset_01HF47A4QDW5B3P1C6AVD3TGBQ" class="form-fieldset-body  collapse ">
+							<div class="row">
+								{% if entity.instance.aidProjects|length == 0 %}
+									<p>Aucun projet</p>
+								{% else %}
+								<ul>
+									{% for aidProject in entity.instance.aidProjects %}
+										{% if aidProject.project %}
+										<li>
+											<a href="{{ ea_url()
+												.setController('App\\Controller\\Admin\\Project\\ProjectCrudController')
+												.setAction('edit')
+												.setEntityId(aidProject.project.id)
+											}}">
+											{{ aidProject.project.name }}
+											</a>
+										</li>
+										{% endif %}
+									{% endfor %}
+								</ul>
+								{% endif %}
+							</div>
+						</div>
+					</fieldset>
+				</div>
+			</div>
+
+			{% if pendingUpdates is defined %}
+			<div class="col-md-6">
+				<h2 clas="title">Mises à jour en revue</h2>
+				<p class="alert alert-info">
+					Pour ne plus voir cette liste, décocher la case "<a href="#Aid_importUpdated">En attente de revue des données importées mises à jour</a>".<br>
+				</p>
+				<div data-accordion-group>
+					{% for update in pendingUpdates %}
+					<div class="accordion card {% if update.value == update.newValue %}bg-success-subtle{% else %}bg-secondary-subtle{% endif %}" data-accordion>
+						<div class="card-header" data-control>Clé : {{ update.key }}</div>
+						<div data-content>
+							<div class="card-body">
+								{% set updateLoopIndex = loop.index %}
+								<div>Valeur actuelle :</div>
+								{% if update.value is iterable %}
+									{% for subValue in update.value %}
+										{% set updateLoopIndex = updateLoopIndex~ '_' ~ loop.index %}
+										<pre><code id="actual_value_{{ updateLoopIndex }}" style="max-width: 100%;overflow: scroll;">{{ subValue }}</code><button class="btn-copy-clipboard" data-clipboard-target="#actual_value_{{ updateLoopIndex }}"><i class="fas fa-clipboard-check"></i></button></pre>
+									{% endfor %}
+								{% else %}
+								<pre><code id="actual_value_{{ updateLoopIndex }}" style="max-width: 100%;overflow: scroll;">{{ update.value }}</code><button class="btn-copy-clipboard" data-clipboard-target="#actual_value_{{ updateLoopIndex }}"><i class="fas fa-clipboard-check"></i></button></pre>
+								{% endif %}
+								
+								{% set updateLoopIndex = loop.index %}
+								<p>Nouvelle valeur :</p>
+								{% if update.newValue is iterable %}
+									{% for subValue in update.newValue %}
+										{% set updateLoopIndex = updateLoopIndex~ '_' ~ loop.index %}
+										<pre><code id="new_value_{{ updateLoopIndex }}" style="max-width: 100%;overflow: scroll;">{{ subValue }}</code><button class="btn-copy-clipboard" data-clipboard-target="#new_value_{{ updateLoopIndex }}"><i class="fas fa-clipboard-check"></i></button></pre>
+									{% endfor %}
+								{% else %}
+								<pre><code id="actual_value_{{ updateLoopIndex }}" style="max-width: 100%;overflow: scroll;">{{ update.newValue }}</code><button class="btn-copy-clipboard" data-clipboard-target="#new_value_{{ updateLoopIndex }}"><i class="fas fa-clipboard-check"></i></button></pre>
+								{% endif %}
+							</div>
+						</div>
+					</div>
+					{% endfor %}
+				</div>
+			</div>
+			{% endif %}
+		</div>
+	</div>
+{% endblock %}

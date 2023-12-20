@@ -1,0 +1,86 @@
+# This file is the entry point to configure your own services.
+# Files in the packages/ subdirectory configure your dependencies.
+
+# Put parameters here that don't need to change on each machine where the app is deployed
+# https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
+parameters:
+    mailing_list_url: '%env(MAILING_LIST_URL)%'
+    meta_title_end: '%env(META_TITLE_END)%'
+    cloud_image_url: '%env(AWS_S3_ENDPOINT_URL)%/%env(AWS_STORAGE_BUCKET_NAME)%/'
+    site_url: '%env(SITE_URL)%'
+    email_super_admin: '%env(EMAIL_SUPER_ADMIN)%'
+    email_from: '%env(EMAIL_FROM)%'
+    email_from_name: '%env(EMAIL_FROM_NAME)%'
+    email_to: '%env(EMAIL_TO)%'
+    email_subject_prefix: '%env(EMAIL_SUBJECT_PREFIX)%'
+    sib_client_key: '%env(SIB_CLIENT_KEY)%'
+    sib_api_key: '%env(SIB_API_KEY)%'
+    sib_endpoint: '%env(SIB_ENDPOINT)%'
+    sib_newsletter_id: '%env(SIB_NEWSLETTER_ID)%'
+    sib_newsletter_list_ids: '%env(SIB_NEWSLETTER_LIST_IDS)%'
+    sib_newsletter_confirm_template_id: '%env(SIB_NEWSLETTER_CONFIRM_TEMPLATE_ID)%'
+    sib_publication_email_template_id: '%env(SIB_PUBLICATION_EMAIL_TEMPLATE_ID)%'
+    sib_new_suggested_aid_template_id: '%env(SIB_NEW_SUGGESTED_AID_TEMPLATE_ID)%'
+    analytics_enabled: '%env(ANALYTICS_ENABLED)%'
+    analytics_site_id: '%env(ANALYTICS_SITE_ID)%'
+    analytics_endpoint: '%env(ANALYTICS_ENDPOINT)%'
+    matomo_site_id: '%env(MATOMO_SITE_ID)%'
+    matomo_endpoint: '%env(MATOMO_ENDPOINT)%'
+    goal_register_id: '%env(GOAL_REGISTER_ID)%'
+    goal_first_login_id: '%env(GOAL_FIRST_LOGIN_ID)%'
+    aws_access_key_id: '%env(AWS_ACCESS_KEY_ID)%'
+    aws_s3_endpoint_url: '%env(AWS_S3_ENDPOINT_URL)%'
+    aws_s3_region_name: '%env(AWS_S3_REGION_NAME)%'
+    aws_secret_access_key: '%env(AWS_SECRET_ACCESS_KEY)%'
+    aws_storage_bucket_name: '%env(AWS_STORAGE_BUCKET_NAME)%'
+    addna_alert_title: '%env(ADDNA_ALERT_TITLE)%'
+    addna_alert_querystring: '%env(ADDNA_ALERT_QUERYSTRING)%'
+    addna_alert_email_subject_prefix: '%env(ADDNA_ALERT_EMAIL_SUBJECT_PREFIX)%'
+    ademe_agir_api_username: '%env(ADEME_AGIR_API_USERNAME)%'
+    ademe_agir_api_password: '%env(ADEME_AGIR_API_PASSWORD)%'
+
+services:
+    # default configuration for services in *this* file
+    _defaults:
+        autowire: true      # Automatically injects dependencies in your services.
+        autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+
+    # makes classes in src/ available to be used as services
+    # this creates a service per class whose id is the fully-qualified class name
+    App\:
+        resource: '../src/'
+        exclude:
+            - '../src/DependencyInjection/'
+            - '../src/Entity/'
+            - '../src/Kernel.php'
+
+    # add more service definitions when explicit configuration is needed
+    # please note that last definitions always *replace* previous ones
+
+    # Register the LogoutListener service
+    App\EventListener\MyCustomLogoutListener:
+        tags:
+            - name: 'kernel.event_listener'
+              event: 'Symfony\Component\Security\Http\Event\LogoutEvent'
+              dispatcher: security.event_dispatcher.main
+
+    # Register the LoginListener service
+    App\EventListener\MyCustomLoginListener:
+        tags:
+            - name: 'kernel.event_listener'
+              event: 'Symfony\Component\Security\Http\Event\LoginSuccessEvent'
+              dispatcher: security.event_dispatcher.main
+            # - name: 'kernel.event_listener'
+            #   event: 'Symfony\Component\Security\Core\Event\AuthenticationSuccessEvent'
+            #   dispatcher: security.event_dispatcher.main
+            # - event: 'security.authentication.success'
+            #   name: 'kernel.event_listener'    
+
+    App\EventListener\RouteListener:
+        tags:
+            # Priority 33 so it runs before routing
+            - {name: kernel.event_listener, event: kernel.request, priority: 33}
+
+    App\EventListener\WithoutOrganizationListener:
+        tags:
+            - {name: kernel.event_listener, event: kernel.request}

@@ -1,0 +1,52 @@
+{% if projects %}
+    <div class="fr-table" id="project_in_list">
+        <table title="Liste des projets subventionnés" id="validated_projects_table">
+            <caption class="fr-sr-only">
+                Liste des projets subventionnés
+            </caption>
+            <thead>
+                <tr>
+                    {% if commune_search and project_perimeter and project_perimeter.latitude and project_perimeter.longitude %}
+                        <th scope="col">Distance</th>
+                    {% endif %}
+                    <th scope="col">Année</th>
+                    <th scope="col">Mairie</th>
+                    <th scope="col">Projet</th>
+                    <th scope="col">Aide</th>
+                    <th scope="col">Porteur de l’aide</th>
+                    <th scope="col">Coût total</th>
+                    <th scope="col">Subvention accordée</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if app.user %}
+                    {% for project in projects %}
+                        {% include 'project/project/_projects_validated_result_as_list_tbody.html.twig' %}
+                    {% endfor %}
+                {% else %}
+                    {% for project in projects|slice(4) %}
+                        {% include 'project/project/_projects_validated_result_as_list_tbody.html.twig' %}
+                    {% endfor %}
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+    {% if not app.user %}
+    <div class="fr-alert fr-alert--info fr-mb-6w">
+        <h2 class="fr-alert__title">Connectez-vous pour consulter la liste complète</h2>
+        <p>Connectez-vous ou inscrivez-vous en 30 secondes pour consulter tous les résultats de recherche sans aucune limitation.</p>
+        <ul class="fr-btns-group fr-btns-group--inline-md fr-btns-group--icon-left">
+            <li>
+                <a class="fr-btn fr-icon-lock-line" href="{{ path('app_login') }}">
+                    Se connecter
+                </a>
+            </li>
+            <li>
+                <a class="fr-btn fr-icon-account-line" href="#">
+                    S’inscrire
+                </a>
+            </li>
+        </ul>
+    </div>
+    {% endif %}
+{% endif %}

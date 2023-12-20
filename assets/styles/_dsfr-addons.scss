@@ -1,0 +1,385 @@
+p {
+    margin: 0 0 1.5rem;
+  }
+  
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    margin-top: 3rem;
+  }
+  
+  .fr-card__desc,
+  .fr-card__title,
+  .fr-alert__title,
+  .at-title--nomargin {
+    margin-top: 0;
+  }
+  
+  .at-centered {
+    text-align: center;
+  }
+  
+  .at-centered-important {
+    text-align: center !important;
+  }
+  
+  .at-left {
+    text-align: left;
+  }
+  
+  .at-clear {
+    clear: both;
+  }
+  
+  .at-align-end {
+    text-align: end;
+  }
+  
+  .at-text--bold {
+    font-weight: bold;
+  }
+  
+  .fr-text--normal {
+    font-weight: normal;
+  }
+  
+  .at-break-word {
+    word-break: break-all;
+  }
+  
+  .at-uppercase {
+    text-transform: uppercase;
+  }
+  
+  .fr-width-fix-100 {
+    width: 100%;
+  }
+  
+  .fr-width-100 {
+    max-width: 100%;
+  }
+  
+  .fr-height--auto {
+    height: auto !important;
+  }
+  
+  .fr-icon-xs {
+    width: 40px;
+    height: 25px;
+  }
+  
+  .at-color--blue {
+    color: var(--text-action-high-blue-france);
+  }
+  
+  // we override ri-xl class to remove line-height propertie that false the icon alignment
+  .ri-xl {
+    line-height: 1.5rem;
+  }
+  
+  .at-icon-align--sub {
+    vertical-align: sub;
+  }
+  
+  .fr-nav__btn[aria-expanded=true] {
+    position: relative;
+  
+    &::before {
+      content: "";
+      display: block;
+      position: absolute;
+      top: auto;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      margin-top: 0;
+      background-color: var(background-action-high-blue-france);
+    }
+  }
+  
+  .overflow--initial {
+    overflow: initial;
+  }
+  
+  .at-color--text-inverted-blue-france {
+    color: var(--text-inverted-blue-france);
+  }
+  
+  .background-blue {
+    background-color: var(--background-active-blue-france) !important;
+  }
+  
+  .at-background-alt-green {
+    background-color: var(--background-alt-green-menthe);
+  }
+  
+  .at-background-alt-grey {
+    background-color: var(--background-alt-grey);
+  }
+  
+  .fr-background-main {
+    background-color: var(--text-inverted-grey);
+  }
+  
+  .fr-background-alt {
+    background-color: var(--background-alt-blue-france);
+  }
+  
+  .fr-background-alt-pink {
+    background-color: var(--background-alt-pink-tuile);
+  }
+  
+  
+  .fr-footer-content__link {
+    font-weight: 700;
+    font-size: medium;
+  }
+  
+  .fr-footer__partners .fr-footer__logo {
+    height: 5.625rem;
+  }
+  
+  .at-link__nodecorator {
+    box-shadow: none;
+    background-image: none;
+  }
+  
+  .fr-list__none {
+    list-style: none;
+  }
+  
+  .fr-display__inline {
+    display: inline;
+  }
+  
+  .at-display__none {
+    display: none;
+  }
+  
+  .at-visibility__hidden {
+    visibility: hidden;
+  }
+  
+  .at-link-blank__none:after {
+    display: none;
+  }
+  
+  .column--space-between {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  
+  .at--space-between {
+    justify-content: space-between;
+  }
+  
+  .at-button-right {
+    margin-left: auto;
+    margin-right: 0;
+  }
+  
+  .at-box-shadow--none {
+    box-shadow: none;
+  }
+  
+  // Force certain classes on tables
+  .at-table--xl td,
+  .at-table--xl th {
+    font-size: 1rem;
+  }
+  
+  .at-table--fullwidth {
+    width: 100%;
+  }
+  
+  .at-table--fullwidth table {
+    display: table;
+  }
+  
+  .at-position--relative {
+    position: relative;
+  }
+  
+  .at-height--30 {
+    height: 30em;
+  }
+  
+  // Custom classes for tabs
+  
+  .at-tabs__panel--opaque {
+    background-color: var(--background-default-grey);
+  }
+  
+  // Used to make a header button look like a normal one 
+  .fr-header__tools-links .at-btn--primary {
+    --hover-tint: var(--hover);
+    --hover: var(--background-action-high-blue-france-hover);
+    --active: var(--background-action-high-blue-france-active);
+    background-color: var(--background-action-high-blue-france);
+    color: var(--text-inverted-blue-france);
+  }
+  
+  // error general rules
+  
+  .error.global-errors {
+    color: var(--text-default-error);
+    padding: 1rem;
+    border: solid 2px;
+  }
+  
+  .error.field-error {
+    color: var(--text-default-error);
+  }
+  
+  // Form general rules
+  
+  form .fr-input-group>ul>li,
+  form .fr-checkbox-group>ul>li,
+  form .fr-radio-group>ul>li {
+    list-style-type: none;
+  }
+  
+  // Fix spacing in checkboxes
+  .fr-checkbox-group ul {
+    margin-block-end: 0;
+    margin-block-start: 0;
+  }
+  
+  .fr-radio-group li,
+  .fr-checkbox-group li {
+    padding-bottom: 0;
+  }
+  
+  
+  // Responsive video iframe
+  
+  .at-responsive-video {
+    position: relative;
+    padding-bottom: 56.25%;
+    /* 16:9 */
+    height: 0;
+  
+    iframe {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+    }
+  }
+  
+  .at-youtube-video {
+    border: 0;
+  }
+  
+  // HEADER: Manage the light/dark schemes on the main logo
+  // Only display the light mode in case the "scheme" media query is not supported
+  .dark-mode {
+    display: none !important;
+  }
+  
+  .light-mode {
+    display: block !important;
+  }
+  
+  // Manage system scheme
+  :root[data-fr-scheme="system"] {
+    @media (prefers-color-scheme: dark) {
+      .dark-mode {
+        display: block !important;
+      }
+  
+      .light-mode {
+        display: none !important;
+      }
+    }
+  
+    @media (prefers-color-scheme: light) {
+      .dark-mode {
+        display: none !important;
+      }
+  
+      .light-mode {
+        display: block !important;
+      }
+    }
+  }
+  
+  // Manage actually selected scheme
+  :root[data-fr-scheme="dark"] {
+    .dark-mode {
+      display: block !important;
+    }
+  
+    .light-mode {
+      display: none !important;
+    }
+  }
+  
+  
+  :root[data-fr-scheme="light"] {
+    .dark-mode {
+      display: none !important;
+    }
+  
+    .light-mode {
+      display: block !important;
+    }
+  }
+
+
+  
+.fr-footer__bottom-item{
+  display: inline-block;
+  .fr-btn[aria-controls="fr-theme-modal"]{
+      padding: 1rem 0.5rem;
+  }
+}
+
+// Notifications
+.at-notification-icon {
+  margin-right: 1em;
+}
+
+.at-notification-icon-unread {
+  --hover-tint: var(--hover);
+  --hover: var(--background-action-high-red-marianne-hover);
+  background-color: var(--background-action-low-red-marianne);
+  color: var(--text-action-high-red-marianne);
+}
+
+// Remove the margin if the notification is empty
+.at-notification-icon-no-unread::before {
+  margin-right: 0 !important;
+}
+
+.at-bg-pic {
+  background: url("../images/home/home_aides.svg") bottom center no-repeat, linear-gradient(0deg, var(--background-default-grey) 10%, var(--background-alt-blue-france) 100%, var(--background-alt-grey) 100%) 0% 0%;
+  background-size: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.fr-collapse.fr-collapse--expanded {
+  max-height: none;
+}
+
+.fr-fieldset--inline{
+  margin-bottom: 0;
+  legend{
+    margin-bottom: 1rem;
+  }
+  .fr-fieldset__content{
+    .fr-input-group:not(:last-child) {
+      margin-right: 1.2rem;
+    }
+  }
+}
+
+.fr-label{
+  margin: 0 0 1rem 0;
+}

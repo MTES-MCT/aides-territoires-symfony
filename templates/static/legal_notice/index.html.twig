@@ -1,0 +1,94 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mentions légales | Aides-territoires
+{% endblock %}
+
+{% block body %}
+	<main role="main" class="fr-container-fluid" id="at-main">
+
+		<div id="main-content" class="main-content">
+
+
+			<article class="fr-container">
+				<div id="page-content" class="fr-grid-row fr-grid-row--center fr-mb-5w fr-pb-5w">
+					<div class="fr-col-md-8">
+						<h1>Mentions légales</h1>
+
+						<h2>Éditeurs</h2>
+
+						<p>Aides-territoires est édité par la Fabrique Numérique du Ministère de la Transition écologique et
+							                solidaire et du Ministère de la Cohésion des territoires et des Relations avec les collectivités
+							                territoriales
+							                (Grande Arche de la Défense, 92055 La Défense CEDEX), avec l’appui de
+							<a href="https://beta.gouv.fr/" target="_blank" rel="noopener" title="l’incubateur de services numériques beta.gouv.fr">
+								l’incubateur de services numériques beta.gouv.fr
+								<span class="fr-sr-only">Ouvre une nouvelle fenêtre</span>
+							</a>
+							de la direction interministérielle du numérique (DINUM).
+						</p>
+
+						<h2>Directeur de la publication</h2>
+
+						<div>
+							<address>
+								<ul class="fr-pl-0">
+									<li class="fr-list__none">Monsieur Philippe Mazenc,</li>
+									<li class="fr-list__none">Directeur général de l’aménagement, du logement et de la nature
+										                            (DGALN)</li>
+									<li class="fr-list__none">1, place Carpeaux, 92800 Puteaux</li>
+									<li class="fr-list__none">
+										<a href="tel:+33140819008" title="01.40.81.90.08">01.40.81.90.08</a>
+									</li>
+								</ul>
+							</address>
+						</div>
+
+						<h2>Hébergeur</h2>
+
+						<p>
+							Le site Aides-territoires (aides-territoires.beta.gouv.fr) est hébergé par la société Scalingo SAS,
+							                inscrite au RCS (Strasbourg B 808&nbsp;665&nbsp;483) et dont les serveurs se situent en France.
+						</p>
+
+						<ul class="fr-pl-0">
+							<li class="fr-list__none">SIREN&nbsp;: 808665483</li>
+							<li class="fr-list__none">Siège social&nbsp;:15 avenue du Rhin, 67100 Strasbourg, France.</li>
+						</ul>
+
+
+						<h2>Accessibilité</h2>
+
+						<p>Voir la page
+							<a href="{{ path('app_static_accessibility') }}" title="Déclaration d’accessibilité">Déclaration d’accessibilité</a>.</p>
+
+						<h2>Signaler un dysfonctionnement</h2>
+
+						<div>
+							<p>Si vous rencontrez un défaut d’accessibilité vous empêchant d’accéder à un contenu ou une
+								                    fonctionnalité du site, merci de nous en faire part.
+								                    Si vous n’obtenez pas de réponse rapide de notre part, vous êtes en droit de faire parvenir vos
+								                    doléances ou une demande de saisine au Défenseur des droits.
+							</p>
+						</div>
+
+						<h2>Politique de confidentialité
+						</h2>
+
+						<p>Voir la page
+							<a href="{{ path('app_static_privacy_policy') }}" title="Politique de confidentialité">Politique de confidentialité</a>.</p>
+
+						<h2>Conditions générales d’utilisation
+						</h2>
+
+						<p>Voir la page
+							<a href="{{ path('app_static_terms') }}" title="Conditions générales d’utilisation">Conditions générales d’utilisation</a>.</p>
+
+
+					</div>
+				</div>
+			</article>
+
+		</div>
+
+	</main>
+{% endblock %}

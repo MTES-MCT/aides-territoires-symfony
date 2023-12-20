@@ -1,0 +1,17 @@
+<p>Bonjour,</p>
+
+<p>Vous avez demandé à réinitialiser votre mot de passe sur le site Aides-territoires.</p>
+
+<p>Retrouvez les accès à votre compte en cliquant sur le lien suivant :</p>
+
+<p><a href="{{ url('app_reset_password', {token: resetToken.token}) }}">{{ url('app_reset_password', {token: resetToken.token}) }}</a></p>
+
+<p>Ce lien expirera dans {{ resetToken.expirationMessageKey|trans(resetToken.expirationMessageData, 'ResetPasswordBundle') }}.</p>
+
+<p>Si vous n’êtes pas à l’initiative de cette demande, vous n’avez rien à faire.</p>
+
+<p>
+À bientôt,
+<br />
+L’équipe d’Aides-territoires.
+</p>

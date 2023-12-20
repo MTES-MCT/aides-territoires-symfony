@@ -1,0 +1,62 @@
+{% extends 'base.html.twig' %}
+
+{% block javascripts %}
+	{{ parent() }}
+    {% cspscript %}
+	<script type="text/javascript">
+	let departments_data = {{ departmentsData|json_encode|raw }};
+	</script>
+    {% endcspscript %}
+	{{ encore_entry_script_tags('form/checkbox-multiple-search') }}
+    {{ encore_entry_script_tags('front/cartography/cartography') }}
+{% endblock %}
+
+{% block title %}Cartographie des porteurs d’aides partenaires de la démarche Aides-territoires | Aides-territoires{% endblock %}
+
+{% block body %}
+ <article id="map-page" class="fr-container">
+    <h1>Cartographie des porteurs d’aides partenaires de la démarche Aides-territoires</h1>
+    <p class="fr-text--lead">
+        Sélectionnez un département pour avoir tout le détail des aides financières et en ingénierie par porteur
+    </p>
+    <div class="fr-grid-row fr-grid-row--gutters fr-grid-row--middle">
+        <div class="fr-col-12 fr-col-lg-7" role="presentation">
+            <div id="france-map" class="fr-mt-4w fr-mb-4w">
+                {% include "perimeter/_france_departments.svg" %}
+            </div>
+            <div id="tooltip"></div>
+        </div>
+         <div class="fr-col-lg-5 fr-mb-10w">
+            <div class="fr-grid-row fr-grid-row--gutters ">
+                <div class="fr-col-12 fr-col-md-6 fr-col-lg-6 ">
+                    <div class="fr-card fr-card--no-arrow">
+                        <div class="fr-card__body fr-pb-0">
+                            <h3 class="fr-card__title">{{ nbPrograms }} programmes</h3>
+                            <p class="fr-card__desc fr-text--sm fr-mb-3w">
+                                    locaux, nationaux, et européens
+                            </p>
+                        </div>
+                    </div>
+                 </div>
+                <div class="fr-col-12 fr-col-md-6 fr-col-lg-6 ">
+                    <div class="fr-card fr-card--no-arrow">
+                        <div class="fr-card__body fr-pb-0">
+                            <h3 class="fr-card__title">{{ nbBackers }} porteurs</h3>
+                            <p class="fr-card__desc fr-text--sm fr-mb-3w">
+                                Des partenaires toujours plus nombreux nous font confiance pour publier leurs aides
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="fr-grid-row fr-grid-row--gutters ">
+                <div class="fr-col-12">
+                    {{ form_start(formCounties) }}
+                    {{ form_row(formCounties.county) }}
+                    {{ form_end(formCounties) }}
+                </div>
+            </div>
+        </div>
+    </div>
+</article>
+{% endblock %}

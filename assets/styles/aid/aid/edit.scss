@@ -1,0 +1,48 @@
+@import 'trumbowyg/dist/ui/trumbowyg.min.css';
+@import '../../_variables';
+@import '../../_mixins';
+@import '../../form/tom-select-override';
+@import '../../form/trumbowyg-override';
+@import '../../form/category-autocomplete-multiple';
+@import '../../form/entity-checkbox-absolute-type';
+@import '../../form/input-length-counter';
+@import '../../form/label';
+@import '../../form/legend';
+
+.at-field-label{
+    font-weight: bold;
+}
+
+section#aid-edit #nav-form {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+#subvention-fields-collapse,
+#loan-fields-collapse,
+#recoverable-advance-fields-collapse,
+#other-financial-aid-fields-collapse,
+#calendar-fields{
+    &.fr-collapse--expanded{
+        margin: 0 0 1rem 0;
+    }
+}
+
+.at-form-stepper {
+    display: block;
+    position: sticky;
+    top: 0;
+    z-index: 12;
+    background-color: var(--background-alt-blue-france);
+
+    @include is-mobile{
+        display: none;
+    }
+}
+
+.actions {
+    border: solid 1px var(--border-action-high-blue-france);
+}

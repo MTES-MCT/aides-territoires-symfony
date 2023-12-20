@@ -1,0 +1,133 @@
+<?php
+
+namespace App\Controller;
+
+use App\Entity\User\UserRegisterConfirmation;
+use App\Form\Security\LoginType;
+use App\Repository\User\UserRegisterConfirmationRepository;
+use Doctrine\Persistence\ManagerRegistry;
+use Scheb\TwoFactorBundle\Security\TwoFactor\Provider\Totp\TotpAuthenticator;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
+
+#[Route(priority:1)]
+class SecurityController extends FrontController
+{
+    #[Route(path: '/comptes/connexion/', name: 'app_login')]
+    public function login(AuthenticationUtils $authenticationUtils): Response
+    {
+        // si déjà connecté
+        if ($this->getUser()) {
+            return $this->redirectToRoute('app_user_dashboard');
+        }
+
+        // get the login error if there is one
+        $error = $authenticationUtils->getLastAuthenticationError();
+
+        // last username entered by the user
+        $lastUsername = $authenticationUtils->getLastUsername();
+
+        $formLogin = $this->createForm(LoginType::class);
+        if ($lastUsername) {
+            $formLogin->get('_username')->setData($lastUsername);
+        }
+
+        return $this->render('security/login.html.twig', [
+            'formLogin' => $formLogin->createView(),
+            'error' => $error
+        ]);
+    }
+
+    #[Route('/comptes/connexion/{token}', name: 'app_user_user_register_confirmation')]
+    public function registerConfirmation(
+        $token,
+        UserRegisterConfirmationRepository $userRegisterConfirmationRepository,
+        ManagerRegistry $managerRegistry,
+        Security $security
+    ): Response
+    {
+        // check token
+        $userRegisterConfirmation = $userRegisterConfirmationRepository->findOneBy(
+            [
+                'token' => $token
+            ]
+        );
+        if (!$userRegisterConfirmation) {
+            throw $this->createNotFoundException('Ce lien n\'existe pas');
+        }
+
+        // le lien n'as pas été utilisé
+        if (!$userRegisterConfirmation->getTimeUse()) {
+            // enregistre l'utilisation
+            $userRegisterConfirmation->setTimeUse(new \DateTime(date('Y-m-d H:i:s')));
+            $managerRegistry->getManager()->persist($userRegisterConfirmation);
+            $managerRegistry->getManager()->flush();
+
+            // log le user
+            if ($userRegisterConfirmation->getUser()) {
+                $flashMessage = $userRegisterConfirmation->getUser()->getTimeLastLogin()
+                                ? 'Vous êtes maintenant connecté. Bienvenue ! Pourriez-vous prendre quelques secondes pour mettre à jour votre profil ?'
+                                : 'Vous êtes maintenant connecté. Bienvenue !'
+                                ;
+                $security->login($userRegisterConfirmation->getUser(), 'form_login', 'main');
+                // message success
+                $this->tAddFlash(
+                    FrontController::FLASH_SUCCESS,
+                    $flashMessage
+                );
+
+                // redirection
+                return $this->redirectToRoute('app_user_dashboard');
+            }
+        }
+        
+        // le lien a déjà été utilisé, on affiche une erreur
+        return $this->render('security/register-confirmation.html.twig', [
+
+        ]);
+    }
+
+    #[Route(path: '/admin/connexion/', name: 'app_login_admin')]
+    public function loginAdmin(AuthenticationUtils $authenticationUtils): Response
+    {
+        // si déjà connecté
+        if ($this->getUser()) {
+            return $this->redirectToRoute('app_user_dashboard');
+        }
+
+        // get the login error if there is one
+        $error = $authenticationUtils->getLastAuthenticationError();
+
+        // last username entered by the user
+        $lastUsername = $authenticationUtils->getLastUsername();
+
+        $formLogin = $this->createForm(LoginType::class);
+        if ($lastUsername) {
+            $formLogin->get('_username')->setData($lastUsername);
+        }
+
+        return $this->render('security/login.html.twig', [
+            'formLogin' => $formLogin->createView(),
+            'error' => $error,
+            'loginAdmin' => true
+        ]);
+    }
+
+
+    // Url pour la connexion à l'API
+    #[Route(path: '/api/connexion/', name: 'app_login_api')]
+    public function loginApi(AuthenticationUtils $authenticationUtils): void
+    {
+        // le code reste vide, c'est le firewall qui intercepte la requête
+        // mais l'existence de la route reste nécessaire
+    }
+
+    #[Route(path: '/logout', name: 'app_logout')]
+    public function logout(): void
+    {
+        throw new \LogicException('This method can be blank - it will be intercepted by the logout key on your firewall.');
+    }
+}

@@ -1,0 +1,49 @@
+{% extends 'base.html.twig' %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    {{ encore_entry_link_tags('import-scss/reference/projets_subventionnes') }}
+{% endblock %}
+
+{% block javascripts %}
+	{{ parent() }}
+
+	{{ encore_entry_script_tags('front/reference/projets_subventionnes') }}
+    
+    {% cspscript %}
+    <script>
+    let commune_search='{{commune_search}}';
+    </script>
+    {% endcspscript %}
+{% endblock %}
+
+{% block title %}Projets | Aides-territoires{% endblock %}
+
+{% block body %}
+    {% include 'reference/_form_project_reference.html.twig' %}
+
+    <div class="fr-container fr-mb-5w fr-mt-0">
+        <div class="fr-grid-row">
+
+            <div class="fr-col-12 fr-col-md-12">
+                <div class="fr-tabs fr-mt-0w fr-mb-5w">
+                    {% include "reference/_menu_project.html.twig" with { projects_publics: true } %}
+
+                    <div id="tabpanel_projects_publics"  class="fr-tabs__panel" role="tabpanel" aria-labelledby="tabpanel_projects_publics" tabindex="2">
+
+                    <div id="projects-list">
+                        {% if projectsPublics|length > 0 %}
+                        {% include "project/project/_projects_publics_as_list.html.twig" with { projects: projectsPublics} %}
+                        {% else %}
+                        <div class="fr-mb-5w">
+                            <div class="fr-alert fr-alert--info fr-alert--sm">
+                                <p>Nous n’avons pu trouver aucun résultat.</p>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div> 
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

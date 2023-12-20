@@ -1,0 +1,54 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Statistiques publiques | Aides-territoires
+{% endblock %}
+
+{% block body %}
+	<main role="main" class="fr-container-fluid" id="at-main">
+
+		<div id="main-content" class="main-content">
+
+			<section id="stats" class="fr-container">
+				<h1>Statistiques publiques</h1>
+
+				<div class="fr-grid-row fr-grid-row--center fr-mb-5w">
+
+					<div class="fr-card fr-card--no-arrow at-centered fr-col-12 fr-col-md-5 fr-m-3w">
+						<div class="fr-card__body">
+							<h2 class="fr-card__title">Aides disponibles</h2>
+							<p class="fr-mb-0 fr-xs">Aides publiées et toujours ouvertes aux candidatures</p>
+							<p class="fr-card__desc fr-h1">{{ nbAids|number_format(0, ',', ' ') }}</p>
+						</div>
+					</div>
+
+					<div class="fr-card fr-card--no-arrow at-centered fr-col-12 fr-col-md-5 fr-m-3w">
+						<div class="fr-card__body">
+							<h2 class="fr-card__title">Alertes envoyées</h2>
+							<p class="fr-mb-0 fr-xs">E-mails d’alertes «&nbsp;nouvelles aides&nbsp;»</p>
+							<p class="fr-card__desc fr-h1">{{ nbAlerts|number_format(0, ',', ' ') }}</p>
+						</div>
+					</div>
+
+					<div class="fr-card fr-card--no-arrow at-centered fr-col-12 fr-col-md-5 fr-m-3w">
+						<div class="fr-card__body">
+							<h2 class="fr-card__title">Aides vues</h2>
+							<p class="fr-mb-0 fr-xs">Aides vues sur les 7 derniers jours</p>
+							<p class="fr-card__desc fr-h1">{{ nbAidViews|number_format(0, ',', ' ') }}</p>
+						</div>
+					</div>
+
+					<div class="fr-card fr-card--no-arrow at-centered fr-col-12 fr-col-md-5 fr-m-3w">
+						<div class="fr-card__body">
+							<h2 class="fr-card__title">Porteurs d’aides</h2>
+							<p class="fr-mb-0 fr-xs">Organisations diffusant au moins une aide financière ou en ingénierie</p>
+							<p class="fr-card__desc fr-h1">{{ nbBackers|number_format(0, ',', ' ') }}</p>
+						</div>
+					</div>
+
+				</div>
+			</section>
+
+		</div>
+
+	</main>
+{% endblock %}

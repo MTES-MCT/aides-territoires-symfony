@@ -1,0 +1,191 @@
+<?php
+
+namespace App\Entity\Aid;
+
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\GetCollection;
+use App\Repository\Aid\AidTypeRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
+use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Mapping\Annotation as Gedmo;
+use Symfony\Component\Serializer\Annotation\Groups;
+use ApiPlatform\OpenApi\Model;
+use App\Controller\Api\Aid\AidTypeController;
+
+#[ApiResource(
+    shortName: 'Aid',
+    operations: [
+        new GetCollection(
+            uriTemplate: '/aids/types/',
+            controller: AidTypeController::class,
+            openapi: new Model\Operation(
+                summary: self::API_DESCRIPTION, 
+                description: self::API_DESCRIPTION,
+            ),
+        ),
+    ],
+)]
+#[ORM\Entity(repositoryClass: AidTypeRepository::class)]
+class AidType
+{
+    const API_GROUP_LIST = 'aid_type:list';
+    const API_DESCRIPTION = 'Lister tous les choix de types d\'aides';
+
+    const TYPE_FINANCIAL_SLUGS = ['grant', 'loan', 'recoverable-advance', 'other', 'cee'];
+    CONST TYPE_TECHNICAL_SLUG = ['technical-engineering', 'financial-engineering', 'legal-engineering'];
+    
+    const SLUG_GRANT = 'grant';
+    const SLUG_LOAN = 'loan';
+    const SLUG_RECOVERABLE_ADVANCE = 'recoverable-advance';
+    const SLUG_CEE = 'cee';
+    const SLUG_OTHER = 'other';
+    
+    const SLUG_TECHNICAL_ENGINEERING = 'technical-engineering';
+    const SLUG_FINANCIAL_ENGINEERING = 'financial-engineering';
+    const SLUG_LEGAL_ENGINEERING = 'legal-engineering';
+
+
+
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column]
+    private ?int $id = null;
+
+    #[Groups([Aid::API_GROUP_LIST, Aid::API_GROUP_ITEM, self::API_GROUP_LIST])]
+    #[ORM\Column(length: 255)]
+    private ?string $name = null;
+
+    #[ORM\Column(length: 255)]
+    #[Gedmo\Slug(fields: ['name'], updatable: false)]
+    private ?string $slug = null;
+
+    #[ORM\Column]
+    // #[Gedmo\SortablePosition]
+    private ?int $position = null;
+
+    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[Gedmo\Timestampable(on: 'create')]
+    private ?\DateTimeInterface $timeCreate = null;
+
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
+    #[Gedmo\Timestampable(on: 'update')]
+    private ?\DateTimeInterface $timeUpdate = null;
+
+    #[Groups([Aid::API_GROUP_LIST, Aid::API_GROUP_ITEM, self::API_GROUP_LIST])]
+    #[ORM\ManyToOne(inversedBy: 'aidTypes')]
+    private ?AidTypeGroup $aidTypeGroup = null;
+
+    #[ORM\ManyToMany(targetEntity: Aid::class, mappedBy: 'aidTypes')]
+    private Collection $aids;
+
+    public function __construct()
+    {
+        $this->aids = new ArrayCollection();
+    }
+
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
+
+    public function getName(): ?string
+    {
+        return $this->name;
+    }
+
+    public function setName(string $name): static
+    {
+        $this->name = $name;
+
+        return $this;
+    }
+
+    public function getSlug(): ?string
+    {
+        return $this->slug;
+    }
+
+    public function setSlug(string $slug): static
+    {
+        $this->slug = $slug;
+
+        return $this;
+    }
+
+    public function getPosition(): ?int
+    {
+        return $this->position;
+    }
+
+    public function setPosition(int $position): static
+    {
+        $this->position = $position;
+
+        return $this;
+    }
+
+    public function getTimeCreate(): ?\DateTimeInterface
+    {
+        return $this->timeCreate;
+    }
+
+    public function setTimeCreate(\DateTimeInterface $timeCreate): static
+    {
+        $this->timeCreate = $timeCreate;
+
+        return $this;
+    }
+
+    public function getTimeUpdate(): ?\DateTimeInterface
+    {
+        return $this->timeUpdate;
+    }
+
+    public function setTimeUpdate(?\DateTimeInterface $timeUpdate): static
+    {
+        $this->timeUpdate = $timeUpdate;
+
+        return $this;
+    }
+
+    public function getAidTypeGroup(): ?AidTypeGroup
+    {
+        return $this->aidTypeGroup;
+    }
+
+    public function setAidTypeGroup(?AidTypeGroup $aidTypeGroup): static
+    {
+        $this->aidTypeGroup = $aidTypeGroup;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Aid>
+     */
+    public function getAids(): Collection
+    {
+        return $this->aids;
+    }
+
+    public function addAid(Aid $aid): static
+    {
+        if (!$this->aids->contains($aid)) {
+            $this->aids->add($aid);
+            $aid->addAidType($this);
+        }
+
+        return $this;
+    }
+
+    public function removeAid(Aid $aid): static
+    {
+        if ($this->aids->removeElement($aid)) {
+            $aid->removeAidType($this);
+        }
+
+        return $this;
+    }
+}

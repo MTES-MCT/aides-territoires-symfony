@@ -1,0 +1,13 @@
+.search-meta{
+    .fr-tags-group.categories{
+        display: flex;
+        flex-direction: column;
+        .theme{
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            --ul-type: disc;
+            --ul-start: 20px;
+        }
+    }
+}

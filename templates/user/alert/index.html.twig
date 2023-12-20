@@ -1,0 +1,109 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mes alertes | {{ parent() }}{% endblock %}
+
+{% block body %}
+
+<div class="fr-container fr-mb-5w fr-mt-0">
+    <div class="fr-grid-row">
+
+        {% include "user/_menu_user.html.twig" with { alert_list:true } %}
+
+        <div class="fr-col-12 fr-col-md-9">
+            <h1 class="fr-h3 fr-mb-5w">Gestion des alertes et souscriptions
+                <button class="fr-m-1w fr-tag _fr-tag--md fr-text--sd fr-icon-information-line _fr-tag--icon-left" id="help-alert-modal-btn"
+                    data-fr-opened="false" aria-controls="help-alert-modal">
+                    <span class="fr-ml-1w">Aide</span>
+                </button>
+            </h1>
+
+            <div class="fr-mb-5w">
+                <h2 class="fr-h4">Newsletter</h2>
+                {% if app.user.mlConsent %}
+                <p>Vous êtes abonné(e) à la newsletter.</p>
+                <a href="{{ path('app_user_alert_newsletter_unsubscribe') }}" class="fr-btn fr-mb-5w">
+                    Se désabonner
+                </a>
+                {% else %}
+                <div class="fr-grid-row fr-grid-row--middle">
+                    <div class="fr-col-12 fr-col-md-2 fr-col-lg-2">
+                        <a class="fr-btn fr-mb-1w" href="{{ path('app_user_alert_newsletter_subscribe') }}"
+                            title="S’abonner à notre newsletter">
+                            S’abonner
+                        </a>
+                    </div>
+                    <div class="fr-col-12 fr-col-md-6 fr-col-lg-6">
+                        <p id="fr-newsletter-hint-text" class="fr-hint-text">En vous abonnant, vous acceptez de recevoir
+                            nos actualités par courriel. Vous pouvez vous désinscrire à tout moment à l’aide des liens
+                            de désinscription ou en nous contactant.</p>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+
+            <h2 class="fr-h4">Mes alertes</h2>
+            <p>Retrouvez ici toutes les alertes auxquelles vous vous êtes abonné.</p>
+            {% if alerts|length > 0 %}
+                <div class="fr-table fr-table--bordered">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th scope="col">Nom</th>
+                                <th scope="col">Fréquence</th>
+                                <th scope="col">Date création</th>
+                                <th scope="col">Dernière réception</th>
+                                <th scope="col">Action</th>
+                            </tr>
+                        </thead>
+                        {% for alert in alerts %}
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <a href="{{ path('app_aid_aid') }}?{{ alert.querystring }}" target="_blank" rel="noopener" id="alert-{{ alert.id }}">
+                                        {{ alert.title }} 
+                                        <span class="fr-sr-only">Ouvre une nouvelle fenêtre</span>
+                                    </a>
+                                </td>
+                                <td>{{ alert.alertFrequency|alertFrequencyDisplay }}</td>
+                                <td>{{ alert.timeCreate|date('d/m/y') }}</td>
+                                <td>
+                                    {% if alert.timeLatestAlert %}
+                                    {{ alert.timeLatestAlert|date('d/m/y') }}
+                                    {% else %}
+                                    Non envoyée
+                                    {% endif %}
+                                </td>
+                                <td class="fr-text">
+                                    <button type="button"
+                                            class="fr-btn fr-icon-delete-line fr-btn--tertiary fr-btn--tertiary-no-outline at-box-shadow--none"
+                                            id="delete-alert-btn-{{ alert.id }}"
+                                            data-fr-opened="false"
+                                            title="Supprimer cette alerte"
+                                            aria-controls="delete-alert-modal-{{ alert.id }}"
+                                            aria-describedby="alert-{{ alert.id }}"
+                                    >
+                                        Supprimer ce projet
+                                    </button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <p>Vous n’avez aucune alerte pour l’instant/p>
+            {% endif %}
+
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block modal %}
+    {% if alerts is defined %}
+        {% for alert in alerts %}
+            {% include 'user/alert/_delete_alert_modal.html.twig' with {alerT: alert } %}
+        {% endfor %}
+    {% endif %}
+    {% include 'user/alert/_info_alert_modal.html.twig' %}
+{% endblock %}

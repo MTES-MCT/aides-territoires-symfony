@@ -1,0 +1,75 @@
+{% if aids %}
+<div class="fr-table {% if forceDisplayAidAsList is not defined %}at-display__none{% endif %}" id="aids-as-list">
+    <table>
+        <caption class="fr-sr-only">Liste des aides</caption>
+        <thead>
+            <tr>
+                <th scope="col">Nom</th>
+                <th scope="col">Porteurs</th>
+                <th scope="col">Périmètre</th>
+                <th scope="col">Subvention</th>
+                <th scope="col">Prêt</th>
+                <th scope="col">Ingénierie</th>
+                <th scope="col">Echéance</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for aid in aids %}
+            {% set aidUrlParams = {'slug': aid.slug} %}
+            {% if integration is defined %}
+                {% set aidUrlParams = aidUrlParams|merge({'integration': 'integration'}) %}
+            {% endif %}
+            <tr>
+                <td>
+                    <a href="{{ path('app_aid_aid_details', {'slug': aid.slug}) }}{% if integration is defined %}?integration=integration{% endif %}">
+                    {{ aid.name }}
+                    </a>
+                </td>
+                <td>
+                    {% if aid.aidFinancers %}
+                    <ul>
+                    {% for aidfinancer in aid.aidFinancers %}
+                    <li>
+                        {{ aidfinancer.backer.name }}                        
+                    </li>
+                    {% endfor %}
+                    </ul>
+                {% endif %}
+                </td>
+                <td>
+                    {{ aid.perimeter.name|u.truncate(40, '...') }}
+                </td>
+                <td>
+                    {% if aid.isGrant %}
+                    <p class="at-centered fr-mb-0">
+                        <p class="fr-badge fr-badge--success">Oui</p>
+                    </p>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if aid.isLoan %}
+                    <p class="at-centered fr-mb-0">
+                        <p class="fr-badge fr-badge--success">Oui</p>
+                    </p>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if aid.isTechnical %}
+                    <p class="at-centered fr-mb-0">
+                        <p class="fr-badge fr-badge--success">Oui</p>
+                    </p>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if aid.hasCalendar %}
+                        {% if aid.dateSubmissionDeadline %}
+                            {{ aid.dateSubmissionDeadline|date('d/m/y') }}
+                        {% endif %}
+                    {% endif %}
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endif %}

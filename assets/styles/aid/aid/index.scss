@@ -1,0 +1,17 @@
+@import 'remixicon/fonts/remixicon.css';
+@import '../../_variables';
+@import '../../_mixins';
+@import '../../form/tom-select-override';
+@import '../../form/entity-checkbox-absolute-type';
+@import '../../form/label';
+@import '../../component/at-deadline.scss';
+@import '_aid_metas';
+
+#search-form-extra-fields{
+    width: 100%;
+    display: none;
+
+    &.show{
+        display: block;
+    }
+}

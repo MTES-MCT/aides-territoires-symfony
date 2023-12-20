@@ -1,0 +1,95 @@
+{% extends 'base.html.twig' %}
+
+
+{% block title %}{{ search_page.metaTitle|default(search_page.name) }}{% endblock %}
+
+{% block meta_description %}Les aides du programme {{search_page.metaDescription}}{% endblock %}
+
+{% block stylesheets %}
+	{{ parent() }}
+	{{ encore_entry_link_tags('import-scss/aid/aid/index') }}
+{% endblock %}
+
+{% block javascripts %}
+	{{ parent() }}
+    {{ encore_entry_script_tags('form/entity-checkbox-absolute-type') }}
+    {{ encore_entry_script_tags('front/aid/aid/index') }}
+{% endblock %}
+
+{% block body %}
+<article class="fr-container fr-mb-5w fr-background-main fr-pb-5w fr-grid-row fr-grid-row--center">
+    <div class="fr-col-12 fr-col-md-12">
+
+        <div id="searchpage-title">
+            <div class="fr-grid-row fr-grid-row--middle fr-mb-5w">
+                <div class="fr-col-12 fr-col-md-9">
+                    <h1>{{ search_page.name }}</h1>
+                </div>
+                {% if search_page.logo %}
+                <div class="fr-col-12 fr-col-md-3">
+                    <img src="{{ getParameter('cloud_image_url') }}{{ search_page.logo }}" class="fr-responsive-img" alt="{{ search_page.name }}">
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="fr-tabs">
+            <ul class="fr-tabs__list" role="tablist" aria-label="Onglets du portail">
+                <li role="presentation">
+                    <button id="tabpanel-home" class="fr-tabs__tab" tabindex="0" role="tab" aria-selected="true" aria-controls="tabpanel-home-panel">Présentation</button>
+                </li>
+                {% for page in search_page.pages %}
+                    <li role="presentation">
+                        <button id="tabpanel-{{ page.name|mySlug }}" class="fr-tabs__tab" tabindex="-1" role="tab" aria-selected="false" aria-controls="tabpanel-{{ page.name|mySlug }}-panel">{{ page.name }}</button>
+                    </li>
+                {% endfor %}
+            </ul>
+            <div id="tabpanel-home-panel" class="fr-tabs__panel fr-tabs__panel--selected" role="tabpanel" aria-labelledby="tabpanel-home" tabindex="0">
+                {{ search_page.description|raw }}
+                {% if search_page.moreContent %}
+                <section class="fr-accordion fr-mb-5w">
+                    <h3 class="fr-accordion__title">
+                        <button id="more-content-reveal-button" class="fr-accordion__btn" aria-expanded="false" aria-controls="more-content">Voir plus de détails</button>
+                    </h3>
+                    <div id="more-content" class="fr-collapse">
+                    {{ search_page.moreContent|raw }}
+                    </div>
+                </section>
+                {% endif %}
+                <section id="aid-list">
+                    <h2>{{ myPager.getNbResults }} résultat{% if myPager.nbResults > 1 %}s{% endif %}</h2>
+                    {% include 'aid/aid/_search_meta.html.twig' %}
+                    {% include "aid/aid/_search_form.html.twig" %}
+
+                    {% include 'aid/aid/_aid_result_as_list.html.twig' with {'aids': myPager.currentPageResults} %}
+
+                    <div class="fr-grid-row" id="aids-as-card">
+                    {% for aid in myPager.currentPageResults %}
+                        <div class="fr-col-xs-12 fr-col-md-4 fr-p-3w">
+                            {% include 'aid/aid/_aid_result.html.twig' %}
+                        </div>
+                    {% endfor %}
+                    </div>
+
+                    {% if myPager.nbPages > 1 %}
+                    <div class="fr-container fr-grid-row fr-grid-row--center fr-my-5w">
+                        {{ pagerfanta(myPager) }}
+                    </div>
+                    {% endif %}
+                </section>
+            </div>
+            {% for page in search_page.pages %}
+                <div id="tabpanel-{{ page.name|mySlug }}-panel" class="fr-tabs__panel" role="tabpanel" aria-labelledby="tabpanel-{{ page.name|mySlug}}" tabindex="0">
+                    <div>
+                        {{ page.description|raw }}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</article>
+{% endblock %}
+
+{% block modal %}
+    {% include 'aid/aid/_alert_modal.html.twig' with {'form': formAlertCreate} %}
+{% endblock %}

@@ -1,0 +1,68 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mes invitations | {{ parent() }}{% endblock %}
+
+{% block body %}
+<div class="fr-container fr-mb-5w fr-mt-0">
+    <div class="fr-grid-row">
+
+        {% include "user/_menu_user.html.twig" with { structure:true, structure_invitations:true } %}
+        <div class="fr-col-12 fr-col-md-9">
+            <h1 class="fr-h3 fr-col">
+                Mes invitations
+            </h1>
+
+
+            <div class="fr-table">
+                <table class="data-table">
+                    <caption>
+                        Liste de vos invitations reçues
+                    </caption>
+                    <thead>
+                        <tr>
+                            <th scope="col">Structure</th>
+                            <th scope="col">Invitée par</th>
+                            <th scope="col">Etat</th>
+                        </tr>
+                    </thead>
+                    {% if organizationInvitations %}
+                    <tbody>
+                        {% for organizationInvitation in organizationInvitations %}
+                        <tr>
+                            <td>
+                                {% if organizationInvitation.organization %}{{ organizationInvitation.organization.name }}{% endif %}
+                            </td>
+                            <td>
+                                {% if organizationInvitation.author %}
+                                    {{ organizationInvitation.author.email }}
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if organizationInvitation.timeAccept %}
+                                    Accepté le {{ organizationInvitation.timeAccept|date('d/m/y') }}
+                                {% elseif organizationInvitation.timeRefuse %}
+                                    Refusé le {{ organizationInvitation.timeRefuse|date('d/m/y') }}
+                                {% else %}
+                                    <a href="{{ path('app_organization_invitations_accept', {'id': organizationInvitation.id}) }}" title="Accepter">Accepter</a> | <a href="{{ path('app_organization_invitations_refuse', {'id': organizationInvitation.id}) }}" title="Refuser">Refuser</a>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                    {% else %}
+                    <tbody>
+                        <tr>
+                            <td colspan="3" class="at-centered-important">
+                                Vous n’avez aucune invitation pour le moment
+                            </td>
+                        </tr>
+                    </tbody>
+                    {% endif %}
+                </table>
+            </div>
+
+        </div>
+        
+    </div>
+</div>
+{% endblock %}

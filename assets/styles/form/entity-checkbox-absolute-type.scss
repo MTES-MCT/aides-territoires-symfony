@@ -1,0 +1,57 @@
+@import '../_variables';
+@import '../_mixins';
+
+.entity-checkbox-absolute-type-wrapper{
+    position: relative;
+    .opener{
+        @include fr-input;
+        @include fr-background-opener;
+        cursor: pointer;
+        min-height: 48px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        padding: 0.5rem 2rem 0.5rem 1rem;
+        margin: 0.5rem 0 0 0;
+    }
+    .checkboxes-wrapper{
+        display: none;
+        position: absolute;
+        z-index: 2;
+        width: 100%;
+        min-width: 266px;
+        max-height: 300px;
+        overflow-y: auto;
+
+        left: 0;
+        top: 100%;
+        color: var(--text-title-grey);
+        background-color: var(--background-contrast-grey);
+        border-bottom: none;
+        border-bottom-left-radius: 0;
+        border-bottom-right-radius: 0;
+
+        border: 1px solid #aaa;
+        border-top-width: 1px;
+        border-top-style: solid;
+        border-top-color: rgb(170, 170, 170);
+        border-radius: 4px;
+        border-top-left-radius: 4px;
+        border-top-right-radius: 4px;
+
+        .filter{
+            input{
+                background: white;
+            }
+        }
+
+        .fr-fieldset__element{
+            padding: 6px;
+            margin: 0;
+        }
+
+        .fr-fieldset__element[aria-selected="true"] {
+            background-color: var(--background-alt-grey-hover);
+        }
+    }
+}

@@ -1,0 +1,116 @@
+{% set aidUrlParams = {'slug': aid.slug} %}
+{% if integration is defined %}
+    {% set aidUrlParams = aidUrlParams|merge({'integration': 'integration'}) %}
+{% endif %}
+
+<div class="fr-card fr-enlarge-link  fr-card--grey">
+    <div class="fr-card__body">
+        <div class="fr-card__content">
+            <h2 class="fr-card__title fr-mb-1w">
+                {% if aid.isApproachingDeadline %}
+                    <span class="deadline deadline-delta fr-tag">J-{{ aid.daysBeforeDeadline }}</span>
+                {% endif %}
+
+                {% if aid.perimeter.code == "PVD" %}
+                    <span class="deadline deadline-delta fr-tag"><span class="fr-icon-flashlight-line fr-icon--sm" aria-hidden="true"></span>Spécifique PVD</span>
+                {% endif %}
+
+                <a class="fr-card__link" href="{{ path('app_aid_aid_details', aidUrlParams) }}" title="Voir l'aide">
+                    {% if aid.europeanAid %}<span title="aide européenne" aria-hidden="true">🇪🇺 </span>{% endif %}{{ aid.name }}
+                </a>
+            </h2>
+            <div class="fr-card__desc">
+                {% if aid.isIsCharged %}
+                <span class="fr-tag at-color--text-inverted-blue-france background-blue"><span class="ri-error-warning-line ri-xl at-icon-align--sub fr-mr-1w" aria-hidden="true"></span><strong>Aide payante</strong></span>
+                {% endif %}
+
+                {% if aid.aidFinancers %}
+                    <h3 class="fr-mb-1w fr-mt-3w fr-text--lg at-text--bold at-uppercase">
+                        <span class="ri-hand-coin-line ri-xl at-color--blue at-icon-align--sub fr-mr-1w" aria-hidden="true"></span>
+                        Porteur{% if aid.aidFinancers|length > 1 %}s{% endif %} d’aides
+                    </h3>
+                    <ul class="financers fr-p-0">
+                    {% for financer in aid.aidFinancers %}
+                        <li class="fr-list__none">
+                            {{ financer.backer.name }}
+                            {% if financer.backer.isCorporate %}
+                                (Privé)
+                            {% endif %}
+                        </li>
+                    {% endfor %}
+                    </ul>
+                {% endif %}
+
+                {% if aid.isFinancial or aid.isTechnical %}
+                    <h3 class="fr-mb-1w fr-mt-3w fr-text--lg at-text--bold at-uppercase">
+                        <span class="ri-settings-5-fill ri-xl at-color--blue at-icon-align--sub fr-mr-1w" aria-hidden="true"></span>
+                        Nature de l’aide
+                    </h3>
+                    <ul class="fr-p-0">
+                        {% if aid.isFinancial %}
+                        <li class="fr-list__none">
+                            Aide financière
+                        </li>
+                        {% endif %}
+                        {% if aid.isTechnical %}
+                        <li class="fr-list__none">
+                            Aide en ingénierie
+                        </li>
+                        {% endif %}
+                    </ul>
+                {% endif %}
+
+                {% if aid.subventionRateMin or aid.subventionRateMax %}
+                    <h3 class="fr-mb-1w fr-mt-3w fr-text--lg at-text--bold at-uppercase">
+                        <span class="ri-percent-line ri-xl at-color--blue at-icon-align--sub fr-mr-1w" aria-hidden="true"></span>
+                        Taux de subvention
+                    </h3>
+                    <ul class="fr-p-0">
+                        {% if aid.subventionRateMin %}
+                            <li class="fr-list__none"><strong>Min :</strong> {{ aid.subventionRateMin }}%</li>
+                        {% endif %}
+                        {% if aid.subventionRateMax %}
+                            <li class="fr-list__none"><strong>Max :</strong> {{ aid.subventionRateMax }}%</li>
+                        {% endif %}
+                    </ul>
+                {% endif %}
+
+                {% if aid.aidRecurrence %}
+                    <h3 class="fr-mb-1w fr-mt-3w fr-text--lg at-text--bold at-uppercase">
+                        <span class="ri-refresh-line ri-xl at-color--blue at-icon-align--sub fr-mr-1w" aria-hidden="true"></span>
+                        Récurrence
+                    </h3>
+                    <ul class="fr-p-0">
+                        <li class="fr-list__none">{{ aid.aidRecurrence.name }}</li>
+                    </ul>
+                {% endif %}
+
+                {% if aid.hasCalendar %}
+                    <h3 class="fr-mb-1w fr-mt-3w fr-text--lg at-text--bold at-uppercase">
+                        <span class="ri-calendar-2-fill ri-xl at-color--blue at-icon-align--sub fr-mr-1w" aria-hidden="true"></span>
+                        Calendrier
+                    </h3>
+                    <ul class="fr-p-0">
+                    {% if aid.isComingSoon %}
+                    <li class="fr-list__none" id="coming-soon">Ouverture prochaine de l’aide !</li>
+                    {% endif %}
+                    {% if aid.dateStart %}
+                        <li class="fr-list__none">Ouverture : {{ aid.dateStart|date('d/m/Y') }}</li>
+                    {% endif %}
+                    {% if aid.dateSubmissionDeadline %}
+                        <li class="fr-list__none">Échéance : {{ aid.dateSubmissionDeadline|date('d/m/Y') }}</li>
+                    {% endif %}
+                    </ul>
+                {% endif %}
+
+                {% if aid.eligibilityTest %}
+                    <div class="eligibility-badge fr-btn">
+                        <a href="{{ path('app_aid_aid_details', aidUrlParams) }}" title="Voir l'aide">
+                            Test d’éligibilité disponible
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>

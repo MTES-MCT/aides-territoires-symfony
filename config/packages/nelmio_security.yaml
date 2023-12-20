@@ -1,0 +1,94 @@
+nelmio_security:
+    # prevents framing of the entire site
+    clickjacking:
+        paths:
+            '^/.*': DENY
+
+    # disables content type sniffing for script resources
+    content_type:
+        nosniff: true
+
+    # prevents inline scripts, unsafe eval, external scripts/images/styles/frames, etc
+    csp:
+        enabled: true
+        hosts: []
+        content_types: []
+        enforce:
+            level1_fallback: false
+            browser_adaptive:
+                enabled: false
+            #recevoir les rapports sans appliquer la politique de sécurité de contenu.
+            #report-uri: '%router.request_context.base_url%/nelmio/csp/report'
+            #définit la politique par défaut utilisée dans tous les cas (fonts, CSS, JavaScript, Frames, etc.) lorsqu’elle a la valeur ‘self’.
+            default-src:
+                - 'self'
+            #définit les sources de scripts autorisées
+            script-src:
+                - 'self'
+                - 'https://www.youtube.com'
+            #définit les sources de feuilles de styles (CSS) autorisées
+            style-src:
+                - 'self'
+                - 'https://fonts.googleapis.com'
+            #définit les sources de plugins autorisées (ex : <embed> ou <object>)
+            #object-src:
+                # - 'self'
+            #définit les sources d’images ou d’icônes autorisées (ex : rel= »icon »)
+            img-src:
+                - 'self'
+                - 'data:'
+                - 'https://aides-territoires-prod.s3.fr-par.scw.cloud'
+                - 'https://aides-territoires-stage.s3.fr-par.scw.cloud'
+            #définit les sources d’éléments multimédias autorisées (ex : <vidéo>, <audio>)
+            media-src:
+                - 'self'
+                - 'https://aides-territoires-prod.s3.fr-par.scw.cloud'
+                - 'https://aides-territoires-stage.s3.fr-par.scw.cloud'
+            #frame-src : définit les sources autorisées pour le chargement des trames (frame ou iframe)
+            frame-src:
+                - 'https://www.youtube.com'
+                - 'https://stats.data.gouv.fr'
+            #font-src : définit les sources autorisées pour le chargement de fichiers de polices
+            font-src: 
+                - 'self'
+                - 'https://fonts.gstatic.com/'
+            #connect-src : applique la CSP aux connexions à partir d’un XMLHttpRequest (AJAX) ou d’un WebSocket
+            #bade-uri :autorise les URL dans l’attribut src de n’importe quelle balise
+            #add-header: ajoute un en-tête pour la Content Security Policy
+            block-all-mixed-content: true # defaults to false, blocks HTTP content over HTTPS transport
+            # upgrade-insecure-requests: true # defaults to false, upgrades HTTP requests to HTTPS transport
+
+    # forces Microsoft's XSS-Protection with
+    # its block mode
+    xss_protection:
+        enabled: true
+        mode_block: true
+
+    # Send a full URL in the `Referer` header when performing a same-origin request,
+    # only send the origin of the document to secure destination (HTTPS->HTTPS),
+    # and send no header to a less secure destination (HTTPS->HTTP).
+    # If `strict-origin-when-cross-origin` is not supported, use `no-referrer` policy,
+    # no referrer information is sent along with requests.
+    referrer_policy:
+        enabled: true
+        policies:
+            - 'no-referrer'
+            - 'strict-origin-when-cross-origin'
+
+when@dev:
+    nelmio_security:
+        csp:
+            enforce:
+                default-src:
+                    - 'self'
+                    - 'unsafe-inline'
+                    - 'unsafe-eval'
+                script-src:
+                    - 'self'
+                    - 'unsafe-inline'
+                    - 'unsafe-eval'
+                style-src:
+                    - 'self'
+                    - 'https://fonts.googleapis.com'
+                    - 'unsafe-inline'
+                    - 'unsafe-eval'  

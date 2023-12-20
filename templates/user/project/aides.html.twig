@@ -1,0 +1,109 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mon projet | {{ parent() }}{% endblock %}
+
+{% block body %}
+
+<div class="fr-container fr-mb-5w fr-mt-0">
+    <div class="fr-grid-row">
+         {% include "user/_menu_user.html.twig" with { user_project:true, user_project_structure:true } %}
+        
+        <div class="fr-col-12 fr-col-md-9">
+             <div class="fr-grid-row">
+              <div class="fr-col-12 fr-col-md-9">
+                  <h1 class="fr-h3">Mon projet « {{ project.name }} »</h1>
+              </div>
+              <div class="fr-col-12 fr-col-md-3">
+                <a href="{{ path('app_user_project_structure') }}" class="fr-m-1w fr-tag _fr-tag--md fr-text--md fr-icon-arrow-left-line fr-tag--icon-left">Retour aux projets</a>
+              </div>
+            </div>
+            <div class="fr-tabs fr-mt-0w fr-mb-5w">
+               {% include "user/project/_menu_project.html.twig" with { aides: true, project_id: project.id, project_slug: project.slug } %}
+                <div id="tabpanel_liste_des_aides" class="fr-tabs__panel" role="tabpanel" aria-labelledby="tabpanel_liste_des_aides" tabindex="0">
+                    {# <h2 class="fr-h6 _fr-mt-1w">Liste des aides que vous avez sélectionnées</h2> #}
+                    <div class="fr-table">
+                      <table class="data-table at-table--xl">
+                          <caption>
+                              Liste des aides que vous avez sélectionnées :
+                          </caption>
+                          <thead>
+                              <tr>
+                                  <th scope="col" class="fr-text">Nom</th>
+                                  <th scope="col" class="fr-text">Echéance</th>
+                                  <th scope="col" class="fr-text">Type d’aide</th>
+                                  <th scope="col" class="fr-text">Porteur d’aides</th>
+                                  <th scope="col" class="fr-text">Ajoutée le</th>
+                              </tr>
+                          </thead>
+                              <tbody>
+                                  {% if project.aidProjects|length > 0 %}
+                                  {% for aidProject in project.aidProjects %}
+                                  <tr> 
+                                      <td class="fr-text">
+                                          <a href="{{ path('app_aid_aid_details', {'slug': aidProject.aid.slug}) }}" target="_blank" rel="noopener" id="aid-{{ aidProject.aid.id }}">
+                                              {{ aidProject.aid.name }}
+                                              <span class="fr-sr-only">Ouvre une nouvelle fenêtre</span>
+                                          </a>
+                                      </td>
+                                      <td class="fr-text">
+                                          <span>{{ aidProject.aid.dateSubmissionDeadline|date('d/m/Y') }}</span>
+                                          {% if aidProject.aid.isOnGoing() %}
+                                              <p class="fr-badge fr-badge--info fr-badge--sm">Permanente</p>
+                                          {% elseif  aidProject.aid.isRecurring() %}
+                                              <p class="fr-badge fr-badge--info fr-badge--sm">Récurrente</p>
+                                          {% elseif  aidProject.aid.isApproachingDeadline() %}
+                                              <p class="fr-badge fr-badge--new fr-badge--sm">Échéance proche</p>                       
+                                          {% elseif  aidProject.aid.hasExpired() %}
+                                              <p class="fr-badge fr-badge--warning fr-badge--sm">Expirée</p>
+                                          {% endif %}
+                                    </td>
+                                      <td class="fr-text">
+                                          {% for aidType in aidProject.aid.aidTypes %}
+                                              {{ aidType.name }}
+                                          {% endfor %} 
+                                      </td>
+                                      <td class="fr-text">
+                                          <ul>
+                                          {% for financer in aidProject.aid.aidFinancers %}
+                                              <li>
+                                                  <a href="{{ path('app_backer_details', {'id': financer.backer.id, 'slug': financer.backer.slug}) }}" target="_blank" rel="noopener">
+                                                  {{ financer.backer.name }}
+                                                  <span class="fr-sr-only">Ouvre une nouvelle fenêtre</span>
+                                              </a>
+                                              </li>
+                                          {% endfor %} 
+                                          </ul>
+                                      </td>      
+                                      <td class="fr-text">
+                                          {{ aidProject.dateCreate|date('d/m/Y') }}
+                                      </td>
+
+                                  </tr>
+                                  {% endfor %}
+                              {% else %}
+                              <tbody>
+                                  <tr>
+                                      <td colspan="6" class="fr-text at-centered-important">
+                                          Aucune aide n’a été ajouté à ce projet pour l’instant
+                                      </td>
+                                  </tr>
+                              </tbody>
+                              {% endif %}
+                          </tbody>
+                      </table>
+                  </div>
+                  <div class="fr-alert fr-alert--info fr-alert--sm fr-mt-5w">
+                        <h3 class="fr-h6 _fr-mt-1w">Découvrez toutes vos opportunités 🌟</h3>
+                        {# <p>Si nous avons sélectionné pour vous des aides spécifiques, n'oubliez pas que d'autres opportunités pourraient vous attendre dans notre base de données. Chaque projet est unique, et une aide insoupçonnée pourrait être la clé de votre réussite.</p> #}
+                        <p>Si vous avez sélectionné des aides spécifiques, n'oubliez pas que d'autres opportunités pourraient vous attendre dans notre base de données. Chaque projet est unique, et une aide insoupçonnée pourrait être la clé de votre réussite.</p>
+                        <div class="fr-mt-2w fr-mb-2w">
+                          <a class="fr-btn fr-fi-search-line fr-btn--icon-left" href="{{ path('app_aid_aid') }}" title="Trouver des aides">Explorer toutes les aides</a>
+                      </div>
+                  </div>
+              </div> <!-- fin tabpanel-->
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

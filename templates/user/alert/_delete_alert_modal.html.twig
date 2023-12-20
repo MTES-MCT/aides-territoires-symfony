@@ -1,0 +1,32 @@
+<dialog aria-labelledby="fr-modal-title-delete-alert" role="dialog" id="delete-alert-modal-{{ alert.id }}" class="fr-modal">
+    <div class="fr-container fr-container--fluid fr-container-md">
+        <div class="fr-grid-row fr-grid-row--center">
+            <div class="fr-col-12 fr-col-md-8 fr-col-lg-6">
+                <div class="fr-modal__body">
+                    <div class="fr-modal__header">
+                        <button class="fr-btn fr-btn--close" title="Fermer la fenêtre modale" aria-controls="delete-alert-modal-{{ alert.id }}">Fermer</button>
+                    </div>
+                    <div class="fr-modal__content">
+                        <h2 id="fr-modal-title-delete-alert" class="fr-modal__title"><span class="fr-icon-arrow-right-line fr-icon--lg"></span>Supprimer cette alerte</h2>
+
+                        <p>En cliquant sur le bouton ci-dessous, vous supprimerez définitivement cette alerte.</p>
+                        <section>
+                            <footer>
+                                <ul class="fr-btns-group fr-btns-group--inline fr-btns-group--right">
+                                    <li>
+                                        <button class="btn-block fr-btn fr-btn--secondary" type="button" title="Fermer la fenêtre modale" aria-controls="delete-alert-modal-{{ alert.id }}">Annuler</button>
+                                    </li>
+                                    <li>
+                                        <a href="{{ path('app_user_alert_delete', {'id': alert.id }) }}" type="submit" class="fr-btn">
+                                            Supprimer cette alerte
+                                        </a>
+                                    </li>
+                                </ul>
+                            </footer>
+                        </section>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</dialog>

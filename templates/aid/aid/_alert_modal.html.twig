@@ -1,0 +1,75 @@
+<dialog aria-labelledby="fr-modal-title-alert-search" role="dialog" id="alert-search-modal" class="fr-modal">
+    <div class="fr-container fr-container--fluid fr-container-md">
+        <div class="fr-grid-row fr-grid-row--center">
+            <div class="fr-col-12 fr-col-md-8 fr-col-lg-6">
+                <div class="fr-modal__body">
+                    <div class="fr-modal__header">
+                        <button class="fr-btn fr-btn--close" title="Fermer la fenêtre modale" aria-controls="alert-search-modal">Fermer</button>
+                    </div>
+                    <div class="fr-modal__content">
+                        {# {% if not search_page.subdomain_enabled and not user.is_authenticated %} #}
+                        {% if not app.user %}
+                            <h2 id="fr-modal-title-alert-search" class="fr-modal__title">
+                                <span class="fr-icon-arrow-right-line fr-icon--lg"></span>Connectez-vous pour être notifié des nouvelles aides correspondant
+                                à votre recherche, et gérer les paramètres de vos alertes
+                            </h2>
+                            <ul class="fr-btns-group fr-btns-group--inline-md fr-btns-group--icon-left">
+                                <li>
+                                    <a class="fr-btn fr-icon-lock-line" href="{{ path('app_login') }}" title="Se connecter">
+                                        Se connecter
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="fr-btn fr-icon-account-line" href="{{ path('app_user_user_register') }}" title="S’inscrire">
+                                        S’inscrire
+                                    </a>
+                                </li>
+                            </ul>
+                        {% else  %}
+                            <h2 id="fr-modal-title-alert-search" class="fr-modal__title">
+                                <span class="fr-icon-arrow-right-line fr-icon--lg"></span>Soyez notifié des nouvelles aides correspondant à votre recherche
+                            </h2>
+
+                            {{ form_start(form) }}
+                                <div>
+                                    <div class="content">
+                                        <div class="fr-mb-3w">
+                                            <h3 class="fr-h6">Les filtres sélectionnés</h3>
+                                            {% include 'aid/aid/_search_meta.html.twig' %}
+                                        </div>
+
+                                        <p>Les champs marqués d’un astérisque (*) sont obligatoires.</p>
+
+                                        {# {% if not search_page.subdomain_enabled and user.is_authenticated %}
+                                            <input type="email" name="email" hidden value="{{ user.email }}" id="id_email" />
+                                        {% else %}
+                                            {% include '_field_snippet.html' with field=alert_form.email %}
+                                        {% endif %} #}
+                                        {{ form_row(form.title) }}
+                                        {{ form_row(form.alertFrequency) }}
+
+
+                                        <div class="fr-alert fr-alert--info fr-alert--sm fr-my-2w">
+                                            <p>
+                                                En créant une alerte, vous acceptez que vos données soient traitées en accord avec
+                                                <a href="{{ path('app_static_privacy_policy') }}" target="_blank" rel="noopener" title="Notre politique de confidentialité - Ouvre une nouvelle fenêtre">
+                                                    notre politique de confidentialité
+                                                </a>. 
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <footer>
+                                        <button class="btn-block fr-btn" type="submit">
+                                        Créer une alerte
+                                        </button>
+                                    </footer>
+                                </div>
+                            {{ form_end(form) }}
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</dialog>

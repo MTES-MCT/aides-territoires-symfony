@@ -1,0 +1,38 @@
+@import 'remixicon/fonts/remixicon.css';
+@import '../../_variables';
+@import '../../_mixins';
+@import '../../form/category-autocomplete-multiple';
+@import '../../form/tom-select-override';
+@import '../../form/entity-checkbox-absolute-type';
+@import '../../form/label';
+@import '../../component/at-deadline.scss';
+
+
+.deadline.fr-tag {
+    display: block;
+    float: right;
+    background-color: var(--background-active-blue-france);
+    color: var(--text-inverted-blue-france);
+    text-align: center;
+}
+
+#search-form-extra-fields{
+    width: 100%;
+    display: none;
+
+    &.show{
+        display: block;
+    }
+}
+#logos-financers img, #logos-programs img,#logos-instructors img  {
+    width: auto;
+    height: auto;
+    max-width: 100%;
+    max-height: 6rem;
+}
+
+
+.at-link__nodecorator {
+    box-shadow: none;
+    /* background-image:none; */
+}

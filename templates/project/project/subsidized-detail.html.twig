@@ -1,0 +1,93 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{% if commune_search %}Projets réalisés par les mairies {% if project_perimeter.latitude %}à côté de {{ project_perimeter.name }}{% endif %}{% elseif department_search %}Projets réalisés par les mairies du département {% if project_perimeter %}{{ project_perimeter.name }} ({{ project_perimeter.code}}){% endif %}{% endif %}{% endblock %}
+
+{% block meta_description %}{% if commune_search %}Découvrez la liste des projets réalisés par des mairies proches. Aides Territoires vous permet de voir le coût total des projets et les subventions accordées.{% elseif department_search %}Découvrez la liste des projets réalisés par les mairies dans le département {% if project_perimeter %}{{ project_perimeter.name }} ({{ project_perimeter.code}}){% endif %}. Aides Territoires vous permet de voir le coût total des projets et les subventions accordées dans ce département.{% endif %}{% endblock %}
+
+{% block stylesheets %}
+	{{ parent() }}
+	{{ encore_entry_link_tags('import-scss/project/project') }}
+{% endblock %}
+
+{% block javascripts %}
+	{{ parent() }}
+
+    {{ encore_entry_script_tags('form/checkbox-multiple-search') }}
+	{{ encore_entry_script_tags('front/project/project') }}
+
+    {% cspscript %}
+    <script>
+    let commune_search='{{commune_search}}';
+    </script>
+    {% endcspscript %}
+{% endblock %}
+
+
+{% block body %}
+<div class="fr-container">
+    <div>
+        <h1>
+            <span class="result-count">
+                {% if commune_search %}
+                    {% if projects|length > 1 %}
+                        Liste des {{ projects|length }} projets subventionnés
+                    {% else %}
+                        {{ projects|length }} projet subventionné
+                    {% endif %}
+                    {% if project_perimeter.latitude and project_perimeter.longitude %}
+                        dans un rayon de 30 km
+                    {% endif %}
+                {% elseif department_search %}
+                    {% if projects|length > 1 %}
+                    Liste des {{ projects|length }} projets subventionnés 
+                    {% else %}
+                    {{ projects|length }} projet subventionné
+                    {% endif %}
+                    sur le département 
+                    {% if project_perimeter %}
+                    {{ project_perimeter.name }} :
+                    {% endif %}
+                {% endif %}
+            </span>
+        </h1>
+
+         {% if commune_search %}
+            <div id="search-engine" class="fr-mb-2w">
+                    <div class="fr-card">
+                        <div class="fr-card__body">
+                            <div class="fr-card__content">
+                                {{ form_start(formProjectSearch) }}
+                                <div class="fr-grid-row fr-grid-row--gutters fr-grid-row--center fr-grid-row--bottom">
+                                    <div class="fr-col-12 fr-col-md-4">
+                                        {{form_row(formProjectSearch.project_perimeter)}}
+                                    </div>
+                                    <div class="fr-col-12 fr-col-md-4">
+                                        {{form_row(formProjectSearch.text)}}
+                                    </div>
+
+                                    <div class="fr-col-12 fr-col-md-4">
+                                        <button name="commune_search" value="true" class="fr-btn fr-mb-0" title="Rechercher" type="submit">
+                                            <span class="fr-icon-search-line fr-mr-1w" aria-hidden="true"></span> Rechercher
+                                        </button>
+                                    </div>
+                                </div>
+                                {{ form_end(formProjectSearch) }}
+                            </div>
+                        </div>
+                    </div>
+            </div>
+        {% endif %} 
+    </div>
+    <div id="projects-list">
+        {% if projects %}
+        {% include "project/project/_projects_validated_result_as_list.html.twig" %}
+        {% else %}
+        <div class="fr-mb-5w">
+            <div class="fr-alert fr-alert--info fr-alert--sm">
+                <p>Nous n’avons pu trouver aucun résultat.</p>
+            </div>
+        </div>
+        {% endif %}
+    </div> 
+</div>
+{% endblock %}

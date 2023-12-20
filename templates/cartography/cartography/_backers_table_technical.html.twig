@@ -1,0 +1,45 @@
+<table class="sortable-table at-table--xl">
+    <caption>{{ current_dept.name }} : {{ backers|length }} porteur{% if backers|length > 1 %}s{% endif %} d‘aides en ingénierie présent{% if backers|length > 1 %}s{% endif %}</caption>
+    <thead>
+         <tr>
+                <th scope="col">Catégorie</th>
+                <th scope="col">Porteur</th>
+                <th scope="col">Périmètre du porteur</th>
+                <th scope="col">Thématiques des aides</th>
+                <th scope="col">Total des aides en ingénierie</th>
+                <th scope="col">Ingénierie technique</th>
+                <th scope="col">Ingénierie financière</th>
+                <th scope="col">Ingénierie juridique / administrative</th>
+            </tr>
+    </thead>
+    <tbody>
+        {% for backer in backers %}
+            <tr>
+                <td>
+                    {{ backer.backerGroup.backerSubCategory.backerCategory.name }}
+                </td>
+                <td>
+                    <a href="{{ path('app_backer_details', {'id': backer.id, 'slug': backer.slug}) }}">{{ backer.name }}</a>
+                </td>
+                <td data-sort="{{ backer.perimeter.scale }}">{{ backer.perimeter.name }}</td>
+                <td>
+                    {% for thematic in backer.aidsThematics %}
+                        <p class="fr-mb-1w">{{ thematic.name }}</p>
+                    {% endfor %}
+                </td>
+                <td>
+                    <a href="{{ path('app_aid_aid', {'perimeter': current_dept.id, 'backers': backer.id, 'aidTypeGroupSlug': constant('App\\Entity\\Aid\\AidTypeGroup::SLUG_TECHNICAL')}) }}" title="Voir les aides en ingénierie du porteur {{ backer.name }}">{{ backer.aidsTechnical|length }}</a>
+                </td>
+                <td>
+                    <a href="{{ path('app_aid_aid', {'perimeter': current_dept.id, 'backers': backer.id, 'aidTypeSlug': constant('App\\Entity\\Aid\\AidType::SLUG_TECHNICAL_ENGINEERING')}) }}" title="Voir les aides en ingénierie de type ingénierie technique du porteur {{ backer.name }}">{{ backer.aidsByAidTypeSlug(constant('App\\Entity\\Aid\\AidType::SLUG_TECHNICAL_ENGINEERING'))|length }}</a>
+                </td>
+                <td>
+                    <a href="{{ path('app_aid_aid', {'perimeter': current_dept.id, 'backers': backer.id, 'aidTypeSlug': constant('App\\Entity\\Aid\\AidType::SLUG_FINANCIAL_ENGINEERING')}) }}" title="Voir les aides en ingénierie de type ingénierie financière du porteur {{ backer.name }}">{{ backer.aidsByAidTypeSlug(constant('App\\Entity\\Aid\\AidType::SLUG_FINANCIAL_ENGINEERING'))|length }}</a>
+                </td>
+                <td>
+                    <a href="{{ path('app_aid_aid', {'perimeter': current_dept.id, 'backers': backer.id, 'aidTypeSlug': constant('App\\Entity\\Aid\\AidType::SLUG_LEGAL_ENGINEERING')}) }}" title="Voir les aides en ingénierie de type ingénierie juridique / administrative du porteur {{ backer.name }}">{{ backer.aidsByAidTypeSlug(constant('App\\Entity\\Aid\\AidType::SLUG_LEGAL_ENGINEERING'))|length }}</a>
+                </td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>

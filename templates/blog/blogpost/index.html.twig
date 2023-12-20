@@ -1,0 +1,48 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Blog{{ getParameter('meta_title_end') }}{% endblock %}
+
+{% block javascripts %}
+	{{ parent() }}
+	{{ encore_entry_script_tags('front/blog/blog') }}
+{% endblock %}
+
+{% block body %}
+	<main role="main" class="fr-container-fluid" id="at-main">
+
+		<div id="main-content" class="main-content">
+
+			<section id="post-list" class="fr-container fr-mb-5w">
+				<div class="fr-grid-row fr-grid-row--center">
+					<div class="fr-col-md-10">
+						<div id="blog-content">
+
+							<h1>Blog</h1>
+							<p>Retrouvez dans cette rubrique nos actualités ainsi que des ressources complémentaires pour vous aider à réaliser vos projets</p>
+
+							<div id="search-posts">
+                                {{ form_start(formCategories) }}
+                                    {{ form_row(formCategories.blogPostCategory) }}
+                                {{ form_end(formCategories) }}
+							</div>
+						</div>
+
+
+						<div class="posts">
+                            {% for blogPost in blogPosts %}
+								{% include 'blog/blogpost/_blogpost.html.twig' %}
+                            {% endfor %}
+						</div>
+
+					</div>
+				</div>
+			</section>
+
+			<div class="fr-container fr-grid-row fr-grid-row--center fr-my-5w">
+				{% include 'blog/_blog-pagination.html.twig' %}
+			</div>
+
+		</div>
+
+	</main>
+{% endblock %}

@@ -1,0 +1,68 @@
+{% extends '@EasyAdmin/crud/edit.html.twig' %}
+
+{% block main %}
+	{{ parent() }}
+
+	<div class="form-fieldset  field-form_fieldset">
+		<fieldset>
+			<div class="form-fieldset-header collapsible ">
+				<div class="form-fieldset-title">
+
+					<a href="#content-ea_form_fieldset_01HF47A4QDW5B3P1C6AVD3TGBQ" data-bs-toggle="collapse" class="form-fieldset-title-content form-fieldset-collapse collapsed" aria-expanded="false" aria-controls="content-ea_form_fieldset_01HF47A4QDW5B3P1C6AVD3TGBQ">
+						<i class="fas fw fa-chevron-right form-fieldset-collapse-marker"></i>
+						Aides par cet auteur ({{ entity.instance.nbAids}})
+					</a>
+				</div>
+			</div>
+
+			<div id="content-ea_form_fieldset_01HF47A4QDW5B3P1C6AVD3TGBQ" class="form-fieldset-body  collapse ">
+				<div class="row">
+                    {% if entity.instance.nbAids == 0 %}
+						<p>Aucune aide</p>
+					{% else %}
+					<table class="table table-striped table-hover">
+						<thead>
+							<tr scope="row">
+								<th scope="col">Aide</th>
+								<th scope="col">Statut</th>
+								<th scope="col">Première date de publication</th>
+								<th scope="col">Porteurs d’aides</th>
+							</tr>
+						</thead>
+						<tbody>
+							{% for aid in entity.instance.aids %}
+							<tr scope="row">
+								<td>
+								<a href="{{ ea_url()
+                                                    .setController('App\\Controller\\Admin\\Aid\\AidCrudController')
+                                                    .setAction('edit')
+                                                    .setEntityId(aid.id)
+                                                }}">
+								{{ aid.name }}
+								</a>
+								</td>
+								<td>{{ aid.status }}</td>
+								<td>{{ aid.timePublished }}</td>
+								<td>
+									<ul>
+										{% for backer in aid.financers %}
+										<a href="{{ ea_url()
+                                                    .setController('App\\Controller\\Admin\\Backer\\BackerCrudController')
+                                                    .setAction('edit')
+                                                    .setEntityId(backer.id)
+                                                }}">
+											{{ backer.name }}
+										</a>
+										{% endfor %}
+									</ul>
+								</td>
+							</tr>
+							{% endfor %}
+						</tbody>
+					</table>
+					{% endif %}
+                </div>
+			</div>
+		</fieldset>
+	</div>
+{% endblock %}

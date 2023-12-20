@@ -1,0 +1,33 @@
+{% extends '@EasyAdmin/crud/edit.html.twig' %}
+
+{% block main %}
+	{{ parent() }}
+
+	<div class="form-fieldset  field-form_fieldset">
+		<fieldset>
+			<div class="form-fieldset-header collapsible ">
+				<div class="form-fieldset-title">
+
+					<a href="#content-ea_form_fieldset_01HF47A4QDW5B3P1C6AVD3TGBQ" data-bs-toggle="collapse" class="form-fieldset-title-content form-fieldset-collapse collapsed" aria-expanded="false" aria-controls="content-ea_form_fieldset_01HF47A4QDW5B3P1C6AVD3TGBQ">
+						<i class="fas fw fa-chevron-right form-fieldset-collapse-marker"></i>
+						Contient les périmètres suivants
+					</a>
+				</div>
+			</div>
+
+			<div id="content-ea_form_fieldset_01HF47A4QDW5B3P1C6AVD3TGBQ" class="form-fieldset-body  collapse ">
+				<div class="row">
+                    {% if entity.instance.perimetersFrom|length == 0 %}
+						<p>Ne contient pas d'autres périmètres</p>
+					{% else %}
+						<ul>
+							{% for perimeter in entity.instance.perimetersFrom %}
+								<li>{{ perimeter.name }}</li>
+							{% endfor %}
+						</ul>
+					{% endif %}
+                </div>
+			</div>
+		</fieldset>
+	</div>
+{% endblock %}

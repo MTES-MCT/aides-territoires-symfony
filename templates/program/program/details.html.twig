@@ -1,0 +1,100 @@
+{% extends 'base.html.twig' %}
+
+
+{% block title %}{{program.name}} | Aides-territoires{% endblock %}
+
+{% block meta_description %}Les aides du programme {{program.name}}{% endblock %}
+
+{% block stylesheets %}
+	{{ parent() }}
+	{{ encore_entry_link_tags('import-scss/aid/aid/index') }}
+{% endblock %}
+
+{% block javascripts %}
+	{{ parent() }}
+    {{ encore_entry_script_tags('form/entity-checkbox-absolute-type') }}
+	{{ encore_entry_script_tags('front/aid/aid/index') }}
+{% endblock %}
+
+{% block body %}
+
+<article id="program" class="fr-container fr-mb-5w fr-pb-5w">
+    <div id="program-content">
+
+        <div id="program-title">
+            {% if program.logo %}
+            <div class="fr-grid-row fr-grid-row--middle">
+                <div class="fr-col-12 fr-col-md-9">
+                    <h1>{{ program.name }}</h1>
+                </div>
+                <div class="fr-col-12 fr-col-md-3">
+                    <img src="{{ getParameter('cloud_image_url') }}{{ program.logo }}" alt="logo {{ program.name }}" class="fr-responsive-img">
+                </div>
+                </div>
+            </div>
+            {% else %}
+                <h1>{{ program.name }}</h1>
+            {% endif %}
+        </div>
+
+        <div class="fr-tabs">
+            <ul class="fr-tabs__list" role="tablist" aria-label="Onglets du programme">
+                <li role="presentation">
+                    <button id="tabpanel-program-description" class="fr-tabs__tab" tabindex="0" aria-selected="true" role="tab" aria-controls="tabpanel-program-description-panel">Présentation générale</button>
+                </li>
+                {% if program.id==36 %}
+                <li role="presentation">
+                    <button id="tabpanel-faq" class="fr-tabs__tab" tabindex="-1" aria-selected="false"role="tab" aria-controls="tabpanel-faq-panel">Foire aux questions</button>
+                </li>
+                {% endif %}
+                {% for tab in program.pageTabs %}
+                <li role="presentation">
+                    <button id="tabpanel-{{tab.name}}" class="fr-tabs__tab" tabindex="-1" aria-selected="false" role="tab" aria-controls="tabpanel-{{tab.name}}-panel">{{ tab.name }}</button>
+                </li>
+                {% endfor %}
+            </ul>
+
+            {% if program.description or aids %}
+            <div id="tabpanel-program-description-panel" class="fr-tabs__panel at-tabs__panel--opaque fr-tabs__panel--selected" role="tabpanel" aria-labelledby="tabpanel-program-description" tabindex="0">
+                <h2 class="fr-mt-0 fr-mb-2w">Présentation générale</h2>
+                {{ program.description | raw }}
+                <section id="aid-list">
+                    <h2>{{ myPager.getNbResults }} aide{% if myPager.nbResults > 1 %}s{% endif %} liée{% if myPager.nbResults > 1 %}s{% endif %} au programme {{ program.name }}</h2>
+                    {% include 'aid/aid/_search_meta.html.twig' %}
+                    {% include "aid/aid/_search_form.html.twig" %}
+
+                    <div class="fr-grid-row" id="aids-as-card">
+                    {% for aid in myPager.currentPageResults %}
+                        <div class="fr-col-xs-12 fr-col-md-4 fr-p-3w">
+                            {% include 'aid/aid/_aid_result.html.twig' %}
+                        </div>
+                    {% endfor %}
+                    </div>
+
+                    {% if myPager.nbPages > 1 %}
+                    <div class="fr-container fr-grid-row fr-grid-row--center fr-my-5w">
+                        {{ pagerfanta(myPager) }}
+                    </div>
+                    {% endif %}
+                </section>
+            </div>
+            {% endif %}
+
+            {% if program.id==36 %}
+            <div id="tabpanel-faq-panel" class="fr-tabs__panel at-tabs__panel--opaque fr-tabs__panel--selected" role="tabpanel" aria-labelledby="tabpanel-faq" tabindex="0">
+                <h2 class="fr-mt-0 fr-mb-2w">Foire aux questions</h2>
+                {% include 'program/program/_faq_program.html.twig' %}
+            </div>
+            {% endif %}
+
+            {% for tab in program.pageTabs %}
+            <div id="tabpanel-{{ tab.name }}-panel" class="fr-tabs__panel at-tabs__panel--opaque" role="tabpanel" aria-labelledby="tabpanel-{{ tab.name }}" tabindex="0">
+                <h2 class="fr-mt-0 fr-mb-2w">{{ tab.name }}</h2>
+                {{ tab.description|raw }}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</article>
+
+{% endblock %}

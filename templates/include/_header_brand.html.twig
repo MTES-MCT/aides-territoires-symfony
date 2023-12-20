@@ -1,0 +1,23 @@
+<div class="fr-header__brand fr-enlarge-link">
+    <div class="fr-header__brand-top">
+        <div class="fr-header__logo">
+            <p class="fr-logo">
+                République
+                <br>Française
+            </p>
+        </div>
+        <div class="fr-header__operator">
+            <a href="{{ path('app_home') }}" title="Accueil Aides-territoires">
+                <picture>
+                    <source srcset="{{ asset('build/images/logo/logo_AT_courbes_dark_mode.svg') }}" media="(prefers-color-scheme: dark)">
+                    <img src="{{ asset('build/images/logo/logo_AT_courbes.svg') }}" class="" alt="Aides-territoires" data-fr-js-ratio="true" width="144" height="86" />
+                </picture>
+            </a>
+        </div>
+        <div class="fr-header__navbar">
+            <button class="fr-btn--menu fr-btn" data-fr-opened="false" aria-controls="modal-menu-mobile" aria-haspopup="menu" title="Menu" id="fr-btn-menu-mobile" data-fr-js-modal-button="true">
+                Menu
+            </button>
+        </div>
+    </div>
+</div>

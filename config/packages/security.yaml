@@ -1,0 +1,172 @@
+security:
+    password_hashers:
+        Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface:
+            id: 'App\Security\Hasher\CustomPasswordHasher'
+    # https://symfony.com/doc/current/security.html#registering-the-user-hashing-passwords
+
+
+    # https://symfony.com/doc/current/security.html#loading-the-user-the-user-provider
+    providers:
+        # used to reload user from session & other features (e.g. switch_user)
+        app_user_provider:
+            entity:
+                class: App\Entity\User\User
+                property: email
+
+    firewalls:
+        dev:
+            pattern: ^/(_(profiler|wdt)|css|images|js)/
+            security: false
+        
+        admin:
+            two_factor:
+                auth_form_path: 2fa_login    # The route name you have used in the routes.yaml
+                check_path: 2fa_login_check  # The route name you have used in the routes.yaml
+            lazy: true
+            # switch_user: { role: ROLE_ADMIN, parameter: _connect_to }
+            pattern: ^/admin
+            http_basic: false
+            provider: app_user_provider
+            logout:
+                # La route où se trouve le process de deconnexion
+                path: app_logout
+                # La route sur laquelle doit etre rediriger l'utilisateur apres une deconnexion
+                target: /
+                # Pour vider les cookies à la déconnexion (#securite)
+                clear_site_data:
+                    - cookies
+                    - storage
+            # custom_authenticator: App\Security\AppCustomAuthenticator
+            form_login:
+                # Le nom de la route où se trouve le formulaire de connexion
+                # Si un utilisateur tente d'acceder à une page protégée sans en avoir les droits
+                # il sera redirigé sur cette page
+                login_path: app_login_admin
+                # Le nom de la route de la page de connexion
+                check_path: app_login_admin
+                # Securisation des formulaires
+                enable_csrf: true
+                # La page par defaut apres une connexion reussie
+                #default_target_path: admin
+            # host: ^my\.host\.fr$
+            # activate different ways to authenticate
+            # http_basic: true
+            # https://symfony.com/doc/current/security.html#a-configuring-how-your-users-will-authenticate
+            # form_login: true
+            # https://symfony.com/doc/current/security/form_login_setup.html
+            remember_me:
+                secret: '%kernel.secret%' # required
+                lifetime: 604800 # 1 week in seconds
+                # by default, the feature is enabled by checking a
+                # checkbox in the login form (see below), uncomment the
+                # following line to always enable it.
+                #always_remember_me: true
+
+            # configure the maximum login attempts in a custom period of time
+        #            login_throttling:
+        #                max_attempts: 5
+        #                interval: '15 minutes'
+
+        # api:
+        #     pattern:    ^/api/
+        #     stateless: true
+        #     provider: app_user_provider
+        #     json_login:
+        #         check_path: /api/connexion/ # The name in routes.yaml is enough for mapping
+        #         username_path: email
+        #         password_path: password
+        #         success_handler: lexik_jwt_authentication.handler.authentication_success
+        #         failure_handler: lexik_jwt_authentication.handler.authentication_failure
+        #     jwt: ~
+
+
+        api:
+            pattern:    ^/api/
+            stateless: true
+            provider: app_user_provider
+            custom_authenticators:
+                - App\Security\TokenAuthenticator
+            jwt: ~
+
+        main:
+            lazy: true
+            provider: app_user_provider
+            pattern:    ^/
+            form_login:
+                # Le nom de la route où se trouve le formulaire de connexion
+                # Si un utilisateur tente d'acceder à une page protégée sans en avoir les droits
+                # il sera redirigé sur cette page
+                login_path: app_login
+                # Le nom de la route de la page de connexion
+                check_path: app_login
+                # Securisation des formulaires
+                enable_csrf: true
+                #La page par defaut apres une connexion reussie
+                default_target_path: app_user_dashboard
+
+            # custom_authenticator: App\Security\AppCustomAuthenticator
+            #host: ^my\.host\.fr$
+            logout:
+                path: app_logout
+                # where to redirect after logout
+                target: /
+                # Pour vider les cookies à la déconnexion (#securite)
+                clear_site_data:
+                    - cookies
+                    - storage
+                    
+            remember_me:
+                secret:   '%kernel.secret%' # required
+                lifetime: 604800 # 1 week in seconds
+
+
+
+            # activate different ways to authenticate
+            # https://symfony.com/doc/current/security.html#the-firewall
+
+            # https://symfony.com/doc/current/security/impersonating_user.html
+            # switch_user: true
+
+
+            # configure the maximum login attempts
+            # login_throttling:
+            #     max_attempts: 3          # per minute ...
+                # interval: '15 minutes' # ... or in a custom period
+
+    # Easy way to control access for large sections of your site
+    # Note: Only the *first* access control that matches will be used
+    access_control:
+        # This makes the logout route accessible during two-factor authentication. Allows the user to
+        # cancel two-factor authentication, if they need to.
+        - { path: ^/logout, role: PUBLIC_ACCESS }
+        # This ensures that the form can only be accessed when two-factor authentication is in progress.
+        - { path: ^/admin/2fa, role: IS_AUTHENTICATED_2FA_IN_PROGRESS }
+        - { path: ^/admin/connexion/, roles: PUBLIC_ACCESS}
+        - { path: ^/admin/user/[0-9]+/qrcode/, roles: ROLE_ADMIN}
+        - { path: ^/admin, roles: ROLE_ADMIN }
+        - { path: ^/comptes/moncompte/, roles: ROLE_USER }
+        - { path: ^/projets/projets-publics/(.*)/, roles: ROLE_USER }
+        - { path: ^/aides/publier/, roles: ROLE_USER }
+        - { path: ^/aides/publications/, roles: ROLE_USER }
+        # - { path: ^/api, roles: ROLE_USER }
+        - { path: ^/api$, roles: PUBLIC_ACCESS } # Allows accessing the Swagger UI
+        - { path: ^/api/docs, roles: PUBLIC_ACCESS } # Allows accessing API documentations and Swagger UI docs
+        - { path: ^/api/login, roles: PUBLIC_ACCESS }
+        - { path: ^/api/, roles: IS_AUTHENTICATED_FULLY }
+
+    # héritage des roles
+    role_hierarchy:
+        ROLE_ADMIN: [ROLE_USER]
+
+# when@test:
+#     security:
+#         password_hashers:
+#             # By default, password hashers are resource intensive and take time. This is
+#             # important to generate secure password hashes. In tests however, secure hashes
+#             # are not important, waste resources and increase test times. The following
+#             # reduces the work factor to the lowest possible values.
+#             Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface:
+#                 algorithm: auto
+#                 cost: 4 # Lowest possible value for bcrypt
+#                 time_cost: 3 # Lowest possible value for argon
+#                 memory_cost: 10 # Lowest possible value for argon

@@ -1,0 +1,60 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Contact | Aides-territoires{% endblock %}
+
+{% block body %}
+
+<main role="main" class="fr-container-fluid" id="at-main">
+
+	<div id="main-content" class="main-content">
+
+		<section id="post-list" class="fr-container fr-mb-5w">
+			<div class="fr-grid-row fr-grid-row--center">
+				<div class="fr-col-md-8">
+
+                    <h1>Nous contacter</h1>
+
+                    {% if success %}
+                    <div class="fr-alert fr-alert--success fr-alert--sm fr-mb-2w fr-mt-5w">
+                        <p>
+                            <strong>
+                                Votre message a bien été envoyé, merci !
+                            </strong> 
+                        </p>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="fr-alert fr-alert--info fr-alert--sm fr-mb-2w fr-mt-5w">
+                        <p>
+                            <strong>
+                                Toute demande relative à un projet spécifique ne pourra être traitée car nous n'avons pas vocation à conseiller directement les porteurs de projets.
+                            </strong> 
+                        </p>
+                        <p>
+                            <strong>
+                                Vous pouvez contacter directement les porteurs d’aides, dont vous trouverez les contacts en bas de chaque fiche aide.
+                            </strong>
+                        </p>
+                    </div>
+                    <p>Les champs marqués d’un astérisque (*) sont obligatoires.</p>
+                {{ form_start(formContact) }}
+                    {{ form_widget(formContact) }}
+                    <div class="fr-alert fr-alert--info fr-alert--sm fr-my-2w">
+                        <p>
+                            En utilisant cette fonctionnalité, vous acceptez que vos données soient traitées en accord avec
+                            <a href="{{ path('app_static_privacy_policy') }}" target="_blank" rel="noopener">
+                                notre politique de confidentialité
+                                <span class="fr-sr-only">Ouvre une nouvelle fenêtre</span>
+                            </a>.
+                        </p>
+                    </div>
+                    <footer>
+                        <button type="submit" class="fr-btn">Envoyer</button>
+                    </footer>
+                    {{ form_end(formContact) }}
+                </div>
+            </div>
+        </section>
+    </div>
+</main>
+{% endblock %}

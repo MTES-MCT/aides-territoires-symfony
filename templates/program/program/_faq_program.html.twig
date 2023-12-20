@@ -1,0 +1,41 @@
+
+{% if program.id==36 %}
+<div class="fr-alert fr-alert--info fr-alert--sm fr-mt-5w fr-mb-5w">
+    <p class="fr-mb-1w"><strong>Pour tout complément, vous êtes invités à contacter votre sous-préfet d’arrondissement ou les services déconcentrés de l’État compétents (DREAL, DDT-M, directions et services de l’État en outre-mer...).</strong></p>
+</div>
+<h3 class="fr-h5">Cliquez sur une rubrique pour voir les questions et réponses associées.</h3>
+{% endif %}
+<p class="fr-mb-5 fr-text--sm">Cette FAQ a été mise à jour le {{ faq_questions_answers_date_updated|date('d/m/Y')}}.</p>
+
+ {% if faqsCategoriesById|length > 0 %}
+
+<div class="fr-accordions-group">
+    {% for faq_category in faqsCategoriesById %}
+    <div class="fr-accordion">
+        <h3 class="fr-accordion__title fr-grid-row">
+            <button type="button" class="fr-accordion__btn fr-col-md-12 fr-background-alt" aria-expanded="false" aria-controls="cat-{{ faq_category.category.id }}">
+                {{ faq_category.category.name }}
+            </button>
+        </h3>
+        <div id="cat-{{ faq_category.category.id }}" class="fr-collapse">
+            <div class="fr-accordions-group">
+                {% for faq in faq_category.faqs %}
+                <div class="fr-accordion">
+                    <h4 class="fr-accordion__title fr-grid-row">
+                        <button type="button" class="fr-accordion__btn fr-col-md-12" aria-expanded="false" aria-controls="{{ faq.id }}">
+                            {{ faq.question }}
+                        </button>
+                    </h4>
+                    <div id="{{ faq.id }}" class="fr-collapse">
+                        <div>
+                            {{ faq.answer|raw }}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endif %} 

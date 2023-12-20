@@ -1,0 +1,45 @@
+{% if projects %}
+    <div class="fr-table" id="project_in_list">
+        <table title="Liste des projets publics" id="projects_publics_table">
+            <caption class="fr-sr-only">
+                Liste des projets publics
+            </caption>
+            <thead>
+                <tr>
+                    <th scope="col">Nom</th>
+                    <th scope="col">Structure</th>
+                    <th scope="col">Territoire</th>
+                    <th scope="col">Etat</th>
+                    <th scope="col">Types</th>
+                    <th scope="col">Nombre d'aides</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for project in projects %}
+                <tr>
+                    <td><a href="{{ path('app_project_project_public_details', {'id': project.id, 'slug': project.slug}) }}" title="Voir le project {{ project.name }}. Ouvre une nouvelle fenêtre" target="_blank">{{ project.name }}</a></td>
+                    <td>{% if project.organization %}{{ project.organization.name }}{% endif %}</td>
+                    <td>{% if project.organization and project.organization.perimeter %}{{ project.organization.perimeter.name }}{% endif %}</td>
+                    <td>
+                        {% if project.step  %}
+                            {{ project.step|projectStepDisplay }}
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if project.keywordSynonymlists %}
+                            {% for project_type in project.keywordSynonymlists %}
+                                <div>{{ project_type.name }}</div>
+                            {% endfor %}
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if project.aidProjects %}
+                            {{ project.aidProjects|length }}
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endif %}

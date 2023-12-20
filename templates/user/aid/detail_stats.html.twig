@@ -1,0 +1,140 @@
+{% extends "base.html.twig" %}
+
+
+{% block title %}Statistiques de l’aide « {{ aid.name }} » | {{ parent() }}{% endblock %}
+
+{% block meta_og %}
+<meta property="og:title" content="Statistiques de l’aide « {{ aid.name }} »" />
+<meta property="og:type" content="website" />
+<meta property="og:description" content="Trouvez les aides pertinentes pour financer et accompagner les projets de votre territoire" />
+<meta property="og:url" content="{{ absolute_url(url('app_aid_aid_details', {'slug': aid.slug})) }}" />
+<meta property="og:site_name" content="Aides-territoires" />
+<meta property="og:image" content="{{ absolute_url(asset('build/images/logo/logo_AT_og.png')) }}" />
+<meta property="og:image:alt" content="Logo : Aides-territoires" />
+{% endblock meta_og %}
+
+
+{% block body %}
+<article id="aid-stats" class="fr-container fr-mb-2w">
+  <section class="aid-content fr-grid-row fr-mt-5w">
+    <div class="aid-details fr-col-12 fr-pb-3w fr-px-3w">
+
+      <h1 class="fr-mb-5w">
+          Statistiques de l’aide « {{ aid.name }} »
+      </h1>
+
+      <div class="at-background-alt-green fr-px-1w fr-py-3w">
+          <p class="fr-mb-1w"><strong>Date de création : le {{ aid.dateCreate|format_datetime('long', 'none', locale='fr')}}</strong></p>
+          <p class="fr-mb-0"><strong>Date de modification : le {{ aid.timeUpdate|format_datetime('long', 'none', locale='fr')}}</strong></p>
+      </div>
+
+      <div id="statistiques" class="fr-mt-5w fr-grid-row fr-grid-row--gutters fr-grid-row--middle fr-mb-5w">
+          <h2 class="fr-col-3 fr-mt-0 fr-mb-0 fr-h4">Choix de la période :</h2>
+            <div class="fr-col-9">
+              {{ form_start(formAidStatsPeriod, {'attr': {'class': 'fr-grid-row fr-grid-row--bottom fr-grid-row--start'}}) }}
+                {{ form_row(formAidStatsPeriod.dateMin, {'row_attr': {'class': 'fr-mb-0 fr-col-4'}}) }}
+                {{ form_row(formAidStatsPeriod.dateMax, {'row_attr': {'class': 'fr-mb-0 fr-col-4'}}) }}
+                  <div class="fr-col-4">
+                      <button type="submit" class="fr-btn">Envoyer</button>
+                  </div>
+              {{ form_end(formAidStatsPeriod) }}
+          </div>
+      </div>
+
+      <div  class="fr-grid-row fr-grid-row--gutters fr-grid-row--center fr-mt-1w fr-mb-5w">
+        <div class="fr-col-12 fr-col-md-4">
+          <div class="fr-tile">
+            <div class="fr-tile__body">
+              <p class="fr-tile__title fr-h6">
+                Vues de l’aide
+              </p>
+            </div>
+            <div class="fr-tile__img overflow--initial" role="presentation">
+              <p class="fr-text--lg"><strong>{{ nbViews }}</strong></p>
+            </div>
+          </div>
+        </div>
+        {% if nbApplicationUrlClicks %}
+        <div class="fr-col-12 fr-col-md-4">
+          <div class="fr-tile">
+            <div class="fr-tile__body">
+              <p class="fr-tile__title fr-h6">
+                Clics sur Candidater
+              </p>
+            </div>
+            <div class="fr-tile__img overflow--initial" role="presentation">
+              <p class="fr-text--lg"><strong>{{ nbApplicationUrlClicks }}</strong></p>
+            </div>
+          </div>
+        </div>
+        {% endif %}
+        <div class="fr-col-12 fr-col-md-4">
+          <div class="fr-tile">
+            <div class="fr-tile__body">
+              <p class="fr-tile__title fr-h6">
+                Clics sur Plus d’informations
+              </p>
+            </div>
+            <div class="fr-tile__img overflow--initial" role="presentation">
+              <p class="fr-text--lg"><strong>{{ nbOriginUrlClicks }}</strong></p>
+            </div>
+          </div>
+        </div>
+
+        <div class="fr-col-12 fr-col-md-4">
+          <div class="fr-tile">
+            <div class="fr-tile__body">
+              <p class="fr-tile__title fr-h6">
+                Ajout dans des projets privés
+              </p>
+            </div>
+            <div class="fr-tile__img overflow--initial" role="presentation">
+              <p class="fr-text--lg"><strong>{{ nbProjectPrivates }}</strong></p>
+            </div>
+          </div>
+        </div>
+        <div class="fr-col-12 fr-col-md-4">
+            <div class="fr-tile">
+              <div class="fr-tile__body">
+                <p class="fr-tile__title fr-h6">
+                  Ajout dans des projets publics
+                </p>
+              </div>
+              <div class="fr-tile__img overflow--initial" role="presentation">
+                <p class="fr-text--lg"><strong>{{ nbProjectPublics }}</strong></p>
+              </div>
+            </div>
+        </div>
+      </div>
+
+      <div class="at-centered fr-my-5w">
+        <a
+        class="fr-btn fr-icon-download-line fr-btn--icon-left"
+        href="{{ path('app_user_aid_export_stats', {'slug': aid.slug, 'dateMin': dateMin|date('Y-m-d'), 'dateMax': dateMax|date('Y-m-d')}) }}">
+          Exporter les statistiques de la période
+        </a>
+      </div>
+
+      <div class="at-centered">
+        <a
+            class="fr-tag fr-icon-arrow-left-line fr-tag--icon-left"
+            href="{{ path('app_user_aid_publications') }}">
+            Retour au portefeuille
+        </a>
+      </div>
+
+      <div class="fr-alert fr-alert--info fr-alert--sm fr-mb-2w fr-mt-5w">
+        <p class="fr-mt-2w fr-mb-1w">
+            <strong>
+                Précautions d’usage sur ces données
+            </strong>
+        </p>
+        <p>
+            Selon la période choisie, des données peuvent ne pas avoir été enregistrées car la fonctionnalité n’existait pas encore.</a>
+        </p>
+      </div>
+    </div>
+  </section>
+</article>
+
+{% endblock body %}

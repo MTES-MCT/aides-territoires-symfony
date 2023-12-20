@@ -1,0 +1,238 @@
+<?php
+
+namespace App\Controller\Admin\SearchPage;
+
+use App\Controller\Admin\AtCrudController;
+use App\Controller\Admin\Page\PageLinkSearchPageCrudController;
+use App\Entity\Aid\Aid;
+use App\Entity\Search\SearchPage;
+use App\Field\TextLengthCountField;
+use App\Field\TrumbowygField;
+use App\Service\Aid\AidSearchFormService;
+use App\Service\Image\ImageService;
+use App\Service\Various\ParamService;
+use Doctrine\Persistence\ManagerRegistry;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
+use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\CollectionField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\ColorField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\DateTimeField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\FormField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\ImageField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\IntegerField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\TextareaField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\UrlField;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\HttpKernel\KernelInterface;
+
+class SearchPageCrudController extends AtCrudController
+{
+    public function __construct(
+        public ManagerRegistry $managerRegistry,
+        public ImageService $imageService,
+        public ParamService $paramService,
+        public KernelInterface $kernelInterface,
+        protected AidSearchFormService $aidSearchFormService
+    ) {
+        parent::__construct($managerRegistry, $imageService, $paramService, $kernelInterface);
+    }
+
+    public static function getEntityFqcn(): string
+    {
+        return SearchPage::class;
+    }
+
+    public function configureFields(string $pageName): iterable
+    {
+        $entity = $this->getContext()->getEntity()->getInstance() ?? null;
+
+        yield IdField::new('id')->onlyOnIndex();
+        yield TextField::new('slug', 'Url')
+        ->setHelp('Par exemple, « /a_propos/contact/ ». Vérifiez la présence du caractère « / » en début et en fin de chaîne.');
+        yield TrumbowygField::new('description', 'Contenu de la page')
+        ->setHelp('Description complète de la page. Sera affichée au dessus des résultats.')
+        ->hideOnIndex();
+        yield TrumbowygField::new('moreContent', 'Contenu additionnel')
+        ->setHelp('Contenu caché, révélé au clic sur le bouton « Voir plus »')
+        ->hideOnIndex();
+
+        yield FormField::addPanel('Configuration');
+        yield TextField::new('name', 'Titre')
+        ->setHelp('Le titre principal.');
+        yield AssociationField::new('administrator', 'Administrateur')
+        ->autocomplete()
+        ->hideOnIndex();
+        yield TextField::new('shortTitle', 'Titre court')
+        ->setHelp('Un titre plus concis, pour affichage spécifique')
+        ->hideOnIndex();
+        yield TextLengthCountField::new('slug', 'Fragment d’URL')
+        ->setHelp('Cette partie est utilisée dans l’URL. NE PAS CHANGER pour une page. DOIT être en minuscule pour les sites partenaires. Longueur max :33 caractères, mais si possible ne pas dépasser 23.')
+        ->setFormTypeOption('attr', ['maxlength' => 33]);
+        yield BooleanField::new('subdomainEnabled', 'Afficher depuis un sous-domaine ?')
+        ->hideOnIndex();
+        yield TextareaField::new('searchQuerystring', 'Querystring')
+        ->setHelp('Les paramètres de recherche en format URL')
+        ->hideOnIndex();
+        yield TextField::new('tabTitle', 'Titre de l’onglet principal')
+        ->hideOnIndex();
+        yield UrlField::new('contactLink', 'URL du lien contact')
+        ->setHelp('URL ou adresse email qui sera utilisé pour le lien « contact » dans le footer.')
+        ->hideOnIndex();
+
+        yield FormField::addPanel('À propos de cette page');
+        if ($entity && $entity->getTimeCreate()) {
+            yield DateTimeField::new('timeCreate', 'Date de création')
+            ->setFormTypeOption('attr', ['readonly' => true])
+            ;
+        }
+        yield DateTimeField::new('timeUpdate', 'Date de mise à jour')
+        ->setFormTypeOption('attr', ['readonly' => true])
+        ->hideOnIndex();
+        
+        $aidParams = [];
+        if ($entity && $entity->getSearchQuerystring()) {
+            $aidParams = $this->aidSearchFormService->convertQuerystringToParams($entity->getSearchQuerystring());
+            $aids = $this->managerRegistry->getRepository(Aid::class)->findCustom($aidParams);
+
+            // $aidParams = array_merge($aidParams, ['inAdmin' => true]);
+            $this->getContext()->getEntity()->getInstance()->setNbAids(
+                count($aids)
+            );
+        }
+
+        yield IntegerField::new('nbAids', 'Nombre d\'aides total (querystring)')
+        ->setFormTypeOption('attr', ['readonly' => true])
+        ->hideOnIndex();
+        if ($entity && $entity->getSearchQuerystring()) {
+            $aidParams = array_merge($aidParams, ['showInSearch' => true]);
+            $aids = $this->managerRegistry->getRepository(Aid::class)->findCustom($aidParams);
+            $this->getContext()->getEntity()->getInstance()->setNbAidsLive(
+                count($aids)
+            );
+        }
+        yield IntegerField::new('nbAidsLive', 'Nombre d\'aides actuellement visible')
+        ->setFormTypeOption('attr', ['readonly' => true])
+        ->hideOnIndex();
+
+        yield FormField::addPanel('Mettre en avant des aides');
+        yield AssociationField::new('highlightedAids', 'Aides à mettre en avant')
+        ->setHelp('Il est possible de mettre jusqu’à 9 aides en avant. Les aides mises en avant s’affichent en haut des résultats du portail, et n’ont pas de mise en forme particulière.')
+        ->autocomplete()
+        ->hideOnIndex()
+        ;
+
+        yield FormField::addPanel('Exclure des aides des résultats');
+        yield AssociationField::new('excludedAids', 'Aides à exclure')
+        ->autocomplete()
+        ->hideOnIndex()
+        ;
+
+        yield FormField::addPanel('SEO');
+        yield TextLengthCountField::new('metaTitle', 'Titre (balise meta)')
+        ->setHelp('Le titre qui sera affiché dans les SERPs. Il est recommandé de le garder < 60 caractères. Laissez vide pour réutiliser le titre de la page.')
+        ->setFormTypeOption('attr', ['maxlength' => 180])
+        ->hideOnIndex();
+        yield TextLengthCountField::new('metaDescription', 'Description (balise meta)')
+        ->setHelp('Sera affichée dans les SERPs. À garder < 120 caractères.')
+        ->setFormTypeOption('attr', ['maxlength' => 255]);
+
+        yield ImageField::new('metaImage', 'Image (balise meta)')
+        ->setHelp('Vérifiez que l’image a une largeur minimale de 1024px')
+        ->setUploadDir(static::UPLOAD_TMP_FOLDER)
+        ->setBasePath($this->paramService->get('cloud_image_url'))
+        ->setUploadedFileNamePattern(SearchPage::FOLDER.'/[slug]-[timestamp].[extension]')
+        ->setFormTypeOption('upload_new', function(UploadedFile $file, string $uploadDir, string $fileName) {
+            $this->imageService->sendImageToCloud($file, SearchPage::FOLDER, $fileName);
+        })
+        ->hideOnIndex();
+        
+        yield FormField::addPanel('Personnalisation du style');
+
+        yield ImageField::new('logo', 'Logo')
+        ->setHelp('Évitez les fichiers trop lourds. Préférez les fichiers svg.')
+        ->setUploadDir(static::UPLOAD_TMP_FOLDER)
+        ->setBasePath($this->paramService->get('cloud_image_url'))
+        ->setUploadedFileNamePattern(SearchPage::FOLDER.'/[slug]-[timestamp].[extension]')
+        ->setFormTypeOption('upload_new', function(UploadedFile $file, string $uploadDir, string $fileName) {
+            $this->imageService->sendImageToCloud($file, SearchPage::FOLDER, $fileName);
+        })
+        ->hideOnIndex();
+        yield UrlField::new('logoLink', 'Lien du logo')
+        ->setHelp('L’URL vers laquelle renvoie un clic sur le logo partenaire')
+        ->hideOnIndex();
+        yield ColorField::new('color1', 'Couleur 1')
+        ->setHelp('Couleur du fond principal')
+        ->hideOnIndex();
+        yield ColorField::new('color2', 'Couleur 2')
+        ->setHelp('Couleur du formulaire de recherche')
+        ->hideOnIndex();
+        yield ColorField::new('color3', 'Couleur 3')
+        ->setHelp('Couleur des boutons et bordures de titres')
+        ->hideOnIndex();
+        yield ColorField::new('color4', 'Couleur 4')
+        ->setHelp('Couleur des liens')
+        ->hideOnIndex();
+        yield ColorField::new('color5', 'Couleur 5')
+        ->setHelp('Couleur de fond du pied de page')
+        ->hideOnIndex();
+
+        yield FormField::addPanel('Personnalisation du formulaire');
+        yield BooleanField::new('showCategoriesField', 'Montrer le champ « thématiques »')
+        ->hideOnIndex();
+        yield AssociationField::new('categories', 'Sous-thématiques')
+        ->setFormTypeOption('choice_label', function($entity) {
+            $return = '';
+            if ($entity->getCategoryTheme()) {
+                $return .= $entity->getCategoryTheme()->getName(). ' > ';
+            }
+            $return .= $entity->getName();
+            return $return;
+        })
+        ->hideOnIndex();
+        yield BooleanField::new('showAudienceField', 'Montrer le champ « structure »')
+        ->hideOnIndex();
+        yield AssociationField::new('organizationTypes', 'Bénéficiaires de l’aide')
+        ->hideOnIndex();
+        yield BooleanField::new('showPerimeterField', 'Montrer le champ « territoire »')
+        ->hideOnIndex();
+        yield BooleanField::new('showMobilizationStepField', 'Montrer le champ « avancement du projet »')
+        ->hideOnIndex();
+        yield BooleanField::new('showAidTypeField', 'Montrer le champ « nature de l’aide »')
+        ->hideOnIndex();
+        yield BooleanField::new('showBackersField', 'Montrer le champ « porteur »')
+        ->hideOnIndex();
+        yield BooleanField::new('showTextField', 'Montrer le champ « recherche textuelle »')
+        ->hideOnIndex();
+
+        yield FormField::addPanel('Onglets');
+        yield CollectionField::new('pages', 'Onglets')
+        ->useEntryCrudForm(PageLinkSearchPageCrudController::class)
+        ->setColumns(12)
+        ->hideOnIndex()
+        ;
+        
+    }
+
+    public function configureActions(Actions $actions): Actions
+    {
+        // action pour afficher le qrCode
+        $displayOnFront = Action::new('displayOnFront', 'Afficher sur le site', 'far fa-eye')
+            ->setHtmlAttributes(['title' => 'Afficher sur le site', 'target' => '_blank']) // titre
+            ;
+
+        //set the link using a string or a callable (function like its being used here)
+        $displayOnFront->linkToUrl(function($entity) {
+            return $this->generateUrl('app_portal_portal_details', ['slug' => $entity->getSlug()]);
+        });
+        
+        return parent::configureActions($actions)
+            ->add(Crud::PAGE_INDEX, $displayOnFront)
+            ->add(Crud::PAGE_EDIT, $displayOnFront)
+        ;
+    }
+}

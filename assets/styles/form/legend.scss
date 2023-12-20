@@ -1,0 +1,19 @@
+.optgroup{
+    legend{
+        font-size: 1rem;
+        font-style: italic;
+        margin-bottom: 0;
+
+        &:before{
+            display: inline-block;
+            font-style: normal;
+            font-variant: normal;
+            font-weight: normal;
+            line-height: 1;
+            content: "→ ";
+            vertical-align: baseline;
+            font-size: 1em;
+            margin-right: .5rem;
+        }
+    }
+}

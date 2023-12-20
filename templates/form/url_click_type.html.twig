@@ -1,0 +1,9 @@
+{% block url_click_type_row %}
+<div class="field-text">
+    {{ form_label(form) }}
+    <p><a href="{{ form.vars.value }}" target="_blank" title="Ouvre une nouvelle fenêtre">{{ form.vars.value }}</a></p>
+    {# {{ form_widget(form) }} #}
+    {{ form_help(form) }}
+    {{ form_errors(form) }}
+</div>
+{% endblock %}

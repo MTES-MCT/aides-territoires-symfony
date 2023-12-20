@@ -1,0 +1,17 @@
+label{
+    &.required{
+        .at-field-label{
+            &:after{
+                content: ' *';
+            }
+        }
+    }
+}
+
+.fr-checkbox-group{
+    label{
+        .at-field-label{
+            font-weight: normal;
+        }
+    }
+}

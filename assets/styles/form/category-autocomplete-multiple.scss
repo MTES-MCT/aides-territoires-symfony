@@ -1,0 +1,60 @@
+.widget-autocomplete-multiple-wrapper{
+    position: relative;
+
+}
+.autocomplete-list-wrapper{
+    display: none;
+    position: fixed;
+    z-index: 2;
+    min-width: 266px;
+    
+    left: 0;
+    top: 100%;
+    color: var(--text-title-grey);
+    background-color: var(--background-contrast-grey);
+    border-bottom: none;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+
+    border: 1px solid #aaa;
+    border-top-width: 1px;
+    border-top-style: solid;
+    border-top-color: rgb(170, 170, 170);
+    border-radius: 4px;
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+
+    .autocomplete-input{
+        padding: 4px;
+        background-color: white;
+
+        input{
+            box-shadow: none;
+        }
+    }
+    .autocomplete-choices{
+        max-height: 300px;
+        overflow-y: auto;
+
+        strong{
+            text-transform: uppercase;
+        }
+
+        .fr-fieldset__element{
+            padding: 6px;
+            margin: 0;
+        }
+        
+        .fr-fieldset__element[aria-selected="true"] {
+            background-color: var(--background-alt-grey-hover);
+        }
+    }
+    // .checkbox-item{
+    //     display: flex;
+    //     align-items: center;
+
+    //     &input{
+    //         margin: 0 5px 0 0;
+    //     }
+    // }
+}

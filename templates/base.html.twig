@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="fr" data-fr-scheme="system">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <meta name="format-detection" content="telephone=no">
+
+        <meta name="theme-color" content="#000091"><!-- Défini la couleur de thème du navigateur (Safari/Android) -->
+        <link rel="apple-touch-icon" href="{{ asset('build/images/favicon/apple-touch-icon.png') }}"><!-- 180×180 -->
+        <link rel="icon" href="{{ asset('build/images/favicon/favicon.svg') }}" type="image/svg+xml">
+        <link rel="shortcut icon" href="{{ asset('build/images/favicon/favicon.ico') }}" type="image/x-icon"><!-- 32×32 -->
+        <link rel="manifest" href="{{ asset('build/images/favicon/manifest.webmanifest') }}" crossorigin="use-credentials">
+        <!-- Modifier les chemins relatifs des favicons en fonction de la structure du projet -->
+        <!-- Dans le fichier manifest.webmanifest aussi, modifier les chemins vers les images -->
+
+        <title>{% block title %}Aides Territoires{% endblock title %}</title>
+        <meta name="description" content="{% block meta_description %}Aides Territoires{% endblock %}" />
+
+        {% block meta_og %}
+        <meta property="og:title" content="Aides-territoires | Toutes les aides pour les acteurs locaux" />
+        <meta property="og:type" content="website" />
+        <meta property="og:description" content="Trouvez les aides pertinentes pour financer et accompagner les projets de votre territoire" />
+        <meta property="og:url" content="https://aides-territoires.beta.gouv.fr" />
+        <meta property="og:site_name" content="Aides-territoires" />
+        <meta property="og:image" content="{{ absolute_url(asset('build/images/logo/logo_AT_og.png')) }}" />
+        <meta property="og:image:alt" content="Logo : Aides-territoires" />
+        {% endblock %}
+
+        {% block stylesheets %}
+            {{ encore_entry_link_tags('app') }}
+        {% endblock %}
+
+        {% block javascripts %}
+            {{ encore_entry_script_tags('app') }}
+        {% endblock %}
+
+        {% block ld_json %}{% endblock %}
+
+        {% include 'include/_matomo.html.twig' %}
+        {% include 'include/_brevo.html.twig' %}
+    </head>
+
+    <body>
+        <!-- code de la page -->
+        {% block header %}
+        <header role="banner" class="fr-header">
+            {% block header_not_connected %}
+                {% if not app.user %}
+                    <div class="fr-background-alt fr-p-2w">
+                        <div class="fr-container at-centered">
+                            <p class="fr-mb-0 at-text--bold">Créez rapidement votre compte pour trouver plus simplement des aides pour vos projets. <a href="/comptes/inscription/" title="Créer votre compte">J'y vais !</a></p>
+                        </div>
+                    </div>
+                {% endif %}
+            {% endblock %}
+
+            <div class="fr-header__body">
+                <div class="fr-container">
+                    <div class="fr-header__body-row">
+                        {% include 'include/_header_brand.html.twig' %}
+                        {% include 'include/_header_tools.html.twig' %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="fr-header__menu fr-modal" id="modal-menu-mobile" data-fr-js-modal="true" data-fr-js-header-modal="true">
+                <div class="fr-container">
+                    <button class="fr-btn fr-btn--close" aria-controls="modal-menu-mobile" data-fr-js-modal-button="true">Fermer</button>
+                    {% include 'include/_header_menu_links.html.twig' %}
+                    {% include 'include/_header_nav.html.twig' %}
+                </div>
+            </div>
+        </header>
+
+            {% block breadcrumb %}
+                {% include('include/_breadcrumb.html.twig') %}
+            {% endblock %}
+
+            {% block flashMessages %}
+                {% set flashes = app.flashes %}
+                {% if flashes|length > 0 %}
+                <div class="messages fr-container fr-my-5w">
+                {% for label, messages in flashes %}
+                    {% for message in messages %}
+                        <div class="fr-alert fr-alert--{{ label|default('info') }} fr-alert--sm">
+                            <p>{{ message|raw }}</p>
+                        </div>
+                    {% endfor %}
+                {% endfor %}
+                </div>
+                {% endif %}
+            {% endblock %}
+        {% endblock %}
+
+        {% block body %}
+        {% endblock %}
+
+        {% block footer %}{% include('include/_footer.html.twig') %}{% endblock %}
+
+        {% include('include/_scheme_modal.html.twig') %}
+
+        {% block modal %}{% endblock %}
+
+        {% block javascriptsBottom %}{% endblock %}
+    </body>
+</html>

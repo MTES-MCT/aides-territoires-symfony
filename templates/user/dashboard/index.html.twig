@@ -1,0 +1,61 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Bienvenue sur votre compte | {{ parent() }}{% endblock %}
+
+{% block body %}
+
+
+<div class="fr-container fr-mb-5w fr-mt-0">
+    <div class="fr-grid-row">
+
+       {% include "user/_menu_user.html.twig" with { dashboard:true } %}
+
+        <div class="fr-col-12 fr-col-md-9">
+            <h1 class="fr-h3">Bienvenue sur votre compte {{ app.user.firstname }}&nbsp;!</h1>
+              <p>Depuis votre compte utilisateur, gérez vos projets, vos aides, ou les informations liées à votre structure.</p>
+            <div class="fr-ml-5w fr-grid-row fr-grid-row--gutters fr-mt-5w">
+                {% if app.user.isContributor %}
+                <div class="fr-col-6 fr-col-md-4 fr-col-lg-4">
+                    <div class="fr-tile fr-enlarge-link">
+                        <div class="fr-tile__body">
+                            <h2 class="fr-tile__title">
+                                <a class="fr-tile__link" href="{{ path('app_user_aid_publications') }}">Diffuser mes aides</a>
+                            </h2>
+                            <p class="fr-tile__desc fr-h4 fr-pb-2w">{{ aidsNumber }}</p>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                {% if app.user.isBeneficiary %}
+                <div class="fr-col-6 fr-col-md-4 fr-col-lg-4">
+                    <div class="fr-tile fr-enlarge-link">
+                        <div class="fr-tile__body">
+                            <h2 class="fr-tile__title">
+                                <a class="fr-tile__link" href="{{ path('app_user_project_structure') }}">Gérer mes projets</a>
+                            </h2>
+                            <p class="fr-tile__desc fr-h4 fr-pb-2w">{{ projectsNumber }}</p>
+                        </div>
+                    </div>    
+                </div>
+                {% endif %}
+                {% if app.user.isBeneficiary %}
+                <div class="fr-col-6 fr-col-md-4 fr-col-lg-4">
+                    <div class="fr-tile fr-enlarge-link">
+                        <div class="fr-tile__body">
+                            <h2 class="fr-tile__title">
+                                <a class="fr-tile__link" href="{{ path('app_organization_collaborateurs') }}">Mes collaborateurs</a>
+                            </h2>
+                            <p class="fr-tile__desc fr-h4 fr-pb-2w">{{ collaboratorsNumber }}</p>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+            
+        </div>
+    </div>
+</div>
+
+
+
+{% endblock %}

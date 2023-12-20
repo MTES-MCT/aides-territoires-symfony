@@ -1,0 +1,124 @@
+<div class="fr-follow at-background-alt-green">
+    <div class="fr-container">
+        <div class="fr-grid-row">
+            <div class="fr-col-12 fr-col-md-8">
+                <section aria-labelledby="follow-newsletter" class="fr-follow__newsletter">
+                    <div>
+                        <h2 id="follow-newsletter" class="fr-h5 fr-follow__title">Abonnez-vous à notre lettre d’information</h2>
+                        <p class="fr-text--sm fr-follow__desc">Restez informé des nouveautés de la plateforme</p>
+                    </div>
+                    <div>
+                        <a class="fr-btn" href="{{ getParameter('mailing_list_url') }}" title="Abonnez-vous à notre lettre d’information - ouvre une nouvelle fenêtre" target="_blank" rel="noopener">Abonnez-vous</a>
+                    </div>
+                </section>
+            </div>
+            <div class="fr-col-12 fr-col-md-4">
+                <section aria-labelledby="follow-social" class="fr-follow__social">
+                    <h2 id="follow-social" class="fr-h5 fr-mb-3v fr-mb-3v">Suivez-nous<br /> sur les réseaux sociaux</h2>
+                    <ul class="fr-btns-group fr-btns-group--lg">
+                        <li>
+                            <a class="fr-btn--facebook fr-btn" href="https://www.facebook.com/Aidesterritoires" title="Retrouvez Aides territoires sur Facebook - ouvre une nouvelle fenêtre" target="_blank" rel="noopener">
+                            Facebook
+                            </a>
+                        </li>
+                        <li>
+                            <a class="fr-btn--twitter fr-btn" href="https://twitter.com/aidesterr" title="Retrouvez Aides territoires sur Twitter - ouvre une nouvelle fenêtre" target="_blank" rel="noopener">
+                            Twitter
+                            </a>
+                        </li>
+                        <li>
+                            <a class="fr-btn--linkedin fr-btn" href="https://www.linkedin.com/company/aides-territoires" title="Retrouvez Aides territoires sur LinkedIn - ouvre une nouvelle fenêtre" target="_blank" rel="noopener">
+                            LinkedIn
+                            </a>
+                        </li>
+                    </ul>
+                </section>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer class="fr-footer" role="contentinfo" id="footer">
+    <div class="fr-container">
+        <div class="fr-footer__body">
+            <div class="fr-footer__brand">
+                <a class="fr-logo" href="https://www.gouvernement.fr" title="Site du Gouvernement Français">
+                    <span class="fr-logo__title">Gouvernement</span>
+                </a>
+            </div>
+            <div class="fr-footer__content">
+                <p class="fr-footer__content-desc">Aides-territoires est une startup d’État portée par la Direction Générale de l’Aménagement, du Logement et de la Nature (DGALN) avec le soutien de l’Agence Nationale de Cohésion des Territoires (ANCT)  et de la Direction Générale des Infrastructures de Transport et de la Mer (DGITM).</p>
+                <ul class="fr-footer__content-list">
+                    <li class="fr-footer__content-item">
+                        <a class="fr-footer__content-link" href="https://www.ecologie.gouv.fr/" title="ecologie.gouv.fr">ecologie.gouv.fr</a>
+                    </li>
+                    <li class="fr-footer__content-item">
+                        <a class="fr-footer__content-link" href="https://www.cohesion-territoires.gouv.fr" title="cohesion-territoires.gouv.fr">cohesion-territoires.gouv.fr</a>
+                    </li>
+                    <li class="fr-footer__content-item">
+                        <a class="fr-footer__content-link" href="https://gouvernement.fr" title="gouvernement.fr">gouvernement.fr</a>
+                    </li>
+                    <li class="fr-footer__content-item">
+                        <a class="fr-footer__content-link" href="https://data.gouv.fr" title="data.gouv.fr">data.gouv.fr</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="fr-footer__partners">
+            <h2 class="fr-footer__partners-title">Nos partenaires</h2>
+            <div class="fr-footer__partners-logos">
+                <div class="fr-footer__partners-main">
+                    <a class="fr-footer__partners-link" href="https://agence-cohesion-territoires.gouv.fr/" title="Agence nationale de la cohésion des territoires">
+                        <img class="fr-footer__logo" src="{{ asset('build/images/logo/logo-anct.svg') }}" width="232" height="90" alt="Logo Agence nationale de la cohésion des territoires" loading="lazy" />
+                    </a>
+                    <a class="fr-footer__partners-link" href="https://www.francemobilites.fr/" title="France Mobilités">
+                        <img class="fr-footer__logo" src="{{ asset('build/images/logo/logo-francemobilites.svg') }}" width="90" height="90" alt="Logo France Mobilités" loading="lazy" />
+                    </a>
+                </div>
+                <div class="fr-footer__partners-sub">
+                    <ul>
+                        <li>
+                            <a class="fr-footer__partners-link" href="https://www.expertises-territoires.fr/" title="Expertises Territoires par le Cerema">
+                                <img class="fr-footer__logo" src="{{ asset('build/images/logo/logo-expertises-territoires.webp') }}" width="211" height="90" alt="Logo Expertises Territoires par le Cerema" loading="lazy" />
+                            </a>
+                        </li>
+                        <li>
+                            <a class="fr-footer__partners-link" href="https://beta.gouv.fr/" title="Beta.gouv.fr">
+                                <img class="fr-footer__logo" src="{{ asset('build/images/logo/logo-betagouvfr.svg') }}" alt="Logo Beta.gouv.fr" width="248" height="90" loading="lazy" />
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="fr-footer__bottom">
+            <ul class="fr-footer__bottom-list">
+                <li class="fr-footer__bottom-item"><a class="fr-footer__bottom-link" href="{{ path('app_static_sitemap') }}" title="Plan du site">Plan du site</a></li>
+                <li class="fr-footer__bottom-item"><a class="fr-footer__bottom-link" href="{{ path('app_static_data') }}" title="Données et API">Données et API</a></li>
+                <li class="fr-footer__bottom-item"><a class="fr-footer__bottom-link" href="{{ path('app_contact_contact') }}" title="Nous contacter">Nous contacter</a></li>
+                <li class="fr-footer__bottom-item"><a class="fr-footer__bottom-link" href="{{ path('app_static_legal_notice') }}" title="Mentions légales">Mentions légales</a></li>
+                <li class="fr-footer__bottom-item"><a class="fr-footer__bottom-link" href="{{ path('app_static_privacy_policy') }}" title="Politique de confidentialité">Politique de confidentialité</a></li>
+                <li class="fr-footer__bottom-item"><a class="fr-footer__bottom-link" href="{{ path('app_static_accessibility') }}" title="Accessibilité : non conforme">Accessibilité : non conforme</a></li>
+                <li class="fr-footer__bottom-item">
+                    <a class="fr-footer__bottom-link" href="https://github.com/MTES-MCT/aides-territoires" target="_blank" rel="noopener" title="Code source - ouvre une nouvelle fenêtre">
+                        Code source
+                    </a>
+                </li>
+                <li class="fr-footer__bottom-item">
+                    <button class="fr-btn--display fr-btn" aria-controls="fr-theme-modal" title="Paramètres d’affichage" data-fr-opened="false">Paramètres d’affichage</button>
+                </li>
+            </ul>
+        </div>
+
+        <div class="fr-footer__bottom-copy">
+            <p>
+                Sauf mention explicite de propriété intellectuelle détenue par des tiers, les contenus de ce site sont proposés sous
+                <a href="https://github.com/etalab/licence-ouverte/blob/master/LO.md" target="_blank" rel="noopener"  title="Licence etalab-2.0 - ouvre une nouvelle fenêtre">
+                    licence etalab-2.0
+                </a>
+            </p>
+        </div>
+    </div>
+</footer>

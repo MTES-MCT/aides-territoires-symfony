@@ -1,0 +1,116 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mon portefeuille d’aides | {{ parent() }}{% endblock %}
+
+{% block body %}
+<div id="draft-list" class="fr-container">
+
+    <div class="fr-grid-row">    
+        
+        {% include "user/_menu_user.html.twig" with { publishAid:true, aidDraftList:true } %}
+
+        <div class="fr-col-12 fr-col-md-9">
+
+            <div class="fr-grid-row fr-grid-row--middle">    
+                <h1 class="fr-h3 fr-col-12 fr-col-md-9">Mon portefeuille d’aides</h1>
+                <a class="fr-btn fr-col-12 fr-col-md-3 fr-grid-row--center" href="{{ path('app_user_aid_detail_publish') }}">Publier une aide</a>
+            </div>
+
+            <div class="fr-alert fr-alert--info fr-alert--sm fr-mb-2w fr-mt-2w">
+                <p>Que pouvez-vous faire ici ? Cette page vous permet de gérer vos aides sur Aides-territoires.</p>
+                <p>Depuis votre portefeuille, vous pouvez modifier vos fiches d’aides, suivre leur état de publication sur la plateforme, ainsi que le nombre de vues associé.</p>
+                <p>Les aides arrivées à échéance sont automatiquement dépubliées de la plateforme, mais restent dans votre portefeuille d’aides en statut "brouillon" au cas où vous souhaiteriez les publier à nouveau.</p>
+            </div>
+        
+            <div class="fr-mt-5w">
+                Nombre d'aides publiées en cours : <span class="counter fr-tag">{{ nbAidsLive }}</span><br />
+                Nombre de vues total des aides depuis la première publication : <span class="counter fr-tag">{{ nbAidsViews }}</span><br />
+                Nombre de vues total des aides sur les 30 derniers jours : <span class="counter fr-tag">{{ nbAidsViewsMonth }}</span>
+            </div>
+
+            {{ form_start(formAidFilter, {'attr': {'class': 'fr-background-alt-pink fr-my-5w', 'autocomplete': 'off'}} )}}
+                <div class="form-container fr-p-3w">
+                    {{ form_row(formAidFilter.state)}}
+                    {{ form_row(formAidFilter.statusDisplay)}}
+                    <div class="fr-input-group">
+                        <button class="filter-btn fr-btn fr-mt-3w" type="submit">
+                            Filtrer les résultats
+                        </button>
+                    </div>
+                </div>
+            {{ form_end(formAidFilter)}}
+
+            <div class="fr-table">
+                <table class="sortable-table data-table">
+                    <caption class="fr-sr-only">
+                        La liste de vos aides publiées
+                        <br />
+                        <span class="fr-text fr-icon-information-line"> Cliquer sur le nom d’une colonne pour trier</span>
+                    </caption>
+                    <thead>
+                        <tr>
+                            <th scope="col" class="aid-name-column" title="Trier par Nom de l’aide">Nom de l’aide</th>
+                            <th scope="col" title="Trier par Périmètre">Périmètre</th>
+                            <th scope="col" title="Trier par Créée le">Créée le</th>
+                            <th scope="col" title="Trier par Modifiée le">Modifiée le</th>
+                            <th scope="col" title="Trier par Echéance">Échéance</th>
+                            <th scope="col">Visibilité sur le site</th>
+                            <th scope="col">Statistiques</th>
+                            <th scope="col">Export PDF</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for aid in aids %}
+                        <tr>
+                            <td>
+                                <a href="{{ path('app_user_aid_edit', {'slug': aid.slug}) }}">
+                                    {{ aid.name }}
+                                </a>
+                                {% if aid.isLive %}
+                                    <p class="fr-badge fr-badge--success fr-badge--sm">Affichée</p>
+                                {% endif %}
+                            </td>
+                            <td>{% if aid.perimeter %}{{ aid.perimeter.name }}{% endif %}</td>
+                            <td data-sort="{{ aid.dateCreate|date('Y-m-d') }}">{{ aid.dateCreate|date('d/m/Y') }}</td>
+                            <td data-sort="{{ aid.timeUpdate|date('Y-m-d') }}">{{ aid.timeUpdate|date('d/m/Y') }}</td>
+                            <td class="nowrap-cell" data-sort="{{ aid.dateSubmissionDeadline|date('Y-m-d') }}">
+                                {% if aid.dateSubmissionDeadline %}<span>{{ aid.dateSubmissionDeadline|date('d/m/Y') }}</span>{% endif %}
+                                {% if aid.isOngoing %}
+                                    <p class="fr-badge fr-badge--info fr-badge--sm">Permanente</p>
+                                {% elseif aid.isApproachingDeadline %}
+                                    <p class="fr-badge fr-badge--new fr-badge--sm">Échéance proche</p>                       
+                                {% elseif aid.hasExpired %}
+                                    <p class="fr-badge fr-badge--warning fr-badge--sm">Expirée</p>
+                                {% endif %}
+                            </td>
+                            <td class="nowrap-cell">
+                                <a href="{{ absolute_url(path('app_aid_aid_details', {'slug': aid.slug})) }}">{% if aid.hasExpired %}Archivée{% else %}{{ aid.status|aidStatusDisplay }}{% endif %}</a>
+                            </td>
+                            <td><a href="{{ path('app_user_aid_stats', {'slug': aid.slug, 'dateMin': aid.dateCreate|date('Y-m-d'), 'dateMax': "now"|date('Y-m-d')}) }}">{{ aid.nbViews }}</a></td>
+                            <td>
+                                <a href="{{ path('app_user_aid_export_pdf', {'slug': aid.slug}) }}" title="Télécharger la fiche détail de l’aide en PDF" class="fr-btn fr-icon-download-line fr-btn--tertiary fr-btn--tertiary-no-outline at-box-shadow--none"><span class="fr-sr-only">Télécharger la fiche détail de l’aide en PDF</span></a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <button
+            type="button"
+            class="fr-btn fr-icon-download-line fr-btn--icon-left fr-mb-5w"
+            id="export-aids-btn"
+            data-fr-opened="false"
+            aria-controls="export-aids-modal-{{ app.user.id }}"
+            {% if app.user.organizations|length == 0 %}disabled="disabled"{% endif %}
+            >
+            Exporter toutes les aides de votre structure
+            </button>    
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block modal %}
+    {% include 'user/aid/_export_aids_modal.html.twig' %}
+{% endblock modal %}

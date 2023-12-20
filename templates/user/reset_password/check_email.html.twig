@@ -1,0 +1,39 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Votre demande a été prise en compte | {{ parent() }}{% endblock %}
+
+{% block body %}
+<div class="fr-container fr-my-5w">
+    <div class="fr-grid-row fr-grid-row--center">
+        <div class="fr-col-md-8">
+            <h1>Votre demande a été prise en compte</h1>
+            <p class="fr-mt-5w">
+                <strong>Si l’adresse e-mail renseignée est bien associée à un compte</strong>,
+                nous allons vous envoyer un e-mail contenant un lien de connexion.
+                Vérifiez votre messagerie et cliquez sur le lien reçu pour accéder à votre compte.
+            </p>
+            <p class="fr-mt-5w">
+                Ce lien expirera dans {{ resetToken.expirationMessageKey|trans(resetToken.expirationMessageData, 'ResetPasswordBundle') }}
+            </p>
+
+            <div class="fr-mt-5w fr-background-alt-pink fr-p-3w">
+                <p>Si vous ne recevez pas d’e-mail, essayez les solutions suivantes :</p>
+                <ul>
+                    <li>vérifiez que vous utilisez l’adresse exacte associée à votre compte ;</li>
+                    <li>vérifiez vos spams ;</li>
+                    <li>attendez quelques minutes <a href="{{ path('app_login') }}" title="Réessayer l'identification">et réessayez</a> ;</li>
+                </ul>
+            </div>
+
+            <div class="fr-col-12 fr-mt-3w">
+                <div class="fr-alert fr-alert--info fr-alert--sm">
+                    <p>
+                        Si vous n’arrivez pas à vous connecter,
+                        <a href="{{ path('app_contact_contact') }}" title="Nous contacter">n’hésitez pas à nous contacter.</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

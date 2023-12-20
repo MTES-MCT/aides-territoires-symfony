@@ -1,0 +1,110 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Blog{{ getParameter('meta_title_end') }}
+{% endblock %}
+
+{% block stylesheets %}
+	{{ parent() }}
+	{{ encore_entry_link_tags('import-scss/blog/blogpost/details') }}
+{% endblock %}
+
+{% block ld_json %}
+<script type="application/ld+json">
+{
+	"@context": "https://schema.org",
+	"@type": "NewsArticle",
+	"headline": "{{ blogPost.name }}",
+	"image": [
+		"{{ getParameter('cloud_image_url') }}{{ blogPost.logo }}"
+	],
+	"datePublished": "{{ blogPost.datePublished|date('Y-m-d H:i:s') }}",
+	"dateModified": "{% if blogPost.timeUpdate %}{{ blogPost.timeUpdate|date('Y-m-d H:i:s') }}{% else %}{{ blogPost.timeCreate|date('Y-m-d H:i:s') }}{% endif %}",
+	"author": [{
+		"@type": "Person",
+		"name": "{% if blogPost.user %}{{ blogPost.user.firstname }} {{ blogPost.user.lastname }}{% endif %}",
+		"url": "{{ getParameter('site_url') }}"
+	}]
+}
+</script>
+{% endblock %}
+
+{% block body %}
+	<main role="main" class="fr-container-fluid" id="at-main">
+
+		<div id="main-content" class="main-content">
+
+
+			<article id="post" class="fr-container fr-mb-5w">
+
+
+				<div class="fr-grid-row fr-grid-row--center">
+					<div class="fr-col-12 fr-col-md-10">
+						<section id="post-content" class="fr-pb-5w">
+
+							<div id="post-title" class="fr-grid-row fr-grid-row--top">
+								<h1 class="fr-h2 fr-col-12 fr-col-md-10 fr-mb-0">{{ blogPost.name }}</h1>
+								{% if blogPost.blogPostCategory %}
+									<p class="at-post-category fr-tag">{{ blogPost.blogPostCategory.name }}</p>
+								{% endif %}
+							</div>
+							<div class="fr-hint-text fr-mb-4w fr-mt-1w">
+								<p class="fr-text--sm">Le
+									{{ blogPost.datePublished|format_datetime('long', 'none', locale='fr') }}
+								</p>
+							</div>
+
+
+							<div class="wysiwyg-wrapper">
+								{{ optimizeHtmlFromWysiwyg(blogPost.description)|raw }}
+							</div>
+
+
+							<div class="fr-grid-row fr-grid-row--middle fr-my-5w">
+								{% if blogPost.user %}
+									{% if blogPost.user.image %}
+										<img id="post-author-img" src="{{ getParameter('cloud_image_url') }}{{ blogPost.user.image }}" alt="Avatar {{ blogPost.user.firstname }} {{ blogPost.user.lastname }}" class="fr-col-12">
+									{% endif %}
+								<div class="fr-mt-2w">
+									<p class="fr-ml-1w fr-mb-0">
+										<strong>{{ blogPost.user.firstname }} {{ blogPost.user.lastname }}</strong>
+									</p>
+
+									<p class="fr-ml-1w fr-mb-2w">j{{ blogPost.user.email }}</p>
+
+
+									<p class="fr-ml-1w fr-mb-1w fr-text--sm">
+										<a href="{{ path('app_contact_contact') }}" title="nous contacter">Nous contacter</a>
+									</p>
+
+								</div>
+								{% endif %}
+							</div>
+
+
+							<div id="related-articles" class="fr-background-alt-pink fr-p-3w">
+								<p>Vous pourriez aussi être intéressé par&nbsp;:</p>
+								<ul>
+
+									<li><a href="/blog/facilitez-la-renovation-de-votre-bati-scolaire-gra/">Facilitez la rénovation de votre bâti scolaire grâce au plan “Rénovation des écoles”</a></li>
+
+									<li><a href="/blog/candidatez-au-prix-territoria/">Candidatez au prix TERRITORIA !</a></li>
+
+									<li><a href="/blog/porteurs-daides-decouvrez-les-evolutions-du-servic/">Porteurs d'aides : découvrez les évolutions du service Aides-territoires</a></li>
+
+									<li><a href="/blog/redynamisation-commerciale-decouvrez-10-solutions/">[Guide] Les 10 essentiels de la redynamisation commerciale : Retours d'expériences des 350 missions SHOP'IN réalisées dans les Petites Villes de Demain</a></li>
+
+									<li><a href="/blog/le-plan-france-ruralites-pour-soutenir-les-territo/">Le Plan France Ruralités pour soutenir les territoires ruraux</a></li>
+
+								</ul>
+							</div>
+
+
+						</section>
+					</div>
+				</div>
+			</article>
+
+		</div>
+
+	</main>
+{% endblock %}

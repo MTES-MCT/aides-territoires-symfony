@@ -1,0 +1,22 @@
+@import '../_variables';
+@import '../_mixins';
+.dataTables_filter{
+    input[type="search"]{
+        border: 1px solid #aaa;
+        border-radius: 3px;
+        padding: 5px;
+        background-color: transparent;
+        color: inherit;
+        margin-left: 3px;
+    }
+}
+.dataTables_length{
+    select{
+        border: 1px solid #aaa;
+        border-radius: 3px;
+        padding: 5px;
+        background-color: transparent;
+        color: inherit;
+        margin-left: 3px;
+    }
+}

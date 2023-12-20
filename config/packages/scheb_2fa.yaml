@@ -1,0 +1,14 @@
+# See the configuration reference at https://symfony.com/bundles/SchebTwoFactorBundle/6.x/configuration.html
+scheb_two_factor:
+    totp:
+        enabled: true
+        template: security/2fa_form.html.twig   # Template used to render the authentication form
+        issuer: v4-Aides-territoires        # Issuer name used in QR code
+    # google:
+    #     enabled: true                  # If Google Authenticator should be enabled, default false
+    #     template: security/2fa_form.html.twig   # Template used to render the authentication form
+    #     # server_name: Aides-territoires      # Server name used in QR code
+    #     issuer: Aides-territoires        # Issuer name used in QR code
+    security_tokens:
+        - Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken
+        - Symfony\Component\Security\Http\Authenticator\Token\PostAuthenticationToken

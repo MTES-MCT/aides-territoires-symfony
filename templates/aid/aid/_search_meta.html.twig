@@ -1,0 +1,124 @@
+{% if formAidSearch is defined %}
+<div class="search-meta fr-mb-2w">
+    {% if formAidSearch.organizationType.vars.data %}
+        <div class="fr-tags-group">
+            <p title="Bénéficiaires de l’aide" class="fr-tag">
+                <span class="ri-home-8-line ri-xl fr-mr-1w at-icon-align--sub" aria-hidden="true"></span>
+                {{ formAidSearch.organizationType.vars.data.name }}
+            </p>
+        </div>
+    {% endif %}
+    {% if formAidSearch.searchPerimeter.vars.data %}
+        {% set scale = getPerimeterScale(formAidSearch.searchPerimeter.vars.data.scale) %}
+        <div class="fr-tags-group">
+            <p title="Périmètre" class="fr-tag">
+                <span class="ri-map-pin-fill ri-xl fr-mr-1w at-icon-align--sub" aria-hidden="true"></span>
+                {{ formAidSearch.searchPerimeter.vars.data.name }} ({{ scale.name }})
+            </p>
+        </div>
+    {% endif %}
+    {% if formAidSearch.keyword.vars.data %}
+    <div class="fr-tags-group">
+        <p title="Mot-clé" class="fr-tag">
+            <span class="ri-double-quotes-r ri-xl fr-mr-1w at-icon-align--sub" aria-hidden="true"></span>
+            {{ formAidSearch.keyword.vars.data }}
+        </p>
+    </div>
+    {% endif %}
+    {% if formAidSearch.categorysearch.vars.data %}
+        <div class="fr-tags-group categories">
+            {% set categoriesMetas = categoriesToMetas(formAidSearch.categorysearch.vars.data) %}
+            {% for categoryMeta in categoriesMetas %}
+                <div class="theme fr-tag">
+                    <div>
+                        <span class="ri-price-tag-3-line ri-xl fr-mr-1w at-icon-align--sub" aria-hidden="true"></span>
+                        <span class="category at-uppercase">{{ categoryMeta.categoryTheme.name }}<br /></span>
+                    </div>
+                    <div>
+                        <ul>
+                        {% for category in categoryMeta.categories %}
+                            <li><span class="category">{{ category.name }} {% if not loop.last %}<br />{% endif %}</span></li>
+                        {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    {% if formAidSearch.aidTypes.vars.data and formAidSearch.aidTypes.vars.data|length > 0 %}
+        <div class="fr-tags-group">
+            <p title="Nature de l’aide" class="fr-tag">
+                <span class="ri-money-euro-circle-line ri-xl fr-mr-1w at-icon-align--sub" aria-hidden="true"></span>
+                {% for aidType in formAidSearch.aidTypes.vars.data %}
+                {{ aidType.name }}{% if not loop.last %}, {% endif %}
+                {% endfor %}
+            </p>
+        </div>
+    {% endif %}
+
+    {% if formAidSearch.backers.vars.data and formAidSearch.backers.vars.data|length > 0 %}
+        <div class="fr-tags-group">
+            <p title="Porteurs d’aides" class="fr-tag">
+                <span class="ri-hand-coin-line ri-xl fr-mr-1w at-icon-align--sub" aria-hidden="true"></span>
+                {% for backer in formAidSearch.backers.vars.data %}
+                {{ backer.name }}{% if not loop.last %}, {% endif %}
+                {% endfor %}
+            </p>
+        </div>
+    {% endif %}
+
+    {% if formAidSearch.programs is defined and formAidSearch.programs.vars.data and formAidSearch.programs.vars.data|length > 0 %}
+    <div class="fr-tags-group">
+        <p title="Programmes d’aides" class="fr-tag fr-icon-arrow-right-line fr-tag--icon-left">
+            {% for program in formAidSearch.programs.vars.data %}
+                {{ program.name}}{% if not loop.last %}, {% endif %}
+            {% endfor %}
+        </p>
+    </div>
+    {% endif %}
+    {% if formAidSearch.aidSteps.vars.data and formAidSearch.aidSteps.vars.data|length > 0 %}
+        <div class="fr-tags-group">
+            <p title="Avancement du projet" class="fr-tag fr-icon-arrow-right-line fr-tag--icon-left">
+            {% for aidStep in formAidSearch.aidSteps.vars.data %}
+                {{ aidStep.name}}{% if not loop.last %}, {% endif %}
+            {% endfor %}
+            </p>
+        </div>
+    {% endif %}
+    {% if formAidSearch.aidDestinations.vars.data and formAidSearch.aidDestinations.vars.data|length > 0 %}
+        <div class="fr-tags-group">
+            <p title="Actions concernées" class="fr-tag fr-icon-arrow-right-line fr-tag--icon-left">
+            {% for aidDestinations in formAidSearch.aidDestinations.vars.data %}
+                {{ aidDestinations.name}}{% if not loop.last %}, {% endif %}
+            {% endfor %}
+            </p>
+        </div>
+    {% endif %}
+
+    {% if formAidSearch.isCharged.vars.data is not null and formAidSearch.isCharged.vars.data != '' %}
+    <div class="fr-tags-group">
+        <p title="aides gratuites ou payantes" class="fr-tag fr-icon-arrow-right-line fr-tag--icon-left">
+            {% if formAidSearch.isCharged.vars.data %}Aides payantes{% else %}Aides gratuites{% endif %}
+        </p>
+    </div>
+    {% endif %}
+
+    {% if formAidSearch.europeanAid is defined and formAidSearch.europeanAid.vars.data is not null and formAidSearch.europeanAid.vars.data  != '' %}
+    <div class="fr-tags-group">
+        <p title="aides gratuites ou payantes" class="fr-tag fr-icon-arrow-right-line fr-tag--icon-left">
+            {{ constant('App\\Entity\\Aid\\Aid::LABELS_EUROPEAN')[formAidSearch.europeanAid.vars.data] }}
+        </p>
+    </div>
+    {% endif %}
+
+    {% if formAidSearch.isCallForProject is defined and formAidSearch.isCallForProject.vars.data %}
+    <div class="fr-tags-group">
+        <p title="Appels à projets / Appels à manifestation d’intérêt uniquement" class="fr-tag fr-icon-arrow-right-line fr-tag--icon-left">
+            Appels à projets / Appels à manifestation d’intérêt uniquement
+        </p>
+    </div>
+    {% endif %}
+
+</div>
+{% endif %}

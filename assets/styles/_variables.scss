@@ -1,0 +1,51 @@
+/****
+COULEURS
+ */
+
+$colorFocus: #009ee5;
+$colorBackground : #262626;
+$colorText: #343434;
+$colorLink: $colorText;
+
+/******
+FONTS
+ */
+
+$fontSizeBase: 16px;
+$fontSizeMobile: 14px;
+$fontText: 'Arial';
+$fontLink: 'Arial';
+$fontTitle: 'Arial';
+
+/*******
+BREAKPOINTS
+ */
+$deviceMobileBreakpointMax: 767px;
+$deviceMobileBreakpointMin: 768px;
+
+$deviceSmallBreakpointMax: 1279px;
+$deviceSmallBreakpointMin: 1280px;
+
+$deviceSmallerBreakpointMax: 1023px;
+$deviceSmallerBreakpointMin: 1024px;
+
+/*********
+FORMS
+ */
+
+$boxShadowGeneric: 0px 5px 5px 0px #797979;
+$inputBorderRadius: 5px;
+
+
+/*********
+TABLES
+ */
+
+$tableBorderColor: #dee2e6;
+
+
+/****
+HEIGHTS
+ */
+
+$heightMenu: 73px;

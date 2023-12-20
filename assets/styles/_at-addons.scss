@@ -1,0 +1,51 @@
+// gestion overflow balise pre
+@import '_mixins';
+
+.at-pre-overflow{
+    @include is-mobile{
+        max-width: 320px;
+        overflow: auto;
+    }
+}
+
+.wysiwyg-wrapper{
+    @include img-reponsive();
+}
+
+#tooltip {
+    position: absolute;
+    background-color: var(--border-action-high-grey);
+    color: var(--text-inverted-grey);
+    padding: 0.5rem;
+    font-size: 1rem;
+    pointer-events: none;
+  }
+
+svg{
+    .land {
+        fill: var(--blue-france-main-525);
+        stroke: var(--background-default-grey);
+        cursor: pointer;
+        &:hover{
+            fill: var(--background-action-high-blue-france);
+        }
+      }
+}
+.ts-wrapper,
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="date"],
+.fr-input[type="date"],
+select{
+    min-height: 48px;
+}
+
+.dataTables_length{
+    select{
+        min-height: auto;
+    }
+}
+.number_one_line{
+    white-space: nowrap;
+}
