@@ -129,13 +129,10 @@
         },
         "paas": {
             "compile": [
-                "RUN curl -sL https://deb.nodesource.com/setup_18.x | bash -",
-                "RUN apt-get install -y nodejs",
-                "RUN corepack enable",
-                "RUN npm i -g corepack",
-                "RUN yarn init -2",
-                "RUN apt-get update || : && apt-get install python3 -y"
-
+                "composer dump-env prod",
+                "yarn install",
+                "php bin/console fos:js-routing:dump --format=json --target=public/js/fos_js_routes.json",
+                "yarn encore production"
             ],
             "php-config": [
                 "memory_limit=-1",
