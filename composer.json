@@ -129,7 +129,7 @@
         },
         "paas": {
             "compile": [
-                "php bin/console assets:install --env=dev --no-debug"
+                "npm run build"
             ]
         }
     },
