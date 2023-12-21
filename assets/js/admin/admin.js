@@ -9,6 +9,7 @@ require('../jQueryAccordion/jquery.accordion.js')
 
 // import le fichier router dans ce fichier
 import ClipboardJS from 'clipboard';
+import Routing from 'fos-router';
 
 $(function(){
 
@@ -72,7 +73,7 @@ $(function(){
         plugins: {
             // Add imagur parameters to upload plugin for demo purposes
             upload: {
-                serverPath: '',
+                serverPath: Routing.generate('app_admin_upload_image'),
                 fileFieldName: 'image',
                 // headers: {
                 //     'Authorization': 'Client-ID xxxxxxxxxxxx'

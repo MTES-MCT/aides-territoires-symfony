@@ -18,7 +18,7 @@
         "dompdf/dompdf": "^2.0",
         "easycorp/easyadmin-bundle": "^4.8",
         "endroid/qr-code": "^4.8",
-        "friendsofsymfony/jsrouting-bundle": "^3.3",
+        "friendsofsymfony/jsrouting-bundle": "^3.4",
         "gedmo/doctrine-extensions": "^3.13",
         "getbrevo/brevo-php": "1.x.x",
         "lexik/jwt-authentication-bundle": "^2.19",
