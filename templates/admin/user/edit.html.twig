@@ -42,7 +42,7 @@
 								</a>
 								</td>
 								<td>{{ aid.status }}</td>
-								<td>{{ aid.timePublished }}</td>
+								<td>{% if aid.timePublished %}{{ aid.timePublished|date('d/m/Y') }}{% endif %}</td>
 								<td>
 									<ul>
 										{% for backer in aid.financers %}
