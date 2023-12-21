@@ -20,10 +20,19 @@ class ParamService
      */
     public function get(string $paramKey): ?string
     {
+        $param = null;
         try {
-            return $this->parameterBagInterface->get($paramKey);
+            $param = $this->parameterBagInterface->resolve($paramKey);
         } catch (\Exception $e) {
-            return null;
+            $param = null;
         }
+        if (!$param || $param == '') {
+            try {
+                $param = $this->parameterBagInterface->get($paramKey);
+            } catch (\Exception $e) {
+                $param = null;
+            }
+        }
+        return $param;
     }
 }
