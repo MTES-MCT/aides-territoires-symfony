@@ -1,1 +1,1 @@
-web: ./bin/start-app.sh
+postdeploy: ./scripts/postdeploy.sh
