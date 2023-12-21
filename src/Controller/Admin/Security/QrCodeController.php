@@ -17,9 +17,9 @@ use Endroid\QrCode\Encoding\Encoding;
 use Endroid\QrCode\ErrorCorrectionLevel\ErrorCorrectionLevelHigh;
 use Endroid\QrCode\RoundBlockSizeMode\RoundBlockSizeModeMargin;
 use Endroid\QrCode\Writer\PngWriter;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Scheb\TwoFactorBundle\Model\Totp\TwoFactorInterface as TotpTwoFactorInterface;
 use Scheb\TwoFactorBundle\Security\TwoFactor\Provider\Totp\TotpAuthenticatorInterface;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+
 
 class QrCodeController extends AbstractController
 {
@@ -30,15 +30,15 @@ class QrCodeController extends AbstractController
     )]
     public function displayTotpQrCode(
         $idUser,
-        TokenStorageInterface $tokenStorage,
         TotpAuthenticatorInterface $totpAuthenticator,
         ManagerRegistry $managerRegistry,
-        UserRepository $userRepository
+        UserRepository $userRepository,
+        UserService $userService
         ): Response
     {
         /** @var User $user */
         $user = $userRepository->find($idUser);
-        if (!($user instanceof TotpTwoFactorInterface)) {
+        if (!$userService->isUserGranted($user, User::ROLE_ADMIN)) {
             throw new NotFoundHttpException('Cannot display QR code');
         }
 
