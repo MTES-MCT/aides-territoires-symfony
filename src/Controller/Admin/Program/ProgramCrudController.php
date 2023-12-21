@@ -56,7 +56,7 @@ class ProgramCrudController extends AtCrudController
         yield AssociationField::new('perimeter', 'Périmètre')
         ->autocomplete();
 
-        yield FormField::addPanel('SEO');
+        yield FormField::addFieldset('SEO');
         yield TextField::new('metaTitle', 'Titre (balise meta)')
         ->setHelp('Le titre qui sera affiché dans les SERPs. Il est recommandé de le garder < 60 caractères. Laissez vide pour réutiliser le nom du programme.')
         ->hideOnIndex();
@@ -64,7 +64,7 @@ class ProgramCrudController extends AtCrudController
         ->setHelp('Sera affichée dans les SERPs. À garder < 120 caractères.')
         ->hideOnIndex();
 
-        yield FormField::addPanel('Données diverses');
+        yield FormField::addFieldset('Données diverses');
         yield IntegerField::new('nbAids', 'Nombre d\'aides')
         ->setFormTypeOption('attr', ['readonly' => true]);
         yield DateTimeField::new('timeCreate', 'Date de création')

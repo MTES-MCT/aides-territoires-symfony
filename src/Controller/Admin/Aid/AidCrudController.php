@@ -180,31 +180,31 @@ class AidCrudController extends AtCrudController
             ->setColumns(12);
         }
 
-        yield FormField::addPanel('Porteurs d’aides');
+        yield FormField::addFieldset('Porteurs d’aides');
         yield CollectionField::new('aidFinancers', 'Porteurs d\'aides')
         ->useEntryCrudForm(AidFinancerAddBackerToAidCrudController::class)
         ->setColumns(12)
         ;
 
-        yield FormField::addPanel('Porteurs d\'aides suggérés');
+        yield FormField::addFieldset('Porteurs d\'aides suggérés');
         yield TextField::new('financerSuggestion', 'Porteurs suggérés')
         ->setHelp('Ce porteur a été suggéré. Créez le nouveau porteur et ajouter le en tant que porteur d’aides via le champ approprié.')
         ->hideOnIndex()
         ->setColumns(12);
 
-        yield FormField::addPanel('Instructeurs');
+        yield FormField::addFieldset('Instructeurs');
         yield CollectionField::new('aidFinancers', 'Instructeurs')
         ->useEntryCrudForm(AidInstructorAddBackerToAidCrudController::class)
         ->setColumns(12)
         ;
         
-        yield FormField::addPanel('Instructeurs suggérés');
+        yield FormField::addFieldset('Instructeurs suggérés');
         yield TextField::new('instructorSuggestion', 'Instructeurs suggérés')
         ->setHelp('Cet instructeur a été suggéré. Créez le nouveau porteur et ajouter le en tant qu’instructeur via le champ approprié.')
         ->hideOnIndex()
         ->setColumns(12);
 
-        yield FormField::addPanel('Périmètre de l’aide');
+        yield FormField::addFieldset('Périmètre de l’aide');
         yield AssociationField::new('perimeter', 'Périmètre')
         ->autocomplete()
         ->setColumns(12);
@@ -213,7 +213,7 @@ class AidCrudController extends AtCrudController
         ->hideOnIndex()
         ->setColumns(12);
 
-        yield FormField::addPanel('Calendrier de l’aide');
+        yield FormField::addFieldset('Calendrier de l’aide');
         yield AssociationField::new('aidRecurrence', 'Récurrence')
         ->setHelp('L’aide est-elle ponctuelle, permanente, ou récurrente ?')
         ->hideOnIndex()
@@ -231,7 +231,7 @@ class AidCrudController extends AtCrudController
         ->hideOnIndex()
         ->setColumns(12);
 
-        yield FormField::addPanel('Description de l’aide');
+        yield FormField::addFieldset('Description de l’aide');
         yield BooleanField::new('isCallForProject', 'Appel à projet / Manifestation d’intérêt')
         ->hideOnIndex()
         ->setColumns(12);
@@ -309,7 +309,7 @@ class AidCrudController extends AtCrudController
         ->hideOnIndex()
         ->setColumns(12);
 
-        yield FormField::addPanel('Contact et démarches');
+        yield FormField::addFieldset('Contact et démarches');
         yield UrlField::new('originUrl', 'Plus d’informations')
         ->hideOnIndex()
         ->setColumns(12);
@@ -337,7 +337,7 @@ class AidCrudController extends AtCrudController
         ->hideOnIndex()
         ->setColumns(12);
 
-        yield FormField::addPanel('Uniquement pour les aides sur Démarches-Simplifiées');
+        yield FormField::addFieldset('Uniquement pour les aides sur Démarches-Simplifiées');
         yield BooleanField::new('dsSchemaExists', 'Schéma existant')
         ->setHelp('Un schéma pour l’api de pré-remplissagede Démarches-Simplifiées est-il renseigné ?')
         ->hideOnIndex()
@@ -351,13 +351,13 @@ class AidCrudController extends AtCrudController
         ->hideOnIndex()
         ->setColumns(12);
 
-        yield FormField::addPanel('Éligibilité');
+        yield FormField::addFieldset('Éligibilité');
         yield AssociationField::new('eligibilityTest', 'Test d’éligibilité')
         ->autocomplete()
         ->hideOnIndex()
         ->setColumns(12);
 
-        yield FormField::addPanel('Administration de l’aide');
+        yield FormField::addFieldset('Administration de l’aide');
         $statusChoices = [];
         foreach (Aid::STATUSES as $status) {
             $statusChoices[$status['name']] = $status['slug'];
@@ -380,13 +380,13 @@ class AidCrudController extends AtCrudController
         ->hideOnIndex()
         ->setColumns(12);
 
-        yield FormField::addPanel('Uniquement pour les aides génériques');
+        yield FormField::addFieldset('Uniquement pour les aides génériques');
         yield BooleanField::new('isGeneric', 'Aide générique')
         ->setHelp('Cette aide est-elle générique ?')
         ->hideOnIndex()
         ->setColumns(12);
 
-        yield FormField::addPanel('Uniquement pour les aides locales');
+        yield FormField::addFieldset('Uniquement pour les aides locales');
         yield AssociationField::new('genericAid', 'Aide générique')
         ->setHelp('Aide générique associée à une aide locale.')
         ->setFormTypeOptions([
@@ -405,7 +405,7 @@ class AidCrudController extends AtCrudController
         ->hideOnIndex()
         ->setColumns(12);
 
-        yield FormField::addPanel('Données liées à l’import');
+        yield FormField::addFieldset('Données liées à l’import');
         yield BooleanField::new('isImported', 'Importé')
         ->hideOnIndex()
         ->setColumns(12);
@@ -436,7 +436,7 @@ class AidCrudController extends AtCrudController
         // yield ArrayField::new('importRawObjectTempCalendar', 'Donnée brute importée temporaire pour le calendrie')
         // ->hideOnIndex();
 
-        yield FormField::addPanel('Données diverses');
+        yield FormField::addFieldset('Données diverses');
         yield DateTimeField::new('timeCreate', 'Date de création')
         ->setFormTypeOption('attr', ['readonly' => true])
         ->hideOnIndex()

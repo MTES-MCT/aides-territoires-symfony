@@ -64,11 +64,11 @@ class UserCrudController extends AtCrudController implements EventSubscriberInte
         yield BooleanField::new('isCertified', 'Certifié')
         ->setHelp('Afficher un badge à côté des aides publiées par ce compte.');
 
-        yield FormField::addPanel('Informations personnelles');
+        yield FormField::addFieldset('Informations personnelles');
         yield TextField::new('firstname', 'Prénom');
         yield TextField::new('lastname', 'Nom');
 
-        yield FormField::addPanel('Espace contributeur');
+        yield FormField::addFieldset('Espace contributeur');
         yield BooleanField::new('isContributor', 'Contributeur')
         ->setHelp('Peut accéder à un espace pour créer et modifier ses aides.');
         yield TextField::new('contributorContactPhone', 'Numéro de téléphone')
@@ -76,7 +76,7 @@ class UserCrudController extends AtCrudController implements EventSubscriberInte
         yield IntegerField::new('nbAids', 'Nombre d\'aides')
         ->setFormTypeOption('attr', ['readonly' => true]);
 
-        yield FormField::addPanel('Espace bénéficiaire');
+        yield FormField::addFieldset('Espace bénéficiaire');
 
         yield BooleanField::new('isBeneficiary', 'Bénéficiaire')
         ->setHelp('Peut accéder à un espace pour créer et modifier ses projets.');
@@ -95,7 +95,7 @@ class UserCrudController extends AtCrudController implements EventSubscriberInte
         ->hideOnIndex()
         ->setFormTypeOption('by_reference', false);
 
-        yield FormField::addPanel('Fusion d\'organisation');
+        yield FormField::addFieldset('Fusion d\'organisation');
         yield AssociationField::new('proposedOrganization', 'Structure proposée')
         ->setHelp('L’utilisateur a reçu une proposition pour rejoindre cette structure')
         ->autocomplete()
@@ -109,18 +109,18 @@ class UserCrudController extends AtCrudController implements EventSubscriberInte
         yield DateTimeField::new('timeJoinOrganization', 'Date d’acceptation de l’invitation')
         ->hideOnIndex();
 
-        yield FormField::addPanel('Espace administrateur');
+        yield FormField::addFieldset('Espace administrateur');
         yield AssociationField::new('searchPages', 'Recherche personnalisée')
         ->autocomplete()
         ->hideOnIndex();
 
-        yield FormField::addPanel('Espace animateur');
+        yield FormField::addFieldset('Espace animateur');
         yield AssociationField::new('perimeter', 'Périmètre d’animation')
         ->setHelp('Sur quel périmètre l’animateur local est-il responsable ?')
         ->autocomplete()
         ->hideOnIndex();
 
-        yield FormField::addPanel('Permissions');
+        yield FormField::addFieldset('Permissions');
         yield ChoiceField::new('roles', 'Rôles')
         ->setChoices([
             'Administrateur' => User::ROLE_ADMIN,
@@ -133,7 +133,7 @@ class UserCrudController extends AtCrudController implements EventSubscriberInte
         yield TextField::new('apiToken', 'Token API')
         ->hideOnIndex();
 
-        yield FormField::addPanel('Préférences de notifications');
+        yield FormField::addFieldset('Préférences de notifications');
         yield ChoiceField::new('notificationEmailFrequency', 'Fréquence d’envoi des emails de notifications')
         ->setChoices([
             'Chaque jour' => User::NOTIFICATION_DAILY,
@@ -142,7 +142,7 @@ class UserCrudController extends AtCrudController implements EventSubscriberInte
         ])
         ->hideOnIndex();
 
-        yield FormField::addPanel('Données diverses');
+        yield FormField::addFieldset('Données diverses');
         yield BooleanField::new('mlConsent', 'A donné son consentement pour recevoir l’actualité')
         ->hideOnIndex();
         $acquisitionChannelChoices = [];

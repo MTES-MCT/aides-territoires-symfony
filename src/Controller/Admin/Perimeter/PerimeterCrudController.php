@@ -100,7 +100,7 @@ class PerimeterCrudController extends AtCrudController
         yield NumberField::new('longitude', 'Longitude')
         ->onlyOnForms();
         
-        yield FormField::addPanel('Données');
+        yield FormField::addFieldset('Données');
         yield NumberField::new('population', 'Population')
         ->onlyOnForms();
         yield NumberField::new('surface', 'Superficie')
@@ -111,7 +111,7 @@ class PerimeterCrudController extends AtCrudController
         ->setHelp('définit le statut d’une commune rurale ou urbaine');
 
 
-        yield FormField::addPanel('Compteurs');
+        yield FormField::addFieldset('Compteurs');
         yield IntegerField::new('backersCount', 'Nombre de porteurs')
         ->onlyOnForms()
         ->setFormTypeOption('attr', [
@@ -138,7 +138,7 @@ class PerimeterCrudController extends AtCrudController
             'readonly' => true
         ]);
 
-        yield FormField::addPanel('Données de périmètres')->renderCollapsed();
+        yield FormField::addFieldset('Données de périmètres')->renderCollapsed();
         yield CollectionField::new('perimeterDatas', 'Données')
         ->onlyOnForms()
         ->setEntryIsComplex()

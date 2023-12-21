@@ -61,7 +61,7 @@ class SearchPageCrudController extends AtCrudController
         ->setHelp('Contenu caché, révélé au clic sur le bouton « Voir plus »')
         ->hideOnIndex();
 
-        yield FormField::addPanel('Configuration');
+        yield FormField::addFieldset('Configuration');
         yield TextField::new('name', 'Titre')
         ->setHelp('Le titre principal.');
         yield AssociationField::new('administrator', 'Administrateur')
@@ -84,7 +84,7 @@ class SearchPageCrudController extends AtCrudController
         ->setHelp('URL ou adresse email qui sera utilisé pour le lien « contact » dans le footer.')
         ->hideOnIndex();
 
-        yield FormField::addPanel('À propos de cette page');
+        yield FormField::addFieldset('À propos de cette page');
         if ($entity && $entity->getTimeCreate()) {
             yield DateTimeField::new('timeCreate', 'Date de création')
             ->setFormTypeOption('attr', ['readonly' => true])
@@ -119,20 +119,20 @@ class SearchPageCrudController extends AtCrudController
         ->setFormTypeOption('attr', ['readonly' => true])
         ->hideOnIndex();
 
-        yield FormField::addPanel('Mettre en avant des aides');
+        yield FormField::addFieldset('Mettre en avant des aides');
         yield AssociationField::new('highlightedAids', 'Aides à mettre en avant')
         ->setHelp('Il est possible de mettre jusqu’à 9 aides en avant. Les aides mises en avant s’affichent en haut des résultats du portail, et n’ont pas de mise en forme particulière.')
         ->autocomplete()
         ->hideOnIndex()
         ;
 
-        yield FormField::addPanel('Exclure des aides des résultats');
+        yield FormField::addFieldset('Exclure des aides des résultats');
         yield AssociationField::new('excludedAids', 'Aides à exclure')
         ->autocomplete()
         ->hideOnIndex()
         ;
 
-        yield FormField::addPanel('SEO');
+        yield FormField::addFieldset('SEO');
         yield TextLengthCountField::new('metaTitle', 'Titre (balise meta)')
         ->setHelp('Le titre qui sera affiché dans les SERPs. Il est recommandé de le garder < 60 caractères. Laissez vide pour réutiliser le titre de la page.')
         ->setFormTypeOption('attr', ['maxlength' => 180])
@@ -151,7 +151,7 @@ class SearchPageCrudController extends AtCrudController
         })
         ->hideOnIndex();
         
-        yield FormField::addPanel('Personnalisation du style');
+        yield FormField::addFieldset('Personnalisation du style');
 
         yield ImageField::new('logo', 'Logo')
         ->setHelp('Évitez les fichiers trop lourds. Préférez les fichiers svg.')
@@ -181,7 +181,7 @@ class SearchPageCrudController extends AtCrudController
         ->setHelp('Couleur de fond du pied de page')
         ->hideOnIndex();
 
-        yield FormField::addPanel('Personnalisation du formulaire');
+        yield FormField::addFieldset('Personnalisation du formulaire');
         yield BooleanField::new('showCategoriesField', 'Montrer le champ « thématiques »')
         ->hideOnIndex();
         yield AssociationField::new('categories', 'Sous-thématiques')
@@ -209,7 +209,7 @@ class SearchPageCrudController extends AtCrudController
         yield BooleanField::new('showTextField', 'Montrer le champ « recherche textuelle »')
         ->hideOnIndex();
 
-        yield FormField::addPanel('Onglets');
+        yield FormField::addFieldset('Onglets');
         yield CollectionField::new('pages', 'Onglets')
         ->useEntryCrudForm(PageLinkSearchPageCrudController::class)
         ->setColumns(12)

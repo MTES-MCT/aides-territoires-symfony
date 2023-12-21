@@ -45,7 +45,7 @@ class OrganizationCrudController extends AtCrudController
         yield TextField::new('populationStrata', 'Strates de population')
         ->onlyOnForms();
 
-        yield FormField::addPanel('Projets');
+        yield FormField::addFieldset('Projets');
         yield AssociationField::new('favoriteProjects', 'Projets Favoris')
         ->autocomplete()
         ->onlyOnForms();
@@ -56,7 +56,7 @@ class OrganizationCrudController extends AtCrudController
         ->autocomplete()
         ->onlyOnForms();
 
-        yield FormField::addPanel('Emplacement');
+        yield FormField::addFieldset('Emplacement');
         yield TextField::new('address', 'Adresse')
         ->onlyOnForms();
         yield TextField::new('cityName', 'Ville')
@@ -93,7 +93,7 @@ class OrganizationCrudController extends AtCrudController
         ])
         ->onlyOnForms();
 
-        yield FormField::addPanel('Informations légales');
+        yield FormField::addFieldset('Informations légales');
         yield TextField::new('sirenCode', 'Code SIREN')
         ->onlyOnForms();
         yield TextField::new('siretCode', 'Code SIRET')
@@ -104,7 +104,7 @@ class OrganizationCrudController extends AtCrudController
         ->onlyOnForms();
 
 
-        yield FormField::addPanel('Composition du périmètre');
+        yield FormField::addFieldset('Composition du périmètre');
         yield IntegerField::new('inhabitantsNumber', 'Nombre d\'habitants')
         ->onlyOnForms();
         yield IntegerField::new('votersNumber', 'Nombre de votants')

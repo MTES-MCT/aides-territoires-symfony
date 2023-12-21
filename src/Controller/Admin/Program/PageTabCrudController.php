@@ -28,7 +28,7 @@ class PageTabCrudController extends AtCrudController
         yield TrumbowygField::new('description', 'Contenu')
         ->hideOnIndex();
         
-        yield FormField::addPanel('A propos de cet onglet');
+        yield FormField::addFieldset('A propos de cet onglet');
         yield DateTimeField::new('timeCreate', 'Date de création')
         ->setFormTypeOption('attr', ['readonly' => true]);
         yield DateTimeField::new('timeUpdate', 'Date de mise à jour')
