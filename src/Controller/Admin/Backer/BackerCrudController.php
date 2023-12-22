@@ -38,7 +38,7 @@ class BackerCrudController extends AtCrudController
 
         yield ImageField::new('logo', 'Logo du porteur')
         ->setHelp('Évitez les fichiers trop lourds. Préférez les fichiers SVG.')
-        ->setUploadDir(static::UPLOAD_TMP_FOLDER)
+        ->setUploadDir($this->fileService->getUploadTmpDirRelative())
         ->setBasePath($this->paramService->get('cloud_image_url'))
         ->setUploadedFileNamePattern(Backer::FOLDER.'/[slug]-[timestamp].[extension]')
         ->setFormTypeOption('upload_new', function(UploadedFile $file, string $uploadDir, string $fileName) {

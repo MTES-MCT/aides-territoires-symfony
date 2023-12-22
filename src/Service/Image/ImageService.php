@@ -2,6 +2,7 @@
 
 namespace App\Service\Image;
 
+use App\Service\File\FileService;
 use App\Service\Various\ParamService;
 use App\Service\Various\StringService;
 use Aws\Credentials\Credentials;
@@ -15,7 +16,8 @@ class ImageService
     public function __construct(
         protected ParamService $paramService,
         protected KernelInterface $kernelInterface,
-        protected StringService $stringService
+        protected StringService $stringService,
+        protected FileService $fileService
     )
     {
     }
@@ -37,7 +39,7 @@ class ImageService
         // Upload a publicly accessible file. The file size and type are determined by the SDK.
         try {
             // créer dossier temporaire si besoin
-            $tmpFolder = $this->kernelInterface->getProjectDir().'/public/uploads/_tmp/'.$uploadDir.'/';
+            $tmpFolder = $this->fileService->getUploadTmpDir();
             if (!is_dir($tmpFolder)) {
                 mkdir($tmpFolder, 0777, true);
             }

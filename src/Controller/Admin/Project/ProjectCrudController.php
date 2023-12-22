@@ -50,7 +50,7 @@ class ProjectCrudController extends AtCrudController
         ->hideOnIndex();
 
         yield ImageField::new('image', 'Image')
-        ->setUploadDir(static::UPLOAD_TMP_FOLDER)
+        ->setUploadDir($this->fileService->getUploadTmpDirRelative())
         ->setBasePath($this->paramService->get('cloud_image_url'))
         ->setUploadedFileNamePattern(Project::FOLDER.'/[slug]-[timestamp].[extension]')
         ->setFormTypeOption('upload_new', function(UploadedFile $file, string $uploadDir, string $fileName) {

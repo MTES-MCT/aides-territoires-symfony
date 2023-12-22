@@ -145,7 +145,7 @@ class SearchPageCrudController extends AtCrudController
 
         yield ImageField::new('metaImage', 'Image (balise meta)')
         ->setHelp('Vérifiez que l’image a une largeur minimale de 1024px')
-        ->setUploadDir(static::UPLOAD_TMP_FOLDER)
+        ->setUploadDir($this->fileService->getUploadTmpDirRelative())
         ->setBasePath($this->paramService->get('cloud_image_url'))
         ->setUploadedFileNamePattern(SearchPage::FOLDER.'/[slug]-[timestamp].[extension]')
         ->setFormTypeOption('upload_new', function(UploadedFile $file, string $uploadDir, string $fileName) {
@@ -157,7 +157,7 @@ class SearchPageCrudController extends AtCrudController
 
         yield ImageField::new('logo', 'Logo')
         ->setHelp('Évitez les fichiers trop lourds. Préférez les fichiers svg.')
-        ->setUploadDir(static::UPLOAD_TMP_FOLDER)
+        ->setUploadDir($this->fileService->getUploadTmpDirRelative())
         ->setBasePath($this->paramService->get('cloud_image_url'))
         ->setUploadedFileNamePattern(SearchPage::FOLDER.'/[slug]-[timestamp].[extension]')
         ->setFormTypeOption('upload_new', function(UploadedFile $file, string $uploadDir, string $fileName) {

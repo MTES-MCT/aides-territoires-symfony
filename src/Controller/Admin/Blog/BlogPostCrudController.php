@@ -64,7 +64,7 @@ class BlogPostCrudController extends AtCrudController
 
         yield ImageField::new('logo', 'Image de l\'article')
         ->setHelp('Évitez les fichiers trop lourds.')
-        ->setUploadDir(static::UPLOAD_TMP_FOLDER)
+        ->setUploadDir($this->fileService->getUploadTmpDirRelative())
         ->setBasePath($this->paramService->get('cloud_image_url'))
         ->setUploadedFileNamePattern(BlogPost::FOLDER.'/[slug]-[timestamp].[extension]')
         ->setFormTypeOption('upload_new', function(UploadedFile $file, string $uploadDir, string $fileName) {
