@@ -72,7 +72,7 @@ class PerimeterImportCrudController extends AtCrudController
         $entity = $this->getContext()->getEntity()->getInstance();
         yield ImageField::new('file', 'Fichier csv')
         ->setHelp('Permière ligne ignorée')
-        ->setUploadDir(static::UPLOAD_TMP_FOLDER)
+        ->setUploadDir($this->fileService->getUploadTmpDirRelative())
         ->setUploadedFileNamePattern('/[slug]-[timestamp].[extension]')
         ->onlyWhenCreating()
         ->setFormTypeOption('mapped', false)
