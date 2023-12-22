@@ -5,6 +5,7 @@ namespace App\Controller\Admin\Blog;
 use App\Controller\Admin\AtCrudController;
 use App\Entity\Blog\BlogPromotionPost;
 use App\Field\TrumbowygField;
+use App\Field\VichImageField;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
@@ -47,16 +48,19 @@ class BlogPromotionPostCrudController extends AtCrudController
         ->onlyOnForms();
         yield BooleanField::new('externalLink', 'Lien externe')
         ->onlyOnForms();
-        yield ImageField::new('image', 'Illustration')
+        // yield ImageField::new('image', 'Illustration')
+        // ->setHelp('Évitez les fichiers trop lourds.')
+        // ->setUploadDir($this->fileService->getUploadTmpDirRelative())
+        // ->setBasePath($this->paramService->get('cloud_image_url'))
+        // ->setUploadedFileNamePattern(BlogPromotionPost::FOLDER.'/[slug]-[timestamp].[extension]')
+        // ->setFormTypeOption('upload_new', function(UploadedFile $file, string $uploadDir, string $fileName) {
+        //     $this->imageService->sendImageToCloud($file, BlogPromotionPost::FOLDER, $fileName);
+        // })
+        // ->onlyOnForms()
+        // ->setFormTypeOption('allow_delete', true)
+        // ;
+        yield VichImageField::new('imageFile', 'Illustration')
         ->setHelp('Évitez les fichiers trop lourds.')
-        ->setUploadDir($this->fileService->getUploadTmpDirRelative())
-        ->setBasePath($this->paramService->get('cloud_image_url'))
-        ->setUploadedFileNamePattern(BlogPromotionPost::FOLDER.'/[slug]-[timestamp].[extension]')
-        ->setFormTypeOption('upload_new', function(UploadedFile $file, string $uploadDir, string $fileName) {
-            $this->imageService->sendImageToCloud($file, BlogPromotionPost::FOLDER, $fileName);
-        })
-        ->onlyOnForms()
-        ->setFormTypeOption('allow_delete', true)
         ;
         yield TextField::new('imageAltText', 'Texte alternatif pour l’image')
         ->onlyOnForms();

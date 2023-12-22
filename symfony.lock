@@ -85,6 +85,9 @@
             "config/routes/fos_js_routing.yaml"
         ]
     },
+    "knplabs/knp-gaufrette-bundle": {
+        "version": "v0.9.0"
+    },
     "lexik/jwt-authentication-bundle": {
         "version": "2.19",
         "recipe": {

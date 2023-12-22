@@ -70,10 +70,10 @@ class EasyAdminSubscriber implements EventSubscriberInterface
             // $this->handleBlogPromotionPostBeforeUpdate($event);
         }
 
-        return;
+        // return;
     }
 
-    private function handleBlogPromotionPostBeforeUpdate(BeforeEntityUpdatedEvent $event): void
+    private function handleBlogPromotionPostBeforeUpdate(BeforeEntityUpdatedEvent $event)
     {
         // l'entite
         $entity = $event->getEntityInstance();
@@ -83,7 +83,8 @@ class EasyAdminSubscriber implements EventSubscriberInterface
         $uow->computeChangeSets();
         $changeset = $uow->getEntityChangeSet($entity);
 
-        if (isset($changeset['image'])) {
+        $todo = false;
+        if (isset($changeset['image']) && $todo) {
             if ($changeset['image'][0] == null) { // Si l'image était vide
 
             } else { // Si l'image n'était pas vide
@@ -94,7 +95,7 @@ class EasyAdminSubscriber implements EventSubscriberInterface
                         && isset($_POST['BlogPromotionPost']['image']) 
                         && isset($_POST['BlogPromotionPost']['image']['delete'])
                         && $_POST['BlogPromotionPost']['image']['delete'] == 1
-                    ) { // on veu supprilmer l'image
+                    ) { // on veu supprimer l'image
                     } else { // on veu garder l'ancienne image
                         $entity->setImage($changeset['image'][0]);
                     }
@@ -107,6 +108,6 @@ class EasyAdminSubscriber implements EventSubscriberInterface
         } else {
 
         }
-        return;
+        // return;
     }
 }

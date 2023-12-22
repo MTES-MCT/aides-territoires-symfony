@@ -84,3 +84,16 @@ services:
     App\EventListener\WithoutOrganizationListener:
         tags:
             - {name: kernel.event_listener, event: kernel.request}
+
+    ct_file_store.s3:
+        class: Aws\S3\S3Client
+        factory: [Aws\S3\S3Client, 'factory']
+        arguments:
+            -
+                version: 'latest'
+                region: '%env(AWS_S3_REGION_NAME)%'
+                endpoint: '%env(resolve:AWS_S3_ENDPOINT_URL)%'
+                credentials:
+                    key: '%env(AWS_ACCESS_KEY_ID)%'
+                    secret: '%env(AWS_SECRET_ACCESS_KEY)%'
+                use_path_style_endpoint: true

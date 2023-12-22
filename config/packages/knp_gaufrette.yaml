@@ -1,0 +1,15 @@
+knp_gaufrette:
+    stream_wrapper: ~
+    adapters:
+        blogPromotionPostThumb_adapter:
+            aws_s3:
+                service_id: ct_file_store.s3
+                bucket_name: '%env(AWS_STORAGE_BUCKET_NAME)%'
+                detect_content_type: true
+                options:
+                    create: true
+                    directory: promotion
+                    acl: public-read
+    filesystems:
+        blogPromotionPostThumb_fs:
+            adapter:    blogPromotionPostThumb_adapter
