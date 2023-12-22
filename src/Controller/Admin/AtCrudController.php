@@ -2,6 +2,7 @@
 
 namespace App\Controller\Admin;
 
+use App\Service\File\FileService;
 use App\Service\Image\ImageService;
 use App\Service\Various\ParamService;
 use Doctrine\Persistence\ManagerRegistry;
@@ -29,6 +30,7 @@ class AtCrudController extends AbstractCrudController
         public ManagerRegistry $managerRegistry,
         public ImageService $imageService,
         public ParamService $paramService,
+        public FileService $fileService,
         public KernelInterface $kernelInterface
     ) {
     }

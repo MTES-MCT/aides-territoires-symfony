@@ -4,6 +4,7 @@ namespace App\Controller\Admin\User;
 
 use App\Controller\Admin\AtCrudController;
 use App\Entity\User\ApiTokenAsk;
+use App\Service\File\FileService;
 use App\Service\Image\ImageService;
 use App\Service\User\UserService;
 use App\Service\Various\ParamService;
@@ -26,10 +27,11 @@ class ApiTokenAskCrudController extends AtCrudController
         public ManagerRegistry $managerRegistry,
         public ImageService $imageService,
         public ParamService $paramService,
+        public FileService $fileService,
         public KernelInterface $kernelInterface,
         public UserService $userService
     ) {
-        parent::__construct($managerRegistry, $imageService, $paramService, $kernelInterface);
+        parent::__construct($managerRegistry, $imageService, $paramService, $fileService, $kernelInterface);
     }
 
     public static function getEntityFqcn(): string

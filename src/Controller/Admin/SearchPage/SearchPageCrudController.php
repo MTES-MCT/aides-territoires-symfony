@@ -9,6 +9,7 @@ use App\Entity\Search\SearchPage;
 use App\Field\TextLengthCountField;
 use App\Field\TrumbowygField;
 use App\Service\Aid\AidSearchFormService;
+use App\Service\File\FileService;
 use App\Service\Image\ImageService;
 use App\Service\Various\ParamService;
 use Doctrine\Persistence\ManagerRegistry;
@@ -36,10 +37,11 @@ class SearchPageCrudController extends AtCrudController
         public ManagerRegistry $managerRegistry,
         public ImageService $imageService,
         public ParamService $paramService,
+        public FileService $fileService,
         public KernelInterface $kernelInterface,
         protected AidSearchFormService $aidSearchFormService
     ) {
-        parent::__construct($managerRegistry, $imageService, $paramService, $kernelInterface);
+        parent::__construct($managerRegistry, $imageService, $paramService, $fileService, $kernelInterface);
     }
 
     public static function getEntityFqcn(): string

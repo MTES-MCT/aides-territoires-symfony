@@ -78,7 +78,7 @@ class PerimeterImportCrudController extends AtCrudController
         ->setFormTypeOption('mapped', false)
         ->setFormTypeOption('upload_new',function(UploadedFile $file, string $uploadDir, string $fileName) use ($entity) {
             // créer dossier temporaire si besoin
-            $tmpFolder = $this->kernelInterface->getProjectDir().static::UPLOAD_TMP_FOLDER;
+            $tmpFolder = $this->fileService->getUploadTmpDir();
             if (!is_dir($tmpFolder)) {
                 mkdir($tmpFolder, 0777, true);
             }
