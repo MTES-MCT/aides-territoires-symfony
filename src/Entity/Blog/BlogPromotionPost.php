@@ -238,7 +238,11 @@ class BlogPromotionPost
 
     public function setImage(?string $image): static
     {
-        $this->image = $image;
+        if (trim($image) !== '') {
+            $this->image = 'promotion/'.$image;
+        } else {
+            $this->image = null;
+        }
 
         return $this;
     }
