@@ -19,6 +19,7 @@ use App\Entity\Backer\BackerGroup;
 use App\Entity\Backer\BackerSubcategory;
 use App\Entity\Blog\BlogPost;
 use App\Entity\Blog\BlogPostCategory;
+use App\Entity\Blog\BlogPromotionPost;
 use App\Entity\Category\Category;
 use App\Entity\Category\CategoryTheme;
 use App\Entity\Contact\ContactMessage;
@@ -170,6 +171,7 @@ class DashboardController extends AbstractDashboardController
 
     public function configureMenuItems(): iterable
     {
+        yield MenuItem::linkToRoute('Front', 'fas fa-external-link-alt', 'app_home', [])->setLinkTarget('_blank');
         yield MenuItem::linkToDashboard('Dashboard', 'fa fa-home');
 
         yield MenuItem::subMenu('Utilisateurs', 'fas fa-user')->setSubItems([
@@ -244,6 +246,7 @@ class DashboardController extends AbstractDashboardController
             MenuItem::linkToCrud('Catégories des articles de blog', 'fas fa-list', BlogPostCategory::class),
             MenuItem::linkToCrud('Pages', 'fas fa-list', Page::class)
             ->setController(PageCrudController::class),
+            MenuItem::linkToCrud('Communication promotionnelle', 'fas fa-list', BlogPromotionPost::class)
         ]);
 
         yield MenuItem::subMenu('Pages Personnalisées', 'fas fa-newspaper')->setSubItems([

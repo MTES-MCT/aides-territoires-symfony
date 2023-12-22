@@ -3,7 +3,10 @@
 namespace App\Repository\Blog;
 
 use App\Entity\Blog\BlogPromotionPost;
+use App\Entity\Organization\OrganizationType;
+use App\Entity\Perimeter\Perimeter;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -31,11 +34,59 @@ class BlogPromotionPostRepository extends ServiceEntityRepository
 
     public function  getQueryBuilder(array $params = null) : QueryBuilder
     {
+        dump($params);
+        $organizationType = $params['organizationType'] ?? null;
+        $backers = $params['backers'] ?? null;
+        $programs = $params['programs'] ?? null;
+        $perimeterFrom = $params['perimeterFrom'] ?? null;
+        $categories = $params['categories'] ?? null;
         $status = $params['status'] ?? null;
         $orderBy = (isset($params['orderBy']) && isset($params['orderBy']['sort']) && isset($params['orderBy']['order'])) ? $params['orderBy'] : null;
 
         $qb = $this->createQueryBuilder('bpp');
-        
+
+        if ($organizationType instanceof OrganizationType && $organizationType->getId()) {
+            $qb
+                ->leftJoin('bpp.organizationTypes', 'organizationTypes')
+                ->andWhere('(:organizationType IN (organizationTypes) OR organizationTypes IS NULL)')
+                ->setParameter('organizationType', $organizationType)
+            ;
+        }
+
+        if (($backers instanceof ArrayCollection || is_array($backers)) && count($backers) > 0) {
+            $qb
+                ->leftJoin('bpp.backers', 'backers')
+                ->andWhere('(backers IN (:backers) OR backers IS NULL)')
+                ->setParameter('backers', $backers)
+            ;
+        }
+
+        if (($programs instanceof ArrayCollection || is_array($programs)) && count($programs) > 0) {
+            $qb
+                ->leftJoin('bpp.programs', 'programs')
+                ->andWhere('(programs IN (:programs) OR programs IS NULL)')
+                ->setParameter('programs', $programs)
+            ;
+        }
+
+        if ($perimeterFrom instanceof Perimeter && $perimeterFrom->getId()) {
+            $ids = $this->getEntityManager()->getRepository(Perimeter::class)->getIdPerimetersContainedIn(array('perimeter' => $perimeterFrom));
+            $ids[] = $perimeterFrom->getId();
+            $qb
+                ->leftJoin('bpp.perimeter', 'perimeter')
+                ->andWhere('(perimeter.id IN (:ids) OR perimeter IS NULL)')
+                ->setParameter('ids', $ids)
+            ;
+        }
+
+        if (($categories instanceof ArrayCollection || is_array($categories)) && count($categories) > 0) {
+            $qb
+                ->leftJoin('bpp.categories', 'categories')
+                ->andWhere('(categories IN (:categories) OR categories IS NULL)')
+                ->setParameter('categories', $categories)
+            ;
+        }
+
         if ($status !== null) {
             $qb
             ->andWhere('bpp.status = :status')

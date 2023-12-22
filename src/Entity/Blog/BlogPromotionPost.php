@@ -9,13 +9,17 @@ use App\Entity\Log\LogBlogPromotionPostDisplay;
 use App\Entity\Organization\OrganizationType;
 use App\Entity\Perimeter\Perimeter;
 use App\Entity\Program\Program;
+use App\Entity\Reference\KeywordReference;
 use App\Repository\Blog\BlogPromotionPostRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
+use Vich\UploaderBundle\Mapping\Annotation as Vich;
+use Symfony\Component\HttpFoundation\File\File;
 
+#[Vich\Uploadable]
 #[ORM\Entity(repositoryClass: BlogPromotionPostRepository::class)]
 #[ORM\Index(columns: ['status'], name: 'status_blog_promotion_post')]
 #[ORM\Index(columns: ['slug'], name: 'slug_blog_promotion_post')]
@@ -72,6 +76,9 @@ class BlogPromotionPost
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $image = null;
 
+    #[Vich\UploadableField(mapping: 'blogPromotionPostThumb', fileNameProperty: 'image')]
+    private ?File $imageFile = null;
+
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $imageAltText = null;
 
@@ -97,6 +104,9 @@ class BlogPromotionPost
     #[ORM\OneToMany(mappedBy: 'blogPromotionPost', targetEntity: LogBlogPromotionPostDisplay::class)]
     #[ORM\JoinColumn(onDelete:'SET NULL')]
     private Collection $logBlogPromotionPostDisplays;
+
+    #[ORM\ManyToOne(inversedBy: 'blogPromotionPosts')]
+    private ?KeywordReference $keywordReferences = null;
 
     public function __construct()
     {
@@ -231,6 +241,20 @@ class BlogPromotionPost
         $this->image = $image;
 
         return $this;
+    }
+
+    public function setImageFile(?File $imageFile = null): void
+    {
+        $this->imageFile = $imageFile;
+
+        if (null !== $imageFile) {
+            $this->timeUpdate = new \DateTime(date('Y-m-d H:i:s'));
+        }
+    }
+
+    public function getImageFile(): ?File
+    {
+        return $this->imageFile;
     }
 
     public function getImageAltText(): ?string
@@ -409,6 +433,18 @@ class BlogPromotionPost
                 $logBlogPromotionPostDisplay->setBlogPromotionPost(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getKeywordReferences(): ?KeywordReference
+    {
+        return $this->keywordReferences;
+    }
+
+    public function setKeywordReferences(?KeywordReference $keywordReferences): static
+    {
+        $this->keywordReferences = $keywordReferences;
 
         return $this;
     }

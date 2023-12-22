@@ -131,6 +131,7 @@
             "compile": [
                 "npm install --global yarn",
                 "yarn install --force",
+                "php bin/console doctrine:migrations:migrate --no-interaction",
                 "php bin/console fos:js-routing:dump --format=json --target=public/js/fos_js_routes.json",
                 "yarn encore production",
                 "php bin/console lexik:jwt:generate-keypair",

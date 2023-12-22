@@ -2,6 +2,7 @@
 
 namespace App\Entity\Reference;
 
+use App\Entity\Blog\BlogPromotionPost;
 use App\Repository\Reference\KeywordReferenceRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -29,9 +30,13 @@ class KeywordReference
     #[ORM\OneToMany(mappedBy: 'parent', targetEntity: self::class, orphanRemoval: true, cascade: ['persist'])]
     private Collection $keywordReferences;
 
+    #[ORM\OneToMany(mappedBy: 'keywordReferences', targetEntity: BlogPromotionPost::class)]
+    private Collection $blogPromotionPosts;
+
     public function __construct()
     {
         $this->keywordReferences = new ArrayCollection();
+        $this->blogPromotionPosts = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -108,6 +113,36 @@ class KeywordReference
     public function __toString(): string
     {
         return $this->name;
+    }
+
+    /**
+     * @return Collection<int, BlogPromotionPost>
+     */
+    public function getBlogPromotionPosts(): Collection
+    {
+        return $this->blogPromotionPosts;
+    }
+
+    public function addBlogPromotionPost(BlogPromotionPost $blogPromotionPost): static
+    {
+        if (!$this->blogPromotionPosts->contains($blogPromotionPost)) {
+            $this->blogPromotionPosts->add($blogPromotionPost);
+            $blogPromotionPost->setKeywordReferences($this);
+        }
+
+        return $this;
+    }
+
+    public function removeBlogPromotionPost(BlogPromotionPost $blogPromotionPost): static
+    {
+        if ($this->blogPromotionPosts->removeElement($blogPromotionPost)) {
+            // set the owning side to null (unless already changed)
+            if ($blogPromotionPost->getKeywordReferences() === $this) {
+                $blogPromotionPost->setKeywordReferences(null);
+            }
+        }
+
+        return $this;
     }
 
 }

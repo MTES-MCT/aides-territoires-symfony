@@ -37,14 +37,20 @@
     border: none;
     color: var(--text-label-grey);
     width: 85%;
-    // .item{
-    //     width: 85%;
-    // }
+    flex-direction: row-reverse;
+    justify-content: flex-end;
+}
+
+.ts-wrapper.multi .ts-control > div {
+    padding: 2px 0;
+    margin: 0 0 3px 0;
 }
 
 .ts-wrapper.plugin-remove_button:not(.rtl) .item .remove {
     border-left: none;
     background-image: none;
+    margin-left: 0;
+    padding: 0 6px 0 0;
 }
 
 .ts-wrapper.multi .ts-control [data-value].active {

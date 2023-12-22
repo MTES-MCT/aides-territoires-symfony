@@ -11,7 +11,6 @@ use App\Entity\Aid\AidSuggestedAidProject;
 use App\Entity\Alert\Alert;
 use App\Entity\Project\Project;
 use App\Entity\User\Notification;
-use App\Entity\User\User;
 use App\Form\Aid\AidSearchType;
 use App\Form\Aid\SuggestToProjectType;
 use App\Form\Alert\AlertCreateType;
@@ -32,7 +31,6 @@ use Pagerfanta\Adapter\ArrayAdapter;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Pagerfanta\Doctrine\ORM\QueryAdapter;
 use Pagerfanta\Pagerfanta;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -105,7 +103,7 @@ class AidController extends FrontController
         $pagerfanta->setCurrentPage($currentPage);
 
         // promotions posts
-        $blogPromotionPosts = $blogPromotionPostRepository->findPublished();
+        $blogPromotionPosts = $blogPromotionPostRepository->findPublished($aidParams);
 
         // page title
         $pageTitle = $pagerfanta->getNbResults() . ' résultat';

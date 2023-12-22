@@ -1,5 +1,6 @@
 @import '../_variables';
 @import '../_mixins';
+@import '../form/trumbowyg-override.scss';
 
 .table{
     &.datagrid {
@@ -39,3 +40,6 @@
     }
 }
 
+.trumbowyg-box .trumbowyg-editor {
+    min-height: 16rem;
+}

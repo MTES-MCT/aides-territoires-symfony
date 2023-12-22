@@ -36,6 +36,9 @@ class ImageService
         string $fileName
     ): bool
     {
+        if (!$file) {
+            return false;
+        }
         // Upload a publicly accessible file. The file size and type are determined by the SDK.
         try {
             // créer dossier temporaire si besoin
