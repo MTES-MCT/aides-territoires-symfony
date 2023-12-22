@@ -1,0 +1,10 @@
+{
+  "jobs": [
+    {
+      "command": "0 6 * * * php bin/console at:cron:perimeter:counties_nb_backers"
+    },
+    {
+      "command": "*/5 * * * php bin/console at:cron:perimeter:perimeter_import"
+    }
+  ]
+}
