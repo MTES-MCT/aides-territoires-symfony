@@ -18,7 +18,7 @@ class FileService
     {
         // Pour scalingo
         if ($this->getEnvironment() == 'prod') {
-            return '/tmp';
+            return '';
         } else {
             return self::UPLOAD_TMP_FOLDER;
         }
@@ -28,7 +28,7 @@ class FileService
     {
         // Pour scalingo
         if ($this->getEnvironment() == 'prod') {
-            return $this->kernelInterface->getProjectDir().'/tmp';
+            return $this->kernelInterface->getProjectDir();
         } else {
             return $this->kernelInterface->getProjectDir().self::UPLOAD_TMP_FOLDER;
         }
