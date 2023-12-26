@@ -50,6 +50,27 @@ knp_gaufrette:
                     create: true
                     directory: projects
                     acl: public-read    
+                
+        searchPageLogo_adapter:
+            aws_s3:
+                service_id: ct_file_store.s3
+                bucket_name: '%env(AWS_STORAGE_BUCKET_NAME)%'
+                detect_content_type: true
+                options:
+                    create: true
+                    directory: minisites
+                    acl: public-read  
+
+        searchPageMetaImage_adapter:
+            aws_s3:
+                service_id: ct_file_store.s3
+                bucket_name: '%env(AWS_STORAGE_BUCKET_NAME)%'
+                detect_content_type: true
+                options:
+                    create: true
+                    directory: minisites
+                    acl: public-read  
+
 
     filesystems:
         blogPromotionPostThumb_fs:
@@ -66,3 +87,9 @@ knp_gaufrette:
 
         projectThumb_fs:
             adapter: projectThumb_adapter
+
+        searchPageLogo_fs:
+            adapter: searchPageLogo_adapter
+
+        searchPageMetaImage_fs:
+            adapter: searchPageMetaImage_adapter

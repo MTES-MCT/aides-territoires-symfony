@@ -8,6 +8,7 @@ use App\Entity\Aid\Aid;
 use App\Entity\Search\SearchPage;
 use App\Field\TextLengthCountField;
 use App\Field\TrumbowygField;
+use App\Field\VichImageField;
 use App\Service\Aid\AidSearchFormService;
 use App\Service\File\FileService;
 use App\Service\Image\ImageService;
@@ -143,27 +144,18 @@ class SearchPageCrudController extends AtCrudController
         ->setHelp('Sera affichée dans les SERPs. À garder < 120 caractères.')
         ->setFormTypeOption('attr', ['maxlength' => 255]);
 
-        yield ImageField::new('metaImage', 'Image (balise meta)')
+        yield VichImageField::new('metaImageFile', 'Image (balise meta)')
         ->setHelp('Vérifiez que l’image a une largeur minimale de 1024px')
-        ->setUploadDir($this->fileService->getUploadTmpDirRelative())
-        ->setBasePath($this->paramService->get('cloud_image_url'))
-        ->setUploadedFileNamePattern(SearchPage::FOLDER.'/[slug]-[timestamp].[extension]')
-        ->setFormTypeOption('upload_new', function(UploadedFile $file, string $uploadDir, string $fileName) {
-            $this->imageService->sendUploadedImageToCloud($file, SearchPage::FOLDER, $fileName);
-        })
-        ->hideOnIndex();
-        
+        ->hideOnIndex()
+        ;
+
         yield FormField::addFieldset('Personnalisation du style');
 
-        yield ImageField::new('logo', 'Logo')
+        yield VichImageField::new('logoFile', 'Logo')
         ->setHelp('Évitez les fichiers trop lourds. Préférez les fichiers svg.')
-        ->setUploadDir($this->fileService->getUploadTmpDirRelative())
-        ->setBasePath($this->paramService->get('cloud_image_url'))
-        ->setUploadedFileNamePattern(SearchPage::FOLDER.'/[slug]-[timestamp].[extension]')
-        ->setFormTypeOption('upload_new', function(UploadedFile $file, string $uploadDir, string $fileName) {
-            $this->imageService->sendUploadedImageToCloud($file, SearchPage::FOLDER, $fileName);
-        })
-        ->hideOnIndex();
+        ->hideOnIndex()
+        ;
+
         yield UrlField::new('logoLink', 'Lien du logo')
         ->setHelp('L’URL vers laquelle renvoie un clic sur le logo partenaire')
         ->hideOnIndex();

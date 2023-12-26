@@ -49,3 +49,19 @@ vich_uploader:
             delete_on_update:   false
             delete_on_remove:   true 
             namer: Vich\UploaderBundle\Naming\SmartUniqueNamer
+
+        searchPageLogo:
+            inject_on_load: true
+            uri_prefix: "%env(AWS_S3_ENDPOINT_URL)%/%env(AWS_STORAGE_BUCKET_NAME)%"
+            upload_destination: searchPageLogo_fs
+            delete_on_update:   false
+            delete_on_remove:   true 
+            namer: Vich\UploaderBundle\Naming\SmartUniqueNamer
+
+        searchPageMetaImage:
+            inject_on_load: true
+            uri_prefix: "%env(AWS_S3_ENDPOINT_URL)%/%env(AWS_STORAGE_BUCKET_NAME)%"
+            upload_destination: searchPageMetaImage_fs
+            delete_on_update:   false
+            delete_on_remove:   true 
+            namer: Vich\UploaderBundle\Naming\SmartUniqueNamer

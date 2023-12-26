@@ -14,6 +14,8 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 use Gedmo\Mapping\Annotation as Gedmo;
+use Vich\UploaderBundle\Mapping\Annotation as Vich;
+use Symfony\Component\HttpFoundation\File\File;
 
 #[ORM\Entity(repositoryClass: SearchPageRepository::class)]
 class SearchPage
@@ -55,6 +57,9 @@ class SearchPage
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $logo = null;
 
+    #[Vich\UploadableField(mapping: 'searchPageLogo', fileNameProperty: 'logo')]
+    private ?File $logoFile = null;
+
     #[ORM\Column(length: 10)]
     private ?string $color4 = null;
 
@@ -69,6 +74,9 @@ class SearchPage
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $metaImage = null;
+
+    #[Vich\UploadableField(mapping: 'searchPageMetaImage', fileNameProperty: 'metaImage')]
+    private ?File $metaImageFile = null;
 
     #[ORM\Column]
     private ?bool $showAudienceField = null;
@@ -272,9 +280,27 @@ class SearchPage
 
     public function setLogo(?string $logo): static
     {
-        $this->logo = $logo;
+        if (trim($logo) !== '') {
+            $this->logo = self::FOLDER.'/'.$logo;
+        } else {
+            $this->logo = null;
+        }
 
         return $this;
+    }
+
+    public function setLogoFile(?File $logoFile = null): void
+    {
+        $this->logoFile = $logoFile;
+
+        if (null !== $logoFile) {
+            $this->timeUpdate = new \DateTime(date('Y-m-d H:i:s'));
+        }
+    }
+
+    public function getLogoFile(): ?File
+    {
+        return $this->logoFile;
     }
 
     public function getColor4(): ?string
@@ -332,9 +358,27 @@ class SearchPage
 
     public function setMetaImage(?string $metaImage): static
     {
-        $this->metaImage = $metaImage;
+        if (trim($metaImage) !== '') {
+            $this->metaImage = self::FOLDER.'/'.$metaImage;
+        } else {
+            $this->metaImage = null;
+        }
 
         return $this;
+    }
+
+    public function setMetaImageFile(?File $metaImageFile = null): void
+    {
+        $this->metaImageFile = $metaImageFile;
+
+        if (null !== $metaImageFile) {
+            $this->timeUpdate = new \DateTime(date('Y-m-d H:i:s'));
+        }
+    }
+
+    public function getMetaImageFile(): ?File
+    {
+        return $this->metaImageFile;
     }
 
     public function isShowAudienceField(): ?bool
