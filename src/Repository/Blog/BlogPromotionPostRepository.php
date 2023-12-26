@@ -34,7 +34,6 @@ class BlogPromotionPostRepository extends ServiceEntityRepository
 
     public function  getQueryBuilder(array $params = null) : QueryBuilder
     {
-        dump($params);
         $organizationType = $params['organizationType'] ?? null;
         $backers = $params['backers'] ?? null;
         $programs = $params['programs'] ?? null;
