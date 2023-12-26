@@ -58,7 +58,7 @@ class UploadController extends FrontController {
             // force resize pour nettoyer code malveillant
             $imagick->cropThumbnailImage($imagick->getImageWidth(), $imagick->getImageHeight());
 
-            $imagick->writeImage($fileService->getUploadTmpDir().$newFilename);
+            $imagick->writeImage($fileService->getUploadTmpDir().'/'.$newFilename);
 
             $imageService->sendImageToCloud(
                 $fileService->getUploadTmpDir().$newFilename,
