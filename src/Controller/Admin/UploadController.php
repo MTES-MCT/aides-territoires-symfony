@@ -61,7 +61,7 @@ class UploadController extends FrontController {
             $imagick->writeImage($fileService->getUploadTmpDir().'/'.$newFilename);
 
             $imageService->sendImageToCloud(
-                $fileService->getUploadTmpDir().$newFilename,
+                $fileService->getUploadTmpDir().'/'.$newFilename,
                 $newFilename
             );
         } catch (FileException $e) {
