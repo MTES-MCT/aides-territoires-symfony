@@ -6,6 +6,7 @@ use App\Controller\Admin\AtCrudController;
 use App\Entity\Backer\Backer;
 use App\Field\TextLengthCountField;
 use App\Field\TrumbowygField;
+use App\Field\VichImageField;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
@@ -36,14 +37,18 @@ class BackerCrudController extends AtCrudController
         yield TrumbowygField::new('description', 'Description')
         ->onlyOnForms();
 
-        yield ImageField::new('logo', 'Logo du porteur')
-        ->setHelp('Évitez les fichiers trop lourds. Préférez les fichiers SVG.')
-        ->setUploadDir($this->fileService->getUploadTmpDirRelative())
-        ->setBasePath($this->paramService->get('cloud_image_url'))
-        ->setUploadedFileNamePattern(Backer::FOLDER.'/[slug]-[timestamp].[extension]')
-        ->setFormTypeOption('upload_new', function(UploadedFile $file, string $uploadDir, string $fileName) {
-            $this->imageService->sendImageToCloud($file, Backer::FOLDER, $fileName);
-        })
+        // yield ImageField::new('logo', 'Logo du porteur')
+        // ->setHelp('Évitez les fichiers trop lourds. Préférez les fichiers SVG.')
+        // ->setUploadDir($this->fileService->getUploadTmpDirRelative())
+        // ->setBasePath($this->paramService->get('cloud_image_url'))
+        // ->setUploadedFileNamePattern(Backer::FOLDER.'/[slug]-[timestamp].[extension]')
+        // ->setFormTypeOption('upload_new', function(UploadedFile $file, string $uploadDir, string $fileName) {
+        //     $this->imageService->sendImageToCloud($file, Backer::FOLDER, $fileName);
+        // })
+        // ;
+        yield VichImageField::new('logoFile', 'Logo du porteur')
+        ->setHelp('Évitez les fichiers trop lourds.')
+        ->hideOnIndex()
         ;
         yield UrlField::new('externalLink', 'Lien externe')
         ->setHelp('L’URL externe vers laquelle renvoie un clic sur le logo du porteur');

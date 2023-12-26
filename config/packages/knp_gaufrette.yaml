@@ -10,6 +10,20 @@ knp_gaufrette:
                     create: true
                     directory: promotion
                     acl: public-read
+        
+        backerLogo_adapter:
+            aws_s3:
+                service_id: ct_file_store.s3
+                bucket_name: '%env(AWS_STORAGE_BUCKET_NAME)%'
+                detect_content_type: true
+                options:
+                    create: true
+                    directory: backers
+                    acl: public-read
+
     filesystems:
         blogPromotionPostThumb_fs:
             adapter:    blogPromotionPostThumb_adapter
+
+        backerLogo_fs:
+            adapter:    backerLogo_adapter

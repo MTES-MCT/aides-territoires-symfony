@@ -239,7 +239,7 @@ class BlogPromotionPost
     public function setImage(?string $image): static
     {
         if (trim($image) !== '') {
-            $this->image = 'promotion/'.$image;
+            $this->image = self::FOLDER.'/'.$image;
         } else {
             $this->image = null;
         }

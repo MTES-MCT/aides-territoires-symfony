@@ -29,6 +29,8 @@ use ApiPlatform\OpenApi\Model;
 use App\Filter\AtSearchFilter;
 use App\Filter\Backer\HasFinancedAidsFilter;
 use App\Filter\Backer\HasPublishedFinancedAidsFilter;
+use Vich\UploaderBundle\Mapping\Annotation as Vich;
+use Symfony\Component\HttpFoundation\File\File;
 
 #[ApiResource(
     // shortName: 'Porteurs',
@@ -67,6 +69,7 @@ use App\Filter\Backer\HasPublishedFinancedAidsFilter;
 )]
 #[ApiFilter(HasFinancedAidsFilter::class)]
 #[ApiFilter(HasPublishedFinancedAidsFilter::class)]
+#[Vich\Uploadable]
 #[ORM\Entity(repositoryClass: BackerRepository::class)]
 class Backer
 {
@@ -99,6 +102,9 @@ class Backer
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $logo = null;
+
+    #[Vich\UploadableField(mapping: 'backerLogo', fileNameProperty: 'logo')]
+    private ?File $logoFile = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $description = null;
@@ -154,6 +160,7 @@ class Backer
     private ArrayCollection $categories;
 
     private ArrayCollection $programs;
+    private ?ArrayCollection $aidsThematics;
     
     public function __construct()
     {
@@ -241,9 +248,27 @@ class Backer
 
     public function setLogo(?string $logo): static
     {
-        $this->logo = $logo;
+        if (trim($logo) !== '') {
+            $this->logo = self::FOLDER.'/'.$logo;
+        } else {
+            $this->logo = null;
+        }
 
         return $this;
+    }
+
+    public function setLogoFile(?File $logoFile = null): void
+    {
+        $this->logoFile = $logoFile;
+
+        if (null !== $logoFile) {
+            $this->timeUpdate = new \DateTime(date('Y-m-d H:i:s'));
+        }
+    }
+
+    public function getLogoFile(): ?File
+    {
+        return $this->logoFile;
     }
 
     public function getDescription(): ?string
@@ -536,6 +561,9 @@ class Backer
     }
 
     private ?array $aidsTechnical = [];
+
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
+    private ?\DateTimeInterface $timeUpdate = null;
     public function getAidsTechnical() : ?array
     {
         if (count($this->aidsTechnical) > 0) {
@@ -578,7 +606,7 @@ class Backer
     }
     
 
-    private ?ArrayCollection $aidsThematics;
+    
 
 
     public function getAidsThematics() : ?ArrayCollection
@@ -717,5 +745,17 @@ class Backer
     public function  __toString(): string
     {
         return $this->getName() ?? 'Backer';
+    }
+
+    public function getTimeUpdate(): ?\DateTimeInterface
+    {
+        return $this->timeUpdate;
+    }
+
+    public function setTimeUpdate(?\DateTimeInterface $timeUpdate): static
+    {
+        $this->timeUpdate = $timeUpdate;
+
+        return $this;
     }
 }
