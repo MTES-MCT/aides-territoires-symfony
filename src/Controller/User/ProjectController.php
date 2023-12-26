@@ -71,12 +71,25 @@ class ProjectController extends FrontController
                 );
             }
         }
+
+        // projets
+        $projects = $projectRepository->findBy(
+            [
+                'author' => $user
+                // 'organization' => $user->getDefaultOrganization()
+            ],
+            [
+                'timeCreate' => 'DESC'
+            ]
+        );
+
         // fil arianne
         $this->breadcrumb->add("Mon compte",$this->generateUrl('app_user_dashboard'));
         $this->breadcrumb->add("Mes projets de ma structure");
         
+        // rendu template
         return $this->render('user/project/index.html.twig', [
-            'projects' => $user->getProjects(),
+            'projects' => $projects,
             'formDeleteProject' => $formDeleteProject
         ]);
     }
@@ -122,7 +135,7 @@ class ProjectController extends FrontController
         if ($form->isSubmitted()) {
             if ($form->isValid()) {
                 // traitement image
-                $imageFile = $form->get('imageFile')->getData();
+                $imageFile = $form->get('imageUploadedFile')->getData();
                 if ($imageFile instanceof UploadedFile) {
                     $project->setImage($imageService->getSafeFileName($imageFile->getClientOriginalName()));
                     $imageService->sendUploadedImageToCloud($imageFile, Project::FOLDER, $project->getImage());
@@ -178,7 +191,7 @@ class ProjectController extends FrontController
         if ($form->isSubmitted()) {
             if ($form->isValid()) {
                 // traitement image
-                $imageFile = $form->get('imageFile')->getData();
+                $imageFile = $form->get('imageUploadedFile')->getData();
                 if ($imageFile instanceof UploadedFile) {
                     $project->setImage($imageService->getSafeFileName($imageFile->getClientOriginalName()));
                     $imageService->sendUploadedImageToCloud($imageFile, Project::FOLDER, $project->getImage());

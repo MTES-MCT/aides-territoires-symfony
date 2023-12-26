@@ -27,9 +27,14 @@ class UserService
         
     }
 
-    public function isMemberOfOrganization(Organization $organization, User $user) : bool
+    public function isMemberOfOrganization(?Organization $organization, User $user) : bool
     {
         $isMember = false;
+
+        if (!$organization) {
+            return true;
+        }
+        
         foreach ($user->getOrganizations() as $userOrganization) {
             if ($userOrganization->getId() === $organization->getId()) {
                 $isMember = true;

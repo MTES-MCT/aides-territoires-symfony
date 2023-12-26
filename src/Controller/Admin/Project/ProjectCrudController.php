@@ -6,6 +6,7 @@ use App\Controller\Admin\Aid\AidProjectDisplayCrudController;
 use App\Controller\Admin\AtCrudController;
 use App\Entity\Project\Project;
 use App\Field\TrumbowygField;
+use App\Field\VichImageField;
 use App\Repository\Keyword\KeywordSynonymlistRepository;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
@@ -44,21 +45,20 @@ class ProjectCrudController extends AtCrudController
         ->setHelp('Laisser vide pour autoremplir.')
         ->hideOnIndex()
         ;
+        yield AssociationField::new('projectReference', 'Projet référent')
+        ;
+        yield BooleanField::new('referentNotFound', 'Référent non trouvé')
+        ->hideOnIndex();
+
         yield TrumbowygField::new('description', 'Description')
         ->hideOnIndex();
         yield TrumbowygField::new('privateDescription', 'Notes internes du projet')
         ->hideOnIndex();
 
-        yield ImageField::new('image', 'Image')
-        ->setUploadDir($this->fileService->getUploadTmpDirRelative())
-        ->setBasePath($this->paramService->get('cloud_image_url'))
-        ->setUploadedFileNamePattern(Project::FOLDER.'/[slug]-[timestamp].[extension]')
-        ->setFormTypeOption('upload_new', function(UploadedFile $file, string $uploadDir, string $fileName) {
-            $this->imageService->sendUploadedImageToCloud($file, Project::FOLDER, $fileName);
-        })
+        yield VichImageField::new('imageFile', 'Image')
+        ->setHelp('Évitez les fichiers trop lourds.')
         ->hideOnIndex()
         ;
-
         yield DateField::new('dueDate', 'Date d’échéance')
         ->hideOnIndex();
         yield ChoiceField::new('step', 'Avancement du projet')
@@ -119,7 +119,8 @@ class ProjectCrudController extends AtCrudController
         ->setChoices($statusChoices)
         ;
         yield DateTimeField::new('timeCreate', 'Date de création')
-        ->setFormTypeOption('attr', ['readonly' => true]);
+        ->setFormTypeOption('attr', ['readonly' => true])
+        ->hideWhenCreating();
 
     }
 

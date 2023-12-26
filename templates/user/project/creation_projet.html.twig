@@ -48,7 +48,7 @@
                   {{ form_row(form.projectTypesSuggestion )}}
                 </div>
                 <div class="fr-col-12 fr-col-md-6">
-                  {{ form_row(form.referentFound )}}
+                  {{ form_row(form.referentNotFound )}}
                 </div>
                 <div class="fr-col-12 fr-col-md-6">
                   {{ form_row(form.step )}}
@@ -72,7 +72,7 @@
                 </div>
               </div>
 
-              {{ form_row(form.imageFile )}}
+              {{ form_row(form.imageUploadedFile )}}
                                     
               <footer class="fr-mt-2w">
                 <a href="{{ path('app_user_project_structure') }}" type="button" class="btn-block fr-btn fr-btn--secondary">Annuler</a>

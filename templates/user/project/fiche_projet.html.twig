@@ -53,7 +53,7 @@
                   {{ form_row(form.projectReference )}}
                 </div>
                 <div class="fr-col-12 fr-col-md-6">
-                  {{ form_row(form.referentFound )}}
+                  {{ form_row(form.referentNotFound )}}
                 </div>
                 <div class="fr-col-12 fr-col-md-6">
                   {{ form_row(form.step )}}
@@ -80,7 +80,7 @@
               {% if project and project.image %}
               <p><img src="{{ getParameter('cloud_image_url') }}{{ project.image }}" class="fr-responsive-img" alt="Image de votre projet" /></p>
               {% endif %}
-              {{ form_row(form.imageFile )}}
+              {{ form_row(form.imageUploadedFile )}}
                                     
               <footer class="fr-mt-2w">
                   <button type="submit" class="fr-btn">Modifier</button>

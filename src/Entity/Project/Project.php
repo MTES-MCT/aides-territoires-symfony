@@ -16,7 +16,11 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Vich\UploaderBundle\Mapping\Annotation as Vich;
+use Symfony\Component\HttpFoundation\File\File;
+use Symfony\Component\Serializer\Annotation\Ignore;
 
+#[Vich\Uploadable]
 #[ORM\Index(columns: ['status'], name: 'status_project')]
 #[ORM\Index(columns: ['is_public'], name: 'is_public_project')]
 #[ORM\Index(columns: ['name'], name: 'name_project_fulltext', flags: ['fulltext'])]
@@ -128,7 +132,11 @@ class Project
     #[ORM\Column(length: 100, nullable: true)]
     private ?string $image = null;
 
-    private ?UploadedFile $imageFile;
+    #[Vich\UploadableField(mapping: 'projectThumb', fileNameProperty: 'image')]
+    #[Ignore]
+    private ?File $imageFile = null;
+
+    private ?UploadedFile $imageUploadedFile;
 
     #[ORM\ManyToOne(inversedBy: 'projects')]
     private ?User $author = null;
@@ -152,8 +160,8 @@ class Project
     #[ORM\OneToMany(mappedBy: 'project', targetEntity: LogPublicProjectView::class)]
     private Collection $logPublicProjectViews;
 
-    #[ORM\Column(nullable: true)]
-    private ?bool $referentFound = null;
+    #[ORM\Column(nullable: true, name: 'referent_not_found')]
+    private ?bool $referentNotFound = null;
 
     #[ORM\ManyToOne(inversedBy: 'projects')]
     private ?ProjectReference $projectReference = null;
@@ -374,9 +382,26 @@ class Project
 
     public function setImage(?string $image): static
     {
-        $this->image = $image;
-
+        if (trim($image) !== '') {
+            $this->image = self::FOLDER.'/'.$image;
+        } else {
+            $this->image = null;
+        }
         return $this;
+    }
+
+    public function setImageFile(?File $imageFile = null): void
+    {
+        $this->imageFile = $imageFile;
+
+        if (null !== $imageFile) {
+            $this->timeUpdate = new \DateTime(date('Y-m-d H:i:s'));
+        }
+    }
+
+    public function getImageFile(): ?File
+    {
+        return $this->imageFile;
     }
 
     public function getAuthor(): ?User
@@ -547,28 +572,28 @@ class Project
         return $this;
     }
 
-    public function isReferentFound(): ?bool
+    public function isReferentNotFound(): ?bool
     {
-        return $this->referentFound;
+        return $this->referentNotFound;
     }
 
-    public function setReferentFound(?bool $referentFound): static
+    public function setReferentNotFound(?bool $referentNotFound): static
     {
-        $this->referentFound = $referentFound;
+        $this->referentNotFound = $referentNotFound;
 
         return $this;
     }
 
-    public function getImageFile(): ?UploadedFile
+    public function getImageUploadedFile(): ?UploadedFile
     {
-        return $this->imageFile;
+        return $this->imageUploadedFile;
     }
 
-    public function setImageFile(?UploadedFile $imageFile): void
+    public function setImageUploadedFile(?UploadedFile $imageUploadedFile): void
     {
-        $this->imageFile = $imageFile;
+        $this->imageUploadedFile = $imageUploadedFile;
 
-        if ($imageFile !== null) {
+        if ($imageUploadedFile !== null) {
             // It's important to update the updatedAt field to trigger the lifecycle events
             $this->timeUpdate = new \DateTime(date('Y-m-d H:i:s'));
         }

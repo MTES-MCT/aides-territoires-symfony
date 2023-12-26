@@ -41,6 +41,16 @@ knp_gaufrette:
                     directory: programs
                     acl: public-read
 
+        projectThumb_adapter:
+            aws_s3:
+                service_id: ct_file_store.s3
+                bucket_name: '%env(AWS_STORAGE_BUCKET_NAME)%'
+                detect_content_type: true
+                options:
+                    create: true
+                    directory: projects
+                    acl: public-read    
+
     filesystems:
         blogPromotionPostThumb_fs:
             adapter: blogPromotionPostThumb_adapter
@@ -53,3 +63,6 @@ knp_gaufrette:
 
         programLogo_fs:
             adapter: programLogo_adapter
+
+        projectThumb_fs:
+            adapter: projectThumb_adapter

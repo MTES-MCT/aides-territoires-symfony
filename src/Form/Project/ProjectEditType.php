@@ -62,7 +62,7 @@ class ProjectEditType extends AbstractType
             },
             'autocomplete' => true,
         ])
-        ->add('referentFound', CheckboxType::class, [
+        ->add('referentNotFound', CheckboxType::class, [
             'required' => false,
             'label' => 'Je n\'ai pas trouvé de projet référent dans la liste',
         ])
@@ -106,7 +106,7 @@ class ProjectEditType extends AbstractType
             ],
             'sanitize_html' => true,
         ])
-        ->add('imageFile', FileType::class, [
+        ->add('imageUploadedFile', FileType::class, [
             'label' => 'Ajouter une photo représentant votre projet',
             'help' => 'Taille maximale : 10 Mio. Formats supportés : jpeg, jpg, png',
             'required' => false, 
@@ -133,9 +133,9 @@ class ProjectEditType extends AbstractType
     public function onSubmit(FormEvent $event): void
     {
         $projectReference = $event->getForm()->get('projectReference')->getData();
-        $referentFound = $event->getForm()->get('referentFound')->getData();
+        $referentNotFound = $event->getForm()->get('referentNotFound')->getData();
 
-        if (!$projectReference && !$referentFound) {
+        if (!$projectReference && !$referentNotFound) {
             $event->getForm()->get('projectReference')->addError(new FormError('Veuillez choisir un projet référent ou cocher la case "Je n\'ai pas trouvé de projet référent dans la liste"'));
         }
     }
