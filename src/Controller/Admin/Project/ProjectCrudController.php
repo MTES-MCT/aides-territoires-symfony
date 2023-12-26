@@ -54,7 +54,7 @@ class ProjectCrudController extends AtCrudController
         ->setBasePath($this->paramService->get('cloud_image_url'))
         ->setUploadedFileNamePattern(Project::FOLDER.'/[slug]-[timestamp].[extension]')
         ->setFormTypeOption('upload_new', function(UploadedFile $file, string $uploadDir, string $fileName) {
-            $this->imageService->sendImageToCloud($file, Project::FOLDER, $fileName);
+            $this->imageService->sendUploadedImageToCloud($file, Project::FOLDER, $fileName);
         })
         ->hideOnIndex()
         ;

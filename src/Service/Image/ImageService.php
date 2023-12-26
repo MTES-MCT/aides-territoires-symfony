@@ -22,8 +22,8 @@ class ImageService
     {
     }
 
-    /**
-     * Envoi une image sur le cloud
+        /**
+     * Envoi une image (deja uploadee / traitee sur le serveur) sur le cloud
      *
      * @param UploadedFile $file
      * @param string $uploadDir
@@ -31,6 +31,66 @@ class ImageService
      * @return boolean
      */
     public function sendImageToCloud(
+        string $file,
+        string $fileName
+    ): bool
+    {
+        if (!$file) {
+            return false;
+        }
+
+        try {
+            // resize image avec \Imagick   
+            $imagick = new \Imagick($file);
+            $imagick = $this->imagickAutorotate($imagick);
+            $maxWidth = 1024;
+            $maxHeight = 1024;
+            // image trop grande, on la reisze
+            if ($imagick->getImageWidth() > $maxWidth || $imagick->getImageHeight() > $maxHeight) {
+                $imagick->resizeImage($maxWidth, $maxHeight, \Imagick::FILTER_LANCZOS, 1, true);
+            } else {
+                // si pas besoin de rezie, on la remet au même format pour nettoyer les métadonnées
+                $imagick->cropThumbnailImage($imagick->getImageWidth(), $imagick->getImageHeight(), true);
+            }
+            $imagick->writeImage($file);
+
+            // Créer un objet Credentials en utilisant les clés d'accès AWS
+            $credentials = new Credentials($this->paramService->get('aws_access_key_id'), $this->paramService->get('aws_secret_access_key'));
+            
+            // Créer un client S3
+            $s3 = new S3Client([
+                'version' => 'latest',
+                'region'  => $this->paramService->get('aws_s3_region_name'),
+                'endpoint' => $this->paramService->get('aws_s3_endpoint_url'),
+                'credentials' => $credentials,
+                'use_path_style_endpoint' => true
+            ]);
+
+            // Télécharger le fichier sur S3
+            $s3->putObject([
+                'Bucket' => $this->paramService->get('aws_storage_bucket_name'),
+                'Key'    => $fileName,
+                'SourceFile' => $file,
+                'ACL'    => 'public-read',
+            ]);
+
+            // suppression fichier temporaire
+            unlink($file);
+            return true;
+        } catch (S3Exception $e) {
+            return false;
+        }
+    }
+
+    /**
+     * Envoi une image (UploadedFile) sur le cloud
+     *
+     * @param UploadedFile $file
+     * @param string $uploadDir
+     * @param string $fileName
+     * @return boolean
+     */
+    public function sendUploadedImageToCloud(
         UploadedFile $file,
         string $uploadDir,
         string $fileName

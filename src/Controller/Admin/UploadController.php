@@ -3,6 +3,9 @@
 namespace App\Controller\Admin;
 
 use App\Controller\FrontController;
+use App\Service\File\FileService;
+use App\Service\Image\ImageService;
+use App\Service\Various\ParamService;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -18,7 +21,9 @@ class UploadController extends FrontController {
     (
         Request $request,
         SluggerInterface $slugger,
-        KernelInterface $kernelInterface
+        FileService $fileService,
+        ImageService $imageService,
+        ParamService $paramService
     ): Response
     {
         $image = $request->files->get('image', null);
@@ -34,7 +39,7 @@ class UploadController extends FrontController {
             // si file, on la met dans le dossier temporaire
             $tmpFile = null;
             if ($image) {
-                $tmpFolder = $kernelInterface->getProjectDir().'/public/uploads/_tmp/';
+                $tmpFolder = $fileService->getUploadTmpDir();
                 $image->move(
                     $tmpFolder,
                     $newFilename
@@ -53,7 +58,12 @@ class UploadController extends FrontController {
             // force resize pour nettoyer code malveillant
             $imagick->cropThumbnailImage($imagick->getImageWidth(), $imagick->getImageHeight());
 
-            $imagick->writeImage($kernelInterface->getProjectDir().'/public/uploads/images/'.$newFilename);
+            $imagick->writeImage($fileService->getUploadTmpDir().$newFilename);
+
+            $imageService->sendImageToCloud(
+                $fileService->getUploadTmpDir().$newFilename,
+                $newFilename
+            );
         } catch (FileException $e) {
             return new JsonResponse([
                 'url' => null,
@@ -63,7 +73,7 @@ class UploadController extends FrontController {
         
         return new JsonResponse([
             'data' => [
-                'link' => $this->generateUrl('app_home', [], UrlGeneratorInterface::ABSOLUTE_URL).'uploads/images/'.$newFilename
+                'link' => $paramService->get('cloud_image_url').$newFilename,
             ],
             'success' => true,
             'code' => 200

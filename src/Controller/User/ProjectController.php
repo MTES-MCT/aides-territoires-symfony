@@ -125,7 +125,7 @@ class ProjectController extends FrontController
                 $imageFile = $form->get('imageFile')->getData();
                 if ($imageFile instanceof UploadedFile) {
                     $project->setImage($imageService->getSafeFileName($imageFile->getClientOriginalName()));
-                    $imageService->sendImageToCloud($imageFile, Project::FOLDER, $project->getImage());
+                    $imageService->sendUploadedImageToCloud($imageFile, Project::FOLDER, $project->getImage());
                 }
 
                 // sauvegarde
@@ -181,7 +181,7 @@ class ProjectController extends FrontController
                 $imageFile = $form->get('imageFile')->getData();
                 if ($imageFile instanceof UploadedFile) {
                     $project->setImage($imageService->getSafeFileName($imageFile->getClientOriginalName()));
-                    $imageService->sendImageToCloud($imageFile, Project::FOLDER, $project->getImage());
+                    $imageService->sendUploadedImageToCloud($imageFile, Project::FOLDER, $project->getImage());
                 }
 
                 // données additionnelles

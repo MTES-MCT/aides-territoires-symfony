@@ -149,7 +149,7 @@ class SearchPageCrudController extends AtCrudController
         ->setBasePath($this->paramService->get('cloud_image_url'))
         ->setUploadedFileNamePattern(SearchPage::FOLDER.'/[slug]-[timestamp].[extension]')
         ->setFormTypeOption('upload_new', function(UploadedFile $file, string $uploadDir, string $fileName) {
-            $this->imageService->sendImageToCloud($file, SearchPage::FOLDER, $fileName);
+            $this->imageService->sendUploadedImageToCloud($file, SearchPage::FOLDER, $fileName);
         })
         ->hideOnIndex();
         
@@ -161,7 +161,7 @@ class SearchPageCrudController extends AtCrudController
         ->setBasePath($this->paramService->get('cloud_image_url'))
         ->setUploadedFileNamePattern(SearchPage::FOLDER.'/[slug]-[timestamp].[extension]')
         ->setFormTypeOption('upload_new', function(UploadedFile $file, string $uploadDir, string $fileName) {
-            $this->imageService->sendImageToCloud($file, SearchPage::FOLDER, $fileName);
+            $this->imageService->sendUploadedImageToCloud($file, SearchPage::FOLDER, $fileName);
         })
         ->hideOnIndex();
         yield UrlField::new('logoLink', 'Lien du logo')

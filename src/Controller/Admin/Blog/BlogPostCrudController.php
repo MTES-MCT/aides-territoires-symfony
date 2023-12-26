@@ -37,7 +37,7 @@ class BlogPostCrudController extends AtCrudController
 
     public function configureFields(string $pageName): iterable
     {
-        yield FormField::addTab('Article');
+        yield FormField::addFieldset('Article');
         yield IdField::new('id')
         ->onlyOnIndex();
         yield TextField::new('name', 'Titre de l\'article');
@@ -73,10 +73,8 @@ class BlogPostCrudController extends AtCrudController
         yield TrumbowygField::new('description', 'Contenu')
         ->onlyOnForms()
         ;
-        yield DateField::new('timeCreate', 'Date de création')
-        ->onlyOnIndex()
-        ;
-        yield FormField::addTab('Administration');
+
+        yield FormField::addFieldset('Administration');
         yield ChoiceField::new('status', 'Statut')
         ->setChoices([
             'Brouillon' => 'draft',
@@ -86,7 +84,10 @@ class BlogPostCrudController extends AtCrudController
         ])
         ;
 
-        yield FormField::addTab('SEO');
+        yield DateField::new('datePublished', 'Date de publication')
+        ;
+
+        yield FormField::addFieldset('SEO');
         yield TextField::new('metaTitle', 'Titre (balise meta)')
         ->setHelp('Le titre qui sera affiché dans les SERPs. Il est recommandé de le garder < 60 caractères. Laissez vide pour réutiliser le titre de l’article.')
         ;
