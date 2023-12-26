@@ -8,6 +8,7 @@
         "ext-ctype": "*",
         "ext-iconv": "*",
         "ext-sodium": "*",
+        "ext-imagick": "*",
         "api-platform/core": "*",
         "aws/aws-sdk-php": "^3.286",
         "babdev/pagerfanta-bundle": "^4.2",
