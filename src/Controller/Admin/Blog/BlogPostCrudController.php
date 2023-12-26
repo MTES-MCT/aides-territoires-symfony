@@ -62,14 +62,9 @@ class BlogPostCrudController extends AtCrudController
         ])
         ;
 
-        yield ImageField::new('logo', 'Image de l\'article')
+        yield VichImageField::new('logoFile', 'Image de l\'article')
         ->setHelp('Évitez les fichiers trop lourds.')
-        ->setUploadDir($this->fileService->getUploadTmpDirRelative())
-        ->setBasePath($this->paramService->get('cloud_image_url'))
-        ->setUploadedFileNamePattern(BlogPost::FOLDER.'/[slug]-[timestamp].[extension]')
-        ->setFormTypeOption('upload_new', function(UploadedFile $file, string $uploadDir, string $fileName) {
-            $this->imageService->sendImageToCloud($file, BlogPost::FOLDER, $fileName);
-        })
+        ->hideOnIndex()
         ;
 
         yield TrumbowygField::new('hat', 'Texte d’introduction')

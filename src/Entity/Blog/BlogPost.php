@@ -11,6 +11,7 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Vich\UploaderBundle\Mapping\Annotation as Vich;
+use Symfony\Component\HttpFoundation\File\File;
 
 #[Vich\Uploadable]
 #[ORM\Entity(repositoryClass: BlogPostRepository::class)]
@@ -51,6 +52,9 @@ class BlogPost
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $logo = null;
+
+    #[Vich\UploadableField(mapping: 'blogPostThumb', fileNameProperty: 'logo')]
+    private ?File $logoFile = null;
 
     #[ORM\Column(length: 16)]
     private ?string $status = null;
@@ -150,9 +154,27 @@ class BlogPost
 
     public function setLogo(?string $logo): static
     {
-        $this->logo = $logo;
+        if (trim($logo) !== '') {
+            $this->logo = self::FOLDER.'/'.$logo;
+        } else {
+            $this->logo = null;
+        }
 
         return $this;
+    }
+
+    public function setLogoFile(?File $logoFile = null): void
+    {
+        $this->logoFile = $logoFile;
+
+        if (null !== $logoFile) {
+            $this->timeUpdate = new \DateTime(date('Y-m-d H:i:s'));
+        }
+    }
+
+    public function getLogoFile(): ?File
+    {
+        return $this->logoFile;
     }
 
     public function getStatus(): ?string

@@ -21,9 +21,22 @@ knp_gaufrette:
                     directory: backers
                     acl: public-read
 
+        blogPostThumb_adapter:
+            aws_s3:
+                service_id: ct_file_store.s3
+                bucket_name: '%env(AWS_STORAGE_BUCKET_NAME)%'
+                detect_content_type: true
+                options:
+                    create: true
+                    directory: blog
+                    acl: public-read
+
     filesystems:
         blogPromotionPostThumb_fs:
             adapter:    blogPromotionPostThumb_adapter
 
         backerLogo_fs:
             adapter:    backerLogo_adapter
+
+        blogPostThumb_fs:
+            adapter:    blogPostThumb_adapter
