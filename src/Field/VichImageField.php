@@ -17,7 +17,7 @@ final class VichImageField implements FieldInterface
             ->setProperty($propertyName)
             ->setLabel($label)
             // this template is used in 'index' and 'detail' pages
-            ->setTemplatePath('admin/field/vich_image.html.twig')
+            // ->setTemplatePath('admin/field/vich_image.html.twig')
             // this is used in 'edit' and 'new' pages to edit the field contents
             // you can use your own form types too
             ->setFormType(VichImageType::class)
