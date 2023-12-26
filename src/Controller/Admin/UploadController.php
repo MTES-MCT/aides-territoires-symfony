@@ -44,7 +44,7 @@ class UploadController extends FrontController {
                     $tmpFolder,
                     $newFilename
                 );
-                $tmpFile = $tmpFolder.$newFilename;
+                $tmpFile = $tmpFolder.'/'.$newFilename;
             }
 
             $imagickSrc = $tmpFile;
