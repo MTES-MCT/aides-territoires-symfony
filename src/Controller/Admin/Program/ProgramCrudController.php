@@ -6,6 +6,7 @@ use App\Controller\Admin\AtCrudController;
 use App\Entity\Program\Program;
 use App\Field\TextLengthCountField;
 use App\Field\TrumbowygField;
+use App\Field\VichImageField;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
@@ -43,16 +44,10 @@ class ProgramCrudController extends AtCrudController
         ->hideOnIndex()
         ->hideOnIndex();
 
-        yield ImageField::new('logo', 'Logo')
-        ->setHelp('Évitez les fichiers trop lourds. Préférez les fichiers SVG.')
-        ->setUploadDir($this->fileService->getUploadTmpDirRelative())
-        ->setBasePath($this->paramService->get('cloud_image_url'))
-        ->setUploadedFileNamePattern(Program::FOLDER.'/[slug]-[timestamp].[extension]')
-        ->setFormTypeOption('upload_new', function(UploadedFile $file, string $uploadDir, string $fileName) {
-            $this->imageService->sendUploadedImageToCloud($file, Program::FOLDER, $fileName);
-        })
+        yield VichImageField::new('logoFile', 'Logo')
+        ->setHelp('Évitez les fichiers trop lourds.')
+        ->hideOnIndex()
         ;
-
         yield AssociationField::new('perimeter', 'Périmètre')
         ->autocomplete();
 
@@ -68,7 +63,8 @@ class ProgramCrudController extends AtCrudController
         yield IntegerField::new('nbAids', 'Nombre d\'aides')
         ->setFormTypeOption('attr', ['readonly' => true]);
         yield DateTimeField::new('timeCreate', 'Date de création')
-        ->setFormTypeOption('attr', ['readonly' => true]);
+        ->setFormTypeOption('attr', ['readonly' => true])
+        ->hideWhenCreating();
     }
 
     public function configureActions(Actions $actions): Actions

@@ -20,6 +20,8 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\OpenApi\Model;
 use App\Controller\Api\Program\ProgramController;
+use Vich\UploaderBundle\Mapping\Annotation as Vich;
+use Symfony\Component\HttpFoundation\File\File;
 
 #[ApiResource(
     operations: [
@@ -33,6 +35,7 @@ use App\Controller\Api\Program\ProgramController;
         ),
     ],
 )]
+#[Vich\Uploadable]
 #[ORM\Entity(repositoryClass: ProgramRepository::class)]
 class Program
 {
@@ -62,6 +65,9 @@ class Program
 
     #[ORM\Column(length: 100, nullable: true)]
     private ?string $logo = null;
+
+    #[Vich\UploadableField(mapping: 'programLogo', fileNameProperty: 'logo')]
+    private ?File $logoFile = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     #[Gedmo\Timestampable(on: 'create')]
@@ -101,6 +107,9 @@ class Program
 
 
     private ?int $nbAids;
+
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
+    private ?\DateTimeInterface $timeUpdate = null;
 
     public function __construct()
     {
@@ -172,9 +181,27 @@ class Program
 
     public function setLogo(?string $logo): static
     {
-        $this->logo = $logo;
+        if (trim($logo) !== '') {
+            $this->logo = self::FOLDER.'/'.$logo;
+        } else {
+            $this->logo = null;
+        }
 
         return $this;
+    }
+
+    public function setLogoFile(?File $logoFile = null): void
+    {
+        $this->logoFile = $logoFile;
+
+        if (null !== $logoFile) {
+            $this->timeUpdate = new \DateTime(date('Y-m-d H:i:s'));
+        }
+    }
+
+    public function getLogoFile(): ?File
+    {
+        return $this->logoFile;
     }
 
     public function getTimeCreate(): ?\DateTimeInterface
@@ -421,5 +448,17 @@ class Program
         } catch (\Exception $e) {
             return null;
         }
+    }
+
+    public function getTimeUpdate(): ?\DateTimeInterface
+    {
+        return $this->timeUpdate;
+    }
+
+    public function setTimeUpdate(?\DateTimeInterface $timeUpdate): static
+    {
+        $this->timeUpdate = $timeUpdate;
+
+        return $this;
     }
 }

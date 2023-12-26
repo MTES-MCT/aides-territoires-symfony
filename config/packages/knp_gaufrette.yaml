@@ -31,12 +31,25 @@ knp_gaufrette:
                     directory: blog
                     acl: public-read
 
+        programLogo_adapter:
+            aws_s3:
+                service_id: ct_file_store.s3
+                bucket_name: '%env(AWS_STORAGE_BUCKET_NAME)%'
+                detect_content_type: true
+                options:
+                    create: true
+                    directory: programs
+                    acl: public-read
+
     filesystems:
         blogPromotionPostThumb_fs:
-            adapter:    blogPromotionPostThumb_adapter
+            adapter: blogPromotionPostThumb_adapter
 
         backerLogo_fs:
-            adapter:    backerLogo_adapter
+            adapter: backerLogo_adapter
 
         blogPostThumb_fs:
-            adapter:    blogPostThumb_adapter
+            adapter: blogPostThumb_adapter
+
+        programLogo_fs:
+            adapter: programLogo_adapter

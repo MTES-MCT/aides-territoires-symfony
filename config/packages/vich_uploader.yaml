@@ -33,3 +33,11 @@ vich_uploader:
             delete_on_update:   false
             delete_on_remove:   true 
             namer: Vich\UploaderBundle\Naming\SmartUniqueNamer
+
+        programLogo:
+            inject_on_load: true
+            uri_prefix: "%env(AWS_S3_ENDPOINT_URL)%/%env(AWS_STORAGE_BUCKET_NAME)%"
+            upload_destination: programLogo_fs
+            delete_on_update:   false
+            delete_on_remove:   true 
+            namer: Vich\UploaderBundle\Naming\SmartUniqueNamer
