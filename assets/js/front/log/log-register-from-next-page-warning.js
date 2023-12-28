@@ -13,11 +13,15 @@ $(function(){
                     params: params,
                     type: 'register-from-next-page-warning',
                 },
+                dataType: 'json',
                 success: function(data){
-                    console.log(data);
                 }
             });
             
+            // Send an event to Matomo
+            if (_paq) {
+                _paq.push(['trackEvent', 'Compte Utilisateur', 'Clic sur le bouton Register-from-Next-Page-Warning']);
+            }
         }
     }, 'a#register-from-next-page-warning');
 });

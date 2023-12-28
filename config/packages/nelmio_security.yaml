@@ -22,10 +22,12 @@ nelmio_security:
             #définit la politique par défaut utilisée dans tous les cas (fonts, CSS, JavaScript, Frames, etc.) lorsqu’elle a la valeur ‘self’.
             default-src:
                 - 'self'
+                - 'https://in-automate.brevo.com'
             #définit les sources de scripts autorisées
             script-src:
                 - 'self'
                 - 'https://www.youtube.com'
+                - 'https://sibautomation.com'
             #définit les sources de feuilles de styles (CSS) autorisées
             style-src:
                 - 'self'

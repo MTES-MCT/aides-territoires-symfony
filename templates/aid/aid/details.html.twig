@@ -8,6 +8,11 @@
 {% block javascripts %}
 	{{ parent() }}
 	{{ encore_entry_script_tags('front/aid/aid/detail') }}
+    {% cspscript %}
+    <script>
+    const aidSlug = '{{ aid.slug }}';
+    </script>
+    {% endcspscript %}
 {% endblock %}
 
 {% block title %}{{ aid.name }}{% endblock %}

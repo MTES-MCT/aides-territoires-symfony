@@ -9,6 +9,7 @@ use App\Entity\Aid\AidInstructor;
 use App\Entity\Aid\AidProject;
 use App\Entity\Aid\AidSuggestedAidProject;
 use App\Entity\Alert\Alert;
+use App\Entity\Organization\OrganizationType;
 use App\Entity\Project\Project;
 use App\Entity\User\Notification;
 use App\Form\Aid\AidSearchType;
@@ -521,7 +522,9 @@ class AidController extends FrontController
             'Détail de l’aide',
             null,
         );
+        $user = $userService->getUserLogged();
 
+        dump($aidService->getDatasFromDs($aid, $user, ($user ? $user->getDefaultOrganization() : null)));
         return $this->render('aid/aid/details.html.twig', [
             'aid' => $aid,
             'open_modal' => $request->query->get('open_modal', null),

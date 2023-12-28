@@ -1,19 +1,19 @@
+import '../../log/log-aid-details.js';
+
 $(document).ready(function () {
 
     $("#clipboard-btn").on("click", function () {
-
-        input_url = $("#currentUrl")
-
+        input_url = $("#currentUrl");
         input_url.focus();
         input_url.select();
-        document.execCommand("copy");
-    })
+        navigator.clipboard.writeText(input_url.val());
+    });
 
 
     let facebook_btn = document.getElementById("fr-btn--facebook");
 
     facebook_btn.addEventListener(
-        "click", function () {
+        "click", function (event) {
             window.open(
                 this.href,
                 'Partager sur Facebook - ouvre une nouvelle fenêtre',
@@ -26,7 +26,7 @@ $(document).ready(function () {
     let twitter_btn = document.getElementById("fr-btn--twitter");
 
     twitter_btn.addEventListener(
-        "click", function () {
+        "click", function (event) {
             window.open(
                 this.href,
                 'Partager sur Twitter - ouvre une nouvelle fenêtre',
@@ -39,7 +39,7 @@ $(document).ready(function () {
     let linkedin_btn = document.getElementById("fr-btn--linkedin");
 
     linkedin_btn.addEventListener(
-        "click", function () {
+        "click", function (event) {
             window.open(
                 this.href,
                 'Partager sur LinkedIn - ouvre une nouvelle fenêtre',

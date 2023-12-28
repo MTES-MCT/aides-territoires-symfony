@@ -1,3 +1,5 @@
+import '../../log/log-register-from-next-page-warning.js';
+
 $(function(){
     $(document).on({
         change: function(e) {

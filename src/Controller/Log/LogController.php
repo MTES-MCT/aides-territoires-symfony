@@ -18,15 +18,15 @@ class LogController extends FrontController
     ): JsonResponse
     {
         $request = $requestStack->getCurrentRequest();
-        $origin = $request->headers->get('origin');
-        $infosOrigin = parse_url($origin);
-        $hostOrigin = $infosOrigin['host'] ?? null;
-        $serverName = $request->server->get('SERVER_NAME');
+        // $origin = $request->headers->get('origin');
+        // $infosOrigin = parse_url($origin);
+        // $hostOrigin = $infosOrigin['host'] ?? null;
+        // $serverName = $request->server->get('SERVER_NAME');
 
-        if ($hostOrigin !== $serverName) {
-            // La requête n'est pas interne, retourner une erreur
-            throw $this->createAccessDeniedException('This action can only be performed by the server itself.');
-        }
+        // if ($hostOrigin !== $serverName) {
+        //     // La requête n'est pas interne, retourner une erreur
+        //     throw $this->createAccessDeniedException('This action can only be performed by the server itself.');
+        // }
 
         // log
         $logService->log(
