@@ -132,8 +132,8 @@ class Project
     #[ORM\Column(length: 100, nullable: true)]
     private ?string $image = null;
 
-    #[Vich\UploadableField(mapping: 'projectThumb', fileNameProperty: 'image')]
     #[Ignore]
+    #[Vich\UploadableField(mapping: 'projectThumb', fileNameProperty: 'image')]
     private ?File $imageFile = null;
 
     private ?UploadedFile $imageUploadedFile;

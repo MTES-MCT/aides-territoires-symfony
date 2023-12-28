@@ -16,6 +16,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Vich\UploaderBundle\Mapping\Annotation as Vich;
 use Symfony\Component\HttpFoundation\File\File;
+use Symfony\Component\Serializer\Attribute\Ignore;
 
 #[Vich\Uploadable]
 #[ORM\Entity(repositoryClass: SearchPageRepository::class)]
@@ -58,6 +59,7 @@ class SearchPage
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $logo = null;
 
+    #[Ignore]
     #[Vich\UploadableField(mapping: 'searchPageLogo', fileNameProperty: 'logo')]
     private ?File $logoFile = null;
 
@@ -76,6 +78,7 @@ class SearchPage
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $metaImage = null;
 
+    #[Ignore]
     #[Vich\UploadableField(mapping: 'searchPageMetaImage', fileNameProperty: 'metaImage')]
     private ?File $metaImageFile = null;
 

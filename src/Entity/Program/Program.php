@@ -22,6 +22,7 @@ use ApiPlatform\OpenApi\Model;
 use App\Controller\Api\Program\ProgramController;
 use Vich\UploaderBundle\Mapping\Annotation as Vich;
 use Symfony\Component\HttpFoundation\File\File;
+use Symfony\Component\Serializer\Attribute\Ignore;
 
 #[ApiResource(
     operations: [
@@ -66,6 +67,7 @@ class Program
     #[ORM\Column(length: 100, nullable: true)]
     private ?string $logo = null;
 
+    #[Ignore]
     #[Vich\UploadableField(mapping: 'programLogo', fileNameProperty: 'logo')]
     private ?File $logoFile = null;
 

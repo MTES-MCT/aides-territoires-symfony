@@ -29,9 +29,10 @@ use ApiPlatform\OpenApi\Model;
 use App\Filter\AtSearchFilter;
 use App\Filter\Backer\HasFinancedAidsFilter;
 use App\Filter\Backer\HasPublishedFinancedAidsFilter;
+use Serializable;
 use Vich\UploaderBundle\Mapping\Annotation as Vich;
 use Symfony\Component\HttpFoundation\File\File;
-
+use Symfony\Component\Serializer\Annotation\Ignore;
 #[ApiResource(
     // shortName: 'Porteurs',
     operations: [
@@ -103,6 +104,7 @@ class Backer
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $logo = null;
 
+    #[Ignore]
     #[Vich\UploadableField(mapping: 'backerLogo', fileNameProperty: 'logo')]
     private ?File $logoFile = null;
 

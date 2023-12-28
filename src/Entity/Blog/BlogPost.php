@@ -12,6 +12,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Vich\UploaderBundle\Mapping\Annotation as Vich;
 use Symfony\Component\HttpFoundation\File\File;
+use Symfony\Component\Serializer\Attribute\Ignore;
 
 #[Vich\Uploadable]
 #[ORM\Entity(repositoryClass: BlogPostRepository::class)]
@@ -53,6 +54,7 @@ class BlogPost
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $logo = null;
 
+    #[Ignore]
     #[Vich\UploadableField(mapping: 'blogPostThumb', fileNameProperty: 'logo')]
     private ?File $logoFile = null;
 
