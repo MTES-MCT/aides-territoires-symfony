@@ -398,7 +398,8 @@ class AidController extends FrontController
         ParamService $paramService,
         StringService $stringService,
         MatomoService $matomoService,
-        ProjectRepository $projectRepository
+        ProjectRepository $projectRepository,
+        LogService $logService
     ): Response
     {
         // le user si dispo
@@ -421,6 +422,18 @@ class AidController extends FrontController
         if (!$aidService->userCanSee($aid, $user)) {
             throw $this->createNotFoundException('Cette aide n\'existe pas');
         }
+
+        // log
+        $logService->log(
+            type: 'aidView',
+            params: [
+                'querystring' => parse_url($requestStack->getCurrentRequest()->getRequestUri(), PHP_URL_QUERY) ?? null,
+                'host' => $requestStack->getCurrentRequest()->getHost(),
+                'aid' => $aid,
+                'organization' => ($user instanceof User && $user->getDefaultOrganization()) ? $user->getDefaultOrganization() : null,
+                'user' => ($user instanceof User) ? $user : null,
+            ]
+        );
 
         // formulaire ajouter aux projets
         $formAddToProject = $this->createForm(AddAidToProjectType::class, null, [

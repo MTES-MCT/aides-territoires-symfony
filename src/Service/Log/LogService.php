@@ -8,6 +8,7 @@ use App\Entity\Log\LogAidApplicationUrlClick;
 use App\Entity\Log\LogAidCreatedsFolder;
 use App\Entity\Log\LogAidOriginUrlClick;
 use App\Entity\Log\LogAidSearch;
+use App\Entity\Log\LogAidView;
 use App\Entity\Organization\Organization;
 use App\Entity\User\User;
 use AWS\CRT\Log;
@@ -128,6 +129,21 @@ class LogService
                             }
                         }
                         break;
+
+                    case 'aidView':
+                        $log = new LogAidView();
+                        $log->setQuerystring($params['querystring'] ?? null);
+                        $log->setSource($this->getSiteFromHost($params['host'] ?? null));
+                        $log->setAid($params['aid'] ?? null);
+                        $log->setOrganization($params['organization'] ?? null);
+                        $log->setUser($params['user'] ?? null);
+                        if (isset($params['organizationTypes'])) {
+                            foreach ($params['organizationTypes'] as $organizationType) {
+                                $log->addOrganizationType($organizationType);
+                            }
+                        }
+                        break;
+                    break;
                 default:
                     // Code à exécuter si aucune des conditions précédentes n'est remplie
                     break;

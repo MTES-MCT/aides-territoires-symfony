@@ -22,10 +22,10 @@ class LogAidView
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(type: Types::TEXT)]
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $querystring = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, nullable: true)]
     private ?string $source = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
@@ -64,7 +64,7 @@ class LogAidView
         return $this->querystring;
     }
 
-    public function setQuerystring(string $querystring): static
+    public function setQuerystring(?string $querystring): static
     {
         $this->querystring = $querystring;
 
@@ -76,7 +76,7 @@ class LogAidView
         return $this->source;
     }
 
-    public function setSource(string $source): static
+    public function setSource(?string $source): static
     {
         $this->source = $source;
 
