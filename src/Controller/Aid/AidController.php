@@ -522,8 +522,7 @@ class AidController extends FrontController
             'Détail de l’aide',
             null,
         );
-        $user = $userService->getUserLogged();
-
+        
         return $this->render('aid/aid/details.html.twig', [
             'aid' => $aid,
             'open_modal' => $request->query->get('open_modal', null),

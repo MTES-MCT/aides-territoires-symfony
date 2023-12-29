@@ -8,11 +8,6 @@
 {% block javascripts %}
 	{{ parent() }}
 	{{ encore_entry_script_tags('front/aid/aid/detail') }}
-    {% cspscript %}
-    <script>
-    const aidSlug = '{{ aid.slug }}';
-    </script>
-    {% endcspscript %}
 {% endblock %}
 
 {% block title %}{{ aid.name }}{% endblock %}
@@ -178,7 +173,7 @@
                 {% endif %}
             {% endif %}
             
-             {% if aid.isCallForProject %}
+            {% if aid.isCallForProject %}
             <div class="call-for-project fr-mb-4w fr-grid-row">
                 <div class="fr-col-1">
                     <span class="ri-pushpin-2-fill ri-xl" aria-hidden="true"></span>
@@ -369,7 +364,7 @@
                     </div>
                 </div>
             </div>
-          
+
             {% if aid.originUrl or aid.applicationUrl or isUserGranted(app.user, constant('App\\Entity\\User\\User::ROLE_ADMIN')) %}
                 <ul class="fr-btns-group fr-btns-group--icon-left">
                     {% if isUserGranted(app.user, constant('App\\Entity\\User\\User::ROLE_ADMIN')) %}
@@ -654,17 +649,22 @@
 
 {% block javascriptsBottom %}
     {% cspscript %}
+    <script>
+    const aidSlug = '{{ aid.slug }}';
+    </script>
+    {% endcspscript %}
+    {% cspscript %}
         <script>
-            if ('{{ dsDatas.prepopulate_application_url }}' !== "False") {
+            {% if dsDatas.prepopulate_application_url %}
                 var PREPOPULATE_APPLICATION_URL = true;
                 var ORGANIZATION = {% if app.user and app.user.defaultOrganization %}parseInt('{{ app.user.defaultOrganization.id }}'){% else %}0{% endif %};
                 var USER = {% if app.user %}parseInt('{{ app.user.id }}'){% else %}0{% endif %};
                 var DS_FOLDER_URL = '{{ dsDatas.prepopulate_application_url }}';
                 var DS_FOLDER_ID = '{{ dsDatas.ds_folder_id }}';
                 var DS_FOLDER_NUMBER = parseInt('{{ dsDatas.ds_folder_number }}');
-            } else {
+            {% else %}
                 var PREPOPULATE_APPLICATION_URL = false;
-            }
+            {% endif %}
             TEXT_SEARCH = {% if aid.keywords and aid.keywords[0] is defined %}'{{ aid.keywords[0].name }}'{% else %}''{% endif %};
             AID_ID = parseInt('{{ aid.id }}');
             AID_SLUG = '{{ aid.slug }}';

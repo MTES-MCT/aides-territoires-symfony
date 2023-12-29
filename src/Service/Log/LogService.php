@@ -5,6 +5,7 @@ namespace App\Service\Log;
 use App\Entity\Aid\Aid;
 use App\Entity\Log\LogAccountRegisterFromNextPageWarningClickEvent;
 use App\Entity\Log\LogAidApplicationUrlClick;
+use App\Entity\Log\LogAidCreatedsFolder;
 use App\Entity\Log\LogAidOriginUrlClick;
 use AWS\CRT\Log;
 use Doctrine\Persistence\ManagerRegistry;
@@ -62,6 +63,12 @@ class LogService
                         $aid = $this->managerRegistry->getRepository(Aid::class)->findOneBy(['slug' => $params['aidSlug']]);
                     }
                     $log->setAid($aid);
+                    break;
+
+                case 'createDsFolder':
+                    dd($params);
+                    $log = new LogAidCreatedsFolder();
+                    // $log->set
                     break;
             default:
                 // Code à exécuter si aucune des conditions précédentes n'est remplie
