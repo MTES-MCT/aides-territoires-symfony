@@ -123,7 +123,7 @@ class PortalController extends FrontController
         // Log recherche
         $logParams = [
             'organizationTypes' => (isset($aidParams['organizationType'])) ? [$aidParams['organizationType']] : null,
-            'querystring' => $query ?? null,
+            'querystring' => $querystring ?? null,
             'resultsCount' => $pagerfanta->getNbResults(),
             'host' => $requestStack->getCurrentRequest()->getHost(),
             'perimeter' => $aidParams['perimeter'] ?? null,
@@ -191,12 +191,23 @@ class PortalController extends FrontController
             }
         }
 
+        // pour les stats
+        $categoriesName = [];
+        if (isset($aidParams['categories']) && is_array($aidParams['categories'])) {
+            foreach ($aidParams['categories'] as $category) {
+                $categoriesName[] = $category->getName();
+            }
+        }
+
         return $this->render('portal/portal/details.html.twig', [
             'search_page' => $search_page,
             'myPager' => $pagerfanta,
             'formAidSearch' => $formAidSearch->createView(),
             'showExtended' => $showExtended,
-            'formAlertCreate' => $formAlertCreate
+            'formAlertCreate' => $formAlertCreate,
+            'querystring' => $queryString,
+            'perimeterName' => (isset($aidParams['perimeterFrom']) && $aidParams['perimeterFrom'] instanceof Perimeter) ? $aidParams['perimeterFrom']->getName() : '',
+            'categoriesName' => $categoriesName
         ]);
     }
 }

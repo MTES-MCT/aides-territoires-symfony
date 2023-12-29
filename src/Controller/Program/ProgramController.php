@@ -3,6 +3,7 @@
 namespace App\Controller\Program;
 
 use App\Controller\FrontController;
+use App\Entity\Perimeter\Perimeter;
 use App\Entity\Program\Program;
 use App\Entity\User\User;
 use App\Form\Aid\AidSearchType;
@@ -132,6 +133,8 @@ class ProgramController extends FrontController
         $pagerfanta->setMaxPerPage(self::NB_AID_BY_PAGE);
         $pagerfanta->setCurrentPage($currentPage);
 
+        $query = parse_url($requestStack->getCurrentRequest()->getRequestUri(), PHP_URL_QUERY) ?? null;
+
         // Log recherche
         $logParams = [
             'organizationTypes' => (isset($aidParams['organizationType'])) ? [$aidParams['organizationType']] : null,
@@ -170,6 +173,14 @@ class ProgramController extends FrontController
             $program->getName()
         );
         
+        // pour les stats
+        $categoriesName = [];
+        if (isset($aidParams['categories']) && is_array($aidParams['categories'])) {
+            foreach ($aidParams['categories'] as $category) {
+                $categoriesName[] = $category->getName();
+            }
+        }
+            
         // rendu template
         return $this->render('program/program/details.html.twig', [
             'program' => $program,
@@ -179,6 +190,9 @@ class ProgramController extends FrontController
             'formAidSearch' => $formAidSearch->createView(),
             'formAidSearchNoOrder' => true,
             'showExtended' => $showExtended,
+            'querystring' => $query,
+            'perimeterName' => (isset($aidParams['perimeterFrom']) && $aidParams['perimeterFrom'] instanceof Perimeter) ? $aidParams['perimeterFrom']->getName() : '',
+            'categoriesName' => $categoriesName
         ]);
     }
 

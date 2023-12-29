@@ -1,5 +1,6 @@
 import '../../log/log-register-from-next-page-warning.js';
 import '../../log/log-promotion-blog-post-click.js';
+import '../../log/log-aid-search.js';
 
 $(function(){
     $(document).on({

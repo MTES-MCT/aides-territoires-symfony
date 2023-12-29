@@ -90,6 +90,22 @@
 </article>
 {% endblock %}
 
+{% block javascriptsBottom %}
+    {{ parent() }}
+    {% cspscript %}
+        <script>
+            var CURRENT_SEARCH = '{{ querystring }}';
+            var PERIMETER_NAME = '{{ perimeterName }}';
+            var CATEGORIES_NAME = [];
+            {% for categoryName in categoriesName %}
+                CATEGORIES_NAME.push('{{ categoryName }}');
+            {% endfor %}
+            var NB_RESULTS = {{ myPager.getNbResults() }};
+        </script>
+    {% endcspscript %}
+{% endblock %}
+
+
 {% block modal %}
     {% include 'aid/aid/_alert_modal.html.twig' with {'form': formAlertCreate} %}
 {% endblock %}

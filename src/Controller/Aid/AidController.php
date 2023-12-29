@@ -10,6 +10,7 @@ use App\Entity\Aid\AidProject;
 use App\Entity\Aid\AidSuggestedAidProject;
 use App\Entity\Alert\Alert;
 use App\Entity\Organization\OrganizationType;
+use App\Entity\Perimeter\Perimeter;
 use App\Entity\Project\Project;
 use App\Entity\User\Notification;
 use App\Entity\User\User;
@@ -221,6 +222,14 @@ class AidController extends FrontController
             null
         );
 
+        // pour les stats
+        $categoriesName = [];
+        if (isset($aidParams['categories']) && is_array($aidParams['categories'])) {
+            foreach ($aidParams['categories'] as $category) {
+                $categoriesName[] = $category->getName();
+            }
+        }
+
         // rendu template
         return $this->render('aid/aid/index.html.twig', [
             'formAidSearch' => $formAidSearch->createView(),
@@ -228,7 +237,10 @@ class AidController extends FrontController
             'blogPromotionPosts' => $blogPromotionPosts,
             'pageTitle' => $pageTitle,
             'showExtended' => $showExtended,
-            'formAlertCreate' => $formAlertCreate->createView()
+            'formAlertCreate' => $formAlertCreate->createView(),
+            'querystring' => $query,
+            'perimeterName' => (isset($aidParams['perimeterFrom']) && $aidParams['perimeterFrom'] instanceof Perimeter) ? $aidParams['perimeterFrom']->getName() : '',
+            'categoriesName' => $categoriesName
         ]);
     }
 
