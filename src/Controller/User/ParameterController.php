@@ -3,6 +3,7 @@
 namespace App\Controller\User;
 
 use App\Controller\FrontController;
+use App\Entity\Project\Project;
 use App\Entity\User\ApiTokenAsk;
 use App\Form\User\ApiTokenAskCreateType;
 use App\Form\User\DeleteType;
@@ -210,7 +211,8 @@ class ParameterController extends FrontController
             $formTransfertProject->handleRequest($requestStack->getCurrentRequest());
             if ($formTransfertProject->isSubmitted()) {
                 if ($formTransfertProject->isValid()) {
-                    foreach ($user->getProjects() as $project) {
+                    $userProjects = $managerRegistry->getRepository(Project::class)->findBy(['author' => $user]);
+                    foreach ($userProjects as $project) {
                         if (!$project->getOrganization() || $project->getOrganization()->getId() !== (int) $formTransfertProject->get('idOrganization')->getData()) {
                             continue;
                         }

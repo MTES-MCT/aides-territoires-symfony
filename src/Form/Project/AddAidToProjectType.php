@@ -5,6 +5,7 @@ namespace App\Form\Project;
 use App\Entity\Project\Project;
 use App\Service\User\UserService;
 use Doctrine\ORM\EntityRepository;
+use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -14,7 +15,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 class AddAidToProjectType extends AbstractType
 {
     public function __construct(
-        protected UserService $userService
+        protected UserService $userService,
+        protected ManagerRegistry $managerRegistry
     )
     {   
     }
@@ -23,9 +25,9 @@ class AddAidToProjectType extends AbstractType
     {
         $user = $this->userService->getUserLogged();
         $currentAid = $options['currentAid'] ?? null;
-
+        $userProjects = $this->managerRegistry->getRepository(Project::class)->findBy(['author' => $user]);
         if ($user) {
-            if (count($user->getProjects()) > 0) {
+            if (count($userProjects) > 0) {
                 $builder
                 ->add('projects', EntityType::class, [
                     'required' => false,
