@@ -8,6 +8,7 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
 
+// TODO a priori plus utilisé, à supprimer
 #[ORM\Entity(repositoryClass: LogAidContactClickRepository::class)]
 #[ORM\Index(columns: ['date_create'], name: 'date_create_lacc')]
 #[ORM\Index(columns: ['source'], name: 'source_lacc')]

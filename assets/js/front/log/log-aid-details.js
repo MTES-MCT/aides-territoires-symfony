@@ -56,5 +56,14 @@ $(function(){
         }
     }, '.at-application-url-btn');
 
+    $('div#contact').on({
+        click: function() {
+            // Send an event to Matomo
+            if (_paq) {
+                _paq.push(['trackEvent', 'Fiche aide', 'Voir lien du porteur', (typeof aidSlug !== 'undefined') ? aidSlug : '', this.href]);
+            }
+        }
+    }, 'a');
+
     
 });
