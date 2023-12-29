@@ -7,6 +7,7 @@ use App\Controller\FrontController;
 use App\Entity\Alert\Alert;
 use App\Entity\Perimeter\Perimeter;
 use App\Entity\Search\SearchPage;
+use App\Entity\User\User;
 use App\Form\Aid\AidSearchType;
 use App\Form\Alert\AlertCreateType;
 use App\Repository\Aid\AidRepository;
@@ -14,7 +15,9 @@ use App\Repository\Portal\PortalRepository;
 use App\Repository\Search\SearchPageRepository;
 use App\Service\Aid\AidSearchFormService;
 use App\Service\Aid\AidService;
+use App\Service\Log\LogService;
 use App\Service\User\UserService;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Persistence\ManagerRegistry;
 use Pagerfanta\Adapter\ArrayAdapter;
 use Pagerfanta\Doctrine\ORM\QueryAdapter;
@@ -43,13 +46,15 @@ class PortalController extends FrontController
         RequestStack $requestStack,
         AidRepository $aidRepository,
         UserService $userService,
-        ManagerRegistry $managerRegistry
+        ManagerRegistry $managerRegistry,
+        LogService $logService
     ): Response
     {
 
         // gestion pagination
         $currentPage = (int) $requestStack->getCurrentRequest()->get('page', 1);
 
+        $user = $userService->getUserLogged();
 
         // charge le portail
         $search_page = $searchPageRepository->findOneBy(
@@ -115,6 +120,33 @@ class PortalController extends FrontController
         $pagerfanta->setMaxPerPage(AidController::NB_AID_BY_PAGE);
         $pagerfanta->setCurrentPage($currentPage);
 
+        // Log recherche
+        $logParams = [
+            'organizationTypes' => (isset($aidParams['organizationType'])) ? [$aidParams['organizationType']] : null,
+            'querystring' => $query ?? null,
+            'resultsCount' => $pagerfanta->getNbResults(),
+            'host' => $requestStack->getCurrentRequest()->getHost(),
+            'perimeter' => $aidParams['perimeter'] ?? null,
+            'search' => $aidParams['keyword'] ?? null,
+            'organization' => ($user instanceof User && $user->getDefaultOrganization()) ? $user->getDefaultOrganization() : null,
+            'backers' => $aidParams['backers'] ?? null,
+            'categories' => $aidParams['categories'] ?? null,
+            'programs' => $aidParams['programs'] ?? null,
+        ];
+        $themes = new ArrayCollection();
+        if (isset($aidParams['categories']) && is_array($aidParams['categories'])) {
+            foreach ($aidParams['categories'] as $category) {
+                if (!$themes->contains($category->getCategoryTheme())) {
+                    $themes->add($category->getCategoryTheme());
+                }
+            }
+        }
+        $logParams['themes'] = $themes->toArray();
+        $logService->log(
+            type: LogService::AID_SEARCH,
+            params: $logParams,
+        );
+        
         // fil arianne
         $this->breadcrumb->add(
             'Portails',

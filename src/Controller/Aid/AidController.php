@@ -110,7 +110,7 @@ class AidController extends FrontController
 
         // Log recherche
         $logParams = [
-            'organizationTypes' => $aidParams['organizationType'] ? [$aidParams['organizationType']] : null,
+            'organizationTypes' => (isset($aidParams['organizationType'])) ? [$aidParams['organizationType']] : null,
             'querystring' => $query ?? null,
             'resultsCount' => $pagerfanta->getNbResults(),
             'host' => $requestStack->getCurrentRequest()->getHost(),
@@ -122,7 +122,7 @@ class AidController extends FrontController
             'programs' => $aidParams['programs'] ?? null,
         ];
         $themes = new ArrayCollection();
-        if (is_array($aidParams['categories'])) {
+        if (isset($aidParams['categories']) && is_array($aidParams['categories'])) {
             foreach ($aidParams['categories'] as $category) {
                 if (!$themes->contains($category->getCategoryTheme())) {
                     $themes->add($category->getCategoryTheme());
@@ -131,7 +131,7 @@ class AidController extends FrontController
         }
         $logParams['themes'] = $themes->toArray();
         $logService->log(
-            type: 'aidSearch',
+            type: LogService::AID_SEARCH,
             params: $logParams,
         );
 
@@ -425,7 +425,7 @@ class AidController extends FrontController
 
         // log
         $logService->log(
-            type: 'aidView',
+            type: LogService::AID_VIEW,
             params: [
                 'querystring' => parse_url($requestStack->getCurrentRequest()->getRequestUri(), PHP_URL_QUERY) ?? null,
                 'host' => $requestStack->getCurrentRequest()->getHost(),

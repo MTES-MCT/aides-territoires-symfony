@@ -12,11 +12,12 @@ use App\Entity\Log\LogAidView;
 use App\Entity\Log\LogBackerView;
 use App\Entity\Organization\Organization;
 use App\Entity\User\User;
-use AWS\CRT\Log;
 use Doctrine\Persistence\ManagerRegistry;
 
 class LogService
 {
+    const AID_SEARCH = 'aidSearch';
+    const AID_VIEW = 'aidView';
     const BACKER_VIEW = 'backerView';
 
     public function __construct(
@@ -97,7 +98,7 @@ class LogService
                         $log->setUser($user);
                         break;
     
-                    case 'aidSearch':
+                    case self::AID_SEARCH:
                         $log = new LogAidSearch();
                         $log->setQuerystring($params['querystring'] ?? null);
                         $log->setResultsCount($params['resultsCount'] ?? null);
@@ -133,7 +134,7 @@ class LogService
                         }
                         break;
 
-                    case 'aidView':
+                    case self::AID_VIEW:
                         $log = new LogAidView();
                         $log->setQuerystring($params['querystring'] ?? null);
                         $log->setSource($this->getSiteFromHost($params['host'] ?? null));

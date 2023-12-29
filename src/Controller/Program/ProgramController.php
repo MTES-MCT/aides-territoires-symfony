@@ -4,11 +4,14 @@ namespace App\Controller\Program;
 
 use App\Controller\FrontController;
 use App\Entity\Program\Program;
+use App\Entity\User\User;
 use App\Form\Aid\AidSearchType;
 use App\Repository\Aid\AidRepository;
 use App\Repository\Program\ProgramRepository;
 use App\Service\Aid\AidSearchFormService;
 use App\Service\Aid\AidService;
+use App\Service\Log\LogService;
+use App\Service\User\UserService;
 use Doctrine\Common\Collections\ArrayCollection;
 use Pagerfanta\Adapter\ArrayAdapter;
 use Pagerfanta\Doctrine\ORM\QueryAdapter;
@@ -49,12 +52,16 @@ class ProgramController extends FrontController
         AidRepository $aidRepository,
         RequestStack $requestStack,
         AidSearchFormService $aidSearchFormService,
-        AidService $aidService
+        AidService $aidService,
+        UserService $userService,
+        LogService $logService
     ): Response
     {
         // gestion pagination
         $currentPage = (int) $requestStack->getCurrentRequest()->get('page', 1);
         
+        $user = $userService->getUserLogged();
+
         // le programe
         $program = $programRepository->findOneBy(['slug'=> $slug]);
         if (!$program instanceof Program) {
@@ -125,6 +132,33 @@ class ProgramController extends FrontController
         $pagerfanta->setMaxPerPage(self::NB_AID_BY_PAGE);
         $pagerfanta->setCurrentPage($currentPage);
 
+        // Log recherche
+        $logParams = [
+            'organizationTypes' => (isset($aidParams['organizationType'])) ? [$aidParams['organizationType']] : null,
+            'querystring' => $query ?? null,
+            'resultsCount' => $pagerfanta->getNbResults(),
+            'host' => $requestStack->getCurrentRequest()->getHost(),
+            'perimeter' => $aidParams['perimeter'] ?? null,
+            'search' => $aidParams['keyword'] ?? null,
+            'organization' => ($user instanceof User && $user->getDefaultOrganization()) ? $user->getDefaultOrganization() : null,
+            'backers' => $aidParams['backers'] ?? null,
+            'categories' => $aidParams['categories'] ?? null,
+            'programs' => $aidParams['programs'] ?? null,
+        ];
+        $themes = new ArrayCollection();
+        if (isset($aidParams['categories']) && is_array($aidParams['categories'])) {
+            foreach ($aidParams['categories'] as $category) {
+                if (!$themes->contains($category->getCategoryTheme())) {
+                    $themes->add($category->getCategoryTheme());
+                }
+            }
+        }
+        $logParams['themes'] = $themes->toArray();
+        $logService->log(
+            type: LogService::AID_SEARCH,
+            params: $logParams,
+        );
+        
         // fil arianne
         $this->breadcrumb->add(
             'Tous les programmes d’aides',
