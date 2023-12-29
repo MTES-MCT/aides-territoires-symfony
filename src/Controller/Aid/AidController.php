@@ -12,6 +12,7 @@ use App\Entity\Alert\Alert;
 use App\Entity\Organization\OrganizationType;
 use App\Entity\Project\Project;
 use App\Entity\User\Notification;
+use App\Entity\User\User;
 use App\Form\Aid\AidSearchType;
 use App\Form\Aid\SuggestToProjectType;
 use App\Form\Alert\AlertCreateType;
@@ -22,11 +23,13 @@ use App\Repository\Project\ProjectRepository;
 use App\Service\Aid\AidSearchFormService;
 use App\Service\Aid\AidService;
 use App\Service\Email\EmailService;
+use App\Service\Log\LogService;
 use App\Service\Matomo\MatomoService;
 use App\Service\User\UserService;
 use App\Service\Various\Breadcrumb;
 use App\Service\Various\ParamService;
 use App\Service\Various\StringService;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Persistence\ManagerRegistry;
 use Pagerfanta\Adapter\ArrayAdapter;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -56,10 +59,12 @@ class AidController extends FrontController
         BlogPromotionPostRepository $blogPromotionPostRepository,
         UserService $userService,
         AidSearchFormService $aidSearchFormService,
-        AidService $aidService
+        AidService $aidService,
+        LogService $logService,
     ): Response
     {
         $requestStack->getCurrentRequest()->getSession()->set('_security.main.target_path', $requestStack->getCurrentRequest()->getRequestUri());
+        $user = $userService->getUserLogged();
 
         // gestion pagination
         $currentPage = (int) $requestStack->getCurrentRequest()->get('page', 1);
@@ -102,6 +107,33 @@ class AidController extends FrontController
         $pagerfanta = new Pagerfanta($adapter);
         $pagerfanta->setMaxPerPage(self::NB_AID_BY_PAGE);
         $pagerfanta->setCurrentPage($currentPage);
+
+        // Log recherche
+        $logParams = [
+            'organizationTypes' => $aidParams['organizationType'] ? [$aidParams['organizationType']] : null,
+            'querystring' => $query ?? null,
+            'resultsCount' => $pagerfanta->getNbResults(),
+            'host' => $requestStack->getCurrentRequest()->getHost(),
+            'perimeter' => $aidParams['perimeter'] ?? null,
+            'search' => $aidParams['keyword'] ?? null,
+            'organization' => ($user instanceof User && $user->getDefaultOrganization()) ? $user->getDefaultOrganization() : null,
+            'backers' => $aidParams['backers'] ?? null,
+            'categories' => $aidParams['categories'] ?? null,
+            'programs' => $aidParams['programs'] ?? null,
+        ];
+        $themes = new ArrayCollection();
+        if (is_array($aidParams['categories'])) {
+            foreach ($aidParams['categories'] as $category) {
+                if (!$themes->contains($category->getCategoryTheme())) {
+                    $themes->add($category->getCategoryTheme());
+                }
+            }
+        }
+        $logParams['themes'] = $themes->toArray();
+        $logService->log(
+            type: 'aidSearch',
+            params: $logParams,
+        );
 
         // promotions posts
         $blogPromotionPosts = $blogPromotionPostRepository->findPublished($aidParams);

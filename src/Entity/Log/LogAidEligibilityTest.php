@@ -9,6 +9,7 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
 
+// TODO a voir si toujours utiliser
 #[ORM\Entity(repositoryClass: LogAidEligibilityTestRepository::class)]
 #[ORM\Index(columns: ['date_create'], name: 'date_create_laet')]
 #[ORM\Index(columns: ['source'], name: 'source_laet')]

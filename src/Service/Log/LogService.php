@@ -7,6 +7,9 @@ use App\Entity\Log\LogAccountRegisterFromNextPageWarningClickEvent;
 use App\Entity\Log\LogAidApplicationUrlClick;
 use App\Entity\Log\LogAidCreatedsFolder;
 use App\Entity\Log\LogAidOriginUrlClick;
+use App\Entity\Log\LogAidSearch;
+use App\Entity\Organization\Organization;
+use App\Entity\User\User;
 use AWS\CRT\Log;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -23,39 +26,29 @@ class LogService
         ?array $params,
     ): void
     {
-        switch ($type) {
-            case 'register-from-next-page-warning':
-                $querystring = '';
-                if (is_array($params)) {
-                    foreach ($params as $key => $param) {
-                        if ($key == '_token') { // pas besoin de stocker le tocken
-                            continue;
+        try {
+            switch ($type) {
+                case 'register-from-next-page-warning':
+                    $querystring = '';
+                    if (is_array($params)) {
+                        foreach ($params as $key => $param) {
+                            if ($key == '_token') { // pas besoin de stocker le tocken
+                                continue;
+                            }
+                            $querystring .= $key.'='.$param . '&';
                         }
-                        $querystring .= $key.'='.$param . '&';
+                        $querystring = substr($querystring, 0, -1); // on enlève le dernier & (qui est en trop)
                     }
-                    $querystring = substr($querystring, 0, -1); // on enlève le dernier & (qui est en trop)
-                }
-                if (trim($querystring) == '') {
-                    $querystring = null;
-                }
-                $log = new LogAccountRegisterFromNextPageWarningClickEvent();
-                $log->setQuerystring($querystring);
-                
-                break;
-
-            case 'originUrl':
-                $log = new LogAidOriginUrlClick();
-                $log->setQuerystring($params['querystring']);
-                $log->setSource($this->getSiteFromHost($params['host']));
-                $aid = null;
-                if (isset($params['aidSlug'])) {
-                    $aid = $this->managerRegistry->getRepository(Aid::class)->findOneBy(['slug' => $params['aidSlug']]);
-                }
-                $log->setAid($aid);
-                break;
-
-                case 'applicationUrl':
-                    $log = new LogAidApplicationUrlClick();
+                    if (trim($querystring) == '') {
+                        $querystring = null;
+                    }
+                    $log = new LogAccountRegisterFromNextPageWarningClickEvent();
+                    $log->setQuerystring($querystring);
+                    
+                    break;
+    
+                case 'originUrl':
+                    $log = new LogAidOriginUrlClick();
                     $log->setQuerystring($params['querystring']);
                     $log->setSource($this->getSiteFromHost($params['host']));
                     $aid = null;
@@ -64,20 +57,86 @@ class LogService
                     }
                     $log->setAid($aid);
                     break;
+    
+                    case 'applicationUrl':
+                        $log = new LogAidApplicationUrlClick();
+                        $log->setQuerystring($params['querystring']);
+                        $log->setSource($this->getSiteFromHost($params['host']));
+                        $aid = null;
+                        if (isset($params['aidSlug'])) {
+                            $aid = $this->managerRegistry->getRepository(Aid::class)->findOneBy(['slug' => $params['aidSlug']]);
+                        }
+                        $log->setAid($aid);
+                        break;
+    
+                    case 'createDsFolder':
+                        dd($params);
+                        $log = new LogAidCreatedsFolder();
+                        $log->setDsFolderUrl($params['dsFolderUrl'] ?? null);
+                        $log->setDsFolderId($params['dsFolderId'] ?? null);
+                        $log->setDsFolderNumber($params['dsFolderNumber'] ?? null);
+                        $aid = null;
+                        if (isset($params['aidSlug'])) {
+                            $aid = $this->managerRegistry->getRepository(Aid::class)->findOneBy(['slug' => (string) $params['aidSlug']]);
+                        }
+                        $log->setAid($aid);
+                        $origanization = null;
+                        if (isset($params['organization'])) {
+                            $origanization = $this->managerRegistry->getRepository(Organization::class)->find((int) $params['organization']);
+                        }
+                        $log->setOrganization($origanization);
 
-                case 'createDsFolder':
-                    dd($params);
-                    $log = new LogAidCreatedsFolder();
-                    // $log->set
+                        $user = null;
+                        if (isset($params['user'])) {
+                            $user = $this->managerRegistry->getRepository(User::class)->find((int) $params['user']);
+                        }
+                        $log->setUser($user);
+                        break;
+    
+                    case 'aidSearch':
+                        $log = new LogAidSearch();
+                        $log->setQuerystring($params['querystring'] ?? null);
+                        $log->setResultsCount($params['resultsCount'] ?? null);
+                        $log->setSource($this->getSiteFromHost($params['host'] ?? null));
+                        $log->setSearch($params['search'] ?? null);
+                        $log->setPerimeter($params['perimeter'] ?? null);
+                        $log->setOrganization($params['organization'] ?? null);
+                        $log->setUser($params['user'] ?? null);
+                        if (isset($params['organizationTypes'])) {
+                            foreach ($params['organizationTypes'] as $organizationType) {
+                                $log->addOrganizationType($organizationType);
+                            }
+                        }
+                        if (isset($params['backers'])) {
+                            foreach ($params['backers'] as $backer) {
+                                $log->addBacker($backer);
+                            }
+                        }
+                        if (isset($params['categories'])) {
+                            foreach ($params['categories'] as $category) {
+                                $log->addCategory($category);
+                            }
+                        }
+                        if (isset($params['programs'])) {
+                            foreach ($params['programs'] as $program) {
+                                $log->addProgram($program);
+                            }
+                        }
+                        if (isset($params['themes'])) {
+                            foreach ($params['themes'] as $theme) {
+                                $log->addTheme($theme);
+                            }
+                        }
+                        break;
+                default:
+                    // Code à exécuter si aucune des conditions précédentes n'est remplie
                     break;
-            default:
-                // Code à exécuter si aucune des conditions précédentes n'est remplie
-                break;
+            }
+    
+            $this->managerRegistry->getManager()->persist($log);
+            $this->managerRegistry->getManager()->flush();
+        } catch (\Exception $exception) {
         }
-
-        $this->managerRegistry->getManager()->persist($log);
-        $this->managerRegistry->getManager()->flush();
-        
     }
 
     public function getSiteFromHost($host)
