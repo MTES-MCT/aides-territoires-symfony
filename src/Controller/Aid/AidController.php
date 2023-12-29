@@ -524,7 +524,6 @@ class AidController extends FrontController
         );
         $user = $userService->getUserLogged();
 
-        dump($aidService->getDatasFromDs($aid, $user, ($user ? $user->getDefaultOrganization() : null)));
         return $this->render('aid/aid/details.html.twig', [
             'aid' => $aid,
             'open_modal' => $request->query->get('open_modal', null),
