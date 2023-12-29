@@ -3,6 +3,7 @@
 namespace App\Service\Log;
 
 use App\Entity\Aid\Aid;
+use App\Entity\Blog\BlogPromotionPost;
 use App\Entity\Log\LogAccountRegisterFromNextPageWarningClickEvent;
 use App\Entity\Log\LogAidApplicationUrlClick;
 use App\Entity\Log\LogAidCreatedsFolder;
@@ -10,6 +11,9 @@ use App\Entity\Log\LogAidOriginUrlClick;
 use App\Entity\Log\LogAidSearch;
 use App\Entity\Log\LogAidView;
 use App\Entity\Log\LogBackerView;
+use App\Entity\Log\LogBlogPostView;
+use App\Entity\Log\LogBlogPromotionPostClick;
+use App\Entity\Log\LogBlogPromotionPostDisplay;
 use App\Entity\Organization\Organization;
 use App\Entity\User\User;
 use Doctrine\Persistence\ManagerRegistry;
@@ -19,6 +23,9 @@ class LogService
     const AID_SEARCH = 'aidSearch';
     const AID_VIEW = 'aidView';
     const BACKER_VIEW = 'backerView';
+    const BLOG_POST_VIEW = 'blogPostView';
+    const BLOG_PROMOTION_POST_CLICK = 'blogPromotionPostClick';
+    const BLOG_PROMOTION_POST_DISPLAY = 'blogPromotionPostDisplay';
 
     public function __construct(
         private ManagerRegistry $managerRegistry
@@ -154,6 +161,36 @@ class LogService
                         $log->setOrganization($params['organization'] ?? null);
                         $log->setUser($params['user'] ?? null);
                         break;
+
+                    case self::BLOG_POST_VIEW:
+                        $log = new LogBlogPostView();
+                        $log->setOrganization($params['organization'] ?? null);
+                        $log->setUser($params['user'] ?? null);
+                        $log->setBlogPost($params['blogPost'] ?? null);
+                        break;
+
+                    case self::BLOG_PROMOTION_POST_CLICK:
+                        $log = new LogBlogPromotionPostClick();
+                        $log->setQuerystring($params['querystring'] ?? null);
+                        $log->setSource($this->getSiteFromHost($params['host'] ?? null));
+                        $blogPromotionPost = null;
+                        if (isset($params['blogPromotionPostId'])) {
+                            $blogPromotionPost = $this->managerRegistry->getRepository(BlogPromotionPost::class)->find((int) $params['blogPromotionPostId']);
+                        }
+                        $log->setBlogPromotionPost($blogPromotionPost);
+                        break;
+
+                        case self::BLOG_PROMOTION_POST_DISPLAY:
+                            $log = new LogBlogPromotionPostDisplay();
+                            $log->setQuerystring($params['querystring'] ?? null);
+                            $log->setSource($this->getSiteFromHost($params['host'] ?? null));
+                            $blogPromotionPost = null;
+                            if (isset($params['blogPromotionPostId'])) {
+                                $blogPromotionPost = $this->managerRegistry->getRepository(BlogPromotionPost::class)->find((int) $params['blogPromotionPostId']);
+                            }
+                            $log->setBlogPromotionPost($blogPromotionPost);
+                            break;
+
                 default:
                     // Code à exécuter si aucune des conditions précédentes n'est remplie
                     break;

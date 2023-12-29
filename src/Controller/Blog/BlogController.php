@@ -8,6 +8,8 @@ use App\Entity\Blog\BlogPostCategory;
 use App\Form\Blog\BlogPostCategoryFilterType;
 use App\Repository\Blog\BlogPostCategoryRepository;
 use App\Repository\Blog\BlogPostRepository;
+use App\Service\Log\LogService;
+use App\Service\User\UserService;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -152,9 +154,14 @@ class BlogController extends FrontController
     #[Route('/blog/{slug}/', name: 'app_blog_post_details', requirements: ['slug' => '[a-zA-Z0-9\-_]+'])]
     public function details(
         $slug,
-        BlogPostRepository $blogPostRepository
+        BlogPostRepository $blogPostRepository,
+        UserService $userService,
+        LogService $logService
     ): Response
     {
+        // le user
+        $user = $userService->getUserLogged();
+
         // charge blogPost
         $blogPost = $blogPostRepository->findOneBy(
             [
@@ -164,6 +171,16 @@ class BlogController extends FrontController
         if (!$blogPost instanceof BlogPost) {
             return $this->redirectToRoute('app_blog_blog');
         }
+
+        // log
+        $logService->log(
+            type: LogService::BLOG_POST_VIEW,
+            params: [
+                'blogPost' => $blogPost,
+                'user' => $user,
+                'organization' => ($user && $user->getDefaultOrganization()) ? $user->getDefaultOrganization() : null
+            ]
+        );
 
         // fil arianne
         $this->breadcrumb->add(
