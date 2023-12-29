@@ -185,11 +185,11 @@ class AidService
      *
      * @param integer $dsId
      * @param array $dsMapping
-     * @param UserInterface|null $user
+     * @param User|null $user
      * @param Organization|null $organization
      * @return array
      */
-    public function getDatasFromDs(Aid $aid, ?UserInterface $user, ?Organization $organization): array
+    public function getDatasFromDs(Aid $aid, ?User $user, ?Organization $organization): array
     {
         $datas = [
             'prepopulate_application_url' => false,
