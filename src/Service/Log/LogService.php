@@ -9,6 +9,7 @@ use App\Entity\Log\LogAidCreatedsFolder;
 use App\Entity\Log\LogAidOriginUrlClick;
 use App\Entity\Log\LogAidSearch;
 use App\Entity\Log\LogAidView;
+use App\Entity\Log\LogBackerView;
 use App\Entity\Organization\Organization;
 use App\Entity\User\User;
 use AWS\CRT\Log;
@@ -16,6 +17,8 @@ use Doctrine\Persistence\ManagerRegistry;
 
 class LogService
 {
+    const BACKER_VIEW = 'backerView';
+
     public function __construct(
         private ManagerRegistry $managerRegistry
     )
@@ -143,7 +146,13 @@ class LogService
                             }
                         }
                         break;
-                    break;
+                    case self::BACKER_VIEW:
+                        $log = new LogBackerView();
+                        $log->setSource($this->getSiteFromHost($params['host'] ?? null));
+                        $log->setBacker($params['backer'] ?? null);
+                        $log->setOrganization($params['organization'] ?? null);
+                        $log->setUser($params['user'] ?? null);
+                        break;
                 default:
                     // Code à exécuter si aucune des conditions précédentes n'est remplie
                     break;

@@ -7,8 +7,11 @@ use App\Entity\Backer\Backer;
 use App\Repository\Aid\AidRepository;
 use App\Repository\Backer\BackerRepository;
 use App\Repository\Program\ProgramRepository;
+use App\Service\Log\LogService;
+use App\Service\User\UserService;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -26,16 +29,19 @@ class BackerController extends FrontController
     public function details(
         $id,
         $slug,
-        ProgramRepository $programRepository,
         BackerRepository $backerRepository,
-        AidRepository $aidRepository
+        AidRepository $aidRepository,
+        LogService $logService,
+        UserService $userService,
+        RequestStack $requestStack
     ): Response
     {
 
         // charge backer
         $backer = $backerRepository->findOneBy(
             [
-                'id' => $id
+                'id' => $id,
+                'slug' => $slug
             ]
             );
         if (!$backer instanceof Backer) {
@@ -49,6 +55,17 @@ class BackerController extends FrontController
 
         // défini les aides lives, à partir de quoi on pourra récupérer les financières, techniques, les thématiques
         $backer->setAidsLive($aidRepository->findCustom($aidsParams));
+
+        // log
+        $logService->log(
+            type: LogService::BACKER_VIEW,
+            params: [
+                'host' => $requestStack->getCurrentRequest()->getHost(),
+                'backer' => $backer,
+                'organization' => $userService->getUserLogged() ? $userService->getUserLogged()->getDefaultOrganization() : null,
+                'user' => $userService->getUserLogged(),
+            ]
+        );
 
         //foreach $backer->getAidsLive()
         $categories_by_theme=[];$programs_list=[];
