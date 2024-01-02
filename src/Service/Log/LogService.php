@@ -14,6 +14,7 @@ use App\Entity\Log\LogBackerView;
 use App\Entity\Log\LogBlogPostView;
 use App\Entity\Log\LogBlogPromotionPostClick;
 use App\Entity\Log\LogBlogPromotionPostDisplay;
+use App\Entity\Log\LogProgramView;
 use App\Entity\Organization\Organization;
 use App\Entity\User\User;
 use Doctrine\Persistence\ManagerRegistry;
@@ -26,6 +27,7 @@ class LogService
     const BLOG_POST_VIEW = 'blogPostView';
     const BLOG_PROMOTION_POST_CLICK = 'blogPromotionPostClick';
     const BLOG_PROMOTION_POST_DISPLAY = 'blogPromotionPostDisplay';
+    const PROGRAM_VIEW = 'programView';
 
     public function __construct(
         private ManagerRegistry $managerRegistry
@@ -189,6 +191,14 @@ class LogService
                                 $blogPromotionPost = $this->managerRegistry->getRepository(BlogPromotionPost::class)->find((int) $params['blogPromotionPostId']);
                             }
                             $log->setBlogPromotionPost($blogPromotionPost);
+                            break;
+
+                        case self::PROGRAM_VIEW:
+                            $log = new LogProgramView();
+                            $log->setSource($this->getSiteFromHost($params['host'] ?? null));
+                            $log->setProgram($params['program'] ?? null);
+                            $log->setOrganization($params['organization'] ?? null);
+                            $log->setUser($params['user'] ?? null);
                             break;
 
                 default:

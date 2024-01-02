@@ -162,6 +162,17 @@ class ProgramController extends FrontController
             params: $logParams,
         );
         
+        // log vue programme
+        $logService->log(
+            type: LogService::PROGRAM_VIEW,
+            params: [
+                'host' => $requestStack->getCurrentRequest()->getHost(),
+                'program' => $program,
+                'organization' => $userService->getUserLogged() ? $userService->getUserLogged()->getDefaultOrganization() : null,
+                'user' => $userService->getUserLogged(),
+            ]
+        );
+        
         // fil arianne
         $this->breadcrumb->add(
             'Tous les programmes d’aides',
