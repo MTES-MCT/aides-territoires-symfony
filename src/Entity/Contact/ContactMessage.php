@@ -71,7 +71,7 @@ class ContactMessage
 
     public function getEmail(): ?string
     {
-        return strip_tags($this->email);
+        return html_entity_decode(strip_tags($this->email));
     }
 
     public function setEmail(string $email): static

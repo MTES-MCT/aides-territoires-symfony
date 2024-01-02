@@ -186,7 +186,7 @@ class Project
 
     public function getName(): ?string
     {
-        return $this->name;
+        return html_entity_decode(strip_tags($this->name));
     }
 
     public function setName(string $name): static

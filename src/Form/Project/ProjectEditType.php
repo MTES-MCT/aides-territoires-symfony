@@ -35,6 +35,7 @@ class ProjectEditType extends AbstractType
             'label'=>'Nom du projet :*',
             'required'=>false,
             'help' => 'Donnez un nom explicite : préférez \'végétalisation du quartier des coteaux\' à \'quartier des coteaux\'',
+            'sanitize_html' => true,
         ])
         ->add('projectReference', EntityType::class, [
             'required' => false,
