@@ -4,6 +4,7 @@ namespace App\Controller\User;
 
 use App\Controller\FrontController;
 use App\Entity\Keyword\KeywordSynonymlist;
+use App\Entity\Perimeter\Perimeter;
 use App\Entity\Project\Project;
 use App\Form\Project\ProjectEditType;
 use App\Form\User\Project\ProjectDeleteType;
@@ -11,6 +12,7 @@ use App\Repository\Perimeter\PerimeterRepository;
 use App\Repository\Project\ProjectRepository;
 use App\Repository\Project\ProjectValidatedRepository;
 use App\Service\Image\ImageService;
+use App\Service\Reference\ReferenceService;
 use App\Service\User\UserService;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -270,11 +272,11 @@ class ProjectController extends FrontController
         $id,
         $slug,
         ProjectRepository $ProjectRepository,
-        PerimeterRepository $perimeterRepository,
         UserService $userService,
         ProjectValidatedRepository $projectValidatedRepository,
         ProjectRepository $projectRepository,
-        RequestStack $requestStack
+        RequestStack $requestStack,
+        ReferenceService $referenceService
     ): Response
     {
         // gestion pagination
@@ -293,17 +295,25 @@ class ProjectController extends FrontController
         }
 
         // Projets subventionnés
-        $keyword=$project->getProjectTypesSuggestion(); //TODO reconnecter les getProjectTypesSuggestion aux nouveaux projets référents
-        $idPerimeter=$user->getDefaultOrganization()->getPerimeter();
-        $project_perimeter = $perimeterRepository->find($idPerimeter);
-        $projects=$projectValidatedRepository->findProjectInRadius(
-            [
-            'perimeter' => $project_perimeter,
-            'keyword' => $keyword,
-            'radius' => 30
-            ]
-        );
+        $synonyms = $referenceService->getSynonymes($project->getProjectReference()->getName());
+        
+        $project_perimeter = ($user->getDefaultOrganization() && $user->getDefaultOrganization()->getPerimeter())
+            ? $user->getDefaultOrganization()->getPerimeter()
+            : null
+        ;
+        $projects = [];
+        if ($project_perimeter instanceof Perimeter) {
+            $projectParams = [
+                'perimeter' => $project_perimeter,
+                'radius' => 30
+            ];
+            if ($synonyms) {
+                $projectParams = array_merge($projectParams, $synonyms);
+            }
+            $projects = $projectValidatedRepository->findProjectInRadius($projectParams);
+        }
 
+        // pagination project validés
         $adapter = new ArrayAdapter($projects);
         $pagerfanta = new Pagerfanta($adapter);
         $pagerfanta->setMaxPerPage(self::NB_PROJECT_BY_PAGE);
@@ -311,19 +321,27 @@ class ProjectController extends FrontController
 
         
         // Projets publics : 
-        $projets_publics = array();
-        if ($keyword) {
-            $projectsParams = array();
-            $projectsParams['isPublic'] = true;
-            $projectsParams['status'] = Project::STATUS_PUBLISHED;
-            $projectsParams['project_types_suggestion'] = $keyword;
-            $projectsParams['limit'] = $params['limit'] ?? 3;
+        $projets_publics = [];
+        if ($synonyms) {
+            $projectParams = $synonyms;
+            $projectParams['exclude'] = $project;
+            $projectsParams['limit'] = 12;
             $projectsParams['orderBy'] = [
                 'sort' => 'p.timeCreate',
                 'order' => 'DESC'
             ];
-            $qb = $projectRepository->getQueryBuilder($projectsParams); // TODO : liste les projets proches du idPerimeter, et avec la bonne thématique/PR
-            $projets_publics = $qb->getQuery()->getResult();
+            if ($project_perimeter instanceof Perimeter) {
+                $projectParams['perimeterRadius'] = $project_perimeter;
+                $projectParams['radius'] = 30;
+            }
+
+            $projets_publics = $projectRepository->findPublicProjects($projectParams);
+
+            // Si rien à 30 km, on élargit à 300 km
+            if (count($projets_publics) == 0 && $project_perimeter instanceof Perimeter) {
+                $projectParams['radius'] = 300;
+                $projets_publics = $projectRepository->findPublicProjects($projectParams);
+            }
         }   
         
         // fil d'arianne

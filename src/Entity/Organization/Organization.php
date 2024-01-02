@@ -64,10 +64,10 @@ class Organization
     #[ORM\Column(length: 10, nullable: true)]
     private ?string $zipCode = null;
 
-    #[ORM\Column(length: 14, nullable: true)]
+    #[ORM\Column(length: 9, nullable: true)]
     private ?string $sirenCode = null;
 
-    #[ORM\Column(length: 9, nullable: true)]
+    #[ORM\Column(length: 14, nullable: true)]
     private ?string $siretCode = null;
 
     #[ORM\Column(length: 5, nullable: true)]

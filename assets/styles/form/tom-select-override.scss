@@ -68,3 +68,8 @@
         white-space: nowrap;
     }
 }
+
+.ts-wrapper.plugin-remove_button .item {
+    flex-direction: row-reverse;
+    justify-content: flex-end;
+}

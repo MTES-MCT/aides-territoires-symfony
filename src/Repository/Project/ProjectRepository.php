@@ -63,7 +63,19 @@ class ProjectRepository extends ServiceEntityRepository
         ];
 
         $qb = $this->getQueryBuilder($params);
-        return $qb->getQuery()->getResult();
+        $projects = [];
+        $results = $qb->getQuery()->getResult();
+        foreach ($results as $result) {
+            if ($result instanceof Project) {
+                $projects[] = $result;
+            } else {
+                if (isset($result['dist'])) {
+                    $result[0]->setDistance($result['dist']);
+                }
+                $projects[] = $result[0];
+            }
+        }
+        return $projects;
     }
 
     public function getQueryBuilder(array $params = null): QueryBuilder
@@ -74,22 +86,55 @@ class ProjectRepository extends ServiceEntityRepository
         $step = $params['step'] ?? null;
         $contractLink = $params['contractLink'] ?? null;
         $perimeter = $params['perimeter'] ?? null;
+        $perimeterRadius = $params['perimeterRadius'] ?? null;
         $keywordSynonymlistSearch = $params['keywordSynonymlistSearch'] ?? null;
         $orderBy = (isset($params['orderBy']) && isset($params['orderBy']['sort']) && isset($params['orderBy']['order'])) ? $params['orderBy'] : null;
         $limit = $params['limit'] ?? null;
         $intentions_string = $params['intentions_string'] ?? null;
         $objects_string = $params['objects_string'] ?? null;
         $simple_words_string = $params['simple_words_string'] ?? null;
-
+        $radius = $params['radius'] ?? null;
+        $exclude = $params['exclude'] ?? null;
+dump($params);
         $qb = $this->createQueryBuilder('p');
 
-        if ($objects_string !== null) {
+        if ($exclude instanceof Project && $exclude->getId()) {
+            $qb
+                ->andWhere('p != :perimeterExclude')
+                ->setParameter('perimeterExclude', $exclude)
+                ;
+        }
+        if ($perimeterRadius instanceof Perimeter && $perimeterRadius->getLatitude() && $perimeterRadius->getLongitude() && $radius !== null) {
+            $qb
+                ->addSelect('(((ACOS(SIN(:lat * PI() / 180) * SIN(perimeterForDistance.latitude * PI() / 180) + COS(:lat * PI() / 180) *
+                    COS(perimeterForDistance.latitude * PI() / 180) * COS((:lng - perimeterForDistance.longitude) * PI() / 180)) * 180 / PI()) * 60 * 1.1515) * 1.6093) AS dist')
+                ->innerJoin('p.organization', 'organizationForDistance')
+                ->innerJoin('organizationForDistance.perimeter', 'perimeterForDistance')
+                ->setParameter('lat', $perimeterRadius->getLatitude())
+                ->setParameter('lng', $perimeterRadius->getLongitude())
+                ->having('dist <= :distanceKm')
+                ->setParameter('distanceKm', $radius)
+                ->orderBy('dist', 'ASC');
+            ;
+        }
+
+        if ($objects_string !== null && $objects_string !== '') {
             $qb
                 ->andWhere('
                 MATCH_AGAINST(p.name) AGAINST (:objects_string IN BOOLEAN MODE) > 5
                 OR MATCH_AGAINST(p.description) AGAINST (:objects_string IN BOOLEAN MODE) > 5
                 ')
                 ->setParameter('objects_string', $objects_string)
+            ;
+        }
+
+        if ($simple_words_string !== null && $objects_string == '') {
+            $qb
+                ->andWhere('
+                MATCH_AGAINST(p.name) AGAINST (:simple_words_string IN BOOLEAN MODE) > 2
+                OR MATCH_AGAINST(p.description) AGAINST (:simple_words_string IN BOOLEAN MODE) > 2
+                ')
+                ->setParameter('simple_words_string', $simple_words_string)
             ;
         }
 

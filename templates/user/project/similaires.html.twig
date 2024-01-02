@@ -25,58 +25,7 @@
                 <div class="fr-grid-row" id="projects-list">
                 {% if projets_publics %}
                  <p>Voici des exemples de projets similaires en cours de réalisation ou récemment finalisés, réalisés par des communes voisines. Ces exemples vous offriront des idées inspirantes, des pratiques à suivre, et peut-être même des pièges à éviter.</p>
-                 {% for project_public in projets_publics %}
-                    <div class="fr-col-xs-12 fr-col-md-4 fr-p-1w fr-mb-3w">
-                    <div class="fr-card fr-enlarge-link">
-                        <div class="fr-card__body">
-                           <div class="fr-card__content">
-                               <h2 class="fr-card__title fr-h5 fr-mb-1w">
-                                   <a class="fr-card__link at-color--blue" href="{{ path('app_project_project_public_details', {'id': project_public.id, 'slug': project_public.slug}) }}" title="Voir le projet {{ project_public.name }}">
-                                       {{ project_public.name }}
-                                   </a>
-                               </h2>
-                               <div class="fr-card__desc">
-                                   <p class="fr-mb-1w fr-mt-0 fr-text--sm at-color--blue">
-                                   {% if app.user and project_public.organization %}
-                                       {{ project_public.organization.name }} ({{ project_public.organization.zipCode }})
-                                   {% else %}
-                                       {% if project_public.organization.perimeterDepartment %}
-                                           ({{ project_public.organization.perimeterDepartment.name }})
-                                       {% endif %}
-                                   {% endif %}
-                                   </p>
-                                   {% if project_public.step and constant('App\\Entity\\Project\\Project::PROJECT_STEPS[project_public.step]') is defined %}
-                                   <p class="fr-mb-1w fr-mt-0 fr-text--sm at-color--blue">
-                                       État d'avancement : {{ constant('App\\Entity\\Project\\Project::PROJECT_STEPS[project_public.step]') }}
-                                   </p>
-                                   {% endif %}
-                                   {% if project_public.aidProjects %}
-                                   <p class="fr-mb-1w fr-mt-0 fr-text--sm at-color--blue">
-                                       {{ project_public.aidProjects|length }} aide{% if project_public.aidProjects|length > 1 %}s{% endif %} sélectionnée{% if project_public.aidProjects|length > 1 %}s{% endif %}
-                                   </p>
-                                   {% endif %}
-
-                                   {% for keywordSynonym in project_public.keywordSynonymlists %}
-                                   <p class="fr-tag fr-mb-1w at-color--blue">{{ keywordSynonym.name }}</p>
-                                   {% endfor %}
-                               </div>
-                           </div>
-                       </div>
-                       <div class="fr-card__header">
-                           <div class="fr-card__img">
-                               {% if project_public.image %}
-                               <img class="fr-responsive-img" src="{{ getParameter('cloud_image_url') }}{{ project_public.image }}" alt="Logo {{ project_public.name }}"/>    
-                               {% else %}
-                               <picture>
-                                   <source srcset="{{ asset('build/images/project/project_illustration.webp') }}">
-                                   <img src="{{ asset('build/images/project/project_illustration.png') }}" class="fr-responsive-img" alt="Logo par défaut" />
-                               </picture>
-                               {% endif %}
-                           </div>
-                       </div>
-                   </div>
-                    </div>
-                  {% endfor %}
+                {% include "project/project/_projects_publics_as_list.html.twig" with { projects: projets_publics, showDistance: true} %}
                 
                 {% else %}
                 <div class="fr-col-12 fr-mb-5w">

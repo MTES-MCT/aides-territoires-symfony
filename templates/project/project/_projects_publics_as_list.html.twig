@@ -6,6 +6,9 @@
             </caption>
             <thead>
                 <tr>
+                    {% if showDistance is defined and showDistance %}
+                    <th scope="col">Distance</th>
+                    {% endif %}
                     <th scope="col">Nom</th>
                     <th scope="col">Structure</th>
                     <th scope="col">Territoire</th>
@@ -17,6 +20,9 @@
             <tbody>
                 {% for project in projects %}
                 <tr>
+                    {% if showDistance is defined and showDistance %}
+                    <td>{{ project.distance|round(2) }} km</td>
+                    {% endif %}
                     <td><a href="{{ path('app_project_project_public_details', {'id': project.id, 'slug': project.slug}) }}" title="Voir le project {{ project.name }}. Ouvre une nouvelle fenêtre" target="_blank">{{ project.name }}</a></td>
                     <td>{% if project.organization %}{{ project.organization.name }}{% endif %}</td>
                     <td>{% if project.organization and project.organization.perimeter %}{{ project.organization.perimeter.name }}{% endif %}</td>

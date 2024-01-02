@@ -2,7 +2,6 @@ require('datatables');
 require ('../project/map.js');
 
 $(function(){
-    $('.widget-autocomplete-multiple-wrapper').checkbox_multiple_search();
     $('form[name="county_select"]').on({
         change: function(e) {
             $(this).parents('form').submit();

@@ -1,5 +1,7 @@
 framework:
     html_sanitizer:
         sanitizers:
-            default:
+            app.post_sanitizer:
+                # enable either of these
                 allow_safe_elements: true
+
