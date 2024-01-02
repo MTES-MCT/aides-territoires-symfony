@@ -39,7 +39,7 @@ class ProjectController extends FrontController
         RequestStack $requestStack,
         LogService $logService,
         UserService $userService,
-        ReferenceService $referenceService
+        ReferenceService $referenceService,
     ): Response
     {
         // le user
@@ -123,7 +123,8 @@ class ProjectController extends FrontController
         RequestStack $requestStack,
         UserService $userService,
         ManagerRegistry $managerRegistry,
-        AidRepository $aidRepository
+        AidRepository $aidRepository,
+        LogService $logService
     ): Response
     {
         // le projet
@@ -205,6 +206,16 @@ class ProjectController extends FrontController
             }
         }
 
+        // log
+        $logService->log(
+            type: LogService::PROJECT_PUBLIC_VIEW,
+            params: [
+                'project' => $project,
+                'organization' => $userService->getUserLogged() ? $userService->getUserLogged()->getDefaultOrganization() : null,
+                'user' => $userService->getUserLogged(),
+            ]
+        );
+
         // fil arianne
         $this->breadcrumb->add(
             'Projets publics',
@@ -216,6 +227,7 @@ class ProjectController extends FrontController
             null
         );
 
+        // rendu template
         return $this->render('project/project/public-details.html.twig', [
             'project' => $project,
             'formAddToFavorite' => $formAddToFavorite->createView(),

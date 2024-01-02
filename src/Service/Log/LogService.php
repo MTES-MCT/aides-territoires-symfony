@@ -17,6 +17,7 @@ use App\Entity\Log\LogBlogPromotionPostDisplay;
 use App\Entity\Log\LogProgramView;
 use App\Entity\Log\LogProjectValidatedSearch;
 use App\Entity\Log\LogPublicProjectSearch;
+use App\Entity\Log\LogPublicProjectView;
 use App\Entity\Organization\Organization;
 use App\Entity\User\User;
 use Doctrine\Persistence\ManagerRegistry;
@@ -32,6 +33,7 @@ class LogService
     const PROGRAM_VIEW = 'programView';
     const PROJECT_VALIDATED_SEARCH = 'projectValidatedSearch';
     const PROJECT_PUBLIC_SEARCH = 'projectPublicSearch';
+    const PROJECT_PUBLIC_VIEW = 'projectPublicView';
 
     public function __construct(
         private ManagerRegistry $managerRegistry
@@ -227,6 +229,13 @@ class LogService
                                 }
                             }
                             break;
+
+                        case self::PROJECT_PUBLIC_VIEW:
+                            $log = new LogPublicProjectView();
+                            $log->setProject($params['project'] ?? null);
+                            $log->setOrganization($params['organization'] ?? null);
+                            $log->setUser($params['user'] ?? null);
+                            break;                            
 
                 default:
                     // Code à exécuter si aucune des conditions précédentes n'est remplie
