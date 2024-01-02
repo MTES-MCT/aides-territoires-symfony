@@ -22,14 +22,14 @@ class ProjectReferenceRepository extends ServiceEntityRepository
         parent::__construct($registry, ProjectReference::class);
     }
 
-    public function findCustom(?array $params): array
+    public function findCustom(?array $params = null): array
     {
         $qb = $this->getQueryBuilder($params);
 
         return $qb->getQuery()->getResult();
     }
 
-    public function getQueryBuilder(?array $params): QueryBuilder
+    public function getQueryBuilder(?array $params = null): QueryBuilder
     {
         $nameMatchAgainst = $params['nameMatchAgainst'] ?? null;
         $nameLike = $params['nameLike'] ?? null;

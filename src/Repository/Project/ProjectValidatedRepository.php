@@ -143,7 +143,7 @@ class ProjectValidatedRepository extends ServiceEntityRepository
         return $projects;
     }
 
-    public function findCustom(?array $params): array
+    public function findCustom(?array $params = null): array
     {
         $qb = $this->getQueryBuilder($params);
 
@@ -164,7 +164,7 @@ class ProjectValidatedRepository extends ServiceEntityRepository
         return $projects;
     }
 
-    public function getQueryBuilder(?array $params): QueryBuilder
+    public function getQueryBuilder(?array $params = null): QueryBuilder
     {
         $keyword = $params['keyword'] ?? null;
         $intentions_string = $params['intentions_string'] ?? null;

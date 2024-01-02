@@ -51,6 +51,19 @@ class ProjectRepository extends ServiceEntityRepository
         return $result[0]['nb'] ?? 0;
     }
 
+    public function countReviewable(?array $params = null): int
+    {
+        $params['status'] = Project::STATUS_REVIEWABLE;
+        try {
+            $qb = $this->getQueryBuilder($params);
+            $qb->select('IFNULL(COUNT(p.id), 0) AS nb');
+
+            return $qb->getQuery()->getResult()[0]['nb'] ?? 0;
+        } catch (\Exception $e) {
+            return 0;
+        }
+    }
+
     
     public function findPublicProjects(array $params = null): array
     {

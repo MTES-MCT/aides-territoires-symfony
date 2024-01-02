@@ -11,6 +11,7 @@ use App\Repository\Keyword\KeywordSynonymlistRepository;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Filters;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ChoiceField;
@@ -22,6 +23,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\ImageField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IntegerField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextareaField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
+use EasyCorp\Bundle\EasyAdminBundle\Filter\ChoiceFilter;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class ProjectCrudController extends AtCrudController
@@ -29,6 +31,17 @@ class ProjectCrudController extends AtCrudController
     public static function getEntityFqcn(): string
     {
         return Project::class;
+    }
+
+    public function configureFilters(Filters $filters): Filters
+    {
+        return $filters
+            ->add(ChoiceFilter::new('status')->setChoices([
+                Project::STATUS_DRAFT => Project::STATUS_DRAFT,
+                Project::STATUS_REVIEWABLE => Project::STATUS_REVIEWABLE,
+                Project::STATUS_PUBLISHED => Project::STATUS_PUBLISHED
+            ]))
+        ;
     }
 
     public function configureFields(string $pageName): iterable

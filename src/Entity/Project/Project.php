@@ -31,8 +31,6 @@ class Project
 {
     const FOLDER = 'projects';
     
-    const STATUS_PUBLISHED = 'published';
-
     const STATUS = [
         ['slug' => 'draft', 'name' => 'Brouillon'],
         ['slug' => 'reviewable', 'name' => 'En revue'],
@@ -41,6 +39,9 @@ class Project
     ];
 
     const STATUS_DRAFT = 'draft';
+    const STATUS_REVIEWABLE = 'reviewable';
+    const STATUS_PUBLISHED = 'published';
+    const STATUS_DELETED = 'deleted';
 
     const CONTRACT_LINK = [
         ['slug' => 'ACV1', 'name' => 'Action Coeur de Ville 1'],

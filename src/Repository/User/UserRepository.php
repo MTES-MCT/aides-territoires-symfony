@@ -73,7 +73,7 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         return $qb;
     }
 
-    public function countRegisterByDay(?array $params): array
+    public function countRegisterByDay(?array $params = null): array
     {
         $params['dateCreateMin'] = $params['dateCreateMin'] ?? null;
         $qb = $this->getQueryBuilder($params);

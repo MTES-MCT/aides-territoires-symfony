@@ -143,6 +143,11 @@ class ProjectController extends FrontController
                     $imageService->sendUploadedImageToCloud($imageFile, Project::FOLDER, $project->getImage());
                 }
 
+                // si demande de projet public
+                if ($project->getStatus() == Project::STATUS_DRAFT && $project->isIsPublic()) {
+                    $project->setStatus(Project::STATUS_REVIEWABLE);
+                }
+
                 // sauvegarde
                 $managerRegistry->getManager()->persist($project); 
                 $managerRegistry->getManager()->flush();
@@ -204,6 +209,11 @@ class ProjectController extends FrontController
                 $project->setOrganization($user->getDefaultOrganization());
                 $project->setAuthor($user);
                 
+                // si demande de projet public
+                if ($project->getStatus() == Project::STATUS_DRAFT && $project->isIsPublic()) {
+                    $project->setStatus(Project::STATUS_REVIEWABLE);
+                }
+
                 // sauvegarde
                 $managerRegistry->getManager()->persist($project); 
                 $managerRegistry->getManager()->flush();
