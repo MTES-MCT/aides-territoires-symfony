@@ -23,12 +23,12 @@ nelmio_security:
             default-src:
                 - 'self'
                 - 'https://in-automate.brevo.com'
+                - 'https://stats.beta.gouv.fr'
             #définit les sources de scripts autorisées
             script-src:
                 - 'self'
                 - 'https://www.youtube.com'
                 - 'https://sibautomation.com'
-                - 'https://stats.beta.gouv.fr/matomo.js'
             #définit les sources de feuilles de styles (CSS) autorisées
             style-src:
                 - 'self'
