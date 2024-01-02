@@ -25,7 +25,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Pagerfanta\Doctrine\ORM\QueryAdapter;
 use Pagerfanta\Pagerfanta;
-use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Serializer\SerializerInterface;
 
 class ProjectController extends FrontController
 {
@@ -37,16 +37,20 @@ class ProjectController extends FrontController
     public function public(
         ProjectRepository $projectRepository,
         RequestStack $requestStack,
+        LogService $logService,
+        UserService $userService,
+        SerializerInterface $serializerInterface
     ): Response
     {
+        // le user
+        $user = $userService->getUserLogged();
 
         // gestion pagination
         $currentPage = (int) $requestStack->getCurrentRequest()->get('page', 1);
 
-        $formProjectSearch = $this->createForm(ProjectSearchType::class);
-
+        // formulaire de recherche
+        $formProjectSearch = $this->createForm(ProjectSearchType::class, null, ['method' => 'GET']);
         $formProjectSearch->handleRequest($requestStack->getCurrentRequest());
-
         if ($formProjectSearch->isSubmitted()) {
             if ($formProjectSearch->isValid()) {                
                 if($formProjectSearch->get('step')->getData()){
@@ -61,10 +65,11 @@ class ProjectController extends FrontController
                 if($formProjectSearch->get('keywordSynonymlistSearch')->getData()){
                     $projectsParams['keywordSynonymlistSearch'] = $formProjectSearch->get('keywordSynonymlistSearch')->getData()['customChoices'];
                 }
-                
+            
             }
         }
 
+        // parametres recherche
         $projectsParams['isPublic'] = true;
         $projectsParams['status'] = Project::STATUS_PUBLISHED;
         $projectsParams['limit'] = $params['limit'] ?? 3;
@@ -79,12 +84,30 @@ class ProjectController extends FrontController
         $pagerfanta->setMaxPerPage(self::NB_PROJECT_BY_PAGE);
         $pagerfanta->setCurrentPage($currentPage);
 
+        if ($formProjectSearch->isSubmitted()) {
+            if ($formProjectSearch->isValid()) {  
+
+                // Log recherche
+                $logService->log(
+                    type: LogService::PROJECT_PUBLIC_SEARCH,
+                    params: [
+                        'querystring' => parse_url($requestStack->getCurrentRequest()->getRequestUri(), PHP_URL_QUERY) ?? null,
+                        'resultsCount' => $pagerfanta->getNbResults(),
+                        'perimeter' => (isset($projectsParams['perimeter']) && $projectsParams['perimeter'] instanceof Perimeter) ? $projectsParams['perimeter'] : null,
+                        'user' => $user,
+                        'organization' => ($user && $user->getDefaultOrganization()) ? $user->getDefaultOrganization() : null
+                    ],
+                );
+            }
+        }
+                
         // fil arianne
         $this->breadcrumb->add(
             ' Projets publics',
             null
         );
 
+        // rendu template
         return $this->render('project/project/public.html.twig', [
             'my_pager' => $pagerfanta,
             'formProjectSearch' => $formProjectSearch

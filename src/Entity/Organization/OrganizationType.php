@@ -19,6 +19,7 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\OpenApi\Model;
 use App\Controller\Api\Aid\AidAudienceController;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Attribute\MaxDepth;
 
 #[ORM\Entity(repositoryClass: OrganizationTypeRepository::class)]
 #[ORM\Index(columns: ['date_create'], name: 'date_create_orgt')]
@@ -80,6 +81,7 @@ class OrganizationType
     #[Gedmo\Timestampable(on: 'update')]
     private ?\DateTimeInterface $timeUpdate = null;
 
+    #[MaxDepth(1)]
     #[ORM\ManyToOne(inversedBy: 'organizationTypes')]
     #[ORM\JoinColumn(nullable: false)]
     private ?OrganizationTypeGroup $organizationTypeGroup = null;

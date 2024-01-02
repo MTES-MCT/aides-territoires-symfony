@@ -16,6 +16,7 @@ use App\Entity\Log\LogBlogPromotionPostClick;
 use App\Entity\Log\LogBlogPromotionPostDisplay;
 use App\Entity\Log\LogProgramView;
 use App\Entity\Log\LogProjectValidatedSearch;
+use App\Entity\Log\LogPublicProjectSearch;
 use App\Entity\Organization\Organization;
 use App\Entity\User\User;
 use Doctrine\Persistence\ManagerRegistry;
@@ -30,6 +31,7 @@ class LogService
     const BLOG_PROMOTION_POST_DISPLAY = 'blogPromotionPostDisplay';
     const PROGRAM_VIEW = 'programView';
     const PROJECT_VALIDATED_SEARCH = 'projectValidatedSearch';
+    const PROJECT_PUBLIC_SEARCH = 'projectPublicSearch';
 
     public function __construct(
         private ManagerRegistry $managerRegistry
@@ -210,6 +212,20 @@ class LogService
                             $log->setOrganization($params['organization'] ?? null);
                             $log->setPerimeter($params['perimeter'] ?? null);
                             $log->setUser($params['user'] ?? null);
+                            break;
+
+                        case self::PROJECT_PUBLIC_SEARCH:
+                            $log = new LogPublicProjectSearch();
+                            $log->setQuerystring($params['querystring'] ?? null);
+                            $log->setResultsCount($params['resultsCount'] ?? null);
+                            $log->setOrganization($params['organization'] ?? null);
+                            $log->setPerimeter($params['perimeter'] ?? null);
+                            $log->setUser($params['user'] ?? null);
+                            if (isset($params['keywordSynonymlists']) && is_array($params['keywordSynonymlists'])) {
+                                foreach ($params['keywordSynonymlists'] as $keywordSynonymlist) {
+                                    $log->addKeywordSynonymlist($keywordSynonymlist);
+                                }
+                            }
                             break;
 
                 default:
