@@ -15,6 +15,7 @@ use App\Entity\Log\LogBlogPostView;
 use App\Entity\Log\LogBlogPromotionPostClick;
 use App\Entity\Log\LogBlogPromotionPostDisplay;
 use App\Entity\Log\LogProgramView;
+use App\Entity\Log\LogProjectValidatedSearch;
 use App\Entity\Organization\Organization;
 use App\Entity\User\User;
 use Doctrine\Persistence\ManagerRegistry;
@@ -28,6 +29,7 @@ class LogService
     const BLOG_PROMOTION_POST_CLICK = 'blogPromotionPostClick';
     const BLOG_PROMOTION_POST_DISPLAY = 'blogPromotionPostDisplay';
     const PROGRAM_VIEW = 'programView';
+    const PROJECT_VALIDATED_SEARCH = 'projectValidatedSearch';
 
     public function __construct(
         private ManagerRegistry $managerRegistry
@@ -84,7 +86,6 @@ class LogService
                         break;
     
                     case 'createDsFolder':
-                        dd($params);
                         $log = new LogAidCreatedsFolder();
                         $log->setDsFolderUrl($params['dsFolderUrl'] ?? null);
                         $log->setDsFolderId($params['dsFolderId'] ?? null);
@@ -198,6 +199,16 @@ class LogService
                             $log->setSource($this->getSiteFromHost($params['host'] ?? null));
                             $log->setProgram($params['program'] ?? null);
                             $log->setOrganization($params['organization'] ?? null);
+                            $log->setUser($params['user'] ?? null);
+                            break;
+
+                        case self::PROJECT_VALIDATED_SEARCH:
+                            $log = new LogProjectValidatedSearch();
+                            $log->setSearch($params['search'] ?? null);
+                            $log->setQuerystring($params['querystring'] ?? null);
+                            $log->setResultsCount($params['resultsCount'] ?? null);
+                            $log->setOrganization($params['organization'] ?? null);
+                            $log->setPerimeter($params['perimeter'] ?? null);
                             $log->setUser($params['user'] ?? null);
                             break;
 

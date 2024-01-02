@@ -16,6 +16,7 @@ use App\Form\Project\RemoveFromFavoriteType;
 use App\Repository\Aid\AidRepository;
 use App\Repository\Project\ProjectRepository;
 use App\Repository\Project\ProjectValidatedRepository;
+use App\Service\Log\LogService;
 use App\Service\Various\StringService;
 use App\Service\User\UserService;
 use Doctrine\Persistence\ManagerRegistry;
@@ -214,44 +215,10 @@ class ProjectController extends FrontController
         $formProjectSearch = $this->createForm(ProjectValidatedSearchType::class,null,['method'=>'GET','action'=>$this->generateUrl('app_project_project_subsidized_detail')]);
 
         $formProjectSearch->handleRequest($requestStack->getCurrentRequest());
-        //  if ($formProjectSearch->isSubmitted()) {
-        //      if ($formProjectSearch->isValid()) {
-
-        //         $project_parameter="";
-        //         if($formProjectSearch->get('project_perimeter')->getData()){
-        //             $project_parameter = $formProjectSearch->get('project_perimeter')->getData()->getId();
-        //         }
-        //         $keyword="";
-        //         if($formProjectSearch->get('text')->getData()){
-        //             $keyword=$formProjectSearch->get('text')->getData()->getName();
-        //         }
-
-                 
-        //         return $this->redirectToRoute('app_project_project_subsidized_detail', [
-        //             'commune_search' => 'true',
-        //             'project_perimeter' => $project_parameter,
-        //             'text'  => $keyword
-        //         ]);
-                 
-        //      }
-        //  }
 
          // formulaire choix département
-         $formCounties = $this->createForm(CountySelectType::class,null,['method'=>'GET','action'=>$this->generateUrl('app_project_project_subsidized_detail')]);
-        //  $formCounties->handleRequest($requestStack->getCurrentRequest());
-        //  if ($formCounties->isSubmitted()) {
-        //      if ($formCounties->isValid()) {
-        //          $county = $perimeterRepository->findOneBy([
-        //              'code' => $formCounties->get('county')->getData()
-        //          ]);
-        //          if ($county instanceof Perimeter) {
-        //              return $this->redirectToRoute('app_project_project_subsidized_detail', [
-        //                  'department_search' => 'true',
-        //                  'project_perimeter' => $county->getId()
-        //              ]);
-        //          }
-        //      }
-        //  }
+        $formCounties = $this->createForm(CountySelectType::class,null,['method'=>'GET','action'=>$this->generateUrl('app_project_project_subsidized_detail')]);
+
 
         // les infos départements pour la carte
         $counties = $perimeterRepository->findCounties();
@@ -282,25 +249,29 @@ class ProjectController extends FrontController
 
     #[Route('/projets/projets-subventionnes/resultats/', name: 'app_project_project_subsidized_detail')]
     public function subsidizedDetail(
-        Request $request,
         PerimeterRepository $perimeterRepository,
         RequestStack $requestStack,
-        ProjectValidatedRepository $projectValidatedRepository
+        ProjectValidatedRepository $projectValidatedRepository,
+        LogService $logService,
+        UserService $userService
     ) : Response
     {
-
+        // le user
+        $user = $userService->getUserLogged();
+        
+        // parametres et variables
         $projects=[];$commune_search=false;$keyword=null;
         $department_search = false;
         $idPerimeter = $requestStack->getCurrentRequest()->query->get('project_perimeter', false);
 
+        // formulaire recherche
         $formProjectSearch = $this->createForm(ProjectValidatedSearchType::class,null,[
             'method'=>'GET'
             ]
         );
-
         $formProjectSearch->handleRequest($requestStack->getCurrentRequest());
-         if ($formProjectSearch->isSubmitted()) {
-             if ($formProjectSearch->isValid()) {
+        if ($formProjectSearch->isSubmitted()) {
+            if ($formProjectSearch->isValid()) {
                 if($formProjectSearch->get('project_perimeter')->getData()){
                     $project_perimeter = $formProjectSearch->get('project_perimeter')->getData();
                 }
@@ -316,36 +287,47 @@ class ProjectController extends FrontController
                     ]
                 );
 
-                 $commune_search=true;
-                
-             }
-         }
+                $commune_search=true;
+            }
+        }
 
-         $formCounties = $this->createForm(CountySelectType::class,null,[
+        // formulaire par département
+        $formCounties = $this->createForm(CountySelectType::class,null,[
             'method'=>'GET'
             ]
         );
-         $formCounties->handleRequest($requestStack->getCurrentRequest());
-         if ($formCounties->isSubmitted()) {
-             if ($formCounties->isValid()) {
-
-                 $project_perimeter = $perimeterRepository->findOneBy(['code' => $formCounties->get('county')->getData()]);
-                 $projects=$projectValidatedRepository->findProjectInCounty(
+        $formCounties->handleRequest($requestStack->getCurrentRequest());
+        if ($formCounties->isSubmitted()) {
+            if ($formCounties->isValid()) {
+                $project_perimeter = $perimeterRepository->findOneBy(['code' => $formCounties->get('county')->getData()]);
+                $projects=$projectValidatedRepository->findProjectInCounty(
                     ['id' => $project_perimeter->getId()]
                 );
-                 $department_search=true;
-                 
-             }
-         }
+                $department_search=true;
+            }
+        }
 
-         if ($idPerimeter && !isset($project_perimeter)) {
+        if ($idPerimeter && !isset($project_perimeter)) {
             $project_perimeter = $perimeterRepository->find($idPerimeter);
             $projects=$projectValidatedRepository->findProjectInCounty(
                 ['id' => $project_perimeter->getId()]
             );
             $department_search=true;
-         }
+        }
 
+        // Log recherche
+        $logService->log(
+            type: LogService::PROJECT_VALIDATED_SEARCH,
+            params: [
+                'search' => (isset($keyword)) ? $keyword : null,
+                'querystring' => parse_url($requestStack->getCurrentRequest()->getRequestUri(), PHP_URL_QUERY) ?? null,
+                'resultsCount' => (isset($projects) && is_array($projects)) ? count($projects) : 0,
+                'perimeter' => (isset($project_perimeter) && $project_perimeter instanceof Perimeter) ? $project_perimeter : null,
+                'user' => $user,
+                'organization' => ($user && $user->getDefaultOrganization()) ? $user->getDefaultOrganization() : null
+            ],
+        );
+        
         // fil arianne
         $this->breadcrumb->add(
             'Projets subventionnés',
