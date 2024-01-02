@@ -4,6 +4,7 @@ namespace App\Controller\Contact;
 
 use App\Controller\FrontController;
 use App\Entity\Contact\ContactMessage;
+use App\Entity\Log\LogContactFormSend;
 use App\Form\Contact\ContactType;
 use App\Service\Email\EmailService;
 use App\Service\Various\ParamService;
@@ -39,10 +40,16 @@ class ContactController extends FrontController
 
         if ($formContact->isSubmitted()){ 
             if ($formContact->isValid()) {
+                // log
+                $logContactFormSend = new LogContactFormSend();
+                $logContactFormSend->setSubject($formContact->get('subject')->getData());
+                $managerRegistry->getManager()->persist($logContactFormSend);
 
+                // enregistre contact
                 $managerRegistry->getManager()->persist($contact);
                 $managerRegistry->getManager()->flush();
 
+                // email admin
                 $email_subject = "[aides-territoires] [Contact]";
 
                 $content_email="<p>Message reçu via le formulaire de contact.</p>";

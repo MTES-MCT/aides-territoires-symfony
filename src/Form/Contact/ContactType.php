@@ -3,6 +3,7 @@
 namespace App\Form\Contact;
 
 use App\Entity\Contact\Contact;
+use App\Entity\Contact\ContactMessage;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -80,7 +81,7 @@ class ContactType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'data_class' => Contact::class,
+            'data_class' => ContactMessage::class,
         ]);
     }
 }
