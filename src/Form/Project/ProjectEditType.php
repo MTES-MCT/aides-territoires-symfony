@@ -37,19 +37,6 @@ class ProjectEditType extends AbstractType
             'help' => 'Donnez un nom explicite : préférez \'végétalisation du quartier des coteaux\' à \'quartier des coteaux\'',
             'sanitize_html' => true,
         ])
-        // ->add('projectTypesSuggestion', EntityType::class, [
-        //     'required' => false,
-        //     'label' => false,
-        //     'placeholder' => 'Saisissez une thématique',
-        //     'class' => KeywordSynonymlist::class,
-        //     'choice_label' => 'name',
-        //     'choice_value' => 'slug',
-        //     'query_builder' => function (EntityRepository $er) {
-        //         return $er->createQueryBuilder('o')
-        //             ->orderBy('o.name', 'ASC');
-        //     },
-        //     'autocomplete' => true,
-        // ])
         ->add('projectReference', EntityType::class, [
             'required' => false,
             'label' => false,
