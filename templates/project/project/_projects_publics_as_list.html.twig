@@ -21,7 +21,7 @@
                 {% for project in projects %}
                 <tr>
                     {% if showDistance is defined and showDistance %}
-                    <td>{{ project.distance|round(2) }} km</td>
+                    <td>{% if project.distance %}{{ project.distance|round(2) }} km{% endif %}</td>
                     {% endif %}
                     <td><a href="{{ path('app_project_project_public_details', {'id': project.id, 'slug': project.slug}) }}" title="Voir le project {{ project.name }}. Ouvre une nouvelle fenêtre" target="_blank">{{ project.name }}</a></td>
                     <td>{% if project.organization %}{{ project.organization.name }}{% endif %}</td>

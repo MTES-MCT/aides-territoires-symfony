@@ -295,8 +295,11 @@ class ProjectController extends FrontController
         }
 
         // Projets subventionnés
-        $synonyms = $referenceService->getSynonymes($project->getProjectReference()->getName());
-        
+        $synonyms = ($project->getProjectReference())
+            ? $referenceService->getSynonymes($project->getProjectReference()->getName())
+            : null
+        ;
+
         $project_perimeter = ($user->getDefaultOrganization() && $user->getDefaultOrganization()->getPerimeter())
             ? $user->getDefaultOrganization()->getPerimeter()
             : null
