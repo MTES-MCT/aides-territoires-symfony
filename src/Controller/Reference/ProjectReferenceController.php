@@ -4,38 +4,23 @@ namespace App\Controller\Reference;
 
 use App\Controller\FrontController;
 use App\Entity\Perimeter\Perimeter;
-use App\Entity\Aid\AidSuggestedAidProject;
 use App\Entity\Organization\OrganizationType;
-use App\Entity\Project\Project;
 use App\Entity\Reference\ProjectReference;
-use App\Entity\Reference\ProjectReferenceCategory;
-use App\Form\Program\CountySelectType;
-use App\Form\Project\AddToFavoriteType;
-use App\Form\Project\AidSuggestedType;
 use App\Form\Reference\ProjectReferenceSearchType;
-use App\Form\Project\ProjectSearchType;
-use App\Form\Project\ProjectValidatedSearchType;
-use App\Repository\Perimeter\PerimeterRepository;
-use App\Form\Project\RemoveFromFavoriteType;
 use App\Repository\Aid\AidRepository;
 use App\Repository\Project\ProjectRepository;
 use App\Repository\Project\ProjectValidatedRepository;
-use App\Repository\Reference\ProjectReferenceCategoryRepository;
 use App\Repository\Reference\ProjectReferenceRepository;
 use App\Service\Aid\AidService;
 use App\Service\Reference\ReferenceService;
 use App\Service\Various\StringService;
-use App\Service\User\UserService;
 use Doctrine\Persistence\ManagerRegistry;
-use Gedmo\Mapping\Annotation\ReferenceMany;
 use Pagerfanta\Adapter\ArrayAdapter;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Pagerfanta\Doctrine\ORM\QueryAdapter;
 use Pagerfanta\Pagerfanta;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Request;
 
 #[Route(priority: 5)]
 class ProjectReferenceController extends FrontController

@@ -9,7 +9,7 @@ use App\Entity\Project\Project;
 use App\Form\Program\CountySelectType;
 use App\Form\Project\AddToFavoriteType;
 use App\Form\Project\AidSuggestedType;
-use App\Form\Project\ProjectSearchType;
+use App\Form\Project\ProjectPublicSearchType;
 use App\Form\Project\ProjectValidatedSearchType;
 use App\Repository\Perimeter\PerimeterRepository;
 use App\Form\Project\RemoveFromFavoriteType;
@@ -17,6 +17,7 @@ use App\Repository\Aid\AidRepository;
 use App\Repository\Project\ProjectRepository;
 use App\Repository\Project\ProjectValidatedRepository;
 use App\Service\Log\LogService;
+use App\Service\Reference\ReferenceService;
 use App\Service\Various\StringService;
 use App\Service\User\UserService;
 use Doctrine\Persistence\ManagerRegistry;
@@ -25,7 +26,6 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Pagerfanta\Doctrine\ORM\QueryAdapter;
 use Pagerfanta\Pagerfanta;
-use Symfony\Component\Serializer\SerializerInterface;
 
 class ProjectController extends FrontController
 {
@@ -39,7 +39,7 @@ class ProjectController extends FrontController
         RequestStack $requestStack,
         LogService $logService,
         UserService $userService,
-        SerializerInterface $serializerInterface
+        ReferenceService $referenceService
     ): Response
     {
         // le user
@@ -47,9 +47,10 @@ class ProjectController extends FrontController
 
         // gestion pagination
         $currentPage = (int) $requestStack->getCurrentRequest()->get('page', 1);
-
+        
+        $projectsParams = [];
         // formulaire de recherche
-        $formProjectSearch = $this->createForm(ProjectSearchType::class, null, ['method' => 'GET']);
+        $formProjectSearch = $this->createForm(ProjectPublicSearchType::class, null, ['method' => 'GET']);
         $formProjectSearch->handleRequest($requestStack->getCurrentRequest());
         if ($formProjectSearch->isSubmitted()) {
             if ($formProjectSearch->isValid()) {                
@@ -62,8 +63,8 @@ class ProjectController extends FrontController
                 if($formProjectSearch->get('contractLink')->getData()){
                     $projectsParams['contractLink'] = $formProjectSearch->get('contractLink')->getData();
                 }
-                if($formProjectSearch->get('keywordSynonymlistSearch')->getData()){
-                    $projectsParams['keywordSynonymlistSearch'] = $formProjectSearch->get('keywordSynonymlistSearch')->getData()['customChoices'];
+                if($formProjectSearch->get('name')->getData()){
+                    $projectsParams = array_merge($projectsParams, $referenceService->getSynonymes($formProjectSearch->get('name')->getData()));
                 }
             
             }

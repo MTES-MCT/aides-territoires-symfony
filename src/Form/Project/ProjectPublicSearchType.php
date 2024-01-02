@@ -4,18 +4,20 @@ namespace App\Form\Project;
 
 use App\Entity\Keyword\KeywordSynonymlist;
 use App\Entity\Project\Project;
-use App\Form\Type\CheckboxMultipleSearchType;
 use App\Form\Type\PerimeterAutocompleteType;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Routing\RouterInterface;
 
-class ProjectSearchType extends AbstractType
+class ProjectPublicSearchType extends AbstractType
 {
     public function  __construct(
-        protected ManagerRegistry $managerRegistry
+        protected ManagerRegistry $managerRegistry,
+        protected RouterInterface $routerInterface
     )
     {
     }
@@ -51,6 +53,23 @@ class ProjectSearchType extends AbstractType
         }
 
 
+        $nameParams = [
+            'required' => true,
+            'label' => "Types de projet",
+            'autocomplete' => true,
+            'autocomplete_url' => $this->routerInterface->generate('app_project_reference_ajax_ux_autocomplete'),
+            'tom_select_options' => [
+                'create' => true,
+                'createOnBlur' => true,
+                'maxItems' => 1,
+                'delimiter' => '$%§'
+            ],
+        ];
+        if ($options['forceName'] !== false) {
+            $nameParams['data'] = $options['forceName'];
+        }
+
+
         $builder
             ->add('perimeter', PerimeterAutocompleteType::class, $perimeterParams)
             ->add('step', ChoiceType::class, [
@@ -63,21 +82,7 @@ class ProjectSearchType extends AbstractType
                 'label' => 'Appartenance à un plan',
                 'choices' => $contactLinks
             ])
-            // ->add('keywordSynonymlist', EntityType::class, [
-            //     'required' => false,
-            //     'label' => 'Types de projet ',
-            //     'class' => KeywordSynonymlist::class,
-            //     'choice_label' => 'name',
-            //     'placeholder' => 'Sélectionnez un type de projet',
-            //     'multiple' => true
-            // ])
-            ->add('keywordSynonymlistSearch', CheckboxMultipleSearchType::class, [
-                'required' => false,
-                'label' => false,
-                'customChoices' => $choicesKeywordSynonymList,
-                'displayerPlaceholder' => 'Sélectionnez un type de projet',
-                'displayerLabel' => 'Types de projet'
-            ])
+            ->add('name', TextType::class, $nameParams)
         ;
     }
 
@@ -85,7 +90,8 @@ class ProjectSearchType extends AbstractType
     {
         $resolver->setDefaults([
             // Configure your form options here
-            'forcePerimeter' => false
+            'forcePerimeter' => false,
+            'forceName' => false,
         ]);
     }
 }
