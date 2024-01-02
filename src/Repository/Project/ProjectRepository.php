@@ -95,7 +95,7 @@ class ProjectRepository extends ServiceEntityRepository
         $simple_words_string = $params['simple_words_string'] ?? null;
         $radius = $params['radius'] ?? null;
         $exclude = $params['exclude'] ?? null;
-dump($params);
+
         $qb = $this->createQueryBuilder('p');
 
         if ($exclude instanceof Project && $exclude->getId()) {
