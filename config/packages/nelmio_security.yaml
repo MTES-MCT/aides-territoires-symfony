@@ -28,6 +28,7 @@ nelmio_security:
                 - 'self'
                 - 'https://www.youtube.com'
                 - 'https://sibautomation.com'
+                - 'https://stats.beta.gouv.fr/matomo.js'
             #définit les sources de feuilles de styles (CSS) autorisées
             style-src:
                 - 'self'
