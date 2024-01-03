@@ -94,7 +94,7 @@ class ImportFluxCommand extends Command
         $time = $timeEnd - $timeStart;
 
         $io->success('Import flux terminé : '.gmdate("H:i:s", $timeEnd).' ('.gmdate("H:i:s", $time).')');
-        $io->success('Mémoire maximale utilisée : ' . round(memory_get_peak_usage() / 1024 / 1024) . ' MB');
+        $io->success('Mémoire maximale utilisée : ' . intval(round(memory_get_peak_usage() / 1024 / 1024)) . ' MB');
 
         $io->title($this->commandTextEnd);
         return Command::SUCCESS;
