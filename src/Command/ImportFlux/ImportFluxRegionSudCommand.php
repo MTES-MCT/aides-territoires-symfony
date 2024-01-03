@@ -13,14 +13,14 @@ use App\Entity\Category\Category;
 use App\Entity\Keyword\Keyword;
 use App\Entity\Organization\OrganizationType;
 
-#[AsCommand(name: 'at:import_flux:cdm', description: 'Import de flux conseil départemental de la manche')]
-class ImportFluxCdmCommand extends ImportFluxCommand
+#[AsCommand(name: 'at:import_flux:region_sud', description: 'Import de flux région sud')]
+class ImportFluxRegionSudCommand extends ImportFluxCommand
 {
-    protected string $commandTextStart = '<Import de flux conseil départemental de la manche';
-    protected string $commandTextEnd = '>Import de flux conseil départemental de la manche';
+    protected string $commandTextStart = '<Import de flux région sud';
+    protected string $commandTextEnd = '>Import de flux région sud';
 
-    protected ?string $importUniqueidPrefix = 'CDManche_';
-    protected ?int $idDataSource = 12;
+    protected ?string $importUniqueidPrefix = 'RSud_';
+    protected ?int $idDataSource = 13;
 
     protected function getImportUniqueid($aidToImport): ?string
     {
@@ -37,15 +37,26 @@ class ImportFluxCdmCommand extends ImportFluxCommand
         $importRawObjectCalendar = $importRaws['importRawObjectCalendar'];
         $importRawObject = $importRaws['importRawObject'];
 
-        $dateStart = $this->getDateTimeOrNull($aidToImport['start_date']);
-        $dateSubmissionDeadline = $this->getDateTimeOrNull($aidToImport['submission_deadline']);
+        $dateStart = null;
+        try {
+            $dateStart = new \DateTime($aidToImport['start_date'] ?? null);
+        } catch (\Exception $e) {
+            $dateStart = null;
+        }
+
+        $dateSubmissionDeadline = null;
+        try {
+            $dateSubmissionDeadline = new \DateTime($aidToImport['submission_deadline'] ?? null);
+        } catch (\Exception $e) {
+            $dateSubmissionDeadline = null;
+        }
 
         $contact = '';
         if (isset($aidToImport['contact'])) {
-            $contact .= $this->getCleanHtml($aidToImport['contact']);
+            $contact .= $this->htmlSanitizerInterface->sanitize($aidToImport['contact']);
         }
         if (isset($aidToImport['contact_phone'])) {
-            $contact .= '  ' . $this->getCleanHtml($aidToImport['contact_phone']);
+            $contact .= '  ' . $this->htmlSanitizerInterface->sanitize($aidToImport['contact_phone']);
         }
         if (trim($contact) == '') {
             $contact = null;
@@ -57,13 +68,13 @@ class ImportFluxCdmCommand extends ImportFluxCommand
             'importRawObject' => $importRawObject,
             'name' => isset($aidToImport['name']) ? strip_tags($aidToImport['name']) : null,
             'nameInitial' => isset($aidToImport['name']) ? strip_tags($aidToImport['name']) : null,
-            'description' => isset($aidToImport['description']) ? $this->getCleanHtml($aidToImport['description']) : null,
+            'description' => isset($aidToImport['description']) ? $this->htmlSanitizerInterface->sanitize($aidToImport['description']) : null,
             'originUrl' => isset($aidToImport['origin_url']) ? $aidToImport['origin_url'] : null,
             'applicationUrl' => isset($aidToImport['application_url']) ? $aidToImport['application_url'] : null,
             'isCallForProject' => isset($aidToImport['is_call_for_project']) ? $aidToImport['is_call_for_project'] : null,
             'dateStart' => $dateStart,
             'dateSubmissionDeadline' => $dateSubmissionDeadline,
-            'eligibility' => isset($aidToImport['eligibility']) ? $this->getCleanHtml($aidToImport['eligibility']) : null,
+            'eligibility' => isset($aidToImport['eligibility']) ? $this->htmlSanitizerInterface->sanitize($aidToImport['eligibility']) : null,
             'contact' => $contact,
 
         ];

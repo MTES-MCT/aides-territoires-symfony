@@ -406,4 +406,54 @@ class ImportFluxCommand extends Command
     {
         return $aid;
     }
+
+    protected function getImportRaws(
+        array $aidToImport,
+        array $keys = ['start_date', 'predeposit_date', 'submission_deadline', 'recurrence']
+    ): array
+    {
+        $importRawObjectCalendar = [];
+        foreach ($keys as $key) {
+            if (isset($aidToImport[$key])) {
+                $importRawObjectCalendar[$key] = $aidToImport[$key];
+            }
+        }
+        if (count($importRawObjectCalendar) == 0) {
+            $importRawObjectCalendar = null;
+        }
+
+        $importRawObject = $aidToImport;
+        foreach ($keys as $key) {
+            if (isset($importRawObject[$key])) {
+                unset($importRawObject[$key]);
+            }
+        }
+
+        return [
+            'importRawObjectCalendar' => $importRawObjectCalendar,
+            'importRawObject' => $importRawObject
+        ];
+    }
+
+    protected function getDateTimeOrNull(?string $date): ?\DateTime
+    {
+        if (!$date) {
+            return null;
+        }
+        try {
+            $date = new \DateTime($date);
+        } catch (\Exception $e) {
+            $date = null;
+        }
+        return $date;
+    }
+
+    protected function getCleanHtml(string $html): string
+    {
+        try {
+            return $this->htmlSanitizerInterface->sanitize($html);
+        } catch (\Exception $e) {
+            return '';
+        }
+    }
 }

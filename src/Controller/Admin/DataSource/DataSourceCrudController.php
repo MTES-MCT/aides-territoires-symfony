@@ -72,7 +72,7 @@ class DataSourceCrudController extends AtCrudController
             ];
         });
         return parent::configureActions($actions)
-            ->remove(Crud::PAGE_INDEX, Action::EDIT)
+            // ->remove(Crud::PAGE_INDEX, Action::EDIT)
             ->remove(Crud::PAGE_INDEX, Action::DELETE)
             // ->add(Crud::PAGE_INDEX, $analyse)
         ;
