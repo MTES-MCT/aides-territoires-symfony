@@ -53,8 +53,8 @@ class ImportFluxCommand extends Command
         protected StringService $stringService
     )
     {
-        ini_set('max_execution_time', 60*60*60);
-        ini_set('memory_limit', '5G');
+        ini_set('max_execution_time', 60*60);
+        ini_set('memory_limit', '1.5G');
         parent::__construct();
     }
 
@@ -66,6 +66,8 @@ class ImportFluxCommand extends Command
     {
         $this->input = $input;
         $this->output = $output;
+
+        $timeStart = microtime(true);
 
         $io = new SymfonyStyle($input, $output);
         $io->title($this->commandTextStart);
@@ -87,6 +89,13 @@ class ImportFluxCommand extends Command
         $io->success('Création : ' . $this->create);
         $io->success('Update : ' . $this->update);
         $io->success('Erreur : ' . $this->error);
+
+        $timeEnd = microtime(true);
+        $time = $timeEnd - $timeStart;
+
+        $io->success('Import flux terminé : '.gmdate("H:i:s", $timeEnd).' ('.gmdate("H:i:s", $time).')');
+        $io->success('Mémoire maximale utilisée : ' . round(memory_get_peak_usage() / 1024 / 1024) . ' MB');
+
         $io->title($this->commandTextEnd);
         return Command::SUCCESS;
     }    
@@ -164,7 +173,7 @@ class ImportFluxCommand extends Command
         $io->progressFinish();
 
         // sauvegarde en base
-        // $this->managerRegistry->getManager()->flush();
+        $this->managerRegistry->getManager()->flush();
     }
 
     protected function callApi()
