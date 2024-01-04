@@ -152,21 +152,26 @@ class AppExtension extends AbstractExtension
     {
         try {
             $html = $this->addLazyToImg($html);
-            $html = $this->addNonceToInlineCss($html);
+            // $html = $this->addNonceToInlineCss($html);
             return $html;
         } catch (\Exception $e) {
+            dd($e);
             return $html;
         }
     }
 
     public function addNonceToInlineCss($html)
     {
-        $nonce = $this->contentSecurityPolicyListener->getNonce('style');
+        // $nonce = $this->contentSecurityPolicyListener->getNonce('style');
 
-        $html = preg_replace_callback('/(<[^>]+style=)(\"[^\"]*\"|\'[^\']*\')/i', function ($matches) use ($nonce) {
-            return $matches[1] . $matches[2] . ' nonce="' . $nonce . '"';
-        }, $html);
-    
+        // dump($html);
+        // $html = preg_replace_callback('/(<[^>]+style=)(\"[^\"]*\"|\'[^\']*\')/i', function ($matches) use ($nonce) {
+        //     // dump($matches);
+        //     return $matches[0]. ' nonce="'.$nonce.'"';
+        // }, $html);
+        // dd($html);
+// dump($html);
+
         return $html;
     }
 
