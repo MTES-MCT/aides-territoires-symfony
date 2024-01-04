@@ -24,6 +24,34 @@ class LogAidOriginUrlClickRepository extends ServiceEntityRepository
         parent::__construct($registry, LogAidOriginUrlClick::class);
     }
 
+    public function countTopAidOnPeriod(?array $params = null): array
+    {
+        $maxResults = $params['maxResults'] ?? null;
+
+        $qb = $this->getQueryBuilder($params);
+        $qb->select('IFNULL(COUNT(laouc.id), 0) AS nb, aid.id AS id, aid.name AS name')
+            ->innerJoin('laouc.aid', 'aid')
+            ->groupBy('aid.id')
+            ->orderBy('nb', 'DESC')
+        ;
+
+        if ($maxResults !== null) {
+            $qb->setMaxResults($maxResults);
+        }
+
+        return $qb->getQuery()->getResult();
+    }
+
+    public function countOnPeriod(?array $params = null): array
+    {
+        $qb = $this->getQueryBuilder($params);
+        $qb->select('IFNULL(COUNT(laouc.id), 0) AS nb, laouc.dateCreate AS dateCreate')
+            ->groupBy('laouc.dateCreate')
+            ->orderBy('laouc.dateCreate', 'ASC')
+        ;
+        return $qb->getQuery()->getResult();
+    }
+
     public function countCustom(array $params = null) : int {
         $qb = $this->getQueryBuilder($params);
 

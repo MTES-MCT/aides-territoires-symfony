@@ -24,6 +24,16 @@ class LogAidContactClickRepository extends ServiceEntityRepository
         parent::__construct($registry, LogAidContactClick::class);
     }
 
+    public function countOnPeriod(?array $params = null): array
+    {
+        $qb = $this->getQueryBuilder($params);
+        $qb->select('IFNULL(COUNT(lacc.id), 0) AS nb, lacc.dateCreate AS dateCreate')
+            ->groupBy('lacc.dateCreate')
+            ->orderBy('lacc.dateCreate', 'ASC')
+        ;
+        return $qb->getQuery()->getResult();
+    }
+
     public function countCustom(array $params = null) : int {
         $qb = $this->getQueryBuilder($params);
 

@@ -4,6 +4,7 @@ namespace App\Controller\Admin\Log;
 
 use App\Controller\Admin\DashboardController;
 use App\Entity\Log\LogAidApplicationUrlClick;
+use App\Entity\Log\LogAidOriginUrlClick;
 use App\Form\Admin\Filter\DateRangeType;
 use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
 use Symfony\Component\HttpFoundation\Response;
@@ -34,6 +35,7 @@ class LogController extends DashboardController
             $formDateRange->get('dateMax')->setData($dateMax);
         }
         
+        // Logs candidater aides
         // récupération des données
         $logAidApplicationUrlClicks = $this->managerRegistry->getRepository(LogAidApplicationUrlClick::class)->countOnPeriod([
             'dateMin' => $dateMin,
@@ -45,10 +47,38 @@ class LogController extends DashboardController
         // création du graphique
         $chartApplication = $this->createChart($allDates, 'Clics candidater aides');
 
+        // Top 10 aides candidater
+        $topAidApplicationsUrlClicks = $this->managerRegistry->getRepository(LogAidApplicationUrlClick::class)->countTopAidOnPeriod([
+            'dateMin' => $dateMin,
+            'dateMax' => $dateMax,
+            'maxResults' => 10
+        ]);
+        
+        // Logs en savoir plus aides
+        $logAidOriginUrlClicks = $this->managerRegistry->getRepository(LogAidOriginUrlClick::class)->countOnPeriod([
+            'dateMin' => $dateMin,
+            'dateMax' => $dateMax,
+        ]);
+        // remplissage des dates manquantes
+        $allDates = $this->fillAllDate($logAidOriginUrlClicks, $dateMin, $dateMax);
+
+        // création du graphique
+        $chartOrigin = $this->createChart($allDates, 'Clics en savoir plus aides');
+        
+        // Top 10 aides en savoir plus
+        $topAidOriginUrlClicks = $this->managerRegistry->getRepository(LogAidOriginUrlClick::class)->countTopAidOnPeriod([
+            'dateMin' => $dateMin,
+            'dateMax' => $dateMax,
+            'maxResults' => 10
+        ]);
+        
         // rendu template
         return $this->render('admin/log/aids.html.twig', [
             'formDateRange' => $formDateRange,
             'chartApplication' => $chartApplication,
+            'chartOrigin' => $chartOrigin,
+            'topAidApplicationsUrlClicks' => $topAidApplicationsUrlClicks,
+            'topAidOriginUrlClicks' => $topAidOriginUrlClicks
         ]);
     }
 
