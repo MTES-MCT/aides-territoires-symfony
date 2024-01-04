@@ -53,7 +53,6 @@ class LogAidEligibilityTestImportCommand extends ImportCommand
 
         $sqlBase = "INSERT INTO `log_aid_eligibility_test`
         (
-        `id`,
         aid_id,
         eligibility_test_id,
         answer_success,
@@ -80,7 +79,6 @@ class LogAidEligibilityTestImportCommand extends ImportCommand
 
                 $sql .= "
                 (
-                    :id".$rowNumber.",
                     :aid_id".$rowNumber.",
                     :eligibility_test_id".$rowNumber.",
                     :answer_success".$rowNumber.",
@@ -91,7 +89,6 @@ class LogAidEligibilityTestImportCommand extends ImportCommand
                     :date_create".$rowNumber."
                 ),";
 
-                $sqlParams['id'.$rowNumber] = (int) $cells[0]->getValue();
                 $sqlParams['answer_success'.$rowNumber] = $this->stringToBool((string) $cells[1]->getValue());
                 $sqlParams['answer_details'.$rowNumber] = (string) $cells[2]->getValue();
                 $sqlParams['querystring'.$rowNumber] = $this->stringOrNull((string) $cells[3]->getValue());

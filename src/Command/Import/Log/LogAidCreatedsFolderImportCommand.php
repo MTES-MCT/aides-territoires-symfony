@@ -53,7 +53,6 @@ class LogAidCreatedsFolderImportCommand extends ImportCommand
 
         $sqlBase = "INSERT INTO `log_aid_createds_folder`
         (
-        `id`,
         aid_id,
         organization_id,
         user_id,
@@ -80,7 +79,6 @@ class LogAidCreatedsFolderImportCommand extends ImportCommand
 
                 $sql .= "
                 (
-                    :id".$rowNumber.",
                     :aid_id".$rowNumber.",
                     :organization_id".$rowNumber.",
                     :user_id".$rowNumber.",
@@ -91,7 +89,6 @@ class LogAidCreatedsFolderImportCommand extends ImportCommand
                     :date_create".$rowNumber."
                 ),";
 
-                $sqlParams['id'.$rowNumber] = (int) $cells[0]->getValue();
                 $sqlParams['ds_folder_url'.$rowNumber] = $this->stringOrNull((string) $cells[1]->getValue());
                 $sqlParams['ds_folder_id'.$rowNumber] = $this->stringOrNull((string) $cells[2]->getValue());
                 $sqlParams['ds_folder_number'.$rowNumber] = $this->intOrNull((string) $cells[3]->getValue());

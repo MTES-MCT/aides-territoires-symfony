@@ -54,7 +54,6 @@ class LogAidSearchImportCommand extends ImportCommand
 
         $sqlBase = "INSERT INTO `log_aid_search`
         (
-        `id`,
         perimeter_id,
         organization_id,
         user_id,
@@ -82,7 +81,6 @@ class LogAidSearchImportCommand extends ImportCommand
 
                 $sql .= "
                 (
-                    :id".$rowNumber.",
                     :perimeter_id".$rowNumber.",
                     :organization_id".$rowNumber.",
                     :user_id".$rowNumber.",
@@ -94,7 +92,6 @@ class LogAidSearchImportCommand extends ImportCommand
                     :date_create".$rowNumber."
                 ),";
 
-                $sqlParams['id'.$rowNumber] = (int) $cells[0]->getValue();
                 $sqlParams['querystring'.$rowNumber] = $this->stringOrNull((string) $cells[2]->getValue());
                 $sqlParams['results_count'.$rowNumber] = $this->intOrNull((string) $cells[3]->getValue());
                 $sqlParams['source'.$rowNumber] = $this->stringOrNull((string) $cells[4]->getValue());

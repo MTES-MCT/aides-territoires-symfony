@@ -65,7 +65,6 @@ class LogAidViewImportCommand extends ImportCommand
 
         $sqlBase = "INSERT INTO `log_aid_view`
         (
-        `id`,
         aid_id,
         organization_id,
         user_id,
@@ -100,7 +99,6 @@ class LogAidViewImportCommand extends ImportCommand
 
                 $sql .= "
                 (
-                    :id".$rowNumber.",
                     :aid_id".$rowNumber.",
                     :organization_id".$rowNumber.",
                     :user_id".$rowNumber.",
@@ -110,7 +108,6 @@ class LogAidViewImportCommand extends ImportCommand
                     :date_create".$rowNumber."
                 ),";
 
-                $sqlParams['id'.$rowNumber] = (int) $cells[0]->getValue();
                 $sqlParams['querystring'.$rowNumber] = $this->stringOrNull((string) $cells[1]->getValue());
                 $sqlParams['source'.$rowNumber] = $this->stringOrNull((string) $cells[2]->getValue());
                 $timeCreate = $this->stringToDateTimeOrNow((string) $cells[3]->getValue());

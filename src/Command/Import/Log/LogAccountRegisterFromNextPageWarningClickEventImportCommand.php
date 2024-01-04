@@ -53,7 +53,6 @@ class LogAccountRegisterFromNextPageWarningClickEventImportCommand extends Impor
 
         $sqlBase = "INSERT INTO `log_account_register_from_next_page_warning_click_event`
         (
-        `id`,
         querystring,
         time_create,
         date_create
@@ -75,13 +74,11 @@ class LogAccountRegisterFromNextPageWarningClickEventImportCommand extends Impor
 
                 $sql .= "
                 (
-                    :id".$rowNumber.",
                     :querystring".$rowNumber.",
                     :time_create".$rowNumber.",
                     :date_create".$rowNumber."
                 ),";
 
-                $sqlParams['id'.$rowNumber] = (int) $cells[0]->getValue();
                 $sqlParams['querystring'.$rowNumber] = $this->stringOrNull((string) $cells[1]->getValue());
                 $timeCreate = $this->stringToDateTimeOrNow((string) $cells[2]->getValue());
                 $sqlParams['time_create'.$rowNumber] = $timeCreate->format('Y-m-d H:i:s');

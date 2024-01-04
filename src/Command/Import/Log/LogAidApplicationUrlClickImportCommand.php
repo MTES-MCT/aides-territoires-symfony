@@ -53,7 +53,6 @@ class LogAidApplicationUrlClickImportCommand extends ImportCommand
 
         $sqlBase = "INSERT INTO `log_aid_application_url_click`
         (
-        `id`,
         aid_id,
         querystring,
         `source`,
@@ -77,7 +76,6 @@ class LogAidApplicationUrlClickImportCommand extends ImportCommand
 
                 $sql .= "
                 (
-                    :id".$rowNumber.",
                     :aid_id".$rowNumber.",
                     :querystring".$rowNumber.",
                     :source".$rowNumber.",
@@ -85,7 +83,6 @@ class LogAidApplicationUrlClickImportCommand extends ImportCommand
                     :date_create".$rowNumber."
                 ),";
 
-                $sqlParams['id'.$rowNumber] = (int) $cells[0]->getValue();
                 $sqlParams['querystring'.$rowNumber] = $this->stringOrNull((string) $cells[1]->getValue());
                 $sqlParams['source'.$rowNumber] = $this->stringOrNull((string) $cells[2]->getValue());
                 $timeCreate = $this->stringToDateTimeOrNow((string) $cells[3]->getValue());
@@ -108,6 +105,7 @@ class LogAidApplicationUrlClickImportCommand extends ImportCommand
                         // advances the progress bar 1 unit
                         $io->progressAdvance();
                     } catch (\Exception $e) {
+                        dd($e);
                     }
 
                 }
@@ -122,6 +120,7 @@ class LogAidApplicationUrlClickImportCommand extends ImportCommand
                 $stmt->execute($sqlParams);
             }
         } catch (\Exception $e) {
+            dd($e);
         }
         // ensures that the progress bar is at 100%
         $io->progressFinish();

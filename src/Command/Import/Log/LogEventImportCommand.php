@@ -53,7 +53,6 @@ class LogEventImportCommand extends ImportCommand
 
         $sqlBase = "INSERT INTO `log_event`
         (
-        `id`,
         `value`,
         time_create,
         date_create,
@@ -78,7 +77,6 @@ class LogEventImportCommand extends ImportCommand
 
                 $sql .= "
                 (
-                    :id".$rowNumber.",
                     :value".$rowNumber.",
                     :time_create".$rowNumber.",
                     :date_create".$rowNumber.",
@@ -88,7 +86,6 @@ class LogEventImportCommand extends ImportCommand
                     :source".$rowNumber."
                 ),";
 
-                $sqlParams['id'.$rowNumber] = (int) $cells[0]->getValue();
                 $sqlParams['value'.$rowNumber] = $this->intOrNull((string) $cells[1]->getValue());
                 $timeCreate = $this->stringToDateTimeOrNow((string) $cells[2]->getValue());
                 $sqlParams['time_create'.$rowNumber] = $timeCreate->format('Y-m-d H:i:s');

@@ -53,7 +53,6 @@ class LogAidContactClickImportCommand extends ImportCommand
 
         $sqlBase = "INSERT INTO `log_aid_contact_click`
         (
-        `id`,
         aid_id,
         querystring,
         `source`,
@@ -77,7 +76,6 @@ class LogAidContactClickImportCommand extends ImportCommand
 
                 $sql .= "
                 (
-                    :id".$rowNumber.",
                     :aid_id".$rowNumber.",
                     :querystring".$rowNumber.",
                     :source".$rowNumber.",
@@ -85,7 +83,6 @@ class LogAidContactClickImportCommand extends ImportCommand
                     :date_create".$rowNumber."
                 ),";
 
-                $sqlParams['id'.$rowNumber] = (int) $cells[0]->getValue();
                 $sqlParams['querystring'.$rowNumber] = $this->stringOrNull((string) $cells[1]->getValue());
                 $sqlParams['source'.$rowNumber] = $this->stringOrNull((string) $cells[2]->getValue());
                 $timeCreate = $this->stringToDateTimeOrNow((string) $cells[3]->getValue());
