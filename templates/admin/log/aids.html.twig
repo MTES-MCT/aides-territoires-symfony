@@ -1,0 +1,37 @@
+{% extends "@EasyAdmin/page/content.html.twig" %}
+
+
+{% block main %}
+<main>
+    <h1 class="title">Statistiques aides</h1>
+
+    <div class="mb-5">
+        {{ form_start(formDateRange) }}
+            <div class="container">
+                <div class="row justify-content-md-center">
+                    <div class="col-md-auto">
+                        {{ form_row(formDateRange.dateMin) }}
+                    </div>
+                    <div class="col-md-auto">
+                        {{ form_row(formDateRange.dateMax) }}
+                    </div>
+                    <div class="col-md-auto">
+                        <button type="submit" class="btn btn-primary">Valider</button>
+                    </div>
+                </div>
+            </div>
+        {{ form_end(formDateRange) }}
+    </div>
+
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="chart-wrapper">
+                    {{ render_chart(chartApplication) }}
+                </div>
+            </div>
+        </div>
+    </div>
+
+</main>
+{% endblock %}

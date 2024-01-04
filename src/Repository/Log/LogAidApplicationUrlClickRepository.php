@@ -24,6 +24,16 @@ class LogAidApplicationUrlClickRepository extends ServiceEntityRepository
         parent::__construct($registry, LogAidApplicationUrlClick::class);
     }
 
+    public function countOnPeriod(?array $params = null): array
+    {
+        $qb = $this->getQueryBuilder($params);
+        $qb->select('IFNULL(COUNT(laau.id), 0) AS nb, laau.dateCreate AS dateCreate')
+            ->groupBy('laau.dateCreate')
+            ->orderBy('laau.dateCreate', 'ASC')
+        ;
+        return $qb->getQuery()->getResult();
+    }
+
     public function countCustom(array $params = null) : int {
         $qb = $this->getQueryBuilder($params);
 

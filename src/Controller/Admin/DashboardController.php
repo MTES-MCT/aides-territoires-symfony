@@ -62,10 +62,10 @@ use Symfony\UX\Chartjs\Model\Chart;
 class DashboardController extends AbstractDashboardController
 {
     public function __construct(
-        private UserService $userService,
-        private ManagerRegistry $managerRegistry,
-        private AdminUrlGenerator $adminUrlGenerator,
-        private ChartBuilderInterface $chartBuilderInterface,
+        protected UserService $userService,
+        protected ManagerRegistry $managerRegistry,
+        protected AdminUrlGenerator $adminUrlGenerator,
+        protected ChartBuilderInterface $chartBuilderInterface,
     )
     {   
     }
@@ -270,6 +270,10 @@ class DashboardController extends AbstractDashboardController
         yield MenuItem::subMenu('Configuration système', 'fas fa-cogs')->setSubItems([
             MenuItem::linkToCrud('Exports de données', 'fas fa-list', DataExport::class),
             MenuItem::linkToCrud('Sources de données', 'fas fa-list', DataSource::class),
+        ]);
+
+        yield MenuItem::subMenu('Statistiques', 'fas fa-chart-line')->setSubItems([
+            MenuItem::linkToRoute('Aides', 'fas fa-list', 'admin_log_aids_logs', [])
         ]);
     }
 }
