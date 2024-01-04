@@ -19,6 +19,7 @@ use Doctrine\Persistence\ManagerRegistry;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;
 use Twig\TwigFunction;
+use Nelmio\SecurityBundle\EventListener\ContentSecurityPolicyListener;
 
 class AppExtension extends AbstractExtension
 {
@@ -30,7 +31,8 @@ class AppExtension extends AbstractExtension
         private CategoryService $categoryService,
         private ManagerRegistry $managerRegistry,
         private StringService $stringService,
-        private MatomoService $matomoService
+        private MatomoService $matomoService,
+        private ContentSecurityPolicyListener $contentSecurityPolicyListener
     ) {
         
     }
@@ -107,6 +109,7 @@ class AppExtension extends AbstractExtension
         }
         return '';
     }
+
     /**
      * @return TwigFunction[]
      */
@@ -117,6 +120,7 @@ class AppExtension extends AbstractExtension
             new TwigFunction('getParameter', [$this, 'getParameter']),
             new TwigFunction('isUserGranted', [$this, 'isUserGranted']),
             new TwigFunction('optimizeHtmlFromWysiwyg', [$this, 'optimizeHtmlFromWysiwyg']),
+            new TwigFunction('addNonceToInlineCss', [$this, 'addNonceToInlineCss']),
             new TwigFunction('getPerimeterScale', [$this, 'getPerimeterScale']),
             new TwigFunction('categoriesToMetas', [$this, 'categoriesToMetas']),
             new TwigFunction('getEntityById', [$this, 'getEntityById']),
@@ -148,11 +152,24 @@ class AppExtension extends AbstractExtension
     {
         try {
             $html = $this->addLazyToImg($html);
+            $html = $this->addNonceToInlineCss($html);
             return $html;
         } catch (\Exception $e) {
             return $html;
         }
     }
+
+    public function addNonceToInlineCss($html)
+    {
+        $nonce = $this->contentSecurityPolicyListener->getNonce('style');
+
+        $html = preg_replace_callback('/(<[^>]+style=)(\"[^\"]*\"|\'[^\']*\')/i', function ($matches) use ($nonce) {
+            return $matches[1] . $matches[2] . ' nonce="' . $nonce . '"';
+        }, $html);
+    
+        return $html;
+    }
+
 
     public function addLazyToImg($html)
     {
@@ -160,7 +177,7 @@ class AppExtension extends AbstractExtension
         // pour garder le utf-8
         $dom->loadHTML(mb_encode_numericentity($html, [0x80, 0x10FFFF, 0, ~0], 'UTF-8'), LIBXML_HTML_NODEFDTD);
         $x = new \DOMXPath($dom);
-    
+        
         foreach($x->query("//img") as $node)
         {   
             $node->setAttribute("loading","lazy");
