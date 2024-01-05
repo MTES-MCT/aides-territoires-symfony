@@ -3,13 +3,13 @@
         <ul class="fr-btns-group">
             {% if app.user %}
             <li>
-                <a class="fr-btn fr-icon-account-line" href="{{ path('app_user_dashboard') }}">
+                <a class="fr-btn fr-icon-account-line" href="{{ path('app_user_dashboard') }}" title="Mon compte">
                     <span class="at-username">{% if app.user.firstname and app.user.lastname %}{{ app.user.firstname }} {{ app.user.lastname }}{% else %}{{ app.user.email }}{% endif %}</span>
                 </a>
             </li>
             {% if isUserGranted(app.user, constant('App\\Entity\\User\\User::ROLE_ADMIN')) %}
             <li>
-                <a href="{{ path('admin') }}" class="fr-btn fr-icon-lock-line">Administration</a>
+                <a href="{{ path('admin') }}" title="Administration" class="fr-btn fr-icon-lock-line">Administration</a>
             </li>
             {% endif %}
             <li>
