@@ -9,6 +9,7 @@ use App\Form\Cartography\CartographySearchType;
 use App\Form\Program\CountySelectType;
 use App\Repository\Aid\AidRepository;
 use App\Repository\Backer\BackerRepository;
+use App\Repository\Category\CategoryRepository;
 use App\Repository\Perimeter\PerimeterRepository;
 use App\Repository\Program\ProgramRepository;
 use App\Service\Perimeter\PerimeterService;
@@ -29,13 +30,6 @@ class CartographyController extends FrontController
         StringService $stringService
     ): Response
     {
-
-         // fil arianne
-        $this->breadcrumb->add(
-            'Cartographie',
-            null
-        );
-
          // les infos départements pour la carte
         $counties = $perimeterRepository->findCounties();
         $departmentsData = [];
@@ -65,13 +59,19 @@ class CartographyController extends FrontController
             }
         }
 
-         // nb porteur
+        // nb porteur
         $nbBackers = $backerRepository->countWithAids();
         
         // nb programs
         $nbPrograms = $programRepository->countCustom();
 
+        // fil arianne
+        $this->breadcrumb->add(
+            'Cartographie',
+            null
+        );
 
+        // rendu template
         return $this->render('cartography/cartography/index.html.twig', [
             'controller_name' => 'CartographyController',
             'departmentsData' => $departmentsData,
@@ -90,7 +90,8 @@ class CartographyController extends FrontController
         RequestStack $requestStack,
         StringService $stringService,
         AidRepository $aidRepository,
-        PerimeterService $perimeterService
+        PerimeterService $perimeterService,
+        CategoryRepository $categoryRepository
     ): Response
     {
         // departement courant
@@ -174,6 +175,18 @@ class CartographyController extends FrontController
                 break;
         }
 
+        $categoryThemesSelected = new ArrayCollection();
+        if (isset($backerParams['categoryIds'])) {
+            $categories = $categoryRepository->findCustom([
+                'ids' => $backerParams['categoryIds']
+            ]);
+            foreach ($categories as $category) {
+                if ($category->getCategoryTheme() !== null && !$categoryThemesSelected->contains($category->getCategoryTheme())) {
+                    $categoryThemesSelected->add($category->getCategoryTheme());
+                }
+            }
+        }
+
         // assigne les aides aux backers
         foreach ($backers as $key => $backer) {
             $aidsParams['backer'] = $backer;
@@ -200,7 +213,8 @@ class CartographyController extends FrontController
             'current_dept'  => $current_dep,
             'backers' => $backers,
             'formBackerSearch' => $formBackerSearch,
-            'tableTemplate' => $tableTemplate
+            'tableTemplate' => $tableTemplate,
+            'categoryThemesSelected' => $categoryThemesSelected
         ]);
     }
 }

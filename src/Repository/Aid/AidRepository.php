@@ -532,19 +532,11 @@ class AidRepository extends ServiceEntityRepository
         // Si on a un périmètre
 
 
-        // si on n'as pas de périmètre
-
-        if (is_array($perimeterScales)) {
-            if (!$perimeterFrom instanceof Perimeter && !$perimeterFrom->getId()) {
-                $qb
-                ->innerJoin('a.perimeter', 'perimeter')
-                ->innerJoin('perimeter.perimetersFrom', 'perimetersFrom')
-                ;
-            }
+        // echelles de périmetres
+        if (is_array($perimeterScales) && isset($perimeterFrom)) {
             $qb
-                ->innerJoin('perimeter.perimetersTo', 'perimetersTo')
-                ->andWhere('(perimetersFrom.scale IN (:perimetersScale) OR perimetersTo.scale IN (:perimetersScale))')
-                ->setParameter('perimetersScale', $perimeterScales)
+                ->andWhere('perimeter.scale IN (:perimeterScales)')
+                ->setParameter('perimeterScales', $perimeterScales)
             ;
         }
 

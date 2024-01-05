@@ -26,7 +26,13 @@
                 <td data-sort="{{ backer.perimeter.scale }}">{{ backer.perimeter.name }}</td>
                 <td>
                     {% for thematic in backer.aidsThematics %}
-                    <p class="fr-mb-1w">{{ thematic.name }}</p>
+                        {% if 
+                        (categoryThemesSelected is defined and thematic in categoryThemesSelected)
+                        or categoryThemesSelected is not defined
+                        or (categoryThemesSelected is defined and categoryThemesSelected is empty)
+                        %}
+                        <p class="fr-mb-1w">{{ thematic.name }}</p>
+                        {% endif %}
                     {% endfor %}
                 </td>
                 <td>

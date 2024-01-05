@@ -21,11 +21,24 @@ class CategoryRepository extends ServiceEntityRepository
         parent::__construct($registry, Category::class);
     }
 
+    public function findCustom(?array $params = null): array
+    {
+        $qb = $this->getQueryBuilder($params);
+
+        return $qb->getQuery()->getResult();
+    }
+    
     public function getQueryBuilder(array $params = null)
     {
         $groupBy = $params['groupBy'] ?? null;
+        $ids = $params['ids'] ?? null;
 
         $qb = $this->createQueryBuilder('c');
+
+        if (is_array($ids)) {
+            $qb->andWhere('c.id IN (:ids)')
+                ->setParameter('ids', $ids);
+        }
 
         if ($groupBy !== null) {
             $qb->addGroupBy($groupBy);
