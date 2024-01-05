@@ -152,27 +152,58 @@ class AppExtension extends AbstractExtension
     {
         try {
             $html = $this->addLazyToImg($html);
-            // $html = $this->addNonceToInlineCss($html);
+            $html = $this->addNonceToInlineCss($html);
             return $html;
         } catch (\Exception $e) {
-            dd($e);
             return $html;
         }
     }
 
     public function addNonceToInlineCss($html)
     {
-        // $nonce = $this->contentSecurityPolicyListener->getNonce('style');
+        $dom = new \DOMDocument();
+        // pour garder le utf-8
+        $dom->loadHTML(mb_encode_numericentity($html, [0x80, 0x10FFFF, 0, ~0], 'UTF-8'), LIBXML_HTML_NODEFDTD);
+        $x = new \DOMXPath($dom);
+        
+        foreach($x->query("//*[@style]") as $node)
+        {   
+            $styles = explode(';', $node->getAttribute('style'));
 
-        // dump($html);
-        // $html = preg_replace_callback('/(<[^>]+style=)(\"[^\"]*\"|\'[^\']*\')/i', function ($matches) use ($nonce) {
-        //     // dump($matches);
-        //     return $matches[0]. ' nonce="'.$nonce.'"';
-        // }, $html);
-        // dd($html);
-// dump($html);
+            $classesToAdd = [];
+            foreach ($styles as $style) {
+                if ($style == 'text-align: left') {
+                    $classesToAdd[] = 'text-left';
+                } else if ($style == 'text-align: right') {
+                    $classesToAdd[] = 'text-right';
+                } else if ($style == 'text-align: center') {
+                    $classesToAdd[] = 'text-center';
+                }
+            }
 
-        return $html;
+            // Récupérer l'attribut de classe actuel
+            $currentClass = $node->getAttribute('class');
+
+            // Ajouter les nouvelles classes
+            $classesToAdd = implode(' ', $classesToAdd);
+            if ($currentClass !== '') {
+                $newClass = $currentClass . ' ' . $classesToAdd;
+            } else {
+                $newClass = $classesToAdd;
+            }
+
+            // Mettre à jour l'attribut de classe du nœud
+            $node->setAttribute('class', $newClass);
+        }
+        
+        // Sélectionner uniquement le contenu intérieur de la balise <body>
+        $body = $x->query('//body')->item(0);
+        $newHtml = '';
+        foreach ($body->childNodes as $childNode) {
+            $newHtml .= $dom->saveHTML($childNode);
+        }
+
+        return $newHtml;
     }
 
 
