@@ -45,14 +45,19 @@
                 {% endfor %}
             </ul>
             <div id="tabpanel-home-panel" class="fr-tabs__panel fr-tabs__panel--selected" role="tabpanel" aria-labelledby="tabpanel-home" tabindex="0">
-                {{ search_page.description|raw }}
+                <div class="wysiwyg-wrapper">
+                    {{ optimizeHtmlFromWysiwyg(search_page.description)|raw }}
+                </div>
+
                 {% if search_page.moreContent %}
                 <section class="fr-accordion fr-mb-5w">
                     <h3 class="fr-accordion__title">
                         <button id="more-content-reveal-button" class="fr-accordion__btn" aria-expanded="false" aria-controls="more-content">Voir plus de détails</button>
                     </h3>
                     <div id="more-content" class="fr-collapse">
-                    {{ search_page.moreContent|raw }}
+                        <div class="wysiwyg-wrapper">
+                            {{ optimizeHtmlFromWysiwyg(search_page.moreContent)|raw }}
+                        </div>
                     </div>
                 </section>
                 {% endif %}
@@ -80,8 +85,8 @@
             </div>
             {% for page in search_page.pages %}
                 <div id="tabpanel-{{ page.name|mySlug }}-panel" class="fr-tabs__panel" role="tabpanel" aria-labelledby="tabpanel-{{ page.name|mySlug}}" tabindex="0">
-                    <div>
-                        {{ page.description|raw }}
+                    <div class="wysiwyg-wrapper">
+                        {{ optimizeHtmlFromWysiwyg(page.description)|raw }}
                     </div>
                 </div>
             {% endfor %}
