@@ -248,7 +248,10 @@ class ProjectController extends FrontController
 
         $projects_count = $projectValidatedRepository->count([]);
 
-        $formProjectSearch = $this->createForm(ProjectValidatedSearchType::class,null,['method'=>'GET','action'=>$this->generateUrl('app_project_project_subsidized_detail')]);
+        $formProjectSearch = $this->createForm(ProjectValidatedSearchType::class, null, [
+            'method'=>'GET',
+            'action'=>$this->generateUrl('app_project_project_subsidized_detail')
+        ]);
 
         $formProjectSearch->handleRequest($requestStack->getCurrentRequest());
 

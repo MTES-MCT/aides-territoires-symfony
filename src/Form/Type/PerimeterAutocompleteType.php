@@ -6,6 +6,7 @@ use App\Entity\Perimeter\Perimeter;
 use App\Repository\Perimeter\PerimeterRepository;
 use App\Service\Perimeter\PerimeterService;
 use Doctrine\ORM\QueryBuilder;
+use DoctrineExtensions\Query\Mysql\PeriodDiff;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -33,7 +34,8 @@ class PerimeterAutocompleteType extends AbstractType
             'preload' => true,
             'query_builder' => function(PerimeterRepository $perimeterRepository) {
                 return $perimeterRepository->getQueryBuilder([
-                    'isVisibleToUsers' => true
+                    'isVisibleToUsers' => true,
+                    'scaleLowerThan' => Perimeter::SCALE_CONTINENT
                 ]);
             },
             'filter_query' => function(QueryBuilder $qb, string $query, PerimeterRepository $repository) {

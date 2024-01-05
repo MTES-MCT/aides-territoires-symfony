@@ -97,6 +97,7 @@ class Perimeter
     const SCALE_COMMUNE = 1;
     const SCALE_REGION = 15;
     const SCALE_ADHOC = 18;
+    const SCALE_CONTINENT = 25;
     
     const SLUG_LOCAL_GROUP = 'local_group';
     const SCALES_LOCAL_GROUP = [

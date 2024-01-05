@@ -6,6 +6,7 @@ use App\Entity\Keyword\KeywordSynonymlist;
 use App\Entity\Project\Project;
 use App\Form\Type\KeywordSynonymlistAutocompleteField;
 use App\Form\Type\PerimeterCityAutocompleteType;
+use App\Service\User\UserService;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -14,13 +15,16 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 class ProjectValidatedSearchType extends AbstractType
 {
     public function  __construct(
-        protected ManagerRegistry $managerRegistry
+        protected ManagerRegistry $managerRegistry,
+        protected UserService $userService
     )
     {
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $user = $this->userService->getUserLogged();
+
         $statuses = [];
         foreach (Project::PROJECT_STEPS as $status) {
             $statuses[$status['name']] = $status['slug'];
@@ -45,13 +49,14 @@ class ProjectValidatedSearchType extends AbstractType
             'required' => true,
             'label' => 'Territoire du projet',
         ];
-
-        
-
         if ($options['forcePerimeter'] !== false) {
             $perimeterParams['data'] = $options['forcePerimeter'];
+        } else {
+            if (!$options['dontUseUserPerimeter']) {
+                $perimeterParams['data'] = ($user && $user->getDefaultOrganization() && $user->getDefaultOrganization()->getPerimeter()) ? $user->getDefaultOrganization()->getPerimeter() : null;
+            }
         }
-
+        
         // keyword params
         $keywordParams = [
             'required' => false,
@@ -72,7 +77,8 @@ class ProjectValidatedSearchType extends AbstractType
     {
         $resolver->setDefaults([
             // Configure your form options here
-            'forcePerimeter' => false
+            'forcePerimeter' => false,
+            'dontUseUserPerimeter' => false
         ]);
     }
 }

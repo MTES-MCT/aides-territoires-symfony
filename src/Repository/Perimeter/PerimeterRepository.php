@@ -160,6 +160,7 @@ class PerimeterRepository extends ServiceEntityRepository
         $maxResults = $params['maxResults'] ?? null;
         $nameMatchAgainst = $params['nameMatchAgainst'] ?? null;
         $isVisibleToUsers = $params['isVisibleToUsers'] ?? null;
+        $scaleLowerThan = $params['scaleLowerThan'] ?? null;
 
         $qb = $this->createQueryBuilder('p');
 
@@ -176,6 +177,14 @@ class PerimeterRepository extends ServiceEntityRepository
             $qb
             ->andWhere('p.isVisibleToUsers = :isVisibleToUsers')
             ->setParameter('isVisibleToUsers', $isVisibleToUsers);
+            
+        }
+
+        if ($scaleLowerThan !== null)
+        {
+            $qb
+            ->andWhere('p.scale < :scaleLowerThan')
+            ->setParameter('scaleLowerThan', $scaleLowerThan);
             
         }
 
