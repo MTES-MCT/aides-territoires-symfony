@@ -29,14 +29,17 @@
                     <li>
                         <a class="fr-nav__link" href="{{ path('app_blog_blog') }}" target="_self" title="Le blog">Le blog</a>
                     </li>
-                    <li>
+                    {# <li>
                         <a class="fr-nav__link" href="{{ path('app_portal_portal_details', {'slug': 'europe'}) }}" target="_self" title="Les financements européens 2021-2027">Les financements européens 2021-2027</a>
-                    </li>
+                    </li> #}
                 </ul>
             </div>
         </li>
         <li class="fr-nav__item" data-fr-js-navigation-item="true">
             <a class="fr-nav__link" href="{{ path('app_portal_portal') }}" target="_self" title="Portails">Portails</a>
+        </li>
+        <li class="fr-nav__item" data-fr-js-navigation-item="true">
+            <a class="fr-nav__link" href="{{ path('app_portal_portal_details', {'slug': 'europe'}) }}" target="_self" title="Portail Europe">Portail Europe</a>
         </li>
         <li class="fr-nav__item" data-fr-js-navigation-item="true">
             <button class="fr-nav__btn" aria-expanded="false" aria-controls="menu-en-savoir-plus" data-fr-js-collapse-button="true" title="En savoir plus">En savoir plus</button>
