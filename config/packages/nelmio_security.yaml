@@ -94,5 +94,5 @@ when@dev:
                 style-src:
                     - 'self'
                     - 'https://fonts.googleapis.com'
-                    - 'unsafe-inline'
-                    - 'unsafe-eval'  
+                    # - 'unsafe-inline'
+                    # - 'unsafe-eval'  
