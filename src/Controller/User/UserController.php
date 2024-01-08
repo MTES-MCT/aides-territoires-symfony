@@ -9,12 +9,15 @@ use App\Entity\Perimeter\Perimeter;
 use App\Entity\User\User;
 use App\Form\User\RegisterType;
 use App\Repository\Perimeter\PerimeterRepository;
+use App\Repository\User\NotificationRepository;
+use App\Service\User\UserService;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
+#[Route(priority: 5)]
 class UserController extends FrontController
 {
     #[Route('/comptes/inscription/', name: 'app_user_user_register')]
@@ -109,22 +112,6 @@ class UserController extends FrontController
             'formRegister' => $formRegister->createView(),
             'no_breadcrumb' => true,
             'formErrors' => $formErrors
-        ]);
-    }
-
-    #[Route('/notifications/', name: 'app_user_user_notification')]
-    public function notification(): Response
-    {
-        return $this->render('user/user/notification.html.twig', [
-            'controller_name' => 'UserController',
-        ]);
-    }
-
-    #[Route('/notifications/preferences/', name: 'app_user_user_notification_settings')]
-    public function notificationSettings(): Response
-    {
-        return $this->render('user/user/notification.html.twig', [
-            'controller_name' => 'UserController',
         ]);
     }
 }

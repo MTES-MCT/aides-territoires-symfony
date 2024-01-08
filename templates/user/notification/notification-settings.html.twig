@@ -1,0 +1,38 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mes préférences de notifications  | {{ parent() }}{% endblock %}
+
+{% block body %}
+
+
+<div class="fr-container fr-mb-5w fr-mt-0">
+    <div class="fr-grid-row">
+
+    {% include "user/_menu_user.html.twig" with { menu_notification:true } %}
+
+        <div class="fr-col-12 fr-col-md-9">
+            <h1 class="fr-h3 fr-mb-5w">Mes préférences de notifications
+            </h1>
+
+            {{ form_start(form) }}
+                <p>Les champs marqués d’un astérisque (*) sont obligatoires.</p>
+
+                {{ form_row(form.notificationEmailFrequency)}}
+
+                <ul class="fr-btns-group fr-btns-group--inline fr-btns-group--center">
+                    <li>
+                        <button type="submit" class="fr-btn">Mettre à jour</button>
+                    </li>
+                    <li>
+                        <a href="{{ path('app_user_user_notification') }}"
+                                class="fr-btn fr-btn--secondary"
+                        >
+                            Retourner aux notifications
+                        </a>
+                    </li>
+                </ul>
+
+                
+            {{ form_end(form) }}
+        </div>
+{% endblock %}

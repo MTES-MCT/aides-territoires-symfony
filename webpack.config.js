@@ -46,6 +46,7 @@ Encore
     .addEntry('front/aid/aid/detail', './assets/js/front/aid/aid/detail.js')
     .addEntry('front/user/register', './assets/js/front/user/register.js')
     .addEntry('front/user/project/index', './assets/js/front/user/project/index.js')
+    .addEntry('front/user/notification/index', './assets/js/front/user/notification/index.js')
     .addEntry('front/user/project/fiche_projet', './assets/js/front/user/project/fiche_projet.js')
     .addEntry('form/checkbox-multiple-search', './assets/js/form/checkbox-multiple-search.js')
     .addEntry('form/entity-checkbox-absolute-type', './assets/js/form/entity-checkbox-absolute-type.js')
