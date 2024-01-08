@@ -38,7 +38,7 @@ class CartographyController extends FrontController
                 'code' => $county->getCode(),
                 'name' => $county->getName(),
                 'slug' => $stringService->getSlug($county->getName()),
-                'backers_count' => $backerRepository->countBackerWithAidInCounty(['id' => $county->getId()])
+                'backers_count' => $county->getBackersCount()
             ];
         }
 
