@@ -2,6 +2,11 @@
 
 {% block title %}Mon projet | {{ parent() }}{% endblock %}
 
+{% block javascripts %}
+	{{ parent() }}
+	{{ encore_entry_script_tags('front/user/project/aides') }}
+{% endblock %}
+
 {% block body %}
 
 <div class="fr-container fr-mb-5w fr-mt-0">
@@ -33,12 +38,15 @@
                                     <th scope="col" class="fr-text">Type d’aide</th>
                                     <th scope="col" class="fr-text">Porteur d’aides</th>
                                     <th scope="col" class="fr-text">Ajoutée le</th>
+                                    <th scope="col" class="fr-text">Par</th>
+                                    <th scope="col" class="fr-text">Statut</th>
+                                    <th scope="col" class="fr-text">Action</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {% if project.aidProjects|length > 0 %}
                                     {% for aidProject in project.aidProjects %}
-                                        <tr> 
+                                        <tr id="aidProject-{{ aidProject.id }}"> 
                                             <td class="fr-text">
                                                 <a href="{{ path('app_aid_aid_details', {'slug': aidProject.aid.slug}) }}" target="_blank" rel="noopener" id="aid-{{ aidProject.aid.id }}">
                                                     {{ aidProject.aid.name }}
@@ -77,6 +85,54 @@
                                             <td class="fr-text">
                                                 {{ aidProject.dateCreate|date('d/m/Y') }}
                                             </td>
+                                            <td class="fr-text">
+                                                {% if aidProject.creator %}
+                                                    {% if aidProject.creator.id == app.user.id %}
+                                                        Vous
+                                                    {% else %}
+                                                        {{ aidProject.creator.firstName }} {{ aidProject.creator.lastName }}
+                                                    {% endif %}
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                {% if aidProject.aidPaid %}
+                                                <span class="fr-mb-1w fr-badge fr-badge--success">Reçue</span>
+                                                {% elseif aidProject.aidObtained %}
+                                                <span class="fr-mb-1w fr-badge fr-badge--success">Obtenue</span>
+                                                {% elseif aidProject.aidDenied %}
+                                                <span class="fr-mb-1w fr-badge fr-badge--error">Refusée</span>
+                                                {% elseif aidProject.aidRequested %}
+                                                <span class="fr-mb-1w fr-badge fr-badge--info">Demandée</span>
+                                                {% endif %}
+                                                <button
+                                                    class="fr-btn edit-aid-project"
+                                                    {# id="aidproject-status-modal-btn" #}
+                                                    title="Editer"
+                                                    {% if formAidProjectEditHasError == aidProject.id %}
+                                                    data-fr-opened="true"
+                                                    {% else %}
+                                                    data-fr-opened="false"
+                                                    {% endif %}
+                                                    aria-controls="aidproject-status-modal"
+                                                    aria-describedby="aidproject-status-{{ aidProject.id }}"
+                                                    data-id_aid_project = "{{ aidProject.id }}"
+                                                >
+                                                    Editer
+                                                </button>
+                                            </td>
+                                <td class="fr-text">
+                                    <button
+                                        class="fr-btn fr-icon-delete-line fr-btn--tertiary fr-btn--tertiary-no-outline at-box-shadow--none"
+                                        {# id="delete-aid-modal-btn" #}
+                                        title="Supprimer cette aide"
+                                        data-fr-opened="false"
+                                        aria-controls="delete-aid-modal"
+                                        aria-describedby="aidProject-{{ aidProject.id }}"
+                                        data-id_aid_project = "{{ aidProject.id }}"
+                                    >
+                                        Supprimer cette aide
+                                    </button>
+                                </td>
                                         </tr>
                                     {% endfor %}
                                 {% else %}
@@ -107,7 +163,8 @@
 {% endblock %}
 
 {% block modal %}
-    {% if project.aidProjects|length == 0 %}
+    {# suggestion aides #}
+    {% if projectCreated %}
         <dialog aria-labelledby="fr-modal-title-project-search-aid-{{ project.id }}" role="dialog" id="project-search-aid-modal-{{ project.id }}" class="fr-modal fr-modal--opened">
             <div class="fr-container fr-container--fluid fr-container-md">
                 <div class="fr-grid-row fr-grid-row--center">
@@ -130,7 +187,7 @@
                                 <footer>
                                     <ul class="fr-btns-group fr-btns-group--inline fr-btns-group--right">
                                         <li>
-                                            <button class="btn-block fr-btn fr-btn--secondary" type="button" title="Fermer la fenêtre modale" aria-controls="project-search-aid-modal-{{ project }}">Non merci</button>
+                                            <button class="btn-block fr-btn fr-btn--secondary" type="button" title="Fermer la fenêtre modale" aria-controls="project-search-aid-modal-{{ project.id }}">Non merci</button>
                                         </li>
                                         <li>
                                             {% if aidsSuggested|length > 0 %}
@@ -150,4 +207,73 @@
             </div>
         </dialog>
     {% endif %}
+
+    {# delete aid project #}
+    <dialog aria-labelledby="fr-modal-title-delete-aid" role="dialog" id="delete-aid-modal" class="fr-modal">
+        <div class="fr-container fr-container--fluid fr-container-md">
+            <div class="fr-grid-row fr-grid-row--center">
+                <div class="fr-col-12 fr-col-md-8 fr-col-lg-6">
+                    <div class="fr-modal__body">
+                        <div class="fr-modal__header">
+                            <button class="fr-btn fr-btn--close" title="Fermer la fenêtre modale" aria-controls="delete-aid-modal">Fermer</button>
+                        </div>
+                        <div class="fr-modal__content">
+                            <h2 id="fr-modal-title-delete-aid" class="fr-modal__title"><span class="fr-icon-arrow-right-line fr-icon--lg"></span>Supprimer cette aide</h2>
+
+                            <p>En cliquant sur le bouton ci-dessous, vous supprimerez définitivement cette aide de votre projet.</p>
+                            {{ form_start(formAidProjectDelete) }}
+                                <div class="content">
+                                    {{ form_widget(formAidProjectDelete.idAidProject) }}
+                                </div>
+                                <footer>
+                                    <ul class="fr-btns-group fr-btns-group--inline fr-btns-group--right">
+                                        <li>
+                                            <button class="btn-block fr-btn fr-btn--secondary" type="button" title="Fermer la fenêtre modale" aria-controls="delete-aid-modal">Annuler</button>
+                                        </li>
+                                        <li>
+                                            <button type="submit" class="fr-btn">
+                                                Supprimer cette aide
+                                            </button>
+                                        </li>
+                                    </ul>
+                                </footer>
+                            {{ form_end(formAidProjectDelete) }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </dialog>
+
+    {# Modifier le statut de l'aide #}
+    <dialog aria-labelledby="fr-modal-title-aidproject-status" role="dialog" id="aidproject-status-modal" class="fr-modal">
+        <div class="fr-container fr-container--fluid fr-container-md">
+            <div class="fr-grid-row fr-grid-row--center">
+                <div class="fr-col-12 fr-col-md-8 fr-col-lg-6">
+                    <div class="fr-modal__body">
+                        <div class="fr-modal__header">
+                            <button class="fr-btn fr-btn--close" title="Fermer la fenêtre modale" aria-controls="aidproject-status-modal">Fermer</button>
+                        </div>
+                        <div class="fr-modal__content">
+                            <h2 id="fr-modal-title-aidproject-status" class="fr-modal__title fr-mt-0"><span class="fr-icon-arrow-right-line fr-icon--lg"></span>Mettre à jour le statut de cette aide</h2>
+                            {{ form_start(formAidProjectEdit, {'attr': {'name': 'aidproject_status'}}) }}
+                                <div class="content">
+                                    {{ form_widget(formAidProjectEdit.idAidProject) }}
+                                    {{ form_row(formAidProjectEdit.aidRequested) }}
+                                    {{ form_row(formAidProjectEdit.aidObtained) }}
+                                    {{ form_row(formAidProjectEdit.aidPaid) }}
+                                    {{ form_row(formAidProjectEdit.aidDenied) }}
+                                    <footer>
+                                        <button class="btn-block fr-btn fr-mt-2w" type="submit">
+                                            Mettre à jour le statut de cette aide
+                                        </button>
+                                    </footer>
+                                </div>
+                            {{ form_end(formAidProjectEdit) }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </dialog>
 {% endblock %}

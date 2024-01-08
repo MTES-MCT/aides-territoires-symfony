@@ -3,11 +3,15 @@
 namespace App\Controller\User;
 
 use App\Controller\FrontController;
+use App\Entity\Aid\AidProject;
 use App\Entity\Keyword\KeywordSynonymlist;
 use App\Entity\Perimeter\Perimeter;
 use App\Entity\Project\Project;
 use App\Form\Project\ProjectEditType;
+use App\Form\User\Project\AidProjectDeleteType;
+use App\Form\User\Project\AidProjectStatusType;
 use App\Form\User\Project\ProjectDeleteType;
+use App\Repository\Aid\AidProjectRepository;
 use App\Repository\Aid\AidRepository;
 use App\Repository\Perimeter\PerimeterRepository;
 use App\Repository\Project\ProjectRepository;
@@ -229,6 +233,7 @@ class ProjectController extends FrontController
                 return $this->redirectToRoute('app_user_project_aides', [
                     'id' => $project->getId(),
                     'slug' => $project->getSlug(),
+                    'projectCreated' => true
                 ]);
             } else {
                 $formErrors = true;
@@ -255,8 +260,13 @@ class ProjectController extends FrontController
         ProjectRepository $ProjectRepository,
         AidRepository $aidRepository,
         UserService $userService,
+        RequestStack $requestStack,
+        AidProjectRepository $aidProjectRepository,
+        ManagerRegistry $managerRegistry
     ): Response
     {
+        $projectCreated = $requestStack->getCurrentRequest()->get('projectCreated', 0);
+
         $project = $ProjectRepository->findOneBy(
             [
                 'id' => $id
@@ -293,6 +303,78 @@ class ProjectController extends FrontController
             $aidsSuggested = $aidRepository->findCustom($aidParams);
         }
 
+        // formulaire suppression aidProject
+        $formAidProjectDelete = $this->createForm(AidProjectDeleteType::class);
+        $formAidProjectDelete->handleRequest($requestStack->getCurrentRequest());
+        if ($formAidProjectDelete->isSubmitted()) {
+            if ($formAidProjectDelete->isValid()) {
+                // suppression
+                $aidProject = $aidProjectRepository->find($formAidProjectDelete->get('idAidProject')->getData());
+                if ($aidProject instanceof AidProject && $aidProject->getProject()->getId() == $project->getId()) {
+                    $managerRegistry->getManager()->remove($aidProject);
+                    $managerRegistry->getManager()->flush();
+                }
+
+                // message
+                $this->addFlash(
+                    FrontController::FLASH_SUCCESS,
+                    'L\'aide a bien été supprimée.'
+                );
+
+                // redirection
+                return $this->redirectToRoute('app_user_project_aides', [
+                    'id' => $project->getId(),
+                    'slug' => $project->getSlug(),
+                ]);
+            } else {
+                $this->addFlash(
+                    FrontController::FLASH_ERROR,
+                    'Vous ne pouvez pas supprimer cette aide.'
+                );
+            }
+        }
+
+        // formulaire modification aidProject
+        $formAidProjectEditHasError = 0;
+        $formProjetEdits = [];
+        foreach ($project->getAidProjects() as $aidProject) {
+
+        }
+        $formAidProjectEdit = $this->createForm(AidProjectStatusType::class);
+        $formAidProjectEdit->handleRequest($requestStack->getCurrentRequest());
+        if ($formAidProjectEdit->isSubmitted()) {
+            if ($formAidProjectEdit->isValid()) {
+                // modification
+                $aidProject = $aidProjectRepository->find($formAidProjectEdit->get('idAidProject')->getData());
+                if ($aidProject instanceof AidProject && $aidProject->getProject()->getId() == $project->getId()) {
+                    $aidProject->setAidRequested($formAidProjectEdit->get('aidRequested')->getData());
+                    $aidProject->setAidObtained($formAidProjectEdit->get('aidObtained')->getData());
+                    $aidProject->setAidPaid($formAidProjectEdit->get('aidPaid')->getData());
+                    $aidProject->setAidDenied($formAidProjectEdit->get('aidDenied')->getData());
+                    $managerRegistry->getManager()->persist($aidProject);
+                    $managerRegistry->getManager()->flush();
+                }
+
+                // message
+                $this->addFlash(
+                    FrontController::FLASH_SUCCESS,
+                    'Le statut de l\'aide a bien été modifié.'
+                );
+
+                // redirection
+                return $this->redirectToRoute('app_user_project_aides', [
+                    'id' => $project->getId(),
+                    'slug' => $project->getSlug(),
+                ]);
+            } else {
+                $formAidProjectEditHasError = $formAidProjectEdit->get('idAidProject')->getData();
+                $this->addFlash(
+                    FrontController::FLASH_ERROR,
+                    'Vous ne pouvez pas modifier ce statut d\'aide.'
+                );
+            }
+        }
+
         // fil arianne
         $this->breadcrumb->add("Mon compte",$this->generateUrl('app_user_dashboard'));
         $this->breadcrumb->add("Mes projets");
@@ -302,7 +384,11 @@ class ProjectController extends FrontController
         return $this->render('user/project/aides.html.twig', [
             'project' => $project,
             'aidsSuggested' => $aidsSuggested,
-            'searchParams' => $searchParams
+            'searchParams' => $searchParams,
+            'formAidProjectDelete' => $formAidProjectDelete,
+            'projectCreated' => $projectCreated,
+            'formAidProjectEdit' => $formAidProjectEdit,
+            'formAidProjectEditHasError' => $formAidProjectEditHasError
         ]);
     }
 
