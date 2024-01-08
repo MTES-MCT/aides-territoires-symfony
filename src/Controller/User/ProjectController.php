@@ -8,6 +8,7 @@ use App\Entity\Perimeter\Perimeter;
 use App\Entity\Project\Project;
 use App\Form\Project\ProjectEditType;
 use App\Form\User\Project\ProjectDeleteType;
+use App\Repository\Aid\AidRepository;
 use App\Repository\Perimeter\PerimeterRepository;
 use App\Repository\Project\ProjectRepository;
 use App\Repository\Project\ProjectValidatedRepository;
@@ -227,7 +228,7 @@ class ProjectController extends FrontController
                 // redirection
                 return $this->redirectToRoute('app_user_project_aides', [
                     'id' => $project->getId(),
-                    'slug' => $project->getSlug()
+                    'slug' => $project->getSlug(),
                 ]);
             } else {
                 $formErrors = true;
@@ -252,7 +253,7 @@ class ProjectController extends FrontController
     public function aides(
         $id,
         ProjectRepository $ProjectRepository,
-        RequestStack $requestStack,
+        AidRepository $aidRepository,
         UserService $userService,
     ): Response
     {
@@ -267,12 +268,41 @@ class ProjectController extends FrontController
             return $this->redirectToRoute('app_user_project_structure');
         }
 
+        // si le projet n'as pas encore d'aide on va essayer d'en trouver pour les suggérer
+        $aidsSuggested = [];
+        $searchParams = [
+            'searchPerimeter' => '',
+            'organizationType' => '',
+            'keyword' => ''
+        ];
+        if (count($project->getAidProjects()) == 0) {
+            $aidParams = [
+                'showInSearch' => true,
+            ];
+            if ($project->getOrganization() && $project->getOrganization()->getPerimeter()) {
+                $aidParams['perimeterFrom'] = $project->getOrganization()->getPerimeter();
+                $searchParams['searchPerimeter'] = $aidParams['perimeterFrom']->getId();
+                if ($project->getOrganization()->getOrganizationType()) {
+                    $aidParams['organizationType'] = $project->getOrganization()->getOrganizationType();
+                    $searchParams['organizationType'] = $aidParams['organizationType']->getSlug();
+                }
+                $aidParams['keyword'] = $project->getName();
+                $searchParams['keyword'] = $aidParams['keyword'];
+            }
+
+            $aidsSuggested = $aidRepository->findCustom($aidParams);
+        }
+
+        // fil arianne
         $this->breadcrumb->add("Mon compte",$this->generateUrl('app_user_dashboard'));
         $this->breadcrumb->add("Mes projets");
         $this->breadcrumb->add("Projet ".$project->getName(),null);
 
+        // rendu template
         return $this->render('user/project/aides.html.twig', [
-            'project' => $project
+            'project' => $project,
+            'aidsSuggested' => $aidsSuggested,
+            'searchParams' => $searchParams
         ]);
     }
 
