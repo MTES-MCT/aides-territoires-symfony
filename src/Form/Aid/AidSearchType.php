@@ -81,7 +81,10 @@ class AidSearchType extends AbstractType
         // Perimeter params
         $perimeterParams = [
             'required' => false,
-            'label' => 'Votre territoire'
+            'label' => 'Votre territoire',
+            'attr' => [
+                'data-controller' => 'custom-autocomplete'
+            ]
         ];
         if ($options['forcePerimeter'] !== false) {
             $perimeterParams['data'] = $options['forcePerimeter'];
@@ -94,7 +97,10 @@ class AidSearchType extends AbstractType
         // keyword params
         $keywordParams = [
             'required' => false,
-            'label' => 'Mot-clés'
+            'label' => 'Mot-clés',
+            'attr' => [
+                'data-controller' => 'custom-autocomplete'
+            ]
         ];
         if ($options['forceKeyword'] !== false) {
             $keywordParams['data'] = $options['forceKeyword'];
@@ -340,6 +346,10 @@ class AidSearchType extends AbstractType
             'forceNewIntegration' => false,
             'extended' => false,
             'removes' => [],
+
+            'attr' => [
+                'data-controller' => 'custom-autocomplete'
+            ]
             
         ]);
     }

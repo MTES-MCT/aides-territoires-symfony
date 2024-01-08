@@ -92,6 +92,9 @@ class ProjectPublicSearchType extends AbstractType
             // Configure your form options here
             'forcePerimeter' => false,
             'forceName' => false,
+            'attr' => [
+                'data-controller' => 'custom-autocomplete'
+            ]
         ]);
     }
 }

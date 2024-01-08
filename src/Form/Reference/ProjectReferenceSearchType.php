@@ -102,7 +102,10 @@ class ProjectReferenceSearchType extends AbstractType
             // Configure your form options here
             'forcePerimeter' => false,
             'forceOrganizationType' => false,
-            'forceName' => false
+            'forceName' => false,
+            'attr' => [
+                'data-controller' => 'custom-autocomplete'
+            ]
         ]);
     }
 }
