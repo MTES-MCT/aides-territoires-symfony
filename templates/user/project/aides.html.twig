@@ -113,9 +113,8 @@
                                                     {% else %}
                                                     data-fr-opened="false"
                                                     {% endif %}
-                                                    aria-controls="aidproject-status-modal"
+                                                    aria-controls="aidproject-status-modal-{{ aidProject.id }}"
                                                     aria-describedby="aidproject-status-{{ aidProject.id }}"
-                                                    data-id_aid_project = "{{ aidProject.id }}"
                                                 >
                                                     Editer
                                                 </button>
@@ -246,19 +245,20 @@
     </dialog>
 
     {# Modifier le statut de l'aide #}
-    <dialog aria-labelledby="fr-modal-title-aidproject-status" role="dialog" id="aidproject-status-modal" class="fr-modal">
+    {% for idAidProject, formAidProjectEdit in formAidProjectEdits %}
+    {% set formAidProjectEdit = formAidProjectEdit.createView() %}
+    <dialog aria-labelledby="fr-modal-title-aidproject-status" role="dialog" id="aidproject-status-modal-{{ idAidProject }}" class="fr-modal">
         <div class="fr-container fr-container--fluid fr-container-md">
             <div class="fr-grid-row fr-grid-row--center">
                 <div class="fr-col-12 fr-col-md-8 fr-col-lg-6">
                     <div class="fr-modal__body">
                         <div class="fr-modal__header">
-                            <button class="fr-btn fr-btn--close" title="Fermer la fenêtre modale" aria-controls="aidproject-status-modal">Fermer</button>
+                            <button class="fr-btn fr-btn--close" title="Fermer la fenêtre modale" aria-controls="aidproject-status-modal-{{ idAidProject }}">Fermer</button>
                         </div>
                         <div class="fr-modal__content">
                             <h2 id="fr-modal-title-aidproject-status" class="fr-modal__title fr-mt-0"><span class="fr-icon-arrow-right-line fr-icon--lg"></span>Mettre à jour le statut de cette aide</h2>
                             {{ form_start(formAidProjectEdit, {'attr': {'name': 'aidproject_status'}}) }}
                                 <div class="content">
-                                    {{ form_widget(formAidProjectEdit.idAidProject) }}
                                     {{ form_row(formAidProjectEdit.aidRequested) }}
                                     {{ form_row(formAidProjectEdit.aidObtained) }}
                                     {{ form_row(formAidProjectEdit.aidPaid) }}
@@ -276,4 +276,5 @@
             </div>
         </div>
     </dialog>
+    {% endfor %}
 {% endblock %}

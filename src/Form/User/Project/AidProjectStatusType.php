@@ -27,10 +27,6 @@ class AidProjectStatusType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('idAidProject', HiddenType::class, [
-                'required' => true,
-                'label' => false
-            ])
             ->add('aidRequested', CheckboxType::class, [
                 'required' => false,
                 'label' => 'Aide demandée',
@@ -61,13 +57,9 @@ class AidProjectStatusType extends AbstractType
 
     public function onSubmit(FormEvent $event): void
     {
+        
         try {
-            // verifie que l'aidProject existe
-            /** @var AidProject $aidProject **/
-            $aidProject = $this->managerRegistry->getRepository(AidProject::class)->find($event->getForm()->get('idAidProject')->getData());
-            if (!$aidProject instanceof AidProject) {
-                $event->getForm()->get('idAidProject')->addError(new FormError('Ce aide n\'existe pas'));
-            }
+            $aidProject = $event->getData();
 
             // verifie que le project appartient bien à l'origanisation de l'utilisateur
             /** @var User $user **/
@@ -107,7 +99,7 @@ class AidProjectStatusType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'class' => AidProject::class,
+            'data_class' => AidProject::class,
         ]);
     }
 }

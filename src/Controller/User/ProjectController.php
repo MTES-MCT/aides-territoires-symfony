@@ -336,44 +336,37 @@ class ProjectController extends FrontController
 
         // formulaire modification aidProject
         $formAidProjectEditHasError = 0;
-        $formProjetEdits = [];
+        $formAidProjectEdits = [];
         foreach ($project->getAidProjects() as $aidProject) {
-
-        }
-        $formAidProjectEdit = $this->createForm(AidProjectStatusType::class);
-        $formAidProjectEdit->handleRequest($requestStack->getCurrentRequest());
-        if ($formAidProjectEdit->isSubmitted()) {
-            if ($formAidProjectEdit->isValid()) {
-                // modification
-                $aidProject = $aidProjectRepository->find($formAidProjectEdit->get('idAidProject')->getData());
-                if ($aidProject instanceof AidProject && $aidProject->getProject()->getId() == $project->getId()) {
-                    $aidProject->setAidRequested($formAidProjectEdit->get('aidRequested')->getData());
-                    $aidProject->setAidObtained($formAidProjectEdit->get('aidObtained')->getData());
-                    $aidProject->setAidPaid($formAidProjectEdit->get('aidPaid')->getData());
-                    $aidProject->setAidDenied($formAidProjectEdit->get('aidDenied')->getData());
+            $formAidProjectEdits[$aidProject->getId()] = $this->createForm(AidProjectStatusType::class, $aidProject);
+            $formAidProjectEdits[$aidProject->getId()]->handleRequest($requestStack->getCurrentRequest());
+            if ($formAidProjectEdits[$aidProject->getId()]->isSubmitted()) {
+                if ($formAidProjectEdits[$aidProject->getId()]->isValid()) {
+                    // modification
                     $managerRegistry->getManager()->persist($aidProject);
                     $managerRegistry->getManager()->flush();
+
+                    // message
+                    $this->addFlash(
+                        FrontController::FLASH_SUCCESS,
+                        'Le statut de l\'aide a bien été modifié.'
+                    );
+    
+                    // redirection
+                    return $this->redirectToRoute('app_user_project_aides', [
+                        'id' => $project->getId(),
+                        'slug' => $project->getSlug(),
+                    ]);
+                } else {
+                    $formAidProjectEditHasError = $aidProject->getId();
+                    $this->addFlash(
+                        FrontController::FLASH_ERROR,
+                        'Vous ne pouvez pas modifier ce statut d\'aide.'
+                    );
                 }
-
-                // message
-                $this->addFlash(
-                    FrontController::FLASH_SUCCESS,
-                    'Le statut de l\'aide a bien été modifié.'
-                );
-
-                // redirection
-                return $this->redirectToRoute('app_user_project_aides', [
-                    'id' => $project->getId(),
-                    'slug' => $project->getSlug(),
-                ]);
-            } else {
-                $formAidProjectEditHasError = $formAidProjectEdit->get('idAidProject')->getData();
-                $this->addFlash(
-                    FrontController::FLASH_ERROR,
-                    'Vous ne pouvez pas modifier ce statut d\'aide.'
-                );
             }
         }
+
 
         // fil arianne
         $this->breadcrumb->add("Mon compte",$this->generateUrl('app_user_dashboard'));
@@ -387,7 +380,7 @@ class ProjectController extends FrontController
             'searchParams' => $searchParams,
             'formAidProjectDelete' => $formAidProjectDelete,
             'projectCreated' => $projectCreated,
-            'formAidProjectEdit' => $formAidProjectEdit,
+            'formAidProjectEdits' => $formAidProjectEdits,
             'formAidProjectEditHasError' => $formAidProjectEditHasError
         ]);
     }
