@@ -12,6 +12,8 @@ use EasyCorp\Bundle\EasyAdminBundle\Config\Assets;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
+use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\KernelInterface;
 
@@ -31,7 +33,9 @@ class AtCrudController extends AbstractCrudController
         public ImageService $imageService,
         public ParamService $paramService,
         public FileService $fileService,
-        public KernelInterface $kernelInterface
+        public KernelInterface $kernelInterface,
+        public AdminUrlGenerator $adminUrlGenerator,
+        public RequestStack $requestStack
     ) {
     }
 

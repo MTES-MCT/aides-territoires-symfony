@@ -9,39 +9,36 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class CsvExporterService
 {
+    // TODO a factoriser
     public function createResponseFromQueryBuilder(QueryBuilder $queryBuilder, FieldCollection $fields, string $filename): Response
     {
         ini_set('max_execution_time', 60*60);
         ini_set('memory_limit', '1.5G');
-
+        
         try {
-            $result = $queryBuilder->getQuery()->getArrayResult();
+            $fieldsToKeep = ['id', 'live', 'name', 'url', 'status'];
+            $results = $queryBuilder->getQuery()->getResult();
 
-            $fieldsToKeep = ['id', 'name', 'slug', 'status'];
-            // Convert DateTime objects into strings
             $datas = [];
-            foreach ($result as $key => $aidArray) {
-                $data = [];
-                foreach ($aidArray as $field => $value) {
-                    if (!in_array($field, $fieldsToKeep)) {
-                        continue;
-                    }
-                    $data[$field] = $value;
-                }
-                array_push($datas, $data);
+            foreach ($results as $result) {
+                $datas[] = [
+                    'id' => $result->getId(),
+                    'live' => $result->isLive() ? 'Oui' : 'Non',
+                    'name' => $result->getName(),
+                    'url' => $result->getUrl(),
+                    'status' => $result->getStatus(),
+                ];
             }
-
             // Stream response
-            $response = new StreamedResponse(function () use ($datas) {
+            $response = new StreamedResponse(function () use ($fieldsToKeep, $datas) {
                 
                 // Open the output stream
                 $fh = fopen('php://output', 'w');
     
+                fputcsv($fh, $fieldsToKeep, ';', '"');
                 foreach ($datas as $data) {
-                    fputcsv($fh, $data);
+                    fputcsv($fh, $data, ';', '"');
                 }
-    
-    
             });
     
             // réponse avec header csv

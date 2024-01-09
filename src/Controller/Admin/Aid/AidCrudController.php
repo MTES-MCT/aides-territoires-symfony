@@ -96,7 +96,12 @@ class AidCrudController extends AtCrudController
         });
 
         $exportAction = Action::new('export')
-        ->linkToCrudAction('export')
+        ->linkToUrl(function () {
+            $request = $this->requestStack->getCurrentRequest();
+            return $this->adminUrlGenerator->setAll($request->query->all())
+                ->setAction('export')
+                ->generateUrl();
+        })
         ->addCssClass('btn btn-success')
         ->setIcon('fa fa-download')
         ->createAsGlobalAction();
@@ -478,10 +483,13 @@ class AidCrudController extends AtCrudController
 
     public function export(AdminContext $context, CsvExporterService $csvExporterService)
     {
+        ini_set('max_execution_time', 60*60);
+        ini_set('memory_limit', '1.5G');
+
         $fields = FieldCollection::new($this->configureFields(Crud::PAGE_INDEX));
         $filters = $this->container->get(FilterFactory::class)->create($context->getCrud()->getFiltersConfig(), $fields, $context->getEntity());
         $queryBuilder = $this->createIndexQueryBuilder($context->getSearch(), $context->getEntity(), $fields, $filters);
-        
+               
         return $csvExporterService->createResponseFromQueryBuilder($queryBuilder, $fields, 'aides.csv');
     }
 }
