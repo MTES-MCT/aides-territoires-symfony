@@ -6,12 +6,16 @@ use App\Controller\Admin\AtCrudController;
 use App\Entity\Aid\Aid;
 use App\Field\TextLengthCountField;
 use App\Field\TrumbowygField;
+use App\Service\Export\CsvExporterService;
 use Doctrine\ORM\EntityRepository;
+use EasyCorp\Bundle\EasyAdminBundle\Collection\FieldCollection;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Filters;
 use EasyCorp\Bundle\EasyAdminBundle\Config\KeyValueStore;
+use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
+use EasyCorp\Bundle\EasyAdminBundle\Factory\FilterFactory;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ChoiceField;
@@ -91,9 +95,16 @@ class AidCrudController extends AtCrudController
             return $this->generateUrl('app_aid_aid_details', ['id' => $entity->getId(), 'slug' => $entity->getSlug()]);
         });
 
+        $exportAction = Action::new('export')
+        ->linkToCrudAction('export')
+        ->addCssClass('btn btn-success')
+        ->setIcon('fa fa-download')
+        ->createAsGlobalAction();
+
         return parent::configureActions($actions)
             ->add(Crud::PAGE_INDEX, $displayOnFront)
             ->add(Crud::PAGE_EDIT, $displayOnFront)
+            ->add(Crud::PAGE_INDEX, $exportAction)
         ;
     }
 
@@ -463,5 +474,14 @@ class AidCrudController extends AtCrudController
         return parent::configureCrud($crud)
         ->overrideTemplate('crud/edit', 'admin/aid/edit.html.twig')  
         ;
+    }
+
+    public function export(AdminContext $context, CsvExporterService $csvExporterService)
+    {
+        $fields = FieldCollection::new($this->configureFields(Crud::PAGE_INDEX));
+        $filters = $this->container->get(FilterFactory::class)->create($context->getCrud()->getFiltersConfig(), $fields, $context->getEntity());
+        $queryBuilder = $this->createIndexQueryBuilder($context->getSearch(), $context->getEntity(), $fields, $filters);
+        
+        return $csvExporterService->createResponseFromQueryBuilder($queryBuilder, $fields, 'aides.csv');
     }
 }
