@@ -26,6 +26,7 @@ use App\Service\Aid\AidService;
 use App\Service\Email\EmailService;
 use App\Service\Log\LogService;
 use App\Service\Matomo\MatomoService;
+use App\Service\Notification\NotificationService;
 use App\Service\User\UserService;
 use App\Service\Various\Breadcrumb;
 use App\Service\Various\ParamService;
@@ -411,7 +412,8 @@ class AidController extends FrontController
         StringService $stringService,
         MatomoService $matomoService,
         ProjectRepository $projectRepository,
-        LogService $logService
+        LogService $logService,
+        NotificationService $notificationService
     ): Response
     {
         // le user si dispo
@@ -457,6 +459,7 @@ class AidController extends FrontController
                 // association projects existants
                 if ($formAddToProject->has('projects')) {
                     $projects = $formAddToProject->get('projects')->getData();
+                    /** @var Project $project */
                     foreach ($projects as $project) {
                         $aidProject = new AidProject();
                         $aidProject->setAid($aid);
@@ -464,7 +467,23 @@ class AidController extends FrontController
                         $project->addAidProject($aidProject);
                         $this->managerRegistry->getManager()->persist($aidProject);
 
-
+                        // envoi notification à tous les autres membres de l'oganisation
+                        if ($project->getOrganization()) {
+                            foreach ($project->getOrganization()->getBeneficiairies() as $beneficiary) {
+                                if ($beneficiary->getId() == $user->getId()) {
+                                    continue;
+                                }
+                                $notificationService->addNotification(
+                                    $beneficiary,
+                                    'Nouvelle aide ajoutée à un projet',
+                                    '<p>
+                                    '.$user->getFirstname().' '.$user->getLastname().' a ajouté une aide au projet
+                                    <a href="'.$this->generateUrl('app_user_project_details_fiche_projet', ['id' => $project->getId(), 'slug' => $project->getSlug()], UrlGeneratorInterface::ABSOLUTE_URL).'">'.$project->getName().'</a>.
+                                    </p>'
+                                );
+                            }
+                        }
+                        // message
                         $this->addFlash(
                             FrontController::FLASH_SUCCESS,
                             'L’aide a bien été associée au projet <a href="'.$this->generateUrl('app_user_project_details_fiche_projet', ['id' => $project->getId(), 'slug' => $project->getSlug()]).'">'.$project->getName().'</a>.'
@@ -500,7 +519,7 @@ class AidController extends FrontController
             }
         }
 
-        // formulauire suggérer cette aide à un projet
+        // formulaire suggérer cette aide à un projet
         $formSuggestToProject = $this->createForm(SuggestToProjectType::class);
         $formSuggestToProject->handleRequest($requestStack->getCurrentRequest());
         if ($formSuggestToProject->isSubmitted()) {
@@ -518,7 +537,10 @@ class AidController extends FrontController
                     $this->managerRegistry->getManager()->persist($aidSuggestedAidProject);
                     $message = $stringService->cleanString($formSuggestToProject->get('message')->getData());
 
-                    $message = '<p>".$message."</p>
+
+                    
+                    // notification
+                    $message = '<p>'.$message.'</p>
                     <ul>
                         <li><a href="'.$aidService->getUrl($aid).'>"'.$aid->getName().'</a></li>
                     </ul>
@@ -528,13 +550,11 @@ class AidController extends FrontController
                             Accepter ou rejeter cette recommandation
                         </a>
                     </p>';
-                    
-                    // notification
-                    $notification = new Notification();
-                    $notification->setName('Suggestion d’une aide pour votre projet « '.$project->getName().' »');
-                    $notification->setDescription($message);
-                    $notification->setUser($aid->getAuthor());
-                    $this->managerRegistry->getManager()->persist($notification);
+                    $notificationService->addNotification(
+                        $project->getAuthor(),
+                        'Suggestion d’une aide pour votre projet « '.$project->getName().' »',
+                        $message
+                    );
 
                     // envoi mail
                     $suggestedAidFinancerName = '';

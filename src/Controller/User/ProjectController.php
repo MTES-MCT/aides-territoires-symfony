@@ -17,6 +17,7 @@ use App\Repository\Perimeter\PerimeterRepository;
 use App\Repository\Project\ProjectRepository;
 use App\Repository\Project\ProjectValidatedRepository;
 use App\Service\Image\ImageService;
+use App\Service\Notification\NotificationService;
 use App\Service\Reference\ReferenceService;
 use App\Service\User\UserService;
 use Doctrine\ORM\EntityRepository;
@@ -36,6 +37,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Validator\Constraints\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpKernel\KernelInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class ProjectController extends FrontController
 {
@@ -47,7 +49,8 @@ class ProjectController extends FrontController
         UserService $userService,
         ProjectRepository $projectRepository,
         RequestStack $requestStack,
-        ManagerRegistry $managerRegistry
+        ManagerRegistry $managerRegistry,
+        NotificationService $notificationService
     ): Response
     {
         $user = $userService->getUserLogged();
@@ -59,6 +62,24 @@ class ProjectController extends FrontController
         $formDeleteProject->handleRequest($requestStack->getCurrentRequest());
         if ($formDeleteProject->isSubmitted()) {
             if ($formDeleteProject->isValid()) {
+
+
+                // notification aux autres membres de l'organization
+                $project = $projectRepository->find($formDeleteProject->get('idProject')->getData());
+                if ($project instanceof Project && $project->getOrganization()) {
+                    foreach ($project->getOrganization()->getBeneficiairies() as $beneficiary) {
+                        if ($beneficiary->getId() != $user->getId()) {
+                            $notificationService->addNotification(
+                                $beneficiary,
+                                'Un projet a été supprimé',
+                                '<p>
+                                '.$user->getFirstname().' '.$user->getLastname().' a supprimé le projet '.$project->getName().'.
+                                </p>'
+                            );
+                        }
+                    }
+                }
+
                 // suppression
                 $managerRegistry->getManager()->remove($projectRepository->find($formDeleteProject->get('idProject')->getData()));
                 $managerRegistry->getManager()->flush();
@@ -121,7 +142,8 @@ class ProjectController extends FrontController
         RequestStack $requestStack,
         UserService $userService,
         ManagerRegistry $managerRegistry,
-        ImageService $imageService
+        ImageService $imageService,
+        NotificationService $notificationService
     ): Response
     {
         $project = $ProjectRepository->findOneBy(
@@ -157,7 +179,21 @@ class ProjectController extends FrontController
                 $managerRegistry->getManager()->persist($project); 
                 $managerRegistry->getManager()->flush();
 
-                // notification
+                // notification aux autres membres de l'organization
+                foreach ($project->getOrganization()->getBeneficiairies() as $beneficiary) {
+                    if ($beneficiary->getId() != $user->getId()) {
+                        $notificationService->addNotification(
+                            $beneficiary,
+                            'Un projet a été mis à jour',
+                            '<p>
+                            '.$user->getFirstname().' '.$user->getLastname().' a modifié les informations du projet
+                            <a href="'.$this->generateUrl('app_user_project_details_fiche_projet', ['id' => $project->getId(), 'slug' => $project->getSlug()], UrlGeneratorInterface::ABSOLUTE_URL).'">'.$project->getName().'</a>.
+                            </p>'
+                        );
+                    }
+                }
+
+                // message
                 $this->tAddFlash(
                     FrontController::FLASH_SUCCESS,
                     'Vos modifications ont été enregistrées avec succès.'
@@ -191,7 +227,8 @@ class ProjectController extends FrontController
         RequestStack $requestStack,
         UserService $userService,
         ManagerRegistry $managerRegistry,
-        ImageService $imageService
+        ImageService $imageService,
+        NotificationService $notificationService
     ): Response
     {
         $project = new Project();
@@ -223,7 +260,21 @@ class ProjectController extends FrontController
                 $managerRegistry->getManager()->persist($project); 
                 $managerRegistry->getManager()->flush();
 
-                // notification
+                // notification aux autres membres de l'organization
+                foreach ($project->getOrganization()->getBeneficiairies() as $beneficiary) {
+                    if ($beneficiary->getId() != $user->getId()) {
+                        $notificationService->addNotification(
+                            $beneficiary,
+                            'Un projet a été créé',
+                            '<p>
+                            '.$user->getFirstname().' '.$user->getLastname().' a créé le projet
+                            <a href="'.$this->generateUrl('app_user_project_details_fiche_projet', ['id' => $project->getId(), 'slug' => $project->getSlug()], UrlGeneratorInterface::ABSOLUTE_URL).'">'.$project->getName().'</a>.
+                            </p>'
+                        );
+                    }
+                }
+
+                // message
                 $this->addFlash(
                     FrontController::FLASH_SUCCESS,
                     'Votre projet a bien été créé, vous pouvez maintenant chercher des aides.'
@@ -262,7 +313,8 @@ class ProjectController extends FrontController
         UserService $userService,
         RequestStack $requestStack,
         AidProjectRepository $aidProjectRepository,
-        ManagerRegistry $managerRegistry
+        ManagerRegistry $managerRegistry,
+        NotificationService $notificationService
     ): Response
     {
         $projectCreated = $requestStack->getCurrentRequest()->get('projectCreated', 0);
@@ -313,6 +365,19 @@ class ProjectController extends FrontController
                 if ($aidProject instanceof AidProject && $aidProject->getProject()->getId() == $project->getId()) {
                     $managerRegistry->getManager()->remove($aidProject);
                     $managerRegistry->getManager()->flush();
+                }
+
+                foreach ($project->getOrganization()->getBeneficiairies() as $beneficiary) {
+                    if ($beneficiary->getId() != $user->getId()) {
+                        $notificationService->addNotification(
+                            $beneficiary,
+                            'Une aide a été supprimée d’un projet',
+                            '<p>
+                            '.$user->getFirstname().' '.$user->getLastname().' a supprimé une aide du projet
+                            <a href="'.$this->generateUrl('app_user_project_details_fiche_projet', ['id' => $project->getId(), 'slug' => $project->getSlug()], UrlGeneratorInterface::ABSOLUTE_URL).'">'.$project->getName().'</a>.
+                            </p>'
+                        );
+                    }
                 }
 
                 // message

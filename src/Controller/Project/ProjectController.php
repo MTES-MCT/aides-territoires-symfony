@@ -3,6 +3,7 @@
 namespace App\Controller\Project;
 
 use App\Controller\FrontController;
+use App\Dto\ProjectDTO;
 use App\Entity\Perimeter\Perimeter;
 use App\Entity\Aid\AidSuggestedAidProject;
 use App\Entity\Project\Project;
@@ -119,7 +120,7 @@ class ProjectController extends FrontController
     public function publicDetails(
         $id,
         $slug,
-        ProjectRepository $ProjectRepository,
+        ProjectRepository $projectRepository,
         RequestStack $requestStack,
         UserService $userService,
         ManagerRegistry $managerRegistry,
@@ -128,7 +129,7 @@ class ProjectController extends FrontController
     ): Response
     {
         // le projet
-        $project = $ProjectRepository->findOneBy(
+        $project = $projectRepository->findOneBy(
             [
                 'id' => $id,
                 'slug' => $slug,
@@ -183,24 +184,38 @@ class ProjectController extends FrontController
         $fromSuggestAid->handleRequest($requestStack->getCurrentRequest());
         if ($fromSuggestAid->isSubmitted()) {
             if ($fromSuggestAid->isValid()) {
-                $aidSuggested = new AidSuggestedAidProject();
-                $aidSuggested->setAid(
-                    $aidRepository->findOneCustom(
-                        [
-                            'showInSearch' => true,
-                            'slug' => $fromSuggestAid->get('aidUrl')->getData()
-                        ]
-                    )
-                );
-                $aidSuggested->setCreator($user ?? null);
-                $aidSuggested->setProject($project);
-                $managerRegistry->getManager()->persist($aidSuggested);
-                $managerRegistry->getManager()->flush();
+                try {
+                    $aidSuggested = new AidSuggestedAidProject();
+                    $url = $fromSuggestAid->get('aidUrl')->getData();
+                    preg_match('/.*\/aides\/(.*)\//', $url, $matches);
+                    $slug = $matches[1] ?? null;
+                    if (!$slug) {
+                        throw new \Exception('Impossible de trouver le slug de l\'aide');
+                    }
 
-                $this->addFlash(
-                    FrontController::FLASH_SUCCESS,
-                    'Merci! L’aide a bien été suggérée!'
-                );
+                    $aidSuggested->setAid(
+                        $aidRepository->findOneCustom(
+                            [
+                                'showInSearch' => true,
+                                'slug' => $slug
+                            ]
+                        )
+                    );
+                    $aidSuggested->setCreator($user ?? null);
+                    $aidSuggested->setProject($project);
+                    $managerRegistry->getManager()->persist($aidSuggested);
+                    $managerRegistry->getManager()->flush();
+
+                    $this->addFlash(
+                        FrontController::FLASH_SUCCESS,
+                        'Merci! L’aide a bien été suggérée!'
+                    );
+                } catch (\Exception $e) {
+                    $this->addFlash(
+                        FrontController::FLASH_ERROR,
+                        'Impossible de suggérer l\'aide'
+                    );
+                }
             } else {
                 $fromSuggestAidInvalid = true;
             }
@@ -215,6 +230,10 @@ class ProjectController extends FrontController
                 'user' => $userService->getUserLogged(),
             ]
         );
+
+        // les projets favoris de l'utilisateur
+        $favoriteProjectDTOs = [];
+        $favoriteProjectDTOs = $user->getDefaultOrganization()->getFavoriteProjects();
 
         // fil arianne
         $this->breadcrumb->add(
@@ -233,7 +252,8 @@ class ProjectController extends FrontController
             'formAddToFavorite' => $formAddToFavorite->createView(),
             'formRemoveFromFavorite' => $formRemoveFromFavorite->createView(),
             'fromSuggestAid' => $fromSuggestAid->createView(),
-            'fromSuggestAidInvalid' => $fromSuggestAidInvalid ?? null
+            'fromSuggestAidInvalid' => $fromSuggestAidInvalid ?? null,
+            'favoriteProjects' => $favoriteProjectDTOs
         ]);
     }
 

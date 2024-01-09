@@ -6,11 +6,13 @@ use App\Controller\FrontController;
 use App\Entity\Organization\Organization;
 use App\Entity\Organization\OrganizationInvitation;
 use App\Entity\Perimeter\Perimeter;
+use App\Entity\User\Notification;
 use App\Form\Organization\OrganizationInvitationSendType;
 use App\Form\User\RegisterType;
 use App\Repository\Organization\OrganizationInvitationRepository;
 use App\Repository\Perimeter\PerimeterRepository;
 use App\Service\Email\EmailService;
+use App\Service\Notification\NotificationService;
 use App\Service\User\UserService;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
@@ -298,7 +300,8 @@ class OrganizationController extends FrontController
         $id,
         UserService $userService,
         OrganizationInvitationRepository $organizationInvitationRepository,
-        ManagerRegistry $managerRegistry
+        ManagerRegistry $managerRegistry,
+        NotificationService $notificationService
     ): Response
     {
         $user = $userService->getUserLogged();
@@ -320,6 +323,31 @@ class OrganizationController extends FrontController
         $managerRegistry->getManager()->persist($organizationInvitation);
         $managerRegistry->getManager()->flush();
 
+        // ajout notification au créateur de l'invitation
+        $message = '
+        <p>
+            '.$user->getFirstname().' '.$user->getLastname().' a accepté votre invitation et vient de
+            rejoindre votre structure '.$organization->getName().'.
+        </p>
+        ';
+        $notificationService->addNotification($organizationInvitation->getAuthor(), 'Votre invitation a été acceptée', $message);
+
+        // notification aux autres membres de l'organization
+        foreach ($organization->getBeneficiairies() as $beneficiary) {
+            // on ne notifie pas le user et l'auteur de l'invitation
+            if (in_array($beneficiary->getId(), [$user->getId(), $organizationInvitation->getAuthor()->getId()])) {
+                continue;
+            }
+
+            $message = '
+            <p>
+            '.$user->getFirstname().' '.$user->getLastname().' a accepté l’invitation de '.$organizationInvitation->getAuthor()->getFirstname().' '.$organizationInvitation->getAuthor()->getLastname().'
+            et vient de rejoindre votre structure '.$organization->getName().'.
+            </p>
+            ';
+            $notificationService->addNotification($beneficiary, 'Une invitation a été acceptée', $message);
+        }
+        // message
         $this->addFlash(
             FrontController::FLASH_SUCCESS,
             'Vous avez bien accepté l\'invitation.'
@@ -333,7 +361,8 @@ class OrganizationController extends FrontController
         $id,
         UserService $userService,
         OrganizationInvitationRepository $organizationInvitationRepository,
-        ManagerRegistry $managerRegistry
+        ManagerRegistry $managerRegistry,
+        NotificationService $notificationService
     ): Response
     {
         $user = $userService->getUserLogged();
@@ -349,6 +378,15 @@ class OrganizationController extends FrontController
         $managerRegistry->getManager()->persist($organizationInvitation);
         $managerRegistry->getManager()->flush();
 
+        // ajout notification au créateur de l'invitation
+        $message = '
+        <p>
+            '.$user->getFirstname().' '.$user->getLastname().' a refusé votre invitation.
+        </p>
+        ';
+        $notificationService->addNotification($organizationInvitation->getAuthor(), 'Votre invitation a été refusée', $message);
+
+        // message
         $this->addFlash(
             FrontController::FLASH_SUCCESS,
             'Vous avez refusé l\'invitation.'

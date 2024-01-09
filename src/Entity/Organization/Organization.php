@@ -211,7 +211,7 @@ class Organization
     #[ORM\Column(length: 15, nullable: true)]
     private ?string $populationStrata = null;
 
-    #[ORM\ManyToMany(targetEntity: Project::class)]
+    #[ORM\ManyToMany(targetEntity: Project::class, fetch: 'LAZY')]
     private Collection $favoriteProjects;
 
     #[ORM\OneToMany(mappedBy: 'organization', targetEntity: Project::class)]

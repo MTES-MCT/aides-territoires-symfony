@@ -15,6 +15,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
+use Serializable;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Vich\UploaderBundle\Mapping\Annotation as Vich;
 use Symfony\Component\HttpFoundation\File\File;
@@ -27,7 +28,7 @@ use Symfony\Component\Serializer\Annotation\Ignore;
 #[ORM\Index(columns: ['description'], name: 'description_project_fulltext', flags: ['fulltext'])]
 #[ORM\Index(columns: ['name', 'description'], name: 'name_description_project_fulltext', flags: ['fulltext'])]
 #[ORM\Entity(repositoryClass: ProjectRepository::class)]
-class Project
+class Project implements \Serializable
 {
     const FOLDER = 'projects';
     
@@ -391,6 +392,7 @@ class Project
         return $this;
     }
 
+    #[Ignore]
     public function setImageFile(?File $imageFile = null): void
     {
         $this->imageFile = $imageFile;
@@ -400,6 +402,7 @@ class Project
         }
     }
 
+    #[Ignore]
     public function getImageFile(): ?File
     {
         return $this->imageFile;
@@ -642,4 +645,18 @@ class Project
         return $this->name ?? 'Projet';
     }
 
+    public function serialize()
+    {
+        return serialize(array(
+            $this->id,
+            $this->name,
+            $this->slug,
+            $this->description,
+        ));
+    }
+
+    public function unserialize($serialized)
+    {
+        
+    }
 }

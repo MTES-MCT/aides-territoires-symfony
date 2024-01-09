@@ -8,6 +8,7 @@ use App\Entity\User\User;
 use App\Entity\User\UserRegisterConfirmation;
 use App\Service\Email\EmailService;
 use App\Service\Matomo\MatomoService;
+use App\Service\Notification\NotificationService;
 use App\Service\Various\ParamService;
 use Doctrine\ORM\Event\PostPersistEventArgs;
 use Doctrine\ORM\Event\PreRemoveEventArgs;
@@ -22,7 +23,8 @@ class UserListener
         protected ParamService $paramService,
         protected HttpClientInterface $httpClientInterface,
         protected EmailService $emailService,
-        protected MatomoService $matomoService
+        protected MatomoService $matomoService,
+        protected NotificationService $notificationService
     ) {
         
     }
@@ -33,10 +35,7 @@ class UserListener
             $entity = $args->getObject();
 
             // Ajoute notification bienvenue
-            $notification = new Notification();
-            $notification->setUser($entity);
-            $notification->setName('Bienvenue sur Aides-territoires !');
-            $notification->setDescription('
+            $message = '
             <p>
             Vous venez de créer votre compte et devriez avoir reçu un courrier
             électronique présentant notre site.
@@ -51,9 +50,13 @@ class UserListener
                 vos préférences
                 </a>.
             </p>
-            ');
-            $this->managerRegistry->getManager()->persist($notification);
-            $this->managerRegistry->getManager()->flush();
+            ';
+            $this->notificationService->addNotification(
+                $entity,
+                'Bienvenue sur Aides-territoires !',
+                $message
+            );
+            
 
             // si optin envoi à sendinblue
             if ($entity->isMlConsent()) {
