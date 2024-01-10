@@ -24,85 +24,185 @@ class ImportFluxRegionSudCommand extends ImportFluxCommand
 
     protected function getImportUniqueid($aidToImport): ?string
     {
-        if (!isset($aidToImport['id'])) {
+        if (!isset($aidToImport['Nom de l’aide'])) {
             return null;
         }
-        $importUniqueid = $this->importUniqueidPrefix . $aidToImport['id'];
+        $importUniqueid = $this->importUniqueidPrefix . md5($aidToImport['Nom de l’aide']);
         return $importUniqueid;
     }
 
     protected function getFieldsMapping(array $aidToImport, array $params = null): array
     {
-        $importRaws = $this->getImportRaws($aidToImport);
+        $importRaws = $this->getImportRaws($aidToImport, ['Date d’ouverture', 'Date de clôture']);
         $importRawObjectCalendar = $importRaws['importRawObjectCalendar'];
         $importRawObject = $importRaws['importRawObject'];
 
         $dateStart = null;
         try {
-            $dateStart = new \DateTime($aidToImport['start_date'] ?? null);
+            $dateStart = new \DateTime($aidToImport['Date d’ouverture'] ?? null);
         } catch (\Exception $e) {
             $dateStart = null;
         }
 
         $dateSubmissionDeadline = null;
         try {
-            $dateSubmissionDeadline = new \DateTime($aidToImport['submission_deadline'] ?? null);
+            $dateSubmissionDeadline = new \DateTime($aidToImport['Date de clôture'] ?? null);
         } catch (\Exception $e) {
             $dateSubmissionDeadline = null;
-        }
-
-        $contact = '';
-        if (isset($aidToImport['contact'])) {
-            $contact .= $this->htmlSanitizerInterface->sanitize($aidToImport['contact']);
-        }
-        if (isset($aidToImport['contact_phone'])) {
-            $contact .= '  ' . $this->htmlSanitizerInterface->sanitize($aidToImport['contact_phone']);
-        }
-        if (trim($contact) == '') {
-            $contact = null;
         }
 
         return [
             'importDataMention' => 'Ces données sont mises à disposition par le Conseil départemental de la Manche.',
             'importRawObjectCalendar' => $importRawObjectCalendar,
             'importRawObject' => $importRawObject,
-            'name' => isset($aidToImport['name']) ? strip_tags($aidToImport['name']) : null,
-            'nameInitial' => isset($aidToImport['name']) ? strip_tags($aidToImport['name']) : null,
-            'description' => isset($aidToImport['description']) ? $this->htmlSanitizerInterface->sanitize($aidToImport['description']) : null,
-            'originUrl' => isset($aidToImport['origin_url']) ? $aidToImport['origin_url'] : null,
-            'applicationUrl' => isset($aidToImport['application_url']) ? $aidToImport['application_url'] : null,
-            'isCallForProject' => isset($aidToImport['is_call_for_project']) ? $aidToImport['is_call_for_project'] : null,
+            'name' => isset($aidToImport['Nom de l’aide']) ? strip_tags($aidToImport['Nom de l’aide']) : null,
+            'nameInitial' => isset($aidToImport['Nom de l’aide']) ? strip_tags($aidToImport['Nom de l’aide']) : null,
+            'description' => $this->concatHtmlFields(['Chapo', 'Pour qui', 'Pourquoi candidater', 'Quelle est la nature de l’aide (type d’aide)', 'Plus d’infos']),
+            'eligibility' => $this->concatHtmlFields(['Quelles sont les critères d’éligibilité', 'Comment en bénéficier ']),
+            'originUrl' => isset($aidToImport['Lien vers le descriptif complet']) ? $aidToImport['Lien vers le descriptif complet'] : null,
+            'applicationUrl' => isset($aidToImport['Lien Je fais ma demande']) ? $aidToImport['Lien Je fais ma demande'] : null,
+            'contact' => isset($aidToImport['Contact']) ? $this->getCleanHtml($aidToImport['Contact']) : null,
             'dateStart' => $dateStart,
             'dateSubmissionDeadline' => $dateSubmissionDeadline,
-            'eligibility' => isset($aidToImport['eligibility']) ? $this->htmlSanitizerInterface->sanitize($aidToImport['eligibility']) : null,
-            'contact' => $contact,
-
         ];
     }
 
-    protected function setAidTypes(array $aidToImport, Aid $aid): Aid
+    protected function setCategories(array $aidToImport, Aid $aid): Aid
     {
-        // converti en tableau
-        if (is_string($aidToImport['aid_types'])) {
-            $aidToImport['aid_types'] = [$aidToImport['aid_types']];
+        if (!isset($aidToImport['Les thématiques']) || !is_array($aidToImport['Les thématiques'])) {
+            return $aid;
         }
 
-        foreach ($aidToImport['aid_types'] as $aidTypeName) {
-            $aidType = $this->managerRegistry->getRepository(AidType::class)->findOneBy(['name' => $aidTypeName]);
-            if ($aidType instanceof AidType) {
-                $aid->addAidType($aidType);
+        $mapping = [
+            'Institution' => [
+                'citoyennete',
+            ],
+            'Économie- Entreprise' => [
+                'culture',
+                'economie-circulaire',
+                'circuits-courts-filieres',
+                'economie-sociale-et-solidaire'
+            ],
+            'Culture' => [
+                'culture'
+            ],
+            'Aménagement du territoire' => [
+                'batiments-construction',
+                'equipement-public',
+                'espace-public'
+            ],
+            'Europe et international' => [
+                'cooperation-transfrontaliere',
+            ],
+            'Santé' => [
+                'sante'
+            ],
+            'Sport' => [
+                'sport'
+            ],
+            'Emploi' => [
+                'emploi'
+            ],
+            'Transports' => [
+                'mobilite-pour-tous',                
+            ],
+            'Formation' => [
+                'formation'
+            ],
+            'Tourisme' => [
+                'tourisme'
+            ],
+            'Enseignement' => [
+                'education'
+            ],
+            'Agriculture' => [
+                'agriculture'
+            ]
+        ];
+
+        $categories = explode(',', $aidToImport['Les thématiques']);
+        foreach ($categories as $categoryName) {
+            if (isset($mapping[$categoryName])) {
+                foreach ($mapping[$categoryName] as $slugCategory) {
+                    $category = $this->managerRegistry->getRepository(Category::class)->findOneBy([
+                        'slug' => $slugCategory
+                    ]);
+                    if ($category instanceof Category) {
+                        $aid->addCategory($category);
+                    }
+                }
             }
         }
 
         return $aid;
     }
 
-    protected function setAidRecurrence(array $aidToImport, Aid $aid): Aid
+    protected function setAidAudiences(array $aidToImport, Aid $aid): Aid
     {
-        if (!isset($aidToImport['recurrence'])) {
+        if (!isset($aidToImport['Pour qui']) || !is_array($aidToImport['Pour qui'])) {
             return $aid;
         }
-        $aidRecurrence = $this->managerRegistry->getRepository(AidRecurrence::class)->findOneBy(['name' => $aidToImport['recurrence']]);
+
+        $mapping = [
+            'Collectivité' => [
+                'commune',
+                'epci'
+            ],
+            'Entreprise' => [
+                'private-sector',
+            ],
+            'Jeune' => [
+                'private-person'
+            ],
+            'Association' => [
+                'association'
+            ],
+            'Établissement d’enseignement' => [
+                'public-cies'
+            ],
+            'Particulier' => [
+                'private-person'
+            ]
+        ];
+
+        foreach ($mapping as $key => $values) {
+            if (preg_match('/.*'.$key.'.*/i', $aidToImport['Pour qui'])) {
+                foreach ($values as $value) {
+                    $organizationType = $this->managerRegistry->getRepository(OrganizationType::class)->findOneBy([
+                        'slug' => $value
+                    ]);
+                    if ($organizationType instanceof OrganizationType) {
+                        $aid->addAidAudience($organizationType);
+                    }
+                }
+            }
+        }
+
+        return $aid;
+    }
+
+    protected function setAidTypes(array $aidToImport, Aid $aid): Aid
+    {
+        $aidTypes = $this->managerRegistry->getRepository(AidType::class)->findCustom([
+            'slugs' => [
+                AidType::SLUG_OTHER,
+            ]
+        ]);
+        foreach ($aidTypes as $aidType) {
+            $aid->addAidType($aidType);
+        }
+        return $aid;
+    }
+
+    protected function setAidRecurrence(array $aidToImport, Aid $aid): Aid
+    {
+        if (isset($aidToImport['Date d’ouverture']) && trim($aidToImport['Date d’ouverture']) !== ''
+        && isset($aidToImport['Date de clôture']) && trim($aidToImport['Date de clôture']) !== ''
+        ) {
+            $aidRecurrence = $this->managerRegistry->getRepository(AidRecurrence::class)->findOneBy(['slug' => AidRecurrence::SLUG_ONEOFF]);
+        } else {
+            $aidRecurrence = $this->managerRegistry->getRepository(AidRecurrence::class)->findOneBy(['slug' => AidRecurrence::SLUG_ONGOING]);
+        }
         if ($aidRecurrence instanceof AidRecurrence) {
             $aid->setAidRecurrence($aidRecurrence);
         }
@@ -124,68 +224,4 @@ class ImportFluxRegionSudCommand extends ImportFluxCommand
         return $aid;
     }
 
-    protected function setAidAudiences(array $aidToImport, Aid $aid): Aid
-    {
-        if (!isset($aidToImport['targeted_audiences']) || !is_array($aidToImport['targeted_audiences'])) {
-            return $aid;
-        }
-
-        foreach ($aidToImport['targeted_audiences'] as $targetedAudienceName) {
-            // Mostly matches our audiences save for two, so mapping manually here
-            if ($targetedAudienceName == 'Établissements publics (écoles, bibliothèques…)') {
-                $targetedAudienceName = 'Établissement public';
-            } elseif ($targetedAudienceName == 'EPCI à fiscalité propre') {
-                $targetedAudienceName = 'Intercommunalité / Pays';
-            }
-            $targetedAudience = $this->managerRegistry->getRepository(OrganizationType::class)->findOneBy(['name' => $targetedAudienceName]);
-            if ($targetedAudience instanceof OrganizationType) {
-                $aid->addAidAudience($targetedAudience);
-            }
-        }
-        return $aid;
-    }
-
-    protected function setCategories(array $aidToImport, Aid $aid): Aid
-    {
-        if (!isset($aidToImport['categories']) || !is_array($aidToImport['categories'])) {
-            return $aid;
-        }
-        foreach ($aidToImport['categories'] as $categoryName) {
-            $category = $this->managerRegistry->getRepository(Category::class)->findOneBy(['name' => $categoryName]);
-            if ($category instanceof Category) {
-                $aid->addCategory($category);
-            }
-        }
-        return $aid;
-    }
-
-    protected function setKeywords(array $aidToImport, Aid $aid): Aid
-    {
-        if (!isset($aidToImport['categories']) || !is_array($aidToImport['categories'])) {
-            return $aid;
-        }
-        foreach ($aidToImport['categories'] as $categoryName) {
-            $keyword = $this->managerRegistry->getRepository(Keyword::class)->findOneBy(['name' => $categoryName]);
-            if ($keyword instanceof Keyword) {
-                $aid->addKeyword($keyword);
-            }
-        }
-        return $aid;
-    }
-
-    protected function setAidDestinations(array $aidToImport, Aid $aid): Aid
-    {
-        if (!isset($aidToImport['destinations']) || !is_array($aidToImport['destinations'])) {
-            return $aid;
-        }
-        foreach($aidToImport['destinations'] as $destinationName) {
-            // on a un problème avec les apostrophes
-            $destinationName = preg_replace("/'/", "’", $destinationName);
-            $destination = $this->managerRegistry->getRepository(OrganizationType::class)->findOneBy(['name' => $destinationName]);
-            if ($destination instanceof AidDestination) {
-                $aid->addAidDestination($destination);
-            }
-        }
-        return $aid;
-    }
 }

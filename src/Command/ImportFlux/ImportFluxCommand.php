@@ -465,4 +465,18 @@ class ImportFluxCommand extends Command
             return '';
         }
     }
+
+    public function concatHtmlFields(array $fields): ?string
+    {
+        $html = '';
+        foreach ($fields as $field) {
+            if (isset($field) && trim($field) != '') {
+                $html .= ' ' . $this->getCleanHtml($field);
+            }
+        }
+
+        $html = trim($html);
+
+        return $html !== '' ? $html : null;
+    }
 }
