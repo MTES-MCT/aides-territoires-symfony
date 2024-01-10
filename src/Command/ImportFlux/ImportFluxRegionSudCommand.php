@@ -64,6 +64,7 @@ class ImportFluxRegionSudCommand extends ImportFluxCommand
             'contact' => isset($aidToImport['Contact']) ? $this->getCleanHtml($aidToImport['Contact']) : null,
             'dateStart' => $dateStart,
             'dateSubmissionDeadline' => $dateSubmissionDeadline,
+            'isCallForProject' => isset($aidToImport['AAP']) && $aidToImport['AAP'] == '1' ? true : false,
         ];
     }
 
