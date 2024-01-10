@@ -80,7 +80,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
         ['slug' => "invited", 'name' => "Invitation à collaborer"],
         ['slug' => "other", 'name' => "Autre"],
     ];
-
+    const ACQUISITION_CHANNEL_ANIMATOR = 'animator';
     // Propriétés scalaires
     #[ORM\Id]
     #[ORM\GeneratedValue]

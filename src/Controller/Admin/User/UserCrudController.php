@@ -3,11 +3,16 @@
 namespace App\Controller\Admin\User;
 
 use App\Controller\Admin\AtCrudController;
+use App\Controller\Admin\Filter\UserAdministratorOfSearchPageFilter;
+use App\Controller\Admin\Filter\UserCountyFilter;
+use App\Controller\Admin\Filter\UserRoleFilter;
+use App\Entity\Perimeter\Perimeter;
 use App\Entity\User\User;
-use App\Service\User\UserService;
+use Doctrine\ORM\EntityRepository;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Filters;
 use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
 use EasyCorp\Bundle\EasyAdminBundle\Event\BeforeEntityPersistedEvent;
 use EasyCorp\Bundle\EasyAdminBundle\Event\BeforeEntityUpdatedEvent;
@@ -19,15 +24,33 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\FormField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IntegerField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
+use EasyCorp\Bundle\EasyAdminBundle\Filter\ChoiceFilter;
+use EasyCorp\Bundle\EasyAdminBundle\Filter\EntityFilter;
+use EasyCorp\Bundle\EasyAdminBundle\Filter\NullFilter;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class UserCrudController extends AtCrudController implements EventSubscriberInterface
 {
     public static function getEntityFqcn(): string
     {
         return User::class;
+    }
+
+    public function configureFilters(Filters $filters): Filters
+    {
+        return $filters
+        ->add(UserRoleFilter::new('roles'))
+        ->add('isContributor')
+        ->add('isBeneficiary')
+        ->add(UserAdministratorOfSearchPageFilter::new('app', 'Administrateur de PP'))
+        ->add(ChoiceFilter::new('acquisitionChannel', 'Animateur local')->setChoices(['Animateur' => User::ACQUISITION_CHANNEL_ANIMATOR]))
+        ->add(NullFilter::new('apiToken', 'Token API')->setChoiceLabels('Pas de token', 'A un token'))
+        ->add('isCertified')
+        ->add('mlConsent', 'Consentement newsletter')
+        ->add('userGroups')
+        ->add(UserCountyFilter::new('perimeter', 'Département'))
+        ;
     }
 
     public static function getSubscribedEvents(): array
