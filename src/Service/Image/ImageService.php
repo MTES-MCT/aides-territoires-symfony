@@ -32,6 +32,7 @@ class ImageService
      */
     public function sendImageToCloud(
         string $file,
+        string $uploadDir,
         string $fileName
     ): bool
     {
@@ -80,6 +81,30 @@ class ImageService
         } catch (S3Exception $e) {
             return false;
         }
+    }
+
+    public function deleteImageFromCloud(
+        string $fileName
+    )
+    {
+        // Créer un objet Credentials en utilisant les clés d'accès AWS
+        $credentials = new Credentials($this->paramService->get('aws_access_key_id'), $this->paramService->get('aws_secret_access_key'));
+
+        
+        // Créer un client S3
+        $s3 = new S3Client([
+            'version' => 'latest',
+            'region'  => $this->paramService->get('aws_s3_region_name'),
+            'endpoint' => $this->paramService->get('aws_s3_endpoint_url'),
+            'credentials' => $credentials,
+            'use_path_style_endpoint' => true
+        ]);
+
+        // supprime le fichier sur S3
+        $s3->deleteObject([
+            'Bucket' => $this->paramService->get('aws_storage_bucket_name'),
+            'Key'    => $fileName,
+        ]);
     }
 
     /**

@@ -2,9 +2,11 @@
 
 namespace App\EventSubscriber;
 
+use App\Entity\Backer\Backer;
 use App\Entity\Blog\BlogPromotionPost;
 use App\Entity\Perimeter\Perimeter;
 use App\Entity\Perimeter\PerimeterImport;
+use App\Service\Image\ImageService;
 use App\Service\Perimeter\PerimeterService;
 use App\Service\Various\StringService;
 use Doctrine\ORM\EntityManagerInterface;
@@ -19,7 +21,8 @@ class EasyAdminSubscriber implements EventSubscriberInterface
         protected ManagerRegistry $managerRegistry,
         protected StringService $stringService,
         protected PerimeterService $perimeterService,
-        protected EntityManagerInterface $entityManagerInterface
+        protected EntityManagerInterface $entityManagerInterface,
+        protected ImageService $imageService
     )
     {
         ini_set('memory_limit', '5G');
@@ -36,6 +39,10 @@ class EasyAdminSubscriber implements EventSubscriberInterface
     public function beforePerimeterImporterCreate(BeforeEntityPersistedEvent $event)
     {
         $entity = $event->getEntityInstance();
+
+        if ($entity instanceof Backer) {
+            dd($entity);
+        }
 
         if (!($entity instanceof PerimeterImport)) {
             return;
@@ -65,6 +72,13 @@ class EasyAdminSubscriber implements EventSubscriberInterface
     {
         // l'entite
         $entity = $event->getEntityInstance();
+
+        if ($entity instanceof Backer) {
+            if ($entity->getDeleteLogo()) {
+                $this->imageService->deleteImageFromCloud($entity->getLogo());
+                $entity->setLogo(null);
+            }
+        }
 
         if ($entity instanceof BlogPromotionPost) {
             // $this->handleBlogPromotionPostBeforeUpdate($event);

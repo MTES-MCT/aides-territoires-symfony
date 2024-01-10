@@ -29,10 +29,8 @@ use ApiPlatform\OpenApi\Model;
 use App\Filter\AtSearchFilter;
 use App\Filter\Backer\HasFinancedAidsFilter;
 use App\Filter\Backer\HasPublishedFinancedAidsFilter;
-use Serializable;
 use Vich\UploaderBundle\Mapping\Annotation as Vich;
-use Symfony\Component\HttpFoundation\File\File;
-use Symfony\Component\Serializer\Annotation\Ignore;
+
 #[ApiResource(
     // shortName: 'Porteurs',
     operations: [
@@ -104,9 +102,9 @@ class Backer
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $logo = null;
 
-    #[Ignore]
-    #[Vich\UploadableField(mapping: 'backerLogo', fileNameProperty: 'logo')]
-    private ?File $logoFile = null;
+    private $logoFile = null;
+
+    private bool $deleteLogo = false;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $description = null;
@@ -250,16 +248,31 @@ class Backer
 
     public function setLogo(?string $logo): static
     {
-        if (trim($logo) !== '') {
-            $this->logo = self::FOLDER.'/'.$logo;
-        } else {
-            $this->logo = null;
-        }
+        // if (trim($logo) !== '') {
+        //     $this->logo = self::FOLDER.'/'.$logo;
+        // } else {
+        //     $this->logo = null;
+        // }
 
+        $this->logo = $logo;
         return $this;
     }
 
-    public function setLogoFile(?File $logoFile = null): void
+    // public function setLogoFile(?File $logoFile = null): void
+    // {
+    //     $this->logoFile = $logoFile;
+
+    //     if (null !== $logoFile) {
+    //         $this->timeUpdate = new \DateTime(date('Y-m-d H:i:s'));
+    //     }
+    // }
+
+    // public function getLogoFile(): ?File
+    // {
+    //     return $this->logoFile;
+    // }
+
+    public function setLogoFile($logoFile = null): void
     {
         $this->logoFile = $logoFile;
 
@@ -268,7 +281,7 @@ class Backer
         }
     }
 
-    public function getLogoFile(): ?File
+    public function getLogoFile()
     {
         return $this->logoFile;
     }
@@ -757,6 +770,18 @@ class Backer
     public function setTimeUpdate(?\DateTimeInterface $timeUpdate): static
     {
         $this->timeUpdate = $timeUpdate;
+
+        return $this;
+    }
+
+    public function getDeleteLogo(): ?bool
+    {
+        return $this->deleteLogo;
+    }
+
+    public function setDeleteLogo(?bool $deleteLogo): static
+    {
+        $this->deleteLogo = $deleteLogo;
 
         return $this;
     }

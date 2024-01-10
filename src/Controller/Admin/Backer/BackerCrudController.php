@@ -7,9 +7,13 @@ use App\Entity\Backer\Backer;
 use App\Field\TextLengthCountField;
 use App\Field\TrumbowygField;
 use App\Field\VichImageField;
+use Doctrine\ORM\EntityManagerInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Filters;
+use EasyCorp\Bundle\EasyAdminBundle\Config\KeyValueStore;
+use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\FormField;
@@ -26,6 +30,13 @@ class BackerCrudController extends AtCrudController
         return Backer::class;
     }
 
+    public function configureFilters(Filters $filters): Filters
+    {
+        return $filters
+            ->add('isSpotlighted')
+        ;
+    }
+
     public function configureFields(string $pageName): iterable
     {
         yield IdField::new('id')->onlyOnIndex();
@@ -37,10 +48,25 @@ class BackerCrudController extends AtCrudController
         yield TrumbowygField::new('description', 'Description')
         ->onlyOnForms();
 
-        yield VichImageField::new('logoFile', 'Logo du porteur')
-        ->setHelp('Évitez les fichiers trop lourds.')
-        ->hideOnIndex()
+
+        
+        yield ImageField::new('logoFile', 'Logo du porteur')
+        ->setHelp('Évitez les fichiers trop lourds. Préférez les fichiers SVG.')
+        ->setUploadDir($this->fileService->getUploadTmpDirRelative())
+        ->setBasePath($this->paramService->get('cloud_image_url'))
+        ->setUploadedFileNamePattern(Backer::FOLDER.'/[slug]-[timestamp].[extension]')
+        ->setFormTypeOption('upload_new', function(UploadedFile $file, string $uploadDir, string $fileName) {
+            $this->imageService->sendImageToCloud($file, Backer::FOLDER, $fileName);
+            $this->getContext()->getEntity()->getInstance()->setLogo($fileName);
+        })
+        ->onlyOnForms()
         ;
+        yield BooleanField::new('deleteLogo', 'Supprimer le fichier')
+        ->onlyOnForms();
+        // yield VichImageField::new('logoFile', 'Logo du porteur')
+        // ->setHelp('Évitez les fichiers trop lourds.')
+        // ->hideOnIndex()
+        // ;
         yield UrlField::new('externalLink', 'Lien externe')
         ->setHelp('L’URL externe vers laquelle renvoie un clic sur le logo du porteur');
 
@@ -93,5 +119,4 @@ class BackerCrudController extends AtCrudController
             ->add(Crud::PAGE_EDIT, $displayOnFront)
         ;
     }
-
 }
