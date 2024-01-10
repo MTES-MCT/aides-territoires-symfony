@@ -7,6 +7,7 @@ use App\Entity\Blog\BlogPost;
 use App\Entity\Blog\BlogPromotionPost;
 use App\Entity\Perimeter\Perimeter;
 use App\Entity\Perimeter\PerimeterImport;
+use App\Entity\Program\Program;
 use App\Service\Image\ImageService;
 use App\Service\Perimeter\PerimeterService;
 use App\Service\Various\StringService;
@@ -94,6 +95,13 @@ class EasyAdminSubscriber implements EventSubscriberInterface
                 $entity->setImage(null);
             }
             // $this->handleBlogPromotionPostBeforeUpdate($event);
+        }
+
+        if ($entity instanceof Program) {
+            if ($entity->getDeleteLogo()) {
+                $this->imageService->deleteImageFromCloud($entity->getLogo());
+                $entity->setLogo(null);
+            }
         }
 
         // return;

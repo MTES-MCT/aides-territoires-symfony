@@ -44,10 +44,20 @@ class ProgramCrudController extends AtCrudController
         ->hideOnIndex()
         ->hideOnIndex();
 
-        yield VichImageField::new('logoFile', 'Logo')
-        ->setHelp('Évitez les fichiers trop lourds.')
-        ->hideOnIndex()
+        yield ImageField::new('logoFile', 'Logo')
+        ->setHelp('Évitez les fichiers trop lourds. Préférez les fichiers SVG.')
+        ->setUploadDir($this->fileService->getUploadTmpDirRelative())
+        ->setBasePath($this->paramService->get('cloud_image_url'))
+        ->setUploadedFileNamePattern(Program::FOLDER.'/[slug]-[timestamp].[extension]')
+        ->setFormTypeOption('upload_new', function(UploadedFile $file, string $uploadDir, string $fileName) {
+            $this->imageService->sendImageToCloud($file, Program::FOLDER, $fileName);
+            $this->getContext()->getEntity()->getInstance()->setLogo($fileName);
+        })
+        ->onlyOnForms()
         ;
+        yield BooleanField::new('deleteLogo', 'Supprimer le fichier actuel')
+        ->onlyOnForms();
+
         yield AssociationField::new('perimeter', 'Périmètre')
         ->autocomplete();
 

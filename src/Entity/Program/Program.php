@@ -20,8 +20,6 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\OpenApi\Model;
 use App\Controller\Api\Program\ProgramController;
-use Vich\UploaderBundle\Mapping\Annotation as Vich;
-use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Serializer\Attribute\Ignore;
 
 #[ApiResource(
@@ -36,7 +34,6 @@ use Symfony\Component\Serializer\Attribute\Ignore;
         ),
     ],
 )]
-#[Vich\Uploadable]
 #[ORM\Entity(repositoryClass: ProgramRepository::class)]
 class Program
 {
@@ -67,9 +64,9 @@ class Program
     #[ORM\Column(length: 100, nullable: true)]
     private ?string $logo = null;
 
-    #[Ignore]
-    #[Vich\UploadableField(mapping: 'programLogo', fileNameProperty: 'logo')]
-    private ?File $logoFile = null;
+    private $logoFile = null;
+
+    private bool $deleteLogo = false;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     #[Gedmo\Timestampable(on: 'create')]
@@ -183,16 +180,11 @@ class Program
 
     public function setLogo(?string $logo): static
     {
-        if (trim($logo) !== '') {
-            $this->logo = self::FOLDER.'/'.$logo;
-        } else {
-            $this->logo = null;
-        }
-
+        $this->logo = $logo;
         return $this;
     }
 
-    public function setLogoFile(?File $logoFile = null): void
+    public function setLogoFile($logoFile = null): void
     {
         $this->logoFile = $logoFile;
 
@@ -201,7 +193,7 @@ class Program
         }
     }
 
-    public function getLogoFile(): ?File
+    public function getLogoFile()
     {
         return $this->logoFile;
     }
@@ -460,6 +452,18 @@ class Program
     public function setTimeUpdate(?\DateTimeInterface $timeUpdate): static
     {
         $this->timeUpdate = $timeUpdate;
+
+        return $this;
+    }
+
+    public function getDeleteLogo(): ?bool
+    {
+        return $this->deleteLogo;
+    }
+
+    public function setDeleteLogo(?bool $deleteLogo): static
+    {
+        $this->deleteLogo = $deleteLogo;
 
         return $this;
     }

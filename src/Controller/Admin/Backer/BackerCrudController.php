@@ -47,8 +47,6 @@ class BackerCrudController extends AtCrudController
         ;
         yield TrumbowygField::new('description', 'Description')
         ->onlyOnForms();
-
-
         
         yield ImageField::new('logoFile', 'Logo du porteur')
         ->setHelp('Évitez les fichiers trop lourds. Préférez les fichiers SVG.')
@@ -63,10 +61,7 @@ class BackerCrudController extends AtCrudController
         ;
         yield BooleanField::new('deleteLogo', 'Supprimer le fichier actuel')
         ->onlyOnForms();
-        // yield VichImageField::new('logoFile', 'Logo du porteur')
-        // ->setHelp('Évitez les fichiers trop lourds.')
-        // ->hideOnIndex()
-        // ;
+
         yield UrlField::new('externalLink', 'Lien externe')
         ->setHelp('L’URL externe vers laquelle renvoie un clic sur le logo du porteur');
 
