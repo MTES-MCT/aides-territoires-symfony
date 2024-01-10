@@ -61,7 +61,7 @@ class BlogPromotionPostCrudController extends AtCrudController
         ->onlyOnForms()
         ;
         yield BooleanField::new('deleteImage', 'Supprimer le fichier actuel')
-        ->onlyOnForms();
+        ->onlyWhenUpdating();
 
         yield TextField::new('imageAltText', 'Texte alternatif pour l’image')
         ->onlyOnForms();

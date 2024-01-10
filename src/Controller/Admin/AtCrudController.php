@@ -2,8 +2,10 @@
 
 namespace App\Controller\Admin;
 
+use App\Service\Aid\AidSearchFormService;
 use App\Service\File\FileService;
 use App\Service\Image\ImageService;
+use App\Service\User\UserService;
 use App\Service\Various\ParamService;
 use Doctrine\Persistence\ManagerRegistry;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
@@ -16,6 +18,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\KernelInterface;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 enum Direction
 {
@@ -35,7 +38,10 @@ class AtCrudController extends AbstractCrudController
         public FileService $fileService,
         public KernelInterface $kernelInterface,
         public AdminUrlGenerator $adminUrlGenerator,
-        public RequestStack $requestStack
+        public RequestStack $requestStack,
+        public AidSearchFormService $aidSearchFormService,
+        public UserService $userService,
+        public UserPasswordHasherInterface $userPasswordHasherInterface
     ) {
     }
 

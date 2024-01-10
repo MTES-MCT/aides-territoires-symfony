@@ -9,6 +9,7 @@ use App\Entity\Perimeter\Perimeter;
 use App\Entity\Perimeter\PerimeterImport;
 use App\Entity\Program\Program;
 use App\Entity\Project\Project;
+use App\Entity\Search\SearchPage;
 use App\Service\Image\ImageService;
 use App\Service\Perimeter\PerimeterService;
 use App\Service\Various\StringService;
@@ -42,10 +43,6 @@ class EasyAdminSubscriber implements EventSubscriberInterface
     public function beforePerimeterImporterCreate(BeforeEntityPersistedEvent $event)
     {
         $entity = $event->getEntityInstance();
-
-        if ($entity instanceof Backer) {
-            dd($entity);
-        }
 
         if (!($entity instanceof PerimeterImport)) {
             return;
@@ -109,6 +106,17 @@ class EasyAdminSubscriber implements EventSubscriberInterface
             if ($entity->getDeleteImage()) {
                 $this->imageService->deleteImageFromCloud($entity->getImage());
                 $entity->setImage(null);
+            }
+        }
+
+        if ($entity instanceof SearchPage) {
+            if ($entity->getDeleteLogo()) {
+                $this->imageService->deleteImageFromCloud($entity->getLogo());
+                $entity->setLogo(null);
+            }
+            if ($entity->getDeleteMetaImage()) {
+                $this->imageService->deleteImageFromCloud($entity->getMetaImage());
+                $entity->setMetaImage(null);
             }
         }
 

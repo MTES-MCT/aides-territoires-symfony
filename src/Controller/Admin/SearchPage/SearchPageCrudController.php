@@ -34,17 +34,6 @@ use Symfony\Component\HttpKernel\KernelInterface;
 
 class SearchPageCrudController extends AtCrudController
 {
-    public function __construct(
-        public ManagerRegistry $managerRegistry,
-        public ImageService $imageService,
-        public ParamService $paramService,
-        public FileService $fileService,
-        public KernelInterface $kernelInterface,
-        protected AidSearchFormService $aidSearchFormService
-    ) {
-        parent::__construct($managerRegistry, $imageService, $paramService, $fileService, $kernelInterface);
-    }
-
     public static function getEntityFqcn(): string
     {
         return SearchPage::class;
@@ -144,17 +133,36 @@ class SearchPageCrudController extends AtCrudController
         ->setHelp('Sera affichée dans les SERPs. À garder < 120 caractères.')
         ->setFormTypeOption('attr', ['maxlength' => 255]);
 
-        yield VichImageField::new('metaImageFile', 'Image (balise meta)')
+        yield ImageField::new('metaImageFile', 'Image (balise meta)')
         ->setHelp('Vérifiez que l’image a une largeur minimale de 1024px')
-        ->hideOnIndex()
+        ->setUploadDir($this->fileService->getUploadTmpDirRelative())
+        ->setBasePath($this->paramService->get('cloud_image_url'))
+        ->setUploadedFileNamePattern(SearchPage::FOLDER.'/[slug]-[timestamp].[extension]')
+        ->setFormTypeOption('upload_new', function(UploadedFile $file, string $uploadDir, string $fileName) {
+            $this->imageService->sendImageToCloud($file, SearchPage::FOLDER, $fileName);
+            $this->getContext()->getEntity()->getInstance()->setMetaImage($fileName);
+        })
+        ->onlyOnForms()
         ;
+        yield BooleanField::new('deleteMetaImage', 'Supprimer le fichier actuel')
+        ->onlyWhenUpdating();
+
 
         yield FormField::addFieldset('Personnalisation du style');
 
-        yield VichImageField::new('logoFile', 'Logo')
-        ->setHelp('Évitez les fichiers trop lourds. Préférez les fichiers svg.')
-        ->hideOnIndex()
+        yield ImageField::new('logoFile', 'Logo')
+        ->setHelp('Évitez les fichiers trop lourds. Préférez les fichiers SVG.')
+        ->setUploadDir($this->fileService->getUploadTmpDirRelative())
+        ->setBasePath($this->paramService->get('cloud_image_url'))
+        ->setUploadedFileNamePattern(SearchPage::FOLDER.'/[slug]-[timestamp].[extension]')
+        ->setFormTypeOption('upload_new', function(UploadedFile $file, string $uploadDir, string $fileName) {
+            $this->imageService->sendImageToCloud($file, SearchPage::FOLDER, $fileName);
+            $this->getContext()->getEntity()->getInstance()->setLogo($fileName);
+        })
+        ->onlyOnForms()
         ;
+        yield BooleanField::new('deleteLogo', 'Supprimer le fichier actuel')
+        ->onlyWhenUpdating();
 
         yield UrlField::new('logoLink', 'Lien du logo')
         ->setHelp('L’URL vers laquelle renvoie un clic sur le logo partenaire')

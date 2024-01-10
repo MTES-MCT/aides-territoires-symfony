@@ -25,13 +25,6 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class UserCrudController extends AtCrudController implements EventSubscriberInterface
 {
-    public function __construct(
-        private UserService $userService,
-        private UserPasswordHasherInterface $userPasswordHasherInterface
-    )
-    {
-    }
-
     public static function getEntityFqcn(): string
     {
         return User::class;

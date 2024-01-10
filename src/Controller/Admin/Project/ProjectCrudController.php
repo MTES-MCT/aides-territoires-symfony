@@ -80,7 +80,7 @@ class ProjectCrudController extends AtCrudController
         ->onlyOnForms()
         ;
         yield BooleanField::new('deleteImage', 'Supprimer le fichier actuel')
-        ->onlyOnForms();
+        ->onlyWhenUpdating();
 
         yield DateField::new('dueDate', 'Date d’échéance')
         ->hideOnIndex();

@@ -72,7 +72,7 @@ class BlogPostCrudController extends AtCrudController
         ->onlyOnForms()
         ;
         yield BooleanField::new('deleteLogo', 'Supprimer le fichier actuel')
-        ->onlyOnForms();
+        ->onlyWhenUpdating();
 
         yield TrumbowygField::new('hat', 'Texte d’introduction')
         ->onlyOnForms()

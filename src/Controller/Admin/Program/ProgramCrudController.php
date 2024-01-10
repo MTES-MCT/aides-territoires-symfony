@@ -56,7 +56,7 @@ class ProgramCrudController extends AtCrudController
         ->onlyOnForms()
         ;
         yield BooleanField::new('deleteLogo', 'Supprimer le fichier actuel')
-        ->onlyOnForms();
+        ->onlyWhenUpdating();
 
         yield AssociationField::new('perimeter', 'Périmètre')
         ->autocomplete();

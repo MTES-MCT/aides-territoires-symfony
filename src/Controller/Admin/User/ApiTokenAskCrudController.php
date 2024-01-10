@@ -23,17 +23,6 @@ use Symfony\Component\HttpKernel\KernelInterface;
 
 class ApiTokenAskCrudController extends AtCrudController
 {
-    public function __construct(
-        public ManagerRegistry $managerRegistry,
-        public ImageService $imageService,
-        public ParamService $paramService,
-        public FileService $fileService,
-        public KernelInterface $kernelInterface,
-        public UserService $userService
-    ) {
-        parent::__construct($managerRegistry, $imageService, $paramService, $fileService, $kernelInterface);
-    }
-
     public static function getEntityFqcn(): string
     {
         return ApiTokenAsk::class;

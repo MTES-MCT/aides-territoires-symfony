@@ -60,7 +60,7 @@ class BackerCrudController extends AtCrudController
         ->onlyOnForms()
         ;
         yield BooleanField::new('deleteLogo', 'Supprimer le fichier actuel')
-        ->onlyOnForms();
+        ->onlyWhenUpdating();
 
         yield UrlField::new('externalLink', 'Lien externe')
         ->setHelp('L’URL externe vers laquelle renvoie un clic sur le logo du porteur');
