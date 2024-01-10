@@ -4,15 +4,14 @@ namespace App\Controller\Admin\Blog;
 
 use App\Controller\Admin\AtCrudController;
 use App\Entity\Blog\BlogPost;
-use App\Entity\User\User;
 use App\Field\TrumbowygField;
 use App\Field\VichImageField;
 use App\Repository\User\UserRepository;
-use Doctrine\ORM\QueryBuilder;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ChoiceField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\DateField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\FormField;
@@ -62,10 +61,18 @@ class BlogPostCrudController extends AtCrudController
         ])
         ;
 
-        yield VichImageField::new('logoFile', 'Image de l\'article')
-        ->setHelp('Évitez les fichiers trop lourds.')
-        ->hideOnIndex()
+        yield ImageField::new('logoFile', 'Image de l\'article')
+        ->setUploadDir($this->fileService->getUploadTmpDirRelative())
+        ->setBasePath($this->paramService->get('cloud_image_url'))
+        ->setUploadedFileNamePattern(BlogPost::FOLDER.'/[slug]-[timestamp].[extension]')
+        ->setFormTypeOption('upload_new', function(UploadedFile $file, string $uploadDir, string $fileName) {
+            $this->imageService->sendImageToCloud($file, BlogPost::FOLDER, $fileName);
+            $this->getContext()->getEntity()->getInstance()->setLogo($fileName);
+        })
+        ->onlyOnForms()
         ;
+        yield BooleanField::new('deleteLogo', 'Supprimer le fichier actuel')
+        ->onlyOnForms();
 
         yield TrumbowygField::new('hat', 'Texte d’introduction')
         ->onlyOnForms()

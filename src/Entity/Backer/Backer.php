@@ -29,7 +29,6 @@ use ApiPlatform\OpenApi\Model;
 use App\Filter\AtSearchFilter;
 use App\Filter\Backer\HasFinancedAidsFilter;
 use App\Filter\Backer\HasPublishedFinancedAidsFilter;
-use Vich\UploaderBundle\Mapping\Annotation as Vich;
 
 #[ApiResource(
     // shortName: 'Porteurs',
@@ -68,7 +67,6 @@ use Vich\UploaderBundle\Mapping\Annotation as Vich;
 )]
 #[ApiFilter(HasFinancedAidsFilter::class)]
 #[ApiFilter(HasPublishedFinancedAidsFilter::class)]
-#[Vich\Uploadable]
 #[ORM\Entity(repositoryClass: BackerRepository::class)]
 class Backer
 {
@@ -248,29 +246,9 @@ class Backer
 
     public function setLogo(?string $logo): static
     {
-        // if (trim($logo) !== '') {
-        //     $this->logo = self::FOLDER.'/'.$logo;
-        // } else {
-        //     $this->logo = null;
-        // }
-
         $this->logo = $logo;
         return $this;
     }
-
-    // public function setLogoFile(?File $logoFile = null): void
-    // {
-    //     $this->logoFile = $logoFile;
-
-    //     if (null !== $logoFile) {
-    //         $this->timeUpdate = new \DateTime(date('Y-m-d H:i:s'));
-    //     }
-    // }
-
-    // public function getLogoFile(): ?File
-    // {
-    //     return $this->logoFile;
-    // }
 
     public function setLogoFile($logoFile = null): void
     {

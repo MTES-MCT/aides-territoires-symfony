@@ -10,11 +10,8 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
-use Vich\UploaderBundle\Mapping\Annotation as Vich;
-use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Serializer\Attribute\Ignore;
 
-#[Vich\Uploadable]
 #[ORM\Entity(repositoryClass: BlogPostRepository::class)]
 #[ORM\Index(columns: ['status'], name: 'status_blog')]
 #[ORM\Index(columns: ['slug'], name: 'slug_blog')]
@@ -54,9 +51,9 @@ class BlogPost
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $logo = null;
 
-    #[Ignore]
-    #[Vich\UploadableField(mapping: 'blogPostThumb', fileNameProperty: 'logo')]
-    private ?File $logoFile = null;
+    private $logoFile = null;
+
+    private bool $deleteLogo = false;
 
     #[ORM\Column(length: 16)]
     private ?string $status = null;
@@ -156,16 +153,12 @@ class BlogPost
 
     public function setLogo(?string $logo): static
     {
-        if (trim($logo) !== '') {
-            $this->logo = self::FOLDER.'/'.$logo;
-        } else {
-            $this->logo = null;
-        }
+        $this->logo = $logo;
 
         return $this;
     }
 
-    public function setLogoFile(?File $logoFile = null): void
+    public function setLogoFile($logoFile = null): void
     {
         $this->logoFile = $logoFile;
 
@@ -174,7 +167,7 @@ class BlogPost
         }
     }
 
-    public function getLogoFile(): ?File
+    public function getLogoFile()
     {
         return $this->logoFile;
     }
@@ -313,6 +306,18 @@ class BlogPost
                 $logBlogPostView->setBlogPost(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getDeleteLogo(): ?bool
+    {
+        return $this->deleteLogo;
+    }
+
+    public function setDeleteLogo(?bool $deleteLogo): static
+    {
+        $this->deleteLogo = $deleteLogo;
 
         return $this;
     }

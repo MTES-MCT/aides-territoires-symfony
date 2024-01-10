@@ -3,6 +3,7 @@
 namespace App\EventSubscriber;
 
 use App\Entity\Backer\Backer;
+use App\Entity\Blog\BlogPost;
 use App\Entity\Blog\BlogPromotionPost;
 use App\Entity\Perimeter\Perimeter;
 use App\Entity\Perimeter\PerimeterImport;
@@ -74,6 +75,13 @@ class EasyAdminSubscriber implements EventSubscriberInterface
         $entity = $event->getEntityInstance();
 
         if ($entity instanceof Backer) {
+            if ($entity->getDeleteLogo()) {
+                $this->imageService->deleteImageFromCloud($entity->getLogo());
+                $entity->setLogo(null);
+            }
+        }
+
+        if ($entity instanceof BlogPost) {
             if ($entity->getDeleteLogo()) {
                 $this->imageService->deleteImageFromCloud($entity->getLogo());
                 $entity->setLogo(null);
