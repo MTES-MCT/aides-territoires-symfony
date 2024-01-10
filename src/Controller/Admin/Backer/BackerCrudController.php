@@ -61,7 +61,7 @@ class BackerCrudController extends AtCrudController
         })
         ->onlyOnForms()
         ;
-        yield BooleanField::new('deleteLogo', 'Supprimer le fichier actuek')
+        yield BooleanField::new('deleteLogo', 'Supprimer le fichier actuel')
         ->onlyOnForms();
         // yield VichImageField::new('logoFile', 'Logo du porteur')
         // ->setHelp('Évitez les fichiers trop lourds.')

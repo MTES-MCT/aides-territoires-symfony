@@ -89,6 +89,10 @@ class EasyAdminSubscriber implements EventSubscriberInterface
         }
 
         if ($entity instanceof BlogPromotionPost) {
+            if ($entity->getDeleteImage()) {
+                $this->imageService->deleteImageFromCloud($entity->getImage());
+                $entity->setImage(null);
+            }
             // $this->handleBlogPromotionPostBeforeUpdate($event);
         }
 

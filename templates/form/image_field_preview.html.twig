@@ -4,7 +4,7 @@
     {% if entity %}
         {% if form.vars.name == 'logo' or form.vars.name == 'logoFile' %}
             {% set currentImage = entity.logo ?? null %}
-        {% elseif form.vars.name == 'image' %}
+        {% elseif form.vars.name == 'image' or form.vars.name == 'imageFile' %}
             {% set currentImage = entity.image ?? null %}
         {% elseif form.vars.name == 'metaImage' %}
             {% set currentImage = entity.metaImage ?? null %}

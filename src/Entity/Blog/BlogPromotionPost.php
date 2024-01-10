@@ -16,11 +16,8 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
-use Vich\UploaderBundle\Mapping\Annotation as Vich;
-use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Serializer\Attribute\Ignore;
 
-#[Vich\Uploadable]
 #[ORM\Entity(repositoryClass: BlogPromotionPostRepository::class)]
 #[ORM\Index(columns: ['status'], name: 'status_blog_promotion_post')]
 #[ORM\Index(columns: ['slug'], name: 'slug_blog_promotion_post')]
@@ -77,9 +74,9 @@ class BlogPromotionPost
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $image = null;
 
-    #[Ignore]
-    #[Vich\UploadableField(mapping: 'blogPromotionPostThumb', fileNameProperty: 'image')]
-    private ?File $imageFile = null;
+    private $imageFile = null;
+
+    private bool $deleteImage = false;
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $imageAltText = null;
@@ -240,16 +237,11 @@ class BlogPromotionPost
 
     public function setImage(?string $image): static
     {
-        if (trim($image) !== '') {
-            $this->image = self::FOLDER.'/'.$image;
-        } else {
-            $this->image = null;
-        }
-
+        $this->image = $image;
         return $this;
     }
 
-    public function setImageFile(?File $imageFile = null): void
+    public function setImageFile($imageFile = null): void
     {
         $this->imageFile = $imageFile;
 
@@ -258,7 +250,7 @@ class BlogPromotionPost
         }
     }
 
-    public function getImageFile(): ?File
+    public function getImageFile()
     {
         return $this->imageFile;
     }
@@ -451,6 +443,18 @@ class BlogPromotionPost
     public function setKeywordReferences(?KeywordReference $keywordReferences): static
     {
         $this->keywordReferences = $keywordReferences;
+
+        return $this;
+    }
+
+    public function getDeleteImage(): ?bool
+    {
+        return $this->deleteImage;
+    }
+
+    public function setDeleteImage(?bool $deleteImage): static
+    {
+        $this->deleteImage = $deleteImage;
 
         return $this;
     }
