@@ -209,7 +209,7 @@ class AidCrudController extends AtCrudController
         ->setColumns(12);
 
         yield FormField::addFieldset('Instructeurs');
-        yield CollectionField::new('aidFinancers', 'Instructeurs')
+        yield CollectionField::new('aidInstructors', 'Instructeurs')
         ->useEntryCrudForm(AidInstructorAddBackerToAidCrudController::class)
         ->setColumns(12)
         ;
