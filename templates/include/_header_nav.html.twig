@@ -23,17 +23,7 @@
             <a class="fr-nav__link" href="{{ path('app_program_program') }}" target="_self" title="Programmes d’aides">Programmes d’aides</a>
         </li>
         <li class="fr-nav__item" data-fr-js-navigation-item="true">
-            <button class="fr-nav__btn" aria-expanded="false" aria-controls="menu-actualites" data-fr-js-collapse-button="true" title="Actualités">Actualités</button>
-            <div class="fr-collapse fr-menu" id="menu-actualites" data-fr-js-collapse="true">
-                <ul class="fr-menu__list">
-                    <li>
-                        <a class="fr-nav__link" href="{{ path('app_blog_blog') }}" target="_self" title="Le blog">Le blog</a>
-                    </li>
-                    {# <li>
-                        <a class="fr-nav__link" href="{{ path('app_portal_portal_details', {'slug': 'europe'}) }}" target="_self" title="Les financements européens 2021-2027">Les financements européens 2021-2027</a>
-                    </li> #}
-                </ul>
-            </div>
+            <a class="fr-nav__link" href="{{ path('app_blog_blog') }}" target="_self" title="Actualités">Actualités</a>
         </li>
         <li class="fr-nav__item" data-fr-js-navigation-item="true">
             <a class="fr-nav__link" href="{{ path('app_portal_portal') }}" target="_self" title="Portails">Portails</a>
