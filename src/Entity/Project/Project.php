@@ -15,20 +15,16 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
-use Serializable;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
-use Vich\UploaderBundle\Mapping\Annotation as Vich;
-use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Serializer\Annotation\Ignore;
 
-#[Vich\Uploadable]
 #[ORM\Index(columns: ['status'], name: 'status_project')]
 #[ORM\Index(columns: ['is_public'], name: 'is_public_project')]
 #[ORM\Index(columns: ['name'], name: 'name_project_fulltext', flags: ['fulltext'])]
 #[ORM\Index(columns: ['description'], name: 'description_project_fulltext', flags: ['fulltext'])]
 #[ORM\Index(columns: ['name', 'description'], name: 'name_description_project_fulltext', flags: ['fulltext'])]
 #[ORM\Entity(repositoryClass: ProjectRepository::class)]
-class Project implements \Serializable
+class Project
 {
     const FOLDER = 'projects';
     
@@ -134,9 +130,9 @@ class Project implements \Serializable
     #[ORM\Column(length: 100, nullable: true)]
     private ?string $image = null;
 
-    #[Ignore]
-    #[Vich\UploadableField(mapping: 'projectThumb', fileNameProperty: 'image')]
-    private ?File $imageFile = null;
+    private $imageFile = null;
+
+    private bool $deleteImage = false;
 
     private ?UploadedFile $imageUploadedFile;
 
@@ -384,16 +380,12 @@ class Project implements \Serializable
 
     public function setImage(?string $image): static
     {
-        if (trim($image) !== '') {
-            $this->image = self::FOLDER.'/'.$image;
-        } else {
-            $this->image = null;
-        }
+        $this->image = $image;
         return $this;
     }
 
     #[Ignore]
-    public function setImageFile(?File $imageFile = null): void
+    public function setImageFile($imageFile = null): void
     {
         $this->imageFile = $imageFile;
 
@@ -403,7 +395,7 @@ class Project implements \Serializable
     }
 
     #[Ignore]
-    public function getImageFile(): ?File
+    public function getImageFile()
     {
         return $this->imageFile;
     }
@@ -645,18 +637,15 @@ class Project implements \Serializable
         return $this->name ?? 'Projet';
     }
 
-    public function serialize()
+    public function getDeleteImage(): ?bool
     {
-        return serialize(array(
-            $this->id,
-            $this->name,
-            $this->slug,
-            $this->description,
-        ));
+        return $this->deleteImage;
     }
 
-    public function unserialize($serialized)
+    public function setDeleteImage(?bool $deleteImage): static
     {
-        
+        $this->deleteImage = $deleteImage;
+
+        return $this;
     }
 }

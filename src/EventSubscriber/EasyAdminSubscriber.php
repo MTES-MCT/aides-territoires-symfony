@@ -8,6 +8,7 @@ use App\Entity\Blog\BlogPromotionPost;
 use App\Entity\Perimeter\Perimeter;
 use App\Entity\Perimeter\PerimeterImport;
 use App\Entity\Program\Program;
+use App\Entity\Project\Project;
 use App\Service\Image\ImageService;
 use App\Service\Perimeter\PerimeterService;
 use App\Service\Various\StringService;
@@ -101,6 +102,13 @@ class EasyAdminSubscriber implements EventSubscriberInterface
             if ($entity->getDeleteLogo()) {
                 $this->imageService->deleteImageFromCloud($entity->getLogo());
                 $entity->setLogo(null);
+            }
+        }
+
+        if ($entity instanceof Project) {
+            if ($entity->getDeleteImage()) {
+                $this->imageService->deleteImageFromCloud($entity->getImage());
+                $entity->setImage(null);
             }
         }
 

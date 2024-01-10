@@ -68,10 +68,20 @@ class ProjectCrudController extends AtCrudController
         yield TrumbowygField::new('privateDescription', 'Notes internes du projet')
         ->hideOnIndex();
 
-        yield VichImageField::new('imageFile', 'Image')
-        ->setHelp('Évitez les fichiers trop lourds.')
-        ->hideOnIndex()
+        yield ImageField::new('imageFile', 'Image')
+        ->setHelp('Évitez les fichiers trop lourds. Préférez les fichiers SVG.')
+        ->setUploadDir($this->fileService->getUploadTmpDirRelative())
+        ->setBasePath($this->paramService->get('cloud_image_url'))
+        ->setUploadedFileNamePattern(Project::FOLDER.'/[slug]-[timestamp].[extension]')
+        ->setFormTypeOption('upload_new', function(UploadedFile $file, string $uploadDir, string $fileName) {
+            $this->imageService->sendImageToCloud($file, Project::FOLDER, $fileName);
+            $this->getContext()->getEntity()->getInstance()->setImage($fileName);
+        })
+        ->onlyOnForms()
         ;
+        yield BooleanField::new('deleteImage', 'Supprimer le fichier actuel')
+        ->onlyOnForms();
+
         yield DateField::new('dueDate', 'Date d’échéance')
         ->hideOnIndex();
         yield ChoiceField::new('step', 'Avancement du projet')
