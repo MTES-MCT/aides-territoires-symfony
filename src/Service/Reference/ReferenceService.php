@@ -70,8 +70,8 @@ class ReferenceService
     {
         $highlightedWords = [];
         $synonyms = $this->getSynonymes($keyword);
-        if (isset($synonyms['objects_string'])) {
-          $objects = explode(' ', $synonyms['objects_string']);
+        if (isset($synonyms['simple_words_string'])) {
+          $objects = explode(' ', $synonyms['simple_words_string']);
           foreach ($objects as $object) {
             $highlightedWords[] = str_replace(['"'], '', $object);
           }

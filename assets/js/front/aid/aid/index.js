@@ -5,7 +5,7 @@ import 'jquery-highlight/jquery.highlight.js';
 
 $(function(){
     if (typeof highlightedWords !== 'undefined') {
-        $('body').highlight(highlightedWords);
+        $('.highlightable').highlight(highlightedWords);
     }
 
     $(document).on({

@@ -5,7 +5,7 @@ import 'jquery-highlight/jquery.highlight.js';
 $(document).ready(function () {
 
     if (typeof highlightedWords !== 'undefined') {
-        $('body').highlight(highlightedWords);
+        $('.highlightable').highlight(highlightedWords);
     }
 
     $("#clipboard-btn").on("click", function () {
