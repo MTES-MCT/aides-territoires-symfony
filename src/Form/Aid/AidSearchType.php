@@ -349,7 +349,8 @@ class AidSearchType extends AbstractType
 
             'attr' => [
                 'data-controller' => 'custom-autocomplete'
-            ]
+            ],
+            'allow_extra_fields' => true,
             
         ]);
     }
