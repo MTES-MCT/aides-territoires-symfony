@@ -36,11 +36,13 @@ class ProjectCrudController extends AtCrudController
     public function configureFilters(Filters $filters): Filters
     {
         return $filters
+            ->add('isPublic')
             ->add(ChoiceFilter::new('status')->setChoices([
-                Project::STATUS_DRAFT => Project::STATUS_DRAFT,
-                Project::STATUS_REVIEWABLE => Project::STATUS_REVIEWABLE,
-                Project::STATUS_PUBLISHED => Project::STATUS_PUBLISHED
+                'Brouillon' => Project::STATUS_DRAFT,
+                'En revue' => Project::STATUS_REVIEWABLE,
+                'Publié' => Project::STATUS_PUBLISHED
             ]))
+            ->add(ChoiceFilter::new('contractLink')->setChoices(Project::CONTRACT_LINK_BY_SLUG))
         ;
     }
 
