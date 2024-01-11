@@ -487,10 +487,12 @@ class AidCrudController extends AtCrudController
         yield DateTimeField::new('timeCreate', 'Date de création')
         ->setFormTypeOption('attr', ['readonly' => true])
         ->hideOnIndex()
-        ->setColumns(12);
+        ->setColumns(12)
+        ->hideWhenCreating();
         yield DateTimeField::new('timeUpdate', 'Date de mise à jour')
         ->setFormTypeOption('attr', ['readonly' => true])
         ->hideOnIndex()
+        ->hideWhenCreating()
         ->setColumns(12);
         yield DateTimeField::new('timePublished', 'Première date et heure de publication')
         ->setFormTypeOption('attr', ['readonly' => true])
