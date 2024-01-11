@@ -200,6 +200,9 @@ class AidCrudController extends AtCrudController
         yield CollectionField::new('aidFinancers', 'Porteurs d\'aides')
         ->useEntryCrudForm(AidFinancerAddBackerToAidCrudController::class)
         ->setColumns(12)
+        ->formatValue(function ($value) {
+            return implode('<br>', $value->toArray());
+        })
         ;
 
         yield FormField::addFieldset('Porteurs d\'aides suggérés');
@@ -212,6 +215,9 @@ class AidCrudController extends AtCrudController
         yield CollectionField::new('aidInstructors', 'Instructeurs')
         ->useEntryCrudForm(AidInstructorAddBackerToAidCrudController::class)
         ->setColumns(12)
+        ->formatValue(function ($value) {
+            return implode('<br>', $value->toArray());
+        })
         ;
         
         yield FormField::addFieldset('Instructeurs suggérés');
