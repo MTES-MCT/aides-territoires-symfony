@@ -1,3 +1,5 @@
+require('datatables');
+
 var autocompleteChoicesClicked = false;
 
 $(function(){
@@ -24,5 +26,11 @@ $(function(){
                 $('form[name="cartography_search"]').submit();
             }
         }
+    });
+
+
+    $('#backers-by-departement table').DataTable({
+        info: false,
+        "language": datatables_fr_strings,
     });
 });
