@@ -33,7 +33,8 @@ class UserCountyFilter implements FilterInterface
         $ids = $queryBuilder->getEntityManager()->getRepository(Perimeter::class)->getIdPerimetersContainedIn(['perimeter' => $filterDataDto->getValue()]);
 
         $queryBuilder
-            ->innerJoin(sprintf('%s.%s', $filterDataDto->getEntityAlias(), $filterDataDto->getProperty()), 'perimeter')
+            ->innerJoin('entity.organizations', 'organizations')
+            ->innerJoin('organizations.perimeter', 'perimeter')
             ->andWhere('perimeter.id IN (:ids)')
             ->setParameter('ids', $ids);
             ;
