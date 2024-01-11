@@ -636,6 +636,7 @@ class AidController extends FrontController
             throw new NotFoundHttpException('Cette aide n\'exite pas');
         }
 
+        // TODO Revoir pour compléter
         // limlitation des champs à ce qui était fait dans Django
         $newAid = new Aid();
         $newAid->setName($aid->getName());

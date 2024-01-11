@@ -327,7 +327,7 @@ class AidController extends FrontController
         $newAid->setLocalCharacteristics($aid->getLocalCharacteristics());
         $newAid->setImportDataSource($aid->getImportDataSource());
         $newAid->setEligibilityTest($aid->getEligibilityTest());
-        $newAid->setIsGeneric($aid->isIsGeneric());
+        $newAid->setIsGeneric(false);
         $newAid->setImportRawObject($aid->getImportRawObject());
         $newAid->setLoanAmount($aid->getLoanAmount());
         $newAid->setOtherFinancialAidComment($aid->getOtherFinancialAidComment());

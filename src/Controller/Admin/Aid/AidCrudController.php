@@ -3,10 +3,17 @@
 namespace App\Controller\Admin\Aid;
 
 use App\Controller\Admin\AtCrudController;
+use App\Controller\Admin\Filter\Aid\AidAuthorFilter;
+use App\Controller\Admin\Filter\Aid\AidBackerFilter;
+use App\Controller\Admin\Filter\Aid\AidPerimeterFilter;
+use App\Controller\Admin\Filter\Aid\AidGenericFilter;
+use App\Controller\Admin\Filter\Aid\AidStateFilter;
 use App\Entity\Aid\Aid;
+use App\Field\JsonField;
 use App\Field\TextLengthCountField;
 use App\Field\TrumbowygField;
 use App\Service\Export\CsvExporterService;
+use Doctrine\DBAL\Types\JsonType;
 use Doctrine\ORM\EntityRepository;
 use EasyCorp\Bundle\EasyAdminBundle\Collection\FieldCollection;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
@@ -42,12 +49,30 @@ class AidCrudController extends AtCrudController
     {
         return $filters
             ->add(ChoiceFilter::new('status')->setChoices([
-                Aid::STATUS_DRAFT => Aid::STATUS_DRAFT,
-                Aid::STATUS_REVIEWABLE => Aid::STATUS_REVIEWABLE,
-                Aid::STATUS_PUBLISHED => Aid::STATUS_PUBLISHED
+                'Brouillon' => Aid::STATUS_DRAFT,
+                'En revue' => Aid::STATUS_REVIEWABLE,
+                'Publiée' => Aid::STATUS_PUBLISHED,
+                'Supprimée' => Aid::STATUS_DELETED,
+                'Fustionnée' => Aid::STATUS_MERGED,
             ]))
             ->add('importUpdated')
+            ->add('contactInfoUpdated')
+            ->add('hasBrokenLink')
             ->add('datePublished')
+            ->add(AidStateFilter::new('state', 'Etat'))
+            ->add('isCharged')
+            ->add(AidGenericFilter::new('generic', 'Aide générique'))
+            ->add('aidRecurrence')
+            ->add('isImported')
+            ->add('importDataSource')
+            ->add('isCallForProject')
+            ->add('inFranceRelance')
+            ->add(AidAuthorFilter::new('author', 'Auteur'))
+            ->add(AidBackerFilter::new('backer', 'Porteur d\'aide'))
+            ->add(AidPerimeterFilter::new('perimeter', 'Périmètre'))
+            ->add('aidAudiences')
+            ->add('programs')
+            ->add('categories')
             // most of the times there is no need to define the
             // filter type because EasyAdmin can guess it automatically
             // ->add(BooleanFilter::new('published'))
@@ -368,10 +393,12 @@ class AidCrudController extends AtCrudController
         ->setHelp('Identifiant de la démarche sur Démarches-Simplifiées')
         ->hideOnIndex()
         ->setColumns(12);
-        yield TextareaField::new('dsMapping', 'Mapping JSON de la démarche')
+
+        yield JsonField::new('dsMapping', 'Mapping JSON de la démarche')
         ->setHelp('Mapping JSON pour pré-remplissage sur Démarches-Simplifiées')
         ->hideOnIndex()
-        ->setColumns(12);
+        ->setColumns(12)
+        ;
 
         yield FormField::addFieldset('Éligibilité');
         yield AssociationField::new('eligibilityTest', 'Test d’éligibilité')

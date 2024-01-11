@@ -201,6 +201,7 @@ class AidService
         if (!$aid->getDsMapping()) {
             return $datas;
         }
+        
         // utilisateur non connecté
         if (!$user) {
             $datas['ds_application_url'] = true;

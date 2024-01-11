@@ -151,7 +151,6 @@ class AidRepository extends ServiceEntityRepository
                 Criteria::expr()->gte($alias.'dateSubmissionDeadline', $today),
                 Criteria::expr()->isNull($alias.'dateSubmissionDeadline')
             ))
-            // ->andWhere(Criteria::expr()->isNull($alias.'genericAid'))
         ;
     }
 
@@ -168,10 +167,46 @@ class AidRepository extends ServiceEntityRepository
         ;
     }
 
+    public static function deadlineCriteria($alias = 'a.'): Criteria
+    {
+        $today = new \DateTime(date('Y-m-d'));
+        $dateLimit = new \DateTime(date('Y-m-d'));
+        $dateLimit->add(new \DateInterval('P'.Aid::APPROACHING_DEADLINE_DELTA.'D'));
+
+        return Criteria::create()
+            ->andWhere(Criteria::expr()->eq($alias.'status', Aid::STATUS_PUBLISHED))
+            ->andWhere(Criteria::expr()->gte($alias.'dateSubmissionDeadline', $today))
+            ->andWhere(Criteria::expr()->lte($alias.'dateSubmissionDeadline', $dateLimit))
+        ;
+    }
+    
+    public static function expiredCriteria($alias = 'a.'): Criteria
+    {
+        $today = new \DateTime(date('Y-m-d'));
+
+        return Criteria::create()
+            ->andWhere(Criteria::expr()->lt($alias.'dateSubmissionDeadline', $today))
+        ;
+    }
+
     public static function grantCriteria($alias = '') : Criteria
     {
         return Criteria::create()
             ->andWhere(Criteria::expr()->eq($alias.'aidTypes.slug', AidType::SLUG_GRANT))
+        ;
+    }
+
+    public static function localCriteria($alias = '') : Criteria
+    {
+        return Criteria::create()
+            ->andWhere(Criteria::expr()->neq($alias.'genericAid', null))
+        ;
+    }
+
+    public static function genericCriteria($alias = '') : Criteria
+    {
+        return Criteria::create()
+            ->andWhere(Criteria::expr()->eq($alias.'isGeneric', true))
         ;
     }
 
