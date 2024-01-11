@@ -35,6 +35,7 @@
         "clipboard": "^2.0.11",
         "datatables": "^1.10.18",
         "jquery": "^3.7.0",
+        "jquery-highlight": "^3.5.0",
         "remixicon": "^3.5.0",
         "trumbowyg": "^2.27.3"
     },

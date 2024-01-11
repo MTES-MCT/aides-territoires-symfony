@@ -1,8 +1,13 @@
 import '../../log/log-register-from-next-page-warning.js';
 import '../../log/log-promotion-blog-post-click.js';
 import '../../log/log-aid-search.js';
+import 'jquery-highlight/jquery.highlight.js';
 
 $(function(){
+    if (typeof highlightedWords !== 'undefined') {
+        $('body').highlight(highlightedWords);
+    }
+
     $(document).on({
         change: function(e) {
             $(this).parents('form').submit();

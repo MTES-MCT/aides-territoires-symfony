@@ -1,6 +1,12 @@
 import '../../log/log-aid-details.js';
+import 'jquery-highlight/jquery.highlight.js';
+
 
 $(document).ready(function () {
+
+    if (typeof highlightedWords !== 'undefined') {
+        $('body').highlight(highlightedWords);
+    }
 
     $("#clipboard-btn").on("click", function () {
         input_url = $("#currentUrl");

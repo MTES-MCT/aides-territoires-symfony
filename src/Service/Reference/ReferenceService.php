@@ -66,6 +66,19 @@ class ReferenceService
     }   
     
 
+    public function getHighlightedWords(string $keyword): array
+    {
+        $highlightedWords = [];
+        $synonyms = $this->getSynonymes($keyword);
+        if (isset($synonyms['objects_string'])) {
+          $objects = explode(' ', $synonyms['objects_string']);
+          foreach ($objects as $object) {
+            $highlightedWords[] = str_replace(['"'], '', $object);
+          }
+        }
+
+        return $highlightedWords;
+    }
 
     private function enleverArticles($content, $articles) {
         $content = str_replace(array("/","(",")",",",":","–"), " ",strtolower($content));

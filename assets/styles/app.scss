@@ -9,6 +9,8 @@
 @import '_mixins';
 @import 'form/fieldset';
 
-body{
-    
+
+.highlight{
+    background-color: $highlightColor;
+    font-weight: bold;
 }

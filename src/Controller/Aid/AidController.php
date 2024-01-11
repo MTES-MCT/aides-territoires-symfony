@@ -9,10 +9,8 @@ use App\Entity\Aid\AidInstructor;
 use App\Entity\Aid\AidProject;
 use App\Entity\Aid\AidSuggestedAidProject;
 use App\Entity\Alert\Alert;
-use App\Entity\Organization\OrganizationType;
 use App\Entity\Perimeter\Perimeter;
 use App\Entity\Project\Project;
-use App\Entity\User\Notification;
 use App\Entity\User\User;
 use App\Form\Aid\AidSearchType;
 use App\Form\Aid\SuggestToProjectType;
@@ -241,7 +239,8 @@ class AidController extends FrontController
             'formAlertCreate' => $formAlertCreate->createView(),
             'querystring' => $query,
             'perimeterName' => (isset($aidParams['perimeterFrom']) && $aidParams['perimeterFrom'] instanceof Perimeter) ? $aidParams['perimeterFrom']->getName() : '',
-            'categoriesName' => $categoriesName
+            'categoriesName' => $categoriesName,
+            'highlightedWords' => $requestStack->getCurrentRequest()->getSession()->get('highlightedWords', [])
         ]);
     }
 
@@ -607,7 +606,8 @@ class AidController extends FrontController
             'formAddToProject' => $formAddToProject->createView(),
             'formSuggestToProject' => $formSuggestToProject->createView(),
             'aidDetailPage' => true,
-            'openModalSuggest' => $openModalSuggest ?? false
+            'openModalSuggest' => $openModalSuggest ?? false,
+            'highlightedWords' => $requestStack->getCurrentRequest()->getSession()->get('highlightedWords', [])
         ]);
     }
 }

@@ -314,7 +314,8 @@ class ProjectController extends FrontController
         RequestStack $requestStack,
         AidProjectRepository $aidProjectRepository,
         ManagerRegistry $managerRegistry,
-        NotificationService $notificationService
+        NotificationService $notificationService,
+        ReferenceService $referenceService
     ): Response
     {
         $projectCreated = $requestStack->getCurrentRequest()->get('projectCreated', 0);
@@ -353,6 +354,9 @@ class ProjectController extends FrontController
             }
 
             $aidsSuggested = $aidRepository->findCustom($aidParams);
+            if (count($aidsSuggested) > 0) {
+                $requestStack->getCurrentRequest()->getSession()->set('highlightedWords', $referenceService->getHighlightedWords($aidParams['keyword']));
+            }
         }
 
         // formulaire suppression aidProject
