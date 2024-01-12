@@ -515,6 +515,7 @@
             </div>
             {% endif %}
 
+            {% if aid.contact or aid.applicationUrl or aid.originUrl %}
             <div class="fr-mb-5w" id="contact">
                 <h2 class="fr-h3 fr-mb-2w">Contact</h2>
                 <div>
@@ -552,6 +553,7 @@
                     </ul>
                 </div>
             </div>
+            {% endif %}
         </div>
     </section>
 </article>

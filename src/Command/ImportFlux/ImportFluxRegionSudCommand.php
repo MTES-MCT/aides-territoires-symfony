@@ -31,6 +31,41 @@ class ImportFluxRegionSudCommand extends ImportFluxCommand
         return $importUniqueid;
     }
 
+    protected function callApi()
+    {
+        $aidsFromImport = [];
+
+        for ($i=0; $i<$this->nbPages; $i++) {
+            $this->currentPage = $i;
+            $importUrl = $this->dataSource->getImportApiUrl();
+            if ($this->paginationEnabled) {
+                $importUrl .= '?limit=' . $this->nbByPages . '&offset=' . ($this->currentPage * $this->nbByPages);
+            }
+            try {
+                $response = $this->httpClientInterface->request(
+                    'GET',
+                    $importUrl,
+                    $this->getApiOptions()
+                );
+                $content = $response->getContent();
+                $content = $response->toArray();
+    
+                // retourne directement un tableau d'aides
+                $aidsFromImport = $content;
+            } catch (\Exception $e) {
+                throw new \Exception($e->getMessage());
+            }
+            if (!count($aidsFromImport)) {
+                throw new \Exception('Le flux ne contient aucune aide');
+            }
+        }
+
+
+        return $aidsFromImport;
+    }
+
+
+
     protected function getFieldsMapping(array $aidToImport, array $params = null): array
     {
         $importRaws = $this->getImportRaws($aidToImport, ['Date d’ouverture', 'Date de clôture']);
@@ -57,11 +92,11 @@ class ImportFluxRegionSudCommand extends ImportFluxCommand
             'importRawObject' => $importRawObject,
             'name' => isset($aidToImport['Nom de l’aide']) ? strip_tags($aidToImport['Nom de l’aide']) : null,
             'nameInitial' => isset($aidToImport['Nom de l’aide']) ? strip_tags($aidToImport['Nom de l’aide']) : null,
-            'description' => $this->concatHtmlFields(['Chapo', 'Pour qui', 'Pourquoi candidater', 'Quelle est la nature de l’aide (type d’aide)', 'Plus d’infos']),
-            'eligibility' => $this->concatHtmlFields(['Quelles sont les critères d’éligibilité', 'Comment en bénéficier ']),
+            'description' => $this->concatHtmlFields($aidToImport, ['Chapo', 'Pour qui', 'Pourquoi candidater', 'Quelle est la nature de l’aide (type d’aide)', 'Plus d’infos']),
+            'eligibility' => $this->concatHtmlFields($aidToImport, ['Quelles sont les critères d’éligibilité', 'Comment en bénéficier ']),
             'originUrl' => isset($aidToImport['Lien vers le descriptif complet']) ? $aidToImport['Lien vers le descriptif complet'] : null,
             'applicationUrl' => isset($aidToImport['Lien Je fais ma demande']) ? $aidToImport['Lien Je fais ma demande'] : null,
-            'contact' => isset($aidToImport['Contact']) ? $this->getCleanHtml($aidToImport['Contact']) : null,
+            'contact' => isset($aidToImport['Contact']) ? $this->getHtmlOrNull($aidToImport['Contact']) : null,
             'dateStart' => $dateStart,
             'dateSubmissionDeadline' => $dateSubmissionDeadline,
             'isCallForProject' => isset($aidToImport['AAP']) && $aidToImport['AAP'] == '1' ? true : false,

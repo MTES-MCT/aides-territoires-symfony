@@ -37,6 +37,7 @@ class LogAidView
     private ?\DateTimeInterface $dateCreate = null;
 
     #[ORM\ManyToOne(inversedBy: 'logAidViews')]
+    #[ORM\JoinColumn(onDelete:'SET NULL')]
     private ?Aid $aid = null;
 
     #[ORM\ManyToMany(targetEntity: OrganizationType::class, inversedBy: 'logAidViews')]

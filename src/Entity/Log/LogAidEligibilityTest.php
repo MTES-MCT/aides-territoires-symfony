@@ -42,6 +42,7 @@ class LogAidEligibilityTest
     private ?\DateTimeInterface $dateCreate = null;
 
     #[ORM\ManyToOne(inversedBy: 'logAidEligibilityTests')]
+    #[ORM\JoinColumn(onDelete:'SET NULL')]
     private ?Aid $aid = null;
 
     #[ORM\ManyToOne(inversedBy: 'logAidEligibilityTests')]

@@ -457,6 +457,11 @@ class ImportFluxCommand extends Command
         return $date;
     }
 
+    protected function getHtmlOrNull(string $html): ?string
+    {
+        return $this->getCleanHtml($html) == '' ? null : $this->getCleanHtml($html);
+    }
+
     protected function getCleanHtml(string $html): string
     {
         try {
@@ -466,12 +471,12 @@ class ImportFluxCommand extends Command
         }
     }
 
-    public function concatHtmlFields(array $fields): ?string
+    public function concatHtmlFields(array $aidToImport, array $fields): ?string
     {
         $html = '';
         foreach ($fields as $field) {
-            if (isset($field) && trim($field) != '') {
-                $html .= ' ' . $this->getCleanHtml($field);
+            if (isset($aidToImport[$field]) && trim($aidToImport[$field]) != '') {
+                $html .= ' ' . $this->getCleanHtml($aidToImport[$field]);
             }
         }
 
