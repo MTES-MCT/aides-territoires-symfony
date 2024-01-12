@@ -31,7 +31,7 @@ class PerimeterAutocompleteType extends AbstractType
                 return $this->perimeterService->getSmartName($entity);
             },
             'data_class' => null,
-            'preload' => true,
+            'preload' => false,
             'query_builder' => function(PerimeterRepository $perimeterRepository) {
                 return $perimeterRepository->getQueryBuilder([
                     'isVisibleToUsers' => true,
