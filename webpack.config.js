@@ -57,6 +57,7 @@ Encore
      */
 
     .addEntry('import-scss/admin/admin', './assets/js/import-scss/admin/admin.js')
+    .addEntry('import-scss/admin/perimeter/combine', './assets/js/import-scss/admin/perimeter/combine.js')
     .addEntry('import-scss/home', './assets/js/import-scss/home.js')
     .addEntry('import-scss/static/sitemap', './assets/js/import-scss/static/sitemap.js')
     .addEntry('import-scss/blog/blogpost/details', './assets/js/import-scss/blog/blogpost/details.js')

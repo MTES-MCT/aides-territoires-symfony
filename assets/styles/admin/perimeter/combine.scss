@@ -1,0 +1,13 @@
+@import 'tom-select/dist/css/tom-select.default.min.css';
+@import '../../_variables';
+@import '../../_mixins';
+
+
+.fr-input-group{
+    margin: 0 0 15px 0; 
+}
+
+.help-text{
+    display: block;
+    font-style: italic;
+}

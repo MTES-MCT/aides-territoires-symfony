@@ -4,13 +4,10 @@ namespace App\Controller\Admin\Perimeter;
 
 use App\Controller\Admin\AtCrudController;
 use App\Entity\Perimeter\Perimeter;
-use App\Entity\Perimeter\PerimeterData;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
-use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ArrayField;
-use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ChoiceField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\CollectionField;
@@ -151,6 +148,24 @@ class PerimeterCrudController extends AtCrudController
     {
         return parent::configureCrud($crud)
         ->overrideTemplate('crud/edit', 'admin/perimeter/edit.html.twig')  
+        ;
+    }
+
+    public function configureActions(Actions $actions): Actions
+    {
+        // action pour afficher le qrCode
+        $combine = Action::new('combine', 'Combiner')
+            ->setHtmlAttributes(['title' => 'Combiner'])
+            ->linkToRoute('admin_perimeter_combine', function (Perimeter $entity) {
+                return [
+                    'id' => $entity->getId()
+                ];
+            })
+        ;
+
+        return parent::configureActions($actions)
+            ->add(Crud::PAGE_INDEX, $combine)
+            ->add(Crud::PAGE_EDIT, $combine)
         ;
     }
 }
