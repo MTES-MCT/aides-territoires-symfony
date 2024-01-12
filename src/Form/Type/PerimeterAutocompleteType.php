@@ -55,7 +55,7 @@ class PerimeterAutocompleteType extends AbstractType
                 } else { // c'est une string
                     $qb
                     ->andWhere('
-                        MATCH_AGAINST(p.name) AGAINST (:nameMatchAgainst IN BOOLEAN MODE) > 5
+                        MATCH_AGAINST(p.name) AGAINST (:nameMatchAgainst IN BOOLEAN MODE) > 1
                     ')
                     ->setParameter('nameMatchAgainst', $query.'*')
                     ;
