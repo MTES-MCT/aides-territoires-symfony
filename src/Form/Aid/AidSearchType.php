@@ -135,6 +135,7 @@ class AidSearchType extends AbstractType
                 return $er->createQueryBuilder('c')
                     ->innerJoin('c.categoryTheme', 'categoryTheme')
                     ->orderBy('categoryTheme.name', 'ASC')
+                    ->addOrderBy('c.name', 'ASC')
                 ;
             },
             'multiple' => true,

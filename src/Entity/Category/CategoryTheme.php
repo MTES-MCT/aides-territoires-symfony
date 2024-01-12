@@ -15,6 +15,7 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\OpenApi\Model;
 use App\Controller\Api\Category\CategoryThemeController;
 use App\Entity\Aid\Aid;
+use Doctrine\ORM\Mapping\OrderBy;
 
 #[ApiResource(
     shortName: 'Thématiques',
@@ -52,6 +53,7 @@ class CategoryTheme
     private ?string $shortDescription = null;
 
     #[ORM\OneToMany(mappedBy: 'categoryTheme', targetEntity: Category::class)]
+    #[OrderBy(['name' => 'ASC'])]
     private Collection $categories;
 
     #[ORM\ManyToMany(targetEntity: LogAidSearch::class, mappedBy: 'themes')]
