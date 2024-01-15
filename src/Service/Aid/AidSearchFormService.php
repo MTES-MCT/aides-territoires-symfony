@@ -109,15 +109,10 @@ class AidSearchFormService
                 unset($params[$key]);
             }
         }
-
+        
         // les noms qui peuvent varier
         $keysMapping = [
             'categorysearch' => 'categories',
-            'programs' => 'programs[]',
-            'backers' => 'backers[]',
-            'aidTypes' => 'aidTypes[]',
-            'aidSteps' => 'aidSteps[]',
-            'aidDestinations' => 'aidDestinations[]',
         ];
         foreach ($params as $key => $value) {
             foreach ($keysMapping as $keyMapping => $keyMappingValue) {
@@ -138,12 +133,28 @@ class AidSearchFormService
             'aidSteps[]',
             'aidDestinations[]',
         ];
-
         foreach ($params as $key => $param) {
             if (in_array($key, $keysForceArray) && !is_array($params[$key])) {
                 $params[$key] = [$param];
             }
         }
+
+        // gestion de prolbème avec les tableaux, ex: aidTypes[] ou aidTypes
+        $keysMapping = [
+            'programs' => 'programs[]',
+            'backers' => 'backers[]',
+            'aidTypes' => 'aidTypes[]',
+            'aidSteps' => 'aidSteps[]',
+            'aidDestinations' => 'aidDestinations[]',
+        ];
+        foreach ($params as $key => $value) {
+            foreach ($keysMapping as $keyMapping => $keyMappingValue) {
+                if (strpos($key, $keyMapping) !== false) {
+                    $params[$keyMappingValue] = $value;
+                }
+            }
+        }
+
 
         // clé qu'on veu pas garder
         $keysToDelete = [
@@ -154,7 +165,7 @@ class AidSearchFormService
                 unset($params[$key]);
             }
         }
-
+        
         // clé sans values
         foreach ($params as $key => $param) {
             if ($param == '') {
