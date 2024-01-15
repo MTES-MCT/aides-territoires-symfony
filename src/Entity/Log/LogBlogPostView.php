@@ -28,9 +28,11 @@ class LogBlogPostView
     private ?\DateTimeInterface $dateCreate = null;
 
     #[ORM\ManyToOne(inversedBy: 'logBlogPostViews')]
+    #[ORM\JoinColumn(onDelete:'SET NULL')]
     private ?Organization $organization = null;
 
     #[ORM\ManyToOne(inversedBy: 'logBlogPostViews')]
+    #[ORM\JoinColumn(onDelete:'SET NULL')]
     private ?BlogPost $blogPost = null;
 
     #[ORM\ManyToOne(inversedBy: 'logBlogPostViews')]

@@ -33,6 +33,7 @@ class LogBlogPromotionPostClick
     private ?\DateTimeInterface $dateCreate = null;
 
     #[ORM\ManyToOne(inversedBy: 'logBlogPromotionPostClicks')]
+    #[ORM\JoinColumn(onDelete:'SET NULL')]
     private ?BlogPromotionPost $blogPromotionPost = null;
 
     public function getId(): ?int

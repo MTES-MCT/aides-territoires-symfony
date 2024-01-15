@@ -42,6 +42,7 @@ class LogAidCreatedsFolder
     private ?Aid $aid = null;
 
     #[ORM\ManyToOne(inversedBy: 'logAidCreatedsFolders')]
+    #[ORM\JoinColumn(onDelete:'SET NULL')]
     private ?Organization $organization = null;
 
     #[ORM\ManyToOne(inversedBy: 'logAidCreatedsFolders')]

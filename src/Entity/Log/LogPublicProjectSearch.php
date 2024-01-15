@@ -37,9 +37,11 @@ class LogPublicProjectSearch
     private ?\DateTimeInterface $dateCreate = null;
 
     #[ORM\ManyToOne(inversedBy: 'logPublicProjectSearches')]
+    #[ORM\JoinColumn(onDelete:'SET NULL')]
     private ?Organization $organization = null;
 
     #[ORM\ManyToOne(inversedBy: 'logPublicProjectSearches')]
+    #[ORM\JoinColumn(onDelete:'SET NULL')]
     private ?Perimeter $perimeter = null;
 
     #[ORM\ManyToOne(inversedBy: 'logPublicProjectSearches')]

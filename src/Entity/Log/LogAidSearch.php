@@ -49,9 +49,11 @@ class LogAidSearch
     private ?string $search = null;
 
     #[ORM\ManyToOne(inversedBy: 'logAidSearches')]
+    #[ORM\JoinColumn(onDelete:'SET NULL')]
     private ?Perimeter $perimeter = null;
 
     #[ORM\ManyToOne(inversedBy: 'logAidSearches')]
+    #[ORM\JoinColumn(onDelete:'SET NULL')]
     private ?Organization $organization = null;
 
     #[ORM\ManyToOne(inversedBy: 'logAidSearches')]

@@ -32,9 +32,11 @@ class LogBackerView
     private ?\DateTimeInterface $dateCreate = null;
 
     #[ORM\ManyToOne(inversedBy: 'logBackerViews')]
+    #[ORM\JoinColumn(onDelete:'SET NULL')]
     private ?Backer $backer = null;
 
     #[ORM\ManyToOne(inversedBy: 'logBackerViews')]
+    #[ORM\JoinColumn(onDelete:'SET NULL')]
     private ?Organization $organization = null;
 
     #[ORM\ManyToOne(inversedBy: 'logBackerViews')]

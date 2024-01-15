@@ -46,6 +46,7 @@ class LogAidEligibilityTest
     private ?Aid $aid = null;
 
     #[ORM\ManyToOne(inversedBy: 'logAidEligibilityTests')]
+    #[ORM\JoinColumn(onDelete:'SET NULL')]
     private ?EligibilityTest $eligibilityTest = null;
 
     public function getId(): ?int

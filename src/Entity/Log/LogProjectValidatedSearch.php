@@ -37,9 +37,11 @@ class LogProjectValidatedSearch
     private ?\DateTimeInterface $dateCreate = null;
 
     #[ORM\ManyToOne(inversedBy: 'logProjectValidatedSearches')]
+    #[ORM\JoinColumn(onDelete:'SET NULL')]
     private ?Organization $organization = null;
 
     #[ORM\ManyToOne(inversedBy: 'logProjectValidatedSearches')]
+    #[ORM\JoinColumn(onDelete:'SET NULL')]
     private ?Perimeter $perimeter = null;
 
     #[ORM\ManyToOne(inversedBy: 'logProjectValidatedSearches')]

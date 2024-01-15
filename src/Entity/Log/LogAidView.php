@@ -44,6 +44,7 @@ class LogAidView
     private Collection $organizationTypes;
 
     #[ORM\ManyToOne(inversedBy: 'logAidViews')]
+    #[ORM\JoinColumn(onDelete:'SET NULL')]
     private ?Organization $organization = null;
 
     #[ORM\ManyToOne(inversedBy: 'logAidViews')]

@@ -31,9 +31,11 @@ class LogProgramView
     private ?\DateTimeInterface $dateCreate = null;
 
     #[ORM\ManyToOne(inversedBy: 'logProgramViews')]
+    #[ORM\JoinColumn(onDelete:'SET NULL')]
     private ?Organization $organization = null;
 
     #[ORM\ManyToOne(inversedBy: 'logProgramViews')]
+    #[ORM\JoinColumn(onDelete:'SET NULL')]
     private ?Program $program = null;
 
     #[ORM\ManyToOne(inversedBy: 'logProgramViews')]
