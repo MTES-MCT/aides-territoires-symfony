@@ -213,11 +213,18 @@ class AidCrudController extends AtCrudController
         ;
         yield AssociationField::new('author', 'Auteur')
         ->autocomplete();
+        $nbAidsLive = 0;
         if ($entity && $entity->getAuthor()) {
-            yield IntegerField::new('author.nbAidsLive', 'Du même auteur')
-            ->setHelp('Nb. d\'aides live créées par le même utilisateur')
-            ->setColumns(12);
+            $nbAidsLive = $entity->getAuthor()->getNbAidsLive();
         }
+        yield IntegerField::new('nbAidsLive', 'Du même auteur')
+        ->setHelp('Nb. d\'aides live créées par le même utilisateur')
+        ->setFormTypeOptions([
+            'data' => $nbAidsLive,
+            'attr' => ['readonly' => true],
+            'mapped' => false
+        ])
+        ->setColumns(12);
 
         yield FormField::addFieldset('Porteurs d’aides');
         yield CollectionField::new('aidFinancers', 'Porteurs d\'aides')

@@ -142,7 +142,9 @@ class AidService
 
     public function userCanSee(Aid $aid, ?User $user) : bool {
         if (!$aid->isPublished()) {
-            if ($user && ($user->getId() == $aid->getAuthor()->getId() || $this->userService->isUserGranted($user, User::ROLE_ADMIN))) {
+            if ($user && ($user->getId() == $aid->getAuthor()->getId())) {
+                return true;
+            } else if ($user && $this->userService->isUserGranted($user, User::ROLE_ADMIN)) {
                 return true;
             } else {
                 return false;
