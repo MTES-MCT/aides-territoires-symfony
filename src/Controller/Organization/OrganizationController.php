@@ -57,45 +57,51 @@ class OrganizationController extends FrontController
             if ($form->isValid()) {
                 $organization = $user->getDefaultOrganization() ?? new Organization();
 
-                $organization->setName($form->get('organizationName')->getData());
-                $organization->setOrganizationType($form->get('organizationType')->getData());
-                $organization->setPerimeter($user->getPerimeter());
-                $departementsCode = ($organization->getPerimeter()) ? $organization->getPerimeter()->getDepartments() : null;
-                $departementCode = $departementsCode[0] ?? null;
-                if ($departementCode) {
-                    $departement = $perimeterRepository->findOneBy([
-                        'code' => $departementCode,
-                        'scale' => Perimeter::SCALE_COUNTY
-                    ]);
-                    if ($departement instanceof Perimeter) {
-                        $organization->setPerimeterDepartment($departement);
+                try {
+                    if ($form->get('organizationName')->getData() && $form->get('organizationType')->getData()) {
+                        $organization->setName($form->get('organizationName')->getData());
+                        $organization->setOrganizationType($form->get('organizationType')->getData());
+                        $organization->setPerimeter($user->getPerimeter());
+                        $departementsCode = ($organization->getPerimeter()) ? $organization->getPerimeter()->getDepartments() : null;
+                        $departementCode = $departementsCode[0] ?? null;
+                        if ($departementCode) {
+                            $departement = $perimeterRepository->findOneBy([
+                                'code' => $departementCode,
+                                'scale' => Perimeter::SCALE_COUNTY
+                            ]);
+                            if ($departement instanceof Perimeter) {
+                                $organization->setPerimeterDepartment($departement);
+                            }
+                        }
+            
+                        $regionsCode = ($organization->getPerimeter()) ? $organization->getPerimeter()->getRegions() : null;
+                        $regionCode = $regionsCode[0] ?? null;
+                        if ($regionCode) {
+                            $region = $perimeterRepository->findOneBy([
+                                'code' => $regionCode,
+                                'scale' => Perimeter::SCALE_REGION
+                            ]);
+                            if ($region instanceof Perimeter) {
+                                $organization->setPerimeterRegion($region);
+                            }
+                        }
+                        $organization->setIntercommunalityType($form->get('intercommunalityType')->getData());
+                        $organization->setAddress($form->get('address')->getData());
+                        $organization->setCityName($form->get('cityName')->getData());
+                        $organization->setZipCode($form->get('zipCode')->getData());
+                        $organization->setSirenCode($form->get('sirenCode')->getData());
+                        $organization->setSiretCode($form->get('siretCode')->getData());
+                        $organization->setApeCode($form->get('apeCode')->getData());
+                        $organization->setInseeCode($form->get('inseeCode')->getData());
+                        
+                        // si nouvelle organization
+                        if (!$user->getDefaultOrganization()) {
+                            $user->addOrganization($organization);
+                        }
                     }
+                } catch (\Exception $e) {
                 }
-    
-                $regionsCode = ($organization->getPerimeter()) ? $organization->getPerimeter()->getRegions() : null;
-                $regionCode = $regionsCode[0] ?? null;
-                if ($regionCode) {
-                    $region = $perimeterRepository->findOneBy([
-                        'code' => $regionCode,
-                        'scale' => Perimeter::SCALE_REGION
-                    ]);
-                    if ($region instanceof Perimeter) {
-                        $organization->setPerimeterRegion($region);
-                    }
-                }
-                $organization->setIntercommunalityType($form->get('intercommunalityType')->getData());
-                $organization->setAddress($form->get('address')->getData());
-                $organization->setCityName($form->get('cityName')->getData());
-                $organization->setZipCode($form->get('zipCode')->getData());
-                $organization->setSirenCode($form->get('sirenCode')->getData());
-                $organization->setSiretCode($form->get('siretCode')->getData());
-                $organization->setApeCode($form->get('apeCode')->getData());
-                $organization->setInseeCode($form->get('inseeCode')->getData());
                 
-                // si nouvelle organization
-                if (!$user->getDefaultOrganization()) {
-                    $user->addOrganization($organization);
-                }
     
                 // sauvegarde
                 $managerRegistry->getManager()->persist($user); 
