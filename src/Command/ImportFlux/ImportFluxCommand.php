@@ -21,9 +21,6 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 #[AsCommand(name: 'at:import_flux:generic', description: 'Import de flux générique, à étendre à chaque nouveau flux')]
 class ImportFluxCommand extends Command
 {
-    const IMPORT_LICENCE_UNKNOWN = 'Inconnu';
-    const IMPORT_LICENCE_OPEN_2 = 'Licence ouverte 2.0';
-
     protected InputInterface $input;
     protected OutputInterface $output;
     protected string $commandTextStart = '<Import de flux générique, à étendre à chaque nouveau flux';
@@ -224,7 +221,7 @@ class ImportFluxCommand extends Command
             $aid->setImportDataSource($this->dataSource);
             $aid->setImportUniqueid($this->getImportUniqueid($aidToImport));
             $aid->setImportDataUrl($this->dataSource->getImportDataUrl());
-            $importLicence = $this->dataSource->getImportLicence() ?? static::IMPORT_LICENCE_UNKNOWN;
+            $importLicence = $this->dataSource->getImportLicence() ?? DataSource::SLUG_LICENCE_UNKNOWN;
             $aid->setImportShareLicence($importLicence);
             $aid->setImportRawObject($aidToImport);
             $aid->setAuthor($this->dataSource->getAidAuthor());

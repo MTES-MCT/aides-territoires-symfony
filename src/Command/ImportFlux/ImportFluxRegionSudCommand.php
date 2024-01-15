@@ -87,7 +87,7 @@ class ImportFluxRegionSudCommand extends ImportFluxCommand
         }
 
         return [
-            'importDataMention' => 'Ces données sont mises à disposition par le Conseil départemental de la Manche.',
+            'importDataMention' => 'Ces données sont mises à disposition par le Conseil Régional PACA.',
             'importRawObjectCalendar' => $importRawObjectCalendar,
             'importRawObject' => $importRawObject,
             'name' => isset($aidToImport['Nom de l’aide']) ? strip_tags($aidToImport['Nom de l’aide']) : null,

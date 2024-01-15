@@ -9,6 +9,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\ChoiceField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\DateField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\NumberField;
@@ -43,7 +44,13 @@ class DataSourceCrudController extends AtCrudController
         ->setHelp('L\'URL utilisée par le script d\'import');
         yield UrlField::new('importDataUrl', 'URL d\'origine de la donnée importée')
         ->onlyOnForms();
-
+        $choices = [];
+        foreach (DataSource::LICENCES as $licence) {
+            $choices[$licence['name']] = $licence['slug'];
+        }
+        yield ChoiceField::new('importLicence', 'Licence de la donnée importée')
+        ->onlyOnForms()
+        ->setChoices($choices);
         yield AssociationField::new('contactTeam', 'Contact (Team AT)')
         ->setFormTypeOption('query_builder', function (UserRepository $entityRepository) {
             return $entityRepository->getQueryBuilder(['onlyAdmin' => true]);

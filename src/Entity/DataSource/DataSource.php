@@ -16,6 +16,13 @@ use Gedmo\Mapping\Annotation as Gedmo;
 #[ORM\Entity(repositoryClass: DataSourceRepository::class)]
 class DataSource
 {
+    const SLUG_LICENCE_UNKNOWN = 'unknown';
+    const SLUG_LICENCE_OPENLICENCE20 = 'openlicence20';
+    const LICENCES = [
+        ['slug' => self::SLUG_LICENCE_UNKNOWN, 'name' => 'Inconnue'],
+        ['slug' => self::SLUG_LICENCE_OPENLICENCE20, 'name' => 'Licence ouverte 2.0']
+    ];
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
