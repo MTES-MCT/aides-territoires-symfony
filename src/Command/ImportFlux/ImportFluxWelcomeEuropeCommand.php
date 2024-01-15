@@ -15,7 +15,7 @@ use App\Entity\Organization\Organization;
 use App\Entity\Organization\OrganizationType;
 
 #[AsCommand(name: 'at:import_flux:welcome_europe', description: 'Import de flux welcome europe')]
-class ImportFluxWelcomeEurope extends ImportFluxCommand
+class ImportFluxWelcomeEuropeCommand extends ImportFluxCommand
 {
     protected string $commandTextStart = '<Import de flux welcome europe';
     protected string $commandTextEnd = '>Import de flux welcome europe';
