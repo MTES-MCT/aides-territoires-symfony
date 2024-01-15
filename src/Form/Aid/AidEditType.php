@@ -101,7 +101,7 @@ class AidEditType extends AbstractType
             ])
             ->add('organization', EntityType::class, [
                 'required' => true,
-                'label' => 'L\'organization pour laquelle vous publiez cette aide',
+                'label' => 'L\'organisation pour laquelle vous publiez cette aide',
                 'class' => Organization::class,
                 'choice_label' => 'name',
                 'query_builder' => function(EntityRepository $entityRepository) {
