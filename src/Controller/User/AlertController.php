@@ -13,7 +13,7 @@ use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Annotation\Route;
 
-#[Route(priority:1)]
+#[Route(priority:5)]
 class AlertController extends FrontController
 {
     #[Route('/comptes/alertes/vos-alertes/', name: 'app_user_alert')]
