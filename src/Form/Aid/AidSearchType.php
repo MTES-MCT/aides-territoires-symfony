@@ -188,7 +188,7 @@ class AidSearchType extends AbstractType
                 'expanded' => true
             ];
             if ($options['forceAidTypes'] !== false) {
-                $aidTypeParams['aidTypes'] = $options['forceAidTypes'];
+                $aidTypeParams['data'] = $options['forceAidTypes'];
             }
             
             $backersParams = [
