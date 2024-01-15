@@ -661,6 +661,12 @@ class Aid
     #[ORM\ManyToOne(inversedBy: 'aids')]
     private ?Organization $organization = null;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $applicationUrlText = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $originUrlText = null;
+
 
     /**
      * <Non Database Fields
@@ -2373,6 +2379,30 @@ class Aid
     public function setOrganization(?Organization $organization): static
     {
         $this->organization = $organization;
+
+        return $this;
+    }
+
+    public function getApplicationUrlText(): ?string
+    {
+        return $this->applicationUrlText;
+    }
+
+    public function setApplicationUrlText(?string $applicationUrlText): static
+    {
+        $this->applicationUrlText = $applicationUrlText;
+
+        return $this;
+    }
+
+    public function getOriginUrlText(): ?string
+    {
+        return $this->originUrlText;
+    }
+
+    public function setOriginUrlText(?string $originUrlText): static
+    {
+        $this->originUrlText = $originUrlText;
 
         return $this;
     }

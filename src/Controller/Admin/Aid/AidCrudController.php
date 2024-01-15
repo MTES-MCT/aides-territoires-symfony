@@ -358,9 +358,19 @@ class AidCrudController extends AtCrudController
         yield UrlField::new('originUrl', 'Plus d’informations')
         ->hideOnIndex()
         ->setColumns(12);
+        yield TextField::new('originUrlText', 'Texte du bouton plus d’informations')
+        ->setHelp('Texte du bouton plus d’informations. Laisser vide pour utiliser le texte par défaut.')
+        ->onlyOnForms()
+        ->setColumns(12);
+
         yield UrlField::new('applicationUrl', 'Candidater à l’aide')
         ->hideOnIndex()
         ->setColumns(12);
+        yield TextField::new('applicationUrlText', 'Texte du bouton de candidature')
+        ->setHelp('Texte du bouton de candidature. Laisser vide pour utiliser le texte par défaut.')
+        ->onlyOnForms()
+        ->setColumns(12);
+
         yield BooleanField::new('hasBrokenLink', 'Contient un lien cassé ?')
         ->hideOnIndex()
         ->setColumns(12);

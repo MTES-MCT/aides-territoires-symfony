@@ -377,7 +377,11 @@
                     {% if aid.originUrl %}
                         <li>
                             <a class="fr-btn fr-btn--secondary" id="origin_url_btn" target="_blank" rel="noopener" title="Lien vers plus d’informations - ouvre une nouvelle fenêtre" href="{{ aid.originUrl }}">
-                                {% if aid.programs[0] is defined and aid.programs[0].slug == "fonds-vert" and aid.originUrl|split('.')|last == ".pdf" %}Cahier d’accompagnement{% else %}Plus d’informations{% endif %}
+                                {% if aid.programs[0] is defined and aid.programs[0].slug == "fonds-vert" and aid.originUrl|split('.')|last == ".pdf" %}
+                                Cahier d’accompagnement
+                                {% else %}
+                                {% if aid.originUrlText %}{{ aid.originUrlText }}{% else %}Plus d’informations{% endif %}
+                                {% endif %}
                             </a>
                         </li>
                     {% endif %}
@@ -386,7 +390,7 @@
                         <li>
                             {% if dsDatas.ds_application_url and searchPage is not defined %}
                             <button class="fr-btn" data-fr-opened="false" aria-controls="ds-modal">
-                                Candidater à l’aide
+                                {% if aid.applicationUrlText %}{{ aid.applicationUrlText }}{% else %}Candidater à l’aide{% endif %}
                             </button>
                             {% else %}
                             <a class="fr-btn at-application-url-btn" id="application-url-btn-left" target="_blank" rel="noopener" title="Lien pour candidater à l’aide - ouvre une nouvelle fenêtre"
@@ -395,7 +399,7 @@
                             {% else %}
                                 href="{{ aid.applicationUrl }}">
                             {% endif %}
-                                Candidater à l’aide
+                                {% if aid.applicationUrlText %}{{ aid.applicationUrlText }}{% else %}Candidater à l’aide{% endif %}
                             </a>
                             {% endif %}
                         </li>
@@ -527,7 +531,11 @@
                         {% if aid.originUrl %}
                             <li>
                                 <a class="fr-btn fr-btn--secondary" id="origin_url_btn" target="_blank" rel="noopener" title="Lien vers plus d’informations - ouvre une nouvelle fenêtre" href="{{ aid.originUrl }}">
-                                    {% if aid.programs[0] is defined and aid.programs[0].slug == "fonds-vert" and aid.originUrl|split('.')|last == ".pdf" %}Cahier d’accompagnement{% else %}Plus d’informations{% endif %}
+                                    {% if aid.programs[0] is defined and aid.programs[0].slug == "fonds-vert" and aid.originUrl|split('.')|last == ".pdf" %}
+                                    Cahier d’accompagnement
+                                    {% else %}
+                                    {% if aid.originUrlText %}{{ aid.originUrlText }}{% else %}Plus d’informations{% endif %}
+                                    {% endif %}
                                 </a>
                             </li>
                         {% endif %}
@@ -536,7 +544,7 @@
                         <li>
                             {% if dsDatas.ds_application_url and searchPage is not defined %}
                             <button class="fr-btn" data-fr-opened="false" aria-controls="ds-modal">
-                                Candidater à l’aide
+                                {% if aid.applicationUrlText %}{{ aid.applicationUrlText }}{% else %}Candidater à l’aide{% endif %}
                             </button>
                             {% else %}
                             <a class="fr-btn at-application-url-btn" id="application-url-btn-bottom" target="_blank" rel="noopener" title="Lien pour candidater à l’aide - ouvre une nouvelle fenêtre"
@@ -545,7 +553,7 @@
                             {% else %}
                                 href="{{ aid.applicationUrl }}">
                             {% endif %}
-                                Candidater à l’aide
+                                {% if aid.applicationUrlText %}{{ aid.applicationUrlText }}{% else %}Candidater à l’aide{% endif %}
                             </a>
                             {% endif %}
                         </li>
