@@ -83,7 +83,8 @@ class AidSearchType extends AbstractType
             'required' => false,
             'label' => 'Votre territoire',
             'attr' => [
-                'data-controller' => 'custom-autocomplete'
+                'data-controller' => 'custom-autocomplete',
+                'placeholder' => 'Votre commune, EPCI...'
             ]
         ];
         if ($options['forcePerimeter'] !== false) {
