@@ -6,6 +6,7 @@ use App\Controller\FrontController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
+#[Route(priority:1)]
 class AccessibilityController extends FrontController
 {
     #[Route('/accessibilité/', name: 'app_static_accessibility')]

@@ -5,7 +5,7 @@ namespace App\Controller\Static;
 use App\Controller\FrontController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-
+#[Route(priority:1)]
 class PrivacyPolicyController extends FrontController
 {
     #[Route('/politique-de-confidentialité/', name: 'app_static_privacy_policy')]
