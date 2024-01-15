@@ -98,6 +98,7 @@ class ProgramController extends FrontController
             'forceOrganizationType' => null,
             'dontUseUserPerimeter' => true,
             'removes' => ['orderBy'],
+            'forcePrograms' => [$program]
             // 'removes' => ['programs', 'eurdopeanAid', 'orderBy']
         ];
         // parametre selon url
@@ -119,7 +120,7 @@ class ProgramController extends FrontController
         // parametres pour requetes aides
         $aidParams = [
             'showInSearch' => true,
-            'program' => $program,
+            'programs' => [$program],
         ];
         $aidParams = array_merge($aidParams, $aidSearchFormService->completeAidParams($formAidSearch));
         // transforme le orderBy
