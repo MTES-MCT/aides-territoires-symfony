@@ -43,6 +43,15 @@ class AidCrudController extends AtCrudController
         return Aid::class;
     }
 
+    /**
+     * Generates a URL from the given parameters.
+     *
+     * @see UrlGeneratorInterface
+     */
+    protected function generateUrl(string $route, array $parameters = [], int $referenceType = UrlGeneratorInterface::ABSOLUTE_URL): string
+    {
+        return $this->container->get('router')->generate($route, $parameters, $referenceType);
+    }
 
     public function configureFilters(Filters $filters): Filters
     {
