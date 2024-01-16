@@ -539,7 +539,12 @@ class AidCrudController extends AtCrudController
         $fields = FieldCollection::new($this->configureFields(Crud::PAGE_INDEX));
         $filters = $this->container->get(FilterFactory::class)->create($context->getCrud()->getFiltersConfig(), $fields, $context->getEntity());
         $queryBuilder = $this->createIndexQueryBuilder($context->getSearch(), $context->getEntity(), $fields, $filters);
-               
-        return $csvExporterService->createResponseFromQueryBuilder($queryBuilder, $fields, 'aides.csv');
+
+        return $csvExporterService->createResponseFromQueryBuilder(
+            $queryBuilder,
+            $fields,
+            $context->getEntity()->getFqcn(),
+            'aides.csv'
+        );
     }
 }

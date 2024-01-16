@@ -8,7 +8,9 @@ use App\Controller\Admin\Filter\UserCountyFilter;
 use App\Controller\Admin\Filter\UserRoleFilter;
 use App\Entity\Perimeter\Perimeter;
 use App\Entity\User\User;
+use App\Service\Export\CsvExporterService;
 use Doctrine\ORM\EntityRepository;
+use EasyCorp\Bundle\EasyAdminBundle\Collection\FieldCollection;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
@@ -16,6 +18,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Config\Filters;
 use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
 use EasyCorp\Bundle\EasyAdminBundle\Event\BeforeEntityPersistedEvent;
 use EasyCorp\Bundle\EasyAdminBundle\Event\BeforeEntityUpdatedEvent;
+use EasyCorp\Bundle\EasyAdminBundle\Factory\FilterFactory;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ChoiceField;
@@ -196,9 +199,21 @@ class UserCrudController extends AtCrudController implements EventSubscriberInte
             ->linkToCrudAction('showQrCode') // l'action appellée
             ->displayIf(fn ($entity) => $this->userService->isUserGranted($entity, User::ROLE_ADMIN)); // condition d'affichage
             ;
+
+        $exportAction = Action::new('export')
+        ->linkToUrl(function () {
+            $request = $this->requestStack->getCurrentRequest();
+            return $this->adminUrlGenerator->setAll($request->query->all())
+                ->setAction('export')
+                ->generateUrl();
+        })
+        ->addCssClass('btn btn-success')
+        ->setIcon('fa fa-download')
+        ->createAsGlobalAction();
         
         return $actions
             ->add(Crud::PAGE_INDEX, $showQrCode)
+            ->add(Crud::PAGE_INDEX, $exportAction)
         ;
     }
 
@@ -209,6 +224,22 @@ class UserCrudController extends AtCrudController implements EventSubscriberInte
         return $this->redirectToRoute('app_admin_qr_code_ga', ['idUser' => $object->getId()]);
     }
 
+    public function export(AdminContext $context, CsvExporterService $csvExporterService)
+    {
+        ini_set('max_execution_time', 60*60);
+        ini_set('memory_limit', '1.5G');
+
+        $fields = FieldCollection::new($this->configureFields(Crud::PAGE_INDEX));
+        $filters = $this->container->get(FilterFactory::class)->create($context->getCrud()->getFiltersConfig(), $fields, $context->getEntity());
+        $queryBuilder = $this->createIndexQueryBuilder($context->getSearch(), $context->getEntity(), $fields, $filters);
+        
+        return $csvExporterService->createResponseFromQueryBuilder(
+            $queryBuilder,
+            $fields,
+            $context->getEntity()->getFqcn(),
+            'utilisateurs.csv'
+        );
+    }
 
     // public function createNewFormBuilder(EntityDto $entityDto, KeyValueStore $formOptions, AdminContext $context): FormBuilderInterface
     // {
