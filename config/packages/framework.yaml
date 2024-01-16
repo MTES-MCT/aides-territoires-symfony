@@ -5,6 +5,8 @@ framework:
     http_method_override: false
     handle_all_throwables: true
 
+    trusted_proxies: '192.0.0.1,10.0.0.0/8'
+
     uid:
         default_uuid_version: 4
     # Enables session support. Note that the session will ONLY be started if you read or write from it.
