@@ -4,11 +4,7 @@ framework:
     csrf_protection: true
     http_method_override: false
     handle_all_throwables: true
-
-    # trusted_proxies: '171.33.105.206'
-    trusted_proxies: '0.0.0.0/0'
-    trusted_headers: ['forwarded']
-
+    
     uid:
         default_uuid_version: 4
     # Enables session support. Note that the session will ONLY be started if you read or write from it.
