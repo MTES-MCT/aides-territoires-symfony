@@ -31,6 +31,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\UrlField;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpKernel\KernelInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class SearchPageCrudController extends AtCrudController
 {
@@ -229,7 +230,7 @@ class SearchPageCrudController extends AtCrudController
 
         //set the link using a string or a callable (function like its being used here)
         $displayOnFront->linkToUrl(function($entity) {
-            return $this->generateUrl('app_portal_portal_details', ['slug' => $entity->getSlug()]);
+            return $this->generateUrl('app_portal_portal_details', ['slug' => $entity->getSlug()], UrlGeneratorInterface::ABSOLUTE_URL);
         });
         
         return parent::configureActions($actions)

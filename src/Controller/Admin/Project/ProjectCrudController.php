@@ -25,6 +25,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\TextareaField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use EasyCorp\Bundle\EasyAdminBundle\Filter\ChoiceFilter;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class ProjectCrudController extends AtCrudController
 {
@@ -159,7 +160,7 @@ class ProjectCrudController extends AtCrudController
 
         //set the link using a string or a callable (function like its being used here)
         $displayOnFront->linkToUrl(function($entity) {
-            return $this->generateUrl('app_project_project_public_details', ['id' => $entity->getId(), 'slug' => $entity->getSlug()]);
+            return $this->generateUrl('app_project_project_public_details', ['id' => $entity->getId(), 'slug' => $entity->getSlug(), UrlGeneratorInterface::ABSOLUTE_URL]);
         });
         
         return parent::configureActions($actions)

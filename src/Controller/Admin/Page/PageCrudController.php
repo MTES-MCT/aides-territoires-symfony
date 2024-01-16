@@ -15,6 +15,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\FormField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class PageCrudController extends AtCrudController
 {
@@ -48,8 +49,8 @@ class PageCrudController extends AtCrudController
     public function displayOnFront(AdminContext $context): Response
     {
         $object = $context->getEntity()->getInstance();
-        
-        return $this->redirect($object->getUrl());
+        $indexRoute = $this->generateUrl('app_home', [], UrlGeneratorInterface::ABSOLUTE_URL);
+        return $this->redirect(substr($indexRoute, 0, -1).$object->getUrl());
     }
 
     public function configureFields(string $pageName): iterable

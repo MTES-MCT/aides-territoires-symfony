@@ -34,6 +34,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\IntegerField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\UrlField;
 use EasyCorp\Bundle\EasyAdminBundle\Filter\ChoiceFilter;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class AidCrudController extends AtCrudController
 {
@@ -115,7 +116,7 @@ class AidCrudController extends AtCrudController
 
         //set the link using a string or a callable (function like its being used here)
         $displayOnFront->linkToUrl(function($entity) {
-            return $this->generateUrl('app_aid_aid_details', ['id' => $entity->getId(), 'slug' => $entity->getSlug()]);
+            return $this->generateUrl('app_aid_aid_details', ['id' => $entity->getId(), 'slug' => $entity->getSlug()], UrlGeneratorInterface::ABSOLUTE_URL);
         });
 
         $exportAction = Action::new('export')
