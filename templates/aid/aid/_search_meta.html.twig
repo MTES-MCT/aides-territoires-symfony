@@ -57,11 +57,11 @@
         </div>
     {% endif %}
 
-    {% if formAidSearch.backers.vars.data and formAidSearch.backers.vars.data|length > 0 %}
+    {% if formAidSearch.backerschoice.vars.data and formAidSearch.backerschoice.vars.data|length > 0 %}
         <div class="fr-tags-group">
             <p title="Porteurs d’aides" class="fr-tag">
                 <span class="ri-hand-coin-line ri-xl fr-mr-1w at-icon-align--sub" aria-hidden="true"></span>
-                {% for backer in formAidSearch.backers.vars.data %}
+                {% for backer in formAidSearch.backerschoice.vars.data %}
                 {{ backer.name }}{% if not loop.last %}, {% endif %}
                 {% endfor %}
             </p>

@@ -27,6 +27,8 @@ use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Routing\RouterInterface;
 
@@ -164,10 +166,18 @@ class AidSearchTypeV2 extends AbstractType
                     'group_by' => function(AidType $aidType) {
                         return $aidType->getAidTypeGroup()->getName();
                     },
+                    'query_builder' => function(EntityRepository $entityRepository) {
+                        return $entityRepository   
+                        ->createQueryBuilder('at')
+                        ->innerJoin('at.aidTypeGroup', 'aidTypeGroup')
+                        ->orderBy('aidTypeGroup.name', 'ASC')
+                        ->addorderBy('at.name', 'ASC')
+                        ;
+                    },
                     'multiple' => true,
                     'expanded' => true
                 ])
-                ->add('backers', EntityType::class, [
+                ->add('backerschoice', EntityType::class, [
                     'required' => false,
                     'label' => 'Porteurs d\'aides',
                     'class' => Backer::class,

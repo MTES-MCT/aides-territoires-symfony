@@ -535,16 +535,18 @@ class Backer
             return $this->aidsFinancial;
         }
 
-        $aidsFinancial = [];
+        $aidsFinancial = new ArrayCollection();
         foreach ($this->getAidsLive() as $aid) {
             foreach ($aid->getAidTypes() as $aidType) {
                 if ($aidType->getAidTypeGroup()->getSlug() == AidTypeGroup::SLUG_FINANCIAL) {
-                    $aidsFinancial[] = $aid;
+                    if (!$aidsFinancial->contains($aid)) {
+                        $aidsFinancial->add($aid);
+                    }
                 }
             }
         }
 
-        $this->setAidsFinancial($aidsFinancial);
+        $this->setAidsFinancial($aidsFinancial->toArray());
         return $this->aidsFinancial;
     }
     public function setAidsFinancial(?array $aids) : static
@@ -562,16 +564,18 @@ class Backer
         if (count($this->aidsTechnical) > 0) {
             return $this->aidsTechnical;
         }
-        $aidsTechnical = [];
+        $aidsTechnical = new ArrayCollection();
         foreach ($this->getAidsLive() as $aid) {
             foreach ($aid->getAidTypes() as $aidType) {
                 if ($aidType->getAidTypeGroup()->getSlug() == AidTypeGroup::SLUG_TECHNICAL) {
-                    $aidsTechnical[] = $aid;
+                    if (!$aidsTechnical->contains($aid)) {
+                        $aidsTechnical->add($aid);
+                    }
                 }
             }
         }
 
-        $this->setAidsTechnical($aidsTechnical);
+        $this->setAidsTechnical($aidsTechnical->toArray());
         return $this->aidsTechnical;
     }
     public function setAidsTechnical(?array $aids) : static

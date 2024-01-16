@@ -31,7 +31,7 @@ class AidSearchClass
     /**
      * @var ?ArrayCollection|AidType[]
      */
-    private $backers;
+    private $backerschoice;
     private ?\DateTime $applyBefore;
     /**
      * @var ?ArrayCollection|Program[]
@@ -57,7 +57,7 @@ class AidSearchClass
         $this->categorysearch = null;
         $this->aidTypes = null;
         $this->orderBy = null;
-        $this->backers = null;
+        $this->backerschoice = null;
         $this->applyBefore = null;
         $this->programs = null;
         $this->aidSteps = null;
@@ -157,23 +157,23 @@ class AidSearchClass
         }
     }
 
-    public function getBackers(): ?ArrayCollection
+    public function getBackerschoice(): ?ArrayCollection
     {
-        return $this->backers;
+        return $this->backerschoice;
     }
 
-    public function setBackers(?ArrayCollection $backers): void
+    public function setBackerschoice(?ArrayCollection $backers): void
     {
-        $this->backers = $backers;
+        $this->backerschoice = $backers;
     }
 
-    public function addBacker(Backer $backer): void
+    public function addBackerchoice(Backer $backer): void
     {
-        if (!$this->backers) {
-            $this->backers = new ArrayCollection();
+        if (!$this->backerschoice) {
+            $this->backerschoice = new ArrayCollection();
         }
-        if (!$this->backers->contains($backer)) {
-            $this->backers->add($backer);
+        if (!$this->backerschoice->contains($backer)) {
+            $this->backerschoice->add($backer);
         }
     }
 

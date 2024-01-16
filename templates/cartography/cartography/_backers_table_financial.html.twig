@@ -38,22 +38,22 @@
                     {% endfor %}
                 </td>
                 <td>
-                    <a href="{{ path('app_aid_aid', {'perimeter': current_dept.id, 'backers[]': backer.id, 'aidTypeGroupSlug': constant('App\\Entity\\Aid\\AidTypeGroup::SLUG_FINANCIAL')}) }}" title="Voir les aides financières du porteur {{ backer.name }}">{{ backer.aidsFinancial|length }}</a>
+                    <a href="{{ path('app_aid_aid', {'forceOrganizationType': 'null', 'perimeter': current_dept.id, 'backers[]': backer.id, 'aidTypeGroupSlug': constant('App\\Entity\\Aid\\AidTypeGroup::SLUG_FINANCIAL')}) }}" title="Voir les aides financières du porteur {{ backer.name }}">{{ backer.aidsFinancial|length }}</a>
                 </td>
                 <td>
-                    <a href="{{ path('app_aid_aid', {'perimeter': current_dept.id, 'backers[]': backer.id, 'aidTypeSlug': constant('App\\Entity\\Aid\\AidType::SLUG_GRANT')}) }}" title="Voir les aides financières de type subvention du porteur {{ backer.name }}">{{ backer.aidsByAidTypeSlug(constant('App\\Entity\\Aid\\AidType::SLUG_GRANT'))|length }}</a>
+                    <a href="{{ path('app_aid_aid', {'forceOrganizationType': 'null', 'perimeter': current_dept.id, 'backers[]': backer.id, 'aidTypeSlug': constant('App\\Entity\\Aid\\AidType::SLUG_GRANT')}) }}" title="Voir les aides financières de type subvention du porteur {{ backer.name }}">{{ backer.aidsByAidTypeSlug(constant('App\\Entity\\Aid\\AidType::SLUG_GRANT'))|length }}</a>
                 </td>
                 <td>
-                    <a href="{{ path('app_aid_aid', {'perimeter': current_dept.id, 'backers[]': backer.id, 'aidTypeSlug': constant('App\\Entity\\Aid\\AidType::SLUG_LOAN')}) }}" title="Voir les aides financières de type prêt du porteur {{ backer.name }}">{{ backer.aidsByAidTypeSlug(constant('App\\Entity\\Aid\\AidType::SLUG_LOAN'))|length }}</a>
+                    <a href="{{ path('app_aid_aid', {'forceOrganizationType': 'null', 'perimeter': current_dept.id, 'backers[]': backer.id, 'aidTypeSlug': constant('App\\Entity\\Aid\\AidType::SLUG_LOAN')}) }}" title="Voir les aides financières de type prêt du porteur {{ backer.name }}">{{ backer.aidsByAidTypeSlug(constant('App\\Entity\\Aid\\AidType::SLUG_LOAN'))|length }}</a>
                 </td>
                 <td>
-                    <a href="{{ path('app_aid_aid', {'perimeter': current_dept.id, 'backers[]': backer.id, 'aidTypeSlug': constant('App\\Entity\\Aid\\AidType::SLUG_RECOVERABLE_ADVANCE')}) }}" title="Voir les aides financières de type avance récupérable du porteur {{ backer.name }}">{{ backer.aidsByAidTypeSlug(constant('App\\Entity\\Aid\\AidType::SLUG_RECOVERABLE_ADVANCE'))|length }}</a>
+                    <a href="{{ path('app_aid_aid', {'forceOrganizationType': 'null', 'perimeter': current_dept.id, 'backers[]': backer.id, 'aidTypeSlug': constant('App\\Entity\\Aid\\AidType::SLUG_RECOVERABLE_ADVANCE')}) }}" title="Voir les aides financières de type avance récupérable du porteur {{ backer.name }}">{{ backer.aidsByAidTypeSlug(constant('App\\Entity\\Aid\\AidType::SLUG_RECOVERABLE_ADVANCE'))|length }}</a>
                 </td>
                 <td>
-                    <a href="{{ path('app_aid_aid', {'perimeter': current_dept.id, 'backers[]': backer.id, 'aidTypeSlug': constant('App\\Entity\\Aid\\AidType::SLUG_CEE')}) }}" title="Voir les aides financières de type avance récupérable du porteur {{ backer.name }}">{{ backer.aidsByAidTypeSlug(constant('App\\Entity\\Aid\\AidType::SLUG_CEE'))|length }}</a>
+                    <a href="{{ path('app_aid_aid', {'forceOrganizationType': 'null', 'perimeter': current_dept.id, 'backers[]': backer.id, 'aidTypeSlug': constant('App\\Entity\\Aid\\AidType::SLUG_CEE')}) }}" title="Voir les aides financières de type avance récupérable du porteur {{ backer.name }}">{{ backer.aidsByAidTypeSlug(constant('App\\Entity\\Aid\\AidType::SLUG_CEE'))|length }}</a>
                 </td>
                 <td>
-                    <a href="{{ path('app_aid_aid', {'perimeter': current_dept.id, 'backers[]': backer.id, 'aidTypeSlug': constant('App\\Entity\\Aid\\AidType::SLUG_OTHER')}) }}" title="Voir les aides financières de type avance récupérable du porteur {{ backer.name }}">{{ backer.aidsByAidTypeSlug(constant('App\\Entity\\Aid\\AidType::SLUG_OTHER'))|length }}</a>
+                    <a href="{{ path('app_aid_aid', {'forceOrganizationType': 'null', 'perimeter': current_dept.id, 'backers[]': backer.id, 'aidTypeSlug': constant('App\\Entity\\Aid\\AidType::SLUG_OTHER')}) }}" title="Voir les aides financières de type avance récupérable du porteur {{ backer.name }}">{{ backer.aidsByAidTypeSlug(constant('App\\Entity\\Aid\\AidType::SLUG_OTHER'))|length }}</a>
                 </td>
             </tr>
         {% endfor %}

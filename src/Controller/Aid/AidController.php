@@ -84,13 +84,13 @@ class AidController extends FrontController
 
         // formulaire recherche aides
         $aidSearchClass = $aidSearchFormService->getAidSearchClass();
+        dump($aidSearchClass);
         $formAidSearch = $this->createForm(
             AidSearchTypeV2::class,
             $aidSearchClass,
             $formAidSearchParams
         );
         $formAidSearch->handleRequest($requestStack->getCurrentRequest());
-
 
         // parametres pour requetes aides
         $aidParams = [

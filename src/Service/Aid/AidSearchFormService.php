@@ -71,8 +71,8 @@ class AidSearchFormService
             $aidParams['orderBy'] = $this->handleOrderBy(['orderBy' => $aidSearchClass->getOrderBy()]);
         }
 
-        if ($aidSearchClass->getBackers()) {
-            $aidParams['backers'] = $aidSearchClass->getBackers();
+        if ($aidSearchClass->getBackerschoice()) {
+            $aidParams['backers'] = $aidSearchClass->getBackerschoice();
         }
 
         if ($aidSearchClass->getApplyBefore()) {
@@ -173,6 +173,10 @@ class AidSearchFormService
             $aidSearchClass->setOrganizationType($params['forceOrganizationType']);
         }
 
+        if (isset($queryParams['forceOrganizationType']) && $queryParams['forceOrganizationType'] == 'null') {
+            $aidSearchClass->setOrganizationType(null);
+        }
+
         /**
          * > OrganizationType
          */
@@ -271,18 +275,26 @@ class AidSearchFormService
         /**
          * < Backers
         */
-        if (isset($queryParams['backers'])) {
-            if (!is_array($queryParams['backers'])) {
-                $queryParams['backers'] = [$queryParams['backers']];
+        $backers = [];
+        foreach ($queryParams as $key => $value) {
+            if (strpos($key, 'backers') !== false) {
+                $backers[] = $value;
+                break;
             }
-            foreach ($queryParams['backers'] as $idBacker) {
+        }
+
+        if ($backers) {
+            if (!is_array($backers)) {
+                $backers = [$backers];
+            }
+            foreach ($backers as $idBacker) {
                 $backer = $this->managerRegistry->getRepository(Backer::class)->find((int) $idBacker);
                 if ($backer instanceof Backer) {
-                    $aidSearchClass->addBacker($backer);
+                    $aidSearchClass->addBackerchoice($backer);
                 } else {
                     $backer = $this->managerRegistry->getRepository(Backer::class)->findOneBy(['slug' => $idBacker]);
                     if ($backer instanceof Backer) {
-                        $aidSearchClass->addBacker($backer);
+                        $aidSearchClass->addBackerchoice($backer);
                     }
                 
                 }
@@ -1065,7 +1077,7 @@ class AidSearchFormService
     {
         if (
             $aidSearchClass->getAidTypes() ||
-            $aidSearchClass->getBackers() ||
+            $aidSearchClass->getBackerschoice() ||
             $aidSearchClass->getApplyBefore() ||
             $aidSearchClass->getPrograms() ||
             $aidSearchClass->getAidSteps() ||
