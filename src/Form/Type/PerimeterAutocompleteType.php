@@ -60,7 +60,8 @@ class PerimeterAutocompleteType extends AbstractType
                     ->andWhere('
                         MATCH_AGAINST(p.name) AGAINST (:nameMatchAgainst IN BOOLEAN MODE) > 1
                     ')
-                    ->setParameter('nameMatchAgainst', '"'.str_replace(['-'], [' '], $query).'*"')
+                    // ->setParameter('nameMatchAgainst', '"'.str_replace(['-'], [' '], $query).'*"')
+                    ->setParameter('nameMatchAgainst', '"'. $query.'*"')
                     ;
                 }
             },
