@@ -61,7 +61,10 @@ class AppExtension extends AbstractExtension
         return $this->stringService->getSlug($string);
     }
 
-    public function perimeterSmartRegionNames(Perimeter $perimeter) : string {
+    public function perimeterSmartRegionNames(?Perimeter $perimeter) : string {
+        if (!$perimeter instanceof Perimeter) {
+            return '';
+        }
         return $this->perimeterService->getSmartRegionNames($perimeter);
     }
 
