@@ -56,7 +56,6 @@ class AtCrudController extends AbstractCrudController
         $url = $this->container->get('router')->generate($route, $parameters, $referenceType);
         $request = $this->requestStack->getCurrentRequest();
 
-        dump($request->isSecure());
         if ($request->isSecure()) {
             if (strpos($url, 'http:') !== false) {
                 $url = str_replace(['http:'], ['https:'], $url);
