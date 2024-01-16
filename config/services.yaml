@@ -99,7 +99,3 @@ services:
                 use_path_style_endpoint: true
 
     Nelmio\SecurityBundle\EventListener\ContentSecurityPolicyListener: '@nelmio_security.csp_listener'
-
-    App\EventListener\RemoveCspListener:
-        tags:
-            - { name: kernel.event_listener, event: kernel.response }
