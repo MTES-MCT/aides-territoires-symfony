@@ -53,15 +53,36 @@ class PerimeterAutocompleteType extends AbstractType
                     ->setParameter('zipcodes', '%'.$query.'%');
                     ;
                 } else { // c'est une string
+                    $strings = [$query];
+                    if (strpos($query, ' ') !== false) {
+                        $strings[] = str_replace(' ', '-', $query);
+                    }
+                    if (strpos($query, '-') !== false) {
+                        $strings[] = str_replace('-', ' ', $query);
+                    }
+                
+                    $sqlWhere = '';
+                    for ($i=0; $i < count($strings); $i++) {
+                        $sqlWhere .= ' p.name LIKE :nameLike'.$i;
+                        if ($i < count($strings) - 1) {
+                            $sqlWhere .= ' OR ';
+                        }
+                        $qb->setParameter('nameLike'.$i, $strings[$i].'%');
+                    }
                     $qb
+                    ->andWhere($sqlWhere)
                     // ->andWhere('
                     //     MATCH_AGAINST(p.name) AGAINST (:nameMatchAgainst IN BOOLEAN MODE) > 3
                     // ')
-                    ->andWhere('
-                        MATCH_AGAINST(p.name) AGAINST (:nameMatchAgainst IN BOOLEAN MODE) > 1
-                    ')
+                    // ->andWhere('
+                    //     (
+                    //     MATCH_AGAINST(p.name) AGAINST (:nameMatchAgainst IN BOOLEAN MODE) > 1
+                    //     OR p.name LIKE :nameLike
+                    //     )
+                    // ')
                     // ->setParameter('nameMatchAgainst', '"'.str_replace(['-'], [' '], $query).'*"')
-                    ->setParameter('nameMatchAgainst', '"'. $query.'*"')
+                    // ->setParameter('nameMatchAgainst', '"'. $query.'*"')
+                    // ->setParameter('nameLike', $query.'%')
                     ;
                 }
             },
