@@ -9,6 +9,7 @@ use App\Entity\Perimeter\Perimeter;
 use App\Entity\Search\SearchPage;
 use App\Entity\User\User;
 use App\Form\Aid\AidSearchType;
+use App\Form\Aid\AidSearchTypeV2;
 use App\Form\Alert\AlertCreateType;
 use App\Repository\Aid\AidRepository;
 use App\Repository\Portal\PortalRepository;
@@ -76,40 +77,56 @@ class PortalController extends FrontController
             $query = parse_url($search_page->getSearchQuerystring())['query'] ?? null;
             $queryString = $query ?? $search_page->getSearchQuerystring();
 
-            $aidParams = array_merge($aidParams, $aidSearchFormService->convertQuerystringToParams($queryString));
+            // $aidParams = array_merge($aidParams, $aidSearchFormService->convertQuerystringToParams($queryString));
             
         } catch (\Exception $e) {
+            $queryString = null;
         }
+
+        $aidSearchClass = $aidSearchFormService->getAidSearchClass(
+            params: [
+                'querystring' => $queryString,
+                'forceOrganizationType' => null,
+                'dontUseUserPerimeter' => true
+                ]
+        );
 
          // form recherche d'aide
         $formAidSearchParams = [
             'method' => 'GET',
             'action' => '#aid-list',
             'extended' => true,
-            'forceOrganizationType' => null,
-            'dontUseUserPerimeter' => true
         ];
 
         // parametre selon url
-        $formAidSearchParams = array_merge(
-            $formAidSearchParams,
-            $aidSearchFormService->completeFormAidSearchParams($queryString)
-        );
+        // $formAidSearchParams = array_merge(
+        //     $formAidSearchParams,
+        //     $aidSearchFormService->completeFormAidSearchParams($queryString)
+        // );
         // formulaire recherche aides
+        // $formAidSearch = $this->createForm(
+        //     AidSearchType::class,
+        //     null,
+        //     $formAidSearchParams
+        // );
         $formAidSearch = $this->createForm(
-            AidSearchType::class,
-            null,
+            AidSearchTypeV2::class,
+            $aidSearchClass,
             $formAidSearchParams
         );
         $formAidSearch->handleRequest($requestStack->getCurrentRequest());
 
         // check si on affiche ou pas le formulaire étendu
-        $showExtended = $aidSearchFormService->setShowExtended($formAidSearch);
+        // $showExtended = $aidSearchFormService->setShowExtended($formAidSearch);
+        $showExtended = $aidSearchFormService->setShowExtendedV2($aidSearchClass);
 
         // parametres pour requetes aides
-        $aidParams = array_merge($aidParams, $aidSearchFormService->completeAidParams($formAidSearch));
+        $aidParams = array_merge($aidParams, $aidSearchFormService->convertAidSearchClassToAidParams($aidSearchClass));
+
+        // parametres pour requetes aides
+        // $aidParams = array_merge($aidParams, $aidSearchFormService->completeAidParams($formAidSearch));
         // transforme le orderBy
-        $aidParams = $aidSearchFormService->handleOrderBy($aidParams);
+        // $aidParams = $aidSearchFormService->handleOrderBy($aidParams);
 
         // le paginateur
         $aids = $aidRepository->findCustom($aidParams);

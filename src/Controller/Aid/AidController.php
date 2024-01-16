@@ -13,12 +13,14 @@ use App\Entity\Perimeter\Perimeter;
 use App\Entity\Project\Project;
 use App\Entity\User\User;
 use App\Form\Aid\AidSearchType;
+use App\Form\Aid\AidSearchTypeV2;
 use App\Form\Aid\SuggestToProjectType;
 use App\Form\Alert\AlertCreateType;
 use App\Form\Project\AddAidToProjectType;
 use App\Repository\Aid\AidRepository;
 use App\Repository\Blog\BlogPromotionPostRepository;
 use App\Repository\Project\ProjectRepository;
+use App\Service\Aid\AidSearchClass;
 use App\Service\Aid\AidSearchFormService;
 use App\Service\Aid\AidService;
 use App\Service\Email\EmailService;
@@ -75,30 +77,33 @@ class AidController extends FrontController
             'extended' => true,
         ];
         // paramètre selon url
-        $formAidSearchParams = array_merge(
-            $formAidSearchParams,
-            $aidSearchFormService->completeFormAidSearchParams()
-        );
+        // $formAidSearchParams = array_merge(
+        //     $formAidSearchParams,
+        //     $aidSearchFormService->completeFormAidSearchParams()
+        // );
 
         // formulaire recherche aides
+        $aidSearchClass = $aidSearchFormService->getAidSearchClass();
         $formAidSearch = $this->createForm(
-            AidSearchType::class,
-            null,
+            AidSearchTypeV2::class,
+            $aidSearchClass,
             $formAidSearchParams
         );
         $formAidSearch->handleRequest($requestStack->getCurrentRequest());
+
 
         // parametres pour requetes aides
         $aidParams = [
             'showInSearch' => true,
         ];
+        $aidParams = array_merge($aidParams, $aidSearchFormService->convertAidSearchClassToAidParams($aidSearchClass));
         $query = parse_url($requestStack->getCurrentRequest()->getRequestUri(), PHP_URL_QUERY) ?? null;
-        if ($query) {
-            $aidParams = array_merge($aidParams, $aidSearchFormService->convertQuerystringToParams($query));
-        }
+        // if ($query) {
+        //     $aidParams = array_merge($aidParams, $aidSearchFormService->convertQuerystringToParams($query));
+        // }
 
         // transforme le orderBy
-        $aidParams = $aidSearchFormService->handleOrderBy($aidParams);
+        // $aidParams = $aidSearchFormService->handleOrderBy($aidParams);
 
         // le paginateur
         $aids = $aidRepository->findCustom($aidParams);
@@ -179,7 +184,7 @@ class AidController extends FrontController
         }
 
         // check si on affiche ou pas le formulaire étendu
-        $showExtended = $aidSearchFormService->setShowExtended($formAidSearch);
+        $showExtended = $aidSearchFormService->setShowExtendedV2($aidSearchClass);
 
         // formulaire creer alerte
         $alert = new Alert();

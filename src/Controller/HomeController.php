@@ -3,17 +3,22 @@
 namespace App\Controller;
 
 use App\Entity\Aid\AidDestination;
+use App\Entity\Aid\AidSearch;
 use App\Entity\Perimeter\Perimeter;
 use App\Form\Aid\AidSearchType;
+use App\Form\Aid\AidSearchTypeV2;
 use App\Form\Program\CountySelectType;
 use App\Form\Reference\ProjectReferenceSearchType;
 use App\Repository\Aid\AidDestinationRepository;
 use App\Repository\Aid\AidRepository;
 use App\Repository\Backer\BackerRepository;
 use App\Repository\Blog\BlogPostRepository;
+use App\Repository\Organization\OrganizationTypeRepository;
 use App\Repository\Perimeter\PerimeterRepository;
 use App\Repository\Program\ProgramRepository;
 use App\Repository\Project\ProjectRepository;
+use App\Service\Aid\AidSearchClass;
+use App\Service\Aid\AidSearchFormService;
 use App\Service\Various\StringService;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -32,13 +37,13 @@ class HomeController extends FrontController
         BackerRepository $backerRepository,
         AidRepository $aidRepository,
         ProjectRepository $projectRepository,
-        StringService $stringService
+        StringService $stringService,
+        AidSearchFormService $aidSearchFormService
     ): Response
     {
-        // formulaire de recherche aide
         $formAidSearch = $this->createForm(
-            AidSearchType::class,
-            null,
+            AidSearchTypeV2::class,
+            $aidSearchFormService->getAidSearchClass(),
             [
                 'action' => $this->generateUrl('app_aid_aid'),
                 'method' => 'GET'

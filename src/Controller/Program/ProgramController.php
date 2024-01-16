@@ -7,6 +7,7 @@ use App\Entity\Perimeter\Perimeter;
 use App\Entity\Program\Program;
 use App\Entity\User\User;
 use App\Form\Aid\AidSearchType;
+use App\Form\Aid\AidSearchTypeV2;
 use App\Repository\Aid\AidRepository;
 use App\Repository\Program\ProgramRepository;
 use App\Service\Aid\AidSearchFormService;
@@ -95,21 +96,33 @@ class ProgramController extends FrontController
             'method' => 'GET',
             'action' => '#aid-list',
             'extended' => true,
-            'forceOrganizationType' => null,
-            'dontUseUserPerimeter' => true,
             'removes' => ['orderBy'],
-            'forcePrograms' => [$program]
+            
             // 'removes' => ['programs', 'eurdopeanAid', 'orderBy']
         ];
         // parametre selon url
-        $formAidSearchParams = array_merge(
-            $formAidSearchParams,
-            $aidSearchFormService->completeFormAidSearchParams()
+        // $formAidSearchParams = array_merge(
+        //     $formAidSearchParams,
+        //     $aidSearchFormService->completeFormAidSearchParams()
+        // );
+
+        $aidSearchClass = $aidSearchFormService->getAidSearchClass(
+            params: [
+                'forceOrganizationType' => null,
+                'dontUseUserPerimeter' => true,
+                'forcePrograms' => [$program]
+                ]
         );
+
         // formulaire recherche aides
+        // $formAidSearch = $this->createForm(
+        //     AidSearchType::class,
+        //     null,
+        //     $formAidSearchParams
+        // );
         $formAidSearch = $this->createForm(
-            AidSearchType::class,
-            null,
+            AidSearchTypeV2::class,
+            $aidSearchClass,
             $formAidSearchParams
         );
         $formAidSearch->handleRequest($requestStack->getCurrentRequest());
