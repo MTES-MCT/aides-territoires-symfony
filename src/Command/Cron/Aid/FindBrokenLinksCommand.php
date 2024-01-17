@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Command\Cron\UserAid;
+namespace App\Command\Cron\Aid;
 
 use App\Entity\Aid\Aid;
 use Symfony\Component\Console\Command\Command;
