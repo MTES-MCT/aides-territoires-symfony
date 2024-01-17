@@ -43,7 +43,7 @@ class PerimeterCrudController extends AtCrudController
         yield TextField::new('code', 'Code')
         ->onlyOnForms()
         ->setHelp('Usage interne uniquement, non pertinent pour les périmètres Ad-hoc.');
-        yield BooleanField::new('manuallyCreated', 'Créer manuellement')
+        yield BooleanField::new('manuallyCreated', 'Crée manuellement')
         ->setFormTypeOption('attr', [
             'readonly' => true
         ]);
