@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Command\Aid;
+namespace App\Command\Cron\UserAid;
 
 use App\Entity\Aid\Aid;
 use Symfony\Component\Console\Command\Command;
@@ -10,8 +10,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Doctrine\Persistence\ManagerRegistry;
-use App\Entity\User\Notification;
-use App\Entity\User\User;
 use App\Service\Aid\AidSearchFormService;
 use App\Service\Aid\AidService;
 use App\Service\Email\EmailService;
@@ -90,8 +88,9 @@ class FindBrokenLinksCommand extends Command
                     $aid->setHasBrokenLink(false);
                 } else {
                     $aid->setHasBrokenLink(true);
-                    $aidsWithBrokenLinks['originUrlBroken'] = true;
+                    $aidsWithBrokenLinks[$key]['originUrlBroken'] = true;
                     $nbBrokenLinks++;
+                    $this->managerRegistry->getManager()->persist($aid);
                 }
             }
 
@@ -101,8 +100,9 @@ class FindBrokenLinksCommand extends Command
                     $aid->setHasBrokenLink(false);
                 } else {
                     $aid->setHasBrokenLink(true);
-                    $aidsWithBrokenLinks['applicationUrlBroken'] = true;
+                    $aidsWithBrokenLinks[$key]['applicationUrlBroken'] = true;
                     $nbBrokenLinks++;
+                    $this->managerRegistry->getManager()->persist($aid);
                 }
             }
 
@@ -112,10 +112,14 @@ class FindBrokenLinksCommand extends Command
             }
         }
 
+        if (count($aidsWithBrokenLinks) > 0) {
+            $this->managerRegistry->getManager()->flush();
+        }
+
         $this->emailService->sendEmail(
             $this->paramService->get('email_super_admin'),
             $nbBrokenLinks. ' liens sont cassés dans des fiches aides',
-            'emails/user/find_broken_links.html.twig',
+            'emails/aid/find_broken_links.html.twig',
             [
                 'aidsWithBrokenLinks' => $aidsWithBrokenLinks,
             ]
@@ -128,11 +132,31 @@ class FindBrokenLinksCommand extends Command
 
     private function checkUrl($url): bool
     {
-        $headers = @get_headers($url);
-        if ($headers && strpos($headers[0], '200')) {
-            return true;
-        } else {
-            return false;
-        }
+        $ch = curl_init($url);
+
+        // Définir l'option pour retourner le transfert en tant que chaîne
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    
+        // Définir l'option pour ne récupérer que les en-têtes
+        curl_setopt($ch, CURLOPT_HEADER, true);
+        curl_setopt($ch, CURLOPT_NOBODY, true);
+    
+        // Définir un délai d'attente
+        curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+    
+        curl_exec($ch);
+    
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    
+        curl_close($ch);
+    
+        return $httpCode == 200;
+
+        // $headers = @get_headers($url);
+        // if ($headers && strpos($headers[0], '200')) {
+        //     return true;
+        // } else {
+        //     return false;
+        // }
     }
 }

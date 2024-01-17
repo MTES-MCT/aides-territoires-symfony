@@ -259,7 +259,14 @@ class AidCrudController extends AtCrudController
         yield FormField::addFieldset('Périmètre de l’aide');
         yield AssociationField::new('perimeter', 'Périmètre')
         ->autocomplete()
-        ->setColumns(12);
+        ->setColumns(12)
+        ->formatValue(function ($value) {
+            $name = $value->getName();
+            $display = strlen($name) < 20 ? $name : substr($name, 0, 20).'...';
+            return sprintf('<span title="%s">%s</span>', $name, $display);
+        })
+        
+        ;
         yield TextField::new('perimeterSuggestion', 'Périmètre suggéré')
         ->setHelp('Le contributeur suggère ce nouveau périmètre')
         ->hideOnIndex()

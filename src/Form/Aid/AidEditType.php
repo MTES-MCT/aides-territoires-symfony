@@ -91,13 +91,13 @@ class AidEditType extends AbstractType
                 'constraints' => [
                     new Length(null, null, 180)
                 ],
-                'sanitize_html' => true,
+                // 'sanitize_html' => true,
             ])
             ->add('nameInitial', TextType::class, [
                 'required' => false,
                 'label' => 'Nom initial',
                 'help' => 'Comment cette aide s’intitule-t-elle au sein de votre structure ? Exemple : AAP Mob’Biodiv',
-                'sanitize_html' => true,
+                // 'sanitize_html' => true,
             ])
             ->add('organization', EntityType::class, [
                 'required' => true,

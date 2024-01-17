@@ -235,7 +235,11 @@ class AidRepository extends ServiceEntityRepository
     {
         $params['showInSearch'] = true;
         $params['hasBrokenLink'] = false;
-
+        $params['orderBy'] = [
+            'sort' => 'a.timeCreate',
+            'order' => 'DESC'
+        ];
+        
         $qb = $this->getQueryBuilder($params);
 
         return $qb->getQuery()->getResult();
