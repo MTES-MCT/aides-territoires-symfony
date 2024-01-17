@@ -1,0 +1,17 @@
+{% extends 'emails/base.html.twig' %}
+
+{% block body %}
+<p>Voici la liste des aides dont au moins l'un des liens renvoie vers une 404 :</p>
+<ul>
+{% for aid in aidsWithBrokenLinks %}
+    <li>
+        <ul>
+            <li>{{ aid.name }}</li>
+            <li>{{ aid.url }}</li>
+            <li style="{% if aid.applicationUrlBroken %}color:red;{% else %}color:green;{% endif %}">{% if aid.applicationUrlBroken %}Erreur :{% else %}Ok :{% endif %} {{ aid.applicationUrl }}</li>
+            <li style="{% if aid.originUrlBroken %}color:red;{% else %}color:green;{% endif %}">{% if aid.originUrlBroken %}Erreur :{% else %}Ok :{% endif %} {{ aid.originUrl }}</li>
+        </ul>
+    </li>
+{% endfor %}
+</ul>
+{% endblock %}

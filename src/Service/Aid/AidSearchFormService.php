@@ -170,10 +170,12 @@ class AidSearchFormService
             }
         }
 
-        if (array_key_exists('forceOrganizationType', $params)) {
-            $aidSearchClass->setOrganizationType($params['forceOrganizationType']);
+        if (is_array($params)) {
+            if (array_key_exists('forceOrganizationType', $params)) {
+                $aidSearchClass->setOrganizationType($params['forceOrganizationType']);
+            }
         }
-
+        
         if (isset($queryParams['forceOrganizationType']) && $queryParams['forceOrganizationType'] == 'null') {
             $aidSearchClass->setOrganizationType(null);
         }

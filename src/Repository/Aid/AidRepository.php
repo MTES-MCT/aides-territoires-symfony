@@ -231,6 +231,16 @@ class AidRepository extends ServiceEntityRepository
         return $result[0]['nb'] ?? 0;
     }
 
+    public function findPublishedWithNoBrokenLink(?array $params = null): array
+    {
+        $params['showInSearch'] = true;
+        $params['hasBrokenLink'] = false;
+
+        $qb = $this->getQueryBuilder($params);
+
+        return $qb->getQuery()->getResult();
+    }
+
     public function findRecent(array $params = null): array
     {
         $params['limit'] = $params['limit'] ?? 3;
@@ -350,9 +360,16 @@ class AidRepository extends ServiceEntityRepository
         $publishedAfter = $params['publishedAfter'] ?? null;
         $aidRecurrence = $params['aidRecurrence'] ?? null;
         $inAdmin = $params['inAdmin'] ?? null;
+        $hasBrokenLink= $params['hasBrokenLink'] ?? null;
 
         $qb = $this->createQueryBuilder('a');
 
+        if ($hasBrokenLink !== null) {
+            $qb
+                ->andWhere('a.hasBrokenLink = :hasBrokenLink')
+                ->setParameter('hasBrokenLink', $hasBrokenLink)
+            ;
+        }
         if (isset($synonyms) && isset($synonyms['objects_string']) && isset($synonyms['intentions_string'])) {
             $sql = '
             (';
