@@ -2091,6 +2091,15 @@ class Aid
         return false;
     }
 
+    public function isDraft(): bool
+    {
+        if ($this->status == Aid::STATUS_DRAFT) {
+            return true;
+        }
+
+        return false;
+    }
+
     public function isPublished(): bool
     {
         if ($this->status == Aid::STATUS_PUBLISHED) {

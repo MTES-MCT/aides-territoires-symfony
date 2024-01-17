@@ -182,6 +182,7 @@ class ImportFluxAdemeAgirCommand extends ImportFluxCommand
                     // on créer un nouveau périmètre adhoc
                     $perimeter = new Perimeter();
                     $perimeter->setName($perimeterName);
+                    $perimeter->setUnaccentedName($this->stringService->getNoAccent($perimeterName));
                     $perimeter->setScale(Perimeter::SCALE_ADHOC);
                     $perimeter->setContinent(Perimeter::SLUG_CONTINENT_DEFAULT);
                     $perimeter->setCountry(Perimeter::SLUG_COUNTRY_DEFAULT);

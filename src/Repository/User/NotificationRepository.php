@@ -30,10 +30,21 @@ class NotificationRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult();
     }
 
+    public function findToSend(?array $params = null): array
+    {
+        $params['notRead'] = true;
+        $params['notSend'] = true;
+
+        $qb = $this->getQueryBuilder($params);
+
+        return $qb->getQuery()->getResult();
+    }
+
     public function getQueryBuilder(?array $params = null): QueryBuilder
     {
         $user = $params['user'] ?? null;
         $notRead = $params['notRead'] ?? null;
+        $notSend = $params['notSend'] ?? null;
         $orderBy = (isset($params['orderBy']) && isset($params['orderBy']['sort']) && isset($params['orderBy']['order'])) ? $params['orderBy'] : null;
 
         $qb = $this->createQueryBuilder('n');
@@ -48,6 +59,12 @@ class NotificationRepository extends ServiceEntityRepository
         if ($notRead) {
             $qb
                 ->andWhere('n.timeRead IS NULL')
+            ;
+        }
+
+        if ($notSend) {
+            $qb
+                ->andWhere('n.timeEmail IS NULL')
             ;
         }
 

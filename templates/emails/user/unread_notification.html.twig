@@ -1,0 +1,22 @@
+{% extends 'emails/base.html.twig' %}
+
+{% block body %}
+<p>Bonjour {{ user.firstname }} {{ user.lastname }},</p>
+
+<p>Vous avez {{ nbNotifications }} nouvelle{% if nbNotifications > 1 %}s{% endif %} notification{% if nbNotifications > 1 %}s{% endif %} en attente.</p>
+
+<p>Rendez-vous sur {{ absolute_url(url('app_user_user_notification')) }} pour les consulter. </p>
+
+<p>À très vite !</p>
+
+<p>L’équipe d’Aides-territoires</p>
+
+<p>----<br />
+PS : pour paramétrer la fréquence d’envoi de cet email, rendez-vous sur {{ absolute_url(url('app_user_user_notification_settings')) }}
+</p>
+<p>
+Cordialement,
+<br />
+L’équipe d’Aides-territoires.
+</p>
+{% endblock %}

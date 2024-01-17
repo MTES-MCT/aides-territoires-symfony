@@ -18,6 +18,7 @@ parameters:
     sib_endpoint: '%env(SIB_ENDPOINT)%'
     sib_newsletter_id: '%env(SIB_NEWSLETTER_ID)%'
     sib_newsletter_list_ids: '%env(SIB_NEWSLETTER_LIST_IDS)%'
+    sib_export_contacts_list_id: '%env(SIB_EXPORT_CONTACTS_LIST_ID)%'
     sib_newsletter_confirm_template_id: '%env(SIB_NEWSLETTER_CONFIRM_TEMPLATE_ID)%'
     sib_publication_email_template_id: '%env(SIB_PUBLICATION_EMAIL_TEMPLATE_ID)%'
     sib_new_suggested_aid_template_id: '%env(SIB_NEW_SUGGESTED_AID_TEMPLATE_ID)%'

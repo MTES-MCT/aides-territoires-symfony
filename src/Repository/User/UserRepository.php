@@ -41,9 +41,24 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         $this->getEntityManager()->flush();
     }
 
-    public function findAdmins(array $params = null)
+    public function findWithUnsentNotification(?array $params = null): array
+    {
+        $params['hasUnsentNotification'] = true;
+        $qb = $this->getQueryBuilder($params);
+
+        return $qb->getQuery()->getResult();
+    }
+    public function findAdmins(array $params = null): array
     {
         $params['onlyAdmin'] = true;
+        $qb = $this->getQueryBuilder($params);
+
+        return $qb->getQuery()->getResult();
+    }
+
+    public function findUsersConnectedSinceYesterday(?array $params = null): array
+    {
+        $params['connectedSinceYesterday'] = true;
         $qb = $this->getQueryBuilder($params);
 
         return $qb->getQuery()->getResult();
@@ -53,6 +68,9 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
     {
         $onlyAdmin = $params['onlyAdmin'] ?? null;
         $dateCreateMin = $params['dateCreateMin'] ?? null;
+        $connectedSinceYesterday = $params['connectedSinceYesterday'] ?? null;
+        $hasUnsentNotification = $params['hasUnsentNotification'] ?? null;
+        $notificationEmailFrequency = $params['notificationEmailFrequency'] ?? null;
 
         $qb = $this->createQueryBuilder('u');
 
@@ -67,6 +85,32 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
             $qb
             ->andWhere('u.dateCreate >= :dateCreateMin')
             ->setParameter('dateCreateMin', $dateCreateMin)
+            ;
+        }
+
+        if ($connectedSinceYesterday == true) {
+            $date = new \DateTime();
+            $date->sub(new \DateInterval('P1D')); // Subtract 1 day from the current date
+        
+            $qb
+                ->andWhere('u.dateLastLogin IS NOT NULL')
+                ->andWhere('u.dateLastLogin >= :yesterday')
+                ->setParameter('yesterday', $date)
+            ;
+        }
+
+        if ($hasUnsentNotification == true) {
+            $qb
+                ->innerJoin('u.notifications', 'n')
+                ->andWhere('n.timeRead IS NULL')
+                ->andWhere('n.timeEmail IS NULL')
+            ;
+        }
+
+        if ($notificationEmailFrequency !== null) {
+            $qb
+                ->andWhere('u.notificationEmailFrequency = :notificationEmailFrequency')
+                ->setParameter('notificationEmailFrequency', $notificationEmailFrequency)
             ;
         }
 

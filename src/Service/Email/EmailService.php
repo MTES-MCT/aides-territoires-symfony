@@ -200,4 +200,39 @@ class EmailService
             return false;
         }
     }
+
+    public function updateUser(User $user, array $datas): bool
+    {
+        // Configure API key authorization: api-key
+        $config = Configuration::getDefaultConfiguration()->setApiKey('api-key', $this->paramService->get('sib_api_key'));
+
+
+        $apiInstance = new ContactsApi(
+            // If you want use custom http client, pass your client which implements `GuzzleHttp\ClientInterface`.
+            // This is optional, `GuzzleHttp\Client` will be used as default.
+            new Client(),
+            $config
+        );
+        
+        $newsletterListIds = explode(',', $this->paramService->get('sib_newsletter_list_ids'));
+        foreach ($newsletterListIds as $key => $value) {
+            $newsletterListIds[$key] = (int) $value;
+        }
+
+        $identifier = $user->getEmail();
+        $updateContact = new UpdateContact();
+        if (isset($datas['attributes']) && is_array($datas['attributes']) && count($datas['attributes']) > 0) {
+            $updateContact['attributes'] = $datas['attributes'];
+        }
+        if (isset($datas['listIds']) && is_array($datas['listIds']) && count($datas['listIds']) > 0) {
+            $updateContact['listIds'] = $datas['listIds'];
+        }
+
+        try {
+            $apiInstance->updateContact($identifier, $updateContact);
+            return true;
+        } catch (\Exception $e) {
+            return false;
+        }
+    }
 }

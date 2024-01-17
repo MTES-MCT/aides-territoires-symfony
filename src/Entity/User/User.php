@@ -40,6 +40,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use Gedmo\Mapping\Annotation as Gedmo;
 use App\Validator as AtAssert;
 use Doctrine\ORM\Mapping\JoinColumn;
+use Doctrine\ORM\Mapping\OrderBy;
 use Scheb\TwoFactorBundle\Model\Totp\TotpConfiguration;
 use Scheb\TwoFactorBundle\Model\Totp\TotpConfigurationInterface;
 use Scheb\TwoFactorBundle\Model\Totp\TwoFactorInterface;
@@ -217,6 +218,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
     private Collection $dataSourceAidAuthors;
 
     #[ORM\OneToMany(mappedBy: 'author', targetEntity: Aid::class)]
+    #[OrderBy(['timeCreate' => 'DESC'])]
     private Collection $aids;
 
     #[ORM\OneToMany(mappedBy: 'author', targetEntity: Project::class, orphanRemoval: true)]
@@ -1833,5 +1835,35 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
         }
 
         return $this;
+    }
+
+    public function getLastestAidPublished(): ?Aid
+    {
+        foreach ($this->aids as $aid) {
+            if ($aid->isPublished()) {
+                return $aid;
+            }
+        }
+        return null;
+    }
+
+    public function getLastestAidDraft(): ?Aid
+    {
+        foreach ($this->aids as $aid) {
+            if (!$aid->isDraft()) {
+                return $aid;
+            }
+        }
+        return null;
+    }
+
+    public function getLatestAidExpired(): ?Aid
+    {
+        foreach ($this->aids as $aid) {
+            if ($aid->hasExpired()) {
+                return $aid;
+            }
+        }
+        return null;
     }
 }

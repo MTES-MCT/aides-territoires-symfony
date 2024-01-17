@@ -349,14 +349,7 @@ class UserImportCommand extends ImportCommand
 
                 $sqlParams['id'.$rowNumber] = (int) $cells[0]->getValue();
                 $sqlParams["password".$rowNumber] = (string) $cells[1]->getValue();
-                try {
-                    $timeLastLogin = new \DateTime(date((string) $cells[2]->getValue()));
-                } catch (\Exception $exception) {
-                }
-                try {
-                    $timeLastLogin = new \DateTime(date((string) $cells[2]->getValue()));
-                } catch (\Exception $exception) {
-                }
+                $timeLastLogin = $this->stringToDateTimeOrNull((string) $cells[2]->getValue());
                 $sqlParams["time_last_login".$rowNumber] = $timeLastLogin ? $timeLastLogin->format('Y-m-d H:i:s') : null;
                 $sqlParams["date_last_login".$rowNumber] = $timeLastLogin ? $timeLastLogin->format('Y-m-d') : null;
 
