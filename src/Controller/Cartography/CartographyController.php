@@ -48,7 +48,8 @@ class CartographyController extends FrontController
         if ($formCounties->isSubmitted()) {
             if ($formCounties->isValid()) {
                 $county = $perimeterRepository->findOneBy([
-                    'code' => $formCounties->get('county')->getData()
+                    'code' => $formCounties->get('county')->getData(),
+                    'scale' => Perimeter::SCALE_COUNTY
                 ]);
                 if ($county instanceof Perimeter) {
                     return $this->redirectToRoute('app_cartography_detail', [
