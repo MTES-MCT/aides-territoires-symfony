@@ -211,8 +211,8 @@ class DashboardController extends AbstractDashboardController
         ]);
 
         yield MenuItem::subMenu('Catégories', 'fas fa-table')->setSubItems([
-            MenuItem::linkToCrud('Catégories', 'fas fa-list', Category::class),
-            MenuItem::linkToCrud('Themes', 'fas fa-list', CategoryTheme::class),
+            MenuItem::linkToCrud('Catégories', 'fas fa-list', CategoryTheme::class),
+            MenuItem::linkToCrud('Sous-catégories', 'fas fa-list', Category::class),
         ]);
 
         yield MenuItem::subMenu('Porteurs', 'fas fa-table')->setSubItems([
