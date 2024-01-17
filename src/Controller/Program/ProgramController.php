@@ -128,16 +128,19 @@ class ProgramController extends FrontController
         $formAidSearch->handleRequest($requestStack->getCurrentRequest());
 
         // check si on affiche ou pas le formulaire étendu
-        $showExtended = $aidSearchFormService->setShowExtended($formAidSearch);
+        // $showExtended = $aidSearchFormService->setShowExtended($formAidSearch);
         
         // parametres pour requetes aides
         $aidParams = [
             'showInSearch' => true,
             'programs' => [$program],
         ];
-        $aidParams = array_merge($aidParams, $aidSearchFormService->completeAidParams($formAidSearch));
+        $aidParams = array_merge($aidParams, $aidSearchFormService->convertAidSearchClassToAidParams($aidSearchClass));
+        // $aidParams = array_merge($aidParams, $aidSearchFormService->completeAidParams($formAidSearch));
         // transforme le orderBy
-        $aidParams = $aidSearchFormService->handleOrderBy($aidParams);
+        // $aidParams = $aidSearchFormService->handleOrderBy($aidParams);
+        // check si on affiche ou pas le formulaire étendu
+        $showExtended = $aidSearchFormService->setShowExtendedV2($aidSearchClass);
         
         // le paginateur
         $aids = $aidRepository->findCustom($aidParams);

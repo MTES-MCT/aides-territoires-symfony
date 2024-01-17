@@ -120,6 +120,7 @@ class AidSearchFormService
         }
         $queryParams = [];
         $queryItems = explode('&', $query);
+
         if (is_array($queryItems)) {
             foreach ($queryItems as $queyItem) {
                 $param = explode('=', urldecode($queyItem));
@@ -169,7 +170,7 @@ class AidSearchFormService
             }
         }
 
-        if (isset($params['forceOrganizationType'])) {
+        if (array_key_exists('forceOrganizationType', $params)) {
             $aidSearchClass->setOrganizationType($params['forceOrganizationType']);
         }
 
