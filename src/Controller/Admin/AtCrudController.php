@@ -51,19 +51,19 @@ class AtCrudController extends AbstractCrudController
      *
      * @see UrlGeneratorInterface
      */
-    protected function generateUrl(string $route, array $parameters = [], int $referenceType = UrlGeneratorInterface::ABSOLUTE_URL): string
-    {
-        $url = $this->container->get('router')->generate($route, $parameters, $referenceType);
-        $request = $this->requestStack->getCurrentRequest();
+    // protected function generateUrl(string $route, array $parameters = [], int $referenceType = UrlGeneratorInterface::ABSOLUTE_URL): string
+    // {
+    //     $url = $this->container->get('router')->generate($route, $parameters, $referenceType);
+    //     $request = $this->requestStack->getCurrentRequest();
 
-        if ($request->isSecure()) {
-            if (strpos($url, 'http:') !== false) {
-                $url = str_replace(['http:'], ['https:'], $url);
-            }
-        }
+    //     if ($request->isSecure()) {
+    //         if (strpos($url, 'http:') !== false) {
+    //             $url = str_replace(['http:'], ['https:'], $url);
+    //         }
+    //     }
 
-        return $url;
-    }
+    //     return $url;
+    // }
 
     public static function getEntityFqcn(): string
     {
