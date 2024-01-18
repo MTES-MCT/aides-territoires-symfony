@@ -289,7 +289,7 @@ class AidRepository extends ServiceEntityRepository
         $qb = $this->getQueryBuilder($params);
 
         $qb
-            ->addSelect('IFNULL(COUNT(DISTINCT(a.id)), 0) AS nb')
+            ->select('IFNULL(COUNT(DISTINCT(a.id)), 0) AS nb')
             ->innerJoin('a.perimeter', 'p')
             ->addCriteria(self::showInSearchCriteria())
         ;
@@ -300,7 +300,7 @@ class AidRepository extends ServiceEntityRepository
     public function countCustom(array $params = null) : int {
         $qb = $this->getQueryBuilder($params);
         
-        $qb->addSelect('IFNULL(COUNT(DISTINCT(a.id)), 0) AS nb');
+        $qb->select('IFNULL(COUNT(DISTINCT(a.id)), 0) AS nb');
 
         return $qb->getQuery()->getResult()[0]['nb'] ?? 0;
     }
