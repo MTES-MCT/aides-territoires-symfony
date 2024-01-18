@@ -9,9 +9,11 @@ use App\Controller\Admin\Filter\Aid\AidPerimeterFilter;
 use App\Controller\Admin\Filter\Aid\AidGenericFilter;
 use App\Controller\Admin\Filter\Aid\AidStateFilter;
 use App\Entity\Aid\Aid;
+use App\Entity\Perimeter\Perimeter;
 use App\Field\JsonField;
 use App\Field\TextLengthCountField;
 use App\Field\TrumbowygField;
+use App\Repository\Perimeter\PerimeterRepository;
 use App\Service\Export\CsvExporterService;
 use Doctrine\ORM\EntityRepository;
 use EasyCorp\Bundle\EasyAdminBundle\Collection\FieldCollection;
@@ -265,15 +267,24 @@ class AidCrudController extends AtCrudController
         ->autocomplete()
         ->setColumns(12)
         ->formatValue(function ($value) {
+            /** @var Perimeter $value */
             if ($value) {
                 $name = $value->getName();
+                if ($value->getScale() == Perimeter::SCALE_COUNTY) {
+                    $name .= ' (Département)';
+                } else if ($value->getScale() == Perimeter::SCALE_REGION) {
+                    $name .= ' (Région)';
+                } else if ($value->getScale() == Perimeter::SCALE_COMMUNE) {
+                    $name .= ' (Commune)';
+                } else if ($value->getScale() == Perimeter::SCALE_ADHOC) {
+                    $name .= ' (Adhoc)';
+                }
                 $display = strlen($name) < 20 ? $name : substr($name, 0, 20).'...';
                 return sprintf('<span title="%s">%s</span>', $name, $display);
             } else {
                 return '';
             }
-        })
-        
+        })   
         ;
         yield TextField::new('perimeterSuggestion', 'Périmètre suggéré')
         ->setHelp('Le contributeur suggère ce nouveau périmètre')

@@ -1135,7 +1135,18 @@ class Perimeter
 
     public function __toString(): string
     {
-        return $this->getName();   
+        $name = $this->getName();
+        if ($this->getScale() == self::SCALE_COUNTY) {
+            $name .= ' (Département)';
+        } else if ($this->getScale() == Perimeter::SCALE_REGION) {
+            $name .= ' (Région)';
+        } else if ($this->getScale() == Perimeter::SCALE_COMMUNE) {
+            $name .= ' (Commune)';
+        } else if ($this->getScale() == Perimeter::SCALE_ADHOC) {
+            $name .= ' (Adhoc)';
+        }
+
+        return $name;   
     }
 
     /**
