@@ -79,6 +79,15 @@ class ImportFluxCommand extends Command
             // import du flux
             $this->importFlux($input, $output);
         } catch (\Exception $exception) {
+            $this->emailService->sendEmail(
+                $this->paramService->get('email_super_admin'),
+                '[aides-territoires][Error] Erreur import flux',
+                'emails/cron/import_flux/error.html.twig',
+                [
+                    'dataSource' => $this->dataSource,
+                    'error' => $exception->getMessage(),
+                ]
+                );
             $io->error($exception->getMessage());
             return Command::FAILURE;
         }
