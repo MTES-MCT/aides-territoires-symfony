@@ -20,7 +20,7 @@ services:
             #- .docker/mysql/my.cnf:/var/lib/mysql
             - .docker/data/db:/var/lib/mysql
         command:
-            --sql_mode=""
+            --sql_mode=only_full_group_by
             #- "--default-authentication-plugin=mysql_native_password"
             #- "--lower_case_table_names=1"
         environment:
