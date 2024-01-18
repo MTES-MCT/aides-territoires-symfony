@@ -15,6 +15,7 @@ use App\Field\JsonField;
 use App\Field\TextLengthCountField;
 use App\Field\TrumbowygField;
 use App\Service\Export\CsvExporterService;
+use App\Service\Export\SpreadsheetExporterService;
 use Doctrine\ORM\EntityRepository;
 use EasyCorp\Bundle\EasyAdminBundle\Collection\FieldCollection;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
@@ -121,21 +122,14 @@ class AidCrudController extends AtCrudController
             return $this->generateUrl('app_aid_aid_details', ['id' => $entity->getId(), 'slug' => $entity->getSlug()], UrlGeneratorInterface::ABSOLUTE_URL);
         });
 
-        $exportAction = Action::new('export')
-        ->linkToUrl(function () {
-            $request = $this->requestStack->getCurrentRequest();
-            return $this->adminUrlGenerator->setAll($request->query->all())
-                ->setAction('export')
-                ->generateUrl();
-        })
-        ->addCssClass('btn btn-success')
-        ->setIcon('fa fa-download')
-        ->createAsGlobalAction();
+        $exportCsvAction = $this->getExportCsvAction();
+        $exportXlsxAction = $this->getExportXlsxAction();
 
         return parent::configureActions($actions)
             ->add(Crud::PAGE_INDEX, $displayOnFront)
             ->add(Crud::PAGE_EDIT, $displayOnFront)
-            ->add(Crud::PAGE_INDEX, $exportAction)
+            ->add(Crud::PAGE_INDEX, $exportCsvAction)
+            ->add(Crud::PAGE_INDEX, $exportXlsxAction)
         ;
     }
 
@@ -559,20 +553,13 @@ class AidCrudController extends AtCrudController
         ;
     }
 
-    public function export(AdminContext $context, CsvExporterService $csvExporterService)
+    public function exportXlsx(AdminContext $context, SpreadsheetExporterService $spreadsheetExporterService, string $filename = 'aides')
     {
-        ini_set('max_execution_time', 60*60);
-        ini_set('memory_limit', '1.5G');
+        return $this->exportSpreadsheet($context, $spreadsheetExporterService, $filename, 'xlsx');
+    }
 
-        $fields = FieldCollection::new($this->configureFields(Crud::PAGE_INDEX));
-        $filters = $this->container->get(FilterFactory::class)->create($context->getCrud()->getFiltersConfig(), $fields, $context->getEntity());
-        $queryBuilder = $this->createIndexQueryBuilder($context->getSearch(), $context->getEntity(), $fields, $filters);
-
-        return $csvExporterService->createResponseFromQueryBuilder(
-            $queryBuilder,
-            $fields,
-            $context->getEntity()->getFqcn(),
-            'aides.csv'
-        );
+    public function exportCsv(AdminContext $context, SpreadsheetExporterService $spreadsheetExporterService, string $filename = 'aides')
+    {
+        return $this->exportSpreadsheet($context, $spreadsheetExporterService, $filename, 'csv');
     }
 }

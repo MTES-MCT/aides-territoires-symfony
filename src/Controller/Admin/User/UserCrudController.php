@@ -9,6 +9,7 @@ use App\Controller\Admin\Filter\UserRoleFilter;
 use App\Entity\Perimeter\Perimeter;
 use App\Entity\User\User;
 use App\Service\Export\CsvExporterService;
+use App\Service\Export\SpreadsheetExporterService;
 use Doctrine\ORM\EntityRepository;
 use EasyCorp\Bundle\EasyAdminBundle\Collection\FieldCollection;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
@@ -200,20 +201,13 @@ class UserCrudController extends AtCrudController implements EventSubscriberInte
             ->displayIf(fn ($entity) => $this->userService->isUserGranted($entity, User::ROLE_ADMIN)); // condition d'affichage
             ;
 
-        $exportAction = Action::new('export')
-        ->linkToUrl(function () {
-            $request = $this->requestStack->getCurrentRequest();
-            return $this->adminUrlGenerator->setAll($request->query->all())
-                ->setAction('export')
-                ->generateUrl();
-        })
-        ->addCssClass('btn btn-success')
-        ->setIcon('fa fa-download')
-        ->createAsGlobalAction();
+        $exportCsvAction = $this->getExportCsvAction();
+        $exportXlsxAction = $this->getExportXlsxAction();
         
         return $actions
             ->add(Crud::PAGE_INDEX, $showQrCode)
-            ->add(Crud::PAGE_INDEX, $exportAction)
+            ->add(Crud::PAGE_INDEX, $exportCsvAction)
+            ->add(Crud::PAGE_INDEX, $exportXlsxAction)
         ;
     }
 
@@ -224,21 +218,14 @@ class UserCrudController extends AtCrudController implements EventSubscriberInte
         return $this->redirectToRoute('app_admin_qr_code_ga', ['idUser' => $object->getId()]);
     }
 
-    public function export(AdminContext $context, CsvExporterService $csvExporterService)
+    public function exportXlsx(AdminContext $context, SpreadsheetExporterService $spreadsheetExporterService, string $filename = 'utilisateur')
     {
-        ini_set('max_execution_time', 60*60);
-        ini_set('memory_limit', '1.5G');
+        return $this->exportSpreadsheet($context, $spreadsheetExporterService, $filename, 'xlsx');
+    }
 
-        $fields = FieldCollection::new($this->configureFields(Crud::PAGE_INDEX));
-        $filters = $this->container->get(FilterFactory::class)->create($context->getCrud()->getFiltersConfig(), $fields, $context->getEntity());
-        $queryBuilder = $this->createIndexQueryBuilder($context->getSearch(), $context->getEntity(), $fields, $filters);
-        
-        return $csvExporterService->createResponseFromQueryBuilder(
-            $queryBuilder,
-            $fields,
-            $context->getEntity()->getFqcn(),
-            'utilisateurs.csv'
-        );
+    public function exportCsv(AdminContext $context, SpreadsheetExporterService $spreadsheetExporterService, string $filename = 'utilisateur')
+    {
+        return $this->exportSpreadsheet($context, $spreadsheetExporterService, $filename, 'csv');
     }
 
     // public function createNewFormBuilder(EntityDto $entityDto, KeyValueStore $formOptions, AdminContext $context): FormBuilderInterface

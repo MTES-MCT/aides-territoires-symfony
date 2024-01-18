@@ -3,17 +3,20 @@
 namespace App\Controller\Admin;
 
 use App\Service\Aid\AidSearchFormService;
+use App\Service\Export\SpreadsheetExporterService;
 use App\Service\File\FileService;
 use App\Service\Image\ImageService;
 use App\Service\User\UserService;
 use App\Service\Various\ParamService;
 use Doctrine\Persistence\ManagerRegistry;
+use EasyCorp\Bundle\EasyAdminBundle\Collection\FieldCollection;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Assets;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
+use EasyCorp\Bundle\EasyAdminBundle\Factory\FilterFactory;
 use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
@@ -235,5 +238,60 @@ class AtCrudController extends AbstractCrudController
         }
 
         $qb->getQuery()->execute();
+    }
+
+    public function exportSpreadsheet(AdminContext $context, SpreadsheetExporterService $spreadsheetExporterService, string $filename, string $format = 'csv')
+    {
+        ini_set('max_execution_time', 60*60);
+        ini_set('memory_limit', '1.5G');
+
+        $fields = FieldCollection::new($this->configureFields(Crud::PAGE_INDEX));
+        $filters = $this->container->get(FilterFactory::class)->create($context->getCrud()->getFiltersConfig(), $fields, $context->getEntity());
+        $queryBuilder = $this->createIndexQueryBuilder($context->getSearch(), $context->getEntity(), $fields, $filters);
+
+        return $spreadsheetExporterService->createResponseFromQueryBuilder(
+            $queryBuilder,
+            $context->getEntity()->getFqcn(),
+            $filename,
+            $format
+        );
+    }
+
+    public function exportXlsx(AdminContext $context, SpreadsheetExporterService $spreadsheetExporterService, string $filename = '')
+    {
+        return $this->exportSpreadsheet($context, $spreadsheetExporterService, $filename, 'xlsx');
+    }
+
+    public function exportCsv(AdminContext $context, SpreadsheetExporterService $spreadsheetExporterService, string $filename = '')
+    {
+        return $this->exportSpreadsheet($context, $spreadsheetExporterService, $filename, 'csv');
+    }
+
+    public function getExportXlsxAction()
+    {
+        return Action::new('exportXlsx')
+        ->linkToUrl(function () {
+            $request = $this->requestStack->getCurrentRequest();
+            return $this->adminUrlGenerator->setAll($request->query->all())
+                ->setAction('exportXlsx')
+                ->generateUrl();
+        })
+        ->addCssClass('btn btn-success')
+        ->setIcon('fa fa-download')
+        ->createAsGlobalAction();
+    }
+
+    public function getExportCsvAction()
+    {
+        return Action::new('exportCsv')
+        ->linkToUrl(function () {
+            $request = $this->requestStack->getCurrentRequest();
+            return $this->adminUrlGenerator->setAll($request->query->all())
+                ->setAction('exportCsv')
+                ->generateUrl();
+        })
+        ->addCssClass('btn btn-success')
+        ->setIcon('fa fa-download')
+        ->createAsGlobalAction();
     }
 }

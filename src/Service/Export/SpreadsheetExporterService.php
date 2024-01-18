@@ -5,49 +5,77 @@ namespace App\Service\Export;
 use App\Entity\Aid\Aid;
 use App\Entity\User\User;
 use Doctrine\ORM\QueryBuilder;
-use EasyCorp\Bundle\EasyAdminBundle\Collection\FieldCollection;
-use Symfony\Component\HttpFoundation\Response;
+use OpenSpout\Common\Entity\Cell;
+use OpenSpout\Common\Entity\Row;
+use OpenSpout\Writer\XLSX\Entity\SheetView;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
-class CsvExporterService
+class SpreadsheetExporterService
 {
-    // TODO a factoriser
-    public function createResponseFromQueryBuilder(QueryBuilder $queryBuilder, FieldCollection $fields, mixed $entityFcqn, string $filename): Response
+    public function  createResponseFromQueryBuilder(
+        QueryBuilder $queryBuilder,
+        mixed $entityFcqn,
+        string $filename,
+        string $format = 'csv'
+    ): StreamedResponse
     {
         ini_set('max_execution_time', 60*60);
         ini_set('memory_limit', '1.5G');
 
-        try {
+        $response = new StreamedResponse();
+        $response->setCallback(function () use ($queryBuilder, $entityFcqn, $filename, $format) {
             $entity = new $entityFcqn();
 
-            $fieldsToKeep = ['id', 'live', 'name', 'url', 'status'];
             $results = $queryBuilder->getQuery()->getResult();
 
             $datas = $this->getDatasFromEntityType($entity, $results);
 
-            $csvHeaders = [];
-            if (isset($datas[0])) {
-                $csvHeaders = array_keys($datas[0]);
+            if ($format == 'csv') {
+                $options = new \OpenSpout\Writer\CSV\Options();
+                $options->FIELD_DELIMITER = ';';
+                $options->FIELD_ENCLOSURE = '"';
+    
+                $writer = new \OpenSpout\Writer\CSV\Writer($options);
+            } else if ($format == 'xlsx') {
+                $sheetView = new SheetView();               
+                $writer = new \OpenSpout\Writer\XLSX\Writer();
+            } else {
+                throw new \Exception('Format not supported');
             }
-            // Stream response
-            $response = new StreamedResponse(function () use ($csvHeaders, $datas) {
-                
-                // Open the output stream
-                $fh = fopen('php://output', 'w');
-    
-                fputcsv($fh, $csvHeaders, ';', '"');
-                foreach ($datas as $data) {
-                    fputcsv($fh, $data, ';', '"');
+
+            $now = new \DateTime(date('Y-m-d H:i:s'));
+            $writer->openToBrowser('export_'.$filename.'_at_'.$now->format('d_m_Y'));
+
+            if ($format == 'xlsx') {
+                $writer->getCurrentSheet()->setSheetView($sheetView);
+            }
+            $headers = [];
+            if (isset($datas[0])) {
+                $headers = array_keys($datas[0]);
+            }
+
+            $cells = [];
+            foreach ($headers as $csvHeader) {
+                $cells[] = Cell::fromValue($csvHeader);
+            }
+            
+            /** add a row at a time */
+            $singleRow = new Row($cells);
+            $writer->addRow($singleRow);
+
+            foreach ($datas as $data) {
+                $cells = [];
+                foreach ($data as $value) {
+                    $cells[] = Cell::fromValue($value);
                 }
-            });
+                $singleRow = new Row($cells);
+                $writer->addRow($singleRow);
+            }
+            
+            $writer->close();
+        });
     
-            // réponse avec header csv
-            $response->headers->set('Content-Type', 'text/csv; charset=utf-8');
-            $response->headers->set('Content-Disposition', 'attachment; filename="'.$filename.'.csv"');
-            return $response;
-        } catch (\Exception $e) {
-            // dd($e);
-        }
+        return $response;
     }
 
     public function getDatasFromEntityType(mixed $entity, mixed $results): array
