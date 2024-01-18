@@ -300,7 +300,11 @@ class AidRepository extends ServiceEntityRepository
     public function countCustom(array $params = null) : int {
         $qb = $this->getQueryBuilder($params);
         
-        $qb->select('IFNULL(COUNT(DISTINCT(a.id)), 0) AS nb');
+        if (isset($params['addSelect'])) {
+            $qb->addSelect('IFNULL(COUNT(DISTINCT(a.id)), 0) AS nb');
+        } else {
+            $qb->select('IFNULL(COUNT(DISTINCT(a.id)), 0) AS nb');
+        }
 
         return $qb->getQuery()->getResult()[0]['nb'] ?? 0;
     }

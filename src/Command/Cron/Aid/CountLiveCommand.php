@@ -82,6 +82,7 @@ class CountLiveCommand extends Command
             foreach ($searchPages as $searchPage) {
                 $aidParams = [
                     'showInSearch' => true,
+                    'addSelect' => true
                 ];
                 $aidSearchClass = $this->aidSearchFormService->getAidSearchClass(
                     params: [
