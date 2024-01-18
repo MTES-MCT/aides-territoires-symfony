@@ -575,7 +575,7 @@ class Aid
     #[ORM\ManyToMany(targetEntity: Category::class, inversedBy: 'aids')]
     private Collection $categories;
 
-    #[ORM\ManyToMany(targetEntity: Keyword::class, inversedBy: 'aids')]
+    #[ORM\ManyToMany(targetEntity: Keyword::class, inversedBy: 'aids', cascade:['persist'])]
     private Collection $keywords;
 
     #[ApiProperty(

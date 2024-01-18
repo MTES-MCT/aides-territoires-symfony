@@ -468,12 +468,15 @@ class ImportFluxCommand extends Command
         }
     }
 
-    public function concatHtmlFields(array $aidToImport, array $fields): ?string
+    public function concatHtmlFields(array $aidToImport, array $fields, ?string $separator = null): ?string
     {
         $html = '';
         foreach ($fields as $field) {
             if (isset($aidToImport[$field]) && trim($aidToImport[$field]) != '') {
                 $html .= ' ' . $this->getCleanHtml($aidToImport[$field]);
+                if ($separator) {
+                    $html .= $separator;
+                }
             }
         }
 

@@ -33,89 +33,98 @@ class ImportFluxMinistereCultureCommand extends ImportFluxCommand
 
     protected function getFieldsMapping(array $aidToImport, array $params = null): array
     {
-        $keys = ['deadline'];
-
-        $importRawObjectCalendar = [];
-        foreach ($keys as $key) {
-            if (isset($aidToImport[$key])) {
-                $importRawObjectCalendar[$key] = $aidToImport[$key];
-            }
-        }
-        if (count($importRawObjectCalendar) == 0) {
-            $importRawObjectCalendar = null;
-        }
-
-        $importRawObject = $aidToImport;
-        foreach ($keys as $key) {
-            if (isset($importRawObject[$key])) {
-                unset($importRawObject[$key]);
-            }
-        }
-
-        $destiption1 = isset($aidToImport['summary']) ? $this->htmlSanitizerInterface->sanitize($aidToImport['summary']) : '';
-        $destiption2 = isset($aidToImport['body']) ? $this->htmlSanitizerInterface->sanitize($aidToImport['body']) : '';
-        $type = isset($aidToImport['type']) ? $aidToImport['type'] : '';
-        $aidToDelete = '';
-        if (in_array($type, ['Demande d\'autorisation', 'Demande de labellisation'])) {
-            $aidToDelete = 'Aide à supprimer : type d\'aides non correspondant ';
-        }
-        $description = $aidToDelete . $destiption1 . $destiption2;
-        if (trim($description) == '') {
-            $description = null;
-        }
-
-        $eligility = '';
-        if (isset($aidToImport['amount'])) {
-            $eligility .= $aidToImport['amount'] . ' ';
-        }
-        if (isset($aidToImport['public'])) {
-            $eligility .= '<br/> bénéficiaires de l\'aide:'. (string) $aidToImport['public'];
-        }
-        if (isset($aidToImport['eztag_region'])) {
-            $eligility .= '<br/> périmètre de l\'aide:'. (string) $aidToImport['eztag_region'];
-        }
-        if (isset($aidToImport['deadline'])) {
-            $eligility .= '<br/> date de clôture de l\'aide :'. (string) $aidToImport['deadline'];
-        }
-        if (trim($eligility) == '') {
-            $eligility = null;
-        } else {
-            $eligility = $this->htmlSanitizerInterface->sanitize($eligility);
-        }
-
-        $dateSubmissionDeadline = null;
         try {
+            $keys = ['deadline'];
+
+            $importRawObjectCalendar = [];
+            foreach ($keys as $key) {
+                if (isset($aidToImport[$key])) {
+                    $importRawObjectCalendar[$key] = $aidToImport[$key];
+                }
+            }
+            if (count($importRawObjectCalendar) == 0) {
+                $importRawObjectCalendar = null;
+            }
+    
+            $importRawObject = $aidToImport;
+            foreach ($keys as $key) {
+                if (isset($importRawObject[$key])) {
+                    unset($importRawObject[$key]);
+                }
+            }
+    
+            $destiption1 = isset($aidToImport['summary']) ? $this->htmlSanitizerInterface->sanitize($aidToImport['summary']) : '';
+            $destiption2 = isset($aidToImport['body']) ? $this->htmlSanitizerInterface->sanitize($aidToImport['body']) : '';
+            $type = isset($aidToImport['type']) ? $aidToImport['type'] : '';
+            $aidToDelete = '';
+            if (in_array($type, ['Demande d\'autorisation', 'Demande de labellisation'])) {
+                $aidToDelete = 'Aide à supprimer : type d\'aides non correspondant ';
+            }
+            $description = $aidToDelete . $destiption1 . $destiption2;
+            if (trim($description) == '') {
+                $description = null;
+            }
+    
+            $eligility = '';
+            if (isset($aidToImport['amount'])) {
+                $eligility .= $aidToImport['amount'] . ' ';
+            }
+            if (isset($aidToImport['public'])) {
+                $eligility .= '<br/> bénéficiaires de l\'aide:'. (string) $aidToImport['public'];
+            }
+            if (isset($aidToImport['eztag_region'])) {
+                $eztagRegion = $aidToImport['eztag_region'];
+                if (is_array($eztagRegion )) {
+                    $eztagRegion  = implode(', ', $eztagRegion);
+                }
+                $eligility .= '<br/> périmètre de l\'aide:'. (string) $eztagRegion;
+            }
             if (isset($aidToImport['deadline'])) {
-                $dateSubmissionDeadline = new \DateTime($aidToImport['deadline']);
+                $eligility .= '<br/> date de clôture de l\'aide :'. (string) $aidToImport['deadline'];
             }
-        } catch (\Exception $e) {
+            if (trim($eligility) == '') {
+                $eligility = null;
+            } else {
+                $eligility = $this->htmlSanitizerInterface->sanitize($eligility);
+            }
+    
             $dateSubmissionDeadline = null;
-        }
-
-        $isCallForProject = (isset($aidToImport['deadline']) && $aidToImport['deadline']) ? true : false;
-
-        $return = [
-            'importDataMention' => 'Ces données sont mises à disposition par le Ministère de la Culture',
-            'importRawObjectCalendar' => $importRawObjectCalendar,
-            'importRawObject' => $importRawObject,
-            'name' => isset($aidToImport['title']) ? strip_tags($aidToImport['title']) : null,
-            'nameInitial' => isset($aidToImport['title']) ? strip_tags($aidToImport['title']) : null,
-            'description' => $description,
-            'originUrl' => isset($aidToImport['url']) ? $aidToImport['url'] : null,
-            'contact' => isset($aidToImport['contact']) ? $this->htmlSanitizerInterface->sanitize($aidToImport['contact']) : null,
-            'eligibility' => $eligility,
-            'isCallForProject' => $isCallForProject,
-        ];
-        if (isset($params['context']) && $params['context'] == 'create') {
-            $return['dateSubmissionDeadline'] = $dateSubmissionDeadline;
-        } else if (isset($params['context']) && $params['context'] == 'update') {
-            // en cas d'update on ne met à jour la date de clôture que si elle n'est pas déjà renseignée
-            if ($dateSubmissionDeadline && isset($params['aid']) && !$params['aid']->getSubmissionDeadline()) {
-                    $return['dateSubmissionDeadline'] = $dateSubmissionDeadline;
+            try {
+                if (isset($aidToImport['deadline'])) {
+                    $dateSubmissionDeadline = new \DateTime($aidToImport['deadline']);
+                }
+            } catch (\Exception $e) {
+                $dateSubmissionDeadline = null;
             }
+    
+            $isCallForProject = (isset($aidToImport['deadline']) && $aidToImport['deadline']) ? true : false;
+    
+            $return = [
+                'importDataMention' => 'Ces données sont mises à disposition par le Ministère de la Culture',
+                'importRawObjectCalendar' => $importRawObjectCalendar,
+                'importRawObject' => $importRawObject,
+                'name' => isset($aidToImport['title']) ? strip_tags($aidToImport['title']) : null,
+                'nameInitial' => isset($aidToImport['title']) ? strip_tags($aidToImport['title']) : null,
+                'description' => $description,
+                'originUrl' => isset($aidToImport['url']) ? $aidToImport['url'] : null,
+                'contact' => isset($aidToImport['contact']) ? $this->htmlSanitizerInterface->sanitize($aidToImport['contact']) : null,
+                'eligibility' => $eligility,
+                'isCallForProject' => $isCallForProject,
+            ];
+            if (isset($params['context']) && $params['context'] == 'create') {
+                $return['dateSubmissionDeadline'] = $dateSubmissionDeadline;
+            } else if (isset($params['context']) && $params['context'] == 'update') {
+                // en cas d'update on ne met à jour la date de clôture que si elle n'est pas déjà renseignée
+                if ($dateSubmissionDeadline && isset($params['aid']) && !$params['aid']->getDateSubmissionDeadline()) {
+                    $return['dateSubmissionDeadline'] = $dateSubmissionDeadline;
+                }
+            }
+    
+            return $return;
+        } catch (\Exception $e) {
+            dd($e, $aidToImport);
         }
 
-        return $return;
     }
 
     protected function setAidSteps(array $aidToImport, Aid $aid): Aid
@@ -257,12 +266,12 @@ class ImportFluxMinistereCultureCommand extends ImportFluxCommand
             return $aid;
         }
         $mapping = $this->getMappingCategories();
-
+        
         foreach ($aidToImport['eztag_theme'] as $thematique) {
-            if (isset($mapping[$thematique])) {
+            if (isset($mapping[$thematique]) && is_array($mapping[$thematique])) {
                 foreach ($mapping[$thematique] as $category) {
                     $category = $this->managerRegistry->getRepository(Category::class)->findOneBy([
-                        'slug' => $category['slug']
+                        'slug' => $category
                     ]);
                     if ($category instanceof Category) {
                         $aid->addCategory($category);
