@@ -439,7 +439,9 @@
             <div class="fr-mb-5w">
                 <h2 class="fr-h3 fr-mb-2w">Description</h2>
                 {% if aid.description %}
+                <div class="wysiwyg-wrapper">
                 {{ aid.description|raw }}
+                </div>
                 {% else %}
                 <p>Aucune description détaillée n’a été renseignée.</p>
                 {% endif %}
