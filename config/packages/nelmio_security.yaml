@@ -11,7 +11,7 @@ nelmio_security:
     # prevents inline scripts, unsafe eval, external scripts/images/styles/frames, etc
     csp:
         enabled: true
-        hosts: ['!/admin']
+        hosts: []
         content_types: []
         enforce:
             level1_fallback: false
@@ -34,6 +34,7 @@ nelmio_security:
             style-src:
                 - 'self'
                 - 'https://fonts.googleapis.com'
+                - 'unsafe-inline'
             #définit les sources de plugins autorisées (ex : <embed> ou <object>)
             #object-src:
                 # - 'self'
@@ -78,21 +79,3 @@ nelmio_security:
         policies:
             - 'no-referrer'
             - 'strict-origin-when-cross-origin'
-
-when@dev:
-    nelmio_security:
-        csp:
-            enforce:
-                default-src:
-                    - 'self'
-                    - 'unsafe-inline'
-                    - 'unsafe-eval'
-                script-src:
-                    - 'self'
-                    - 'unsafe-inline'
-                    - 'unsafe-eval'
-                style-src:
-                    - 'self'
-                    - 'https://fonts.googleapis.com'
-                    # - 'unsafe-inline'
-                    # - 'unsafe-eval'  

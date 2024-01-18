@@ -26,6 +26,35 @@ class AidService
         
     }
 
+    public function extractInlineStyles(Aid $aid): Aid
+    {
+        $styles = [];
+        $dom = new \DOMDocument();
+        $dom->loadHTML($aid->getDescription());
+
+        $xpath = new \DOMXPath($dom);
+        $nodes = $xpath->query("//*[@style]");
+        foreach ($nodes as $node) {
+            $itemId = $node->getAttribute('id') ?? '';
+            if ($itemId == '') {
+                $itemId = uniqid('style-');
+                $node->setAttribute('id', $itemId);
+            }
+            $styles[$itemId] = $node->nodeValue;
+        }
+
+        // Sélectionner uniquement le contenu intérieur de la balise <body>
+        $body = $xpath->query('//body')->item(0);
+        $newHtml = '';
+        foreach ($body->childNodes as $childNode) {
+            $newHtml .= $dom->saveHTML($childNode);
+        }
+
+        $aid->setDescription($newHtml);
+        $aid->setInlineStyles($styles);
+        return $aid;
+    }
+
     public function postPopulateAids(array $aids, ?array $params) : array
     {
         // on déduplique les génériques
