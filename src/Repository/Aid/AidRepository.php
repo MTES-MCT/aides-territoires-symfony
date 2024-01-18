@@ -289,9 +289,9 @@ class AidRepository extends ServiceEntityRepository
         $qb = $this->getQueryBuilder($params);
 
         $qb
-            ->select('IFNULL(COUNT(DISTINCT(a.id)), 0) AS nb')
+            ->addSelect('IFNULL(COUNT(DISTINCT(a.id)), 0) AS nb')
             ->innerJoin('a.perimeter', 'p')
-            ->addCriteria(self::liveCriteria())
+            ->addCriteria(self::showInSearchCriteria())
         ;
 
         return $qb->getQuery()->getResult()[0]['nb'] ?? 0;
@@ -299,8 +299,8 @@ class AidRepository extends ServiceEntityRepository
 
     public function countCustom(array $params = null) : int {
         $qb = $this->getQueryBuilder($params);
-
-        $qb->select('IFNULL(COUNT(DISTINCT(a.id)), 0) AS nb');
+        
+        $qb->addSelect('IFNULL(COUNT(DISTINCT(a.id)), 0) AS nb');
 
         return $qb->getQuery()->getResult()[0]['nb'] ?? 0;
     }
@@ -374,20 +374,18 @@ class AidRepository extends ServiceEntityRepository
                 ->setParameter('hasBrokenLink', $hasBrokenLink)
             ;
         }
-        if (isset($synonyms) && isset($synonyms['objects_string']) && isset($synonyms['intentions_string'])) {
+
+        if (
+            isset($synonyms)
+            && isset($synonyms['objects_string']) && $synonyms['objects_string'] !== ''
+            && isset($synonyms['simple_words_string']) && $synonyms['simple_words_string'] !== ''
+            ) {
             $sql = '
             (';
             if (trim($synonyms['simple_words_string']) !== '') {
                 $sql .= '
                     CASE WHEN (MATCH_AGAINST(a.name, a.description, a.eligibility) AGAINST(:simple_words_string IN BOOLEAN MODE) > 5) THEN 3 ELSE 0 END
                 ';
-                // $sql .= '
-                //     CASE WHEN (MATCH_AGAINST(a.name) AGAINST(:simple_words_string IN BOOLEAN MODE) > 0) THEN 30 ELSE 0 END
-                //     +
-                //     CASE WHEN (MATCH_AGAINST(a.description) AGAINST(:simple_words_string IN BOOLEAN MODE) > 0) THEN 10 ELSE 0 END
-                //     +
-                //     CASE WHEN (MATCH_AGAINST(a.eligibility) AGAINST(:simple_words_string IN BOOLEAN MODE) > 0) THEN 20 ELSE 0 END
-                // ';
                 $qb->setParameter('simple_words_string', $synonyms['simple_words_string']);
             }
 
@@ -395,9 +393,6 @@ class AidRepository extends ServiceEntityRepository
                 if (trim($synonyms['simple_words_string']) !== '') {
                     $sql .= ' + ';
                 }
-                // $sql .= '
-                // MATCH_AGAINST(a.name, a.description, a.eligibility) AGAINST(:objects_string IN BOOLEAN MODE)
-                // ';
                 $sql .= '
                     CASE WHEN (MATCH_AGAINST(a.name) AGAINST(:objects_string IN BOOLEAN MODE) > 5) THEN 10 ELSE 0 END
                     +
@@ -407,55 +402,17 @@ class AidRepository extends ServiceEntityRepository
                 ';
                 $qb->setParameter('objects_string', $synonyms['objects_string']);
             }
-            if (trim($synonyms['intentions_string']) !== '') {
-                // if (trim($synonyms['simple_words_string']) !== '' || trim($synonyms['objects_string']) !== '') {
-                //     $sql .= ' + ';
-                // }
-                // $sql .= '
-                // MATCH_AGAINST(a.name, a.description, a.eligibility) AGAINST(:intentions_string IN BOOLEAN MODE)
-                // ';
-                // $sql .= '
-                //     +
-                //     CASE WHEN (MATCH_AGAINST(a.name) AGAINST(:intentions_string IN BOOLEAN MODE) > 5) THEN 3 ELSE 0 END
-                //     +
-                //     CASE WHEN (MATCH_AGAINST(a.description) AGAINST(:intentions_string IN BOOLEAN MODE) > 5) THEN 1 ELSE 0 END
-                //     +
-                //     CASE WHEN (MATCH_AGAINST(a.eligibility) AGAINST(:intentions_string IN BOOLEAN MODE) > 5) THEN 2 ELSE 0 END
-                // ';
-                // $qb->setParameter('intentions_string',$synonyms['intentions_string']);
-            }
 
-            // if (trim($synonyms['objects_string']) !== '') {
-            //     $sql .= '
-            //         MATCH_AGAINST(a.name) AGAINST(:objects_string IN BOOLEAN MODE)
-            //         +
-            //         MATCH_AGAINST(a.description) AGAINST(:objects_string IN BOOLEAN MODE)
-            //         +
-            //         MATCH_AGAINST(a.eligibility) AGAINST(:objects_string IN BOOLEAN MODE)
-            //     ';
-            //     $qb->setParameter('objects_string',$synonyms['objects_string']);
-            // }
-            // if (trim($synonyms['intentions_string']) !== '') {
-            //     $sql .= '
-            //         +
-            //         MATCH_AGAINST(a.name) AGAINST(:intentions_string IN BOOLEAN MODE)
-            //         +
-            //         MATCH_AGAINST(a.description) AGAINST(:intentions_string IN BOOLEAN MODE)
-            //         +
-            //         MATCH_AGAINST(a.eligibility) AGAINST(:intentions_string IN BOOLEAN MODE)
-            //     ';
-            //     $qb->setParameter('intentions_string',$synonyms['intentions_string']);
-            // }
             $sql .= '
             ) as score_total
             ';
-            if (trim($synonyms['objects_string']) !== '' || trim($synonyms['intentions_string']) !== '' || trim($synonyms['simple_words_string']) !== '') {
+
+            if (trim($synonyms['simple_words_string']) !== '' || trim($synonyms['objects_string']) !== '') {
                 if (!$inAdmin) {
                 $scoreTotalAvailable = true;
 
                 $qb
                 ->addSelect($sql)
-                // ->andHaving('score_total > 10')
                 ->andHaving('score_total >= 1')
                 ;
                 }

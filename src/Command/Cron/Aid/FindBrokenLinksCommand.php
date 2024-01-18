@@ -151,12 +151,5 @@ class FindBrokenLinksCommand extends Command
         curl_close($ch);
     
         return $httpCode == 200;
-
-        // $headers = @get_headers($url);
-        // if ($headers && strpos($headers[0], '200')) {
-        //     return true;
-        // } else {
-        //     return false;
-        // }
     }
 }

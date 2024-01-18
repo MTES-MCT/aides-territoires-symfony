@@ -149,6 +149,9 @@ class AidSearchFormService
 
         // si ancien paramètre
         if (isset($queryParams['targeted_audiences'])) {
+            if (is_array($queryParams['targeted_audiences'])) {
+                $queryParams['targeted_audiences'] = $queryParams['targeted_audiences'][0];
+            }
             $organizationType = $this->managerRegistry->getRepository(OrganizationType::class)->findOneBy(['slug' => $this->stringService->getSlug((string) $queryParams['targeted_audiences'])]);
             if ($organizationType instanceof OrganizationType) {
                 $aidSearchClass->setOrganizationType($organizationType);
