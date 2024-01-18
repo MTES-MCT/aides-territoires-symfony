@@ -20,7 +20,9 @@
         {% for backer in backers %}
             <tr>
                 <td>
+                    {% if backer.backerGroup and backer.backerGroup.backerSubCategory and backer.backerGroup.backerSubCategory.backerCategory %}
                     {{ backer.backerGroup.backerSubCategory.backerCategory.name }}
+                    {% endif %}
                 </td>
                 <td>
                     <a href="{{ path('app_backer_details', {'id': backer.id, 'slug': backer.slug}) }}">{{ backer.name }}</a>
