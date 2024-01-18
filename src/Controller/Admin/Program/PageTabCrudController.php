@@ -30,8 +30,10 @@ class PageTabCrudController extends AtCrudController
         
         yield FormField::addFieldset('A propos de cet onglet');
         yield DateTimeField::new('timeCreate', 'Date de création')
-        ->setFormTypeOption('attr', ['readonly' => true]);
+        ->setFormTypeOption('attr', ['readonly' => true])
+        ->onlyWhenUpdating();
         yield DateTimeField::new('timeUpdate', 'Date de mise à jour')
-        ->setFormTypeOption('attr', ['readonly' => true]);
+        ->setFormTypeOption('attr', ['readonly' => true])
+        ->onlyWhenUpdating();
     }
 }
