@@ -302,6 +302,7 @@ class AidRepository extends ServiceEntityRepository
         
         if (isset($params['addSelect'])) {
             $qb->addSelect('IFNULL(COUNT(DISTINCT(a.id)), 0) AS nb');
+            $qb->addGroupBy('a.id');
         } else {
             $qb->select('IFNULL(COUNT(DISTINCT(a.id)), 0) AS nb');
         }
