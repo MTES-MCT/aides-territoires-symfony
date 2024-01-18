@@ -8,12 +8,12 @@ use App\Controller\Admin\Filter\Aid\AidBackerFilter;
 use App\Controller\Admin\Filter\Aid\AidPerimeterFilter;
 use App\Controller\Admin\Filter\Aid\AidGenericFilter;
 use App\Controller\Admin\Filter\Aid\AidStateFilter;
+use App\Controller\Admin\Filter\Aid\AidTypeFilter;
 use App\Entity\Aid\Aid;
 use App\Entity\Perimeter\Perimeter;
 use App\Field\JsonField;
 use App\Field\TextLengthCountField;
 use App\Field\TrumbowygField;
-use App\Repository\Perimeter\PerimeterRepository;
 use App\Service\Export\CsvExporterService;
 use Doctrine\ORM\EntityRepository;
 use EasyCorp\Bundle\EasyAdminBundle\Collection\FieldCollection;
@@ -73,6 +73,7 @@ class AidCrudController extends AtCrudController
             ->add('aidAudiences')
             ->add('programs')
             ->add('categories')
+            ->add('aidTypes')
             // most of the times there is no need to define the
             // filter type because EasyAdmin can guess it automatically
             // ->add(BooleanFilter::new('published'))
