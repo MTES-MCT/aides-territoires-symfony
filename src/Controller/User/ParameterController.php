@@ -11,19 +11,16 @@ use App\Form\User\TransfertAidType;
 use App\Form\User\TransfertProjectType;
 use App\Form\User\UserProfilType;
 use App\Repository\Log\LogUserLoginRepository;
-use App\Repository\Project\ProjectRepository;
 use App\Repository\User\ApiTokenAskRepository;
 use App\Service\Email\EmailService;
 use App\Service\User\UserService;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
-use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Pagerfanta\Doctrine\ORM\QueryAdapter;
 use Pagerfanta\Pagerfanta;
-use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
@@ -38,6 +35,7 @@ class ParameterController extends FrontController
         $this->breadcrumb->add("Mon compte",$this->generateUrl('app_user_dashboard'));
         $this->breadcrumb->add("Mon profil");
         $user = $userService->getUserLogged();
+
         $form = $this->createForm(UserProfilType::class, $user);
         $form->handleRequest($requestStack->getCurrentRequest());
         if($form->isSubmitted()){

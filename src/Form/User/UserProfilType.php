@@ -43,7 +43,7 @@ class UserProfilType extends AbstractType
                 'label'=>'Votre email :',
                 'required'=>true,
                 'help' => 'Par exemple : prenom.nom@domaine.fr',
-                'sanitize_html' => true,
+                // 'sanitize_html' => true,
             ])
             ->add('beneficiaryFunction', ChoiceType::class, [
                 'choices' => [

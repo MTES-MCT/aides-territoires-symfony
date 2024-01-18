@@ -9,8 +9,6 @@ use App\Entity\Perimeter\Perimeter;
 use App\Entity\User\User;
 use App\Form\User\RegisterType;
 use App\Repository\Perimeter\PerimeterRepository;
-use App\Repository\User\NotificationRepository;
-use App\Service\User\UserService;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\RequestStack;
