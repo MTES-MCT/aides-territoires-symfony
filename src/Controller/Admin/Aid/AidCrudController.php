@@ -177,10 +177,12 @@ class AidCrudController extends AtCrudController
         yield AssociationField::new('categories', 'Thématiques')
         ->setFormTypeOption('choice_label', function($entity) {
             $return = '';
-            if ($entity->getCategoryTheme()) {
-                $return .= $entity->getCategoryTheme()->getName().' > ';
+            if ($entity) {
+                if ($entity->getCategoryTheme()) {
+                    $return .= $entity->getCategoryTheme()->getName().' > ';
+                }
+                $return .= $entity->getName();
             }
-            $return .= $entity->getName();
             return $return;
         })
         ->setFormTypeOptions([
@@ -195,10 +197,12 @@ class AidCrudController extends AtCrudController
         yield AssociationField::new('aidAudiences', 'Bénéficiaires de l’aide')
         ->setFormTypeOption('choice_label', function($entity) {
             $return = '';
-            if ($entity->getOrganizationTypeGroup()) {
-                $return .= $entity->getOrganizationTypeGroup()->getName().' > ';
+            if ($entity) {
+                if ($entity->getOrganizationTypeGroup()) {
+                    $return .= $entity->getOrganizationTypeGroup()->getName().' > ';
+                }
+                $return .= $entity->getName();
             }
-            $return .= $entity->getName();
             return $return;
         })
         ->setFormTypeOptions([
@@ -261,9 +265,13 @@ class AidCrudController extends AtCrudController
         ->autocomplete()
         ->setColumns(12)
         ->formatValue(function ($value) {
-            $name = $value->getName();
-            $display = strlen($name) < 20 ? $name : substr($name, 0, 20).'...';
-            return sprintf('<span title="%s">%s</span>', $name, $display);
+            if ($value) {
+                $name = $value->getName();
+                $display = strlen($name) < 20 ? $name : substr($name, 0, 20).'...';
+                return sprintf('<span title="%s">%s</span>', $name, $display);
+            } else {
+                return '';
+            }
         })
         
         ;
@@ -305,11 +313,12 @@ class AidCrudController extends AtCrudController
         yield AssociationField::new('aidTypes', 'Types d\'aide')
         ->setFormTypeOption('choice_label', function ($entity) {
             $return = '';
-            if ($entity->getAidTypeGroup()) {
-                $return .= $entity->getAidTypeGroup()->getName(). ' > ';
+            if ($entity) {
+                if ($entity->getAidTypeGroup()) {
+                    $return .= $entity->getAidTypeGroup()->getName(). ' > ';
+                }
+                $return .= $entity->getName();
             }
-            $return .= $entity->getName();
-
             return $return;
         })
         ->setFormTypeOptions([
