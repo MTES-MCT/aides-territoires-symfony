@@ -241,7 +241,12 @@ class AidController extends FrontController
         if (isset($aidSearchClass) and $aidSearchClass instanceof AidSearchClass) {
             if ($aidSearchClass->getKeyword()) {
                 $synonyms = $referenceService->getSynonymes($aidSearchClass->getKeyword());
-                if (isset($synonyms['simple_words_string'])) {
+                if (isset($synonyms['objects_string'])) {
+                    $keywords = explode(' ', $synonyms['objects_string']);
+                    foreach ($keywords as $keyword) {
+                        $highlightedWords[] = $keyword;
+                    }
+                } else if (isset($synonyms['simple_words_string'])) {
                     $keywords = explode(' ', $synonyms['simple_words_string']);
                     foreach ($keywords as $keyword) {
                         $highlightedWords[] = $keyword;
@@ -249,6 +254,7 @@ class AidController extends FrontController
                 }
             }
         }
+        
         $requestStack->getCurrentRequest()->getSession()->set('highlightedWords', $highlightedWords);
 
         // rendu template
