@@ -11,6 +11,7 @@ use Aws\Crypto\Polyfill\Key;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Filters;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\CollectionField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextEditorField;
@@ -27,7 +28,9 @@ class KeywordReferenceCrudController extends AtCrudController
     public function configureFilters(Filters $filters): Filters
     {
         return $filters
-            ->add(KeywordReferenceParentFilter::new('parent'))
+            ->add(KeywordReferenceParentFilter::new('parentFilter'))
+            ->add('parent')
+
             // most of the times there is no need to define the
             // filter type because EasyAdmin can guess it automatically
             // ->add(BooleanFilter::new('published'))
@@ -42,5 +45,6 @@ class KeywordReferenceCrudController extends AtCrudController
         yield CollectionField::new('keywordReferences', 'Synonymes')
         ->setEntryType(KeywordReferenceEditType::class)
         ;
+        yield BooleanField::new('intention', 'Intention');
     }
 }
