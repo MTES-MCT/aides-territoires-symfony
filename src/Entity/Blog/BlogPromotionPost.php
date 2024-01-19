@@ -104,8 +104,8 @@ class BlogPromotionPost
     #[ORM\JoinColumn(onDelete:'SET NULL')]
     private Collection $logBlogPromotionPostDisplays;
 
-    #[ORM\ManyToOne(inversedBy: 'blogPromotionPosts')]
-    private ?KeywordReference $keywordReferences = null;
+    #[ORM\ManyToMany(targetEntity: KeywordReference::class, inversedBy: 'blogPromotionPosts')]
+    private Collection $keywordReferences;
 
     public function __construct()
     {
@@ -115,6 +115,7 @@ class BlogPromotionPost
         $this->programs = new ArrayCollection();
         $this->logBlogPromotionPostClicks = new ArrayCollection();
         $this->logBlogPromotionPostDisplays = new ArrayCollection();
+        $this->keywordReferences = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -435,18 +436,6 @@ class BlogPromotionPost
         return $this;
     }
 
-    public function getKeywordReferences(): ?KeywordReference
-    {
-        return $this->keywordReferences;
-    }
-
-    public function setKeywordReferences(?KeywordReference $keywordReferences): static
-    {
-        $this->keywordReferences = $keywordReferences;
-
-        return $this;
-    }
-
     public function getDeleteImage(): ?bool
     {
         return $this->deleteImage;
@@ -455,6 +444,30 @@ class BlogPromotionPost
     public function setDeleteImage(?bool $deleteImage): static
     {
         $this->deleteImage = $deleteImage;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, KeywordReference>
+     */
+    public function getKeywordReferences(): Collection
+    {
+        return $this->keywordReferences;
+    }
+
+    public function addKeywordReference(KeywordReference $keywordReference): static
+    {
+        if (!$this->keywordReferences->contains($keywordReference)) {
+            $this->keywordReferences->add($keywordReference);
+        }
+
+        return $this;
+    }
+
+    public function removeKeywordReference(KeywordReference $keywordReference): static
+    {
+        $this->keywordReferences->removeElement($keywordReference);
 
         return $this;
     }

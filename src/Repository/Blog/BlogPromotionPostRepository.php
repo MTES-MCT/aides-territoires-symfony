@@ -5,6 +5,7 @@ namespace App\Repository\Blog;
 use App\Entity\Blog\BlogPromotionPost;
 use App\Entity\Organization\OrganizationType;
 use App\Entity\Perimeter\Perimeter;
+use App\Service\Reference\ReferenceService;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\QueryBuilder;
@@ -20,7 +21,7 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class BlogPromotionPostRepository extends ServiceEntityRepository
 {
-    public function __construct(ManagerRegistry $registry)
+    public function __construct(ManagerRegistry $registry, private ReferenceService $referenceService)
     {
         parent::__construct($registry, BlogPromotionPost::class);
     }
@@ -40,10 +41,21 @@ class BlogPromotionPostRepository extends ServiceEntityRepository
         $perimeterFrom = $params['perimeterFrom'] ?? null;
         $categories = $params['categories'] ?? null;
         $status = $params['status'] ?? null;
+        $keyword = $params['keyword'] ?? null;
+        if ($keyword) {
+            $synonyms = $this->referenceService->getSynonymes($keyword);
+        }
         $orderBy = (isset($params['orderBy']) && isset($params['orderBy']['sort']) && isset($params['orderBy']['order'])) ? $params['orderBy'] : null;
 
         $qb = $this->createQueryBuilder('bpp');
-
+        if (isset($synonyms) && isset($synonyms['objects_string'])) {
+            $objetcs = str_getcsv($synonyms['objects_string'], ' ', '"');
+            $qb
+                ->leftJoin('bpp.keywordReferences', 'keywordReferences')
+                ->andWhere('keywordReferences.name IN (:objetcs) OR keywordReferences IS NULL')
+                ->setParameter('objetcs', $objetcs)
+                ;
+        }
         if ($organizationType instanceof OrganizationType && $organizationType->getId()) {
             $qb
                 ->leftJoin('bpp.organizationTypes', 'organizationTypes')

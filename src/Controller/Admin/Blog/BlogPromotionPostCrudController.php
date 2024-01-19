@@ -98,6 +98,20 @@ class BlogPromotionPostCrudController extends AtCrudController
         ->hideOnIndex()
         ;
 
+        yield AssociationField::new('keywordReferences', 'Listes de synonymes')
+        ->setFormTypeOption('choice_label', 'name')
+        ->hideOnIndex()
+        ->setFormTypeOption(
+            'query_builder',
+            function (EntityRepository $er) {
+                return $er->createQueryBuilder('o')
+                ->andWhere('o.parent = o')
+                ->orderBy('o.name', 'ASC')
+                ;
+            }
+        )
+        ;
+
         yield FormField::addFieldset('Administration');
         $statusChoices = [];
         foreach (BlogPromotionPost::STATUSES as $status) {

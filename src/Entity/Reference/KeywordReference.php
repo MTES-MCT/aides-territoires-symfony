@@ -30,8 +30,9 @@ class KeywordReference
     #[ORM\OneToMany(mappedBy: 'parent', targetEntity: self::class, orphanRemoval: true, cascade: ['persist'])]
     private Collection $keywordReferences;
 
-    #[ORM\OneToMany(mappedBy: 'keywordReferences', targetEntity: BlogPromotionPost::class)]
+    #[ORM\ManyToMany(targetEntity: BlogPromotionPost::class, mappedBy: 'keywordReferences')]
     private Collection $blogPromotionPosts;
+
 
     public function __construct()
     {
@@ -127,7 +128,7 @@ class KeywordReference
     {
         if (!$this->blogPromotionPosts->contains($blogPromotionPost)) {
             $this->blogPromotionPosts->add($blogPromotionPost);
-            $blogPromotionPost->setKeywordReferences($this);
+            $blogPromotionPost->addKeywordReference($this);
         }
 
         return $this;
@@ -136,13 +137,9 @@ class KeywordReference
     public function removeBlogPromotionPost(BlogPromotionPost $blogPromotionPost): static
     {
         if ($this->blogPromotionPosts->removeElement($blogPromotionPost)) {
-            // set the owning side to null (unless already changed)
-            if ($blogPromotionPost->getKeywordReferences() === $this) {
-                $blogPromotionPost->setKeywordReferences(null);
-            }
+            $blogPromotionPost->removeKeywordReference($this);
         }
 
         return $this;
     }
-
 }

@@ -24,6 +24,7 @@ use App\Repository\Project\ProjectRepository;
 use App\Service\Aid\AidSearchClass;
 use App\Service\Aid\AidSearchFormService;
 use App\Service\Aid\AidService;
+use App\Service\Blog\BlogPromotionPostService;
 use App\Service\Email\EmailService;
 use App\Service\Log\LogService;
 use App\Service\Matomo\MatomoService;
@@ -65,7 +66,8 @@ class AidController extends FrontController
         AidSearchFormService $aidSearchFormService,
         AidService $aidService,
         LogService $logService,
-        ReferenceService $referenceService
+        ReferenceService $referenceService,
+        BlogPromotionPostService $blogPromotionPostService
     ): Response
     {
         $requestStack->getCurrentRequest()->getSession()->set('_security.main.target_path', $requestStack->getCurrentRequest()->getRequestUri());
@@ -144,7 +146,8 @@ class AidController extends FrontController
 
         // promotions posts
         $blogPromotionPosts = $blogPromotionPostRepository->findPublished($aidParams);
-
+        $blogPromotionPosts = $blogPromotionPostService->handleRequires($blogPromotionPosts, $aidParams);
+        
         // page title
         $pageTitle = $pagerfanta->getNbResults() . ' résultat';
         if ($pagerfanta->getNbResults() > 1) {
