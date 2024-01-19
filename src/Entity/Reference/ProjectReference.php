@@ -19,10 +19,10 @@ class ProjectReference
     #[ORM\Column]
     private ?int $id = null;
 
-    #[Gedmo\Slug(fields: ['name'])]
     #[ORM\Column(length: 150)]
     private ?string $name = null;
 
+    #[Gedmo\Slug(fields: ['name'])]
     #[ORM\Column(length: 255)]
     private ?string $slug = null;
 
