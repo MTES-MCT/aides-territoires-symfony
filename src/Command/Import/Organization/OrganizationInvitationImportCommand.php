@@ -8,11 +8,11 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 use OpenSpout\Reader\CSV\Reader;
 use OpenSpout\Reader\CSV\Options;
 
-#[AsCommand(name: 'at:import:organization_favorite_projects', description: 'Import organization favorite projects')]
-class OrganizationFavoriteProjectsImportCommand extends ImportCommand
+#[AsCommand(name: 'at:import:organization_invitation', description: 'Import organization invitation')]
+class OrganizationInvitationImportCommand extends ImportCommand
 {
-    protected string $commandTextStart = '>Import organization favorite projects';
-    protected string $commandTextEnd = '<Import organization favorite projects';
+    protected string $commandTextStart = '>Import organization invitation';
+    protected string $commandTextEnd = '<Import organization invitation';
 
     protected function import($input, $output)
     {
@@ -21,10 +21,10 @@ class OrganizationFavoriteProjectsImportCommand extends ImportCommand
         // ==================================================================
 
         $io = new SymfonyStyle($input, $output);
-        $io->info('organization favorite projects');
+        $io->info('organization invitation');
 
         // fichier
-        $filePath = $this->findCsvFile('organizations_organization_favorite_projects_');
+        $filePath = $this->findCsvFile('accounts_user_');
         if (!$filePath) {
             throw new \Exception('File missing');
         }
@@ -51,10 +51,20 @@ class OrganizationFavoriteProjectsImportCommand extends ImportCommand
         // starts and displays the progress bar
         $io->progressStart();
         
-        $sqlBase = "INSERT INTO `organization_project`
+        $sqlBase = "INSERT INTO `organization_invitation`
                     (
+                    author_id,
+                    guest_id,
+                    time_create,
+                    date_create,
+                    time_accept,
+                    date_accept,
                     organization_id,
-                    project_id
+                    firstname,
+                    lastname,
+                    email,
+                    time_refuse,
+                    date_refuse
                     )
                     VALUES ";
 
@@ -71,17 +81,45 @@ class OrganizationFavoriteProjectsImportCommand extends ImportCommand
                 // do stuff with the row
                 $cells = $row->getCells();
 
+                $idOrganization = (int) $cells[21]->getValue();
+                if (!$idOrganization) {
+                    continue;
+                }
+                
                 // entite
 
                 $sql .= "
                 (
+                    :author_id".$rowNumber.",
+                    :guest_id".$rowNumber.",
+                    :time_create".$rowNumber.",
+                    :date_create".$rowNumber.",
+                    :time_accept".$rowNumber.",
+                    :date_accept".$rowNumber.",
                     :organization_id".$rowNumber.",
-                    :project_id".$rowNumber."
+                    :firstname".$rowNumber.",
+                    :lastname".$rowNumber.",
+                    :email".$rowNumber.",
+                    :time_refuse".$rowNumber.",
+                    :date_refuse".$rowNumber."
                 ),";
 
-                $sqlParams['organization_id'.$rowNumber] = (int) $cells[1]->getValue();
-                $sqlParams['project_id'.$rowNumber] = (int) $cells[2]->getValue();
-                
+                $sqlParams['author_id'.$rowNumber] = (int) $cells[22]->getValue();
+                $sqlParams['guest_id'.$rowNumber] = (int) $cells[0]->getValue();
+                $timeCreate = $this->stringToDateTimeOrNow((string) $cells[23]->getValue());
+                $sqlParams['time_create'.$rowNumber] = $timeCreate->format('Y-m-d H:i:s');
+                $sqlParams['date_create'.$rowNumber] = $timeCreate->format('Y-m-d');
+                $timeAccept = $this->stringToDateTimeOrNull((string) $cells[24]->getValue());
+                $sqlParams['time_accept'.$rowNumber] = $timeAccept ? $timeAccept->format('Y-m-d H:i:s') : null;
+                $sqlParams['date_accept'.$rowNumber] = $timeAccept ? $timeAccept->format('Y-m-d') : null;
+                $sqlParams['organization_id'.$rowNumber] = (int) $cells[21]->getValue();
+                $sqlParams['firstname'.$rowNumber] = (string) $cells[12]->getValue();
+                $sqlParams['lastname'.$rowNumber] = (string) $cells[5]->getValue();
+                $sqlParams['email'.$rowNumber] = (string) $cells[4]->getValue();
+                $sqlParams['time_refuse'.$rowNumber] = null;
+                $sqlParams['date_refuse'.$rowNumber] = null;
+
+
                 if ($rowNumber % $nbByBatch == 0) {
                     $sql = substr($sql, 0, -1);
 

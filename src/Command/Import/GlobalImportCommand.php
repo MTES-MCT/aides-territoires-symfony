@@ -60,6 +60,7 @@ class GlobalImportCommand extends Command
             'at:import:project',
             'at:import:aid_project',
             'at:import:organization_favorite_projects',
+            'at:import:organization_invitation',
             'at:import:bundle',
             'at:import:data_export',
             'at:import:blog',
