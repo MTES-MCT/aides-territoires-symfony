@@ -175,21 +175,28 @@ class ProjectController extends FrontController
                     $project->setStatus(Project::STATUS_REVIEWABLE);
                 }
 
+                // si pas le projet n'a pas d'organization on met l'organization par défaut du user
+                if (!$project->getOrganization()) {
+                    $project->setOrganization($user->getDefaultOrganization());
+                }
+
                 // sauvegarde
                 $managerRegistry->getManager()->persist($project); 
                 $managerRegistry->getManager()->flush();
 
                 // notification aux autres membres de l'organization
-                foreach ($project->getOrganization()->getBeneficiairies() as $beneficiary) {
-                    if ($beneficiary->getId() != $user->getId()) {
-                        $notificationService->addNotification(
-                            $beneficiary,
-                            'Un projet a été mis à jour',
-                            '<p>
-                            '.$user->getFirstname().' '.$user->getLastname().' a modifié les informations du projet
-                            <a href="'.$this->generateUrl('app_user_project_details_fiche_projet', ['id' => $project->getId(), 'slug' => $project->getSlug()], UrlGeneratorInterface::ABSOLUTE_URL).'">'.$project->getName().'</a>.
-                            </p>'
-                        );
+                if ($project->getOrganization()) {
+                    foreach ($project->getOrganization()->getBeneficiairies() as $beneficiary) {
+                        if ($beneficiary->getId() != $user->getId()) {
+                            $notificationService->addNotification(
+                                $beneficiary,
+                                'Un projet a été mis à jour',
+                                '<p>
+                                '.$user->getFirstname().' '.$user->getLastname().' a modifié les informations du projet
+                                <a href="'.$this->generateUrl('app_user_project_details_fiche_projet', ['id' => $project->getId(), 'slug' => $project->getSlug()], UrlGeneratorInterface::ABSOLUTE_URL).'">'.$project->getName().'</a>.
+                                </p>'
+                            );
+                        }
                     }
                 }
 

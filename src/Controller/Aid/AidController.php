@@ -11,6 +11,7 @@ use App\Entity\Aid\AidSuggestedAidProject;
 use App\Entity\Alert\Alert;
 use App\Entity\Perimeter\Perimeter;
 use App\Entity\Project\Project;
+use App\Entity\Reference\ProjectReference;
 use App\Entity\User\User;
 use App\Form\Aid\AidSearchType;
 use App\Form\Aid\AidSearchTypeV2;
@@ -502,6 +503,19 @@ class AidController extends FrontController
                     $project->setName($newProject);
                     $project->setAuthor($user);
                     $project->setStatus(Project::STATUS_DRAFT);
+                    $project->setOrganization($user->getDefaultOrganization());
+
+                    // on va voir si on peu associer un projet référent
+                    if (isset($aidSearchClass) && $aidSearchClass instanceof AidSearchClass && $aidSearchClass->getKeyword()) {
+                        $projectReferent = $this->managerRegistry->getRepository(ProjectReference::class)->findOneBy(
+                            [
+                                'name' => $aidSearchClass->getKeyword()
+                            ]
+                        );
+                        if ($projectReferent instanceof ProjectReference) {
+                            $project->setProjectReference($projectReferent);
+                        }
+                    }
 
                     $aidProject = new AidProject();
                     $aidProject->setAid($aid);
