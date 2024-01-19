@@ -28,6 +28,7 @@ use App\Service\Email\EmailService;
 use App\Service\Log\LogService;
 use App\Service\Matomo\MatomoService;
 use App\Service\Notification\NotificationService;
+use App\Service\Reference\ReferenceService;
 use App\Service\User\UserService;
 use App\Service\Various\Breadcrumb;
 use App\Service\Various\ParamService;
@@ -64,6 +65,7 @@ class AidController extends FrontController
         AidSearchFormService $aidSearchFormService,
         AidService $aidService,
         LogService $logService,
+        ReferenceService $referenceService
     ): Response
     {
         $requestStack->getCurrentRequest()->getSession()->set('_security.main.target_path', $requestStack->getCurrentRequest()->getRequestUri());
@@ -234,6 +236,21 @@ class AidController extends FrontController
             }
         }
 
+        // pour avoir la recherche surlignée
+        $highlightedWords = $requestStack->getCurrentRequest()->getSession()->get('highlightedWords', []);
+        if (isset($aidSearchClass) and $aidSearchClass instanceof AidSearchClass) {
+            if ($aidSearchClass->getKeyword()) {
+                $synonyms = $referenceService->getSynonymes($aidSearchClass->getKeyword());
+                if (isset($synonyms['simple_words_string'])) {
+                    $keywords = explode(' ', $synonyms['simple_words_string']);
+                    foreach ($keywords as $keyword) {
+                        $highlightedWords[] = $keyword;
+                    }
+                }
+            }
+        }
+        $requestStack->getCurrentRequest()->getSession()->set('highlightedWords', $highlightedWords);
+
         // rendu template
         return $this->render('aid/aid/index.html.twig', [
             'formAidSearch' => $formAidSearch->createView(),
@@ -245,7 +262,7 @@ class AidController extends FrontController
             'querystring' => $query,
             'perimeterName' => (isset($aidParams['perimeterFrom']) && $aidParams['perimeterFrom'] instanceof Perimeter) ? $aidParams['perimeterFrom']->getName() : '',
             'categoriesName' => $categoriesName,
-            'highlightedWords' => $requestStack->getCurrentRequest()->getSession()->get('highlightedWords', [])
+            'highlightedWords' => $highlightedWords
         ]);
     }
 
