@@ -401,12 +401,16 @@ class AidRepository extends ServiceEntityRepository
                     $sql .= ' + ';
                 }
                 $sql .= '
-                    CASE WHEN (MATCH_AGAINST(a.name) AGAINST(:full_string IN BOOLEAN MODE) > 5) THEN 30 ELSE 0 END +
+                    CASE WHEN (MATCH_AGAINST(a.name) AGAINST(:full_string IN BOOLEAN MODE) > 5) THEN 30 ELSE 0 END
                 ';
                 $qb->setParameter('full_string', $itentionsString.' '.$objectsString);
             }
 
             if ($itentionsString) {
+                if ($originalName || ($itentionsString && $objectsString)) {
+                    $sql .= ' + ';
+                }
+
                 $somethingToSearch = true;
                 $intentions = str_getcsv($itentionsString, ' ', '"');
                 $sql .= '
