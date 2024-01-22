@@ -6,6 +6,10 @@ use Symfony\Component\HttpKernel\KernelInterface;
 
 class FileService
 {
+    const FORMAT_CSV = 'csv';
+    const FORMAT_XLSX = 'xlsx';
+    const FORMAT_PDF = 'pdf';
+    
     const UPLOAD_TMP_FOLDER = '/public/uploads/_tmp/';
 
     public function __construct(

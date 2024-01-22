@@ -146,12 +146,25 @@
                             </tbody>
                         </table>
                     </div>
+
+                    {% if project.id %}
+                        <p>
+                        <button type="button" class="fr-btn fr-btn--secondary fr-icon-download-line fr-btn--icon-left" id="export-project-btn" data-fr-opened="false" aria-controls="export-project-modal-{{ project.id }}" data-fr-js-modal-button="true" {% if project.aidProjects|length == 0 %}disabled="disabled"{% endif %}>
+                            Exporter ce projet
+                        </button>
+                        </p>
+                    {% endif %}
+
                     <div class="fr-alert fr-alert--info fr-alert--sm fr-mt-5w">
                         <h3 class="fr-h6 _fr-mt-1w">Découvrez toutes vos opportunités 🌟</h3>
                         {# <p>Si nous avons sélectionné pour vous des aides spécifiques, n'oubliez pas que d'autres opportunités pourraient vous attendre dans notre base de données. Chaque projet est unique, et une aide insoupçonnée pourrait être la clé de votre réussite.</p> #}
                         <p>Si vous avez sélectionné des aides spécifiques, n'oubliez pas que d'autres opportunités pourraient vous attendre dans notre base de données. Chaque projet est unique, et une aide insoupçonnée pourrait être la clé de votre réussite.</p>
                         <div class="fr-mt-2w fr-mb-2w">
+                            {% if project.projectReference %}
+                            <a class="fr-btn fr-fi-search-line fr-btn--icon-left" href="{{ path('app_aid_aid', {'keyword': project.projectReference.name}) }}" title="Trouver des aides">Explorer toutes les aides</a>
+                            {% else %}
                             <a class="fr-btn fr-fi-search-line fr-btn--icon-left" href="{{ path('app_aid_aid') }}" title="Trouver des aides">Explorer toutes les aides</a>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
@@ -277,4 +290,35 @@
         </div>
     </dialog>
     {% endfor %}
+
+    {# Exporter le projet #}
+    <dialog aria-labelledby="fr-modal-title-export-project" role="dialog" id="export-project-modal-{{ project.id }}" class="fr-modal">
+        <div class="fr-container fr-container--fluid fr-container-md">
+            <div class="fr-grid-row fr-grid-row--center">
+                <div class="fr-col-12 fr-col-md-8 fr-col-lg-6">
+                    <div class="fr-modal__body">
+                        <div class="fr-modal__header">
+                            <button class="fr-btn fr-btn--close" title="Fermer la fenêtre modale" aria-controls="export-project-modal-{{ project.id }}">Fermer</button>
+                        </div>
+                        <div class="fr-modal__content">
+                            <h1 id="fr-modal-title-export-project" class="fr-modal__title"><span class="fr-icon-arrow-right-line fr-icon--lg"></span>Exporter ce projet</h1>
+
+                            <p>Les champs marqués d’un astérisque (*) sont obligatoires.</p>
+
+                            {{ form_start(formExportProject)}}
+                                <div class="content">
+                                    {{ form_row(formExportProject.format) }}
+                                    <footer>
+                                        <button class="btn-block fr-btn fr-mt-2w" type="submit">
+                                            Exporter ce projet
+                                        </button>
+                                    </footer>
+                                </div>
+                            {{ form_end(formExportProject)}}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </dialog>
 {% endblock %}

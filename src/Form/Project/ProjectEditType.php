@@ -71,7 +71,7 @@ class ProjectEditType extends AbstractType
         ])
         ->add('description', TextareaType::class, [
             'required' => true,
-            'label' => 'Description complète de l’aide et de ses objectif :',
+            'label' => 'Description du projet :',
             'help' => 'Cette description sera utilisée dans l\'export du projet mais aussi dans le cas où vous le rendiez public',
             'attr' => [
                 'placeholder' => 'Si vous avez un descriptif, n’hésitez pas à le copier ici. Essayez de compléter le descriptif avec le maximum d’informations. Si l’on vous contacte régulièrement pour vous demander les mêmes informations, essayez de donner des éléments de réponses dans cet espace.',

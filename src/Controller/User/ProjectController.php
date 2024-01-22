@@ -11,17 +11,22 @@ use App\Form\Project\ProjectEditType;
 use App\Form\User\Project\AidProjectDeleteType;
 use App\Form\User\Project\AidProjectStatusType;
 use App\Form\User\Project\ProjectDeleteType;
+use App\Form\User\Project\ProjectExportType;
 use App\Repository\Aid\AidProjectRepository;
 use App\Repository\Aid\AidRepository;
 use App\Repository\Perimeter\PerimeterRepository;
 use App\Repository\Project\ProjectRepository;
 use App\Repository\Project\ProjectValidatedRepository;
+use App\Service\Export\SpreadsheetExporterService;
+use App\Service\File\FileService;
 use App\Service\Image\ImageService;
 use App\Service\Notification\NotificationService;
 use App\Service\Reference\ReferenceService;
 use App\Service\User\UserService;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Dompdf\Dompdf;
+use Dompdf\Options;
 use Pagerfanta\Adapter\ArrayAdapter;
 use Pagerfanta\Doctrine\ORM\QueryAdapter;
 use Pagerfanta\Pagerfanta;
@@ -225,7 +230,7 @@ class ProjectController extends FrontController
         return $this->render('user/project/fiche_projet.html.twig', [
             'project' => $project,
             'form' => $form->createView(),
-            'formErrors' => $formErrors ?? false
+            'formErrors' => $formErrors ?? false,
         ]);
     }
 
@@ -322,7 +327,8 @@ class ProjectController extends FrontController
         AidProjectRepository $aidProjectRepository,
         ManagerRegistry $managerRegistry,
         NotificationService $notificationService,
-        ReferenceService $referenceService
+        ReferenceService $referenceService,
+        SpreadsheetExporterService $spreadsheetExporterService
     ): Response
     {
         $projectCreated = $requestStack->getCurrentRequest()->get('projectCreated', 0);
@@ -443,6 +449,37 @@ class ProjectController extends FrontController
             }
         }
 
+        // formulaire export projet
+        $formExportProject = $this->createForm(ProjectExportType::class, null, ['attr' => ['target' => '_blank']]);
+        if ($project->getId()) {
+            $formExportProject->get('idProject')->setData($project->getId());
+        }
+        $formExportProject->handleRequest($requestStack->getCurrentRequest());
+        if ($formExportProject->isSubmitted()) {
+            if ($formExportProject->isValid()) {
+                switch ($formExportProject->get('format')->getData()) {
+                    case FileService::FORMAT_CSV:
+                        return $spreadsheetExporterService->exportProjectAids($project, FileService::FORMAT_CSV);
+                        break;
+                    case FileService::FORMAT_XLSX:
+                        try {
+                        $spreadsheetExporterService->exportProjectAidsV2($project, FileService::FORMAT_XLSX);
+                        } catch (\Exception $e) {
+                            dd($e);
+                        }
+                        break;
+                    case FileService::FORMAT_PDF:
+                        return $this->exportAidsToPdf($project);
+                        break;
+                    default: 
+                        $this->addFlash(FrontController::FLASH_ERROR, 'Format non supporté');
+                }
+            } else {
+                foreach ($formExportProject->getErrors(true) as $error) {
+                    dump($error);
+                }
+            }
+        }
 
         // fil arianne
         $this->breadcrumb->add("Mon compte",$this->generateUrl('app_user_dashboard'));
@@ -457,7 +494,38 @@ class ProjectController extends FrontController
             'formAidProjectDelete' => $formAidProjectDelete,
             'projectCreated' => $projectCreated,
             'formAidProjectEdits' => $formAidProjectEdits,
-            'formAidProjectEditHasError' => $formAidProjectEditHasError
+            'formAidProjectEditHasError' => $formAidProjectEditHasError,
+            'formExportProject' => $formExportProject
+        ]);
+    }
+
+    private function exportAidsToPdf(Project $project)
+    {
+        $now = new \DateTime(date('Y-m-d H:i:s'));
+        $filename = 'Aides-territoires_-_'.$now->format('Y-m-d').'_-_'.$project->getSlug().'.pdf';
+        $pdfOptions = new Options();
+        $pdfOptions->setIsRemoteEnabled(true);
+
+        // instantiate and use the dompdf class
+        $dompdf = new Dompdf($pdfOptions);
+
+        $dompdf->loadHtml(
+            $this->renderView('user/project/aids_list_export_pdf.html.twig', [
+                'project' => $project,
+                'organization' => ($project->getAuthor() && $project->getAuthor()->getDefaultOrganization()) ? $project->getAuthor()->getDefaultOrganization() : null,
+                'today' => new \DateTime(date('Y-m-d H:i:s'))
+            ])
+        );
+
+        // (Optional) Setup the paper size and orientation
+        $dompdf->setPaper('A4', 'portrait');
+
+        // Render the HTML as PDF
+        $dompdf->render();
+
+        // Output the generated PDF to Browser (inline view)
+        $response = $dompdf->stream($filename.'.pdf', [
+            "Attachment" => false
         ]);
     }
 

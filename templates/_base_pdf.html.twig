@@ -5,6 +5,9 @@
         <title>{% block title %}Aides-territoires | {% block extratitle %}Aides publiques pour les collectivités{% endblock extratitle %}{% endblock title %}</title>
 
         <style type="text/css">
+        .page-break {
+            page-break-before: always;
+        }
         @page {
             size: a4 portrait;
 
@@ -67,6 +70,9 @@
 
         .at-pdf-footer__logo { height: 50px;}
 
+        table {
+            border-spacing: 0;
+        }
         td, th {
             border: 1px solid #000;
             padding: 0.5em;
