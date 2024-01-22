@@ -10,25 +10,42 @@ use Doctrine\ORM\QueryBuilder;
 use OpenSpout\Common\Entity\Cell;
 use OpenSpout\Common\Entity\Row;
 use OpenSpout\Writer\XLSX\Entity\SheetView;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\StreamedResponse;
+use Twig\Environment;
 
 class SpreadsheetExporterService
 {
+    public function __construct(
+        protected Environment $twig
+    )
+    {
+        
+    }
     public function  createResponseFromQueryBuilder(
         QueryBuilder $queryBuilder,
         mixed $entityFcqn,
         string $filename,
         string $format = FileService::FORMAT_CSV
-    ): StreamedResponse
+    ): StreamedResponse|Response
     {
         ini_set('max_execution_time', 60*60);
         ini_set('memory_limit', '1.5G');
 
+        $results = $queryBuilder->getQuery()->getResult();
+        if (count($results) > 1000) {
+            $content = $this->twig->render('admin/cron/cron-launched.html.twig', [
+                
+            ]);
+            return new Response($content);
+        }
+
         $response = new StreamedResponse();
-        $response->setCallback(function () use ($queryBuilder, $entityFcqn, $filename, $format) {
+        $response->setCallback(function () use ($queryBuilder, $entityFcqn, $filename, $format, $results) {
             $entity = new $entityFcqn();
 
-            $results = $queryBuilder->getQuery()->getResult();
+            // $results = $queryBuilder->getQuery()->getResult();
 
             $datas = $this->getDatasFromEntityType($entity, $results);
 

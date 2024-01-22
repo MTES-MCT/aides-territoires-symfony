@@ -1,0 +1,26 @@
+{% extends "@EasyAdmin/page/content.html.twig" %}
+{# @var ea \EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext #}
+{# @var action \EasyCorp\Bundle\EasyAdminBundle\Dto\ActionDto #}
+{# @var entity \EasyCorp\Bundle\EasyAdminBundle\Dto\EntityDto #}
+
+{% block head_javascript %}
+    {{ parent() }}
+    {{ encore_entry_script_tags('admin/data-source/analyse') }}
+{% endblock head_javascript %}
+
+{% block main %}
+<main>
+
+<h1 class="title">Votre export</h1>
+
+<div class="alert alert-info" role="alert">
+<p>Votre export est trop volumineux, il sera lancé par une tâche automatique et vous recevrez un mail avec le lien de téléchargement.</p>
+<hr />
+<p>Les taches automatiques sont lancées toutes les 10 minutes.</p>
+</div>
+</main>
+{% endblock %}
+
+{% block body_javascript %}
+
+{% endblock body_javascript %}
