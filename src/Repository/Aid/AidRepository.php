@@ -433,7 +433,7 @@ class AidRepository extends ServiceEntityRepository
             }
 
             if ($objectsString) {
-                if ($itentionsString) {
+                if ($originalName || $itentionsString) {
                     $sql .= ' + ';
                 }
                 $somethingToSearch = true;
