@@ -12,17 +12,10 @@ h3 {
 }
 {% endblock title_style%}
 
-{% block extratitle %}{{ organization.name }}{% endblock extratitle %}
-
-{% block logo_partner %}
-<img src="{{ absolute_url(asset('build/images/logo/logo_AT_courbes.png')) }}" style="height:60pt" alt="Aides-territoires" />
-{% if organization.backer and organization.backer.logo %}
-<img src="{{ getParameter('cloud_image_url') }}{{ organization.backer.logo }}" style="height:60pt" alt="logo de la structure {{organization.name}}" />
-{% endif %}
-{% endblock logo_partner %}
-
-{% block intro %}{% endblock intro %}
-
+{% block intro %}
+    <div>Aides-territoires est un service public numérique qui facilite la recherche d’aides, financières et d’ingénierie, et la réalisation des
+projets des collectivités territoriales en regroupant les dispositifs auxquels elles peuvent prétendre sur un portail unique.</div>
+{% endblock intro %}
 
 {% block content %}
 <div class="fr-container fr-mb-5w fr-mt-0">
