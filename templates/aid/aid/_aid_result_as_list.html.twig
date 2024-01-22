@@ -20,7 +20,7 @@
                 {% set aidUrlParams = aidUrlParams|merge({'integration': 'integration'}) %}
             {% endif %}
             <tr>
-                <td>
+                <td  class="highlightable">
                     <a href="{{ path('app_aid_aid_details', {'slug': aid.slug}) }}{% if integration is defined %}?integration=integration{% endif %}">
                     {{ aid.name }}
                     </a>

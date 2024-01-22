@@ -51,7 +51,7 @@ class AidService
         }
 
         $aid->setDescription($newHtml);
-        $aid->setInlineStyles($styles);
+        // $aid->setInlineStyles($styles);
         return $aid;
     }
 

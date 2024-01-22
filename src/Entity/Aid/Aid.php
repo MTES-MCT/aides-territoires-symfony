@@ -60,6 +60,7 @@ use App\Filter\Aid\AidTypeGroupFilter;
 #[ORM\Index(columns: ['description'], name: 'description_aid_fulltext', flags: ['fulltext'])]
 #[ORM\Index(columns: ['eligibility'], name: 'eligibility_aid_fulltext', flags: ['fulltext'])]
 #[ORM\Index(columns: ['name','description','eligibility'], name: 'synonym_aid_fulltext', flags: ['fulltext'])]
+#[ORM\Index(columns: ['description','eligibility'], name: 'synonym_aid_fulltext', flags: ['fulltext'])]
 #[ApiResource(
     operations: [
         new GetCollection(

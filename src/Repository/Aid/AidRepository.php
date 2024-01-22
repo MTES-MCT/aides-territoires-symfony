@@ -380,49 +380,150 @@ class AidRepository extends ServiceEntityRepository
             ;
         }
 
-        if (
-            isset($synonyms)
-            && isset($synonyms['objects_string']) && $synonyms['objects_string'] !== ''
-            && isset($synonyms['simple_words_string']) && $synonyms['simple_words_string'] !== ''
-            ) {
-            $sql = '
-            (';
-            if (trim($synonyms['simple_words_string']) !== '') {
+        // dd($synonyms);
+        if (isset($synonyms)) {
+            $somethingToSearch = false;
+            $itentionsString = (isset($synonyms['intentions_string']) && $synonyms['intentions_string'] !== '')  ? $synonyms['intentions_string'] : null;
+            $objectsString = (isset($synonyms['objects_string']) && $synonyms['objects_string'] !== '')  ? $synonyms['objects_string'] : null;
+            $simpleWordsString = (isset($synonyms['simple_words_string']) && $synonyms['simple_words_string'] !== '')  ? $synonyms['simple_words_string'] : null;
+            $sql = '(';
+
+            if ($itentionsString && $objectsString) {
                 $sql .= '
-                    CASE WHEN (MATCH_AGAINST(a.name, a.description, a.eligibility) AGAINST(:simple_words_string IN BOOLEAN MODE) > 5) THEN 3 ELSE 0 END
+                    CASE WHEN (MATCH_AGAINST(a.name) AGAINST(:full_string IN BOOLEAN MODE) > 5) THEN 30 ELSE 0 END +
                 ';
-                $qb->setParameter('simple_words_string', $synonyms['simple_words_string']);
+                $qb->setParameter('full_string', $itentionsString.' '.$objectsString);
             }
 
-            if (trim($synonyms['objects_string']) !== '') {
-                if (trim($synonyms['simple_words_string']) !== '') {
+            if ($itentionsString) {
+                $somethingToSearch = true;
+                $intentions = str_getcsv($itentionsString, ' ', '"');
+                $sql .= '
+                    CASE WHEN (MATCH_AGAINST(a.name) AGAINST(:intentions_string IN BOOLEAN MODE) > 5) THEN 5 ELSE 0 END +
+                ';
+                $qb->setParameter('intentions_string', $itentionsString);
+
+                for ($i = 0; $i<count($intentions); $i++) {
+                    $sql .= '
+                        CASE WHEN (a.name LIKE :intentions'.$i.') THEN 2 ELSE 0 END +
+                        CASE WHEN (a.description LIKE :intentions'.$i.') THEN 1 ELSE 0 END +
+                        CASE WHEN (a.eligibility LIKE :intentions'.$i.') THEN 1 ELSE 0 END
+                    ';
+                    if ($i < count($intentions) - 1) {
+                        $sql .= ' + ';
+                    }
+                    $qb->setParameter('intentions'.$i, '%'.$intentions[$i].'%');
+                }
+                // $sql = substr($sql, 0, -1);
+            }
+
+            if ($objectsString) {
+                if ($itentionsString) {
                     $sql .= ' + ';
                 }
+                $somethingToSearch = true;
+                $objects = str_getcsv($objectsString, ' ', '"');
                 $sql .= '
-                    CASE WHEN (MATCH_AGAINST(a.name) AGAINST(:objects_string IN BOOLEAN MODE) > 5) THEN 10 ELSE 0 END
-                    +
-                    CASE WHEN (MATCH_AGAINST(a.description) AGAINST(:objects_string IN BOOLEAN MODE) > 5) THEN 1 ELSE 0 END
-                    +
-                    CASE WHEN (MATCH_AGAINST(a.eligibility) AGAINST(:objects_string IN BOOLEAN MODE) > 5) THEN 2 ELSE 0 END
+                CASE WHEN (MATCH_AGAINST(a.name) AGAINST(:objects_string IN BOOLEAN MODE) > 5) THEN 10 ELSE 0 END +
+                CASE WHEN (MATCH_AGAINST(a.description, a.eligibility) AGAINST(:objects_string IN BOOLEAN MODE) > 5) THEN 4 ELSE 0 END +
                 ';
-                $qb->setParameter('objects_string', $synonyms['objects_string']);
+                $qb->setParameter('objects_string', $objectsString);
+
+                for ($i = 0; $i<count($objects); $i++) {
+                    $sql .= '
+                        CASE WHEN (a.name LIKE :objects'.$i.') THEN 4 ELSE 0 END +
+                        CASE WHEN (a.description LIKE :objects'.$i.') THEN 2 ELSE 0 END +
+                        CASE WHEN (a.eligibility LIKE :objects'.$i.') THEN 2 ELSE 0 END
+                    ';
+                    if ($i < count($objects) - 1) {
+                        $sql .= ' + ';
+                    }
+                    $qb->setParameter('objects'.$i, '%'.$objects[$i].'%');
+                }
+                // $sql = substr($sql, 0, -1);
             }
 
-            $sql .= '
-            ) as score_total
-            ';
+            if ($simpleWordsString) {
+                if ($itentionsString || $objectsString) {
+                    $sql .= ' + ';
+                }
 
-            if (trim($synonyms['simple_words_string']) !== '' || trim($synonyms['objects_string']) !== '') {
-                if (!$inAdmin) {
+                $somethingToSearch = true;
+                $words = str_getcsv($simpleWordsString, ' ', '"');
+                $sql .= '
+                CASE WHEN (MATCH_AGAINST(a.name) AGAINST(:simple_words_string IN BOOLEAN MODE) > 5) THEN 5 ELSE 0 END +
+                ';
+                $qb->setParameter('simple_words_string', $simpleWordsString);
+
+                for ($i = 0; $i<count($words); $i++) {
+                    $sql .= '
+                        CASE WHEN (a.name LIKE :words'.$i.') THEN 2 ELSE 0 END
+                    ';
+                    if ($i < count($words) - 1) {
+                        $sql .= ' + ';
+                    }
+                    $qb->setParameter('words'.$i, '%'.$words[$i].'%');
+                }
+                // $sql = substr($sql, 0, -1);
+            }
+            $sql .= ') as score_total';
+
+            if ($somethingToSearch && !$inAdmin) {
                 $scoreTotalAvailable = true;
-
+                $orderBy = [
+                    'sort' => 'score_total',
+                    'order' => 'DESC'
+                ];
                 $qb
                 ->addSelect($sql)
-                ->andHaving('score_total >= 1')
+                ->andHaving('score_total >= 10')
                 ;
-                }
             }
         }
+
+        // if (
+        //     isset($synonyms)
+        //     && isset($synonyms['objects_string']) && $synonyms['objects_string'] !== ''
+        //     && isset($synonyms['simple_words_string']) && $synonyms['simple_words_string'] !== ''
+        //     ) {
+        //     $sql = '
+        //     (';
+        //     if (trim($synonyms['simple_words_string']) !== '') {
+        //         $sql .= '
+        //             CASE WHEN (MATCH_AGAINST(a.name, a.description, a.eligibility) AGAINST(:simple_words_string IN BOOLEAN MODE) > 5) THEN 3 ELSE 0 END
+        //         ';
+        //         $qb->setParameter('simple_words_string', $synonyms['simple_words_string']);
+        //     }
+
+        //     if (trim($synonyms['objects_string']) !== '') {
+        //         if (trim($synonyms['simple_words_string']) !== '') {
+        //             $sql .= ' + ';
+        //         }
+        //         $sql .= '
+        //             CASE WHEN (MATCH_AGAINST(a.name) AGAINST(:objects_string IN BOOLEAN MODE) > 5) THEN 10 ELSE 0 END
+        //             +
+        //             CASE WHEN (MATCH_AGAINST(a.description) AGAINST(:objects_string IN BOOLEAN MODE) > 5) THEN 1 ELSE 0 END
+        //             +
+        //             CASE WHEN (MATCH_AGAINST(a.eligibility) AGAINST(:objects_string IN BOOLEAN MODE) > 5) THEN 2 ELSE 0 END
+        //         ';
+        //         $qb->setParameter('objects_string', $synonyms['objects_string']);
+        //     }
+
+        //     $sql .= '
+        //     ) as score_total
+        //     ';
+
+        //     if (trim($synonyms['simple_words_string']) !== '' || trim($synonyms['objects_string']) !== '') {
+        //         if (!$inAdmin) {
+        //         $scoreTotalAvailable = true;
+
+        //         $qb
+        //         ->addSelect($sql)
+        //         ->andHaving('score_total >= 1')
+        //         ;
+        //         }
+        //     }
+        // }
 
         if ($aidRecurrence instanceof AidRecurrence && $aidRecurrence->getId()) {
             $qb

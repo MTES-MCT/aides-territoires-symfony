@@ -241,22 +241,32 @@ class AidController extends FrontController
 
         // pour avoir la recherche surlignée
         $highlightedWords = $requestStack->getCurrentRequest()->getSession()->get('highlightedWords', []);
+        
         if (isset($aidSearchClass) and $aidSearchClass instanceof AidSearchClass) {
+            $highlightedWords = [];
             if ($aidSearchClass->getKeyword()) {
                 $synonyms = $referenceService->getSynonymes($aidSearchClass->getKeyword());
-                if (isset($synonyms['objects_string'])) {
-                    $keywords = explode(' ', $synonyms['objects_string']);
+                if (isset($synonyms['intentions_string'])) {
+                    $keywords = str_getcsv($synonyms['intentions_string'], ' ', '"');
                     foreach ($keywords as $keyword) {
                         $highlightedWords[] = $keyword;
                     }
-                } else if (isset($synonyms['simple_words_string'])) {
-                    $keywords = explode(' ', $synonyms['simple_words_string']);
+                } 
+                if (isset($synonyms['objects_string'])) {
+                    $keywords = str_getcsv($synonyms['objects_string'], ' ', '"');
+                    foreach ($keywords as $keyword) {
+                        $highlightedWords[] = $keyword;
+                    }
+                } 
+                if (isset($synonyms['simple_words_string'])) {
+                    $keywords = str_getcsv($synonyms['simple_words_string'], ' ', '"');
                     foreach ($keywords as $keyword) {
                         $highlightedWords[] = $keyword;
                     }
                 }
             }
         }
+        dump($highlightedWords);
         
         $requestStack->getCurrentRequest()->getSession()->set('highlightedWords', $highlightedWords);
 
