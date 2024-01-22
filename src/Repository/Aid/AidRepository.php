@@ -380,7 +380,6 @@ class AidRepository extends ServiceEntityRepository
             ;
         }
 
-        // dd($synonyms);
         if (isset($synonyms)) {
             $somethingToSearch = false;
             $originalName = (isset($synonyms['original_name']) && $synonyms['original_name'] !== '')  ? $synonyms['original_name'] : null;
@@ -456,7 +455,7 @@ class AidRepository extends ServiceEntityRepository
             }
 
             if ($simpleWordsString) {
-                if ($itentionsString || $objectsString) {
+                if ($originalName || $itentionsString || $objectsString) {
                     $sql .= ' + ';
                 }
 
