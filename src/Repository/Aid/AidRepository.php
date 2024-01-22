@@ -383,12 +383,24 @@ class AidRepository extends ServiceEntityRepository
         // dd($synonyms);
         if (isset($synonyms)) {
             $somethingToSearch = false;
+            $originalName = (isset($synonyms['original_name']) && $synonyms['original_name'] !== '')  ? $synonyms['original_name'] : null;
             $itentionsString = (isset($synonyms['intentions_string']) && $synonyms['intentions_string'] !== '')  ? $synonyms['intentions_string'] : null;
             $objectsString = (isset($synonyms['objects_string']) && $synonyms['objects_string'] !== '')  ? $synonyms['objects_string'] : null;
             $simpleWordsString = (isset($synonyms['simple_words_string']) && $synonyms['simple_words_string'] !== '')  ? $synonyms['simple_words_string'] : null;
             $sql = '(';
 
+            if ($originalName) {
+                $somethingToSearch = true;
+                $sql .= '
+                CASE WHEN (a.name = :originalName) THEN 100 ELSE 0 END
+                ';
+                $qb->setParameter('originalName', $originalName);
+            }
+
             if ($itentionsString && $objectsString) {
+                if ($originalName) {
+                    $sql .= ' + ';
+                }
                 $sql .= '
                     CASE WHEN (MATCH_AGAINST(a.name) AGAINST(:full_string IN BOOLEAN MODE) > 5) THEN 30 ELSE 0 END +
                 ';

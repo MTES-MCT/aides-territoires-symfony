@@ -26,6 +26,7 @@ class ReferenceService
 
     public function getSynonymes(string $project_name): ?array
     {
+        $original_name = $project_name;
         $project_name = str_replace(array("/","(",")",",",":","–","-"), " ",strtolower($project_name));
         $projet_keywords_combinaisons=$this->genererCombinaisons($project_name, $this->articles);
         // Tri du tableau pour d'abord chercher des expressions complètes "terrain de football" aura la priorité sur "terrain"
@@ -61,7 +62,12 @@ class ReferenceService
         $intentions_string = $this->arrayToStringWithQuotes($intentions);
         $objects_string = $this->arrayToStringWithQuotes($objects);
         $simple_words_string = $this->enleverArticles($project_name, $this->articles); // $simple_words_string = $project_name;
-        return array("intentions_string"=>$intentions_string, "objects_string"=>$objects_string,"simple_words_string"=>$simple_words_string);
+        return [
+          'intentions_string' => $intentions_string,
+          'objects_string' => $objects_string,
+          'simple_words_string' => $simple_words_string,
+          'original_name' => $original_name,
+        ];
       
     }   
     

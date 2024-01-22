@@ -28,7 +28,7 @@ class KeywordReferenceCrudController extends AtCrudController
     public function configureFilters(Filters $filters): Filters
     {
         return $filters
-            ->add(KeywordReferenceParentFilter::new('parentFilter'))
+            ->add(KeywordReferenceParentFilter::new('parentFilter')->setFormTypeOption('mapped', false))
             ->add('parent')
 
             // most of the times there is no need to define the

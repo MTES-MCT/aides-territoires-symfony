@@ -27,9 +27,9 @@ class KeywordReferenceParentFilter implements FilterInterface
     public function apply(QueryBuilder $queryBuilder, FilterDataDto $filterDataDto, ?FieldDto $fieldDto, EntityDto $entityDto): void
     {
         if ($filterDataDto->getValue()) {
-            $queryBuilder->andWhere(sprintf('%s.%s = %s', $filterDataDto->getEntityAlias(), $filterDataDto->getProperty(), $filterDataDto->getEntityAlias()));
+            $queryBuilder->andWhere(sprintf('%s.parent = entity', $filterDataDto->getEntityAlias(), $filterDataDto->getProperty(), $filterDataDto->getEntityAlias()));
         } else {
-            $queryBuilder->andWhere(sprintf('%s.%s != %s', $filterDataDto->getEntityAlias(), $filterDataDto->getProperty(), $filterDataDto->getEntityAlias()));
+            $queryBuilder->andWhere(sprintf('%s.parent != entity', $filterDataDto->getEntityAlias(), $filterDataDto->getProperty(), $filterDataDto->getEntityAlias()));
         }
     }
 }
