@@ -391,7 +391,7 @@ class AidRepository extends ServiceEntityRepository
             if ($originalName) {
                 $somethingToSearch = true;
                 $sql .= '
-                CASE WHEN (a.name = :originalName) THEN 100 ELSE 0 END
+                CASE WHEN (a.name = :originalName) THEN 500 ELSE 0 END
                 ';
                 $qb->setParameter('originalName', $originalName);
             }
@@ -439,16 +439,16 @@ class AidRepository extends ServiceEntityRepository
                 $somethingToSearch = true;
                 $objects = str_getcsv($objectsString, ' ', '"');
                 $sql .= '
-                CASE WHEN (MATCH_AGAINST(a.name) AGAINST(:objects_string IN BOOLEAN MODE) > 5) THEN 10 ELSE 0 END +
-                CASE WHEN (MATCH_AGAINST(a.description, a.eligibility) AGAINST(:objects_string IN BOOLEAN MODE) > 5) THEN 4 ELSE 0 END +
+                CASE WHEN (MATCH_AGAINST(a.name) AGAINST(:objects_string IN BOOLEAN MODE) > 5) THEN 100 ELSE 0 END +
+                CASE WHEN (MATCH_AGAINST(a.description, a.eligibility) AGAINST(:objects_string IN BOOLEAN MODE) > 5) THEN 50 ELSE 0 END +
                 ';
                 $qb->setParameter('objects_string', $objectsString);
 
                 for ($i = 0; $i<count($objects); $i++) {
                     $sql .= '
-                        CASE WHEN (a.name LIKE :objects'.$i.') THEN 4 ELSE 0 END +
-                        CASE WHEN (a.description LIKE :objects'.$i.') THEN 2 ELSE 0 END +
-                        CASE WHEN (a.eligibility LIKE :objects'.$i.') THEN 2 ELSE 0 END
+                        CASE WHEN (a.name LIKE :objects'.$i.') THEN 8 ELSE 0 END +
+                        CASE WHEN (a.description LIKE :objects'.$i.') THEN 4 ELSE 0 END +
+                        CASE WHEN (a.eligibility LIKE :objects'.$i.') THEN 4 ELSE 0 END
                     ';
                     if ($i < count($objects) - 1) {
                         $sql .= ' + ';
@@ -491,7 +491,7 @@ class AidRepository extends ServiceEntityRepository
                 ];
                 $qb
                 ->addSelect($sql)
-                ->andHaving('score_total >= 10')
+                ->andHaving('score_total >= 30')
                 ;
             }
         }
