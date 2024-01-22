@@ -92,25 +92,27 @@
     </head>
     <body>
         {% block header %}
-        <div id="header_content">
-            <header role="banner"  class="at-pdf-header">
-                <div class="at-pdf-header__body">
-                    <div class="fr-container">
-                        <div class="at-pdf-header__body-row">
-                            <div class="at-pdf-header__brand fr-enlarge-link">
-                                <div class="at-pdf-header__brand-top">
-                                    <div class="at-pdf-header__operator">
-                                        {% block logo_partner %}
-                                        <img src="{{ absolute_url(asset('build/images/logo/logo_gouv.jpg')) }}" style="width:150px" alt="Gouvernement" />
-                                        <img src="{{ absolute_url(asset('build/images/logo/logo_AT_courbes.jpg')) }}" style="width:150px" alt="Aides-territoires" />
-                                        {% endblock logo_partner %}
+        <div id="header-wrapper">
+            <div id="header_content">
+                <header role="banner"  class="at-pdf-header">
+                    <div class="at-pdf-header__body">
+                        <div class="fr-container">
+                            <div class="at-pdf-header__body-row">
+                                <div class="at-pdf-header__brand fr-enlarge-link">
+                                    <div class="at-pdf-header__brand-top">
+                                        <div class="at-pdf-header__operator">
+                                            {% block logo_partner %}
+                                            <img src="{{ absolute_url(asset('build/images/logo/logo_gouv.jpg')) }}" style="width:150px" alt="Gouvernement" />
+                                            <img src="{{ absolute_url(asset('build/images/logo/logo_AT_courbes.jpg')) }}" style="width:150px" alt="Aides-territoires" />
+                                            {% endblock logo_partner %}
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            </header>
+                </header>
+            </div>
         </div>
         {% endblock header %}
   
