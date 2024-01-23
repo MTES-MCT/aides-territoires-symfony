@@ -75,7 +75,7 @@
                                 Exclu le {{ organizationInvitation.timeExclude|date('d/m/y') }}
                             {% elseif organizationInvitation.dateAccept %}
                                 Acceptée le {{ organizationInvitation.dateAccept|date('d/m/y') }}
-                                {% if organizationInvitation.author == app.user and organizationInvitation.guest != app.user %}
+                                {% if organizationInvitation.guest and organizationInvitation.author == app.user and organizationInvitation.guest != app.user %}
                                     <br />
                                     <button data-url="{{ path('app_organization_invitations_exclude', {'id': organizationInvitation.id})}}" class="fr-m-1w fr-tag _fr-tag--md fr-text--sd fr-icon-delete-line _fr-tag--icon-left exclude-collaborators-modal-btn" id="exclude-collaborators-modal-btn-{{ organizationInvitation.id }}" data-fr-opened="false" aria-controls="exclude-collaborators-modal">
                                         Exclure le membre
