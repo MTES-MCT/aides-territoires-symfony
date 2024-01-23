@@ -144,6 +144,8 @@ security:
         - { path: ^/admin/connexion/, roles: PUBLIC_ACCESS}
         - { path: ^/admin/user/[0-9]+/qrcode/, roles: ROLE_ADMIN}
         - { path: ^/admin, roles: ROLE_ADMIN }
+        - { path: ^/comptes/connexion/, roles: PUBLIC_ACCESS }
+        - { path: ^/comptes/inscription/, roles: PUBLIC_ACCESS }
         - { path: ^/comptes/, roles: ROLE_USER }
         - { path: ^/projets/projets-publics/(.*)/, roles: ROLE_USER }
         - { path: ^/aides/publier/, roles: ROLE_USER }
