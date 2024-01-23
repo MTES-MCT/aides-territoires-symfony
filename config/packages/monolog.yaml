@@ -54,7 +54,7 @@ when@prod:
                 from_email: '%env(EMAIL_FROM)%'
                 to_email:   '%env(EMAIL_SUPER_ADMIN)%'
                 subject:    'An Error Occurred! %%message%%'
-                level:      debug
+                level:      error
                 formatter:  monolog.formatter.html
                 content_type: text/html
             nested:
