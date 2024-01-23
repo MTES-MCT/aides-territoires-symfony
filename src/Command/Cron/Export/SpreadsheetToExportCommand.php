@@ -78,59 +78,69 @@ class SpreadsheetToExportCommand extends Command
             return;
         }
 
-        // passe en cours de traitement pour éviter de le relancer
-        $cronExportSpreadsheet->setProcessing(true);
-        $this->managerRegistry->getManager()->persist($cronExportSpreadsheet);
-        $this->managerRegistry->getManager()->flush();
+        try {
+            // passe en cours de traitement pour éviter de le relancer
+            $cronExportSpreadsheet->setProcessing(true);
+            $this->managerRegistry->getManager()->persist($cronExportSpreadsheet);
+            $this->managerRegistry->getManager()->flush();
 
-        // la requete sql
-        $sqlParams = [];
-        if ($cronExportSpreadsheet->getSqlParams() !== null) {
-            foreach ($cronExportSpreadsheet->getSqlParams() as $param) {
-                if (isset($param['name']) && isset($param['value'])) {
-                    $sqlParams[$param['name']] = $param['value'];
+            // la requete sql
+            $sqlParams = [];
+            if ($cronExportSpreadsheet->getSqlParams() !== null) {
+                foreach ($cronExportSpreadsheet->getSqlParams() as $param) {
+                    if (isset($param['name']) && isset($param['value'])) {
+                        $sqlParams[$param['name']] = $param['value'];
+                    }
                 }
             }
+            $query = $this->entityManager
+                    ->createQuery($cronExportSpreadsheet->getSqlRequest())
+                    ->setParameters($sqlParams)
+                    ;
+
+            // le fichier d'export
+            $fileTarget = $this->spreadsheetExporterService->exportToFile(
+                $query->getResult(),
+                $cronExportSpreadsheet->getEntityFqcn(),
+                $cronExportSpreadsheet->getFormat(),
+                $cronExportSpreadsheet->getFilename()
+            );
+
+            // envoi de l'email
+            $this->emailService->sendEmail(
+                $cronExportSpreadsheet->getUser()->getEmail(),
+                'Votre export est prêt',
+                'emails/cron/export/export_send.html.twig',
+                [],
+                [
+                    'attachments' => [$fileTarget]
+                ]
+            );
+
+            // supprime le fichier
+            @unlink($fileTarget);
+
+            // passe le statut à envoyé
+            $cronExportSpreadsheet->setTimeEmail(new \DateTime(date('Y-m-d H:i:s')));
+            $cronExportSpreadsheet->setProcessing(false);
+
+            // sauvegarde
+            $this->managerRegistry->getManager()->persist($cronExportSpreadsheet);
+            $this->managerRegistry->getManager()->flush();
+
+
+            // success
+            $io->success('export traité');
+            $io->success('Mémoire maximale utilisée : ' . round(memory_get_peak_usage() / 1024 / 1024) . ' MB');
+        } catch (\Exception $e) {
+            // passe en erreur pour éviter de le relancer
+            $cronExportSpreadsheet->setError(true);
+            $cronExportSpreadsheet->setProcessing(false);
+            $this->managerRegistry->getManager()->persist($cronExportSpreadsheet);
+            $this->managerRegistry->getManager()->flush();
+
+            $io->error($e->getMessage());
         }
-        $query = $this->entityManager
-                ->createQuery($cronExportSpreadsheet->getSqlRequest())
-                ->setParameters($sqlParams)
-                ;
-
-        // le fichier d'export
-        $fileTarget = $this->spreadsheetExporterService->exportToFile(
-            $query->getResult(),
-            $cronExportSpreadsheet->getEntityFqcn(),
-            $cronExportSpreadsheet->getFormat(),
-            $cronExportSpreadsheet->getFilename()
-        );
-
-        // envoi de l'email
-        $this->emailService->sendEmail(
-            $cronExportSpreadsheet->getUser()->getEmail(),
-            'Votre export est prêt',
-            'emails/cron/export/export_send.html.twig',
-            [],
-            [
-                'attachments' => [$fileTarget]
-            ]
-        );
-
-        // supprime le fichier
-        @unlink($fileTarget);
-        
-        // passe le statut à envoyé
-        $cronExportSpreadsheet->setTimeEmail(new \DateTime(date('Y-m-d H:i:s')));
-        $cronExportSpreadsheet->setProcessing(false);
-
-        // sauvegarde
-        $this->managerRegistry->getManager()->persist($cronExportSpreadsheet);
-        $this->managerRegistry->getManager()->flush();
-
-
-        // success
-        $io->success('export traité');
-        $io->success('Mémoire maximale utilisée : ' . round(memory_get_peak_usage() / 1024 / 1024) . ' MB');
     }
 
 }

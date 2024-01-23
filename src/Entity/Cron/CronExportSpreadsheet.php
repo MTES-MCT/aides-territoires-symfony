@@ -40,6 +40,9 @@ class CronExportSpreadsheet
     #[ORM\Column(length: 255)]
     private ?string $entityFqcn = null;
 
+    #[ORM\Column]
+    private ?bool $error = false;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -137,6 +140,18 @@ class CronExportSpreadsheet
     public function setEntityFqcn(string $entityFqcn): static
     {
         $this->entityFqcn = $entityFqcn;
+
+        return $this;
+    }
+
+    public function isError(): ?bool
+    {
+        return $this->error;
+    }
+
+    public function setError(bool $error): static
+    {
+        $this->error = $error;
 
         return $this;
     }
