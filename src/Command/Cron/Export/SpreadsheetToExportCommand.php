@@ -106,6 +106,9 @@ class SpreadsheetToExportCommand extends Command
                 format: $cronExportSpreadsheet->getFormat(),
             );
 
+            // libère la mémoire
+            unset($results);
+
             // envoi de l'email
             $this->emailService->sendEmail(
                 $cronExportSpreadsheet->getUser()->getEmail(),

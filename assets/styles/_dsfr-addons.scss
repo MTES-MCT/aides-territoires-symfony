@@ -384,3 +384,7 @@ p {
 .fr-label{
   margin: 0 0 1rem 0;
 }
+
+.fr-fieldset .fr-fieldset__content .fr-checkbox-group input[type="checkbox"] {
+  margin-top: 0;
+}
