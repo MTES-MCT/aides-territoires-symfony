@@ -426,7 +426,7 @@ class OrganizationController extends FrontController
             '.$user->getFirstname().' '.$user->getLastname().' vous à exclu de l\'organization '.$organizationName.'.
         </p>
         ';
-        $notificationService->addNotification($organizationInvitation->getGuest(), 'Votre avez été exclu de '.$organizationName, $message);
+        $notificationService->addNotification($organizationInvitation->getGuest(), 'Vous avez été exclu de '.$organizationName, $message);
 
         // message
         $this->addFlash(
