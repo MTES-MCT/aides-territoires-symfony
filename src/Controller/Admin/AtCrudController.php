@@ -243,7 +243,7 @@ class AtCrudController extends AbstractCrudController
     public function exportSpreadsheet(AdminContext $context, SpreadsheetExporterService $spreadsheetExporterService, string $filename, string $format = 'csv')
     {
         ini_set('max_execution_time', 60*60);
-        ini_set('memory_limit', '1.5G');
+        ini_set('memory_limit', '1G');
 
         $fields = FieldCollection::new($this->configureFields(Crud::PAGE_INDEX));
         $filters = $this->container->get(FilterFactory::class)->create($context->getCrud()->getFiltersConfig(), $fields, $context->getEntity());

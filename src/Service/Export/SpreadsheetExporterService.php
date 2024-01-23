@@ -36,10 +36,13 @@ class SpreadsheetExporterService
     ): StreamedResponse|Response
     {
         ini_set('max_execution_time', 60*60);
-        ini_set('memory_limit', '1.5G');
+        ini_set('memory_limit', '1G');
 
-        $results = $queryBuilder->getQuery()->getResult();
-        if (count($results) > 1000) {
+        // compte le nombre de résultats
+        $count = $queryBuilder->select('COUNT(entity)')->getQuery()->getSingleScalarResult();
+        
+        // si trop de résultats, on va traiter par cron
+        if ($count > 1000) {
             $params = $queryBuilder->getQuery()->getParameters() ?? null;
             $sqlParams = [];
             if ($params) {
@@ -64,11 +67,12 @@ class SpreadsheetExporterService
             return new Response($content);
         }
 
+        // on peu retourner directement un fichier tableur
         $response = new StreamedResponse();
-        $response->setCallback(function () use ($queryBuilder, $entityFcqn, $filename, $format, $results) {
+        $response->setCallback(function () use ($queryBuilder, $entityFcqn, $filename, $format) {
             $entity = new $entityFcqn();
 
-            // $results = $queryBuilder->getQuery()->getResult();
+            $results = $queryBuilder->getQuery()->getResult();
 
             $datas = $this->getDatasFromEntityType($entity, $results);
 
