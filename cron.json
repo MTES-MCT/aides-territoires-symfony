@@ -5,6 +5,9 @@
     },
     {
       "command": "*/10 * * * * php bin/console at:cron:perimeter:perimeter_import"
+    },
+    {
+      "command": "*/10 * * * * php bin/console at:cron:export:spreadsheet_export"
     }
   ]
 }

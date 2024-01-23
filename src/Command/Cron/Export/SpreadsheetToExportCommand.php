@@ -2,8 +2,6 @@
 
 namespace App\Command\Cron\Export;
 
-use App\Entity\Aid\Aid;
-use App\Entity\Alert\Alert;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputInterface;
@@ -11,15 +9,10 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Doctrine\Persistence\ManagerRegistry;
-use App\Entity\Perimeter;
-use App\Entity\Backer;
 use App\Entity\Cron\CronExportSpreadsheet;
-use App\Service\Aid\AidSearchFormService;
-use App\Service\Aid\AidService;
 use App\Service\Email\EmailService;
 use App\Service\Export\SpreadsheetExporterService;
 use App\Service\Various\ParamService;
-use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 
 #[AsCommand(name: 'at:cron:export:spreadsheet_export', description: 'Envoi des exports trop volumineux')]
