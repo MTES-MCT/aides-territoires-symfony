@@ -453,7 +453,11 @@ class SpreadsheetExporterService
             $entity = new $entityFqcn();
             $datas = $this->getDatasFromEntityType($entity, $results);
             $now = new \DateTime(date('Y-m-d H:i:s'));
-            $fileTarget = $this->fileService->getUploadTmpDir().'export_'.$filename.'_at_'.$now->format('d_m_Y');
+            $tmpFolder = $this->fileService->getUploadTmpDir();
+            if (!is_dir($tmpFolder)) {
+                mkdir($tmpFolder, 0777, true);
+            }
+            $fileTarget = $tmpFolder.'export_'.$filename.'_at_'.$now->format('d_m_Y');
             if ($format == FileService::FORMAT_CSV) {
                 $options = new \OpenSpout\Writer\CSV\Options();
                 $options->FIELD_DELIMITER = ';';
