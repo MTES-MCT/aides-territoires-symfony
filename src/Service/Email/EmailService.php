@@ -14,6 +14,8 @@ use Brevo\Client\Model\UpdateContact;
 use GuzzleHttp\Client;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mime\Part\DataPart;
+use Symfony\Component\Mime\Part\File;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 
@@ -57,6 +59,12 @@ class EmailService
             ->htmlTemplate($template)
             ->context($datas);
     
+            if ($options['attachments'] ?? false) {
+                foreach ($options['attachments'] as $attachment) {
+                    $email->addPart(new DataPart(new File($attachment)));
+                }
+            }
+
             $this->mailerInterface->send($email);
 
             return true;

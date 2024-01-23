@@ -6,6 +6,7 @@ use App\Entity\Aid\Aid;
 use App\Entity\Aid\AidProject;
 use App\Entity\Aid\AidSuggestedAidProject;
 use App\Entity\Bundle\Bundle;
+use App\Entity\Cron\CronExportSpreadsheet;
 use App\Entity\DataExport\DataExport;
 use App\Entity\DataSource\DataSource;
 use App\Entity\Eligibility\EligibilityQuestion;
@@ -295,6 +296,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
     private int $nbAidsLive = 0;
     private string $notificationSignature;
 
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: CronExportSpreadsheet::class)]
+    private Collection $cronExportSpreadsheets;
+
     public function __construct()
     {
         $this->logUserLogins = new ArrayCollection();
@@ -330,6 +334,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
         $this->organizationInvitations = new ArrayCollection();
         $this->organizationGuests = new ArrayCollection();
         $this->apiTokenAsks = new ArrayCollection();
+        $this->cronExportSpreadsheets = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -1865,5 +1870,35 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
             }
         }
         return null;
+    }
+
+    /**
+     * @return Collection<int, CronExportSpreadsheet>
+     */
+    public function getCronExportSpreadsheets(): Collection
+    {
+        return $this->cronExportSpreadsheets;
+    }
+
+    public function addCronExportSpreadsheet(CronExportSpreadsheet $cronExportSpreadsheet): static
+    {
+        if (!$this->cronExportSpreadsheets->contains($cronExportSpreadsheet)) {
+            $this->cronExportSpreadsheets->add($cronExportSpreadsheet);
+            $cronExportSpreadsheet->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCronExportSpreadsheet(CronExportSpreadsheet $cronExportSpreadsheet): static
+    {
+        if ($this->cronExportSpreadsheets->removeElement($cronExportSpreadsheet)) {
+            // set the owning side to null (unless already changed)
+            if ($cronExportSpreadsheet->getUser() === $this) {
+                $cronExportSpreadsheet->setUser(null);
+            }
+        }
+
+        return $this;
     }
 }

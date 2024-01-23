@@ -3,22 +3,27 @@
 namespace App\Service\Export;
 
 use App\Entity\Aid\Aid;
+use App\Entity\Cron\CronExportSpreadsheet;
 use App\Entity\Project\Project;
 use App\Entity\User\User;
 use App\Service\File\FileService;
+use App\Service\User\UserService;
 use Doctrine\ORM\QueryBuilder;
+use Doctrine\Persistence\ManagerRegistry;
 use OpenSpout\Common\Entity\Cell;
 use OpenSpout\Common\Entity\Row;
 use OpenSpout\Writer\XLSX\Entity\SheetView;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Twig\Environment;
 
 class SpreadsheetExporterService
 {
     public function __construct(
-        protected Environment $twig
+        protected Environment $twig,
+        protected UserService $userService,
+        protected ManagerRegistry $managerRegistry,
+        protected FileService $fileService
     )
     {
         
@@ -35,6 +40,24 @@ class SpreadsheetExporterService
 
         $results = $queryBuilder->getQuery()->getResult();
         if (count($results) > 1000) {
+            $params = $queryBuilder->getQuery()->getParameters() ?? null;
+            $sqlParams = [];
+            if ($params) {
+                foreach ($params as $param) {
+                    $sqlParams[] = ['name' => $param->getName(), 'value' => $param->getValue()];
+                }
+            }
+            $cronExportSpreadsheet = new CronExportSpreadsheet();
+            $cronExportSpreadsheet->setSqlRequest($queryBuilder->getQuery()->getDQL());
+            $cronExportSpreadsheet->setSqlParams($sqlParams);
+            $cronExportSpreadsheet->setEntityFqcn($entityFcqn);
+            $cronExportSpreadsheet->setFilename($filename);
+            $cronExportSpreadsheet->setFormat($format);
+            $cronExportSpreadsheet->setUser($this->userService->getUserLogged());
+
+            $this->managerRegistry->getManager()->persist($cronExportSpreadsheet);
+            $this->managerRegistry->getManager()->flush();
+
             $content = $this->twig->render('admin/cron/cron-launched.html.twig', [
                 
             ]);
@@ -417,6 +440,64 @@ class SpreadsheetExporterService
             $writer->close();
             exit;
         } catch (\Exception $e) {
+        }
+    }
+
+    public function exportToFile(array $results, string $entityFqcn, string $format = FileService::FORMAT_CSV, string $filename)
+    {
+        try {
+            $entity = new $entityFqcn();
+            $datas = $this->getDatasFromEntityType($entity, $results);
+            $now = new \DateTime(date('Y-m-d H:i:s'));
+            $fileTarget = $this->fileService->getUploadTmpDir().'export_'.$filename.'_at_'.$now->format('d_m_Y');
+            if ($format == FileService::FORMAT_CSV) {
+                $options = new \OpenSpout\Writer\CSV\Options();
+                $options->FIELD_DELIMITER = ';';
+                $options->FIELD_ENCLOSURE = '"';
+                $fileTarget .= '.'.FileService::FORMAT_CSV;
+    
+                $writer = new \OpenSpout\Writer\CSV\Writer($options);
+            } else if ($format == FileService::FORMAT_XLSX) {
+                $sheetView = new SheetView();               
+                $writer = new \OpenSpout\Writer\XLSX\Writer();
+                $fileTarget .= '.'.FileService::FORMAT_XLSX;
+            } else {
+                throw new \Exception('Format not supported');
+            }
+    
+            
+            $writer->openToFile($fileTarget);
+    
+            if ($format == FileService::FORMAT_XLSX) {
+                $writer->getCurrentSheet()->setSheetView($sheetView);
+            }
+            $headers = [];
+            if (isset($datas[0])) {
+                $headers = array_keys($datas[0]);
+            }
+    
+            $cells = [];
+            foreach ($headers as $csvHeader) {
+                $cells[] = Cell::fromValue($csvHeader);
+            }
+            
+            /** add a row at a time */
+            $singleRow = new Row($cells);
+            $writer->addRow($singleRow);
+    
+            foreach ($datas as $data) {
+                $cells = [];
+                foreach ($data as $value) {
+                    $cells[] = Cell::fromValue($value);
+                }
+                $singleRow = new Row($cells);
+                $writer->addRow($singleRow);
+            }
+            
+            $writer->close();
+            return $fileTarget;
+        } catch (\Exception $e) {
+            return null;
         }
     }
 }
