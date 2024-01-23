@@ -39,8 +39,9 @@ class SpreadsheetExporterService
         ini_set('memory_limit', '1G');
 
         // compte le nombre de résultats
-        $count = $queryBuilder->select('COUNT(entity)')->getQuery()->getSingleScalarResult();
-        
+        $queryBuilderCount = clone $queryBuilder;
+        $count = $queryBuilderCount->select('COUNT(entity)')->getQuery()->getSingleScalarResult();
+
         // si trop de résultats, on va traiter par cron
         if ($count > 1000) {
             $params = $queryBuilder->getQuery()->getParameters() ?? null;
@@ -73,7 +74,6 @@ class SpreadsheetExporterService
             $entity = new $entityFcqn();
 
             $results = $queryBuilder->getQuery()->getResult();
-
             $datas = $this->getDatasFromEntityType($entity, $results);
 
             if ($format == FileService::FORMAT_CSV) {
