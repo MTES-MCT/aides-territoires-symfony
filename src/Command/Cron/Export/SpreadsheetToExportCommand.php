@@ -100,12 +100,12 @@ class SpreadsheetToExportCommand extends Command
 
             // le fichier d'export
             $fileTarget = $this->spreadsheetExporterService->exportToFile(
-                $query->getResult(),
-                $cronExportSpreadsheet->getEntityFqcn(),
-                $cronExportSpreadsheet->getFormat(),
-                $cronExportSpreadsheet->getFilename()
+                results: $query->getResult(),
+                entityFqcn: $cronExportSpreadsheet->getEntityFqcn(), 
+                filename: $cronExportSpreadsheet->getFilename(),
+                format: $cronExportSpreadsheet->getFormat(),
             );
-
+dd($fileTarget);
             // envoi de l'email
             $this->emailService->sendEmail(
                 $cronExportSpreadsheet->getUser()->getEmail(),

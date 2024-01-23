@@ -447,7 +447,7 @@ class SpreadsheetExporterService
         }
     }
 
-    public function exportToFile(array $results, string $entityFqcn, string $format = FileService::FORMAT_CSV, string $filename)
+    public function exportToFile(array $results, string $entityFqcn, string $filename, string $format = FileService::FORMAT_CSV)
     {
         try {
             $entity = new $entityFqcn();
@@ -473,7 +473,7 @@ class SpreadsheetExporterService
                 throw new \Exception('Format not supported');
             }
     
-            
+            dump($fileTarget);
             $writer->openToFile($fileTarget);
     
             if ($format == FileService::FORMAT_XLSX) {
