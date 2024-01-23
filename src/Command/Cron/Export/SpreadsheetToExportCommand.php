@@ -105,7 +105,7 @@ class SpreadsheetToExportCommand extends Command
                 filename: $cronExportSpreadsheet->getFilename(),
                 format: $cronExportSpreadsheet->getFormat(),
             );
-dd($fileTarget);
+
             // envoi de l'email
             $this->emailService->sendEmail(
                 $cronExportSpreadsheet->getUser()->getEmail(),
