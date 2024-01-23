@@ -67,8 +67,6 @@ class ProjectController extends FrontController
         $formDeleteProject->handleRequest($requestStack->getCurrentRequest());
         if ($formDeleteProject->isSubmitted()) {
             if ($formDeleteProject->isValid()) {
-
-
                 // notification aux autres membres de l'organization
                 $project = $projectRepository->find($formDeleteProject->get('idProject')->getData());
                 if ($project instanceof Project && $project->getOrganization()) {
@@ -108,8 +106,8 @@ class ProjectController extends FrontController
         // projets
         $projects = $projectRepository->findBy(
             [
-                'author' => $user
-                // 'organization' => $user->getDefaultOrganization()
+                // 'author' => $user
+                'organization' => $user->getDefaultOrganization()
             ],
             [
                 'timeCreate' => 'DESC'

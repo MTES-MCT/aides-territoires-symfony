@@ -28,7 +28,7 @@ class DashboardController extends FrontController
         if ($user->isIsContributor()){
             $aidsNumber = $aidRepository->countByUser($userService->getUserLogged());
         }
-        $projectsNumber = $projectRepository->countByUser($userService->getUserLogged());
+        $projectsNumber = $projectRepository->countByOrganization($user->getDefaultOrganization());
         $collaboratorsNumber = $organizationRepository->countCollaborators($userService->getUserLogged());
         
         $this->breadcrumb->add("Mon compte",null);

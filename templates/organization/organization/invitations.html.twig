@@ -38,7 +38,9 @@
                                 {% endif %}
                             </td>
                             <td>
-                                {% if organizationInvitation.timeAccept %}
+                                {% if organizationInvitation.timeExclude %}
+                                    Exclu le {{ organizationInvitation.timeExclude|date('d/m/y') }}
+                                {% elseif organizationInvitation.timeAccept %}
                                     Accepté le {{ organizationInvitation.timeAccept|date('d/m/y') }}
                                 {% elseif organizationInvitation.timeRefuse %}
                                     Refusé le {{ organizationInvitation.timeRefuse|date('d/m/y') }}

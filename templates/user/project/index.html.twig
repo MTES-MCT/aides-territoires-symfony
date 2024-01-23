@@ -68,10 +68,12 @@
                                 {% endif %}
                             </td>
                             <td class="fr-text">
-                            {% if project.author == app.user %}
+                            {% if project.author and project.author == app.user %}
                                 Vous
                             {% else %}
-                                {{ author.firstname }} {{ author.lastname }}
+                                {% if project.author %}
+                                {{ project.author.firstname }} {{ project.author.lastname }}
+                                {% endif %}
                             {% endif %}
                             </td>
                             <td class="fr-text">
@@ -86,17 +88,19 @@
                                 {% endif %}
                             </td>
                             <td class="fr-text">
-                                <button type="button"
-                                        class="fr-btn fr-icon-delete-line fr-btn--tertiary fr-btn--tertiary-no-outline at-box-shadow--none"
-                                        id="delete-project-btn-{{ project.id }}"
-                                        data-fr-opened="false"
-                                        title="Supprimer ce projet"
-                                        aria-controls="delete-project-modal"
-                                        aria-describedby="project-{{ project.id }}"
-                                        data-project-id="{{ project.id }}"
-                                >
-                                    Supprimer ce projet
-                                </button>
+                                {% if project.author and project.author == app.user %}
+                                    <button type="button"
+                                            class="fr-btn fr-icon-delete-line fr-btn--tertiary fr-btn--tertiary-no-outline at-box-shadow--none"
+                                            id="delete-project-btn-{{ project.id }}"
+                                            data-fr-opened="false"
+                                            title="Supprimer ce projet"
+                                            aria-controls="delete-project-modal"
+                                            aria-describedby="project-{{ project.id }}"
+                                            data-project-id="{{ project.id }}"
+                                    >
+                                        Supprimer ce projet
+                                    </button>
+                                {% endif %}
                             </td>
                         </tr>
                         {% endfor %}

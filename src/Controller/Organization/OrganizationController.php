@@ -401,4 +401,51 @@ class OrganizationController extends FrontController
         return $this->redirectToRoute('app_organization_invitations');
     }
 
+
+    #[Route('/comptes/structure/invitations/{id}/exclure/', name: 'app_organization_invitations_exclude')]
+    public function excludeInvitation(
+        $id,
+        UserService $userService,
+        OrganizationInvitationRepository $organizationInvitationRepository,
+        ManagerRegistry $managerRegistry,
+        NotificationService $notificationService
+    ): Response
+    {
+        $user = $userService->getUserLogged();
+
+        // on vérifie que c'est bien l'auteur
+        $organizationInvitation = $organizationInvitationRepository->find($id);
+        if ($organizationInvitation->getAuthor() !== $user) {
+            return $this->redirectToRoute('app_organization_invitations');
+        }
+
+        // retire l'organization à l'utilisateur
+        $organizationInvitation->getOrganization()->removeBeneficiairy($organizationInvitation->getGuest());
+        $managerRegistry->getManager()->persist($organizationInvitation->getOrganization());
+
+        // l'exclusion
+        $organizationInvitation->setTimeExclude(new \DateTime());
+        $organizationInvitation->setGuest(null);
+        $managerRegistry->getManager()->persist($organizationInvitation);
+        
+        // sauvegarde
+        $managerRegistry->getManager()->flush();
+
+        // ajout notification a l'utilisation de l'invitation
+        $message = '
+        <p>
+            '.$user->getFirstname().' '.$user->getLastname().' vous à exclu de l\'organization '.$organizationInvitation->getOrganization()->getName().'.
+        </p>
+        ';
+        $notificationService->addNotification($organizationInvitation->getGuest(), 'Votre avez été exclu de '.$organizationInvitation->getOrganization()->getName(), $message);
+
+        // message
+        $this->addFlash(
+            FrontController::FLASH_SUCCESS,
+            'Vous avez exclu '.$organizationInvitation->getGuest()->getFirstname().' '.$organizationInvitation->getGuest()->getLastname().' de l\'organization.'
+        );
+
+        return $this->redirectToRoute('app_organization_collaborateurs');
+    }
+
 }

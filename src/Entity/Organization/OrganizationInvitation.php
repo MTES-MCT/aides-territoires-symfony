@@ -59,6 +59,9 @@ class OrganizationInvitation
     #[ORM\JoinColumn(nullable: false)]
     private ?Organization $organization = null;
 
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
+    private ?\DateTimeInterface $timeExclude = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -204,6 +207,18 @@ class OrganizationInvitation
     public function setDateRefuse(?\DateTimeInterface $dateRefuse): static
     {
         $this->dateRefuse = $dateRefuse;
+
+        return $this;
+    }
+
+    public function getTimeExclude(): ?\DateTimeInterface
+    {
+        return $this->timeExclude;
+    }
+
+    public function setTimeExclude(?\DateTimeInterface $timeExclude): static
+    {
+        $this->timeExclude = $timeExclude;
 
         return $this;
     }

@@ -2,6 +2,7 @@
 
 namespace App\Repository\Project;
 
+use App\Entity\Organization\Organization;
 use App\Entity\Perimeter\Perimeter;
 use App\Entity\Project\Project;
 use App\Entity\User\User;
@@ -37,6 +38,18 @@ class ProjectRepository extends ServiceEntityRepository
         return Criteria::create()
             ->andWhere(Criteria::expr()->eq($alias.'isPublic', false))
         ;
+    }
+
+    public function countByOrganization(Organization $organization): int
+    {
+        $result = $this->createQueryBuilder('p')
+            ->select('COUNT(p.id) AS nb')
+            ->andWhere('p.organization = :organization')
+            ->setParameter('organization', $organization)
+            ->getQuery()
+            ->getResult()
+        ;
+        return $result[0]['nb'] ?? 0;
     }
 
     public function countByUser(User $user): int
