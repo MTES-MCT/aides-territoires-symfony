@@ -68,7 +68,7 @@ class PerimeterImportCommand extends Command
     
             // Pour économiser la mémoire
             $this->managerRegistry->getConnection()->getConfiguration()->setSQLLogger(null);
-            
+
             $notFound = [];
             foreach ($perimeterImport->getCityCodes() as $cityCode) {
                 $perimeterToAdd = $this->managerRegistry->getRepository(Perimeter::class)->findOneBy([
