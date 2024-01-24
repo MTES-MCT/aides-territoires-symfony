@@ -123,7 +123,7 @@ class AidEditType extends AbstractType
                 'expanded' => true
             ])
             ->add('financers', EntityType::class, [
-                'required' => false,
+                'required' => true,
                 'mapped' => false,
                 'label' => 'Porteurs d\'aides',
                 'help' => 'Saisissez quelques caractères et sélectionnez une valeur parmi les suggestions.',
@@ -284,7 +284,7 @@ class AidEditType extends AbstractType
                 'sanitize_html' => true,
             ])
             ->add('categories', EntityCheckboxGroupAbsoluteType::class, [
-                'required' => false,
+                'required' => true,
                 'label' => 'Thématiques de l\'aide',
                 'placeholder' => 'Toutes les sous-thématiques',
                 'help' => 'Sélectionnez la ou les thématiques associées à votre aide. N’hésitez pas à en choisir plusieurs.',
@@ -297,7 +297,7 @@ class AidEditType extends AbstractType
                 'expanded' => true
             ])
             ->add('aidRecurrence', EntityType::class, [
-                'required' => false,
+                'required' => true,
                 'label' => 'Récurrence',
                 'help' => 'L’aide est-elle ponctuelle, permanente, ou récurrent',
                 'placeholder' => '---------',
