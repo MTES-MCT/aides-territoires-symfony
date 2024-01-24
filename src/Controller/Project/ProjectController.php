@@ -157,6 +157,13 @@ class ProjectController extends FrontController
                         FrontController::FLASH_SUCCESS,
                         'Le projet «'.$project->getName().'» a bien été ajouté à <a href="'.$this->generateUrl('app_user_project_favoris').'">vos projets favoris</a>.'
                     );
+                } else {
+                    $this->tAddFlash(
+                        FrontController::FLASH_ERROR,
+                        'Vous devez appartenir à une organisation pour ajouter un projet à vos favoris.'
+                    );
+
+                    return $this->redirectToRoute('app_project_project_public_details', ['id' => $project->getId(), 'slug' => $project->getSlug()]);
                 }
             }
         }
