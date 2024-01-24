@@ -53,10 +53,10 @@ class PerimeterCrudController extends AtCrudController
         ->setHelp('Date de mise à jour des périmètres à laquelle ce périmètre ne figurait plus dans les sources officielles');
         yield BooleanField::new('isVisibleToUsers', 'Le périmètre est visible pour les utilisateurs');
         yield DateTimeField::new('timeCreate', 'Date de création')
-        ->onlyOnForms()
+        ->onlyWhenUpdating()
         ->setFormTypeOption('attr', ['readonly' => true]);
         yield DateTimeField::new('timeUpdate', 'Date de modification')
-        ->onlyOnForms()
+        ->onlyWhenUpdating()
         ->setFormTypeOption('attr', ['readonly' => true]);
 
         yield FormField::addFieldset('Identifiants');
