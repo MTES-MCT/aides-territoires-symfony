@@ -637,6 +637,12 @@ class AidController extends FrontController
                 }
                 $this->managerRegistry->getManager()->flush();
 
+                $this->addFlash(
+                    FrontController::FLASH_SUCCESS,
+                    'L’aide a bien été suggérée à la collectivité, merci pour elle !'
+                );
+
+                return $this->redirectToRoute('app_aid_aid_details', ['slug' => $aid->getSlug()]);
             } else {
                 $openModalSuggest = true;
             }
