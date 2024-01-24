@@ -66,6 +66,9 @@ class PerimeterImportCommand extends Command
     
             $io->info('Import de périmètre adhoc : '.$perimeterImport->getAdhocPerimeter()->getName().', auteur : '.$perimeterImport->getAuthor()->getEmail());
     
+            // Pour économiser la mémoire
+            $this->managerRegistry->getConnection()->getConfiguration()->setSQLLogger(null);
+            
             $notFound = [];
             foreach ($perimeterImport->getCityCodes() as $cityCode) {
                 $perimeterToAdd = $this->managerRegistry->getRepository(Perimeter::class)->findOneBy([
@@ -92,7 +95,6 @@ class PerimeterImportCommand extends Command
                     }
                 }
                 unset($perimeterToAdd);
-                // gc_collect_cycles();
             }
     
             // met à jour le perimetre import

@@ -156,6 +156,7 @@ class PerimeterRepository extends ServiceEntityRepository
         $scale = $params['scale'] ?? null;
         $orderBy = (isset($params['orderBy']) && isset($params['orderBy']['sort']) && isset($params['orderBy']['order'])) ? $params['orderBy'] : null;
         $codes = $params['codes'] ?? null;
+        $insees = $params['insees'] ?? null;
         $firstResult = $params['firstResult'] ?? null;
         $maxResults = $params['maxResults'] ?? null;
         $nameMatchAgainst = $params['nameMatchAgainst'] ?? null;
@@ -170,6 +171,13 @@ class PerimeterRepository extends ServiceEntityRepository
             ->andWhere('MATCH_AGAINST(p.name) AGAINST (:nameMatchAgainst IN BOOLEAN MODE) > 5')
             ->setParameter('nameMatchAgainst', $nameMatchAgainst);
             
+        }
+        
+        if (is_array($insees)) {
+            $qb
+                ->andWhere('p.insee IN (:insees)')
+                ->setParameter('insees', $insees)
+            ;
         }
 
         if ($isVisibleToUsers !== null)

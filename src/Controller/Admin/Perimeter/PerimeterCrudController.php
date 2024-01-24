@@ -17,7 +17,6 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IntegerField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\NumberField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
-use Symfony\Component\HttpFoundation\Response;
 
 class PerimeterCrudController extends AtCrudController
 {
@@ -163,9 +162,21 @@ class PerimeterCrudController extends AtCrudController
             })
         ;
 
+        // action pour importer csv de codes insee
+        $importInsee = Action::new('importInsee', 'Import CSV codes Insee')
+            ->setHtmlAttributes(['title' => 'Import CSV codes Insee'])
+            ->linkToRoute('admin_perimeter_import_insee', function (Perimeter $entity) {
+                return [
+                    'id' => $entity->getId()
+                ];
+            })
+        ;
+
         return parent::configureActions($actions)
             ->add(Crud::PAGE_INDEX, $combine)
+            ->add(Crud::PAGE_INDEX, $importInsee)
             ->add(Crud::PAGE_EDIT, $combine)
+            ->add(Crud::PAGE_EDIT, $importInsee)
         ;
     }
 }

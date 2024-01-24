@@ -1,0 +1,41 @@
+{% extends "@EasyAdmin/page/content.html.twig" %}
+
+{% block head_stylesheets %}
+	{{ parent() }}
+{% endblock %}
+
+{% block main %}
+<main>
+
+<section class="content-header">
+    <div class="content-header-title">
+        <h1 class="title">Importer des codes insee</h1>
+    </div>
+
+    <div class="page-actions">
+        <a href="{{ backUrl }}" class="btn btn-secondary"><i class="fas fa-angle-left"></i> Retour à l'édition du périmètre</a>
+    </div>
+</section>
+
+<p>Pour le périmètre <strong>{{ perimeter.name }}</strong></p>
+
+{% if codesInseeNotFound|length > 0 %}
+<p>Les codes INSEE suivants n'ont pas été trouvés ({{ codesInseeNotFound|length }}) :
+    <ul>
+    {% for code in codesInseeNotFound %}
+        <li>{{ code }}</li>
+    {% endfor %}
+    </ul>
+{% endif %}
+
+{{ form_start(form) }}
+    <div class="form-group">
+    {{ form_row(form.fileCsv) }}
+    <div class="help-text">Format CSV, séparateur : point-virgule, encodage : UTF-8, 1 colonne : code_insee</div>
+    </div>
+    <div class="form-row">
+        <button type="submit" class="btn btn-primary">Envoyer</button>
+    </div>
+{{ form_end(form) }}
+</main>
+{% endblock %}
