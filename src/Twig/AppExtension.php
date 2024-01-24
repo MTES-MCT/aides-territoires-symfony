@@ -46,6 +46,7 @@ class AppExtension extends AbstractExtension
             new TwigFilter('myTruncate', [$this, 'myTruncate']),
             new TwigFilter('mySlug', [$this, 'mySlug']),
             new TwigFilter('perimeterSmartRegionNames', [$this, 'perimeterSmartRegionNames']),
+            new TwigFilter('getPerimeterSmartName', [$this, 'getPerimeterSmartName']),
             new TwigFilter('aidStatusDisplay', [$this, 'aidStatusDisplay']),
             new TwigFilter('alertFrequencyDisplay', [$this, 'alertFrequencyDisplay']),
             new TwigFilter('projectStepDisplay', [$this, 'projectStepDisplay']),
@@ -61,6 +62,13 @@ class AppExtension extends AbstractExtension
         return $this->stringService->getSlug($string);
     }
 
+    public function getPerimeterSmartName(?Perimeter $perimeter) : string {
+        if (!$perimeter instanceof Perimeter) {
+            return '';
+        }
+        return $this->perimeterService->getSmartName($perimeter);
+    }
+    
     public function perimeterSmartRegionNames(?Perimeter $perimeter) : string {
         if (!$perimeter instanceof Perimeter) {
             return '';

@@ -10,7 +10,7 @@
 
 					<a href="#content-ea_form_fieldset_01HF47A4QDW5B3P1C6AVD3TGBQ" data-bs-toggle="collapse" class="form-fieldset-title-content form-fieldset-collapse collapsed" aria-expanded="false" aria-controls="content-ea_form_fieldset_01HF47A4QDW5B3P1C6AVD3TGBQ">
 						<i class="fas fw fa-chevron-right form-fieldset-collapse-marker"></i>
-						Contient les périmètres suivants
+						Contient les périmètres suivants ({{ entity.instance.perimetersFrom|length }})
 					</a>
 				</div>
 			</div>
@@ -22,7 +22,7 @@
 					{% else %}
 						<ul>
 							{% for perimeter in entity.instance.perimetersFrom %}
-								<li>{{ perimeter.name }}</li>
+								<li>{{ perimeter|getPerimeterSmartName }}</li>
 							{% endfor %}
 						</ul>
 					{% endif %}
