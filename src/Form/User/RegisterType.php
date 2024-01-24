@@ -207,6 +207,9 @@ class RegisterType extends AbstractType
                     'required' => false,
                     'mapped' => false,
                     'sanitize_html' => true,
+                    'constraints' => [
+                        new Length(max: 10)
+                    ],
                 ])
                 ->add('inseeCode', TextType::class, [
                     'label' => 'Code INSEE',

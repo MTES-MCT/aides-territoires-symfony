@@ -70,7 +70,7 @@ class Organization
     #[ORM\Column(length: 14, nullable: true)]
     private ?string $siretCode = null;
 
-    #[ORM\Column(length: 5, nullable: true)]
+    #[ORM\Column(length: 10, nullable: true)]
     private ?string $apeCode = null;
 
     #[ORM\Column(nullable: true)]
