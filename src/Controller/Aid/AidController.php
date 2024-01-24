@@ -566,8 +566,10 @@ class AidController extends FrontController
                     );
                 }
 
+                
                 // redirection page mes projets
-                return $this->redirectToRoute('app_user_project_structure');
+                return $this->redirect($requestStack->getCurrentRequest()->getUri());
+                // return $this->redirectToRoute('app_user_project_structure');
             }
         }
 
