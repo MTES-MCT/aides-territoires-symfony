@@ -233,7 +233,9 @@ class ProjectController extends FrontController
 
         // les projets favoris de l'utilisateur
         $favoriteProjectDTOs = [];
-        $favoriteProjectDTOs = $user->getDefaultOrganization()->getFavoriteProjects();
+        if ($user->getDefaultOrganization()) {
+            $favoriteProjectDTOs = $user->getDefaultOrganization()->getFavoriteProjects();
+        }
 
         // fil arianne
         $this->breadcrumb->add(
