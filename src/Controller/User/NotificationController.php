@@ -88,6 +88,12 @@ class NotificationController extends FrontController
                 foreach ($notifications as $notification) {
                     $managerRegistry->getManager()->remove($notification);
                 }
+
+                // met le compteur user à 0
+                $user->setNotificationCounter(0);
+                $managerRegistry->getManager()->persist($user);
+
+                // sauvegarde
                 $managerRegistry->getManager()->flush();
 
                 // message

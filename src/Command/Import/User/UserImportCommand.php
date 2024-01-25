@@ -624,7 +624,7 @@ class UserImportCommand extends ImportCommand
                     :user_id".$rowNumber."     
                 ),";
 
-                $sqlParams['user_group_id'.$rowNumber] = (int) $cells[0]->getValue();
+                $sqlParams['user_group_id'.$rowNumber] = (int) $cells[2]->getValue();
                 $sqlParams['user_id'.$rowNumber] = (int) $cells[1]->getValue();
 
                 if ($rowNumber % $nbByBatch == 0) {
