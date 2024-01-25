@@ -4,6 +4,7 @@ namespace App\Repository\Keyword;
 
 use App\Entity\Keyword\Keyword;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -19,6 +20,26 @@ class KeywordRepository extends ServiceEntityRepository
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Keyword::class);
+    }
+
+    public function findCustom(?array $params = null) : array
+    {
+        $qb = $this->getQueryBuilder($params);
+
+        return $qb->getQuery()->getResult();
+        
+    }
+
+    public function getQueryBuilder(?array $params = null): QueryBuilder
+    {
+        $names = $params['names'] ?? null;
+        $qb = $this->createQueryBuilder('k');
+
+        if (is_array($names)) {
+            $qb->andWhere('k.name IN (:names)')
+                ->setParameter('names', $names);
+        }
+        return $qb;
     }
 
     public function importOldId(array $params = null): bool

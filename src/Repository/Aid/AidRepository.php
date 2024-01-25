@@ -272,7 +272,10 @@ class AidRepository extends ServiceEntityRepository
     {
         $qb = $this->getQueryBuilder($params);
         $results = $qb->getQuery()->getResult();
-
+        // foreach ($results as $result) {
+        //     dump($result[0]->getName(), $result['score_total'], '-----');
+        // }
+        // exit;
         $return = [];
         foreach ($results as $result) {
             if ($result instanceof Aid) {
@@ -370,7 +373,8 @@ class AidRepository extends ServiceEntityRepository
         $aidRecurrence = $params['aidRecurrence'] ?? null;
         $inAdmin = $params['inAdmin'] ?? null;
         $hasBrokenLink= $params['hasBrokenLink'] ?? null;
-        $scoreTotalMin = $params['scoreTotalMin'] ?? 30;
+        $scoreTotalMin = $params['scoreTotalMin'] ?? 60;
+        $scoreObjectslMin = $params['scoreObjectslMin'] ?? 30;
         $qb = $this->createQueryBuilder('a');
 
         if ($hasBrokenLink !== null) {
@@ -379,7 +383,134 @@ class AidRepository extends ServiceEntityRepository
                 ->setParameter('hasBrokenLink', $hasBrokenLink)
             ;
         }
+// dump($synonyms);
+        if (isset($synonyms)) {
+            $originalName = (isset($synonyms['original_name']) && $synonyms['original_name'] !== '')  ? $synonyms['original_name'] : null;
+            $intentionsString = (isset($synonyms['intentions_string']) && $synonyms['intentions_string'] !== '')  ? $synonyms['intentions_string'] : null;
+            $objectsString = (isset($synonyms['objects_string']) && $synonyms['objects_string'] !== '')  ? $synonyms['objects_string'] : null;
+            $simpleWordsString = (isset($synonyms['simple_words_string']) && $synonyms['simple_words_string'] !== '')  ? $synonyms['simple_words_string'] : null;
+            $oldKeywordsString = '';
 
+            if ($originalName) {
+                $sqlOriginalName = '
+                CASE WHEN (a.name = :originalName) THEN 500 ELSE 0 END
+                ';
+                $qb->setParameter('originalName', $originalName);
+            }
+
+            if ($objectsString) {
+                $oldKeywordsString .= $objectsString;
+                $sqlObjects = '
+                CASE WHEN (MATCH_AGAINST(a.name) AGAINST(:objects_string IN BOOLEAN MODE) > 1) THEN 30 ELSE 0 END +
+                CASE WHEN (MATCH_AGAINST(a.description, a.eligibility) AGAINST(:objects_string IN BOOLEAN MODE) > 1) THEN 10 ELSE 0 END 
+                ';
+
+                $objects = str_getcsv($objectsString, ' ', '"');
+                if (count($objects) > 0) {
+                    $sqlObjects .= ' + ';
+                }
+                for ($i = 0; $i<count($objects); $i++) {
+
+                    $sqlObjects .= '
+                        CASE WHEN (a.name LIKE :objects'.$i.') THEN 10 ELSE 0 END +
+                        CASE WHEN (a.description LIKE :objects'.$i.') THEN 2 ELSE 0 END +
+                        CASE WHEN (a.eligibility LIKE :objects'.$i.') THEN 2 ELSE 0 END
+                    ';
+                    if ($i < count($objects) - 1) {
+                        $sqlObjects .= ' + ';
+                    }
+                    $qb->setParameter('objects'.$i, '%'.$objects[$i].'%');
+                }
+
+                $qb->addSelect('('.$sqlObjects.') as score_objects');
+                $qb->setParameter('objects_string', $objectsString);
+                $qb->andHaving('score_objects >= '.$scoreObjectslMin);
+            }
+
+            if ($intentionsString && $objectsString) {
+                $oldKeywordsString .= ' '.$intentionsString;
+                $sqlIntentions = '
+                CASE WHEN (MATCH_AGAINST(a.name) AGAINST(:intentions_string IN BOOLEAN MODE) > 1) THEN 5 ELSE 0 END +
+                CASE WHEN (MATCH_AGAINST(a.description, a.eligibility) AGAINST(:intentions_string IN BOOLEAN MODE) > 1) THEN 1 ELSE 0 END 
+                ';
+                $qb->setParameter('intentions_string', $intentionsString);
+            }
+
+            if (!$objectsString && $simpleWordsString) {
+                $sqlSimpleWords = '
+                CASE WHEN (MATCH_AGAINST(a.name) AGAINST(:simple_words_string IN BOOLEAN MODE) > 1) THEN 30 ELSE 0 END +
+                CASE WHEN (MATCH_AGAINST(a.description, a.eligibility) AGAINST(:simple_words_string IN BOOLEAN MODE) > 1) THEN 5 ELSE 0 END 
+                ';
+
+                $simpleWords = str_getcsv($simpleWordsString, ' ', '"');
+                if (count($simpleWords) > 0) {
+                    $sqlSimpleWords .= ' + ';
+                }
+                for ($i = 0; $i<count($simpleWords); $i++) {
+                    $sqlSimpleWords .= '
+                        CASE WHEN (a.name LIKE :simple_word'.$i.') THEN 30 ELSE 0 END +
+                        CASE WHEN (a.description LIKE :simple_word'.$i.') THEN 4 ELSE 0 END +
+                        CASE WHEN (a.eligibility LIKE :simple_word'.$i.') THEN 4 ELSE 0 END
+                    ';
+                    if ($i < count($simpleWords) - 1) {
+                        $sqlSimpleWords .= ' + ';
+                    }
+                    $qb->setParameter('simple_word'.$i, '%'.$simpleWords[$i].'%');
+                }
+
+                $qb->setParameter('simple_words_string', $simpleWordsString);
+            }
+
+            // if ($simpleWordsString) {
+            //     $oldKeywordsString .= ' '.$simpleWordsString;
+            // }
+            // $oldKeywords = $objects = str_getcsv($oldKeywordsString, ' ', '"');
+            // foreach ($oldKeywords as $key => $keyword) {
+            //     if (trim($keyword) === '') {
+            //         unset($oldKeywords[$key]);
+            //     }
+            // }
+            // if (count($oldKeywords) > 0) {
+            //     $qb
+            //     ->leftJoin('a.keywords', 'keywords')
+            //     ->leftJoin('a.categories', 'categoriesKeyword')
+            //     ->andWhere('keywords.name IN (:oldKeywords) OR categoriesKeyword.name IN (:oldKeywords)')
+            //     ->setParameter('oldKeywords', $oldKeywords)
+            //     ;
+            // }
+
+
+            $sqlTotal = '';
+            if ($originalName) {
+                $sqlTotal .= $sqlOriginalName;
+            }
+            if ($objectsString) {
+                if ($originalName) {
+                    $sqlTotal .= ' + ';
+                }
+                $sqlTotal .= $sqlObjects;
+            }
+            if ($intentionsString && $objectsString) {
+                if ($originalName || $objectsString) {
+                    $sqlTotal .= ' + ';
+                }
+                $sqlTotal .= $sqlIntentions;
+            }
+            if (isset($sqlSimpleWords)) {
+                if ($originalName || $objectsString || $intentionsString) {
+                    $sqlTotal .= ' + ';
+                }
+                $sqlTotal .= $sqlSimpleWords;
+            }
+
+            if ($sqlTotal !== '') {
+                $qb->addSelect('('.$sqlTotal.') as score_total');
+                $qb->andHaving('score_total >= '.$scoreTotalMin);
+                $qb->orderBy('score_total', 'DESC');
+            }
+        }
+
+        unset($synonyms);
         if (isset($synonyms)) {
             $somethingToSearch = false;
             $originalName = (isset($synonyms['original_name']) && $synonyms['original_name'] !== '')  ? $synonyms['original_name'] : null;

@@ -8,8 +8,10 @@ use App\Entity\Organization\OrganizationType;
 use App\Entity\Perimeter\Perimeter;
 use App\Entity\Search\SearchPage;
 use App\Entity\User\User;
+use App\Service\Reference\ReferenceService;
 use App\Service\User\UserService;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -20,10 +22,25 @@ class AidService
     public function __construct(
         protected HttpClientInterface $httpClientInterface,
         protected UserService $userService,
-        protected RouterInterface $routerInterface
+        protected RouterInterface $routerInterface,
+        protected ReferenceService $referenceService,
+        protected ManagerRegistry $managerRegistry
     )
     {
         
+    }
+
+    public function searchAids(array $aidParams): array
+    {
+        $aids = $this->managerRegistry->getRepository(Aid::class)->findCustom($aidParams);
+        if (count($aids) <= 10) {
+            $aidParams['scoreTotalMin'] = 40;
+            $aidParams['scoreObjectsMin'] = 20;
+            $aids = $this->managerRegistry->getRepository(Aid::class)->findCustom($aidParams);
+        }
+        $aids = $this->postPopulateAids($aids, $aidParams);
+
+        return $aids;
     }
 
     public function extractInlineStyles(Aid $aid): Aid
@@ -54,6 +71,8 @@ class AidService
         // $aid->setInlineStyles($styles);
         return $aid;
     }
+
+
 
     public function postPopulateAids(array $aids, ?array $params) : array
     {

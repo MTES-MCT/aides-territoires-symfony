@@ -110,12 +110,7 @@ class AidController extends FrontController
         // $aidParams = $aidSearchFormService->handleOrderBy($aidParams);
 
         // le paginateur
-        $aids = $aidRepository->findCustom($aidParams);
-        if (count($aids) == 0) {
-            $aidParams['scoreTotalMin'] = 2;
-            $aids = $aidRepository->findCustom($aidParams);
-        }
-        $aids = $aidService->postPopulateAids($aids, $aidParams);
+        $aids = $aidService->searchAids($aidParams);
         $adapter = new ArrayAdapter($aids);
         $pagerfanta = new Pagerfanta($adapter);
         $pagerfanta->setMaxPerPage(self::NB_AID_BY_PAGE);
@@ -253,19 +248,25 @@ class AidController extends FrontController
                 if (isset($synonyms['intentions_string'])) {
                     $keywords = str_getcsv($synonyms['intentions_string'], ' ', '"');
                     foreach ($keywords as $keyword) {
-                        $highlightedWords[] = $keyword;
+                        if ($keyword && trim($keyword) !== '') {
+                            $highlightedWords[] = $keyword;
+                        }
                     }
                 } 
                 if (isset($synonyms['objects_string'])) {
                     $keywords = str_getcsv($synonyms['objects_string'], ' ', '"');
                     foreach ($keywords as $keyword) {
-                        $highlightedWords[] = $keyword;
+                        if ($keyword && trim($keyword) !== '') {
+                            $highlightedWords[] = $keyword;
+                        }
                     }
                 } 
                 if (isset($synonyms['simple_words_string'])) {
                     $keywords = str_getcsv($synonyms['simple_words_string'], ' ', '"');
                     foreach ($keywords as $keyword) {
-                        $highlightedWords[] = $keyword;
+                        if ($keyword && trim($keyword) !== '') {
+                            $highlightedWords[] = $keyword;
+                        }
                     }
                 }
             }
