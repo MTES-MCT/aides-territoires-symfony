@@ -13,7 +13,13 @@
             </li>
             {% endif %}
             <li>
-                <a href="{{ path('app_user_user_notification') }}" class="at-notification-icon fr-tag fr-icon-notification-3-line fr-tag--icon-left at-notification-icon-no-unread" target="_self" title="Voir la page des notifications"></a>
+                <a 
+                href="{{ path('app_user_user_notification') }}"
+                class="at-notification-icon fr-tag fr-icon-notification-3-line fr-tag--icon-left {% if app.user and  app.user.notificationCounter %}at-notification-icon-unread{% else %}at-notification-icon-no-unread{% endif %}"
+                target="_self"
+                title="{% if app.user and  app.user.notificationCounter %}{% if app.user.notificationCounter == 0 %}Voir la page des notifications{% elseif app.user.notificationCounter == 1 %}Voir la notification non lue{% else %}Voir les {{ app.user.notificationCounter }} notifications non lues{% endif %}{% else %}Voir la page des notifications{% endif %}">
+                {% if app.user and  app.user.notificationCounter %}{{ app.user.notificationCounter }}{% endif %}
+                </a>
             </li>        
             {% else %}
                 <li>

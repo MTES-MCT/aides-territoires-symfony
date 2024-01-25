@@ -205,8 +205,13 @@ class NotificationController extends FrontController
             $notification->setTimeRead($now);
             $managerRegistry->getManager()->persist($notification);
         }
-        $managerRegistry->getManager()->flush();
 
+        // met le compteur à 0
+        $user->setNotificationCounter(0);
+        $managerRegistry->getManager()->persist($user);
+
+        // sauvegarde
+        $managerRegistry->getManager()->flush();
         // message
         $this->addFlash(
             FrontController::FLASH_SUCCESS,
