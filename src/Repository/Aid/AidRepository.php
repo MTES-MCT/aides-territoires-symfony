@@ -484,22 +484,22 @@ class AidRepository extends ServiceEntityRepository
             }
             
             // recherche sur  les anciens keyword
-            $fullWords = trim((string) $itentionsString.' '.(string) $objectsString.' '.(string) $simpleWordsString);
-            if ($fullWords !== '') {
-                if ($simpleWordsString || $originalName || $itentionsString || $objectsString) {
-                    $sql .= ' + ';
-                }
+            // $fullWords = trim((string) $itentionsString.' '.(string) $objectsString.' '.(string) $simpleWordsString);
+            // if ($fullWords !== '') {
+            //     if ($simpleWordsString || $originalName || $itentionsString || $objectsString) {
+            //         $sql .= ' + ';
+            //     }
 
-                $fullWords = str_getcsv($fullWords, ' ', '"');
-            $qb
-                ->leftJoin('a.keywords', 'keywords')
-                ->leftJoin('a.categories', 'categoriesKeyword')
-            ;
-            $sql .= 'CASE WHEN (keywords.name IN (:fullWords)) THEN 2 ELSE 0 END +
-                    CASE WHEN (categoriesKeyword.name IN (:fullWords)) THEN 2 ELSE 0 END
-            ';
-            }
-            $qb->setParameter('fullWords', $fullWords);
+            //     $fullWords = str_getcsv($fullWords, ' ', '"');
+            // $qb
+            //     ->leftJoin('a.keywords', 'keywords')
+            //     ->leftJoin('a.categories', 'categoriesKeyword')
+            // ;
+            // $sql .= 'CASE WHEN (keywords.name IN (:fullWords)) THEN 2 ELSE 0 END +
+            //         CASE WHEN (categoriesKeyword.name IN (:fullWords)) THEN 2 ELSE 0 END
+            // ';
+            // }
+            // $qb->setParameter('fullWords', $fullWords);
             // dd($sql, $originalName, $itentionsString, $objectsString, $simpleWordsString, $words, $fullWords);
 
             $sql .= ') as score_total';
