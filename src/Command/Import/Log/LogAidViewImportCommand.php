@@ -18,17 +18,6 @@ class LogAidViewImportCommand extends ImportCommand
     protected function import($input, $output)
     {
         // ==================================================================
-        // OrganizationType id by slug
-        // ==================================================================
-
-        $organizationTypeIdBySlugs = [];
-        $organizationTypes = $this->managerRegistry->getRepository(OrganizationType::class)->findAll();
-        foreach ($organizationTypes as $organizationType) {
-            $organizationTypeIdBySlugs[$organizationType->getSlug()] = $organizationType->getId();
-        }
-        unset($organizationTypes);
-
-        // ==================================================================
         // LOG AID VIEW
         // ==================================================================
 
@@ -77,15 +66,6 @@ class LogAidViewImportCommand extends ImportCommand
         $sql = $sqlBase;
         $sqlParams = [];
 
-        $sqlBase2 = "INSERT INTO log_aid_view_organization_type
-        (
-            log_aid_view_id,
-            organization_type_id
-        )
-        VALUES ";
-        $sql2 = $sqlBase2;
-        $sqlParams2 = [];
-
         $this->managerRegistry->getManager()->getConnection()->getConfiguration()->setSQLLogger(null);
 
         // importe les lignes
@@ -117,6 +97,106 @@ class LogAidViewImportCommand extends ImportCommand
                 $sqlParams['organization_id'.$rowNumber] = $this->intOrNull((string) $cells[6]->getValue());
                 $sqlParams['user_id'.$rowNumber] = $this->intOrNull((string) $cells[7]->getValue());
 
+
+                if ($rowNumber % $nbByBatch == 0) {
+                    try {
+                        if (count($sqlParams) > 0) {
+                            $sql = substr($sql, 0, -1);
+
+                            $stmt = $this->managerRegistry->getManager()->getConnection()->prepare($sql);
+                            $stmt->execute($sqlParams);
+                        }
+                        $sqlParams = [];
+                        $sql = $sqlBase;
+
+                        // advances the progress bar 1 unit
+                        $io->progressAdvance();
+                    } catch (\Exception $e) {
+                    }
+
+                }
+            }
+        }
+
+        try {
+            // sauvegarde
+            if (count($sqlParams) > 0) {
+                $sql = substr($sql, 0, -1);
+                $stmt = $this->managerRegistry->getManager()->getConnection()->prepare($sql);
+                $stmt->execute($sqlParams);
+            }
+        } catch (\Exception $e) {
+        }
+        // ensures that the progress bar is at 100%
+        $io->progressFinish();
+
+        // ==================================================================
+        // OrganizationType id by slug
+        // ==================================================================
+
+        $organizationTypeIdBySlugs = [];
+        $organizationTypes = $this->managerRegistry->getRepository(OrganizationType::class)->findAll();
+        foreach ($organizationTypes as $organizationType) {
+            $organizationTypeIdBySlugs[$organizationType->getSlug()] = $organizationType->getId();
+        }
+        unset($organizationTypes);
+
+
+        // ==================================================================
+        // LOG AID VIEW / OrganizationType
+        // ==================================================================
+
+        $io = new SymfonyStyle($input, $output);
+        $io->info('LOG AID VIEW / OrganizationType');
+
+        // fichier
+        $filePath = $this->findCsvFile('stats_aidviewevent_');
+        if (!$filePath) {
+            throw new \Exception('File missing');
+        }
+        // ouverture du fichier
+        $options = new Options();
+        $options->FIELD_DELIMITER = ';';
+        $options->FIELD_ENCLOSURE = '"';
+        $reader = new Reader($options);
+        $reader->open($filePath);
+
+        // estime le nombre de lignes à importé
+        $file = new \SplFileObject($filePath, 'r');
+        $file->seek(PHP_INT_MAX);
+        $nbToImport = $file->key() + 1;
+        unset($file);
+
+        // batch
+        $nbByBatch = 1;
+        $nbBatch = ceil($nbToImport / $nbByBatch);
+
+        // progressbar
+        $io->createProgressBar($nbBatch);
+
+        // starts and displays the progress bar
+        $io->progressStart();
+
+        $sqlBase2 = "INSERT INTO log_aid_view_organization_type
+        (
+            log_aid_view_id,
+            organization_type_id
+        )
+        VALUES ";
+        $sql2 = $sqlBase2;
+        $sqlParams2 = [];
+
+        $this->managerRegistry->getManager()->getConnection()->getConfiguration()->setSQLLogger(null);
+
+        // importe les lignes
+        foreach ($reader->getSheetIterator() as $sheet) {
+            foreach ($sheet->getRowIterator() as $rowNumber => $row) {
+                if ($rowNumber == 1) {
+                    continue;
+                }
+                // do stuff with the row
+                $cells = $row->getCells();
+
                 $organizationTypeSlugs = $this->stringToArrayOrNull((string) $cells[5]->getValue());
                 if (is_array($organizationTypeSlugs)) {
                     $i=1;
@@ -136,16 +216,7 @@ class LogAidViewImportCommand extends ImportCommand
                 }
 
                 if ($rowNumber % $nbByBatch == 0) {
-                    try {
-                        if (count($sqlParams) > 0) {
-                            $sql = substr($sql, 0, -1);
-
-                            $stmt = $this->managerRegistry->getManager()->getConnection()->prepare($sql);
-                            $stmt->execute($sqlParams);
-                        }
-                        $sqlParams = [];
-                        $sql = $sqlBase;
-                        
+                    try {                       
                         if (count($sqlParams2) > 0) {
                             $sql2 = substr($sql2, 0, -1);
     
@@ -167,14 +238,7 @@ class LogAidViewImportCommand extends ImportCommand
             }
         }
 
-        try {
-            // sauvegarde
-            if (count($sqlParams) > 0) {
-                $sql = substr($sql, 0, -1);
-                $stmt = $this->managerRegistry->getManager()->getConnection()->prepare($sql);
-                $stmt->execute($sqlParams);
-            }
-            
+        try {           
             if (count($sqlParams2) > 0) {
                 $sql2 = substr($sql2, 0, -1);
                 $stmt = $this->managerRegistry->getManager()->getConnection()->prepare($sql2);
