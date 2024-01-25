@@ -370,7 +370,7 @@ class AidRepository extends ServiceEntityRepository
         $aidRecurrence = $params['aidRecurrence'] ?? null;
         $inAdmin = $params['inAdmin'] ?? null;
         $hasBrokenLink= $params['hasBrokenLink'] ?? null;
-
+        $scoreTotalMin = $params['scoreTotalMin'] ?? 30;
         $qb = $this->createQueryBuilder('a');
 
         if ($hasBrokenLink !== null) {
@@ -466,7 +466,7 @@ class AidRepository extends ServiceEntityRepository
                 $somethingToSearch = true;
                 $words = str_getcsv($simpleWordsString, ' ', '"');
                 $sql .= '
-                CASE WHEN (MATCH_AGAINST(a.name) AGAINST(:simple_words_string IN BOOLEAN MODE) > 5) THEN 5 ELSE 0 END +
+                CASE WHEN (MATCH_AGAINST(a.name) AGAINST(:simple_words_string IN BOOLEAN MODE) > 2) THEN 5 ELSE 0 END +
                 ';
                 $qb->setParameter('simple_words_string', $simpleWordsString);
 
@@ -481,6 +481,26 @@ class AidRepository extends ServiceEntityRepository
                 }
                 // $sql = substr($sql, 0, -1);
             }
+            
+            // recherche sur  les anciens keyword
+            $fullWords = trim((string) $itentionsString.' '.(string) $objectsString.' '.(string) $simpleWordsString);
+            if ($fullWords !== '') {
+                if ($simpleWordsString || $originalName || $itentionsString || $objectsString) {
+                    $sql .= ' + ';
+                }
+
+                $fullWords = str_getcsv($fullWords, ' ', '"');
+            $qb
+                ->innerJoin('a.keywords', 'keywords')
+                ->innerJoin('a.categories', 'categoriesKeyword')
+            ;
+            $sql .= 'CASE WHEN (keywords.name IN (:fullWords)) THEN 2 ELSE 0 END +
+                    CASE WHEN (categoriesKeyword.name IN (:fullWords)) THEN 2 ELSE 0 END
+            ';
+            }
+            $qb->setParameter('fullWords', $fullWords);
+
+
             $sql .= ') as score_total';
 
             if ($somethingToSearch && !$inAdmin) {
@@ -491,7 +511,7 @@ class AidRepository extends ServiceEntityRepository
                 ];
                 $qb
                 ->addSelect($sql)
-                ->andHaving('score_total >= 30')
+                ->andHaving('score_total >= '.$scoreTotalMin)
                 ;
             }
         }

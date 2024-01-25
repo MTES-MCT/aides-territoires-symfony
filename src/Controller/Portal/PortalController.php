@@ -130,6 +130,10 @@ class PortalController extends FrontController
 
         // le paginateur
         $aids = $aidRepository->findCustom($aidParams);
+        if (count($aids) == 0) {
+            $aidParams['scoreTotalMin'] = 2;
+            $aids = $aidRepository->findCustom($aidParams);
+        }
         $aidParams['searchPage'] = $search_page;
         $aids = $aidService->postPopulateAids($aids, $aidParams);
         $adapter = new ArrayAdapter($aids);
