@@ -472,8 +472,9 @@ class AidRepository extends ServiceEntityRepository
 
                 for ($i = 0; $i<count($words); $i++) {
                     $sql .= '
-                        CASE WHEN (a.name LIKE :words'.$i.') THEN 2 ELSE 0 END
+                        CASE WHEN (a.name LIKE :words'.$i.') THEN 30 ELSE 0 END
                     ';
+
                     if ($i < count($words) - 1) {
                         $sql .= ' + ';
                     }
@@ -491,15 +492,15 @@ class AidRepository extends ServiceEntityRepository
 
                 $fullWords = str_getcsv($fullWords, ' ', '"');
             $qb
-                ->innerJoin('a.keywords', 'keywords')
-                ->innerJoin('a.categories', 'categoriesKeyword')
+                ->leftJoin('a.keywords', 'keywords')
+                ->leftJoin('a.categories', 'categoriesKeyword')
             ;
             $sql .= 'CASE WHEN (keywords.name IN (:fullWords)) THEN 2 ELSE 0 END +
                     CASE WHEN (categoriesKeyword.name IN (:fullWords)) THEN 2 ELSE 0 END
             ';
             }
             $qb->setParameter('fullWords', $fullWords);
-
+            // dd($sql, $originalName, $itentionsString, $objectsString, $simpleWordsString, $words, $fullWords);
 
             $sql .= ') as score_total';
 
