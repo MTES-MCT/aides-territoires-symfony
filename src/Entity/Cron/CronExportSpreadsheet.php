@@ -27,7 +27,7 @@ class CronExportSpreadsheet
     #[ORM\Column(length: 255)]
     private ?string $format = null;
 
-    #[ORM\ManyToOne(inversedBy: 'crontExportSpreadsheets')]
+    #[ORM\ManyToOne(inversedBy: 'cronExportSpreadsheets')]
     #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
     private ?User $user = null;
 
