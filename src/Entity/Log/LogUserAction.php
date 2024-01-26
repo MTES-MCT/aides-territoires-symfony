@@ -147,7 +147,7 @@ class LogUserAction
 
     public function setReferer(?string $referer): static
     {
-        $this->referer = $referer;
+        $this->referer = substr($referer, 0, 255);
 
         return $this;
     }
