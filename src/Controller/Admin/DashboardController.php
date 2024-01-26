@@ -183,8 +183,8 @@ class DashboardController extends AbstractDashboardController
 
     public function configureMenuItems(): iterable
     {
-        yield MenuItem::linkToRoute('Front', 'fas fa-external-link-alt', 'app_home', [])->setLinkTarget('_blank');
-        yield MenuItem::linkToDashboard('Dashboard', 'fa fa-home');
+        yield MenuItem::linkToRoute('Visiter le site', 'fas fa-external-link-alt', 'app_home', [])->setLinkTarget('_blank');
+        yield MenuItem::linkToDashboard('Tableau de bord', 'fa fa-home');
 
         yield MenuItem::subMenu('Utilisateurs', 'fas fa-user')->setSubItems([
             MenuItem::linkToCrud('Dernières connexions des utilisateurs', 'fas fa-list', LogUserLogin::class),
@@ -192,22 +192,22 @@ class DashboardController extends AbstractDashboardController
             MenuItem::linkToCrud('Demandes de token API', 'fas fa-list', ApiTokenAsk::class),
         ]);
 
-        yield MenuItem::subMenu('Organizations', 'fas fa-table')->setSubItems([
-            MenuItem::linkToCrud('Organizations', 'fas fa-list', Organization::class),
+        yield MenuItem::subMenu('Organisations', 'fas fa-table')->setSubItems([
+            MenuItem::linkToCrud('Organisations', 'fas fa-list', Organization::class),
             MenuItem::linkToCrud('Types', 'fas fa-list', OrganizationType::class),
             MenuItem::linkToCrud('Groupes des types', 'fas fa-list', OrganizationTypeGroup::class),
         ]);
 
 
         yield MenuItem::subMenu('Aides', 'fas fa-table')->setSubItems([
-            MenuItem::linkToCrud('Destinations', 'fas fa-list', AidDestination::class),
-            MenuItem::linkToCrud('Aide Projets', 'fas fa-list', AidProject::class),
-            MenuItem::linkToCrud('Récurrences', 'fas fa-list', AidRecurrence::class),
-            MenuItem::linkToCrud('Etapes', 'fas fa-list', AidStep::class),
-            MenuItem::linkToCrud('Aide projets suggérés', 'fas fa-list', AidSuggestedAidProject::class),
-            MenuItem::linkToCrud('Aide type', 'fas fa-list', AidType::class),
-            MenuItem::linkToCrud('Aide type group', 'fas fa-list', AidTypeGroup::class),
             MenuItem::linkToCrud('Aides', 'fas fa-list', Aid::class),
+            MenuItem::linkToCrud('Aide Projets', 'fas fa-list', AidProject::class),
+            MenuItem::linkToCrud('Aide projets suggérés', 'fas fa-list', AidSuggestedAidProject::class),
+            MenuItem::linkToCrud('[caractéristique] Destinations', 'fas fa-list', AidDestination::class),
+            MenuItem::linkToCrud('[caractéristique] Etapes', 'fas fa-list', AidStep::class),
+            MenuItem::linkToCrud('[caractéristique] Récurrences', 'fas fa-list', AidRecurrence::class),
+            MenuItem::linkToCrud('[caractéristique] Types d\'aides', 'fas fa-list', AidType::class),
+            MenuItem::linkToCrud('[caractéristique] Groupes de types d\'aides', 'fas fa-list', AidTypeGroup::class),
         ]);
 
         yield MenuItem::subMenu('Catégories', 'fas fa-table')->setSubItems([
@@ -233,15 +233,11 @@ class DashboardController extends AbstractDashboardController
         ]);
 
         yield MenuItem::subMenu('Projets Référents', 'fas fa-table')->setSubItems([
-            MenuItem::linkToCrud('Keyword', 'fas fa-list', KeywordReference::class),
+            MenuItem::linkToCrud('Mots clé référents', 'fas fa-list', KeywordReference::class),
             MenuItem::linkToCrud('Projets', 'fas fa-list', ProjectReference::class),
             MenuItem::linkToCrud('Catégories de projet', 'fas fa-list', ProjectReferenceCategory::class),
         ]);
 
-        yield MenuItem::subMenu('Mots clés', 'fas fa-table')->setSubItems([
-            MenuItem::linkToCrud('Mots clés', 'fas fa-list', Keyword::class),
-            MenuItem::linkToCrud('Listes de synonymes', 'fas fa-list', KeywordSynonymlist::class),
-        ]);
 
         yield MenuItem::subMenu('Périmètres', 'fas fa-table')->setSubItems([
             MenuItem::linkToCrud('Données Financiaires', 'fas fa-list', FinancialData::class),
@@ -275,5 +271,11 @@ class DashboardController extends AbstractDashboardController
         yield MenuItem::subMenu('Statistiques', 'fas fa-chart-line')->setSubItems([
             MenuItem::linkToRoute('Aides', 'fas fa-list', 'admin_log_aids_logs', [])
         ]);
+
+        yield MenuItem::subMenu('Obsolète - Mots clés', 'fas fa-table')->setSubItems([
+            MenuItem::linkToCrud('Mots clés', 'fas fa-list', Keyword::class),
+            MenuItem::linkToCrud('Listes de synonymes', 'fas fa-list', KeywordSynonymlist::class),
+        ]);
+
     }
 }
