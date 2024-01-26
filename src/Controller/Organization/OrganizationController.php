@@ -302,12 +302,15 @@ class OrganizationController extends FrontController
         $organizationInvitations = $organizationInvitationRepository->findBy([
             'organization' => $organization
         ]);
-
+        $organizationInvitationsByCollaboratorId = [];
+        foreach ($organizationInvitations as $organizationInvitation) {
+            $organizationInvitationsByCollaboratorId[$organizationInvitation->getGuest()->getId()] = $organizationInvitation;
+        }
         return $this->render('organization/organization/collaborateurs.html.twig', [
             'formInvitation' => $formInvitation,
             'collaborators' => $users,
             'user' => $user,
-            'organizationInvitations' => $organizationInvitations
+            'organizationInvitationsByCollaboratorId' => $organizationInvitationsByCollaboratorId
         ]);
     }
 

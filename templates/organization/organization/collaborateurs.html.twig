@@ -46,34 +46,37 @@
                         <th scope="col">Statut</th>
                     </tr>
                 </thead>
-                {% if organizationInvitations %}
+                {% if collaborators %}
                 <tbody>
-                    {% for organizationInvitation in organizationInvitations %}
+                    {% for collaborator in collaborators %}
+                    {% set organizationInvitation = organizationInvitationsByCollaboratorId[collaborator.id] ?? null %}
                     <tr>
                         <td>
-                            {% if organizationInvitation.email == app.user.email %}
+                            {% if collaborator.email == app.user.email %}
                                 Vous
                             {% else %}
-                                {{ organizationInvitation.firstname }} {{ organizationInvitation.lastname }}
+                                {{ collaborator.firstname }} {{ collaborator.lastname }}
                             {% endif %}
                         </td>
                         <td>
-                            {{ organizationInvitation.email }}
+                            {{ collaborator.email }}
                         </td>
                         <td>
-                        {% if organizationInvitation.guest and organizationInvitation.guest.beneficiaryRole %}
-                            {{ organizationInvitation.guest.beneficiaryRole }}
+                        {% if collaborator.beneficiaryRole %}
+                            {{ collaborator.beneficiaryRole }}
                         {% else %}
                             Ce collaborateur n’a pas encore renseigné sa fonction
                         {% endif %}
                         </td>
                         <td>
-                            {{ organizationInvitation.dateCreate|date('d/m/y') }}
+                            {% if organizationInvitation and oorganizationInvitation.dateCreate %}
+                            {{ organizationInvitationsByCollaboratorId[collaborator.id].dateCreate|date('d/m/y') }}
+                            {% endif %}
                         </td>
                         <td>
-                            {% if organizationInvitation.timeExclude %}
+                            {% if organizationInvitation and organizationInvitation.timeExclude %}
                                 Exclu le {{ organizationInvitation.timeExclude|date('d/m/y') }}
-                            {% elseif organizationInvitation.dateAccept %}
+                            {% elseif organizationInvitation and organizationInvitation.dateAccept %}
                                 Acceptée le {{ organizationInvitation.dateAccept|date('d/m/y') }}
                                 {% if organizationInvitation.guest and organizationInvitation.author == app.user and organizationInvitation.guest != app.user %}
                                     <br />
@@ -81,9 +84,8 @@
                                         Exclure le membre
                                     </button>
                                 {% endif %}
-                            {% elseif organizationInvitation.dateRefuse %}
+                            {% elseif organizationInvitation and organizationInvitation.dateRefuse %}
                                 Refusée le {{ organizationInvitation.dateRefuse|date('d/m/y') }}
-
                             {% else %}
                                 En attente
                             {% endif %}
