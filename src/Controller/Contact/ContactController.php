@@ -83,6 +83,8 @@ class ContactController extends FrontController
                     );
 
                 return $this->redirectToRoute('app_contact_contact', ['success'=>1]);
+            } else {
+                $this->addFlash(FrontController::FLASH_ERROR, 'Une erreur est survenue lors de l\'envoi du message.');
             }
         }
 

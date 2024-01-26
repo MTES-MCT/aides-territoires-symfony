@@ -85,6 +85,9 @@
             "config/routes/fos_js_routing.yaml"
         ]
     },
+    "gregwar/captcha-bundle": {
+        "version": "v2.2.0"
+    },
     "knplabs/knp-gaufrette-bundle": {
         "version": "v0.9.0"
     },

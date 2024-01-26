@@ -4,6 +4,7 @@ namespace App\Form\Contact;
 
 use App\Entity\Contact\Contact;
 use App\Entity\Contact\ContactMessage;
+use Gregwar\CaptchaBundle\Type\CaptchaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -31,21 +32,21 @@ class ContactType extends AbstractType
         $builder
             ->add('firstname', TextType::class, [
                 'label' => 'Votre prénom :',
-                'sanitize_html' => true,
+                // 'sanitize_html' => true,
             ])
             ->add('lastname', TextType::class, [
                 'label' => 'Votre nom :',
-                'sanitize_html' => true,
+                // 'sanitize_html' => true,
             ])
             ->add('email', EmailType::class, [
                 'label' => 'Votre email :*',
                 'required' => true,
                 'help' => 'Par exemple : prenom.nom@domaine.fr',
-                'sanitize_html' => true,
+                // 'sanitize_html' => true,
             ])
             ->add('phoneNumber', TextType::class, [
                 'label' => 'Votre numéro de téléphone :',
-                'sanitize_html' => true,
+                // 'sanitize_html' => true,
             ])
             ->add('structureAndFunction', TextType::class, [
                 'label' => 'Votre structure et fonction :',
@@ -53,7 +54,7 @@ class ContactType extends AbstractType
                 'attr' => [
                     'placeholder' => 'Exemple: Mairie de Château-Thierry / Chargé de mission habitat'
                 ],
-                'sanitize_html' => true,
+                // 'sanitize_html' => true,
             ])
             ->add('subject', ChoiceType::class, [
                 'choices' => [
@@ -74,7 +75,8 @@ class ContactType extends AbstractType
                 'required' => true,
                 'attr' => ['class' => 'fr-input', 'cols' => 40, 'rows' => 10],
                 'sanitize_html' => true,
-            ]);
+            ])
+            ->add('captcha', CaptchaType::class)
         ;
     }
 
