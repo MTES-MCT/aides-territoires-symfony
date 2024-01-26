@@ -245,7 +245,6 @@ class OrganizationController extends FrontController
         
         $user = $userService->getUserLogged();
         $organization = $user->getDefaultOrganization();
-        $users = $organization ? $organization->getBeneficiairies() : [];
 
         $organizationInvitation = new OrganizationInvitation();
         $formInvitation = $this->createForm(OrganizationInvitationSendType::class, $organizationInvitation);
@@ -298,21 +297,79 @@ class OrganizationController extends FrontController
             }
         }
 
-        // la liste des invitations
+        $collaborators = [];
+        $collaboratorsEmails = [];
+        // les personnes déjà dans l'organization
+        if ($organization) {
+            foreach ($organization->getBeneficiairies() as $beneficiary) {
+                $invitationId = null;
+                $userInvitation = $organizationInvitationRepository->findOneBy([
+                    'email' => $beneficiary->getEmail(),
+                    'organization' => $organization
+                ]);
+                if ($userInvitation) {
+                    $invitationId = $userInvitation->getId();
+                }
+                $excludable = false;
+                $status = '';
+                if ($userInvitation && $userInvitation->getTimeExclude()) {
+                    $status = 'Exclu le '.$userInvitation->getTimeExclude()->format('d/m/Y');
+                } elseif ($userInvitation && $userInvitation->getTimeAccept()) {
+                    $status = 'Accepté le '.$userInvitation->getTimeAccept()->format('d/m/Y');
+                    $excludable = true;
+                } elseif ($userInvitation && $userInvitation->getTimeRefuse()) {
+                    $status = 'Refusé le '.$userInvitation->getTimeRefuse()->format('d/m/Y');
+                }
+                $collaborators[] = [
+                    'name' => $beneficiary->getFirstname().' '.$beneficiary->getLastname(),
+                    'email' => $beneficiary->getEmail(),
+                    'role' => $beneficiary->getBeneficiaryRole() ?? '',
+                    'dateInvite' => ($userInvitation && $userInvitation->getDateCreate()) ? $userInvitation->getDateCreate()->format('d/m/Y') : '',
+                    'status' => $status,
+                    'excludable' => $excludable,
+                    'invitationId' => $invitationId,
+                ];
+
+                $collaboratorsEmails[] = $beneficiary->getEmail();
+            }
+        }
+
         $organizationInvitations = $organizationInvitationRepository->findBy([
             'organization' => $organization
         ]);
-        $organizationInvitationsByCollaboratorId = [];
+
+        /** @var OrganizationInvitation $organizationInvitation */
         foreach ($organizationInvitations as $organizationInvitation) {
-            if ($organizationInvitation->getGuest()) {
-                $organizationInvitationsByCollaboratorId[$organizationInvitation->getGuest()->getId()] = $organizationInvitation;
+            if (in_array($organizationInvitation->getEmail(), $collaboratorsEmails)) {
+                continue;
             }
+            $excludable = false;
+            $status = '';
+            if ($organizationInvitation && $organizationInvitation->getTimeExclude()) {
+                $status = 'Exclu le '.$organizationInvitation->getTimeExclude()->format('d/m/Y');
+            } elseif ($organizationInvitation && $organizationInvitation->getTimeAccept()) {
+                $status = 'Accepté le '.$organizationInvitation->getTimeAccept()->format('d/m/Y');
+                $excludable = true;
+            } elseif ($organizationInvitation && $organizationInvitation->getTimeRefuse()) {
+                $status = 'Refusé le '.$organizationInvitation->getTimeRefuse()->format('d/m/Y');
+            } else {
+                $status = 'En attente';
+            }
+            $collaborators[] = [
+                'name' => $organizationInvitation->getFirstname().' '.$organizationInvitation->getLastname(),
+                'email' => $organizationInvitation->getEmail(),
+                'role' => '',
+                'dateInvite' => ($organizationInvitation->getDateCreate()) ? $organizationInvitation->getDateCreate()->format('d/m/Y') : '',
+                'status' => $status,
+                'excludable' => $excludable,
+                'invitationId' => $organizationInvitation->getId(),
+            ];
         }
+
         return $this->render('organization/organization/collaborateurs.html.twig', [
             'formInvitation' => $formInvitation,
-            'collaborators' => $users,
+            'collaborators' => $collaborators,
             'user' => $user,
-            'organizationInvitationsByCollaboratorId' => $organizationInvitationsByCollaboratorId
         ]);
     }
 
