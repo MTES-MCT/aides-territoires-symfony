@@ -420,6 +420,9 @@ class AidRepository extends ServiceEntityRepository
                 for ($i = 0; $i<count($objects); $i++) {
 
                     $sqlObjects .= '
+                        CASE WHEN (a.name LIKE :objects'.$i.') THEN 10 ELSE 0 END
+                    ';
+                    $sqlObjects .= '
                         CASE WHEN (a.name LIKE :objects'.$i.') THEN 10 ELSE 0 END +
                         CASE WHEN (a.description LIKE :objects'.$i.') THEN 2 ELSE 0 END +
                         CASE WHEN (a.eligibility LIKE :objects'.$i.') THEN 2 ELSE 0 END
@@ -469,6 +472,27 @@ class AidRepository extends ServiceEntityRepository
                 $qb->setParameter('simple_words_string', $simpleWordsString);
             }
 
+            // Les catégories
+            if ($objectsString) {
+                $qb->leftJoin('a.categories', 'categoriesKeyword');
+                $sqlCategories = '
+                    CASE WHEN (MATCH_AGAINST(categoriesKeyword.name) AGAINST(:objects_string IN BOOLEAN MODE) > 1) THEN 30 ELSE 0 END 
+                ';
+                if ($intentionsString) {
+                    $sqlCategories .= '
+                    +
+                    CASE WHEN (MATCH_AGAINST(categoriesKeyword.name) AGAINST(:intentions_string IN BOOLEAN MODE) > 1) THEN 10 ELSE 0 END
+                    ';
+                }
+            } else {
+                if ($simpleWordsString) {
+                    $qb->leftJoin('a.categories', 'categoriesKeyword');
+                    $sqlCategories = '
+                        CASE WHEN (MATCH_AGAINST(categoriesKeyword.name) AGAINST(:simple_words_string IN BOOLEAN MODE) > 1) THEN 20 ELSE 0 END 
+                    ';
+                }
+            }
+
             // if ($simpleWordsString) {
             //     $oldKeywordsString .= ' '.$simpleWordsString;
             // }
@@ -509,6 +533,13 @@ class AidRepository extends ServiceEntityRepository
                     $sqlTotal .= ' + ';
                 }
                 $sqlTotal .= $sqlSimpleWords;
+            }
+
+            if (isset($sqlCategories)) {
+                if ($originalName || $objectsString || $intentionsString || isset($sqlSimpleWords)) {
+                    $sqlTotal .= ' + ';
+                }
+                $sqlTotal .= $sqlCategories;
             }
 
             if ($sqlTotal !== '') {

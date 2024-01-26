@@ -14,6 +14,8 @@ use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Symfony\Component\Serializer\Annotation\Groups;
 
+#[ORM\Index(columns: ['name'], name: 'name_aid')]
+#[ORM\Index(columns: ['name'], name: 'name_category_fulltext', flags: ['fulltext'])]
 #[ORM\Entity(repositoryClass: CategoryRepository::class)]
 class Category
 {
