@@ -422,11 +422,11 @@ class AidRepository extends ServiceEntityRepository
                     $sqlObjects .= '
                         CASE WHEN (a.name LIKE :objects'.$i.') THEN 10 ELSE 0 END
                     ';
-                    $sqlObjects .= '
-                        CASE WHEN (a.name LIKE :objects'.$i.') THEN 10 ELSE 0 END +
-                        CASE WHEN (a.description LIKE :objects'.$i.') THEN 2 ELSE 0 END +
-                        CASE WHEN (a.eligibility LIKE :objects'.$i.') THEN 2 ELSE 0 END
-                    ';
+                    // $sqlObjects .= '
+                    //     CASE WHEN (a.name LIKE :objects'.$i.') THEN 10 ELSE 0 END +
+                    //     CASE WHEN (a.description LIKE :objects'.$i.') THEN 2 ELSE 0 END +
+                    //     CASE WHEN (a.eligibility LIKE :objects'.$i.') THEN 2 ELSE 0 END
+                    // ';
                     if ($i < count($objects) - 1) {
                         $sqlObjects .= ' + ';
                     }
