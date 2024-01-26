@@ -163,9 +163,14 @@ class ProjectCrudController extends AtCrudController
             return $this->generateUrl('app_project_project_public_details', ['id' => $entity->getId(), 'slug' => $entity->getSlug(), UrlGeneratorInterface::ABSOLUTE_URL]);
         });
         
+        $exportCsvAction = $this->getExportCsvAction();
+        $exportXlsxAction = $this->getExportXlsxAction();
+
         return parent::configureActions($actions)
             ->add(Crud::PAGE_INDEX, $displayOnFront)
             ->add(Crud::PAGE_EDIT, $displayOnFront)
+            ->add(Crud::PAGE_INDEX, $exportCsvAction)
+            ->add(Crud::PAGE_INDEX, $exportXlsxAction)
         ;
     }
 }

@@ -174,6 +174,31 @@ class SpreadsheetExporterService
                     unset($results[$key]);
                 }
                 break;
+
+                case Project::class:
+                    /** @var Project $result */
+                    foreach ($results as $key => $result) {
+                        $regions = ($result->getOrganization() && $result->getOrganization()->getPerimeter()) ? $result->getOrganization()->getPerimeter()->getRegions() : '';
+                        if (is_array($regions)) {
+                            $regions = implode(',', $regions);
+                        }
+                        $counties = ($result->getOrganization() && $result->getOrganization()->getPerimeter()) ? $result->getOrganization()->getPerimeter()->getDepartments() : '';
+                        if (is_array($counties)) {
+                            $counties = implode(',', $counties);
+                        }
+                        $datas[] = [
+                            'Nom' => $result->getName(),
+                            'Organisation' => $result->getOrganization() ? $result->getOrganization()->getName() : '',
+                            'Description' => $result->getDescription(),
+                            'Périmètre du porteur de projet' => ($result->getOrganization() && $result->getOrganization()->getPerimeter()) ? $result->getOrganization()->getPerimeter()->getName() : '',
+                            'Périmètre (Région)' => $regions,
+                            'Périmètre (Département)' => $counties,
+                            'Est public' => $result->isIsPublic() ? 'Oui' : 'Non',
+                            'Date création' => $result->getTimeCreate() ? $result->getTimeCreate()->format('d/m/Y H:i:s') : '',
+                        ];
+                        unset($results[$key]);
+                    }
+                    break;
         }
         return $datas;
     }
