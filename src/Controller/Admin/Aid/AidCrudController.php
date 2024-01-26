@@ -119,7 +119,7 @@ class AidCrudController extends AtCrudController
 
         //set the link using a string or a callable (function like its being used here)
         $displayOnFront->linkToUrl(function($entity) {
-            return $this->generateUrl('app_aid_aid_details', ['id' => $entity->getId(), 'slug' => $entity->getSlug()], UrlGeneratorInterface::ABSOLUTE_URL);
+            return $this->generateUrl('app_aid_aid_details', ['slug' => $entity->getSlug()], UrlGeneratorInterface::ABSOLUTE_URL);
         });
 
         $exportCsvAction = $this->getExportCsvAction();
