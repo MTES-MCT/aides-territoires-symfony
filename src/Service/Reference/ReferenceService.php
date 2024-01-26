@@ -2,6 +2,7 @@
 
 namespace App\Service\Reference;
 
+use App\Entity\Reference\KeywordReference;
 use App\Repository\Reference\KeywordReferenceRepository;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
@@ -12,6 +13,19 @@ class ReferenceService
         protected KeywordReferenceRepository $keywordReferenceRepository
     )
     {
+    }
+
+    public function keywordHasSynonym(KeywordReference $keywordReference, string $synonym): bool
+    {
+        if ($keywordReference->getName() == $synonym) {
+            return true;
+        }
+        foreach ($keywordReference->getKeywordReferences() as $keywordReferenceChild) {
+            if ($keywordReferenceChild->getName() == $synonym) {
+                return true;
+            }
+        }
+        return false;
     }
 
     protected array $articles = array(
