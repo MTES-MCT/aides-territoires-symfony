@@ -30,7 +30,7 @@
                             <th scope="col" class="fr-text">Porté par</th>
                         </tr>
                     </thead>
-                    {% if user.defaultOrganization.favoriteProjects %}
+                    {% if user.defaultOrganization and user.defaultOrganization.favoriteProjects %}
                     <tbody>
                         {% for project in user.defaultOrganization.favoriteProjects %}
                         {# {% dump(project) %} #}
