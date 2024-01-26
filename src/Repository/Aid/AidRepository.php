@@ -391,7 +391,7 @@ class AidRepository extends ServiceEntityRepository
                 ->setParameter('hasBrokenLink', $hasBrokenLink)
             ;
         }
-// dump($synonyms);
+
         if (isset($synonyms)) {
             $originalName = (isset($synonyms['original_name']) && $synonyms['original_name'] !== '')  ? $synonyms['original_name'] : null;
             $intentionsString = (isset($synonyms['intentions_string']) && $synonyms['intentions_string'] !== '')  ? $synonyms['intentions_string'] : null;
@@ -444,7 +444,7 @@ class AidRepository extends ServiceEntityRepository
                 $qb->setParameter('intentions_string', $intentionsString);
             }
 
-            if (!$objectsString && $simpleWordsString) {
+            if ($simpleWordsString) {
                 $sqlSimpleWords = '
                 CASE WHEN (MATCH_AGAINST(a.name) AGAINST(:simple_words_string IN BOOLEAN MODE) > 1) THEN 30 ELSE 0 END +
                 CASE WHEN (MATCH_AGAINST(a.description, a.eligibility) AGAINST(:simple_words_string IN BOOLEAN MODE) > 1) THEN 5 ELSE 0 END 
