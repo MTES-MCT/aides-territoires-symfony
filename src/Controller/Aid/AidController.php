@@ -271,7 +271,7 @@ class AidController extends FrontController
                 }
             }
         }
-        dump($highlightedWords);
+
         $requestStack->getCurrentRequest()->getSession()->set('highlightedWords', $highlightedWords);
 
         // rendu template
