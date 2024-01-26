@@ -14,6 +14,7 @@ class AidGenericFilterType extends AbstractType
             'choices' => [
                 'Aides génériques' => 'generic',
                 'Local aids' => 'local',
+                'Standard aids' => 'standard',
             ],
         ]);
     }

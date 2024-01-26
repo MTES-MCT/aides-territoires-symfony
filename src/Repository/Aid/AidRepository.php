@@ -209,6 +209,14 @@ class AidRepository extends ServiceEntityRepository
             ->andWhere(Criteria::expr()->eq($alias.'isGeneric', true))
         ;
     }
+    
+    public static function decliStandardCriteria($alias = '') : Criteria
+    {
+        return Criteria::create()
+            ->andWhere(Criteria::expr()->eq($alias.'isGeneric', false))
+            ->andWhere(Criteria::expr()->eq($alias.'genericAid', null))
+        ;
+    }
 
     public function countByUser(User $user, array $params = null): int
     {

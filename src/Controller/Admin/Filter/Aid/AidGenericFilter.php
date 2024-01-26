@@ -36,6 +36,9 @@ class AidGenericFilter implements FilterInterface
             case 'local':
                 $queryBuilder->addCriteria(AidRepository::localCriteria($filterDataDto->getEntityAlias().'.'));
                 break;
+            case 'standard':
+                $queryBuilder->addCriteria(AidRepository::decliStandardCriteria($filterDataDto->getEntityAlias().'.'));
+                break;
         }
 
         return;
