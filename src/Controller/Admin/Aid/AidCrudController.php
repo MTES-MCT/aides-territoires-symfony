@@ -373,12 +373,32 @@ class AidCrudController extends AtCrudController
         yield TrumbowygField::new('eligibility', 'Conditions d’éligibilité')
         ->hideOnIndex()
         ->setColumns(12);
-        yield AssociationField::new('keywords', 'Mots clés')
+        // yield AssociationField::new('keywords', 'Obsolète - Mots clés')
+        // ->setFormTypeOptions([
+        //     'query_builder' => function (EntityRepository $er) {
+        //         return $er->createQueryBuilder('k')
+        //         ->orderBy('k.name', 'ASC');
+        //     },
+        // ])
+        // ->hideOnIndex()
+        // ->setColumns(12);
+        yield AssociationField::new('keywordReferences', 'Mots clés références (uniquement les parents)')
         ->setFormTypeOptions([
             'query_builder' => function (EntityRepository $er) {
                 return $er->createQueryBuilder('k')
+                // ->andWhere('k.parent = k')
                 ->orderBy('k.name', 'ASC');
             },
+            // 'choice_value' => function ($entity) {
+            //     return ($entity && $entity->getParent()) ? $entity->getParent()->getId() : '';
+            // },
+            'choice_label' => function ($entity) {
+                $label = $entity->getName();
+                if ($entity->getParent()) {
+                    $label .= ' ('.$entity->getParent()->getName().')';
+                }
+                return $label;
+            }
         ])
         ->hideOnIndex()
         ->setColumns(12);

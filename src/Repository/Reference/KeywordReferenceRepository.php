@@ -4,6 +4,7 @@ namespace App\Repository\Reference;
 
 use App\Entity\Reference\KeywordReference;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -21,7 +22,30 @@ class KeywordReferenceRepository extends ServiceEntityRepository
         parent::__construct($registry, KeywordReference::class);
     }
 
+    public function findFromString(string $string): array
+    {
+        $qb = $this->getQueryBuilder(['string' => $string]);
+        return $qb->getQuery()->getResult();
+    }
 
+    public function getQueryBuilder(?array $params = null) : QueryBuilder
+    {
+        $string = $params['string'] ?? null;
+
+        $qb = $this->createQueryBuilder('kr');
+
+        if ($string) {
+            $words = str_getcsv($string, ' ', '"');
+            if (is_array($words) && count($words) > 1) {
+                $qb->andWhere('kr.name IN (:words)')
+                    ->setParameter('words', $words)
+                    ;
+            }
+        }
+        
+        
+        return $qb;
+    }
 	public function getAllSynonyms($searchText)
 	{
         $sql="SELECT distinct(k.name),k.intention

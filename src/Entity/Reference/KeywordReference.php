@@ -2,6 +2,7 @@
 
 namespace App\Entity\Reference;
 
+use App\Entity\Aid\Aid;
 use App\Entity\Blog\BlogPromotionPost;
 use App\Repository\Reference\KeywordReferenceRepository;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -11,6 +12,7 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity(repositoryClass: KeywordReferenceRepository::class)]
 #[ORM\Index(columns: ['name'], name: 'name_kr')]
 #[ORM\Index(columns: ['intention'], name: 'intention_kr')]
+#[ORM\Index(columns: ['name'], name: 'name_kr_fulltext', flags: ['fulltext'])]
 class KeywordReference
 {
     #[ORM\Id]
@@ -33,11 +35,15 @@ class KeywordReference
     #[ORM\ManyToMany(targetEntity: BlogPromotionPost::class, mappedBy: 'keywordReferences')]
     private Collection $blogPromotionPosts;
 
+    #[ORM\ManyToMany(targetEntity: Aid::class, mappedBy: 'keywordReferences')]
+    private Collection $aids;
+
 
     public function __construct()
     {
         $this->keywordReferences = new ArrayCollection();
         $this->blogPromotionPosts = new ArrayCollection();
+        $this->aids = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -138,6 +144,33 @@ class KeywordReference
     {
         if ($this->blogPromotionPosts->removeElement($blogPromotionPost)) {
             $blogPromotionPost->removeKeywordReference($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Aid>
+     */
+    public function getAids(): Collection
+    {
+        return $this->aids;
+    }
+
+    public function addAid(Aid $aid): static
+    {
+        if (!$this->aids->contains($aid)) {
+            $this->aids->add($aid);
+            $aid->addKeywordReference($this);
+        }
+
+        return $this;
+    }
+
+    public function removeAid(Aid $aid): static
+    {
+        if ($this->aids->removeElement($aid)) {
+            $aid->removeKeywordReference($this);
         }
 
         return $this;

@@ -18,6 +18,7 @@ use App\Entity\Organization\OrganizationType;
 use App\Entity\Perimeter\Perimeter;
 use App\Entity\Program\Program;
 use App\Entity\Project\ProjectValidated;
+use App\Entity\Reference\KeywordReference;
 use App\Entity\Search\SearchPage;
 use App\Entity\User\User;
 use App\Repository\Aid\AidRepository;
@@ -668,6 +669,9 @@ class Aid
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $originUrlText = null;
 
+    #[ORM\ManyToMany(targetEntity: KeywordReference::class, inversedBy: 'aids')]
+    private Collection $keywordReferences;
+
 
     /**
      * <Non Database Fields
@@ -699,6 +703,7 @@ class Aid
         $this->logAidCreatedsFolders = new ArrayCollection();
         $this->logAidEligibilityTests = new ArrayCollection();
         $this->financers = new ArrayCollection();
+        $this->keywordReferences = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -2413,6 +2418,30 @@ class Aid
     public function setOriginUrlText(?string $originUrlText): static
     {
         $this->originUrlText = $originUrlText;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, KeywordReference>
+     */
+    public function getKeywordReferences(): Collection
+    {
+        return $this->keywordReferences;
+    }
+
+    public function addKeywordReference(KeywordReference $keywordReference): static
+    {
+        if (!$this->keywordReferences->contains($keywordReference)) {
+            $this->keywordReferences->add($keywordReference);
+        }
+
+        return $this;
+    }
+
+    public function removeKeywordReference(KeywordReference $keywordReference): static
+    {
+        $this->keywordReferences->removeElement($keywordReference);
 
         return $this;
     }

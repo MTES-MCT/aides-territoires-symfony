@@ -14,6 +14,7 @@ use App\Entity\Keyword\Keyword;
 use App\Entity\Organization\OrganizationType;
 use App\Entity\Perimeter\Perimeter;
 use App\Entity\Program\Program;
+use App\Entity\Reference\KeywordReference;
 use App\Entity\User\User;
 use App\Service\Reference\ReferenceService;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
@@ -280,9 +281,9 @@ class AidRepository extends ServiceEntityRepository
     {
         $qb = $this->getQueryBuilder($params);
         $results = $qb->getQuery()->getResult();
-        // foreach ($results as $result) {
-        //     dump($result[0]->getName(), $result['score_total'], '-----');
-        // }
+        foreach ($results as $result) {
+            dump($result[0]->getName(), $result['score_total'], '-----');
+        }
         // exit;
         $return = [];
         foreach ($results as $result) {
@@ -495,6 +496,47 @@ class AidRepository extends ServiceEntityRepository
                 }
             }
 
+            // les keywordReferences
+            if ($objectsString) {
+                $keywordReferences = $this->getEntityManager()->getRepository(KeywordReference::class)->findFromString($objectsString);
+                if (count($keywordReferences) > 0) {
+                    $qb
+                    ->leftJoin('a.keywordReferences', 'keywordReferences')
+                    ->setParameter('keywordReferences', $keywordReferences)
+                    ;
+                    $sqlKeywordReferences = '
+                        CASE WHEN (keywordReferences IN (:keywordReferences)) THEN 60 ELSE 0 END 
+                    ';
+
+                    if ($intentionsString) {
+                        $keywordReferences = $this->getEntityManager()->getRepository(KeywordReference::class)->findFromString($intentionsString);
+                        if (count($keywordReferences) > 0) {
+                            $sqlKeywordReferences .= '
+                            +
+                            CASE WHEN (keywordReferences IN (:keywordReferences)) THEN 20 ELSE 0 END 
+                            ';
+                        }
+                    }
+                }
+            } else {
+                if ($simpleWordsString) {
+                    $keywordReferences = $this->getEntityManager()->getRepository(KeywordReference::class)->findFromString($simpleWordsString);
+                    if (count($keywordReferences) > 0) {
+                        $sqlKeywordReferences = '
+                        +
+                        CASE WHEN (keywordReferences IN (:keywordReferences)) THEN 20 ELSE 0 END 
+                        ';
+                    }
+                    $qb
+                    ->leftJoin('a.keywordReferences', 'keywordReferences')
+                    ->setParameter('keywordReferences', $keywordReferences)
+                    ;
+                }
+            }
+
+        ;
+
+
             // if ($simpleWordsString) {
             //     $oldKeywordsString .= ' '.$simpleWordsString;
             // }
@@ -544,6 +586,13 @@ class AidRepository extends ServiceEntityRepository
                 $sqlTotal .= $sqlCategories;
             }
 
+            if (isset($sqlKeywordReferences)) {
+                if ($originalName || $objectsString || $intentionsString || isset($sqlSimpleWords) || isset($sqlCategories)) {
+                    $sqlTotal .= ' + ';
+                }
+                $sqlTotal .= $sqlKeywordReferences;
+            }
+// dump($sqlTotal);
             if ($sqlTotal !== '') {
                 $qb->addSelect('('.$sqlTotal.') as score_total');
                 $qb->andHaving('score_total >= '.$scoreTotalMin);
