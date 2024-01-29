@@ -23,6 +23,15 @@ class AidProjectRepository extends ServiceEntityRepository
         parent::__construct($registry, AidProject::class);
     }
 
+    public function countDistinctAids(?array $params = null) : int {
+        $qb = $this->getQueryBuilder($params);
+
+        $qb
+            ->innerJoin('ap.aid', 'aid')
+            ->select('IFNULL(COUNT(DISTINCT(aid.id)), 0) AS nb');
+
+        return $qb->getQuery()->getResult()[0]['nb'] ?? 0;
+    }
     public function countProjectByAid(Aid $aid, array $params = null) : int {
         $params['aid'] = $aid;
         $qb = $this->getQueryBuilder($params);

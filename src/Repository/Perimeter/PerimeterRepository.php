@@ -136,6 +136,13 @@ class PerimeterRepository extends ServiceEntityRepository
         return $results;
     }
 
+    public function countEcpi(?array $params = null) : int
+    {
+        $params['scale'] = Perimeter::SCALE_EPCI;
+        $params['isObsolete'] = false;
+        return $this->countCustom($params);        
+    }
+
     public function countCustom(array $params = null) : int {
         $qb = $this->getQueryBuilder($params);
 
@@ -162,9 +169,14 @@ class PerimeterRepository extends ServiceEntityRepository
         $nameMatchAgainst = $params['nameMatchAgainst'] ?? null;
         $isVisibleToUsers = $params['isVisibleToUsers'] ?? null;
         $scaleLowerThan = $params['scaleLowerThan'] ?? null;
+        $isObsolete = $params['isObsolete'] ?? null;
 
         $qb = $this->createQueryBuilder('p');
 
+        if ($isObsolete !== null) {
+            $qb->andWhere('p.isObsolete = :isObsolete')
+                ->setParameter('isObsolete', $isObsolete);
+        }
         if ($nameMatchAgainst !== null)
         {
             $qb

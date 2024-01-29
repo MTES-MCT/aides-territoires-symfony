@@ -26,6 +26,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
 
 #[ORM\Entity(repositoryClass: OrganizationRepository::class)]
+#[ORM\Index(columns: ['is_imported'], name: 'organization_is_imported')]
 #[ORM\Index(columns: ['intercommunality_type'], name: 'intercommunality_type_organization')]
 class Organization
 {

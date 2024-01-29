@@ -1,0 +1,22 @@
+{% extends "@EasyAdmin/page/content.html.twig" %}
+
+
+{% block main %}
+<main>
+    <h1 class="title">Statistiques globales</h1>
+
+    <p class="fr-text--lg"><strong>
+        <a href="">{{ nbUsers|number_format(0, ',', ' ') }} comptes utilisateurs</a></strong>,
+        répartis en <strong><a href="">{{ nbOrganizations|number_format(0, ',', ' ') }} structures</a></strong>
+        (<a href="">carte</a>),
+        dont <strong><a href="">{{ nbInterco|number_format(0, ',', ' ') }} intercommunalités</a></strong>,
+        ont créé <strong><a href="">{{ nbProjects|number_format(0, ',', ' ') }} projets</a></strong>
+        avec en tout <strong>{{ nbAidProjects|number_format(0, ',', ' ') }} aides sélectionnées</strong> sur un total de
+        <strong>{{ nbAidsLive|number_format(0, ',', ' ') }} aides disponibles</strong> publiées par
+        <strong>{{ nbBackers|number_format(0, ',', ' ') }} porteurs</strong>.
+        Sont également disponibles <strong>{{ nbSearchPages|number_format(0, ',', ' ') }} portails</strong>.
+        <span class="fr-hint-text">Pour rappel, le compte utilisateur a été lancé le 4 novembre 2021.</span>
+    </p>
+    
+</main>
+{% endblock %}
