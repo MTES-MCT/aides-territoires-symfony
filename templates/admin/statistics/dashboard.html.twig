@@ -32,5 +32,182 @@
             <h4 class="text-center"><a href="">{{ nbEcpi }} ({{ nbEcpiPercentage }} %). Objectif : {{ nbEcpiObjectifPercentage }}%</a></h4>
         </div>
     </div>
+
+    <div id="statistiques" class="mt-5 mb-5 d-flex flex-row justify-content-center align-items-center">
+        <h2 class="me-3">Statistiques sur une période :</h2>
+        <div class="d-flex me-3">
+        {{ form_start(formDateRange) }}
+        </div>
+        <div class="d-flex me-3">
+        {{ form_row(formDateRange.dateMin) }}
+        </div>
+        <div class="d-flex me-3">
+        {{ form_row(formDateRange.dateMax) }}
+        </div>
+        <div class="d-flex me-3">
+        <button type="submit" class="btn btn-primary">Valider</button>
+        </div>
+        {{ form_end(formDateRange) }}
+    </div>
+
+    <div class="container mb-5">
+        <ul class="nav nav-tabs" role="tablist" aria-label="Différentes statistiques">
+            <li class="nav-item" role="presentation">
+                <a
+                    id="consultation"
+                    href="#statistiques"
+                    class="nav-link {% if consultationSelected %}active{% endif %}"
+                    tabindex="{% if consultationSelected %}0{% else %}-1{% endif %}"
+                    role="tab"
+                    aria-selected="{% if consultationSelected %}true{% else %}false{% endif %}"
+                    aria-controls="consultation-panel"
+                    ><span aria-hidden="true">👥 </span>Consultation</a>
+            </li>
+            <li class="nav-item" role="presentation">
+                <a
+                    id="acquisition"
+                    href="#statistiques"
+                    class="nav-link {% if acquisitionSelected %}active{% endif %}"
+                    tabindex="{% if acquisitionSelected %}0{% else %}-1{% endif %}"
+                    role="tab"
+                    aria-selected="{% if acquisitionSelected %}true{% else %}false{% endif %}"
+                    aria-controls="acquisition-panel"
+                    ><span aria-hidden="true">🎣 </span>Acquisition</a>
+            </li>
+            <li class="nav-item" role="presentation">
+                <a
+                    id="engagement"
+                    href="#statistiques"
+                    class="nav-link {% if engagementSelected %}active{% endif %}"
+                    tabindex="{% if engagementSelected %}0{% else %}-1{% endif %}"
+                    role="tab"
+                    aria-selected="{% if engagementSelected %}true{% else %}false{% endif %}"
+                    aria-controls="engagement-panel"
+                    ><span aria-hidden="true">🏅 </span>Engagement</a>
+            </li>
+            <li class="nav-item" role="presentation">
+                <a
+                    id="cote-porteurs"
+                    href="#statistiques"
+                    class="nav-link {% if porteursSelected %}active{% endif %}"
+                    tabindex="{% if porteursSelected %}0{% else %}-1{% endif %}"
+                    role="tab"
+                    aria-selected="{% if porteursSelected %}true{% else %}false{% endif %}"
+                    aria-controls="cote-porteurs-panel"
+                    ><span aria-hidden="true">💪 </span>Côté porteurs</a>
+            </li>
+        </ul>
+        
+        <div id="consultation-panel" class="fr-tabs__panel fr-tabs__panel--selected" role="tabpanel" aria-labelledby="consultation" tabindex="0">
+            <div class="d-flex">
+
+                    <div class="card col">
+                        <div class="card-body d-flex flex-column justify-content-between">
+                            <h5 class="card-title">
+                                <a class="card-link" href="#">
+                                    Nombre de visiteurs
+                                </a>
+                            </h5>
+                            <p class="card-text fs-2"><strong>{% if statsMatomo.nb_visits is defined %}{{ statsMatomo.nb_visits }}{% endif %}</strong></p>
+                        </div>
+                    </div>
+
+                    <div class="card col">
+                        <div class="card-body d-flex flex-column justify-content-between">
+                            <h5 class="card-title">
+                                <a class="card-link" href="#">Taux de rebond</a>
+                            </h5>
+                            <p class="card-text fs-2"><strong>{% if statsMatomo.bounce_rate is defined %}{{ statsMatomo.bounce_rate }}{% endif %}</strong></p>
+                        </div>
+                    </div>
+
+                    <div class="card col">
+                        <div class="card-body d-flex flex-column justify-content-between">
+                            <h5 class="card-title">
+                                <a class="card-link" href="#">
+                                    Durée moyenne d’une visite
+                                </a>
+                            </h5>
+                            <p class="card-text fs-2"><strong>{% if statsMatomo.avg_time_on_site is defined %}{{ statsMatomo.avg_time_on_site }}{% endif %}</strong></p>
+                        </div>
+                    </div>
+
+                    <div class="card col">
+                        <div class="card-body d-flex flex-column justify-content-between">
+                            <h5 class="card-title">
+                                <a class="card-link" href="#">
+                                    Nombre de pages vues
+                                </a>
+                            </h5>
+                            <p class="card-text fs-2"><strong>{% if statsMatomoActions.nb_pageviews is defined %}{{ statsMatomoActions.nb_pageviews }}{% endif %}</strong></p>
+                        </div>
+                    </div>
+
+                    <div class="card col">
+                        <div class="card-body d-flex flex-column justify-content-between">
+                            <h5 class="card-title">
+                                <a class="card-link" href="">
+                                    Nombre d’aides vues (sans l’API)
+                                </a>
+                            </h5>
+                            <p class="card-text fs-2"><strong>{% if nbAidViews is defined %}{{ nbAidViews }}{% endif %}</strong></p>
+                        </div>
+                    </div>
+
+                    <div class="card col">
+                        <div class="card-body d-flex flex-column justify-content-between">
+                            <h5 class="card-title">
+                                <a class="card-link" href="">
+                                    Nombre d’aides vues différentes (sans l’API)
+                                </a>
+                            </h5>
+                            <p class="card-text fs-2"><strong>{% if nbAidViewsDistinct is defined %}{{ nbAidViewsDistinct }}{% endif %}</strong></p>
+                        </div>
+                    </div>
+
+            </div>
+
+            <h3 class="mt-5"><span aria-hidden="true">🚀 </span>Visites uniques ces 10 dernières semaines :</h3>
+            <div class="alert alert-info">
+                <p>Les inscriptions et alertes créées sont multipliées par 20 afin qu’elles soient visibles et comparables avec les visites uniques.</p>
+                <p>Cela permet de visualiser une conversion hebdomadaire en fonction des actions engagées par l’équipe.</p>
+            </div>
+            <div class="charts">
+                <div id="chart-visites-uniques" class="ct-chart"></div>
+            </div>
+            <div class="charts-legends">
+                <ul>
+                    <li><span class="charts-legend charts-legend-accent"></span> Visites uniques hebdomadaires</li>
+                    <li><span class="charts-legend charts-legend-regular"></span> Inscriptions (⨯20)</li>
+                    <li><span class="charts-legend charts-legend-regular2"></span> Alertes créées (⨯20)</li>
+                </ul>
+            </div>
+        </div>
+
+        <div id="acquisition-panel" class="fr-tabs__panel" role="tabpanel" aria-labelledby="acquisition" tabindex="0">
+            <div class="row">
+                <div class="col-md-12">
+                    <h3>Chargement en cours…</h3>
+                </div>
+            </div>
+        </div>
+
+        <div id="engagement-panel" class="fr-tabs__panel" role="tabpanel" aria-labelledby="engagement" tabindex="0">
+            <div class="row">
+                <div class="col-md-12">
+                    <h3>Chargement en cours…</h3>
+                </div>
+            </div>
+        </div>
+
+        <div id="cote-porteurs-panel" class="fr-tabs__panel" role="tabpanel" aria-labelledby="cote-porteurs" tabindex="0">
+            <div class="row">
+                <div class="col-md-12">
+                    <h3>Chargement en cours…</h3>
+                </div>
+            </div>
+        </div>
+
+    </div>
 </main>
 {% endblock %}

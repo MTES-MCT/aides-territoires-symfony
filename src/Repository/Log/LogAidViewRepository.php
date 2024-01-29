@@ -45,15 +45,37 @@ class LogAidViewRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult()[0]['nb'] ?? 0;
     }
 
+    public function countAidsViews(?array $params = null): int
+    {
+        $distinctAids = $params['distinctAids'] ?? null;
+        $qb = $this->getQueryBuilder($params);
+
+        $qb
+            ->innerJoin('lav.aid', 'aidForCount')
+        ;
+        if ($distinctAids !== null) {
+            $qb->select('IFNULL(COUNT(DISTINCT(aidForCount.id)), 0) AS nb');
+        } else {
+            $qb->select('IFNULL(COUNT(aidForCount.id), 0) AS nb');
+        }
+        return $qb->getQuery()->getResult()[0]['nb'] ?? 0;
+    }
     public function getQueryBuilder(array $params = null): QueryBuilder
     {
         $dateMin = $params['dateMin'] ?? null;
         $dateMax = $params['dateMax'] ?? null;
         $author = $params['author'] ?? null;
         $aid = $params['aid'] ?? null;
+        $excludeSources = $params['excludeSources'] ?? null;
 
         $qb = $this->createQueryBuilder('lav');
 
+        if (is_array($excludeSources) && count($excludeSources) > 0) {
+            $qb
+                ->andWhere('lav.source NOT IN (:excludeSources)')
+                ->setParameter('excludeSources', $excludeSources)
+            ;
+        }
         if ($author instanceof User && $author->getId()) {
             $qb
                 ->innerJoin('lav.aid', 'aid')

@@ -6,12 +6,14 @@ use App\Controller\Admin\DashboardController;
 use App\Entity\Aid\Aid;
 use App\Entity\Aid\AidProject;
 use App\Entity\Backer\Backer;
+use App\Entity\Log\LogAidView;
 use App\Entity\Organization\Organization;
 use App\Entity\Perimeter\Perimeter;
 use App\Entity\Project\Project;
 use App\Entity\Search\SearchPage;
 use App\Entity\User\User;
 use App\Form\Admin\Filter\DateRangeType;
+use App\Service\Matomo\MatomoService;
 use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\UX\Chartjs\Model\Chart;
@@ -20,7 +22,8 @@ class StatisticsController extends DashboardController
 {
     #[Route('/admin/statistics/dashboard', name: 'admin_statistics_dashboard')]
     public function dashboard(
-        AdminContext $adminContext
+        AdminContext $adminContext,
+        MatomoService $matomoService
     )
     {
         $nbUsers = $this->managerRegistry->getRepository(User::class)->count(['isBeneficiary' => true]);
@@ -158,6 +161,39 @@ class StatisticsController extends DashboardController
             $formDateRange->get('dateMax')->setData($dateMax);
         }
 
+        // stats matomo
+        $statsMatomo = $matomoService->getMatomoStats(
+            apiMethod: 'VisitsSummary.get',
+            customSegment: null,
+            fromDateString: $dateMin->format('Y-m-d'),
+            toDateString: $dateMax->format('Y-m-d')
+        );
+        $statsMatomoActions = $matomoService->getMatomoStats(
+            apiMethod: 'Actions.get',
+            customSegment: null,
+            fromDateString: $dateMin->format('Y-m-d'),
+            toDateString: $dateMax->format('Y-m-d')
+        );
+        $statsMatomoLast10Weeks = $matomoService->getMatomoStats(
+            apiMethod:'VisitsSummary.get',
+            period: 'week',
+            fromDateString: 'last10',
+            toDateString: null
+        );
+
+        // nombre d'aides vues
+        $nbAidViews = $this->managerRegistry->getRepository(LogAidView::class)->countAidsViews([
+            'dateMin' => $dateMin,
+            'dateMax' => $dateMax,
+            'excludeSources' => ['api'],
+        ]);
+        $nbAidViewsDistinct = $this->managerRegistry->getRepository(LogAidView::class)->countAidsViews([
+            'dateMin' => $dateMin,
+            'dateMax' => $dateMax,
+            'excludeSources' => ['api'],
+            'distinctAids' => true
+        ]);
+
         return $this->render('admin/statistics/dashboard.html.twig', [
             'nbUsers' => $nbUsers,
             'nbOrganizations' => $nbOrganizations,
@@ -175,35 +211,19 @@ class StatisticsController extends DashboardController
             'nbEcpiPercentage' => $nbEcpiPercentage,
             'nbEcpiObjectif' => $nbEcpiObjectif,
             'nbEcpiObjectifPercentage' => $nbEcpiObjectifPercentage,
-            'chartEcpi' => $chartEcpi
+            'chartEcpi' => $chartEcpi,
+            'formDateRange' => $formDateRange,
+            'dateMin' => $dateMin,
+            'dateMax' => $dateMax,
+            'statsMatomo' => $statsMatomo[0] ?? [],
+            'consultationSelected' => true,
+            'acquisitionSelected' => false,
+            'engagementSelected' => false,
+            'porteursSelected' => false,
+            'statsMatomoActions' => $statsMatomoActions[0] ?? [],
+            'statsMatomoLast10Weeks' => $statsMatomoLast10Weeks,
+            'nbAidViews' => $nbAidViews,
+            'nbAidViewsDistinct' => $nbAidViewsDistinct,
         ]);
-    }
-
-    public function createChart(array $datas, string $chartLabel): Chart
-    {
-        // création du graphique
-        $chartDatasLabels = [];
-        $chartDatas = [];
-
-        foreach ($datas as $data) {
-            $chartDatasLabels[] = $data['dateCreate'];
-            $chartDatas[] = $data['nb'];
-        }
-
-        $chart = $this->chartBuilderInterface->createChart(Chart::TYPE_DOUGHNUT);
-
-        $chart->setData([
-            'labels' => $chartDatasLabels,
-            'datasets' => [
-                [
-                    'label' => $chartLabel,
-                    'backgroundColor' => 'rgb(255, 255, 255)',
-                    'borderColor' => 'rgb(255, 0, 0)',
-                    'data' => $chartDatas,
-                ],
-            ],
-        ]);
-
-        return $chart;
     }
 }

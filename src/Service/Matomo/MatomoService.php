@@ -73,27 +73,30 @@ class MatomoService
      */
     public function getMatomoStats(
         $apiMethod,
-        string $customSegment="",
+        ?string $customSegment="",
         string $fromDateString="2023-01-01",
-        string $toDateString=null
-    ): ?array
+        string $toDateString=null,
+        ?string $period= 'range'
+    ): mixed
     {
         try {
-            $today = new \DateTime(date('Y-m-d'));
-            $toDateString = $toDateString ?? $today->format('Y-m-d');
+            $date = $fromDateString;
+            if ($toDateString) {
+                $date .= ','.$toDateString;
+            }
         
             $params = [
                 "idSite" => $this->paramService->get('matomo_site_id'),
                 "module" => "API",
                 "method" => $apiMethod,
-                "period" => "range",
-                "date" => $fromDateString.','.$toDateString,
+                "period" => $period,
+                "date" => $date,
                 "flat" => 1,
                 "filter_limit" => -1,
                 "format" => "json",
                 "segment" => $customSegment,
             ];
-    
+
             $response = $this->httpClientInterface->request(
                 'GET',
                 $this->paramService->get('matomo_endpoint'),
@@ -101,7 +104,7 @@ class MatomoService
                     'query' => $params
                 ]
             );
-    
+// dd(json_decode($response->getContent()));
             return json_decode($response->getContent());
         } catch (\Exception $e) {
             return null;
