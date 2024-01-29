@@ -5,6 +5,7 @@ namespace App\Controller\Admin\Statistics;
 use App\Controller\Admin\DashboardController;
 use App\Entity\Aid\Aid;
 use App\Entity\Aid\AidProject;
+use App\Entity\Alert\Alert;
 use App\Entity\Backer\Backer;
 use App\Entity\Log\LogAidView;
 use App\Entity\Organization\Organization;
@@ -15,6 +16,7 @@ use App\Entity\User\User;
 use App\Form\Admin\Filter\DateRangeType;
 use App\Service\Matomo\MatomoService;
 use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\UX\Chartjs\Model\Chart;
 
@@ -24,7 +26,7 @@ class StatisticsController extends DashboardController
     public function dashboard(
         AdminContext $adminContext,
         MatomoService $matomoService
-    )
+    ): Response
     {
         $nbUsers = $this->managerRegistry->getRepository(User::class)->count(['isBeneficiary' => true]);
         $nbOrganizations = $this->managerRegistry->getRepository(Organization::class)->count(['isImported' => false]);
@@ -194,7 +196,52 @@ class StatisticsController extends DashboardController
             'distinctAids' => true
         ]);
 
+        $labels = [];
+        $visitsUnique = [];
+        $registers = [];
+        $alerts = [];
+
+        foreach ($statsMatomoLast10Weeks as $key => $stats) {
+            $dates = explode(',', $key);
+            $dateStart = new \DateTime($dates[0]);
+            $dateEnd = new \DateTime($dates[1]);
+            // dd($registersByWeek, $dateStart->format('Y-W'));
+            $labels[] = $dateStart->format('d/m/Y').' au '.$dateEnd->format('d/m/Y');
+            $visitsUnique[] = $stats[0]->nb_uniq_visitors ?? 0;
+            $registers[] = $this->managerRegistry->getRepository(User::class)->countRegisters(['dateCreateMin' => $dateStart, 'dateCreateMax' => $dateMax]);
+            $alerts[] = $this->managerRegistry->getRepository(Alert::class)->countCustom(['dateCreateMin' => $dateStart, 'dateCreateMax' => $dateMax]);
+        }
+        $chartLast10Weeks = $this->chartBuilderInterface->createChart(Chart::TYPE_LINE);
+        $chartLast10Weeks->setData([
+            'labels' => $labels,
+            'datasets' => [
+                [
+                    'label' => 'Visites uniques hebdomadaires',
+                    'backgroundColor' => 'rgb(255, 99, 132)',
+                    'data' => $visitsUnique,
+                    'fill' => false, // pour avoir une ligne sans remplissage
+                    'borderColor' => 'rgb(255, 99, 132)', // couleur de la ligne
+                ],
+                [
+                    'label' => 'Inscriptions',
+                    'backgroundColor' => 'rgb(75, 192, 192)',
+                    'data' => $registers,
+                    'fill' => false, // pour avoir une ligne sans remplissage
+                    'borderColor' => 'rgb(75, 192, 192)', // couleur de la ligne
+                ],
+                [
+                    'label' => 'Alertes créées',
+                    'backgroundColor' => 'rgb(54, 162, 235)',
+                    'data' => $alerts,
+                    'fill' => false, // pour avoir une ligne sans remplissage
+                    'borderColor' => 'rgb(54, 162, 235)', // couleur de la ligne
+                ],
+            ],
+        ]);
+
+
         return $this->render('admin/statistics/dashboard.html.twig', [
+            // globale
             'nbUsers' => $nbUsers,
             'nbOrganizations' => $nbOrganizations,
             'nbInterco' => $nbInterco,
@@ -212,6 +259,8 @@ class StatisticsController extends DashboardController
             'nbEcpiObjectif' => $nbEcpiObjectif,
             'nbEcpiObjectifPercentage' => $nbEcpiObjectifPercentage,
             'chartEcpi' => $chartEcpi,
+
+            // specific
             'formDateRange' => $formDateRange,
             'dateMin' => $dateMin,
             'dateMax' => $dateMax,
@@ -224,6 +273,43 @@ class StatisticsController extends DashboardController
             'statsMatomoLast10Weeks' => $statsMatomoLast10Weeks,
             'nbAidViews' => $nbAidViews,
             'nbAidViewsDistinct' => $nbAidViewsDistinct,
+            'chartLast10Weeks' => $chartLast10Weeks,
+        ]);
+    }
+
+    #[Route('/admin/statistics/acquisition/', name: 'admin_statistics_acquisition')]
+    public function acquisition(
+        AdminContext $adminContext
+    ): Response
+    {
+        return $this->render('admin/statistics/dashboard.html.twig', [
+        ]);
+    }
+
+    #[Route('/admin/statistics/engagement/', name: 'admin_statistics_engagement')]
+    public function engagement(
+        AdminContext $adminContext
+    ): Response
+    {
+        return $this->render('admin/statistics/dashboard.html.twig', [
+        ]);
+    }
+
+    #[Route('/admin/statistics/porteurs/', name: 'admin_statistics_porteurs')]
+    public function porteurs(
+        AdminContext $adminContext
+    ): Response
+    {
+        return $this->render('admin/statistics/dashboard.html.twig', [
+        ]);
+    }
+
+    #[Route('/admin/statistics/stats-utilisateurs/', name: 'admin_statistics_users')]
+    public function statsUsers(
+        AdminContext $adminContext
+    ): Response
+    {
+        return $this->render('admin/statistics/dashboard.html.twig', [
         ]);
     }
 }

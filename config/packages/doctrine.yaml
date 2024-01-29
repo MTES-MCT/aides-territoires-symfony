@@ -38,6 +38,7 @@ doctrine:
                 REGEXP: DoctrineExtensions\Query\Mysql\Regexp
                 MATCH_AGAINST: DoctrineExtensions\Query\Mysql\MatchAgainst
                 IF: DoctrineExtensions\Query\Mysql\IfElse
+                WEEK: DoctrineExtensions\Query\Mysql\Week
 
 when@test:
     doctrine:

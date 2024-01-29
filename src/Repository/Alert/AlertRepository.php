@@ -22,6 +22,14 @@ class AlertRepository extends ServiceEntityRepository
         parent::__construct($registry, Alert::class);
     }
 
+    public function countCustom(?array $params = null): int
+    {
+        $qb = $this->getQueryBuilder($params);
+        $qb->select('COUNT(a.id)');
+
+        return (int) $qb->getQuery()->getSingleScalarResult();
+    }
+
     public function findToSend(array $params = null) : array {
         $today = new \DateTime(date('Y-m-d'));
         $yesterday = new \DateTime(date('Y-m-d', strtotime('-1 day')));
@@ -39,9 +47,28 @@ class AlertRepository extends ServiceEntityRepository
     {
         $dailyMinDate = $params['dailyMinDate'] ?? null;
         $weeklyMinDate = $params['weeklyMinDate'] ?? null;
+        $dateCreateMin = $params['dateCreateMin'] ?? null;
+        $dateCreateMax = $params['dateCreateMax'] ?? null;
+
 
         $qb = $this->createQueryBuilder('a');
         
+        if ($dateCreateMin instanceof \DateTime) {
+            $qb
+            ->andWhere('a.timeCreate >= :dateCreateMin')
+            ->setParameter('dateCreateMin', $dateCreateMin)
+            ;
+        }
+
+
+        if ($dateCreateMax instanceof \DateTime) {
+            $qb
+            ->andWhere('a.timeCreate <= :dateCreateMax')
+            ->setParameter('dateCreateMax', $dateCreateMax)
+            ;
+        }
+
+
         if ($dailyMinDate instanceof \DateTime && $weeklyMinDate instanceof \DateTime) {
             $qb
                 ->andWhere('

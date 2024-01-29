@@ -27,6 +27,33 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         parent::__construct($registry, User::class);
     }
 
+    public function countRegisters(?array $params = null): int
+    {
+        $qb = $this->getQueryBuilder($params);
+        $qb->select('COUNT(u.id)');
+
+        return (int) $qb->getQuery()->getSingleScalarResult();
+    }
+
+    public function countRegistersByWeek(?array $params = null): array
+    {
+        $dateMin = $params['dateMin'] ?? null;
+        $dateMax = $params['dateMax'] ?? null;
+
+
+        if (!$dateMin instanceof \DateTime || !$dateMax instanceof \DateTime) {
+            return [];
+        }
+
+        $qb = $this->getQueryBuilder([
+            'dateCreateMin' => $dateMin,
+            'dateCreateMax' => $dateMax
+        ])
+        ->select('DATE_FORMAT(u.dateCreate, \'%Y-%u\') AS week, IFNULL(COUNT(DISTINCT(u.id)), 0) AS nb')
+        ->groupBy('week');
+
+        return $qb->getQuery()->getResult();
+    }
     /**
      * Used to upgrade (rehash) the user's password automatically over time.
      */
@@ -68,6 +95,7 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
     {
         $onlyAdmin = $params['onlyAdmin'] ?? null;
         $dateCreateMin = $params['dateCreateMin'] ?? null;
+        $dateCreateMax = $params['dateCreateMax'] ?? null;
         $connectedSinceYesterday = $params['connectedSinceYesterday'] ?? null;
         $hasUnsentNotification = $params['hasUnsentNotification'] ?? null;
         $notificationEmailFrequency = $params['notificationEmailFrequency'] ?? null;
@@ -85,6 +113,14 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
             $qb
             ->andWhere('u.dateCreate >= :dateCreateMin')
             ->setParameter('dateCreateMin', $dateCreateMin)
+            ;
+        }
+
+
+        if ($dateCreateMax instanceof \DateTime) {
+            $qb
+            ->andWhere('u.dateCreate <= :dateCreateMax')
+            ->setParameter('dateCreateMax', $dateCreateMax)
             ;
         }
 

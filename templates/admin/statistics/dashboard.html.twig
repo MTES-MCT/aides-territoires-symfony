@@ -9,18 +9,20 @@
 <main>
     <h1 class="title">Statistiques globales</h1>
 
-    <p class="fr-text--lg"><strong>
-        <a href="">{{ nbUsers|number_format(0, ',', ' ') }} comptes utilisateurs</a></strong>,
-        répartis en <strong><a href="">{{ nbOrganizations|number_format(0, ',', ' ') }} structures</a></strong>
-        (<a href="">carte</a>),
-        dont <strong><a href="">{{ nbInterco|number_format(0, ',', ' ') }} intercommunalités</a></strong>,
-        ont créé <strong><a href="">{{ nbProjects|number_format(0, ',', ' ') }} projets</a></strong>
-        avec en tout <strong>{{ nbAidProjects|number_format(0, ',', ' ') }} aides sélectionnées</strong> sur un total de
-        <strong>{{ nbAidsLive|number_format(0, ',', ' ') }} aides disponibles</strong> publiées par
-        <strong>{{ nbBackers|number_format(0, ',', ' ') }} porteurs</strong>.
-        Sont également disponibles <strong>{{ nbSearchPages|number_format(0, ',', ' ') }} portails</strong>.
-        <span class="fr-hint-text">Pour rappel, le compte utilisateur a été lancé le 4 novembre 2021.</span>
-    </p>
+    <div class="alert alert-success mt-5 mb-5">
+        <p class="fs-5"><strong>
+            <a href="">{{ nbUsers|number_format(0, ',', ' ') }} comptes utilisateurs</a></strong>,
+            répartis en <strong><a href="">{{ nbOrganizations|number_format(0, ',', ' ') }} structures</a></strong>
+            (<a href="">carte</a>),
+            dont <strong><a href="">{{ nbInterco|number_format(0, ',', ' ') }} intercommunalités</a></strong>,
+            ont créé <strong><a href="">{{ nbProjects|number_format(0, ',', ' ') }} projets</a></strong>
+            avec en tout <strong>{{ nbAidProjects|number_format(0, ',', ' ') }} aides sélectionnées</strong> sur un total de
+            <strong>{{ nbAidsLive|number_format(0, ',', ' ') }} aides disponibles</strong> publiées par
+            <strong>{{ nbBackers|number_format(0, ',', ' ') }} porteurs</strong>.
+            Sont également disponibles <strong>{{ nbSearchPages|number_format(0, ',', ' ') }} portails</strong>.
+            <span class="fr-hint-text">Pour rappel, le compte utilisateur a été lancé le 4 novembre 2021.</span>
+        </p>
+    </div>
 
     <div class="row">
         <div class="col-md-6">
@@ -172,42 +174,10 @@
                 <p>Les inscriptions et alertes créées sont multipliées par 20 afin qu’elles soient visibles et comparables avec les visites uniques.</p>
                 <p>Cela permet de visualiser une conversion hebdomadaire en fonction des actions engagées par l’équipe.</p>
             </div>
-            <div class="charts">
-                <div id="chart-visites-uniques" class="ct-chart"></div>
-            </div>
-            <div class="charts-legends">
-                <ul>
-                    <li><span class="charts-legend charts-legend-accent"></span> Visites uniques hebdomadaires</li>
-                    <li><span class="charts-legend charts-legend-regular"></span> Inscriptions (⨯20)</li>
-                    <li><span class="charts-legend charts-legend-regular2"></span> Alertes créées (⨯20)</li>
-                </ul>
+            <div class="mt-5">
+                <div>{{ render_chart(chartLast10Weeks) }}</div>
             </div>
         </div>
-
-        <div id="acquisition-panel" class="fr-tabs__panel" role="tabpanel" aria-labelledby="acquisition" tabindex="0">
-            <div class="row">
-                <div class="col-md-12">
-                    <h3>Chargement en cours…</h3>
-                </div>
-            </div>
-        </div>
-
-        <div id="engagement-panel" class="fr-tabs__panel" role="tabpanel" aria-labelledby="engagement" tabindex="0">
-            <div class="row">
-                <div class="col-md-12">
-                    <h3>Chargement en cours…</h3>
-                </div>
-            </div>
-        </div>
-
-        <div id="cote-porteurs-panel" class="fr-tabs__panel" role="tabpanel" aria-labelledby="cote-porteurs" tabindex="0">
-            <div class="row">
-                <div class="col-md-12">
-                    <h3>Chargement en cours…</h3>
-                </div>
-            </div>
-        </div>
-
     </div>
 </main>
 {% endblock %}
