@@ -50,7 +50,7 @@ class ReferenceService
         // dump($projet_keywords_combinaisons);
         $intentions=array();
         $objects=array();
-      
+
         $synonym_found=array();
         foreach ($projet_keywords_combinaisons as $synonym) {
           $result = $this->keywordReferenceRepository->getAllSynonyms($synonym);

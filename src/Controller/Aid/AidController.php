@@ -274,6 +274,11 @@ class AidController extends FrontController
 
         $requestStack->getCurrentRequest()->getSession()->set('highlightedWords', $highlightedWords);
 
+        $synonyms = null;
+        if ($aidSearchClass->getKeyword()) {
+            $synonyms = $referenceService->getSynonymes($aidSearchClass->getKeyword());
+        }
+
         // rendu template
         return $this->render('aid/aid/index.html.twig', [
             'formAidSearch' => $formAidSearch->createView(),
@@ -285,7 +290,8 @@ class AidController extends FrontController
             'querystring' => $query,
             'perimeterName' => (isset($aidParams['perimeterFrom']) && $aidParams['perimeterFrom'] instanceof Perimeter) ? $aidParams['perimeterFrom']->getName() : '',
             'categoriesName' => $categoriesName,
-            'highlightedWords' => $highlightedWords
+            'highlightedWords' => $highlightedWords,
+            'synonyms' => $synonyms
         ]);
     }
 

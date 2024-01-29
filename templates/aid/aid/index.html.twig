@@ -22,6 +22,14 @@
     
         {% include 'aid/aid/_search_meta.html.twig' %}
         
+        {% if synonyms %}
+            <div class="fr-alert fr-alert--info">
+                <h2>A des fins de TESTS :</h2>
+                <p><strong>Intentions</strong> : {% if synonyms.intentions_string %}{{ synonyms.intentions_string }}{% else %}Aucune{% endif %}</p>
+                <p><strong>Objets</strong> : {% if synonyms.objects_string %}{{ synonyms.objects_string }}{% else %}Aucune{% endif %}</p>
+                <p><strong>Simple word</strong> : {% if synonyms.simple_words_string %}{{ synonyms.simple_words_string }}{% else %}Aucune{% endif %}</p>
+            </div>
+        {% endif %}
         <div class="fr-mb-2w">
             {% include 'aid/aid/_search_form.html.twig' %}
         </div>

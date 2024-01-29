@@ -170,9 +170,16 @@ class PerimeterRepository extends ServiceEntityRepository
         $isVisibleToUsers = $params['isVisibleToUsers'] ?? null;
         $scaleLowerThan = $params['scaleLowerThan'] ?? null;
         $isObsolete = $params['isObsolete'] ?? null;
+        $ids = $params['ids'] ?? null;
 
         $qb = $this->createQueryBuilder('p');
 
+        if (is_array($ids) && count($ids) > 0) {
+            $qb
+                ->andWhere('p.id IN (:ids)')
+                ->setParameter('ids', $ids)
+            ;
+        }
         if ($isObsolete !== null) {
             $qb->andWhere('p.isObsolete = :isObsolete')
                 ->setParameter('isObsolete', $isObsolete);

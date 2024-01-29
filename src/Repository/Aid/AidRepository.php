@@ -382,7 +382,7 @@ class AidRepository extends ServiceEntityRepository
         $inAdmin = $params['inAdmin'] ?? null;
         $hasBrokenLink= $params['hasBrokenLink'] ?? null;
         $scoreTotalMin = $params['scoreTotalMin'] ?? 60;
-        $scoreObjectslMin = $params['scoreObjectslMin'] ?? 30;
+        $scoreObjectsMin = $params['scoreObjectsMin'] ?? 30;
         $qb = $this->createQueryBuilder('a');
 
         if ($hasBrokenLink !== null) {
@@ -392,6 +392,7 @@ class AidRepository extends ServiceEntityRepository
             ;
         }
 
+        // dump($synonyms);
         if (isset($synonyms)) {
             $originalName = (isset($synonyms['original_name']) && $synonyms['original_name'] !== '')  ? $synonyms['original_name'] : null;
             $intentionsString = (isset($synonyms['intentions_string']) && $synonyms['intentions_string'] !== '')  ? $synonyms['intentions_string'] : null;
@@ -410,7 +411,7 @@ class AidRepository extends ServiceEntityRepository
                 $oldKeywordsString .= $objectsString;
                 $sqlObjects = '
                 CASE WHEN (MATCH_AGAINST(a.name) AGAINST(:objects_string IN BOOLEAN MODE) > 1) THEN 30 ELSE 0 END +
-                CASE WHEN (MATCH_AGAINST(a.description, a.eligibility) AGAINST(:objects_string IN BOOLEAN MODE) > 1) THEN 10 ELSE 0 END 
+                CASE WHEN (MATCH_AGAINST(a.description, a.eligibility, a.projectExamples) AGAINST(:objects_string IN BOOLEAN MODE) > 1) THEN 10 ELSE 0 END 
                 ';
 
                 $objects = str_getcsv($objectsString, ' ', '"');
@@ -435,14 +436,14 @@ class AidRepository extends ServiceEntityRepository
 
                 $qb->addSelect('('.$sqlObjects.') as score_objects');
                 $qb->setParameter('objects_string', $objectsString);
-                $qb->andHaving('score_objects >= '.$scoreObjectslMin);
+                $qb->andHaving('score_objects >= '.$scoreObjectsMin);
             }
 
             if ($intentionsString && $objectsString) {
                 $oldKeywordsString .= ' '.$intentionsString;
                 $sqlIntentions = '
                 CASE WHEN (MATCH_AGAINST(a.name) AGAINST(:intentions_string IN BOOLEAN MODE) > 1) THEN 5 ELSE 0 END +
-                CASE WHEN (MATCH_AGAINST(a.description, a.eligibility) AGAINST(:intentions_string IN BOOLEAN MODE) > 1) THEN 1 ELSE 0 END 
+                CASE WHEN (MATCH_AGAINST(a.description, a.eligibility, a.projectExamples) AGAINST(:intentions_string IN BOOLEAN MODE) > 1) THEN 1 ELSE 0 END 
                 ';
                 $qb->setParameter('intentions_string', $intentionsString);
             }
@@ -450,7 +451,7 @@ class AidRepository extends ServiceEntityRepository
             if ($simpleWordsString) {
                 $sqlSimpleWords = '
                 CASE WHEN (MATCH_AGAINST(a.name) AGAINST(:simple_words_string IN BOOLEAN MODE) > 1) THEN 30 ELSE 0 END +
-                CASE WHEN (MATCH_AGAINST(a.description, a.eligibility) AGAINST(:simple_words_string IN BOOLEAN MODE) > 1) THEN 5 ELSE 0 END 
+                CASE WHEN (MATCH_AGAINST(a.description, a.eligibility, a.projectExamples) AGAINST(:simple_words_string IN BOOLEAN MODE) > 1) THEN 5 ELSE 0 END 
                 ';
 
                 $simpleWords = str_getcsv($simpleWordsString, ' ', '"');
@@ -461,7 +462,8 @@ class AidRepository extends ServiceEntityRepository
                     $sqlSimpleWords .= '
                         CASE WHEN (a.name LIKE :simple_word'.$i.') THEN 30 ELSE 0 END +
                         CASE WHEN (a.description LIKE :simple_word'.$i.') THEN 4 ELSE 0 END +
-                        CASE WHEN (a.eligibility LIKE :simple_word'.$i.') THEN 4 ELSE 0 END
+                        CASE WHEN (a.eligibility LIKE :simple_word'.$i.') THEN 4 ELSE 0 END +
+                        CASE WHEN (a.projectExamples LIKE :simple_word'.$i.') THEN 4 ELSE 0 END
                     ';
                     if ($i < count($simpleWords) - 1) {
                         $sqlSimpleWords .= ' + ';
@@ -820,6 +822,7 @@ class AidRepository extends ServiceEntityRepository
             //     ;
             $ids = $this->getEntityManager()->getRepository(Perimeter::class)->getIdPerimetersContainedIn(array('perimeter' => $perimeterFrom));
             $ids[] = $perimeterFrom->getId();
+
             $qb
             ->innerJoin('a.perimeter', 'perimeter')
             ->andWhere('perimeter.id IN (:ids)')

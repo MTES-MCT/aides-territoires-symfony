@@ -163,7 +163,7 @@
                             {% if project.projectReference %}
                             <a class="fr-btn fr-fi-search-line fr-btn--icon-left" href="{{ path('app_aid_aid', {'keyword': project.projectReference.name}) }}" title="Trouver des aides">Explorer toutes les aides</a>
                             {% else %}
-                            <a class="fr-btn fr-fi-search-line fr-btn--icon-left" href="{{ path('app_aid_aid') }}" title="Trouver des aides">Explorer toutes les aides</a>
+                            <a class="fr-btn fr-fi-search-line fr-btn--icon-left" href="{{ path('app_aid_aid', {'keyword': project.name}) }}" title="Trouver des aides">Explorer toutes les aides</a>
                             {% endif %}
                         </div>
                     </div>
