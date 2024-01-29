@@ -103,6 +103,34 @@
                 <li class="fr-sidemenu__item">
                     <a class="fr-sidemenu__link" href="{{ path('app_logout') }}" target="_self" rel="noopener" title="Se déconnecter">Se déconnecter</a>
                 </li>
+
+                {% if isUserGranted(app.user, constant('App\\Entity\\User\\User::ROLE_ADMIN')) %}
+                <li class="fr-sidemenu__item fr-py-2w">
+                    <div class="at-sidemenu__separator fr-px-2w"><hr/></div>
+                </li>
+                <li class="fr-sidemenu__item">
+                    <button class="fr-sidemenu__btn" aria-expanded="false" aria-controls="fr-sidemenu-item-6">
+                        <span class="fr-icon-lock-fill" aria-hidden="true"></span> Admin AT
+                    </button>
+                    <div class="fr-collapse" id="fr-sidemenu-item-6">
+                        <ul class="fr-sidemenu__list">
+                            <li class="fr-sidemenu__item">
+                                <a class="fr-sidemenu__link" href="{{ path('admin') }}" target="_self" rel="noopener">
+                                    <span class="fr-icon-lock-fill fr-mr-1w"></span>
+                                    Backoffice
+                                </a>
+                            </li>
+                            <li class="fr-sidemenu__item">
+                                <a class="fr-sidemenu__link" href="{{ path('admin_statistics_dashboard') }}" target="_self" rel="noopener">
+                                    <span class="fr-icon-lock-fill fr-mr-1w" aria-hidden="true"></span>
+                                    Statistiques
+                                </a>
+                            </li>            
+                        </ul>
+                    </div>
+                </li>
+                {% endif %}
+
             </ul>
         </div>
     </div>
