@@ -33,6 +33,7 @@ Encore
     .addEntry('admin/admin', './assets/js/admin/admin.js')
     .addEntry('admin/perimeter/perimeter-import', './assets/js/admin/perimeter/perimeter-import.js')
     .addEntry('admin/data-source/analyse', './assets/js/admin/data-source/analyse.js')
+    .addEntry('admin/statistics/dashboard', './assets/js/admin/statistics/dashboard.js')
 
     .addEntry('front/home', './assets/js/front/home.js')
     .addEntry('front/cartography/cartography', './assets/js/front/cartography/cartography.js')

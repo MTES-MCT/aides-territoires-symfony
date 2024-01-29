@@ -1,5 +1,9 @@
 {% extends "@EasyAdmin/page/content.html.twig" %}
 
+{% block head_javascript %}
+    {{ parent() }}
+    {{ encore_entry_script_tags('admin/statistics/dashboard') }}
+{% endblock head_javascript %}
 
 {% block main %}
 <main>
@@ -17,6 +21,16 @@
         Sont également disponibles <strong>{{ nbSearchPages|number_format(0, ',', ' ') }} portails</strong>.
         <span class="fr-hint-text">Pour rappel, le compte utilisateur a été lancé le 4 novembre 2021.</span>
     </p>
-    
+
+    <div class="row">
+        <div class="col-md-6">
+            <div>{{ render_chart(chartCommune) }}</div>
+            <h4 class="text-center"><a href="">{{ nbCommune }} communes / {{ nbCommuneTotal }}</a></h4>
+        </div>
+        <div class="col-md-6">
+            <div>{{ render_chart(chartEcpi) }}</div>
+            <h4 class="text-center"><a href="">{{ nbEcpi }} ({{ nbEcpiPercentage }} %). Objectif : {{ nbEcpiObjectifPercentage }}%</a></h4>
+        </div>
+    </div>
 </main>
 {% endblock %}

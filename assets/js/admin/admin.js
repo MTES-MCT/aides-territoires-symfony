@@ -11,7 +11,19 @@ require('../jQueryAccordion/jquery.accordion.js')
 import ClipboardJS from 'clipboard';
 import Routing from 'fos-router';
 
+// plugin chartJS
+// import { Chart, registerables } from 'chart.js';
+import annotationPlugin from 'chartjs-plugin-annotation';
+document.addEventListener('chartjs:init', function (event) {
+    const Chart = event.detail.Chart;
+    Chart.register(annotationPlugin);
+});
+
 $(function(){
+
+    // register globally for all charts
+// register globally for all charts
+
 
     $('.accordion').accordion({
         "transitionSpeed": 400

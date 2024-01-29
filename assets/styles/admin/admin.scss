@@ -1,7 +1,11 @@
+@import 'chartist/dist/index.css';
 @import '../_variables';
 @import '../_mixins';
 @import '../form/trumbowyg-override.scss';
 
+*{
+    background-color: red!important;
+}
 .table{
     &.datagrid {
         tbody{

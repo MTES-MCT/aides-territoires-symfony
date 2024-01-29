@@ -50,7 +50,11 @@ class OrganizationRepository extends ServiceEntityRepository
         $params['perimeterIsObsolete'] = false;
         $params['isImported'] = false;
         $params['intercommunalityType'] = ["CC", "CA", "CU", "METRO"];
-        return $this->countCustom($params);        
+        $qb = $this->getQueryBuilder($params);
+
+        $qb->select('IFNULL(COUNT(DISTINCT(perimeterForScale.id)), 0) AS nb');
+
+        return $qb->getQuery()->getResult()[0]['nb'] ?? 0;      
     }
 
     public function countCustom(array $params = null) : int {
