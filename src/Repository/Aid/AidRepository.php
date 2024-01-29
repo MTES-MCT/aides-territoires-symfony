@@ -281,10 +281,6 @@ class AidRepository extends ServiceEntityRepository
     {
         $qb = $this->getQueryBuilder($params);
         $results = $qb->getQuery()->getResult();
-        foreach ($results as $result) {
-            dump($result[0]->getName(), $result['score_total'], '-----');
-        }
-        // exit;
         $return = [];
         foreach ($results as $result) {
             if ($result instanceof Aid) {
@@ -393,7 +389,6 @@ class AidRepository extends ServiceEntityRepository
             ;
         }
 
-        // dump($synonyms);
         if (isset($synonyms)) {
             $originalName = (isset($synonyms['original_name']) && $synonyms['original_name'] !== '')  ? $synonyms['original_name'] : null;
             $intentionsString = (isset($synonyms['intentions_string']) && $synonyms['intentions_string'] !== '')  ? $synonyms['intentions_string'] : null;
@@ -604,7 +599,7 @@ class AidRepository extends ServiceEntityRepository
                 }
                 $sqlTotal .= $sqlKeywordReferences;
             }
-// dump($sqlTotal);
+
             if ($sqlTotal !== '') {
                 $qb->addSelect('('.$sqlTotal.') as score_total');
                 $qb->andHaving('score_total >= '.$scoreTotalMin);
