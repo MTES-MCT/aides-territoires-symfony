@@ -416,7 +416,7 @@ class AidRepository extends ServiceEntityRepository
             if ($objectsString) {
                 $oldKeywordsString .= $objectsString;
                 $sqlObjects = '
-                CASE WHEN (MATCH_AGAINST(a.name) AGAINST(:objects_string IN BOOLEAN MODE) > 1) THEN 30 ELSE 0 END +
+                CASE WHEN (MATCH_AGAINST(a.name) AGAINST(:objects_string IN BOOLEAN MODE) > 1) THEN 60 ELSE 0 END +
                 CASE WHEN (MATCH_AGAINST(a.description, a.eligibility, a.projectExamples) AGAINST(:objects_string IN BOOLEAN MODE) > 1) THEN 10 ELSE 0 END 
                 ';
 
