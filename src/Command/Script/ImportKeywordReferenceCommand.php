@@ -2,24 +2,15 @@
 
 namespace App\Command\Script;
 
-use App\Entity\Aid\Aid;
-use App\Entity\Aid\AidFinancer;
-use App\Entity\DataSource\DataSource;
 use App\Entity\Reference\KeywordReference;
-use App\Service\Email\EmailService;
-use App\Service\Perimeter\PerimeterService;
-use App\Service\Various\ParamService;
-use App\Service\Various\StringService;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Symfony\Component\HtmlSanitizer\HtmlSanitizerInterface;
-use Symfony\Contracts\HttpClient\HttpClientInterface;
 
-#[AsCommand(name: 'at:script:import_keyword_reference', description: 'Import des mots-clés référents')]
+#[AsCommand(name: 'at:script:keyword_import_references', description: 'Import des mots-clés référents')]
 class ImportKeywordReferenceCommand extends Command
 {
 
@@ -79,7 +70,7 @@ class ImportKeywordReferenceCommand extends Command
             "bassin" => array("bassins","berge","berges","biodiversité","biodiversités","marais","mare","marécage","marécages","mares","nature","noue","noues","renaturation","zone humide"),
             "bassin municipal" => array("centre aquatique","parc aquatique","piscine","piscine municipale","piscines"),
             "bâtiment communal" => array("bâtiment","bâtiments","bâtiment public","bâtiments communaux","bâtiments publics","espace multifonction","espaces multifonctions","foyer rural","foyers ruraux","garage communal","garages communaux","local associatif","local périscolaire","locaux associatifs","locaux périscolaires","mairie","maison associations","salle fêtes","salle polyvalente"),
-            "bâtiment scolaire" => array("centre apprentissage","collège","collèges","l'école","école","école élémentaire","école maternelle","école primaire","écoles","établissement scolaire","groupe scolaire","institution éducative","lycée","lycées","salle de classe","salles de classe","pôle scolaire"), // -"école de musique", -"école de conduiteé
+            "bâtiment scolaire" => array("centre apprentissage","collège","collèges","l'école","école","école élémentaire","école maternelle","école primaire","écoles","établissement scolaire","groupe scolaire","institution éducative","lycée","lycées","salle de classe","salles de classe","pôle scolaire", "l'école", "patrimoine scolaire"), // -"école de musique", -"école de conduiteé
             "bibliothèque" => array("bibliothèque municipale","bibliothèque publique","bibliothèque ville","bibliothèques","médiathèque","médiathèques"),
             "borne électrique" => array("bornes électriques","bornes recharge","irve","mobilités vertes","point charge","points recharge","rechargeur électrique","station recharge","stations recharge"),
             "bouche incendie" => array("deci","hydrant","hydrants","incendie","incendies","poteaux incendies","prise eau incendie"),
@@ -97,7 +88,7 @@ class ImportKeywordReferenceCommand extends Command
             "chapelle" => array("chapelles","cimetière","cimetières","columbarium","columbariums","église","l'église","églises","enterrement","enterrements","funéraille","funérailles","funéraire","funéraires","funérarium","funérariums","monument morts","obsèque","obsèques","pierre tombale","presbytère","presbytères","sépulture","sépultures","tombe","tombes"),
             "chaudière" => array("chaudières","chauffage","chauffage urbain","distributionde chaleur","réseau de chaleur","système de chauffage collectif"),
             "chaussée" => array("chaussées","feux tricolores","parking","parkings","réseau routier","signalétique","signalétiques","voirie","voiries"),
-            "chemin piétonnier" => array("chemins piétonniers","cyclable","cyclables","liaison douce","piste cyclable","piste vélo","piste verte","plan vélo","sentier non motorisé","vélovoie","vélovoies","voie cyclable","voie douce","voie vélo","voie verte"),
+            "chemin piétonnier" => array("chemins piétonniers","cyclable","cyclables","liaison douce","piste cyclable","piste vélo","piste verte","plan vélo","sentier non motorisé","vélovoie","vélovoies","voie cyclable","voie douce","voie vélo","voie verte", "voirie"),
             "city park" => array("city stade","espace vert municipal","jardin public","parc urbain","skate park","streetpark","terrains multisports","terrain multisport","l'aire de loisir","l'aire de loisirs","aires de jeux","aire de jeux","aires de loisirs","espace ludique","espaces ludiques","parc de jeux","parcs de jeux","terrain de jeux","terrains de jeux"),
             "consultation ligne" => array("santé numérique","soins distance","télémedecine"),
             "cour d'école" => array("cours d'école","espace extérieur scolaire","playground scolaire","préau","préaux"),
@@ -204,9 +195,25 @@ class ImportKeywordReferenceCommand extends Command
             "recyclage" => array("recyclages","recycler","réhabilitation","réhabilitations","réhabiliter")
             );
             
-            $stmt = $this->managerRegistry->getManager()->getConnection()->prepare("TRUNCATE TABLE `keyword_reference`");
-            $stmt->execute();
+            // supprime les existants
+            $keywordReferences = $this->managerRegistry->getRepository(KeywordReference::class)->findAll();
+            /** @var KeywordReference $keywordReference */
+            foreach ($keywordReferences as $keywordReference) {
+                $keywordReference->setParent(null);
+                $this->managerRegistry->getManager()->persist($keywordReference);
+            }
+            $this->managerRegistry->getManager()->flush();
+            foreach ($keywordReferences as $keywordReference) {
+                $this->managerRegistry->getManager()->remove($keywordReference);
+            }
+            $this->managerRegistry->getManager()->flush();
 
+            // on reinitialiser l'id
+            $connection = $this->managerRegistry->getConnection();
+            $connection->exec("ALTER TABLE keyword_reference AUTO_INCREMENT = 1");
+
+
+            // les ajoutes
             foreach ($verbs_synonyms_array as $name => $synonymes) {
                 $c_action = new KeywordReference();
                 $c_action->setName(strtolower($name));
@@ -222,7 +229,6 @@ class ImportKeywordReferenceCommand extends Command
                     $c_action_synonym->setIntention(true);
                     $c_action_synonym->setParent($c_action);
                     $this->managerRegistry->getManager()->persist($c_action_synonym);
-                       
                 }
             }
             
@@ -241,12 +247,10 @@ class ImportKeywordReferenceCommand extends Command
                     $c_action_synonym->setIntention(false);
                     $c_action_synonym->setParent($c_action);
                     $this->managerRegistry->getManager()->persist($c_action_synonym);
-                       
                 }
             }
             
             $this->managerRegistry->getManager()->flush();
-  
     }
 
 }

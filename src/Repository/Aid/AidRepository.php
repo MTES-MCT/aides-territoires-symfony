@@ -292,6 +292,16 @@ class AidRepository extends ServiceEntityRepository
         return $return;
     }
 
+    public function findWithKeywords(?array $params = null): array
+    {
+        $qb = $this->getQueryBuilder($params);
+        $qb
+            ->innerJoin('a.keywords', 'keywords')
+        ;
+
+        return $qb->getQuery()->getResult();
+    }
+
     public function countLives(array $params = null): int
     {
         $qb = $this->getQueryBuilder($params);

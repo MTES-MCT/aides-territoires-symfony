@@ -28,12 +28,25 @@ class KeywordReferenceRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult();
     }
 
+    public function findCustom(?array $params = null) : array
+    {
+        $qb = $this->getQueryBuilder($params);
+        return $qb->getQuery()->getResult();
+        
+    }
+
     public function getQueryBuilder(?array $params = null) : QueryBuilder
     {
         $string = $params['string'] ?? null;
+        $names = $params['names'] ?? null;
 
         $qb = $this->createQueryBuilder('kr');
 
+        if (is_array($names) && count($names) > 0) {
+            $qb->andWhere('kr.name IN (:names)')
+                ->setParameter('names', $names)
+                ;
+        }
         if ($string) {
             $words = str_getcsv($string, ' ', '"');
             if (is_array($words) && count($words) > 1) {
