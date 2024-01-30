@@ -416,29 +416,29 @@ class AidRepository extends ServiceEntityRepository
             if ($objectsString) {
                 $oldKeywordsString .= $objectsString;
                 $sqlObjects = '
-                CASE WHEN (MATCH_AGAINST(a.name) AGAINST(:objects_string IN BOOLEAN MODE) > 1) THEN 60 ELSE 0 END +
+                CASE WHEN (MATCH_AGAINST(a.name) AGAINST(:objects_string IN BOOLEAN MODE) > 1) THEN 90 ELSE 0 END +
                 CASE WHEN (MATCH_AGAINST(a.description, a.eligibility, a.projectExamples) AGAINST(:objects_string IN BOOLEAN MODE) > 1) THEN 10 ELSE 0 END 
                 ';
 
                 $objects = str_getcsv($objectsString, ' ', '"');
-                // if (count($objects) > 0) {
-                //     $sqlObjects .= ' + ';
-                // }
-                // for ($i = 0; $i<count($objects); $i++) {
+                if (count($objects) > 0) {
+                    $sqlObjects .= ' + ';
+                }
+                for ($i = 0; $i<count($objects); $i++) {
 
-                //     $sqlObjects .= '
-                //         CASE WHEN (a.name LIKE :objects'.$i.') THEN 10 ELSE 0 END
-                //     ';
-                //     // $sqlObjects .= '
-                //     //     CASE WHEN (a.name LIKE :objects'.$i.') THEN 10 ELSE 0 END +
-                //     //     CASE WHEN (a.description LIKE :objects'.$i.') THEN 2 ELSE 0 END +
-                //     //     CASE WHEN (a.eligibility LIKE :objects'.$i.') THEN 2 ELSE 0 END
-                //     // ';
-                //     if ($i < count($objects) - 1) {
-                //         $sqlObjects .= ' + ';
-                //     }
-                //     $qb->setParameter('objects'.$i, '%'.$objects[$i].'%');
-                // }
+                    $sqlObjects .= '
+                        CASE WHEN (a.name LIKE :objects'.$i.') THEN 30 ELSE 0 END
+                    ';
+                    // $sqlObjects .= '
+                    //     CASE WHEN (a.name LIKE :objects'.$i.') THEN 10 ELSE 0 END +
+                    //     CASE WHEN (a.description LIKE :objects'.$i.') THEN 2 ELSE 0 END +
+                    //     CASE WHEN (a.eligibility LIKE :objects'.$i.') THEN 2 ELSE 0 END
+                    // ';
+                    if ($i < count($objects) - 1) {
+                        $sqlObjects .= ' + ';
+                    }
+                    $qb->setParameter('objects'.$i, '%'.$objects[$i].'%');
+                }
 
                 $qb->addSelect('('.$sqlObjects.') as score_objects');
                 $qb->setParameter('objects_string', $objectsString);
@@ -514,7 +514,7 @@ class AidRepository extends ServiceEntityRepository
                     // ';
                     $sqlKeywordReferences = '
                     CASE 
-                        WHEN :keywordReferences MEMBER OF a.keywordReferences THEN 90 
+                        WHEN :keywordReferences MEMBER OF a.keywordReferences THEN 60 
                         ELSE 0 
                     END
                     ';
