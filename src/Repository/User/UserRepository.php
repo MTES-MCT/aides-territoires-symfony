@@ -68,6 +68,13 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         $this->getEntityManager()->flush();
     }
 
+    public function findCustom(?array $params = null): array
+    {
+        $qb = $this->getQueryBuilder($params);
+
+        return $qb->getQuery()->getResult();
+    }
+
     public function findWithUnsentNotification(?array $params = null): array
     {
         $params['hasUnsentNotification'] = true;
