@@ -2,6 +2,8 @@
 
 namespace App\Controller\Aid;
 
+use App\Controller\Admin\Aid\AidCrudController;
+use App\Controller\Admin\DashboardController;
 use App\Controller\FrontController;
 use App\Entity\Aid\Aid;
 use App\Entity\Aid\AidFinancer;
@@ -36,6 +38,8 @@ use App\Service\Various\ParamService;
 use App\Service\Various\StringService;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Persistence\ManagerRegistry;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
+use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
 use Pagerfanta\Adapter\ArrayAdapter;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
@@ -670,6 +674,8 @@ class AidController extends FrontController
             'Détail de l’aide',
             null,
         );
+
+        $adminEditUrl = $this->generateUrl('admin', [], UrlGeneratorInterface::ABSOLUTE_URL).'?crudAction=edit&crudControllerFqcn=App%5CController%5CAdmin%5CAid%5CAidCrudController&entityId='.$aid->getId();
         
         return $this->render('aid/aid/details.html.twig', [
             'aid' => $aid,
@@ -679,7 +685,8 @@ class AidController extends FrontController
             'formSuggestToProject' => $formSuggestToProject->createView(),
             'aidDetailPage' => true,
             'openModalSuggest' => $openModalSuggest ?? false,
-            'highlightedWords' => $requestStack->getCurrentRequest()->getSession()->get('highlightedWords', [])
+            'highlightedWords' => $requestStack->getCurrentRequest()->getSession()->get('highlightedWords', []),
+            'adminEditUrl' => $adminEditUrl
         ]);
     }
 }
