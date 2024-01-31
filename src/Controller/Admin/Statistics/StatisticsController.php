@@ -7,7 +7,12 @@ use App\Entity\Aid\Aid;
 use App\Entity\Aid\AidProject;
 use App\Entity\Alert\Alert;
 use App\Entity\Backer\Backer;
+use App\Entity\Log\LogAidApplicationUrlClick;
+use App\Entity\Log\LogAidContactClick;
+use App\Entity\Log\LogAidOriginUrlClick;
+use App\Entity\Log\LogAidSearch;
 use App\Entity\Log\LogAidView;
+use App\Entity\Log\LogUserLogin;
 use App\Entity\Organization\Organization;
 use App\Entity\Perimeter\Perimeter;
 use App\Entity\Project\Project;
@@ -397,45 +402,15 @@ class StatisticsController extends DashboardController
             ],
         ]);
 
-        
-        // new Chartist.Line('#chart-nouvelles-inscriptions', {
-        //     labels: {{ nb_user_days|safe }},
-        //     series: [
-        //       {{ nb_user_inscriptions_serie }},
-        //     ]
-        //   }, {
-        //     fullWidth: true,
-        //     chartPadding: {
-        //       right: 40
-        //     },
-        //     axisX: {
-        //       labelInterpolationFnc: function(value) {
-        //         // Only display day/month (from ISO date).
-        //         const [ month, day ] = value.slice(5, 10).split('-')
-        //         return `${day}/${month}`
-        //       }
-        //     },
-        //     axisY: {
-        //       type: Chartist.AutoScaleAxis,
-        //       low: 0,
-        //       offset: 100
-        //     },
-        //     plugins: [
-        //       Chartist.plugins.tooltip({appendToBody: true})
-        //     ]
-        //   })
-
-        // dump($referrers);
-        // dump($statsMatomoReferer, $statsMatomoRefererAll, $tmp_referrers, $nb_referrers_total, $nb_referrers_total_without_search);
         return $this->render('admin/statistics/dashboard_acquisition.html.twig', [
             // globale
             'statsGlobal' => $statsGlobal,
             'chartCommune' => $chartCommune,
             'chartEcpi' => $chartEcpi,
-
             'formDateRange' => $formDateRange,
             'dateMin' => $dateMin,
             'dateMax' => $dateMax,
+
             'statsMatomoReferer' => $statsMatomoReferer[0] ?? [],
             'referrers' => $referrers,
             'userRegisters' => $userRegisters,
@@ -446,10 +421,264 @@ class StatisticsController extends DashboardController
 
     #[Route('/admin/statistics/engagement/', name: 'admin_statistics_engagement')]
     public function engagement(
-        AdminContext $adminContext
+        AdminContext $adminContext,
+        MatomoService $matomoService
     ): Response
     {
-        return $this->render('admin/statistics/dashboard.html.twig', [
+        $statsGlobal = $this->getStatsGlobal();
+        $chartCommune = $this->getChartCommune($statsGlobal['nbCommune'], $statsGlobal['nbCommuneTotal'], $statsGlobal['nbCommuneObjectif']);
+        $chartEcpi = $this->getChartEcpi($statsGlobal['nbEcpi'], $statsGlobal['nbEcpiTotal'], $statsGlobal['nbEcpiObjectif']);
+
+        // dates par défaut
+        $dateMin = new \DateTime('-1 month');
+        $dateMax = new \DateTime();
+
+        // formulaire de filtre
+        $formDateRange = $this->createForm(DateRangeType::class);
+        $formDateRange->handleRequest($adminContext->getRequest());
+        if ($formDateRange->isSubmitted()) {
+            if ($formDateRange->isValid()) {
+                $dateMin = $formDateRange->get('dateMin')->getData();
+                $dateMax = $formDateRange->get('dateMax')->getData();
+            }
+        } else {
+            $formDateRange->get('dateMin')->setData($dateMin);
+            $formDateRange->get('dateMax')->setData($dateMax);
+        }
+
+        // nb connexions
+        $nbLogins = $this->managerRegistry->getRepository(LogUserLogin::class)->countCustom([
+            'dateCreateMin' => $dateMin,
+            'dateCreateMax' => $dateMax,
+            'distinctUser' => true
+        ]);
+        $nbAidSearch = $this->managerRegistry->getRepository(LogAidSearch::class)->countCustom([
+            'dateCreateMin' => $dateMin,
+            'dateCreateMax' => $dateMax,
+        ]);
+        $nbAlerts = $this->managerRegistry->getRepository(Alert::class)->countCustom([
+            'dateCreateMin' => $dateMin,
+            'dateCreateMax' => $dateMax,
+        ]);
+        $nbContactClicks = $this->managerRegistry->getRepository(LogAidContactClick::class)->countCustom([
+            'dateMin' => $dateMin,
+            'dateMax' => $dateMax,
+        ]);
+        $nbInformations = $this->managerRegistry->getRepository(LogAidOriginUrlClick::class)->countCustom([
+            'dateMin' => $dateMin,
+            'dateMax' => $dateMax,
+        ]);
+        $nbApplications = $this->managerRegistry->getRepository(LogAidApplicationUrlClick::class)->countCustom([
+            'dateMin' => $dateMin,
+            'dateMax' => $dateMax,
+        ]);
+        
+        $statsMatomoLast10Weeks = $matomoService->getMatomoStats(
+            apiMethod:'VisitsSummary.get',
+            period: 'week',
+            fromDateString: 'last10',
+            toDateString: null
+        );
+
+        $labels = [];
+        $registers = [];
+        $registersWithAid = [];
+        $registersWithProject = [];
+        foreach ($statsMatomoLast10Weeks as $key => $stats) {
+            $dates = explode(',', $key);
+            $dateStart = new \DateTime($dates[0]);
+            $dateEnd = new \DateTime($dates[1]);
+            
+            $labels[] = $dateStart->format('d/m/Y').' au '.$dateEnd->format('d/m/Y');
+            $registers[] = $this->managerRegistry->getRepository(User::class)->countRegisters([
+                'dateCreateMin' => $dateStart,
+                'dateCreateMax' => $dateMax,
+            
+            ]);
+            $registersWithAid[] = $this->managerRegistry->getRepository(User::class)->countRegistersWithAid([
+                'dateCreateMin' => $dateStart,
+                'dateCreateMax' => $dateMax,
+            
+            ]);
+            $registersWithProject[] = $this->managerRegistry->getRepository(User::class)->countRegistersWithProject([
+                'dateCreateMin' => $dateStart,
+                'dateCreateMax' => $dateMax,
+            ]);;
+        }
+
+        $chartRegisters = $this->chartBuilderInterface->createChart(Chart::TYPE_BAR);
+        $chartRegisters->setData([
+            'labels' => $labels,
+            'datasets' => [
+                [
+                    'label' => 'Inscriptions',
+                    'backgroundColor' => 'rgb(255, 0, 0)',
+                    'data' => $registers,
+                    'fill' => false, // pour avoir une ligne sans remplissage
+                    'borderColor' => 'rgb(255, 0, 0)', // couleur de la ligne
+                ],
+                [
+                    'label' => 'Avec aides',
+                    'backgroundColor' => 'rgb(0, 255, 0)',
+                    'data' => $registersWithAid,
+                    'fill' => false, // pour avoir une ligne sans remplissage
+                    'borderColor' => 'rgb(0, 255, 0)', // couleur de la ligne
+                ],
+                [
+                    'label' => 'Avec projets',
+                    'backgroundColor' => 'rgb(0, 0, 255)',
+                    'data' => $registersWithProject,
+                    'fill' => false, // pour avoir une ligne sans remplissage
+                    'borderColor' => 'rgb(0, 0, 255)', // couleur de la ligne
+                ],
+            ],
+        ]);
+
+        // top aides
+        $statsMatomoTopAids = $matomoService->getMatomoStats(
+            apiMethod:'Actions.getPageUrls',
+            fromDateString: $dateMin->format('Y-m-d'),
+            toDateString: $dateMax->format('Y-m-d'),
+            options: [
+                'flat' => 1,
+                'filter_column' => 'label',
+                'filter_limit' => 100 * 1.3,
+                'filter_pattern' => '^/(aides/)?([a-z0-9]){4}-'
+            ]
+        );
+        // dd($statsMatomoTopAids);
+        $topAids = [];
+        foreach ($statsMatomoTopAids as $stats) {
+            preg_match('/^\/(aides\/)?(.*)\/$/', $stats->label, $matches);
+            $slug = $matches[2] ?? null;
+            $aid = null;
+            if ($slug) {
+                $aid = $this->managerRegistry->getRepository(Aid::class)->findOneBy(['slug' => $slug]);
+            }
+
+            $nbContactClicks = $nbInformations = $nbApplications = 0;
+            $allClicks = 0; // aid.contact_clicks_count + aid.origin_clicks_count + aid.application_clicks_count
+            if ($aid instanceof Aid) {
+                $nbContactClicks = $this->managerRegistry->getRepository(LogAidContactClick::class)->countCustom([
+                    'dateMin' => $dateMin,
+                    'dateMax' => $dateMax,
+                    'aid' => $aid
+                ]);
+                $nbInformations = $this->managerRegistry->getRepository(LogAidOriginUrlClick::class)->countCustom([
+                    'dateMin' => $dateMin,
+                    'dateMax' => $dateMax,
+                    'aid' => $aid
+                ]);
+                $nbApplications = $this->managerRegistry->getRepository(LogAidApplicationUrlClick::class)->countCustom([
+                    'dateMin' => $dateMin,
+                    'dateMax' => $dateMax,
+                    'aid' => $aid
+                ]);
+                $allClicks = $nbContactClicks + $nbInformations + $nbApplications;
+            }
+            
+            $nbUniqVisitors = $stats->nb_uniq_visitors ?? $stats->sum_daily_nb_uniq_visitors ?? 0;
+            $conversionvalue = $nbUniqVisitors == 0 ? 0 : 100 * $allClicks / $nbUniqVisitors;
+            $topAids[] = [
+                'aid' => $aid,
+                'nbVisits' => $stats->nb_visits ?? 0,
+                'nbUniqVisitors' => $nbUniqVisitors,
+                'nbClicks' => $allClicks,
+                'conversionRate' => $conversionvalue,
+                'nbInformations' => $nbInformations,
+                'nbApplications' => $nbApplications,
+            ];
+        }
+
+        $dateStart = new \DateTime('last month');
+        $dateEnd = clone $dateStart;
+        $dateEnd->sub(new \DateInterval('P5M'));
+        
+        $currentDate = clone $dateStart;
+        $labels = [];
+        $usersConnected = [];
+        $communesConnected = [];
+        $epcisConnected = [];
+        while ($currentDate > $dateEnd) {
+            // user connectés
+            $nbUsersConnected = $this->managerRegistry->getRepository(LogUserLogin::class)->countCustom([
+                'month' => $currentDate,
+                'distinctUser' => true,
+                'excludeAdmins' => true
+            ]);
+            $nbCommunesConnected = $this->managerRegistry->getRepository(LogUserLogin::class)->countCustom([
+                'month' => $currentDate,
+                'distinctUser' => true,
+                'isCommune' => true,
+                'excludeAdmins' => true
+            ]);
+            $nbEpcisConnected = $this->managerRegistry->getRepository(LogUserLogin::class)->countCustom([
+                'month' => $currentDate,
+                'distinctUser' => true,
+                'isEcpi' => true,
+                'excludeAdmins' => true
+            ]);
+
+            $labels[] = $currentDate->format('m-Y');
+            $usersConnected[] = $nbUsersConnected;
+            $communesConnected[] = $nbCommunesConnected;
+            $epcisConnected[] = $nbEpcisConnected;
+
+            $currentDate->sub(new \DateInterval('P1M'));
+        }
+
+
+        $chartActivity = $this->chartBuilderInterface->createChart(Chart::TYPE_LINE);
+        $chartActivity->setData([
+            'labels' => $labels,
+            'datasets' => [
+                [
+                    'label' => 'Tous les comptes',
+                    'backgroundColor' => 'rgb(255, 0, 0)',
+                    'data' => $usersConnected,
+                    // 'fill' => false, // pour avoir une ligne sans remplissage
+                    'borderColor' => 'rgb(255, 0, 0)', // couleur de la ligne
+                    'tension' => 0.4, // ajoute une courbure aux lignes
+                ],
+                [
+                    'label' => 'Les comptes des communes',
+                    'backgroundColor' => 'rgb(0, 255, 0)',
+                    'data' => $communesConnected,
+                    'fill' => false, // pour avoir une ligne sans remplissage
+                    'borderColor' => 'rgb(0, 255, 0)', // couleur de la ligne
+                    'tension' => 0.4, // ajoute une courbure aux lignes
+                ],
+                [
+                    'label' => 'Les comptes des EPCI',
+                    'backgroundColor' => 'rgb(0, 0, 255)',
+                    'data' => $epcisConnected,
+                    'fill' => false, // pour avoir une ligne sans remplissage
+                    'borderColor' => 'rgb(0, 0, 255)', // couleur de la ligne
+                    'tension' => 0.4, // ajoute une courbure aux lignes
+                ],
+            ],
+        ]);
+
+        return $this->render('admin/statistics/dashboard_engagement.html.twig', [
+            // globale
+            'statsGlobal' => $statsGlobal,
+            'chartCommune' => $chartCommune,
+            'chartEcpi' => $chartEcpi,
+            'formDateRange' => $formDateRange,
+            'dateMin' => $dateMin,
+            'dateMax' => $dateMax,
+
+            'nbLogins' => $nbLogins,
+            'nbAidSearch' => $nbAidSearch,
+            'nbAlerts' => $nbAlerts,
+            'nbContactClicks' => $nbContactClicks,
+            'nbInformations' => $nbInformations,
+            'nbApplications' => $nbApplications,
+            'chartRegisters' => $chartRegisters,
+            'topAids' => $topAids,
+            'chartActivity' => $chartActivity,
+
+            'engagementSelected' => true
         ]);
     }
 
@@ -458,7 +687,216 @@ class StatisticsController extends DashboardController
         AdminContext $adminContext
     ): Response
     {
-        return $this->render('admin/statistics/dashboard.html.twig', [
+        $statsGlobal = $this->getStatsGlobal();
+        $chartCommune = $this->getChartCommune($statsGlobal['nbCommune'], $statsGlobal['nbCommuneTotal'], $statsGlobal['nbCommuneObjectif']);
+        $chartEcpi = $this->getChartEcpi($statsGlobal['nbEcpi'], $statsGlobal['nbEcpiTotal'], $statsGlobal['nbEcpiObjectif']);
+
+        // dates par défaut
+        $dateMin = new \DateTime('-1 month');
+        $dateMax = new \DateTime();
+
+        // formulaire de filtre
+        $formDateRange = $this->createForm(DateRangeType::class);
+        $formDateRange->handleRequest($adminContext->getRequest());
+        if ($formDateRange->isSubmitted()) {
+            if ($formDateRange->isValid()) {
+                $dateMin = $formDateRange->get('dateMin')->getData();
+                $dateMax = $formDateRange->get('dateMax')->getData();
+            }
+        } else {
+            $formDateRange->get('dateMin')->setData($dateMin);
+            $formDateRange->get('dateMax')->setData($dateMax);
+        }
+
+        $nbBeneficiaries = $this->managerRegistry->getRepository(User::class)->countBeneficiaries([
+            'dateCreateMin' => $dateMin,
+            'dateCreateMax' => $dateMax,
+        ]);
+        $nbOrganizationWithBeneficiary = $this->managerRegistry->getRepository(Organization::class)->countWithUserBeneficiary([
+            'dateCreateMin' => $dateMin,
+            'dateCreateMax' => $dateMax,
+            'isImported' => false,
+        ]);
+        $nbProjects = $this->managerRegistry->getRepository(Project::class)->countCustom([
+            'dateCreateMin' => $dateMin,
+            'dateCreateMax' => $dateMax,
+        ]);
+        $nbAidProjects = $this->managerRegistry->getRepository(AidProject::class)->countCustom([
+            'dateMin' => $dateMin,
+            'dateMax' => $dateMax,
+        ]);
+        
+        $nbContributors = $this->managerRegistry->getRepository(User::class)->countContributors([
+            'dateCreateMin' => $dateMin,
+            'dateCreateMax' => $dateMax,
+        ]);
+        $nbOrganizationWithContributor = $this->managerRegistry->getRepository(Organization::class)->countWithUserContributor([
+            'dateCreateMin' => $dateMin,
+            'dateCreateMax' => $dateMax,
+            'isImported' => false,
+        ]);
+        $nbAidsLive = $this->managerRegistry->getRepository(Aid::class)->countLives([
+            'dateCreateMin' => $dateMin,
+            'dateCreateMax' => $dateMax,
+        ]);
+        $nbBeneficiariesAndContributors = $this->managerRegistry->getRepository(User::class)->countCustom([
+            'isBeneficary' => true,
+            'isContributor' => true,
+            'dateCreateMin' => $dateMin,
+            'dateCreateMax' => $dateMax,
+        ]);
+
+        $dateStart = new \DateTime('-10 weeks');
+        $dateEnd = new \DateTime();
+        $currentDate = clone $dateStart;
+        
+        $labels = [];
+        $communes = [];
+        $communesWithAid = [];
+        $communesWithProject = [];
+        $epcis = [];
+        $epcisWithAid = [];
+        $epcisWithProject = [];
+
+        while ($currentDate < $dateEnd) {
+            $startOfWeek = (clone $currentDate)->setISODate($currentDate->format('Y'), $currentDate->format('W'), 1);
+            $endOfWeek = (clone $currentDate)->setISODate($currentDate->format('Y'), $currentDate->format('W'), 7);
+        
+            // inscriptions communes
+            $nbCommunes = $this->managerRegistry->getRepository(User::class)->countRegisters([
+                'dateCreateMin' => $startOfWeek,
+                'dateCreateMax' => $endOfWeek,
+                'organizationIsCommune' => true,
+            ]);
+
+            // inscription communes avec une aide publiée
+            $nbCommunesWithAid = $this->managerRegistry->getRepository(User::class)->countRegisters([
+                'dateCreateMin' => $startOfWeek,
+                'dateCreateMax' => $endOfWeek,
+                'organizationIsCommune' => true,
+                'organizationHasAid' => true,
+            ]);
+
+            // inscription communes avec un projet
+            $nbCommunesWithProject = $this->managerRegistry->getRepository(User::class)->countRegisters([
+                'dateCreateMin' => $startOfWeek,
+                'dateCreateMax' => $endOfWeek,
+                'organizationIsCommune' => true,
+                'organizationHasProject' => true,
+            ]);
+
+            // inscriptions epci
+            $nbEpcis = $this->managerRegistry->getRepository(User::class)->countRegisters([
+                'dateCreateMin' => $startOfWeek,
+                'dateCreateMax' => $endOfWeek,
+                'organizationIsEpci' => true,
+            ]);
+
+            // inscription epci avec une aide publiée
+            $nbEpcisWithAid = $this->managerRegistry->getRepository(User::class)->countRegisters([
+                'dateCreateMin' => $startOfWeek,
+                'dateCreateMax' => $endOfWeek,
+                'organizationIsEpci' => true,
+                'organizationHasAid' => true,
+            ]);
+
+            // inscription epci avec un projet
+            $nbEpcisWithProject = $this->managerRegistry->getRepository(User::class)->countRegisters([
+                'dateCreateMin' => $startOfWeek,
+                'dateCreateMax' => $endOfWeek,
+                'organizationIsEpci' => true,
+                'organizationHasProject' => true,
+            ]);
+
+
+            $labels[] = $startOfWeek->format('d/m/Y').' au '.$endOfWeek->format('d/m/Y');
+            $communes[] = $nbCommunes;
+            $communesWithAid[] = $nbCommunesWithAid;
+            $communesWithProject[] = $nbCommunesWithProject;
+            $epcis[] = $nbEpcis;
+            $epcisWithAid[] = $nbEpcisWithAid;
+            $epcisWithProject[] = $nbEpcisWithProject;
+
+            $currentDate->modify('+1 week');
+        }
+
+        $chartCommunes = $this->chartBuilderInterface->createChart(Chart::TYPE_BAR);
+        $chartCommunes->setData([
+            'labels' => $labels,
+            'datasets' => [
+                [
+                    'label' => 'Toutes les communes',
+                    'backgroundColor' => 'rgb(255, 0, 0)',
+                    'data' => $communes,
+                    'fill' => false, // pour avoir une ligne sans remplissage
+                    'borderColor' => 'rgb(255, 0, 0)', // couleur de la ligne
+                ],
+                [
+                    'label' => 'Avec aides',
+                    'backgroundColor' => 'rgb(0, 255, 0)',
+                    'data' => $communesWithAid,
+                    'fill' => false, // pour avoir une ligne sans remplissage
+                    'borderColor' => 'rgb(0, 255, 0)', // couleur de la ligne
+                ],
+                [
+                    'label' => 'Avec projets',
+                    'backgroundColor' => 'rgb(0, 0, 255)',
+                    'data' => $communesWithProject,
+                    'fill' => false, // pour avoir une ligne sans remplissage
+                    'borderColor' => 'rgb(0, 0, 255)', // couleur de la ligne
+                ],
+            ],
+        ]);
+
+        $chartEpcis = $this->chartBuilderInterface->createChart(Chart::TYPE_BAR);
+        $chartEpcis->setData([
+            'labels' => $labels,
+            'datasets' => [
+                [
+                    'label' => 'Tous les EPCI',
+                    'backgroundColor' => 'rgb(255, 0, 0)',
+                    'data' => $epcis,
+                    'fill' => false, // pour avoir une ligne sans remplissage
+                    'borderColor' => 'rgb(255, 0, 0)', // couleur de la ligne
+                ],
+                [
+                    'label' => 'Avec aides',
+                    'backgroundColor' => 'rgb(0, 255, 0)',
+                    'data' => $epcisWithAid,
+                    'fill' => false, // pour avoir une ligne sans remplissage
+                    'borderColor' => 'rgb(0, 255, 0)', // couleur de la ligne
+                ],
+                [
+                    'label' => 'Avec projets',
+                    'backgroundColor' => 'rgb(0, 0, 255)',
+                    'data' => $epcisWithProject,
+                    'fill' => false, // pour avoir une ligne sans remplissage
+                    'borderColor' => 'rgb(0, 0, 255)', // couleur de la ligne
+                ],
+            ],
+        ]);
+
+        return $this->render('admin/statistics/dashboard_porteurs.html.twig', [
+            // globale
+            'statsGlobal' => $statsGlobal,
+            'chartCommune' => $chartCommune,
+            'chartEcpi' => $chartEcpi,
+            'formDateRange' => $formDateRange,
+            'dateMin' => $dateMin,
+            'dateMax' => $dateMax,
+
+            'nbBeneficiaries' => $nbBeneficiaries,
+            'nbOrganizationWithBeneficiary' => $nbOrganizationWithBeneficiary,
+            'nbProjects' => $nbProjects,
+            'nbAidProjects' => $nbAidProjects,
+            'nbContributors' => $nbContributors,
+            'nbOrganizationWithContributor' => $nbOrganizationWithContributor,
+            'nbAidsLive' => $nbAidsLive,
+            'nbBeneficiariesAndContributors' => $nbBeneficiariesAndContributors,
+            'chartCommunes' => $chartCommunes,
+            'chartEpcis' => $chartEpcis,
+
+            'porteursSelected' => true
         ]);
     }
 

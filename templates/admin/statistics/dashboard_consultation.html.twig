@@ -15,7 +15,7 @@
                             Nombre de visiteurs
                         </a>
                     </h5>
-                    <p class="card-text fs-2"><strong>{% if statsMatomo.nb_visits is defined %}{{ statsMatomo.nb_visits }}{% endif %}</strong></p>
+                    <p class="card-text fs-2"><strong>{% if statsMatomo.nb_visits is defined %}{{ statsMatomo.nb_visits|number_format(0, ',', ' ') }}{% endif %}</strong></p>
                 </div>
             </div>
 
@@ -35,7 +35,7 @@
                             Durée moyenne d’une visite
                         </a>
                     </h5>
-                    <p class="card-text fs-2"><strong>{% if statsMatomo.avg_time_on_site is defined %}{{ statsMatomo.avg_time_on_site }}{% endif %}</strong></p>
+                    <p class="card-text fs-2"><strong>{% if statsMatomo.avg_time_on_site is defined %}{{ statsMatomo.avg_time_on_site|number_format(0, ',', ' ') }}{% endif %}</strong></p>
                 </div>
             </div>
 
@@ -46,7 +46,7 @@
                             Nombre de pages vues
                         </a>
                     </h5>
-                    <p class="card-text fs-2"><strong>{% if statsMatomoActions.nb_pageviews is defined %}{{ statsMatomoActions.nb_pageviews }}{% endif %}</strong></p>
+                    <p class="card-text fs-2"><strong>{% if statsMatomoActions.nb_pageviews is defined %}{{ statsMatomoActions.nb_pageviews|number_format(0, ',', ' ') }}{% endif %}</strong></p>
                 </div>
             </div>
 
@@ -57,7 +57,7 @@
                             Nombre d’aides vues (sans l’API)
                         </a>
                     </h5>
-                    <p class="card-text fs-2"><strong>{% if nbAidViews is defined %}{{ nbAidViews }}{% endif %}</strong></p>
+                    <p class="card-text fs-2"><strong>{% if nbAidViews is defined %}{{ nbAidViews|number_format(0, ',', ' ') }}{% endif %}</strong></p>
                 </div>
             </div>
 
@@ -68,7 +68,7 @@
                             Nombre d’aides vues différentes (sans l’API)
                         </a>
                     </h5>
-                    <p class="card-text fs-2"><strong>{% if nbAidViewsDistinct is defined %}{{ nbAidViewsDistinct }}{% endif %}</strong></p>
+                    <p class="card-text fs-2"><strong>{% if nbAidViewsDistinct is defined %}{{ nbAidViewsDistinct|number_format(0, ',', ' ') }}{% endif %}</strong></p>
                 </div>
             </div>
 

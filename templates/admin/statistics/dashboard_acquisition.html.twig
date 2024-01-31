@@ -6,220 +6,115 @@
 
 {% block stats_content %}
 <div id="acquisition-panel" class="fr-tabs__panel fr-tabs__panel--selected" role="tabpanel" aria-labelledby="acquisition" tabindex="0">
-  <div  class="fr-grid-row fr-grid-row--gutters">
-    <div class="fr-col-12 fr-col-md-2">
-      <div class="fr-tile fr-enlarge-link">
-        <div class="fr-tile__body">
-          <p class="fr-tile__title">
-            <a class="fr-tile__link" href="#">Entrées directes</a>
-          </p>
+    <div class="d-flex">
+        <div class="card col">
+            <div class="card-body d-flex flex-column justify-content-between">
+                <h5 class="card-title">
+                    <a class="card-link" href="#">Entrées directes</a>
+                </h5>
+                <p class="card-text fs-2"><strong>{{ statsMatomoReferer.Referrers_visitorsFromDirectEntry }}</strong></p>
+            </div>
         </div>
-        <div class="fr-tile__img overflow--initial" role="presentation">
-          <p class="fr-text--lg"><strong>{{ statsMatomoReferer.Referrers_visitorsFromDirectEntry }}</strong></p>
+        <div class="card col">
+            <div class="card-body d-flex flex-column justify-content-between">
+                <h5 class="card-title">
+                    <a class="card-link" href="#">Depuis les moteurs</a>
+                </h5>
+                <p class="card-text fs-2"><strong>{{ statsMatomoReferer.Referrers_visitorsFromSearchEngines }}</strong></p>
+            </div>
         </div>
-      </div>
+        <div class="card col">
+            <div class="card-body d-flex flex-column justify-content-between">
+                <h5 class="card-title">
+                    <a class="card-link" href="#">Depuis d’autres sites</a>
+                </h5>
+                <p class="card-text fs-2"><strong>{{ statsMatomoReferer.Referrers_visitorsFromWebsites }}</strong></p>
+            </div>
+        </div>
+        <div class="card col">
+            <div class="card-body d-flex flex-column justify-content-between">
+                <h5 class="card-title">
+                    <a class="card-link" href="#">Depuis les newsletters</a>
+                </h5>
+                <p class="card-text fs-2"><strong>{{ statsMatomoReferer.Referrers_visitorsFromCampaigns }}</strong></p>
+            </div>
+        </div>
+        <div class="card col">
+            <div class="card-body d-flex flex-column justify-content-between">
+                <h5 class="card-title">
+                    <a class="card-link" href="#">Depuis les réseaux sociaux</a>
+                </h5>
+                <p class="card-text fs-2"><strong>{{ statsMatomoReferer.Referrers_visitorsFromSocialNetworks }}</strong></p>
+            </div>
+        </div>
     </div>
-    <div class="fr-col-12 fr-col-md-2">
-      <div class="fr-tile fr-enlarge-link">
-        <div class="fr-tile__body">
-          <p class="fr-tile__title">
-            <a class="fr-tile__link" href="#">Depuis les moteurs</a>
-          </p>
-        </div>
-        <div class="fr-tile__img overflow--initial" role="presentation">
-          <p class="fr-text--lg"><strong>{{ statsMatomoReferer.Referrers_visitorsFromSearchEngines }}</strong></p>
-        </div>
-      </div>
-    </div>
-    <div class="fr-col-12 fr-col-md-2">
-      <div class="fr-tile fr-enlarge-link">
-        <div class="fr-tile__body">
-          <p class="fr-tile__title">
-            <a class="fr-tile__link" href="#">Depuis d’autres sites</a>
-          </p>
-        </div>
-        <div class="fr-tile__img overflow--initial" role="presentation">
-          <p class="fr-text--lg"><strong>{{ statsMatomoReferer.Referrers_visitorsFromWebsites }}</strong></p>
-        </div>
-      </div>
-    </div>
-    <div class="fr-col-12 fr-col-md-2">
-      <div class="fr-tile fr-enlarge-link">
-        <div class="fr-tile__body">
-          <p class="fr-tile__title">
-            <a class="fr-tile__link" href="#">Depuis les newsletters</a>
-          </p>
-        </div>
-        <div class="fr-tile__img overflow--initial" role="presentation">
-          <p class="fr-text--lg"><strong>{{ statsMatomoReferer.Referrers_visitorsFromCampaigns }}</strong></p>
-        </div>
-      </div>
-    </div>
-    <div class="fr-col-12 fr-col-md-2">
-      <div class="fr-tile fr-enlarge-link">
-        <div class="fr-tile__body">
-          <p class="fr-tile__title">
-            <a class="fr-tile__link" href="#">Depuis les réseaux sociaux</a>
-          </p>
-        </div>
-        <div class="fr-tile__img overflow--initial" role="presentation">
-          <p class="fr-text--lg"><strong>{{ statsMatomoReferer.Referrers_visitorsFromSocialNetworks }}</strong></p>
-        </div>
-      </div>
-    </div>
-  </div>
 
-  <h3 class="fr-mt-5w"><span aria-hidden="true">🧲 </span>Principales sources d’entrées sur la période ({{ dateMin|date('d/m/Y') }}→{{ dateMax|date('d/m/Y') }}) :</h3>
-  <div class="fr-alert fr-alert--info">
-    <p>Entrées sur le site en fonction du domaine, aucun regroupement n’est fait sur les sous-domaines des listes de diffusion.</p>
-    <p>La colonne excluant la recherche permet d’avoir des écarts résultants d’actions de l’équipe plus significatifs.</p>
-  </div>
-  <div
-    class="fr-table fr-table--layout-fixed fr-table--no-caption"
-    data-controller="table"
-    data-downloadable="true"
-    >
-    <table data-table-target="table">
-      <caption>Principales sources d’entrées</caption>
-      <thead>
-        <tr>
-          <th
-            scope="col"
-            data-action="click->table#sortTable"
-            data-table-target="header"
-            data-type="text"
-            >Domaine</th>
-          <th
-            scope="col"
-            aria-sort="descending"
-            data-action="click->table#sortTable"
-            data-table-target="header"
-            data-type="number"
-            >Visites</th>
-          <th
-            scope="col"
-            data-action="click->table#sortTable"
-            data-table-target="header"
-            data-type="number"
-            >Pourcentage</th>
-          <th
-            scope="col"
-            data-action="click->table#sortTable"
-            data-table-target="header"
-            data-type="number"
-            >Pourcentage (sans la recherche)</th>
-        </tr>
-      </thead>
-      <tbody data-table-target="body">
-        {% for label, counts in referrers %}
-        <tr data-table-target="row">
-          <td scope="row">{{ label }}</td>
-          <td>{% if counts.nb_visits is defined %}{{ counts.nb_visits }}{% else %}-{% endif %}</td>
-          <td>{% if counts.percentage_total is defined %}{{ counts.percentage_total }}{% else %}-{% endif %}</td>
-          <td>{% if counts.percentage_without_search is defined %}{{ counts.percentage_without_search }}{% else %}-{% endif %}</td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  </div>
-  <h3 class="fr-mt-5w"><span aria-hidden="true">🙋 </span>Nouvelles inscriptions sur la période ({{ dateMin|date('d/m/Y') }}→{{ dateMax|date('d/m/Y') }}) :</h3>
-  <div class="fr-alert fr-alert--info">
-    <p>Flux des inscriptions avec une cadence hebdomadaire classique.</p>
-  </div>
+    <h3 class="mt-5"><span aria-hidden="true">🧲 </span>Principales sources d’entrées sur la période ({{ dateMin|date('d/m/Y') }}→{{ dateMax|date('d/m/Y') }}) :</h3>
+    <div class="alert alert-info">
+        <p>Entrées sur le site en fonction du domaine, aucun regroupement n’est fait sur les sous-domaines des listes de diffusion.</p>
+        <p>La colonne excluant la recherche permet d’avoir des écarts résultants d’actions de l’équipe plus significatifs.</p>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <caption>Principales sources d’entrées</caption>
+            <thead>
+                <tr>
+                    <th scope="col">Domaine</th>
+                    <th scope="col">Visites</th>
+                    <th scope="col">Pourcentage</th>
+                    <th scope="col">Pourcentage (sans la recherche)</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for label, counts in referrers %}
+                <tr>
+                    <td scope="row">{{ label }}</td>
+                    <td>{% if counts.nb_visits is defined %}{{ counts.nb_visits }}{% else %}-{% endif %}</td>
+                    <td>{% if counts.percentage_total is defined %}{{ counts.percentage_total }}{% else %}-{% endif %}</td>
+                    <td>{% if counts.percentage_without_search is defined %}{{ counts.percentage_without_search }}{% else %}-{% endif %}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <h3 class="mt-5"><span aria-hidden="true">🙋 </span>Nouvelles inscriptions sur la période ({{ dateMin|date('d/m/Y') }}→{{ dateMax|date('d/m/Y') }}) :</h3>
+    <div class="alert alert-info">
+        <p>Flux des inscriptions avec une cadence hebdomadaire classique.</p>
+    </div>
 
-  <div class="charts">
-    {{ render_chart(chartInscriptions) }}
-  </div>
+    <div class="charts">
+        {{ render_chart(chartInscriptions) }}
+    </div>
 
-{#}
-  <script nonce="{{ request.csp_nonce }}">
-    new Chartist.Line('#chart-nouvelles-inscriptions', {
-      labels: {{ nb_user_days|safe }},
-      series: [
-        {{ nb_user_inscriptions_serie }},
-      ]
-    }, {
-      fullWidth: true,
-      chartPadding: {
-        right: 40
-      },
-      axisX: {
-        labelInterpolationFnc: function(value) {
-          // Only display day/month (from ISO date).
-          const [ month, day ] = value.slice(5, 10).split('-')
-          return `${day}/${month}`
-        }
-      },
-      axisY: {
-        type: Chartist.AutoScaleAxis,
-        low: 0,
-        offset: 100
-      },
-      plugins: [
-        Chartist.plugins.tooltip({appendToBody: true})
-      ]
-    })
-  </script>
-#}
-  <div class="fr-alert fr-alert--info">
-    <p>Tableau de détail des inscriptions sur la période.</p>
-    <p>Cela permet d’identifier si les pics correspondent à des actions localisées par exemple.</p>
-  </div>
-  <div
-    class="fr-table fr-table--layout-fixed fr-table--no-caption"
-    data-controller="table"
-    data-downloadable="true"
-    >
-    <table data-table-target="table">
-      <caption>Nouvelles inscription sur la périodes</caption>
-      <thead>
-        <tr>
-          <th
-            scope="col"
-            data-action="click->table#sortTable"
-            data-table-target="header"
-            data-type="text"
-            >Nom</th>
-          <th
-            scope="col"
-            data-action="click->table#sortTable"
-            data-table-target="header"
-            data-type="text"
-            >Courriel</th>
-          <th
-            scope="col"
-            aria-sort="descending"
-            data-action="click->table#sortTable"
-            data-table-target="header"
-            data-type="date"
-            >Date d’inscription</th>
-          <th
-            scope="col"
-            data-action="click->table#sortTable"
-            data-table-target="header"
-            data-type="text"
-            >Organisation</th>
-          <th
-            scope="col"
-            data-action="click->table#sortTable"
-            data-table-target="header"
-            data-type="text"
-            >Type</th>
-        </tr>
-      </thead>
-      <tbody data-table-target="body">
-        {% for user in userRegisters %}
-        <tr data-table-target="row">
-          <td scope="row">{{ user.firstname }}{{ user.lastname }}</td>
-          <td>{{ user.email }}</td>
-          <td>{{ user.dateCreate|date('d/m/Y') }}</td>
-          <td>{% if user.defaultOrganization %}{{ user.defaultOrganization.name }}{% endif %}</td>
-          <td>{% if user.defaultOrganization and user.defaultOrganization.organizationType %}{{ user.defaultOrganization.organizationType }}{% endif %}</td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  </div>
+    <div class="alert alert-info">
+        <p>Tableau de détail des inscriptions sur la période.</p>
+        <p>Cela permet d’identifier si les pics correspondent à des actions localisées par exemple.</p>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <caption>Nouvelles inscription sur la périodes</caption>
+            <thead>
+                <tr>
+                    <th scope="col">Nom</th>
+                    <th scope="col">Courriel</th>
+                    <th scope="col">Date d’inscription</th>
+                    <th scope="col">Organisation</th>
+                    <th scope="col">Type</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in userRegisters %}
+                <tr>
+                    <td scope="row">{{ user.firstname }}{{ user.lastname }}</td>
+                    <td>{{ user.email }}</td>
+                    <td>{{ user.dateCreate|date('d/m/Y') }}</td>
+                    <td>{% if user.defaultOrganization %}{{ user.defaultOrganization.name }}{% endif %}</td>
+                    <td>{% if user.defaultOrganization and user.defaultOrganization.organizationType %}{{ user.defaultOrganization.organizationType }}{% endif %}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </div>
 
 {% endblock stats_content %}

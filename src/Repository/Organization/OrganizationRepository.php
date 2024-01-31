@@ -25,6 +25,18 @@ class OrganizationRepository extends ServiceEntityRepository
         parent::__construct($registry, Organization::class);
     }
 
+    public function countWithUserBeneficiary(?array $params = null): int
+    {
+        $params['hasUserBeneficiary'] = true;
+        return $this->countCustom($params);
+    }
+
+    public function countWithUserContributor(?array $params = null): int
+    {
+        $params['hasUserContributor'] = true;
+        return $this->countCustom($params);
+    }
+
     public function countCommune(?array $params = null) : int
     {
         $params['typeSlug'] = OrganizationType::SLUG_COMMUNE;
@@ -93,8 +105,38 @@ class OrganizationRepository extends ServiceEntityRepository
         $perimeterIsObsolete = $params['perimeterIsObsolete'] ?? null;
         $isImported = $params['isImported'] ?? null;
         $intercommunalityTypes = $params['intercommunalityTypes'] ?? null;
+        $dateCreateMin = $params['dateCreateMin'] ?? null;
+        $dateCreateMax = $params['dateCreateMax'] ?? null;
+        $hasUserBeneficiary = $params['hasUserBeneficiary'] ?? null;
+        $hasUserContributor = $params['hasUserContributor'] ?? null;
 
         $qb = $this->createQueryBuilder('o');
+
+        if ($hasUserContributor) {
+            $qb
+                ->innerJoin('o.beneficiairies', 'beneficiairiesForContributor')
+                ->andWhere('beneficiairiesForContributor.isContributor = :isContributorTrue')
+                ->setParameter('isContributorTrue', true)
+                ;
+        }
+
+        if ($hasUserBeneficiary) {
+            $qb
+                ->innerJoin('o.beneficiairies', 'beneficiairiesForBeneficiary')
+                ->andWhere('beneficiairiesForBeneficiary.isBeneficiary = :isBeneficiaryTrue')
+                ->setParameter('isBeneficiaryTrue', true)
+                ;
+        }
+
+        if ($dateCreateMin instanceof \DateTime) {
+            $qb->andWhere('o.dateCreate >= :dateCreateMin')
+            ->setParameter('dateCreateMin', $dateCreateMin);
+        }
+
+        if ($dateCreateMax instanceof \DateTime) {
+            $qb->andWhere('o.dateCreate <= :dateCreateMax')
+            ->setParameter('dateCreateMax', $dateCreateMax);
+        }
 
         if (is_array($intercommunalityTypes)) {
             $qb

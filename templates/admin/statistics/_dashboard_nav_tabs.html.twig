@@ -24,7 +24,7 @@
     <li class="nav-item" role="presentation">
         <a
             id="engagement"
-            href="#statistiques"
+            href=""
             class="nav-link {% if engagementSelected is defined %}active{% endif %}"
             tabindex="{% if engagementSelected is defined %}0{% else %}-1{% endif %}"
             role="tab"
@@ -35,7 +35,7 @@
     <li class="nav-item" role="presentation">
         <a
             id="cote-porteurs"
-            href="#statistiques"
+            href="{{ path('admin_statistics_porteurs', { '_fragment': 'statistiques' }) }}"
             class="nav-link {% if porteursSelected is defined %}active{% endif %}"
             tabindex="{% if porteursSelected is defined %}0{% else %}-1{% endif %}"
             role="tab"

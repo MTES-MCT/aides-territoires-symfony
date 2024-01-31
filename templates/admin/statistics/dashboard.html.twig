@@ -1,7 +1,13 @@
 {% extends "@EasyAdmin/page/content.html.twig" %}
 
+{% block head_stylesheets %}
+    {{ parent() }}
+    {{ encore_entry_link_tags('import-scss/admin/admin') }}
+{% endblock head_stylesheets %}
+
 {% block head_javascript %}
     {{ parent() }}
+    {{ encore_entry_script_tags('admin/admin') }}
     {{ encore_entry_script_tags('admin/statistics/dashboard') }}
 {% endblock head_javascript %}
 

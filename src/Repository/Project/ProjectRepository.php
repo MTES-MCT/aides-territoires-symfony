@@ -77,6 +77,13 @@ class ProjectRepository extends ServiceEntityRepository
         }
     }
 
+    public function countCustom(?array $params = null): int
+    {
+        $qb = $this->getQueryBuilder($params);
+        $qb->select('IFNULL(COUNT(DISTINCT(p.id)), 0) AS nb');
+
+        return $qb->getQuery()->getResult()[0]['nb'] ?? 0;
+    }
     
     public function findPublicProjects(array $params = null): array
     {
@@ -121,9 +128,21 @@ class ProjectRepository extends ServiceEntityRepository
         $simple_words_string = $params['simple_words_string'] ?? null;
         $radius = $params['radius'] ?? null;
         $exclude = $params['exclude'] ?? null;
+        $dateCreateMin = $params['dateCreateMin'] ?? null;
+        $dateCreateMax = $params['dateCreateMax'] ?? null;
 
         $qb = $this->createQueryBuilder('p');
 
+        if ($dateCreateMin instanceof \DateTime) {
+            $qb->andWhere('p.dateCreate >= :dateCreateMin')
+            ->setParameter('dateCreateMin', $dateCreateMin);
+        }
+
+        if ($dateCreateMax instanceof \DateTime) {
+            $qb->andWhere('p.dateCreate <= :dateCreateMax')
+            ->setParameter('dateCreateMax', $dateCreateMax);
+        }
+        
         if ($exclude instanceof Project && $exclude->getId()) {
             $qb
                 ->andWhere('p != :perimeterExclude')

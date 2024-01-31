@@ -4,6 +4,7 @@ namespace App\Repository\Log;
 
 use App\Entity\Log\LogAidSearch;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -21,28 +22,36 @@ class LogAidSearchRepository extends ServiceEntityRepository
         parent::__construct($registry, LogAidSearch::class);
     }
 
-//    /**
-//     * @return LogAidSearch[] Returns an array of LogAidSearch objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('l')
-//            ->andWhere('l.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('l.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
+    public function countCustom(?array $params = null): int
+    {   
+        $qb = $this->getQueryBuilder($params);
 
-//    public function findOneBySomeField($value): ?LogAidSearch
-//    {
-//        return $this->createQueryBuilder('l')
-//            ->andWhere('l.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
+        $qb->select('COUNT(l.id)');
+
+        return (int) $qb->getQuery()->getSingleScalarResult();
+    }
+    
+    public function getQueryBuilder(?array $params = null): QueryBuilder
+    {
+        $dateCreateMin = $params['dateCreateMin'] ?? null;
+        $dateCreateMax = $params['dateCreateMax'] ?? null;
+
+        $qb = $this->createQueryBuilder('l');
+
+        if ($dateCreateMin instanceof \DateTime) {
+            $qb
+                ->andWhere('l.dateCreate >= :dateCreateMin')
+                ->setParameter('dateCreateMin', $dateCreateMin)
+                ;
+        }
+
+        if ($dateCreateMax instanceof \DateTime) {
+            $qb
+                ->andWhere('l.dateCreate <= :dateCreateMax')
+                ->setParameter('dateCreateMax', $dateCreateMax)
+                ;
+        }
+
+        return $qb;
+    }
 }

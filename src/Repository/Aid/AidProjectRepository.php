@@ -32,6 +32,7 @@ class AidProjectRepository extends ServiceEntityRepository
 
         return $qb->getQuery()->getResult()[0]['nb'] ?? 0;
     }
+    
     public function countProjectByAid(Aid $aid, array $params = null) : int {
         $params['aid'] = $aid;
         $qb = $this->getQueryBuilder($params);

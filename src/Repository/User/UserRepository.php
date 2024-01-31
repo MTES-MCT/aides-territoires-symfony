@@ -2,6 +2,7 @@
 
 namespace App\Repository\User;
 
+use App\Entity\Organization\OrganizationType;
 use App\Entity\User\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\QueryBuilder;
@@ -27,10 +28,61 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         parent::__construct($registry, User::class);
     }
 
+    public function countCustom(?array $params = null)
+    {
+        $qb = $this->getQueryBuilder($params);
+        $qb->select('COUNT(DISTINCT(u.id))')
+        ;
+
+        return (int) $qb->getQuery()->getSingleScalarResult();
+    }
+
+    public function countBeneficiaries(?array $params = null)
+    {
+        $params['isBeneficiary'] = true;
+        $params['isContributor'] = false;
+
+        $qb = $this->getQueryBuilder($params);
+        $qb->select('COUNT(DISTINCT(u.id))')
+        ;
+
+        return (int) $qb->getQuery()->getSingleScalarResult();
+    }
+
+    public function countContributors(?array $params = null)
+    {
+        $params['isBeneficiary'] = false;
+        $params['isContributor'] = true;
+
+        $qb = $this->getQueryBuilder($params);
+        $qb->select('COUNT(DISTINCT(u.id))')
+        ;
+
+        return (int) $qb->getQuery()->getSingleScalarResult();
+    }
+
+    public function countRegistersWithAid(?array $params = null): int
+    {
+        $qb = $this->getQueryBuilder($params);
+        $qb->select('COUNT(DISTINCT(u.id))')
+        ->innerJoin('u.aids', 'aids');
+
+        return (int) $qb->getQuery()->getSingleScalarResult();
+    }
+
+    public function countRegistersWithProject(?array $params = null): int
+    {
+        $qb = $this->getQueryBuilder($params);
+        $qb->select('COUNT(DISTINCT(u.id))')
+        ->innerJoin('u.projects', 'projects');
+
+        return (int) $qb->getQuery()->getSingleScalarResult();
+    }
+
     public function countRegisters(?array $params = null): int
     {
         $qb = $this->getQueryBuilder($params);
-        $qb->select('COUNT(u.id)');
+        $qb->select('COUNT(DISTINCT(u.id))');
 
         return (int) $qb->getQuery()->getSingleScalarResult();
     }
@@ -106,8 +158,58 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         $connectedSinceYesterday = $params['connectedSinceYesterday'] ?? null;
         $hasUnsentNotification = $params['hasUnsentNotification'] ?? null;
         $notificationEmailFrequency = $params['notificationEmailFrequency'] ?? null;
+        $isBeneficiary = $params['isBeneficiary'] ?? null;
+        $isContributor = $params['isContributor'] ?? null;
+        $organizationIsCommune = $params['organizationIsCommune'] ?? null;
+        $organizationIsEpci = $params['organizationIsEpci'] ?? null;
+        $organizationHasAid = $params['organizationHasAid'] ?? null;
+        $organizationHasProject = $params['organizationHasProject'] ?? null;
 
         $qb = $this->createQueryBuilder('u');
+
+        if ($organizationHasProject) {
+            $qb
+                ->innerJoin('u.organizations', 'organizationForProject')
+                ->innerJoin('organizationForProject.projects', 'project')
+                ;
+        }
+        if ($organizationHasAid) {
+            $qb
+                ->innerJoin('u.organizations', 'organizationForAid')
+                ->innerJoin('organizationForAid.aids', 'aid')
+                ;
+        }
+        if ($organizationIsCommune) {
+            $qb
+                ->innerJoin('u.organizations', 'organizationForCommune')
+                ->innerJoin('organizationForCommune.organizationType', 'organizationTypeForCommune')
+                ->andWhere('organizationTypeForCommune.slug = :slugCommune')
+                ->setParameter('slugCommune', OrganizationType::SLUG_COMMUNE)
+            ;
+        }
+
+        if ($organizationIsEpci) {
+            $qb
+                ->innerJoin('u.organizations', 'organizationForCommune')
+                ->innerJoin('organizationForCommune.organizationType', 'organizationTypeForCommune')
+                ->andWhere('organizationTypeForCommune.slug = :slugCommune')
+                ->setParameter('slugCommune', OrganizationType::SLUG_ECPI)
+            ;
+        }
+
+        if ($isBeneficiary !== null) {
+            $qb
+                ->andWhere('u.isBeneficiary = :isBeneficiary')
+                ->setParameter('isBeneficiary', $isBeneficiary)
+            ;
+        }
+
+        if ($isContributor !== null) {
+            $qb
+                ->andWhere('u.isContributor = :isContributor')
+                ->setParameter('isContributor', $isContributor)
+            ;
+        }
 
         if ($onlyAdmin === true) {
             $qb

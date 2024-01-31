@@ -76,7 +76,8 @@ class MatomoService
         ?string $customSegment="",
         string $fromDateString="2023-01-01",
         string $toDateString=null,
-        ?string $period= 'range'
+        ?string $period= 'range',
+        ?array $options = null
     ): mixed
     {
         try {
@@ -97,6 +98,9 @@ class MatomoService
                 "segment" => $customSegment,
             ];
 
+            if (is_array($options)) {
+                $params = array_merge($params, $options);
+            }
             $response = $this->httpClientInterface->request(
                 'GET',
                 $this->paramService->get('matomo_endpoint'),

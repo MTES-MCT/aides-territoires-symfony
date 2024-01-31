@@ -3,6 +3,8 @@
 namespace App\Repository\Log;
 
 use App\Entity\Log\LogUserLogin;
+use App\Entity\Organization\OrganizationType;
+use App\Entity\User\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
@@ -22,13 +24,78 @@ class LogUserLoginRepository extends ServiceEntityRepository
         parent::__construct($registry, LogUserLogin::class);
     }
 
+    public function countCustom(?array $params = null): int
+    {   
+        $distinctUser = $params['distinctUser'] ?? null;
+        $qb = $this->getQueryBuilder($params);
+        if ($distinctUser) {
+            $qb->select('COUNT(DISTINCT(l.user))');
+        } else {
+            $qb->select('COUNT(l.id)');
+        }
+        return (int) $qb->getQuery()->getSingleScalarResult();
+    }
+    
     public function getQueryBuilder(array $params = null): QueryBuilder
     {
         $user = $params['user'] ?? null;
         $limit = $params['limit'] ?? null;
         $action = $params['action'] ?? null;
+        $dateCreateMin = $params['dateCreateMin'] ?? null;
+        $dateCreateMax = $params['dateCreateMax'] ?? null;
+        $month = $params['month'] ?? null;
+        $isCommune = $params['isCommune'] ?? null;
+        $isEcpi = $params['isEcpi'] ?? null;
+        $excludeAdmins = $params['excludeAdmins'] ?? null;
 
         $qb = $this->createQueryBuilder('l');
+
+        if ($excludeAdmins === true) {
+            $qb
+            ->innerJoin('l.user', 'userForRole')
+            ->andWhere('userForRole.roles NOT LIKE :roleAdmin')
+            ->setParameter('roleAdmin', '%'.User::ROLE_ADMIN.'%')
+            ;
+        }
+
+        if ($isCommune) {
+            $qb
+                ->innerJoin('l.user', 'u')
+                ->innerJoin('u.organizations', 'organizations')
+                ->innerJoin('organizations.organizationType', 'organizationType')
+                ->andWhere('organizationType.slug = :slugCommune')
+                ->setParameter('slugCommune', OrganizationType::SLUG_COMMUNE)
+                ;
+        }
+
+        if ($isEcpi) {
+            $qb
+                ->innerJoin('l.user', 'u')
+                ->innerJoin('u.organizations', 'organizations')
+                ->innerJoin('organizations.organizationType', 'organizationType')
+                ->andWhere('organizationType.slug = :slugCommune')
+                ->setParameter('slugCommune', OrganizationType::SLUG_ECPI)
+                ;
+        }
+
+        if ($month instanceof \DateTime) {
+            $qb->andWhere('DATE_FORMAT(l.dateCreate, \'%Y-%m\') = :month')
+                ->setParameter('month', $month->format('Y-m'))
+                ;
+        }
+        if ($dateCreateMin instanceof \DateTime) {
+            $qb
+                ->andWhere('l.dateCreate >= :dateCreateMin')
+                ->setParameter('dateCreateMin', $dateCreateMin)
+                ;
+        }
+
+        if ($dateCreateMax instanceof \DateTime) {
+            $qb
+                ->andWhere('l.dateCreate <= :dateCreateMax')
+                ->setParameter('dateCreateMax', $dateCreateMax)
+                ;
+        }
 
         if ($user !== null) {
             $qb
@@ -50,29 +117,4 @@ class LogUserLoginRepository extends ServiceEntityRepository
 
         return $qb;
     }
-
-//    /**
-//     * @return LogUserLogin[] Returns an array of LogUserLogin objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('l')
-//            ->andWhere('l.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('l.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
-
-//    public function findOneBySomeField($value): ?LogUserLogin
-//    {
-//        return $this->createQueryBuilder('l')
-//            ->andWhere('l.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
 }

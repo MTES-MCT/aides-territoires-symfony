@@ -390,8 +390,21 @@ class AidRepository extends ServiceEntityRepository
         $hasBrokenLink= $params['hasBrokenLink'] ?? null;
         $scoreTotalMin = $params['scoreTotalMin'] ?? 60;
         $scoreObjectsMin = $params['scoreObjectsMin'] ?? 30;
+        $dateCreateMin = $params['dateCreateMin'] ?? null;
+        $dateCreateMax = $params['dateCreateMax'] ?? null;
+
         $qb = $this->createQueryBuilder('a');
 
+        if ($dateCreateMin instanceof \DateTime) {
+            $qb->andWhere('a.dateCreate >= :dateCreateMin')
+            ->setParameter('dateCreateMin', $dateCreateMin);
+        }
+
+        if ($dateCreateMax instanceof \DateTime) {
+            $qb->andWhere('a.dateCreate <= :dateCreateMax')
+            ->setParameter('dateCreateMax', $dateCreateMax);
+        }
+        
         if ($hasBrokenLink !== null) {
             $qb
                 ->andWhere('a.hasBrokenLink = :hasBrokenLink')

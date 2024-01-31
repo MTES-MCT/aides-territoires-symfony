@@ -8,18 +8,15 @@ $(function(){
         }
     }, 'select');
 
-    $(document).ready( function () {
+    if(typeof commune_search !== 'undefined' && commune_search){
+        var order = [[ 0, 'asc' ], [ 2, 'asc' ], [ 1, 'asc' ]];
+    }else{
+        var order = [[ 1, 'asc' ], [ 0, 'asc' ]];
+    }
 
-        if(typeof commune_search !== 'undefined' && commune_search){
-            var order = [[ 0, 'asc' ], [ 2, 'asc' ], [ 1, 'asc' ]];
-        }else{
-            var order = [[ 1, 'asc' ], [ 0, 'asc' ]];
-        }
-
-        $('#validated_projects_table').DataTable({
-            info: false,
-            "order": order,
-            "language": datatables_fr_strings,
-        });
-    } );
+    $('#validated_projects_table').DataTable({
+        info: false,
+        "order": order,
+        "language": datatables_fr_strings,
+    });
 });
