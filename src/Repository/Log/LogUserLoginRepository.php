@@ -45,7 +45,7 @@ class LogUserLoginRepository extends ServiceEntityRepository
         $dateCreateMax = $params['dateCreateMax'] ?? null;
         $month = $params['month'] ?? null;
         $isCommune = $params['isCommune'] ?? null;
-        $isEcpi = $params['isEcpi'] ?? null;
+        $isEpci = $params['isEpci'] ?? null;
         $excludeAdmins = $params['excludeAdmins'] ?? null;
 
         $qb = $this->createQueryBuilder('l');
@@ -68,13 +68,13 @@ class LogUserLoginRepository extends ServiceEntityRepository
                 ;
         }
 
-        if ($isEcpi) {
+        if ($isEpci) {
             $qb
                 ->innerJoin('l.user', 'u')
                 ->innerJoin('u.organizations', 'organizations')
                 ->innerJoin('organizations.organizationType', 'organizationType')
                 ->andWhere('organizationType.slug = :slugCommune')
-                ->setParameter('slugCommune', OrganizationType::SLUG_ECPI)
+                ->setParameter('slugCommune', OrganizationType::SLUG_EPCI)
                 ;
         }
 

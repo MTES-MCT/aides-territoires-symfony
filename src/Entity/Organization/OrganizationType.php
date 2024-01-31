@@ -43,7 +43,7 @@ class OrganizationType
     const API_DESCRIPTION = 'Lister tous les choix de bénéficiaires';
 
     const SLUG_COMMUNE = 'commune';
-    const SLUG_ECPI = 'epci';
+    const SLUG_EPCI = 'epci';
     const SLUG_DEPARTMENT = 'department';
     const SLUG_REGION = 'region';
     const SLUG_SPECIAL = 'special';

@@ -48,16 +48,16 @@ class OrganizationRepository extends ServiceEntityRepository
 
     public function countInterco(?array $params = null) : int
     {
-        $params['typeSlug'] = OrganizationType::SLUG_ECPI;
+        $params['typeSlug'] = OrganizationType::SLUG_EPCI;
         $params['perimeterScale'] = Perimeter::SCALE_EPCI;
         $params['perimeterIsObsolete'] = false;
         $params['isImported'] = false;
         return $this->countCustom($params);        
     }
 
-    public function countEcpi(?array $params = null) : int
+    public function countEpci(?array $params = null) : int
     {
-        $params['typeSlug'] = OrganizationType::SLUG_ECPI;
+        $params['typeSlug'] = OrganizationType::SLUG_EPCI;
         $params['perimeterScale'] = Perimeter::SCALE_EPCI;
         $params['perimeterIsObsolete'] = false;
         $params['isImported'] = false;
@@ -67,6 +67,17 @@ class OrganizationRepository extends ServiceEntityRepository
         $qb->select('IFNULL(COUNT(DISTINCT(perimeterForScale.id)), 0) AS nb');
 
         return $qb->getQuery()->getResult()[0]['nb'] ?? 0;      
+    }
+
+    public function countByType(?array $params = null): array
+    {
+        $qb = $this->getQueryBuilder($params);
+        $qb->innerJoin('o.organizationType', 'organizationType');
+        $qb->select('IFNULL(COUNT(o.id), 0) AS nb, organizationType.name AS typeName');
+        $qb->groupBy('typeName');
+        $qb->orderBy('nb', 'DESC');
+
+        return $qb->getQuery()->getResult();
     }
 
     public function countCustom(array $params = null) : int {
@@ -109,9 +120,13 @@ class OrganizationRepository extends ServiceEntityRepository
         $dateCreateMax = $params['dateCreateMax'] ?? null;
         $hasUserBeneficiary = $params['hasUserBeneficiary'] ?? null;
         $hasUserContributor = $params['hasUserContributor'] ?? null;
+        $hasPerimeter = $params['hasPerimeter'] ?? null;
 
         $qb = $this->createQueryBuilder('o');
 
+        if ($hasPerimeter) {
+            $qb->innerJoin('o.perimeter', 'perimeterForPerimeter');
+        }
         if ($hasUserContributor) {
             $qb
                 ->innerJoin('o.beneficiairies', 'beneficiairiesForContributor')

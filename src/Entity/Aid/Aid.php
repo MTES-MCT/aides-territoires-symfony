@@ -229,7 +229,7 @@ class Aid
             'description' => 'Les audiences cibles',
             'enum' => [
                 OrganizationType::SLUG_COMMUNE,
-                OrganizationType::SLUG_ECPI,
+                OrganizationType::SLUG_EPCI,
                 OrganizationType::SLUG_DEPARTMENT,
                 OrganizationType::SLUG_REGION,
                 OrganizationType::SLUG_SPECIAL,

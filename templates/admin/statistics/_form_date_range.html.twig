@@ -1,8 +1,6 @@
 <div id="statistiques" class="mt-5 mb-5 d-flex flex-row justify-content-center align-items-center">
     <h2 class="me-3">Statistiques sur une période :</h2>
-    <div class="d-flex me-3">
-    {{ form_start(formDateRange) }}
-    </div>
+    {{ form_start(formDateRange, {'attr': {'class': 'd-flex'}}) }}
     <div class="d-flex me-3">
     {{ form_row(formDateRange.dateMin) }}
     </div>

@@ -148,7 +148,7 @@ class ImportFluxIleDeFranceCommand extends ImportFluxCommand
                 OrganizationType::SLUG_RESEARCHER,
             ],
             'Collectivités - Institutions' => [
-                OrganizationType::SLUG_ECPI,
+                OrganizationType::SLUG_EPCI,
             ],
             'Entreprises' => [
                 OrganizationType::SLUG_PRIVATE_SECTOR,

@@ -164,6 +164,7 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         $organizationIsEpci = $params['organizationIsEpci'] ?? null;
         $organizationHasAid = $params['organizationHasAid'] ?? null;
         $organizationHasProject = $params['organizationHasProject'] ?? null;
+        $orderBy = (isset($params['orderBy']) && isset($params['orderBy']['sort']) && isset($params['orderBy']['order'])) ? $params['orderBy'] : null;
 
         $qb = $this->createQueryBuilder('u');
 
@@ -193,7 +194,7 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
                 ->innerJoin('u.organizations', 'organizationForCommune')
                 ->innerJoin('organizationForCommune.organizationType', 'organizationTypeForCommune')
                 ->andWhere('organizationTypeForCommune.slug = :slugCommune')
-                ->setParameter('slugCommune', OrganizationType::SLUG_ECPI)
+                ->setParameter('slugCommune', OrganizationType::SLUG_EPCI)
             ;
         }
 
@@ -259,6 +260,12 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
             ;
         }
 
+        if ($orderBy !== null) {
+            $qb
+                ->addOrderBy($orderBy['sort'], $orderBy['order'])
+            ;
+        }
+        
         return $qb;
     }
 

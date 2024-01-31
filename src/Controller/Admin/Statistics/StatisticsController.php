@@ -22,32 +22,38 @@ use App\Form\Admin\Filter\DateRangeType;
 use App\Service\Matomo\MatomoService;
 use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
 use FontLib\Table\Type\name;
+use Pagerfanta\Doctrine\ORM\QueryAdapter;
+use Pagerfanta\Pagerfanta;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\UX\Chartjs\Model\Chart;
 
 class StatisticsController extends DashboardController
 {
-    private function getChartEcpi($nbEcpi, $nbEcpiTotal, $nbEcpiObjectif): Chart
+    const NB_USER_BY_PAGE = 50;
+    const NB_ORGANIZATION_BY_PAGE = 50;
+
+    private function getChartEpci($nbEpci, $nbEpciTotal, $nbEpciObjectif): Chart
     {
-        $chartEcpi = $this->chartBuilderInterface->createChart(Chart::TYPE_BAR);
-        $chartEcpi->setData([
-            'labels' => ['Ecpi'],
+        $chartEpci = $this->chartBuilderInterface->createChart(Chart::TYPE_BAR);
+        $chartEpci->setData([
+            'labels' => ['Epci'],
             'datasets' => [
                 [
                     'label' => 'Inscrites',
                     'backgroundColor' => 'rgb(255, 99, 132)',
-                    'data' => [$nbEcpi],
+                    'data' => [$nbEpci],
                 ],
                 [
                     'label' => 'Total',
                     'backgroundColor' => 'rgb(75, 192, 192)',
-                    'data' => [$nbEcpiTotal],
+                    'data' => [$nbEpciTotal],
                 ],
             ],
         ]);
         
-        $chartEcpi->setOptions([
+        $chartEpci->setOptions([
             'scales' => [
                 'y' => [
                     'beginAtZero' => true,
@@ -62,14 +68,14 @@ class StatisticsController extends DashboardController
                     'annotations' => [
                         'line1' => [
                             'type' => 'line',
-                            'yMin' => $nbEcpiObjectif,
-                            'yMax' => $nbEcpiObjectif,
+                            'yMin' => $nbEpciObjectif,
+                            'yMax' => $nbEpciObjectif,
                             'borderColor' => 'rgb(54, 162, 235)',
                             'borderWidth' => 4,
                             'clip' => false, // add this line
                             'label' => [
                                 'enabled' => true,
-                                'content' => 'Objectif '.$nbEcpiObjectif,
+                                'content' => 'Objectif '.$nbEpciObjectif,
                                 'position' => 'center',
                                 'display' => true
                             ],
@@ -79,7 +85,7 @@ class StatisticsController extends DashboardController
             ],
         ]);
 
-        return $chartEcpi;
+        return $chartEpci;
     }
     private function getChartCommune($nbCommune, $nbCommuneTotal, $nbCommuneObjectif): Chart
     {
@@ -150,11 +156,11 @@ class StatisticsController extends DashboardController
             'nbCommune' => $this->managerRegistry->getRepository(Organization::class)->countCommune([]),
             'nbCommuneTotal' => 35039,
             'nbCommuneObjectif' => 10000,
-            'nbEcpi' => $this->managerRegistry->getRepository(Organization::class)->countEcpi([]),
-            'nbEcpiTotal' => 1256,
-            'nbEcpiObjectif' => (int) 1256 * 0.75,
-            'nbEcpiObjectifPercentage' => round((1256 * 0.75 / 1256) * 100, 1),
-            'nbEcpiPercentage' => round((1256 / 1256) * 100, 1),
+            'nbEpci' => $this->managerRegistry->getRepository(Organization::class)->countEpci([]),
+            'nbEpciTotal' => 1256,
+            'nbEpciObjectif' => (int) 1256 * 0.75,
+            'nbEpciObjectifPercentage' => round((1256 * 0.75 / 1256) * 100, 1),
+            'nbEpciPercentage' => round((1256 / 1256) * 100, 1),
         ];
     }
 
@@ -166,7 +172,7 @@ class StatisticsController extends DashboardController
     {
         $statsGlobal = $this->getStatsGlobal();
         $chartCommune = $this->getChartCommune($statsGlobal['nbCommune'], $statsGlobal['nbCommuneTotal'], $statsGlobal['nbCommuneObjectif']);
-        $chartEcpi = $this->getChartEcpi($statsGlobal['nbEcpi'], $statsGlobal['nbEcpiTotal'], $statsGlobal['nbEcpiObjectif']);
+        $chartEpci = $this->getChartEpci($statsGlobal['nbEpci'], $statsGlobal['nbEpciTotal'], $statsGlobal['nbEpciObjectif']);
 
         // dates par défaut
         $dateMin = new \DateTime('-1 month');
@@ -266,7 +272,7 @@ class StatisticsController extends DashboardController
             // globale
             'statsGlobal' => $statsGlobal,
             'chartCommune' => $chartCommune,
-            'chartEcpi' => $chartEcpi,
+            'chartEpci' => $chartEpci,
 
             // specific
             'formDateRange' => $formDateRange,
@@ -291,7 +297,7 @@ class StatisticsController extends DashboardController
     {
         $statsGlobal = $this->getStatsGlobal();
         $chartCommune = $this->getChartCommune($statsGlobal['nbCommune'], $statsGlobal['nbCommuneTotal'], $statsGlobal['nbCommuneObjectif']);
-        $chartEcpi = $this->getChartEcpi($statsGlobal['nbEcpi'], $statsGlobal['nbEcpiTotal'], $statsGlobal['nbEcpiObjectif']);
+        $chartEpci = $this->getChartEpci($statsGlobal['nbEpci'], $statsGlobal['nbEpciTotal'], $statsGlobal['nbEpciObjectif']);
 
         // dates par défaut
         $dateMin = new \DateTime('-1 month');
@@ -406,7 +412,7 @@ class StatisticsController extends DashboardController
             // globale
             'statsGlobal' => $statsGlobal,
             'chartCommune' => $chartCommune,
-            'chartEcpi' => $chartEcpi,
+            'chartEpci' => $chartEpci,
             'formDateRange' => $formDateRange,
             'dateMin' => $dateMin,
             'dateMax' => $dateMax,
@@ -427,7 +433,7 @@ class StatisticsController extends DashboardController
     {
         $statsGlobal = $this->getStatsGlobal();
         $chartCommune = $this->getChartCommune($statsGlobal['nbCommune'], $statsGlobal['nbCommuneTotal'], $statsGlobal['nbCommuneObjectif']);
-        $chartEcpi = $this->getChartEcpi($statsGlobal['nbEcpi'], $statsGlobal['nbEcpiTotal'], $statsGlobal['nbEcpiObjectif']);
+        $chartEpci = $this->getChartEpci($statsGlobal['nbEpci'], $statsGlobal['nbEpciTotal'], $statsGlobal['nbEpciObjectif']);
 
         // dates par défaut
         $dateMin = new \DateTime('-1 month');
@@ -615,7 +621,7 @@ class StatisticsController extends DashboardController
             $nbEpcisConnected = $this->managerRegistry->getRepository(LogUserLogin::class)->countCustom([
                 'month' => $currentDate,
                 'distinctUser' => true,
-                'isEcpi' => true,
+                'isEpci' => true,
                 'excludeAdmins' => true
             ]);
 
@@ -663,7 +669,7 @@ class StatisticsController extends DashboardController
             // globale
             'statsGlobal' => $statsGlobal,
             'chartCommune' => $chartCommune,
-            'chartEcpi' => $chartEcpi,
+            'chartEpci' => $chartEpci,
             'formDateRange' => $formDateRange,
             'dateMin' => $dateMin,
             'dateMax' => $dateMax,
@@ -689,7 +695,7 @@ class StatisticsController extends DashboardController
     {
         $statsGlobal = $this->getStatsGlobal();
         $chartCommune = $this->getChartCommune($statsGlobal['nbCommune'], $statsGlobal['nbCommuneTotal'], $statsGlobal['nbCommuneObjectif']);
-        $chartEcpi = $this->getChartEcpi($statsGlobal['nbEcpi'], $statsGlobal['nbEcpiTotal'], $statsGlobal['nbEcpiObjectif']);
+        $chartEpci = $this->getChartEpci($statsGlobal['nbEpci'], $statsGlobal['nbEpciTotal'], $statsGlobal['nbEpciObjectif']);
 
         // dates par défaut
         $dateMin = new \DateTime('-1 month');
@@ -880,7 +886,7 @@ class StatisticsController extends DashboardController
             // globale
             'statsGlobal' => $statsGlobal,
             'chartCommune' => $chartCommune,
-            'chartEcpi' => $chartEcpi,
+            'chartEpci' => $chartEpci,
             'formDateRange' => $formDateRange,
             'dateMin' => $dateMin,
             'dateMax' => $dateMax,
@@ -905,7 +911,120 @@ class StatisticsController extends DashboardController
         AdminContext $adminContext
     ): Response
     {
-        return $this->render('admin/statistics/dashboard.html.twig', [
+        $nbUsers = $this->managerRegistry->getRepository(User::class)->countCustom();
+        $nbBeneficiaries = $this->managerRegistry->getRepository(User::class)->countBeneficiaries();
+        $nbContributors = $this->managerRegistry->getRepository(User::class)->countContributors();
+        $nbBeneficiariesAndContributors = $this->managerRegistry->getRepository(User::class)->countCustom([
+            'isBeneficary' => true,
+            'isContributor' => true,
+        ]);
+        $nbBeneficiariesPercent = $nbUsers == 0 ? 0 : round($nbBeneficiaries / $nbUsers * 100, 2);
+        $nbContributorsPercent = $nbUsers == 0 ? 0 : round($nbContributors / $nbUsers * 100, 2);
+        $nbBeneficiariesAndContributorsPercent = $nbUsers == 0 ? 0 : round($nbBeneficiariesAndContributors / $nbUsers * 100, 2);
+
+        // dates par défaut
+        $dateMin = new \DateTime('-1 month');
+        $dateMax = new \DateTime();
+
+        // formulaire de filtre
+        $formDateRange = $this->createForm(DateRangeType::class, null, ['method' => 'GET']);
+        $formDateRange->handleRequest($adminContext->getRequest());
+        if ($formDateRange->isSubmitted()) {
+            if ($formDateRange->isValid()) {
+                $dateMin = $formDateRange->get('dateMin')->getData();
+                $dateMax = $formDateRange->get('dateMax')->getData();
+            }
+        } else {
+            $formDateRange->get('dateMin')->setData($dateMin);
+            $formDateRange->get('dateMax')->setData($dateMax);
+        }
+
+        // gestion pagination
+        $currentPage = (int) $adminContext->getRequest()->get('page', 1);
+        
+        // le paginateur
+        $users = $this->managerRegistry->getRepository(User::class)->getQueryBuilder([
+            'dateCreateMin' => $dateMin,
+            'dateCreateMax' => $dateMax,
+            'orderBy' => [
+                'sort' => 'u.dateCreate',
+                'order' => 'DESC'
+            ]
+        ]);
+        $adapter = new QueryAdapter($users);
+        $pagerfanta = new Pagerfanta($adapter);
+        $pagerfanta->setMaxPerPage(self::NB_USER_BY_PAGE);
+        $pagerfanta->setCurrentPage($currentPage);
+        
+        return $this->render('admin/statistics/users.html.twig', [
+            'nbUsers' => $nbUsers,
+            'nbBeneficiaries' => $nbBeneficiaries,
+            'nbContributors' => $nbContributors,
+            'nbBeneficiariesAndContributors' => $nbBeneficiariesAndContributors,
+            'nbBeneficiariesPercent' => $nbBeneficiariesPercent,
+            'nbContributorsPercent' => $nbContributorsPercent,
+            'nbBeneficiariesAndContributorsPercent' => $nbBeneficiariesAndContributorsPercent,
+            'formDateRange' => $formDateRange,
+            'myPager' => $pagerfanta,
+        ]);
+    }
+
+    #[Route('/admin/statistics/stats-structures/', name: 'admin_statistics_organizations')]
+    public function statsOrganizations(
+        AdminContext $adminContext
+    ): Response
+    {
+        $nbOrganizations = $this->managerRegistry->getRepository(Organization::class)->countCustom([
+            'isImported' => false,
+            'hasPerimeter' => true
+        ]);
+        $nbOrganizationsByType = $this->managerRegistry->getRepository(Organization::class)->countByType([
+            'isImported' => false,
+            'hasPerimeter' => true
+        ]);
+        foreach ($nbOrganizationsByType as $key => $organizationType) {
+            $nbOrganizationsByType[$key]['percent'] = $nbOrganizations == 0 ? 0 : round($organizationType['nb'] / $nbOrganizations * 100, 2);
+        }
+        
+        // dates par défaut
+        $dateMin = new \DateTime('-1 month');
+        $dateMax = new \DateTime();
+
+        // formulaire de filtre
+        $formDateRange = $this->createForm(DateRangeType::class, null, ['method' => 'GET']);
+        $formDateRange->handleRequest($adminContext->getRequest());
+        if ($formDateRange->isSubmitted()) {
+            if ($formDateRange->isValid()) {
+                $dateMin = $formDateRange->get('dateMin')->getData();
+                $dateMax = $formDateRange->get('dateMax')->getData();
+            }
+        } else {
+            $formDateRange->get('dateMin')->setData($dateMin);
+            $formDateRange->get('dateMax')->setData($dateMax);
+        }
+
+        // gestion pagination
+        $currentPage = (int) $adminContext->getRequest()->get('page', 1);
+        
+        // le paginateur
+        $organizations = $this->managerRegistry->getRepository(Organization::class)->getQueryBuilder([
+            'dateCreateMin' => $dateMin,
+            'dateCreateMax' => $dateMax,
+            'orderBy' => [
+                'sort' => 'o.dateCreate',
+                'order' => 'DESC'
+            ]
+        ]);
+        $adapter = new QueryAdapter($organizations);
+        $pagerfanta = new Pagerfanta($adapter);
+        $pagerfanta->setMaxPerPage(self::NB_ORGANIZATION_BY_PAGE);
+        $pagerfanta->setCurrentPage($currentPage);
+
+        return $this->render('admin/statistics/organizations.html.twig', [
+            'nbOrganizations' => $nbOrganizations,
+            'nbOrganizationsByType' => $nbOrganizationsByType,
+            'formDateRange' => $formDateRange,
+            'myPager' => $pagerfanta,
         ]);
     }
 }

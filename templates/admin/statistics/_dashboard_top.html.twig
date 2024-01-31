@@ -1,7 +1,7 @@
 <div class="alert alert-success mt-5 mb-5">
     <p class="fs-5"><strong>
-        <a href="">{{ statsGlobal.nbUsers|number_format(0, ',', ' ') }} comptes utilisateurs</a></strong>,
-        répartis en <strong><a href="">{{ statsGlobal.nbOrganizations|number_format(0, ',', ' ') }} structures</a></strong>
+        <a href="{{ path('admin_statistics_users') }}">{{ statsGlobal.nbUsers|number_format(0, ',', ' ') }} comptes utilisateurs</a></strong>,
+        répartis en <strong><a href="{{ path('admin_statistics_organizations') }}">{{ statsGlobal.nbOrganizations|number_format(0, ',', ' ') }} structures</a></strong>
         (<a href="">carte</a>),
         dont <strong><a href="">{{ statsGlobal.nbInterco|number_format(0, ',', ' ') }} intercommunalités</a></strong>,
         ont créé <strong><a href="">{{ statsGlobal.nbProjects|number_format(0, ',', ' ') }} projets</a></strong>

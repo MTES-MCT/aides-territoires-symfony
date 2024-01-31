@@ -1901,4 +1901,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
 
         return $this;
     }
+
+    public function getBeneficiaryFunctionDisplay(): ?string
+    {
+        foreach (self::FUNCTION_TYPES as $function) {
+            if ($function['slug'] == $this->beneficiaryFunction) {
+                return $function['name'];
+            }
+        }
+        return '';
+    }
 }

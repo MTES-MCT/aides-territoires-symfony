@@ -134,7 +134,7 @@ class UserService
     {
         $targetOrganizationTypeSlugs = [
             OrganizationType::SLUG_COMMUNE,
-            OrganizationType::SLUG_ECPI,
+            OrganizationType::SLUG_EPCI,
             OrganizationType::SLUG_DEPARTMENT,
             OrganizationType::SLUG_PUBLIC_ORG,
             OrganizationType::SLUG_REGION,

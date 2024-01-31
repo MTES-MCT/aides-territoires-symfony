@@ -136,7 +136,7 @@ class PerimeterRepository extends ServiceEntityRepository
         return $results;
     }
 
-    public function countEcpi(?array $params = null) : int
+    public function countEpci(?array $params = null) : int
     {
         $params['scale'] = Perimeter::SCALE_EPCI;
         $params['isObsolete'] = false;
