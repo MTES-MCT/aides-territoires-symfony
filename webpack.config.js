@@ -23,6 +23,13 @@ Encore
         {from: './node_modules/trumbowyg/dist/ui/', to: 'trumbowyg/[path][name].[ext]', pattern: /\.(svg)$/, includeSubdirectories: false}
     ])
 
+    /**
+     * Pour la carte backoffice
+     */
+    .copyFiles([
+        {from: './datas/geojson/', to: 'datas/geojson/[path][name].[ext]', pattern: /\.(geojson)$/, includeSubdirectories: false}
+    ])
+
     /*
      * ENTRY CONFIG
      *
@@ -34,6 +41,8 @@ Encore
     .addEntry('admin/perimeter/perimeter-import', './assets/js/admin/perimeter/perimeter-import.js')
     .addEntry('admin/data-source/analyse', './assets/js/admin/data-source/analyse.js')
     .addEntry('admin/statistics/dashboard', './assets/js/admin/statistics/dashboard.js')
+    .addEntry('admin/statistics/map_controller', './assets/js/admin/statistics/map_controller.js')
+    .addEntry('admin/statistics/carto', './assets/js/admin/statistics/carto.js')
 
     .addEntry('front/home', './assets/js/front/home.js')
     .addEntry('front/cartography/cartography', './assets/js/front/cartography/cartography.js')
@@ -60,6 +69,7 @@ Encore
 
     .addEntry('import-scss/admin/admin', './assets/js/import-scss/admin/admin.js')
     .addEntry('import-scss/admin/perimeter/combine', './assets/js/import-scss/admin/perimeter/combine.js')
+    .addEntry('import-scss/admin/statistics/carto', './assets/js/import-scss/admin/statistics/carto.js')
     .addEntry('import-scss/home', './assets/js/import-scss/home.js')
     .addEntry('import-scss/static/sitemap', './assets/js/import-scss/static/sitemap.js')
     .addEntry('import-scss/blog/blogpost/details', './assets/js/import-scss/blog/blogpost/details.js')

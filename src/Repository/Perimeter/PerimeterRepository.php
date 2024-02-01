@@ -151,6 +151,14 @@ class PerimeterRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult()[0]['nb'] ?? 0;
     }
 
+    public function findCommunesContained(?array $params = null): array
+    {
+
+        $qb = $this->getQueryBuilder($params);
+        $qb->select('p.code, p.name');
+        return $qb->getQuery()->getResult();
+    }
+
     public function findCustom(array $params = null): array
     {
         $qb = $this->getQueryBuilder($params);
@@ -171,8 +179,26 @@ class PerimeterRepository extends ServiceEntityRepository
         $scaleLowerThan = $params['scaleLowerThan'] ?? null;
         $isObsolete = $params['isObsolete'] ?? null;
         $ids = $params['ids'] ?? null;
+        $regions = $params['regions'] ?? null;
+        $idParent = $params['idParent'] ?? null;
 
         $qb = $this->createQueryBuilder('p');
+
+        if ($idParent !== null) {
+            $qb
+                ->innerJoin('p.perimetersTo', 'perimetersTo')
+                ->andWhere('perimetersTo.id = :idParent')
+                ->setParameter('idParent', $idParent)
+            ;
+        }
+        
+        if ($regions && is_array($regions) && count($regions) > 0) {
+            $qb
+                ->andWhere("JSON_CONTAINS(p.regions, :regions, '$') = 1 ")
+                // ->andWhere(':regions MEMBER OF p.regions')
+                ->setParameter('regions', json_encode($regions))
+            ;
+        }
 
         if (is_array($ids) && count($ids) > 0) {
             $qb

@@ -26,6 +26,7 @@ use Pagerfanta\Doctrine\ORM\QueryAdapter;
 use Pagerfanta\Pagerfanta;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\UX\Chartjs\Model\Chart;
 
@@ -1026,5 +1027,323 @@ class StatisticsController extends DashboardController
             'formDateRange' => $formDateRange,
             'myPager' => $pagerfanta,
         ]);
+    }
+
+    #[Route('/admin/statistics/stats-cartographie/', name: 'admin_statistics_carto')]
+    public function statsCarto(
+        AdminContext $adminContext,
+        KernelInterface $kernelInterface
+    ): Response
+    {
+        // fichier geojson des régions pour la carte
+        $regionsGeojson = file_get_contents($kernelInterface->getProjectDir().'/datas/geojson/regions-1000m.geojson');
+
+        // on recupère toutes les régions
+        $regions = $this->managerRegistry->getRepository(Perimeter::class)->findCustom([
+            'scale' => Perimeter::SCALE_REGION,
+            'isObsolete' => false
+        ]);
+
+        $regionsOrgCounts = [];
+        $regionsOrgCommunesMax = 0;
+
+        // on parcours les régions
+        /** @var Perimeter $region */
+        foreach ($regions as $region) {
+            if (!$region->getCode()) {
+                continue;
+            }
+
+            // on va recupérer les organisations communes de cette région
+            $nbCommune = $this->managerRegistry->getRepository(Organization::class)->countCommune([
+                'perimeterRegion' => $region
+            ]);
+
+            // on regarde si on change le nombre max de communes pour une région
+            $regionsOrgCommunesMax = $nbCommune > $regionsOrgCommunesMax ? $nbCommune : $regionsOrgCommunesMax;
+
+            // on va recupérer les organisations epci de cette région
+            $nbEpci = $this->managerRegistry->getRepository(Organization::class)->countEpci([
+                'perimeterRegion' => $region
+            ]);
+
+            // on alimente le tableau
+            $regionsOrgCounts[$region->getCode()] = [
+                'name' => $region->getName(),
+                'communes_count' => $nbCommune,
+                'epcis_count' => $nbEpci
+            ];
+        }
+        // libere memoire
+        unset($regions);
+        
+
+        # Les départements
+        $counties = $this->managerRegistry->getRepository(Perimeter::class)->findCustom([
+            'scale' => Perimeter::SCALE_COUNTY,
+            'isObsolete' => false
+        ]);
+
+        $countiesOrgCounts = [];
+        $countiesOrgCommunesMax = 0;
+        $countiesCode = [];
+        // on parcours les départements
+        /** @var Perimeter $region */
+        foreach ($counties as $county) {
+            if (!$county->getCode()) {
+                continue;
+            }
+
+            // alimente le tableau des codes
+            $countiesCode[] = $county->getCode();
+
+            // on va recupérer les organisations communes de cette région
+            $nbCommune = $this->managerRegistry->getRepository(Organization::class)->countCommune([
+                'perimeterDepartment' => $county
+            ]);
+
+            // on regarde si on change le nombre max de communes pour une région
+            $countiesOrgCommunesMax = $nbCommune > $countiesOrgCommunesMax ? $nbCommune : $countiesOrgCommunesMax;
+
+            // on va recupérer les organisations epci de cette région
+            $nbEpci = $this->managerRegistry->getRepository(Organization::class)->countEpci([
+                'perimeterDepartment' => $county
+            ]);
+
+            // calcul le pourcentage de communes inscrites
+            $nbCommuneTotalOffical = $this->getNbCommuneByDepartmentOffical($county->getCode());
+            $percentCommunes = $nbCommuneTotalOffical == 0 ? 0 : round($nbCommune / $nbCommuneTotalOffical * 100, 2);
+            
+            // on alimente le tableau
+            $countiesOrgCounts[$county->getCode()] = [
+                'name' => $county->getName(),
+                'communes_count' => $nbCommune,
+                'percentage_communes' => $percentCommunes,
+                'epcis_count' => $nbEpci
+            ];
+        }
+        $countiesOrgCommunesMax = 30; // le chiffre est forcé pour l'affichage
+        // libere memoire
+        unset($counties);
+
+        // recuperes toutes les organizations de type communes
+        $organizationCommunes = $this->managerRegistry->getRepository(Organization::class)->findCommunes([]);
+        
+        $communes_with_org = [];
+        /** @var Organization $organization */
+        foreach ($organizationCommunes as $organization) {
+            $key = $organization['perimeter__code'] . '-' . $organization['perimeter__name'];
+            $content = [
+                'organization_name' => $organization['name'],
+                'user_email' => $organization['user__email'],
+                'projects_count' => $organization['projects_count'],
+                'date_created' => $organization['dateCreate']->format('Y-m-d'),
+                'age' => $this->getAge($organization['dateCreate']),
+            ];
+            if (array_key_exists($key, $communes_with_org)) {
+                $already_exists = false;
+                foreach ($communes_with_org[$key] as &$commune) {
+                    if ($commune['organization_name'] == $organization['name']) {
+                        $already_exists = true;
+                        $finalEmail = $commune['user_email'] ?? '';
+                        $finalEmail .= $organization['user__email'] ? ', ' . $organization['user__email'] : '';
+                        $commune['user_email'] = $finalEmail;
+                    }
+                }
+                if (!$already_exists) {
+                    $communes_with_org[$key][] = $content;
+                }
+            } else {
+                $communes_with_org[$key][] = $content;
+            }
+        }
+        // libère mémoire
+        unset($organizationCommunes);
+
+        // recuperes toutes les organizations de type Epci
+        $organizations_epcis = $this->managerRegistry->getRepository(Organization::class)->findEpcis([]);
+
+        $epcis_with_org = [];
+        $communes_perimeters = [];
+
+        foreach ($organizations_epcis as $organization) {
+            // Cache commune perimeters for a given perimeter id.
+            $perimeter_id = $organization["perimeter__id"];
+            if (array_key_exists($perimeter_id, $communes_perimeters)) {
+                $perimeters = $communes_perimeters[$perimeter_id];
+            } else {
+                $perimeters = $this->managerRegistry->getRepository(Perimeter::class)->findCommunesContained([
+                    'idParent' => $perimeter_id,
+                    'scale' => Perimeter::SCALE_COMMUNE
+                ]);
+                $communes_perimeters[$perimeter_id] = $perimeters;
+            }
+
+            foreach ($perimeters as $perimeter) {
+                $key = $perimeter["code"] . "-" . $perimeter["name"];
+                $content = [
+                    "organization_name" => $organization["name"],
+                    "user_email" => $organization["user__email"],
+                    "projects_count" => $organization["projects_count"],
+                    "date_created" => $organization["dateCreate"]->format("Y-m-d"),
+                    "age" => 4,
+                ];
+                if (array_key_exists($key, $epcis_with_org)) {
+                    $already_exists = false;
+                    foreach ($epcis_with_org[$key] as &$epci) {
+                        if ($epci["organization_name"] == $organization["name"]) {
+                            $already_exists = true;
+                            $epci["user_email"] = $epci["user_email"] . ", " . $organization["user__email"];
+                            $epci["projects_count"] += $organization["projects_count"];
+                        }
+                    }
+                    if (!$already_exists) {
+                        $epcis_with_org[$key][] = $content;
+                    }
+                } else {
+                    $epcis_with_org[$key][] = $content;
+                }
+            }
+            unset($perimeters);
+        }
+        unset($organizations_epcis);
+
+        dump('Mémoire maximale utilisée : ' . intval(round(memory_get_peak_usage() / 1024 / 1024)) . ' MB');
+        // rendu template
+        return $this->render('admin/statistics/carto.html.twig', [
+            'regions_geojson' => $regionsGeojson,
+            'regions_org_counts' => json_encode($regionsOrgCounts),
+            'regions_org_communes_max' => $regionsOrgCommunesMax,
+            'departments_codes' => $countiesCode,
+            'departments_org_communes_max' => $countiesOrgCommunesMax,
+            'departments_org_counts' => json_encode($countiesOrgCounts),
+            'communes_with_org' => json_encode($communes_with_org),
+            'epcis_with_org' => json_encode($epcis_with_org),
+            'project_dir' => $kernelInterface->getProjectDir()
+        ]);
+    }
+
+    private function getNbCommuneByDepartmentOffical(string $departmentCode): int
+    {
+        $nbCommunes = [
+            "01" => 393,
+            "02" => 799,
+            "03" => 317,
+            "04" => 198,
+            "05" => 162,
+            "06" => 163,
+            "07" => 335,
+            "08" => 449,
+            "09" => 327,
+            "10" => 431,
+            "11" => 433,
+            "12" => 285,
+            "13" => 119,
+            "14" => 528,
+            "15" => 246,
+            "16" => 364,
+            "17" => 463,
+            "18" => 287,
+            "19" => 279,
+            "2A" => 124,
+            "2B" => 236,
+            "21" => 698,
+            "22" => 348,
+            "23" => 256,
+            "24" => 503,
+            "25" => 571,
+            "26" => 363,
+            "27" => 585,
+            "28" => 365,
+            "29" => 277,
+            "30" => 351,
+            "31" => 586,
+            "32" => 461,
+            "33" => 535,
+            "34" => 342,
+            "35" => 333,
+            "36" => 241,
+            "37" => 272,
+            "38" => 512,
+            "39" => 494,
+            "40" => 327,
+            "41" => 267,
+            "42" => 323,
+            "43" => 257,
+            "44" => 207,
+            "45" => 325,
+            "46" => 313,
+            "47" => 319,
+            "48" => 152,
+            "49" => 177,
+            "50" => 446,
+            "51" => 613,
+            "52" => 426,
+            "53" => 240,
+            "54" => 591,
+            "55" => 499,
+            "56" => 249,
+            "57" => 725,
+            "58" => 309,
+            "59" => 648,
+            "60" => 679,
+            "61" => 385,
+            "62" => 890,
+            "63" => 464,
+            "64" => 546,
+            "65" => 469,
+            "66" => 226,
+            "67" => 514,
+            "68" => 366,
+            "69" => 208,
+            "69M" => 59,
+            "70" => 539,
+            "71" => 565,
+            "72" => 354,
+            "73" => 273,
+            "74" => 279,
+            "75" => 1,
+            "76" => 708,
+            "77" => 507,
+            "78" => 259,
+            "79" => 256,
+            "80" => 772,
+            "81" => 314,
+            "82" => 195,
+            "83" => 153,
+            "84" => 151,
+            "85" => 257,
+            "86" => 266,
+            "87" => 195,
+            "88" => 507,
+            "89" => 423,
+            "90" => 101,
+            "91" => 194,
+            "92" => 36,
+            "93" => 40,
+            "94" => 47,
+            "95" => 184,
+            "971" => 32,
+            "972" => 34,
+            "973" => 22,
+            "974" => 24,
+            "976" => 17,
+        ];
+
+        return isset($nbCommunes[$departmentCode]) ? $nbCommunes[$departmentCode] : 0;
+    }
+
+    function getAge(\DateTime $date): int
+    {
+        $now = new \DateTime();
+        $interval = $now->diff($date);
+        
+        if ($interval->days < 30) {
+            return 3;
+        } elseif ($interval->days < 90) {
+            return 2;
+        } else {
+            return 1;
+        }
     }
 }

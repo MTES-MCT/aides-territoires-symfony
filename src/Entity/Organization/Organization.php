@@ -1437,4 +1437,13 @@ class Organization
         }
         return $aids;
     }
+
+
+    public function getFirstBeneficary() : ?User
+    {
+        if (!$this->beneficiairies) {
+            return null;
+        }    
+        return $this->beneficiairies->first() ?? null;
+    }
 }

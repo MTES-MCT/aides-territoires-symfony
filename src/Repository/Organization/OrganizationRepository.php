@@ -43,7 +43,32 @@ class OrganizationRepository extends ServiceEntityRepository
         $params['perimeterScale'] = Perimeter::SCALE_COMMUNE;
         $params['perimeterIsObsolete'] = false;
         $params['isImported'] = false;
-        return $this->countCustom($params);        
+
+        $qb = $this->getQueryBuilder($params);
+        $qb->select('IFNULL(COUNT(DISTINCT(perimeterForScale.id)), 0) AS nb');
+
+        return $qb->getQuery()->getResult()[0]['nb'] ?? 0;
+        // return $this->countCustom($params);        
+    }
+
+    public function findCommunes(?array $params = null) : array
+    {
+        $params['typeSlug'] = OrganizationType::SLUG_COMMUNE;
+        $params['perimeterScale'] = Perimeter::SCALE_COMMUNE;
+        $params['perimeterIsObsolete'] = false;
+        $params['isImported'] = false;
+        $qb = $this->getQueryBuilder($params);
+        $qb->select('o.name, o.dateCreate');
+        $qb->addSelect('
+        (SELECT COUNT(DISTINCT(projects.id)) FROM App\Entity\Project\Project projects WHERE projects.organization = o) as projects_count'
+        );
+        $qb->innerJoin('o.perimeter', 'perimeter');
+        $qb->addSelect('perimeter.code AS perimeter__code, perimeter.name as perimeter__name');
+        $qb->innerJoin('o.beneficiairies', 'beneficiairies');
+        $qb->addSelect('beneficiairies.email AS user__email');
+        $qb->addSelect('organizationType.name AS organization_type');
+
+        return $qb->getQuery()->getResult();       
     }
 
     public function countInterco(?array $params = null) : int
@@ -67,6 +92,26 @@ class OrganizationRepository extends ServiceEntityRepository
         $qb->select('IFNULL(COUNT(DISTINCT(perimeterForScale.id)), 0) AS nb');
 
         return $qb->getQuery()->getResult()[0]['nb'] ?? 0;      
+    }
+
+    public function findEpcis(?array $params = null) : array
+    {
+        $params['typeSlug'] = OrganizationType::SLUG_EPCI;
+        $params['perimeterScale'] = Perimeter::SCALE_EPCI;
+        $params['perimeterIsObsolete'] = false;
+        $params['isImported'] = false;
+        $qb = $this->getQueryBuilder($params);
+        $qb->select('o.name, o.dateCreate');
+        $qb->addSelect('
+        (SELECT COUNT(DISTINCT(projects.id)) FROM App\Entity\Project\Project projects WHERE projects.organization = o) as projects_count'
+        );
+        $qb->innerJoin('o.perimeter', 'perimeter');
+        $qb->addSelect('perimeter.id AS perimeter__id, perimeter.code AS perimeter__code, perimeter.name as perimeter__name');
+        $qb->innerJoin('o.beneficiairies', 'beneficiairies');
+        $qb->addSelect('beneficiairies.email AS user__email');
+        $qb->addSelect('organizationType.name AS organization_type');
+
+        return $qb->getQuery()->getResult();       
     }
 
     public function countByType(?array $params = null): array
@@ -121,9 +166,20 @@ class OrganizationRepository extends ServiceEntityRepository
         $hasUserBeneficiary = $params['hasUserBeneficiary'] ?? null;
         $hasUserContributor = $params['hasUserContributor'] ?? null;
         $hasPerimeter = $params['hasPerimeter'] ?? null;
+        $perimeterRegion = $params['perimeterRegion'] ?? null;
+        $perimeterDepartment= $params['perimeterDepartment'] ?? null;
 
         $qb = $this->createQueryBuilder('o');
 
+        if ($perimeterDepartment instanceof Perimeter && $perimeterDepartment->getId()) {
+            $qb->andWhere('o.perimeterDepartment = :perimeterDepartment')
+            ->setParameter('perimeterDepartment', $perimeterDepartment);
+        }
+
+        if ($perimeterRegion instanceof Perimeter && $perimeterRegion->getId()) {
+            $qb->andWhere('o.perimeterRegion = :perimeterRegion')
+            ->setParameter('perimeterRegion', $perimeterRegion);
+        }
         if ($hasPerimeter) {
             $qb->innerJoin('o.perimeter', 'perimeterForPerimeter');
         }
