@@ -2,6 +2,7 @@
 
 namespace App\Entity\Reference;
 
+use App\Entity\Aid\Aid;
 use App\Entity\Project\Project;
 use App\Repository\Reference\ProjectReferenceRepository;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -32,9 +33,13 @@ class ProjectReference
     #[ORM\OneToMany(mappedBy: 'projectReference', targetEntity: Project::class)]
     private Collection $projects;
 
+    #[ORM\ManyToMany(targetEntity: Aid::class, mappedBy: 'projectReferences')]
+    private Collection $aids;
+
     public function __construct()
     {
         $this->projects = new ArrayCollection();
+        $this->aids = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -111,5 +116,32 @@ class ProjectReference
     public function  __toString(): string
     {
         return $this->getName() ?? '';
+    }
+
+    /**
+     * @return Collection<int, Aid>
+     */
+    public function getAids(): Collection
+    {
+        return $this->aids;
+    }
+
+    public function addAid(Aid $aid): static
+    {
+        if (!$this->aids->contains($aid)) {
+            $this->aids->add($aid);
+            $aid->addProjectReference($this);
+        }
+
+        return $this;
+    }
+
+    public function removeAid(Aid $aid): static
+    {
+        if ($this->aids->removeElement($aid)) {
+            $aid->removeProjectReference($this);
+        }
+
+        return $this;
     }
 }

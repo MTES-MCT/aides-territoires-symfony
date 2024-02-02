@@ -10,6 +10,7 @@ use App\Entity\Category\Category;
 use App\Entity\Organization\OrganizationType;
 use App\Entity\Perimeter\Perimeter;
 use App\Entity\Program\Program;
+use App\Entity\Reference\ProjectReference;
 use Doctrine\Common\Collections\ArrayCollection;
 
 class AidSearchClass
@@ -49,6 +50,8 @@ class AidSearchClass
     private ?string $europeanAid;
     private ?bool $isCallForProject;
 
+    private ?ProjectReference $projectReference;
+
     public function  __construct()
     {
         $this->organizationType = null;
@@ -65,6 +68,7 @@ class AidSearchClass
         $this->isCharged = null;
         $this->europeanAid = null;
         $this->isCallForProject = null;
+        $this->projectReference = null;
     }
 
     public function getOrganizationType(): ?OrganizationType
@@ -275,5 +279,15 @@ class AidSearchClass
     public function setIsCallForProject(?bool $isCallForProject): void
     {
         $this->isCallForProject = $isCallForProject;
+    }
+
+    public function getProjectReference(): ?ProjectReference
+    {
+        return $this->projectReference;
+    }
+
+    public function setProjectReference(?ProjectReference $projectReference): void
+    {
+        $this->projectReference = $projectReference;
     }
 }

@@ -19,6 +19,7 @@ use App\Entity\Perimeter\Perimeter;
 use App\Entity\Program\Program;
 use App\Entity\Project\ProjectValidated;
 use App\Entity\Reference\KeywordReference;
+use App\Entity\Reference\ProjectReference;
 use App\Entity\Search\SearchPage;
 use App\Entity\User\User;
 use App\Repository\Aid\AidRepository;
@@ -672,6 +673,9 @@ class Aid
     #[ORM\ManyToMany(targetEntity: KeywordReference::class, inversedBy: 'aids')]
     private Collection $keywordReferences;
 
+    #[ORM\ManyToMany(targetEntity: ProjectReference::class, inversedBy: 'aids')]
+    private Collection $projectReferences;
+
 
     /**
      * <Non Database Fields
@@ -704,6 +708,7 @@ class Aid
         $this->logAidEligibilityTests = new ArrayCollection();
         $this->financers = new ArrayCollection();
         $this->keywordReferences = new ArrayCollection();
+        $this->projectReferences = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -2442,6 +2447,30 @@ class Aid
     public function removeKeywordReference(KeywordReference $keywordReference): static
     {
         $this->keywordReferences->removeElement($keywordReference);
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, ProjectReference>
+     */
+    public function getProjectReferences(): Collection
+    {
+        return $this->projectReferences;
+    }
+
+    public function addProjectReference(ProjectReference $projectReference): static
+    {
+        if (!$this->projectReferences->contains($projectReference)) {
+            $this->projectReferences->add($projectReference);
+        }
+
+        return $this;
+    }
+
+    public function removeProjectReference(ProjectReference $projectReference): static
+    {
+        $this->projectReferences->removeElement($projectReference);
 
         return $this;
     }

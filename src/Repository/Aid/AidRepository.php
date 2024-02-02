@@ -15,6 +15,7 @@ use App\Entity\Organization\OrganizationType;
 use App\Entity\Perimeter\Perimeter;
 use App\Entity\Program\Program;
 use App\Entity\Reference\KeywordReference;
+use App\Entity\Reference\ProjectReference;
 use App\Entity\User\User;
 use App\Service\Reference\ReferenceService;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
@@ -392,6 +393,7 @@ class AidRepository extends ServiceEntityRepository
         $scoreObjectsMin = $params['scoreObjectsMin'] ?? 30;
         $dateCreateMin = $params['dateCreateMin'] ?? null;
         $dateCreateMax = $params['dateCreateMax'] ?? null;
+        $projectReference = $params['projectReference'] ?? null;
 
         $qb = $this->createQueryBuilder('a');
 
@@ -564,27 +566,18 @@ class AidRepository extends ServiceEntityRepository
                 }
             }
 
-        ;
+            if ($projectReference instanceof ProjectReference) {
+                $sqlProjectReference = '
+                CASE 
+                    WHEN :projectReference MEMBER OF a.projectReferences THEN 90 
+                    ELSE 0 
+                END
+                ';
 
-
-            // if ($simpleWordsString) {
-            //     $oldKeywordsString .= ' '.$simpleWordsString;
-            // }
-            // $oldKeywords = $objects = str_getcsv($oldKeywordsString, ' ', '"');
-            // foreach ($oldKeywords as $key => $keyword) {
-            //     if (trim($keyword) === '') {
-            //         unset($oldKeywords[$key]);
-            //     }
-            // }
-            // if (count($oldKeywords) > 0) {
-            //     $qb
-            //     ->leftJoin('a.keywords', 'keywords')
-            //     ->leftJoin('a.categories', 'categoriesKeyword')
-            //     ->andWhere('keywords.name IN (:oldKeywords) OR categoriesKeyword.name IN (:oldKeywords)')
-            //     ->setParameter('oldKeywords', $oldKeywords)
-            //     ;
-            // }
-
+                $qb
+                ->setParameter('projectReference', $projectReference)
+                ;
+            }
 
             $sqlTotal = '';
             if ($originalName) {
@@ -621,6 +614,13 @@ class AidRepository extends ServiceEntityRepository
                     $sqlTotal .= ' + ';
                 }
                 $sqlTotal .= $sqlKeywordReferences;
+            }
+
+            if (isset($sqlProjectReference)) {
+                if ($originalName || $objectsString || $intentionsString || isset($sqlSimpleWords) || isset($sqlCategories) || isset($sqlKeywordReferences)) {
+                    $sqlTotal .= ' + ';
+                }
+                $sqlTotal .= $sqlProjectReference;
             }
 
             if ($sqlTotal !== '') {

@@ -191,6 +191,8 @@ class AidCrudController extends AtCrudController
         ])
         ->hideOnIndex()
         ->setColumns(12);
+        yield AssociationField::new('projectReferences', 'Projets référents')
+        ;
         yield AssociationField::new('aidAudiences', 'Bénéficiaires de l’aide')
         ->setFormTypeOption('choice_label', function($entity) {
             $return = '';

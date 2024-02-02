@@ -13,6 +13,7 @@ use App\Entity\Organization\Organization;
 use App\Entity\Organization\OrganizationType;
 use App\Entity\Perimeter\Perimeter;
 use App\Entity\Program\Program;
+use App\Entity\Reference\ProjectReference;
 use App\Form\Aid\AidSearchType;
 use App\Repository\Category\CategoryRepository;
 use App\Repository\Keyword\KeywordSynonymlistRepository;
@@ -101,6 +102,10 @@ class AidSearchFormService
 
         if ($aidSearchClass->getIsCallForProject()) {
             $aidParams['isCallForProject'] = $aidSearchClass->getIsCallForProject();
+        }
+
+        if ($aidSearchClass->getProjectReference()) {
+            $aidParams['projectReference'] = $aidSearchClass->getProjectReference();
         }
 
         return $aidParams;
@@ -428,6 +433,23 @@ class AidSearchFormService
 
         /**
          * > isCallForProject
+        */
+
+
+
+        /**
+         * < ProjectReference
+        */
+        // si il y a un mot clé on va regarder si c'est le nom exact d'un projet référent
+        if ($aidSearchClass->getKeyword()) {
+            $projectReference = $this->managerRegistry->getRepository(ProjectReference::class)->findOneBy(['name' => $aidSearchClass->getKeyword()]);
+            if ($projectReference instanceof ProjectReference) {
+                $aidSearchClass->setProjectReference($projectReference);
+            }
+        }
+        
+        /**
+         * > ProjectReference
         */
 
         return $aidSearchClass;
