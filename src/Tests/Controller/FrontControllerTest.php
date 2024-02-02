@@ -2,8 +2,10 @@
 
 namespace App\Tests\Controller;
 
+use App\Entity\Aid\Aid;
+use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-
+use GuzzleHttp\Client;
 /**
  * php bin/phpunit src/Tests/Controller/FrontControllerTest.php
  */
@@ -11,14 +13,22 @@ class FrontControllerTest extends WebTestCase
 {
     public function testUrls()
     {
-        $client = static::createClient([], ['HTTP_HOST' => 'localhost:8080']);
-
-        $urls = $this->getUrls();
-
-        foreach ($urls as $url) {
-            $crawler = $client->request('GET', $url);
-            $this->assertResponseIsSuccessful(sprintf('The %s URL loads correctly.', $url));
+        $client = new Client();
+        foreach ($this->getUrls() as $url) {
+            try {
+            $response = $client->get($this->getBaseUrl().$url);
+            $this->assertEquals(200, $response->getStatusCode());
+            } catch (\Exception $e) {
+                $this->fail($e->getMessage());
+            }
         }
+    }
+
+    private function getBaseUrl(): string{
+        // en docker, ip locale
+        // docker ps pour afficher les container
+        // docker inspect at_apache pour avoir l'ip
+        return 'http://172.27.0.4';
     }
 
     private function getUrls()
@@ -26,6 +36,7 @@ class FrontControllerTest extends WebTestCase
         return [
             '/',
             '/programmes/',
+            '/programmes2/',
             // ajoutez d'autres URLs ici...
         ];
     }
