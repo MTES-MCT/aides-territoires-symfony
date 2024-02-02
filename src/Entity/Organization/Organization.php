@@ -41,6 +41,17 @@ class Organization
         ['slug' => 'SM', 'name' => 'Syndicat mixte et syndicat de commune'],
     ];
     
+    const TOTAL_BY_INTERCOMMUNALITY_TYPE = [
+        "CC" => 1019,
+        "CA" => 219,
+        "CU" => 14,
+        "METRO" => 22,
+        "GAL" => 339,
+        "PNR" => 59,
+        "PETR" => 368,
+        "SM" => 9970,
+    ];
+    
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]

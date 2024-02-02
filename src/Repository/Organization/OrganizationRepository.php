@@ -74,10 +74,14 @@ class OrganizationRepository extends ServiceEntityRepository
     public function countInterco(?array $params = null) : int
     {
         $params['typeSlug'] = OrganizationType::SLUG_EPCI;
-        $params['perimeterScale'] = Perimeter::SCALE_EPCI;
+        // $params['perimeterScale'] = Perimeter::SCALE_EPCI;
         $params['perimeterIsObsolete'] = false;
         $params['isImported'] = false;
-        return $this->countCustom($params);        
+        $qb = $this->getQueryBuilder($params);
+
+        $qb->select('IFNULL(COUNT(DISTINCT(perimeterForObsolete.id)), 0) AS nb');
+
+        return $qb->getQuery()->getResult()[0]['nb'] ?? 0;         
     }
 
     public function countEpci(?array $params = null) : int
@@ -86,7 +90,7 @@ class OrganizationRepository extends ServiceEntityRepository
         $params['perimeterScale'] = Perimeter::SCALE_EPCI;
         $params['perimeterIsObsolete'] = false;
         $params['isImported'] = false;
-        $params['intercommunalityType'] = ["CC", "CA", "CU", "METRO"];
+        $params['intercommunalityTypes'] = ["CC", "CA", "CU", "METRO"];
         $qb = $this->getQueryBuilder($params);
 
         $qb->select('IFNULL(COUNT(DISTINCT(perimeterForScale.id)), 0) AS nb');
@@ -161,6 +165,7 @@ class OrganizationRepository extends ServiceEntityRepository
         $perimeterIsObsolete = $params['perimeterIsObsolete'] ?? null;
         $isImported = $params['isImported'] ?? null;
         $intercommunalityTypes = $params['intercommunalityTypes'] ?? null;
+        $intercommunalityType = $params['intercommunalityType'] ?? null;
         $dateCreateMin = $params['dateCreateMin'] ?? null;
         $dateCreateMax = $params['dateCreateMax'] ?? null;
         $hasUserBeneficiary = $params['hasUserBeneficiary'] ?? null;
@@ -209,6 +214,12 @@ class OrganizationRepository extends ServiceEntityRepository
             ->setParameter('dateCreateMax', $dateCreateMax);
         }
 
+        if ($intercommunalityType !== null) {
+            $qb
+                ->andWhere('o.intercommunalityType = :intercommunalityType')
+                ->setParameter('intercommunalityType', $intercommunalityType)
+                ;
+        }
         if (is_array($intercommunalityTypes)) {
             $qb
                 ->andWhere('o.intercommunalityType IN (:intercommunalityTypes)')

@@ -20,20 +20,32 @@ use App\Entity\Search\SearchPage;
 use App\Entity\User\User;
 use App\Form\Admin\Filter\DateRangeType;
 use App\Service\Matomo\MatomoService;
+use App\Service\Various\Breadcrumb;
+use Doctrine\Persistence\ManagerRegistry;
 use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
-use FontLib\Table\Type\name;
 use Pagerfanta\Doctrine\ORM\QueryAdapter;
 use Pagerfanta\Pagerfanta;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\UX\Chartjs\Builder\ChartBuilderInterface;
 use Symfony\UX\Chartjs\Model\Chart;
 
 class StatisticsController extends DashboardController
 {
     const NB_USER_BY_PAGE = 50;
     const NB_ORGANIZATION_BY_PAGE = 50;
+    const NB_PROJECT_BY_PAGE = 50;
+
+    public function  __construct(
+        protected KernelInterface $kernel,
+        protected ChartBuilderInterface $chartBuilderInterface,
+        protected ManagerRegistry $managerRegistry,
+        protected Breadcrumb $breadcrumb
+        )
+    {
+        
+    }
 
     private function getChartEpci($nbEpci, $nbEpciTotal, $nbEpciObjectif): Chart
     {
@@ -957,6 +969,16 @@ class StatisticsController extends DashboardController
         $pagerfanta->setMaxPerPage(self::NB_USER_BY_PAGE);
         $pagerfanta->setCurrentPage($currentPage);
         
+        // fil arianne
+        $this->breadcrumb->add(
+            'Dashboard',
+            $this->generateUrl('admin_statistics_dashboard')
+        );
+        $this->breadcrumb->add(
+            'Statistiques Comptes Utilisateurs'
+        );
+
+        // rendu template
         return $this->render('admin/statistics/users.html.twig', [
             'nbUsers' => $nbUsers,
             'nbBeneficiaries' => $nbBeneficiaries,
@@ -1021,6 +1043,16 @@ class StatisticsController extends DashboardController
         $pagerfanta->setMaxPerPage(self::NB_ORGANIZATION_BY_PAGE);
         $pagerfanta->setCurrentPage($currentPage);
 
+        // fil arianne
+        $this->breadcrumb->add(
+            'Dashboard',
+            $this->generateUrl('admin_statistics_dashboard')
+        );
+        $this->breadcrumb->add(
+            'Statistiques Structures'
+        );
+
+        // rendu template
         return $this->render('admin/statistics/organizations.html.twig', [
             'nbOrganizations' => $nbOrganizations,
             'nbOrganizationsByType' => $nbOrganizationsByType,
@@ -1208,7 +1240,15 @@ class StatisticsController extends DashboardController
         }
         unset($organizations_epcis);
 
-        dump('Mémoire maximale utilisée : ' . intval(round(memory_get_peak_usage() / 1024 / 1024)) . ' MB');
+        // fil arianne
+        $this->breadcrumb->add(
+            'Dashboard',
+            $this->generateUrl('admin_statistics_dashboard')
+        );
+        $this->breadcrumb->add(
+            'Statistiques sur carte'
+        );
+
         // rendu template
         return $this->render('admin/statistics/carto.html.twig', [
             'regions_geojson' => $regionsGeojson,
@@ -1345,5 +1385,146 @@ class StatisticsController extends DashboardController
         } else {
             return 1;
         }
+    }
+
+
+    #[Route('/admin/statistics/stats-intercommunalites/', name: 'admin_statistics_interco')]
+    public function statsInterco(
+    ): Response
+    {
+        $interco_types = [];
+        
+        foreach (Organization::INTERCOMMUNALITY_TYPES as $intercoType) {
+            $key = $intercoType['slug'];
+            $label = $intercoType['name'];
+            # Saving some space on the label
+            $label = str_replace(["Communauté"], ["Comm."], $label);
+
+
+            $interco_type_dict = [
+                "code" => $key,
+                "div_id" => "#chart-" . strtolower($key),
+                "label" => $label,
+            ];
+
+            $interco_type_dict["total"] = Organization::TOTAL_BY_INTERCOMMUNALITY_TYPE[$key];
+            $interco_type_dict["current"] = $this->managerRegistry->getRepository(Organization::class)->countInterco([
+                'intercommunalityType' => $key,
+            ]);
+            $interco_type_dict["percentage"] = round(
+                $interco_type_dict["current"] * 100 / $interco_type_dict["total"],
+                1
+            );
+
+            # Prevent the chart to "overflow"
+            if ($interco_type_dict["current"] > $interco_type_dict["total"]) {
+                $interco_type_dict["current_chart"] = $interco_type_dict["total"];
+            } else {
+                $interco_type_dict["current_chart"] = $interco_type_dict["current"];
+            }
+
+            $interco_types[] = $interco_type_dict;
+        }
+
+        $charts = [];
+        foreach ($interco_types as $interco_type) {
+
+            $objectif = $interco_type['total'] - $interco_type['current'];
+            if ($objectif < 0) {
+                $objectif = 0;
+            }
+            $chart = $this->chartBuilderInterface->createChart(Chart::TYPE_DOUGHNUT);
+            $chart->setData([
+                'labels' => ['Inscrits', 'Objectif'],
+                'datasets' => [
+                    [
+                        'label' => 'Progression',
+                        'backgroundColor' => ['rgb(255, 99, 132)', 'rgb(75, 192, 192)'],
+                        'data' => [$interco_type['current'], $objectif]
+                    ]
+                ]
+            ]);
+
+            $charts[$interco_type['code']] = $chart;
+        }
+
+        // on refait le tableau par code
+        $interco_types_final = [];
+        foreach ($interco_types as $interco_type) {
+            $interco_types_final[$interco_type['code']] = $interco_type;
+        }
+        
+        // fil arianne
+        $this->breadcrumb->add(
+            'Dashboard',
+            $this->generateUrl('admin_statistics_dashboard')
+        );
+        $this->breadcrumb->add(
+            'Statistiques Intercommunalités'
+        );
+
+        // rendu template
+        return $this->render('admin/statistics/interco.html.twig', [
+            'interco_types' => $interco_types_final,
+            'charts' => $charts
+        ]);
+    }
+
+    #[Route('/admin/statistics/stats-projets/', name: 'admin_statistics_projects')]
+    public function statsProjects(
+        AdminContext $adminContext
+    ): Response
+    {
+        
+        // dates par défaut
+        $dateMin = new \DateTime('-1 month');
+        $dateMax = new \DateTime();
+
+        // formulaire de filtre
+        $formDateRange = $this->createForm(DateRangeType::class, null, ['method' => 'GET']);
+        $formDateRange->handleRequest($adminContext->getRequest());
+        if ($formDateRange->isSubmitted()) {
+            if ($formDateRange->isValid()) {
+                $dateMin = $formDateRange->get('dateMin')->getData();
+                $dateMax = $formDateRange->get('dateMax')->getData();
+            }
+        } else {
+            $formDateRange->get('dateMin')->setData($dateMin);
+            $formDateRange->get('dateMax')->setData($dateMax);
+        }
+
+                // gestion pagination
+                $currentPage = (int) $adminContext->getRequest()->get('page', 1);
+        
+
+        // les projets
+        $projects = $this->managerRegistry->getRepository(Project::class)->getQueryBuilder([
+            'dateCreateMin' => $dateMin,
+            'dateCreateMax' => $dateMax,
+            'orderBy' => [
+                'sort' => 'p.dateCreate',
+                'order' => 'DESC'
+            ]
+        ]);
+        $adapter = new QueryAdapter($projects);
+        $pagerfanta = new Pagerfanta($adapter);
+        $pagerfanta->setMaxPerPage(self::NB_PROJECT_BY_PAGE);
+        $pagerfanta->setCurrentPage($currentPage);
+
+        // fil arianne
+        $this->breadcrumb->add(
+            'Dashboard',
+            $this->generateUrl('admin_statistics_dashboard')
+        );
+        $this->breadcrumb->add(
+            'Statistiques projets'
+        );
+
+        // rendu template
+        return $this->render('admin/statistics/projects.html.twig', [
+            'formDateRange' => $formDateRange,
+            'projects' => $projects,
+            'myPager' => $pagerfanta,
+        ]);
     }
 }

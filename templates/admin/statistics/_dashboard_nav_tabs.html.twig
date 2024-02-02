@@ -24,7 +24,7 @@
     <li class="nav-item" role="presentation">
         <a
             id="engagement"
-            href=""
+            href="{{ path('admin_statistics_engagement', { '_fragment': 'statistiques' }) }}"
             class="nav-link {% if engagementSelected is defined %}active{% endif %}"
             tabindex="{% if engagementSelected is defined %}0{% else %}-1{% endif %}"
             role="tab"

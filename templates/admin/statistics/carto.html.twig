@@ -1,19 +1,16 @@
-{% extends "@EasyAdmin/page/content.html.twig" %}
+{% extends "admin/statistics/stats_base.html.twig" %}
 
 {% block head_stylesheets %}
     {{ parent() }}
-    {{ encore_entry_link_tags('import-scss/admin/admin') }}
     {{ encore_entry_link_tags('import-scss/admin/statistics/carto') }}
 {% endblock head_stylesheets %}
 
 {% block head_javascript %}
     {{ parent() }}
-    {{ encore_entry_script_tags('admin/admin') }}
     {{ encore_entry_script_tags('admin/statistics/carto') }}
 {% endblock head_javascript %}
 
-{% block main %}
-<main>
+{% block stats_content %}
 <section class="fr-container">
     <div data-controller="map"
       data-action="map:moveend->map#switchShapes"
@@ -105,5 +102,4 @@
       <div data-map-target="tables"></div>
     </div>
 </section>
-</main>
-{% endblock %}
+{% endblock stats_content %}

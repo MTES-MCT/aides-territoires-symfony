@@ -1,17 +1,6 @@
-{% extends "@EasyAdmin/page/content.html.twig" %}
+{% extends "admin/statistics/stats_base.html.twig" %}
 
-{% block head_stylesheets %}
-    {{ parent() }}
-    {{ encore_entry_link_tags('import-scss/admin/admin') }}
-{% endblock head_stylesheets %}
-
-{% block head_javascript %}
-    {{ parent() }}
-    {{ encore_entry_script_tags('admin/admin') }}
-{% endblock head_javascript %}
-
-{% block main %}
-<main>
+{% block stats_content %}
 <section id="users-stats" class="container">
 
     <div class="table-responsive mt-5">
@@ -106,5 +95,4 @@
     </div>
     
 </section>
-</main>
-{% endblock %}
+{% endblock stats_content %}

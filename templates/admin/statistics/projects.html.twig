@@ -1,0 +1,65 @@
+{% extends "admin/statistics/stats_base.html.twig" %}
+
+{% block stats_content %}
+<section id="projects-stats" class="container">
+
+
+    <h4 class="mt-0">Projets ({{myPager.getNbResults()}}) :</h4>
+
+    <div class="mt-5">
+        {{ form_start(formDateRange) }}
+        <div class="d-flex">
+            <div class="d-flex me-3">
+            {{ form_row(formDateRange.dateMin) }}
+            </div>
+            <div class="d-flex me-3">
+            {{ form_row(formDateRange.dateMax) }}
+            </div>
+            <div class="d-flex me-3">
+            <button type="submit" class="btn btn-primary">Valider</button>
+            </div>
+        </div>
+        {{ form_end(formDateRange) }}
+    </div>
+
+    <div class="table-responsive mt-5">
+        <table class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th scope="col">Nom du projet</th>
+                    <th scope="col">Structure</th>
+                    <th scope="col">Description</th>
+                    <th scope="col">Nb d'aides</th>
+                    <th scope="col">Création</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for project in myPager.currentPageResults %}
+                <tr>
+                    <td>{{ project.name }}</td>
+                    <td>
+                        {% if project.organization %}
+                        {{ project.organization.name }}
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if project.description %}
+                        {{ project.description|sanitize_html|raw }}
+                        {% endif %}
+                    </td>
+                    <td>
+                        {{ project.aidProjects|length }}
+                    </td>
+                    <td>{{ project.dateCreate|date('d/m/Y') }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div> 
+
+    <div class="">
+        {{ pagerfanta(myPager) }}
+    </div>
+    
+</section>
+{% endblock stats_content %}

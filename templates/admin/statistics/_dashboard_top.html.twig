@@ -3,12 +3,33 @@
         <a href="{{ path('admin_statistics_users') }}">{{ statsGlobal.nbUsers|number_format(0, ',', ' ') }} comptes utilisateurs</a></strong>,
         répartis en <strong><a href="{{ path('admin_statistics_organizations') }}">{{ statsGlobal.nbOrganizations|number_format(0, ',', ' ') }} structures</a></strong>
         (<a href="{{ path('admin_statistics_carto') }}">carte</a>),
-        dont <strong><a href="">{{ statsGlobal.nbInterco|number_format(0, ',', ' ') }} intercommunalités</a></strong>,
-        ont créé <strong><a href="">{{ statsGlobal.nbProjects|number_format(0, ',', ' ') }} projets</a></strong>
+        dont <strong><a href="{{ path('admin_statistics_interco') }}">{{ statsGlobal.nbInterco|number_format(0, ',', ' ') }} intercommunalités</a></strong>,
+        ont créé <strong><a href="{{ path('admin_statistics_projects') }}">{{ statsGlobal.nbProjects|number_format(0, ',', ' ') }} projets</a></strong>
         avec en tout <strong>{{ statsGlobal.nbAidProjects|number_format(0, ',', ' ') }} aides sélectionnées</strong> sur un total de
         <strong>{{ statsGlobal.nbAidsLive|number_format(0, ',', ' ') }} aides disponibles</strong> publiées par
         <strong>{{ statsGlobal.nbBackers|number_format(0, ',', ' ') }} porteurs</strong>.
         Sont également disponibles <strong>{{ statsGlobal.nbSearchPages|number_format(0, ',', ' ') }} portails</strong>.
         <span class="fr-hint-text">Pour rappel, le compte utilisateur a été lancé le 4 novembre 2021.</span>
     </p>
+</div>
+
+<div class="mt-5 d-flex">
+    {% if chartCommune is defined %}
+        <div class="col">
+            <div>{{ render_chart(chartCommune) }}</div>
+            <div class="text-center fs-5">
+                <p>{{ statsGlobal.nbCommune|number_format(0, ',', ' ')}} communes sur {{ statsGlobal.nbCommuneTotal|number_format(0, ',', ' ') }}</p>
+                <p>Objectif : {{ statsGlobal.nbCommuneObjectif }}</p>
+            </div>
+        </div>
+    {% endif %}
+    {% if chartEpci is defined %}
+        <div class="col">
+            <div>{{ render_chart(chartEpci) }}</div>
+            <div class="text-center fs-5">
+                <p>{{ statsGlobal.nbEpci }} EPCI ({{ statsGlobal.nbEpciPercentage|number_format(2, ',', ' ') }}%)</p>
+                <p>Objectif : {{ statsGlobal.nbEpciObjectifPercentage|number_format(2, ',', ' ') }}%</p>
+            </div>
+        </div>
+    {% endif %}
 </div>
