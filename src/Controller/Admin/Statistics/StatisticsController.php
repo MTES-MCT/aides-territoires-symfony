@@ -20,9 +20,11 @@ use App\Entity\Search\SearchPage;
 use App\Entity\User\User;
 use App\Form\Admin\Filter\DateRangeType;
 use App\Service\Matomo\MatomoService;
+use App\Service\User\UserService;
 use App\Service\Various\Breadcrumb;
 use Doctrine\Persistence\ManagerRegistry;
 use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
+use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
 use Pagerfanta\Doctrine\ORM\QueryAdapter;
 use Pagerfanta\Pagerfanta;
 use Symfony\Component\HttpFoundation\Response;
@@ -38,9 +40,10 @@ class StatisticsController extends DashboardController
     const NB_PROJECT_BY_PAGE = 50;
 
     public function  __construct(
-        protected KernelInterface $kernel,
-        protected ChartBuilderInterface $chartBuilderInterface,
+        protected UserService $userService,
         protected ManagerRegistry $managerRegistry,
+        protected AdminUrlGenerator $adminUrlGenerator,
+        protected ChartBuilderInterface $chartBuilderInterface,
         protected Breadcrumb $breadcrumb
         )
     {

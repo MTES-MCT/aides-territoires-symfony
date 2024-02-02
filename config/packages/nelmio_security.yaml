@@ -44,6 +44,7 @@ nelmio_security:
                 - 'data:'
                 - 'https://aides-territoires-prod.s3.fr-par.scw.cloud'
                 - 'https://aides-territoires-stage.s3.fr-par.scw.cloud'
+                - 'https://b.forte.tiles.quaidorsay.fr'
             #définit les sources d’éléments multimédias autorisées (ex : <vidéo>, <audio>)
             media-src:
                 - 'self'
