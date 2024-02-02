@@ -47,26 +47,31 @@ class StatisticsController extends DashboardController
         
     }
 
-    private function getChartEpci($nbEpci, $nbEpciTotal, $nbEpciObjectif): Chart
+    private function getChartObjectif(int $nbCurrent, int $nbTotal, ?int $nbObjectif): Chart
     {
-        $chartEpci = $this->chartBuilderInterface->createChart(Chart::TYPE_BAR);
-        $chartEpci->setData([
+        $total = $nbTotal - $nbCurrent;
+        if ($total < 0) {
+            $total = 0;
+        }
+
+        $chart = $this->chartBuilderInterface->createChart(Chart::TYPE_BAR);
+        $chart->setData([
             'labels' => ['Epci'],
             'datasets' => [
                 [
-                    'label' => 'Inscrites',
-                    'backgroundColor' => 'rgb(255, 99, 132)',
-                    'data' => [$nbEpci],
+                    'label' => 'Actuel',
+                    'backgroundColor' => 'rgb(75, 192, 192)',
+                    'data' => [$nbCurrent],
                 ],
                 [
                     'label' => 'Total',
-                    'backgroundColor' => 'rgb(75, 192, 192)',
-                    'data' => [$nbEpciTotal],
+                    'backgroundColor' => '#ccc',
+                    'data' => [$total],
                 ],
             ],
         ]);
         
-        $chartEpci->setOptions([
+        $options = [
             'scales' => [
                 'y' => [
                     'beginAtZero' => true,
@@ -75,89 +80,41 @@ class StatisticsController extends DashboardController
                 'x' => [
                     'stacked' => true
                 ]
-            ],
-            'plugins' => [
-                'annotation' => [
-                    'annotations' => [
-                        'line1' => [
-                            'type' => 'line',
-                            'yMin' => $nbEpciObjectif,
-                            'yMax' => $nbEpciObjectif,
-                            'borderColor' => 'rgb(54, 162, 235)',
-                            'borderWidth' => 4,
-                            'clip' => false, // add this line
-                            'label' => [
-                                'enabled' => true,
-                                'content' => 'Objectif '.$nbEpciObjectif,
-                                'position' => 'center',
-                                'display' => true
+            ]
+        ];
+        if ($nbObjectif) {
+            $options['plugins'] =[
+                    'annotation' => [
+                        'annotations' => [
+                            'line1' => [
+                                'type' => 'line',
+                                'yMin' => $nbObjectif,
+                                'yMax' => $nbObjectif,
+                                'borderColor' => 'rgb(54, 162, 235)',
+                                'borderWidth' => 4,
+                                'clip' => false, // add this line
+                                'label' => [
+                                    'enabled' => true,
+                                    'content' => 'Objectif '.$nbObjectif,
+                                    'position' => 'center',
+                                    'display' => true
+                                ],
                             ],
                         ],
                     ],
-                ],
-            ],
-        ]);
-
-        return $chartEpci;
-    }
-    private function getChartCommune($nbCommune, $nbCommuneTotal, $nbCommuneObjectif): Chart
-    {
-        $chartCommune = $this->chartBuilderInterface->createChart(Chart::TYPE_BAR);
-
-        $chartCommune->setData([
-            'labels' => ['Communes'],
-            'datasets' => [
-                [
-                    'label' => 'Inscrites',
-                    'backgroundColor' => 'rgb(255, 99, 132)',
-                    'data' => [$nbCommune],
-                ],
-                [
-                    'label' => 'Total',
-                    'backgroundColor' => 'rgb(75, 192, 192)',
-                    'data' => [$nbCommuneTotal],
-                ],
-            ],
-        ]);
-        
-        $chartCommune->setOptions([
-            'scales' => [
-                'y' => [
-                    'beginAtZero' => true,
-                    'stacked' => true,
-                ],
-                'x' => [
-                    'stacked' => true
                 ]
-            ],
-            'plugins' => [
-                'annotation' => [
-                    'annotations' => [
-                        'line1' => [
-                            'type' => 'line',
-                            'yMin' => $nbCommuneObjectif,
-                            'yMax' => $nbCommuneObjectif,
-                            'borderColor' => 'rgb(54, 162, 235)',
-                            'borderWidth' => 4,
-                            'clip' => false, // add this line
-                            'label' => [
-                                'enabled' => true,
-                                'content' => 'Objectif '.$nbCommuneObjectif,
-                                'position' => 'center',
-                                'display' => true
-                            ],
-                        ],
-                    ],
-                ],
-            ],
-        ]);
+        ;
+        }
 
-        return $chartCommune;
+        $chart->setOptions($options);
+
+
+        return $chart;
     }
 
     private function getStatsGlobal(): array
     {
-        return [
+        $stats = [
             'nbUsers' => $this->managerRegistry->getRepository(User::class)->count(['isBeneficiary' => true]),
             'nbOrganizations' => $this->managerRegistry->getRepository(Organization::class)->count(['isImported' => false]),
             'nbInterco' => $this->managerRegistry->getRepository(Organization::class)->countInterco([]),
@@ -173,8 +130,10 @@ class StatisticsController extends DashboardController
             'nbEpciTotal' => 1256,
             'nbEpciObjectif' => (int) 1256 * 0.75,
             'nbEpciObjectifPercentage' => round((1256 * 0.75 / 1256) * 100, 1),
-            'nbEpciPercentage' => round((1256 / 1256) * 100, 1),
+            
         ];
+        $stats['nbEpciPercentage'] = round(($stats['nbEpci'] / $stats['nbEpciTotal']) * 100, 1);
+        return $stats;
     }
 
     #[Route('/admin/statistics/dashboard', name: 'admin_statistics_dashboard')]
@@ -184,8 +143,8 @@ class StatisticsController extends DashboardController
     ): Response
     {
         $statsGlobal = $this->getStatsGlobal();
-        $chartCommune = $this->getChartCommune($statsGlobal['nbCommune'], $statsGlobal['nbCommuneTotal'], $statsGlobal['nbCommuneObjectif']);
-        $chartEpci = $this->getChartEpci($statsGlobal['nbEpci'], $statsGlobal['nbEpciTotal'], $statsGlobal['nbEpciObjectif']);
+        $chartCommune = $this->getChartObjectif($statsGlobal['nbCommune'], $statsGlobal['nbCommuneTotal'], $statsGlobal['nbCommuneObjectif']);
+        $chartEpci = $this->getChartObjectif($statsGlobal['nbEpci'], $statsGlobal['nbEpciTotal'], $statsGlobal['nbEpciObjectif']);
 
         // dates par défaut
         $dateMin = new \DateTime('-1 month');
@@ -309,8 +268,8 @@ class StatisticsController extends DashboardController
     ): Response
     {
         $statsGlobal = $this->getStatsGlobal();
-        $chartCommune = $this->getChartCommune($statsGlobal['nbCommune'], $statsGlobal['nbCommuneTotal'], $statsGlobal['nbCommuneObjectif']);
-        $chartEpci = $this->getChartEpci($statsGlobal['nbEpci'], $statsGlobal['nbEpciTotal'], $statsGlobal['nbEpciObjectif']);
+        $chartCommune = $this->getChartObjectif($statsGlobal['nbCommune'], $statsGlobal['nbCommuneTotal'], $statsGlobal['nbCommuneObjectif']);
+        $chartEpci = $this->getChartObjectif($statsGlobal['nbEpci'], $statsGlobal['nbEpciTotal'], $statsGlobal['nbEpciObjectif']);
 
         // dates par défaut
         $dateMin = new \DateTime('-1 month');
@@ -445,8 +404,8 @@ class StatisticsController extends DashboardController
     ): Response
     {
         $statsGlobal = $this->getStatsGlobal();
-        $chartCommune = $this->getChartCommune($statsGlobal['nbCommune'], $statsGlobal['nbCommuneTotal'], $statsGlobal['nbCommuneObjectif']);
-        $chartEpci = $this->getChartEpci($statsGlobal['nbEpci'], $statsGlobal['nbEpciTotal'], $statsGlobal['nbEpciObjectif']);
+        $chartCommune = $this->getChartObjectif($statsGlobal['nbCommune'], $statsGlobal['nbCommuneTotal'], $statsGlobal['nbCommuneObjectif']);
+        $chartEpci = $this->getChartObjectif($statsGlobal['nbEpci'], $statsGlobal['nbEpciTotal'], $statsGlobal['nbEpciObjectif']);
 
         // dates par défaut
         $dateMin = new \DateTime('-1 month');
@@ -707,8 +666,8 @@ class StatisticsController extends DashboardController
     ): Response
     {
         $statsGlobal = $this->getStatsGlobal();
-        $chartCommune = $this->getChartCommune($statsGlobal['nbCommune'], $statsGlobal['nbCommuneTotal'], $statsGlobal['nbCommuneObjectif']);
-        $chartEpci = $this->getChartEpci($statsGlobal['nbEpci'], $statsGlobal['nbEpciTotal'], $statsGlobal['nbEpciObjectif']);
+        $chartCommune = $this->getChartObjectif($statsGlobal['nbCommune'], $statsGlobal['nbCommuneTotal'], $statsGlobal['nbCommuneObjectif']);
+        $chartEpci = $this->getChartObjectif($statsGlobal['nbEpci'], $statsGlobal['nbEpciTotal'], $statsGlobal['nbEpciObjectif']);
 
         // dates par défaut
         $dateMin = new \DateTime('-1 month');
@@ -1429,21 +1388,7 @@ class StatisticsController extends DashboardController
         $charts = [];
         foreach ($interco_types as $interco_type) {
 
-            $objectif = $interco_type['total'] - $interco_type['current'];
-            if ($objectif < 0) {
-                $objectif = 0;
-            }
-            $chart = $this->chartBuilderInterface->createChart(Chart::TYPE_DOUGHNUT);
-            $chart->setData([
-                'labels' => ['Inscrits', 'Objectif'],
-                'datasets' => [
-                    [
-                        'label' => 'Progression',
-                        'backgroundColor' => ['rgb(255, 99, 132)', 'rgb(75, 192, 192)'],
-                        'data' => [$interco_type['current'], $objectif]
-                    ]
-                ]
-            ]);
+            $chart = $this->getChartObjectif($interco_type['current_chart'], $interco_type['total'], null);
 
             $charts[$interco_type['code']] = $chart;
         }

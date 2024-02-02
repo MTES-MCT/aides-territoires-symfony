@@ -13,9 +13,9 @@
     </p>
 </div>
 
-<div class="mt-5 d-flex">
+<div class="mt-5 row  justify-content-center">
     {% if chartCommune is defined %}
-        <div class="col">
+        <div class="col-md-4">
             <div>{{ render_chart(chartCommune) }}</div>
             <div class="text-center fs-5">
                 <p>{{ statsGlobal.nbCommune|number_format(0, ',', ' ')}} communes sur {{ statsGlobal.nbCommuneTotal|number_format(0, ',', ' ') }}</p>
@@ -24,7 +24,7 @@
         </div>
     {% endif %}
     {% if chartEpci is defined %}
-        <div class="col">
+        <div class="col-md-4">
             <div>{{ render_chart(chartEpci) }}</div>
             <div class="text-center fs-5">
                 <p>{{ statsGlobal.nbEpci }} EPCI ({{ statsGlobal.nbEpciPercentage|number_format(2, ',', ' ') }}%)</p>
