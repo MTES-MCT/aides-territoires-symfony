@@ -13,7 +13,7 @@ use Symfony\UX\Autocomplete\Form\BaseEntityAutocompleteType;
 #[AsEntityAutocompleteField] 
 class AidPerimeterFilterType extends AbstractType
 {
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'class' => Perimeter::class,
@@ -24,7 +24,7 @@ class AidPerimeterFilterType extends AbstractType
         ]);
     }
 
-    public function getParent()
+    public function getParent(): ?string
     {
         return PerimeterAutocompleteType::class;
     }

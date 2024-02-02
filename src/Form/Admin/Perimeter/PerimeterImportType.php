@@ -13,21 +13,6 @@ class PerimeterImportType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            // ->add('testfile', FileUploadType::class, [
-            //     'required' => true,
-            //     'label' => 'Fichier à importer (.csv)',
-            //     'constraints' => [
-            //         new \Symfony\Component\Validator\Constraints\File([
-            //             'mimeTypes' => [
-            //                 'text/plain',
-            //                 'text/csv',
-            //                 'application/vnd.ms-excel',
-            //                 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-            //             ],
-            //             'mimeTypesMessage' => 'Veuillez sélectionner un fichier .csv valide',
-            //         ])
-            //     ]
-            // ])
             ->add('file', FileType::class, [
                 'required' => true,
                 'label' => 'Fichier à importer (.csv)',
