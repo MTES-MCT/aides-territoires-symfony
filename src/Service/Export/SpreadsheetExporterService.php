@@ -55,7 +55,7 @@ class SpreadsheetExporterService
             $cronExportSpreadsheet->setSqlRequest($queryBuilder->getQuery()->getDQL());
             $cronExportSpreadsheet->setSqlParams($sqlParams);
             $cronExportSpreadsheet->setEntityFqcn($entityFcqn);
-            $cronExportSpreadsheet->setFilename($filename);
+            $cronExportSpreadsheet->setFilename($filename.'.'.$format);
             $cronExportSpreadsheet->setFormat($format);
             $cronExportSpreadsheet->setUser($this->userService->getUserLogged());
 
@@ -90,7 +90,7 @@ class SpreadsheetExporterService
             }
 
             $now = new \DateTime(date('Y-m-d H:i:s'));
-            $writer->openToBrowser('export_'.$filename.'_at_'.$now->format('d_m_Y'));
+            $writer->openToBrowser('export_'.$filename.'_at_'.$now->format('d_m_Y').'.'.$format);
 
             if ($format == FileService::FORMAT_XLSX) {
                 $writer->getCurrentSheet()->setSheetView($sheetView);
