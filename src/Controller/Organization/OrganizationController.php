@@ -39,32 +39,34 @@ class OrganizationController extends FrontController
         $user = $userService->getUserLogged();
         $organization = $user->getDefaultOrganization();
         // si on a des infos manquantes, on va voir si elles sont dans les autres tables
-        if (!$organization->getSirenCode() || !$organization->getSiretCode() || !$organization->getApeCode() || $organization->getInseeCode()) {
-            if ($organization->getPerimeter() && $organization->getOrganizationType()) {
-                if (!$organization->getSirenCode() && $organization->getPerimeter()->getSiren()) {
-                    $organization->setSirenCode($organization->getPerimeter()->getSiren());
-                }
-                if (!$organization->getSiretCode() && $organization->getPerimeter()->getSiret()) {
-                    $organization->setSiretCode($organization->getPerimeter()->getSiret());
-                }
-                if (!$organization->getInseeCode() && $organization->getPerimeter()->getInsee()) {
-                    $organization->setInseeCode($organization->getPerimeter()->getInsee());
-                }
-                if (!$organization->getApeCode()) {
-                    $perimeterDatas = $perimeterDataRepository->findBy([
-                        'perimeter' => $organization->getPerimeter(),
-                    ]);
-                    foreach ($perimeterDatas as $perimeterData) {
-                        if ($perimeterData->getProp() == 'ape_code') {
-                            $organization->setApeCode($perimeterData->getValue());
-                            break;
+        if ($organization instanceof Organization) {
+            if (!$organization->getSirenCode() || !$organization->getSiretCode() || !$organization->getApeCode() || $organization->getInseeCode()) {
+                if ($organization->getPerimeter() && $organization->getOrganizationType()) {
+                    if (!$organization->getSirenCode() && $organization->getPerimeter()->getSiren()) {
+                        $organization->setSirenCode($organization->getPerimeter()->getSiren());
+                    }
+                    if (!$organization->getSiretCode() && $organization->getPerimeter()->getSiret()) {
+                        $organization->setSiretCode($organization->getPerimeter()->getSiret());
+                    }
+                    if (!$organization->getInseeCode() && $organization->getPerimeter()->getInsee()) {
+                        $organization->setInseeCode($organization->getPerimeter()->getInsee());
+                    }
+                    if (!$organization->getApeCode()) {
+                        $perimeterDatas = $perimeterDataRepository->findBy([
+                            'perimeter' => $organization->getPerimeter(),
+                        ]);
+                        foreach ($perimeterDatas as $perimeterData) {
+                            if ($perimeterData->getProp() == 'ape_code') {
+                                $organization->setApeCode($perimeterData->getValue());
+                                break;
+                            }
                         }
                     }
                 }
             }
         }
         $form = $this->createForm(RegisterType::class, $user, ['onlyOrganization' => true]);
-        if ($organization) {
+        if ($organization instanceof Organization) {
             $form->get('organizationType')->setData($organization->getOrganizationType());
             $form->get('organizationName')->setData($organization->getName());
             $form->get('intercommunalityType')->setData($organization->getIntercommunalityType());
