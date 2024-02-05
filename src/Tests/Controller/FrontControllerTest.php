@@ -19,7 +19,7 @@ class FrontControllerTest extends WebTestCase
             $response = $client->get($this->getBaseUrl().$url);
             $this->assertEquals(200, $response->getStatusCode());
             } catch (\Exception $e) {
-                $this->fail($e->getMessage());
+                $this->fail($url.' : '.$e->getCode());
             }
         }
     }
@@ -33,10 +33,25 @@ class FrontControllerTest extends WebTestCase
 
     private function getUrls()
     {
+        // // (1) boot the Symfony kernel
+        // self::bootKernel();
+
+        // // (2) use static::getContainer() to access the service container
+        // $container = static::getContainer();
+        
+        // $managerRegistry =  $container->get('doctrine');
+        // $manager = $managerRegistry->getManager();
+        // $aids = $manager->getRepository(Aid::class)->findAll();
+        // $urls = [];
+        // foreach ($aids as $aid) {
+        //     $urls[] = '/aides/'.$aid->getSlug();
+        // }
+        // return $urls;
+
         return [
             '/',
             '/programmes/',
-            '/programmes2/',
+            '/blog/',
             // ajoutez d'autres URLs ici...
         ];
     }
