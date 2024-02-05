@@ -192,6 +192,7 @@ class StatisticsController extends DashboardController
             'dateMax' => $dateMax,
             'excludeSources' => ['api'],
         ]);
+
         $nbAidViewsDistinct = $this->managerRegistry->getRepository(LogAidView::class)->countAidsViews([
             'dateMin' => $dateMin,
             'dateMax' => $dateMax,

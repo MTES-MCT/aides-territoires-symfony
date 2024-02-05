@@ -59,6 +59,7 @@ class LogController extends DashboardController
             'dateMin' => $dateMin,
             'dateMax' => $dateMax,
         ]);
+
         // remplissage des dates manquantes
         $allDates = $this->fillAllDate($logAidOriginUrlClicks, $dateMin, $dateMax);
 
@@ -89,7 +90,7 @@ class LogController extends DashboardController
 
         $allDates = [];
 
-        while ($dateMin < $dateMax) {
+        while ($dateMin <= $dateMax) {
             $allDates[$dateMin->format('Y-m-d')] = [
                 'dateCreate' => $dateMin->format('Y-m-d'),
                 'nb' => $this->getDateValueInArray($data, $dateMin)
@@ -134,7 +135,13 @@ class LogController extends DashboardController
                 ],
             ],
         ]);
-
+        $chart->setOptions([
+            'scales' => [
+                'y' => [
+                    'beginAtZero' => true,
+                ],
+            ]
+        ]);
         return $chart;
     }
 }
