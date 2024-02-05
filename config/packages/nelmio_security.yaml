@@ -66,7 +66,6 @@ nelmio_security:
             object-src:
                 - 'none'
 
-            require-trusted-types-for: 'script'
             #connect-src : applique la CSP aux connexions à partir d’un XMLHttpRequest (AJAX) ou d’un WebSocket
             #bade-uri :autorise les URL dans l’attribut src de n’importe quelle balise
             #add-header: ajoute un en-tête pour la Content Security Policy
