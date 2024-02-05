@@ -93,7 +93,7 @@ class StatisticsController extends DashboardController
                                 'type' => 'line',
                                 'yMin' => $nbObjectif,
                                 'yMax' => $nbObjectif,
-                                'borderColor' => 'rgb(54, 162, 235)',
+                                'borderColor' => 'rgb(255, 99, 132)',
                                 'borderWidth' => 4,
                                 'clip' => false, // add this line
                                 'label' => [
@@ -128,7 +128,7 @@ class StatisticsController extends DashboardController
             'nbSearchPages' => $this->managerRegistry->getRepository(SearchPage::class)->count([]),
             'nbCommune' => $this->managerRegistry->getRepository(Organization::class)->countCommune([]),
             'nbCommuneTotal' => 35039,
-            'nbCommuneObjectif' => 10000,
+            'nbCommuneObjectif' => 15000,
             'nbEpci' => $this->managerRegistry->getRepository(Organization::class)->countEpci([]),
             'nbEpciTotal' => 1256,
             'nbEpciObjectif' => (int) 1256 * 0.75,
