@@ -14,6 +14,7 @@ use App\Entity\Aid\AidStep;
 use App\Entity\Aid\AidSuggestedAidProject;
 use App\Entity\Aid\AidType;
 use App\Entity\Aid\AidTypeGroup;
+use App\Entity\Alert\Alert;
 use App\Entity\Backer\Backer;
 use App\Entity\Backer\BackerCategory;
 use App\Entity\Backer\BackerGroup;
@@ -246,7 +247,9 @@ class DashboardController extends AbstractDashboardController
             MenuItem::linkToCrud('Pages Personnalisées', 'fas fa-list', SearchPage::class),            
         ]);
 
-
+        yield MenuItem::subMenu('Alertes', 'far fa-bell')->setSubItems([
+            MenuItem::linkToCrud('Alertes', 'fas fa-list', Alert::class),
+        ]);
 
         yield MenuItem::subMenu('Configuration système', 'fas fa-cogs')->setSubItems([
             MenuItem::linkToCrud('Exports de données', 'fas fa-list', DataExport::class),
