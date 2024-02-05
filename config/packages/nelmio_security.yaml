@@ -27,9 +27,11 @@ nelmio_security:
             #définit les sources de scripts autorisées
             script-src:
                 - 'self'
+                - 'strict-dynamic'
                 - 'https://www.youtube.com'
                 - 'https://sibautomation.com'
                 - 'https://stats.beta.gouv.fr/matomo.js'
+                - 'unsafe-inline'
             #définit les sources de feuilles de styles (CSS) autorisées
             style-src:
                 - 'self'
@@ -60,6 +62,11 @@ nelmio_security:
             font-src: 
                 - 'self'
                 - 'https://fonts.gstatic.com/'
+
+            object-src:
+                - 'none'
+
+            require-trusted-types-for: 'script'
             #connect-src : applique la CSP aux connexions à partir d’un XMLHttpRequest (AJAX) ou d’un WebSocket
             #bade-uri :autorise les URL dans l’attribut src de n’importe quelle balise
             #add-header: ajoute un en-tête pour la Content Security Policy
