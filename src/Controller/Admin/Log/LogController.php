@@ -34,13 +34,14 @@ class LogController extends DashboardController
             $formDateRange->get('dateMin')->setData($dateMin);
             $formDateRange->get('dateMax')->setData($dateMax);
         }
-        
+
         // Logs candidater aides
         // récupération des données
         $logAidApplicationUrlClicks = $this->managerRegistry->getRepository(LogAidApplicationUrlClick::class)->countOnPeriod([
             'dateMin' => $dateMin,
             'dateMax' => $dateMax,
         ]);
+
         // remplissage des dates manquantes
         $allDates = $this->fillAllDate($logAidApplicationUrlClicks, $dateMin, $dateMax);
 
@@ -97,14 +98,14 @@ class LogController extends DashboardController
             ];
             $dateMin->modify('+1 day');
         }
-        
+
         return $allDates;
     }
 
     public function getDateValueInArray(array $data, \DateTime $date): int
     {
         foreach ($data as $item) {
-            if ($item['dateCreate'] == $date) {
+            if ($item['dateCreate']->format('Y-m-d') == $date->format('Y-m-d')) {
                 return $item['nb'];
             }
         }
