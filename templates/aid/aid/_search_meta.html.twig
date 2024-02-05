@@ -104,7 +104,7 @@
     </div>
     {% endif %}
 
-    {% if formAidSearch.europeanAid is defined and formAidSearch.europeanAid.vars.data is not null and formAidSearch.europeanAid.vars.data  != '' %}
+    {% if formAidSearch.europeanAid is defined and formAidSearch.europeanAid.vars.data is not null and formAidSearch.europeanAid.vars.data  != '' and formAidSearch.europeanAid.vars.data  != 'all' %}
     <div class="fr-tags-group">
         <p title="aides gratuites ou payantes" class="fr-tag fr-icon-arrow-right-line fr-tag--icon-left">
             {{ constant('App\\Entity\\Aid\\Aid::LABELS_EUROPEAN')[formAidSearch.europeanAid.vars.data] }}

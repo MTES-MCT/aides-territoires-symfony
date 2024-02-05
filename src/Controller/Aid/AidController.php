@@ -85,11 +85,6 @@ class AidController extends FrontController
             'method' => 'GET',
             'extended' => true,
         ];
-        // paramètre selon url
-        // $formAidSearchParams = array_merge(
-        //     $formAidSearchParams,
-        //     $aidSearchFormService->completeFormAidSearchParams()
-        // );
 
         // formulaire recherche aides
         $aidSearchClass = $aidSearchFormService->getAidSearchClass();
@@ -99,19 +94,19 @@ class AidController extends FrontController
             $formAidSearchParams
         );
         $formAidSearch->handleRequest($requestStack->getCurrentRequest());
-
+        if ($formAidSearch->isSubmitted()) {
+            if ($formAidSearch->isValid()) {
+                dump('valid');
+            } else {
+                dump('pas valid');
+            }
+        }
         // parametres pour requetes aides
         $aidParams = [
             'showInSearch' => true,
         ];
         $aidParams = array_merge($aidParams, $aidSearchFormService->convertAidSearchClassToAidParams($aidSearchClass));
         $query = parse_url($requestStack->getCurrentRequest()->getRequestUri(), PHP_URL_QUERY) ?? null;
-        // if ($query) {
-        //     $aidParams = array_merge($aidParams, $aidSearchFormService->convertQuerystringToParams($query));
-        // }
-
-        // transforme le orderBy
-        // $aidParams = $aidSearchFormService->handleOrderBy($aidParams);
 
         // le paginateur
         $aids = $aidService->searchAids($aidParams);
@@ -193,7 +188,7 @@ class AidController extends FrontController
 
         // check si on affiche ou pas le formulaire étendu
         $showExtended = $aidSearchFormService->setShowExtendedV2($aidSearchClass);
-
+dump($aidSearchClass, $aidSearchFormService->convertAidSearchClassToQueryString($aidSearchClass));
         // formulaire creer alerte
         $alert = new Alert();
         $formAlertCreate = $this->createForm(AlertCreateType::class, $alert);
@@ -204,7 +199,7 @@ class AidController extends FrontController
                 if ($user) {
                     try {
                         $alert->setEmail($user->getEmail());
-                        $alert->setQuerystring($requestStack->getCurrentRequest()->server->get('QUERY_STRING', null));
+                        $alert->setQuerystring($aidSearchFormService->convertAidSearchClassToQueryString($aidSearchClass));
                         $alert->setSource(Alert::SOURCE_AIDES_TERRITOIRES);
     
                         $this->managerRegistry->getManager()->persist($alert);

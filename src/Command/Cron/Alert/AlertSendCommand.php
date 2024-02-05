@@ -81,14 +81,22 @@ class AlertSendCommand extends Command
                     ? new \DateTime(date('Y-m-d', strtotime('-1 day')))
                     : new \DateTime(date('Y-m-d', strtotime('-7 day')))
             ;
-            $params = $this->aidSearchFormService->convertQuerystringToParams($alert->getQuerystring());
-            $params = array_merge($params, [
-                'isLive' => true,
+
+            $aidSearchClass = $this->aidSearchFormService->getAidSearchClass(
+                params: [
+                    'querystring' => $alert->getQuerystring(),
+                    ]
+            );
+
+            // parametres pour requetes aides
+            $aidParams =[
+                'showInSearch' => true,
                 'publishedAfter' => $publishedAfter
-            ]);
+            ];
+            $aidParams = array_merge($aidParams, $this->aidSearchFormService->convertAidSearchClassToAidParams($aidSearchClass));
 
             // recupere les nouvelles aides qui correspondent à l'alerte
-            $aids = $this->managerRegistry->getRepository(Aid::class)->findCustom($params);
+            $aids = $this->managerRegistry->getRepository(Aid::class)->findCustom($aidParams);
 
             // il y a de nouvelles aides
             if (count($aids) > 0) {

@@ -22,6 +22,7 @@ use App\Repository\Perimeter\PerimeterRepository;
 use App\Service\User\UserService;
 use App\Service\Various\StringService;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\ORM\Query\Expr\Func;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormFactoryInterface;
@@ -42,6 +43,12 @@ class AidSearchFormService
     )
     {
         
+    }
+
+    public function convertAidSearchClassToQueryString(AidSearchClass $aidSearchClass): string{
+        $aidParams = $this->convertAidSearchClassToAidParams($aidSearchClass);
+        $querystring = http_build_query($aidParams);
+        return $querystring;
     }
 
     public function convertAidSearchClassToAidParams(AidSearchClass $aidSearchClass): array
@@ -142,6 +149,8 @@ class AidSearchFormService
             }
         }
 
+
+
         // > les paramètres en query
 
         // < le user
@@ -171,8 +180,8 @@ class AidSearchFormService
             }
         }
 
-        // si pas de paramètre on pends le type de l'organisation par défaut du user
-        if (!$aidSearchClass->getOrganizationType()) {
+        // si pas de paramètre et pas de paramètres dans l'url on pends le type de l'organisation par défaut du user (on viens direcement sur l'url de recherche d'aide ou page d'accueil)
+        if (!$aidSearchClass->getOrganizationType() && count($queryParams) == 0) {
             if ($user && $user->getDefaultOrganization() && $user->getDefaultOrganization()->getOrganizationType()) {
                 $aidSearchClass->setOrganizationType($user->getDefaultOrganization()->getOrganizationType());
             }
@@ -214,7 +223,7 @@ class AidSearchFormService
         }
 
         // si pas de paramètre on pends le périmètre de l'organisation par défaut du user
-        if (!$aidSearchClass->getSearchPerimeter() && !isset($params['dontUseUserPerimeter'])) {
+        if (!$aidSearchClass->getSearchPerimeter() && !isset($params['dontUseUserPerimeter']) && count($queryParams) == 0){
             if ($user && $user->getDefaultOrganization() && $user->getDefaultOrganization()->getPerimeter()) {
                 $aidSearchClass->setSearchPerimeter($user->getDefaultOrganization()->getPerimeter());
             }
