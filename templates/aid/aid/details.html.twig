@@ -450,74 +450,75 @@
             {% if aid.eligibility or aid.aidDestinations|length > 0 or aid.aidSteps|length > 0 or aid.eligibilityTest or aid.isGeneric or aid.isLocal %}
             <div class="fr-mb-5w">
                 <h2 class="fr-h3 fr-mb-2w">Critères d’éligibilité</h2>
-
-                {% if aid.aidSteps|length > 0 %}
-                <p class="fr-mb-2w">
-                    <strong>État d’avancement du projet pour bénéficier du dispositif :</strong>
-                    {% for aidStep in aid.aidSteps %}
-                    {{ aidStep.name }},
-                    {% endfor %}
-                </p>
-                {% endif %}
-
-                {% if aid.aidDestinations|length > 0 %}
-                <p class="fr-mb-2w">
-                    <strong>Dépenses/actions couvertes :</strong>
-                    {% for aidDestination in aid.aidDestinations %}
-                    {{ aidDestination.name }},
-                    {% endfor %}
-                </p>
-                {% endif %}
-
-                {% if aid.eligibility %}
-                <p class="fr-mb-2w">
-                    <strong>Autres critères d’éligibilité :</strong>
-                    {{ aid.eligibility|raw }}
-                </p>
-                {% endif %}
-
-                {% if aid.eligibilityTest %}
-                <div>
-                    <button class="fr-btn fr-mb-5w fr-mt-2w"  data-fr-opened="false" id="aid-eligibility-test-modal-btn" aria-controls="aid-eligibility-test-modal">
-                        Tester mon éligibilité !
-                    </button>
-                </div>
-                {% endif %}
-
-                
-
-                {% if aid.projectExamples %}
-                <p class="fr-mb-2w">
-                    <strong>Exemples de projets réalisables :</strong>
-                    {{ aid.projectExamples|raw }}
-                </p>
-                {% endif %}
-                
-                
-                {% if aid.isGeneric  %}
-                    <p class="fr-mb-1w" id="aides-locales">
-                        <strong>Déclinaisons locales :</strong> En l’absence d’aide locale, les informations relatives à cette aide nationale font foi.
+                <div class="wysiwyg-wrapper">
+                    {% if aid.aidSteps|length > 0 %}
+                    <p class="fr-mb-2w">
+                        <strong>État d’avancement du projet pour bénéficier du dispositif :</strong>
+                        {% for aidStep in aid.aidSteps %}
+                        {{ aidStep.name }},
+                        {% endfor %}
                     </p>
-                    {% if aid.aidsFromGeneric %}
-                        <div id="localAidsLinks">
-                            <ul>
-                                {% for localAid in aid.aidsFromGeneric %}
-                                    <li><a href="{{ path('app_aid_aid_details', {'slug': localAid.slug }) }}">{{ localAid.perimeter.name }}</a></li>
-                                {% endfor %}
-                            </ul>
-                        </div>
                     {% endif %}
 
-                    {% if app.user and app.user.isContributor %}
-                        {% include 'aid/aid/_generic_to_local.html.twig' %}
+                    {% if aid.aidDestinations|length > 0 %}
+                    <p class="fr-mb-2w">
+                        <strong>Dépenses/actions couvertes :</strong>
+                        {% for aidDestination in aid.aidDestinations %}
+                        {{ aidDestination.name }},
+                        {% endfor %}
+                    </p>
                     {% endif %}
 
-                {% endif %}
+                    {% if aid.eligibility %}
+                    <p class="fr-mb-2w">
+                        <strong>Autres critères d’éligibilité :</strong>
+                        {{ aid.eligibility|raw }}
+                    </p>
+                    {% endif %}
 
-                {% if aid.isLocal and aid.localCharacteristics %}
-                <h3 class="fr-h4 fr-mb-2w">Spécificités locales</h3>
-                {{ aid.localCharacteristics|raw }}
-                {% endif %} 
+                    {% if aid.eligibilityTest %}
+                    <div>
+                        <button class="fr-btn fr-mb-5w fr-mt-2w"  data-fr-opened="false" id="aid-eligibility-test-modal-btn" aria-controls="aid-eligibility-test-modal">
+                            Tester mon éligibilité !
+                        </button>
+                    </div>
+                    {% endif %}
+
+                    
+
+                    {% if aid.projectExamples %}
+                    <p class="fr-mb-2w">
+                        <strong>Exemples de projets réalisables :</strong>
+                        {{ aid.projectExamples|raw }}
+                    </p>
+                    {% endif %}
+                    
+                    
+                    {% if aid.isGeneric  %}
+                        <p class="fr-mb-1w" id="aides-locales">
+                            <strong>Déclinaisons locales :</strong> En l’absence d’aide locale, les informations relatives à cette aide nationale font foi.
+                        </p>
+                        {% if aid.aidsFromGeneric %}
+                            <div id="localAidsLinks">
+                                <ul>
+                                    {% for localAid in aid.aidsFromGeneric %}
+                                        <li><a href="{{ path('app_aid_aid_details', {'slug': localAid.slug }) }}">{{ localAid.perimeter.name }}</a></li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        {% endif %}
+
+                        {% if app.user and app.user.isContributor %}
+                            {% include 'aid/aid/_generic_to_local.html.twig' %}
+                        {% endif %}
+
+                    {% endif %}
+
+                    {% if aid.isLocal and aid.localCharacteristics %}
+                    <h3 class="fr-h4 fr-mb-2w">Spécificités locales</h3>
+                    {{ aid.localCharacteristics|raw }}
+                    {% endif %} 
+                </div>
             </div>
             {% endif %}
 
