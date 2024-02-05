@@ -474,7 +474,7 @@ class ProjectController extends FrontController
                 }
             } else {
                 foreach ($formExportProject->getErrors(true) as $error) {
-                    dump($error);
+                    // dump($error);
                 }
             }
         }

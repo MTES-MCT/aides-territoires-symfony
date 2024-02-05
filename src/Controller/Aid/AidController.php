@@ -94,13 +94,7 @@ class AidController extends FrontController
             $formAidSearchParams
         );
         $formAidSearch->handleRequest($requestStack->getCurrentRequest());
-        if ($formAidSearch->isSubmitted()) {
-            if ($formAidSearch->isValid()) {
-                dump('valid');
-            } else {
-                dump('pas valid');
-            }
-        }
+
         // parametres pour requetes aides
         $aidParams = [
             'showInSearch' => true,
@@ -188,7 +182,7 @@ class AidController extends FrontController
 
         // check si on affiche ou pas le formulaire étendu
         $showExtended = $aidSearchFormService->setShowExtendedV2($aidSearchClass);
-dump($aidSearchClass, $aidSearchFormService->convertAidSearchClassToQueryString($aidSearchClass));
+
         // formulaire creer alerte
         $alert = new Alert();
         $formAlertCreate = $this->createForm(AlertCreateType::class, $alert);
