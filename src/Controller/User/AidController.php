@@ -297,6 +297,7 @@ class AidController extends FrontController
                 // redirection
                 return $this->redirectToRoute('app_user_aid_edit', ['slug' => $aid->getSlug()]);
             } else {
+                $aid->setStatus(Aid::STATUS_DRAFT);
                 // message
                 $this->addFlash(
                     FrontController::FLASH_ERROR,

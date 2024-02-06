@@ -123,7 +123,8 @@ class AidEditType extends AbstractType
                 'expanded' => true
             ])
             ->add('financers', EntityType::class, [
-                'required' => true,
+                'required' => false,
+                // 'required' => true,
                 'mapped' => false,
                 'label' => 'Porteurs d\'aides',
                 'help' => 'Saisissez quelques caractères et sélectionnez une valeur parmi les suggestions.',
@@ -169,7 +170,8 @@ class AidEditType extends AbstractType
                 'sanitize_html' => true,
             ])
             ->add('aidAudiences', EntityGroupedType::class, [
-                'required' => true,
+                'required' => false,
+                // 'required' => true,
                 'label' => 'Bénéficiaires de l’aide',
                 'class' => OrganizationType::class,
                 'choice_label' => 'name',
@@ -178,12 +180,13 @@ class AidEditType extends AbstractType
                 },
                 'expanded' => true,
                 'multiple' => true,
-                'constraints' => [
-                    new ConstraintsCount(null, 1)
-                ]
+                // 'constraints' => [
+                //     new ConstraintsCount(null, 1)
+                // ]
             ])
             ->add('aidTypes', EntityGroupedType::class, [
-                'required' => true,
+                'required' => false,
+                // 'required' => true,
                 'label' => 'Types daide',
                 'help' => 'Précisez le ou les types de l’aide.',
                 'class' => AidType::class,
@@ -193,9 +196,9 @@ class AidEditType extends AbstractType
                 },
                 'expanded' => true,
                 'multiple' => true,
-                'constraints' => [
-                    new ConstraintsCount(null, 1)
-                ]
+                // 'constraints' => [
+                //     new ConstraintsCount(null, 1)
+                // ]
             ])
             ->add('subventionRateMin', TypeIntegerType::class, [
                 'required' => false,
@@ -258,7 +261,8 @@ class AidEditType extends AbstractType
                 'label' => 'Appel à projet / Manifestation d’intérêt'
             ])
             ->add('description', TextareaType::class, [
-                'required' => true,
+                'required' => false,
+                // 'required' => true,
                 'label' => 'Description complète de l’aide et de ses objectif',
                 'attr' => [
                     'placeholder' => 'Si vous avez un descriptif, n’hésitez pas à le copier ici.
@@ -284,7 +288,8 @@ class AidEditType extends AbstractType
                 'sanitize_html' => true,
             ])
             ->add('categories', EntityCheckboxGroupAbsoluteType::class, [
-                'required' => true,
+                'required' => false,
+                // 'required' => true,
                 'label' => 'Thématiques de l\'aide',
                 'placeholder' => 'Toutes les sous-thématiques',
                 'help' => 'Sélectionnez la ou les thématiques associées à votre aide. N’hésitez pas à en choisir plusieurs.',
@@ -297,7 +302,8 @@ class AidEditType extends AbstractType
                 'expanded' => true
             ])
             ->add('aidRecurrence', EntityType::class, [
-                'required' => true,
+                'required' => false,
+                // 'required' => true,
                 'label' => 'Récurrence',
                 'help' => 'L’aide est-elle ponctuelle, permanente, ou récurrent',
                 'placeholder' => '---------',
@@ -327,7 +333,8 @@ class AidEditType extends AbstractType
                 'sanitize_html' => true,
             ])
             ->add('aidSteps', EntityType::class, [
-                'required' => true,
+                'required' => false,
+                // 'required' => true,
                 'label' => 'État d’avancement du projet pour bénéficier du dispositif',
                 'class' => AidStep::class,
                 'choice_label' => 'name',
@@ -350,7 +357,8 @@ class AidEditType extends AbstractType
                 ]
             ])
             ->add('perimeter', PerimeterAutocompleteType::class, [
-                'required' => true,
+                'required' => false,
+                // 'required' => true,
                 'label' => 'Zone géographique couverte par l’aide',
                 'help' => 'La zone géographique sur laquelle l\'aide est disponible.<br />
                 Exemples de zones valides :
@@ -374,7 +382,8 @@ class AidEditType extends AbstractType
                 'sanitize_html' => true,
             ])
             ->add('originUrl', TextType::class, [
-                'required' => true,
+                // 'required' => true,
+                'required' => false,
                 'label' => 'Lien vers plus d’information (url d’origine, site du porteur d’aides)',
                 'constraints' => [
                     new Url()
@@ -390,7 +399,8 @@ class AidEditType extends AbstractType
                 'sanitize_html' => true,
             ])
             ->add('contact', TextareaType::class, [
-                'required' => true,
+                'required' => false,
+                // 'required' => true,
                 'label' => 'Contact pour candidater',
                 'help' => 'N’hésitez pas à ajouter plusieurs contacts',
                 'attr' => [
@@ -469,7 +479,34 @@ class AidEditType extends AbstractType
         }
 
         $aidTypes = $event->getForm()->has('aidTypes') ? $event->getForm()->get('aidTypes')->getData() : null;
-        if ($aidTypes) {
+        $status = $event->getForm()->get('status')->getData();
+
+        $fieldsToSwitch = [
+            'financers',
+            'aidAudiences',
+            'aidTypes',
+            'description',
+            'categories',
+            'aidRecurrence',
+            'aidSteps',
+            'perimeter',
+            'originUrl',
+            'contact',
+        ];
+
+        $notDraftError = false;
+        if ($status !== Aid::STATUS_DRAFT) {
+            foreach ($fieldsToSwitch as $field) {
+                if ($event->getForm()->has($field)) {
+                    if (!$event->getForm()->get($field)->getData()) {
+                        $event->getForm()->get($field)->addError(new FormError('Ce champ est obligatoire si votre aide n\'est pas en brouillon'));
+                        $notDraftError = true;
+                    }
+                }
+            }
+        }
+
+        if ($aidTypes && $status !== Aid::STATUS_DRAFT) {
             /** @var AidType $aidType */
             $typeError = false;
             foreach ($aidTypes as $aidType) {
