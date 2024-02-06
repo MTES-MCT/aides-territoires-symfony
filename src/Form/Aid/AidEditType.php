@@ -493,14 +493,23 @@ class AidEditType extends AbstractType
             'originUrl',
             'contact',
         ];
+        $fieldsOneMin = [
+            'aidAudiences',
+            'aidTypes',
+        ];
 
-        $notDraftError = false;
         if ($status !== Aid::STATUS_DRAFT) {
             foreach ($fieldsToSwitch as $field) {
                 if ($event->getForm()->has($field)) {
                     if (!$event->getForm()->get($field)->getData()) {
                         $event->getForm()->get($field)->addError(new FormError('Ce champ est obligatoire si votre aide n\'est pas en brouillon'));
-                        $notDraftError = true;
+                    }
+                }
+            }
+            foreach ($fieldsOneMin as $field) {
+                if ($event->getForm()->has($field)) {
+                    if (count($event->getForm()->get($field)->getData()) < 1) {
+                        $event->getForm()->get($field)->addError(new FormError('Ce champ est obligatoire si votre aide n\'est pas en brouillon'));
                     }
                 }
             }
