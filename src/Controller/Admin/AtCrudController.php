@@ -81,7 +81,6 @@ class AtCrudController extends AbstractCrudController
             // {{ encore_entry_link_tags('...') }} and {{ encore_entry_script_tags('...') }}
             // ->addWebpackEncoreEntry('admin/admin')
             ->addWebpackEncoreEntry('import-scss/admin/admin')
-            
         ;
     }
 

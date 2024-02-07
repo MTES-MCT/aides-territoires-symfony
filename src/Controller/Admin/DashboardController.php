@@ -189,6 +189,7 @@ class DashboardController extends AbstractDashboardController
             MenuItem::linkToCrud('Aides', 'fas fa-list', Aid::class),
             MenuItem::linkToCrud('Aide Projets', 'fas fa-list', AidProject::class),
             MenuItem::linkToCrud('Aide projets suggérés', 'fas fa-list', AidSuggestedAidProject::class),
+            // MenuItem::linkToRoute('[caractéristique] Associations', 'fas fa-list', 'admin_aid_association', []),
             MenuItem::linkToCrud('[caractéristique] Destinations', 'fas fa-list', AidDestination::class),
             MenuItem::linkToCrud('[caractéristique] Etapes', 'fas fa-list', AidStep::class),
             MenuItem::linkToCrud('[caractéristique] Récurrences', 'fas fa-list', AidRecurrence::class),

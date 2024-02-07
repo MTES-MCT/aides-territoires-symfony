@@ -2,57 +2,49 @@
 
 namespace App\Tests\Controller;
 
-use App\Entity\Aid\Aid;
-use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-use GuzzleHttp\Client;
+use Symfony\Component\Routing\Route;
+use Symfony\Component\Routing\RouterInterface;
 /**
  * php bin/phpunit src/Tests/Controller/FrontControllerTest.php
+ * On test que les pages du site n'ont pas de code 500 ou plus (codes d'erreurs)
  */
 class FrontControllerTest extends WebTestCase
 {
-    public function testUrls()
+    /**
+     * @dataProvider provideRoutes
+     */
+    public function testPageSuccessfullyRespondWithoutError500(string $path, int $statusCode): void
     {
-        $client = new Client();
-        foreach ($this->getUrls() as $url) {
-            try {
-            $response = $client->get($this->getBaseUrl().$url);
-            $this->assertEquals(200, $response->getStatusCode());
-            } catch (\Exception $e) {
-                $this->fail($url.' : '.$e->getCode());
+        self::ensureKernelShutdown();
+        $client = static::createClient();
+        $client->request('GET', $path);
+
+        $this->assertLessThan(
+            $statusCode,
+            $client->getResponse()->getStatusCode(),
+            sprintf('Result value: %d', $client->getResponse()->getStatusCode())
+        );
+    }
+
+    public function provideRoutes(): \Generator
+    {
+        /** @var RouterInterface $router */
+        $router = self::getContainer()->get(RouterInterface::class);
+        $routes = $router->getRouteCollection();
+
+        /** @var Route $route */
+        foreach ($routes as $route) {
+            // on ne test pas l'api ici
+            if (strpos($route->getPath(), 'api') !== false) {
+                continue;
+            }
+            if ([] === $route->getMethods() ||
+                (1 === \count($route->getMethods())) && \in_array('GET', $route->getMethods())
+            ) {
+                $path = $route->getPath();
+                yield $path => [$path, 500];
             }
         }
-    }
-
-    private function getBaseUrl(): string{
-        // en docker, ip locale
-        // docker ps pour afficher les container
-        // docker inspect at_apache pour avoir l'ip
-        return 'http://172.27.0.4';
-    }
-
-    private function getUrls()
-    {
-        // // (1) boot the Symfony kernel
-        // self::bootKernel();
-
-        // // (2) use static::getContainer() to access the service container
-        // $container = static::getContainer();
-        
-        // $managerRegistry =  $container->get('doctrine');
-        // $manager = $managerRegistry->getManager();
-        // $aids = $manager->getRepository(Aid::class)->findAll();
-        // $urls = [];
-        // foreach ($aids as $aid) {
-        //     $urls[] = '/aides/'.$aid->getSlug();
-        // }
-        // return $urls;
-
-        return [
-            '/',
-            '/programmes/',
-            '/blog/',
-            // ajoutez d'autres URLs ici...
-        ];
     }
 }

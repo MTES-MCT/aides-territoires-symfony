@@ -411,7 +411,7 @@ class ProjectController extends FrontController
         return $this->render('project/project/subsidized-detail.html.twig', [
             'commune_search' => $commune_search,
             'department_search' => $department_search,
-            'project_perimeter' => $project_perimeter,
+            'project_perimeter' => $project_perimeter ?? null,
             'formProjectSearch' => $formProjectSearch,
             'projects' => $projects
         ]);

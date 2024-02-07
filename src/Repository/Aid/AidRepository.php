@@ -287,6 +287,12 @@ class AidRepository extends ServiceEntityRepository
             if ($result instanceof Aid) {
                 $return[] = $result;
             } else if (is_array($result) && isset($result[0]) && $result[0] instanceof Aid) {
+                if (isset($result['score_total'])) {
+                    $result[0]->setScoreTotal($result['score_total']);
+                }
+                if (isset($result['score_objects'])) {
+                    $result[0]->setScoreObjects($result['score_objects']);
+                }
                 $return[] = $result[0];
             }
         }

@@ -653,6 +653,8 @@ class Aid
      * >Non Database Fields
      */
     private int $nbViews = 0;
+    private int $scoreTotal = 0;
+    private int $scoreObjects = 0;
 
     #[Groups([self::API_GROUP_LIST, self::API_GROUP_ITEM])]
     private ?string $url = null;
@@ -2474,4 +2476,30 @@ class Aid
 
         return $this;
     }
+
+    public function getScoreTotal(): ?float
+    {
+        return $this->scoreTotal;
+    }
+
+    public function setScoreTotal(?float $scoreTotal): static
+    {
+        $this->scoreTotal = $scoreTotal;
+
+        return $this;
+    }
+
+    public function getScoreObjects(): ?float
+    {
+        return $this->scoreObjects;
+    }
+
+    public function setScoreObjects(?float $scoreObjects): static
+    {
+        $this->scoreObjects = $scoreObjects;
+
+        return $this;
+    }
+    
+    
 }

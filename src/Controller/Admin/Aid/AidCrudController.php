@@ -11,20 +11,31 @@ use App\Controller\Admin\Filter\Aid\AidStateFilter;
 use App\Controller\Admin\Filter\Aid\AidTypeFilter;
 use App\Entity\Aid\Aid;
 use App\Entity\Perimeter\Perimeter;
+use App\Entity\Project\Project;
+use App\Entity\Reference\ProjectReference;
 use App\Field\JsonField;
 use App\Field\TextLengthCountField;
 use App\Field\TrumbowygField;
+use App\Form\Admin\Aid\AidAssociationType;
+use App\Form\Admin\Aid\KeywordReferenceAssociationType;
+use App\Form\Admin\Aid\ProjectReferenceAssociationType;
+use App\Form\Aid\AidSearchTypeV2;
+use App\Service\Aid\AidSearchFormService;
+use App\Service\Aid\AidService;
 use App\Service\Export\CsvExporterService;
 use App\Service\Export\SpreadsheetExporterService;
 use Doctrine\ORM\EntityRepository;
 use EasyCorp\Bundle\EasyAdminBundle\Collection\FieldCollection;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Assets;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Filters;
 use EasyCorp\Bundle\EasyAdminBundle\Config\KeyValueStore;
 use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
+use EasyCorp\Bundle\EasyAdminBundle\Dto\BatchActionDto;
 use EasyCorp\Bundle\EasyAdminBundle\Factory\FilterFactory;
+use EasyCorp\Bundle\EasyAdminBundle\Field\ArrayField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ChoiceField;
@@ -37,6 +48,9 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\IntegerField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\UrlField;
 use EasyCorp\Bundle\EasyAdminBundle\Filter\ChoiceFilter;
+use Pagerfanta\Adapter\ArrayAdapter;
+use Pagerfanta\Pagerfanta;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class AidCrudController extends AtCrudController
@@ -44,6 +58,16 @@ class AidCrudController extends AtCrudController
     public static function getEntityFqcn(): string
     {
         return Aid::class;
+    }
+
+    public function configureAssets(Assets $assets): Assets
+    {
+        $assets = parent::configureAssets($assets);
+        return $assets
+            ->addWebpackEncoreEntry('import-scss/admin/aid/associate')          
+            ->addWebpackEncoreEntry('form/entity-checkbox-absolute-type')     
+            ->addWebpackEncoreEntry('admin/aid/associate')        
+        ;
     }
 
     public function configureFilters(Filters $filters): Filters
@@ -84,6 +108,14 @@ class AidCrudController extends AtCrudController
 
     public function configureResponseParameters(KeyValueStore $responseParameters): KeyValueStore
     {
+        // formulaire association projet referent en batch
+        $formProjectReferenceAssociation = $this->createForm(ProjectReferenceAssociationType::class);
+        $responseParameters->setIfNotSet('formProjectReferenceAssociation', $formProjectReferenceAssociation);
+        
+        // formulaire association mots clés referent en batch
+        $formKeywordReferenceAssociation = $this->createForm(KeywordReferenceAssociationType::class);
+        $responseParameters->setIfNotSet('formKeywordReferenceAssociation', $formKeywordReferenceAssociation);
+
         $aid = $this->getContext()->getEntity()->getInstance() ?? null;
 
         if ($aid && is_array($aid->getImportRawObject()) && $aid->isImportUpdated()) {
@@ -125,11 +157,20 @@ class AidCrudController extends AtCrudController
         $exportCsvAction = $this->getExportCsvAction();
         $exportXlsxAction = $this->getExportXlsxAction();
 
+
+        $batchAssociate = Action::new('batchAssociate', 'Associé')
+        ->linkToCrudAction('batchAssociate');
+
+        $batchAssociateKeyword = Action::new('batchAssociateKeyword', 'Associé Mot clés')
+        ->linkToCrudAction('batchAssociateKeyword');
+
         return parent::configureActions($actions)
             ->add(Crud::PAGE_INDEX, $displayOnFront)
             ->add(Crud::PAGE_EDIT, $displayOnFront)
             ->add(Crud::PAGE_INDEX, $exportCsvAction)
             ->add(Crud::PAGE_INDEX, $exportXlsxAction)
+            ->addBatchAction($batchAssociate)
+            ->addBatchAction($batchAssociateKeyword)
         ;
     }
 
@@ -192,7 +233,22 @@ class AidCrudController extends AtCrudController
         ->hideOnIndex()
         ->setColumns(12);
         yield AssociationField::new('projectReferences', 'Projets référents')
-        ;
+        ->hideOnIndex();
+        yield ArrayField::new('projectReferences', 'Projets référents')
+        ->formatValue(function ($value, $entity) {
+        return implode('', array_map(function ($projectReference) {
+            return '- '.$projectReference->getName().'<br>';
+        }, $value->toArray()));
+        })
+        ->onlyOnIndex();
+        yield ArrayField::new('keywordReferences', 'Mots clés référents')
+        ->formatValue(function ($value, $entity) {
+        return implode('', array_map(function ($keywordReference) {
+            return '- '.$keywordReference->getName().'<br>';
+        }, $value->toArray()));
+        })
+        ->onlyOnIndex();
+
         yield AssociationField::new('aidAudiences', 'Bénéficiaires de l’aide')
         ->setFormTypeOption('choice_label', function($entity) {
             $return = '';
@@ -227,7 +283,8 @@ class AidCrudController extends AtCrudController
             'attr' => ['readonly' => true],
             'mapped' => false
         ])
-        ->setColumns(12);
+        ->setColumns(12)
+        ->hideOnIndex();
 
         yield FormField::addFieldset('Porteurs d’aides');
         yield CollectionField::new('aidFinancers', 'Porteurs d\'aides')
@@ -251,6 +308,7 @@ class AidCrudController extends AtCrudController
         ->formatValue(function ($value) {
             return implode('<br>', $value->toArray());
         })
+        ->hideOnIndex()
         ;
         
         yield FormField::addFieldset('Instructeurs suggérés');
@@ -559,6 +617,7 @@ class AidCrudController extends AtCrudController
     {
         return parent::configureCrud($crud)
         ->overrideTemplate('crud/edit', 'admin/aid/edit.html.twig')  
+        ->overrideTemplate('crud/index', 'admin/aid/index.html.twig')  
         ;
     }
 
@@ -570,5 +629,53 @@ class AidCrudController extends AtCrudController
     public function exportCsv(AdminContext $context, SpreadsheetExporterService $spreadsheetExporterService, string $filename = 'aides')
     {
         return $this->exportSpreadsheet($context, $spreadsheetExporterService, $filename, 'csv');
+    }
+
+    public function batchAssociate(BatchActionDto $batchActionDto): RedirectResponse
+    {
+        $form = $this->createForm(ProjectReferenceAssociationType::class);
+        $form->handleRequest($this->getContext()->getRequest());
+        if ($form->isSubmitted()) {
+            if ($form->isValid()) {
+                $projectReference = $form->get('projectReference')->getData();
+                if ($projectReference instanceof ProjectReference) {
+                    foreach ($batchActionDto->getEntityIds() as $id) {
+                        $aid = $this->managerRegistry->getRepository(Aid::class)->find($id);
+                        if ($aid instanceof Aid) {
+                            $aid->addProjectReference($projectReference);
+                            $this->managerRegistry->getManager()->persist($aid);
+                        }
+                    }
+                    $this->managerRegistry->getManager()->flush();
+                }
+            }
+        }
+
+        return $this->redirect($batchActionDto->getReferrerUrl());
+    }
+
+    public function batchAssociateKeyword(BatchActionDto $batchActionDto): RedirectResponse
+    {
+        $form = $this->createForm(KeywordReferenceAssociationType::class);
+        $form->handleRequest($this->getContext()->getRequest());
+        if ($form->isSubmitted()) {
+            if ($form->isValid()) {
+                $keywordReferences = $form->get('keywordReferences')->getData();
+
+                foreach ($batchActionDto->getEntityIds() as $id) {
+                    $aid = $this->managerRegistry->getRepository(Aid::class)->find($id);
+                    if ($aid instanceof Aid) {
+                        foreach ($keywordReferences as $keywordReference) {
+                            $aid->addKeywordReference($keywordReference);
+                        }
+                        $this->managerRegistry->getManager()->persist($aid);
+                    }
+                }
+                $this->managerRegistry->getManager()->flush();
+
+            }
+        }
+
+        return $this->redirect($batchActionDto->getReferrerUrl());
     }
 }
