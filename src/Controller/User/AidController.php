@@ -113,7 +113,11 @@ class AidController extends FrontController
 
         // paramètre filtre aides
         $aidsParams = [
-            'author' => $user
+            'author' => $user,
+            'orderBy' => [
+                'sort' => 'a.dateCreate',
+                'order' => 'DESC'
+            ]
         ];
 
         // formulaire filtre aides
