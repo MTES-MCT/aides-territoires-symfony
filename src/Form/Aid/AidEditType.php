@@ -94,13 +94,11 @@ class AidEditType extends AbstractType
                 'constraints' => [
                     new Length(null, null, 180)
                 ],
-                // 'sanitize_html' => true,
             ])
             ->add('nameInitial', TextType::class, [
                 'required' => false,
                 'label' => 'Nom initial',
                 'help' => 'Comment cette aide s’intitule-t-elle au sein de votre structure ? Exemple : AAP Mob’Biodiv',
-                // 'sanitize_html' => true,
             ])
             ->add('organization', EntityType::class, [
                 'required' => true,
@@ -146,7 +144,6 @@ class AidEditType extends AbstractType
                 'required' => false,
                 'label' => 'Suggérer un nouveau porteur',
                 'help' => 'Suggérez un porteur si vous ne trouvez pas votre choix dans la liste principale.',
-                'sanitize_html' => true,
             ])
             ->add('instructors', EntityType::class, [
                 'required' => false,
@@ -169,7 +166,6 @@ class AidEditType extends AbstractType
                 'required' => false,
                 'label' => 'Suggérer un nouvel instructeur',
                 'help' => 'Suggérez un instructeur si vous ne trouvez pas votre choix dans la liste principale.',
-                'sanitize_html' => true,
             ])
             ->add('aidAudiences', EntityGroupedType::class, [
                 'required' => $isDraft ? false : true,
@@ -248,7 +244,6 @@ class AidEditType extends AbstractType
             ->add('otherFinancialAidComment', TextType::class, [
                 'required' => false,
                 'label' => 'Autre aide financière (commentaire optionnel)',
-                'sanitize_html' => true,
             ])
 
             ->add('isCharged', CheckboxType::class, [
@@ -311,13 +306,19 @@ class AidEditType extends AbstractType
                 'required' => false,
                 'label' => 'Date d’ouverture',
                 'help' => 'À quelle date l’aide est-elle ouverte aux candidatures ?',
-                'widget' => 'single_text'
+                'widget' => 'single_text',
+                'attr' => [
+                    'autocomplete' => 'off'
+                ]
             ])
             ->add('dateSubmissionDeadline', DateType::class, [
                 'required' => false,
                 'label' => 'Date de clôture',
                 'help' => 'Quelle est la date de clôture de dépôt des dossiers ?',
-                'widget' => 'single_text'
+                'widget' => 'single_text',
+                'attr' => [
+                    'autocomplete' => 'off'
+                ]
             ])
             ->add('eligibility', TextareaType::class, [
                 'required' => false,
@@ -374,7 +375,6 @@ class AidEditType extends AbstractType
                 'required' => false,
                 'label' => 'Vous ne trouvez pas de zone géographique appropriée ?',
                 'help' => 'Si vous ne trouvez pas de zone géographique suffisamment précise dans la liste existante, spécifiez « France » et décrivez brièvement ici le périmètre souhaité.',
-                'sanitize_html' => true,
             ])
             ->add('originUrl', TextType::class, [
                 'required' => $isDraft ? false : true,
@@ -382,7 +382,6 @@ class AidEditType extends AbstractType
                 'constraints' => [
                     new Url()
                 ],
-                'sanitize_html' => true,
             ])
             ->add('applicationUrl', TextType::class, [
                 'required' => false,
@@ -390,7 +389,6 @@ class AidEditType extends AbstractType
                 'constraints' => [
                     new Url()
                 ],
-                'sanitize_html' => true,
             ])
             ->add('contact', TextareaType::class, [
                 'required' => $isDraft ? false : true,
@@ -489,6 +487,7 @@ class AidEditType extends AbstractType
         $fieldsOneMin = [
             'aidAudiences',
             'aidTypes',
+            'aidSteps'
         ];
 
         if ($status !== Aid::STATUS_DRAFT) {
@@ -518,6 +517,13 @@ class AidEditType extends AbstractType
                         $typeError = true; // pour ne pas ajouter plusieurs fois l'erreur
                         $event->getForm()->get('aidDestinations')->addError(new FormError('Veuillez compléter le champ types de dépenses / actions couvertes '));
                     }
+                }
+            }
+
+            // si récurrence "Ponctuelle" ou "Récurrent" => date de clôture obligatoire
+            if ($event->getForm()->has('aidRecurrence') && $event->getForm()->get('aidRecurrence')->getData() && in_array($event->getForm()->get('aidRecurrence')->getData()->getSlug(), [AidRecurrence::SLUG_ONEOFF, AidRecurrence::SLUG_RECURRING])) {
+                if ($event->getForm()->has('dateSubmissionDeadline') && !$event->getForm()->get('dateSubmissionDeadline')->getData()) {
+                    $event->getForm()->get('dateSubmissionDeadline')->addError(new FormError('Ce champ est obligatoire pour les aides ponctuelles ou récurrentes'));
                 }
             }
         }
