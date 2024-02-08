@@ -107,16 +107,7 @@ class PerimeterController extends DashboardController
 
 
                 while (($line = fgetcsv($file)) !== false) {
-                    $perimeterImport->addCityCode($line[0]);
-                    // $perimeterToAdd = $managerRegistry->getRepository(Perimeter::class)->findOneBy([
-                    //     'insee' => $line[0],
-                    //     'scale' => Perimeter::SCALE_COMMUNE
-                    // ]);
-                    // if ($perimeterToAdd instanceof Perimeter) {
-                    //     $perimeter->addPerimetersFrom($perimeterToAdd);
-                    // } else {
-                    //     $codesInseeNotFound[] = $line[0];
-                    // }
+                    $perimeterImport->addCityCode(str_pad($line[0], 5, '0', STR_PAD_LEFT));
                 }
 
                 // sauvegarde
