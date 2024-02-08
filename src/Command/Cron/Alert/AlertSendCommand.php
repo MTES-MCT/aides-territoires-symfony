@@ -115,7 +115,7 @@ class AlertSendCommand extends Command
                     $emailSubjectPrefix = $this->paramService->get('email_subject_prefix');
                 }
                 $today = new \DateTime(date('Y-m-d H:i:s'));
-                $emailSubject = $emailSubjectPrefix . $today->format('d/m/Y') . ' — De nouvelles aides correspondent à vos recherches';
+                $emailSubject = $emailSubjectPrefix . ' '. $today->format('d/m/Y') . ' — De nouvelles aides correspondent à vos recherches';
                 
                 $this->emailService->sendEmail(
                     $alert->getEmail(),
