@@ -416,6 +416,9 @@ class AidEditType extends AbstractType
             'choices' => [
                 'Brouillon' => Aid::STATUS_DRAFT,
                 'En revue' => Aid::STATUS_REVIEWABLE
+            ],
+            'attr' => [
+                'autocomplete' => 'off'
             ]
         ];
         if ($options['allowStatusPublished']) {
