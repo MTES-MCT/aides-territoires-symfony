@@ -69,7 +69,7 @@ class AlertSendCommand extends Command
 
         // charge les alertes
         $alerts = $this->managerRegistry->getRepository(Alert::class)->findToSend();
-dd(count($alerts));
+
         // pour le retour
         $nbAlertSend = 0;
 
