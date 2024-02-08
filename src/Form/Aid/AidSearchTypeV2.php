@@ -105,7 +105,7 @@ class AidSearchTypeV2 extends AbstractType
                 'required' => false,
                 'label' => 'Thématiques de l\'aide',
                 'placeholder' => 'Toutes les sous-thématiques',
-                'help' => 'Sélectionnez la ou les thématiques associées à votre aide. N’hésitez pas à en choisir plusieurs.',
+                // 'help' => 'Sélectionnez la ou les thématiques associées à votre aide. N’hésitez pas à en choisir plusieurs.',
                 'class' => Category::class,
                 'choice_label' => 'name',
                 'group_by' => function(Category $category) {

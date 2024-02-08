@@ -312,7 +312,7 @@ class AidEditType extends AbstractType
             ->add('aidRecurrence', EntityType::class, [
                 'required' => $isDraft ? false : true,
                 'label' => 'Récurrence',
-                'help' => 'L’aide est-elle ponctuelle, permanente, ou récurrent',
+                'help' => 'L’aide est-elle ponctuelle, permanente, ou récurrente',
                 'placeholder' => '---------',
                 'class' => AidRecurrence::class,
                 'choice_label' => 'name'
