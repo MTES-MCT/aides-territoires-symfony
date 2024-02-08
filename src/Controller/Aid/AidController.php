@@ -193,9 +193,9 @@ class AidController extends FrontController
                 if ($user) {
                     try {
                         $queryString = trim($aidSearchFormService->convertAidSearchClassToQueryString($aidSearchClass));
-                        dump($queryString);
+
                         if ($queryString == '') {
-                            throw new \Exception('Aucun critère de recherche');
+                            throw new \Exception('Veuillez sélectionner au moins un critère de recherche');
                         }
                         $alert->setEmail($user->getEmail());
                         $alert->setQuerystring($queryString);
@@ -209,9 +209,13 @@ class AidController extends FrontController
                             'Votre alerte a bien été créée'
                         );
                     } catch (\Exception $e) {
+                        $message = $e->getMessage() == 
+                        'Veuillez sélectionner au moins un critère de recherche'
+                            ? 'Veuillez sélectionner au moins un critère de recherche'
+                            : 'Une erreur est survenue lors de la création de votre alerte';
                         $this->addFlash(
                             FrontController::FLASH_ERROR,
-                            'Une erreur est survenue lors de la création de votre alerte'
+                            $message
                         );
                     }
                 }
