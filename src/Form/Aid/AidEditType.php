@@ -15,6 +15,7 @@ use App\Entity\Organization\Organization;
 use App\Entity\Organization\OrganizationType;
 use App\Entity\Perimeter\Perimeter;
 use App\Entity\Program\Program;
+use App\Entity\Reference\ProjectReference;
 use App\Form\Type\EntityCheckboxAbsoluteType;
 use App\Form\Type\EntityCheckboxGroupAbsoluteType;
 use App\Form\Type\EntityGroupedType;
@@ -294,6 +295,20 @@ class AidEditType extends AbstractType
                 'multiple' => true,
                 'expanded' => true
             ])
+            ->add('projectReferences', EntityCheckboxAbsoluteType::class, [
+                'required' => false,
+                'label' => 'Projet référent',
+                'placeholder' => 'Toutes projets référents',
+                'help' => 'Si votre aide corresponds à un ou plusieurs de nos projets référents, sélectionnez-les ici. Ceci améliorera leur remontée dans les résultats de recherche.',
+                'class' => ProjectReference::class,
+                'choice_label' => 'name',
+                'query_builder' => function(EntityRepository $entityRepository) {
+                    return $entityRepository->createQueryBuilder('pr')->orderBy('pr.name', 'ASC');
+                },
+                'multiple' => true,
+                'expanded' => true
+            ])
+
             ->add('aidRecurrence', EntityType::class, [
                 'required' => $isDraft ? false : true,
                 'label' => 'Récurrence',
@@ -478,7 +493,8 @@ class AidEditType extends AbstractType
         $fieldsOneMin = [
             'aidAudiences',
             'aidTypes',
-            'aidSteps'
+            'aidSteps',
+            'categories'
         ];
 
         if ($status !== Aid::STATUS_DRAFT) {
