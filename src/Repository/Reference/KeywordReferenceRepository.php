@@ -72,11 +72,9 @@ class KeywordReferenceRepository extends ServiceEntityRepository
 
         $conn = $this->getEntityManager()->getConnection();
         $stmt = $conn->prepare($sql);
-       
-        $sqlParams = array(
-            'searchText' => $searchText
-        );
-        $result = $stmt->executeQuery($sqlParams);
+
+        $stmt->bindValue('searchText', $searchText);
+        $result = $stmt->executeQuery();
 
         return $result->fetchAllAssociative();
 	}
