@@ -22,7 +22,7 @@ class AidSearchClass
      * @var ?ArrayCollection|Category[]
      */
     private $categorysearch;
-    private bool $newIntegration;
+    private ?bool $newIntegration;
     private ?string $orderBy;
     /**
      * @var ?ArrayCollection|AidType[]
@@ -58,6 +58,7 @@ class AidSearchClass
         $this->searchPerimeter = null;
         $this->keyword = null;
         $this->categorysearch = null;
+        $this->newIntegration = null;
         $this->aidTypes = null;
         $this->orderBy = null;
         $this->backerschoice = null;
@@ -121,12 +122,12 @@ class AidSearchClass
         }
     }
 
-    public function isNewIntegration(): bool
+    public function isNewIntegration(): ?bool
     {
         return $this->newIntegration;
     }
 
-    public function setNewIntegration(bool $newIntegration): void
+    public function setNewIntegration(?bool $newIntegration): void
     {
         $this->newIntegration = $newIntegration;
     }

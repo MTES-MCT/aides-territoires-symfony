@@ -192,8 +192,13 @@ class AidController extends FrontController
                 $user = $userService->getUserLogged();
                 if ($user) {
                     try {
+                        $queryString = trim($aidSearchFormService->convertAidSearchClassToQueryString($aidSearchClass));
+                        dump($queryString);
+                        if ($queryString == '') {
+                            throw new \Exception('Aucun critère de recherche');
+                        }
                         $alert->setEmail($user->getEmail());
-                        $alert->setQuerystring($aidSearchFormService->convertAidSearchClassToQueryString($aidSearchClass));
+                        $alert->setQuerystring($queryString);
                         $alert->setSource(Alert::SOURCE_AIDES_TERRITOIRES);
     
                         $this->managerRegistry->getManager()->persist($alert);

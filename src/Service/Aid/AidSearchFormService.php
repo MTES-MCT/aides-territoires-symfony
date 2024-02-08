@@ -46,8 +46,78 @@ class AidSearchFormService
     }
 
     public function convertAidSearchClassToQueryString(AidSearchClass $aidSearchClass): string{
-        $aidParams = $this->convertAidSearchClassToAidParams($aidSearchClass);
-        $querystring = http_build_query($aidParams);
+        $params = [];
+        if ($aidSearchClass->getOrganizationType()) {
+            $params['organizationType'] = $aidSearchClass->getOrganizationType()->getSlug();
+        }
+        if ($aidSearchClass->getSearchPerimeter()) {
+            $params['searchPerimeter'] = $aidSearchClass->getSearchPerimeter()->getId();
+        }
+        if ($aidSearchClass->getKeyword()) {
+            $params['keyword'] = $aidSearchClass->getKeyword();
+        }
+        if ($aidSearchClass->getCategorySearch()) {
+            $categories = [];
+            foreach ($aidSearchClass->getCategorySearch() as $category) {
+                $categories[] = $category->getId();
+            }
+            $params['categorySearch'] = $categories;
+        }
+        if ($aidSearchClass->isNewIntegration()) {
+            $params['newIntegration'] = $aidSearchClass->isNewIntegration();
+        }
+        if ($aidSearchClass->getOrderBy()) {
+            $params['orderBy'] = $aidSearchClass->getOrderBy();
+        }
+        if ($aidSearchClass->getAidTypes()) {
+            $aidTypes = [];
+            foreach ($aidSearchClass->getAidTypes() as $aidType) {
+                $aidTypes[] = $aidType->getSlug();
+            }
+            $params['aidTypes'] = $aidTypes;
+        }
+        if ($aidSearchClass->getBackerschoice()) {
+            $backers = [];
+            foreach ($aidSearchClass->getBackerschoice() as $backer) {
+                $backers[] = $backer->getId();
+            }
+            $params['backerschoice'] = $backers;
+        }
+        if ($aidSearchClass->getApplyBefore()) {
+            $params['applyBefore'] = $aidSearchClass->getApplyBefore()->format('Y-m-d');
+        }
+        if ($aidSearchClass->getPrograms()) {
+            $programs = [];
+            foreach ($aidSearchClass->getPrograms() as $program) {
+                $programs[] = $program->getId();
+            }
+            $params['programs'] = $programs;
+        }
+        if ($aidSearchClass->getAidSteps()) {
+            $aidSteps = [];
+            foreach ($aidSearchClass->getAidSteps() as $aidStep) {
+                $aidSteps[] = $aidStep->getSlug();
+            }
+            $params['aidSteps'] = $aidSteps;
+        }
+        if ($aidSearchClass->getAidDestinations()) {
+            $aidDestinations = [];
+            foreach ($aidSearchClass->getAidDestinations() as $aidDestination) {
+                $aidDestinations[] = $aidDestination->getSlug();
+            }
+            $params['aidDestinations'] = $aidDestinations;
+        }
+        if ($aidSearchClass->getIsCharged()) {
+            $params['isCharged'] = $aidSearchClass->getIsCharged();
+        }
+        if ($aidSearchClass->getEuropeanAid()) {
+            $params['europeanAid'] = $aidSearchClass->getEuropeanAid();
+        }
+        if ($aidSearchClass->getIsCallForProject()) {
+            $params['isCallForProject'] = $aidSearchClass->getIsCallForProject();
+        }
+
+        $querystring = http_build_query($params);
         return $querystring;
     }
 
