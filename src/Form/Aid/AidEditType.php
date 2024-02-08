@@ -404,11 +404,6 @@ class AidEditType extends AbstractType
             ])
 
             ->addEventListener(
-                FormEvents::PRE_SUBMIT,
-                [$this, 'onPreSubmit']
-            )
-
-            ->addEventListener(
                 FormEvents::SUBMIT,
                 [$this, 'onSubmit']
             )
@@ -446,21 +441,14 @@ class AidEditType extends AbstractType
         }
     }
 
-    public function onPreSubmit(FormEvent $event): void
+    public function onSubmit(FormEvent $event): void
     {
         // si aide permanente, on force date ouverture et cloture à null
         if ($event->getForm()->has('aidRecurrence') && $event->getForm()->get('aidRecurrence')->getData() && $event->getForm()->get('aidRecurrence')->getData()->getSlug() == AidRecurrence::SLUG_ONGOING) {
-            if ($event->getForm()->has('dateStart')) {
-                $event->setData(array_merge($event->getData(), ['dateStart' => null]));
-            }
-            if ($event->getForm()->has('dateSubmissionDeadline')) {
-                $event->setData(array_merge($event->getData(), ['dateSubmissionDeadline' => null]));
-            }
+            $event->getData()->setDateStart(null);
+            $event->getData()->setDateSubmissionDeadline(null);
         }
-    }
-
-    public function onSubmit(FormEvent $event): void
-    {
+        
         // vérifications subventions
         $subventionRateMin = $event->getForm()->has('subventionRateMin') ? $event->getForm()->get('subventionRateMin')->getData() : null;
         $subventionRateMax = $event->getForm()->has('subventionRateMax') ? $event->getForm()->get('subventionRateMax')->getData() : null;
