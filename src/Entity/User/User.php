@@ -48,7 +48,7 @@ use Scheb\TwoFactorBundle\Model\Totp\TwoFactorInterface;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: '`user`')]
-#[UniqueEntity(fields: ['email'], message: 'Cet email n\'est pas valide')]
+#[UniqueEntity(fields: ['email'], message: 'Cet email n\'est pas disponible')]
 #[ORM\Index(columns: ['email'], name: 'email_u')]
 #[ORM\Index(columns: ['is_beneficiary'], name: 'is_beneficiary_u')]
 #[ORM\Index(columns: ['is_contributor'], name: 'is_contributor_u')]

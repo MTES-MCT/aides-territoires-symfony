@@ -5,10 +5,17 @@ namespace App\Controller\User;
 use App\Controller\FrontController;
 use App\Entity\Organization\Organization;
 use App\Entity\Organization\OrganizationInvitation;
+use App\Entity\Organization\OrganizationType;
 use App\Entity\Perimeter\Perimeter;
 use App\Entity\User\User;
+use App\Form\User\RegisterCommuneType;
 use App\Form\User\RegisterType;
+use App\Repository\Organization\OrganizationTypeRepository;
 use App\Repository\Perimeter\PerimeterRepository;
+use App\Service\Api\InternalApiService;
+use App\Service\Matomo\MatomoService;
+use App\Service\User\UserService;
+use App\Service\Various\ParamService;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -24,7 +31,9 @@ class UserController extends FrontController
         UserPasswordHasherInterface $userPasswordHasherInterface,
         PerimeterRepository $perimeterRepository,
         ManagerRegistry $managerRegistry,
-        Security $security
+        Security $security,
+        MatomoService $matomoService,
+        ParamService $paramService
     ): Response
     {
         // nouveau user
@@ -86,6 +95,9 @@ class UserController extends FrontController
                     'Vous êtes bien enregistré !'
                 );
 
+                // track goal
+                $matomoService->trackGoal($paramService->get('goal_register_id'));
+
                 // regarde si il y a des invitations sur ce compte
                 $organizationInvitations = $managerRegistry->getRepository(OrganizationInvitation::class)->findBy([
                     'email' => $user->getEmail()
@@ -110,6 +122,111 @@ class UserController extends FrontController
             'formRegister' => $formRegister->createView(),
             'no_breadcrumb' => true,
             'formErrors' => $formErrors
+        ]);
+    }
+
+    #[Route('/comptes/inscription-mairie/', name: 'app_user_user_register_commune')]
+    public function registerCommune(
+        UserService $userService,
+        RequestStack $requestStack,
+        OrganizationTypeRepository $organizationTypeRepository,
+        PerimeterRepository $perimeterRepository,
+        ManagerRegistry $managerRegistry,
+        UserPasswordHasherInterface $userPasswordHasherInterface,
+        Security $security,
+        MatomoService $matomoService,
+        ParamService $paramService
+    ): Response
+    {
+        // le user
+        $user = $userService->getUserLogged();
+
+        // si déjà connecté on regidirige sur mon compte
+        if ($user) {
+            return $this->redirectToRoute('app_user_parameter_profil');
+        }
+
+        // nouveau user avec valeurs forcées
+        $user = new User();
+        $user->setIsBeneficiary(true);
+        $user->setIsContributor(true);
+        $user->setAcquisitionChannel(User::ACQUISITION_CHANNEL_ANIMATOR);
+        $user->addRole(User::ROLE_USER);
+
+        // nouvelle organization commune
+        $organization = new Organization();
+        $organization->setOrganizationType($organizationTypeRepository->findOneBy(['slug' => OrganizationType::SLUG_COMMUNE]));
+        $user->addOrganization($organization);
+
+        // formulaire inscription
+        $formRegisterCommune = $this->createForm(RegisterCommuneType::class, $user);
+        $formRegisterCommune->handleRequest($requestStack->getCurrentRequest());
+        if ($formRegisterCommune->isSubmitted()) {
+            if ($formRegisterCommune->isValid()) {
+                // encode le password
+                $user->setPassword($userPasswordHasherInterface->hashPassword($user, $formRegisterCommune->get('password')->getData()));
+
+                // assigne le perimetre à l'organisation
+                $organization->setPerimeter($user->getPerimeter());
+                
+                // le nom de l'organization en fonction du perimetre
+                $organization->setName('Mairie de '.$organization->getPerimeter()->getName());
+                
+                // defini le departement de l'organisation
+                $departementsCode = ($organization->getPerimeter()) ? $organization->getPerimeter()->getDepartments() : null;
+                $departementCode = $departementsCode[0] ?? null;
+                if ($departementCode) {
+                    $departement = $perimeterRepository->findOneBy([
+                        'code' => $departementCode,
+                        'scale' => Perimeter::SCALE_COUNTY
+                    ]);
+                    if ($departement instanceof Perimeter) {
+                        $organization->setPerimeterDepartment($departement);
+                    }
+                }
+
+                // défini la région de l'organisation
+                $regionsCode = ($organization->getPerimeter()) ? $organization->getPerimeter()->getRegions() : null;
+                $regionCode = $regionsCode[0] ?? null;
+                if ($regionCode) {
+                    $region = $perimeterRepository->findOneBy([
+                        'code' => $regionCode,
+                        'scale' => Perimeter::SCALE_REGION
+                    ]);
+                    if ($region instanceof Perimeter) {
+                        $organization->setPerimeterRegion($region);
+                    }
+                }
+
+                // on sauvegarde le nouveau user et on organization
+                $managerRegistry->getManager()->persist($user);
+                $managerRegistry->getManager()->flush();
+
+                // authentifie le user
+                $security->login($user, 'form_login', 'main');
+                
+                // message success
+                $this->tAddFlash(
+                    FrontController::FLASH_SUCCESS,
+                    'Vous êtes bien enregistré !'
+                );
+
+                // track goal
+                $matomoService->trackGoal($paramService->get('goal_register_id'));
+                            
+                // redirection
+                return $this->redirectToRoute('app_user_dashboard');
+            } else {
+                $this->addFlash(
+                    FrontController::FLASH_ERROR,
+                    'Impossible de valider le formulaire, veuillez verifier vos informations'
+                );
+            }
+        }
+
+        // rendu template
+        return $this->render('user/user/register_commune.html.twig', [
+            'formRegisterCommune' => $formRegisterCommune
         ]);
     }
 }

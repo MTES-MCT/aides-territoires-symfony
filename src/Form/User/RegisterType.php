@@ -46,12 +46,12 @@ class RegisterType extends AbstractType
             ->add('firstname', TextType::class, [
                 'required' => true,
                 'label' => 'Votre prénom',
-                'sanitize_html' => true,
+                // 'sanitize_html' => true,
             ])
             ->add('lastname', TextType::class, [
                 'required' => true,
                 'label' => 'Votre nom',
-                'sanitize_html' => true,
+                // 'sanitize_html' => true,
             ])
             ->add('email', EmailType::class, [
                 'required' => true,
@@ -118,7 +118,7 @@ class RegisterType extends AbstractType
                 'mapped' => false,
                 'label' => 'Nom de votre structure',
                 'help' => 'En fonction des informations saisies précédemment, nous pouvons, parfois pré-remplir ce champ automatiquement. Vous pouvez cependant corriger le nom proposé si besoin.',
-                'sanitize_html' => true,
+                // 'sanitize_html' => true,
             ])
             ->add('beneficiaryFunction', ChoiceType::class, [
                 'required' => false,
@@ -129,7 +129,7 @@ class RegisterType extends AbstractType
             ->add('beneficiaryRole', TextType::class, [
                 'required' => false,
                 'label' => 'Votre rôle',
-                'sanitize_html' => true,
+                // 'sanitize_html' => true,
             ])
             ->add('isBeneficiary', CheckboxType::class, [
                 'required' => false,
@@ -148,7 +148,7 @@ class RegisterType extends AbstractType
             ->add('acquisitionChannelComment', TextType::class, [
                 'required' => false,
                 'label' => 'Précisez comment vous avez connu Aides-territoires',
-                'sanitize_html' => true,
+                // 'sanitize_html' => true,
             ])
             ->add('mlConsent', CheckboxType::class, [
                 'required' => false,
@@ -168,19 +168,19 @@ class RegisterType extends AbstractType
                     'label' => 'Adresse postale',
                     'required' => true,
                     'mapped' => false,
-                    'sanitize_html' => true,
+                    // 'sanitize_html' => true,
                 ])
                 ->add('cityName', TextType::class, [
                     'label' => 'Ville',
                     'required' => true,
                     'mapped' => false,
-                    'sanitize_html' => true,
+                    // 'sanitize_html' => true,
                 ])
                 ->add('zipCode', TextType::class, [
                     'label' => 'Code postal',
                     'required' => true,
                     'mapped' => false,
-                    'sanitize_html' => true,
+                    // 'sanitize_html' => true,
                 ])
                 ->add('sirenCode', TextType::class, [
                     'label' => 'Code SIREN',
@@ -190,7 +190,7 @@ class RegisterType extends AbstractType
                     'constraints' => [
                         new Length(9)
                     ],
-                    'sanitize_html' => true,
+                    // 'sanitize_html' => true,
                 ])
                 ->add('siretCode', TextType::class, [
                     'label' => 'Code SIRET',
@@ -200,13 +200,13 @@ class RegisterType extends AbstractType
                     'constraints' => [
                         new Length(14)
                     ],
-                    'sanitize_html' => true,
+                    // 'sanitize_html' => true,
                 ])
                 ->add('apeCode', TextType::class, [
                     'label' => 'Code APE',
                     'required' => false,
                     'mapped' => false,
-                    'sanitize_html' => true,
+                    // 'sanitize_html' => true,
                     'constraints' => [
                         new Length(max: 10)
                     ],
@@ -218,7 +218,7 @@ class RegisterType extends AbstractType
                     'constraints' => [
                         new Length(5)
                     ],
-                    'sanitize_html' => true,
+                    // 'sanitize_html' => true,
                 ])
             ;
         }
