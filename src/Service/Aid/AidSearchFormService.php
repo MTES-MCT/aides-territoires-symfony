@@ -200,10 +200,13 @@ class AidSearchFormService
         }
 
         // < les paramètres en query
+        $query = '';
         if (isset($params['querystring'])) {
             $query = $params['querystring'];
         } else {
-            $query = parse_url($this->requestStack->getCurrentRequest()->getRequestUri(), PHP_URL_QUERY) ?? null;
+            if ($this->requestStack->getCurrentRequest()) {
+                $query = parse_url($this->requestStack->getCurrentRequest()->getRequestUri(), PHP_URL_QUERY) ?? null;
+            }
         }
         $queryParams = [];
         $queryItems = explode('&', $query);
