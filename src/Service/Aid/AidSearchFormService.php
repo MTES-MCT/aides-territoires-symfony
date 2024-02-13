@@ -3,6 +3,7 @@
 namespace App\Service\Aid;
 
 use App\Entity\Aid\AidDestination;
+use App\Entity\Aid\AidRecurrence;
 use App\Entity\Aid\AidStep;
 use App\Entity\Aid\AidType;
 use App\Entity\Aid\AidTypeGroup;
@@ -169,7 +170,7 @@ class AidSearchFormService
             $aidParams['aidDestinations'] = $aidSearchClass->getAidDestinations();
         }
 
-        if ($aidSearchClass->getIsCharged()) {
+        if ($aidSearchClass->getIsCharged() !== null) {
             $aidParams['isCharged'] = $aidSearchClass->getIsCharged();
         }
 
@@ -183,6 +184,10 @@ class AidSearchFormService
 
         if ($aidSearchClass->getProjectReference()) {
             $aidParams['projectReference'] = $aidSearchClass->getProjectReference();
+        }
+
+        if ($aidSearchClass->getAidRecurrence()) {
+            $aidParams['aidRecurrence'] = $aidSearchClass->getAidRecurrence();
         }
 
         return $aidParams;
@@ -358,6 +363,39 @@ class AidSearchFormService
                 $aidSearchClass->addAidType($aidType);
             }
         }
+
+        // via l'api on peu avoir un groupe d'aide
+        if (isset($queryParams['aid_type'])) {
+            $aidTypes = [];
+            if ($queryParams['aid_type'] == AidTypeGroup::SLUG_FINANCIAL) {
+                $aidTypes = $this->managerRegistry->getRepository(AidType::class)->findBy([
+                    'aidTypeGroup' => $this->managerRegistry->getRepository(AidTypeGroup::class)->findOneBy(['slug' => AidTypeGroup::SLUG_FINANCIAL])
+                ]);
+            } else if ($queryParams['aid_type'] == AidTypeGroup::SLUG_TECHNICAL) {
+                $aidTypes = $this->managerRegistry->getRepository(AidType::class)->findBy([
+                    'aidTypeGroup' => $this->managerRegistry->getRepository(AidTypeGroup::class)->findOneBy(['slug' => AidTypeGroup::SLUG_FINANCIAL])
+                ]);
+            }
+            foreach ($aidTypes as $aidType) {
+                $aidSearchClass->addAidType($aidType);
+            }
+        }
+
+        // via l'api
+        if (isset($queryParams['financial_aids'])) {
+            $aidType = $this->managerRegistry->getRepository(AidType::class)->findOneBy(['slug' => (string) $queryParams['financial_aids']]);
+            if ($aidType instanceof AidType) {
+                $aidSearchClass->addAidType($aidType);
+            }
+        }
+
+        if (isset($queryParams['technical_aids'])) {
+            $aidType = $this->managerRegistry->getRepository(AidType::class)->findOneBy(['slug' => (string) $queryParams['technical_aids']]);
+            if ($aidType instanceof AidType) {
+                $aidSearchClass->addAidType($aidType);
+            }
+        }
+
         /**
          * > AidType
         */
@@ -452,6 +490,22 @@ class AidSearchFormService
         */
 
         /**
+         * < AidRecurrence
+        */
+
+        if (isset($queryParams['recurrence'])) {
+            $aidRecurrence = $this->managerRegistry->getRepository(AidRecurrence::class)->findOneBy(['slug' => $queryParams['recurrence']]);
+            if ($aidRecurrence instanceof AidRecurrence) {
+                $aidSearchClass->setAidRecurrence($aidRecurrence);
+            }
+        }
+
+        /**
+         * > AidRecurrence
+        */
+
+
+        /**
          * < AidDestination
         */
 
@@ -477,9 +531,9 @@ class AidSearchFormService
         */
 
         if (isset($queryParams['is_charged'])) {
-            if ($queryParams['is_charged'] === 'False') {
+            if (trim(strtolower((string) $queryParams['is_charged'])) === 'false') {
                 $aidSearchClass->setIsCharged(false);
-            } else if ($queryParams['is_charged'] === 'True') {
+            } else if (trim(strtolower((string) $queryParams['is_charged'])) === 'true') {
                 $aidSearchClass->setIsCharged(true);
             }
         }
@@ -510,6 +564,12 @@ class AidSearchFormService
             }
         }
 
+        if (isset($queryParams['call_for_projects_only']) && (string) $queryParams['call_for_projects_only'] == 'true') {
+            $aidSearchClass->setIsCallForProject(true);
+        }
+        if (isset($queryParams['call_for_projects_only']) && (string) $queryParams['call_for_projects_only'] == 'false') {
+            $aidSearchClass->setIsCallForProject(false);
+        }
         /**
          * > isCallForProject
         */
@@ -809,9 +869,9 @@ class AidSearchFormService
             }
         }
         if (isset($params['is_charged'])) {
-            if ($params['is_charged'] === 'False') {
+            if (trim(strtolower((string) $params['is_charged'])) === 'false') {
                 $params['isCharged'] = false;
-            } else if ($params['is_charged'] === 'True') {
+            } else if (trim(strtolower((string) $params['is_charged'])) === 'true') {
                 $params['isCharged'] = true;
             }
             unset($params['is_charged']);
@@ -826,9 +886,9 @@ class AidSearchFormService
             }
         }
         if (isset($params['call_for_projects_only'])) {
-            if ($params['call_for_projects_only'] == 'on') {
+            if (trim(strtolower((string) $params['call_for_projects_only'])) == 'on') {
                 $params['isCallForProject'] = true;
-            } else if ($params['call_for_projects_only'] == 'off') {
+            } else if (trim(strtolower((string) $params['call_for_projects_only'])) == 'off') {
                 $params['isCallForProject'] = false;
             }
             unset($params['call_for_projects_only']);

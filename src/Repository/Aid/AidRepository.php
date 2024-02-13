@@ -322,6 +322,12 @@ class AidRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult()[0]['nb'] ?? 0;
     }
 
+    public function countAfterSelect(?array $params = null): int
+    {
+        $qb = $this->getQueryBuilder($params);
+        return count($qb->getQuery()->getResult());
+    }
+
     public function countCustom(array $params = null) : int {
         $qb = $this->getQueryBuilder($params);
         

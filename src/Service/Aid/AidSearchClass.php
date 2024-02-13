@@ -3,6 +3,7 @@
 namespace App\Service\Aid;
 
 use App\Entity\Aid\AidDestination;
+use App\Entity\Aid\AidRecurrence;
 use App\Entity\Aid\AidStep;
 use App\Entity\Aid\AidType;
 use App\Entity\Backer\Backer;
@@ -51,6 +52,7 @@ class AidSearchClass
     private ?bool $isCallForProject;
 
     private ?ProjectReference $projectReference;
+    private ?AidRecurrence $aidRecurrence;
 
     public function  __construct()
     {
@@ -70,6 +72,7 @@ class AidSearchClass
         $this->europeanAid = null;
         $this->isCallForProject = null;
         $this->projectReference = null;
+        $this->aidRecurrence = null;
     }
 
     public function getOrganizationType(): ?OrganizationType
@@ -291,4 +294,15 @@ class AidSearchClass
     {
         $this->projectReference = $projectReference;
     }
+
+    public function getAidRecurrence(): ?AidRecurrence
+    {
+        return $this->aidRecurrence;
+    }
+
+    public function setAidRecurrence(?AidRecurrence $aidRecurrence): void
+    {
+        $this->aidRecurrence = $aidRecurrence;
+    }
+    
 }

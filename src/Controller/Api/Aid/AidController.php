@@ -11,6 +11,7 @@ use App\Entity\Aid\AidType;
 use App\Entity\Aid\AidTypeGroup;
 use App\Entity\Perimeter\Perimeter;
 use App\Repository\Aid\AidRepository;
+use App\Service\Aid\AidSearchFormService;
 use App\Service\Aid\AidService;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Attribute\AsController;
@@ -23,88 +24,100 @@ class AidController extends ApiController
     #[Route('/api/aids/', name: 'api_aid_aids', priority: 5)]
     public function index(
         AidRepository $aidRepository,
-        AidService $aidService
+        AidService $aidService,
+        AidSearchFormService $aidSearchFormService
     ): JsonResponse
     {
-        $params = [];
-        $params['showInSearch'] = true;
-        $params['orderBy'] = ['sort' => 'a.id', 'order' => 'DESC'];
+        $aidSearchClass = $aidSearchFormService->getAidSearchClass();
+        // parametres pour requetes aides
+        $aidParams = [
+            'showInSearch' => true,
+        ];
+        $aidParams = array_merge($aidParams, $aidSearchFormService->convertAidSearchClassToAidParams($aidSearchClass));
 
-        $text = $this->requestStack->getCurrentRequest()->get('text', null);
-        if (!empty($text)) {
-            $params['textSearch'] = $text;
-        }
+        // $params = [];
+        // $params['showInSearch'] = true;
+        // // $params['orderBy'] = ['sort' => 'a.id', 'order' => 'DESC'];
 
-        $targetedAudiences = $this->requestStack->getCurrentRequest()->get('targeted_audiences', null);
-        if (!empty($targetedAudiences)) {
-            $params['organizationTypeSlugs'] = [$targetedAudiences]; // malgré le nom il n'y a qu'une seul audience dans le filtre
-        }
+        // $text = $this->requestStack->getCurrentRequest()->get('text', null);
+        // if (!empty($text)) {
+        //     $params['keyword'] = $text;
+        // }
 
-        $applyBefore = $this->requestStack->getCurrentRequest()->get('apply_before', null);
-        if (!empty($applyBefore)) {
-            $params['applyBefore'] = new \DateTime(date($applyBefore));
-        }
+        // $targetedAudiences = $this->requestStack->getCurrentRequest()->get('targeted_audiences', null);
+        // if (!empty($targetedAudiences)) {
+        //     $params['organizationTypeSlugs'] = [$targetedAudiences]; // malgré le nom il n'y a qu'une seul audience dans le filtre
+        // }
 
-        $publishedAfter = $this->requestStack->getCurrentRequest()->get('published_after', null);
-        if (!empty($publishedAfter)) {
-            $params['publishedAfter'] = new \DateTime(date($publishedAfter));
-        }
+        // $applyBefore = $this->requestStack->getCurrentRequest()->get('apply_before', null);
+        // if (!empty($applyBefore)) {
+        //     $params['applyBefore'] = new \DateTime(date($applyBefore));
+        // }
 
-        $aidType = $this->requestStack->getCurrentRequest()->get('aid_type', null);
-        if (!empty($aidType)) {
-            $params['aidTypeGroup'] = $this->managerRegistry->getRepository(AidTypeGroup::class)->findOneBy(['slug' => $this->stringService->getSlug($aidType)]);
-        }
+        // $publishedAfter = $this->requestStack->getCurrentRequest()->get('published_after', null);
+        // if (!empty($publishedAfter)) {
+        //     $params['publishedAfter'] = new \DateTime(date($publishedAfter));
+        // }
 
-        $params['aidTypes'] = [];
-        $financialAids = $this->requestStack->getCurrentRequest()->get('financial_aids', null);
-        if (!empty($financialAids)) {
-            $params['aidTypes'][] = $this->managerRegistry->getRepository(AidType::class)->findOneBy(['slug' => $this->stringService->getSlug($financialAids)]);
-        }
+        // $aidType = $this->requestStack->getCurrentRequest()->get('aid_type', null);
+        // if (!empty($aidType)) {
+        //     $params['aidTypeGroup'] = $this->managerRegistry->getRepository(AidTypeGroup::class)->findOneBy(['slug' => $this->stringService->getSlug($aidType)]);
+        // }
 
-        $technicalAids = $this->requestStack->getCurrentRequest()->get('technical_aids', null);
-        if (!empty($technicalAids)) {
-            $params['aidTypes'][] = $this->managerRegistry->getRepository(AidType::class)->findOneBy(['slug' => $this->stringService->getSlug($technicalAids)]);
-        }
+        // $params['aidTypes'] = [];
+        // $financialAids = $this->requestStack->getCurrentRequest()->get('financial_aids', null);
+        // if (!empty($financialAids)) {
+        //     $params['aidTypes'][] = $this->managerRegistry->getRepository(AidType::class)->findOneBy(['slug' => $this->stringService->getSlug($financialAids)]);
+        // }
 
-        $mobilizationStep = $this->requestStack->getCurrentRequest()->get('mobilization_step', null);
-        if (!empty($mobilizationStep)) {
-            $params['aidStep'] = $this->managerRegistry->getRepository(AidStep::class)->findOneBy(['slug' => $this->stringService->getSlug($mobilizationStep)]);
-        }
+        // $technicalAids = $this->requestStack->getCurrentRequest()->get('technical_aids', null);
+        // if (!empty($technicalAids)) {
+        //     $params['aidTypes'][] = $this->managerRegistry->getRepository(AidType::class)->findOneBy(['slug' => $this->stringService->getSlug($technicalAids)]);
+        // }
+        // if (count($params['aidTypes']) == 0) {
+        //     unset($params['aidTypes']);
+        // }
 
-        $destinations = $this->requestStack->getCurrentRequest()->get('destinations', null);
-        if (!empty($destinations)) {
-            $params['aidDestination'] = $this->managerRegistry->getRepository(AidDestination::class)->findOneBy(['slug' => $this->stringService->getSlug($destinations)]);
-        }
+        // $mobilizationStep = $this->requestStack->getCurrentRequest()->get('mobilization_step', null);
+        // if (!empty($mobilizationStep)) {
+        //     $params['aidStep'] = $this->managerRegistry->getRepository(AidStep::class)->findOneBy(['slug' => $this->stringService->getSlug($mobilizationStep)]);
+        // }
 
-        $recurrence = $this->requestStack->getCurrentRequest()->get('recurrence', null);
-        if (!empty($recurrence)) {
-            $params['aidRecurrence'] = $this->managerRegistry->getRepository(AidRecurrence::class)->findOneBy(['slug' => $this->stringService->getSlug($recurrence)]);
-        }
+        // $destinations = $this->requestStack->getCurrentRequest()->get('destinations', null);
+        // if (!empty($destinations)) {
+        //     $params['aidDestination'] = $this->managerRegistry->getRepository(AidDestination::class)->findOneBy(['slug' => $this->stringService->getSlug($destinations)]);
+        // }
 
-        $callForProjectsOnly = $this->requestStack->getCurrentRequest()->get('call_for_projects_only', null);
-        if (!empty($callForProjectsOnly)) {
-            $params['isCallForProject'] = $this->stringToBool($callForProjectsOnly);
-        }
+        // $recurrence = $this->requestStack->getCurrentRequest()->get('recurrence', null);
+        // if (!empty($recurrence)) {
+        //     $params['aidRecurrence'] = $this->managerRegistry->getRepository(AidRecurrence::class)->findOneBy(['slug' => $this->stringService->getSlug($recurrence)]);
+        // }
 
-        $isCharged = $this->requestStack->getCurrentRequest()->get('is_charged', null);
-        if (!empty($isCharged)) {
-            $params['isCharged'] = $this->stringToBool($isCharged);
-        }
+        // $callForProjectsOnly = $this->requestStack->getCurrentRequest()->get('call_for_projects_only', null);
+        // if (!empty($callForProjectsOnly)) {
+        //     $params['isCallForProject'] = $this->stringToBool($callForProjectsOnly);
+        // }
 
-        $perimeter = $this->requestStack->getCurrentRequest()->get('perimeter', null);
-        if (!empty($perimeter)) {
-            $params['perimeter'] = $this->managerRegistry->getRepository(Perimeter::class)->find((int) $perimeter);
-        }
+        // $isCharged = $this->requestStack->getCurrentRequest()->get('is_charged', null);
+        // if (!empty($isCharged)) {
+        //     $params['isCharged'] = $this->stringToBool($isCharged);
+        // }
+
+        // $perimeter = $this->requestStack->getCurrentRequest()->get('perimeter', null);
+        // if (!empty($perimeter)) {
+        //     $params['perimeter'] = $this->managerRegistry->getRepository(Perimeter::class)->find((int) $perimeter);
+        // }
 
         // requete pour compter sans la pagination
-        $count = $aidRepository->countCustom($params);
-        
+        $countParams = $aidParams;
+        $count = $aidRepository->countAfterSelect($countParams);
+
         // requete pour les résultats avec la pagination
-        $params['firstResult'] = ($this->getPage() - 1) * $this->getItemsPerPage();
-        $params['maxResults'] = $this->getItemsPerPage();
+        $aidParams['firstResult'] = ($this->getPage() - 1) * $this->getItemsPerPage();
+        $aidParams['maxResults'] = $this->getItemsPerPage();
         
-        $results = $aidRepository->findCustom($params);
-        
+        $results = $aidRepository->findCustom($aidParams);
+
         // spécifique
         $resultsSpe = $this->getResultsSpe($results, $aidService);
         
