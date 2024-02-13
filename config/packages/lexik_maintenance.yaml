@@ -4,4 +4,4 @@ lexik_maintenance:
     driver:
         class: 'Lexik\Bundle\MaintenanceBundle\Drivers\FileDriver'
         options:
-            file_path: '%env(resolve:MAINTENANCE_FILE_FOLDER)%'
+            file_path: '%kernel.project_dir%/../var/cache/lock'
