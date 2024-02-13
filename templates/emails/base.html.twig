@@ -171,9 +171,13 @@
             </tr>
             <!-- Logo AT END -->
 
-            {% block body %}
-                {{ body|raw }}
-            {% endblock %}
+            <tr>
+                <td align="center">
+                    {% block body %}
+                        {{ body|raw }}
+                    {% endblock %}
+                </td>
+            </tr>
 
             <!-- Clear Spacer : BEGIN -->
             <tr>
