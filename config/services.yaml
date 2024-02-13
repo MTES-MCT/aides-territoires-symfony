@@ -39,6 +39,7 @@ parameters:
     addna_alert_email_subject_prefix: '%env(ADDNA_ALERT_EMAIL_SUBJECT_PREFIX)%'
     ademe_agir_api_username: '%env(ADEME_AGIR_API_USERNAME)%'
     ademe_agir_api_password: '%env(ADEME_AGIR_API_PASSWORD)%'
+    at_x_auth_token: '%env(AT_X_AUTH_TOKEN)%'
 
 services:
     # default configuration for services in *this* file

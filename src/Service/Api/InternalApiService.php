@@ -2,15 +2,18 @@
 
 namespace App\Service\Api;
 
+use App\Service\Various\ParamService;
 use GuzzleHttp\Client;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 class InternalApiService
 {
     const API_FOLDER = 'api';
+    private string $bearerToken = '';
 
     public function  __construct(
-        private RequestStack $requestStack
+        private RequestStack $requestStack,
+        private ParamService $paramService
     )
     {    
     }
@@ -32,14 +35,18 @@ class InternalApiService
 
     }
 
-    private function getBearerToken(): string
+    private function getBearerToken(bool $force = false): string
     {
+        if ($this->bearerToken !== '' && !$force) {
+            return $this->bearerToken;
+        }
+
         try {
             // créer le client pour appeller l'api
             $client = new Client([
                 'base_uri' => $this->getAPiBaseUrl(),
                 'headers' => [
-                    'X-AUTH-TOKEN' => '123456',
+                    'X-AUTH-TOKEN' => $this->paramService->get('at_x_auth_token'),
                     'Accept' => 'application/json',
                 ],
             ]);
@@ -49,10 +56,16 @@ class InternalApiService
             ]);
 
             // retour
-            return json_decode($response->getBody()->getContents())->token;
+            $this->bearerToken = json_decode($response->getBody()->getContents())->token;
+            return $this->bearerToken;
         } catch (\Exception $e) {
             return '';
         }
+    }
+
+    private function setBearerToken(string $bearerToken): void
+    {
+        $this->bearerToken = $bearerToken;
     }
 
     public function callApi(
@@ -74,6 +87,10 @@ class InternalApiService
         $response = $client->request($method, '/'.self::API_FOLDER.''.$url, [
             'query' => $params,
         ]);
+        if ($response->getStatusCode() == 401) { // token expiré, on relance
+            $this->getBearerToken(true);
+            return $this->callApi($url, $params, $method);
+        }
 
         // retour
         return $response->getBody()->getContents();        
