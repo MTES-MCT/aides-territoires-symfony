@@ -154,6 +154,18 @@
             "tests/bootstrap.php"
         ]
     },
+    "prolix/maintenance-bundle": {
+        "version": "2.1",
+        "recipe": {
+            "repo": "github.com/symfony/recipes-contrib",
+            "branch": "main",
+            "version": "2.1",
+            "ref": "662179a8c0bdc0f96a366ac359bbb9e766010844"
+        },
+        "files": [
+            "config/packages/lexik_maintenance.yaml"
+        ]
+    },
     "scheb/2fa-bundle": {
         "version": "6.9",
         "recipe": {

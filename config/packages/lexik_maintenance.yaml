@@ -1,0 +1,7 @@
+lexik_maintenance:
+    authorized:
+        query: { '%env(MAINTENANCE_QUERY_ATTRIBUTE)%': '%env(MAINTENANCE_QUERY_VALUE)%' }
+    driver:
+        class: 'Lexik\Bundle\MaintenanceBundle\Drivers\FileDriver'
+        options:
+            file_path: '%kernel.cache_dir%/lock'
