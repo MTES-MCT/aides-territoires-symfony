@@ -2,6 +2,5 @@ lexik_maintenance:
     authorized:
         query: { '%env(MAINTENANCE_QUERY_ATTRIBUTE)%': '%env(MAINTENANCE_QUERY_VALUE)%' }
     driver:
-        class: 'Lexik\Bundle\MaintenanceBundle\Drivers\FileDriver'
-        options:
-            file_path: '%env(resolve:MAINTENANCE_FILE_FOLDER)%'
+        class: '\Lexik\Bundle\MaintenanceBundle\Drivers\FileDriver'
+        options: { file_path: '%kernel.project_dir%/var/cache/lock' }
