@@ -17,12 +17,9 @@ services:
         image: mysql:8.0.33
         container_name: at_mysql
         volumes:
-            #- .docker/mysql/my.cnf:/var/lib/mysql
             - .docker/data/db:/var/lib/mysql
         command:
-            --sql_mode=only_full_group_by
-            #- "--default-authentication-plugin=mysql_native_password"
-            #- "--lower_case_table_names=1"
+            --sql-mode=ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION
         environment:
             MYSQL_ROOT_PASSWORD: root
             MYSQL_DATABASE: at

@@ -2,6 +2,5 @@ lexik_maintenance:
     authorized:
         query: { '%env(MAINTENANCE_QUERY_ATTRIBUTE)%': '%env(MAINTENANCE_QUERY_VALUE)%' }
     driver:
-        class: 'Lexik\Bundle\MaintenanceBundle\Drivers\FileDriver'
-        options:
-            file_path: '%env(resolve:MAINTENANCE_FILE_FOLDER)%'
+        # Database driver:
+        class: 'Lexik\Bundle\MaintenanceBundle\Drivers\DatabaseDriver'  
