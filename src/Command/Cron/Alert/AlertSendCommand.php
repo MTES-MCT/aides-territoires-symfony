@@ -116,13 +116,13 @@ class AlertSendCommand extends Command
                 }
                 $today = new \DateTime(date('Y-m-d H:i:s'));
                 $emailSubject = $emailSubjectPrefix . ' '. $today->format('d/m/Y') . ' — De nouvelles aides correspondent à vos recherches';
-                
+                $subject = count($aids).' résultat'.(count($aids) > 1 ? 's' : '').' pour votre alerte';
                 $this->emailService->sendEmail(
                     $alert->getEmail(),
                     $emailSubject,
                     'emails/alert/alert_send.html.twig',
                     [
-                        'subject' => count($aids).' résultats pour votre alerte',
+                        'subject' => $subject,
                         'alert' => $alert,
                         'aids' => $aids,
                         'aidsDisplay' => array_slice($aids, 0, 3)
