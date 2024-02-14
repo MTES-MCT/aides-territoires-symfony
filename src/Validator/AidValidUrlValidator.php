@@ -27,7 +27,6 @@ class AidValidUrlValidator extends ConstraintValidator
 
             // check host
             if (!isset($infos['host']) || $infos['host'] !== $this->requestStack->getCurrentRequest()->getHost()) {
-                dd($infos, $this->requestStack->getCurrentRequest()->getHost());
                 throw new \Exception($this->message);
             }
     
