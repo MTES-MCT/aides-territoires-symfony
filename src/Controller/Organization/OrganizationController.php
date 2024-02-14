@@ -519,12 +519,15 @@ class OrganizationController extends FrontController
             '.$user->getFirstname().' '.$user->getLastname().' vous à exclu de l\'organization '.$organizationName.'.
         </p>
         ';
-        $notificationService->addNotification($organizationInvitation->getGuest(), 'Vous avez été exclu de '.$organizationName, $message);
 
+        if ($organizationInvitation->getGuest()) {
+            $notificationService->addNotification($organizationInvitation->getGuest(), 'Vous avez été exclu de '.$organizationName, $message);
+        }
+        
         // message
         $this->addFlash(
             FrontController::FLASH_SUCCESS,
-            'Vous avez exclu '.$organizationInvitation->getGuest()->getFirstname().' '.$organizationInvitation->getGuest()->getLastname().' de l\'organization.'
+            'Vous avez exclu '.$organizationInvitation->getFirstname().' '.$organizationInvitation->getLastname().' de l\'organization.'
         );
 
         // retire l'organization à l'utilisateur
