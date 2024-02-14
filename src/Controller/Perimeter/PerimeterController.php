@@ -57,6 +57,7 @@ class PerimeterController extends FrontController
         } catch (\Exception $e) {
             return new JsonResponse([
                 'success' => 0,
+                'message' => $e->getMessage()
             ]);
         }
     }
