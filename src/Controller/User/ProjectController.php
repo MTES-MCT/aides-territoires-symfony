@@ -109,7 +109,7 @@ class ProjectController extends FrontController
                 'organizations' => $user->getOrganizations(),
                 'orderBy' => [
                     'sort' => 'p.timeCreate',
-                    'order '=> 'DESC'
+                    'order' => 'DESC'
                 ]
             ]
         );
