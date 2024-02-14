@@ -258,7 +258,9 @@ class ProjectController extends FrontController
 
                 // données additionnelles
                 $project->setStatus(Project::STATUS_DRAFT);
-                $project->setOrganization($user->getDefaultOrganization());
+                if (!$project->getOrganization()) {
+                    $project->setOrganization($user->getDefaultOrganization());
+                }
                 $project->setAuthor($user);
                 
                 // si demande de projet public

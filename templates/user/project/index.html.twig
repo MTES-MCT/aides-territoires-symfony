@@ -31,6 +31,7 @@
                     <thead>
                         <tr>
                             <th scope="col" class="fr-text">Nom</th>
+                            <th scope="col" class="fr-text">Structure</th>
                             <th scope="col" class="fr-text">Nombre d’aides ajoutées</th>
                             <th scope="col" class="fr-text">Date création</th>
                             <th scope="col" class="fr-text">État d’avancement</th>
@@ -47,6 +48,13 @@
                                 <a  href="{{ path('app_user_project_details_fiche_projet', {'id': project.id, 'slug': project.slug}) }}" id="project-{{ project.id }}">
                                     {{ project.name }}
                                 </a>
+                            </td>
+                            <td class="fr-text">
+                                {% if project.organization %}
+                                    {{ project.organization.name }}
+                                {% else %}
+                                    Non renseigné
+                                {% endif %}
                             </td>
                             <td class="fr-text">
                                 {% if project.aidProjects.count %}
