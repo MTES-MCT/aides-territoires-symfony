@@ -104,13 +104,13 @@ class ProjectController extends FrontController
         }
 
         // projets
-        $projects = $projectRepository->findBy(
+        $projects = $projectRepository->findCustom(
             [
-                // 'author' => $user
-                'organization' => $user->getDefaultOrganization()
-            ],
-            [
-                'timeCreate' => 'DESC'
+                'organizations' => $user->getOrganizations(),
+                'orderBy' => [
+                    'sort' => 'p.timeCreate',
+                    'order '=> 'DESC'
+                ]
             ]
         );
 

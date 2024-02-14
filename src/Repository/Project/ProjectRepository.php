@@ -111,6 +111,12 @@ class ProjectRepository extends ServiceEntityRepository
         return $projects;
     }
 
+    public function findCustom(?array $params = null): array
+    {
+        $qb = $this->getQueryBuilder($params);
+        return $qb->getQuery()->getResult();
+    }
+
     public function getQueryBuilder(array $params = null): QueryBuilder
     {
         $isPublic = $params['isPublic'] ?? null;
@@ -130,8 +136,16 @@ class ProjectRepository extends ServiceEntityRepository
         $exclude = $params['exclude'] ?? null;
         $dateCreateMin = $params['dateCreateMin'] ?? null;
         $dateCreateMax = $params['dateCreateMax'] ?? null;
+        $organizations = $params['organizations'] ?? null;
 
         $qb = $this->createQueryBuilder('p');
+
+        if ($organizations !== null) {
+            $qb
+                ->andWhere('p.organization IN (:organizations)')
+                ->setParameter('organizations', $organizations)
+                ;
+        }
 
         if ($dateCreateMin instanceof \DateTime) {
             $qb->andWhere('p.dateCreate >= :dateCreateMin')
