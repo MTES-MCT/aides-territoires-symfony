@@ -60,7 +60,7 @@ class DataSourceCrudController extends AtCrudController
         ->onlyOnForms();
         yield AssociationField::new('aidAuthor', 'L\'auteur par défaut des aides importées')
         ->autocomplete()
-        ->setHelp('Mettre Admin AT par défaut');
+        ->setHelp('Mettre Admin AT (aides-territoires@beta.gouv.fr) par défaut');
         yield NumberField::new('nbAids', 'Nombre d\'aides')
         ->onlyOnIndex();
         yield DateField::new('timeLastAccess', 'Date du dernier accès')

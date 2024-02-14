@@ -24,10 +24,10 @@ class ImportFluxRegionSudCommand extends ImportFluxCommand
 
     protected function getImportUniqueid($aidToImport): ?string
     {
-        if (!isset($aidToImport['Nom de l’aide'])) {
+        if (!isset($aidToImport['Uid'])) {
             return null;
         }
-        $importUniqueid = $this->importUniqueidPrefix . md5($aidToImport['Nom de l’aide']);
+        $importUniqueid = $this->importUniqueidPrefix . $aidToImport['Uid'];
         return $importUniqueid;
     }
 
