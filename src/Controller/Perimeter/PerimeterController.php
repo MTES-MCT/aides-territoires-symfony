@@ -17,31 +17,42 @@ class PerimeterController extends FrontController
     ): JsonResponse
     {
         try {
-        // recuperer id du perimetre
-        $perimeterId = $requestStack->getCurrentRequest()->get('perimeter_id', null);
-        if (!$perimeterId) {
-            throw new \Exception('Id périmètre manquant');
-        }
+            $request = $requestStack->getCurrentRequest();
+            $origin = $request->headers->get('origin');
+            $infosOrigin = parse_url($origin);
+            $hostOrigin = $infosOrigin['host'] ?? null;
+            $serverName = $request->getHost();
+    
+            if ($hostOrigin !== $serverName) {
+                // La requête n'est pas interne, retourner une erreur
+                throw $this->createAccessDeniedException('This action can only be performed by the server itself.');
+            }
 
-        // appel l'api pour avoir les datas
-        $perimeterDatas = $internalApiService->callApi(
-            url: '/perimeters/data/',
-            params: ['perimeter_id' => (int) $perimeterId]
-        );
-        $perimeterDatas = json_decode($perimeterDatas);
-        $results = $perimeterDatas->results;
-        $return = [];
-        foreach ($results as $result) {
-            $return[] = [
-                'prop' => $result->prop,
-                'value' => $result->value
-            ];
-        }
+            // recuperer id du perimetre
+            $perimeterId = $requestStack->getCurrentRequest()->get('perimeter_id', null);
+            if (!$perimeterId) {
+                throw new \Exception('Id périmètre manquant');
+            }
 
-        return new JsonResponse([
-            'success' => 1,
-            'results' => $return
-        ]);
+            // appel l'api pour avoir les datas
+            $perimeterDatas = $internalApiService->callApi(
+                url: '/perimeters/data/',
+                params: ['perimeter_id' => (int) $perimeterId]
+            );
+            $perimeterDatas = json_decode($perimeterDatas);
+            $results = $perimeterDatas->results;
+            $return = [];
+            foreach ($results as $result) {
+                $return[] = [
+                    'prop' => $result->prop,
+                    'value' => $result->value
+                ];
+            }
+
+            return new JsonResponse([
+                'success' => 1,
+                'results' => $return
+            ]);
 
         } catch (\Exception $e) {
             return new JsonResponse([
