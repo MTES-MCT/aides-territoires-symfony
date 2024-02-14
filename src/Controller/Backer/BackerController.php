@@ -20,6 +20,7 @@ class BackerController extends FrontController
     #[Route('/partenaires/', name: 'app_backer_backer')]
     public function index(): Response
     {
+        return $this->redirectToRoute('app_cartography_cartography');
         return $this->render('backer/backer/index.html.twig', [
 
         ]);

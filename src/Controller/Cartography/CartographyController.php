@@ -82,7 +82,7 @@ class CartographyController extends FrontController
         ]);
     }
 
-    #[Route('/cartographie/{code}-{slug}/porteurs/', name: 'app_cartography_detail', requirements: ['code' => '[0-9]+','slug' => '[a-zA-Z0-9\-_]+'])]
+    #[Route('/cartographie/{code}-{slug}/porteurs/', name: 'app_cartography_detail', requirements: ['code' => '[0-9A-Za-z]+','slug' => '[a-zA-Z0-9\-_]+'])]
     public function detail(
         $code,
         $slug,
