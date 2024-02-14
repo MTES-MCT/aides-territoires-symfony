@@ -347,13 +347,15 @@ class OrganizationController extends FrontController
             }
             $excludable = false;
             $status = '';
-            if ($organizationInvitation && $organizationInvitation->getTimeExclude()) {
-                $status = 'Exclu le '.$organizationInvitation->getTimeExclude()->format('d/m/Y');
-            } elseif ($organizationInvitation && $organizationInvitation->getTimeAccept()) {
-                $status = 'Accepté le '.$organizationInvitation->getTimeAccept()->format('d/m/Y');
-                $excludable = true;
-            } elseif ($organizationInvitation && $organizationInvitation->getTimeRefuse()) {
-                $status = 'Refusé le '.$organizationInvitation->getTimeRefuse()->format('d/m/Y');
+            if ($organizationInvitation->getGuest()) {
+                if ($organizationInvitation && $organizationInvitation->getTimeExclude()) {
+                    $status = 'Exclu le '.$organizationInvitation->getTimeExclude()->format('d/m/Y');
+                } elseif ($organizationInvitation && $organizationInvitation->getTimeAccept()) {
+                    $status = 'Accepté le '.$organizationInvitation->getTimeAccept()->format('d/m/Y');
+                    $excludable = true;
+                } elseif ($organizationInvitation && $organizationInvitation->getTimeRefuse()) {
+                    $status = 'Refusé le '.$organizationInvitation->getTimeRefuse()->format('d/m/Y');
+                }
             } else {
                 $status = 'En attente';
             }

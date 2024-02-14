@@ -3,9 +3,11 @@
 namespace App\Form\Project;
 
 use App\Entity\Keyword\KeywordSynonymlist;
+use App\Entity\Organization\Organization;
 use App\Entity\Project\Project;
 use App\Entity\Reference\ProjectReference;
 use App\Service\Image\ImageService;
+use App\Service\User\UserService;
 use Doctrine\ORM\EntityRepository;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
@@ -24,7 +26,8 @@ use Symfony\Component\Validator\Constraints\File;
 class ProjectEditType extends AbstractType
 {
     public function __construct(
-        protected ImageService $imageService
+        protected ImageService $imageService,
+        protected UserService $userService
     ) {  
     }
 
@@ -37,6 +40,21 @@ class ProjectEditType extends AbstractType
             'help' => 'Donnez un nom explicite : préférez \'végétalisation du quartier des coteaux\' à \'quartier des coteaux\'',
             'sanitize_html' => true,
         ])
+        ->add('organization', EntityType::class, [
+            'required' => true,
+            'label' => 'L\'organisation pour laquelle vous publiez ce projet',
+            'class' => Organization::class,
+            'choice_label' => 'name',
+            'query_builder' => function(EntityRepository $entityRepository) {
+                return $entityRepository->createQueryBuilder('o')
+                ->innerJoin('o.beneficiairies', 'beneficiairies')
+                ->andWhere('beneficiairies = :user')
+                ->setParameter('user', $this->userService->getUserLogged())
+                ->orderBy('o.name', 'ASC')
+                ;
+            },
+        ])
+
         ->add('projectReference', EntityType::class, [
             'required' => false,
             'label' => false,
