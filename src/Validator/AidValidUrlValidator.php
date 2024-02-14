@@ -27,6 +27,7 @@ class AidValidUrlValidator extends ConstraintValidator
 
             // check host
             if (!isset($infos['host']) || $infos['host'] !== $this->requestStack->getCurrentRequest()->server->get('SERVER_NAME')) {
+                dd($infos, $this->requestStack->getCurrentRequest()->server->get('SERVER_NAME'));
                 throw new \Exception($this->message);
             }
     
@@ -38,7 +39,7 @@ class AidValidUrlValidator extends ConstraintValidator
 
             // check base
             $aidTest = $this->managerRegistry->getRepository(Aid::class)->findOneCustom([
-                'isLive' => true,
+                'showInSearch' => true,
                 'slug' => $matches[1]
             ]);
             if (!$aidTest instanceof Aid) {
