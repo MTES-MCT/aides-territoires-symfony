@@ -7,15 +7,19 @@ use App\Entity\Organization\Organization;
 use App\Entity\Organization\OrganizationInvitation;
 use App\Entity\Perimeter\Perimeter;
 use App\Entity\User\Notification;
+use App\Form\Organization\OrganizationDatasType;
 use App\Form\Organization\OrganizationInvitationSendType;
+use App\Form\User\OrganizationChoiceType;
 use App\Form\User\RegisterType;
 use App\Repository\Organization\OrganizationInvitationRepository;
 use App\Repository\Perimeter\PerimeterDataRepository;
 use App\Repository\Perimeter\PerimeterRepository;
 use App\Service\Email\EmailService;
 use App\Service\Notification\NotificationService;
+use App\Service\Organization\OrganizationService;
 use App\Service\User\UserService;
 use Doctrine\Persistence\ManagerRegistry;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -163,72 +167,63 @@ class OrganizationController extends FrontController
     }
 
     #[Route('/comptes/structure/donnees-cles/', name: 'app_organization_donnees_cles')]
-    public function donneesCles(UserService $userService, ManagerRegistry $managerRegistry, RequestStack $requestStack): Response
+    public function donneesCles(
+        RequestStack $requestStack
+    ): Response
+    {
+        $this->breadcrumb->add('Mon compte',$this->generateUrl('app_user_dashboard'));
+        $this->breadcrumb->add('Ma structure',$this->generateUrl('app_organization_structure_information'));
+        $this->breadcrumb->add('Données clés');
+
+        $formOrganizationChoice = $this->createForm(OrganizationChoiceType::class);
+        $formOrganizationChoice->handleRequest($requestStack->getCurrentRequest());
+        if ($formOrganizationChoice->isSubmitted()) {
+            if ($formOrganizationChoice->isValid()) {
+                $organization = $formOrganizationChoice->get('organization')->getData();
+                return $this->redirectToRoute('app_organization_donnees_cles_details', ['id' => $organization->getId()]);
+            }
+        }
+
+        return $this->render('organization/organization/donnees_cles.html.twig', [
+            'formOrganizationChoice' => $formOrganizationChoice,
+        ]);
+    }
+
+    #[Route('/comptes/structure/donnees-cles/{id}', name: 'app_organization_donnees_cles_details', requirements: ['id' => '[0-9]+'])]
+    public function donneesClesDetails(
+        UserService $userService,
+        ManagerRegistry $managerRegistry,
+        RequestStack $requestStack,
+        OrganizationService $organizationService
+    ): Response
     {
         $this->breadcrumb->add('Mon compte',$this->generateUrl('app_user_dashboard'));
         $this->breadcrumb->add('Ma structure',$this->generateUrl('app_organization_structure_information'));
         $this->breadcrumb->add('Données clés');
         
         $user = $userService->getUserLogged();
-        $organization = $user->getOrganizations()[0];
-            
-        $form = $this->createFormBuilder($organization)
-            ->add('inhabitantsNumber',NumberType::class,['label_html' => true,'label'=>'Habitants&nbsp;:','required'=>false,'help' => ''])
-            ->add('votersNumber',NumberType::class,['label_html' => true,'label'=>'Votants&nbsp;:','required'=>false,'help' => ''])
-            
-            ->add('corporatesNumber',NumberType::class,['label_html' => true,'label'=>'Entreprise&nbsp;:','required'=>false,'help' => ''])
-            ->add('shopsNumber',NumberType::class,['label_html' => true,'label'=>'Commerce&nbsp;:','required'=>false,'help' => ''])
-            ->add('associationsNumber',NumberType::class,['label_html' => true,'label'=>'Association&nbsp;:','required'=>false,'help' => ''])
-
-            ->add('municipalRoads',NumberType::class,['label_html' => true,'label'=>'Routes communales (kms)&nbsp;:','required'=>false,'help' => ''])
-            ->add('departmentalRoads',NumberType::class,['label_html' => true,'label'=>'Routes départementales (kms)&nbsp;:','required'=>false,'help' => ''])
-            ->add('tramRoads',NumberType::class,['label_html' => true,'label'=>'Tramway (kms)&nbsp;:','required'=>false,'help' => ''])
-            ->add('lamppostNumber',NumberType::class,['label_html' => true,'label'=>'Lampadaires&nbsp;:','required'=>false,'help' => ''])
-            ->add('bridgeNumber',NumberType::class,['label_html' => true,'label'=>'Ponts&nbsp;:','required'=>false,'help' => ''])
-
-            ->add('libraryNumber',NumberType::class,['label_html' => true,'label'=>'Bibliothèque&nbsp;:','required'=>false,'help' => ''])
-            
-            ->add('medialibraryNumber',NumberType::class,['label_html' => true,'label'=>'Médiathèque&nbsp;:','required'=>false,'help' => ''])
-            ->add('theaterNumber',NumberType::class,['label_html' => true,'label'=>'Théâtre&nbsp;:','required'=>false,'help' => ''])
-            ->add('cinemaNumber',NumberType::class,['label_html' => true,'label'=>'Cinéma&nbsp;:','required'=>false,'help' => ''])
-            ->add('museumNumber',NumberType::class,['label_html' => true,'label'=>'Musée&nbsp;:','required'=>false,'help' => ''])
-
-            ->add('nurseryNumber',NumberType::class,['label_html' => true,'label'=>'Crèche&nbsp;:','required'=>false,'help' => ''])
-            ->add('kindergartenNumber',NumberType::class,['label_html' => true,'label'=>'École maternelle&nbsp;:','required'=>false,'help' => ''])
-            ->add('primarySchoolNumber',NumberType::class,['label_html' => true,'label'=>'École élémentaire&nbsp;:','required'=>false,'help' => ''])
-            ->add('recCenterNumber',NumberType::class,['label_html' => true,'label'=>'Centre de loisirs&nbsp;:','required'=>false,'help' => ''])
-            ->add('middleSchoolNumber',NumberType::class,['label_html' => true,'label'=>'Collège&nbsp;:','required'=>false,'help' => ''])
-            ->add('highSchoolNumber',NumberType::class,['label_html' => true,'label'=>'Lycée&nbsp;:','required'=>false,'help' => ''])
-            ->add('universityNumber',NumberType::class,['label_html' => true,'label'=>'Université&nbsp;:','required'=>false,'help' => ''])
-            
-            ->add('tennisCourtNumber',NumberType::class,['label_html' => true,'label'=>'Court de tennis&nbsp;:','required'=>false,'help' => ''])
-            ->add('footballFieldNumber',NumberType::class,['label_html' => true,'label'=>'Terrain de football&nbsp;:','required'=>false,'help' => ''])
-            ->add('runningTrackNumber',NumberType::class,['label_html' => true,'label'=>'Piste d\'athlétismes&nbsp;:','required'=>false,'help' => ''])
-            ->add('otherOutsideStructureNumber',NumberType::class,['label_html' => true,'label'=>'Structure extérieure autre&nbsp;:','required'=>false,'help' => ''])
-            ->add('coveredSportingComplexNumber',NumberType::class,['label_html' => true,'label'=>'Complexe sportif couvert&nbsp;:','required'=>false,'help' => ''])
-            ->add('swimmingPoolNumber',NumberType::class,['label_html' => true,'label'=>'Piscine&nbsp;:','required'=>false,'help' => ''])
-            
-            ->add('placeOfWorshipNumber',NumberType::class,['label_html' => true,'label'=>'Lieux de cultes&nbsp;:','required'=>false,'help' => ''])
-            ->add('cemeteryNumber',NumberType::class,['label_html' => true,'label'=>'Cimetières&nbsp;:','required'=>false,'help' => ''])
-            
-            ->add('protectedMonumentNumber',NumberType::class,['label_html' => true,'label'=>'Monument classé&nbsp;:','required'=>false,'help' => ''])
-            ->add('forestNumber',NumberType::class,['label_html' => true,'label'=>'Forêt (en hactares)&nbsp;:','required'=>false,'help' => ''])
-            
-                
-            ->add('save',SubmitType::class,['label_html' => true,'label'=>'Mettre à jour'])
-            ->getForm();
-
-        $form->handleRequest($requestStack->getCurrentRequest());
-        if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager = $managerRegistry->getManager();
-            $entityManager->persist($organization); 
-            $entityManager->flush();
-            $this->addFlash(FrontController::FLASH_SUCCESS, 'Vos modifications ont été enregistrées avec succès.');
+        $organization = $managerRegistry->getRepository(Organization::class)->find($requestStack->getCurrentRequest()->get('id'));
+        if (!$organizationService->canEdit($user, $organization)) {
             return $this->redirectToRoute('app_organization_donnees_cles');
         }
 
-        return $this->render('organization/organization/donnees_cles.html.twig', [
-            'form' => $form->createView(),
+        
+        $formOrganizationDatas = $this->createForm(OrganizationDatasType::class, $organization);
+        $formOrganizationDatas->handleRequest($requestStack->getCurrentRequest());
+        if ($formOrganizationDatas->isSubmitted()) {
+            if ($formOrganizationDatas->isValid()) {
+                $managerRegistry->getManager()->persist($organization); 
+                $managerRegistry->getManager()->flush();
+                $this->addFlash(FrontController::FLASH_SUCCESS, 'Vos modifications ont été enregistrées avec succès.');
+                return $this->redirectToRoute('app_organization_donnees_cles_details', ['id' => $organization->getId()]);
+            } else {
+                $this->addFlash(FrontController::FLASH_ERROR, 'Votre formulaire contient des erreurs.');
+            }
+        }
+
+        return $this->render('organization/organization/donnees_cles_details.html.twig', [
+            'form' => $formOrganizationDatas,
+            'organization' => $organization
         ]);
     }
 
@@ -318,7 +313,9 @@ class OrganizationController extends FrontController
                     $status = 'Exclu le '.$userInvitation->getTimeExclude()->format('d/m/Y');
                 } elseif ($userInvitation && $userInvitation->getTimeAccept()) {
                     $status = 'Accepté le '.$userInvitation->getTimeAccept()->format('d/m/Y');
-                    $excludable = true;
+                    if ($userInvitation->getGuest() !== $user) {
+                        $excludable = true;
+                    }
                 } elseif ($userInvitation && $userInvitation->getTimeRefuse()) {
                     $status = 'Refusé le '.$userInvitation->getTimeRefuse()->format('d/m/Y');
                 }

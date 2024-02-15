@@ -1,0 +1,182 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Les données-clés de la collectivité | {{ parent() }}{% endblock %}
+
+{% block body %}
+<div class="fr-container fr-mb-5w fr-mt-0">
+    <div class="fr-grid-row">
+
+    {% include "user/_menu_user.html.twig" with { structure:true, data_info:true } %}
+
+    <div class="fr-col-12 fr-col-md-9">
+        <h1 class="fr-h3">Les données-clés de la collectivité</h1>
+        
+
+        {% if organization %}
+            <p>Pour bénéficier de recommandations adaptées à votre collectivité, vous pouvez renseigner les informations ci-dessous.</p>
+            <p>Pour la structure : <strong>{{ organization.name }}</strong></p>
+            {{ form_start(form) }}
+
+            <fieldset class="fr-pl-0 fr-my-5w">
+                <legend class="fr-h4"><span aria-hidden="true">🧑 </span>Population</legend>
+                <div class="fr-grid-row fr-grid-row--bottom fr-grid-row--gutters">
+                    <div class="fr-col-12  fr-col-md-3">
+                        {{ form_row(form.inhabitantsNumber) }}
+                    </div>
+                    <div class="fr-col-12 fr-col-md-3">
+                        {{ form_row(form.votersNumber) }}
+                    </div>
+                </div>
+            </fieldset>
+
+            <fieldset class="fr-pl-0 fr-my-5w">
+                <legend class="fr-h4"><span aria-hidden="true">👋 </span>Développement économique</legend>
+                <div class="fr-grid-row fr-grid-row--bottom fr-grid-row--gutters">
+                    <div class="fr-col-12 fr-col-md-3">
+                        {{ form_row(form.corporatesNumber) }}
+                    </div>
+                    <div class="fr-col-12 fr-col-md-3">
+                        {{ form_row(form.shopsNumber) }}
+
+                    </div>
+                    <div class="fr-col-12 fr-col-md-3">
+                        {{ form_row(form.associationsNumber) }}
+
+                    </div>
+                </div>
+            </fieldset>
+
+            <fieldset class="fr-pl-0 fr-my-5w">
+                <legend class="fr-h4"><span aria-hidden="true">🛣️ </span>Réseaux & voiries</legend>
+                <div class="fr-grid-row fr-grid-row--bottom fr-grid-row--gutters">
+                    <div class="fr-col-12 fr-col-md-3">
+                        {{ form_row(form.municipalRoads) }}
+                    </div>
+                    <div class="fr-col-12 fr-col-md-3">
+                        {{ form_row(form.departmentalRoads) }}
+                    </div>
+                    <div class="fr-col-12 fr-col-md-3">
+                        {{ form_row(form.tramRoads) }}
+                    </div>
+                    <div class="fr-col-12 fr-col-md-3">
+                        {{ form_row(form.lamppostNumber) }}
+                    </div>
+                    <div class="fr-col-12 fr-col-md-3">
+                        {{ form_row(form.bridgeNumber) }}
+                    </div>
+                </div>
+            </fieldset>
+
+            <fieldset class="fr-pl-0 fr-my-5w">
+                <legend class="fr-h4"><span aria-hidden="true">📚 </span>Culture</legend>
+                <div class="fr-grid-row fr-grid-row--bottom fr-grid-row--gutters">
+                    <div class="fr-col-12 fr-col-md-3">
+                        {{ form_row(form.libraryNumber) }}
+                    </div>
+                    <div class="fr-col-12 fr-col-md-3">
+                        {{ form_row(form.medialibraryNumber) }}
+                    </div>
+                    <div class="fr-col-12 fr-col-md-3">
+                        {{ form_row(form.theaterNumber) }}
+                    </div>
+                    <div class="fr-col-12 fr-col-md-3">
+                        {{ form_row(form.cinemaNumber) }}
+                    </div>
+                    <div class="fr-col-12 fr-col-md-3">
+                        {{ form_row(form.museumNumber) }}
+                    </div>
+                </div>
+            </fieldset>
+
+            <fieldset class="fr-pl-0 fr-my-5w">
+                <legend class="fr-h4"><span aria-hidden="true">🎒 </span>Enfance - Enseignement</legend>
+                <div class="fr-grid-row fr-grid-row--bottom fr-grid-row--gutters">
+                    <div class="fr-col-12 fr-col-md-3">
+                        {{ form_row(form.nurseryNumber) }}
+                    </div>
+                    <div class="fr-col-12 fr-col-md-3">
+                        {{ form_row(form.kindergartenNumber) }}
+                    </div>
+                    <div class="fr-col-12 fr-col-md-3">
+                        {{ form_row(form.primarySchoolNumber) }}
+                    </div>
+                    <div class="fr-col-12 fr-col-md-3">
+                        {{ form_row(form.recCenterNumber) }}
+                    </div>
+                    <div class="fr-col-12 fr-col-md-3">
+                        {{ form_row(form.middleSchoolNumber) }}
+                    </div>
+                    <div class="fr-col-12 fr-col-md-3">
+                        {{ form_row(form.highSchoolNumber) }}
+                    </div>
+                    <div class="fr-col-12 fr-col-md-3">
+                        {{ form_row(form.universityNumber) }}
+                    </div>
+                </div>
+            </fieldset>
+
+            <fieldset class="fr-pl-0 fr-my-5w">
+                <legend class="fr-h4"><span aria-hidden="true">🎾 </span>Infrastructures sportives</legend>
+                <div class="fr-grid-row fr-grid-row--bottom fr-grid-row--gutters">
+                    <div class="fr-col-12 fr-col-md-3">
+                        {{ form_row(form.tennisCourtNumber) }}
+                    </div>
+                    <div class="fr-col-12 fr-col-md-3">
+                        {{ form_row(form.footballFieldNumber) }}
+                    </div>
+                    <div class="fr-col-12 fr-col-md-3">
+                        {{ form_row(form.runningTrackNumber) }}
+                    </div>
+                    <div class="fr-col-12 fr-col-md-3">
+                        {{ form_row(form.otherOutsideStructureNumber) }}
+                    </div>
+                    <div class="fr-col-12 fr-col-md-3">
+                        {{ form_row(form.coveredSportingComplexNumber) }}
+                    </div>
+                    <div class="fr-col-12 fr-col-md-3">
+                        {{ form_row(form.swimmingPoolNumber) }}
+                    </div>
+                </div>
+            </fieldset>
+
+            <fieldset class="fr-pl-0 fr-my-5w">
+                <legend class="fr-h4"><span aria-hidden="true">⛪ </span>Lieux de culte et de mémoire</legend>
+                <div class="fr-grid-row fr-grid-row--bottom fr-grid-row--gutters">
+                    <div class="fr-col-12 fr-col-md-3">
+                        {{ form_row(form.placeOfWorshipNumber) }}
+                    </div>
+                    <div class="fr-col-12 fr-col-md-3">
+                        {{ form_row(form.cemeteryNumber) }}
+                    </div>
+                </div>
+            </fieldset>
+
+            <fieldset class="fr-pl-0 fr-my-5w">
+                <legend class="fr-h4"><span aria-hidden="true">🌳 </span>Patrimoine</legend>
+                <div class="fr-grid-row fr-grid-row--bottom fr-grid-row--gutters">
+                    <div class="fr-col-12 fr-col-md-3">
+                        {{ form_row(form.protectedMonumentNumber) }}
+                    </div>
+                    <div class="fr-col-12 fr-col-md-3">
+                        {{ form_row(form.forestNumber) }}
+                    </div>
+                </div>
+            </fieldset>
+
+            <footer>
+                <button type="submit" class="fr-btn">Mettre à jour</button>
+            </footer>
+            {{ form_end(form) }}
+        {% else %}
+            <div class="fr-alert fr-alert--info fr-mb-3w">
+                <p>Veuillez choisir la structure dont vous souhaitez renseigner les données.</p>
+            </div>
+        {% endif %}
+        
+        </div>
+    </div>
+</div>
+
+
+
+{% endblock %}
