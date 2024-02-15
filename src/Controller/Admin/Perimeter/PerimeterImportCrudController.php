@@ -39,7 +39,7 @@ class PerimeterImportCrudController extends AtCrudController
         ->hideWhenCreating();
         yield TextField::new('adhocPerimeterName', 'Périmètre adhoc')
         ->onlyWhenCreating()
-        ->setHelp('Périmètre à définir. Laissez vide pour auto-remplir avec les données, ex: regions_01_05_06_75_68')
+        ->setHelp('Le nom du périmètre à créer avec cet import. Laissez vide pour auto-remplir avec les données, ex: regions_01_05_06_75_68')
         ;
 
         yield AssociationField::new('author', 'Auteur')
@@ -64,7 +64,7 @@ class PerimeterImportCrudController extends AtCrudController
         ;
 
         $entity = $this->getContext()->getEntity()->getInstance();
-        yield ImageField::new('file', 'Fichier csv')
+        yield ImageField::new('file', 'Fichier csv des codes INSEE')
         ->setHelp('Permière ligne ignorée')
         ->setUploadDir($this->fileService->getUploadTmpDirRelative())
         ->setUploadedFileNamePattern('/[slug]-[timestamp].[extension]')
