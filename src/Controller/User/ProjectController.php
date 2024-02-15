@@ -24,6 +24,7 @@ use App\Service\Notification\NotificationService;
 use App\Service\Reference\ReferenceService;
 use App\Service\User\UserService;
 use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\Query\Expr\Func;
 use Doctrine\Persistence\ManagerRegistry;
 use Dompdf\Dompdf;
 use Dompdf\Options;
@@ -41,6 +42,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Validator\Constraints\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
@@ -48,7 +50,12 @@ class ProjectController extends FrontController
 {
     const NB_PROJECT_BY_PAGE = 30;
 
-
+    #[Route('/projets/vos-projets/', name: 'old_app_user_project_structure')]
+    public function oldIndex(): RedirectResponse
+    {
+        return $this->redirectToRoute('app_user_project_structure');   
+    }
+    
     #[Route('/comptes/projets/', name: 'app_user_project_structure')]
     public function index(
         UserService $userService,
