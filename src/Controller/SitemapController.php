@@ -19,7 +19,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 
-#[Route(priority:5)]
+#[Route(priority:1)]
 class SitemapController extends AbstractController
 {
     #[Route('/sitemap.xml', name: 'app_sitemap')]
