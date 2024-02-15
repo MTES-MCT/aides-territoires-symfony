@@ -8,6 +8,9 @@ use App\Entity\Blog\BlogPost;
 use App\Entity\Blog\BlogPostCategory;
 use App\Entity\Page\Page;
 use App\Entity\Perimeter\Perimeter;
+use App\Entity\Program\Program;
+use App\Entity\Project\Project;
+use App\Entity\Search\SearchPage;
 use App\Service\Various\StringService;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -190,6 +193,66 @@ class SitemapController extends AbstractController
                 ], UrlGeneratorInterface::ABSOLUTE_URL). trim($page->getUrl(), '/'). '/',
             ];
         }
+        unset($pages);
+        // ----------------------------------------------------------------------
+        // PORTAILS
+
+        $searchPages = $managerRegistry->getRepository(SearchPage::class)->findBy([
+
+        ]);
+        foreach ($searchPages as $searchPage) {
+            $urls[] = [
+                'loc' => $this->generateUrl('app_portal_portal_details', [
+                    'slug' => $searchPage->getSlug()
+                ], UrlGeneratorInterface::ABSOLUTE_URL),
+            ];
+        }
+        unset($searchPages);
+
+        // ----------------------------------------------------------------------
+        // PROGRAMMES
+
+        // index
+        $urls[] = [
+            'loc' => $this->generateUrl('app_program_program', [], UrlGeneratorInterface::ABSOLUTE_URL),
+        ];
+
+        // pages détails
+        $programs = $managerRegistry->getRepository(Program::class)->findAll();
+        foreach ($programs as $program) {
+            $urls[] = [
+                'loc' => $this->generateUrl('app_program_details', [
+                    'slug' => $program->getSlug()
+                ], UrlGeneratorInterface::ABSOLUTE_URL),
+            ];
+        }
+        unset($programs);
+
+        // ----------------------------------------------------------------------
+        // PROJETS
+
+        // index projets publics
+        $urls[] = [
+            'loc' => $this->generateUrl('app_project_project_public', [], UrlGeneratorInterface::ABSOLUTE_URL),
+        ];
+
+        // pages détails projets publics
+        $publicProjects = $managerRegistry->getRepository(Project::class)->findBy(
+            [
+                'status' => Project::STATUS_PUBLISHED,
+                'isPublic' => true
+            ]
+        );
+        foreach ($publicProjects as $publicProject) {
+            $urls[] = [
+                'loc' => $this->generateUrl('app_project_project_public_details', [
+                    'id' => $publicProject->getId(),
+                    'slug' => $publicProject->getSlug()
+                ], UrlGeneratorInterface::ABSOLUTE_URL),
+            ];
+        }
+        unset($publicProjects);
+        
         // ----------------------------------------------------------------------
         // Rendu template
         $response = new Response(
