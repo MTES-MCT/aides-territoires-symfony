@@ -93,7 +93,7 @@ class CountLiveCommand extends Command
                 );
 
                 $aidParams = array_merge($aidParams, $this->aidSearchFormService->convertAidSearchClassToAidParams($aidSearchClass));
-                $nbAids = $this->managerRegistry->getRepository(Aid::class)->countCustom($aidParams);
+                $nbAids = $this->managerRegistry->getRepository(Aid::class)->countAfterSelect($aidParams);
 
                 $logEvent = new LogEvent();
                 $logEvent->setCategory('aid');
