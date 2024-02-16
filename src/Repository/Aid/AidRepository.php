@@ -249,7 +249,7 @@ class AidRepository extends ServiceEntityRepository
             'sort' => 'a.timeCreate',
             'order' => 'DESC'
         ];
-        $params['maxResults'] = 1;
+        $params['maxResults'] = 500;
         $qb = $this->getQueryBuilder($params);
 
         return $qb->getQuery()->getResult();
