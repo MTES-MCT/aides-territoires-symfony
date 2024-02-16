@@ -55,6 +55,7 @@ use App\Filter\Aid\AidTypeGroupFilter;
 #[ORM\Index(columns: ['date_start'], name: 'date_start_aid')]
 #[ORM\Index(columns: ['date_submission_deadline'], name: 'date_submission_deadline_aid')]
 #[ORM\Index(columns: ['date_published'], name: 'date_published_aid')]
+#[ORM\Index(columns: ['date_check_broken_link'], name: 'date_check_broken_link_aid')]
 #[ORM\Index(columns: ['european_aid'], name: 'european_aid_aid')]
 #[ORM\Index(columns: ['origin_url'], name: 'origin_url_aid')]
 #[ORM\Index(columns: ['import_uniqueid'], name: 'import_uniqueid_aid')]
@@ -677,6 +678,9 @@ class Aid
 
     #[ORM\ManyToMany(targetEntity: ProjectReference::class, inversedBy: 'aids')]
     private Collection $projectReferences;
+
+    #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
+    private ?\DateTimeInterface $dateCheckBrokenLink = null;
 
 
     /**
@@ -2497,6 +2501,18 @@ class Aid
     public function setScoreObjects(?float $scoreObjects): static
     {
         $this->scoreObjects = $scoreObjects;
+
+        return $this;
+    }
+
+    public function getDateCheckBrokenLink(): ?\DateTimeInterface
+    {
+        return $this->dateCheckBrokenLink;
+    }
+
+    public function setDateCheckBrokenLink(?\DateTimeInterface $dateCheckBrokenLink): static
+    {
+        $this->dateCheckBrokenLink = $dateCheckBrokenLink;
 
         return $this;
     }

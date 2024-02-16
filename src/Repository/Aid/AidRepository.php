@@ -249,7 +249,7 @@ class AidRepository extends ServiceEntityRepository
             'sort' => 'a.timeCreate',
             'order' => 'DESC'
         ];
-        $params['maxResults'] = 500;
+        $params['maxResults'] = 200;
         $qb = $this->getQueryBuilder($params);
 
         return $qb->getQuery()->getResult();
@@ -406,9 +406,16 @@ class AidRepository extends ServiceEntityRepository
         $dateCreateMin = $params['dateCreateMin'] ?? null;
         $dateCreateMax = $params['dateCreateMax'] ?? null;
         $projectReference = $params['projectReference'] ?? null;
+        $dateCheckBrokenLinkMax = $params['dateCheckBrokenLinkMax'] ?? null;
 
         $qb = $this->createQueryBuilder('a');
 
+        if ($dateCheckBrokenLinkMax instanceof \DateTime) {
+            $qb
+                ->andWhere('a.dateCheckBrokenLink < :dateCheckBrokenLinkMax OR a.dateCheckBrokenLink IS NULL')
+                ->setParameter('dateCheckBrokenLinkMax', $dateCheckBrokenLinkMax)
+            ;
+        }
         if ($dateCreateMin instanceof \DateTime) {
             $qb->andWhere('a.dateCreate >= :dateCreateMin')
             ->setParameter('dateCreateMin', $dateCreateMin);

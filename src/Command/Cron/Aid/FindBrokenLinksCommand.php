@@ -65,8 +65,11 @@ class FindBrokenLinksCommand extends Command
         $io = new SymfonyStyle($input, $output);
         $timeStart = microtime(true);
 
+        $today = new \DateTime(date('Y-m-d'));
         // charge les aides publiées sans lien cassé de noté
-        $aids = $this->managerRegistry->getRepository(Aid::class)->findPublishedWithNoBrokenLink();
+        $aids = $this->managerRegistry->getRepository(Aid::class)->findPublishedWithNoBrokenLink([
+            'dateCheckBrokenLinkMax' => $today
+        ]);
 
         $nbBrokenLinks = 0;
         $aidsWithBrokenLinks = [];
@@ -91,7 +94,6 @@ class FindBrokenLinksCommand extends Command
                     $aid->setHasBrokenLink(true);
                     $aidsWithBrokenLinks[$key]['originUrlBroken'] = true;
                     $nbBrokenLinks++;
-                    $this->managerRegistry->getManager()->persist($aid);
                 }
             }
 
@@ -103,9 +105,12 @@ class FindBrokenLinksCommand extends Command
                     $aid->setHasBrokenLink(true);
                     $aidsWithBrokenLinks[$key]['applicationUrlBroken'] = true;
                     $nbBrokenLinks++;
-                    $this->managerRegistry->getManager()->persist($aid);
                 }
             }
+
+            // met à jour la date de vérification
+            $aid->setDateCheckBrokenLink($today);
+            $this->managerRegistry->getManager()->persist($aid);
 
             // l'aide n'as pas de lien cassé, on la retire du tableau
             if (!$aid->isHasBrokenLink()) {
@@ -113,9 +118,9 @@ class FindBrokenLinksCommand extends Command
             }
         }
 
-        if (count($aidsWithBrokenLinks) > 0) {
-            $this->managerRegistry->getManager()->flush();
-        }
+
+        $this->managerRegistry->getManager()->flush();
+
 
         $this->emailService->sendEmail(
             $this->paramService->get('email_super_admin'),
@@ -137,33 +142,33 @@ class FindBrokenLinksCommand extends Command
 
     private function checkUrl($url): bool
     {
-        try {
-            $headers = get_headers($url);
-            if (!isset($headers[0])) {
-                return false;
-            }
-            return strpos($headers[0], '200');
-        } catch (\Exception $e) {
-            return false;
-        }
-        // $ch = curl_init($url);
+        // try {
+        //     $headers = get_headers($url);
+        //     if (!isset($headers[0])) {
+        //         return false;
+        //     }
+        //     return strpos($headers[0], '200');
+        // } catch (\Exception $e) {
+        //     return false;
+        // }
+        $ch = curl_init($url);
 
-        // // Définir l'option pour retourner le transfert en tant que chaîne
-        // curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        // Définir l'option pour retourner le transfert en tant que chaîne
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     
-        // // Définir l'option pour ne récupérer que les en-têtes
-        // curl_setopt($ch, CURLOPT_HEADER, true);
-        // curl_setopt($ch, CURLOPT_NOBODY, true);
+        // Définir l'option pour ne récupérer que les en-têtes
+        curl_setopt($ch, CURLOPT_HEADER, true);
+        curl_setopt($ch, CURLOPT_NOBODY, true);
     
-        // // Définir un délai d'attente
-        // curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+        // Définir un délai d'attente
+        curl_setopt($ch, CURLOPT_TIMEOUT, 10);
     
-        // curl_exec($ch);
+        curl_exec($ch);
     
-        // $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
     
-        // curl_close($ch);
+        curl_close($ch);
     
-        // return $httpCode == 200;
+        return $httpCode == 200;
     }
 }
