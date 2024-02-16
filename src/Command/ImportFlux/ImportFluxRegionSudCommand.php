@@ -72,19 +72,8 @@ class ImportFluxRegionSudCommand extends ImportFluxCommand
         $importRawObjectCalendar = $importRaws['importRawObjectCalendar'];
         $importRawObject = $importRaws['importRawObject'];
 
-        $dateStart = null;
-        try {
-            $dateStart = new \DateTime($aidToImport['Date d’ouverture'] ?? null);
-        } catch (\Exception $e) {
-            $dateStart = null;
-        }
-
-        $dateSubmissionDeadline = null;
-        try {
-            $dateSubmissionDeadline = new \DateTime($aidToImport['Date de clôture'] ?? null);
-        } catch (\Exception $e) {
-            $dateSubmissionDeadline = null;
-        }
+        $dateStart = (isset($aidToImport['Date d’ouverture']) && $aidToImport['Date d’ouverture'] !== '' && $aidToImport['Date d’ouverture'] !== null) ? new \DateTime($aidToImport['Date d’ouverture']) : null;
+        $dateSubmissionDeadline = (isset($aidToImport['Date de clôture']) && $aidToImport['Date de clôture'] !== '' && $aidToImport['Date de clôture'] !== null) ? new \DateTime($aidToImport['Date de clôture']) : null;
 
         return [
             'importDataMention' => 'Ces données sont mises à disposition par le Conseil Régional PACA.',
