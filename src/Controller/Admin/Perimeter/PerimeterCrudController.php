@@ -79,7 +79,7 @@ class PerimeterCrudController extends AtCrudController
         ->setHelp('Code ISO, EU pour Europe');
         yield TextField::new('country', 'Pays')
         ->onlyOnForms()
-        ->setHelp('Code ISO, FRA pour France');
+        ->setHelp('Code ISO, FR pour France');
         yield ArrayField::new('regions', 'Régions')
         ->onlyOnForms();
         yield ArrayField::new('departments', 'Départements')
