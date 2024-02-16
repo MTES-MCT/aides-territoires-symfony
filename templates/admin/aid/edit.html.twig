@@ -76,7 +76,7 @@
 										<pre><code id="new_value_{{ updateLoopIndex }}" style="max-width: 100%;overflow: scroll;">{{ subValue }}</code><button class="btn-copy-clipboard" data-clipboard-target="#new_value_{{ updateLoopIndex }}"><i class="fas fa-clipboard-check"></i></button></pre>
 									{% endfor %}
 								{% else %}
-								<pre><code id="actual_value_{{ updateLoopIndex }}" style="max-width: 100%;overflow: scroll;">{{ update.newValue }}</code><button class="btn-copy-clipboard" data-clipboard-target="#new_value_{{ updateLoopIndex }}"><i class="fas fa-clipboard-check"></i></button></pre>
+								<pre><code id="new_value_{{ updateLoopIndex }}" style="max-width: 100%;overflow: scroll;">{{ update.newValue }}</code><button class="btn-copy-clipboard" data-clipboard-target="#new_value_{{ updateLoopIndex }}"><i class="fas fa-clipboard-check"></i></button></pre>
 								{% endif %}
 							</div>
 						</div>

@@ -69,7 +69,7 @@ class CountLiveCommand extends Command
 
             // charge les aides publiées sans lien cassé de noté
             $nbAids = $this->managerRegistry->getRepository(Aid::class)->countLives();
-    
+
             $logEvent = new LogEvent();
             $logEvent->setCategory('aid');
             $logEvent->setEvent('live_count');

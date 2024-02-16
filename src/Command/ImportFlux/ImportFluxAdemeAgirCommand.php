@@ -266,9 +266,9 @@ class ImportFluxAdemeAgirCommand extends ImportFluxCommand
 
         foreach ($aidToImport['thematiques'] as $thematique) {
             if (isset($mapping[$thematique])) {
-                foreach ($mapping[$thematique] as $category) {
+                foreach ($mapping[$thematique] as $currentCategory) {
                     $category = $this->managerRegistry->getRepository(Category::class)->findOneBy([
-                        'slug' => $category['slug']
+                        'slug' => $currentCategory['slug']
                     ]);
                     if ($category instanceof Category) {
                         $aid->addCategory($category);
@@ -466,7 +466,10 @@ class ImportFluxAdemeAgirCommand extends ImportFluxCommand
                 ],  
             ],
             'RESTAU' => [
-                'alimentation',
+                [
+                    'name' => 'Alimentation',
+                    'slug' => 'alimentation',
+                ],
                 [
                     'name' => 'Tourisme',
                     'slug' => 'tourisme'

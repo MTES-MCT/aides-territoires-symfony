@@ -146,15 +146,15 @@ class ImportFluxWelcomeEuropeCommand extends ImportFluxCommand
 
         $contact = null;
         if (isset($aidToImport['info_utile'])) {
-            $info_utile_list = explode(' ', $aidToImport['info_utile_list']);
+            $info_utile_list = explode(' ', $aidToImport['info_utile']);
             $info_utile = '<p>' . '<br/>' . join($info_utile_list) . '</p>'; 
         }
         if (isset($aidToImport['info_contact'])) {
-            $info_contact_list = explode(' ', $aidToImport['info_contact_list']);
+            $info_contact_list = explode(' ', $aidToImport['info_contact']);
             $info_contact = '<p>' . '<br/>' . join($info_contact_list) . '</p>'; 
         }
         if (isset($aidToImport['info_advice'])) {
-            $info_advice_list = explode(' ', $aidToImport['info_advice_list']);
+            $info_advice_list = explode(' ', $aidToImport['info_advice']);
             $info_advice = '<p>' . '<br/>' . join($info_advice_list) . '</p>'; 
         }
         if (isset($info_utile) || isset($info_contact) || isset($info_advice)) {
