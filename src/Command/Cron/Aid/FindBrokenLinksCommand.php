@@ -93,6 +93,7 @@ class FindBrokenLinksCommand extends Command
                 } else {
                     $aid->setHasBrokenLink(true);
                     $aidsWithBrokenLinks[$key]['originUrlBroken'] = true;
+                    $this->managerRegistry->getManager()->persist($aid);
                     $nbBrokenLinks++;
                 }
             }
@@ -104,6 +105,7 @@ class FindBrokenLinksCommand extends Command
                 } else {
                     $aid->setHasBrokenLink(true);
                     $aidsWithBrokenLinks[$key]['applicationUrlBroken'] = true;
+                    $this->managerRegistry->getManager()->persist($aid);
                     $nbBrokenLinks++;
                 }
             }
