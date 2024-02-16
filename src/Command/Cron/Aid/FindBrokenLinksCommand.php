@@ -63,6 +63,7 @@ class FindBrokenLinksCommand extends Command
     protected function cronTask($input, $output)
     {
         $io = new SymfonyStyle($input, $output);
+        $timeStart = microtime(true);
 
         // charge les aides publiées sans lien cassé de noté
         $aids = $this->managerRegistry->getRepository(Aid::class)->findPublishedWithNoBrokenLink();
@@ -125,31 +126,44 @@ class FindBrokenLinksCommand extends Command
             ]
         );
         
+        $timeEnd = microtime(true);
+        $time = $timeEnd - $timeStart;
+
         // success
+        $io->success('Temps écoulé : '.gmdate("H:i:s", $timeEnd).' ('.gmdate("H:i:s", intval($time)).')');
         $io->success('Nombre d\'aides avec lien cassé : ' . $nbBrokenLinks);
         $io->success('Mémoire maximale utilisée : ' . round(memory_get_peak_usage() / 1024 / 1024) . ' MB');
     }
 
     private function checkUrl($url): bool
     {
-        $ch = curl_init($url);
+        try {
+            $headers = get_headers($url);
+            if (!isset($headers[0])) {
+                return false;
+            }
+            return strpos($headers[0], '200');
+        } catch (\Exception $e) {
+            return false;
+        }
+        // $ch = curl_init($url);
 
-        // Définir l'option pour retourner le transfert en tant que chaîne
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        // // Définir l'option pour retourner le transfert en tant que chaîne
+        // curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     
-        // Définir l'option pour ne récupérer que les en-têtes
-        curl_setopt($ch, CURLOPT_HEADER, true);
-        curl_setopt($ch, CURLOPT_NOBODY, true);
+        // // Définir l'option pour ne récupérer que les en-têtes
+        // curl_setopt($ch, CURLOPT_HEADER, true);
+        // curl_setopt($ch, CURLOPT_NOBODY, true);
     
-        // Définir un délai d'attente
-        curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+        // // Définir un délai d'attente
+        // curl_setopt($ch, CURLOPT_TIMEOUT, 10);
     
-        curl_exec($ch);
+        // curl_exec($ch);
     
-        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        // $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
     
-        curl_close($ch);
+        // curl_close($ch);
     
-        return $httpCode == 200;
+        // return $httpCode == 200;
     }
 }
