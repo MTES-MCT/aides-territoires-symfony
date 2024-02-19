@@ -3,6 +3,7 @@
 namespace App\Form\Project;
 
 use App\Entity\Project\Project;
+use App\Entity\User\User;
 use App\Service\User\UserService;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -26,7 +27,7 @@ class AddAidToProjectType extends AbstractType
         $user = $this->userService->getUserLogged();
         $currentAid = $options['currentAid'] ?? null;
         $organizationProjects = [];
-        if ($user->getDefaultOrganization()) {
+        if ($user instanceof User && $user->getDefaultOrganization()) {
             $organizationProjects = $this->managerRegistry->getRepository(Project::class)->findBy(['organization' => $user->getDefaultOrganization()]);
         }
 
