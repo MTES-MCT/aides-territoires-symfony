@@ -45,6 +45,7 @@ class ContactType extends AbstractType
                 // 'sanitize_html' => true,
             ])
             ->add('phoneNumber', TextType::class, [
+                'required' => false,
                 'label' => 'Votre numéro de téléphone :',
                 // 'sanitize_html' => true,
             ])
