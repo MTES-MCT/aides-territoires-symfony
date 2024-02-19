@@ -51,7 +51,7 @@ when@prod:
             streamed:
                 type:  stream
                 path:  '%kernel.logs_dir%/%kernel.environment%.log'
-                level: debug
+                level: error
             deduplicated:
                 type:    deduplication
                 handler: symfony_mailer
@@ -60,6 +60,6 @@ when@prod:
                 from_email:   '%env(EMAIL_FROM)%'
                 to_email:     '%env(EMAIL_SUPER_ADMIN)%'
                 subject:      'An Error Occurred! %%message%%'
-                level:        debug
+                level:        critical
                 formatter:    monolog.formatter.html
                 content_type: text/html
