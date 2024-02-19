@@ -2074,7 +2074,7 @@ class Aid
     public function isLive(): bool
     {
         $today = new \DateTime(date('Y-m-d'));
-        return $this->dateStart > $today;
+        // return $this->dateStart > $today;
         if (
             $this->status == self::STATUS_PUBLISHED
             && (($this->dateStart && $this->dateStart <= $today) || !$this->dateStart)

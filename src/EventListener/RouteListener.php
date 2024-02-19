@@ -33,13 +33,17 @@ final class RouteListener
 
         // si page trouvée
         if ($page instanceof Page) {
-            $event->getRequest()->attributes->set('url', $url);
-            $event->getRequest()->attributes->set('_route_params', ['url' => $url]);
-            $event->getRequest()->attributes->set(
-                '_controller',
-                PageController::class . '::index'
-            );
-            ;
+            try {
+                $event->getRequest()->attributes->set('url', $url);
+                $event->getRequest()->attributes->set('_route_params', ['url' => $url]);
+                $event->getRequest()->attributes->set(
+                    '_controller',
+                    PageController::class . '::index'
+                );
+                ;
+            } catch (\Exception $e) {
+
+            }
         }
     }
 }
