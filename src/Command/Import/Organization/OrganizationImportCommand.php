@@ -179,7 +179,7 @@ class OrganizationImportCommand extends ImportCommand
                 $sqlParams['id'.$rowNumber] = (int) $cells[0]->getValue();
                 $organizationsSlug = $this->stringToArrayOrNull((string) $cells[3]->getValue());
 
-                $sqlParams["organization_type_id".$rowNumber] = isset($organizationTypesBySlug[$organizationsSlug[0]]) ? $organizationTypesBySlug[$organizationsSlug[0]]->getId() : null;
+                $sqlParams["organization_type_id".$rowNumber] = isset($organizationTypesBySlug[$this->redoSlug($organizationsSlug[0])]) ? $organizationTypesBySlug[$this->redoSlug($organizationsSlug[0])]->getId() : null;
                 $sqlParams["perimeter_id".$rowNumber] = isset($perimetersById[(int) $cells[32]->getValue()]) ? (int) $cells[32]->getValue() : null;
                 $sqlParams["perimeter_department_id".$rowNumber] = isset($perimetersById[(int) $cells[33]->getValue()]) ? (int) $cells[33]->getValue() : null;
                 $sqlParams["perimeter_region_id".$rowNumber] = isset($perimetersById[(int) $cells[34]->getValue()]) ? (int) $cells[34]->getValue() : null;
