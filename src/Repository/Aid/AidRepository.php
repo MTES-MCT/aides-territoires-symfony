@@ -281,6 +281,7 @@ class AidRepository extends ServiceEntityRepository
     public function findCustom(array $params = null): array
     {
         $qb = $this->getQueryBuilder($params);
+
         $results = $qb->getQuery()->getResult();
         $return = [];
         foreach ($results as $result) {
@@ -434,10 +435,10 @@ class AidRepository extends ServiceEntityRepository
         }
 
         if (isset($synonyms)) {
-            $originalName = (isset($synonyms['original_name']) && $synonyms['original_name'] !== '')  ? $synonyms['original_name'] : null;
-            $intentionsString = (isset($synonyms['intentions_string']) && $synonyms['intentions_string'] !== '')  ? $synonyms['intentions_string'] : null;
-            $objectsString = (isset($synonyms['objects_string']) && $synonyms['objects_string'] !== '')  ? $synonyms['objects_string'] : null;
-            $simpleWordsString = (isset($synonyms['simple_words_string']) && $synonyms['simple_words_string'] !== '')  ? $synonyms['simple_words_string'] : null;
+            $originalName = (isset($synonyms['original_name']) && trim($synonyms['original_name']) !== '')  ? $synonyms['original_name'] : null;
+            $intentionsString = (isset($synonyms['intentions_string']) && trim($synonyms['intentions_string']) !== '')  ? $synonyms['intentions_string'] : null;
+            $objectsString = (isset($synonyms['objects_string']) && trim($synonyms['objects_string']) !== '')  ? $synonyms['objects_string'] : null;
+            $simpleWordsString = (isset($synonyms['simple_words_string']) && trim($synonyms['simple_words_string']) !== '')  ? $synonyms['simple_words_string'] : null;
             $oldKeywordsString = '';
 
             if ($originalName) {
@@ -577,11 +578,12 @@ class AidRepository extends ServiceEntityRepository
                             ELSE 0 
                         END
                         ';
+
+                        $qb
+                        ->leftJoin('a.keywordReferences', 'keywordReferences')
+                        ->setParameter('keywordReferences', $keywordReferences)
+                        ;
                     }
-                    $qb
-                    ->leftJoin('a.keywordReferences', 'keywordReferences')
-                    ->setParameter('keywordReferences', $keywordReferences)
-                    ;
                 }
             }
 
@@ -632,6 +634,7 @@ class AidRepository extends ServiceEntityRepository
                 if ($originalName || $objectsString || $intentionsString || isset($sqlSimpleWords) || isset($sqlCategories)) {
                     $sqlTotal .= ' + ';
                 }
+                dd('laee');
                 $sqlTotal .= $sqlKeywordReferences;
             }
 
