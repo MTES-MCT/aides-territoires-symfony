@@ -634,7 +634,6 @@ class AidRepository extends ServiceEntityRepository
                 if ($originalName || $objectsString || $intentionsString || isset($sqlSimpleWords) || isset($sqlCategories)) {
                     $sqlTotal .= ' + ';
                 }
-                dd('laee');
                 $sqlTotal .= $sqlKeywordReferences;
             }
 
