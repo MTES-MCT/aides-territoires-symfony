@@ -7,6 +7,7 @@ use App\Entity\Organization\Organization;
 use App\Entity\Organization\OrganizationInvitation;
 use App\Entity\Perimeter\Perimeter;
 use App\Entity\User\Notification;
+use App\Entity\User\User;
 use App\Form\Organization\OrganizationDatasType;
 use App\Form\Organization\OrganizationInvitationSendType;
 use App\Form\User\OrganizationChoiceType;
@@ -42,6 +43,14 @@ class OrganizationController extends FrontController
         
         $user = $userService->getUserLogged();
         $organization = $user->getDefaultOrganization();
+        if ($user instanceof User && $organization instanceof Organization) {
+            if ($organization->getPerimeter() && !$user->getPerimeter()) {
+                $user->setPerimeter($organization->getPerimeter());
+                $managerRegistry->getManager()->persist($user);
+                $managerRegistry->getManager()->flush();
+            }
+        }
+
         // si on a des infos manquantes, on va voir si elles sont dans les autres tables
         if ($organization instanceof Organization) {
             if (!$organization->getSirenCode() || !$organization->getSiretCode() || !$organization->getApeCode() || $organization->getInseeCode()) {
