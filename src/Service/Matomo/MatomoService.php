@@ -42,10 +42,14 @@ class MatomoService
      */
     public function getGoal(): ?string
     {
-        $value = $this->requestStack->getSession()->get(self::GOAL_KEY);
-        $this->requestStack->getSession()->set(self::GOAL_KEY, null);
-
-        return $value;
+        try {
+            $value = $this->requestStack->getSession()->get(self::GOAL_KEY);
+            $this->requestStack->getSession()->set(self::GOAL_KEY, null);
+    
+            return $value;
+        } catch (\Exception $e) {
+            return null;
+        }
     }
 
     /**
