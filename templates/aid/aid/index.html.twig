@@ -22,7 +22,7 @@
     
         {% include 'aid/aid/_search_meta.html.twig' %}
         
-        {% if synonyms %}
+        {% if synonyms and app.user and isUserGranted(app.user, constant('App\\Entity\\User\\User::ROLE_ADMIN')) %}
             <div class="fr-alert fr-alert--info">
                 <h2>A des fins de TESTS :</h2>
                 <p><strong>Intentions</strong> : {% if synonyms.intentions_string %}{{ synonyms.intentions_string }}{% else %}Aucune{% endif %}</p>
