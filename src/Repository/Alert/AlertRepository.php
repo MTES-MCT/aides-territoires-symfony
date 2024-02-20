@@ -49,10 +49,17 @@ class AlertRepository extends ServiceEntityRepository
         $weeklyMinDate = $params['weeklyMinDate'] ?? null;
         $dateCreateMin = $params['dateCreateMin'] ?? null;
         $dateCreateMax = $params['dateCreateMax'] ?? null;
-
+        $email = $params['email'] ?? null;
 
         $qb = $this->createQueryBuilder('a');
         
+        if ($email !== null)
+        {
+            $qb
+                ->andWhere('a.email = :email')
+                ->setParameter('email', $email)
+                ;
+        }
         if ($dateCreateMin instanceof \DateTime) {
             $qb
             ->andWhere('a.timeCreate >= :dateCreateMin')
@@ -72,9 +79,11 @@ class AlertRepository extends ServiceEntityRepository
         if ($dailyMinDate instanceof \DateTime && $weeklyMinDate instanceof \DateTime) {
             $qb
                 ->andWhere('
+                (
                 (a.alertFrequency = :daily AND (a.dateLatestAlert <= :dailyMinDate OR a.dateLatestAlert IS NULL))
                 OR
                 (a.alertFrequency = :weekly AND (a.dateLatestAlert <= :weeklyMinDate OR a.dateLatestAlert IS NULL))
+                )
                 ')
                 ->setParameter('daily', Alert::FREQUENCY_DAILY_SLUG)
                 ->setParameter('dailyMinDate', $dailyMinDate)

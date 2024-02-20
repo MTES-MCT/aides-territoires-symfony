@@ -75,7 +75,7 @@ class AlertSendCommand extends Command
         $context->setScheme('https');
         
         // charge les alertes
-        $alerts = $this->managerRegistry->getRepository(Alert::class)->findToSend();
+        $alerts = $this->managerRegistry->getRepository(Alert::class)->findToSend(['email' => 'barret.remi.pro@gmail.com']);
 
         // pour le retour
         $nbAlertSend = 0;
