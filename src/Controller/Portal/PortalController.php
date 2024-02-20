@@ -123,19 +123,9 @@ class PortalController extends FrontController
         // parametres pour requetes aides
         $aidParams = array_merge($aidParams, $aidSearchFormService->convertAidSearchClassToAidParams($aidSearchClass));
 
-        // parametres pour requetes aides
-        // $aidParams = array_merge($aidParams, $aidSearchFormService->completeAidParams($formAidSearch));
-        // transforme le orderBy
-        // $aidParams = $aidSearchFormService->handleOrderBy($aidParams);
-
-        // le paginateur
-        $aids = $aidRepository->findCustom($aidParams);
-        if (count($aids) == 0) {
-            $aidParams['scoreTotalMin'] = 2;
-            $aids = $aidRepository->findCustom($aidParams);
-        }
+        // // le paginateur
         $aidParams['searchPage'] = $search_page;
-        $aids = $aidService->postPopulateAids($aids, $aidParams);
+        $aids = $aidService->searchAids($aidParams);
         $adapter = new ArrayAdapter($aids);
         $pagerfanta = new Pagerfanta($adapter);
         $pagerfanta->setMaxPerPage(AidController::NB_AID_BY_PAGE);

@@ -133,13 +133,13 @@ class AidService
         }
         // converti le array en ArrayCollection
         $aids = new ArrayCollection($aids);
-
+dump(count($aids));
         // les aides que l'on va exclude
         $perimeterSearch = $perimeter instanceof Perimeter;
         $perimeterScale = ($perimeter instanceof Perimeter) ? $perimeter->getScale() : 0;
         // Parcours la liste des aides actuelles
         /** @var Aid $aid */
-        foreach ($aids as $aid) {
+        foreach ($aids as $keyAid => $aid) {
             // Si on a un périmètre de recherche
             if ($perimeterSearch) {
                 $searchSmaller = $perimeterScale <= $aid->getPerimeter()->getScale();
@@ -162,7 +162,7 @@ class AidService
             } else if ($searchWider) {
                 // Si c'est une aide locale et que la liste contiens l'aide générique, on la retire de la listes
                 if ($aid->getGenericAid() && $aids->contains($aid->getGenericAid())) {
-                    $aids->remove($aid);
+                    $aids->remove($keyAid);
                 }
             }
         }

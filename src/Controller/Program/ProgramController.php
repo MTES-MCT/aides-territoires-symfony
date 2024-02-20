@@ -136,19 +136,10 @@ class ProgramController extends FrontController
             'programs' => [$program],
         ];
         $aidParams = array_merge($aidParams, $aidSearchFormService->convertAidSearchClassToAidParams($aidSearchClass));
-        // $aidParams = array_merge($aidParams, $aidSearchFormService->completeAidParams($formAidSearch));
-        // transforme le orderBy
-        // $aidParams = $aidSearchFormService->handleOrderBy($aidParams);
-        // check si on affiche ou pas le formulaire étendu
         $showExtended = $aidSearchFormService->setShowExtendedV2($aidSearchClass);
         
         // le paginateur
-        $aids = $aidRepository->findCustom($aidParams);
-        if (count($aids) == 0) {
-            $aidParams['scoreTotalMin'] = 2;
-            $aids = $aidRepository->findCustom($aidParams);
-        }
-        $aids = $aidService->postPopulateAids($aids, $aidParams);
+        $aids = $aidService->searchAids($aidParams);
         $adapter = new ArrayAdapter($aids);
         $pagerfanta = new Pagerfanta($adapter);
         $pagerfanta->setMaxPerPage(self::NB_AID_BY_PAGE);
