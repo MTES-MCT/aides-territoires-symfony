@@ -4,7 +4,7 @@
 
 <p>Retrouvez les accès à votre compte en cliquant sur le lien suivant :</p>
 
-<p><a href="{{ url('app_reset_password', {token: resetToken.token}) }}">{{ url('app_reset_password', {token: resetToken.token}) }}</a></p>
+<p><a href="{{ absolute_url(url('app_reset_password', {token: resetToken.token})) }}">{{ absolute_url(url('app_reset_password', {token: resetToken.token})) }}</a></p>
 
 <p>Ce lien expirera dans {{ resetToken.expirationMessageKey|trans(resetToken.expirationMessageData, 'ResetPasswordBundle') }}.</p>
 

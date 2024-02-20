@@ -15,6 +15,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use SymfonyCasts\Bundle\ResetPassword\Controller\ResetPasswordControllerTrait;
 use SymfonyCasts\Bundle\ResetPassword\Exception\ResetPasswordExceptionInterface;
@@ -35,7 +36,7 @@ class ResetPasswordController extends AbstractController
      * Display & process form to request a password reset.
      */
     #[Route('/comptes/demande-nouveau-mot-de-passe/', name: 'app_forgot_password_request')]
-    public function request(Request $request, EmailService $emailService, TranslatorInterface $translator): Response
+    public function request(Request $request, EmailService $emailService, TranslatorInterface $translator, RouterInterface $routerInterface): Response
     {
         $form = $this->createForm(ResetPasswordRequestFormType::class);
         $form->handleRequest($request);
@@ -44,7 +45,8 @@ class ResetPasswordController extends AbstractController
             return $this->processSendingPasswordResetEmail(
                 $form->get('email')->getData(),
                 $emailService,
-                $translator
+                $translator,
+                $routerInterface
             );
         }
 
@@ -134,7 +136,9 @@ class ResetPasswordController extends AbstractController
 
     private function processSendingPasswordResetEmail(
         string $emailFormData,
-        EmailService $emailService
+        EmailService $emailService,
+        TranslatorInterface $translator,
+        RouterInterface $routerInterface
         ): RedirectResponse
     {
         $user = $this->entityManager->getRepository(User::class)->findOneBy([
@@ -162,6 +166,12 @@ class ResetPasswordController extends AbstractController
             return $this->redirectToRoute('app_check_email');
         }
 
+        // donne le contexte au router pour generer l'url beta ou prod
+        $host = $_ENV["APP_ENV"] == 'dev' ? 'aides-terr-php.osc-fr1.scalingo.io' : 'aides-territoires.beta.gouv.fr';
+        $context = $routerInterface->getContext();
+        $context->setHost($host);
+        $context->setScheme('https');
+        
         $emailService->sendEmail(
             $user->getEmail(),
             'Renouvellement de votre mot de passe',

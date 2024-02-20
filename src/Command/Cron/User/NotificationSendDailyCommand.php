@@ -15,6 +15,7 @@ use App\Service\Aid\AidSearchFormService;
 use App\Service\Aid\AidService;
 use App\Service\Email\EmailService;
 use App\Service\Various\ParamService;
+use Symfony\Component\Routing\RouterInterface;
 
 #[AsCommand(name: 'at:cron:notification:send_daily', description: 'Envoi des notifications quotidiennes')]
 class NotificationSendDailyCommand extends Command
@@ -30,7 +31,8 @@ class NotificationSendDailyCommand extends Command
         protected AidService $aidService,
         protected AidSearchFormService $aidSearchFormService,
         protected EmailService $emailService,
-        protected ParamService $paramService
+        protected ParamService $paramService,
+        protected RouterInterface $routerInterface
     )
     {
         ini_set('max_execution_time', 60*60*60);
@@ -72,6 +74,12 @@ class NotificationSendDailyCommand extends Command
         $nbOk = 0;
         $nbError = 0;
 
+        // donne le contexte au router pour generer l'url beta ou prod
+        $host = $_ENV["APP_ENV"] == 'dev' ? 'aides-terr-php.osc-fr1.scalingo.io' : 'aides-territoires.beta.gouv.fr';
+        $context = $this->routerInterface->getContext();
+        $context->setHost($host);
+        $context->setScheme('https');
+        
         // Pour chaque utilisateurs on lui envoi un email avec toutes les notifications non envoyées
         foreach ($users as $user) {
             $notifications = $this->managerRegistry->getRepository(Notification::class)->findToSend(['user' => $user]);
