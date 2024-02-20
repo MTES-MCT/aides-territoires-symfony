@@ -164,10 +164,18 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         $organizationIsEpci = $params['organizationIsEpci'] ?? null;
         $organizationHasAid = $params['organizationHasAid'] ?? null;
         $organizationHasProject = $params['organizationHasProject'] ?? null;
+        $email = $params['email'] ?? null;
         $orderBy = (isset($params['orderBy']) && isset($params['orderBy']['sort']) && isset($params['orderBy']['order'])) ? $params['orderBy'] : null;
 
         $qb = $this->createQueryBuilder('u');
 
+        if ($email !== null) {
+            $qb
+                ->andWhere('u.email = :email')
+                ->setParameter('email', $email)
+                ;
+        }
+        
         if ($organizationHasProject) {
             $qb
                 ->innerJoin('u.organizations', 'organizationForProject')

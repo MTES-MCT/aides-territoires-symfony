@@ -37,7 +37,8 @@ class AlertRepository extends ServiceEntityRepository
 
         $params['dailyMinDate'] = $yesterday;
         $params['weeklyMinDate'] = $lastWeek;
-        
+        $params['hasQueryString'] = true;
+
         $qb = $this->getQueryBuilder($params);
 
         return $qb->getQuery()->getResult();
@@ -49,10 +50,18 @@ class AlertRepository extends ServiceEntityRepository
         $weeklyMinDate = $params['weeklyMinDate'] ?? null;
         $dateCreateMin = $params['dateCreateMin'] ?? null;
         $dateCreateMax = $params['dateCreateMax'] ?? null;
+        $hasQueryString = $params['hasQueryString'] ?? null;
+        
         $email = $params['email'] ?? null;
 
         $qb = $this->createQueryBuilder('a');
         
+        if ($hasQueryString) {
+            $qb
+                ->andWhere('a.queryString IS NOT NULL')
+                ->andWhere('a.queryString !== ""')
+                ;
+        }
         if ($email !== null)
         {
             $qb
