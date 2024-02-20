@@ -50,12 +50,12 @@ class AidController extends FrontController
         $formAid->handleRequest($requestStack->getCurrentRequest());
         if ($formAid->isSubmitted()) {
             if ($formAid->isValid()) {
-                $status = $requestStack->getCurrentRequest()->get('_status');
-                if (!in_array($status, [Aid::STATUS_REVIEWABLE, Aid::STATUS_DRAFT])) {
-                    $status = Aid::STATUS_DRAFT;
-                }
+                // $status = $requestStack->getCurrentRequest()->get('_status');
+                // if (!in_array($status, [Aid::STATUS_REVIEWABLE, Aid::STATUS_DRAFT])) {
+                //     $status = Aid::STATUS_DRAFT;
+                // }
                 
-                $aid->setStatus($status);
+                // $aid->setStatus($status);
                 $aid->setAuthor($user);
                 // les financers
                 $financers = $formAid->get('financers')->getData();
@@ -258,7 +258,7 @@ class AidController extends FrontController
                 );
 
                 // redirection
-                $this->redirectToRoute('app_user_aid_publications');
+                return $this->redirectToRoute('app_user_aid_publications');
             }
         }
 

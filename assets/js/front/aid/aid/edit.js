@@ -33,9 +33,18 @@ $(function(){
     $(document).on({
         click: function(e) {
             $('#aid_edit_status').val($(this).attr('data-status'));
-            $('.form-aid').submit();
+            $('.form-aid').trigger('submit');
         }
     }, '.btn-change-status');
+
+    // submit with change status
+    $(document).on({
+        click: function(e) {
+            $('#aid_edit_status').val($(this).attr('data-status'));
+        }
+    }, '.submit-change-status');
+
+
 
     // wysiwyg
     $('.trumbowyg').trumbowyg({

@@ -193,8 +193,8 @@
 
                 <div class="form-actions fr-grid-row">
                     <div class="submit-buttons fr-col-12 fr-col-md-10">
-                        <button name="_status" value="{{ constant('App\\Entity\\Aid\\Aid::STATUS_REVIEWABLE') }}" type="submit" class="fr-btn fr-mb-2w">Enregistrer et demander la publication</button>
-                        <button name="_status" value="{{ constant('App\\Entity\\Aid\\Aid::STATUS_DRAFT') }}" type="submit" class="fr-btn fr-mb-2w">Enregistrer en brouillon</button>
+                        <button data-status="{{ constant('App\\Entity\\Aid\\Aid::STATUS_REVIEWABLE') }}" type="submit" class="fr-btn fr-mb-2w submit-change-status">Enregistrer et demander la publication</button>
+                        <button data-status="{{ constant('App\\Entity\\Aid\\Aid::STATUS_DRAFT') }}" type="submit" class="fr-btn fr-mb-2w submit-change-status">Enregistrer en brouillon</button>
                     </div>
                     <div class="fr-col-md-2 fr-grid-row fr-grid-row--right">
                         <a href="{{ path('app_user_aid_publications') }}" class="fr-btn fr-mb-2w">Annuler</a>
