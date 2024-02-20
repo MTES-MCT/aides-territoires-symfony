@@ -70,6 +70,7 @@ class ExportToSibCommand extends Command
 
         $nbOk = 0;
         $nbError = 0;
+        $errors = [];
         /** @var User $user */
         foreach ($users as $user) {
             $aids = $user->getAids();
@@ -124,8 +125,21 @@ class ExportToSibCommand extends Command
             if ($update) {
                 $nbOk++;
             } else {
+                $errors[] = $user->getEmail();
                 $nbError++;
             }
+        }
+
+        if (count($errors) > 0) {
+            // envoi un mail à l'admin
+            $this->emailService->sendEmail(
+                $this->paramService->get('email_super_admin'),
+                $nbError. ' utilisateurs non envoyés à SIB',
+                'emails/cron/user/errors_export_sib.html.twig',
+                [
+                    'errors' => $errors,
+                ]
+            );
         }
 
         // success

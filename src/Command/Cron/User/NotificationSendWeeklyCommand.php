@@ -68,7 +68,7 @@ class NotificationSendWeeklyCommand extends Command
         $io = new SymfonyStyle($input, $output);
 
         // charge les utilisateurs avec des notificaitons non envoyées
-        $users = $this->managerRegistry->getRepository(User::class)->findWithUnsentNotification(['notificationEmailFrequency' => User::NOTIFICATION_WEEKLY, 'email' => 'barret.remi.pro@gmail.com']);
+        $users = $this->managerRegistry->getRepository(User::class)->findWithUnsentNotification(['notificationEmailFrequency' => User::NOTIFICATION_WEEKLY]);
 
         // pour le retour
         $nbOk = 0;
