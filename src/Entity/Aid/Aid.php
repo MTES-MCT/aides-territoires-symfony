@@ -2521,7 +2521,6 @@ class Aid
     
     public function getAidsFromGenericLive()
     {
-        $today = new \DateTime(date('Y-m-d'));
         $aids = new ArrayCollection();
         foreach ($this->getAidsFromGeneric() as $aid) {
             if ($aid->isLive()) {
