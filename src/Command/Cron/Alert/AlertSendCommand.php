@@ -68,14 +68,13 @@ class AlertSendCommand extends Command
         $io = new SymfonyStyle($input, $output);
 
         // donne le contexte au router pour generer l'url beta ou prod
-        // $host = $_ENV["APP_ENV"] == 'dev' ? 'aides-terr-php.osc-fr1.scalingo.io' : 'aides-territoires.beta.gouv.fr';
-        $host = $_ENV["APP_ENV"] == 'dev' ? 'aides-terr-php.osc-fr1.scalingo.io' : 'aides-terr-php.osc-fr1.scalingo.io';
+        $host = $_ENV["APP_ENV"] == 'dev' ? 'aides-terr-php.osc-fr1.scalingo.io' : 'aides-territoires.beta.gouv.fr';
         $context = $this->routerInterface->getContext();
         $context->setHost($host);
         $context->setScheme('https');
         
         // charge les alertes
-        $alerts = $this->managerRegistry->getRepository(Alert::class)->findToSend();
+        $alerts = $this->managerRegistry->getRepository(Alert::class)->findToSend(['email' => 'barret.remi.pro@gmail.com']);
 
         // pour le retour
         $nbAlertSend = 0;
