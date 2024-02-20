@@ -105,9 +105,11 @@ h1 {
                     </p>
                 {% endif %}
 
+                {% if aid.perimeter %}
                 <h4>Zone géographique couverte par l’aide</h4>
                 <p>{{ aid.perimeter.name }}</p>
-
+                {% endif %}
+                
                 <h4>Critères d’éligibilité</h4>
 
                 {% if aid.aidSteps %}

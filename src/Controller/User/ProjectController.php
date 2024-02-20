@@ -472,7 +472,7 @@ class ProjectController extends FrontController
                         try {
                         $spreadsheetExporterService->exportProjectAidsV2($project, FileService::FORMAT_XLSX);
                         } catch (\Exception $e) {
-                            dd($e);
+                            // dd($e);
                         }
                         break;
                     case FileService::FORMAT_PDF:
@@ -534,6 +534,8 @@ class ProjectController extends FrontController
         $response = $dompdf->stream($filename.'.pdf', [
             "Attachment" => false
         ]);
+
+        return $response;
     }
 
 
