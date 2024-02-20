@@ -5,7 +5,7 @@
 
 <p>Vous avez {{ nbNotifications }} nouvelle{% if nbNotifications > 1 %}s{% endif %} notification{% if nbNotifications > 1 %}s{% endif %} en attente.</p>
 
-<p>Rendez-vous sur {{ absolute_url(url('app_user_user_notification')) }} pour les consulter. </p>
+<p>Rendez-vous sur <a href="{{ absolute_url(url('app_user_user_notification')) }}">{{ absolute_url(url('app_user_user_notification')) }}</a> pour les consulter. </p>
 
 <p>À très vite !</p>
 
