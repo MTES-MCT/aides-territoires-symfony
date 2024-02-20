@@ -133,7 +133,7 @@ class AidService
         }
         // converti le array en ArrayCollection
         $aids = new ArrayCollection($aids);
-dump(count($aids));
+
         // les aides que l'on va exclude
         $perimeterSearch = $perimeter instanceof Perimeter;
         $perimeterScale = ($perimeter instanceof Perimeter) ? $perimeter->getScale() : 0;
