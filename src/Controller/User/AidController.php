@@ -395,9 +395,11 @@ class AidController extends FrontController
             $dompdf->render();
     
             // Output the generated PDF to Browser (inline view)
-            $response = $dompdf->stream($filename.'.pdf', [
+            $dompdf->stream($filename.'.pdf', [
                 "Attachment" => false
             ]);
+            // exit pour eviter les erreur sur le retour null
+            exit;
         } elseif (in_array($format, ['csv', 'xlsx'])) {
             $response = new StreamedResponse(function () use ($aids, $routerInterface) {
                 $csv = fopen('php://output', 'w+');
