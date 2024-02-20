@@ -466,11 +466,11 @@ class ProjectController extends FrontController
             if ($formExportProject->isValid()) {
                 switch ($formExportProject->get('format')->getData()) {
                     case FileService::FORMAT_CSV:
-                        return $spreadsheetExporterService->exportProjectAids($project, FileService::FORMAT_CSV);
+                        return $spreadsheetExporterService->exportProjectAidsV2($project, FileService::FORMAT_CSV);
                         break;
                     case FileService::FORMAT_XLSX:
                         try {
-                        $spreadsheetExporterService->exportProjectAidsV2($project, FileService::FORMAT_XLSX);
+                            return $spreadsheetExporterService->exportProjectAidsV2($project, FileService::FORMAT_XLSX);
                         } catch (\Exception $e) {
                             // dd($e);
                         }

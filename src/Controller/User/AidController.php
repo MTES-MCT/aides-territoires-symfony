@@ -566,7 +566,6 @@ class AidController extends FrontController
                 break;
         }
 
-
         return $response;
     }
 
@@ -612,7 +611,7 @@ class AidController extends FrontController
         $dompdf->render();
 
         // Output the generated PDF to Browser (inline view)
-        $dompdf->stream('aide.pdf', [
+        return $dompdf->stream('aide.pdf', [
             "Attachment" => false
         ]);
     }
