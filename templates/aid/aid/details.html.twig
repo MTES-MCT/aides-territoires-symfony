@@ -498,10 +498,10 @@
                         <p class="fr-mb-1w" id="aides-locales">
                             <strong>Déclinaisons locales :</strong> En l’absence d’aide locale, les informations relatives à cette aide nationale font foi.
                         </p>
-                        {% if aid.aidsFromGeneric %}
+                        {% if aid.aidsFromGenericLive %}
                             <div id="localAidsLinks">
                                 <ul>
-                                    {% for localAid in aid.aidsFromGeneric %}
+                                    {% for localAid in aid.aidsFromGenericLive %}
                                         <li><a href="{{ path('app_aid_aid_details', {'slug': localAid.slug }) }}">{{ localAid.perimeter.name }}</a></li>
                                     {% endfor %}
                                 </ul>

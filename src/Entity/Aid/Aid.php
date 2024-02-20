@@ -682,6 +682,7 @@ class Aid
     #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $dateCheckBrokenLink = null;
 
+    private ArrayCollection $aidsFromGenericLive;
 
     /**
      * <Non Database Fields
@@ -695,6 +696,7 @@ class Aid
         $this->aidSteps = new ArrayCollection();
         $this->aidsAmended = new ArrayCollection();
         $this->aidsFromGeneric = new ArrayCollection();
+        $this->aidsFromGenericLive = new ArrayCollection();
         $this->categories = new ArrayCollection();
         $this->keywords = new ArrayCollection();
         $this->programs = new ArrayCollection();
@@ -2078,7 +2080,7 @@ class Aid
         if (
             $this->status == self::STATUS_PUBLISHED
             && (($this->dateStart && $this->dateStart <= $today) || !$this->dateStart)
-            && (($this->dateSubmissionDeadline && $this->dateSubmissionDeadline < $today) || !$this->dateSubmissionDeadline)
+            && (($this->dateSubmissionDeadline && $this->dateSubmissionDeadline >= $today) || !$this->dateSubmissionDeadline)
         ) {
             return true;
         }
@@ -2517,5 +2519,16 @@ class Aid
         return $this;
     }
     
+    public function getAidsFromGenericLive()
+    {
+        $today = new \DateTime(date('Y-m-d'));
+        $aids = new ArrayCollection();
+        foreach ($this->getAidsFromGeneric() as $aid) {
+            if ($aid->isLive()) {
+                $aids->add($aid);
+            }
+        }
+        return $aids;
+    }
     
 }
