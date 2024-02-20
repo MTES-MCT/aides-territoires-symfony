@@ -4,10 +4,28 @@
       "command": "0 1 * * * php bin/console at:cron:perimeter:counties_nb_backers"
     },
     {
+      "command": "30 06 * * * php bin/console at:cron:alert:send"
+    },
+    {
+      "command": "10 04 * * * php bin/console at:cron:user:export_to_sib"
+    },
+    {
+      "command": "30 10 * * 1-5 php bin/console at:cron:notification:send_daily"
+    },
+    {
+      "command": "0 11 * * 1 php bin/console at:cron:notification:send_weekly"
+    },
+    {
       "command": "*/10 * * * * php bin/console at:cron:perimeter:perimeter_import"
     },
     {
       "command": "*/10 * * * * php bin/console at:cron:export:spreadsheet_export"
+    },
+    {
+      "command": "*/30 * * * SUN php bin/console at:cron:aid:find_broken_links"
+    },
+    {
+      "command": "30 12 * * MON php bin/console at:cron:aid:count_live"
     }
   ]
 }
