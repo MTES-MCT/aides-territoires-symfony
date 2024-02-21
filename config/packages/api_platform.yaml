@@ -1,6 +1,6 @@
 api_platform:
     title: Api - Aides Territoires
-    version: 1.0.0
+    version: 1.7.0
     formats:
         jsonld: ['application/ld+json']
         json: ['application/json']
