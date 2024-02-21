@@ -5,7 +5,7 @@
     {# {{ encore_entry_link_tags('import-scss/page/page-details') }} #}
 {% endblock %}
 
-{% block title %}{% if page.metaTitle %}{{ page.metaTitle }}{% else %}{{ page.name }}{% endif %}{{ getParameter('meta_title_end') }}{% endblock %}
+{% block title %}{% if page.metaTitle %}{{ page.metaTitle }}{% else %}{{ page.name }}{% endif %} {{ getParameter('meta_title_end') }}{% endblock %}
 
 
 {% block metaDescription %}{% if page.metaDescription %}{{ page.metaDescription }}{% else %}{{ parent() }}{% endif %}{% endblock %}
