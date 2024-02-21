@@ -50,10 +50,13 @@ class CustomPasswordHasher implements PasswordHasherInterface
 
     private function verify_Password($dbString, $password) {
         $pieces = explode("$", $dbString);
-        $iterations = $pieces[1];
+        $iterations = (int) $pieces[1];
         $salt = $pieces[2];
         $old_hash = $pieces[3];
     
+        if ($iterations <= 0) {
+            return false;
+        }
         $hash = hash_pbkdf2("SHA256", $password, $salt, $iterations, 0, true);
         $hash = base64_encode($hash);
     
