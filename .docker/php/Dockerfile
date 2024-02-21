@@ -86,20 +86,14 @@ COPY $PHP_INI /usr/local/etc/php/
 
 # Install composer -----------------------------------------------------------------------------------------------------
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
-#RUN groupadd dev -g 999
-#RUN useradd dev -g dev -d /home/dev -m
 # end Install composer -------------------------------------------------------------------------------------------------
 
 # NODE JS, YARN et PYTHON ----------------------------------------------------------------------------------------------
 RUN curl -sL https://deb.nodesource.com/setup_18.x | bash -
 RUN apt-get install -y nodejs
-# node js >= 16
 RUN corepack enable
-# node js < 16
-RUN npm i -g corepack
 RUN yarn init -2
 RUN apt-get update || : && apt-get install python3 -y
-# npm rebuild node-sass a lancer dans le bash si besoin après update (docker exec -it sf4_php bash)
 # end NODE JS, YARN et PYTHON ------------------------------------------------------------------------------------------
 
 WORKDIR /home/
