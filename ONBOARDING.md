@@ -69,6 +69,10 @@ Utilisez les commandes Symgony pour créer la base de données
 
 ### Lancement des tests
 
+Pour avoir des données dans la base de test
+
+    php bin/console doctrine:fixtures:load --env=test
+
 Pour lancer les tests vous pouvez utiliser la commande
 
     php bin/phpunit src/Tests/Controller/FrontControllerTest.php

@@ -6,6 +6,9 @@ use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Routing\RouterInterface;
 
+/**
+ * php bin/phpunit src/Tests/Controller/Security/SecurityControllerTest.php
+ */
 class SecurityControllerTest extends WebTestCase
 {
     private ?KernelBrowser $client = null;
@@ -15,6 +18,33 @@ class SecurityControllerTest extends WebTestCase
         self::ensureKernelShutdown();
         $this->client = static::createClient();
     }
+
+
+    /**
+     * @dataProvider provideAdmins
+     */
+    public function testLoginAdmins(string $email, string $redirectUrl): void
+    {
+        /** @var RouterInterface $router */
+        $router = static::getContainer()->get(RouterInterface::class);
+
+        $route = $router->generate('app_login_admin');
+
+        $crawler = $this->client->request('GET', $route);
+
+        $form = $crawler->selectButton('Connectez-vous')->form();
+        $form['_username'] = $email;
+        $form['_password'] = '#123Password';
+
+        $this->client->submit($form);
+        $this->assertResponseRedirects($redirectUrl);
+    }
+
+    public function provideAdmins(): \Generator
+    {
+        yield 'Admin can login as Admin' => ['admin@aides-territoires.beta.gouv.fr', '/'];
+    }
+
 
     /**
      * @dataProvider provideUsers
@@ -28,9 +58,9 @@ class SecurityControllerTest extends WebTestCase
 
         $crawler = $this->client->request('GET', $route);
 
-        $form = $crawler->selectButton('Se connecter')->form();
-        $form['email'] = $email;
-        $form['password'] = 'punaises';
+        $form = $crawler->selectButton('Connectez-vous')->form();
+        $form['_username'] = $email;
+        $form['_password'] = '#123Password';
 
         $this->client->submit($form);
         $this->assertResponseRedirects($redirectUrl);
@@ -38,9 +68,6 @@ class SecurityControllerTest extends WebTestCase
 
     public function provideUsers(): \Generator
     {
-        yield 'Admin can login as Admin' => ['admin@punaises.fr', '/bo'];
-        yield 'Company 1 can login as Entreprise' => ['company-01@punaises.fr', '/bo'];
-        yield 'Company 3 cannot login as Entreprise' => ['company-03@punaises.fr', '/login'];
-        yield 'Company 69-01 can login as Entreprise' => ['company-69-01@punaises.fr', '/bo'];
+        yield 'User login' => ['user@aides-territoires.beta.gouv.fr', '/comptes/moncompte/'];
     }
 }

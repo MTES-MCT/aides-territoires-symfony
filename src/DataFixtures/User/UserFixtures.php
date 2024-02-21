@@ -40,20 +40,34 @@ class UserFixtures extends Fixture
         $organization->setName('organizationTest');
         $organization->setSlug($this->stringService->getSlug($organization->getName()));
 
+        /**
+         * USER ADMIN
+         */
+        $admin = new User();
+        $admin->setEmail('admin@aides-territoires.beta.gouv.fr');
+        $admin->setFirstname('Ad');
+        $admin->setLastname('Min');
+        $admin->setPassword($this->passwordEncoder->hashPassword($admin, '#123Password'));
+        $admin->addRole(User::ROLE_ADMIN);
+        $admin->setTotpSecret('rand0mT0tpS3cr3t');
+        $manager->persist($admin);
 
-
-        // user  test
+        /**
+         * USER
+         */
         $user = new User();
-        $user->setEmail('remi.barret@beta.gouv.fr');
-        $user->setFirstname('Rémi');
-        $user->setLastname('Barret');
-        $user->setPassword($this->passwordEncoder->hashPassword($user, '#MonMotDePasse42'));
+        $user->setEmail('user@aides-territoires.beta.gouv.fr');
+        $user->setFirstname('Us');
+        $user->setLastname('er');
+        $user->setPassword($this->passwordEncoder->hashPassword($user, '#123Password'));
         $user->addRole(User::ROLE_USER);
         $user->setPerimeter($perimeter);
-
+        $organization->addBeneficiairy($user);
         $manager->persist($user);
-        // $manager->persist($product);
 
+        /**
+         * SAUVEGARDE
+         */
         $manager->flush();
     }
 }

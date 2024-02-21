@@ -23,23 +23,5 @@ class AppFixtures extends Fixture
 
     public function load(ObjectManager $manager): void
     {
-        /**
-         * USER ADMIN
-         */
-        // $admin = new User();
-        // $admin->setEmail('barret.remi.pro@gmail.com');
-        // $admin->setFirstname('Rémi');
-        // $admin->setLastname('Barret');
-        // $admin->setPassword($this->passwordEncoder->hashPassword($admin, '#MonMotDePasse42'));
-        // $admin->addRole('ROLE_ADMIN');
-        // $admin->setUserFunction($userFunction);
-        // $admin->setUserAcquisitionChannel($userAcquisitionChannel);
-        // $admin->setOrganizationType($organizationType);
-        // $admin->setPerimeter($perimeter);
-        // $admin->setOrganizationName('Nom organisation');
-        // $admin->setNewsletterSubscription(false);
-        // $manager->persist($admin);
-
-        $manager->flush();
     }
 }
