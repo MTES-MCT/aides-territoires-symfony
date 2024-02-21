@@ -62,7 +62,8 @@ class UploadController extends FrontController {
 
             $imageService->sendImageToCloud(
                 $fileService->getUploadTmpDir().'/'.$newFilename,
-                $newFilename
+                'upload',
+                'upload/'.$newFilename
             );
         } catch (FileException $e) {
             return new JsonResponse([
@@ -73,7 +74,7 @@ class UploadController extends FrontController {
         
         return new JsonResponse([
             'data' => [
-                'link' => $paramService->get('cloud_image_url').$newFilename,
+                'link' => $paramService->get('cloud_image_url').'upload/'.$newFilename,
             ],
             'success' => true,
             'code' => 200
