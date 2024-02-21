@@ -21,15 +21,6 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 class QrCodeController extends AbstractController
 {
     #[Route(
-        '/admin/testinfos/',
-        name: 'app_admin_test_infos',
-    )]
-    public function testInfos(): Response
-    {
-        dd(phpinfo());
-    }
-
-    #[Route(
         '/admin/user/qrcode/{idUser}/',
         name: 'app_admin_qr_code_ga',
         requirements: ['idUser' => '[0-9]+']
