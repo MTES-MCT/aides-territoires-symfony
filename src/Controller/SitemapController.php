@@ -17,7 +17,6 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Symfony\Component\Routing\RouterInterface;
 
 #[Route(priority:1)]
 class SitemapController extends AbstractController
@@ -90,12 +89,13 @@ class SitemapController extends AbstractController
         ];
 
         // détails des aides publiées
-        $aids = $managerRegistry->getRepository(Aid::class)->findCustom([
+        $aids = $managerRegistry->getRepository(Aid::class)->findForSitemap([
             'showInSearch' => true
         ]);
+
         foreach ($aids as $aid) {
             $urls[] = [
-                'loc' => $aid->getUrl(),
+                'loc' => $this->generateUrl('app_aid_aid_details', ['slug' => $aid['slug']], UrlGeneratorInterface::ABSOLUTE_URL),
             ];
         }
         unset($aids);

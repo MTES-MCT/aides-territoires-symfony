@@ -278,6 +278,13 @@ class AidRepository extends ServiceEntityRepository
         return $qb->getQuery()->getOneOrNullResult();
     }
 
+    public function findForSitemap(array $params = null): array
+    {
+        $qb = $this->getQueryBuilder($params);
+        $qb->select('a.slug');
+        return $qb->getQuery()->getResult();
+    }
+
     public function findCustom(array $params = null): array
     {
         $qb = $this->getQueryBuilder($params);
