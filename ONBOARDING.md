@@ -2,6 +2,7 @@
 
 ## Montage de l'environnement de travail
 
+Un docker est fourni dans le code source
 La procédure est documentée [ici](https://github.com/MTES-MCT/aides-territoires/wiki/Installation-de-l'environment-en-local).
 
 
