@@ -43,11 +43,11 @@ class NotificationDeleteType extends AbstractType
         $notification = $this->managerRegistry->getRepository(Notification::class)->find($event->getForm()->get('idNotification')->getData());
         if (!$notification instanceof Notification) {
             $event->getForm()->get('idNotification')->addError(new FormError('Cette notification n\'existe pas'));
-        }
-
-        // verifie que la notification appartient bien à l'utilisateur
-        if (!$notification->getUser() || $notification->getUser() != $this->userService->getUserLogged()) {
-            $event->getForm()->get('idNotification')->addError(new FormError('Cette notification ne vous appartient pas, vous ne pouvez pas la supprimer'));
+        } else {
+            // verifie que la notification appartient bien à l'utilisateur
+            if (!$notification->getUser() || $notification->getUser() != $this->userService->getUserLogged()) {
+                $event->getForm()->get('idNotification')->addError(new FormError('Cette notification ne vous appartient pas, vous ne pouvez pas la supprimer'));
+            }
         }
     }
 
