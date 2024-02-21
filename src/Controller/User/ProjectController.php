@@ -466,14 +466,10 @@ class ProjectController extends FrontController
             if ($formExportProject->isValid()) {
                 switch ($formExportProject->get('format')->getData()) {
                     case FileService::FORMAT_CSV:
-                        return $spreadsheetExporterService->exportProjectAidsV2($project, FileService::FORMAT_CSV);
+                        return $spreadsheetExporterService->exportProjectAids($project, FileService::FORMAT_CSV);
                         break;
                     case FileService::FORMAT_XLSX:
-                        try {
-                            return $spreadsheetExporterService->exportProjectAidsV2($project, FileService::FORMAT_XLSX);
-                        } catch (\Exception $e) {
-                            // dd($e);
-                        }
+                            return $spreadsheetExporterService->exportProjectAids($project, FileService::FORMAT_XLSX);
                         break;
                     case FileService::FORMAT_PDF:
                         return $this->exportAidsToPdf($project);
@@ -482,9 +478,11 @@ class ProjectController extends FrontController
                         $this->addFlash(FrontController::FLASH_ERROR, 'Format non supporté');
                 }
             } else {
-                foreach ($formExportProject->getErrors(true) as $error) {
-                    // dump($error);
-                }
+                $this->addFlash(FrontController::FLASH_ERROR, 'Erreur lors de l\'export');
+                return $this->redirectToRoute('app_user_project_aides', [
+                    'id' => $project->getId(),
+                    'slug' => $project->getSlug(),
+                ]);
             }
         }
 
@@ -530,12 +528,23 @@ class ProjectController extends FrontController
         // Render the HTML as PDF
         $dompdf->render();
 
-        // Output the generated PDF to Browser (inline view)
-        $response = $dompdf->stream($filename.'.pdf', [
-            "Attachment" => false
-        ]);
+        $pdfContent = $dompdf->output();
+
+        // Créez une réponse avec le contenu du PDF
+        $response = new Response($pdfContent);
+
+        // Définissez le type de contenu et le nom du fichier dans les en-têtes HTTP
+        $response->headers->set('Content-Type', 'application/pdf');
+        $response->headers->set('Content-Disposition', 'inline; filename="'.$filename.'.pdf"');
 
         return $response;
+
+        // // Output the generated PDF to Browser (inline view)
+        // $response = $dompdf->stream($filename.'.pdf', [
+        //     "Attachment" => false
+        // ]);
+
+        // return $response;
     }
 
 

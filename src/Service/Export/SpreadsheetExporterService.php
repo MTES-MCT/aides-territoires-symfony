@@ -203,7 +203,7 @@ class SpreadsheetExporterService
         return $datas;
     }
 
-    public function exportProjectAidsV2(Project $project, string $format = 'csv')
+    public function exportProjectAids(Project $project, string $format = 'csv')
     {
         try {
             if ($format == FileService::FORMAT_CSV) {
