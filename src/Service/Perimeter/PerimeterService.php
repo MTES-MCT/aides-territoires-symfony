@@ -38,9 +38,13 @@ class PerimeterService
         return 'regions_'.join('_', $regionCodes);
     }
 
-    public function  getSmartName(Perimeter $perimeter) : string {
+    public function getSmartName(Perimeter $perimeter) : string {
         if ($perimeter->getScale() == Perimeter::SCALE_COMMUNE) {
-            return $perimeter->getName().' (Commune - '.join(', ', $perimeter->getZipcodes()).')';
+            if (is_array($perimeter->getZipcodes())) {
+                return $perimeter->getName().' (Commune - '.join(', ', $perimeter->getZipcodes()).')';
+            } else {
+                return $perimeter->getName().' (Commune - '.$perimeter->getZipcodes().')';
+            }
         } else {
             if(isset(Perimeter::SCALES_FOR_SEARCH[$perimeter->getScale()]['name'])){
                 return $perimeter->getName(). ' ('.Perimeter::SCALES_FOR_SEARCH[$perimeter->getScale()]['name'].')';
