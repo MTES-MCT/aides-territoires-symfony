@@ -49,7 +49,7 @@ Les porteurs d'aides ont accès aux fonctionnalités suivantes :
  ### Admins
 
 Les admins sont les membres d'Aides-territoires qui ont accès à l'interface
-d'admin Django, et peuvent administrer les différentes données.
+d'admin, et peuvent administrer les différentes données.
 
   - éditer les aides
   - saisir de nouvelles aides
@@ -78,12 +78,9 @@ La liste des « gros morceaux » ou fonctionnalités principales à connaître :
 
 ### Architecture
 
-Le produit est développé en Django (Python).
-Il est structuré comme un projet Django classique, découpé en applications.
+Le produit est développé en Symfony (PHP).
 
-La base de données utilisée est PostgreSQL.
-Redis nous sert aussi à accélérer les requêtes (caching), il sert aussi de broker pour les tâches de fond (Celery),
-et pour compter les tentatives infructueuses de connexion (Defender).
+La base de données utilisée est MySQL.
 
 Certaines données de projet sont accessible depuis une API. L'API est en lecture seule.
 
@@ -104,7 +101,6 @@ Les fichiers statiques (images, documents) sont chez [Scaleway](https://www.scal
 ### Outillage
 
 - [Github](https://github.com/) pour l'hébergement du code et l'intégration continue
-- [Sentry](https://sentry.io) pour le reporting des erreurs
 - [Brevo](https://www.brevo.com/fr/) pour l'envoi d'emails
 - [AlwaysData](https://www.alwaysdata.com/fr/) pour la gestion des DNS
 - [Metabase](https://www.metabase.com/) pour l'analyse et la visualisation des données
