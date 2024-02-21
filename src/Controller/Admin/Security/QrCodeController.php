@@ -7,11 +7,8 @@ use App\Repository\User\UserRepository;
 use App\Service\User\UserService;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpFoundation\Response;
-use Scheb\TwoFactorBundle\Security\TwoFactor\Provider\Google\GoogleAuthenticatorInterface;
-use Scheb\TwoFactorBundle\Model\Google\TwoFactorInterface as GoogleAuthenticatorTwoFactorInterface;
 use Endroid\QrCode\Builder\Builder;
 use Endroid\QrCode\Encoding\Encoding;
 use Endroid\QrCode\ErrorCorrectionLevel\ErrorCorrectionLevelHigh;
@@ -23,6 +20,15 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class QrCodeController extends AbstractController
 {
+    #[Route(
+        '/admin/testinfos/',
+        name: 'app_admin_test_infos',
+    )]
+    public function testInfos(): Response
+    {
+        dd(phpinfo());
+    }
+
     #[Route(
         '/admin/user/qrcode/{idUser}/',
         name: 'app_admin_qr_code_ga',
