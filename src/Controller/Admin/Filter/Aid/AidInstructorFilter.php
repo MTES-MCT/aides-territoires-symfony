@@ -9,7 +9,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Dto\FieldDto;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\FilterDataDto;
 use EasyCorp\Bundle\EasyAdminBundle\Filter\FilterTrait;
 
-class AidBackerFilter implements FilterInterface
+class AidInstructorFilter implements FilterInterface
 {
     use FilterTrait;
 
@@ -29,12 +29,12 @@ class AidBackerFilter implements FilterInterface
         }
 
         $queryBuilder
-            ->innerJoin(sprintf('%s.aidFinancers', $filterDataDto->getEntityAlias()), 'aidFinancersFilter')
-            // ->innerJoin(sprintf('%s.aidInstructors', $filterDataDto->getEntityAlias()), 'aidInstructorsFilter')
-            ->innerJoin('aidFinancersFilter.backer', 'backerFinancersFilter')
-            // ->innerJoin('aidInstructorsFilter.backer', 'backerInstructorsFilter')
-            ->andWhere('backerFinancersFilter = :backer')
-            // ->andWhere('backerFinancersFilter = :backer OR backerInstructorsFilter = :backer')
+            // ->innerJoin(sprintf('%s.aidFinancers', $filterDataDto->getEntityAlias()), 'aidFinancersFilter')
+            ->innerJoin(sprintf('%s.aidInstructors', $filterDataDto->getEntityAlias()), 'aidInstructorsFilter')
+            // ->innerJoin('aidFinancersFilter.backer', 'backerFinancersFilter')
+            ->innerJoin('aidInstructorsFilter.backer', 'backerInstructorsFilter')
+            // ->andWhere('backerFinancersFilter = :backer')
+            ->andWhere('backerInstructorsFilter = :backer')
             ->setParameter('backer', $filterDataDto->getValue())
         ;
 

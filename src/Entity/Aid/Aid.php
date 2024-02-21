@@ -784,6 +784,7 @@ class Aid
     {
         if (!$this->aidAudiences->contains($aidAudience)) {
             $this->aidAudiences->add($aidAudience);
+            // $this->setTimeUpdate(new \DateTime(date('Y-m-d H:i:s')));
         }
 
         return $this;
@@ -1672,6 +1673,7 @@ class Aid
     {
         if (!$this->categories->contains($category)) {
             $this->categories->add($category);
+            // $this->setTimeUpdate(new \DateTime(date('Y-m-d H:i:s')));
         }
 
         return $this;

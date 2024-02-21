@@ -94,7 +94,7 @@ class ImportFluxRegionSudCommand extends ImportFluxCommand
 
     protected function setCategories(array $aidToImport, Aid $aid): Aid
     {
-        if (!isset($aidToImport['Les thématiques']) || !is_array($aidToImport['Les thématiques'])) {
+        if (!isset($aidToImport['Les thématiques'])) {
             return $aid;
         }
 
@@ -146,7 +146,9 @@ class ImportFluxRegionSudCommand extends ImportFluxCommand
         ];
 
         $categories = explode(',', $aidToImport['Les thématiques']);
+
         foreach ($categories as $categoryName) {
+            $categoryName = trim($categoryName);
             if (isset($mapping[$categoryName])) {
                 foreach ($mapping[$categoryName] as $slugCategory) {
                     $category = $this->managerRegistry->getRepository(Category::class)->findOneBy([
@@ -164,7 +166,7 @@ class ImportFluxRegionSudCommand extends ImportFluxCommand
 
     protected function setAidAudiences(array $aidToImport, Aid $aid): Aid
     {
-        if (!isset($aidToImport['Pour qui']) || !is_array($aidToImport['Pour qui'])) {
+        if (!isset($aidToImport['Pour qui'])) {
             return $aid;
         }
 

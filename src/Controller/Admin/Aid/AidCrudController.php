@@ -7,6 +7,7 @@ use App\Controller\Admin\Filter\Aid\AidAuthorFilter;
 use App\Controller\Admin\Filter\Aid\AidBackerFilter;
 use App\Controller\Admin\Filter\Aid\AidPerimeterFilter;
 use App\Controller\Admin\Filter\Aid\AidGenericFilter;
+use App\Controller\Admin\Filter\Aid\AidInstructorFilter;
 use App\Controller\Admin\Filter\Aid\AidStateFilter;
 use App\Entity\Aid\Aid;
 use App\Entity\Perimeter\Perimeter;
@@ -83,6 +84,7 @@ class AidCrudController extends AtCrudController
             ->add('inFranceRelance')
             ->add(AidAuthorFilter::new('author', 'Auteur'))
             ->add(AidBackerFilter::new('backer', 'Porteur d\'aide'))
+            ->add(AidInstructorFilter::new('instructor', 'Instructeur'))
             ->add(AidPerimeterFilter::new('perimeter', 'Périmètre'))
             ->add('aidAudiences')
             ->add('programs')

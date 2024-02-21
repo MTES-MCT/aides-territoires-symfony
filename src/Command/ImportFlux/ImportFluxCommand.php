@@ -39,6 +39,7 @@ class ImportFluxCommand extends Command
     protected int $create = 0;
     protected int $update = 0;
     protected int $error = 0;
+    protected \DateTime $dateImportStart;
 
     public function __construct(
         protected ManagerRegistry $managerRegistry,
@@ -53,6 +54,7 @@ class ImportFluxCommand extends Command
         ini_set('max_execution_time', 60*60);
         ini_set('memory_limit', '1G');
         parent::__construct();
+        $this->dateImportStart = new \DateTime(date('Y-m-d H:i:s'));
     }
 
     protected function configure() : void
@@ -344,6 +346,10 @@ class ImportFluxCommand extends Command
                 }
                 $entityUpdated = true;
             }
+
+            
+            // $aid = $this->setCategories($aidToImport, $aid);
+            // dd($aid->getId(), $this->dateImportStart, $aid->getTimeUpdate(), $aid->getTimeUpdate() >= $this->dateImportStart);
 
             if ($entityUpdated) {
                 // notifie que l'aide à été modifié suite à l'import
