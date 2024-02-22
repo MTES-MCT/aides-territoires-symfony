@@ -41,7 +41,6 @@ class PerimeterAutocompleteType extends AbstractType
                     return;
                 }
 
-
                 // c'est un code postal
                 if (preg_match('/^[0-9]{5}$/', $query)) {
                     $qb
