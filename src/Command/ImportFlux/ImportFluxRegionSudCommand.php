@@ -169,7 +169,7 @@ class ImportFluxRegionSudCommand extends ImportFluxCommand
         if (!isset($aidToImport['Pour qui'])) {
             return $aid;
         }
-
+        
         $mapping = [
             'Collectivité' => [
                 'commune',
@@ -186,6 +186,9 @@ class ImportFluxRegionSudCommand extends ImportFluxCommand
             ],
             'Établissement d’enseignement' => [
                 'public-cies'
+            ],
+            'Etablissement d\'enseignement' => [
+                'public-cies',
             ],
             'Particulier' => [
                 'private-person'
