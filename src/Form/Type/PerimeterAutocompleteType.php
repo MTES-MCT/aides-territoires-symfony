@@ -6,9 +6,7 @@ use App\Entity\Perimeter\Perimeter;
 use App\Repository\Perimeter\PerimeterRepository;
 use App\Service\Perimeter\PerimeterService;
 use Doctrine\ORM\QueryBuilder;
-use DoctrineExtensions\Query\Mysql\PeriodDiff;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\UX\Autocomplete\Form\AsEntityAutocompleteField;
 use Symfony\UX\Autocomplete\Form\BaseEntityAutocompleteType;
@@ -43,7 +41,6 @@ class PerimeterAutocompleteType extends AbstractType
                     return;
                 }
 
-
                 // c'est un code postal
                 if (preg_match('/^[0-9]{5}$/', $query)) {
                     $qb
@@ -60,29 +57,17 @@ class PerimeterAutocompleteType extends AbstractType
                     if (strpos($query, '-') !== false) {
                         $strings[] = str_replace('-', ' ', $query);
                     }
-                
+
                     $sqlWhere = '';
                     for ($i=0; $i < count($strings); $i++) {
                         $sqlWhere .= ' p.name LIKE :nameLike'.$i;
                         if ($i < count($strings) - 1) {
                             $sqlWhere .= ' OR ';
                         }
-                        $qb->setParameter('nameLike'.$i, $strings[$i].'%');
+                        $qb->setParameter('nameLike'.$i, '%'.$strings[$i].'%');
                     }
                     $qb
                     ->andWhere($sqlWhere)
-                    // ->andWhere('
-                    //     MATCH_AGAINST(p.name) AGAINST (:nameMatchAgainst IN BOOLEAN MODE) > 3
-                    // ')
-                    // ->andWhere('
-                    //     (
-                    //     MATCH_AGAINST(p.name) AGAINST (:nameMatchAgainst IN BOOLEAN MODE) > 1
-                    //     OR p.name LIKE :nameLike
-                    //     )
-                    // ')
-                    // ->setParameter('nameMatchAgainst', '"'.str_replace(['-'], [' '], $query).'*"')
-                    // ->setParameter('nameMatchAgainst', '"'. $query.'*"')
-                    // ->setParameter('nameLike', $query.'%')
                     ;
                 }
             },
