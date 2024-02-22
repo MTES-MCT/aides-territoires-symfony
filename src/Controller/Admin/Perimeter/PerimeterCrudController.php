@@ -25,7 +25,14 @@ class PerimeterCrudController extends AtCrudController
         return Perimeter::class;
     }
 
-    
+    public function createEntity(string $entityFqcn)
+    {
+        $perimeter = new Perimeter();
+        $perimeter->setCountry(Perimeter::SLUG_COUNTRY_DEFAULT);
+        $perimeter->setContinent(Perimeter::SLUG_CONTINENT_DEFAULT);
+        return $perimeter;
+    }
+
     public function configureFields(string $pageName): iterable
     {
         $scaleChoices = [];
@@ -76,10 +83,10 @@ class PerimeterCrudController extends AtCrudController
         yield FormField::addFieldset('Situation');
         yield TextField::new('continent', 'Continent')
         ->onlyOnForms()
-        ->setHelp('Code ISO, EU pour Europe');
+        ->setHelp('Code ISO, '.Perimeter::SLUG_CONTINENT_DEFAULT.' pour Europe');
         yield TextField::new('country', 'Pays')
         ->onlyOnForms()
-        ->setHelp('Code ISO, FR pour France');
+        ->setHelp('Code ISO, '.Perimeter::SLUG_COUNTRY_DEFAULT.' pour France');
         yield ArrayField::new('regions', 'Régions')
         ->onlyOnForms();
         yield ArrayField::new('departments', 'Départements')

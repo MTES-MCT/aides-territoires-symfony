@@ -29,7 +29,6 @@ class EasyAdminSubscriber implements EventSubscriberInterface
         protected ImageService $imageService
     )
     {
-        ini_set('memory_limit', '5G');
     }
 
     public static function getSubscribedEvents(): array
