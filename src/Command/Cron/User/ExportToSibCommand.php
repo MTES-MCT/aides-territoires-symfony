@@ -30,7 +30,7 @@ class ExportToSibCommand extends Command
         protected EmailService $emailService
     )
     {
-        ini_set('max_execution_time', 60*60*60);
+        ini_set('max_execution_time', 60*60);
         ini_set('memory_limit', '1G');
         parent::__construct();
     }
@@ -48,9 +48,9 @@ class ExportToSibCommand extends Command
         $io->title($this->commandTextStart);
 
         try  {
-            // if ($this->kernelInterface->getEnvironment() != 'prod') {
-            //     throw new \Exception('Commande uniquement disponible en prod');
-            // }
+            if ($this->kernelInterface->getEnvironment() != 'prod') {
+                throw new \Exception('Commande uniquement disponible en prod');
+            }
             // generate menu
             $this->cronTask($input, $output);
         } catch (\Exception $exception) {

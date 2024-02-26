@@ -2,25 +2,15 @@
 
 namespace App\Command\Script;
 
-use App\Entity\Aid\Aid;
-use App\Entity\Aid\AidFinancer;
-use App\Entity\DataSource\DataSource;
-use App\Entity\Keyword\Keyword;
 use App\Entity\Keyword\KeywordSynonymlist;
 use App\Entity\Reference\KeywordReference;
-use App\Service\Email\EmailService;
-use App\Service\Perimeter\PerimeterService;
 use App\Service\Reference\ReferenceService;
-use App\Service\Various\ParamService;
-use App\Service\Various\StringService;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Symfony\Component\HtmlSanitizer\HtmlSanitizerInterface;
-use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 #[AsCommand(name: 'at:script:keywords_to_reference', description: 'Import des mots-clés référents')]
 class AddKeywordToReferenceCommand extends Command
@@ -38,7 +28,7 @@ class AddKeywordToReferenceCommand extends Command
         protected ReferenceService $referenceService
     )
     {
-        ini_set('max_execution_time', 60*60*60);
+        ini_set('max_execution_time', 60*60);
         ini_set('memory_limit', '1G');
         parent::__construct();
     }

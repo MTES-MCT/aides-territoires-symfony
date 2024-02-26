@@ -5,12 +5,10 @@ namespace App\Command\ImportFlux;
 use Symfony\Component\Console\Attribute\AsCommand;
 use App\Command\ImportFlux\ImportFluxCommand;
 use App\Entity\Aid\Aid;
-use App\Entity\Aid\AidDestination;
 use App\Entity\Aid\AidRecurrence;
 use App\Entity\Aid\AidStep;
 use App\Entity\Aid\AidType;
 use App\Entity\Category\Category;
-use App\Entity\Keyword\Keyword;
 use App\Entity\Organization\OrganizationType;
 
 #[AsCommand(name: 'at:import_flux:cddr', description: 'Import de flux conseil départemental de la drôme')]

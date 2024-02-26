@@ -24,7 +24,7 @@ class GlobalImportCommand extends Command
         protected ManagerRegistry $managerRegistry
     )
     {
-        ini_set('max_execution_time', 60*60*60);
+        ini_set('max_execution_time', 60*60);
         ini_set('memory_limit', '20G');
         parent::__construct();
     }

@@ -32,7 +32,7 @@ class FindBrokenLinksCommand extends Command
         protected ParamService $paramService
     )
     {
-        ini_set('max_execution_time', 60*60*60);
+        ini_set('max_execution_time', 60*60);
         ini_set('memory_limit', '1G');
         parent::__construct();
     }
@@ -144,15 +144,6 @@ class FindBrokenLinksCommand extends Command
 
     private function checkUrl($url): bool
     {
-        // try {
-        //     $headers = get_headers($url);
-        //     if (!isset($headers[0])) {
-        //         return false;
-        //     }
-        //     return strpos($headers[0], '200');
-        // } catch (\Exception $e) {
-        //     return false;
-        // }
         $ch = curl_init($url);
 
         // Définir l'option pour retourner le transfert en tant que chaîne

@@ -347,10 +347,6 @@ class ImportFluxCommand extends Command
                 $entityUpdated = true;
             }
 
-            
-            // $aid = $this->setCategories($aidToImport, $aid);
-            // dd($aid->getId(), $this->dateImportStart, $aid->getTimeUpdate(), $aid->getTimeUpdate() >= $this->dateImportStart);
-
             if ($entityUpdated) {
                 // notifie que l'aide à été modifié suite à l'import
                 $aid->setImportUpdated(true);

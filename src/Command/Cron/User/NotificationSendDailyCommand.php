@@ -35,7 +35,7 @@ class NotificationSendDailyCommand extends Command
         protected RouterInterface $routerInterface
     )
     {
-        ini_set('max_execution_time', 60*60*60);
+        ini_set('max_execution_time', 60*60);
         ini_set('memory_limit', '1G');
         parent::__construct();
     }
