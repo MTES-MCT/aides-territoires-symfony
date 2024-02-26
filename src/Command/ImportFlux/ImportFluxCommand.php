@@ -428,6 +428,11 @@ class ImportFluxCommand extends Command
         return $aid;
     }
 
+    protected function setIsCallForProject(array $aidToImport, Aid $aid): Aid
+    {
+        return $aid;
+    }
+
     protected function getImportRaws(
         array $aidToImport,
         array $keys = ['start_date', 'predeposit_date', 'submission_deadline', 'recurrence']
@@ -499,4 +504,5 @@ class ImportFluxCommand extends Command
 
         return $html !== '' ? $html : null;
     }
+    
 }
