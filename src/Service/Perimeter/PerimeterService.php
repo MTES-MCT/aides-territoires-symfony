@@ -38,7 +38,10 @@ class PerimeterService
         return 'regions_'.join('_', $regionCodes);
     }
 
-    public function getSmartName(Perimeter $perimeter) : string {
+    public function getSmartName(?Perimeter $perimeter) : string {
+        if (!$perimeter instanceof Perimeter) {
+            return '';
+        }
         if ($perimeter->getScale() == Perimeter::SCALE_COMMUNE) {
             if (is_array($perimeter->getZipcodes())) {
                 return $perimeter->getName().' (Commune - '.join(', ', $perimeter->getZipcodes()).')';
