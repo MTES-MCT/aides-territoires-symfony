@@ -40,6 +40,9 @@ class AidListener
                 if (!$aid->getTimePublished()) {
                     $aid->setTimePublished(new \DateTime(date('Y-m-d H:i:s')));
                 }
+                if (!$aid->getDatePublished()) {
+                    $aid->setDatePublished(new \DateTime(date('Y-m-d')));
+                }
 
                 // si auteur à demandé à être notifié en cas de publication
                 if ($aid->isAuthorNotification()) {
