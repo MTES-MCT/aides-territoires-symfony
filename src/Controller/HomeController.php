@@ -2,29 +2,21 @@
 
 namespace App\Controller;
 
-use App\Entity\Aid\AidDestination;
-use App\Entity\Aid\AidSearch;
 use App\Entity\Perimeter\Perimeter;
-use App\Form\Aid\AidSearchType;
 use App\Form\Aid\AidSearchTypeV2;
 use App\Form\Program\CountySelectType;
 use App\Form\Reference\ProjectReferenceSearchType;
-use App\Repository\Aid\AidDestinationRepository;
 use App\Repository\Aid\AidRepository;
 use App\Repository\Backer\BackerRepository;
 use App\Repository\Blog\BlogPostRepository;
-use App\Repository\Organization\OrganizationTypeRepository;
 use App\Repository\Perimeter\PerimeterRepository;
 use App\Repository\Program\ProgramRepository;
 use App\Repository\Project\ProjectRepository;
-use App\Service\Aid\AidSearchClass;
 use App\Service\Aid\AidSearchFormService;
 use App\Service\Various\StringService;
-use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class HomeController extends FrontController
 {

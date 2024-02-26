@@ -6,7 +6,6 @@ use App\Controller\FrontController;
 use App\Entity\Perimeter\Perimeter;
 use App\Entity\Program\Program;
 use App\Entity\User\User;
-use App\Form\Aid\AidSearchType;
 use App\Form\Aid\AidSearchTypeV2;
 use App\Repository\Aid\AidRepository;
 use App\Repository\Program\ProgramRepository;
@@ -16,7 +15,6 @@ use App\Service\Log\LogService;
 use App\Service\User\UserService;
 use Doctrine\Common\Collections\ArrayCollection;
 use Pagerfanta\Adapter\ArrayAdapter;
-use Pagerfanta\Doctrine\ORM\QueryAdapter;
 use Pagerfanta\Pagerfanta;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
@@ -51,7 +49,6 @@ class ProgramController extends FrontController
     public function details(
         $slug,
         ProgramRepository $programRepository,
-        AidRepository $aidRepository,
         RequestStack $requestStack,
         AidSearchFormService $aidSearchFormService,
         AidService $aidService,
@@ -97,15 +94,9 @@ class ProgramController extends FrontController
             'action' => '#aid-list',
             'extended' => true,
             'removes' => ['orderBy'],
-            
-            // 'removes' => ['programs', 'eurdopeanAid', 'orderBy']
         ];
-        // parametre selon url
-        // $formAidSearchParams = array_merge(
-        //     $formAidSearchParams,
-        //     $aidSearchFormService->completeFormAidSearchParams()
-        // );
 
+        // parametre selon url
         $aidSearchClass = $aidSearchFormService->getAidSearchClass(
             params: [
                 'forceOrganizationType' => null,
@@ -115,20 +106,12 @@ class ProgramController extends FrontController
         );
 
         // formulaire recherche aides
-        // $formAidSearch = $this->createForm(
-        //     AidSearchType::class,
-        //     null,
-        //     $formAidSearchParams
-        // );
         $formAidSearch = $this->createForm(
             AidSearchTypeV2::class,
             $aidSearchClass,
             $formAidSearchParams
         );
         $formAidSearch->handleRequest($requestStack->getCurrentRequest());
-
-        // check si on affiche ou pas le formulaire étendu
-        // $showExtended = $aidSearchFormService->setShowExtended($formAidSearch);
         
         // parametres pour requetes aides
         $aidParams = [

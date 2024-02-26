@@ -7,9 +7,7 @@ use App\Entity\Alert\Alert;
 use App\Repository\Alert\AlertRepository;
 use App\Service\Email\EmailService;
 use App\Service\User\UserService;
-use App\Service\Various\ParamService;
 use Doctrine\Persistence\ManagerRegistry;
-use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Annotation\Route;
 

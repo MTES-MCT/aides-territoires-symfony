@@ -3,7 +3,6 @@
 namespace App\Controller\Project;
 
 use App\Controller\FrontController;
-use App\Dto\ProjectDTO;
 use App\Entity\Perimeter\Perimeter;
 use App\Entity\Aid\AidSuggestedAidProject;
 use App\Entity\Project\Project;

@@ -12,7 +12,6 @@ use App\Form\User\RegisterCommuneType;
 use App\Form\User\RegisterType;
 use App\Repository\Organization\OrganizationTypeRepository;
 use App\Repository\Perimeter\PerimeterRepository;
-use App\Service\Api\InternalApiService;
 use App\Service\Matomo\MatomoService;
 use App\Service\User\UserService;
 use App\Service\Various\ParamService;

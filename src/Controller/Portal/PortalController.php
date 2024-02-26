@@ -8,11 +8,9 @@ use App\Entity\Alert\Alert;
 use App\Entity\Perimeter\Perimeter;
 use App\Entity\Search\SearchPage;
 use App\Entity\User\User;
-use App\Form\Aid\AidSearchType;
 use App\Form\Aid\AidSearchTypeV2;
 use App\Form\Alert\AlertCreateType;
 use App\Repository\Aid\AidRepository;
-use App\Repository\Portal\PortalRepository;
 use App\Repository\Search\SearchPageRepository;
 use App\Service\Aid\AidSearchFormService;
 use App\Service\Aid\AidService;
@@ -21,7 +19,6 @@ use App\Service\User\UserService;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Persistence\ManagerRegistry;
 use Pagerfanta\Adapter\ArrayAdapter;
-use Pagerfanta\Doctrine\ORM\QueryAdapter;
 use Pagerfanta\Pagerfanta;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
@@ -98,17 +95,7 @@ class PortalController extends FrontController
             'extended' => true,
         ];
 
-        // parametre selon url
-        // $formAidSearchParams = array_merge(
-        //     $formAidSearchParams,
-        //     $aidSearchFormService->completeFormAidSearchParams($queryString)
-        // );
         // formulaire recherche aides
-        // $formAidSearch = $this->createForm(
-        //     AidSearchType::class,
-        //     null,
-        //     $formAidSearchParams
-        // );
         $formAidSearch = $this->createForm(
             AidSearchTypeV2::class,
             $aidSearchClass,
@@ -117,7 +104,6 @@ class PortalController extends FrontController
         $formAidSearch->handleRequest($requestStack->getCurrentRequest());
 
         // check si on affiche ou pas le formulaire étendu
-        // $showExtended = $aidSearchFormService->setShowExtended($formAidSearch);
         $showExtended = $aidSearchFormService->setShowExtendedV2($aidSearchClass);
 
         // parametres pour requetes aides

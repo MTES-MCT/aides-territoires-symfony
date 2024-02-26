@@ -296,8 +296,7 @@ class AidController extends FrontController
     public function genericToLocal(
         $slug,
         AidRepository $aidRepository,
-        UserService $userService,
-        AidService $aidService
+        UserService $userService
     ): Response
     {
         // charge l'aide et verifie qu'elle soit générique

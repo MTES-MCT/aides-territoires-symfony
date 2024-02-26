@@ -4,7 +4,6 @@ namespace App\Controller\Keyword;
 
 use App\Controller\FrontController;
 use App\Repository\Keyword\KeywordSynonymlistRepository;
-use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Annotation\Route;

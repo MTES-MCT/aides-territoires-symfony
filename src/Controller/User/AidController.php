@@ -50,12 +50,6 @@ class AidController extends FrontController
         $formAid->handleRequest($requestStack->getCurrentRequest());
         if ($formAid->isSubmitted()) {
             if ($formAid->isValid()) {
-                // $status = $requestStack->getCurrentRequest()->get('_status');
-                // if (!in_array($status, [Aid::STATUS_REVIEWABLE, Aid::STATUS_DRAFT])) {
-                //     $status = Aid::STATUS_DRAFT;
-                // }
-                
-                // $aid->setStatus($status);
                 $aid->setAuthor($user);
                 // les financers
                 $financers = $formAid->get('financers')->getData();
@@ -213,8 +207,7 @@ class AidController extends FrontController
         AidService $aidService,
         RequestStack $requestStack,
         ManagerRegistry $managerRegistry,
-        AidRepository $aidRepository,
-        HtmlSanitizerInterface $htmlSanitizerInterface
+        AidRepository $aidRepository
     ) : Response {
         // user
         $user = $userService->getUserLogged();
@@ -325,7 +318,6 @@ class AidController extends FrontController
         UserService $userService,
         RequestStack $requestStack,
         AidRepository $aidRepository,
-        AidService $aidService,
         StringService $stringService,
         RouterInterface $routerInterface
     )

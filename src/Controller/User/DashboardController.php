@@ -3,8 +3,6 @@
 namespace App\Controller\User;
 
 use App\Controller\FrontController;
-use App\Entity\Organization\Organization;
-use App\Entity\User\User;
 use App\Repository\Aid\AidRepository;
 use App\Repository\Organization\OrganizationRepository;
 use App\Repository\Project\ProjectRepository;

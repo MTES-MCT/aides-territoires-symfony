@@ -158,7 +158,6 @@ class SitemapController extends AbstractController
         // index
         $urls[] = [
             'loc' => $this->generateUrl('app_cartography_cartography', [
-                'slug' => $blogPostCategory->getSlug()
             ], UrlGeneratorInterface::ABSOLUTE_URL),
         ];
 

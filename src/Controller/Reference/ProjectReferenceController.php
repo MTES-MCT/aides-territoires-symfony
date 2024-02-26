@@ -34,7 +34,6 @@ class ProjectReferenceController extends FrontController
     public function index(
         AidRepository $aidRepository,
         RequestStack $requestStack,
-        ReferenceService $referenceService,
         ManagerRegistry $managerRegistry,
         ProjectReferenceRepository $projectReferenceRepository,
         AidService $aidService
@@ -105,8 +104,6 @@ class ProjectReferenceController extends FrontController
             $aids = $aidRepository->findCustom(array_merge($aidParams, ['keyword' => $name]));
             $aids = $aidService->postPopulateAids($aids, $aidParams);
         }
-
-        // $aids = $aidService->postPopulateAids($aids, $aidParams);
 
          // le paginateur
         $adapter = new ArrayAdapter($aids);
