@@ -143,7 +143,6 @@
                 "rm -rf .docker"
             ],
             "php-config": [
-                "memory_limit=-1",
                 "opcache.memory_consumption=256",
                 "opcache.max_accelerated_files=20000",
                 "opcache.validate_timestamps=0",
