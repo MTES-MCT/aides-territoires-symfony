@@ -612,10 +612,16 @@ class AidController extends FrontController
         // Render the HTML as PDF
         $dompdf->render();
 
-        // Output the generated PDF to Browser (inline view)
-        return $dompdf->stream('aide.pdf', [
-            "Attachment" => false
-        ]);
+        $pdfContent = $dompdf->output();
+
+        // Créez une réponse avec le contenu du PDF
+        $response = new Response($pdfContent);
+
+        // Définissez le type de contenu et le nom du fichier dans les en-têtes HTTP
+        $response->headers->set('Content-Type', 'application/pdf');
+        $response->headers->set('Content-Disposition', 'inline; filename="'.$aid->getSlug().'.pdf"');
+
+        return $response;
     }
 
     #[Route('/comptes/aides/dupliquer/{slug}/', name: 'app_user_aid_duplicate', requirements: ['slug' => '[a-zA-Z0-9\-_]+'])]
