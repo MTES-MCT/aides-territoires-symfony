@@ -13,8 +13,6 @@ use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Filters;
 use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
-use EasyCorp\Bundle\EasyAdminBundle\Event\BeforeEntityPersistedEvent;
-use EasyCorp\Bundle\EasyAdminBundle\Event\BeforeEntityUpdatedEvent;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ChoiceField;
@@ -25,10 +23,9 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\IntegerField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use EasyCorp\Bundle\EasyAdminBundle\Filter\ChoiceFilter;
 use EasyCorp\Bundle\EasyAdminBundle\Filter\NullFilter;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Response;
 
-class UserCrudController extends AtCrudController implements EventSubscriberInterface
+class UserCrudController extends AtCrudController
 {
     public static function getEntityFqcn(): string
     {
@@ -49,14 +46,6 @@ class UserCrudController extends AtCrudController implements EventSubscriberInte
         ->add('userGroups')
         ->add(UserCountyFilter::new('perimeter', 'Département'))
         ;
-    }
-
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            BeforeEntityUpdatedEvent::class => ['beforeEntityUpdatedEvent'],
-            BeforeEntityPersistedEvent::class => ['beforeEntityPersisteddEvent'],
-        ];
     }
     
     public function configureFields(string $pageName): iterable
