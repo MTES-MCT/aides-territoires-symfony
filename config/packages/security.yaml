@@ -63,22 +63,9 @@ security:
                 #always_remember_me: true
 
             # configure the maximum login attempts in a custom period of time
-        #            login_throttling:
-        #                max_attempts: 5
-        #                interval: '15 minutes'
-
-        # api:
-        #     pattern:    ^/api/
-        #     stateless: true
-        #     provider: app_user_provider
-        #     json_login:
-        #         check_path: /api/connexion/ # The name in routes.yaml is enough for mapping
-        #         username_path: email
-        #         password_path: password
-        #         success_handler: lexik_jwt_authentication.handler.authentication_success
-        #         failure_handler: lexik_jwt_authentication.handler.authentication_failure
-        #     jwt: ~
-
+            login_throttling:
+                max_attempts: 5
+                interval: '15 minutes'
 
         api:
             pattern:    ^/api/
@@ -129,9 +116,9 @@ security:
 
 
             # configure the maximum login attempts
-            # login_throttling:
-            #     max_attempts: 3          # per minute ...
-                # interval: '15 minutes' # ... or in a custom period
+            login_throttling:
+                max_attempts: 5          # per minute ...
+                interval: '15 minutes' # ... or in a custom period
 
     # Easy way to control access for large sections of your site
     # Note: Only the *first* access control that matches will be used
@@ -162,16 +149,3 @@ security:
     # héritage des roles
     role_hierarchy:
         ROLE_ADMIN: [ROLE_USER]
-
-# when@test:
-#     security:
-#         password_hashers:
-#             # By default, password hashers are resource intensive and take time. This is
-#             # important to generate secure password hashes. In tests however, secure hashes
-#             # are not important, waste resources and increase test times. The following
-#             # reduces the work factor to the lowest possible values.
-#             Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface:
-#                 algorithm: auto
-#                 cost: 4 # Lowest possible value for bcrypt
-#                 time_cost: 3 # Lowest possible value for argon
-#                 memory_cost: 10 # Lowest possible value for argon
