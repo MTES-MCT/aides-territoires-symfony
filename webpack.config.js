@@ -75,6 +75,7 @@ Encore
     .addEntry('import-scss/admin/aid/associate', './assets/js/import-scss/admin/aid/associate.js')
 
     .addEntry('import-scss/home', './assets/js/import-scss/home.js')
+    .addEntry('import-scss/contact/index', './assets/js/import-scss/contact/index.js')
     .addEntry('import-scss/static/sitemap', './assets/js/import-scss/static/sitemap.js')
     .addEntry('import-scss/blog/blogpost/details', './assets/js/import-scss/blog/blogpost/details.js')
     .addEntry('import-scss/cartography/details', './assets/js/import-scss/cartography/details.js')
