@@ -147,7 +147,7 @@ class AidSearchFormService
         }
 
         if ($aidSearchClass->getOrderBy()) {
-            $aidParams['orderBy'] = $this->handleOrderBy(['orderBy' => $aidSearchClass->getOrderBy()]);
+            $aidParams = $this->handleOrderBy(['orderBy' => $aidSearchClass->getOrderBy()]);
         }
 
         if ($aidSearchClass->getBackerschoice()) {
