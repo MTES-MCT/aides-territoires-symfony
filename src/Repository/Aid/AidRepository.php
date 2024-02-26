@@ -739,12 +739,6 @@ class AidRepository extends ServiceEntityRepository
         }
         
         if ($perimeterFrom instanceof Perimeter && $perimeterFrom->getId()) {
-            // $qb
-            //     ->innerJoin('a.perimeter', 'perimeter')
-            //     ->innerJoin('perimeter.perimetersFrom', 'perimetersFrom')
-            //     ->andWhere('(perimetersFrom = :perimeter OR perimeter = :perimeter)')
-            //     ->setParameter('perimeter', $perimeterFrom)
-            //     ;
             $ids = $this->getEntityManager()->getRepository(Perimeter::class)->getIdPerimetersContainedIn(array('perimeter' => $perimeterFrom));
             $ids[] = $perimeterFrom->getId();
 
@@ -772,18 +766,6 @@ class AidRepository extends ServiceEntityRepository
                 ->setParameter('perimeter', $perimeterTo)
                 ;
         }
-
-        // GESTION DES AID GENERICS / DECLINAISONS
-        // We should never have both the generic aid and its local version
-        // together on search results.
-        // Which one should be removed from the result ? It depends...
-        // We consider the scale perimeter associated to the local aid.
-        // - When searching on a wider area than the local aid's perimeter,
-        //     then we display the generic version.
-        // - When searching on a smaller area than the local aid's perimeter,
-        //     then we display the local version.
-        // Si on a un périmètre
-
 
         // echelles de périmetres
         if (is_array($perimeterScales) && isset($perimeterFrom)) {

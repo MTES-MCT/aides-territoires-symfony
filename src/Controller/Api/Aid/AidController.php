@@ -4,16 +4,15 @@ namespace App\Controller\Api\Aid;
 
 use App\Controller\Api\ApiController;
 use App\Entity\Aid\Aid;
-use App\Entity\Aid\AidDestination;
-use App\Entity\Aid\AidRecurrence;
-use App\Entity\Aid\AidStep;
-use App\Entity\Aid\AidType;
-use App\Entity\Aid\AidTypeGroup;
-use App\Entity\Perimeter\Perimeter;
+use App\Entity\User\User;
 use App\Repository\Aid\AidRepository;
 use App\Service\Aid\AidSearchFormService;
 use App\Service\Aid\AidService;
+use App\Service\Log\LogService;
+use App\Service\User\UserService;
+use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Attribute\AsController;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -25,7 +24,10 @@ class AidController extends ApiController
     public function index(
         AidRepository $aidRepository,
         AidService $aidService,
-        AidSearchFormService $aidSearchFormService
+        AidSearchFormService $aidSearchFormService,
+        LogService $logService,
+        RequestStack $requestStack,
+        UserService $userService
     ): JsonResponse
     {
         $aidSearchClass = $aidSearchFormService->getAidSearchClass();
@@ -34,79 +36,6 @@ class AidController extends ApiController
             'showInSearch' => true,
         ];
         $aidParams = array_merge($aidParams, $aidSearchFormService->convertAidSearchClassToAidParams($aidSearchClass));
-
-        // $params = [];
-        // $params['showInSearch'] = true;
-        // // $params['orderBy'] = ['sort' => 'a.id', 'order' => 'DESC'];
-
-        // $text = $this->requestStack->getCurrentRequest()->get('text', null);
-        // if (!empty($text)) {
-        //     $params['keyword'] = $text;
-        // }
-
-        // $targetedAudiences = $this->requestStack->getCurrentRequest()->get('targeted_audiences', null);
-        // if (!empty($targetedAudiences)) {
-        //     $params['organizationTypeSlugs'] = [$targetedAudiences]; // malgré le nom il n'y a qu'une seul audience dans le filtre
-        // }
-
-        // $applyBefore = $this->requestStack->getCurrentRequest()->get('apply_before', null);
-        // if (!empty($applyBefore)) {
-        //     $params['applyBefore'] = new \DateTime(date($applyBefore));
-        // }
-
-        // $publishedAfter = $this->requestStack->getCurrentRequest()->get('published_after', null);
-        // if (!empty($publishedAfter)) {
-        //     $params['publishedAfter'] = new \DateTime(date($publishedAfter));
-        // }
-
-        // $aidType = $this->requestStack->getCurrentRequest()->get('aid_type', null);
-        // if (!empty($aidType)) {
-        //     $params['aidTypeGroup'] = $this->managerRegistry->getRepository(AidTypeGroup::class)->findOneBy(['slug' => $this->stringService->getSlug($aidType)]);
-        // }
-
-        // $params['aidTypes'] = [];
-        // $financialAids = $this->requestStack->getCurrentRequest()->get('financial_aids', null);
-        // if (!empty($financialAids)) {
-        //     $params['aidTypes'][] = $this->managerRegistry->getRepository(AidType::class)->findOneBy(['slug' => $this->stringService->getSlug($financialAids)]);
-        // }
-
-        // $technicalAids = $this->requestStack->getCurrentRequest()->get('technical_aids', null);
-        // if (!empty($technicalAids)) {
-        //     $params['aidTypes'][] = $this->managerRegistry->getRepository(AidType::class)->findOneBy(['slug' => $this->stringService->getSlug($technicalAids)]);
-        // }
-        // if (count($params['aidTypes']) == 0) {
-        //     unset($params['aidTypes']);
-        // }
-
-        // $mobilizationStep = $this->requestStack->getCurrentRequest()->get('mobilization_step', null);
-        // if (!empty($mobilizationStep)) {
-        //     $params['aidStep'] = $this->managerRegistry->getRepository(AidStep::class)->findOneBy(['slug' => $this->stringService->getSlug($mobilizationStep)]);
-        // }
-
-        // $destinations = $this->requestStack->getCurrentRequest()->get('destinations', null);
-        // if (!empty($destinations)) {
-        //     $params['aidDestination'] = $this->managerRegistry->getRepository(AidDestination::class)->findOneBy(['slug' => $this->stringService->getSlug($destinations)]);
-        // }
-
-        // $recurrence = $this->requestStack->getCurrentRequest()->get('recurrence', null);
-        // if (!empty($recurrence)) {
-        //     $params['aidRecurrence'] = $this->managerRegistry->getRepository(AidRecurrence::class)->findOneBy(['slug' => $this->stringService->getSlug($recurrence)]);
-        // }
-
-        // $callForProjectsOnly = $this->requestStack->getCurrentRequest()->get('call_for_projects_only', null);
-        // if (!empty($callForProjectsOnly)) {
-        //     $params['isCallForProject'] = $this->stringToBool($callForProjectsOnly);
-        // }
-
-        // $isCharged = $this->requestStack->getCurrentRequest()->get('is_charged', null);
-        // if (!empty($isCharged)) {
-        //     $params['isCharged'] = $this->stringToBool($isCharged);
-        // }
-
-        // $perimeter = $this->requestStack->getCurrentRequest()->get('perimeter', null);
-        // if (!empty($perimeter)) {
-        //     $params['perimeter'] = $this->managerRegistry->getRepository(Perimeter::class)->find((int) $perimeter);
-        // }
 
         // requete pour compter sans la pagination
         $countParams = $aidParams;
@@ -128,6 +57,36 @@ class AidController extends ApiController
             'next' => $this->getNext($count),
             'results' => $resultsSpe
         ];
+
+
+        // Log recherche
+        $query = $aidSearchFormService->convertAidSearchClassToQueryString($aidSearchClass);
+        $user = $userService->getUserLogged();
+        $logParams = [
+            'organizationTypes' => (isset($aidParams['organizationType'])) ? [$aidParams['organizationType']] : null,
+            'querystring' => $query ?? null,
+            'resultsCount' => $count,
+            'host' => $requestStack->getCurrentRequest()->getHost(),
+            'perimeter' => $aidParams['perimeter'] ?? null,
+            'search' => $aidParams['keyword'] ?? null,
+            'organization' => ($user instanceof User && $user->getDefaultOrganization()) ? $user->getDefaultOrganization() : null,
+            'backers' => $aidParams['backers'] ?? null,
+            'categories' => $aidParams['categories'] ?? null,
+            'programs' => $aidParams['programs'] ?? null,
+        ];
+        $themes = new ArrayCollection();
+        if (isset($aidParams['categories']) && is_array($aidParams['categories'])) {
+            foreach ($aidParams['categories'] as $category) {
+                if (!$themes->contains($category->getCategoryTheme())) {
+                    $themes->add($category->getCategoryTheme());
+                }
+            }
+        }
+        $logParams['themes'] = $themes->toArray();
+        $logService->log(
+            type: LogService::AID_SEARCH,
+            params: $logParams,
+        );
 
         // la réponse
         $response =  new JsonResponse($data, 200, [], false);
@@ -176,7 +135,10 @@ class AidController extends ApiController
     public function bySlug(
         $slug,
         AidRepository $aidRepository,
-        AidService $aidService
+        AidService $aidService,
+        LogService $logService,
+        RequestStack $requestStack,
+        UserService $userService
     ): JsonResponse
     {
         $params = [];
@@ -195,6 +157,19 @@ class AidController extends ApiController
             ];
         }
 
+        // log
+        $user = $userService->getUserLogged();
+        $logService->log(
+            type: LogService::AID_VIEW,
+            params: [
+                'querystring' => parse_url($requestStack->getCurrentRequest()->getRequestUri(), PHP_URL_QUERY) ?? null,
+                'host' => $requestStack->getCurrentRequest()->getHost(),
+                'aid' => $aid,
+                'organization' => ($user instanceof User && $user->getDefaultOrganization()) ? $user->getDefaultOrganization() : null,
+                'user' => ($user instanceof User) ? $user : null,
+            ]
+        );
+        
         // la réponse
         $response =  new JsonResponse($data, 200, [], false);
         // pour eviter que les urls ne soient ecodées

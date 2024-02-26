@@ -48,6 +48,7 @@ class AidSearchFormService
 
     public function convertAidSearchClassToQueryString(AidSearchClass $aidSearchClass): string{
         $params = [];
+
         if ($aidSearchClass->getOrganizationType()) {
             $params['organizationType'] = $aidSearchClass->getOrganizationType()->getSlug();
         }
@@ -147,7 +148,7 @@ class AidSearchFormService
         }
 
         if ($aidSearchClass->getOrderBy()) {
-            $aidParams = $this->handleOrderBy(['orderBy' => $aidSearchClass->getOrderBy()]);
+            $aidParams = array_merge($aidParams, $this->handleOrderBy(['orderBy' => $aidSearchClass->getOrderBy()]));
         }
 
         if ($aidSearchClass->getBackerschoice()) {
@@ -226,7 +227,6 @@ class AidSearchFormService
                 }
             }
         }
-
 
 
         // > les paramètres en query
@@ -338,6 +338,18 @@ class AidSearchFormService
             }
             foreach ($queryParams['categories'] as $categorySlug) {
                 $category = $this->managerRegistry->getRepository(Category::class)->findOneBy(['slug' => $categorySlug]);
+                if ($category instanceof Category) {
+                    $aidSearchClass->addCategorySearch($category);
+                }
+            }
+        }
+
+        if (isset($queryParams['categorysearch[]'])) {
+            if (!is_array($queryParams['categorysearch[]'])) {
+                $queryParams['categorysearch[]'] = [$queryParams['categorysearch[]']];
+            }
+            foreach ($queryParams['categorysearch[]'] as $categoryId) {
+                $category = $this->managerRegistry->getRepository(Category::class)->find((int) $categoryId);
                 if ($category instanceof Category) {
                     $aidSearchClass->addCategorySearch($category);
                 }

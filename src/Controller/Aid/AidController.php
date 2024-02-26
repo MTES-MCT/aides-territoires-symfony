@@ -99,6 +99,7 @@ class AidController extends FrontController
         $aidParams = [
             'showInSearch' => true,
         ];
+
         $aidParams = array_merge($aidParams, $aidSearchFormService->convertAidSearchClassToAidParams($aidSearchClass));
         $query = parse_url($requestStack->getCurrentRequest()->getRequestUri(), PHP_URL_QUERY) ?? null;
 
