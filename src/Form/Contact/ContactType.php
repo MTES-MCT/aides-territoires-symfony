@@ -32,14 +32,16 @@ class ContactType extends AbstractType
         $builder
             ->add('firstname', TextType::class, [
                 'label' => 'Votre prénom :',
+                'required' => true,
                 // 'sanitize_html' => true,
             ])
             ->add('lastname', TextType::class, [
                 'label' => 'Votre nom :',
+                'required' => true,
                 // 'sanitize_html' => true,
             ])
             ->add('email', EmailType::class, [
-                'label' => 'Votre email :*',
+                'label' => 'Votre email :',
                 'required' => true,
                 'help' => 'Par exemple : prenom.nom@domaine.fr',
                 // 'sanitize_html' => true,
@@ -68,11 +70,11 @@ class ContactType extends AbstractType
                     'Autres' => 'contact_other',
                 ],
                 'placeholder' => '---',
-                'label' => 'Sujet :*',
+                'label' => 'Sujet :',
                 'required' => true
             ])
             ->add('message', TextareaType::class, [
-                'label' => 'Votre question ou message *',
+                'label' => 'Votre question ou message :',
                 'required' => true,
                 'attr' => ['class' => 'fr-input', 'cols' => 40, 'rows' => 10],
                 'sanitize_html' => true,

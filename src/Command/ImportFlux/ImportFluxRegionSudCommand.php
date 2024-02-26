@@ -5,12 +5,10 @@ namespace App\Command\ImportFlux;
 use Symfony\Component\Console\Attribute\AsCommand;
 use App\Command\ImportFlux\ImportFluxCommand;
 use App\Entity\Aid\Aid;
-use App\Entity\Aid\AidDestination;
 use App\Entity\Aid\AidRecurrence;
 use App\Entity\Aid\AidStep;
 use App\Entity\Aid\AidType;
 use App\Entity\Category\Category;
-use App\Entity\Keyword\Keyword;
 use App\Entity\Organization\OrganizationType;
 
 #[AsCommand(name: 'at:import_flux:region_sud', description: 'Import de flux région sud')]
@@ -142,6 +140,9 @@ class ImportFluxRegionSudCommand extends ImportFluxCommand
             ],
             'Agriculture' => [
                 'agriculture'
+            ],
+            'Environnement' => [
+                'biodiversite'
             ]
         ];
 
@@ -161,6 +162,44 @@ class ImportFluxRegionSudCommand extends ImportFluxCommand
             }
         }
 
+        // Spécifique sur ce flux, les beneficiaires et les catégories sont mélangés
+        $mapping = [
+            'Collectivité' => [
+                'commune',
+                'epci',
+                'department',
+                'region',
+                'special'
+            ],
+            'Entreprise' => [
+                'private-sector'
+            ],
+            'Etablissement d\'enseignement' => [
+                'public-org'
+            ],
+            'Association' => [
+                'association'
+            ]
+        ];
+
+        $categories = explode(',', $aidToImport['Les thématiques']);
+
+        foreach ($categories as $categoryName) {
+            $categoryName = trim($categoryName);
+            if (isset($mapping[$categoryName])) {
+                foreach ($mapping[$categoryName] as $slugCategory) {
+                    $organizationType = $this->managerRegistry->getRepository(OrganizationType::class)->findOneBy([
+                        'slug' => $slugCategory
+                    ]);
+                    if ($organizationType instanceof OrganizationType) {
+                        $aid->addAidAudience($organizationType);
+                    }
+                }
+            }
+        }
+
+        
+        
         return $aid;
     }
 
@@ -203,6 +242,29 @@ class ImportFluxRegionSudCommand extends ImportFluxCommand
                     ]);
                     if ($organizationType instanceof OrganizationType) {
                         $aid->addAidAudience($organizationType);
+                    }
+                }
+            }
+        }
+
+        // Spécifique sur ce flux, les beneficiaires et les catégories sont mélangés
+        $mapping = [
+            'Formation' => [
+                'formation'
+            ],
+            'Transports' => [
+                'transports-collectifs-et-optimisation-des-trafics'
+            ]
+        ];
+
+        foreach ($mapping as $key => $values) {
+            if (preg_match('/.*'.$key.'.*/i', $aidToImport['Pour qui'])) {
+                foreach ($values as $value) {
+                    $category = $this->managerRegistry->getRepository(Category::class)->findOneBy([
+                        'slug' => $value
+                    ]);
+                    if ($category instanceof Category) {
+                        $aid->addCategory($category);
                     }
                 }
             }
@@ -251,6 +313,19 @@ class ImportFluxRegionSudCommand extends ImportFluxCommand
         foreach ($aidSteps as $aidStep) {
             $aid->addAidStep($aidStep);
         }
+        return $aid;
+    }
+
+    protected function setIsCallForProject(array $aidToImport, Aid $aid): Aid
+    {
+        if (!isset($aidToImport['Pour qui'])) {
+            return $aid;
+        }
+
+        if (preg_match('/.*Appels à projets*/i', $aidToImport['Pour qui'])) {
+            $aid->setIsCallForProject(true);
+        }
+
         return $aid;
     }
 
