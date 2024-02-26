@@ -117,6 +117,9 @@ class LogService
                         $log->setQuerystring($params['querystring'] ?? null);
                         $log->setResultsCount($params['resultsCount'] ?? null);
                         $log->setSource($this->getSiteFromHost($params['host'] ?? null));
+                        if (isset($params['source'])) {
+                            $log->setSource($params['source']);
+                        }
                         $log->setSearch($params['search'] ?? null);
                         $log->setPerimeter($params['perimeter'] ?? null);
                         $log->setOrganization($params['organization'] ?? null);
@@ -152,6 +155,9 @@ class LogService
                         $log = new LogAidView();
                         $log->setQuerystring($params['querystring'] ?? null);
                         $log->setSource($this->getSiteFromHost($params['host'] ?? null));
+                        if (isset($params['source'])) {
+                            $log->setSource($params['source']);
+                        }
                         $log->setAid($params['aid'] ?? null);
                         $log->setOrganization($params['organization'] ?? null);
                         $log->setUser($params['user'] ?? null);

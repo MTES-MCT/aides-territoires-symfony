@@ -4,6 +4,7 @@ namespace App\Controller\Api\Aid;
 
 use App\Controller\Api\ApiController;
 use App\Entity\Aid\Aid;
+use App\Entity\Log\LogAidSearch;
 use App\Entity\User\User;
 use App\Repository\Aid\AidRepository;
 use App\Service\Aid\AidSearchFormService;
@@ -67,6 +68,7 @@ class AidController extends ApiController
             'querystring' => $query ?? null,
             'resultsCount' => $count,
             'host' => $requestStack->getCurrentRequest()->getHost(),
+            'source' => LogAidSearch::SOURCE_API,
             'perimeter' => $aidParams['perimeter'] ?? null,
             'search' => $aidParams['keyword'] ?? null,
             'organization' => ($user instanceof User && $user->getDefaultOrganization()) ? $user->getDefaultOrganization() : null,
@@ -167,6 +169,7 @@ class AidController extends ApiController
                 'aid' => $aid,
                 'organization' => ($user instanceof User && $user->getDefaultOrganization()) ? $user->getDefaultOrganization() : null,
                 'user' => ($user instanceof User) ? $user : null,
+                'source' => LogAidSearch::SOURCE_API,
             ]
         );
         

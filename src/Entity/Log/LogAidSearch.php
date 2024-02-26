@@ -23,6 +23,8 @@ use Gedmo\Mapping\Annotation as Gedmo;
 #[ORM\Index(columns: ['search'], name: 'source_las')]
 class LogAidSearch
 {
+    const SOURCE_API = 'api';
+    
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
