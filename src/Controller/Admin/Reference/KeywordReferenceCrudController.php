@@ -5,18 +5,13 @@ namespace App\Controller\Admin\Reference;
 use App\Controller\Admin\AtCrudController;
 use App\Controller\Admin\Filter\KeywordReferenceParentFilter;
 use App\Entity\Reference\KeywordReference;
-use App\Form\Reference\KeywordReferenceCollectionType;
 use App\Form\Reference\KeywordReferenceEditType;
-use Aws\Crypto\Polyfill\Key;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Filters;
-use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\CollectionField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
-use EasyCorp\Bundle\EasyAdminBundle\Field\TextEditorField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
-use EasyCorp\Bundle\EasyAdminBundle\Filter\BooleanFilter;
 
 class KeywordReferenceCrudController extends AtCrudController
 {
@@ -30,10 +25,6 @@ class KeywordReferenceCrudController extends AtCrudController
         return $filters
             ->add(KeywordReferenceParentFilter::new('parentFilter')->setFormTypeOption('mapped', false))
             ->add('parent')
-
-            // most of the times there is no need to define the
-            // filter type because EasyAdmin can guess it automatically
-            // ->add(BooleanFilter::new('published'))
         ;
     }
 

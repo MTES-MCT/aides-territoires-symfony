@@ -5,7 +5,6 @@ namespace App\Controller\Admin\Aid;
 use App\Controller\Admin\AtCrudController;
 use App\Entity\Aid\AidProject;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
-use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 
 class AidProjectDisplayCrudController extends AtCrudController
 {

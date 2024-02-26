@@ -5,7 +5,6 @@ namespace App\Controller\Admin\Blog;
 use App\Controller\Admin\AtCrudController;
 use App\Entity\Blog\BlogPost;
 use App\Field\TrumbowygField;
-use App\Field\VichImageField;
 use App\Repository\User\UserRepository;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;

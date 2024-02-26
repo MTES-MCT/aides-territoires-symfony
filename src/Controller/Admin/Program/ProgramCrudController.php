@@ -6,7 +6,6 @@ use App\Controller\Admin\AtCrudController;
 use App\Entity\Program\Program;
 use App\Field\TextLengthCountField;
 use App\Field\TrumbowygField;
-use App\Field\VichImageField;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;

@@ -4,10 +4,8 @@ namespace App\Controller\Admin\Backer;
 
 use App\Controller\Admin\AtCrudController;
 use App\Entity\Backer\BackerGroup;
-use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
-use EasyCorp\Bundle\EasyAdminBundle\Field\TextEditorField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 
 class BackerGroupCrudController extends AtCrudController

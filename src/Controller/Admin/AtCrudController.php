@@ -22,7 +22,6 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 enum Direction
 {
@@ -48,25 +47,6 @@ class AtCrudController extends AbstractCrudController
         public UserPasswordHasherInterface $userPasswordHasherInterface
     ) {
     }
-
-    /**
-     * Generates a URL from the given parameters.
-     *
-     * @see UrlGeneratorInterface
-     */
-    // protected function generateUrl(string $route, array $parameters = [], int $referenceType = UrlGeneratorInterface::ABSOLUTE_URL): string
-    // {
-    //     $url = $this->container->get('router')->generate($route, $parameters, $referenceType);
-    //     $request = $this->requestStack->getCurrentRequest();
-
-    //     if ($request->isSecure()) {
-    //         if (strpos($url, 'http:') !== false) {
-    //             $url = str_replace(['http:'], ['https:'], $url);
-    //         }
-    //     }
-
-    //     return $url;
-    // }
 
     public static function getEntityFqcn(): string
     {

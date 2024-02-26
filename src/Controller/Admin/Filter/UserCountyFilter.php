@@ -1,10 +1,7 @@
 <?php
 namespace App\Controller\Admin\Filter;
 
-use App\Entity\Perimeter\Perimeter;
 use App\Form\Admin\Filter\UserCountyFilterType;
-use App\Form\Admin\Filter\UserRoleFilterType;
-use App\Repository\Perimeter\PerimeterRepository;
 use Doctrine\ORM\QueryBuilder;
 use EasyCorp\Bundle\EasyAdminBundle\Contracts\Filter\FilterInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\EntityDto;
@@ -37,15 +34,6 @@ class UserCountyFilter implements FilterInterface
             ->andWhere('perimeterDepartment.id = :id')
             ->setParameter('id', $filterDataDto->getValue());
             ;
-
-        // $ids = $queryBuilder->getEntityManager()->getRepository(Perimeter::class)->getIdPerimetersContainedIn(['perimeter' => $filterDataDto->getValue()]);
-
-        // $queryBuilder
-        //     ->innerJoin('entity.organizations', 'organizations')
-        //     ->innerJoin('organizations.perimeter', 'perimeter')
-        //     ->andWhere('perimeter.id IN (:ids)')
-        //     ->setParameter('ids', $ids);
-        //     ;
 
         return;
     }

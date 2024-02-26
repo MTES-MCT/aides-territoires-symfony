@@ -9,7 +9,6 @@ use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
-use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\DateTimeField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\FormField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
@@ -37,7 +36,6 @@ class PageCrudController extends AtCrudController
         $displayOnFront = Action::new('displayOnFront', 'Afficher sur le site', 'far fa-eye')
             ->setHtmlAttributes(['title' => 'Afficher sur le site', 'target' => '_blank']) // titre
             ->linkToCrudAction('displayOnFront') // l'action appellée
-            // ->displayIf(fn ($entity) => $this->userService->isUserGranted($entity, User::ROLE_ADMIN)); // condition d'affichage
             ;
         
         return $actions

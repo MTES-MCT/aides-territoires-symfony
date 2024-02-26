@@ -6,12 +6,8 @@ use App\Controller\Admin\AtCrudController;
 use App\Controller\Admin\Filter\UserAdministratorOfSearchPageFilter;
 use App\Controller\Admin\Filter\UserCountyFilter;
 use App\Controller\Admin\Filter\UserRoleFilter;
-use App\Entity\Perimeter\Perimeter;
 use App\Entity\User\User;
-use App\Service\Export\CsvExporterService;
 use App\Service\Export\SpreadsheetExporterService;
-use Doctrine\ORM\EntityRepository;
-use EasyCorp\Bundle\EasyAdminBundle\Collection\FieldCollection;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
@@ -19,7 +15,6 @@ use EasyCorp\Bundle\EasyAdminBundle\Config\Filters;
 use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
 use EasyCorp\Bundle\EasyAdminBundle\Event\BeforeEntityPersistedEvent;
 use EasyCorp\Bundle\EasyAdminBundle\Event\BeforeEntityUpdatedEvent;
-use EasyCorp\Bundle\EasyAdminBundle\Factory\FilterFactory;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ChoiceField;
@@ -29,7 +24,6 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IntegerField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use EasyCorp\Bundle\EasyAdminBundle\Filter\ChoiceFilter;
-use EasyCorp\Bundle\EasyAdminBundle\Filter\EntityFilter;
 use EasyCorp\Bundle\EasyAdminBundle\Filter\NullFilter;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Response;
@@ -63,18 +57,6 @@ class UserCrudController extends AtCrudController implements EventSubscriberInte
             BeforeEntityUpdatedEvent::class => ['beforeEntityUpdatedEvent'],
             BeforeEntityPersistedEvent::class => ['beforeEntityPersisteddEvent'],
         ];
-    }
-
-    public function beforeEntityUpdatedEvent(BeforeEntityUpdatedEvent $event)
-    {
-        $entity = $event->getEntityInstance();
-        // dd($entity);
-    }
-
-    public function beforeEntityPersisteddEvent(BeforeEntityPersistedEvent $event)
-    {
-        $entity = $event->getEntityInstance();
-        // dd('persist', $entity);
     }
     
     public function configureFields(string $pageName): iterable
@@ -227,41 +209,4 @@ class UserCrudController extends AtCrudController implements EventSubscriberInte
     {
         return $this->exportSpreadsheet($context, $spreadsheetExporterService, $filename, 'csv');
     }
-
-    // public function createNewFormBuilder(EntityDto $entityDto, KeyValueStore $formOptions, AdminContext $context): FormBuilderInterface
-    // {
-    //     $formBuilder = parent::createNewFormBuilder($entityDto, $formOptions, $context);
-    //     return $this->addPasswordEventListener($formBuilder);
-    // }
-
-    // public function createEditFormBuilder(EntityDto $entityDto, KeyValueStore $formOptions, AdminContext $context): FormBuilderInterface
-    // {
-    //     $formBuilder = parent::createEditFormBuilder($entityDto, $formOptions, $context);
-    //     return $this->addPasswordEventListener($formBuilder);
-    // }
-
-    // private function addPasswordEventListener(FormBuilderInterface $formBuilder): FormBuilderInterface
-    // {
-    //     return $formBuilder->addEventListener(FormEvents::POST_SUBMIT, $this->hashPassword());
-    // }
-
-    // private function hashPassword() {
-    //     return function($event) {
-    //         $form = $event->getForm();
-    //         if (!$form->isValid()) {
-    //             return;
-    //         }
-    //         $password = null;
-    //         if ($form->has('password')) {
-    //             $password = $form->get('password')->getData();
-    //         }
-    //         if ($password === null) {
-    //             return;
-    //         }
-
-    //         $hash = $this->userPasswordHasherInterface->hashPassword($this->getUser(), $password);
-    //         $form->getData()->setPassword($hash);
-    //     };
-    // }
-    
 }

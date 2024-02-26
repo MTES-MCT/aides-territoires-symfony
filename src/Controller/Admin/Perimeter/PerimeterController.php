@@ -9,8 +9,6 @@ use App\Form\Admin\Perimeter\CombineType;
 use App\Form\Admin\Perimeter\ImportCsvInseeType;
 use App\Service\User\UserService;
 use Doctrine\Persistence\ManagerRegistry;
-use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
-use Sabberworm\CSS\Property\Import;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;

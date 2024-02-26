@@ -4,7 +4,6 @@ namespace App\Controller\Admin\Backer;
 
 use App\Controller\Admin\AtCrudController;
 use App\Entity\Backer\BackerCategory;
-use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 

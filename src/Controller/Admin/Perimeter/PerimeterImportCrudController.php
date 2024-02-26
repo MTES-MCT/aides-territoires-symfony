@@ -132,17 +132,6 @@ class PerimeterImportCrudController extends AtCrudController
     
     public function configureActions(Actions $actions): Actions
     {
-        // action pour afficher le qrCode
-        $import = Action::new('import', 'Importer')
-            ->setHtmlAttributes(['title' => 'Importer']) // titre
-            // ->linkToCrudAction('import') // l'action appellée
-            ->linkToRoute('admin_perimeter_import', function (PerimeterImport $entity) {
-                return [
-                    'id' => $entity->getId()
-                ];
-            })
-        ;
-
         $askImport = Action::new('askImport', 'Demander import')
             ->setHtmlAttributes(['title' => 'Demander import']) // titre
             ->linkToCrudAction('askImport') // l'action appellée
@@ -156,7 +145,6 @@ class PerimeterImportCrudController extends AtCrudController
 
         return
             $actions
-                // ->add(Crud::PAGE_INDEX, $import)
                 ->add(Crud::PAGE_INDEX, $export)
                 ->add(Crud::PAGE_EDIT, $export)
                 ->add(Crud::PAGE_INDEX, $askImport)
@@ -190,18 +178,6 @@ class PerimeterImportCrudController extends AtCrudController
                 ->generateUrl()
         );
     }
-    // public function import(AdminContext $context) : Response
-    // {
-
-    //     $form = $this->createFormBuilder()
-    //         ->add('file')
-    //         ->getForm();
-    //     return $this->render('admin/perimeter/import.html.twig', [
-    //         'form' => $form->createView(),
-    //         'test' => 'tutu'
-    //     ]);
-        
-    // }
 
     public function export(AdminContext $context): StreamedResponse
     {

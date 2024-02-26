@@ -30,11 +30,8 @@ class AidBackerFilter implements FilterInterface
 
         $queryBuilder
             ->innerJoin(sprintf('%s.aidFinancers', $filterDataDto->getEntityAlias()), 'aidFinancersFilter')
-            // ->innerJoin(sprintf('%s.aidInstructors', $filterDataDto->getEntityAlias()), 'aidInstructorsFilter')
             ->innerJoin('aidFinancersFilter.backer', 'backerFinancersFilter')
-            // ->innerJoin('aidInstructorsFilter.backer', 'backerInstructorsFilter')
             ->andWhere('backerFinancersFilter = :backer')
-            // ->andWhere('backerFinancersFilter = :backer OR backerInstructorsFilter = :backer')
             ->setParameter('backer', $filterDataDto->getValue())
         ;
 

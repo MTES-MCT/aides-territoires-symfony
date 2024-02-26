@@ -5,7 +5,6 @@ namespace App\Controller\Admin\Perimeter;
 use App\Entity\Perimeter\PerimeterData;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
-use EasyCorp\Bundle\EasyAdminBundle\Field\TextEditorField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 
 class PerimeterDataCrudController extends AbstractCrudController

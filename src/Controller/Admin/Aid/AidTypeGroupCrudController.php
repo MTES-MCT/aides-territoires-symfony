@@ -4,9 +4,7 @@ namespace App\Controller\Admin\Aid;
 
 use App\Controller\Admin\AtCrudController;
 use App\Entity\Aid\AidTypeGroup;
-use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
-use EasyCorp\Bundle\EasyAdminBundle\Field\TextEditorField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 
 class AidTypeGroupCrudController extends AtCrudController

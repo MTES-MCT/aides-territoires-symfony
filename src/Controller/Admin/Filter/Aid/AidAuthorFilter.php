@@ -2,7 +2,6 @@
 namespace App\Controller\Admin\Filter\Aid;
 
 use App\Form\Admin\Filter\Aid\AidAuthorFilterType;
-use App\Repository\Aid\AidRepository;
 use Doctrine\ORM\QueryBuilder;
 use EasyCorp\Bundle\EasyAdminBundle\Contracts\Filter\FilterInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\EntityDto;

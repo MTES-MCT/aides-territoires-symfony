@@ -8,12 +8,6 @@ use App\Entity\Aid\Aid;
 use App\Entity\Search\SearchPage;
 use App\Field\TextLengthCountField;
 use App\Field\TrumbowygField;
-use App\Field\VichImageField;
-use App\Service\Aid\AidSearchFormService;
-use App\Service\File\FileService;
-use App\Service\Image\ImageService;
-use App\Service\Various\ParamService;
-use Doctrine\Persistence\ManagerRegistry;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
@@ -30,7 +24,6 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\TextareaField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\UrlField;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
-use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class SearchPageCrudController extends AtCrudController
@@ -92,7 +85,6 @@ class SearchPageCrudController extends AtCrudController
             $aidParams = $this->aidSearchFormService->convertQuerystringToParams($entity->getSearchQuerystring());
             $aids = $this->managerRegistry->getRepository(Aid::class)->findCustom($aidParams);
 
-            // $aidParams = array_merge($aidParams, ['inAdmin' => true]);
             $this->getContext()->getEntity()->getInstance()->setNbAids(
                 count($aids)
             );

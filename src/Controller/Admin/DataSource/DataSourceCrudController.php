@@ -70,18 +70,8 @@ class DataSourceCrudController extends AtCrudController
 
     public function configureActions(Actions $actions): Actions
     {
-        $analyse = Action::new('analyse', 'Analyser')
-        ->setHtmlAttributes(['title' => 'Importer']) // titre
-        // ->linkToCrudAction('import') // l'action appellée
-        ->linkToRoute('admin_data_source_analyse', function (DataSource $entity) {
-            return [
-                'id' => $entity->getId()
-            ];
-        });
         return parent::configureActions($actions)
-            // ->remove(Crud::PAGE_INDEX, Action::EDIT)
             ->remove(Crud::PAGE_INDEX, Action::DELETE)
-            // ->add(Crud::PAGE_INDEX, $analyse)
         ;
     }
 }

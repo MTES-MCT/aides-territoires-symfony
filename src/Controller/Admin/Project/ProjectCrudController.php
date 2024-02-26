@@ -6,7 +6,6 @@ use App\Controller\Admin\Aid\AidProjectDisplayCrudController;
 use App\Controller\Admin\AtCrudController;
 use App\Entity\Project\Project;
 use App\Field\TrumbowygField;
-use App\Field\VichImageField;
 use App\Repository\Keyword\KeywordSynonymlistRepository;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
