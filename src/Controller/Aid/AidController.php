@@ -2,8 +2,6 @@
 
 namespace App\Controller\Aid;
 
-use App\Controller\Admin\Aid\AidCrudController;
-use App\Controller\Admin\DashboardController;
 use App\Controller\FrontController;
 use App\Entity\Aid\Aid;
 use App\Entity\Aid\AidFinancer;
@@ -15,7 +13,6 @@ use App\Entity\Perimeter\Perimeter;
 use App\Entity\Project\Project;
 use App\Entity\Reference\ProjectReference;
 use App\Entity\User\User;
-use App\Form\Aid\AidSearchType;
 use App\Form\Aid\AidSearchTypeV2;
 use App\Form\Aid\SuggestToProjectType;
 use App\Form\Alert\AlertCreateType;
@@ -38,8 +35,6 @@ use App\Service\Various\ParamService;
 use App\Service\Various\StringService;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Persistence\ManagerRegistry;
-use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
-use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
 use Pagerfanta\Adapter\ArrayAdapter;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
@@ -64,7 +59,6 @@ class AidController extends FrontController
     #[Route('/aides/', name: 'app_aid_aid')]
     public function index(
         RequestStack $requestStack,
-        AidRepository $aidRepository,
         BlogPromotionPostRepository $blogPromotionPostRepository,
         UserService $userService,
         AidSearchFormService $aidSearchFormService,
@@ -583,7 +577,6 @@ class AidController extends FrontController
                 
                 // redirection page mes projets
                 return $this->redirect($requestStack->getCurrentRequest()->getUri());
-                // return $this->redirectToRoute('app_user_project_structure');
             }
         }
 

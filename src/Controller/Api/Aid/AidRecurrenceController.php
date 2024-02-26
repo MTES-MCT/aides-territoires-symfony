@@ -3,7 +3,6 @@
 namespace App\Controller\Api\Aid;
 
 use App\Controller\Api\ApiController;
-use App\Repository\Aid\AidDestinationRepository;
 use App\Repository\Aid\AidRecurrenceRepository;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Attribute\AsController;

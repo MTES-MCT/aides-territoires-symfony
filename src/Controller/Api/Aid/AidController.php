@@ -133,7 +133,7 @@ class AidController extends ApiController
         $response->setEncodingOptions(JSON_UNESCAPED_SLASHES);
         return $response;
     }
-    #[Route('/api/aids/{slug}/', name: 'api_aid_by_slug', priority: 5)]
+    #[Route('/api/aids/{slug}/', name: 'api_aid_by_slug', priority: 4)]
     public function bySlug(
         $slug,
         AidRepository $aidRepository,
