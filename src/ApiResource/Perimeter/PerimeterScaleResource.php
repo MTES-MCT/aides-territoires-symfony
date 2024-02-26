@@ -5,9 +5,7 @@ namespace App\ApiResource\Perimeter;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\OpenApi\Model;
-use App\Controller\Api\Aid\AidController;
 use App\Controller\Api\Perimeter\PerimeterController;
-use App\Entity\Aid\Aid;
 
 #[ApiResource(
     shortName: 'Périmètres',

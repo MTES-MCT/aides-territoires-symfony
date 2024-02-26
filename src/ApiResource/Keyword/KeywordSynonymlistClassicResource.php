@@ -4,11 +4,7 @@ namespace App\ApiResource\Keyword;
 
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
-use ApiPlatform\OpenApi\Model;
-use App\Controller\Api\Aid\AidController;
 use App\Controller\Api\Keyword\KeywordSynonymlistController;
-use App\Controller\Api\Perimeter\PerimeterController;
-use App\Entity\Aid\Aid;
 
 #[ApiResource(
     shortName: 'synonymlists',
@@ -17,10 +13,7 @@ use App\Entity\Aid\Aid;
             name: self::API_OPERATION_NAME,
             uriTemplate: '/api/synonymlists/classic-list/',
             controller: KeywordSynonymlistController::class,
-            normalizationContext: ['groups' => self::API_GROUP_LIST],
-            // openapi: new Model\Operation(
-            //     summary: 'Lister tous les choix d\'échelles', 
-            // )
+            normalizationContext: ['groups' => self::API_GROUP_LIST]
         ),
     ],
 )]
