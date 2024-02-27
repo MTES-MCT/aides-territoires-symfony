@@ -415,8 +415,16 @@ class AidRepository extends ServiceEntityRepository
         $dateCreateMax = $params['dateCreateMax'] ?? null;
         $projectReference = $params['projectReference'] ?? null;
         $dateCheckBrokenLinkMax = $params['dateCheckBrokenLinkMax'] ?? null;
+        $nameLike = $params['nameLike'] ?? null;
 
         $qb = $this->createQueryBuilder('a');
+
+        if ($nameLike !== null) {
+            $qb
+                ->andWhere('a.name LIKE :nameLike')
+                ->setParameter('nameLike', '%'.$nameLike.'%')
+                ;
+        }
 
         if ($dateCheckBrokenLinkMax instanceof \DateTime) {
             $qb

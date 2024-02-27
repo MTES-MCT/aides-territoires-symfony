@@ -1,0 +1,21 @@
+@import 'trumbowyg/dist/ui/trumbowyg.min.css';
+@import 'remixicon/fonts/remixicon.css';
+@import '../../_variables';
+@import '../../_mixins';
+@import '../../form/tom-select-override';
+@import '../../form/trumbowyg-override';
+@import '../../form/label';
+@import '../../form/legend';
+
+.btn-delete-collection-generic{
+    border-color: #e1000f!important;
+    color: #e1000f;
+}
+
+.collection-item-wrapper-generic{
+    >div{
+        >div:last-child{
+            text-align: right;
+        }
+    }
+}

@@ -1,0 +1,84 @@
+{% extends 'base.html.twig' %}
+
+
+{% block stylesheets %}
+	{{ parent() }}
+	{{ encore_entry_link_tags('import-scss/user/searchpage/edit') }}
+{% endblock %}
+
+{% block javascripts %}
+	{{ parent() }}
+    {{ encore_entry_script_tags('form/checkbox-multiple-search') }}
+    {{ encore_entry_script_tags('form/entity-checkbox-absolute-type') }}
+	{{ encore_entry_script_tags('front/aid/aid/edit') }}
+	{{ encore_entry_script_tags('front/user/searchpage/edit') }}
+{% endblock %}
+
+{% block title %}Editer votre portail {{ searchPage.name }} {{ parent() }}{% endblock %}
+
+{% block body %}
+
+<div class="fr-container fr-mb-5w fr-mt-0">
+    <div class="fr-grid-row">
+        {% include "user/_menu_user.html.twig" with { user_portals:true, user_portal_selected: searchPage.id } %}
+        
+        <div class="fr-col-12 fr-col-md-9">
+            <h1 class="fr-h3">Mon portail « {{ searchPage.name }} »</h1>
+
+            {{ form_start(form) }}
+                <fieldset>
+                    <legend>Contenu</legend>
+                        {{ form_row(form.description) }}
+                        {{ form_row(form.moreContent) }}
+                </fieldset>
+                
+                <fieldset>
+                    <legend>À propos de cette page</legend>
+
+                </fieldset>
+
+                <fieldset>
+                    <legend>Mettre en avant des aides</legend>
+                    {{ form_row(form.highlightedAids) }}
+                </fieldset>
+
+                <fieldset>
+                    <legend>Exclure des aides des résultats</legend>
+                    {{ form_row(form.excludedAids) }}
+                </fieldset>
+
+                
+
+                <div class="form-group form-control-width-auto">
+                    {{ form_label(form.pages) }}
+                    {# store the prototype on the data-prototype attribute #}
+                    <div id="pages-list" class="form-group-display-inline-block"
+                        data-prototype="{{ form_widget(form.pages.vars.prototype)|e }}"
+                        data-widget-tags="{{ '<div class="collection-item-wrapper-generic fr-mb-2w"></div>'|e }}"
+                        data-widget-counter="{{ form.pages|length }}">
+                        {% for page in form.pages %}
+                            <div class="collection-item-wrapper-generic fr-mb-2w">
+                                {{ form_errors(page) }}
+                                {{ form_widget(page.name) }}
+                                {{ form_widget(page.description) }}
+                                {{ form_widget(page.delete) }}
+                            </div>
+                        {% endfor %}
+                    </div>
+
+                    <button type="button"
+                            class="add-another-collection-widget fr-btn fr-btn--secondary fr-btn--icon-left fr-icon-add-circle-line"
+                            data-list-selector="#pages-list">Ajouter un autre onglet</button>
+                </div>
+                                        
+                <footer class="fr-mt-5w">
+                    <button type="submit" class="fr-btn">Modifier</button>
+                </footer>
+
+                <p class="fr-hint-text fr-mt-2w">Les champs marqués d’un astérisque (*) sont obligatoires.</p>
+
+            {{ form_end(form) }}
+        </div>
+    </div>
+</div>
+{% endblock %}
