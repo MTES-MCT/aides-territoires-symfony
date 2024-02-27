@@ -3,12 +3,8 @@
 namespace App\Form\User\SearchPage;
 
 use App\Entity\Aid\Aid;
-use App\Entity\Category\Category;
-use App\Entity\Organization\OrganizationType;
 use App\Entity\Search\SearchPage;
-use App\Entity\User\User;
 use App\Form\Type\AidAutocompleteType;
-use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
@@ -61,12 +57,13 @@ class SearchPageEditType extends AbstractType
                     'createOnBlur' => true,
                     'delimiter' => '$%§'
                 ],
-                'constrains' => [
+                'constraints' => [
                     new Count(max: 9)
                 ]
             ])
 
             ->add('excludedAids', AidAutocompleteType::class, [
+                'required' => false,
                 'label' => 'Exclure des aides des résultats',
                 'help' => 'Tapez le nom exact de l\'aide pour la sélectionner',
                 'class' => Aid::class,
@@ -80,13 +77,14 @@ class SearchPageEditType extends AbstractType
             ])
 
             ->add('pages', CollectionType::class, [
+                'required' => true,
                 'entry_type' => SearchPageOngletType::class,
                 'entry_options' => array(
                     'label' => false
                 ),
                 'allow_add' => true,
                 'allow_delete' => true,
-                'label' => 'Onglets',
+                'label' => false,
                 'by_reference' => false
             ])
         ;

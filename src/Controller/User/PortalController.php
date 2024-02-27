@@ -8,6 +8,7 @@ use App\Entity\User\User;
 use App\Form\User\SearchPage\SearchPageEditType;
 use App\Repository\Search\SearchPageRepository;
 use App\Service\User\UserService;
+use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -19,7 +20,8 @@ class PortalController extends FrontController
         $id,
         SearchPageRepository $searchPageRepository,
         RequestStack $requestStack,
-        UserService $userService
+        UserService $userService,
+        ManagerRegistry $managerRegistry
     ): Response
     {
         // verification user
@@ -39,7 +41,15 @@ class PortalController extends FrontController
         $form->handleRequest($requestStack->getCurrentRequest());
         if ($form->isSubmitted()) {
             if ($form->isValid()) {
+                // sauvegarde
+                $managerRegistry->getManager()->persist($searchPage);
+                $managerRegistry->getManager()->flush();
 
+                // message
+                $this->addFlash(FrontController::FLASH_SUCCESS, 'Vos modifications ont bien été enregistrées');
+
+                // redirection
+                return $this->redirectToRoute('app_user_portal_edit', ['id' => $id]);
             } else {
                 $this->addFlash(FrontController::FLASH_ERROR, 'Le formulaire contient des erreurs');
             }

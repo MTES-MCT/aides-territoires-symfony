@@ -25,51 +25,56 @@
         <div class="fr-col-12 fr-col-md-9">
             <h1 class="fr-h3">Mon portail « {{ searchPage.name }} »</h1>
 
+            <div class="link-to-visit fr-mb-2w">
+                <a href="{{ path('app_portal_portal_details', {'slug': searchPage.slug}) }}" class="fr-btn fr-btn--secondary" target="_blank" title="Voir le portail - Ouvre un nouvel onglet">Voir le portail</a>
+            </div>
+
             {{ form_start(form) }}
-                <fieldset>
+                <fieldset class="optgroup fr-mb-2w">
                     <legend>Contenu</legend>
                         {{ form_row(form.description) }}
                         {{ form_row(form.moreContent) }}
                 </fieldset>
                 
-                <fieldset>
+                <fieldset class="optgroup fr-mb-2w">
                     <legend>À propos de cette page</legend>
 
                 </fieldset>
 
-                <fieldset>
+                <fieldset class="optgroup fr-mb-2w">
                     <legend>Mettre en avant des aides</legend>
                     {{ form_row(form.highlightedAids) }}
                 </fieldset>
 
-                <fieldset>
+                <fieldset class="optgroup fr-mb-2w">
                     <legend>Exclure des aides des résultats</legend>
                     {{ form_row(form.excludedAids) }}
                 </fieldset>
 
-                
+                <fieldset class="optgroup fr-mb-2w">
+                    <legend>Onglets</legend>
+                    <div class="form-group form-control-width-auto">
+                        {{ form_label(form.pages) }}
+                        {# store the prototype on the data-prototype attribute #}
+                        <div id="pages-list" class="form-group-display-inline-block"
+                            data-prototype="{{ form_widget(form.pages.vars.prototype)|e }}"
+                            data-widget-tags="{{ '<div class="collection-item-wrapper-generic fr-mb-2w"></div>'|e }}"
+                            data-widget-counter="{{ form.pages|length }}">
+                            {% for page in form.pages %}
+                                <div class="collection-item-wrapper-generic fr-mb-2w">
+                                    {{ form_errors(page) }}
+                                    {{ form_widget(page) }}
+                                </div>
+                            {% endfor %}
+                        </div>
 
-                <div class="form-group form-control-width-auto">
-                    {{ form_label(form.pages) }}
-                    {# store the prototype on the data-prototype attribute #}
-                    <div id="pages-list" class="form-group-display-inline-block"
-                        data-prototype="{{ form_widget(form.pages.vars.prototype)|e }}"
-                        data-widget-tags="{{ '<div class="collection-item-wrapper-generic fr-mb-2w"></div>'|e }}"
-                        data-widget-counter="{{ form.pages|length }}">
-                        {% for page in form.pages %}
-                            <div class="collection-item-wrapper-generic fr-mb-2w">
-                                {{ form_errors(page) }}
-                                {{ form_widget(page.name) }}
-                                {{ form_widget(page.description) }}
-                                {{ form_widget(page.delete) }}
-                            </div>
-                        {% endfor %}
+                        <button type="button"
+                                class="add-another-collection-widget fr-btn fr-btn--secondary fr-btn--icon-left fr-icon-add-circle-line"
+                                data-list-selector="#pages-list">Ajouter un autre onglet</button>
                     </div>
+                </fieldset>
 
-                    <button type="button"
-                            class="add-another-collection-widget fr-btn fr-btn--secondary fr-btn--icon-left fr-icon-add-circle-line"
-                            data-list-selector="#pages-list">Ajouter un autre onglet</button>
-                </div>
+
                                         
                 <footer class="fr-mt-5w">
                     <button type="submit" class="fr-btn">Modifier</button>

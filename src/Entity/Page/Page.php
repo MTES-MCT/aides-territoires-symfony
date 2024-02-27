@@ -20,6 +20,7 @@ class Page
     #[ORM\Column]
     private ?int $id = null;
 
+    #[Gedmo\Slug(fields: ['name'])]
     #[ORM\Column(length: 255, unique: true)]
     #[AtAssert\PageUrl]
     private ?string $url = null;

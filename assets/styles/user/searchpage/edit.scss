@@ -7,12 +7,17 @@
 @import '../../form/label';
 @import '../../form/legend';
 
+.link-to-visit{
+    text-align: right;
+}
 .btn-delete-collection-generic{
     border-color: #e1000f!important;
     color: #e1000f;
 }
 
 .collection-item-wrapper-generic{
+    padding: 0 0 2rem 5rem;
+    border-bottom: 1px solid #ccc;
     >div{
         >div:last-child{
             text-align: right;
