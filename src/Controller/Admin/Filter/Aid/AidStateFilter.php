@@ -31,6 +31,7 @@ class AidStateFilter implements FilterInterface
         $state = $filterDataDto->getValue();
         switch ($state) {
             case 'live':
+            case 'showInSearch':
                 $queryBuilder->addCriteria(AidRepository::showInSearchCriteria($filterDataDto->getEntityAlias().'.'));
                 break;
             case 'hidden':
