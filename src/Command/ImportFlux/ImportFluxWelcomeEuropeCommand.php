@@ -123,7 +123,7 @@ class ImportFluxWelcomeEuropeCommand extends ImportFluxCommand
         foreach ($keys as $key) {
             if (isset($aidToImport[$key])) {
                 try {
-                    $dateStart = new \DateTime($aidToImport[$key]);
+                    $dateStart = \DateTime::createFromFormat('Ymd', $aidToImport[$key]);
                 } catch (\Exception $e) {
                     $dateStart = null;
                 }
@@ -135,7 +135,7 @@ class ImportFluxWelcomeEuropeCommand extends ImportFluxCommand
         foreach ($keys as $key) {
             if (isset($aidToImport[$key])) {
                 try {
-                    $dateSubmissionDeadline = new \DateTime($aidToImport[$key]);
+                    $dateSubmissionDeadline = \DateTime::createFromFormat('Ymd', $aidToImport[$key]);
                 } catch (\Exception $e) {
                     $dateSubmissionDeadline = null;
                 }
