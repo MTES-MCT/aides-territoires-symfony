@@ -12,6 +12,7 @@ use App\Entity\Category\Category;
 use App\Entity\Keyword\Keyword;
 use App\Entity\Organization\OrganizationType;
 use App\Entity\Perimeter\Perimeter;
+use App\Entity\Reference\KeywordReference;
 
 #[AsCommand(name: 'at:import_flux:ademe_agir', description: 'Import de flux ADEME AGIR')]
 class ImportFluxAdemeAgirCommand extends ImportFluxCommand
@@ -291,19 +292,18 @@ class ImportFluxAdemeAgirCommand extends ImportFluxCommand
         foreach ($aidToImport['thematiques'] as $thematique) {
             if (isset($mapping[$thematique])) {
                 foreach ($mapping[$thematique] as $category) {
-                    $keyword = $this->managerRegistry->getRepository(Keyword::class)->findOneBy([
-                        'slug' => $category['slug']
+                    $keyword = $this->managerRegistry->getRepository(KeywordReference::class)->findOneBy([
+                        'name' => $category['name']
                     ]);
-                    if (!$keyword instanceof Keyword) {
+                    if (!$keyword instanceof KeywordReference) {
                         // nouveau keyword, on le créer
-                        $keyword = new Keyword();
+                        $keyword = new KeywordReference();
                         $keyword->setName($category['name']);
-                        $keyword->setSlug($category['slug']);
                         $this->managerRegistry->getManager()->persist($keyword);
                     }
 
                     // ajoute le keyword à l'aide
-                    $aid->addKeyword($keyword);
+                    $aid->addKeywordReference($keyword);
                 }
             }
         }

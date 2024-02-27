@@ -11,6 +11,7 @@ use App\Entity\Aid\AidType;
 use App\Entity\Category\Category;
 use App\Entity\Keyword\Keyword;
 use App\Entity\Organization\OrganizationType;
+use App\Entity\Reference\KeywordReference;
 
 #[AsCommand(name: 'at:import_flux:ministere_culture', description: 'Import de flux du ministère de la culture')]
 class ImportFluxMinistereCultureCommand extends ImportFluxCommand
@@ -289,7 +290,7 @@ class ImportFluxMinistereCultureCommand extends ImportFluxCommand
             return $aid;
         }
 
-        $keywords = $this->managerRegistry->getRepository(Keyword::class)->findAll();
+        $keywords = $this->managerRegistry->getRepository(KeywordReference::class)->findAll();
         $keywordsByName = [];
         foreach ($keywords as $keyword) {
             $keywordsByName[$keyword->getName()] = $keyword;
@@ -297,14 +298,13 @@ class ImportFluxMinistereCultureCommand extends ImportFluxCommand
 
         foreach ($aidToImport['eztag_theme'] as $thematique) {
             if (!isset($keywordsByName[$thematique])) {
-                $keyword = new Keyword();
+                $keyword = new KeywordReference();
                 $keyword->setName($thematique);
-                $keyword->setSlug($this->stringService->getSlug($thematique));
                 $this->managerRegistry->getManager()->persist($keyword);
                 $keywordsByName[$thematique] = $keyword;
             }
-            if ($keywordsByName[$thematique] instanceof Keyword) {
-                $aid->addKeyword($keywordsByName[$thematique]);
+            if ($keywordsByName[$thematique] instanceof KeywordReference) {
+                $aid->addKeywordReference($keywordsByName[$thematique]);
             }
         }
 

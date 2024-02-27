@@ -11,6 +11,7 @@ use App\Entity\Aid\AidType;
 use App\Entity\Category\Category;
 use App\Entity\Keyword\Keyword;
 use App\Entity\Organization\OrganizationType;
+use App\Entity\Reference\KeywordReference;
 
 #[AsCommand(name: 'at:import_flux:ile_de_france', description: 'Import de flux ile de france')]
 class ImportFluxIleDeFranceCommand extends ImportFluxCommand
@@ -325,14 +326,14 @@ class ImportFluxIleDeFranceCommand extends ImportFluxCommand
         $categories = $aidToImport['competences'] ?? [];
 
         foreach ($categories as $category) {
-            $keyword = $this->managerRegistry->getRepository(Keyword::class)->findOneBy([
+            $keyword = $this->managerRegistry->getRepository(KeywordReference::class)->findOneBy([
                 'name' => $category['title']
             ]);
-            if (!$keyword instanceof Keyword) {
-                $keyword = new Keyword();
+            if (!$keyword instanceof KeywordReference) {
+                $keyword = new KeywordReference();
                 $keyword->setName($category['title']);
             }
-            $aid->addKeyword($keyword);
+            $aid->addKeywordReference($keyword);
         }
         return $aid;
     }

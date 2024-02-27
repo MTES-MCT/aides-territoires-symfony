@@ -12,6 +12,7 @@ use App\Entity\Aid\AidType;
 use App\Entity\Category\Category;
 use App\Entity\Keyword\Keyword;
 use App\Entity\Organization\OrganizationType;
+use App\Entity\Reference\KeywordReference;
 
 #[AsCommand(name: 'at:import_flux:cdm', description: 'Import de flux conseil départemental de la manche')]
 class ImportFluxCdmCommand extends ImportFluxCommand
@@ -154,9 +155,9 @@ class ImportFluxCdmCommand extends ImportFluxCommand
             return $aid;
         }
         foreach ($aidToImport['categories'] as $categoryName) {
-            $keyword = $this->managerRegistry->getRepository(Keyword::class)->findOneBy(['name' => $categoryName]);
-            if ($keyword instanceof Keyword) {
-                $aid->addKeyword($keyword);
+            $keyword = $this->managerRegistry->getRepository(KeywordReference::class)->findOneBy(['name' => $categoryName]);
+            if ($keyword instanceof KeywordReference) {
+                $aid->addKeywordReference($keyword);
             }
         }
         return $aid;
