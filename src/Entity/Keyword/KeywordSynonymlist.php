@@ -12,7 +12,6 @@ use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
-use ApiPlatform\OpenApi\Model;
 use App\Controller\Api\Keyword\KeywordSynonymlistController;
 
 #[ApiResource(
@@ -22,9 +21,6 @@ use App\Controller\Api\Keyword\KeywordSynonymlistController;
             uriTemplate: '/synonymlists/',
             controller: KeywordSynonymlistController::class,
             normalizationContext: ['groups' => self::API_GROUP_LIST],
-            // openapi: new Model\Operation(
-            //     summary: 'Lister tous les programmes d\'aides', 
-            // ),
         ),
     ],
 )]

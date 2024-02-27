@@ -7,7 +7,6 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
 
-//TODO a faire, voir log_event dans le python
 #[ORM\Entity(repositoryClass: LogEventRepository::class)]
 #[ORM\Index(columns: ['category'], name: 'category_event')]
 #[ORM\Index(columns: ['event'], name: 'event_event')]

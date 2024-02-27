@@ -5,7 +5,6 @@ namespace App\Entity\Aid;
 use App\Entity\Backer\Backer;
 use App\Repository\Aid\AidInstructorRepository;
 use Doctrine\ORM\Mapping as ORM;
-use Gedmo\Mapping\Annotation as Gedmo;
 use Symfony\Component\Serializer\Annotation\Groups;
 #[ORM\Entity(repositoryClass: AidInstructorRepository::class)]
 class AidInstructor
@@ -16,7 +15,6 @@ class AidInstructor
     private ?int $id = null;
 
     #[ORM\Column]
-    // #[Gedmo\SortablePosition]
     private ?int $position = null;
 
     #[ORM\ManyToOne(inversedBy: 'aidInstructors')]

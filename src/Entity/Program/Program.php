@@ -20,7 +20,6 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\OpenApi\Model;
 use App\Controller\Api\Program\ProgramController;
-use Symfony\Component\Serializer\Attribute\Ignore;
 
 #[ApiResource(
     operations: [

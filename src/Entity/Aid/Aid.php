@@ -103,66 +103,6 @@ use App\Filter\Aid\AidTypeGroupFilter;
 #[ApiFilter(AidCallForProjectOnlyFilter::class)]
 #[ApiFilter(AidIsChargedFilter::class)]
 #[ApiFilter(AidPerimeterFilter::class)]
-// #[ApiFilter(SearchFilter::class, properties:
-//     [
-//         'name' => SearchFilterInterface::STRATEGY_IPARTIAL,
-//         'description' => SearchFilterInterface::STRATEGY_IPARTIAL,
-//         'aidAudiences.slug' => SearchFilterInterface::STRATEGY_EXACT,
-//         'aidTypes.aidTypeGroup.slug' => SearchFilterInterface::STRATEGY_EXACT,
-//         'aidTypes.slug' => SearchFilterInterface::STRATEGY_EXACT,
-//         'aidDestinations.slug' => SearchFilterInterface::STRATEGY_EXACT,
-//         'aidRecurrence.slug' => SearchFilterInterface::STRATEGY_EXACT,
-//         'perimeter.id' => SearchFilterInterface::STRATEGY_EXACT,
-//         'financers.backer.id' => SearchFilterInterface::STRATEGY_EXACT,
-//         'programs.slug' => SearchFilterInterface::STRATEGY_EXACT,
-//         'categories.categoryTheme.slug' => SearchFilterInterface::STRATEGY_EXACT,
-//         'categories.slug' => SearchFilterInterface::STRATEGY_EXACT,
-//         'originUrl' => SearchFilterInterface::STRATEGY_EXACT,
-//     ]
-// )]
-// #[ApiFilter(DateFilter::class, properties:
-//     [
-//         'dateSubmissionDeadline',
-//         'timePublished'
-//     ]
-// )]
-// #[ApiFilter(BooleanFilter::class, properties:
-//     [
-//         'isCallForProject',
-//         'isCharged',
-//         'inFranceRelance',
-//         'isGeneric',
-//     ]
-// )]
-// #[ApiFilter(OrderFilter::class, properties:
-//     [
-//         'id' => 'ASC',
-//         'name' => 'DESC'
-//     ]
-// )]
-// #[ApiFilter(SimpleSearchFilter::class, properties:['name', 'description'], arguments: ['searchParameterName'=>'text'])]
-// #[ApiFilter(
-//     SearchFilter::class, 
-//     properties: ['aidAudiences.slug' => 'exact', ],
-// )]
-// #[ApiFilter(
-//     AtSearchFilter::class, 
-//     properties: ['aidAudiences.slug' => 'exact'],
-//     arguments: [
-//         'swaggerDescription' => [
-//             'name' => 'audiences',
-//             'description' => 'Les audiences cibles',
-//             'openapi' => [
-//                 'examples' => [
-//                     ['value' => 'commune', 'summary' => 'Commune'],
-//                     ['value' => 'farmer', 'summary' => 'Agriculteur'],
-//                 ],
-//                 'example' => 'commune'
-//             ]
-//         ]
-//     ]
-// )]
-// #[ApiFilter(SearchFilter::class, properties: ['author.email' => 'exact'])]
 class Aid
 {
     const API_OPERATION_GET_BY_SLUG = 'api_aid_get_by_slug';

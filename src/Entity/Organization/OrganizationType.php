@@ -7,7 +7,6 @@ use App\Entity\Blog\BlogPromotionPost;
 use App\Entity\Log\LogAidSearch;
 use App\Entity\Log\LogAidView;
 use App\Entity\Search\SearchPage;
-use App\Entity\User\User;
 use App\Repository\Organization\OrganizationTypeRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
