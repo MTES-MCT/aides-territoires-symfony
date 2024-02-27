@@ -249,7 +249,7 @@ class AidSearchFormService
                 $aidSearchClass->setOrganizationType($organizationType);
             }
         }
-
+        
         // nouveau paramètre
         if (isset($queryParams['organizationType'])) {
             $organizationType = $this->managerRegistry->getRepository(OrganizationType::class)->findOneBy(['slug' => (string) $queryParams['organizationType']]);
@@ -266,12 +266,12 @@ class AidSearchFormService
         }
 
         if (is_array($params)) {
-            if (array_key_exists('forceOrganizationType', $params)) {
+            if (array_key_exists('forceOrganizationType', $params) && !$aidSearchClass->getOrganizationType()) {
                 $aidSearchClass->setOrganizationType($params['forceOrganizationType']);
             }
         }
         
-        if (isset($queryParams['forceOrganizationType']) && $queryParams['forceOrganizationType'] == 'null') {
+        if (isset($queryParams['forceOrganizationType']) && $queryParams['forceOrganizationType'] == 'null' && !$aidSearchClass->getOrganizationType()) {
             $aidSearchClass->setOrganizationType(null);
         }
 
