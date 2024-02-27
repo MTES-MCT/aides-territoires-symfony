@@ -54,7 +54,7 @@ class AidListener
                             'PRENOM' => $aid->getAuthor()->getFirstname(),
                             'NOM' => $aid->getAuthor()->getLastname(),
                             'AIDE_NOM' => $aid->getName(),
-                            'AIDE_URL' => $this->aidService->getUrl($aid, UrlGeneratorInterface::RELATIVE_PATH),
+                            'AIDE_URL' => $this->aidService->getUrl($aid, UrlGeneratorInterface::ABSOLUTE_URL),
                             'BASE_URL' => $this->routerInterface->generate('app_home', [], UrlGeneratorInterface::ABSOLUTE_URL)
                         ]
                     );
