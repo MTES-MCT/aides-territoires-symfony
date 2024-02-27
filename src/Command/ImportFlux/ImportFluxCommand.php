@@ -98,6 +98,9 @@ class ImportFluxCommand extends Command
         $io->success('Update : ' . $this->update);
         $io->success('Erreur : ' . $this->error);
 
+        // met à jour le last access
+        $this->dataSource->setTimeLastAccess(new \DateTime(date('Y-m-d H:i:s')));
+
         $timeEnd = microtime(true);
         $time = $timeEnd - $timeStart;
 
