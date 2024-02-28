@@ -35,7 +35,28 @@
                 
                 <fieldset class="optgroup fr-mb-2w">
                     <legend>À propos de cette page</legend>
-
+                    {% if searchPage.timeCreate %}
+                    <p>
+                    Date de création :
+                    <br />
+                    {{ searchPage.timeCreate|format_datetime('long', 'short', locale='fr') }}
+                    </p>
+                    <hr />
+                    {% endif %}
+                    {% if searchPage.timeUpdate %}
+                    <p>
+                    Date de mise à jour :
+                    <br />
+                    {{ searchPage.timeUpdate|format_datetime('long', 'short', locale='fr') }}
+                    </p>
+                    <hr />
+                    {% endif %}
+                    <p>
+                    Nombre d’aides actuellement visibles :
+                    <br />
+                    {{ nbAids }} (dont aides locales : {{ nbLocals }})
+                    </p>
+                </fieldset>
                 </fieldset>
 
                 <fieldset class="optgroup fr-mb-2w">

@@ -3,10 +3,13 @@
 namespace App\Controller\User;
 
 use App\Controller\FrontController;
+use App\Entity\Aid\Aid;
 use App\Entity\Search\SearchPage;
 use App\Entity\User\User;
 use App\Form\User\SearchPage\SearchPageEditType;
 use App\Repository\Search\SearchPageRepository;
+use App\Service\Aid\AidSearchFormService;
+use App\Service\Aid\AidService;
 use App\Service\User\UserService;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -21,7 +24,9 @@ class PortalController extends FrontController
         SearchPageRepository $searchPageRepository,
         RequestStack $requestStack,
         UserService $userService,
-        ManagerRegistry $managerRegistry
+        ManagerRegistry $managerRegistry,
+        AidSearchFormService $aidSearchFormService,
+        AidService $aidService
     ): Response
     {
         // verification user
@@ -36,6 +41,31 @@ class PortalController extends FrontController
             return $this->redirectToRoute('app_user_dashboard');
         }
 
+        // compte les aides
+        $queryString = null;
+        $query = parse_url($searchPage->getSearchQuerystring())['query'] ?? null;
+        $queryString = $query ?? $searchPage->getSearchQuerystring();
+        $aidSearchClass = $aidSearchFormService->getAidSearchClass(
+            params: [
+                'querystring' => $queryString,
+                'forceOrganizationType' => null,
+                'dontUseUserPerimeter' => true
+                ]
+        );
+        $aidParams = [
+            'showInSearch' => true,
+        ];
+        $aidParams = array_merge($aidParams, $aidSearchFormService->convertAidSearchClassToAidParams($aidSearchClass));
+        $aidParams['searchPage'] = $searchPage;
+        $aids = $aidService->searchAids($aidParams);
+        $nbAids = count($aids);
+        $nbLocals = 0;
+        /** @var Aid $aid */
+        foreach ($aids as $aid) {
+            if ($aid->isLocal()) {
+                $nbLocals++;
+            }
+        }
         // formulaire edition
         $form = $this->createForm(SearchPageEditType::class, $searchPage);
         $form->handleRequest($requestStack->getCurrentRequest());
@@ -62,7 +92,9 @@ class PortalController extends FrontController
         // rendu template
         return $this->render('user/searchpage/edit.html.twig', [
             'form' => $form,
-            'searchPage' => $searchPage
+            'searchPage' => $searchPage,
+            'nbAids' => $nbAids,
+            'nbLocals' => $nbLocals
         ]);
     }
 }
