@@ -21,7 +21,7 @@ class FileService
     public function getUploadTmpDirRelative(): string
     {
         // Pour scalingo
-        if ($this->getEnvironment() == 'prod') {
+        if ($this->getEnvironment() == 'prod' || $this->getEnvironment() == 'staging') {
             return '';
         } else {
             return self::UPLOAD_TMP_FOLDER;
@@ -31,7 +31,7 @@ class FileService
     public function getUploadTmpDir(): string
     {
         // Pour scalingo
-        if ($this->getEnvironment() == 'prod') {
+        if ($this->getEnvironment() == 'prod' || $this->getEnvironment() == 'staging') {
             return $this->kernelInterface->getProjectDir();
         } else {
             return $this->kernelInterface->getProjectDir().self::UPLOAD_TMP_FOLDER;
