@@ -40,7 +40,7 @@
                 </li>
                 {% for page in search_page.pages %}
                     <li role="presentation">
-                        <button id="tabpanel-{{ page.name|mySlug }}" class="fr-tabs__tab" tabindex="-1" role="tab" aria-selected="false" aria-controls="tabpanel-{{ page.name|mySlug }}-panel">{{ page.name }}</button>
+                        <button id="tabpanel-{{ page.url }}" class="fr-tabs__tab" tabindex="-1" role="tab" aria-selected="false" aria-controls="tabpanel-{{ page.url }}-panel">{{ page.name }}</button>
                     </li>
                 {% endfor %}
             </ul>
@@ -84,7 +84,7 @@
                 </section>
             </div>
             {% for page in search_page.pages %}
-                <div id="tabpanel-{{ page.name|mySlug }}-panel" class="fr-tabs__panel" role="tabpanel" aria-labelledby="tabpanel-{{ page.name|mySlug}}" tabindex="0">
+                <div id="tabpanel-{{ page.url }}-panel" class="fr-tabs__panel" role="tabpanel" aria-labelledby="tabpanel-{{ page.url }}" tabindex="0">
                     <div class="wysiwyg-wrapper">
                         {{ optimizeHtmlFromWysiwyg(page.description)|raw }}
                     </div>
