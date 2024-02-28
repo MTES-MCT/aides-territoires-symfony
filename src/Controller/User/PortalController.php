@@ -59,7 +59,6 @@ class PortalController extends FrontController
         $this->breadcrumb->add('Comptes', $this->generateUrl('app_user_dashboard'));
         $this->breadcrumb->add('Portail '.$searchPage->getName(), $this->generateUrl('app_user_portal_edit', ['id' => $id]));
 
-        dump('Mémoire maximale utilisée : ' . round(memory_get_peak_usage() / 1024 / 1024) . ' MB');
         // rendu template
         return $this->render('user/searchpage/edit.html.twig', [
             'form' => $form,
