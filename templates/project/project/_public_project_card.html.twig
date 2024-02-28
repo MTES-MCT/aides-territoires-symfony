@@ -17,7 +17,7 @@
                     {% if app.user and project.organization %}
                         {{ project.organization.name }} ({{ project.organization.zipCode }})
                     {% else %}
-                        {% if project.organization.perimeterDepartment %}
+                        {% if project.organization and project.organization.perimeterDepartment %}
                             ({{ project.organization.perimeterDepartment.name }})
                         {% endif %}
                     {% endif %}
