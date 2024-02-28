@@ -98,17 +98,21 @@ class AidService
 
             // aides à mettre en avant
             $highlightedAids = [];
+            foreach ($params['searchPage']->getHighlightedAids() as $aid) {
+                if ($aid->isLive()) {
+                    $highlightedAids[] = $aid;
+                }
+            }
             $normalAids = [];
             foreach ($aids as $key => $aid) {
-                if ($params['searchPage']->getHighlightedAids()->contains($aid)) {
-                    $highlightedAids[] = $aid;
-                } else {
+                if (!$params['searchPage']->getHighlightedAids()->contains($aid)) {
                     $normalAids[] = $aid;
                 }
                 unset($aids[$key]);
             }
 
-            $aids = array_merge($highlightedAids, $normalAids);
+            // on ajoute les normalAids après les highlightAids
+            $aids = array_values(array_merge($highlightedAids, $normalAids));
         }
 
         return $aids;
