@@ -1,4 +1,10 @@
+require('trumbowyg/dist/trumbowyg.min.js');
+require('trumbowyg/dist/langs/fr.min.js');
+
 $(function() {
+    // wysiwyg
+    launchTrumbowyg('.trumbowyg');
+    
     /**
      * Supprimer collection item
      */
@@ -34,14 +40,24 @@ $(function() {
         var newElem = jQuery(list.attr('data-widget-tags')).html(newWidget);
         newElem.appendTo(list);
 
-
-        if (typeof redoToggleButton == 'function') {
-            redoToggleButton();
-        }
-
-        if (typeof callbackAddAnotherWidget == 'function') {
-            callbackAddAnotherWidget();
-        }
+        launchTrumbowyg(newElem.find('textarea'));
     });
 
 })
+
+function launchTrumbowyg(elt)
+{
+    $(elt).trumbowyg({
+        svgPath: '/build/trumbowyg/icons.svg',
+        lang: 'fr',
+        // Redefine the button pane
+        btns: [
+            ['formatting'],
+            ['strong', 'em'],
+            ['link'],
+            ['unorderedList', 'orderedList'],
+            ['removeformat'],            
+            ['fullscreen']
+        ]
+    });
+}
