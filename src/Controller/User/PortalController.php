@@ -27,13 +27,13 @@ class PortalController extends FrontController
         // verification user
         $user = $userService->getUserLogged();
         if (!$user instanceof User) {
-            return $this->redirect('app_user_dashboard');
+            return $this->redirectToRoute('app_user_dashboard');
         }
 
         // verification searchPage et administrateur
         $searchPage = $searchPageRepository->find((int) $id);
         if (!$searchPage instanceof SearchPage || $searchPage->getAdministrator() !== $user) {
-            return $this->redirect('app_user_dashboard');
+            return $this->redirectToRoute('app_user_dashboard');
         }
 
         // formulaire edition
