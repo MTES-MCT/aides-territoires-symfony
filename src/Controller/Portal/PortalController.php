@@ -42,7 +42,6 @@ class PortalController extends FrontController
         AidSearchFormService $aidSearchFormService,
         AidService $aidService,
         RequestStack $requestStack,
-        AidRepository $aidRepository,
         UserService $userService,
         ManagerRegistry $managerRegistry,
         LogService $logService
