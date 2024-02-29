@@ -8,6 +8,7 @@ use App\Entity\Project\Project;
 use App\Entity\User\User;
 use App\Service\File\FileService;
 use App\Service\User\UserService;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use OpenSpout\Common\Entity\Cell;
@@ -48,9 +49,18 @@ class SpreadsheetExporterService
             $sqlParams = [];
             if ($params) {
                 foreach ($params as $param) {
-                    $sqlParams[] = ['name' => $param->getName(), 'value' => $param->getValue()];
+                    if ($param->getValue() instanceof ArrayCollection) {
+                        $values = [];
+                        foreach ($param->getValue() as $value) {
+                            $values[] = $value->getId();
+                        }
+                        $sqlParams[] = ['name' => $param->getName(), 'value' => $values];
+                    } else {
+                        $sqlParams[] = ['name' => $param->getName(), 'value' => $param->getValue()];
+                    }
                 }
             }
+
             $cronExportSpreadsheet = new CronExportSpreadsheet();
             $cronExportSpreadsheet->setSqlRequest($queryBuilder->getQuery()->getDQL());
             $cronExportSpreadsheet->setSqlParams($sqlParams);
