@@ -170,8 +170,6 @@ class AidCrudController extends AtCrudController
         $entity = $this->getContext()->getEntity()->getInstance() ?? null;
 
         yield IdField::new('id')->onlyOnIndex();
-        yield BooleanField::new('isLive', 'Live')
-        ->onlyOnIndex();
         yield TextLengthCountField::new('name', 'Nom')
         ->setHelp('Le titre doit commencer par un verbe à l’infinitif pour que l’objectif de l’aide soit explicite vis-à-vis de ses bénéficiaires.')
         ->setFormTypeOption('attr', ['maxlength' => 180])

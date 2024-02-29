@@ -132,7 +132,6 @@ class SpreadsheetExporterService
                 foreach ($results as $key => $result) {
                     $datas[] = [
                         'id' => $result->getId(),
-                        'live' => $result->isLive() ? 'Oui' : 'Non',
                         'name' => $result->getName(),
                         'url' => $result->getUrl(),
                         'status' => $result->getStatus(),
@@ -342,7 +341,7 @@ class SpreadsheetExporterService
             if (!is_dir($tmpFolder)) {
                 mkdir($tmpFolder, 0777, true);
             }
-            $fileTarget = $tmpFolder.'/export_'.$filename.'_at_'.$now->format('d_m_Y');
+            $fileTarget = $tmpFolder.'/export_'.pathinfo($filename, PATHINFO_FILENAME).'_at_'.$now->format('d_m_Y_H_i_s');
             if ($format == FileService::FORMAT_CSV) {
                 $options = new \OpenSpout\Writer\CSV\Options();
                 $options->FIELD_DELIMITER = ';';
