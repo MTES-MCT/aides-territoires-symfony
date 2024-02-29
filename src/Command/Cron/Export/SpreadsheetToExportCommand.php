@@ -101,6 +101,7 @@ class SpreadsheetToExportCommand extends Command
                     }
                 }
             }
+
             $query = $this->entityManager
                     ->createQuery($cronExportSpreadsheet->getSqlRequest())
                     ->setParameters($sqlParams)
