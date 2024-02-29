@@ -48,7 +48,7 @@ final class RouteListener
 
         // Le sous-domaine est le premier composant
         $subdomain = $hostParts[0] ?? null;
-        dd($subdomain);
+
         if ($subdomain) {
             // on regarde si cela corresponds à un portail
             $searchPage = $this->searchPageRepository->findOneBy(
@@ -58,6 +58,13 @@ final class RouteListener
             );
             if ($searchPage instanceof SearchPage) {
                 try {
+                    // pour s'assurer de rediriger vers la prod
+                    $host = 'aides-territoires.beta.gouv.fr';
+                    $context = $this->routerInterface->getContext();
+                    $context->setHost($host);
+                    $context->setScheme('https');
+
+                    // redirige vers le portail
                     $url = $this->routerInterface->generate('app_portal_portal_details', ['slug' => $subdomain], UrlGeneratorInterface::ABSOLUTE_URL);
                     $response = new RedirectResponse($url);
                     $event->setResponse($response);
