@@ -43,6 +43,16 @@ final class RouteListener
         // Si sous domaine, on va regarder si cela corresponds à une SearchPage (portail)
         $host = $event->getRequest()->getHost();
 
+        // spe aides.francemobilites.fr
+        if ($host == 'aides.francemobilites.fr') {
+            $host = 'aides-territoires.beta.gouv.fr';
+            $context = $this->routerInterface->getContext();
+            $context->setHost($host);
+            $context->setScheme('https');
+            $url = $this->routerInterface->generate('app_portal_portal_details', ['slug' => 'francemobilites'], UrlGeneratorInterface::ABSOLUTE_URL);
+            $response = new RedirectResponse($url);
+            $event->setResponse($response);
+        }
         // Sépare le nom de l'hôte en ses composants
         $hostParts = explode('.', $host);
 
