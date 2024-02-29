@@ -48,7 +48,8 @@ final class RouteListener
 
         // Le sous-domaine est le premier composant
         $subdomain = $hostParts[0] ?? null;
-            if ($subdomain) {
+        dd($subdomain);
+        if ($subdomain) {
             // on regarde si cela corresponds à un portail
             $searchPage = $this->searchPageRepository->findOneBy(
                 [
