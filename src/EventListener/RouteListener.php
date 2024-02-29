@@ -41,87 +41,38 @@ final class RouteListener
 
         //----------------------------------------------------------------------------------
         // Si sous domaine, on va regarder si cela corresponds à une SearchPage (portail)
-        $request = $event->getRequest();
+        $host = $event->getRequest()->getHost();
 
-        // Obtient le referer
-        $referer = $request->headers->get('referer');
-    
-        if ($referer) {
-            // Analyse l'URL du referer et extrait le nom de l'hôte
-            $host = parse_url($referer, PHP_URL_HOST);
-    
-            if ($host) {
-                // Sépare le nom de l'hôte en ses composants
-                $hostParts = explode('.', $host);
-    
-                // Vérifie si le nom de l'hôte contient un sous-domaine
-                if (count($hostParts) > 2) {
-                    // Le referer contient un sous-domaine
-                    $subdomain = $hostParts[0] ?? null;
+        // Sépare le nom de l'hôte en ses composants
+        $hostParts = explode('.', $host);
 
-                    if ($subdomain) {
-                        // on regarde si cela corresponds à un portail
-                        $searchPage = $this->searchPageRepository->findOneBy(
-                            [
-                                'slug' => $subdomain,
-                            ]
-                        );
-                        if ($searchPage instanceof SearchPage) {
-                            try {
-                                // pour s'assurer de rediriger vers la prod
-                                $host = 'aides-territoires.beta.gouv.fr';
-                                $context = $this->routerInterface->getContext();
-                                $context->setHost($host);
-                                $context->setScheme('https');
-            
-                                // redirige vers le portail
-                                $url = $this->routerInterface->generate('app_portal_portal_details', ['slug' => $subdomain], UrlGeneratorInterface::ABSOLUTE_URL);
-                                $response = new RedirectResponse($url);
-                                $event->setResponse($response);
-                            } catch (\Exception $e) {
-            
-                            }
-                        }
-                    }
-                } else {
-                    // Le referer ne contient pas de sous-domaine
+        // Le sous-domaine est le premier composant
+        $subdomain = $hostParts[0] ?? null;
+
+        if ($subdomain) {
+            // on regarde si cela corresponds à un portail
+            $searchPage = $this->searchPageRepository->findOneBy(
+                [
+                    'slug' => $subdomain,
+                ]
+            );
+            if ($searchPage instanceof SearchPage) {
+                try {
+                    // pour s'assurer de rediriger vers la prod
+                    $host = 'aides-territoires.beta.gouv.fr';
+                    $context = $this->routerInterface->getContext();
+                    $context->setHost($host);
+                    $context->setScheme('https');
+
+                    // redirige vers le portail
+                    $url = $this->routerInterface->generate('app_portal_portal_details', ['slug' => $subdomain], UrlGeneratorInterface::ABSOLUTE_URL);
+                    $response = new RedirectResponse($url);
+                    $event->setResponse($response);
+                } catch (\Exception $e) {
+
                 }
             }
         }
-
-
-        // $host = $event->getRequest()->getHost();
-        
-        // // Sépare le nom de l'hôte en ses composants
-        // $hostParts = explode('.', $host);
-
-        // // Le sous-domaine est le premier composant
-        // $subdomain = $hostParts[0] ?? null;
-
-        // if ($subdomain) {
-        //     // on regarde si cela corresponds à un portail
-        //     $searchPage = $this->searchPageRepository->findOneBy(
-        //         [
-        //             'slug' => $subdomain,
-        //         ]
-        //     );
-        //     if ($searchPage instanceof SearchPage) {
-        //         try {
-        //             // pour s'assurer de rediriger vers la prod
-        //             $host = 'aides-territoires.beta.gouv.fr';
-        //             $context = $this->routerInterface->getContext();
-        //             $context->setHost($host);
-        //             $context->setScheme('https');
-
-        //             // redirige vers le portail
-        //             $url = $this->routerInterface->generate('app_portal_portal_details', ['slug' => $subdomain], UrlGeneratorInterface::ABSOLUTE_URL);
-        //             $response = new RedirectResponse($url);
-        //             $event->setResponse($response);
-        //         } catch (\Exception $e) {
-
-        //         }
-        //     }
-        // }
 
         //----------------------------------------------------------------------------------
         // regarde si une page corresponds à l'url demandée
