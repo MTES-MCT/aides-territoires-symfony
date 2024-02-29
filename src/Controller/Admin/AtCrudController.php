@@ -3,6 +3,7 @@
 namespace App\Controller\Admin;
 
 use App\Service\Aid\AidSearchFormService;
+use App\Service\Aid\AidService;
 use App\Service\Export\SpreadsheetExporterService;
 use App\Service\File\FileService;
 use App\Service\Image\ImageService;
@@ -43,6 +44,7 @@ class AtCrudController extends AbstractCrudController
         public AdminUrlGenerator $adminUrlGenerator,
         public RequestStack $requestStack,
         public AidSearchFormService $aidSearchFormService,
+        public AidService $aidService,
         public UserService $userService,
         public UserPasswordHasherInterface $userPasswordHasherInterface
     ) {

@@ -152,6 +152,10 @@ class SearchPage
 
     private int $nbAidsLive = 0;
 
+    #[ORM\ManyToOne(targetEntity: self::class)]
+    #[ORM\JoinColumn(onDelete: 'SET NULL')]
+    private ?self $searchPageRedirect = null;
+
     public function __construct()
     {
         $this->organizationTypes = new ArrayCollection();
@@ -724,6 +728,18 @@ class SearchPage
     public function setDeleteMetaImage(?bool $deleteMetaImage): static
     {
         $this->deleteMetaImage = $deleteMetaImage;
+
+        return $this;
+    }
+
+    public function getSearchPageRedirect(): ?self
+    {
+        return $this->searchPageRedirect;
+    }
+
+    public function setSearchPageRedirect(?self $searchPageRedirect): static
+    {
+        $this->searchPageRedirect = $searchPageRedirect;
 
         return $this;
     }

@@ -48,6 +48,7 @@ class SearchPageCrudController extends AtCrudController
         ->hideOnIndex();
 
         yield FormField::addFieldset('Configuration');
+        yield AssociationField::new('searchPageRedirect', 'Portail vers lequel rediriger');
         yield TextField::new('name', 'Titre')
         ->setHelp('Le titre principal.');
         yield AssociationField::new('administrator', 'Administrateur')
@@ -82,22 +83,42 @@ class SearchPageCrudController extends AtCrudController
         
         $aidParams = [];
         if ($entity && $entity->getSearchQuerystring()) {
-            $aidParams = $this->aidSearchFormService->convertQuerystringToParams($entity->getSearchQuerystring());
-            $aids = $this->managerRegistry->getRepository(Aid::class)->findCustom($aidParams);
+            $queryString = null;
+            $query = parse_url($entity->getSearchQuerystring())['query'] ?? null;
+            $queryString = $query ?? $entity->getSearchQuerystring();
+            $aidSearchClass = $this->aidSearchFormService->getAidSearchClass(
+                params: [
+                    'querystring' => $queryString,
+                    'forceOrganizationType' => null,
+                    'dontUseUserPerimeter' => true
+                    ]
+            );
+            $aidParams = [
+                'showInSearch' => true,
+            ];
+            $aidParams = array_merge($aidParams, $this->aidSearchFormService->convertAidSearchClassToAidParams($aidSearchClass));
+            $aidParams['searchPage'] = $entity;
+            $aids = $this->aidService->searchAids($aidParams);
+            $nbAids = count($aids);
+            $nbLocals = 0;
+            /** @var Aid $aid */
+            foreach ($aids as $aid) {
+                if ($aid->isLocal()) {
+                    $nbLocals++;
+                }
+            }
 
             $this->getContext()->getEntity()->getInstance()->setNbAids(
-                count($aids)
+                $nbAids
             );
         }
 
         yield IntegerField::new('nbAids', 'Nombre d\'aides total (querystring)')
         ->setFormTypeOption('attr', ['readonly' => true])
         ->hideOnIndex();
-        if ($entity && $entity->getSearchQuerystring()) {
-            $aidParams = array_merge($aidParams, ['showInSearch' => true]);
-            $aids = $this->managerRegistry->getRepository(Aid::class)->findCustom($aidParams);
+        if ($entity && $entity->getSearchQuerystring() && isset($nbLocals)) {
             $this->getContext()->getEntity()->getInstance()->setNbAidsLive(
-                count($aids)
+                $nbLocals
             );
         }
         yield IntegerField::new('nbAidsLive', 'Nombre d\'aides actuellement visible')
