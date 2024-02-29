@@ -14,6 +14,7 @@ use App\Service\Email\EmailService;
 use App\Service\Export\SpreadsheetExporterService;
 use App\Service\Various\ParamService;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\Routing\RouterInterface;
 
 #[AsCommand(name: 'at:cron:export:spreadsheet_export', description: 'Envoi des exports trop volumineux')]
 class SpreadsheetToExportCommand extends Command
@@ -29,7 +30,8 @@ class SpreadsheetToExportCommand extends Command
         protected EntityManagerInterface $entityManager,
         protected EmailService $emailService,
         protected ParamService $paramService,
-        protected SpreadsheetExporterService $spreadsheetExporterService
+        protected SpreadsheetExporterService $spreadsheetExporterService,
+        protected RouterInterface $routerInterface
     )
     {
         ini_set('max_execution_time', 60*60);
@@ -79,6 +81,12 @@ class SpreadsheetToExportCommand extends Command
         }
 
         try {
+            // donne le contexte au router pour generer l'url beta ou prod
+            $host = 'aides-territoires.beta.gouv.fr';
+            $context = $this->routerInterface->getContext();
+            $context->setHost($host);
+            $context->setScheme('https');
+
             // passe en cours de traitement pour éviter de le relancer
             $cronExportSpreadsheet->setProcessing(true);
             $this->managerRegistry->getManager()->persist($cronExportSpreadsheet);
