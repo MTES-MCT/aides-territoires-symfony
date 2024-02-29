@@ -62,6 +62,11 @@ class PortalController extends FrontController
         if (!$search_page instanceof SearchPage) {
             return $this->redirectToRoute('app_portal_portal');
         }
+
+        // redirection vers un autre portail
+        if ($search_page->getSearchPageRedirect()) {
+            return $this->redirectToRoute('app_portal_portal_details', ['slug' => $search_page->getSearchPageRedirect()->getSlug()]);
+        }
 ;
         // converti la querystring en parametres
         $aidParams = [
