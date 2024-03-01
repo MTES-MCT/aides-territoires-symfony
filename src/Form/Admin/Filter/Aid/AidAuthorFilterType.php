@@ -12,7 +12,7 @@ class AidAuthorFilterType extends AbstractType
     {
         $resolver->setDefaults([
             'attr' => [
-                'placeholder' => 'Email auteur',
+                'placeholder' => 'Email, nom ou prénom auteur',
             ],
         ]);
     }

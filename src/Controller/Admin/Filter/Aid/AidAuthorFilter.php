@@ -30,8 +30,9 @@ class AidAuthorFilter implements FilterInterface
 
         $queryBuilder
             ->innerJoin(sprintf('%s.author', $filterDataDto->getEntityAlias()), 'authorFilter')
-            ->andWhere('authorFilter.email = :email')
+            ->andWhere('(authorFilter.email = :email OR authorFilter.firstname LIKE :nameLike OR authorFilter.lastname LIKE :nameLike)')
             ->setParameter('email', $filterDataDto->getValue())
+            ->setParameter('nameLike', '%'.$filterDataDto->getValue().'%')
         ;
 
         return;
