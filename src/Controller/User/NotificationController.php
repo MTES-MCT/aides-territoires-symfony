@@ -55,6 +55,11 @@ class NotificationController extends FrontController
             if ($formDelete->isValid()) {
                 // suppression
                 $managerRegistry->getManager()->remove($notificationRepository->find($formDelete->get('idNotification')->getData()));
+
+                // décrémente le compteur user
+                $user->setNotificationCounter($user->getNotificationCounter() - 1);
+
+                // sauvegarde
                 $managerRegistry->getManager()->flush();
 
                 // message

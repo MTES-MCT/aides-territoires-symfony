@@ -75,30 +75,32 @@
             {{ pagerfanta(myPager) }}
         </div>
 
-        {% if myPager.getNbResults() %}
-            <ul class="fr-btns-group fr-btns-group--inline fr-btns-group--center fr-btns-group--icon-left">
-                <li>
-                    <a href="{{ path('app_user_user_notification_mark_all_read') }}"
-                            class="fr-btn fr-icon-checkbox-circle-line"
-                            id="mark-all-notifications-read"
-                            title="Tout marquer comme lu"
-                    >
-                        Tout marquer comme lu
-                    </a>
-                </li>
-                <li>
-                    <button type="button"
-                            class="fr-btn fr-icon-delete-line fr-btn--secondary"
-                            data-fr-opened="false"
-                            id="delete-all-notifications"
-                            title="Tout supprimer"
-                            aria-controls="delete-all-notifications-modal"
-                    >
-                        Tout supprimer
-                    </button>
-                </li>
-            </ul>
-        {% endif %}
+        
+        <ul class="fr-btns-group fr-btns-group--inline fr-btns-group--center fr-btns-group--icon-left">
+            <li>
+                <a href="{{ path('app_user_user_notification_mark_all_read') }}"
+                        class="fr-btn fr-icon-checkbox-circle-line"
+                        id="mark-all-notifications-read"
+                        title="Tout marquer comme lu"
+                >
+                    Tout marquer comme lu
+                </a>
+            </li>
+            {% if myPager.getNbResults() %}
+            <li>
+                <button type="button"
+                        class="fr-btn fr-icon-delete-line fr-btn--secondary"
+                        data-fr-opened="false"
+                        id="delete-all-notifications"
+                        title="Tout supprimer"
+                        aria-controls="delete-all-notifications-modal"
+                >
+                    Tout supprimer
+                </button>
+            </li>
+            {% endif %}
+        </ul>
+        
     </div>
 </div>
 {% endblock %}
