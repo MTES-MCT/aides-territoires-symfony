@@ -12,6 +12,7 @@ use App\Entity\Category\Category;
 use App\Entity\Keyword\Keyword;
 use App\Entity\Organization\OrganizationType;
 use App\Entity\Reference\KeywordReference;
+use Symfony\Component\DomCrawler\Crawler;
 
 #[AsCommand(name: 'at:import_flux:welcome_europe', description: 'Import de flux welcome europe')]
 class ImportFluxWelcomeEuropeCommand extends ImportFluxCommand
@@ -145,26 +146,31 @@ class ImportFluxWelcomeEuropeCommand extends ImportFluxCommand
 
         $contact = null;
         if (isset($aidToImport['info_utile'])) {
-            $info_utile_list = explode(' ', $aidToImport['info_utile']);
-            $info_utile = '<p>' . '<br/>' . join($info_utile_list) . '</p>'; 
+            $info_utile_tmp = preg_replace('/<\/a>/', '</a>|%|', $aidToImport['info_utile']);
+            $info_utile_list = explode('|%|', $info_utile_tmp);
+            $info_utile = '';
+            foreach ($info_utile_list as $key => $value) {
+                if (trim($value) != '') {
+                    $info_utile .= '<p>'.trim($value).'</p>';
+                }
+                
+            }
         }
-        if (isset($aidToImport['info_contact'])) {
-            $info_contact_list = explode(' ', $aidToImport['info_contact']);
-            $info_contact = '<p>' . '<br/>' . join($info_contact_list) . '</p>'; 
+        if (isset($aidToImport['info_contact']) && trim($aidToImport['info_contact']) != '') {
+            $info_contact = '<p>' . $aidToImport['info_contact'] . '</p>'; 
         }
-        if (isset($aidToImport['info_advice'])) {
-            $info_advice_list = explode(' ', $aidToImport['info_advice']);
-            $info_advice = '<p>' . '<br/>' . join($info_advice_list) . '</p>'; 
+        if (isset($aidToImport['info_advice']) && trim($aidToImport['info_advice']) != '') {
+            $info_advice = '<p>' . $aidToImport['info_advice'] . '</p>'; 
         }
         if (isset($info_utile) || isset($info_contact) || isset($info_advice)) {
             $contact = '<div>';
-            if (isset($info_advice)) {
+            if (isset($info_advice) && $info_advice != '') {
                 $contact .= '<p>-----</p>' . $info_advice;
             }
-            if (isset($info_contact)) {
+            if (isset($info_contact) && $info_contact != '') {
                 $contact .= '<p>-----</p>' . $info_contact;
             }
-            if (isset($info_utile)) {
+            if (isset($info_utile) && $info_utile != '') {
                 $contact .= '<p>-----</p>' . $info_utile;
             }
             $contact .= '</div>';
