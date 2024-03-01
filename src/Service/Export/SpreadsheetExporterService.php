@@ -140,12 +140,83 @@ class SpreadsheetExporterService
         $datas = [];
         switch (get_class($entity)) {
             case Aid::class:
+                /** @var Aid $result */
                 foreach ($results as $key => $result) {
+                    $audiences = [];
+                    foreach ($result->getAidAudiences() as $aidAudience) {
+                        $audiences[] = $aidAudience->getName();
+                    }
+                    $categories = [];
+                    foreach ($result->getCategories() as $category) {
+                        $categories[] = $category->getName();
+                    }
+                    $types = [];
+                    foreach ($result->getAidTypes() as $type) {
+                        $types[] = $type->getName();
+                    }
+                    $destinations = [];
+                    foreach ($result->getAidDestinations() as $destination) {
+                        $destinations[] = $destination->getName();
+                    }
+                    $aidSteps = [];
+                    foreach ($result->getAidSteps() as $step) {
+                        $aidSteps[] = $step->getName();
+                    }
+                    $programs = [];
+                    foreach ($result->getPrograms() as $program) {
+                        $programs[] = $program->getName();
+                    }
+                    $backers = [];
+                    foreach ($result->getAidFinancers() as $backer) {
+                        if ($backer->getBacker() instanceof Backer) {
+                            $backers[] = $backer->getBacker()->getName();
+                        }
+                    }
+                    $instructors = [];
+                    foreach ($result->getAidInstructors() as $instructor) {
+                        if ($instructor->getBacker() instanceof Backer) {
+                            $instructors[] = $instructor->getBacker()->getName();
+                        }
+                    }
+                    $rate = '';
+                    if ($result->getSubventionRateMin()) {
+                        $rate .= ' Min : '.$result->getSubventionRateMin();
+                    }
+                    if ($result->getSubventionRateMax()) {
+                        $rate .= ' Max : '.$result->getSubventionRateMax();
+                    }
                     $datas[] = [
-                        'id' => $result->getId(),
-                        'name' => $result->getName(),
+                        'Nom de l\'aide' => $result->getName(),
+                        'Programmes' => join("\n", $programs),
+                        'Nom initial' => $result->getNameInitial(),
+                        'Porteurs d’aides' => join("\n", $backers),
+                        'Instructeurs de l\'aide' => join("\n", $instructors),
+                        'Bénéficiaires' => join("\n", $audiences),
+                        'Types d\'aide' => join("\n", $types),
+                        'Taux de subvention, min. et max. (en %, nombre entier)' => $rate,
+                        'Taux de subvention (commentaire optionnel)' => $result->getSubventionComment(),
+                        'Appel à projet / Manifestation d’intérêt' => $result->isIsCallForProject() ? 'Oui' : 'Non',
+                        
+                        'Description' => $result->getDescription(),
+                        'Exemples d\'applications' => $result->getProjectExamples(),
+                        'Sous thématiques' => join("\n", $categories),
+                        'Récurrence' => $result->getAidRecurrence() ? $result->getAidRecurrence()->getName() : '',
+                        'Date d\'ouverture' => $result->getDateStart() ? $result->getDateStart()->format('d/m/Y') : '',
+                        'Date de clôture' => $result->getDateSubmissionDeadline() ? $result->getDateSubmissionDeadline()->format('d/m/Y') : '',
+                        
+                        'Conditions d\'éligibilité' => $result->getEligibility(), 
+                        'État d\'avancement du projet pour bénéficier du dispositif' => join("\n", $aidSteps),
+                        'Types de dépenses / actions couvertes' => join("\n", $destinations),
+                        'Zone géographique couverte par l\'aide*' => $result->getPerimeter() ? $result->getPerimeter()->getName() : '',
+
+                        'Lien vers le descriptif complet' => $result->getOriginUrl(),
+                        'Lien vers la démarche en ligne' => $result->getApplicationUrl(),
+                        'Contact(s) pour candidater' => $result->getContact(),
+
+                        'Auteur de l\'aide' => $result->getAuthor() ? $result->getAuthor()->getEmail() : '',
+
                         'url' => $result->getUrl(),
-                        'status' => $result->getStatus(),
+                        'Statut' => $result->getStatus(),
                     ];
                     unset($results[$key]);
                 }
