@@ -518,7 +518,7 @@ class SpreadsheetExporterService
             return null;
         }
         // Tronque le HTML à 32767 caractères
-        $truncatedHtml = substr($html, 0, 32767);
+        $truncatedHtml = substr($html, 0, $length);
 
         // Assainit le HTML tronqué
         $cleanHtml = $this->htmlSanitizerInterface->sanitize($truncatedHtml);
