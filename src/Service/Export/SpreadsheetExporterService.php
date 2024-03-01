@@ -15,6 +15,7 @@ use Doctrine\Persistence\ManagerRegistry;
 use OpenSpout\Common\Entity\Cell;
 use OpenSpout\Common\Entity\Row;
 use OpenSpout\Writer\XLSX\Entity\SheetView;
+use Symfony\Component\HtmlSanitizer\HtmlSanitizerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Twig\Environment;
@@ -25,7 +26,8 @@ class SpreadsheetExporterService
         protected Environment $twig,
         protected UserService $userService,
         protected ManagerRegistry $managerRegistry,
-        protected FileService $fileService
+        protected FileService $fileService,
+        protected HtmlSanitizerInterface $htmlSanitizerInterface
     )
     {
         
@@ -197,21 +199,21 @@ class SpreadsheetExporterService
                         'Taux de subvention (commentaire optionnel)' => $result->getSubventionComment(),
                         'Appel à projet / Manifestation d’intérêt' => $result->isIsCallForProject() ? 'Oui' : 'Non',
                         
-                        'Description' => $result->getDescription(),
-                        'Exemples d\'applications' => $result->getProjectExamples(),
+                        'Description' => $this->truncateHtml($result->getDescription()),
+                        'Exemples d\'applications' => $this->truncateHtml($result->getProjectExamples()),
                         'Sous thématiques' => join("\n", $categories),
                         'Récurrence' => $result->getAidRecurrence() ? $result->getAidRecurrence()->getName() : '',
                         'Date d\'ouverture' => $result->getDateStart() ? $result->getDateStart()->format('d/m/Y') : '',
                         'Date de clôture' => $result->getDateSubmissionDeadline() ? $result->getDateSubmissionDeadline()->format('d/m/Y') : '',
                         
-                        'Conditions d\'éligibilité' => $result->getEligibility(), 
+                        'Conditions d\'éligibilité' => $this->truncateHtml($result->getEligibility()), 
                         'État d\'avancement du projet pour bénéficier du dispositif' => join("\n", $aidSteps),
                         'Types de dépenses / actions couvertes' => join("\n", $destinations),
                         'Zone géographique couverte par l\'aide*' => $result->getPerimeter() ? $result->getPerimeter()->getName() : '',
 
                         'Lien vers le descriptif complet' => $result->getOriginUrl(),
                         'Lien vers la démarche en ligne' => $result->getApplicationUrl(),
-                        'Contact(s) pour candidater' => $result->getContact(),
+                        'Contact(s) pour candidater' => $this->truncateHtml($result->getContact()),
 
                         'Auteur de l\'aide' => $result->getAuthor() ? $result->getAuthor()->getEmail() : '',
 
@@ -509,5 +511,18 @@ class SpreadsheetExporterService
         } catch (\Exception $e) {
             return null;
         }
+    }
+
+    public function truncateHtml(?string $html, int $length = 32767) : ?string {
+        if (!$html) {
+            return null;
+        }
+        // Tronque le HTML à 32767 caractères
+        $truncatedHtml = substr($html, 0, 32767);
+
+        // Assainit le HTML tronqué
+        $cleanHtml = $this->htmlSanitizerInterface->sanitize($truncatedHtml);
+
+        return $cleanHtml;
     }
 }
