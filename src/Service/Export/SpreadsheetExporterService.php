@@ -3,6 +3,7 @@
 namespace App\Service\Export;
 
 use App\Entity\Aid\Aid;
+use App\Entity\Backer\Backer;
 use App\Entity\Cron\CronExportSpreadsheet;
 use App\Entity\Project\Project;
 use App\Entity\User\User;
@@ -208,6 +209,43 @@ class SpreadsheetExporterService
                         unset($results[$key]);
                     }
                     break;
+
+                    case Backer::class:
+                    /** @var Backer $result */
+                    foreach ($results as $key => $result) {
+                        $regions = ($result->getPerimeter()) ? $result->getPerimeter()->getRegions() : '';
+                        if (is_array($regions)) {
+                            $regions = implode(',', $regions);
+                        }
+                        $counties = ($result->getPerimeter()) ? $result->getPerimeter()->getDepartments() : '';
+                        if (is_array($counties)) {
+                            $counties = implode(',', $counties);
+                        }
+
+                        $aidsParams = [
+                            'backer' => $result,
+                        ];
+                        $aids = $this->managerRegistry->getRepository(Aid::class)->findCustom($aidsParams);
+                        $nbAidsLive = 0;
+                        foreach ($aids as $aid) {
+                            if ($aid->isLive()) {
+                                $nbAidsLive++;
+                            }
+                        }
+
+                        
+                        $datas[] = [
+                            'Nom du porteur' => $result->getName(),
+                            'Périmètre' => $result->getPerimeter() ? $result->getPerimeter()->getName() : '',
+                            'Périmètre (région)' => $regions,
+                            'Périmètre (département)' => $counties,
+                            'Groupe de porteur' => $result->getBackerGroup() ? $result->getBackerGroup()->getName() : '',
+                            'Nombre d’aides' => count($aids),
+                            'Nombre d’aides publiées' => $nbAidsLive
+                        ];
+                        unset($results[$key]);
+                    }
+                        break;
         }
         return $datas;
     }
