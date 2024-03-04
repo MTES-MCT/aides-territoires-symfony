@@ -64,7 +64,7 @@ final class RouteListener
         // Le sous-domaine est le premier composant
         $subdomain = $hostParts[0] ?? null;
 
-        if ($subdomain) {
+        if ($subdomain && $host != $subdomain) {
             // spe life-europe.aides-territoires.beta.gouv.fr :
             if ($subdomain == 'life-europe') {
                 $program = $this->entityManagerInterface->getRepository(Program::class)->findOneBy(['slug' => 'life']);
@@ -105,12 +105,11 @@ final class RouteListener
 
                 }
             } else {
-                // dd('la');
                 // // portail non existant, on redirige vers la page d'accueil
-                // $url = $this->routerInterface->generate('app_home', [], UrlGeneratorInterface::ABSOLUTE_URL);
-                // $response = new RedirectResponse($url);
-                // $event->setResponse($response);
-                // return;
+                $url = $this->routerInterface->generate('app_home', [], UrlGeneratorInterface::ABSOLUTE_URL);
+                $response = new RedirectResponse($url);
+                $event->setResponse($response);
+                return;
             }
         }
 
