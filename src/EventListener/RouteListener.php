@@ -64,10 +64,10 @@ final class RouteListener
 
         if ($subdomain) {
             // spe life-europe.aides-territoires.beta.gouv.fr :
-            if ($host == 'life-europe') {
+            if ($subdomain == 'life-europe') {
                 $program = $this->entityManagerInterface->getRepository(Program::class)->findOneBy(['slug' => 'life']);
                 if ($program instanceof Program) {
-                    $url = $this->routerInterface->generate('app_program_details', ['slug' => $subdomain], UrlGeneratorInterface::ABSOLUTE_URL);
+                    $url = $this->routerInterface->generate('app_program_details', ['slug' => $program->getSlug()], UrlGeneratorInterface::ABSOLUTE_URL);
                     $response = new RedirectResponse($url);
                     $event->setResponse($response);
                     return;
