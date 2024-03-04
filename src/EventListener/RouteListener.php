@@ -9,6 +9,7 @@ use App\Entity\Program\Program;
 use App\Entity\Search\SearchPage;
 use App\Repository\Page\PageRepository;
 use App\Repository\Search\SearchPageRepository;
+use App\Service\Various\ParamService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -26,7 +27,8 @@ final class RouteListener
         private PageRepository $pageRepository,
         private SearchPageRepository $searchPageRepository,
         private RouterInterface $routerInterface,
-        private KernelInterface $kernelInterface
+        private KernelInterface $kernelInterface,
+        private ParamService $paramService
     )
     {
         
@@ -46,7 +48,7 @@ final class RouteListener
 
         // spe aides.francemobilites.fr
         if ($host == 'aides.francemobilites.fr') {
-            $host = 'aides-territoires.beta.gouv.fr';
+            $host = $this->paramService->get('prod_url');
             $context = $this->routerInterface->getContext();
             $context->setHost($host);
             $context->setScheme('https');
@@ -67,6 +69,12 @@ final class RouteListener
             if ($subdomain == 'life-europe') {
                 $program = $this->entityManagerInterface->getRepository(Program::class)->findOneBy(['slug' => 'life']);
                 if ($program instanceof Program) {
+                    // pour s'assurer de rediriger vers la prod
+                    $host = $this->paramService->get('prod_url');
+                    $context = $this->routerInterface->getContext();
+                    $context->setHost($host);
+                    $context->setScheme('https');
+                    
                     $url = $this->routerInterface->generate('app_program_details', ['slug' => $program->getSlug()], UrlGeneratorInterface::ABSOLUTE_URL);
                     $response = new RedirectResponse($url);
                     $event->setResponse($response);
@@ -83,7 +91,7 @@ final class RouteListener
             if ($searchPage instanceof SearchPage) {
                 try {
                     // pour s'assurer de rediriger vers la prod
-                    $host = 'aides-territoires.beta.gouv.fr';
+                    $host = $this->paramService->get('prod_url');
                     $context = $this->routerInterface->getContext();
                     $context->setHost($host);
                     $context->setScheme('https');

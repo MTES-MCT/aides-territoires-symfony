@@ -8,6 +8,7 @@ parameters:
     meta_title_end: '%env(META_TITLE_END)%'
     cloud_image_url: '%env(resolve:AWS_S3_ENDPOINT_URL)%/%env(resolve:AWS_STORAGE_BUCKET_NAME)%/'
     site_url: '%env(SITE_URL)%'
+    prod_url: '%env(PROD_URL)%'
     email_super_admin: '%env(EMAIL_SUPER_ADMIN)%'
     email_from: '%env(EMAIL_FROM)%'
     email_from_name: '%env(EMAIL_FROM_NAME)%'
