@@ -5,6 +5,7 @@ namespace App\EventListener;
 use App\Controller\Page\PageController;
 use App\Controller\Portal\PortalController;
 use App\Entity\Page\Page;
+use App\Entity\Program\Program;
 use App\Entity\Search\SearchPage;
 use App\Repository\Page\PageRepository;
 use App\Repository\Search\SearchPageRepository;
@@ -52,7 +53,9 @@ final class RouteListener
             $url = $this->routerInterface->generate('app_portal_portal_details', ['slug' => 'francemobilites'], UrlGeneratorInterface::ABSOLUTE_URL);
             $response = new RedirectResponse($url);
             $event->setResponse($response);
+            return;
         }
+
         // Sépare le nom de l'hôte en ses composants
         $hostParts = explode('.', $host);
 
@@ -60,6 +63,17 @@ final class RouteListener
         $subdomain = $hostParts[0] ?? null;
 
         if ($subdomain) {
+            // spe life-europe.aides-territoires.beta.gouv.fr :
+            if ($host == 'life-europe') {
+                $program = $this->entityManagerInterface->getRepository(Program::class)->findOneBy(['slug' => 'life']);
+                if ($program instanceof Program) {
+                    $url = $this->routerInterface->generate('app_program_details', ['slug' => $subdomain], UrlGeneratorInterface::ABSOLUTE_URL);
+                    $response = new RedirectResponse($url);
+                    $event->setResponse($response);
+                    return;
+                }
+            }
+
             // on regarde si cela corresponds à un portail
             $searchPage = $this->searchPageRepository->findOneBy(
                 [
@@ -78,6 +92,7 @@ final class RouteListener
                     $url = $this->routerInterface->generate('app_portal_portal_details', ['slug' => $subdomain], UrlGeneratorInterface::ABSOLUTE_URL);
                     $response = new RedirectResponse($url);
                     $event->setResponse($response);
+                    return;
                 } catch (\Exception $e) {
 
                 }
