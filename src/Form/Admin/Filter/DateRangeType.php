@@ -11,8 +11,14 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class DateRangeType extends AbstractType
 {
+    private string $blockPrefix = '';
+
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        if (isset($options['block_prefix'])) {
+            $this->blockPrefix = $options['block_prefix'];
+        }
+
         $builder
             ->add('dateMin', DateType::class, [
                 'label' => 'Date de début',
@@ -44,10 +50,8 @@ class DateRangeType extends AbstractType
         });
     }
 
-    public function configureOptions(OptionsResolver $resolver): void
+    public function getBlockPrefix()
     {
-        $resolver->setDefaults([
-            // Configure your form options here
-        ]);
+        return $this->blockPrefix == '' ? 'date_range' : $this->blockPrefix;
     }
 }

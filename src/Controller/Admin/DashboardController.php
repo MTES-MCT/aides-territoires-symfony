@@ -258,7 +258,8 @@ class DashboardController extends AbstractDashboardController
 
         yield MenuItem::subMenu('Statistiques', 'fas fa-chart-line')->setSubItems([
             MenuItem::linkToRoute('Globale', 'fas fa-list', 'admin_statistics_dashboard', []),
-            MenuItem::linkToRoute('Aides', 'fas fa-list', 'admin_log_aids_logs', [])
+            MenuItem::linkToRoute('Aides', 'fas fa-list', 'admin_log_aids_logs', []),
+            MenuItem::linkToRoute('Blog', 'fas fa-list', 'admin_statistics_blog_dashboard', [])
         ]);
 
         yield MenuItem::subMenu('Obsolète - Mots clés', 'fas fa-table')->setSubItems([

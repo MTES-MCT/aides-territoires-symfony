@@ -42,6 +42,7 @@ Encore
     .addEntry('admin/statistics/dashboard', './assets/js/admin/statistics/dashboard.js')
     .addEntry('admin/statistics/map_controller', './assets/js/admin/statistics/map_controller.js')
     .addEntry('admin/statistics/carto', './assets/js/admin/statistics/carto.js')
+    .addEntry('admin/statistics/blog/dashboard', './assets/js/admin/statistics/blog/dashboard.js')
     .addEntry('admin/aid/associate', './assets/js/admin/aid/associate.js')
 
     .addEntry('front/home', './assets/js/front/home.js')
