@@ -105,11 +105,12 @@ final class RouteListener
 
                 }
             } else {
-                // portail non existant, on redirige vers la page d'accueil
-                $url = $this->routerInterface->generate('app_home', [], UrlGeneratorInterface::ABSOLUTE_URL);
-                $response = new RedirectResponse($url);
-                $event->setResponse($response);
-                return;
+                // dd('la');
+                // // portail non existant, on redirige vers la page d'accueil
+                // $url = $this->routerInterface->generate('app_home', [], UrlGeneratorInterface::ABSOLUTE_URL);
+                // $response = new RedirectResponse($url);
+                // $event->setResponse($response);
+                // return;
             }
         }
 

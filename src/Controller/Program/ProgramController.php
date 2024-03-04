@@ -5,10 +5,12 @@ namespace App\Controller\Program;
 use App\Controller\FrontController;
 use App\Entity\Perimeter\Perimeter;
 use App\Entity\Program\Program;
+use App\Entity\Search\SearchPage;
 use App\Entity\User\User;
 use App\Form\Aid\AidSearchTypeV2;
 use App\Repository\Aid\AidRepository;
 use App\Repository\Program\ProgramRepository;
+use App\Repository\Search\SearchPageRepository;
 use App\Service\Aid\AidSearchFormService;
 use App\Service\Aid\AidService;
 use App\Service\Log\LogService;
@@ -49,6 +51,7 @@ class ProgramController extends FrontController
     public function details(
         $slug,
         ProgramRepository $programRepository,
+        SearchPageRepository $searchPageRepository,
         RequestStack $requestStack,
         AidSearchFormService $aidSearchFormService,
         AidService $aidService,
@@ -65,6 +68,14 @@ class ProgramController extends FrontController
         $program = $programRepository->findOneBy(['slug'=> $slug]);
         if (!$program instanceof Program) {
             return $this->redirectToRoute('app_program_program');
+        }
+
+        // redirection ecoquartier
+        if ($program->getSlug() == 'ecoquartier') {
+            $searchPage = $searchPageRepository->findOneBy(['slug' => 'ecoquartier']);
+            if ($searchPage instanceof SearchPage) {
+                return $this->redirectToRoute('app_portal_portal_details', ['slug' => $searchPage->getSlug()]);
+            }
         }
 
         // FAQ
