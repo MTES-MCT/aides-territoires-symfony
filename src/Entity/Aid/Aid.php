@@ -60,6 +60,7 @@ use App\Filter\Aid\AidTypeGroupFilter;
 #[ORM\Index(columns: ['origin_url'], name: 'origin_url_aid')]
 #[ORM\Index(columns: ['import_uniqueid'], name: 'import_uniqueid_aid')]
 #[ORM\Index(columns: ['name'], name: 'name_aid_fulltext', flags: ['fulltext'])]
+#[ORM\Index(columns: ['name_initial'], name: 'name_initial_aid_fulltext', flags: ['fulltext'])]
 #[ORM\Index(columns: ['description'], name: 'description_aid_fulltext', flags: ['fulltext'])]
 #[ORM\Index(columns: ['eligibility'], name: 'eligibility_aid_fulltext', flags: ['fulltext'])]
 #[ORM\Index(columns: ['name','description','eligibility'], name: 'synonym_aid_nde_fulltext', flags: ['fulltext'])]

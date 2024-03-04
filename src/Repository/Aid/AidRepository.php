@@ -458,7 +458,8 @@ class AidRepository extends ServiceEntityRepository
 
             if ($originalName) {
                 $sqlOriginalName = '
-                CASE WHEN (a.name = :originalName) THEN 500 ELSE 0 END
+                CASE WHEN (a.name = :originalName) THEN 500 ELSE 0 END +
+                CASE WHEN (a.nameInitial = :originalName) THEN 400 ELSE 0 END
                 ';
                 $qb->setParameter('originalName', $originalName);
             }
@@ -467,6 +468,7 @@ class AidRepository extends ServiceEntityRepository
                 $oldKeywordsString .= $objectsString;
                 $sqlObjects = '
                 CASE WHEN (MATCH_AGAINST(a.name) AGAINST(:objects_string IN BOOLEAN MODE) > 1) THEN 90 ELSE 0 END +
+                CASE WHEN (MATCH_AGAINST(a.nameInitial) AGAINST(:objects_string IN BOOLEAN MODE) > 1) THEN 60 ELSE 0 END +
                 CASE WHEN (MATCH_AGAINST(a.description, a.eligibility, a.projectExamples) AGAINST(:objects_string IN BOOLEAN MODE) > 1) THEN 10 ELSE 0 END 
                 ';
 
@@ -477,7 +479,8 @@ class AidRepository extends ServiceEntityRepository
                 for ($i = 0; $i<count($objects); $i++) {
 
                     $sqlObjects .= '
-                        CASE WHEN (a.name LIKE :objects'.$i.') THEN 30 ELSE 0 END
+                        CASE WHEN (a.name LIKE :objects'.$i.') THEN 30 ELSE 0 END +
+                        CASE WHEN (a.nameInitial LIKE :objects'.$i.') THEN 20 ELSE 0 END
                     ';
                     // $sqlObjects .= '
                     //     CASE WHEN (a.name LIKE :objects'.$i.') THEN 10 ELSE 0 END +
@@ -499,6 +502,7 @@ class AidRepository extends ServiceEntityRepository
                 $oldKeywordsString .= ' '.$intentionsString;
                 $sqlIntentions = '
                 CASE WHEN (MATCH_AGAINST(a.name) AGAINST(:intentions_string IN BOOLEAN MODE) > 1) THEN 5 ELSE 0 END +
+                CASE WHEN (MATCH_AGAINST(a.nameInitial) AGAINST(:intentions_string IN BOOLEAN MODE) > 1) THEN 5 ELSE 0 END +
                 CASE WHEN (MATCH_AGAINST(a.description, a.eligibility, a.projectExamples) AGAINST(:intentions_string IN BOOLEAN MODE) > 1) THEN 1 ELSE 0 END 
                 ';
                 $qb->setParameter('intentions_string', $intentionsString);
@@ -507,6 +511,7 @@ class AidRepository extends ServiceEntityRepository
             if ($simpleWordsString) {
                 $sqlSimpleWords = '
                 CASE WHEN (MATCH_AGAINST(a.name) AGAINST(:simple_words_string IN BOOLEAN MODE) > 1) THEN 30 ELSE 0 END +
+                CASE WHEN (MATCH_AGAINST(a.nameInitial) AGAINST(:simple_words_string IN BOOLEAN MODE) > 1) THEN 30 ELSE 0 END +
                 CASE WHEN (MATCH_AGAINST(a.description, a.eligibility, a.projectExamples) AGAINST(:simple_words_string IN BOOLEAN MODE) > 1) THEN 5 ELSE 0 END 
                 ';
 
