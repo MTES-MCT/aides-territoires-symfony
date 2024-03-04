@@ -88,12 +88,13 @@ final class RouteListener
                     'slug' => $subdomain,
                 ]
             );
+            // pour s'assurer de rediriger vers la prod
+            $host = $this->paramService->get('prod_host');
+            $context = $this->routerInterface->getContext();
+            $context->setHost($host);
+            $context->setScheme('https');
+
             if ($searchPage instanceof SearchPage) {
-                // pour s'assurer de rediriger vers la prod
-                $host = $this->paramService->get('prod_host');
-                $context = $this->routerInterface->getContext();
-                $context->setHost($host);
-                $context->setScheme('https');
                 try {
                     // redirige vers le portail
                     $url = $this->routerInterface->generate('app_portal_portal_details', ['slug' => $subdomain], UrlGeneratorInterface::ABSOLUTE_URL);
