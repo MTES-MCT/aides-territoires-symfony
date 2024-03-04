@@ -89,13 +89,12 @@ final class RouteListener
                 ]
             );
             if ($searchPage instanceof SearchPage) {
+                // pour s'assurer de rediriger vers la prod
+                $host = $this->paramService->get('prod_host');
+                $context = $this->routerInterface->getContext();
+                $context->setHost($host);
+                $context->setScheme('https');
                 try {
-                    // pour s'assurer de rediriger vers la prod
-                    $host = $this->paramService->get('prod_host');
-                    $context = $this->routerInterface->getContext();
-                    $context->setHost($host);
-                    $context->setScheme('https');
-
                     // redirige vers le portail
                     $url = $this->routerInterface->generate('app_portal_portal_details', ['slug' => $subdomain], UrlGeneratorInterface::ABSOLUTE_URL);
                     $response = new RedirectResponse($url);
@@ -104,6 +103,12 @@ final class RouteListener
                 } catch (\Exception $e) {
 
                 }
+            } else {
+                // portail non existant, on redirige vers la page d'accueil
+                $url = $this->routerInterface->generate('app_home', [], UrlGeneratorInterface::ABSOLUTE_URL);
+                $response = new RedirectResponse($url);
+                $event->setResponse($response);
+                return;
             }
         }
 
