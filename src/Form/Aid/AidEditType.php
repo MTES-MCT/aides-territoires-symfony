@@ -193,9 +193,14 @@ class AidEditType extends AbstractType
                 },
                 'expanded' => true,
                 'multiple' => true,
-                // 'constraints' => [
-                //     new ConstraintsCount(null, 1)
-                // ]
+                'query_builder' => function(EntityRepository $entityRepository) {
+                    return $entityRepository->createQueryBuilder('at')
+                    ->innerJoin('at.aidTypeGroup', 'atg')
+                    ->andWhere('at.active = 1')
+                    ->orderBy('atg.name', 'ASC')
+                    ->addOrderBy('at.name', 'ASC')
+                    ;
+                }
             ])
             ->add('subventionRateMin', TypeIntegerType::class, [
                 'required' => false,
@@ -354,7 +359,13 @@ class AidEditType extends AbstractType
                 'multiple' => true,
                 'label_attr' => [
                     'class' => 'fr-fieldset__legend'
-                ]
+                ],
+                'query_builder' => function(EntityRepository $entityRepository) {
+                    return $entityRepository->createQueryBuilder('asteps')
+                    ->andWhere('asteps.active = 1')
+                    ->orderBy('asteps.name', 'ASC')
+                    ;
+                }
             ])
             ->add('aidDestinations', EntityType::class, [
                 'required' => false,

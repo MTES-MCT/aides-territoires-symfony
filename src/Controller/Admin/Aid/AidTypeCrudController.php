@@ -5,6 +5,7 @@ namespace App\Controller\Admin\Aid;
 use App\Controller\Admin\AtCrudController;
 use App\Entity\Aid\AidType;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 
@@ -26,5 +27,6 @@ class AidTypeCrudController extends AtCrudController
         yield AssociationField::new('aidTypeGroup', 'Groupe')
         ->setFormTypeOption('choice_label', 'name')
         ->setRequired(true);
+        yield BooleanField::new('active', 'Actif');
     }
 }

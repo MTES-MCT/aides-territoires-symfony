@@ -4,6 +4,7 @@ namespace App\Controller\Admin\Aid;
 
 use App\Controller\Admin\AtCrudController;
 use App\Entity\Aid\AidStep;
+use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 
@@ -22,5 +23,6 @@ class AidStepCrudController extends AtCrudController
             ->setFormTypeOption('attr', ['readonly' => true, 'autocomplete' => 'off'])
             ->setHelp('Laisser vide pour autoremplir.')
         ;
+        yield BooleanField::new('active', 'Actif');
     }
 }

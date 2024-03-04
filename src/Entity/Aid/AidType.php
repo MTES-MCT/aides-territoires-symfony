@@ -80,6 +80,9 @@ class AidType
     #[ORM\ManyToMany(targetEntity: Aid::class, mappedBy: 'aidTypes')]
     private Collection $aids;
 
+    #[ORM\Column(nullable: true)]
+    private ?bool $active = null;
+
     public function __construct()
     {
         $this->aids = new ArrayCollection();
@@ -192,5 +195,17 @@ class AidType
     public function __toString()
     {
         return $this->getName() ?? '';
+    }
+
+    public function isActive(): ?bool
+    {
+        return $this->active;
+    }
+
+    public function setActive(?bool $active): static
+    {
+        $this->active = $active;
+
+        return $this;
     }
 }

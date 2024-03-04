@@ -36,6 +36,8 @@ class AidStep
     const SLUG_PREOP = 'preop';
     const SLUG_OP = 'op';
     const SLUG_POSTOP = 'postop';
+    const SLUG_EMERGENCE_STRATEGIE = 'emergence-stategie';
+    const SLUG_CONCEPTION_FAISABILITE = 'conception-faisabilite';
 
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -65,6 +67,9 @@ class AidStep
 
     #[ORM\ManyToMany(targetEntity: Aid::class, mappedBy: 'aidSteps')]
     private Collection $aids;
+
+    #[ORM\Column(nullable: true)]
+    private ?bool $active = null;
 
     public function __construct()
     {
@@ -167,5 +172,17 @@ class AidStep
     public function __toString(): string
     {
         return $this->name ?? 'AideStep';
+    }
+
+    public function isActive(): ?bool
+    {
+        return $this->active;
+    }
+
+    public function setActive(?bool $active): static
+    {
+        $this->active = $active;
+
+        return $this;
     }
 }
