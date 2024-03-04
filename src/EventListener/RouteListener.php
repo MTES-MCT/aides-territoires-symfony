@@ -48,7 +48,7 @@ final class RouteListener
 
         // spe aides.francemobilites.fr
         if ($host == 'aides.francemobilites.fr') {
-            $host = $this->paramService->get('prod_url');
+            $host = $this->paramService->get('prod_host');
             $context = $this->routerInterface->getContext();
             $context->setHost($host);
             $context->setScheme('https');
@@ -70,7 +70,7 @@ final class RouteListener
                 $program = $this->entityManagerInterface->getRepository(Program::class)->findOneBy(['slug' => 'life']);
                 if ($program instanceof Program) {
                     // pour s'assurer de rediriger vers la prod
-                    $host = $this->paramService->get('prod_url');
+                    $host = $this->paramService->get('prod_host');
                     $context = $this->routerInterface->getContext();
                     $context->setHost($host);
                     $context->setScheme('https');
@@ -91,7 +91,7 @@ final class RouteListener
             if ($searchPage instanceof SearchPage) {
                 try {
                     // pour s'assurer de rediriger vers la prod
-                    $host = $this->paramService->get('prod_url');
+                    $host = $this->paramService->get('prod_host');
                     $context = $this->routerInterface->getContext();
                     $context->setHost($host);
                     $context->setScheme('https');
