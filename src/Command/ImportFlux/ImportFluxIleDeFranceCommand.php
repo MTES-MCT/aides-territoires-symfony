@@ -124,7 +124,8 @@ class ImportFluxIleDeFranceCommand extends ImportFluxCommand
     {
         $aidSteps = $this->managerRegistry->getRepository(AidStep::class)->findCustom([
             'slugs' => [
-                AidStep::SLUG_PREOP,
+                AidStep::SLUG_EMERGENCE_STRATEGIE,
+                AidStep::SLUG_CONCEPTION_FAISABILITE,
                 AidStep::SLUG_OP,
                 AidStep::SLUG_POSTOP,
             ]
