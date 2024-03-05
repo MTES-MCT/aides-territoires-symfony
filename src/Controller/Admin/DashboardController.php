@@ -14,6 +14,7 @@ use App\Entity\Aid\AidStep;
 use App\Entity\Aid\AidSuggestedAidProject;
 use App\Entity\Aid\AidType;
 use App\Entity\Aid\AidTypeGroup;
+use App\Entity\Aid\AidTypeSupport;
 use App\Entity\Alert\Alert;
 use App\Entity\Backer\Backer;
 use App\Entity\Backer\BackerCategory;
@@ -194,6 +195,7 @@ class DashboardController extends AbstractDashboardController
             MenuItem::linkToCrud('[caractéristique] Récurrences', 'fas fa-list', AidRecurrence::class),
             MenuItem::linkToCrud('[caractéristique] Types d\'aides', 'fas fa-list', AidType::class),
             MenuItem::linkToCrud('[caractéristique] Groupes de types d\'aides', 'fas fa-list', AidTypeGroup::class),
+            MenuItem::linkToCrud('[caractéristique] Types d\'appui', 'fas fa-list', AidTypeSupport::class),
         ]);
 
         yield MenuItem::subMenu('Catégories', 'fas fa-table')->setSubItems([

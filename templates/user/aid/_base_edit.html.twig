@@ -77,6 +77,7 @@
 
                     {{ form_row(formAid.aidAudiences) }}
                     {{ form_row(formAid.aidTypes) }}
+                    {{ form_row(formAid.aidTypeSupport) }}
 
                     <div id="subvention-fields">
                         <div id="subvention-fields-collapse" data-parent="aid_edit[aidTypes][]" data-value="1" class="fr-collapse">
@@ -109,8 +110,10 @@
                         </div>
                     </div>
 
+                    <div class="fr-mt-2w">
                     {{ form_row(formAid.isCharged) }}
                     {{ form_row(formAid.isCallForProject) }}
+                    </div>
             </fieldset>
 
             <fieldset class="at-fields-section">

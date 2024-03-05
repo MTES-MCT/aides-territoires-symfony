@@ -248,6 +248,7 @@ class AidController extends ApiController
                 'application_url' => $result->getApplicationUrl(),
                 'targeted_audiences' => $audiences,
                 'aid_types' => $types,
+                'aid_type_support' => $result->getAidTypeSupport() ? $result->getAidTypeSupport()->getName() : null,
                 'is_charged' => $result->isIsCharged(),
                 'destinations' => $destinations,
                 'start_date' => $result->getDateStart() ? $result->getDateStart()->format('Y-m-d') : null,

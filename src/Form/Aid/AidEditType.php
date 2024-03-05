@@ -8,6 +8,7 @@ use App\Entity\Aid\AidRecurrence;
 use App\Entity\Aid\AidStep;
 use App\Entity\Aid\AidType;
 use App\Entity\Aid\AidTypeGroup;
+use App\Entity\Aid\AidTypeSupport;
 use App\Entity\Backer\Backer;
 use App\Entity\Category\Category;
 use App\Entity\Category\CategoryTheme;
@@ -201,6 +202,19 @@ class AidEditType extends AbstractType
                     ->addOrderBy('at.name', 'ASC')
                     ;
                 }
+            ])
+            ->add('aidTypeSupport', EntityType::class, [
+                'required' => false,
+                'label' => 'Type d\'appui',
+                'class' => AidTypeSupport::class,
+                'choice_label' => 'name',
+                'query_builder' => function(EntityRepository $entityRepository) {
+                    return $entityRepository->createQueryBuilder('ats')
+                    ->andWhere('ats.active = 1')
+                    ->orderBy('ats.name', 'ASC')
+                    ;
+                },
+                'help' => 'Obligatoire pour les aides en ingénierie'
             ])
             ->add('subventionRateMin', TypeIntegerType::class, [
                 'required' => false,
@@ -534,6 +548,14 @@ class AidEditType extends AbstractType
                     if ($event->getForm()->has('aidDestinations') && !count($event->getForm()->get('aidDestinations')->getData()) && !$typeError) {
                         $typeError = true; // pour ne pas ajouter plusieurs fois l'erreur
                         $event->getForm()->get('aidDestinations')->addError(new FormError('Veuillez compléter le champ types de dépenses / actions couvertes '));
+                    }
+                }
+
+                // si aide en ingénierie, type d'appui est obligatoire
+                if ($aidType->getAidTypeGroup()->getSlug() == AidTypeGroup::SLUG_TECHNICAL) {
+                    if ($event->getForm()->has('aidTypeSupport') && !$event->getForm()->get('aidTypeSupport')->getData() && !$typeError) {
+                        $typeError = true; // pour ne pas ajouter plusieurs fois l'erreur
+                        $event->getForm()->get('aidTypeSupport')->addError(new FormError('Veuillez compléter le champ type d\'appui'));
                     }
                 }
             }

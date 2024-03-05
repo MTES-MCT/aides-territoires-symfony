@@ -3,37 +3,35 @@
 namespace App\Controller\Api\Aid;
 
 use App\Controller\Api\ApiController;
-use App\Repository\Aid\AidStepRepository;
+use App\Repository\Aid\AidTypeSupportRepository;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Attribute\AsController;
 use Symfony\Component\Routing\Annotation\Route;
 
 #[AsController]
-class AidStepController extends ApiController
+class AidTypeSupportController extends ApiController
 {
-    #[Route('/api/aids/steps/', name: 'api_aid_steps', priority: 5)]
+    #[Route('/api/aids/type-support/', name: 'api_aid_type_support', priority: 5)]
     public function index(
-        AidStepRepository $aidStepRepository,
+        AidTypeSupportRepository $aidTypeSupportRepository,
     ): JsonResponse
     {
-        $params = [
-            'active' => true
-        ];
+        $params = [];
         // requete pour compter sans la pagination
-        $count = $aidStepRepository->countCustom($params);
+        $count = $aidTypeSupportRepository->countCustom($params);
 
         // requete pour les résultats avec la pagination
         $params['firstResult'] = ($this->getPage() - 1) * $this->getItemsPerPage();
         $params['maxResults'] = $this->getItemsPerPage();
     
-        $results = $aidStepRepository->findCustom($params);
+        $results = $aidTypeSupportRepository->findCustom($params);
 
         // spécifique
         $resultsSpe = [];
         foreach ($results as $result) {
             $resultsSpe[] = [
                 'id' => $result->getSlug(),
-                'name' => $result->getName()
+                'name' => $result->getName(),
             ];
         }
         

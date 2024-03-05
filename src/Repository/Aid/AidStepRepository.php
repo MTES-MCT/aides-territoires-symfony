@@ -41,12 +41,19 @@ class AidStepRepository extends ServiceEntityRepository
     public function getQueryBuilder(array $params = null): QueryBuilder
     {
         $slugs = $params['slugs'] ?? null;
+        $active = $params['active'] ?? null;
 
         $qb = $this->createQueryBuilder('ast');
 
         if (is_array($slugs) && count($slugs) > 0) {
             $qb->andWhere('ast.slug IN (:slugs)')
                 ->setParameter('slugs', $slugs);
+        }
+        
+        if ($active !== null) {
+            $qb
+                ->andWhere('ast.active = :active')
+                ->setParameter('active', $active);
         }
         
         return $qb;

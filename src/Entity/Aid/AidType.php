@@ -57,6 +57,7 @@ class AidType
     #[ORM\Column(length: 255)]
     private ?string $name = null;
 
+    #[Groups([Aid::API_GROUP_LIST, Aid::API_GROUP_ITEM, self::API_GROUP_LIST])]
     #[ORM\Column(length: 255)]
     #[Gedmo\Slug(fields: ['name'], updatable: false)]
     private ?string $slug = null;

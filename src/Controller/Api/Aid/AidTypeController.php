@@ -16,7 +16,9 @@ class AidTypeController extends ApiController
         AidTypeRepository $aidTypeRepository,
     ): JsonResponse
     {
-        $params = [];
+        $params = [
+            'active' => true
+        ];
         // requete pour compter sans la pagination
         $count = $aidTypeRepository->countCustom($params);
 

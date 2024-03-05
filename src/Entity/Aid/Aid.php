@@ -626,6 +626,17 @@ class Aid
 
     private ArrayCollection $aidsFromGenericLive;
 
+    #[ApiProperty(
+        openapiContext: [
+            'description' => 'Nature de l\'aide',
+            'enum' => [
+                AidTypeSupport::SLUG_DIRECT,
+                AidTypeSupport::SLUG_INDIRECT,
+            ],
+            'example' => AidTypeSupport::SLUG_DIRECT
+        ]
+    )]
+    #[Groups([self::API_GROUP_LIST, self::API_GROUP_ITEM])]
     #[ORM\ManyToOne(inversedBy: 'aids')]
     #[JoinColumn(nullable: true, onDelete: 'SET NULL')]
     private ?AidTypeSupport $aidTypeSupport = null;
