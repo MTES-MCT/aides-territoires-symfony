@@ -90,6 +90,7 @@ class AidCrudController extends AtCrudController
             ->add('programs')
             ->add('categories')
             ->add('aidTypes')
+            ->add('projectReferences')
             // most of the times there is no need to define the
             // filter type because EasyAdmin can guess it automatically
             // ->add(BooleanFilter::new('published'))
