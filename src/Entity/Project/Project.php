@@ -43,7 +43,7 @@ class Project
     const CONTRACT_LINK = [
         ['slug' => 'ACV1', 'name' => 'Action Coeur de Ville 1'],
         ['slug' => 'ACV2', 'name' => 'Action Coeur de Ville 2'],
-        ['slug' => 'AMI', 'name' => 'AMI pour l’égalité entre les femmes et les hommes dans les territoires ruraux'],
+        ['slug' => 'AMI', 'name' => 'Expérimentations et bonnes pratiques locales des collectivités en faveur de l\'emploi des femmes en zone rurale'],
         ['slug' => 'CRTE', 'name' => 'CRTE'],
         ['slug' => 'PCAET', 'name' => 'PCAET'],
         ['slug' => 'PVD', 'name' => 'Petites Villes de Demain']
@@ -52,7 +52,7 @@ class Project
     const CONTRACT_LINK_BY_SLUG = [
         'ACV1' => 'Action Coeur de Ville 1',
         'ACV2'=> 'Action Coeur de Ville 2',
-        'AMI' => 'AMI pour l’égalité entre les femmes et les hommes dans les territoires ruraux',
+        'AMI' => 'Expérimentations et bonnes pratiques locales des collectivités en faveur de l\'emploi des femmes en zone rurale',
         'CRTE' => 'CRTE',
         'PCAET' => 'PCAET',
         'PVD' => 'Petites Villes de Demain'
