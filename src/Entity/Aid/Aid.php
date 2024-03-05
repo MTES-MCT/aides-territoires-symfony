@@ -49,6 +49,7 @@ use App\Filter\Aid\AidTargetedAudiencesFilter;
 use App\Filter\Aid\AidTechnicalAidFilter;
 use App\Filter\Aid\AidTextFilter;
 use App\Filter\Aid\AidTypeGroupFilter;
+use Doctrine\ORM\Mapping\JoinColumn;
 
 #[ORM\Entity(repositoryClass: AidRepository::class)]
 #[ORM\Index(columns: ['status'], name: 'status_aid')]
@@ -624,6 +625,10 @@ class Aid
     private ?\DateTimeInterface $dateCheckBrokenLink = null;
 
     private ArrayCollection $aidsFromGenericLive;
+
+    #[ORM\ManyToOne(inversedBy: 'aids')]
+    #[JoinColumn(nullable: true, onDelete: 'SET NULL')]
+    private ?AidTypeSupport $aidTypeSupport = null;
 
     /**
      * <Non Database Fields
@@ -2471,6 +2476,18 @@ class Aid
             }
         }
         return $aids;
+    }
+
+    public function getAidTypeSupport(): ?AidTypeSupport
+    {
+        return $this->aidTypeSupport;
+    }
+
+    public function setAidTypeSupport(?AidTypeSupport $aidTypeSupport): static
+    {
+        $this->aidTypeSupport = $aidTypeSupport;
+
+        return $this;
     }
     
 }
