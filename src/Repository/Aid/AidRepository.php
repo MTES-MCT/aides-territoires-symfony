@@ -8,6 +8,7 @@ use App\Entity\Aid\AidRecurrence;
 use App\Entity\Aid\AidStep;
 use App\Entity\Aid\AidType;
 use App\Entity\Aid\AidTypeGroup;
+use App\Entity\Aid\AidTypeSupport;
 use App\Entity\Backer\Backer;
 use App\Entity\Backer\BackerCategory;
 use App\Entity\Keyword\Keyword;
@@ -416,6 +417,7 @@ class AidRepository extends ServiceEntityRepository
         $projectReference = $params['projectReference'] ?? null;
         $dateCheckBrokenLinkMax = $params['dateCheckBrokenLinkMax'] ?? null;
         $nameLike = $params['nameLike'] ?? null;
+        $aidTypeSupport = $params['aidTypeSupport'] ?? null;
 
         $qb = $this->createQueryBuilder('a');
 
@@ -908,6 +910,13 @@ class AidRepository extends ServiceEntityRepository
             ->andWhere('aidTypes IN (:aidTypes)')
             ->setParameter('aidTypes', $aidTypes)
         ;
+        }
+
+        if ($aidTypeSupport instanceof AidTypeSupport && $aidTypeSupport->getId()) {
+            $qb
+                ->andWhere('a.aidTypeSupport = :aidTypeSupport')
+                ->setParameter('aidTypeSupport', $aidTypeSupport)
+            ;
         }
 
         if ($applyBefore instanceof \DateTime) {
