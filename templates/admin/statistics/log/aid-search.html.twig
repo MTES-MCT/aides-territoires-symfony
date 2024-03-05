@@ -31,6 +31,7 @@
                         <th>Recherche</th>
                         <th>Date de publication</th>
                         <th>Nombre de résultats</th>
+                        <th>Paramètres</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -39,6 +40,13 @@
                             <td>{{ logAidSearch.search }}</td>
                             <td>{% if logAidSearch.dateCreate %}{{ logAidSearch.dateCreate|date('d/m/Y') }}{% endif %}</td>
                             <td>{{ logAidSearch.resultsCount }}</td>
+                            <td>
+                                {% if queriesByLogId[logAidSearch.id] is defined %}
+                                    {% for key, item in queriesByLogId[logAidSearch.id] %}
+                                        {{ item }}<br />
+                                    {% endfor %}
+                                {% endif %}
+                            </td>
                         </tr>
                     {% endfor %}
                 </tbody>
