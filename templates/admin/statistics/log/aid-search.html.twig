@@ -1,0 +1,49 @@
+{% extends 'admin/statistics/_stats_base.html.twig' %}
+
+{% block stats_content %}
+<section class="container">
+    <h1>Recherches infructueuses</h1>
+</section>
+
+<section class="container mt-5">
+    
+    <div class="mt-5">
+        {{ form_start(formDateRange) }}
+        <div class="d-flex">
+            <div class="d-flex me-3">
+            {{ form_row(formDateRange.dateMin) }}
+            </div>
+            <div class="d-flex me-3">
+            {{ form_row(formDateRange.dateMax) }}
+            </div>
+            <div class="d-flex me-3">
+            <button type="submit" class="btn btn-primary">Valider</button>
+            </div>
+        </div>
+        {{ form_end(formDateRange) }}
+    </div>
+
+    <div class="row mt-5">
+        <div class="col-md-6">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Recherche</th>
+                        <th>Date de publication</th>
+                        <th>Nombre de résultats</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for logAidSearch in logAidSearchs %}
+                        <tr>
+                            <td>{{ logAidSearch.search }}</td>
+                            <td>{% if logAidSearch.dateCreate %}{{ logAidSearch.dateCreate|date('d/m/Y') }}{% endif %}</td>
+                            <td>{{ logAidSearch.resultsCount }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+{% endblock stats_content %}
