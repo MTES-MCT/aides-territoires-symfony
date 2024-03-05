@@ -138,6 +138,7 @@ class AidSearchTypeV2 extends AbstractType
                 if (!isset($aidTypesByGroup[$aidTypeGroup->getName()])) {
                     $aidTypesByGroup[$aidTypeGroup->getName()] = [];
                 }
+                /** @var AidType $aidType */
                 foreach ($aidTypeGroup->getAidTypes() as $aidType) {
                     $aidTypesByGroup[$aidTypeGroup->getName()][] = [$aidType->getName() => $aidType->getId()];
                 }
