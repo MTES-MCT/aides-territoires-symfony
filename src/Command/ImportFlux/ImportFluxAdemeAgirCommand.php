@@ -113,6 +113,7 @@ class ImportFluxAdemeAgirCommand extends ImportFluxCommand
         return $apiOptions;
     }   
 
+    #TODO voir nouveau aidType
     protected function setAidTypes(array $aidToImport, Aid $aid): Aid
     {
         $aidTypes = $this->managerRegistry->getRepository(AidType::class)->findCustom([
