@@ -59,6 +59,9 @@ class ProgramController extends FrontController
         LogService $logService
     ): Response
     {
+        // si onglet selectionne
+        $tabSelected = $requestStack->getCurrentRequest()->get('tab', null);
+
         // gestion pagination
         $currentPage = (int) $requestStack->getCurrentRequest()->get('page', 1);
         
@@ -209,7 +212,8 @@ class ProgramController extends FrontController
             'showExtended' => $showExtended,
             'querystring' => $query,
             'perimeterName' => (isset($aidParams['perimeterFrom']) && $aidParams['perimeterFrom'] instanceof Perimeter) ? $aidParams['perimeterFrom']->getName() : '',
-            'categoriesName' => $categoriesName
+            'categoriesName' => $categoriesName,
+            'tabSelected' => $tabSelected
         ]);
     }
 

@@ -55,6 +55,7 @@ Encore
     .addEntry('front/project/project', './assets/js/front/project/project.js')
     .addEntry('front/reference/projets_subventionnes', './assets/js/front/reference/projets_subventionnes.js')
     .addEntry('front/program/index', './assets/js/front/program/index.js')
+    .addEntry('front/program/tab_url_parameters', './assets/js/front/program/tab_url_parameters.js')
     .addEntry('front/aid/aid/detail', './assets/js/front/aid/aid/detail.js')
     .addEntry('front/user/register', './assets/js/front/user/register.js')
     .addEntry('front/user/register-commune', './assets/js/front/user/register-commune.js')

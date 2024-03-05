@@ -14,6 +14,7 @@
 	{{ parent() }}
     {{ encore_entry_script_tags('form/entity-checkbox-absolute-type') }}
 	{{ encore_entry_script_tags('front/aid/aid/index') }}
+	{{ encore_entry_script_tags('front/program/tab_url_parameters') }}
 {% endblock %}
 
 {% block body %}
@@ -40,7 +41,7 @@
         <div class="fr-tabs">
             <ul class="fr-tabs__list" role="tablist" aria-label="Onglets du programme">
                 <li role="presentation">
-                    <button id="tabpanel-program-description" class="fr-tabs__tab" tabindex="0" aria-selected="true" role="tab" aria-controls="tabpanel-program-description-panel">Présentation générale</button>
+                    <button id="tabpanel-program-description" class="fr-tabs__tab" tabindex="0" aria-selected="{% if tabSelected == 'program-description' or tabSelected is null %}true{% else %}false{% endif %}" role="tab" aria-controls="tabpanel-program-description-panel">Présentation générale</button>
                 </li>
                 {# {% if program.id==36 %}
                 <li role="presentation">
@@ -49,13 +50,13 @@
                 {% endif %} #}
                 {% for tab in program.pageTabs %}
                 <li role="presentation">
-                    <button id="tabpanel-{{tab.name}}" class="fr-tabs__tab" tabindex="-1" aria-selected="false" role="tab" aria-controls="tabpanel-{{tab.name}}-panel">{{ tab.name }}</button>
+                    <button id="tabpanel-{{tab.name}}" class="fr-tabs__tab" tabindex="-1" aria-selected="{% if tabSelected == tab.name %}true{% else %}false{% endif %}" role="tab" aria-controls="tabpanel-{{tab.name}}-panel">{{ tab.name }}</button>
                 </li>
                 {% endfor %}
             </ul>
 
             {% if program.description or aids %}
-            <div id="tabpanel-program-description-panel" class="fr-tabs__panel at-tabs__panel--opaque fr-tabs__panel--selected" role="tabpanel" aria-labelledby="tabpanel-program-description" tabindex="0">
+            <div id="tabpanel-program-description-panel" class="fr-tabs__panel at-tabs__panel--opaque {% if tabSelected == 'program-description' or tabSelected is null %}fr-tabs__panel--selected{% endif %}" role="tabpanel" aria-labelledby="tabpanel-program-description" tabindex="0">
                 <h2 class="fr-mt-0 fr-mb-2w">Présentation générale</h2>
                 {{ program.description | raw }}
                 <section id="aid-list">
@@ -88,7 +89,7 @@
             {% endif %} #}
 
             {% for tab in program.pageTabs %}
-            <div id="tabpanel-{{ tab.name }}-panel" class="fr-tabs__panel at-tabs__panel--opaque" role="tabpanel" aria-labelledby="tabpanel-{{ tab.name }}" tabindex="0">
+            <div id="tabpanel-{{ tab.name }}-panel" class="fr-tabs__panel at-tabs__panel--opaque {% if tabSelected == tab.name %}fr-tabs__panel--selected{% endif %}" role="tabpanel" aria-labelledby="tabpanel-{{ tab.name }}" tabindex="0">
                 <h2 class="fr-mt-0 fr-mb-2w">{{ tab.name }}</h2>
                 {{ tab.description|raw }}
             </div>
