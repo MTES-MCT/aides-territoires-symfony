@@ -386,6 +386,11 @@ class AidCrudController extends AtCrudController
         ->setHelp('Précisez le ou les types de l’aide.')
         ->hideOnIndex()
         ->setColumns(12);
+        yield AssociationField::new('aidTypeSupport', 'Type d\'appui')
+        ->setFormTypeOption('choice_label', function ($entity) {
+            return $entity->getName();
+        });
+        
         yield IntegerField::new('subventionRateMin', 'Taux de subvention min. (en %, nombre entier)')
         ->hideOnIndex()
         ->setColumns(12);
