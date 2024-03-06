@@ -124,6 +124,7 @@ class ImportFluxAdemeAgirCommand extends ImportFluxCommand
                 AidType::SLUG_INGENIERIE_ANIMATION_RESEAU,
                 AidType::SLUG_AMOA_MOD,
                 AidType::SLUG_MOE_MOE_DELEGUEE,
+                AidType::SLUG_FORMATION_MONTEE_EN_COMPETENCE,
             ]
         ]);
         foreach ($aidTypes as $aidType) {

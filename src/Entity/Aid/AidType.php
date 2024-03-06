@@ -48,6 +48,7 @@ class AidType
     const SLUG_INGENIERIE_ANIMATION_RESEAU = 'ingenierie-danimation-et-mise-en-reseau';
     const SLUG_AMOA_MOD = 'amoa-mod';
     const SLUG_MOE_MOE_DELEGUEE = 'moe-moe-deleguee';
+    const SLUG_FORMATION_MONTEE_EN_COMPETENCE = 'formation-montee-en-competence';
 
     const SLUG_FINANCIAL_ENGINEERING = 'financial-engineering';
 

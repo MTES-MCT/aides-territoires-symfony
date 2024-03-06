@@ -35,6 +35,7 @@ final class Version20240304160611 extends AbstractMigration
             (2,'MOE/MOE déléguée','moe-moe-deleguee',12,'2024-03-04 16:22:12','2024-03-04 16:22:12',1),
             (2,'Ingénierie administrative','ingenierie-administrative',13,'2024-03-04 16:28:41','2024-03-04 16:28:41',1),
             (2,'Ingénierie juridique et réglementaire','ingenierie-juridique-et-reglementaire',14,'2024-03-04 16:28:58','2024-03-04 16:28:58',1)
+            (2,'Formation/montée en compétence','formation-montee-en-competence',14,'2024-03-04 16:28:58','2024-03-04 16:28:58',1)
         ");
         $this->addSql("
         INSERT INTO aid_step (name,slug,`position`,time_create,time_update,active) VALUES
