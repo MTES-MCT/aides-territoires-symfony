@@ -113,13 +113,17 @@ class ImportFluxAdemeAgirCommand extends ImportFluxCommand
         return $apiOptions;
     }   
 
-    #TODO voir nouveau aidType
     protected function setAidTypes(array $aidToImport, Aid $aid): Aid
     {
         $aidTypes = $this->managerRegistry->getRepository(AidType::class)->findCustom([
             'slugs' => [
                 AidType::SLUG_GRANT,
-                AidType::SLUG_TECHNICAL_ENGINEERING
+                // AidType::SLUG_TECHNICAL_ENGINEERING,
+                AidType::SLUG_INGENIERIE_DE_PLANIFICATION_ET_STRATEGIE,
+                AidType::SLUG_INGENIERIE_ETUDES_DIAGNOSTICS,
+                AidType::SLUG_INGENIERIE_ANIMATION_RESEAU,
+                AidType::SLUG_AMOA_MOD,
+                AidType::SLUG_MOE_MOE_DELEGUEE,
             ]
         ]);
         foreach ($aidTypes as $aidType) {

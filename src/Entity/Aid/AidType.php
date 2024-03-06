@@ -43,9 +43,17 @@ class AidType
     const SLUG_OTHER = 'other';
     
     const SLUG_TECHNICAL_ENGINEERING = 'technical-engineering';
-    const SLUG_FINANCIAL_ENGINEERING = 'financial-engineering';
-    const SLUG_LEGAL_ENGINEERING = 'legal-engineering';
+    const SLUG_INGENIERIE_DE_PLANIFICATION_ET_STRATEGIE = 'ingenierie-de-planification-et-strategie';
+    const SLUG_INGENIERIE_ETUDES_DIAGNOSTICS = 'ingenierie-detudes-et-diagnostics';
+    const SLUG_INGENIERIE_ANIMATION_RESEAU = 'ingenierie-danimation-et-mise-en-reseau';
+    const SLUG_AMOA_MOD = 'amoa-mod';
+    const SLUG_MOE_MOE_DELEGUEE = 'moe-moe-deleguee';
 
+    const SLUG_FINANCIAL_ENGINEERING = 'financial-engineering';
+
+    const SLUG_LEGAL_ENGINEERING = 'legal-engineering';
+    const SLUG_INGENIERIE_ADMINISTRATIVE = 'ingenierie-administrative';
+    const SLUG_INGENIERIE_JURIDIQUE_REGLEMENTAIRE = 'ingenierie-juridique-et-reglementaire';
 
 
     #[ORM\Id]
