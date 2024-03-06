@@ -17,12 +17,23 @@ class AlertController extends FrontController
     #[Route('/comptes/alertes/vos-alertes/', name: 'app_user_alert')]
     public function index(
         UserService $userService,
-        AlertRepository $alertRepository
+        AlertRepository $alertRepository,
+        EmailService $emailService,
+        ManagerRegistry $managerRegistry
     )
     {
         // user actuel
         $user = $userService->getUserLogged();
 
+        // regarde le statut actuel de l'utilisateur
+        $isMlConsent = $emailService->isUserMlConsent($user);
+        if ($isMlConsent !== $user->isMlConsent()) {
+            // on met à jour notre base
+            $user->setMlConsent($isMlConsent);
+            $managerRegistry->getManager()->persist($user);
+            $managerRegistry->getManager()->flush();
+        }
+        
         // les alertes
         $alerts = $alertRepository->findBy(
             [

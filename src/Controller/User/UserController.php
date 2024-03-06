@@ -12,6 +12,7 @@ use App\Form\User\RegisterCommuneType;
 use App\Form\User\RegisterType;
 use App\Repository\Organization\OrganizationTypeRepository;
 use App\Repository\Perimeter\PerimeterRepository;
+use App\Service\Email\EmailService;
 use App\Service\Matomo\MatomoService;
 use App\Service\User\UserService;
 use App\Service\Various\ParamService;
@@ -32,7 +33,8 @@ class UserController extends FrontController
         ManagerRegistry $managerRegistry,
         Security $security,
         MatomoService $matomoService,
-        ParamService $paramService
+        ParamService $paramService,
+        EmailService $emailService
     ): Response
     {
         // nouveau user
@@ -47,6 +49,25 @@ class UserController extends FrontController
                 $user->addRole(User::ROLE_USER);
                 $user->setPassword($userPasswordHasherInterface->hashPassword($user, $formRegister->get('password')->getData()));
 
+                // si abonné newsletter
+                if ($user->isMlConsent()) {
+                    // inscription à la newsletter
+                    if ($emailService->subscribeUser($user)) {
+                        $this->tAddFlash(
+                            FrontController::FLASH_SUCCESS,
+                            'Votre demande d’inscription à la newsletter a bien été prise en compte.<br />
+                            <strong>Afin de finaliser votre inscription il vous reste à cliquer sur le lien
+                            de confirmation présent dans l’e-mail que vous allez recevoir.</strong>'
+                        );
+                    } else {
+                        // erreur Service, on notifie l'utilisateur
+                        $this->tAddFlash(
+                            FrontController::FLASH_ERROR,
+                            'Une erreur s\'est produite lors de votre inscription à la newsletter'
+                        );
+                    }                    
+                }
+                
                 // si infos organization
                 if ($formRegister->get('organizationName')->getData() && $formRegister->get('organizationType')->getData()) {
                     $organization = new Organization();

@@ -75,6 +75,9 @@ class OrganizationController extends FrontController
             }
         }
         $form = $this->createForm(RegisterType::class, $user, ['onlyOrganization' => true]);
+        if ($form->has('mlConsent')) {
+            $form->remove('mlConsent');
+        }
         if ($organization instanceof Organization) {
             $form->get('organizationType')->setData($organization->getOrganizationType());
             $form->get('organizationName')->setData($organization->getName());
