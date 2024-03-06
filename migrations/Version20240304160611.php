@@ -23,7 +23,9 @@ final class Version20240304160611 extends AbstractMigration
         $this->addSql('ALTER TABLE aid_step ADD active TINYINT(1) DEFAULT NULL');
         $this->addSql('ALTER TABLE aid_type ADD active TINYINT(1) DEFAULT NULL');
         $this->addSql('UPDATE aid_type SET active = 1');
+        $this->addSql('UPDATE aid_type SET active = 0 WHERE slug IN (\'technical-engineering\', \'legal-engineering\')');
         $this->addSql('UPDATE aid_step SET active = 1');
+        $this->addSql('UPDATE aid_step SET active = 0 WHERE slug IN (\'preop\')');
         $this->addSql("
         INSERT INTO aid_type (aid_type_group_id,name,slug,`position`,time_create,time_update,active) VALUES
             (2,'Ingénierie de planification et stratégie','ingenierie-de-planification-et-strategie',8,'2024-03-04 16:20:57','2024-03-04 16:20:57',1),

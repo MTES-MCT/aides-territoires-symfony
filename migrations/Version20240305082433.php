@@ -24,6 +24,11 @@ final class Version20240305082433 extends AbstractMigration
         $this->addSql('ALTER TABLE aid ADD aid_type_support_id INT DEFAULT NULL');
         $this->addSql('ALTER TABLE aid ADD CONSTRAINT FK_48B40DAAF635BDEE FOREIGN KEY (aid_type_support_id) REFERENCES aid_type_support (id) ON DELETE SET NULL');
         $this->addSql('CREATE INDEX IDX_48B40DAAF635BDEE ON aid (aid_type_support_id)');
+        $this->addSql("
+        INSERT INTO aid_type_support (name,slug,time_create,time_update,active) VALUES
+            ('Direct','direct','2024-03-05 08:41:19','2024-03-05 08:41:19',1),
+            ('Indirect','indirect','2024-03-05 08:41:27','2024-03-05 08:41:27',1)
+        ");
     }
 
     public function down(Schema $schema): void
