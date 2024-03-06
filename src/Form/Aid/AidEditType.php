@@ -369,7 +369,7 @@ class AidEditType extends AbstractType
                 ]
             ])
             ->add('perimeter', PerimeterAutocompleteType::class, [
-                'required' => $isDraft ? false : true,
+                'required' => false,
                 'label' => 'Zone géographique couverte par l’aide',
                 'help' => 'La zone géographique sur laquelle l\'aide est disponible.<br />
                 Exemples de zones valides :
@@ -485,7 +485,6 @@ class AidEditType extends AbstractType
             'categories',
             'aidRecurrence',
             'aidSteps',
-            'perimeter',
             'originUrl',
             'contact',
         ];
@@ -536,6 +535,11 @@ class AidEditType extends AbstractType
             // porteurs d'aide ou suggesiton porteur d'aide obligatoire
             if ($event->getForm()->has('financers') && !count($event->getForm()->get('financers')->getData()) && !$event->getForm()->get('financerSuggestion')->getData()) {
                 $event->getForm()->get('financers')->addError(new FormError('Veuillez choisir un porteur d\'aides ou suggérer un nouveau porteur'));
+            }
+
+            // perimetre ou suggestion de périmètre obligatoire
+            if ($event->getForm()->has('perimeter') && !$event->getForm()->get('perimeter')->getData() && !$event->getForm()->get('perimeterSuggestion')->getData()) {
+                $event->getForm()->get('perimeter')->addError(new FormError('Veuillez choisir un périmètre ou suggérer un nouveau périmètre'));
             }
         }
     }
