@@ -125,7 +125,7 @@ class AidEditType extends AbstractType
                 'expanded' => true
             ])
             ->add('financers', EntityType::class, [
-                'required' => $isDraft ? false : true,
+                'required' => false,
                 'mapped' => false,
                 'label' => 'Porteurs d\'aides',
                 'help' => 'Saisissez quelques caractères et sélectionnez une valeur parmi les suggestions.',
@@ -479,7 +479,6 @@ class AidEditType extends AbstractType
         $status = $event->getForm()->get('status')->getData();
 
         $fieldsToSwitch = [
-            'financers',
             'aidAudiences',
             'aidTypes',
             'description',
@@ -532,6 +531,11 @@ class AidEditType extends AbstractType
                 if ($event->getForm()->has('dateSubmissionDeadline') && !$event->getForm()->get('dateSubmissionDeadline')->getData()) {
                     $event->getForm()->get('dateSubmissionDeadline')->addError(new FormError('Ce champ est obligatoire pour les aides ponctuelles ou récurrentes'));
                 }
+            }
+
+            // porteurs d'aide ou suggesiton porteur d'aide obligatoire
+            if ($event->getForm()->has('financers') && !count($event->getForm()->get('financers')->getData()) && !$event->getForm()->get('financerSuggestion')->getData()) {
+                $event->getForm()->get('financers')->addError(new FormError('Veuillez choisir un porteur d\'aides ou suggérer un nouveau porteur'));
             }
         }
     }
