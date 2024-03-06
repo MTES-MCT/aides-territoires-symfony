@@ -313,9 +313,15 @@
                         <strong>Programme(s) :</strong>
                     </h2>
                     {% for program in aid.programs %}
-                    <a href="{{ path('app_program_details', {'slug': program.slug}) }}" class="fr-col-10 at-link__nodecorator" title="{{ program.name }}">
-                        <img src="{{ getParameter('cloud_image_url') }}{{ program.logo }}" class="fr-responsive-img" alt="" />
-                    </a>
+                        {% if program.logo %}
+                            <a href="{{ path('app_program_details', {'slug': program.slug}) }}" class="fr-col-10 at-link__nodecorator" title="{{ program.name }}">
+                                <img src="{{ getParameter('cloud_image_url') }}{{ program.logo }}" class="fr-responsive-img" alt="{{ program.name }}" />
+                            </a>
+                        {% else %}
+                            <a href="{{ path('app_program_details', {'slug': program.slug}) }}" class="fr-col-10" title="{{ program.name }}">
+                                {{ program.name }}
+                            </a>
+                        {% endif %}
                     {% endfor %}
                 </div>
             </div>
