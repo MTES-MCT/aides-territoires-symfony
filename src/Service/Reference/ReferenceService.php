@@ -86,9 +86,12 @@ class ReferenceService
     }   
     
 
-    public function getHighlightedWords(string $keyword): array
+    public function getHighlightedWords(?string $keyword): array
     {
         $highlightedWords = [];
+        if (!$keyword) {
+            return $highlightedWords;
+        }
         $synonyms = $this->getSynonymes($keyword);
         if (isset($synonyms['simple_words_string'])) {
           $objects = explode(' ', $synonyms['simple_words_string']);
