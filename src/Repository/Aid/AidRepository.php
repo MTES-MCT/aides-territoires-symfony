@@ -482,6 +482,19 @@ class AidRepository extends ServiceEntityRepository
                         CASE WHEN (a.name LIKE :objects'.$i.') THEN 30 ELSE 0 END +
                         CASE WHEN (a.nameInitial LIKE :objects'.$i.') THEN 20 ELSE 0 END
                     ';
+                    if ($projectReference instanceof ProjectReference) {
+                        $sqlObjects .= '
+                        + 
+                        CASE 
+                            WHEN :projectReferenceScO MEMBER OF a.projectReferences THEN 90 
+                            ELSE 0 
+                        END
+                        ';
+        
+                        $qb
+                        ->setParameter('projectReferenceScO', $projectReference)
+                        ;
+                    }
                     // $sqlObjects .= '
                     //     CASE WHEN (a.name LIKE :objects'.$i.') THEN 10 ELSE 0 END +
                     //     CASE WHEN (a.description LIKE :objects'.$i.') THEN 2 ELSE 0 END +
