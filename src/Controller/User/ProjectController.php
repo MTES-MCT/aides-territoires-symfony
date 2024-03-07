@@ -15,6 +15,7 @@ use App\Repository\Aid\AidProjectRepository;
 use App\Repository\Aid\AidRepository;
 use App\Repository\Project\ProjectRepository;
 use App\Repository\Project\ProjectValidatedRepository;
+use App\Service\Aid\AidService;
 use App\Service\Export\SpreadsheetExporterService;
 use App\Service\File\FileService;
 use App\Service\Image\ImageService;
@@ -322,7 +323,8 @@ class ProjectController extends FrontController
         ManagerRegistry $managerRegistry,
         NotificationService $notificationService,
         ReferenceService $referenceService,
-        SpreadsheetExporterService $spreadsheetExporterService
+        SpreadsheetExporterService $spreadsheetExporterService,
+        AidService $aidService
     ): Response
     {
         $projectCreated = $requestStack->getCurrentRequest()->get('projectCreated', 0);
@@ -360,7 +362,7 @@ class ProjectController extends FrontController
                 $searchParams['keyword'] = $aidParams['keyword'];
             }
 
-            $aidsSuggested = $aidRepository->findCustom($aidParams);
+            $aidsSuggested = $aidService->searchAids($aidParams);
             if (count($aidsSuggested) > 0) {
                 $requestStack->getCurrentRequest()->getSession()->set('highlightedWords', $referenceService->getHighlightedWords($aidParams['keyword']));
             }
@@ -373,24 +375,25 @@ class ProjectController extends FrontController
             if ($formAidProjectDelete->isValid()) {
                 // suppression
                 $aidProject = $aidProjectRepository->find($formAidProjectDelete->get('idAidProject')->getData());
-                if ($aidProject instanceof AidProject && $aidProject->getProject()->getId() == $project->getId()) {
+                if ($aidProject instanceof AidProject && $aidProject->getProject() && $aidProject->getProject()->getId() == $project->getId()) {
                     $managerRegistry->getManager()->remove($aidProject);
                     $managerRegistry->getManager()->flush();
                 }
 
-                foreach ($project->getOrganization()->getBeneficiairies() as $beneficiary) {
-                    if ($beneficiary->getId() != $user->getId()) {
-                        $notificationService->addNotification(
-                            $beneficiary,
-                            'Une aide a été supprimée d’un projet',
-                            '<p>
-                            '.$user->getFirstname().' '.$user->getLastname().' a supprimé une aide du projet
-                            <a href="'.$this->generateUrl('app_user_project_details_fiche_projet', ['id' => $project->getId(), 'slug' => $project->getSlug()], UrlGeneratorInterface::ABSOLUTE_URL).'">'.$project->getName().'</a>.
-                            </p>'
-                        );
+                if ($project->getOrganization()) {
+                    foreach ($project->getOrganization()->getBeneficiairies() as $beneficiary) {
+                        if ($beneficiary->getId() != $user->getId()) {
+                            $notificationService->addNotification(
+                                $beneficiary,
+                                'Une aide a été supprimée d’un projet',
+                                '<p>
+                                '.$user->getFirstname().' '.$user->getLastname().' a supprimé une aide du projet
+                                <a href="'.$this->generateUrl('app_user_project_details_fiche_projet', ['id' => $project->getId(), 'slug' => $project->getSlug()], UrlGeneratorInterface::ABSOLUTE_URL).'">'.$project->getName().'</a>.
+                                </p>'
+                            );
+                        }
                     }
                 }
-
                 // message
                 $this->addFlash(
                     FrontController::FLASH_SUCCESS,
