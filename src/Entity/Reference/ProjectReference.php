@@ -4,6 +4,7 @@ namespace App\Entity\Reference;
 
 use App\Entity\Aid\Aid;
 use App\Entity\Project\Project;
+use App\Repository\Aid\AidRepository;
 use App\Repository\Reference\ProjectReferenceRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -150,13 +151,7 @@ class ProjectReference
 
     public function getAidsLive(): Collection
     {
-        $aidsLive = new ArrayCollection();
-        foreach ($this->getAids() as $aid) {
-            if ($aid->isLive()) {
-                $aidsLive->add($aid);
-            }
-        }
-        $this->aidsLive = $aidsLive;
+        $this->aidsLive = $this->aids->filter(fn(Aid $aid) => $aid->isLive());
         return $this->aidsLive;
     }
 }
