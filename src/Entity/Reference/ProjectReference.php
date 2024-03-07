@@ -4,6 +4,7 @@ namespace App\Entity\Reference;
 
 use App\Entity\Aid\Aid;
 use App\Entity\Project\Project;
+use App\Repository\Aid\AidRepository;
 use App\Repository\Reference\ProjectReferenceRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -36,10 +37,13 @@ class ProjectReference
     #[ORM\ManyToMany(targetEntity: Aid::class, mappedBy: 'projectReferences')]
     private Collection $aids;
 
+    private Collection $aidsLive;
+
     public function __construct()
     {
         $this->projects = new ArrayCollection();
         $this->aids = new ArrayCollection();
+        $this->aidsLive = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -143,5 +147,11 @@ class ProjectReference
         }
 
         return $this;
+    }
+
+    public function getAidsLive(): Collection
+    {
+        $this->aidsLive = $this->aids->filter(fn(Aid $aid) => $aid->isLive());
+        return $this->aidsLive;
     }
 }
