@@ -6,6 +6,7 @@ use App\Controller\FrontController;
 use App\Entity\Aid\AidProject;
 use App\Entity\Perimeter\Perimeter;
 use App\Entity\Project\Project;
+use App\Entity\Reference\ProjectReference;
 use App\Form\Project\ProjectEditType;
 use App\Form\User\Project\AidProjectDeleteType;
 use App\Form\User\Project\AidProjectStatusType;
@@ -15,6 +16,7 @@ use App\Repository\Aid\AidProjectRepository;
 use App\Repository\Aid\AidRepository;
 use App\Repository\Project\ProjectRepository;
 use App\Repository\Project\ProjectValidatedRepository;
+use App\Repository\Reference\ProjectReferenceRepository;
 use App\Service\Aid\AidService;
 use App\Service\Export\SpreadsheetExporterService;
 use App\Service\File\FileService;
@@ -316,7 +318,7 @@ class ProjectController extends FrontController
     public function aides(
         $id,
         ProjectRepository $ProjectRepository,
-        AidRepository $aidRepository,
+        ProjectReferenceRepository $projectReferenceRepository,
         UserService $userService,
         RequestStack $requestStack,
         AidProjectRepository $aidProjectRepository,
@@ -358,8 +360,14 @@ class ProjectController extends FrontController
                     $aidParams['organizationType'] = $project->getOrganization()->getOrganizationType();
                     $searchParams['organizationType'] = $aidParams['organizationType']->getSlug();
                 }
-                $aidParams['keyword'] = $project->getName();
-                $searchParams['keyword'] = $aidParams['keyword'];
+            }
+            $aidParams['keyword'] = $project->getName();
+            $searchParams['keyword'] = $aidParams['keyword'];
+
+            // regarde si le projet à un projet référent associé pour écraser la recherche
+            if ($project->getProjectReference() instanceof ProjectReference && $project->getProjectReference()->getName()) {
+                    $aidParams['keyword'] = $project->getProjectReference()->getName();
+                    $searchParams['keyword'] = $aidParams['keyword'];
             }
 
             $aidsSuggested = $aidService->searchAids($aidParams);
