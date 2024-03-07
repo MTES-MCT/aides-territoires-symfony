@@ -314,7 +314,7 @@ class AidController extends FrontController
         // le user si dispo
         $user = $userService->getUserLogged();
         if (!$user) {
-            return $this->redirectToRoute($aid->getUrl());
+            return $this->redirect($aid->getUrl());
         }
 
         // duplique l'aide en aide locale
