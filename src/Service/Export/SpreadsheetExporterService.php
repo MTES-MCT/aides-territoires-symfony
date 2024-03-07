@@ -244,7 +244,7 @@ class SpreadsheetExporterService
                         'Périmètre de l\'organization' => ($result->getDefaultOrganization() && $result->getDefaultOrganization()->getPerimeter()) ? $result->getDefaultOrganization()->getPerimeter()->getName() : '', 
                         'Périmètre (region)' => ($result->getDefaultOrganization() && $result->getDefaultOrganization()->getPerimeterRegion()) ? $result->getDefaultOrganization()->getPerimeterRegion()->getName() : '', 
                         'Périmètre (Département)' => ($result->getDefaultOrganization() && $result->getDefaultOrganization()->getPerimeterDepartment()) ? $result->getDefaultOrganization()->getPerimeterDepartment()->getName() : '', 
-                        'Périmètre (Population)' => ($result->getDefaultOrganization() && $result->getDefaultOrganization()->getPerimeter()) ? $result->getDefaultOrganization()->getPerimeterDepartment()->getPopulation() : '', 
+                        'Périmètre (Population)' => ($result->getDefaultOrganization() && $result->getDefaultOrganization()->getPerimeter()) ? $result->getDefaultOrganization()->getPerimeter()->getPopulation() : '', 
                         'Contributeur ?' => $result->isIsContributor() ? 'Oui' : 'Non',
                         'Bénéficiaire ?' => $result->isIsBeneficiary() ? 'Oui' : 'Non',
                         'Nombre d\'aides' => $result->getAids() ? count($result->getAids()) : 0,
