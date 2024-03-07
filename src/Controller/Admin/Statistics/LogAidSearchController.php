@@ -6,6 +6,7 @@ use App\Controller\Admin\DashboardController;
 use App\Entity\Log\LogAidSearch;
 use App\Form\Admin\Filter\DateRangeType;
 use App\Repository\Log\LogAidSearchRepository;
+use App\Repository\Reference\ProjectReferenceRepository;
 use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
 use Symfony\Component\Routing\Attribute\Route;
 
@@ -14,7 +15,8 @@ class LogAidSearchController extends DashboardController
     #[Route('/admin/statistics/log/aid-search', name: 'admin_statistics_log_aid_search')]
     public function blogDashboard(
         AdminContext $adminContext,
-        LogAidSearchRepository $logAidSearchRepository
+        LogAidSearchRepository $logAidSearchRepository,
+        ProjectReferenceRepository $projectReferenceRepository
     )
     {
         // dates par défaut
@@ -52,12 +54,26 @@ class LogAidSearchController extends DashboardController
             $queriesByLogId[$logAidSearch->getId()] = explode('&', $logAidSearch->getQuerystring());
         }
 
+        // regarde si il y a un projet référent correspondant à la recherche
+        $projectReferences = $projectReferenceRepository->findAll();
+        $projectReferencesByLogId = [];
+        foreach ($logAidSearchs as $logAidSearch) {
+            $projectReferencesByLogId[$logAidSearch->getId()] = null;
+            foreach ($projectReferences as $projectReference) {
+                if ($projectReference->getName() == $logAidSearch->getSearch()) {
+                    $projectReferencesByLogId[$logAidSearch->getId()] = $projectReference;
+                    break;
+                }
+            }
+        }
+
         return $this->render('admin/statistics/log/aid-search.html.twig', [
             'formDateRange' => $formDateRange,
             'dateMin' => $dateMin,
             'dateMax' => $dateMax,
             'logAidSearchs' => $logAidSearchs,
-            'queriesByLogId' => $queriesByLogId
+            'queriesByLogId' => $queriesByLogId,
+            'projectReferencesByLogId' => $projectReferencesByLogId
         ]);
     }
 }

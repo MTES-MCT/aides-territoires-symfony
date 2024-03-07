@@ -36,10 +36,13 @@ class ProjectReference
     #[ORM\ManyToMany(targetEntity: Aid::class, mappedBy: 'projectReferences')]
     private Collection $aids;
 
+    private Collection $aidsLive;
+
     public function __construct()
     {
         $this->projects = new ArrayCollection();
         $this->aids = new ArrayCollection();
+        $this->aidsLive = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -143,5 +146,17 @@ class ProjectReference
         }
 
         return $this;
+    }
+
+    public function getAidsLive(): Collection
+    {
+        $aidsLive = new ArrayCollection();
+        foreach ($this->getAids() as $aid) {
+            if ($aid->isLive()) {
+                $aidsLive->add($aid);
+            }
+        }
+        $this->aidsLive = $aidsLive;
+        return $this->aidsLive;
     }
 }

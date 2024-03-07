@@ -32,6 +32,7 @@
                         <th>Date de publication</th>
                         <th>Nombre de résultats</th>
                         <th>Paramètres</th>
+                        <th>Projet référent</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -45,6 +46,11 @@
                                     {% for key, item in queriesByLogId[logAidSearch.id] %}
                                         {{ item }}<br />
                                     {% endfor %}
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if projectReferencesByLogId[logAidSearch.id] is defined and projectReferencesByLogId[logAidSearch.id] %}
+                                    {{ projectReferencesByLogId[logAidSearch.id].name }} ({{ projectReferencesByLogId[logAidSearch.id].aidsLive|length }} aides live associées)
                                 {% endif %}
                             </td>
                         </tr>
