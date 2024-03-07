@@ -334,7 +334,7 @@ class ProjectController extends FrontController
         );
         $user = $userService->getUserLogged();
         
-        if (!$project instanceof Project || $project->getOrganization()->getId()!=$user->getDefaultOrganization()->getId()) {
+        if (!$project instanceof Project || !$userService->isMemberOfOrganization($project->getOrganization(), $user)) {
             return $this->redirectToRoute('app_user_project_structure');
         }
 
@@ -558,7 +558,7 @@ class ProjectController extends FrontController
         );
         $user = $userService->getUserLogged();
         
-        if (!$project instanceof Project || $project->getOrganization()->getId()!=$user->getDefaultOrganization()->getId()) {
+        if (!$project instanceof Project || !$userService->isMemberOfOrganization($project->getOrganization(), $user)) {
             return $this->redirectToRoute('app_user_project_structure');
         }
 
