@@ -35,8 +35,7 @@ class Faq
     #[OrderBy(['position' => 'ASC'])]
     private Collection $faqCategories;
 
-    #[ORM\OneToOne(mappedBy: 'faq', cascade: ['persist'])]
-    #[JoinColumn(nullable: true, onDelete: 'SET NULL')]
+    #[ORM\ManyToOne(inversedBy: 'faqs')]
     private ?PageTab $pageTab = null;
 
     public function __construct()
@@ -115,6 +114,11 @@ class Faq
         return $this;
     }
 
+    public function  __toString(): string
+    {
+        return $this->name;
+    }
+
     public function getPageTab(): ?PageTab
     {
         return $this->pageTab;
@@ -122,23 +126,8 @@ class Faq
 
     public function setPageTab(?PageTab $pageTab): static
     {
-        // unset the owning side of the relation if necessary
-        if ($pageTab === null && $this->pageTab !== null) {
-            $this->pageTab->setFaq(null);
-        }
-
-        // set the owning side of the relation if necessary
-        if ($pageTab !== null && $pageTab->getFaq() !== $this) {
-            $pageTab->setFaq($this);
-        }
-
         $this->pageTab = $pageTab;
 
         return $this;
-    }
-
-    public function  __toString(): string
-    {
-        return $this->name;
     }
 }

@@ -59,41 +59,14 @@ $(function(){
         });
     });
 
-    // wysiwyg
-    $('.trumbowyg').trumbowyg({
-        svgPath: '/build/trumbowyg/icons.svg',
-        lang: 'fr',
-        btnsDef: {
-            // Create a new dropdown
-            image: {
-                dropdown: ['insertImage', 'upload'],
-                ico: 'insertImage'
-            }
-        },
-        // Redefine the button pane
-        btns: [
-            ['viewHTML'],
-            ['formatting'],
-            ['strong', 'em'],
-            ['link'],
-            ['unorderedList', 'orderedList'],
-            ['removeformat'],            
-            ['fullscreen'],
-            ['image'],
-            ['justifyLeft', 'justifyCenter', 'justifyRight'],
-        ],
-        plugins: {
-            // Add imagur parameters to upload plugin for demo purposes
-            upload: {
-                serverPath: Routing.generate('app_admin_upload_image'),
-                fileFieldName: 'image',
-                // headers: {
-                //     'Authorization': 'Client-ID xxxxxxxxxxxx'
-                // },
-                urlPropertyName: 'data.link'
-            }
+    $(document).on({
+        click: function(e) {
+            launchTrumbowyg();
         }
-    });
+    }, '.field-collection-add-button');
+
+    launchTrumbowyg();
+    
 
     global.datatables_fr_strings = {
         search: "Filtrer :",
@@ -108,3 +81,42 @@ $(function(){
     
     }
 })
+
+function launchTrumbowyg()
+{
+// wysiwyg
+$('textarea:not(.trumbowyg-textarea)').trumbowyg({
+    svgPath: '/build/trumbowyg/icons.svg',
+    lang: 'fr',
+    btnsDef: {
+        // Create a new dropdown
+        image: {
+            dropdown: ['insertImage', 'upload'],
+            ico: 'insertImage'
+        }
+    },
+    // Redefine the button pane
+    btns: [
+        ['viewHTML'],
+        ['formatting'],
+        ['strong', 'em'],
+        ['link'],
+        ['unorderedList', 'orderedList'],
+        ['removeformat'],            
+        ['fullscreen'],
+        ['image'],
+        ['justifyLeft', 'justifyCenter', 'justifyRight'],
+    ],
+    plugins: {
+        // Add imagur parameters to upload plugin for demo purposes
+        upload: {
+            serverPath: Routing.generate('app_admin_upload_image'),
+            fileFieldName: 'image',
+            // headers: {
+            //     'Authorization': 'Client-ID xxxxxxxxxxxx'
+            // },
+            urlPropertyName: 'data.link'
+        }
+    }
+});
+}

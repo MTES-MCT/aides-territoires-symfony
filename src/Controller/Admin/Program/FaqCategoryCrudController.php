@@ -24,10 +24,6 @@ class FaqCategoryCrudController extends AtCrudController
         yield TextField::new('name', 'Nom');
         yield AssociationField::new('faq', 'FAQ');
         yield IntegerField::new('position', 'Position')->onlyOnIndex();
-        yield CollectionField::new('faqQuestionAnswsers', 'Questions/Réponses')
-        ->setEntryIsComplex(true)
-        ->useEntryCrudForm(FaqQuestionAnswserCollectionCrudController::class)
-        ;
         yield DateTimeField::new('timeCreate', 'Date de création')
         ->setFormTypeOption('attr', ['readonly' => true])
         ->onlyWhenUpdating();

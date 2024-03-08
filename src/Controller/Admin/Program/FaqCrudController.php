@@ -4,6 +4,8 @@ namespace App\Controller\Admin\Program;
 
 use App\Controller\Admin\AtCrudController;
 use App\Entity\Page\Faq;
+use App\Form\Admin\Faq\FaqEditType;
+use App\Form\Admin\Program\FaqCategoryCollectionType;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\CollectionField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\DateTimeField;
@@ -23,9 +25,13 @@ class FaqCrudController extends AtCrudController
         yield TextField::new('name', 'Nom')
         ->setHelp('Utilisé uniquement pour l\'association dans l\'administration.');
         yield AssociationField::new('pageTab', 'Onglet lié');
+        // yield CollectionField::new('faqCategories', 'Catégories des questions')
+        // ->setEntryIsComplex(true)
+        // ->useEntryCrudForm(FaqCategoryCollectionCrudController::class)
+        // ->setColumns(12)
+        // ;
         yield CollectionField::new('faqCategories', 'Catégories des questions')
-        ->setEntryIsComplex(true)
-        ->useEntryCrudForm(FaqCategoryCollectionCrudController::class)
+        ->setEntryType(FaqCategoryCollectionType::class)
         ->setColumns(12)
         ;
         yield DateTimeField::new('timeCreate', 'Date de création')

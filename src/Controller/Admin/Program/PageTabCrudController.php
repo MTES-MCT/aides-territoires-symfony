@@ -28,8 +28,6 @@ class PageTabCrudController extends AtCrudController
         ->setHelp('Programme lié à cette page.');
         yield TrumbowygField::new('description', 'Contenu')
         ->hideOnIndex();
-        yield AssociationField::new('faq', 'Faq')
-        ->setHelp('Faq liée à cette page. Affichée après le contenu.');
         yield BooleanField::new('active', 'Actif');
         
         yield FormField::addFieldset('A propos de cet onglet');
