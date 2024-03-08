@@ -34,7 +34,7 @@ class AidService
     {
         $aids = $this->managerRegistry->getRepository(Aid::class)->findCustom($aidParams);
         if (count($aids) <= 10) {
-            $aidParams['scoreTotalMin'] = 20;
+            $aidParams['scoreTotalMin'] = 1;
             $aidParams['scoreObjectsMin'] = 0;
             $aids = $this->managerRegistry->getRepository(Aid::class)->findCustom($aidParams);
         }

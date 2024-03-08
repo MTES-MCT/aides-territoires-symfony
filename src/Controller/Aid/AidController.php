@@ -242,6 +242,14 @@ class AidController extends FrontController
         if (isset($aidSearchClass) and $aidSearchClass instanceof AidSearchClass) {
             $highlightedWords = [];
             if ($aidSearchClass->getKeyword()) {
+                // on met la recherche dans les highlights
+                $keywords = explode(' ', $aidSearchClass->getKeyword());
+                foreach ($keywords as $keyword) {
+                    if ($keyword && trim($keyword) !== '') {
+                        $highlightedWords[] = $keyword;
+                    }
+                }
+                // on va chercher les synonymes
                 $synonyms = $referenceService->getSynonymes($aidSearchClass->getKeyword());
                 if (isset($synonyms['intentions_string'])) {
                     $keywords = str_getcsv($synonyms['intentions_string'], ' ', '"');
