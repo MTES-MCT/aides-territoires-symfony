@@ -10,6 +10,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\DateTimeField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IntegerField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextareaField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\TextEditorField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 
 class FaqQuestionAnswserCrudController extends AtCrudController
@@ -31,7 +32,7 @@ class FaqQuestionAnswserCrudController extends AtCrudController
         yield IdField::new('id')->onlyOnIndex();
         yield TextField::new('question', 'Question')
         ->setColumns(12);
-        yield TextareaField::new('answer', 'Réponse')
+        yield TextEditorField::new('answer', 'Réponse')
         ->setColumns(12);
         yield AssociationField::new('faqCategory', 'Catégorie FAQ');
         yield IntegerField::new('position', 'Position')->onlyOnIndex();

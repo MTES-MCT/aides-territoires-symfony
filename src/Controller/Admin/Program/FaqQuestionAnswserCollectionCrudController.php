@@ -5,8 +5,10 @@ namespace App\Controller\Admin\Program;
 use App\Controller\Admin\AtCrudController;
 use App\Entity\Page\FaqQuestionAnswser;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Filters;
+
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextareaField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\TextEditorField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 
 class FaqQuestionAnswserCollectionCrudController extends AtCrudController
@@ -28,7 +30,12 @@ class FaqQuestionAnswserCollectionCrudController extends AtCrudController
         yield IdField::new('id')->onlyOnIndex();
         yield TextField::new('question', 'Question')
         ->setColumns(12);
-        yield TextareaField::new('answer', 'Réponse')
-        ->setColumns(12);
+        yield TextEditorField::new('answer', 'Réponse')
+        ->setColumns(12)
+        ->setFormTypeOptions([
+            'attr' => [
+                'class' => 'trumbowyg'
+            ]
+        ]);
     }
 }
