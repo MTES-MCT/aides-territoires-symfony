@@ -67,7 +67,7 @@ class ImportFluxAdemeAgirCommand extends ImportFluxCommand
 
         $dateSubmissionDeadline = null;
         try {
-            $dateSubmissionDeadline = new \DateTime($aidToImport['submission_deadline'] ?? null);
+            $dateSubmissionDeadline = new \DateTime($aidToImport['date_fin'] ?? null);
         } catch (\Exception $e) {
             $dateSubmissionDeadline = null;
         }
