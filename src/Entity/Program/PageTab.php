@@ -2,10 +2,12 @@
 
 namespace App\Entity\Program;
 
+use App\Entity\Page\Faq;
 use App\Entity\Program\Program;
 use App\Repository\Program\PageTabRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ORM\Mapping\JoinColumn;
 use Gedmo\Mapping\Annotation as Gedmo;
 
 #[ORM\Entity(repositoryClass: PageTabRepository::class)]
@@ -32,6 +34,13 @@ class PageTab
 
     #[ORM\ManyToOne(inversedBy: 'pageTabs')]
     private ?Program $program = null;
+
+    #[ORM\OneToOne(inversedBy: 'pageTab', cascade: ['persist'])]
+    #[JoinColumn(nullable: true, onDelete: 'SET NULL')]
+    private ?Faq $faq = null;
+
+    #[ORM\Column]
+    private ?bool $active = false;
 
     public function getId(): ?int
     {
@@ -94,6 +103,35 @@ class PageTab
     public function setProgram(?Program $program): static
     {
         $this->program = $program;
+
+        return $this;
+    }
+
+    public function getFaq(): ?Faq
+    {
+        return $this->faq;
+    }
+
+    public function setFaq(?Faq $faq): static
+    {
+        $this->faq = $faq;
+
+        return $this;
+    }
+
+    public function  __toString(): string
+    {
+        return $this->name;
+    }
+
+    public function isActive(): ?bool
+    {
+        return $this->active;
+    }
+
+    public function setActive(bool $active): static
+    {
+        $this->active = $active;
 
         return $this;
     }

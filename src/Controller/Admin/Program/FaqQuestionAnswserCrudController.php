@@ -3,36 +3,38 @@
 namespace App\Controller\Admin\Program;
 
 use App\Controller\Admin\AtCrudController;
-use App\Entity\Program\PageTab;
-use App\Field\TrumbowygField;
+use App\Entity\Page\FaqQuestionAnswser;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Filters;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
-use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\DateTimeField;
-use EasyCorp\Bundle\EasyAdminBundle\Field\FormField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\IntegerField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\TextareaField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 
-class PageTabCrudController extends AtCrudController
+class FaqQuestionAnswserCrudController extends AtCrudController
 {
     public static function getEntityFqcn(): string
     {
-        return PageTab::class;
+        return FaqQuestionAnswser::class;
+    }
+
+    public function configureFilters(Filters $filters): Filters
+    {
+        return $filters
+            ->add('faqCategory')
+        ;
     }
 
     public function configureFields(string $pageName): iterable
     {
         yield IdField::new('id')->onlyOnIndex();
-        yield TextField::new('name', 'Nom');
-        yield AssociationField::new('program', 'Program')
-        ->autocomplete()
-        ->setHelp('Programme lié à cette page.');
-        yield TrumbowygField::new('description', 'Contenu')
-        ->hideOnIndex();
-        yield AssociationField::new('faq', 'Faq')
-        ->setHelp('Faq liée à cette page. Affichée après le contenu.');
-        yield BooleanField::new('active', 'Actif');
-        
-        yield FormField::addFieldset('A propos de cet onglet');
+        yield TextField::new('question', 'Question')
+        ->setColumns(12);
+        yield TextareaField::new('answer', 'Réponse')
+        ->setColumns(12);
+        yield AssociationField::new('faqCategory', 'Catégorie FAQ');
+        yield IntegerField::new('position', 'Position')->onlyOnIndex();
         yield DateTimeField::new('timeCreate', 'Date de création')
         ->setFormTypeOption('attr', ['readonly' => true])
         ->onlyWhenUpdating();

@@ -33,6 +33,9 @@ use App\Entity\Log\LogUserLogin;
 use App\Entity\Organization\Organization;
 use App\Entity\Organization\OrganizationType;
 use App\Entity\Organization\OrganizationTypeGroup;
+use App\Entity\Page\Faq;
+use App\Entity\Page\FaqCategory;
+use App\Entity\Page\FaqQuestionAnswser;
 use App\Entity\Page\Page;
 use App\Entity\Perimeter\FinancialData;
 use App\Entity\Perimeter\Perimeter;
@@ -211,6 +214,9 @@ class DashboardController extends AbstractDashboardController
         yield MenuItem::subMenu('Programmes', 'fas fa-table')->setSubItems([
             MenuItem::linkToCrud('Onglets', 'fas fa-list', PageTab::class),
             MenuItem::linkToCrud('Programmes', 'fas fa-list', Program::class),
+            MenuItem::linkToCrud('Faqs', 'fas fa-list', Faq::class),
+            MenuItem::linkToCrud('Faqs Catégories', 'fas fa-list', FaqCategory::class),
+            MenuItem::linkToCrud('Faqs Questions', 'fas fa-list', FaqQuestionAnswser::class),
         ]);
 
         yield MenuItem::subMenu('Projets', 'fas fa-table')->setSubItems([

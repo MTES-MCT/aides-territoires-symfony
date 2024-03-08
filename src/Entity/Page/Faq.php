@@ -2,16 +2,18 @@
 
 namespace App\Entity\Page;
 
-use App\Repository\Page\FaqCategoryRepository;
+use App\Entity\Program\PageTab;
+use App\Repository\Page\FaqRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ORM\Mapping\JoinColumn;
 use Doctrine\ORM\Mapping\OrderBy;
 use Gedmo\Mapping\Annotation as Gedmo;
 
-#[ORM\Entity(repositoryClass: FaqCategoryRepository::class)]
-class FaqCategory
+#[ORM\Entity(repositoryClass: FaqRepository::class)]
+class Faq
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -21,29 +23,25 @@ class FaqCategory
     #[ORM\Column(length: 255)]
     private ?string $name = null;
 
-    #[ORM\Column]
-    // #[Gedmo\SortablePosition]
-    private ?int $position = null;
-
-    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     #[Gedmo\Timestampable(on: 'create')]
+    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $timeCreate = null;
 
-    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     #[Gedmo\Timestampable(on: 'update')]
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $timeUpdate = null;
 
-    #[ORM\OneToMany(mappedBy: 'faqCategory', targetEntity: FaqQuestionAnswser::class, cascade: ['persist'], orphanRemoval: true)]
+    #[ORM\OneToMany(mappedBy: 'faq', targetEntity: FaqCategory::class, cascade: ['persist'], orphanRemoval: true)]
     #[OrderBy(['position' => 'ASC'])]
-    private Collection $faqQuestionAnswsers;
+    private Collection $faqCategories;
 
-    #[ORM\ManyToOne(inversedBy: 'faqCategories')]
-    #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
-    private ?Faq $faq = null;
+    #[ORM\OneToOne(mappedBy: 'faq', cascade: ['persist'])]
+    #[JoinColumn(nullable: true, onDelete: 'SET NULL')]
+    private ?PageTab $pageTab = null;
 
     public function __construct()
     {
-        $this->faqQuestionAnswsers = new ArrayCollection();
+        $this->faqCategories = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -59,18 +57,6 @@ class FaqCategory
     public function setName(string $name): static
     {
         $this->name = $name;
-
-        return $this;
-    }
-
-    public function getPosition(): ?int
-    {
-        return $this->position;
-    }
-
-    public function setPosition(int $position): static
-    {
-        $this->position = $position;
 
         return $this;
     }
@@ -100,43 +86,53 @@ class FaqCategory
     }
 
     /**
-     * @return Collection<int, FaqQuestionAnswser>
+     * @return Collection<int, FaqCategory>
      */
-    public function getFaqQuestionAnswsers(): Collection
+    public function getFaqCategories(): Collection
     {
-        return $this->faqQuestionAnswsers;
+        return $this->faqCategories;
     }
 
-    public function addFaqQuestionAnswser(FaqQuestionAnswser $faqQuestionAnswser): static
+    public function addFaqCategory(FaqCategory $faqCategory): static
     {
-        if (!$this->faqQuestionAnswsers->contains($faqQuestionAnswser)) {
-            $this->faqQuestionAnswsers->add($faqQuestionAnswser);
-            $faqQuestionAnswser->setFaqCategory($this);
+        if (!$this->faqCategories->contains($faqCategory)) {
+            $this->faqCategories->add($faqCategory);
+            $faqCategory->setFaq($this);
         }
 
         return $this;
     }
 
-    public function removeFaqQuestionAnswser(FaqQuestionAnswser $faqQuestionAnswser): static
+    public function removeFaqCategory(FaqCategory $faqCategory): static
     {
-        if ($this->faqQuestionAnswsers->removeElement($faqQuestionAnswser)) {
+        if ($this->faqCategories->removeElement($faqCategory)) {
             // set the owning side to null (unless already changed)
-            if ($faqQuestionAnswser->getFaqCategory() === $this) {
-                $faqQuestionAnswser->setFaqCategory(null);
+            if ($faqCategory->getFaq() === $this) {
+                $faqCategory->setFaq(null);
             }
         }
 
         return $this;
     }
 
-    public function getFaq(): ?Faq
+    public function getPageTab(): ?PageTab
     {
-        return $this->faq;
+        return $this->pageTab;
     }
 
-    public function setFaq(?Faq $faq): static
+    public function setPageTab(?PageTab $pageTab): static
     {
-        $this->faq = $faq;
+        // unset the owning side of the relation if necessary
+        if ($pageTab === null && $this->pageTab !== null) {
+            $this->pageTab->setFaq(null);
+        }
+
+        // set the owning side of the relation if necessary
+        if ($pageTab !== null && $pageTab->getFaq() !== $this) {
+            $pageTab->setFaq($this);
+        }
+
+        $this->pageTab = $pageTab;
 
         return $this;
     }
