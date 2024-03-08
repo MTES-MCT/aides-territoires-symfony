@@ -552,7 +552,7 @@ class Aid
     #[ORM\OneToMany(mappedBy: 'aid', targetEntity: ProjectValidated::class)]
     private Collection $projectValidateds;
 
-    #[ORM\OneToMany(mappedBy: 'aid', targetEntity: AidProject::class)]
+    #[ORM\OneToMany(mappedBy: 'aid', targetEntity: AidProject::class, orphanRemoval: true)]
     private Collection $aidProjects;
 
     #[ORM\OneToMany(mappedBy: 'aid', targetEntity: AidSuggestedAidProject::class)]
