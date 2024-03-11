@@ -124,14 +124,18 @@ class FindBrokenLinksCommand extends Command
         $this->managerRegistry->getManager()->flush();
 
 
-        $this->emailService->sendEmail(
-            $this->paramService->get('email_super_admin'),
-            $nbBrokenLinks. ' liens sont cassés dans des fiches aides',
-            'emails/aid/find_broken_links.html.twig',
-            [
-                'aidsWithBrokenLinks' => $aidsWithBrokenLinks,
-            ]
-        );
+        // envoi email seulement si des liens sont cassés
+        if ($nbBrokenLinks > 0) {
+            $this->emailService->sendEmail(
+                $this->paramService->get('email_super_admin'),
+                $nbBrokenLinks. ' liens sont cassés dans des fiches aides',
+                'emails/aid/find_broken_links.html.twig',
+                [
+                    'aidsWithBrokenLinks' => $aidsWithBrokenLinks,
+                ]
+            );
+        }
+
         
         $timeEnd = microtime(true);
         $time = $timeEnd - $timeStart;
