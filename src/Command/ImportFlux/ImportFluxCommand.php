@@ -100,7 +100,9 @@ class ImportFluxCommand extends Command
 
         // met à jour le last access
         $this->dataSource->setTimeLastAccess(new \DateTime(date('Y-m-d H:i:s')));
-
+        $this->managerRegistry->getManager()->persist($this->dataSource);
+        $this->managerRegistry->getManager()->flush();
+        
         $timeEnd = microtime(true);
         $time = $timeEnd - $timeStart;
 
