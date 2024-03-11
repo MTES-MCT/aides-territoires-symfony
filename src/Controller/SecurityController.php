@@ -6,6 +6,8 @@ use App\Form\Security\LoginType;
 use App\Repository\User\UserRegisterConfirmationRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
@@ -116,10 +118,14 @@ class SecurityController extends FrontController
 
     // Url pour la connexion à l'API
     #[Route(path: '/api/connexion/', name: 'app_login_api')]
-    public function loginApi(AuthenticationUtils $authenticationUtils): void
+    public function loginApi(AuthenticationUtils $authenticationUtils, RequestStack $requestStack): JsonResponse
     {
-        // le code reste vide, c'est le firewall qui intercepte la requête
-        // mais l'existence de la route reste nécessaire
+        if ($requestStack->getMainRequest()->getMethod() !== 'POST') {
+            return new JsonResponse('Cette page doit être appellée en POST', 405);
+        }
+        if (!$requestStack->getMainRequest()->headers->get('X-AUTH-TOKEN')) {
+            return new JsonResponse('Veuillez ajouter votre X-AUTH-TOKEN dans les HEADERS', 401);
+        }
     }
 
     #[Route(path: '/logout', name: 'app_logout')]
