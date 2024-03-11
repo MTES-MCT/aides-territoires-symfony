@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "5fda08daa04c24ea8736ada464d1ae46",
+    "content-hash": "a7f476b0dda52f1f4795437379c288f1",
     "packages": [
         {
             "name": "api-platform/core",
@@ -4887,70 +4887,6 @@
                 "source": "https://github.com/phpstan/phpdoc-parser/tree/1.24.5"
             },
             "time": "2023-12-16T09:33:33+00:00"
-        },
-        {
-            "name": "prolix/maintenance-bundle",
-            "version": "2.1.15",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/prolixtechnikos/LexikMaintenanceBundle.git",
-                "reference": "f90f1e5a327d5aec4fb55502093f41959a258c96"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/prolixtechnikos/LexikMaintenanceBundle/zipball/f90f1e5a327d5aec4fb55502093f41959a258c96",
-                "reference": "f90f1e5a327d5aec4fb55502093f41959a258c96",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.3.9",
-                "symfony/framework-bundle": "^6.0|^7.0",
-                "symfony/translation": "^6.0|^7.0"
-            },
-            "require-dev": {
-                "phpunit/phpunit": "8.5.*",
-                "symfony/phpunit-bridge": "^6.0|^7.0"
-            },
-            "type": "symfony-bundle",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "2.0.x-dev"
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Lexik\\Bundle\\MaintenanceBundle\\": ""
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Gilles Gauthier",
-                    "email": "g.gauthier@lexik.fr"
-                },
-                {
-                    "name": "Dev Lexik",
-                    "email": "dev@lexik.fr"
-                },
-                {
-                    "name": "Djuri Baars",
-                    "email": "info@djurict.nl"
-                }
-            ],
-            "description": "This bundle allows you to place your website in maintenance mode by calling two commands from your console.",
-            "homepage": "https://github.com/lexik/LexikMaintenanceBundle",
-            "keywords": [
-                "Symfony2",
-                "bundle",
-                "maintenance"
-            ],
-            "support": {
-                "source": "https://github.com/prolixtechnikos/LexikMaintenanceBundle/tree/2.1.15"
-            },
-            "time": "2024-01-03T06:06:36+00:00"
         },
         {
             "name": "psr/cache",
