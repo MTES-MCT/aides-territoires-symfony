@@ -614,7 +614,7 @@ class Aid
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $originUrlText = null;
 
-    #[ORM\ManyToMany(targetEntity: KeywordReference::class, inversedBy: 'aids')]
+    #[ORM\ManyToMany(targetEntity: KeywordReference::class, inversedBy: 'aids', cascade:['persist'])]
     private Collection $keywordReferences;
 
     #[ORM\ManyToMany(targetEntity: ProjectReference::class, inversedBy: 'aids')]

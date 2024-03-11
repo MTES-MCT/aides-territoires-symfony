@@ -208,6 +208,7 @@ class ImportFluxWelcomeEuropeCommand extends ImportFluxCommand
             if (!$keyword instanceof KeywordReference) {
                 $keyword = new KeywordReference();
                 $keyword->setName($category);
+                $this->managerRegistry->getManager()->persist($keyword);
             }
             $aid->addKeywordReference($keyword);
         }
