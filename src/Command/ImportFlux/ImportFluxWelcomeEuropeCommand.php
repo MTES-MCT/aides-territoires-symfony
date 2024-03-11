@@ -384,7 +384,7 @@ class ImportFluxWelcomeEuropeCommand extends ImportFluxCommand
             ]
         ];
 
-        $audiences = explode(';', $aidToImport['filtres_beneficiaries']);
+        $audiences = explode(';', html_entity_decode($aidToImport['filtres_beneficiaries']));
 
         if (is_array($audiences)) {
             foreach ($audiences as $audience) {

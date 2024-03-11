@@ -352,6 +352,28 @@ class ImportFluxCommand extends Command
                 $entityUpdated = true;
             }
 
+            // on regarde si modification des audiences
+            $oldArray = $aid->getAidAudiences()->toArray();
+            $aid = $this->setAidAudiences($aidToImport, $aid);
+            $newArray = $aid->getAidAudiences()->toArray();
+
+            $diff = array_diff($oldArray, $newArray);
+            if (!empty($diff)) {
+                $entityUpdated = true;
+            }
+            //-----------------------------------------------------
+
+
+            // on regarde si modification des categories
+            $oldArray = $aid->getCategories()->toArray();
+            $aid = $this->setCategories($aidToImport, $aid);
+            $newArray = $aid->getCategories()->toArray();
+
+            $diff = array_diff($oldArray, $newArray);
+            if (!empty($diff)) {
+                $entityUpdated = true;
+            }
+            //-----------------------------------------------------
 
             if ($entityUpdated) {
                 // notifie que l'aide à été modifié suite à l'import
