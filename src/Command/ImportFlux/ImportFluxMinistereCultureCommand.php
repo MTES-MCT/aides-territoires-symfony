@@ -35,33 +35,19 @@ class ImportFluxMinistereCultureCommand extends ImportFluxCommand
     protected function getFieldsMapping(array $aidToImport, array $params = null): array
     {
         try {
-            $keys = ['deadline'];
+            $importRaws = $this->getImportRaws($aidToImport, ['deadline']);
+            $importRawObjectCalendar = $importRaws['importRawObjectCalendar'];
+            $importRawObject = $importRaws['importRawObject'];
 
-            $importRawObjectCalendar = [];
-            foreach ($keys as $key) {
-                if (isset($aidToImport[$key])) {
-                    $importRawObjectCalendar[$key] = $aidToImport[$key];
-                }
-            }
-            if (count($importRawObjectCalendar) == 0) {
-                $importRawObjectCalendar = null;
-            }
     
-            $importRawObject = $aidToImport;
-            foreach ($keys as $key) {
-                if (isset($importRawObject[$key])) {
-                    unset($importRawObject[$key]);
-                }
-            }
-    
-            $destiption1 = isset($aidToImport['summary']) ? $this->htmlSanitizerInterface->sanitize($aidToImport['summary']) : '';
-            $destiption2 = isset($aidToImport['body']) ? $this->htmlSanitizerInterface->sanitize($aidToImport['body']) : '';
+            $description1 = isset($aidToImport['summary']) ? $this->htmlSanitizerInterface->sanitize($aidToImport['summary']) : '';
+            $description2 = isset($aidToImport['body']) ? $this->htmlSanitizerInterface->sanitize($aidToImport['body']) : '';
             $type = isset($aidToImport['type']) ? $aidToImport['type'] : '';
             $aidToDelete = '';
             if (in_array($type, ['Demande d\'autorisation', 'Demande de labellisation'])) {
                 $aidToDelete = 'Aide à supprimer : type d\'aides non correspondant ';
             }
-            $description = $aidToDelete . $destiption1 . $destiption2;
+            $description = html_entity_decode($aidToDelete . $description1 . $description2);
             if (trim($description) == '') {
                 $description = null;
             }
@@ -83,6 +69,7 @@ class ImportFluxMinistereCultureCommand extends ImportFluxCommand
             if (isset($aidToImport['deadline'])) {
                 $eligility .= '<br/> date de clôture de l\'aide :'. (string) $aidToImport['deadline'];
             }
+            $eligility = html_entity_decode($eligility);
             if (trim($eligility) == '') {
                 $eligility = null;
             } else {

@@ -352,6 +352,7 @@ class ImportFluxCommand extends Command
                 $entityUpdated = true;
             }
 
+
             if ($entityUpdated) {
                 // notifie que l'aide à été modifié suite à l'import
                 $aid->setImportUpdated(true);
