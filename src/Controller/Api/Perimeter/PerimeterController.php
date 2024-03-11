@@ -51,7 +51,7 @@ class PerimeterController extends ApiController
         foreach ($results as $result) {
             $resultsSpe[] = [
                 'id' => $result->getId().'-'.$this->stringService->getSlug($result->getName()),
-                'text' => $perimeterService->getSmartName($perimeter),
+                'text' => $perimeterService->getSmartName($result),
                 'name' => $result->getName(),
                 'scale' => $perimeterService->getScale($result->getScale())['name'] ?? null,
                 'zipcodes' => $result->getZipcodes() ?? [],
