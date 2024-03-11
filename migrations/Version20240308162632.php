@@ -26,6 +26,7 @@ final class Version20240308162632 extends AbstractMigration
         $this->addSql('ALTER TABLE faq_category ADD CONSTRAINT FK_FAEEE0D681BEC8C2 FOREIGN KEY (faq_id) REFERENCES faq (id) ON DELETE SET NULL');
         $this->addSql('CREATE INDEX IDX_FAEEE0D681BEC8C2 ON faq_category (faq_id)');
         $this->addSql('ALTER TABLE page_tab ADD active TINYINT(1) NOT NULL');
+        $this->addSql('UPDATE page_tab SET active = 1');
     }
 
     public function down(Schema $schema): void
