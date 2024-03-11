@@ -115,7 +115,11 @@ class PageTab
 
     public function  __toString(): string
     {
-        return $this->name;
+        $name = $this->getName();
+        if ($this->getProgram() instanceof Program) {
+            $name .= ' (' . $this->getProgram()->getName() . ')';
+        }
+        return $name;
     }
 
     public function isActive(): ?bool
