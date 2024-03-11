@@ -79,11 +79,6 @@ class ImportFluxWelcomeEuropeCommand extends ImportFluxCommand
             }
         }
         $importRawObject = $aidToImport;
-        foreach ($keys as $key) {
-            if (isset($aidToImport[$key])) {
-                unset($aidToImport[$key]);
-            }
-        }
 
         $description = '';
         if (isset($aidToImport['relations_programmes'])) {
@@ -130,6 +125,9 @@ class ImportFluxWelcomeEuropeCommand extends ImportFluxCommand
                 }
             }
         }
+        if (!$dateStart instanceof \DateTime) {
+            $dateStart = null;
+        }
 
         $dateSubmissionDeadline = null;
         $keys = ['dates_deadline-4', 'dates_deadline-3', 'dates_deadline-2', 'dates_deadline1', 'deadline1'];
@@ -142,7 +140,9 @@ class ImportFluxWelcomeEuropeCommand extends ImportFluxCommand
                 }
             }
         }
-
+        if (!$dateSubmissionDeadline instanceof \DateTime) {
+            $dateSubmissionDeadline = null;
+        }
 
         $contact = null;
         if (isset($aidToImport['info_utile'])) {
