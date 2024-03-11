@@ -46,7 +46,7 @@ class AidController extends ApiController
         $aidParams['firstResult'] = ($this->getPage() - 1) * $this->getItemsPerPage();
         $aidParams['maxResults'] = $this->getItemsPerPage();
         
-        $results = $aidRepository->findCustom($aidParams);
+        $results = $aidService->searchAids($aidParams);
 
         // spécifique
         $resultsSpe = $this->getResultsSpe($results, $aidService);
