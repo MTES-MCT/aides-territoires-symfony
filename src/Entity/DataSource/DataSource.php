@@ -79,6 +79,9 @@ class DataSource
 
     private int $nbAids = 0;
 
+    #[ORM\Column]
+    private ?bool $active = true;
+
     public function __construct()
     {
         $this->aids = new ArrayCollection();
@@ -308,5 +311,17 @@ class DataSource
     public function  __toString(): string
     {
         return $this->name ?? 'DataSource';
+    }
+
+    public function isActive(): ?bool
+    {
+        return $this->active;
+    }
+
+    public function setActive(bool $active): static
+    {
+        $this->active = $active;
+
+        return $this;
     }
 }
