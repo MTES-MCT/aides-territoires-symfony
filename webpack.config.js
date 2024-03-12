@@ -63,6 +63,7 @@ Encore
     .addEntry('front/user/project/aides', './assets/js/front/user/project/aides.js')
     .addEntry('front/user/notification/index', './assets/js/front/user/notification/index.js')
     .addEntry('front/user/project/fiche_projet', './assets/js/front/user/project/fiche_projet.js')
+    .addEntry('front/user/backer/edit', './assets/js/front/user/backer/edit.js')
     .addEntry('front/user/searchpage/edit', './assets/js/front/user/searchpage/edit.js')
     .addEntry('form/checkbox-multiple-search', './assets/js/form/checkbox-multiple-search.js')
     .addEntry('form/entity-checkbox-absolute-type', './assets/js/form/entity-checkbox-absolute-type.js')
@@ -91,6 +92,7 @@ Encore
     .addEntry('import-scss/user/register-commune', './assets/js/import-scss/user/register-commune.js')
     .addEntry('import-scss/user/project/fiche_projet', './assets/js/import-scss/user/project/fiche_projet.js')
     .addEntry('import-scss/user/searchpage/edit', './assets/js/import-scss/user/searchpage/edit.js')
+    .addEntry('import-scss/user/backer/edit', './assets/js/import-scss/user/backer/edit.js')
     .addEntry('import-scss/reference/index', './assets/js/import-scss/reference/index.js')
     .addEntry('import-scss/reference/projets_subventionnes', './assets/js/import-scss/reference/projets_subventionnes.js')
 

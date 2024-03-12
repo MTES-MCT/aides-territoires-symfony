@@ -6,12 +6,14 @@ use App\Controller\Admin\AtCrudController;
 use App\Entity\Backer\Backer;
 use App\Field\TextLengthCountField;
 use App\Field\TrumbowygField;
+use App\Form\Admin\Backer\BackerUserCollectionType;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Filters;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\CollectionField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\FormField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ImageField;
@@ -55,6 +57,11 @@ class BackerCrudController extends AtCrudController
             $this->getContext()->getEntity()->getInstance()->setLogo($fileName);
         })
         ->onlyOnForms()
+        ;
+        yield CollectionField::new('backerUsers', 'Utilisateurs')
+        ->setEntryIsComplex(true)
+        ->setEntryType(BackerUserCollectionType::class)
+        ->setFormTypeOption('by_reference', false)
         ;
         yield BooleanField::new('deleteLogo', 'Supprimer le fichier actuel')
         ->onlyWhenUpdating();
