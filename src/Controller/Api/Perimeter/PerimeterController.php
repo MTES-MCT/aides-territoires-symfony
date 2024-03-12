@@ -50,7 +50,7 @@ class PerimeterController extends ApiController
         /** @var Perimeter $result */
         foreach ($results as $result) {
             $resultsSpe[] = [
-                'id' => $result->getId().'-'.$this->stringService->getSlug($result->getName()),
+                'id' => $result->getId(),
                 'text' => $perimeterService->getSmartName($result),
                 'name' => $result->getName(),
                 'scale' => $perimeterService->getScale($result->getScale())['name'] ?? null,
@@ -108,21 +108,21 @@ class PerimeterController extends ApiController
         return $response;
     }
 
-    #[Route('/api/perimeters/{id}/', name: 'api_perimeters_details', priority: 5, requirements: ['id' => '[0-9]+'])]
+    #[Route('/api/perimeters/{id}/', name: 'api_perimeters_details', priority: 5, requirements: ['id' => '[A-Za-z0-9\-]+'])]
     public function details(
-        int $id,
+        string $id,
         PerimeterRepository $perimeterRepository,
         PerimeterService $perimeterService
     ): JsonResponse
     {
-        $perimeter = $perimeterRepository->find($id);
+        $perimeter = $perimeterRepository->find((int) $id);
         if (!$perimeter instanceof Perimeter) {
             return new JsonResponse('Périmètre non trouvé', 404);
         }
 
         // spécifique
         $data = [
-            'id' => $perimeter->getId().'-'.$this->stringService->getSlug($perimeter->getName()),
+            'id' => $perimeter->getId(),
             'text' => $perimeterService->getSmartName($perimeter),
             'name' => $perimeter->getName(),
             'scale' => $perimeterService->getScale($perimeter->getScale())['name'] ?? null,
