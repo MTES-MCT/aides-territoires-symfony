@@ -50,7 +50,7 @@ class PerimeterController extends ApiController
         /** @var Perimeter $result */
         foreach ($results as $result) {
             $resultsSpe[] = [
-                'id' => $result->getId(),
+                'id' => $result->getId().'-'.$this->stringService->getSlug($result->getName()),
                 'text' => $perimeterService->getSmartName($result),
                 'name' => $result->getName(),
                 'scale' => $perimeterService->getScale($result->getScale())['name'] ?? null,
@@ -122,7 +122,7 @@ class PerimeterController extends ApiController
 
         // spécifique
         $data = [
-            'id' => $perimeter->getId(),
+            'id' => $perimeter->getId().'-'.$this->stringService->getSlug($perimeter->getName()),
             'text' => $perimeterService->getSmartName($perimeter),
             'name' => $perimeter->getName(),
             'scale' => $perimeterService->getScale($perimeter->getScale())['name'] ?? null,
