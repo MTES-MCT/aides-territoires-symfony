@@ -678,9 +678,9 @@ class AidRepository extends ServiceEntityRepository
             }
 
             if ($sqlTotal !== '') {
+                $scoreTotalAvailable = true;
                 $qb->addSelect('('.$sqlTotal.') as score_total');
                 $qb->andHaving('score_total >= '.$scoreTotalMin);
-                $qb->orderBy('score_total', 'DESC');
             }
         }
 
