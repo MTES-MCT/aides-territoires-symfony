@@ -957,7 +957,7 @@ class AidRepository extends ServiceEntityRepository
         }
 
         // si aucun tri mais qu'on a le score total
-        if ($orderBy == null && $orderByDateSubmissionDeadline == null && $scoreTotalAvailable === true) {
+        if ($orderBy == null && $orderByDateSubmissionDeadline == null && isset($scoreTotalAvailable) && $scoreTotalAvailable === true) {
             $qb
                 ->addOrderBy('score_total', 'DESC')
             ;
