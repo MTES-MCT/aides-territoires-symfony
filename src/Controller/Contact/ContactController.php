@@ -41,6 +41,7 @@ class ContactController extends FrontController
             $contact = $requestStack->getCurrentRequest()->get('contact');
             $subject = $contact['subject'] ?? null;
             if (!$subject || trim($subject) == '') {
+                $this->addFlash(FrontController::FLASH_ERROR, 'Une erreur est survenue lors de l\'envoi du message.');
                 return $this->redirectToRoute('app_contact_contact', ['success'=>0]);
             }
         }
@@ -89,7 +90,9 @@ class ContactController extends FrontController
                         'subject' => $email_subject,
                         'body' => $content_email,
                     ]
-                    );
+                );
+
+                $this->addFlash(FrontController::FLASH_SUCCESS, 'Votre message a bien été envoyé.');
 
                 return $this->redirectToRoute('app_contact_contact', ['success'=>1]);
             } else {
