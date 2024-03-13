@@ -38,8 +38,8 @@ class ContactController extends FrontController
         // vérification supplémentaire
         // des bots retire le required sur le sujet ce qui provoque une erreur dans le handleRequest
         if ($requestStack->getCurrentRequest()->request->has('contact') ) {
-            $contact = $requestStack->getCurrentRequest()->get('contact');
-            $subject = $contact['subject'] ?? null;
+            $contactRequest = $requestStack->getCurrentRequest()->get('contact');
+            $subject = $contactRequest['subject'] ?? null;
             if (!$subject || trim($subject) == '') {
                 $this->addFlash(FrontController::FLASH_ERROR, 'Une erreur est survenue lors de l\'envoi du message.');
                 return $this->redirectToRoute('app_contact_contact', ['success'=>0]);
