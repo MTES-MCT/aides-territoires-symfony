@@ -40,24 +40,6 @@ class BackerUserCollectionType extends AbstractType
                 'choice_label' => 'email',
                 'autocomplete' => true
             ])
-            ->add('timeAccept', DateTimeType::class, [
-                'label' => 'Date d\'acceptation',
-                'attr' => [
-                    'readonly' => 'readonly'
-                ]
-            ])
-            ->add('timeRefuse', DateTimeType::class, [
-                'label' => 'Date de refus',
-                'attr' => [
-                    'readonly' => 'readonly'
-                ]
-            ])
-            ->add('timeInvitation', DateTimeType::class, [
-                'label' => 'Date d\'invitation',
-                'attr' => [
-                    'readonly' => 'readonly'
-                ]        
-            ])
         ;
     }
 

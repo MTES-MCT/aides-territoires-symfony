@@ -20,6 +20,18 @@
         <div class="fr-col-12 fr-col-md-9">
             <h1>Editer la ficher du porteur {% if backer.name %}{{ backer.name }}{% else %}d'aide{% endif %}</h1>
             
+            <div class="fr-grid-row">
+                <div class="fr-col-12 fr-col-md-6">
+                    <p><a href="{{ path('app_user_backer_users', {'slug': backer.slug})}}" class="fr-btn fr-btn--secondary" title="Voir les utilisateurs">Voir les utilisateurs</a></p>
+                </div>
+                <div class="fr-col-12 fr-col-md-6">
+                    <p class="at-align-end"><a href="{{ path('app_backer_details', {'id': backer.id, 'slug': backer.slug})}}" class="fr-btn fr-btn--secondary" title="Voir la fiche sur le site - Ouvre une nouvelle fenêtre" target="_blank">Voir la fiche sur le site</a></p>
+                </div>
+            </div>
+            
+            
+
+            {% if userCanEdit %}
             {{ form_start(form) }}
                 {{ form_row(form.name) }}
                 {{ form_row(form.isCorporate) }}
@@ -41,6 +53,21 @@
 
                 <p class="fr-hint-text fr-mt-2w">Les champs marqués d’un astérisque (*) sont obligatoires.</p>
             {{ form_end(form) }}
+            {% else %}
+                <div class="fr-alert fr-alert--info fr-alert--sm fr-my-2w">
+                    <p>Vous n'avez pas les droits pour éditer la fiche du porteur d'aide.</p>
+                </div>
+
+                
+                <p>Veuillez contacter un administrateur :</p>
+                <ul>
+                    {% for backerUser in backer.backerUsers %}
+                        {% if backerUser.user %}
+                            <li>{{ backerUser.user.email }}</li>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+            {% endif %}
         </div>
     </div>
 </div>

@@ -1,0 +1,71 @@
+{% extends 'base.html.twig' %}
+
+{% block stylesheets %}
+	{{ parent() }}
+	{{ encore_entry_link_tags('import-scss/user/backer/edit') }}
+{% endblock %}
+
+{% block javascripts %}
+	{{ parent() }}
+	{{ encore_entry_script_tags('front/user/backer/edit') }}
+{% endblock %}
+
+{% block title %}Utilisateur du porteur d'aide | {{ parent() }}{% endblock %}
+
+{% block body %}
+<div class="fr-container fr-mb-5w fr-mt-0">
+    <div class="fr-grid-row">
+        {% include "user/_menu_user.html.twig" %}
+        
+        <div class="fr-col-12 fr-col-md-9">
+            <h1>Utilisateurs du porteur {% if backer.name %}{{ backer.name }}{% else %}d'aide{% endif %}</h1>
+            
+            <div class="fr-table">
+                <table class="data-table">
+                    <caption>
+                        Liste des personnes attachées à ce porteur d'aide
+                    </caption>
+                    <thead>
+                        <tr>
+                            <th scope="col">Nom</th>
+                            <th scope="col">Email</th>
+                            <th scope="col">Administrateur</th>
+                            <th scope="col">Editeur</th>
+                            <th scope="col"></th>
+                        </tr>
+                    </thead>
+                    {% if backer.backerUsers|length > 0 %}
+                    <tbody>
+                        {% for backerUser in backer.backerUsers %}
+                        <tr>
+                            <td>
+                                {% if backerUser.user.id == app.user.id %}
+                                    Vous
+                                {% else %}
+                                    {{ backerUser.user.firstName }} {{ backerUser.user.lastName }}
+                                {% endif %}
+                            </td>
+                            <td>
+                                {{ backerUser.user.email }}
+                            </td>
+                            <td>{% if backerUser.isAdministrator %}Oui{% else %}Non{% endif %}</td>
+                            <td>{% if backerUser.isEditor %}Oui{% else %}Non{% endif %}</td>
+                            <td></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                    {% else %}
+                    <tbody>
+                        <tr>
+                            <td colspan="5" class="at-centered-important">
+                                Vous n’avez aucun collaborateur pour le moment
+                            </td>
+                        </tr>
+                    </tbody>
+                    {% endif %}
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

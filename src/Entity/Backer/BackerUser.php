@@ -25,10 +25,10 @@ class BackerUser
     private ?User $user = null;
 
     #[ORM\Column]
-    private ?bool $administrator = null;
+    private ?bool $administrator = false;
 
     #[ORM\Column]
-    private ?bool $editor = null;
+    private ?bool $editor = false;
 
     #[Gedmo\Timestampable(on: 'create')]
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
@@ -37,15 +37,6 @@ class BackerUser
     #[Gedmo\Timestampable(on: 'update')]
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $timeUpdate = null;
-
-    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
-    private ?\DateTimeInterface $timeAccept = null;
-
-    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
-    private ?\DateTimeInterface $timeRefuse = null;
-
-    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
-    private ?\DateTimeInterface $timeInvitation = null;
 
     public function getId(): ?int
     {
@@ -120,42 +111,6 @@ class BackerUser
     public function setTimeUpdate(?\DateTimeInterface $timeUpdate): static
     {
         $this->timeUpdate = $timeUpdate;
-
-        return $this;
-    }
-
-    public function getTimeAccept(): ?\DateTimeInterface
-    {
-        return $this->timeAccept;
-    }
-
-    public function setTimeAccept(?\DateTimeInterface $timeAccept): static
-    {
-        $this->timeAccept = $timeAccept;
-
-        return $this;
-    }
-
-    public function getTimeRefuse(): ?\DateTimeInterface
-    {
-        return $this->timeRefuse;
-    }
-
-    public function setTimeRefuse(?\DateTimeInterface $timeRefuse): static
-    {
-        $this->timeRefuse = $timeRefuse;
-
-        return $this;
-    }
-
-    public function getTimeInvitation(): ?\DateTimeInterface
-    {
-        return $this->timeInvitation;
-    }
-
-    public function setTimeInvitation(?\DateTimeInterface $timeInvitation): static
-    {
-        $this->timeInvitation = $timeInvitation;
 
         return $this;
     }
