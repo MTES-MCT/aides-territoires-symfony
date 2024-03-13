@@ -75,14 +75,16 @@ class BackerEditType extends AbstractType
             ])
             ->add('metaDescription', TextType::class, [
                 'required' => false,
-                'label' => 'Méta description'
+                'label' => 'Méta description',
+                'help' => 'La méta description est un court texte qui décrit le contenu de la page. (max 255 caractères)'
             ])
             ->add('metaTitle', TextType::class, [
                 'required' => false,
-                'label' => 'Meta title'
+                'label' => 'Meta title',
+                'help' => 'Le meta title est le titre de la page qui apparait dans les résultats de recherche. (max 255 caractères)'
             ])
             ->add('perimeter', PerimeterAutocompleteType::class, [
-                'required' => false,
+                'required' => true,
                 'label' => 'Zone géographique couverte par le porteur',
                 'help' => 'La zone géographique sur laquelle le porteur fourni des aides.<br />
                 Exemples de zones valides :
@@ -104,7 +106,8 @@ class BackerEditType extends AbstractType
                 'label' => 'Groupe auquel le porteur appartiens',
                 'class' => BackerGroup::class,
                 'choice_label' => 'name',
-                'autocomplete' => true
+                'autocomplete' => true,
+                'placeholder' => 'Tapez les premiers caractères',
             ])
         ;
     }

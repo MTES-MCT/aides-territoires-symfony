@@ -9,6 +9,7 @@ use App\Entity\Backer\Backer;
 use App\Entity\Backer\BackerCategory;
 use App\Entity\Organization\OrganizationType;
 use App\Entity\Perimeter\Perimeter;
+use App\Entity\User\User;
 use App\Repository\Aid\AidRepository;
 use App\Repository\Perimeter\PerimeterRepository;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
@@ -236,9 +237,17 @@ class BackerRepository extends ServiceEntityRepository
         $nameLike = $params['nameLike'] ?? null;
         $hasFinancedAids = $params['hasFinancedAids'] ?? null;
         $hasPublishedFinancedAids = $params['hasPublishedFinancedAids'] ?? null;
+        $user = $params['user'] ?? null;
 
         $qb = $this->createQueryBuilder('b');
 
+        if ($user instanceof User) {
+            $qb
+                ->innerJoin('b.backerUsers', 'backerUsers')
+                ->andWhere('backerUsers.user = :user')
+                ->setParameter('user', $user);
+            ;
+        }
         if ($hasLogo === true) {
             $qb
                 ->andWhere('b.logo IS NOT NULL')

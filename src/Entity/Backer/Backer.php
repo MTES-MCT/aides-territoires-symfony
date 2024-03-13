@@ -95,7 +95,7 @@ class Backer
     private ?string $externalLink = null;
 
     #[ORM\Column]
-    private ?bool $isSpotlighted = null;
+    private ?bool $isSpotlighted = false;
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $logo = null;

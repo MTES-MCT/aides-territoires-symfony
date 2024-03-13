@@ -176,7 +176,7 @@ class ImageService
                 'SourceFile' => $tmpFile,
                 'ACL'    => 'public-read',
             ]);
-
+            
             // suppression fichier temporaire
             unlink($tmpFile);
             return true;

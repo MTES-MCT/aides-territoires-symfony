@@ -7,16 +7,22 @@
                 <li class="fr-sidemenu__item {% if dashboard is defined %}fr-sidemenu__item--active{% endif %}">
                     <a class="fr-sidemenu__link" href="{{ path('app_user_dashboard') }}" target="_self" title="Tableau de bord" {% if dashboard is defined %}aria-current="page"{% endif %} rel="noopener">Tableau de bord</a>
                 </li>     
-                {% if app.user and app.user.backerUsers %}
+                {% if app.user.isContributor %}
                 <li class="fr-sidemenu__item">
                     <button class="fr-sidemenu__btn" {% if user_backer is defined %} aria-expanded="true" {% else %} aria-expanded="false" {% endif %} aria-controls="fr-sidemenu-item-backer" title="Mes porteurs d'aide">Mes porteurs d'aide</button>
                     <div class="fr-collapse" id="fr-sidemenu-item-backer">
                         <ul class="fr-sidemenu__list">
-                            {% for backerUser in app.user.backerUsers %}
-                            <li class="fr-sidemenu__item {% if user_backer is defined and user_backer_id is defined and backerUser.backer and user_backer_id == backerUser.backer.id %}fr-sidemenu__item--active{% endif %}">
-                                <a class="fr-sidemenu__link" href="{{ path('app_user_backer_edit', {'slug': backerUser.backer.slug}) }}" target="_self"  {% if user_backer is defined and user_backer_id is defined and backerUser.backer and user_backer_id == backerUser.backer.id %}aria-current="page"{% endif %} rel="noopener" title="{{ backerUser.backer.name }}">{{ backerUser.backer.name }}</a>
-                            </li>
-                            {% endfor %}
+                            {% if app.user.backerUsers|length > 0 %}
+                                {% for backerUser in app.user.backerUsers %}
+                                    <li class="fr-sidemenu__item {% if user_backer is defined and user_backer_id is defined and backerUser.backer and user_backer_id == backerUser.backer.id %}fr-sidemenu__item--active{% endif %}">
+                                        <a class="fr-sidemenu__link" href="{{ path('app_user_backer_edit', {'id': backerUser.backer.id}) }}" target="_self"  {% if user_backer is defined and user_backer_id is defined and backerUser.backer and user_backer_id == backerUser.backer.id %}aria-current="page"{% endif %} rel="noopener" title="{{ backerUser.backer.name }}">{{ backerUser.backer.name }}</a>
+                                    </li>
+                                {% endfor %}
+                            {% else %}
+                                <li class="fr-sidemenu__item {% if user_backer is defined and user_backer_create is defined %}fr-sidemenu__item--active{% endif %}">
+                                    <a class="fr-sidemenu__link" href="{{ path('app_user_backer_create') }}" target="_self"  {% if user_backer is defined and user_backer_create is defined %}aria-current="page"{% endif %} rel="noopener" title="Créer une fiche porteur d'aides">Créer une fiche porteur d'aides</a>
+                                </li>
+                            {% endif %}
                         </ul>
                     </div>
                 </li>

@@ -1,0 +1,43 @@
+{% extends 'base.html.twig' %}
+
+{% block stylesheets %}
+	{{ parent() }}
+	{{ encore_entry_link_tags('import-scss/user/backer/edit') }}
+{% endblock %}
+
+{% block javascripts %}
+	{{ parent() }}
+	{{ encore_entry_script_tags('front/user/backer/edit') }}
+{% endblock %}
+
+{% block title %}Créer votre fiche porteur d'aide | {{ parent() }}{% endblock %}
+
+{% block body %}
+<div class="fr-container fr-mb-5w fr-mt-0">
+    <div class="fr-grid-row">
+        {% include "user/_menu_user.html.twig" %}
+        
+        <div class="fr-col-12 fr-col-md-9">
+            <h1>Créer la ficher du porteur d'aides</h1>
+        
+            {{ form_start(form) }}
+                {{ form_row(form.name) }}
+                {{ form_row(form.isCorporate) }}
+                {{ form_row(form.externalLink) }}
+                {{ form_row(form.logoFile) }}
+                {{ form_row(form.description) }}
+                {{ form_row(form.metaDescription) }}
+                {{ form_row(form.metaTitle) }}
+                {{ form_row(form.perimeter) }}
+                {{ form_row(form.backerGroup) }}
+
+                <footer class="fr-mt-2w">
+                    <button type="submit" class="fr-btn">Créer</button>
+                </footer>
+
+                <p class="fr-hint-text fr-mt-2w">Les champs marqués d’un astérisque (*) sont obligatoires.</p>
+            {{ form_end(form) }}
+        </div>
+    </div>
+</div>
+{% endblock %}
