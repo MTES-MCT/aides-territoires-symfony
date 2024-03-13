@@ -5,8 +5,12 @@ namespace App\Controller\User;
 use App\Controller\FrontController;
 use App\Entity\Backer\Backer;
 use App\Entity\Backer\BackerUser;
+use App\Entity\User\User;
 use App\Form\Backer\BackerEditType;
+use App\Form\Backer\BackerUserAddType;
 use App\Repository\Backer\BackerRepository;
+use App\Repository\Backer\BackerUserRepository;
+use App\Repository\User\UserRepository;
 use App\Service\Backer\BackerService;
 use App\Service\Image\ImageService;
 use App\Service\User\UserService;
@@ -152,7 +156,10 @@ class BackerController extends FrontController
         RequestStack $requestStack,
         BackerRepository $backerRepository,
         UserService $userService,
-        BackerService $backerService
+        BackerService $backerService,
+        UserRepository $userRepository,
+        BackerUserRepository $backerUserRepository,
+        ManagerRegistry $managerRegistry
     )
     {
         // regarde si backer
@@ -168,6 +175,38 @@ class BackerController extends FrontController
         if (!$backerService->userCanSee($user, $backer)) {
             return $this->redirectToRoute('app_user_dashboard');
         }
+
+        $form = $this->createForm(BackerUserAddType::class);
+        $form->handleRequest($requestStack->getCurrentRequest());
+        if ($form->isSubmitted() && $backerService->userCanAdmin($user, $backer)) {
+            if ($form->isValid()) {
+                // regarde si l'utilisateur existe
+                $userToAdd = $userRepository->findOneBy(['email' => $form->get('email')->getData()]);
+                if ($userToAdd instanceof User) {
+                    // regarde si l'utilisateur ne fait pas déjà parti du porteur
+                    $backerUser = $backerUserRepository->findOneBy([
+                        'backer' => $backer,
+                        'user' => $userToAdd
+                    ]);
+                    if (!$backerUser) {
+                        // il n'en fait pas partie, on va pouvoir l'ajouter
+                        $backerUser =  new BackerUser();
+                        $backerUser->setBacker($backer);
+                        $backerUser->setUser($userToAdd);
+                        $backerUser->setAdministrator($form->get('administrator')->getData());
+                        $backerUser->setEditor($form->get('editor')->getData());
+
+                        // sauvegarde
+                        $managerRegistry->getManager()->persist($backerUser);
+                        $managerRegistry->getManager()->flush();
+                    }
+
+                    $this->addFlash(FrontController::FLASH_ERROR, 'Si cet utilisateur est inscrit, il à été ajouté');
+                }
+            } else {
+                $this->addFlash(FrontController::FLASH_ERROR, 'Le formulaire contient des erreurs.');
+            }
+        }
         
         // fil arianne
         $this->breadcrumb->add(
@@ -181,7 +220,8 @@ class BackerController extends FrontController
         return $this->render('user/backer/users.html.twig', [
             'backer' => $backer,
             'user_backer' => true,
-            'user_backer_id' => $backer instanceof Backer ? $backer->getId() : null
+            'user_backer_id' => $backer instanceof Backer ? $backer->getId() : null,
+            'form' => $form
         ]);
     }
 }

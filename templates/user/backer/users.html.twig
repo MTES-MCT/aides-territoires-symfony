@@ -65,6 +65,13 @@
                     {% endif %}
                 </table>
             </div>
+
+            <h2>Ajouter un nouvel utilisateur</h2>
+            {{ form_start(form) }}
+                {{ form_row(form.email) }}
+                {{ form_row(form.administrator) }}
+                {{ form_row(form.editor) }}
+            {{ form_end(form) }}
         </div>
     </div>
 </div>
