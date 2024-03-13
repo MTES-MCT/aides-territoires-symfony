@@ -956,6 +956,13 @@ class AidRepository extends ServiceEntityRepository
             ;
         }
 
+        // si aucun tri mais qu'on a le score total
+        if ($orderBy == null && $orderByDateSubmissionDeadline == null && $scoreTotalAvailable === true) {
+            $qb
+                ->addOrderBy('score_total', 'DESC')
+            ;
+        }
+
         if (is_array($aidStepIds) && count($aidStepIds) > 0) {
             $qb
                 ->innerJoin('a.aidSteps', 'aidSteps')
