@@ -151,7 +151,7 @@ class AidController extends FrontController
                 'showInSearch' => true
             ]
         );
-
+        dump($nbAidsLive);
         
         // nb vues des aides du user
         $nbAidsViews = $logAidViewRepository->countCustom(

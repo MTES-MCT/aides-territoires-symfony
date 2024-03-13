@@ -222,7 +222,7 @@ class AidRepository extends ServiceEntityRepository
 
     public function countByUser(User $user, array $params = null): int
     {
-        $isLive = $params['isLive'] ?? null;
+        $showInSearch = $params['showInSearch'] ?? null;
 
         $qb = $this->createQueryBuilder('a')
             ->select('COUNT(a.id) AS nb')
@@ -231,8 +231,8 @@ class AidRepository extends ServiceEntityRepository
             ->setParameter('user', $user)
             ->setParameter('delete', Aid::STATUS_DELETED);
 
-        if ($isLive !== null) {
-            $qb->addCriteria(AidRepository::liveCriteria('a.'));
+        if ($showInSearch !== null) {
+            $qb->addCriteria(AidRepository::showInSearchCriteria('a.'));
         }
         $result = $qb
             ->getQuery()
