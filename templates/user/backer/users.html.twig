@@ -48,9 +48,13 @@
                             <td>
                                 {{ backerUser.user.email }}
                             </td>
+                            
                             <td>{% if backerUser.isAdministrator %}Oui{% else %}Non{% endif %}</td>
                             <td>{% if backerUser.isEditor %}Oui{% else %}Non{% endif %}</td>
-                            <td></td>
+                            <td>
+                                {% if userCanAdmin %}
+                                {% endif %}
+                            </td>
                         </tr>
                         {% endfor %}
                     </tbody>
@@ -71,6 +75,11 @@
                 {{ form_row(form.email) }}
                 {{ form_row(form.administrator) }}
                 {{ form_row(form.editor) }}
+
+                <footer class="fr-mt-2w">
+                    <button type="submit" class="fr-btn">Ajouter l'utilisateur</button>
+                </footer>
+
             {{ form_end(form) }}
         </div>
     </div>

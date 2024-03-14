@@ -8,14 +8,17 @@ use App\Entity\Backer\BackerUser;
 use App\Entity\User\User;
 use App\Form\Backer\BackerEditType;
 use App\Form\Backer\BackerUserAddType;
+use App\Form\Backer\BackerUserMultipleEditType;
 use App\Repository\Backer\BackerRepository;
 use App\Repository\Backer\BackerUserRepository;
 use App\Repository\User\UserRepository;
 use App\Service\Backer\BackerService;
 use App\Service\Image\ImageService;
+use App\Service\Notification\NotificationService;
 use App\Service\User\UserService;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -159,7 +162,8 @@ class BackerController extends FrontController
         BackerService $backerService,
         UserRepository $userRepository,
         BackerUserRepository $backerUserRepository,
-        ManagerRegistry $managerRegistry
+        ManagerRegistry $managerRegistry,
+        NotificationService $notificationService
     )
     {
         // regarde si backer
@@ -195,19 +199,30 @@ class BackerController extends FrontController
                         $backerUser->setUser($userToAdd);
                         $backerUser->setAdministrator($form->get('administrator')->getData());
                         $backerUser->setEditor($form->get('editor')->getData());
-
-                        // sauvegarde
                         $managerRegistry->getManager()->persist($backerUser);
+
+                        // Ajout notification à l'utilisateur
+                        $notificationService->addNotification(
+                            $userToAdd,
+                            'Vous avez été ajouté au groupe du porteur d\'aide '.$backer->getName(),
+                            '<p>
+                            '.$user->getFirstname().' '.$user->getLastname().' vous à ajouter au groupe du porteur d\'aide '.$backer->getName().'.
+                            </p>'
+                        );
+
+                        // sauvegarde en base
                         $managerRegistry->getManager()->flush();
                     }
 
-                    $this->addFlash(FrontController::FLASH_ERROR, 'Si cet utilisateur est inscrit, il à été ajouté');
+                    $this->addFlash(FrontController::FLASH_SUCCESS, 'Si cet utilisateur est inscrit, il à été ajouté');
+
+                    return $this->redirectToRoute('app_user_backer_users', ['id' => $backer->getId()]);
                 }
             } else {
                 $this->addFlash(FrontController::FLASH_ERROR, 'Le formulaire contient des erreurs.');
             }
         }
-        
+
         // fil arianne
         $this->breadcrumb->add(
             'Mon compte',
@@ -221,7 +236,25 @@ class BackerController extends FrontController
             'backer' => $backer,
             'user_backer' => true,
             'user_backer_id' => $backer instanceof Backer ? $backer->getId() : null,
-            'form' => $form
+            'form' => $form,
+            'formsEdit' => $formsEdit,
+            'userCanAdmin' => $backerService->userCanAdmin($user, $backer)
         ]);
+    }
+
+    #[Route('/comptes/porteur/utilisateurs/{id}/set-admin/{idBackerUser}', name: 'app_user_backer_user_set_admin', requirements: ['id' => '[0-9]+', 'idBackerUser' => '[0-9]+'])]
+    public function userSetAdmin() : RedirectResponse
+    {
+        // TODO
+    }
+
+    #[Route('/comptes/porteur/utilisateurs/{id}/set-editor/{idBackerUser}', name: 'app_user_backer_user_set_editor', requirements: ['id' => '[0-9]+', 'idBackerUser' => '[0-9]+'])]
+    public function setEditor() : RedirectResponse {
+        
+    }
+
+    #[Route('/comptes/porteur/utilisateurs/{id}/delete/{idBackerUser}', name: 'app_user_backer_user_delete', requirements: ['id' => '[0-9]+', 'idBackerUser' => '[0-9]+'])]
+    public function userDelete(): RedirectResponse {
+        
     }
 }
