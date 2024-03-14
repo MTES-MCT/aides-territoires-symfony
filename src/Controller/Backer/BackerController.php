@@ -40,7 +40,8 @@ class BackerController extends FrontController
         $backer = $backerRepository->findOneBy(
             [
                 'id' => $id,
-                'slug' => $slug
+                'slug' => $slug,
+                'active' => true
             ]
             );
         if (!$backer instanceof Backer) {

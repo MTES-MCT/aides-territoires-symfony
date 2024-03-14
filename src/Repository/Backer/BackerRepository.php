@@ -53,6 +53,7 @@ class BackerRepository extends ServiceEntityRepository
 
         $queryBuilder
             ->select('COUNT(DISTINCT(b.id)) as nb')
+            ->addCriteria(self::activeCriteria())
             ->innerJoin('b.aidFinancers', 'aidFinancers')
             ->innerJoin('aidFinancers.aid', 'aid')
             ->addCriteria(AidRepository::liveCriteria('aid.'))
@@ -73,11 +74,19 @@ class BackerRepository extends ServiceEntityRepository
         $categoryIds = $params['categoryIds'] ?? null;
         $perimeterScales = $params['perimeterScales'] ?? null;
         $backerCategory = $params['backerCategory'] ?? null;
-    
+        $active = $params['active'] ?? null;
         $orderBy = (isset($params['orderBy']) && isset($params['orderBy']['sort']) && isset($params['orderBy']['order'])) ? $params['orderBy'] : null;
 
         $qb = $this->createQueryBuilder('b');
 
+        if ($active == true) {
+            $qb
+                ->addCriteria(self::activeCriteria());
+        } else if ($active == false) {
+            $qb
+                ->addCriteria(self::unactiveCriteria());
+        }
+        
         $qb
             ->innerJoin('b.aidFinancers', 'aidFinancers')
             ->innerJoin('aidFinancers.aid', 'aid')
@@ -151,6 +160,7 @@ class BackerRepository extends ServiceEntityRepository
 
         $qb
             ->select('IFNULL(COUNT(DISTINCT(b.id)), 0) AS nb')
+            ->addCriteria(self::activeCriteria())
             ->innerJoin('b.aidFinancers', 'aidFinancers')
         ;
 

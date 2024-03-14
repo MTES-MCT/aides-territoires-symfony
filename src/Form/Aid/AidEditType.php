@@ -20,6 +20,7 @@ use App\Form\Type\EntityCheckboxAbsoluteType;
 use App\Form\Type\EntityCheckboxGroupAbsoluteType;
 use App\Form\Type\EntityGroupedType;
 use App\Form\Type\PerimeterAutocompleteType;
+use App\Repository\Backer\BackerRepository;
 use App\Service\User\UserService;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -136,8 +137,14 @@ class AidEditType extends AbstractType
                 ],
                 'autocomplete' => true,
                 'multiple' => true,
-                'query_builder' => function(EntityRepository $entityRepository) {
-                    return $entityRepository->createQueryBuilder('b')->orderBy('b.name', 'ASC');
+                'query_builder' => function(BackerRepository $backerRepository) {
+                    return $backerRepository->getQueryBuilder([
+                        'active' => true,
+                        'orderBy' => [
+                            'order' => 'b.name',
+                            'sort' => 'ASC'
+                        ]
+                    ]);
                 },
                 'data' => $financers
             ])
@@ -158,8 +165,14 @@ class AidEditType extends AbstractType
                 ],
                 'autocomplete' => true,
                 'multiple' => true,
-                'query_builder' => function(EntityRepository $entityRepository) {
-                    return $entityRepository->createQueryBuilder('b')->orderBy('b.name', 'ASC');
+                'query_builder' => function(BackerRepository $backerRepository) {
+                    return $backerRepository->getQueryBuilder([
+                        'active' => true,
+                        'orderBy' => [
+                            'order' => 'b.name',
+                            'sort' => 'ASC'
+                        ]
+                    ]);
                 },
                 'data' => $instructors
             ])
