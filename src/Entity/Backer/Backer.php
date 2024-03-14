@@ -157,6 +157,10 @@ class Backer
     #[ORM\JoinColumn(onDelete:'SET NULL')]
     private Collection $logBackerViews;
     
+
+    #[ORM\Column]
+    private ?bool $active = false;
+
     /**
      * Champs non en base
      */
@@ -564,6 +568,7 @@ class Backer
 
     private ?array $aidsTechnical = [];
 
+
     public function getAidsTechnical() : ?array
     {
         if (count($this->aidsTechnical) > 0) {
@@ -799,6 +804,18 @@ class Backer
                 $backerUser->setBacker(null);
             }
         }
+
+        return $this;
+    }
+
+    public function isActive(): ?bool
+    {
+        return $this->active;
+    }
+
+    public function setActive(bool $active): static
+    {
+        $this->active = $active;
 
         return $this;
     }

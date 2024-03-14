@@ -63,7 +63,7 @@ class BackerController extends FrontController
                 $managerRegistry->getManager()->flush();
 
                 // message ok
-                $this->addFlash(FrontController::FLASH_SUCCESS, 'La fiche porteur d\'aide a bien été créée.');
+                $this->addFlash(FrontController::FLASH_SUCCESS, 'La fiche porteur d\'aide a bien été soumises à validation. Une fois validée vous pourrez l\'associer à vos aides.');
 
                 // redirection
                 return $this->redirectToRoute('app_user_backer_edit', ['id' => $backer->getId()]);

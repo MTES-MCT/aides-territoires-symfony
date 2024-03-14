@@ -44,6 +44,8 @@ class BackerCrudController extends AtCrudController
             ->setFormTypeOption('attr', ['readonly' => true, 'autocomplete' => 'off'])
             ->setHelp('Laisser vide pour autoremplir.')
         ;
+        yield BooleanField::new('active', 'Actif')
+            ->setHelp('Un porteur d’aides actif est visible sur le site');
         yield TrumbowygField::new('description', 'Description')
         ->onlyOnForms();
         

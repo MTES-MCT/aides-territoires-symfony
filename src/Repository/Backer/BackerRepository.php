@@ -13,6 +13,7 @@ use App\Entity\User\User;
 use App\Repository\Aid\AidRepository;
 use App\Repository\Perimeter\PerimeterRepository;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -29,6 +30,20 @@ class BackerRepository extends ServiceEntityRepository
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Backer::class);
+    }
+
+    public static function activeCriteria($alias = 'b.'): Criteria
+    {
+        return Criteria::create()
+            ->andWhere(Criteria::expr()->eq($alias.'active', true))
+        ;
+    }
+
+    public static function unactiveCriteria($alias = 'b.'): Criteria
+    {
+        return Criteria::create()
+            ->andWhere(Criteria::expr()->eq($alias.'active', false))
+        ;
     }
 
     public function countBackerWithAidInCounty(array $params = null)
@@ -238,8 +253,19 @@ class BackerRepository extends ServiceEntityRepository
         $hasFinancedAids = $params['hasFinancedAids'] ?? null;
         $hasPublishedFinancedAids = $params['hasPublishedFinancedAids'] ?? null;
         $user = $params['user'] ?? null;
+        $active = $params['active'] ?? null;
 
         $qb = $this->createQueryBuilder('b');
+
+        if ($active === true) {
+            $qb
+                ->addCriteria(self::activeCriteria());
+            ;
+        } else if ($active === false) {
+            $qb
+                ->addCriteria(self::unactiveCriteria());
+            ;
+        }
 
         if ($user instanceof User) {
             $qb
