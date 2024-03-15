@@ -1,5 +1,6 @@
 require('trumbowyg/dist/trumbowyg.min.js');
 require('trumbowyg/dist/langs/fr.min.js');
+require('trumbowyg/dist/plugins/cleanpaste/trumbowyg.cleanpaste.min.js');
 
 $(function() {
     
@@ -15,8 +16,12 @@ $(function() {
             ['unorderedList', 'orderedList'],
             ['removeformat'],            
             ['fullscreen']
-        ]
-    }); // Cette accolade ferme la fonction .trumbowyg()
+        ],
+        plugins: {
+            // nettoyage texte word
+            cleanpaste: true
+        }
+    });
 
     // Gestionnaire d'événement 'submit'
     $(document).on('submit', 'form[name="form"]', function(e) {
