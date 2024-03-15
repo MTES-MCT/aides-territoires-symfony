@@ -17,6 +17,7 @@ use App\Repository\Organization\OrganizationInvitationRepository;
 use App\Repository\Organization\OrganizationRepository;
 use App\Repository\Perimeter\PerimeterDataRepository;
 use App\Repository\Perimeter\PerimeterRepository;
+use App\Service\Backer\BackerService;
 use App\Service\Email\EmailService;
 use App\Service\Image\ImageService;
 use App\Service\Notification\NotificationService;
@@ -45,9 +46,11 @@ class OrganizationController extends FrontController
         $user = $userService->getUserLogged();
 
         // l'organization
+        $organization = null;
         if ($id) {
-        $organization = $organizationRepository->find($id);
-        } else {
+            $organization = $organizationRepository->find($id);
+        }
+        if (!$organization) {
             $organization = new Organization();
         }
 
@@ -191,6 +194,7 @@ class OrganizationController extends FrontController
 
     #[Route('/comptes/structure/donnees-cles/{id}', name: 'app_organization_donnees_cles_details', requirements: ['id' => '[0-9]+'])]
     public function donneesClesDetails(
+        int $id,
         UserService $userService,
         ManagerRegistry $managerRegistry,
         RequestStack $requestStack,
@@ -200,7 +204,10 @@ class OrganizationController extends FrontController
         // le user
         $user = $userService->getUserLogged();
         // la structure
-        $organization = $managerRegistry->getRepository(Organization::class)->find($requestStack->getCurrentRequest()->get('id'));
+        $organization = $managerRegistry->getRepository(Organization::class)->find($id);
+        if (!$organization instanceof Organization) {
+            return $this->redirectToRoute('app_user_dashboard');
+        }
         // on verifie que l'utilisateur peut éditer
         if (!$organizationService->canEdit($user, $organization)) {
             return $this->redirectToRoute('app_organization_donnees_cles');
@@ -589,7 +596,8 @@ class OrganizationController extends FrontController
         ManagerRegistry $managerRegistry,
         OrganizationRepository $organizationRepository,
         OrganizationService $organizationService,
-        NotificationService $notificationService
+        NotificationService $notificationService,
+        BackerService $backerService
     )
     {
         // le user
@@ -607,6 +615,11 @@ class OrganizationController extends FrontController
         $backer = null;
         if ($idBacker) {
             $backer = $backerRepository->find($idBacker);
+            // on vérifie que le porteur d'aide peu bien être éditer par l'utilisateur de cette organization
+            if (!$backerService->userCanEdit($user, $backer)) {
+                $this->addFlash(FrontController::FLASH_ERROR, 'Vous n\'avez pas les droits pour éditer cette fiche porteur d\'aide.');
+                return $this->redirectToRoute('app_user_dashboard');
+            }
         }
         if (!$backer instanceof Backer) {
             $backer = new Backer();

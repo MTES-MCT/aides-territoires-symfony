@@ -14,10 +14,10 @@ class BackerService
         }
 
         foreach ($backer->getOrganizations() as $organization) {
-            if ($organization->getOwner()->getId() === $user->getId()) {
+            if ($organization->getBeneficiairies()->contains($user)) {
                 return true;
             }
         }
-        return $user->getId() === $backer->getUser()->getId();
+        return false;
     }
 }
