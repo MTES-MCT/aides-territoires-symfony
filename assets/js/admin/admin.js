@@ -3,6 +3,7 @@ import '../../bootstrap.js';
 require('trumbowyg/dist/trumbowyg.min.js');
 require('trumbowyg/dist/langs/fr.min.js');
 require('trumbowyg/dist/plugins/upload/trumbowyg.upload.min.js');
+require('trumbowyg/dist/plugins/cleanpaste/trumbowyg.cleanpaste.min.js');
 require('trumbowyg/dist/ui/trumbowyg.min.css');
 require('clipboard/dist/clipboard.min.js');
 require('../jQueryAccordion/jquery.accordion.js')
@@ -116,7 +117,9 @@ $('textarea:not(.trumbowyg-textarea)').trumbowyg({
             //     'Authorization': 'Client-ID xxxxxxxxxxxx'
             // },
             urlPropertyName: 'data.link'
-        }
+        },
+        // nettoyage texte word
+        cleanpaste: true
     }
 });
 }
