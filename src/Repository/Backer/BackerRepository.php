@@ -262,7 +262,6 @@ class BackerRepository extends ServiceEntityRepository
         $nameLike = $params['nameLike'] ?? null;
         $hasFinancedAids = $params['hasFinancedAids'] ?? null;
         $hasPublishedFinancedAids = $params['hasPublishedFinancedAids'] ?? null;
-        $user = $params['user'] ?? null;
         $active = $params['active'] ?? null;
 
         $qb = $this->createQueryBuilder('b');
@@ -277,13 +276,6 @@ class BackerRepository extends ServiceEntityRepository
             ;
         }
 
-        if ($user instanceof User) {
-            $qb
-                ->innerJoin('b.backerUsers', 'backerUsers')
-                ->andWhere('backerUsers.user = :user')
-                ->setParameter('user', $user);
-            ;
-        }
         if ($hasLogo === true) {
             $qb
                 ->andWhere('b.logo IS NOT NULL')

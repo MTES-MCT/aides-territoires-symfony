@@ -60,11 +60,6 @@ class BackerCrudController extends AtCrudController
         })
         ->onlyOnForms()
         ;
-        yield CollectionField::new('backerUsers', 'Utilisateurs')
-        ->setEntryIsComplex(true)
-        ->setEntryType(BackerUserCollectionType::class)
-        ->setFormTypeOption('by_reference', false)
-        ;
         yield BooleanField::new('deleteLogo', 'Supprimer le fichier actuel')
         ->onlyWhenUpdating();
 

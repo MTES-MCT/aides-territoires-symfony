@@ -9,26 +9,6 @@
                 </li>     
                 {% if app.user.isContributor %}
                 <li class="fr-sidemenu__item">
-                    <button class="fr-sidemenu__btn" {% if user_backer is defined %} aria-expanded="true" {% else %} aria-expanded="false" {% endif %} aria-controls="fr-sidemenu-item-backer" title="Mes porteurs d'aide">Mes porteurs d'aide</button>
-                    <div class="fr-collapse" id="fr-sidemenu-item-backer">
-                        <ul class="fr-sidemenu__list">
-                            {% if app.user.backerUsers|length > 0 %}
-                                {% for backerUser in app.user.backerUsers %}
-                                    <li class="fr-sidemenu__item {% if user_backer is defined and user_backer_id is defined and backerUser.backer and user_backer_id == backerUser.backer.id %}fr-sidemenu__item--active{% endif %}">
-                                        <a class="fr-sidemenu__link" href="{{ path('app_user_backer_edit', {'id': backerUser.backer.id}) }}" target="_self"  {% if user_backer is defined and user_backer_id is defined and backerUser.backer and user_backer_id == backerUser.backer.id %}aria-current="page"{% endif %} rel="noopener" title="{{ backerUser.backer.name }}">{{ backerUser.backer.name }}</a>
-                                    </li>
-                                {% endfor %}
-                            {% else %}
-                                <li class="fr-sidemenu__item {% if user_backer is defined and user_backer_create is defined %}fr-sidemenu__item--active{% endif %}">
-                                    <a class="fr-sidemenu__link" href="{{ path('app_user_backer_create') }}" target="_self"  {% if user_backer is defined and user_backer_create is defined %}aria-current="page"{% endif %} rel="noopener" title="Créer une fiche porteur d'aides">Créer une fiche porteur d'aides</a>
-                                </li>
-                            {% endif %}
-                        </ul>
-                    </div>
-                </li>
-                {% endif %}
-                {% if app.user.isContributor %}
-                <li class="fr-sidemenu__item">
                     <button class="fr-sidemenu__btn" {% if publishAid is defined %} aria-expanded="true" {% else %} aria-expanded="false" {% endif %} aria-controls="fr-sidemenu-item-2" title="Diffuser mes aides">Diffuser mes aides</button>
                     <div class="fr-collapse" id="fr-sidemenu-item-2">
                         <ul class="fr-sidemenu__list">
@@ -48,8 +28,8 @@
                     <div class="fr-collapse" id="fr-sidemenu-item-projects">
                         <ul class="fr-sidemenu__list">
                             <li class="fr-sidemenu__item {% if user_project_structure is defined %}fr-sidemenu__item--active{% endif %}">
-                                <a class="fr-sidemenu__link" href="{{ path('app_user_project_structure') }}" target="_self" {% if user_project_structure is defined %}aria-current="page"{% endif %} rel="noopener" title="Projets de ma structure">
-                                    De ma structure
+                                <a class="fr-sidemenu__link" href="{{ path('app_user_project_structure') }}" target="_self" {% if user_project_structure is defined %}aria-current="page"{% endif %} rel="noopener" title="Voir mes projets">
+                                    Voir mes projets
                                 </a>
                             </li>
                             <li class="fr-sidemenu__item {% if user_project_favoris is defined %}fr-sidemenu__item--active{% endif %}">
@@ -87,22 +67,16 @@
                 {% endif %}
 
                 <li class="fr-sidemenu__item">
-                    <button class="fr-sidemenu__btn"  {% if structure is defined %} aria-expanded="true" {% else %} aria-expanded="false" {% endif %} aria-controls="fr-sidemenu-item-4">Ma structure</button>
+                    <button class="fr-sidemenu__btn"  {% if structure is defined %} aria-expanded="true" {% else %} aria-expanded="false" {% endif %} aria-controls="fr-sidemenu-item-4">{% if app.user.organizations and app.user.organizations|length > 1 %}Mes structures{% else %}Ma structure{% endif %}</button>
                     <div class="fr-collapse" id="fr-sidemenu-item-4">
                         <ul class="fr-sidemenu__list">
-                            
-                            <li class="fr-sidemenu__item {% if structure_info is defined %}fr-sidemenu__item--active{% endif %}">
-                                <a class="fr-sidemenu__link" href="{{ path('app_organization_structure_information') }}" target="_self" {% if structure_info is defined %}aria-current="page"{% endif %} rel="noopener" title="Informations de ma structure">Informations</a>
-                            </li>
-                            {% if app.user.defaultOrganization and app.user.defaultOrganization.organizationType %}
-                                {% if app.user.defaultOrganization.organizationType.slug in ["commune", "epci", "department", "region"] %}
-                                <li class="fr-sidemenu__item {% if data_info is defined %}fr-sidemenu__item--active{% endif %}">
-                                    <a class="fr-sidemenu__link" href="{{ path('app_organization_donnees_cles') }}" target="_self" {% if data_info is defined %}aria-current="page"{% endif %} rel="noopener" title="Données clés de ma structure">Données clés</a>
+                            {% for userOrganization in app.user.organizations %}
+                                <li class="fr-sidemenu__item {% if organization is defined and userOrganization.id == organization.id %}fr-sidemenu__item--active{% endif %}">
+                                    <a class="fr-sidemenu__link" href="{{ path('app_organization_structure_information', {'id': userOrganization.id}) }}" target="_self" {% if organization is defined and organization.id == userOrganization.id %}aria-current="page"{% endif %} rel="noopener" title="{{ userOrganization.name }}">{{ userOrganization.name }}</a>
                                 </li>
-                                {% endif %}
-                            {% endif %}
-                            <li class="fr-sidemenu__item {% if structure_collab is defined %}fr-sidemenu__item--active{% endif %}">
-                                <a class="fr-sidemenu__link" href="{{ path('app_organization_collaborateurs') }}" target="_self" {% if structure_collab is defined %}aria-current="page"{% endif %} rel="noopener" title="Mes collaborateurs">Collaborateurs</a>
+                            {% endfor %}
+                            <li class="fr-sidemenu__item {% if organization is defined and organization == null %}fr-sidemenu__item--active{% endif %}">
+                                <a class="fr-sidemenu__link" href="{{ path('app_organization_structure_information') }}" target="_self" {% if organization is defined and organization.id == null %}aria-current="page"{% endif %} rel="noopener" title="Nouvelle structure">Nouvelle structure</a>
                             </li>
                             <li class="fr-sidemenu__item {% if structure_invitations is defined %}fr-sidemenu__item--active{% endif %}">
                                 <a class="fr-sidemenu__link" href="{{ path('app_organization_invitations') }}" target="_self" {% if structure_invitations is defined %}aria-current="page"{% endif %} rel="noopener" title="Mes invitations">Mes invitations</a>

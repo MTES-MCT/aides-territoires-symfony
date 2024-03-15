@@ -9,7 +9,7 @@ class OrganizationService
 {
     public function canEdit(?User $user, ?Organization $organization): bool
     {
-        if ($user === null || $organization === null) {
+        if (!$user instanceof User || !$organization instanceof Organization) {
             return false;
         }
 

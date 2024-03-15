@@ -38,12 +38,12 @@
                 </div>    
             </div>
             {% endif %}
-            {% if app.user.isBeneficiary %}
+            {% if app.user.isBeneficiary and app.user.defaultOrganization %}
             <div class="fr-col-6 fr-col-md-4 fr-col-lg-4">
                 <div class="fr-tile fr-enlarge-link">
                     <div class="fr-tile__body">
                         <h2 class="fr-tile__title">
-                            <a class="fr-tile__link" href="{{ path('app_organization_collaborateurs') }}" title="Mes collaborateurs">Mes collaborateurs</a>
+                            <a class="fr-tile__link" href="{{ path('app_organization_collaborateurs', {'id': app.user.defaultOrganization.id}) }}" title="Mes collaborateurs">Mes collaborateurs</a>
                         </h2>
                         <p class="fr-tile__desc fr-h4 fr-pb-2w">{{ collaboratorsNumber }}</p>
                     </div>

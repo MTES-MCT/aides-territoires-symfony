@@ -3,31 +3,43 @@ require('./toggle_acquisition_channel_related_field.js');
 require('./toggle_beneficiary_related_fields.js');
 require('./toggle_intercommunality_type_field.js');
 
-$(document).ready(function () {
+$(function() {
     $(document).on({
         change: function (e) {
             completeOrganizationName();
         }
-    }, '#register_organizationType');
+    }, '#register_organizationType, #organization_edit_organizationType');
 
     $(document).on({
         change: function (e) {
             completeOrganizationName();
         }
-    }, '#register_perimeter');
+    }, '#register_perimeter, #organization_edit_perimeter');
     
     
 });
 
 function completeOrganizationName()
 {
-    var perimeterTxt = $('#register_perimeter').parents().find('div.item:first').text();
-    var organizationType = $('option:selected', '#register_organizationType').text();
+    if ($('#register_perimeter').length) {
+        var perimeterTxt = $('#register_perimeter').parents().find('div.item:first').text();
+        var organizationType = $('option:selected', '#register_organizationType').text();
+    } else {
+        var perimeterTxt = $('#organization_edit_perimeter').parents().find('div.item:first').text();
+        var organizationType = $('option:selected', '#organization_edit_organizationType').text();
+    }
+
 
     if (organizationType == 'Commune' && perimeterTxt != '') {
         var organizationName = 'Marie de ' + perimeterTxt.replace(/ *\([^)]*\) */g, " ");;
     } else {
         organizationName = '';
     }
-    $('#register_organizationName').val(organizationName);
+
+    if ($('#register_organizationName').length) {
+        $('#register_organizationName').val(organizationName);
+    } else if ($('#organization_edit_name').length && $('#organization_edit_name').val() == '') {
+        $('#organization_edit_name').val(organizationName);
+    }
+    
 }

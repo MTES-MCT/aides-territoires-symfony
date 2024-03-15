@@ -5,7 +5,6 @@ namespace App\Entity\User;
 use App\Entity\Aid\Aid;
 use App\Entity\Aid\AidProject;
 use App\Entity\Aid\AidSuggestedAidProject;
-use App\Entity\Backer\BackerUser;
 use App\Entity\Bundle\Bundle;
 use App\Entity\Cron\CronExportSpreadsheet;
 use App\Entity\DataExport\DataExport;
@@ -300,9 +299,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: CronExportSpreadsheet::class)]
     private Collection $cronExportSpreadsheets;
 
-    #[ORM\OneToMany(mappedBy: 'user', targetEntity: BackerUser::class, orphanRemoval: true)]
-    private Collection $backerUsers;
-
     public function __construct()
     {
         $this->logUserLogins = new ArrayCollection();
@@ -339,7 +335,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
         $this->organizationGuests = new ArrayCollection();
         $this->apiTokenAsks = new ArrayCollection();
         $this->cronExportSpreadsheets = new ArrayCollection();
-        $this->backerUsers = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -1915,35 +1910,5 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
             }
         }
         return '';
-    }
-
-    /**
-     * @return Collection<int, BackerUser>
-     */
-    public function getBackerUsers(): Collection
-    {
-        return $this->backerUsers;
-    }
-
-    public function addBackerUser(BackerUser $backerUser): static
-    {
-        if (!$this->backerUsers->contains($backerUser)) {
-            $this->backerUsers->add($backerUser);
-            $backerUser->setUser($this);
-        }
-
-        return $this;
-    }
-
-    public function removeBackerUser(BackerUser $backerUser): static
-    {
-        if ($this->backerUsers->removeElement($backerUser)) {
-            // set the owning side to null (unless already changed)
-            if ($backerUser->getUser() === $this) {
-                $backerUser->setUser(null);
-            }
-        }
-
-        return $this;
     }
 }

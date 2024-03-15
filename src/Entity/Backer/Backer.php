@@ -146,9 +146,6 @@ class Backer
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $timeUpdate = null;
 
-    #[ORM\OneToMany(mappedBy: 'backer', targetEntity: BackerUser::class, orphanRemoval: true, cascade: ['persist'])]
-    private Collection $backerUsers;
-
     #[ORM\ManyToMany(targetEntity: LogAidSearch::class, mappedBy: 'backers')]
     #[ORM\JoinColumn(onDelete:'SET NULL')]
     private Collection $logAidSearches;
@@ -182,7 +179,6 @@ class Backer
         $this->logBackerViews = new ArrayCollection();
         $this->categories = new ArrayCollection();
         $this->programs = new ArrayCollection();
-        $this->backerUsers = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -774,36 +770,6 @@ class Backer
     public function setDeleteLogo(?bool $deleteLogo): static
     {
         $this->deleteLogo = $deleteLogo;
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, BackerUser>
-     */
-    public function getBackerUsers(): Collection
-    {
-        return $this->backerUsers;
-    }
-
-    public function addBackerUser(BackerUser $backerUser): static
-    {
-        if (!$this->backerUsers->contains($backerUser)) {
-            $this->backerUsers->add($backerUser);
-            $backerUser->setBacker($this);
-        }
-
-        return $this;
-    }
-
-    public function removeBackerUser(BackerUser $backerUser): static
-    {
-        if ($this->backerUsers->removeElement($backerUser)) {
-            // set the owning side to null (unless already changed)
-            if ($backerUser->getBacker() === $this) {
-                $backerUser->setBacker(null);
-            }
-        }
 
         return $this;
     }
