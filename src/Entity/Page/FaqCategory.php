@@ -143,6 +143,6 @@ class FaqCategory
 
     public function  __toString(): string
     {
-        return $this->name;
+        return $this->name ?? 'FaqCategory';
     }
 }

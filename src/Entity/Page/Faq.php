@@ -116,7 +116,7 @@ class Faq
 
     public function  __toString(): string
     {
-        return $this->name;
+        return $this->name ?? 'Faq';
     }
 
     public function getPageTab(): ?PageTab
