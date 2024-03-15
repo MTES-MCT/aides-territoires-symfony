@@ -130,6 +130,6 @@ class FaqQuestionAnswser
 
     public function  __toString(): string
     {
-        return $this->question;
+        return $this->question ?? 'Question';
     }
 }
