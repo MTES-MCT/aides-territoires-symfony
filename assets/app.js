@@ -51,5 +51,5 @@ global.datatables_fr_strings = {
         next: "Suivant",
         last: "Dernier"
     },
-
+    pageLength: 50
 }

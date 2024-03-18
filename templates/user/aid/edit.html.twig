@@ -20,7 +20,7 @@
                     {% elseif aid.status == constant('App\\Entity\\Aid\\Aid::STATUS_PUBLISHED') %}
                         <p>Vous éditez actuellement une aide publiée à <a href="{{ absolute_url(path('app_aid_aid_details', {'slug': aid.slug})) }}"><strong>cette adresse</strong></a>. Merci de procéder avec prudence.</p>
                         <p class="help">Vous devrez demander une revue par un administrateur pour re-publier votre aide.</p>
-                        <button type="button" data-status="{{ constant('App\\Entity\\Aid\\Aid::STATUS_REVIEWABLE') }}"  class="fr-btn btn-change-status">Dépublier maintenant</button>
+                        <button type="button" data-status="{{ constant('App\\Entity\\Aid\\Aid::STATUS_DRAFT') }}"  class="fr-btn btn-change-status">Dépublier maintenant</button>
                     {% endif %}
                 </div>
             </div>
