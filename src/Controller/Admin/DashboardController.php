@@ -260,6 +260,7 @@ class DashboardController extends AbstractDashboardController
         yield MenuItem::subMenu('Configuration système', 'fas fa-cogs')->setSubItems([
             MenuItem::linkToCrud('Exports de données', 'fas fa-list', DataExport::class),
             MenuItem::linkToCrud('Sources de données', 'fas fa-list', DataSource::class),
+            MenuItem::linkToRoute('Logs Symfony', 'fas fa-list', 'admin_log_symfony_download', [])
         ]);
 
         yield MenuItem::subMenu('Statistiques', 'fas fa-chart-line')->setSubItems([
