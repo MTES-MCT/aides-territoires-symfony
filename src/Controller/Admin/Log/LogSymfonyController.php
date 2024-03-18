@@ -18,10 +18,14 @@ class LogSymfonyController extends DashboardController
         $logFilename = $kernelInterface->getEnvironment().'.log';
         $logFile = $logsDir . '/'.$logFilename;
         if (is_file($logFile)) {
-            $fileContent = file_get_contents($logFile);
-            $response = new Response($fileContent, 200, ['Content-Type' => 'text/plain']);
-            $response->headers->set('Content-Disposition', 'attachment; filename="'.$logFilename.'"');
-            return $response;
+            try {
+                $fileContent = file_get_contents($logFile);
+                $response = new Response($fileContent, 200, ['Content-Type' => 'text/plain']);
+                $response->headers->set('Content-Disposition', 'attachment; filename="'.$logFilename.'"');
+                return $response;
+            } catch (\Exception $e) {
+                $file = null;
+            }
         } else {
             $file = null;
         }
