@@ -20,6 +20,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 class Category
 {
     const API_GROUP_LIST = 'category:list';
+    const SLUG_ANIMATION_MISE_EN_RESEAU = 'animation-mise-en-reseau';
 
     #[ORM\Id]
     #[ORM\GeneratedValue]
