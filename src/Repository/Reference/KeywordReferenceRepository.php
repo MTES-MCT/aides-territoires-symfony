@@ -49,7 +49,7 @@ class KeywordReferenceRepository extends ServiceEntityRepository
         }
         if ($string) {
             $words = str_getcsv($string, ' ', '"');
-            if (is_array($words) && count($words) > 1) {
+            if (is_array($words) && count($words) > 0) {
                 $qb->andWhere('kr.name IN (:words)')
                     ->setParameter('words', $words)
                     ;
