@@ -4,10 +4,12 @@ namespace App\Form\Project;
 
 use App\Entity\Keyword\KeywordSynonymlist;
 use App\Entity\Project\Project;
+use App\Entity\Reference\KeywordReference;
 use App\Form\Type\KeywordSynonymlistAutocompleteField;
 use App\Form\Type\PerimeterCityAutocompleteType;
 use App\Service\User\UserService;
 use Doctrine\Persistence\ManagerRegistry;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -35,19 +37,10 @@ class ProjectValidatedSearchType extends AbstractType
             $contactLinks[$contactLink['name']] = $contactLink['slug'];
         }
 
-        $keywordSynonymlists = $this->managerRegistry->getRepository(KeywordSynonymlist::class)->findBy(
-            [],
-            ['name'=>'ASC']
-        );
-        $choicesKeywordSynonymList = [];
-        foreach ($keywordSynonymlists as $keywordSynonymlist) {
-            $choicesKeywordSynonymList[$keywordSynonymlist->getName()] = $keywordSynonymlist->getId();
-        }
-
         // Perimeter params
         $perimeterParams = [
             'required' => true,
-            'label' => 'Territoire du projet',
+            'label' => 'Commune du projet',
         ];
         if ($options['forcePerimeter'] !== false) {
             $perimeterParams['data'] = $options['forcePerimeter'];
@@ -56,20 +49,28 @@ class ProjectValidatedSearchType extends AbstractType
                 $perimeterParams['data'] = ($user && $user->getDefaultOrganization() && $user->getDefaultOrganization()->getPerimeter()) ? $user->getDefaultOrganization()->getPerimeter() : null;
             }
         }
-        
-        // keyword params
-        $keywordParams = [
-            'required' => false,
-            'label' => 'Mot-clés',
-            'attr' => [
-                'placeholder' => 'Ex: rénovation énergétique, vélo, tiers lieu, etc.'
-            ]
-        ];
 
 
         $builder
             ->add('project_perimeter', PerimeterCityAutocompleteType::class, $perimeterParams)
-            ->add('text', KeywordSynonymlistAutocompleteField::class,  $keywordParams)
+            ->add('text', EntityType::class,  [
+                'required' => false,
+                'label' => 'Mot-clés',
+                'attr' => [
+                    'placeholder' => 'Ex: rénovation énergétique, vélo, tiers lieu, etc.'
+                ],
+                'class' => KeywordReference::class,
+                'autocomplete' => true,
+                'query_builder' => function ($er) {
+                    return $er->createQueryBuilder('k')
+                        ->andWhere('k.intention = 0')
+                        ->andWhere('k.parent = k')
+                        ->orderBy('k.name', 'ASC');
+                },
+                'choice_label' => function(KeywordReference $keywordReference) {
+                    return ucfirst($keywordReference->getName());
+                },
+            ])
         ;
     }
 

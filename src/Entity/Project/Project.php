@@ -166,6 +166,7 @@ class Project
 
     private ?int $nbAids;
     private ?float $distance = null;
+    private ?int $scoreTotal = 0;
 
     public function __construct()
     {
@@ -648,4 +649,17 @@ class Project
 
         return $this;
     }
+
+    public function getScoreTotal(): ?int
+    {
+        return $this->scoreTotal;
+    }
+
+    public function setScoreTotal(?int $scoreTotal): static
+    {
+        $this->scoreTotal = $scoreTotal;
+
+        return $this;
+    }
+    
 }
