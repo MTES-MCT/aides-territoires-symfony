@@ -16,7 +16,7 @@
                 {% endif %}
 
                 <a class="fr-card__link highlightable" href="{{ path('app_aid_aid_details', aidUrlParams) }}" title="Voir l'aide">
-                    {% if aid.europeanAid %}<span title="aide européenne" aria-hidden="true">🇪🇺 </span>{% endif %}{{ aid.name }}
+                    {% if aid.europeanAid %}<span title="aide européenne" aria-hidden="true">🇪🇺 </span>{% endif %}{{ aid.name }} {% if app.user and app.user and isUserGranted(app.user, constant('App\\Entity\\User\\User::ROLE_ADMIN')) %}(score : {{ aid.scoreTotal}}){% endif %}
                 </a>
             </h2>
             <div class="fr-card__desc">
