@@ -10,6 +10,7 @@ use App\Entity\Aid\AidType;
 use App\Entity\Aid\AidTypeGroup;
 use App\Entity\Backer\Backer;
 use App\Entity\Backer\BackerCategory;
+use App\Entity\Category\Category;
 use App\Entity\Keyword\Keyword;
 use App\Entity\Organization\OrganizationType;
 use App\Entity\Perimeter\Perimeter;
@@ -527,67 +528,32 @@ class AidRepository extends ServiceEntityRepository
                 CASE WHEN (MATCH_AGAINST(a.nameInitial) AGAINST(:simple_words_string IN BOOLEAN MODE) > 1) THEN 30 ELSE 0 END +
                 CASE WHEN (MATCH_AGAINST(a.description, a.eligibility, a.projectExamples) AGAINST(:simple_words_string IN BOOLEAN MODE) > 1) THEN 5 ELSE 0 END 
                 ';
-
-                $simpleWords = str_getcsv($simpleWordsString, ' ', '"');
-                // if (count($simpleWords) > 0) {
-                //     $sqlSimpleWords .= ' + ';
-                // }
-                // for ($i = 0; $i<count($simpleWords); $i++) {
-                //     $sqlSimpleWords .= '
-                //         CASE WHEN (a.name LIKE :simple_word'.$i.') THEN 30 ELSE 0 END +
-                //         CASE WHEN (a.description LIKE :simple_word'.$i.') THEN 4 ELSE 0 END +
-                //         CASE WHEN (a.eligibility LIKE :simple_word'.$i.') THEN 4 ELSE 0 END +
-                //         CASE WHEN (a.projectExamples LIKE :simple_word'.$i.') THEN 4 ELSE 0 END
-                //     ';
-                //     if ($i < count($simpleWords) - 1) {
-                //         $sqlSimpleWords .= ' + ';
-                //     }
-                //     $qb->setParameter('simple_word'.$i, '%'.$simpleWords[$i].'%');
-                // }
-
                 $qb->setParameter('simple_words_string', $simpleWordsString);
             }
 
             // Les catégories
-            if ($objectsString) {
-                $qb->leftJoin('a.categories', 'categoriesKeyword');
+            $categories = $this->getEntityManager()->getRepository(Category::class)->findFromSynonyms($synonyms);
+            if (count($categories) > 0) {
                 $sqlCategories = '
-                    CASE WHEN (MATCH_AGAINST(categoriesKeyword.name) AGAINST(:objects_string IN BOOLEAN MODE) > 1) THEN 30 ELSE 0 END 
+                CASE 
+                    WHEN :categoriesSynonyms MEMBER OF a.categories THEN 60
+                    ELSE 0 
+                END
                 ';
-                if ($intentionsString) {
-                    $sqlCategories .= '
-                    +
-                    CASE WHEN (MATCH_AGAINST(categoriesKeyword.name) AGAINST(:intentions_string IN BOOLEAN MODE) > 1) THEN 10 ELSE 0 END
-                    ';
-                }
-            } else {
-                if ($simpleWordsString) {
-                    $qb->leftJoin('a.categories', 'categoriesKeyword');
-                    $sqlCategories = '
-                        CASE WHEN (MATCH_AGAINST(categoriesKeyword.name) AGAINST(:simple_words_string IN BOOLEAN MODE) > 1) THEN 20 ELSE 0 END 
-                    ';
-                }
+                $qb->setParameter('categoriesSynonyms', $categories);
             }
 
             // les keywordReferences
             if ($objectsString) {
                 $keywordReferences = $this->getEntityManager()->getRepository(KeywordReference::class)->findFromString($objectsString);
                 if (count($keywordReferences) > 0) {
-                    // $qb
-                    // ->leftJoin('a.keywordReferences', 'keywordReferencesOs')
-                    // ->setParameter('keywordReferences', $keywordReferences)
-                    // ;
-                    // $sqlKeywordReferences = '
-                    //     CASE WHEN (:keywordReferences IN (keywordReferencesOs)) THEN 60 ELSE 0 END 
-                    // ';
                     $sqlKeywordReferences = '
                     CASE 
                         WHEN :keywordReferences MEMBER OF a.keywordReferences THEN 60 
                         ELSE 0 
                     END
                     ';
-                $qb->setParameter('keywordReferences', $keywordReferences)
-                ;
+                    $qb->setParameter('keywordReferences', $keywordReferences);
                     if ($intentionsString) {
                         $keywordReferences = $this->getEntityManager()->getRepository(KeywordReference::class)->findFromString($intentionsString);
                         if (count($keywordReferences) > 0) {
