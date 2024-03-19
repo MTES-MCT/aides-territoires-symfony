@@ -544,48 +544,18 @@ class AidRepository extends ServiceEntityRepository
             }
 
             // les keywordReferences
-            if ($objectsString) {
-                $keywordReferences = $this->getEntityManager()->getRepository(KeywordReference::class)->findFromString($objectsString);
-                if (count($keywordReferences) > 0) {
-                    $sqlKeywordReferences = '
-                    CASE 
-                        WHEN :keywordReferences MEMBER OF a.keywordReferences THEN 60 
-                        ELSE 0 
-                    END
-                    ';
-                    $qb->setParameter('keywordReferences', $keywordReferences);
-                    if ($intentionsString) {
-                        $keywordReferences = $this->getEntityManager()->getRepository(KeywordReference::class)->findFromString($intentionsString);
-                        if (count($keywordReferences) > 0) {
-                            $sqlKeywordReferences .= '
-                            +
-                            CASE 
-                                WHEN :keywordReferences MEMBER OF a.keywordReferences THEN 20 
-                                ELSE 0 
-                            END
-                            ';
-                        }
-                    }
-                }
-            } else {
-                if ($simpleWordsString) {
-                    $keywordReferences = $this->getEntityManager()->getRepository(KeywordReference::class)->findFromString($simpleWordsString);
-                    if (count($keywordReferences) > 0) {
-                        $sqlKeywordReferences = '
-                        CASE 
-                            WHEN :keywordReferences MEMBER OF a.keywordReferences THEN 20 
-                            ELSE 0 
-                        END
-                        ';
-
-                        $qb
-                        ->leftJoin('a.keywordReferences', 'keywordReferences')
-                        ->setParameter('keywordReferences', $keywordReferences)
-                        ;
-                    }
-                }
+            $keywordReferences = $this->getEntityManager()->getRepository(KeywordReference::class)->findFromSynonyms($synonyms);
+            if (count($keywordReferences) > 0) {
+                $sqlKeywordReferences = '
+                CASE 
+                    WHEN :keywordReferences MEMBER OF a.keywordReferences THEN 60 
+                    ELSE 0 
+                END
+                ';
+                $qb->setParameter('keywordReferences', $keywordReferences);
             }
 
+            // Projets référents
             if ($projectReference instanceof ProjectReference) {
                 $sqlProjectReference = '
                 CASE 
