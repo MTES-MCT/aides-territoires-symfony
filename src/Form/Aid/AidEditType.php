@@ -220,7 +220,10 @@ class AidEditType extends AbstractType
             ])
             ->add('subventionComment', TextType::class, [
                 'required' => false,
-                'label' => 'Taux de subvention (commentaire optionnel)'
+                'label' => 'Taux de subvention (commentaire optionnel)',
+                'constraints' => [
+                    new Length(max: 255)
+                ]
             ])
             ->add('loanAmount', TypeIntegerType::class, [
                 'required' => false,
