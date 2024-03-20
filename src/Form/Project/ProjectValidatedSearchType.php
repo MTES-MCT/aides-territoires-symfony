@@ -2,14 +2,10 @@
 
 namespace App\Form\Project;
 
-use App\Entity\Keyword\KeywordSynonymlist;
 use App\Entity\Project\Project;
-use App\Entity\Reference\KeywordReference;
-use App\Form\Type\KeywordSynonymlistAutocompleteField;
 use App\Form\Type\PerimeterCityAutocompleteType;
 use App\Service\User\UserService;
 use Doctrine\Persistence\ManagerRegistry;
-use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -62,6 +58,12 @@ class ProjectValidatedSearchType extends AbstractType
                 'help' => 'Ex: rénovation énergétique, vélo, tiers lieu, etc.',
                 'autocomplete' => true,
                 'autocomplete_url' => $this->routerInterface->generate('app_keyword_reference_ajax_ux_autocomplete'),
+                'tom_select_options' => [
+                    'create' => true,
+                    'createOnBlur' => true,
+                    'maxItems' => 1,
+                    'delimiter' => '$%§'
+                ],
             ])
         ;
     }
@@ -71,7 +73,10 @@ class ProjectValidatedSearchType extends AbstractType
         $resolver->setDefaults([
             // Configure your form options here
             'forcePerimeter' => false,
-            'dontUseUserPerimeter' => false
+            'dontUseUserPerimeter' => false,
+            'attr' => [
+                'data-controller' => 'custom-autocomplete'
+            ]
         ]);
     }
 }
