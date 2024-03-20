@@ -11,14 +11,17 @@ use App\Service\User\UserService;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Routing\RouterInterface;
 
 class ProjectValidatedSearchType extends AbstractType
 {
     public function  __construct(
         protected ManagerRegistry $managerRegistry,
-        protected UserService $userService
+        protected UserService $userService,
+        protected RouterInterface $routerInterface
     )
     {
     }
@@ -53,23 +56,12 @@ class ProjectValidatedSearchType extends AbstractType
 
         $builder
             ->add('project_perimeter', PerimeterCityAutocompleteType::class, $perimeterParams)
-            ->add('text', EntityType::class,  [
+            ->add('text', TextType::class,  [
                 'required' => false,
                 'label' => 'Mot-clés',
-                'attr' => [
-                    'placeholder' => 'Ex: rénovation énergétique, vélo, tiers lieu, etc.'
-                ],
-                'class' => KeywordReference::class,
+                'help' => 'Ex: rénovation énergétique, vélo, tiers lieu, etc.',
                 'autocomplete' => true,
-                'query_builder' => function ($er) {
-                    return $er->createQueryBuilder('k')
-                        ->andWhere('k.intention = 0')
-                        ->andWhere('k.parent = k')
-                        ->orderBy('k.name', 'ASC');
-                },
-                'choice_label' => function(KeywordReference $keywordReference) {
-                    return ucfirst($keywordReference->getName());
-                },
+                'autocomplete_url' => $this->routerInterface->generate('app_keyword_reference_ajax_ux_autocomplete'),
             ])
         ;
     }

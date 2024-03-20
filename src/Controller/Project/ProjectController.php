@@ -354,10 +354,10 @@ class ProjectController extends FrontController
                     $project_perimeter = $formProjectSearch->get('project_perimeter')->getData();
                 }
                 if($formProjectSearch->get('text')->getData()){
-                    $keyword=$formProjectSearch->get('text')->getData()->getName();
+                    $keyword = $formProjectSearch->get('text')->getData();
                 }
 
-                $projects=$projectValidatedRepository->findProjectInRadius(
+                $projects = $projectValidatedRepository->findProjectInRadius(
                     [
                     'perimeter' => $project_perimeter,
                     'search' => $keyword,
