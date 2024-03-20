@@ -58,8 +58,7 @@ class AlertRepository extends ServiceEntityRepository
         
         if ($hasQueryString) {
             $qb
-                ->andWhere('a.queryString IS NOT NULL')
-                ->andWhere('a.queryString !== ""')
+                ->andWhere('a.querystring IS NOT NULL AND a.querystring <> \'\'')
                 ;
         }
         if ($email !== null)
