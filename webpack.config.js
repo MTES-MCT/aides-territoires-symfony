@@ -52,6 +52,7 @@ Encore
     .addEntry('front/aid/aid/index', './assets/js/front/aid/aid/index.js')
     .addEntry('front/aid/aid/edit', './assets/js/front/aid/aid/edit.js')
     .addEntry('front/organization/collaborateurs', './assets/js/front/organization/collaborateurs.js')
+    .addEntry('front/portal/stats', './assets/js/front/portal/stats.js')
     .addEntry('front/project/project', './assets/js/front/project/project.js')
     .addEntry('front/reference/projets_subventionnes', './assets/js/front/reference/projets_subventionnes.js')
     .addEntry('front/program/index', './assets/js/front/program/index.js')

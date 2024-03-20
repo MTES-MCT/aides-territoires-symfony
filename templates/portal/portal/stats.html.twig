@@ -1,5 +1,12 @@
 {% extends 'base.html.twig' %}
 
+{% block javascripts %}
+	{{ parent() }}
+    {{ encore_entry_script_tags('front/portal/stats') }}
+{% endblock %}
+
+
+
 {% block body %}
 <div class="fr-container">
     <h1>Statistiques du portail {{ search_page.slug }}</h1>
@@ -15,48 +22,27 @@
 
         <div class="fr-mb-3w">
             <h2>Top 10 des aides les plus candidater</h2>
-            <div class="fr-table">
-                <table>
-                    <thead>
-                        <tr>
-                            <th></th>
-                            <th>Aide</th>
-                            <th>Nombre de vues</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for topAidsView in topAidsViews %}
-                        <tr>
-                            <td>{{ loop.index }}</td>
-                            <td><a href="{{ topAidsView.url }}" target="_blank" title="Voir l'aide  - Ouvre une nouvelle fenêtre">{{ topAidsView.name }}</a></td>
-                            <td>{{ topAidsView.nb }}</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
+            <div id="top-aids-container">Calcul en cours...</div>
         </div>
 
         <div class="fr-grid-row">
             <div class="fr-col-md-6">
                 <div class="fr-mb-3w">
-                    {{ render_chart(chartViewsByMonth)}}
+                    <div id="chart-views-by-month-container">Calcul en cours...</div>
+                    <hr />
                 </div>
 
                 <div class="fr-mb-3w">
                     <p class="fr-alert fr-alert--info">Les Statistiques Matomo ne sont disponibles qu'à partir du {{ dateStartMatomoto|date('d/m/Y') }}</p>
-                    {{ render_chart(chartVisitsByMonth)}}
+                    <div id="chart-visits-by-month-container">Calcul en cours...</div>
                 </div>
             </div>
             <div class="fr-col-md-6">
                 <div class="fr-mb-3w">
-                    {{ render_chart(chartOrganizationTypes)}}
+                    <div id="chart-views-by-organization-container">Calcul en cours...</div>
                 </div>
             </div>
         </div>
-
-
-
     </div>
 </div>
 {% endblock %}
