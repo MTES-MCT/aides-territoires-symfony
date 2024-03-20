@@ -11,11 +11,13 @@ use App\Entity\User\User;
 use App\Form\Aid\AidSearchTypeV2;
 use App\Form\Alert\AlertCreateType;
 use App\Repository\Aid\AidRepository;
+use App\Repository\Log\LogAidViewRepository;
 use App\Repository\Search\SearchPageRepository;
 use App\Service\Aid\AidSearchClass;
 use App\Service\Aid\AidSearchFormService;
 use App\Service\Aid\AidService;
 use App\Service\Log\LogService;
+use App\Service\Matomo\MatomoService;
 use App\Service\Reference\ReferenceService;
 use App\Service\User\UserService;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -25,6 +27,10 @@ use Pagerfanta\Pagerfanta;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Generator\UrlGenerator;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\UX\Chartjs\Builder\ChartBuilderInterface;
+use Symfony\UX\Chartjs\Model\Chart;
 
 class PortalController extends FrontController
 {
@@ -263,5 +269,231 @@ class PortalController extends FrontController
             'categoriesName' => $categoriesName,
             'highlightedWords' => $highlightedWords
         ]);
+    }
+
+
+    #[Route('/portails/{slug}/stats/', name: 'app_portal_portal_stats')]
+    public function stats(
+        $slug,
+        SearchPageRepository $searchPageRepository,
+        AidSearchFormService $aidSearchFormService,
+        AidService $aidService,
+        UserService $userService,
+        LogAidViewRepository $logAidViewRepository,
+        MatomoService $matomoService,
+        ChartBuilderInterface $chartBuilderInterface
+    ): Response
+    {
+        $user = $userService->getUserLogged();
+
+        // charge le portail
+        $search_page = $searchPageRepository->findOneBy(
+            [
+                'slug' => $slug
+            ]
+            );
+        if (!$search_page instanceof SearchPage) {
+            return $this->redirectToRoute('app_portal_portal');
+        }
+
+        // redirection vers un autre portail
+        if ($search_page->getSearchPageRedirect()) {
+            return $this->redirectToRoute('app_portal_portal_stats', ['slug' => $search_page->getSearchPageRedirect()->getSlug()]);
+        }
+
+        // converti la querystring en parametres
+        $aidParams = [
+            'showInSearch' => true,
+        ];
+        $queryString = null;
+        try {
+            // certaines pages ont un querystring avec https://... d'autres directement les parametres
+            $query = parse_url($search_page->getSearchQuerystring())['query'] ?? null;
+            $queryString = $query ?? $search_page->getSearchQuerystring();
+
+            // $aidParams = array_merge($aidParams, $aidSearchFormService->convertQuerystringToParams($queryString));
+            
+        } catch (\Exception $e) {
+            $queryString = null;
+        }
+
+        $aidSearchClass = $aidSearchFormService->getAidSearchClass(
+            params: [
+                'querystring' => $queryString,
+                'forceOrganizationType' => null,
+                'dontUseUserPerimeter' => true
+                ]
+        );
+
+        // parametres pour requetes aides
+        $aidParams = array_merge($aidParams, $aidSearchFormService->convertAidSearchClassToAidParams($aidSearchClass));
+
+        // les aides
+        $aidParams['searchPage'] = $search_page;
+        $aids = $aidService->searchAids($aidParams);
+
+
+        // tableau des ids des aides
+        $aidIds = [];
+        foreach ($aids as $aid) {
+            $aidIds[] = $aid->getId();
+        }
+
+        // Top 10 aides consulter
+        $topAidsViews = $logAidViewRepository->countTop([
+            'aidIds' => $aidIds,
+            'maxResults' => 10
+        ]);
+        foreach ($topAidsViews as $key => $topAidsView) {
+            $topAidsViews[$key]['url'] = $this->generateUrl('app_aid_aid_details', ['slug' => $topAidsView['slug']], UrlGeneratorInterface::ABSOLUTE_URL);
+        }
+
+        // nombre de vues par mois
+        $viewsByMonth = $logAidViewRepository->countByMonth([
+            'aidIds' => $aidIds,
+        ]);
+
+        // graphique vues par mois
+        $labels = [];
+        $datas = [];
+        foreach ($viewsByMonth as $viewByMonth) {
+            $labels[] = $viewByMonth['monthCreate'];
+            $datas[] = $viewByMonth['nb'];
+        }
+        $chartViewsByMonth = $chartBuilderInterface->createChart(Chart::TYPE_LINE);
+        $chartViewsByMonth->setData([
+            'labels' => $labels,
+            'datasets' => [
+                [
+                    'label' => 'Vues des aides par mois',
+                    'backgroundColor' => 'rgb(255, 255, 255)',
+                    'borderColor' => 'rgb(255, 0, 0)',
+                    'data' => $datas,
+                ],
+            ],
+        ]);
+
+
+        // les types d'organization les plus demandeurs
+        $organizationTypes = $logAidViewRepository->countOrganizationTypes([
+            'aidIds' => $aidIds
+        ]);
+
+        // première boucle pour faire les pourcentages
+        $total = 0;
+        foreach ($organizationTypes as $organizationType) {
+            $total += $organizationType['nb'];
+        }
+        foreach ($organizationTypes as $key => $organizationType) {
+            $organizationTypes[$key]['percentage'] = $total == 0 ? 0 : number_format(($organizationType['nb'] * 100 / $total), 2);
+        }
+
+        // datas pour le graphique
+        $labels = [];
+        $datas = [];
+        foreach ($organizationTypes as $organizationType) {
+            $labels[] = $organizationType['name']. ' ('.$organizationType['percentage'].'%)';;
+            $datas[] = $organizationType['nb'];
+        }
+        $colors = $this->getPieColors($organizationTypes);
+        $chartOrganizationTypes = $chartBuilderInterface->createChart(Chart::TYPE_PIE);
+        $chartOrganizationTypes->setData([
+            'labels' => $labels,
+            'datasets' => [
+                [
+                    'backgroundColor' => $colors,
+                    'data' => $datas,
+                ],
+            ],
+        ]);
+        $chartOrganizationTypes->setOptions([
+            'responsive' => true,
+            'plugins' => [
+                'legend' => [
+                    'position' => 'top',
+                ],
+                'title' => [
+                    'display' => true,
+                    'text' => 'Nombre de type de structure unique ayant consulté les aides',
+                ],
+            ],
+        ]);
+
+        // défini la date de début pour les stats
+        $dateStartMatomoto = new \DateTime(date('2024-02-19'));
+        $dateStartStats = $dateStartMatomoto > $search_page->getTimeCreate() ? $dateStartMatomoto : $search_page->getTimeCreate();
+
+        // nombre de visites du portail par mois
+        $today = new \DateTime(date('Y-m-d'));
+        $url = urlencode($this->generateUrl('app_portal_portal_details', ['slug' => $slug], UrlGeneratorInterface::ABSOLUTE_URL));
+        $url = urlencode('https://aides-territoires.beta.gouv.fr/portails/francemobilites/');
+        $visitsByMonth = $matomoService->getMatomoStats(
+            'VisitsSummary.get',
+            'pageUrl=='.$url,
+            $dateStartStats->format('Y-m-d'),
+            $today->format('Y-m-d'),
+            'month'
+        );
+        $labels = [];
+        $datas = [];
+        foreach ($visitsByMonth as $key => $visitByMonth) {
+            $labels[] = $key;
+            $datas[] = isset($visitByMonth[0]) ? $visitByMonth[0]->nb_visits : 0;
+        }
+        $chartVisitsByMonth = $chartBuilderInterface->createChart(Chart::TYPE_LINE);
+        $chartVisitsByMonth->setData([
+            'labels' => $labels,
+            'datasets' => [
+                [
+                    'label' => 'Visites du portail par mois',
+                    'backgroundColor' => 'rgb(255, 255, 255)',
+                    'borderColor' => 'rgb(255, 0, 0)',
+                    'data' => $datas,
+                ],
+            ],
+        ]);
+
+        // rendu template
+        return $this->render('portal/portal/stats.html.twig', [
+            'search_page' => $search_page,
+            'aids' => $aids,
+            'topAidsViews' => $topAidsViews,
+            'viewsByMonth' => $viewsByMonth,
+            'chartViewsByMonth' => $chartViewsByMonth,
+            'organizationTypes' => $organizationTypes,
+            'chartOrganizationTypes' => $chartOrganizationTypes,
+            'chartVisitsByMonth' => $chartVisitsByMonth,
+            'dateStartMatomoto' => $dateStartMatomoto
+        ]);
+    }
+
+
+    private function getPieColors(array $array) {
+        $colorsBySlug = [
+            'commune' => 'rgb(255, 99, 132)',
+            'epci' => 'rgb(54, 162, 235)',
+            'department' => 'rgb(255, 205, 86)',
+            'region' => 'rgb(75, 192, 192)',
+            'special' => 'rgb(153, 102, 255)',
+            'public-org' => 'rgb(255, 159, 64)',
+            'public-cies' => 'rgb(201, 203, 207)',
+            'association' => 'rgb(0, 255, 0)',
+            'private-sector' => 'rgb(128, 128, 128)',
+            'private-person' => 'rgb(0, 0, 255)',
+            'farmer' => 'rgb(255, 255, 0)',
+            'researcher' => 'rgb(255, 0, 255)',
+            'other' => 'rgb(0, 255, 255)',
+        ];
+        $returnColors = [];
+
+        foreach ($array as $key => $item) {
+            if (!isset($colorsBySlug[$item['slug']])) {
+                $returnColors[] = $colorsBySlug['other'];
+            } else {
+                $returnColors[] = $colorsBySlug[$item['slug']];
+            }
+        }
+
+        return $returnColors;
     }
 }
