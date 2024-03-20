@@ -102,7 +102,7 @@ class AlertSendCommand extends Command
             $aidParams = array_merge($aidParams, $this->aidSearchFormService->convertAidSearchClassToAidParams($aidSearchClass));
 
             // recupere les nouvelles aides qui correspondent à l'alerte
-            $aids = $this->managerRegistry->getRepository(Aid::class)->findCustom($aidParams);
+            $aids = $this->aidService->searchAids($aidParams);
 
             // il y a de nouvelles aides
             if (count($aids) > 0) {
@@ -132,6 +132,7 @@ class AlertSendCommand extends Command
 
                 $nbAlertSend++;
             }
+            unset($aids);
         }
 
         // sauvegarde
