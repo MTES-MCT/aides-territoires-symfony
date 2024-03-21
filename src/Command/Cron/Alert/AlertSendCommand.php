@@ -79,13 +79,17 @@ class AlertSendCommand extends Command
         // pour le retour
         $nbAlertSend = 0;
 
+        // prépare les deux dates de publication à checker
+        $dateTimeDaily = new \DateTime(date('Y-m-d', strtotime('-1 day')));
+        $dateTimeWeekly = new \DateTime(date('Y-m-d', strtotime('-7 day')));
+
         // pour chaque alerte on regarde si de nouvelles aide (datePublished = hier) correspondent
         /**@var Alert $alert */
         foreach ($alerts as $alert) {
             $publishedAfter = 
                 $alert->getAlertFrequency() === Alert::FREQUENCY_DAILY_SLUG
-                    ? new \DateTime(date('Y-m-d', strtotime('-1 day')))
-                    : new \DateTime(date('Y-m-d', strtotime('-7 day')))
+                    ? $dateTimeDaily
+                    : $dateTimeWeekly
             ;
 
             $aidSearchClass = $this->aidSearchFormService->getAidSearchClass(
