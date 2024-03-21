@@ -5,6 +5,7 @@ namespace App\Form\Organization;
 use App\Entity\Backer\Backer;
 use App\Entity\Organization\Organization;
 use App\Entity\Organization\OrganizationType;
+use App\Entity\Organization\OrganizationTypeGroup;
 use App\Entity\Perimeter\Perimeter;
 use App\Entity\Project\Project;
 use App\Entity\User\User;
@@ -14,6 +15,9 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormError;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\Length;
 
@@ -93,12 +97,32 @@ class OrganizationEditType extends AbstractType
             ])
             ->add('inseeCode', TextType::class, [
                 'label' => 'Code INSEE',
-                'required' => true,
+                'required' => false,
                 'constraints' => [
                     new Length(5)
                 ],
             ])
+
+            ->addEventListener(
+                FormEvents::SUBMIT,
+                [$this, 'onSubmit']
+            )
         ;
+    }
+
+    public function onSubmit(FormEvent $event): void
+    {
+        // si on a le type d'organization
+        if ($event->getForm()->has('organizationType') && $event->getForm()->get('organizationType')->getData()) {
+            // si c'est une collectivité
+            if ($event->getForm()->get('organizationType')->getData()->getOrganizationTypeGroup() && $event->getForm()->get('organizationType')->getData()->getOrganizationTypeGroup()->getId() == OrganizationTypeGroup::ID_COLLECTIVITES) {
+                //  le code insee est alors obligatoire
+                if ($event->getForm()->has('inseeCode') && !$event->getForm()->get('inseeCode')->getData()) {
+                    $event->getForm()->get('inseeCode')->addError(new FormError('Le code INSEE est obligatoire pour les collectivités'));
+                }
+            }
+        }
+                
     }
 
     public function configureOptions(OptionsResolver $resolver): void

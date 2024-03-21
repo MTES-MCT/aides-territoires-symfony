@@ -12,6 +12,8 @@ use Gedmo\Mapping\Annotation as Gedmo;
 #[ORM\Entity(repositoryClass: OrganizationTypeGroupRepository::class)]
 class OrganizationTypeGroup
 {
+    const ID_COLLECTIVITES = 1;
+    
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
