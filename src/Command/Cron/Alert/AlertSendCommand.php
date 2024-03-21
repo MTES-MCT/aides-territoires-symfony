@@ -85,7 +85,7 @@ class AlertSendCommand extends Command
 
         // pour chaque alerte on regarde si de nouvelles aide (datePublished = hier) correspondent
         /**@var Alert $alert */
-        foreach ($alerts as $alert) {
+        foreach ($alerts as $key => $alert) {
             $publishedAfter = 
                 $alert->getAlertFrequency() === Alert::FREQUENCY_DAILY_SLUG
                     ? $dateTimeDaily
@@ -101,7 +101,9 @@ class AlertSendCommand extends Command
             // parametres pour requetes aides
             $aidParams =[
                 'showInSearch' => true,
-                'publishedAfter' => $publishedAfter
+                'publishedAfter' => $publishedAfter,
+                'noRelaunch' => true,
+                'noPostPopulate' => true
             ];
             $aidParams = array_merge($aidParams, $this->aidSearchFormService->convertAidSearchClassToAidParams($aidSearchClass));
 
@@ -133,15 +135,18 @@ class AlertSendCommand extends Command
                 $alert->setTimeLatestAlert($today);
                 $alert->setDateLatestAlert($today);
                 $this->managerRegistry->getManager()->persist($alert);
-
+                // sauvegarde
+                $this->managerRegistry->getManager()->flush();
+                // libère mémoire
+                $this->managerRegistry->getManager()->clear();
+                // incrémente le compteur
                 $nbAlertSend++;
             }
+
+            // libère mémoire
             unset($aids);
+            unset($alerts[$key]);
         }
-
-        // sauvegarde
-        $this->managerRegistry->getManager()->flush();
-
 
         // success
         $io->success($nbAlertSend. ' alertes envoyées');

@@ -33,13 +33,16 @@ class AidService
     public function searchAids(array $aidParams): array
     {
         $aids = $this->managerRegistry->getRepository(Aid::class)->findCustom($aidParams);
-        if (count($aids) <= 10) {
-            $aidParams['scoreTotalMin'] = 1;
-            $aidParams['scoreObjectsMin'] = 0;
-            $aids = $this->managerRegistry->getRepository(Aid::class)->findCustom($aidParams);
+        if (!isset($aidParams['noRelaunch'])) {
+            if (count($aids) <= 10) {
+                $aidParams['scoreTotalMin'] = 1;
+                $aidParams['scoreObjectsMin'] = 0;
+                $aids = $this->managerRegistry->getRepository(Aid::class)->findCustom($aidParams);
+            }
         }
-        $aids = $this->postPopulateAids($aids, $aidParams);
-
+        if (!isset($aidParams['noPostPopulate'])) {
+            $aids = $this->postPopulateAids($aids, $aidParams);
+        }
         return $aids;
     }
 
