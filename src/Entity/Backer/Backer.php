@@ -564,6 +564,21 @@ class Backer
 
     private ?array $aidsTechnical = [];
 
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    private ?string $backerType = null;
+
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    private ?string $projectsExamples = null;
+
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    private ?string $internalOperation = null;
+
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    private ?string $contact = null;
+
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    private ?string $usefulLinks = null;
+
 
     public function getAidsTechnical() : ?array
     {
@@ -782,6 +797,66 @@ class Backer
     public function setActive(bool $active): static
     {
         $this->active = $active;
+
+        return $this;
+    }
+
+    public function getBackerType(): ?string
+    {
+        return $this->backerType;
+    }
+
+    public function setBackerType(?string $backerType): static
+    {
+        $this->backerType = $backerType;
+
+        return $this;
+    }
+
+    public function getProjectsExamples(): ?string
+    {
+        return $this->projectsExamples;
+    }
+
+    public function setProjectsExamples(?string $projectsExamples): static
+    {
+        $this->projectsExamples = $projectsExamples;
+
+        return $this;
+    }
+
+    public function getInternalOperation(): ?string
+    {
+        return $this->internalOperation;
+    }
+
+    public function setInternalOperation(?string $internalOperation): static
+    {
+        $this->internalOperation = $internalOperation;
+
+        return $this;
+    }
+
+    public function getContact(): ?string
+    {
+        return $this->contact;
+    }
+
+    public function setContact(?string $contact): static
+    {
+        $this->contact = $contact;
+
+        return $this;
+    }
+
+    public function getUsefulLinks(): ?string
+    {
+        return $this->usefulLinks;
+    }
+
+    public function setUsefulLinks(?string $usefulLinks): static
+    {
+        $this->usefulLinks = $usefulLinks;
 
         return $this;
     }

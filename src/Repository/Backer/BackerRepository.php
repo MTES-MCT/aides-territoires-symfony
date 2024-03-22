@@ -46,6 +46,19 @@ class BackerRepository extends ServiceEntityRepository
         ;
     }
 
+    public function countReviewable(?array $params = null): int
+    {
+        $params['active'] = false;
+        try {
+            $qb = $this->getQueryBuilder($params);
+            $qb->select('IFNULL(COUNT(b.id), 0) AS nb');
+
+            return $qb->getQuery()->getResult()[0]['nb'] ?? 0;
+        } catch (\Exception $e) {
+            return 0;
+        }
+    }
+
     public function countBackerWithAidInCounty(array $params = null)
     {
 

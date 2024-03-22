@@ -73,16 +73,6 @@ class BackerEditType extends AbstractType
                 ],
                 'sanitize_html' => true,
             ])
-            ->add('metaDescription', TextType::class, [
-                'required' => false,
-                'label' => 'Méta description',
-                'help' => 'La méta description est un court texte qui décrit le contenu de la page. (max 255 caractères)'
-            ])
-            ->add('metaTitle', TextType::class, [
-                'required' => false,
-                'label' => 'Meta title',
-                'help' => 'Le meta title est le titre de la page qui apparait dans les résultats de recherche. (max 255 caractères)'
-            ])
             ->add('perimeter', PerimeterAutocompleteType::class, [
                 'required' => true,
                 'label' => 'Zone géographique couverte par le porteur',
@@ -100,14 +90,6 @@ class BackerEditType extends AbstractType
                 'help_html' => true,
                 'placeholder' => 'Tapez les premiers caractères',
                 'class' => Perimeter::class,
-            ])
-            ->add('backerGroup', EntityType::class, [
-                'required' => false,
-                'label' => 'Groupe auquel le porteur appartiens',
-                'class' => BackerGroup::class,
-                'choice_label' => 'name',
-                'autocomplete' => true,
-                'placeholder' => 'Tapez les premiers caractères',
             ])
         ;
     }

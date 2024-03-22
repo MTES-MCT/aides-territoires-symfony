@@ -35,6 +35,12 @@
                             </p>
                             <p>Les membres de votre structure peuvent également participer au contenu de cette fiche</p>
                         </div>
+
+                        <div class="fr-alert fr-alert--info fr-alert--sm fr-my-2w">
+                            <p>
+                                Si la fiche porteur d'aide est déjà existante mais n'est pas reliée à votre structure, veuillez <a href="{{ path('app_contact_contact') }}" title="Nous contacter">nous contacter</a> pour la relier à votre structure.
+                            </p>
+                        </div>
                     {% endif %}
 
 
@@ -58,10 +64,7 @@
                         {% endif %}
                         {{ form_row(form.logoFile) }}
                         {{ form_row(form.description) }}
-                        {{ form_row(form.metaDescription) }}
-                        {{ form_row(form.metaTitle) }}
                         {{ form_row(form.perimeter) }}
-                        {{ form_row(form.backerGroup) }}
 
                         <footer class="fr-mt-2w">
                             <button type="submit" class="fr-btn">{% if backer.id %}Modifier{% else %}Créer{% endif %}</button>

@@ -32,6 +32,7 @@ class BackerCrudController extends AtCrudController
     public function configureFilters(Filters $filters): Filters
     {
         return $filters
+            ->add('active')
             ->add('isSpotlighted')
         ;
     }

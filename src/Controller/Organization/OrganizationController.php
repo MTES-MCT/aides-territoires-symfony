@@ -623,6 +623,7 @@ class OrganizationController extends FrontController
         }
         if (!$backer instanceof Backer) {
             $backer = new Backer();
+            $create = true;
         }
     
         // formulaire edition porteur
@@ -637,25 +638,45 @@ class OrganizationController extends FrontController
                     $imageService->sendUploadedImageToCloud($logoFile, Backer::FOLDER, $backer->getLogo());
                 }
 
-                // sauvegarde
                 $managerRegistry->getManager()->persist($backer);
+
+                // assigne le porteur d'aide à l'organization
+                $organization->setBacker($backer);
+                $managerRegistry->getManager()->persist($organization);
+
+                 // sauvegarde
                 $managerRegistry->getManager()->flush();
 
                 // on envoi une notification à tous les membres de l'organization pour les prévenir de l'update
                 foreach ($organization->getBeneficiairies() as $beneficiary) {
                     if ($beneficiary->getId() != $user->getId()) {
-                        $notificationService->addNotification(
-                            $beneficiary,
-                            'La fiche du porteur d\'aide '.$backer->getName().' à été modifiée',
-                            '<p>
-                            '.$user->getFirstname().' '.$user->getLastname().' de la structure '.$organization->getName(). ' a mis à jour la fiche du porteur d\'aide '.$backer->getName().'.
-                            </p>'
-                        );
+                        if (isset($create)) {
+                            $notificationService->addNotification(
+                                $beneficiary,
+                                'La fiche du porteur d\'aide '.$backer->getName().' à été créee',
+                                '<p>
+                                '.$user->getFirstname().' '.$user->getLastname().' de la structure '.$organization->getName(). ' a créé la fiche du porteur d\'aide '.$backer->getName().'.
+                                </p>'
+                            );
+                        } else {
+                            $notificationService->addNotification(
+                                $beneficiary,
+                                'La fiche du porteur d\'aide '.$backer->getName().' à été modifiée',
+                                '<p>
+                                '.$user->getFirstname().' '.$user->getLastname().' de la structure '.$organization->getName(). ' a mis à jour la fiche du porteur d\'aide '.$backer->getName().'.
+                                </p>'
+                            );
+                        }
                     }
                 }
 
                 // message ok
-                $this->addFlash(FrontController::FLASH_SUCCESS, 'La fiche porteur d\'aide a bien été modifiée.');
+                if (isset($create)) {
+                    $this->addFlash(FrontController::FLASH_SUCCESS, 'La fiche porteur d\'aide a bien été créée. Elle sera validée par un administrateur avant d\'être publiée');
+                } else {
+                    $this->addFlash(FrontController::FLASH_SUCCESS, 'La fiche porteur d\'aide a bien été modifiée.');
+                }
+                
 
                 // redirection
                 return $this->redirectToRoute('app_organization_backer_edit', ['id' => $organization->getId(), 'idBacker' => $backer->getId()]);
