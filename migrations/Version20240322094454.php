@@ -20,12 +20,13 @@ final class Version20240322094454 extends AbstractMigration
     public function up(Schema $schema): void
     {
         // this up() migration is auto-generated, please modify it to your needs
-        $this->addSql('ALTER TABLE backer ADD backer_type LONGTEXT DEFAULT NULL, ADD projects_examples LONGTEXT DEFAULT NULL, ADD internal_operation LONGTEXT DEFAULT NULL, ADD contact LONGTEXT DEFAULT NULL, ADD useful_links LONGTEXT DEFAULT NULL, DROP nb_aids, DROP nb_aids_live');
+        $this->addSql('ALTER TABLE backer ADD backer_type LONGTEXT DEFAULT NULL, ADD projects_examples LONGTEXT DEFAULT NULL, ADD internal_operation LONGTEXT DEFAULT NULL, ADD contact LONGTEXT DEFAULT NULL, ADD useful_links LONGTEXT DEFAULT NULL');
+        $this->addSql('UPDATE organization_type SET name="Etablissement public dont services de l\'Etat" where slug = "public-org"');
     }
 
     public function down(Schema $schema): void
     {
         // this down() migration is auto-generated, please modify it to your needs
-        $this->addSql('ALTER TABLE backer ADD nb_aids INT DEFAULT NULL, ADD nb_aids_live INT DEFAULT NULL, DROP backer_type, DROP projects_examples, DROP internal_operation, DROP contact, DROP useful_links');
+        $this->addSql('ALTER TABLE backer DROP backer_type, DROP projects_examples, DROP internal_operation, DROP contact, DROP useful_links');
     }
 }

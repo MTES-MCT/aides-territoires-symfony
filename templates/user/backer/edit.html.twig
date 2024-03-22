@@ -66,6 +66,12 @@
                         {{ form_row(form.description) }}
                         {{ form_row(form.perimeter) }}
 
+                        {{ form_row(form.backerType) }}
+                        {{ form_row(form.projectsExamples) }}
+                        {{ form_row(form.internalOperation) }}
+                        {{ form_row(form.contact) }}
+                        {{ form_row(form.usefulLinks) }}
+
                         <footer class="fr-mt-2w">
                             <button type="submit" class="fr-btn">{% if backer.id %}Modifier{% else %}Créer{% endif %}</button>
                         </footer>

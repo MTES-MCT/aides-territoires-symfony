@@ -91,6 +91,56 @@ class BackerEditType extends AbstractType
                 'placeholder' => 'Tapez les premiers caractères',
                 'class' => Perimeter::class,
             ])
+            ->add('backerType', TextareaType::class, [
+                'required' => false,
+                'label' => 'Type de porteur',
+                'attr' => [
+                    'class' => 'trumbowyg',
+                    'cols' => 40,
+                    'rows' => 10
+                ],
+                'sanitize_html' => true,
+            ])
+            ->add('projectsExamples', TextareaType::class, [
+                'required' => false,
+                'label' => 'Exemples de projets accompagnés par le porteur',
+                'attr' => [
+                    'class' => 'trumbowyg',
+                    'cols' => 40,
+                    'rows' => 10
+                ],
+                'sanitize_html' => true,
+            ])
+            ->add('internalOperation', TextareaType::class, [
+                'required' => false,
+                'label' => 'Mode de fonctionnement interne pour obtenir une aide',
+                'attr' => [
+                    'class' => 'trumbowyg',
+                    'cols' => 40,
+                    'rows' => 10
+                ],
+                'sanitize_html' => true,
+            ])
+            ->add('contact', TextareaType::class, [
+                'required' => false,
+                'label' => 'Contact',
+                'attr' => [
+                    'class' => 'trumbowyg',
+                    'cols' => 40,
+                    'rows' => 10
+                ],
+                'sanitize_html' => true,
+            ])
+            ->add('usefulLinks', TextareaType::class, [
+                'required' => false,
+                'label' => 'Liens utiles',
+                'attr' => [
+                    'class' => 'trumbowyg',
+                    'cols' => 40,
+                    'rows' => 10
+                ],
+                'sanitize_html' => true,
+            ])
         ;
     }
 

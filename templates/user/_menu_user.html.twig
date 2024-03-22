@@ -75,9 +75,11 @@
                                     <a class="fr-sidemenu__link" href="{{ path('app_organization_structure_information', {'id': userOrganization.id}) }}" target="_self" {% if organization is defined and organization.id == userOrganization.id %}aria-current="page"{% endif %} rel="noopener" title="{{ userOrganization.name }}">{{ userOrganization.name }}</a>
                                 </li>
                             {% endfor %}
+                            {% if app.user and app.user.organizations|length == 0 %}
                             <li class="fr-sidemenu__item {% if organization is defined and organization == null %}fr-sidemenu__item--active{% endif %}">
                                 <a class="fr-sidemenu__link" href="{{ path('app_organization_structure_information') }}" target="_self" {% if organization is defined and organization.id == null %}aria-current="page"{% endif %} rel="noopener" title="Nouvelle structure">Nouvelle structure</a>
                             </li>
+                            {% endif %}
                             <li class="fr-sidemenu__item {% if structure_invitations is defined %}fr-sidemenu__item--active{% endif %}">
                                 <a class="fr-sidemenu__link" href="{{ path('app_organization_invitations') }}" target="_self" {% if structure_invitations is defined %}aria-current="page"{% endif %} rel="noopener" title="Mes invitations">Mes invitations</a>
                             </li>

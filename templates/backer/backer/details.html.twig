@@ -7,7 +7,7 @@
         {{ backer.metaDescription }}
     {% else %}
         {{parent()}}
-     {% endif %}
+    {% endif %}
 {% endblock %}
 
 {% block meta_og %}
@@ -40,15 +40,50 @@
 
         <div class="fr-grid-row fr-grid-row--gutters at--space-between">
             {% if backer.perimeter %}
-            <div class="fr-col-12 at-background-alt-grey fr-pt-5w fr-px-5w">
+            <div class="fr-col-12 at-background-alt-grey fr-mb-5w fr-p-5w">
                 <h2 class="fr-mt-1w">Zone géographique couverte</h2>
                 <p class="fr-mb-0">{{ backer.perimeter.name }}</p>
             </div>
             {% endif %}
+            {% if backer.backerType %}
+                <div class="fr-col-12 at-background-alt-grey fr-mb-5w fr-p-5w">
+                    <h2 class="fr-mt-1w">Type de porteur</h2>
+                    {{ backer.backerType|sanitize_html|raw }}
+                </div>
+            {% endif %}
+
             {% if backer.description %}
                 <div class="fr-col-12 at-background-alt-grey fr-mb-5w fr-p-5w">
                     <h2 class="fr-mt-1w">Présentation générale</h2>
-                    {{ backer.description|raw }}
+                    {{ backer.description|sanitize_html|raw }}
+                </div>
+            {% endif %}
+
+            {% if backer.projectsExamples %}
+                <div class="fr-col-12 at-background-alt-grey fr-mb-5w fr-p-5w">
+                    <h2 class="fr-mt-1w">Exemples de projets accompagnés par le porteur</h2>
+                    {{ backer.projectsExamples|sanitize_html|raw }}
+                </div>
+            {% endif %}
+
+            {% if backer.internalOperation %}
+                <div class="fr-col-12 at-background-alt-grey fr-mb-5w fr-p-5w">
+                    <h2 class="fr-mt-1w">Mode de fonctionnement interne pour obtenir une aide </h2>
+                    {{ backer.internalOperation|sanitize_html|raw }}
+                </div>
+            {% endif %}
+
+            {% if backer.contact %}
+                <div class="fr-col-12 at-background-alt-grey fr-mb-5w fr-p-5w">
+                    <h2 class="fr-mt-1w">Contact</h2>
+                    {{ backer.contact|sanitize_html|raw }}
+                </div>
+            {% endif %}
+
+            {% if backer.usefulLinks %}
+                <div class="fr-col-12 at-background-alt-grey fr-mb-5w fr-p-5w">
+                    <h2 class="fr-mt-1w">Liens utiles</h2>
+                    {{ backer.usefulLinks|sanitize_html|raw }}
                 </div>
             {% endif %}
         </div>

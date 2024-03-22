@@ -154,9 +154,23 @@ class Backer
     #[ORM\JoinColumn(onDelete:'SET NULL')]
     private Collection $logBackerViews;
     
-
     #[ORM\Column]
     private ?bool $active = false;
+
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    private ?string $backerType = null;
+
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    private ?string $projectsExamples = null;
+
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    private ?string $internalOperation = null;
+
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    private ?string $contact = null;
+
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    private ?string $usefulLinks = null;
 
     /**
      * Champs non en base
@@ -563,22 +577,6 @@ class Backer
     }
 
     private ?array $aidsTechnical = [];
-
-    #[ORM\Column(type: Types::TEXT, nullable: true)]
-    private ?string $backerType = null;
-
-    #[ORM\Column(type: Types::TEXT, nullable: true)]
-    private ?string $projectsExamples = null;
-
-    #[ORM\Column(type: Types::TEXT, nullable: true)]
-    private ?string $internalOperation = null;
-
-    #[ORM\Column(type: Types::TEXT, nullable: true)]
-    private ?string $contact = null;
-
-    #[ORM\Column(type: Types::TEXT, nullable: true)]
-    private ?string $usefulLinks = null;
-
 
     public function getAidsTechnical() : ?array
     {

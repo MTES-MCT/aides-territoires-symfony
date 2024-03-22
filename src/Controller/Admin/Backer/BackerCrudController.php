@@ -49,7 +49,17 @@ class BackerCrudController extends AtCrudController
             ->setHelp('Un porteur d’aides actif est visible sur le site');
         yield TrumbowygField::new('description', 'Description')
         ->onlyOnForms();
-        
+        yield TrumbowygField::new('backerType', 'Type de porteur')
+        ->onlyOnForms();
+        yield TrumbowygField::new('projectsExamples', 'Exemples de projets accompagnés par le porteur')
+        ->onlyOnForms();
+        yield TrumbowygField::new('internalOperation', 'Mode de fonctionnement interne pour obtenir une aide')
+        ->onlyOnForms();
+        yield TrumbowygField::new('contact', 'Contact')
+        ->onlyOnForms();
+        yield TrumbowygField::new('usefulLinks', 'Liens utiles')
+        ->onlyOnForms();
+
         yield ImageField::new('logoFile', 'Logo du porteur')
         ->setHelp('Évitez les fichiers trop lourds. Préférez les fichiers SVG.')
         ->setUploadDir($this->fileService->getUploadTmpDirRelative())
