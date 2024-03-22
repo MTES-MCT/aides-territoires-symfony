@@ -2,6 +2,7 @@
 
 namespace App\Repository\Project;
 
+use App\Entity\Organization\OrganizationType;
 use App\Entity\Perimeter\Perimeter;
 use App\Entity\Project\Project;
 use App\Entity\Project\ProjectValidated;
@@ -172,6 +173,7 @@ class ProjectValidatedRepository extends ServiceEntityRepository
         $simple_words_string = $params['simple_words_string'] ?? null;
         $perimeter = $params['perimeter'] ?? null;
         $radius = $params['radius'] ?? null;
+        $organizationType = $params['organizationType'] ?? null;
 
         $qb = $this->createQueryBuilder('p');
 
@@ -193,6 +195,14 @@ class ProjectValidatedRepository extends ServiceEntityRepository
                 ->setParameter('distanceKm', $radius)
                 ;
             }
+        }
+
+        if ($organizationType instanceof OrganizationType && $organizationType->getId()) {
+            $qb
+                ->innerJoin('p.organization', 'organizationForType')
+                ->andWhere('organizationForType.organizationType = :organizationType')
+                ->setParameter('organizationType', $organizationType)
+                ;
         }
 
         if ($keyword !== null) {

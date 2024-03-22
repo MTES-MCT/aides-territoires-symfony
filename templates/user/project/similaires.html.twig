@@ -64,15 +64,15 @@
                             {% for project in myPager.currentPageResults %}
                                 <tr>
                                     <td data-order="{{ project.distance|round(2) }}">
-                                        {% if project.distance > 0 %}{{ project.distance|round(2) }} km{% endif %}
+                                        {% if project.distance > 0 %}{{ project.distance|round(2) }} km{% endif %}
                                     </td> 
 
-                                <td>{{ project.timeObtained|date("Y")}}</td>
+                                <td>{% if project.timeObtained %}{{ project.timeObtained|date("Y")}}{% endif %}</td>
                                 <td>
-                                    {{ project.organization.name }}
+                                    {% if project.organization %}{{ project.organization.name }}{% endif %}
                                 </td>
                                 <td>
-                                   {{ project.projectName }}
+                                    {{ project.projectName }}
                                 </td>
                                 <td>
                                     {% if project.aid  %}
