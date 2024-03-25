@@ -933,8 +933,6 @@ class AidController extends FrontController
             throw new NotFoundHttpException('Cette aide n\'existe pas');
         }
 
-
-
         // nom de fichier
         $filename = 'Aides-territoires-statistiques';
 

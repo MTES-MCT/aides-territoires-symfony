@@ -181,6 +181,7 @@ class LogAidViewRepository extends ServiceEntityRepository
     {
         $dateMin = $params['dateMin'] ?? null;
         $dateMax = $params['dateMax'] ?? null;
+        $dateCreate = $params['dateCreate'] ?? null;
         $author = $params['author'] ?? null;
         $aid = $params['aid'] ?? null;
         $aidIds = $params['aidIds'] ?? null;
@@ -216,6 +217,14 @@ class LogAidViewRepository extends ServiceEntityRepository
                 ->setParameter('aidIds', $aidIds)
             ;
         }
+
+        if ($dateCreate instanceof \DateTime) {
+            $qb
+                ->andWhere('lav.dateCreate = :dateCreate')
+                ->setParameter('dateCreate', $dateCreate)
+            ;
+        }
+        
         if ($dateMin instanceof \DateTime) {
             $qb
                 ->andWhere('lav.dateCreate >= :dateMin')
