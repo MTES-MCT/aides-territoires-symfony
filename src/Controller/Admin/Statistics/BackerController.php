@@ -25,14 +25,43 @@ class BackerController extends DashboardController
         ChartBuilderInterface $chartBuilderInterface
     )
     {
-        // tous les porteurs
-        $backers = $backerRepository->findBy(
-            [],
-            ['nbAidsLive' => 'DESC']
+        // nombre total de porteurs
+        $nbBackersTotal = $backerRepository->count([]);
+        
+        // Les porteurs avec des aides lives
+        $backers = $backerRepository->findCustom(
+            [
+                'nbAidsLiveMin' => 1,
+                'orderBy' => [
+                    'order' => 'b.nbAidsLive',
+                    'sort' => 'DESC'
+                ]
+            ],
         );
+
+        // pourcentage de backer avec des aides lives
+        $percentBackerAidsLive = $nbBackersTotal == 0 ? 0 : number_format((count($backers) * 100 / $nbBackersTotal), 2);
 
         // grapgique
         $chartBackerAids = $chartBuilderInterface->createChart(Chart::TYPE_PIE);
+
+        // pourcentage des 10 premiers backers
+        $top10TotalAids = 0;
+        $backersTotalAids = 0;
+        $current = 0;
+        foreach ($backers as $backer) {
+            $backersTotalAids += (int) $backer->getNbAidsLive();
+            if ($current < 10) {
+                $top10TotalAids += (int) $backer->getNbAidsLive();
+            }
+            $current++;
+        }
+        $top10Percent = $backersTotalAids == 0 ? 0 : number_format(($top10TotalAids * 100 / $backersTotalAids), 2);
+
+        // moyenne et ecart type de nbAidsLives par backer
+        $moyenne = count($backers) == 0 ? 0 : (int) ($backersTotalAids / count($backers));
+
+
 
         // première boucle pour faire les pourcentages
         $total = 0;
@@ -77,6 +106,12 @@ class BackerController extends DashboardController
         
         return $this->render('admin/statistics/backer/dashboard.html.twig', [
             'chartBackerAids' => $chartBackerAids,
+            'percentBackerAidsLive' => $percentBackerAidsLive,
+            'nbBackersTotal' => $nbBackersTotal,
+            'backers' => $backers,
+            'backersTotalAids' => $backersTotalAids,
+            'top10Percent' => $top10Percent,
+            'moyenne' => $moyenne,
         ]);
     }
 }

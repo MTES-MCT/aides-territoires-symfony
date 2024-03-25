@@ -236,9 +236,16 @@ class BackerRepository extends ServiceEntityRepository
         $nameLike = $params['nameLike'] ?? null;
         $hasFinancedAids = $params['hasFinancedAids'] ?? null;
         $hasPublishedFinancedAids = $params['hasPublishedFinancedAids'] ?? null;
+        $nbAidsLiveMin = $params['nbAidsLiveMin'] ?? null;
 
         $qb = $this->createQueryBuilder('b');
 
+        if ($nbAidsLiveMin !== null) {
+            $qb
+                ->andWhere('b.nbAidsLive >= :nbAidsLiveMin')
+                ->setParameter('nbAidsLiveMin', $nbAidsLiveMin)
+            ;
+        }
         if ($hasLogo === true) {
             $qb
                 ->andWhere('b.logo IS NOT NULL')
