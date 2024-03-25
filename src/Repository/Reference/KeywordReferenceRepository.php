@@ -64,8 +64,21 @@ class KeywordReferenceRepository extends ServiceEntityRepository
         $string = $params['string'] ?? null;
         $names = $params['names'] ?? null;
         $words = $params['words'] ?? null;
-
+        $nameLike = $params['nameLike'] ?? null;
+        $onlyParent = $params['onlyParent'] ?? false;
+        $orderBy = (isset($params['orderBy']) && isset($params['orderBy']['sort']) && isset($params['orderBy']['order'])) ? $params['orderBy'] : null;
+        
         $qb = $this->createQueryBuilder('kr');
+
+        if ($nameLike !== null) {
+            $qb->andWhere('kr.name LIKE :nameLike')
+                ->setParameter('nameLike', '%'.$nameLike.'%')
+                ;
+        }
+
+        if ($onlyParent) {
+            $qb->andWhere('kr.parent = kr');
+        }
 
         if (is_array($names) && count($names) > 0) {
             $qb->andWhere('kr.name IN (:names)')
@@ -88,6 +101,13 @@ class KeywordReferenceRepository extends ServiceEntityRepository
             }
         }
         
+        if ($orderBy !== null) {
+            if ($orderBy['sort'] == 'projectReferenceCategory.name') {
+                $qb->leftJoin('pr.projectReferenceCategory', 'projectReferenceCategory');
+            }
+            $qb->addOrderBy($orderBy['sort'], $orderBy['order']);
+            ;
+        }
         
         return $qb;
     }
