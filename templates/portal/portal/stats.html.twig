@@ -22,22 +22,7 @@
         </div>
     </div>
 
-    <div class="fr-grid-row fr-grid-row--gutters fr-grid-row--bottom">
-        <div class="fr-col-md-6">
-            <div class="fr-mb-3w">
-                <div id="chart-views-by-month-container">Calcul en cours...</div>
-                <hr />
-            </div>
-        </div>
-        <div class="fr-col-md-6">
-            <div class="fr-mb-3w">
-                <p class="fr-alert fr-alert--info">Ces statistiques ne sont disponibles qu'à partir du {{ dateStartMatomoto|date('d/m/Y') }}</p>
-                <div id="chart-visits-by-month-container">Calcul en cours...</div>
-            </div>
-        </div>
-    </div>
-
-    <h2>Pour la période du {{ dateMin|date('d/m/Y') }} au {{ dateMax|date('d/m/Y') }}</h2>
+        <h2>Pour la période du {{ dateMin|date('d/m/Y') }} au {{ dateMax|date('d/m/Y') }}</h2>
 
     <div class="fr-card fr-mb-5w">
         <div class="fr-card__body">
@@ -60,7 +45,7 @@
     </div>
 
     <div class="fr-mb-5w">
-        <div class="fr-grid-row">
+        <div class="fr-grid-row fr-grid-row--middle">
             <div class="fr-col-md-6">
                 <div class="fr-mb-3w">
                     <h3>Top 10 des aides les plus vues</h3>
@@ -71,6 +56,22 @@
                 <div class="fr-mb-3w">
                     <div id="chart-views-by-organization-container">Calcul en cours...</div>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <h2>Depuis sa création</h2>
+    <div class="fr-grid-row fr-grid-row--gutters fr-grid-row--bottom">
+        <div class="fr-col-md-6">
+            <div class="fr-mb-3w">
+                <div id="chart-views-by-month-container">Calcul en cours...</div>
+                <hr />
+            </div>
+        </div>
+        <div class="fr-col-md-6">
+            <div class="fr-mb-3w">
+                <p class="fr-alert fr-alert--info">Ces statistiques ne sont disponibles qu'à partir du {{ dateStartMatomoto|date('d/m/Y') }}</p>
+                <div id="chart-visits-by-month-container">Calcul en cours...</div>
             </div>
         </div>
     </div>
