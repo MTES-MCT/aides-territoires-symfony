@@ -237,7 +237,7 @@ class BackerRepository extends ServiceEntityRepository
         $hasFinancedAids = $params['hasFinancedAids'] ?? null;
         $hasPublishedFinancedAids = $params['hasPublishedFinancedAids'] ?? null;
         $nbAidsLiveMin = $params['nbAidsLiveMin'] ?? null;
-
+        $orderBy = (isset($params['orderBy']) && isset($params['orderBy']['sort']) && isset($params['orderBy']['order'])) ? $params['orderBy'] : null;
         $qb = $this->createQueryBuilder('b');
 
         if ($nbAidsLiveMin !== null) {
@@ -296,6 +296,10 @@ class BackerRepository extends ServiceEntityRepository
 
         if ($orderRand === true) {
             $qb->orderBy('RAND()');
+        }
+
+        if ($orderBy !== null) {
+            $qb->orderBy($orderBy['sort'], $orderBy['order']);
         }
 
         if ($firstResult !== null) {
