@@ -3,14 +3,9 @@
 namespace App\Controller\Admin\Statistics;
 
 use App\Controller\Admin\DashboardController;
-use App\Entity\Blog\BlogPost;
-use App\Form\Admin\Filter\DateRangeType;
 use App\Repository\Backer\BackerRepository;
-use App\Repository\Log\LogBlogPostViewRepository;
 use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
-use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\FormFactoryInterface;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\UX\Chartjs\Builder\ChartBuilderInterface;
 use Symfony\UX\Chartjs\Model\Chart;
@@ -19,9 +14,7 @@ class BackerController extends DashboardController
 {
     #[Route('/admin/statistics/backer/dashboard', name: 'admin_statistics_backer_dashboard')]
     public function backerDashboard(
-        AdminContext $adminContext,
         BackerRepository $backerRepository,
-        FormFactoryInterface $formFactoryInterface,
         ChartBuilderInterface $chartBuilderInterface
     )
     {
@@ -33,8 +26,8 @@ class BackerController extends DashboardController
             [
                 'nbAidsLiveMin' => 1,
                 'orderBy' => [
-                    'order' => 'b.nbAidsLive',
-                    'sort' => 'DESC'
+                    'sort' => 'b.nbAidsLive',
+                    'order' => 'DESC'
                 ]
             ],
         );
@@ -60,8 +53,6 @@ class BackerController extends DashboardController
 
         // moyenne et ecart type de nbAidsLives par backer
         $moyenne = count($backers) == 0 ? 0 : (int) ($backersTotalAids / count($backers));
-
-
 
         // première boucle pour faire les pourcentages
         $total = 0;
