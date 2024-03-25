@@ -1,14 +1,28 @@
 {% extends 'admin/statistics/_stats_base.html.twig' %}
 
+{% block breadcrumb %}
+{% endblock %}
 
 {% block stats_content %}
 <section class="container">
-    <h1>Porteurs statistiques</h1>
+    <h1 class="title">Porteurs statistiques</h1>
 </section>
 
 <section id="backer-dahboard-stats" class="container mt-5">
     <div class="alert alert-info">Mis à jour tous les jours à 01h30</div>
 
+    <div class="mb-5">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Informations</h5>
+                <div class="card-text p-3">
+                    <li><strong>{{ backers|length }}</strong> / <strong>{{ nbBackersTotal }}</strong> porteurs ont <strong>{{ backersTotalAids }}</strong> aides lives  (<strong>{{ percentBackerAidsLive }}</strong>%)</li>
+                    <li>Les 10 premiers porteurs représentent <strong>{{ top10Percent }}</strong>% de ces aides</li>
+                    <li>La moyenne est de <strong>{{ moyenne }}</strong> aides par porteur</li>
+                </div>
+            </div>
+        </div>
+    </div>
     {% if chartBackerAids %}
     <div class="charts">
         {{ render_chart(chartBackerAids) }}
