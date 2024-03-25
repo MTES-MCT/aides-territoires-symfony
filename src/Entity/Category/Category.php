@@ -21,7 +21,8 @@ class Category
 {
     const API_GROUP_LIST = 'category:list';
     const SLUG_ANIMATION_MISE_EN_RESEAU = 'animation-mise-en-reseau';
-
+    const SLUG_VALORISATION_ACTIONS_PROJETS = 'valorisation-dactions-de-projets';
+    
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]

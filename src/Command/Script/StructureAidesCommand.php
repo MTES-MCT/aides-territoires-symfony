@@ -3,13 +3,13 @@
 namespace App\Command\Script;
 
 use App\Entity\Aid\Aid;
+use App\Entity\Aid\AidStep;
 use App\Entity\Aid\AidType;
 use App\Entity\Category\Category;
 use App\Service\Reference\ReferenceService;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
@@ -50,6 +50,7 @@ class StructureAidesCommand extends Command
 
         $timeStart = microtime(true);
 
+        // > Catégorie : animation et mise en réseau => Type  : ingénierie animation et mise en réseau
         // le  nouveau types d'aides
         $newType = $this->managerRegistry->getRepository(AidType::class)->findOneBy([
             'slug' => AidType::SLUG_INGENIERIE_ANIMATION_RESEAU
@@ -78,7 +79,47 @@ class StructureAidesCommand extends Command
         // sauvegarde
         $this->managerRegistry->getManager()->flush();
         $io->progressFinish();
+
+        // < Catégorie : animation et mise en réseau => Type  : ingénierie animation et mise en réseau
         
+        // > Catégorie : Valorisation d'actions => Type  : ingénierie animation et mise en réseau + Step : Suivi / évaluation
+        // le  nouveau types d'aides
+        $newType = $this->managerRegistry->getRepository(AidType::class)->findOneBy([
+            'slug' => AidType::SLUG_INGENIERIE_ANIMATION_RESEAU
+        ]);
+
+        // l'étape
+        $newAidStep = $this->managerRegistry->getRepository(AidStep::class)->findOneBy([
+            'slug' => AidStep::SLUG_POSTOP
+        ]);
+
+        // recupére toutes les aides avec “sous catégorie” animation et mise en réseau 
+        $category = $this->managerRegistry->getRepository(Category::class)->findOneBy([
+            'slug' => Category::SLUG_VALORISATION_ACTIONS_PROJETS
+        ]);
+        $aids = $this->managerRegistry->getRepository(Aid::class)->findCustom([
+            'categories' => [$category]
+        ]);
+
+
+        // progressbar
+        $io->createProgressBar(count($aids));
+        
+        /** @var Aid $aid */
+        foreach ($aids as $aid) {
+            $aid->removeCategory($category);
+            $aid->addAidType($newType);
+            $aid->addAidStep($newAidStep);
+            $this->managerRegistry->getManager()->persist($aid);
+            $io->progressAdvance();
+        }
+
+        // sauvegarde
+        $this->managerRegistry->getManager()->flush();
+        $io->progressFinish();
+
+        // < Catégorie : Valorisation d'actions => Type  : ingénierie animation et mise en réseau + Step : Suivi / évaluation
+
         $timeEnd = microtime(true);
         $time = $timeEnd - $timeStart;
 

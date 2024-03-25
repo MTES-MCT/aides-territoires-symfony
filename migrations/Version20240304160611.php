@@ -42,6 +42,9 @@ final class Version20240304160611 extends AbstractMigration
             ('Émergence / stratégie','emergence-stategie',3,'2024-03-04 15:06:37',NULL,1),
             ('Conception / faisabilité','conception-faisabilite',4,'2024-03-04 15:06:37',NULL,1)
         ");
+        $this->addSql("
+        UPDATE aid_step SET name='Suivi / évaluation' WHERE slug='postop'
+        ");
     }
 
     public function down(Schema $schema): void
