@@ -67,6 +67,7 @@ class StructureAidesCommand extends Command
 
         // progressbar
         $io->createProgressBar(count($aids));
+        $io->progressStart(count($aids));
         
         /** @var Aid $aid */
         foreach ($aids as $aid) {
@@ -104,6 +105,7 @@ class StructureAidesCommand extends Command
 
         // progressbar
         $io->createProgressBar(count($aids));
+        $io->progressStart(count($aids));
         
         /** @var Aid $aid */
         foreach ($aids as $aid) {
