@@ -8,6 +8,7 @@ use App\Entity\Alert\Alert;
 use App\Entity\Perimeter\Perimeter;
 use App\Entity\Search\SearchPage;
 use App\Entity\User\User;
+use App\Form\Admin\Filter\DateRangeType;
 use App\Form\Aid\AidSearchTypeV2;
 use App\Form\Alert\AlertCreateType;
 use App\Repository\Aid\AidRepository;
@@ -79,7 +80,7 @@ class PortalController extends FrontController
         if ($search_page->getSearchPageRedirect()) {
             return $this->redirectToRoute('app_portal_portal_details', ['slug' => $search_page->getSearchPageRedirect()->getSlug()]);
         }
-;
+
         // converti la querystring en parametres
         $aidParams = [
             'showInSearch' => true,
@@ -280,7 +281,8 @@ class PortalController extends FrontController
         $slug,
         SearchPageRepository $searchPageRepository,
         AidSearchFormService $aidSearchFormService,
-        AidService $aidService
+        AidService $aidService,
+        RequestStack $requestStack
     ): Response
     {
         // charge le portail
@@ -345,11 +347,36 @@ class PortalController extends FrontController
         // défini la date de début pour les stats
         $dateStartMatomoto = new \DateTime(date(self::DATE_START_MATOMO));
     
+
+        // dates par défaut
+        $dateMin = new \DateTime('-1 month');
+        $dateMax = new \DateTime(date('Y-m-d'));
+
+        // formulaire de filtre
+        $formDateRange = $this->createForm(DateRangeType::class);
+        $formDateRange->handleRequest($requestStack->getCurrentRequest());
+        if ($formDateRange->isSubmitted()) {
+            if ($formDateRange->isValid()) {
+                $dateMin = $formDateRange->get('dateMin')->getData();
+                $dateMax = $formDateRange->get('dateMax')->getData();
+
+                // met les dates en session
+                $session->set('dateMin', $dateMin);
+                $session->set('dateMax', $dateMax);
+            }
+        } else {
+            $formDateRange->get('dateMin')->setData($dateMin);
+            $formDateRange->get('dateMax')->setData($dateMax);
+        }
+
         // rendu template
         return $this->render('portal/portal/stats.html.twig', [
             'search_page' => $search_page,
             'aids' => $aids,
-            'dateStartMatomoto' => $dateStartMatomoto
+            'dateStartMatomoto' => $dateStartMatomoto,
+            'formDateRange' => $formDateRange,
+            'dateMin' => $dateMin,
+            'dateMax' => $dateMax
         ]);
     }
 
@@ -366,12 +393,16 @@ class PortalController extends FrontController
 
         $session = new Session();
         $aidIds = $session->get('aidIds', []);
+        $dateMin = $session->get('dateMin', new \DateTime('-1 month'));
+        $dateMax = $session->get('dateMax', new \DateTime(date('Y-m-d')));
 
         if (count($aidIds) > 0) {
             // Top 10 aides consulter
             $topAidsViews = $logAidViewRepository->countTop([
                 'aidIds' => $aidIds,
-                'maxResults' => 10
+                'maxResults' => 10,
+                'dateMin' => $dateMin,
+                'dateMax' => $dateMax
             ]);
             foreach ($topAidsViews as $key => $topAidsView) {
                 $topAidsViews[$key]['url'] = $this->generateUrl('app_aid_aid_details', ['slug' => $topAidsView['slug']], UrlGeneratorInterface::ABSOLUTE_URL);
@@ -445,11 +476,15 @@ class PortalController extends FrontController
         
         $session = new Session();
         $aidIds = $session->get('aidIds', []);
+        $dateMin = $session->get('dateMin', new \DateTime('-1 month'));
+        $dateMax = $session->get('dateMax', new \DateTime(date('Y-m-d')));
 
         if (count($aidIds) > 0) {
             // les types d'organization les plus demandeurs
             $organizationTypes = $logAidViewRepository->countOrganizationTypes([
-                'aidIds' => $aidIds
+                'aidIds' => $aidIds,
+                'dateMin' => $dateMin,
+                'dateMax' => $dateMax
             ]);
 
             // première boucle pour faire les pourcentages
