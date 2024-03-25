@@ -46,6 +46,9 @@
       "command": "0 7 * * SUN php bin/console at:import_flux:ministere_culture"
     },
     {
+      "command": "0 7 * * SUN php bin/console at:import_flux:region_sud"
+    },
+    {
       "command": "30 8 * * SUN php bin/console at:import_flux:ademe_agir"
     }
   ]
