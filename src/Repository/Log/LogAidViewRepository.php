@@ -65,6 +65,8 @@ class LogAidViewRepository extends ServiceEntityRepository
     {
         $maxResults = $params['maxResults'] ?? null;
         $aidIds = $params['aidIds'] ?? null;
+        $dateMin = $params['dateMin'] ?? null;
+        $dateMax = $params['dateMax'] ?? null;
 
         $qb = $this->getQueryBuilder($params);
         $qb->select('IFNULL(COUNT(lav.id), 0) AS nb, aid.id AS id, aid.name AS name, aid.slug AS slug')
@@ -72,6 +74,20 @@ class LogAidViewRepository extends ServiceEntityRepository
             ->groupBy('aid.id')
             ->orderBy('nb', 'DESC')
         ;
+
+        if ($dateMin instanceof \DateTime) {
+            $qb
+                ->andWhere('lav.dateCreate >= :dateMin')
+                ->setParameter('dateMin', $dateMin)
+            ;
+        }
+
+        if ($dateMax instanceof \DateTime) {
+            $qb
+                ->andWhere('lav.dateCreate <= :dateMax')
+                ->setParameter('dateMax', $dateMax)
+            ;
+        }
 
         if (is_array($aidIds) && count($aidIds) > 0) {
             $qb
@@ -90,6 +106,8 @@ class LogAidViewRepository extends ServiceEntityRepository
     public function countOrganizationTypes(?array $params = null): array
     {
         $aidIds = $params['aidIds'] ?? null;
+        $dateMin = $params['dateMin'] ?? null;
+        $dateMax = $params['dateMax'] ?? null;
 
         $qb = $this->getQueryBuilder($params);
         $qb->select('IFNULL(COUNT(DISTINCT(organization.id)), 0) AS nb, organizationType.id AS id, organizationType.name AS name, organizationType.slug AS slug')
@@ -106,12 +124,28 @@ class LogAidViewRepository extends ServiceEntityRepository
             ;
         }
 
+        if ($dateMin instanceof \DateTime) {
+            $qb
+                ->andWhere('lav.dateCreate >= :dateMin')
+                ->setParameter('dateMin', $dateMin)
+            ;
+        }
+
+        if ($dateMax instanceof \DateTime) {
+            $qb
+                ->andWhere('lav.dateCreate <= :dateMax')
+                ->setParameter('dateMax', $dateMax)
+            ;
+        }
+
         return $qb->getQuery()->getResult();
     }
 
     public function countByMonth(?array $params = null): array
     {
         $aidIds = $params['aidIds'] ?? null;
+        $dateMin = $params['dateMin'] ?? null;
+        $dateMax = $params['dateMax'] ?? null;
 
         $qb = $this->getQueryBuilder($params);
         $qb->select('IFNULL(COUNT(lav.id), 0) AS nb, DATE_FORMAT(lav.dateCreate, \'%Y-%m\') AS monthCreate')
@@ -123,6 +157,20 @@ class LogAidViewRepository extends ServiceEntityRepository
             $qb
                 ->andWhere('lav.aid IN (:aidIds)')
                 ->setParameter('aidIds', $aidIds)
+            ;
+        }
+
+        if ($dateMin instanceof \DateTime) {
+            $qb
+                ->andWhere('lav.dateCreate >= :dateMin')
+                ->setParameter('dateMin', $dateMin)
+            ;
+        }
+
+        if ($dateMax instanceof \DateTime) {
+            $qb
+                ->andWhere('lav.dateCreate <= :dateMax')
+                ->setParameter('dateMax', $dateMax)
             ;
         }
 
