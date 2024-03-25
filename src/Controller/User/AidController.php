@@ -798,13 +798,9 @@ class AidController extends FrontController
         // formulaire periode
         $dateMinGet = $requestStack->getCurrentRequest()->get('dateMin', null);
         $dateMaxGet = $requestStack->getCurrentRequest()->get('dateMax', null);
-        try {
-            $dateMin = new \DateTime(date($dateMinGet));
-            $dateMax = new \DateTime(date($dateMaxGet));
-        } catch (\Exception $e) {
-            $dateMin = null;
-            $dateMax = null;
-        }
+        $dateMin = $dateMinGet ? new \DateTime(date($dateMinGet)) : new \DateTime('-1 month');
+        $dateMax = $dateMaxGet ? new \DateTime(date($dateMaxGet)) : new \DateTime(date('Y-m-d'));
+
         $formAidStatsPeriod = $this->createForm(AidStatsPeriodType::class);
         if ($dateMin) {
             $formAidStatsPeriod->get('dateMin')->setData($dateMin);
