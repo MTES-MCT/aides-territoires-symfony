@@ -815,8 +815,11 @@ class AidController extends FrontController
         $formAidStatsPeriod->handleRequest($requestStack->getCurrentRequest());
         if ($formAidStatsPeriod->isSubmitted()) {
             if ($formAidStatsPeriod->isValid()) {
-                $periodParams['dateMin'] = $formAidStatsPeriod->get('dateMin')->getData();
-                $periodParams['dateMax'] = $formAidStatsPeriod->get('dateMax')->getData();
+                return $this->redirectToRoute('app_user_aid_stats', [
+                    'slug' => $aid->getSlug(),
+                    'dateMin' => $formAidStatsPeriod->get('dateMin')->getData()->format('Y-m-d'),
+                    'dateMax' => $formAidStatsPeriod->get('dateMax')->getData()->format('Y-m-d')
+                ]);
             }
         }
 
@@ -898,7 +901,8 @@ class AidController extends FrontController
         LogAidViewRepository $logAidViewRepository,
         LogAidApplicationUrlClickRepository $logAidApplicationUrlClickRepository,
         LogAidOriginUrlClickRepository $logAidOriginUrlClickRepository,
-        AidProjectRepository $aidProjectRepository
+        AidProjectRepository $aidProjectRepository,
+        AidService $aidService
     )
     {
         // le user
@@ -907,13 +911,18 @@ class AidController extends FrontController
         // l'aide
         $aid = $aidRepository->findOneBy(
             [
-                'author' => $user,
                 'slug' => $slug
             ]
         );
         if (!$aid instanceof Aid) {
             throw new NotFoundHttpException('Cette aide n\'existe pas');
         }
+        // verifie que l'utilisateur appartienne à la structure de l'aide, oue que l'utilisateur est l'auteur de l'aide ou que l'utilisateur est un admin
+        if (!$aidService->canUserAccessStatsPage($user, $aid)) {
+            $this->addFlash(FrontController::FLASH_ERROR, 'Vous n\'avez pas accès à cette page');
+            return $this->redirectToRoute('app_user_aid_publications');
+        }
+
 
         $dateMinGet = $requestStack->getCurrentRequest()->get('dateMin', null);
         $dateMaxGet = $requestStack->getCurrentRequest()->get('dateMax', null);
@@ -927,7 +936,7 @@ class AidController extends FrontController
 
 
         // nom de fichier
-        $filename = 'Aides-territoires-statistiques.xlxs';
+        $filename = 'Aides-territoires-statistiques';
 
         $response = new StreamedResponse(function () use (
             $aid,
