@@ -774,19 +774,26 @@ class AidController extends FrontController
         LogAidViewRepository $logAidViewRepository,
         LogAidApplicationUrlClickRepository $logAidApplicationUrlClickRepository,
         LogAidOriginUrlClickRepository $logAidOriginUrlClickRepository,
-        AidProjectRepository $aidProjectRepository
+        AidProjectRepository $aidProjectRepository,
+        AidService $aidService
     ) {
         // le user
         $user = $userService->getUserLogged();
 
         // l'aide
         $aid = $aidRepository->findOneBy([
-            'author' => $user,
             'slug' => $slug
         ]);
         if (!$aid instanceof Aid) {
             throw new NotFoundHttpException('Cette aide n\'exite pas');
         }
+
+        // verifie que l'utilisateur appartienne à la structure de l'aide, oue que l'utilisateur est l'auteur de l'aide ou que l'utilisateur est un admin
+        if (!$aidService->canUserAccessStatsPage($user, $aid)) {
+            $this->addFlash(FrontController::FLASH_ERROR, 'Vous n\'avez pas accès à cette page');
+            return $this->redirectToRoute('app_user_aid_publications');
+        }
+
 
         // formulaire periode
         $dateMinGet = $requestStack->getCurrentRequest()->get('dateMin', null);

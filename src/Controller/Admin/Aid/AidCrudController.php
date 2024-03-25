@@ -146,6 +146,15 @@ class AidCrudController extends AtCrudController
             return $this->generateUrl('app_aid_aid_details', ['slug' => $entity->getSlug()], UrlGeneratorInterface::ABSOLUTE_URL);
         });
 
+        // lien affichage stats
+        $displayStats = Action::new('displayStats', 'Statistiques', 'fas fa-chart-line')
+            ->setHtmlAttributes(['title' => 'Statistiques', 'target' => '_blank']) // titre
+            ->linkToUrl(function($entity) {
+                return $this->generateUrl('app_user_aid_stats', ['slug' => $entity->getSlug()]);
+            });
+        ;
+
+        // exports
         $exportCsvAction = $this->getExportCsvAction();
         $exportXlsxAction = $this->getExportXlsxAction();
 
@@ -158,6 +167,7 @@ class AidCrudController extends AtCrudController
 
         return parent::configureActions($actions)
             ->add(Crud::PAGE_INDEX, $displayOnFront)
+            ->add(Crud::PAGE_INDEX, $displayStats)
             ->add(Crud::PAGE_EDIT, $displayOnFront)
             ->add(Crud::PAGE_INDEX, $exportCsvAction)
             ->add(Crud::PAGE_INDEX, $exportXlsxAction)

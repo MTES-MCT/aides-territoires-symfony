@@ -30,6 +30,25 @@ class AidService
         
     }
 
+    public function canUserAccessStatsPage(?User $user, Aid $aid) : bool
+    {
+        if (!$user instanceof User || !$aid instanceof Aid) {
+            return false;
+        }
+
+        $access = false;
+        if(
+            $aid->getAuthor() == $user
+            || $this->userService->isUserGranted($user, User::ROLE_ADMIN)
+            || ($aid->getOrganization() && $aid->getOrganization()->getBeneficiairies()->contains($user))
+        ) {
+            $access = true;
+        }
+
+        return $access;
+        
+    }
+
     public function searchAids(array $aidParams): array
     {
         $aids = $this->managerRegistry->getRepository(Aid::class)->findCustom($aidParams);
