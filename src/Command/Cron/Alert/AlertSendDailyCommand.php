@@ -2,7 +2,6 @@
 
 namespace App\Command\Cron\Alert;
 
-use App\Entity\Aid\Aid;
 use App\Entity\Alert\Alert;
 use App\Entity\User\User;
 use Symfony\Component\Console\Command\Command;
@@ -19,8 +18,8 @@ use App\Service\Notification\NotificationService;
 use App\Service\Various\ParamService;
 use Symfony\Component\Routing\RouterInterface;
 
-#[AsCommand(name: 'at:cron:alert:send', description: 'Envoi des alertes')]
-class AlertSendCommand extends Command
+#[AsCommand(name: 'at:cron:alert:send_daily', description: 'Envoi des alertes quotidiennes')]
+class AlertSendDailyCommand extends Command
 {
     protected InputInterface $input;
     protected OutputInterface $output;
@@ -77,24 +76,17 @@ class AlertSendCommand extends Command
         $context->setScheme('https');
         
         // charge les alertes
-        $alerts = $this->managerRegistry->getRepository(Alert::class)->findToSend();
+        $alerts = $this->managerRegistry->getRepository(Alert::class)->findToSendDaily();
 
         // pour le retour
         $nbAlertSend = 0;
 
         // prépare les deux dates de publication à checker
-        $dateTimeDaily = new \DateTime(date('Y-m-d', strtotime('-1 day')));
-        $dateTimeWeekly = new \DateTime(date('Y-m-d', strtotime('-7 day')));
+        $publishedAfter = new \DateTime(date('Y-m-d', strtotime('-1 day')));
 
         // pour chaque alerte on regarde si de nouvelles aide (datePublished = hier) correspondent
         /**@var Alert $alert */
         foreach ($alerts as $key => $alert) {
-            $publishedAfter = 
-                $alert->getAlertFrequency() === Alert::FREQUENCY_DAILY_SLUG
-                    ? $dateTimeDaily
-                    : $dateTimeWeekly
-            ;
-
             $aidSearchClass = $this->aidSearchFormService->getAidSearchClass(
                 params: [
                     'querystring' => $alert->getQuerystring(),
@@ -105,8 +97,6 @@ class AlertSendCommand extends Command
             $aidParams =[
                 'showInSearch' => true,
                 'publishedAfter' => $publishedAfter,
-                'noRelaunch' => true,
-                'noPostPopulate' => true
             ];
             $aidParams = array_merge($aidParams, $this->aidSearchFormService->convertAidSearchClassToAidParams($aidSearchClass));
 
@@ -153,7 +143,7 @@ class AlertSendCommand extends Command
 
         // notif admin
         $admin = $this->managerRegistry->getRepository(User::class)->findOneBy(['email' => $this->paramService->get('email_super_admin')]);
-        $this->notificationService->addNotification($admin, 'Envoi des alertes', $nbAlertSend. ' alertes envoyées');
+        $this->notificationService->addNotification($admin, 'Envoi des alertes quotidiennes', $nbAlertSend. ' alertes envoyées pour les aides publiées après le ' . $publishedAfter->format('d/m/Y') . ' inclus');
         
         // success
         $io->success($nbAlertSend. ' alertes envoyées');
