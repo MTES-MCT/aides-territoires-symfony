@@ -25,7 +25,7 @@ function completeOrganizationName()
     var organizationType = $('option:selected', '#register_organizationType').text();
 
     if (organizationType == 'Commune' && perimeterTxt != '') {
-        var organizationName = 'Marie de ' + perimeterTxt.replace(/ *\([^)]*\) */g, " ");;
+        var organizationName = 'Mairie de ' + perimeterTxt.replace(/ *\([^)]*\) */g, " ");;
     } else {
         organizationName = '';
     }
