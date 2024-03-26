@@ -11,6 +11,7 @@ use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints\Length;
 
 class ContactType extends AbstractType
 {
@@ -45,6 +46,9 @@ class ContactType extends AbstractType
             ->add('phoneNumber', TextType::class, [
                 'required' => false,
                 'label' => 'Votre numéro de téléphone :',
+                'constraints' => [
+                    new Length(max: 20)
+                ]
             ])
             ->add('structureAndFunction', TextType::class, [
                 'label' => 'Votre structure et fonction :',
