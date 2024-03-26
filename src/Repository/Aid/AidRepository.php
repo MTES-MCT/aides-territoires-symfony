@@ -465,6 +465,21 @@ class AidRepository extends ServiceEntityRepository
                 $qb->setParameter('originalName', $originalName);
             }
 
+            // Projets référents
+            if ($projectReference instanceof ProjectReference) {
+                $sqlProjectReference = '
+                CASE 
+                    WHEN :projectReference MEMBER OF a.projectReferences THEN 90 
+                    ELSE 0 
+                END
+                ';
+
+                $qb
+                ->setParameter('projectReference', $projectReference)
+                ;
+            }
+            
+            $sqlObjects = '';
             if ($objectsString) {
                 $oldKeywordsString .= $objectsString;
                 $sqlObjects = '
@@ -483,34 +498,22 @@ class AidRepository extends ServiceEntityRepository
                         CASE WHEN (a.name LIKE :objects'.$i.') THEN 30 ELSE 0 END +
                         CASE WHEN (a.nameInitial LIKE :objects'.$i.') THEN 20 ELSE 0 END
                     ';
-                    if ($projectReference instanceof ProjectReference) {
-                        $sqlObjects .= '
-                        + 
-                        CASE 
-                            WHEN :projectReferenceScO MEMBER OF a.projectReferences THEN 90 
-                            ELSE 0 
-                        END
-                        ';
-        
-                        $qb
-                        ->setParameter('projectReferenceScO', $projectReference)
-                        ;
-                    }
-                    // $sqlObjects .= '
-                    //     CASE WHEN (a.name LIKE :objects'.$i.') THEN 10 ELSE 0 END +
-                    //     CASE WHEN (a.description LIKE :objects'.$i.') THEN 2 ELSE 0 END +
-                    //     CASE WHEN (a.eligibility LIKE :objects'.$i.') THEN 2 ELSE 0 END
-                    // ';
+
                     if ($i < count($objects) - 1) {
                         $sqlObjects .= ' + ';
                     }
                     $qb->setParameter('objects'.$i, '%'.$objects[$i].'%');
                 }
 
+                if (isset($sqlProjectReference) && $sqlProjectReference !== '') {
+                    $sqlObjects .= ' + '.$sqlProjectReference;
+                }
+
                 $qb->addSelect('('.$sqlObjects.') as score_objects');
                 $qb->setParameter('objects_string', $objectsString);
                 $qb->andHaving('score_objects >= '.$scoreObjectsMin);
             }
+
 
             if ($intentionsString && $objectsString) {
                 $oldKeywordsString .= ' '.$intentionsString;
@@ -532,42 +535,30 @@ class AidRepository extends ServiceEntityRepository
             }
 
             // Les catégories
-            $categories = $this->getEntityManager()->getRepository(Category::class)->findFromSynonyms($synonyms);
-            if (count($categories) > 0) {
+            $categoriesSynonyms = $this->getEntityManager()->getRepository(Category::class)->findFromSynonyms($synonyms);
+            if (count($categoriesSynonyms) > 0) {
                 $sqlCategories = '
                 CASE 
                     WHEN :categoriesSynonyms MEMBER OF a.categories THEN 60
                     ELSE 0 
                 END
                 ';
-                $qb->setParameter('categoriesSynonyms', $categories);
+                $qb->setParameter('categoriesSynonyms', $categoriesSynonyms);
             }
 
             // les keywordReferences
-            $keywordReferences = $this->getEntityManager()->getRepository(KeywordReference::class)->findFromSynonyms($synonyms);
-            if (count($keywordReferences) > 0) {
+            $keywordReferencesSynonyms = $this->getEntityManager()->getRepository(KeywordReference::class)->findFromSynonyms($synonyms);
+            if (count($keywordReferencesSynonyms) > 0) {
                 $sqlKeywordReferences = '
                 CASE 
                     WHEN :keywordReferences MEMBER OF a.keywordReferences THEN 60 
                     ELSE 0 
                 END
                 ';
-                $qb->setParameter('keywordReferences', $keywordReferences);
+                $qb->setParameter('keywordReferences', $keywordReferencesSynonyms);
             }
 
-            // Projets référents
-            if ($projectReference instanceof ProjectReference) {
-                $sqlProjectReference = '
-                CASE 
-                    WHEN :projectReference MEMBER OF a.projectReferences THEN 90 
-                    ELSE 0 
-                END
-                ';
 
-                $qb
-                ->setParameter('projectReference', $projectReference)
-                ;
-            }
 
             $sqlTotal = '';
             if ($originalName) {
