@@ -4,6 +4,7 @@ namespace App\Command\Cron\Alert;
 
 use App\Entity\Aid\Aid;
 use App\Entity\Alert\Alert;
+use App\Entity\User\User;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputInterface;
@@ -14,6 +15,7 @@ use Doctrine\Persistence\ManagerRegistry;
 use App\Service\Aid\AidSearchFormService;
 use App\Service\Aid\AidService;
 use App\Service\Email\EmailService;
+use App\Service\Notification\NotificationService;
 use App\Service\Various\ParamService;
 use Symfony\Component\Routing\RouterInterface;
 
@@ -32,7 +34,8 @@ class AlertSendCommand extends Command
         protected AidSearchFormService $aidSearchFormService,
         protected EmailService $emailService,
         protected ParamService $paramService,
-        protected RouterInterface $routerInterface
+        protected RouterInterface $routerInterface,
+        protected NotificationService $notificationService
     )
     {
         ini_set('max_execution_time', 60*60);
@@ -148,6 +151,10 @@ class AlertSendCommand extends Command
             unset($alerts[$key]);
         }
 
+        // notif admin
+        $admin = $this->managerRegistry->getRepository(User::class)->findOneBy(['email' => $this->paramService->get('email_super_admin')]);
+        $this->notificationService->addNotification($admin, 'Envoi des alertes', $nbAlertSend. ' alertes envoyées');
+        
         // success
         $io->success($nbAlertSend. ' alertes envoyées');
         $io->success('Mémoire maximale utilisée : ' . round(memory_get_peak_usage() / 1024 / 1024) . ' MB');
