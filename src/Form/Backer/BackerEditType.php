@@ -97,7 +97,8 @@ class BackerEditType extends AbstractType
                 'attr' => [
                     'class' => 'trumbowyg',
                     'cols' => 40,
-                    'rows' => 10
+                    'rows' => 10,
+                    'placeholder' => 'Expliquez quel type de porteur êtes vous : collectivité, établissement public ( et le cas échéant votre tutelle), date de création etc...'
                 ],
                 'sanitize_html' => true,
             ])
@@ -117,7 +118,8 @@ class BackerEditType extends AbstractType
                 'attr' => [
                     'class' => 'trumbowyg',
                     'cols' => 40,
-                    'rows' => 10
+                    'rows' => 10,
+                    'placeholder' => 'Donnez ici des explications sur les modalités de saisine de vos équipe, votre fonctionnement (centralisé, déconcentré ou autre), l\'utilisation ou non de plateformes de dépôt de dossier : en bref tous les bons conseils pour une collectivité qui voudrait demander une aide !'
                 ],
                 'sanitize_html' => true,
             ])
@@ -127,7 +129,8 @@ class BackerEditType extends AbstractType
                 'attr' => [
                     'class' => 'trumbowyg',
                     'cols' => 40,
-                    'rows' => 10
+                    'rows' => 10,
+                    'placeholder' => 'Indiquez ici des coordonnées de contact, si possible génériques ! et non nominatives contact@nouvellestructuretest'
                 ],
                 'sanitize_html' => true,
             ])
@@ -137,7 +140,8 @@ class BackerEditType extends AbstractType
                 'attr' => [
                     'class' => 'trumbowyg',
                     'cols' => 40,
-                    'rows' => 10
+                    'rows' => 10,
+                    'placeholder' => 'Les éventuels raccourcis vers des documents disponibles en ligne, sur votre site web ...'
                 ],
                 'sanitize_html' => true,
             ])

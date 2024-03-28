@@ -3,8 +3,10 @@
 namespace App\EventListener;
 
 use App\Entity\Aid\Aid;
+use App\Entity\Backer\Backer;
 use App\Entity\Log\LogAdminAction;
 use App\EventListener\Aid\AidListener;
+use App\EventListener\Backer\BackerListener;
 use App\Service\User\UserService;
 use Doctrine\Bundle\DoctrineBundle\Attribute\AsDoctrineListener;
 use Doctrine\ORM\Event\PostUpdateEventArgs;
@@ -21,13 +23,20 @@ class PostUpdateListener
         protected UserService $userService,
         protected FirewallMapInterface $firewallMapInterface,
         protected ManagerRegistry $managerRegistry,
-        protected AidListener $aidListener
+        protected AidListener $aidListener,
+        protected BackerListener $backerListener
     ) {}
 
     public function postUpdate(PostUpdateEventArgs $args): void
     {
+        // Aides
         if ($args->getObject() instanceof Aid) {
             $this->aidListener->onPostUpdate($args);
+        }
+
+        // Porteurs d'aides
+        if ($args->getObject() instanceof Backer) {
+            $this->backerListener->onPostUpdate($args);
         }
         
         // LOG ADMIN

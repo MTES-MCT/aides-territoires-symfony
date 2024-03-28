@@ -38,7 +38,6 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Routing\RouterInterface;
-use Symfony\Component\Validator\Constraints\Count as ConstraintsCount;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\PositiveOrZero;
 use Symfony\Component\Validator\Constraints\Url;
@@ -125,7 +124,7 @@ class AidEditType extends AbstractType
         $organizationParams['choice_attr'] = function(Organization $organization) use ($aid) {
             // bloquage pour les nouvelles aides
             if (!$aid->getId()) {
-                if (!$organization->getBacker() || ($organization->getBacker() && !$organization->getBacker()->isActive())) {
+                if (!$organization->getBacker()) {
                     return ['disabled' => true];
                 } else {
                     return [];
@@ -134,7 +133,7 @@ class AidEditType extends AbstractType
                 // si aide existante, on empêche de changer d'organisation pour une non valide
                 if ($organization->getId() === $aid->getOrganization()->getId()) {
                     return [];
-                } else if (!$organization->getBacker() || ($organization->getBacker() && !$organization->getBacker()->isActive())) {
+                } else if (!$organization->getBacker()) {
                     return ['disabled' => true];
                 } else {
                     return [];
@@ -143,7 +142,7 @@ class AidEditType extends AbstractType
         };
 
         if ($needUpdateBacker) {
-            $help = '<div class="fr-alert fr-alert--info">Pour choisir une structure, vous devez avoir remplir sa fiche Porteur d\'aides et attendre sa validation';
+            $help = '<div class="fr-alert fr-alert--info">Pour choisir une structure, vous devez avoir remplir sa fiche Porteur d\'aides';
             foreach ($user->getOrganizations() as $organization) {
                 if (!$organization->getBacker()) {
                     $help .= '<br />- <a href="' . $this->routerInterface->generate('app_organization_backer_edit', ['id' => $organization->getId(), 'idBacker' => 0]) . '">' . $organization->getName() . '</a>';

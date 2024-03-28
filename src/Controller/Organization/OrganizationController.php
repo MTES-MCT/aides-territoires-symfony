@@ -628,6 +628,12 @@ class OrganizationController extends FrontController
     
         // formulaire edition porteur
         $form = $this->createForm(BackerEditType::class, $backer);
+        if (!$backer->getId() && $organization) {
+            $form->get('name')->setData($organization->getName());
+            if ($organization->getPerimeter()) {
+                $form->get('perimeter')->setData($organization->getPerimeter());
+            }
+        }
         $form->handleRequest($requestStack->getCurrentRequest());
         if ($form->isSubmitted()) {
             if ($form->isValid()) {

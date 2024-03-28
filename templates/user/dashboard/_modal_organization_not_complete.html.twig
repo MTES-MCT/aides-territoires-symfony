@@ -1,0 +1,62 @@
+{% if app.user and app.user.isContributor and (not app.user.defaultOrganization or (app.user.defaultOrganization and not app.user.defaultOrganization.backer)) %}
+    {% if app.user.dateCreate|date('Y-m-d') == 'now'|date('Y-m-d') %}
+    <dialog aria-labelledby="fr-modal-title-new-backer-modal" role="dialog" id="new-backer-modal" class="fr-modal fr-modal--opened">
+        <div class="fr-container fr-container--fluid fr-container-md">
+            <div class="fr-grid-row fr-grid-row--center">
+                <div class="fr-col-12 fr-col-md-8 fr-col-lg-6">
+                    <div class="fr-modal__body">
+                        <div class="fr-modal__header">
+                            <button class="fr-link--close fr-link" title="Fermer la fenêtre modale" aria-controls="new-backer-modal">Fermer</button>
+                        </div>
+                        <div class="fr-modal__content">
+                            <h2 id="fr-modal-title-new-backer-modal" class="fr-modal__title"><span class="fr-icon-arrow-right-line fr-icon--lg"></span>Bienvenue sur Aides-territoires ! </h2>
+                            <p>Pour commencer, nous vous invitons à renseigner la fiche d’identité de votre structure. Cette fiche permet à nos utilisateurs de mieux vous connaître et d’identifier votre périmètre d’intervention, aussi bien sur le plan géographique que thématique . Elle servira à constituer un annuaire des porteurs d’aides sur la zone géographique sur laquelle vous intervenez.</p>
+                            <p>Vous pourrez la mettre à jour ultérieurement. Une fois la fiche remplie, vous pourrez commencer à renseigner vos aides !</p>
+                            <footer>
+                                <ul class="fr-btns-group fr-btns-group--inline fr-btns-group--right">
+                                    <li>
+                                        {% if not app.user.defaultOrganization %}
+                                            <a href="{{ path('app_organization_structure_information', {'id': 0})  }}" class="fr-btn">Je renseigne la fiche de ma structure</a> 
+                                        {% elseif app.user.defaultOrganization and not app.user.defaultOrganization.backer %}
+                                            <a href="{{ path('app_organization_backer_edit', {'id': app.user.defaultOrganization.id, 'idBacker': 0})  }}" class="fr-btn">Je renseigne la fiche de ma structure</a> 
+                                        {% endif %}
+                                    </li>
+                                </ul>
+                            </footer>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </dialog>
+    {% else %}
+        <dialog aria-labelledby="fr-modal-title-new-backer-modal" role="dialog" id="new-backer-modal" class="fr-modal fr-modal--opened">
+            <div class="fr-container fr-container--fluid fr-container-md">
+                <div class="fr-grid-row fr-grid-row--center">
+                    <div class="fr-col-12 fr-col-md-8 fr-col-lg-6">
+                        <div class="fr-modal__body">
+                            <div class="fr-modal__header">
+                                <button class="fr-link--close fr-link" title="Fermer la fenêtre modale" aria-controls="new-backer-modal">Fermer</button>
+                            </div>
+                            <div class="fr-modal__content">
+                                <h2 id="fr-modal-title-new-backer-modal" class="fr-modal__title"><span class="fr-icon-arrow-right-line fr-icon--lg"></span>NOUVEAU ! </h2>
+                                <p>Nous vous invitons à mettre à jour la fiche présentant votre structure.  Cette fiche permet à nos utilisateurs de mieux vous connaître et d’identifier votre périmètre d’intervention, aussi bien sur le plan géographique que thématique . Elle servira à constituer un annuaire des porteurs d’aides sur la zone géographique sur laquelle vous intervenez</p>
+                                <footer>
+                                    <ul class="fr-btns-group fr-btns-group--inline fr-btns-group--right">
+                                        <li>
+                                            {% if not app.user.defaultOrganization %}
+                                                <a href="{{ path('app_organization_structure_information', {'id': 0})  }}" class="fr-btn">Je renseigne la fiche de ma structure</a> 
+                                            {% elseif app.user.defaultOrganization and not app.user.defaultOrganization.backer %}
+                                                <a href="{{ path('app_organization_backer_edit', {'id': app.user.defaultOrganization.id, 'idBacker': 0})  }}" class="fr-btn">Je renseigne la fiche de ma structure</a> 
+                                            {% endif %}
+                                        </li>
+                                    </ul>
+                                </footer>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </dialog>
+    {% endif %}
+{% endif %}

@@ -3,8 +3,6 @@
 {% block title %}Bienvenue sur votre compte | {{ parent() }}{% endblock %}
 
 {% block body %}
-
-
 <div class="fr-container fr-mb-5w fr-mt-0">
     <div class="fr-grid-row">
 
@@ -54,3 +52,9 @@
     </div>
 </div>
 {% endblock %}
+
+{% block modal %}
+    {% include 'user/dashboard/_modal_organization_not_complete.html.twig' %}
+{% endblock %}
+
+
