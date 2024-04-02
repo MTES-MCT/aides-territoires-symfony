@@ -641,6 +641,7 @@ class OrganizationController extends FrontController
                 $logoFile = $form->get('logoFile')->getData();
                 if ($logoFile instanceof UploadedFile) {
                     $backer->setLogo(Backer::FOLDER.'/'.$imageService->getSafeFileName($logoFile->getClientOriginalName()));
+                    $backer->setLogoFile(null);
                     $imageService->sendUploadedImageToCloud($logoFile, Backer::FOLDER, $backer->getLogo());
                 }
 
