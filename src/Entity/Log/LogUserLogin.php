@@ -154,8 +154,9 @@ class LogUserLogin
 
     public function setReferer(?string $referer): static
     {
-        $this->referer = substr($referer, 0, 255);
-
+        if ($referer) {
+            $this->referer = substr($referer, 0, 255);
+        }
         return $this;
     }
 
