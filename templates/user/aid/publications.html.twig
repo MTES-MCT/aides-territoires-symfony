@@ -118,7 +118,7 @@
             id="export-aids-btn"
             data-fr-opened="false"
             aria-controls="export-aids-modal-{{ app.user.id }}"
-            {% if app.user.organizations|length == 0 %}disabled="disabled"{% endif %}
+            {% if app.user.organizations|length == 0 or nbAidsLive == 0 %}disabled="disabled"{% endif %}
             >
             Exporter toutes les aides publiées de votre structure
             </button>    
