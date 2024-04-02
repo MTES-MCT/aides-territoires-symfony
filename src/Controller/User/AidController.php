@@ -332,7 +332,8 @@ class AidController extends FrontController
                 // les aides
                 $aids = $aidRepository->findCustom(
                     [
-                        'author' => $user
+                        'author' => $user,
+                        'showInSearch' => true
                     ]
                 );
 

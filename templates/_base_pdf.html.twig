@@ -40,7 +40,7 @@
 
         {% block header_style %}
         #header_content {
-            position: fixed;
+            /* position: fixed; */
             left: 0px;
             right: 0px;
             top: 0; 
@@ -55,7 +55,7 @@
             left: 0px;
             right: 0px;
             bottom: 0; 
-            padding-top: 1em;
+            padding-top: 2rem;
             color: #666;
             font-style: italic;
         }
@@ -64,6 +64,12 @@
         }
         {% endblock footer_style %}
 
+        {% block main_content_style %}
+        .main-content{
+            padding: 0 0 1rem 0;
+        }
+        {% endblock main_content_style %}
+        
         .at-pdf-link {
             text-align: center;
             margin: 1em;
