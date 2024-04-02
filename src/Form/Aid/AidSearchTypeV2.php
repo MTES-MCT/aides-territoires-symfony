@@ -191,8 +191,8 @@ class AidSearchTypeV2 extends AbstractType
                         return $backerRepository->getQueryBuilder([
                             'active' => true,
                             'orderBy' => [
-                                'order' => 'b.name',
-                                'sort' => 'ASC'
+                                'sort' => 'b.name',
+                                'order' => 'ASC'
                             ]
                         ]);
                     },
