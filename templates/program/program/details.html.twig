@@ -85,7 +85,10 @@
                 <h2 class="fr-mt-0 fr-mb-2w">{{ tab.name }}</h2>
                 {{ tab.description|raw }}
                 {% for faq in tab.faqs %}
-                {% if faq.timeUpdate %}<p>Mis à jour le {{ faq.timeUpdate|format_datetime('long', 'none', locale='fr') }}</p>{% endif %}
+                {% if faq.latestUpdateTime %}
+                <p>Mis à jour le {{ faq.latestUpdateTime|format_datetime('long', 'none', locale='fr') }}</p>
+                {% elseif faq.timeUpdate %}<p>Mis à jour le {{ faq.timeUpdate|format_datetime('long', 'none', locale='fr') }}</p>
+                {% endif %}
                 <div class="fr-accordions-group">
                     {% for faq_category in faq.faqCategories %}
                     <div class="fr-accordion">

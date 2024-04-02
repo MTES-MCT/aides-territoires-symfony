@@ -34,11 +34,11 @@ class FaqCrudController extends AtCrudController
         ->setEntryType(FaqCategoryCollectionType::class)
         ->setColumns(12)
         ;
-        yield DateTimeField::new('timeCreate', 'Date de création')
-        ->setFormTypeOption('attr', ['readonly' => true])
-        ->onlyWhenUpdating();
-        yield DateTimeField::new('timeUpdate', 'Date de mise à jour')
-        ->setFormTypeOption('attr', ['readonly' => true])
-        ->onlyWhenUpdating();
+        // yield DateTimeField::new('timeCreate', 'Date de création')
+        // ->setFormTypeOption('attr', ['readonly' => true])
+        // ->onlyWhenUpdating();
+        // yield DateTimeField::new('timeUpdate', 'Date de mise à jour')
+        // ->setFormTypeOption('attr', ['readonly' => true])
+        // ->onlyWhenUpdating();
     }
 }

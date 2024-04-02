@@ -11,6 +11,7 @@ use App\Form\Aid\AidSearchTypeV2;
 use App\Repository\Aid\AidRepository;
 use App\Repository\Program\ProgramRepository;
 use App\Repository\Search\SearchPageRepository;
+use App\Service\Page\FaqService;
 use App\Service\Aid\AidSearchClass;
 use App\Service\Aid\AidSearchFormService;
 use App\Service\Aid\AidService;
@@ -59,7 +60,8 @@ class ProgramController extends FrontController
         AidService $aidService,
         UserService $userService,
         LogService $logService,
-        ReferenceService $referenceService
+        ReferenceService $referenceService,
+        FaqService $faqService
     ): Response
     {
         // si onglet selectionne
@@ -83,27 +85,6 @@ class ProgramController extends FrontController
                 return $this->redirectToRoute('app_portal_portal_details', ['slug' => $searchPage->getSlug()]);
             }
         }
-
-        // FAQ
-        $faq_questions_answers_date_updated = date('2000-01-01');
-
-        $faqsCategoriesById = [];
-
-        foreach($program->getFaqQuestionAnswsers() as $faq){
-            if($faq->getTimeUpdate()>$faq_questions_answers_date_updated){
-                $faq_questions_answers_date_updated = $faq->getTimeUpdate();
-            }
-            if(!isset($faqsCategoriesById[$faq->getFaqCategory()->getId()])){
-                $faqsCategoriesById[$faq->getFaqCategory()->getId()] = array(
-                    'position' => $faq->getFaqCategory()->getPosition(),
-                    'category' => $faq->getFaqCategory(),
-                    'faqs'  => []
-                );
-            }
-            $faqsCategoriesById[$faq->getFaqCategory()->getId()]['faqs'][] = $faq;
-        }
-
-        usort($faqsCategoriesById, [$this, 'compareByPosition']);
 
         // form recherche d'aide
         $formAidSearchParams = [
@@ -253,11 +234,18 @@ class ProgramController extends FrontController
 
         $requestStack->getCurrentRequest()->getSession()->set('highlightedWords', $highlightedWords);
 
+        // date de dernière mise à jour des FAQ
+        foreach ($program->getPageTabs() as $pageTab) {
+            foreach ($pageTab->getFaqs() as $faq) {
+                $faq->setLatestUpdateTime($faqService->getLatestUpdateTime($faq));
+            }
+        }
+
         // rendu template
         return $this->render('program/program/details.html.twig', [
             'program' => $program,
-            'faq_questions_answers_date_updated' => $faq_questions_answers_date_updated,
-            'faqsCategoriesById'   => $faqsCategoriesById,
+            // 'faq_questions_answers_date_updated' => $faq_questions_answers_date_updated,
+            // 'faqsCategoriesById'   => $faqsCategoriesById,
             'myPager' => $pagerfanta,
             'formAidSearch' => $formAidSearch->createView(),
             'formAidSearchNoOrder' => true,

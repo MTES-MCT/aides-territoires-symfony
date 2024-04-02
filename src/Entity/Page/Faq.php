@@ -38,6 +38,9 @@ class Faq
     #[ORM\ManyToOne(inversedBy: 'faqs')]
     private ?PageTab $pageTab = null;
 
+    
+    private ?\DateTime $latestUpdateTime = null;
+
     public function __construct()
     {
         $this->faqCategories = new ArrayCollection();
@@ -127,6 +130,18 @@ class Faq
     public function setPageTab(?PageTab $pageTab): static
     {
         $this->pageTab = $pageTab;
+
+        return $this;
+    }
+
+    public function getLatestUpdateTime(): ?\DateTime
+    {
+        return $this->latestUpdateTime;
+    }
+
+    public function setLatestUpdateTime(?\DateTime $latestUpdateTime): static
+    {
+        $this->latestUpdateTime = $latestUpdateTime;
 
         return $this;
     }
