@@ -41,6 +41,7 @@ h1 {
                         <th>Titre de l’aide</th>
                         <th>Nature</th>
                         <th>Récurrence et date d’échéance</th>    
+                        <th>Lien Aides-territoires</th>    
                     </tr>
                 </thead>
 
@@ -63,6 +64,7 @@ h1 {
                                     <br />Échéance : {{ aid.dateSubmissionDeadline|date('d/m/Y') }}
                                 {% endif %}
                             </td>
+                            <td><a href="{{ aid.url }}">Lien</a></td>
                         </tr>
                     </tbody>
                 {% endfor %}
@@ -74,8 +76,7 @@ h1 {
             <h2 id="aids-table">Détail des fiches aides sélectionnées</h2>
             {% for aid in aids %}
                 {# name is an obsolete attribute for web but it is the correct one for PDFs #}
-                <a name="anchor-aid-{{ aid.id }}"></a>
-                <h3 class="aid-title">{{ aid.name }}</h3>
+                <h3 class="aid-title"><a name="anchor-aid-{{ aid.id }}" style="text-decoration:none;">{{ aid.name }}</a></h3>
                 <p>{{ aid.description|raw }}</p>
 
                 {% if aid.isLocal and aid.localCharacteristics %}
