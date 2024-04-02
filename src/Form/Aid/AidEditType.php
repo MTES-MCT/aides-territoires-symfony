@@ -196,8 +196,8 @@ class AidEditType extends AbstractType
                     return $backerRepository->getQueryBuilder([
                         'active' => true,
                         'orderBy' => [
-                            'order' => 'b.name',
-                            'sort' => 'ASC'
+                            'sort' => 'b.name',
+                            'order' => 'ASC'
                         ]
                     ]);
                 },
@@ -224,8 +224,8 @@ class AidEditType extends AbstractType
                     return $backerRepository->getQueryBuilder([
                         'active' => true,
                         'orderBy' => [
-                            'order' => 'b.name',
-                            'sort' => 'ASC'
+                            'sort' => 'b.name',
+                            'order' => 'ASC'
                         ]
                     ]);
                 },
