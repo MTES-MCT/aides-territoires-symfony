@@ -498,6 +498,15 @@ class ImportFluxCommand extends Command
         return $date;
     }
 
+    protected function cleanName(string $name): string
+    {
+        $name = $this->stringService->cleanString($name);
+        if (strlen($name) > 255) {
+            $name = $this->stringService->truncate($name, 255);
+        }
+        return $name;
+    }
+
     protected function getHtmlOrNull(string $html): ?string
     {
         return $this->getCleanHtml($html) == '' ? null : $this->getCleanHtml($html);
