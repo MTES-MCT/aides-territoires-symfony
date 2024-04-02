@@ -33,14 +33,14 @@ class OrganizationController extends FrontController
 {
     #[Route('/comptes/structure/information/{id?}', name: 'app_organization_structure_information', requirements: ['id' => '\d+'])]
     public function informationEdit(
-        ?int $id = null,
         UserService $userService,
         ManagerRegistry $managerRegistry,
         OrganizationRepository $organizationRepository,
         OrganizationService $organizationService,
         RequestStack $requestStack,
         PerimeterRepository $perimeterRepository,
-        PerimeterDataRepository $perimeterDataRepository
+        PerimeterDataRepository $perimeterDataRepository,
+        ?int $id = null
     ) : Response {
         // le user        
         $user = $userService->getUserLogged();
