@@ -36,11 +36,11 @@ class FaqQuestionAnswserCrudController extends AtCrudController
         ->setColumns(12);
         yield AssociationField::new('faqCategory', 'Catégorie FAQ');
         yield IntegerField::new('position', 'Position')->onlyOnIndex();
-        yield DateTimeField::new('timeCreate', 'Date de création')
-        ->setFormTypeOption('attr', ['readonly' => true])
-        ->onlyWhenUpdating();
-        yield DateTimeField::new('timeUpdate', 'Date de mise à jour')
-        ->setFormTypeOption('attr', ['readonly' => true])
-        ->onlyWhenUpdating();
+        // yield DateTimeField::new('timeCreate', 'Date de création')
+        // ->setFormTypeOption('attr', ['readonly' => true])
+        // ->onlyWhenUpdating();
+        // yield DateTimeField::new('timeUpdate', 'Date de mise à jour')
+        // ->setFormTypeOption('attr', ['readonly' => true])
+        // ->onlyWhenUpdating();
     }
 }
