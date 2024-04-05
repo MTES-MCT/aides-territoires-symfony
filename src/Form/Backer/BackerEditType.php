@@ -44,7 +44,7 @@ class BackerEditType extends AbstractType
                 ],
             ])
             ->add('logoFile', FileType::class, [
-                'label' => 'Ajouter une photo représentant votre porteur d\'aides',
+                'label' => 'Ajoutez le logo de votre structure',
                 'help' => 'Taille maximale : 10 Mio. Formats supportés : jpeg, jpg, png',
                 'required' => false, 
                 'constraints' => [
@@ -65,7 +65,7 @@ class BackerEditType extends AbstractType
                 'attr' => [
                     'placeholder' => 'Si vous avez un descriptif, n’hésitez pas à le copier ici.
                     Essayez de compléter le descriptif avec le maximum d’informations.
-                    Si l’on vous contacte régulièrement pour vous demander les mêmes "
+                    Si l’on vous contacte régulièrement pour vous demander les mêmes
                     informations, essayez de donner des éléments de réponses dans cet espace.',
                     'class' => 'trumbowyg',
                     'cols' => 40,
@@ -98,7 +98,7 @@ class BackerEditType extends AbstractType
                     'class' => 'trumbowyg',
                     'cols' => 40,
                     'rows' => 10,
-                    'placeholder' => 'Expliquez quel type de porteur êtes vous : collectivité, établissement public ( et le cas échéant votre tutelle), date de création etc...'
+                    'placeholder' => 'Indiquez la nature juridique de votre structure : collectivité, établissement public (et le cas échéant votre tutelle), association, entreprise …'
                 ],
                 'sanitize_html' => true,
             ])
@@ -119,7 +119,7 @@ class BackerEditType extends AbstractType
                     'class' => 'trumbowyg',
                     'cols' => 40,
                     'rows' => 10,
-                    'placeholder' => 'Donnez ici des explications sur les modalités de saisine de vos équipe, votre fonctionnement (centralisé, déconcentré ou autre), l\'utilisation ou non de plateformes de dépôt de dossier : en bref tous les bons conseils pour une collectivité qui voudrait demander une aide !'
+                    'placeholder' => 'Donnez ici des explications sur les modalités de saisine de vos équipes, votre fonctionnement (centralisé, déconcentré ou autre), l\'utilisation ou non de plateformes de dépôt de dossier : en bref tous les bons conseils pour une collectivité qui voudrait demander une aide !'
                 ],
                 'sanitize_html' => true,
             ])
@@ -130,7 +130,7 @@ class BackerEditType extends AbstractType
                     'class' => 'trumbowyg',
                     'cols' => 40,
                     'rows' => 10,
-                    'placeholder' => 'Indiquez ici des coordonnées de contact, si possible génériques ! et non nominatives contact@nouvellestructuretest'
+                    'placeholder' => 'Indiquez ici des coordonnées de contact, si possible génériques et non nominatives contact@nouvellestructuretest'
                 ],
                 'sanitize_html' => true,
             ])

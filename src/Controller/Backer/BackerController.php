@@ -6,6 +6,7 @@ use App\Controller\FrontController;
 use App\Entity\Backer\Backer;
 use App\Repository\Aid\AidRepository;
 use App\Repository\Backer\BackerRepository;
+use App\Service\Backer\BackerService;
 use App\Service\Log\LogService;
 use App\Service\User\UserService;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -32,19 +33,25 @@ class BackerController extends FrontController
         AidRepository $aidRepository,
         LogService $logService,
         UserService $userService,
-        RequestStack $requestStack
+        RequestStack $requestStack,
+        BackerService $backerService
     ): Response
     {
+        $user = $userService->getUserLogged();
 
         // charge backer
         $backer = $backerRepository->findOneBy(
             [
                 'id' => $id,
                 'slug' => $slug,
-                'active' => true
             ]
             );
         if (!$backer instanceof Backer) {
+            return $this->redirectToRoute('app_home');
+        }
+
+        // si la fiche n'est pas active, seuls les membres de l'organization ou les admins peuvent la voir
+        if (!$backer->isActive() && !$backerService->userCanPreview($user, $backer)) {
             return $this->redirectToRoute('app_home');
         }
 
