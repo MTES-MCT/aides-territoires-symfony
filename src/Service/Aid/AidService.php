@@ -54,7 +54,7 @@ class AidService
         $aids = $this->managerRegistry->getRepository(Aid::class)->findCustom($aidParams);
         if (!isset($aidParams['noRelaunch'])) {
             if (count($aids) <= 10) {
-                $aidParams['scoreTotalMin'] = 1;
+                $aidParams['scoreTotalMin'] = 40;
                 $aidParams['scoreObjectsMin'] = 0;
                 $aids = $this->managerRegistry->getRepository(Aid::class)->findCustom($aidParams);
             }

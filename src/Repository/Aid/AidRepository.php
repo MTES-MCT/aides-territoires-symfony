@@ -517,12 +517,12 @@ class AidRepository extends ServiceEntityRepository
 
             if ($intentionsString && $objectsString) {
                 $oldKeywordsString .= ' '.$intentionsString;
-                $sqlIntentions = '
-                CASE WHEN (MATCH_AGAINST(a.name) AGAINST(:intentions_string IN BOOLEAN MODE) > 1) THEN 5 ELSE 0 END +
-                CASE WHEN (MATCH_AGAINST(a.nameInitial) AGAINST(:intentions_string IN BOOLEAN MODE) > 1) THEN 5 ELSE 0 END +
-                CASE WHEN (MATCH_AGAINST(a.description, a.eligibility, a.projectExamples) AGAINST(:intentions_string IN BOOLEAN MODE) > 1) THEN 1 ELSE 0 END 
-                ';
-                $qb->setParameter('intentions_string', $intentionsString);
+                // $sqlIntentions = '
+                // CASE WHEN (MATCH_AGAINST(a.name) AGAINST(:intentions_string IN BOOLEAN MODE) > 1) THEN 5 ELSE 0 END +
+                // CASE WHEN (MATCH_AGAINST(a.nameInitial) AGAINST(:intentions_string IN BOOLEAN MODE) > 1) THEN 5 ELSE 0 END +
+                // CASE WHEN (MATCH_AGAINST(a.description, a.eligibility, a.projectExamples) AGAINST(:intentions_string IN BOOLEAN MODE) > 1) THEN 1 ELSE 0 END 
+                // ';
+                // $qb->setParameter('intentions_string', $intentionsString);
             }
 
             if ($simpleWordsString) {
@@ -570,12 +570,12 @@ class AidRepository extends ServiceEntityRepository
                 }
                 $sqlTotal .= $sqlObjects;
             }
-            if ($intentionsString && $objectsString) {
-                if ($originalName || $objectsString) {
-                    $sqlTotal .= ' + ';
-                }
-                $sqlTotal .= $sqlIntentions;
-            }
+            // if ($intentionsString && $objectsString) {
+            //     if ($originalName || $objectsString) {
+            //         $sqlTotal .= ' + ';
+            //     }
+            //     $sqlTotal .= $sqlIntentions;
+            // }
             if (isset($sqlSimpleWords)) {
                 if ($originalName || $objectsString || $intentionsString) {
                     $sqlTotal .= ' + ';
