@@ -29,13 +29,14 @@ nelmio_security:
                 - 'self'
                 - 'https://www.youtube.com'
                 - 'https://sibautomation.com'
-                - 'https://stats.beta.gouv.fr/matomo.js'
+                - 'https://stats.beta.gouv.fr/'
                 - 'unsafe-inline'
             #définit les sources de feuilles de styles (CSS) autorisées
             style-src:
                 - 'self'
                 - 'https://fonts.googleapis.com'
                 - 'unsafe-inline'
+                - 'https://stats.beta.gouv.fr'
             #définit les sources de plugins autorisées (ex : <embed> ou <object>)
             #object-src:
                 # - 'self'

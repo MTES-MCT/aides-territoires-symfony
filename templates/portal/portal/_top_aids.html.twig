@@ -1,0 +1,22 @@
+{% if topAidsViews %}
+<div class="fr-table">
+    <table>
+        <thead>
+            <tr>
+                <th></th>
+                <th>Aide</th>
+                <th>Nombre de vues</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for topAidsView in topAidsViews %}
+            <tr>
+                <td>{{ loop.index }}</td>
+                <td><a href="{{ topAidsView.url }}" target="_blank" title="Voir l'aide  - Ouvre une nouvelle fenêtre">{{ topAidsView.name }}</a></td>
+                <td>{{ topAidsView.nb }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endif %}

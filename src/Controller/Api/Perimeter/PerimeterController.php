@@ -108,14 +108,14 @@ class PerimeterController extends ApiController
         return $response;
     }
 
-    #[Route('/api/perimeters/{id}/', name: 'api_perimeters_details', priority: 5, requirements: ['id' => '[0-9]+'])]
+    #[Route('/api/perimeters/{id}/', name: 'api_perimeters_details', priority: 5, requirements: ['id' => '[A-Za-z0-9\-]+'])]
     public function details(
-        int $id,
+        string $id,
         PerimeterRepository $perimeterRepository,
         PerimeterService $perimeterService
     ): JsonResponse
     {
-        $perimeter = $perimeterRepository->find($id);
+        $perimeter = $perimeterRepository->find((int) $id);
         if (!$perimeter instanceof Perimeter) {
             return new JsonResponse('Périmètre non trouvé', 404);
         }

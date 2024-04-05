@@ -1,0 +1,14 @@
+{% extends "@EasyAdmin/page/content.html.twig" %}
+
+
+{% block main %}
+<main>
+    <h1 class="title">Logs Symfony</h1>
+
+    {% if file %}
+    <p><a href="{{ file }}">{{ file }}</a></p>
+    {% else %}
+    <p>Le fichier de log n'est pas disponible</p>
+    {% endif %}
+</main>
+{% endblock %}

@@ -288,7 +288,10 @@ class AidEditType extends AbstractType
             ])
             ->add('subventionComment', TextType::class, [
                 'required' => false,
-                'label' => 'Taux de subvention (commentaire optionnel)'
+                'label' => 'Taux de subvention (commentaire optionnel)',
+                'constraints' => [
+                    new Length(max: 255)
+                ]
             ])
             ->add('loanAmount', TypeIntegerType::class, [
                 'required' => false,
@@ -463,14 +466,16 @@ class AidEditType extends AbstractType
                 'required' => $isDraft ? false : true,
                 'label' => 'Lien vers plus d’information (url d’origine, site du porteur d’aides)',
                 'constraints' => [
-                    new Url()
+                    new Url(),
+                    new Length(max: 255)
                 ],
             ])
             ->add('applicationUrl', TextType::class, [
                 'required' => false,
                 'label' => 'Lien vers une démarche en ligne pour candidater',
                 'constraints' => [
-                    new Url()
+                    new Url(),
+                    new Length(max: 255)
                 ],
             ])
             ->add('contact', TextareaType::class, [

@@ -133,7 +133,7 @@ class ProjectReferenceController extends FrontController
     ): Response
     {
         // paramètres en session
-        $organizationType = $requestStack->getCurrentRequest()->getSession()->get('reference_organizationType', null);
+        $organizationType = $requestStack->getCurrentRequest()->getSession()->get('reference_organizationType', $managerRegistry->getRepository(OrganizationType::class)->findOneBy(['slug' => OrganizationType::SLUG_COMMUNE]));
         $name = $requestStack->getCurrentRequest()->getSession()->get('reference_name', null);
         $perimeter = $requestStack->getCurrentRequest()->getSession()->get('reference_perimeter', null);
 
@@ -173,11 +173,17 @@ class ProjectReferenceController extends FrontController
             $projectValidatedsParams = $referenceService->getSynonymes($name);
         }
         $projectValidatedsParams = array_merge($projectValidatedsParams, [
+            'organizationType' => $organizationType,
             'perimeter' => $perimeter,
             'radius' => 30
         ]);
 
-        $projectValidateds = $projectValidatedRepository->findCustom($projectValidatedsParams);
+        if ($organizationType && $name) {
+            $projectValidateds = $projectValidatedRepository->findCustom($projectValidatedsParams);
+        } else {
+            $projectValidateds = [];
+        }
+        
 
         // fil arianne
         $this->breadcrumb->add(

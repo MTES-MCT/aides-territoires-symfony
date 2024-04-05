@@ -186,6 +186,22 @@
             </div>
             {% endif %}
 
+            {# {% if aid.subventionRateMin or aid.subventionRateMax %}
+                <h3 class="fr-mb-1w fr-mt-3w fr-text--lg at-text--bold at-uppercase">
+                    <span class="ri-percent-line ri-xl at-color--blue at-icon-align--sub fr-mr-1w" aria-hidden="true"></span>
+                    Taux de subvention
+                </h3>
+                <ul class="fr-p-0">
+                    {% if aid.subventionRateMin %}
+                        <li class="fr-list__none"><strong>Min :</strong> {{ aid.subventionRateMin }}%</li>
+                    {% endif %}
+                    {% if aid.subventionRateMax %}
+                        <li class="fr-list__none"><strong>Max :</strong> {{ aid.subventionRateMax }}%</li>
+                    {% endif %}
+                </ul>
+            {% endif %} #}
+
+            {% if aid.aidTypes|length > 0 %}
             <div class="aid-type fr-grid-row fr-mb-4w">
                 <div class="fr-col-1">
                     <span class="ri-hand-coin-line ri-xl" aria-hidden="true"></span>
@@ -193,11 +209,32 @@
                 <div class="fr-col-11">
                     <h2 class="fr-text--md fr-text--normal fr-mb-0 fr-ml-1w">
                         {% for aidType in aid.aidTypes %}
-                        <strong>{{ aidType.name }}</strong><br />
+                            {% if aidType.slug == constant('App\\Entity\\Aid\\AidType::SLUG_GRANT') %}
+                                <strong>Subvention</strong> 
+                                {% if aid.subventionRateMin and aid.subventionRateMax %}
+                                (min : {{ aid.subventionRateMin }}% - max : {{ aid.subventionRateMax }}%)
+                                {% elseif aid.subventionRateMin and not aid.subventionRateMax %}
+                                (min : {{ aid.subventionRateMin }}%)
+                                {% elseif not aid.subventionRateMin and aid.subventionRateMax %}
+                                (max : {{ aid.subventionRateMax }}%)
+                                {% endif %}
+                                {% if aid.subventionComment %}
+                                <br />
+                                {{ aid.subventionComment }}
+                                {% endif %}
+                                <br />
+                            {% elseif aidType.slug == constant('App\\Entity\\Aid\\AidType::SLUG_RECOVERABLE_ADVANCE') %}
+                                <strong>Avance récupérable</strong> {% if aid.recoverableAdvanceAmount %} (jusqu'à {{ aid.recoverableAdvanceAmount }} €){% endif %}<br />
+                            {% elseif aidType.slug == constant('App\\Entity\\Aid\\AidType::SLUG_LOAN') %}
+                                <strong>Prêt</strong> {% if aid.loanAmount %} (jusqu'à {{ aid.loanAmount }} €){% endif %}<br />
+                            {% elseif aidType.slug == constant('App\\Entity\\Aid\\AidType::SLUG_OTHER') %}
+                                <strong>Autre aide financière</strong> {% if aid.otherFinancialAidComment %} {{ aid.otherFinancialAidComment }}{% endif %}<br />                        
+                            {% endif %}
                         {% endfor %}
                     </h2>
                 </div>
             </div>
+            {% endif %}
 
             {% if aid.hasCalendar %}
             <div class="calendar-start fr-mb-4w fr-grid-row">

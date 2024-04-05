@@ -8,7 +8,6 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
 
-// TODO a priori plus utilisé, à supprimer
 #[ORM\Entity(repositoryClass: FaqQuestionAnswserRepository::class)]
 class FaqQuestionAnswser
 {
@@ -127,5 +126,10 @@ class FaqQuestionAnswser
         $this->program = $program;
 
         return $this;
+    }
+
+    public function  __toString(): string
+    {
+        return $this->question ?? 'Question';
     }
 }

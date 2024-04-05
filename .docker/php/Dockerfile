@@ -62,7 +62,9 @@ RUN docker-php-ext-install \
 
 # end PDOSQL, IMAGICK, SOAP
 
-
+# Excimer pour Sentry
+RUN pecl install excimer
+# end Excimer pour Sentry
 
 # Imagick
 RUN apt-get update && apt-get install -y libmagickwand-6.q16-dev --no-install-recommends \
