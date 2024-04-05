@@ -11,3 +11,7 @@ location ~* \.(css|js|jpg|jpeg|png|svg|webp|mp4|ico|woff2|woff|eot|ttf) {
     # See: https://symfony.com/doc/current/frontend/encore/versioning.html
     add_header Cache-Control "public, max-age=31536000";
 }
+
+location = /js/fos_js_routes.json {
+    return 403;
+}

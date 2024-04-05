@@ -14,11 +14,22 @@
                 </h2>
                 <div class="fr-card__desc">
                     <p class="fr-mb-1w fr-mt-0 fr-text--sm at-color--blue">
-                    {% if app.user and project.organization %}
-                        {{ project.organization.name }} ({{ project.organization.zipCode }})
-                    {% else %}
-                        {% if project.organization and project.organization.perimeterDepartment %}
-                            ({{ project.organization.perimeterDepartment.name }})
+                    {% if project.organization %}
+                        {{ project.organization.name }} 
+                        {% if project.organization.zipCode or (project.organization.perimeter and project.organization.perimeter.zipCodes) %}
+                        (
+                            {% if project.organization.zipCode %}
+                                {{ project.organization.zipCode }}
+                            {% else %}
+                                {% if project.organization.perimeter %}
+                                    {% if project.organization.perimeter.zipCodes is iterable %}
+                                        {{ project.organization.perimeter.zipCodes|join(', ') }}
+                                    {% else %}
+                                        {{ project.organization.perimeter.zipCodes }}
+                                    {% endif %}
+                                {% endif %}
+                            {% endif %}
+                        )
                         {% endif %}
                     {% endif %}
                     </p>

@@ -2,7 +2,6 @@
 
 namespace App\Form\Contact;
 
-use App\Entity\Contact\Contact;
 use App\Entity\Contact\ContactMessage;
 use Gregwar\CaptchaBundle\Type\CaptchaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -12,6 +11,7 @@ use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints\Length;
 
 class ContactType extends AbstractType
 {
@@ -33,23 +33,22 @@ class ContactType extends AbstractType
             ->add('firstname', TextType::class, [
                 'label' => 'Votre prénom :',
                 'required' => true,
-                // 'sanitize_html' => true,
             ])
             ->add('lastname', TextType::class, [
                 'label' => 'Votre nom :',
                 'required' => true,
-                // 'sanitize_html' => true,
             ])
             ->add('email', EmailType::class, [
                 'label' => 'Votre email :',
                 'required' => true,
                 'help' => 'Par exemple : prenom.nom@domaine.fr',
-                // 'sanitize_html' => true,
             ])
             ->add('phoneNumber', TextType::class, [
                 'required' => false,
                 'label' => 'Votre numéro de téléphone :',
-                // 'sanitize_html' => true,
+                'constraints' => [
+                    new Length(max: 20)
+                ]
             ])
             ->add('structureAndFunction', TextType::class, [
                 'label' => 'Votre structure et fonction :',
@@ -57,7 +56,6 @@ class ContactType extends AbstractType
                 'attr' => [
                     'placeholder' => 'Exemple: Mairie de Château-Thierry / Chargé de mission habitat'
                 ],
-                // 'sanitize_html' => true,
             ])
             ->add('subject', ChoiceType::class, [
                 'choices' => [
@@ -71,7 +69,7 @@ class ContactType extends AbstractType
                 ],
                 'placeholder' => '---',
                 'label' => 'Sujet :',
-                'required' => true
+                'required' => true,
             ])
             ->add('message', TextareaType::class, [
                 'label' => 'Votre question ou message :',

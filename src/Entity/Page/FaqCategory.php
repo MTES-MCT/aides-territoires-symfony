@@ -7,9 +7,9 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ORM\Mapping\OrderBy;
 use Gedmo\Mapping\Annotation as Gedmo;
 
-// TODO a priori plus utilisé, à supprimer
 #[ORM\Entity(repositoryClass: FaqCategoryRepository::class)]
 class FaqCategory
 {
@@ -33,8 +33,13 @@ class FaqCategory
     #[Gedmo\Timestampable(on: 'update')]
     private ?\DateTimeInterface $timeUpdate = null;
 
-    #[ORM\OneToMany(mappedBy: 'faqCategory', targetEntity: FaqQuestionAnswser::class)]
+    #[ORM\OneToMany(mappedBy: 'faqCategory', targetEntity: FaqQuestionAnswser::class, cascade: ['persist'], orphanRemoval: true)]
+    #[OrderBy(['position' => 'ASC'])]
     private Collection $faqQuestionAnswsers;
+
+    #[ORM\ManyToOne(inversedBy: 'faqCategories')]
+    #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
+    private ?Faq $faq = null;
 
     public function __construct()
     {
@@ -122,5 +127,22 @@ class FaqCategory
         }
 
         return $this;
+    }
+
+    public function getFaq(): ?Faq
+    {
+        return $this->faq;
+    }
+
+    public function setFaq(?Faq $faq): static
+    {
+        $this->faq = $faq;
+
+        return $this;
+    }
+
+    public function  __toString(): string
+    {
+        return $this->name ?? 'FaqCategory';
     }
 }

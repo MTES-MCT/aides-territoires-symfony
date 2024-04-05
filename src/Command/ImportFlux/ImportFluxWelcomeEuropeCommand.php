@@ -9,10 +9,8 @@ use App\Entity\Aid\AidRecurrence;
 use App\Entity\Aid\AidStep;
 use App\Entity\Aid\AidType;
 use App\Entity\Category\Category;
-use App\Entity\Keyword\Keyword;
 use App\Entity\Organization\OrganizationType;
 use App\Entity\Reference\KeywordReference;
-use Symfony\Component\DomCrawler\Crawler;
 
 #[AsCommand(name: 'at:import_flux:welcome_europe', description: 'Import de flux welcome europe')]
 class ImportFluxWelcomeEuropeCommand extends ImportFluxCommand
@@ -181,9 +179,9 @@ class ImportFluxWelcomeEuropeCommand extends ImportFluxCommand
             'importRawObjectCalendar' => $importRawObjectCalendar,
             'importRawObject' => $importRawObject,
             'europeanAid' => Aid::SLUG_EUROPEAN_SECTORIAL,
-            'name' => isset($aidToImport['post_title']) ? strip_tags($aidToImport['post_title']) : null,
-            'nameInitial' => isset($aidToImport['post_title']) ? strip_tags($aidToImport['post_title']) : null,
-            'shortTitle' => isset($aidToImport['info_references']) ? strip_tags($aidToImport['info_references']) : null,
+            'name' => isset($aidToImport['post_title']) ? $this->cleanName($aidToImport['post_title']) : null,
+            'nameInitial' => isset($aidToImport['post_title']) ? $this->cleanName($aidToImport['post_title']) : null,
+            'shortTitle' => isset($aidToImport['info_references']) ? $this->cleanName($aidToImport['info_references']) : null,
             'description' => $description,
             'eligibility' => $this->getCleanHtml($aidToImport['info_info-regions']),
             'isCallForProject' => true,

@@ -213,7 +213,7 @@ class PerimeterRepository extends ServiceEntityRepository
         if ($nameMatchAgainst !== null)
         {
             $qb
-            ->andWhere('MATCH_AGAINST(p.name) AGAINST (:nameMatchAgainst IN BOOLEAN MODE) > 5')
+            ->andWhere('MATCH_AGAINST(p.name) AGAINST (:nameMatchAgainst) > 1')
             ->setParameter('nameMatchAgainst', $nameMatchAgainst);
             
         }

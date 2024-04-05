@@ -35,7 +35,17 @@ class ContactController extends FrontController
 
         $formContact = $this->createForm(ContactType::class, $contact);
 
-
+        // vérification supplémentaire
+        // des bots retire le required sur le sujet ce qui provoque une erreur dans le handleRequest
+        if ($requestStack->getCurrentRequest()->request->has('contact') ) {
+            $contactRequest = $requestStack->getCurrentRequest()->get('contact');
+            $subject = $contactRequest['subject'] ?? null;
+            if (!$subject || trim($subject) == '') {
+                $this->addFlash(FrontController::FLASH_ERROR, 'Une erreur est survenue lors de l\'envoi du message.');
+                return $this->redirectToRoute('app_contact_contact', ['success'=>0]);
+            }
+        }
+        
         $formContact->handleRequest($requestStack->getCurrentRequest());
 
         if ($formContact->isSubmitted()){ 
@@ -80,7 +90,9 @@ class ContactController extends FrontController
                         'subject' => $email_subject,
                         'body' => $content_email,
                     ]
-                    );
+                );
+
+                $this->addFlash(FrontController::FLASH_SUCCESS, 'Votre message a bien été envoyé.');
 
                 return $this->redirectToRoute('app_contact_contact', ['success'=>1]);
             } else {

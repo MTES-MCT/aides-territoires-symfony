@@ -31,7 +31,7 @@ function completeOrganizationName()
 
 
     if (organizationType == 'Commune' && perimeterTxt != '') {
-        var organizationName = 'Marie de ' + perimeterTxt.replace(/ *\([^)]*\) */g, " ");;
+        var organizationName = 'Mairie de ' + perimeterTxt.replace(/ *\([^)]*\) */g, " ");;
     } else {
         organizationName = '';
     }

@@ -1,0 +1,10 @@
+@import 'datatables/media/css/jquery.dataTables.min.css';
+@import '../../_variables';
+@import '../../_mixins';
+@import '../../override/dataTable';
+
+a.fr-icon-download-line{
+    &::after{
+        display: none!important;
+    }
+}

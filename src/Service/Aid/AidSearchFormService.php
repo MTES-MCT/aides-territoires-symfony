@@ -137,6 +137,13 @@ class AidSearchFormService
 
         if ($aidSearchClass->getKeyword()) {
             $aidParams['keyword'] = $aidSearchClass->getKeyword();
+            // si pas de projet référent, on vérifie si on ne trouve pas avec le keyword
+            if (!$aidSearchClass->getProjectReference()) {
+                $projectReference = $this->managerRegistry->getRepository(ProjectReference::class)->findOneBy(['name' => $aidSearchClass->getKeyword()]);
+                if ($projectReference instanceof ProjectReference) {
+                    $aidParams['projectReference'] = $projectReference;
+                }
+            }
         }
 
         if ($aidSearchClass->getCategorySearch()) {

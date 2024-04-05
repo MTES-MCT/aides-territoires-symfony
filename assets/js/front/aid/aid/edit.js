@@ -1,5 +1,6 @@
 require('trumbowyg/dist/trumbowyg.min.js');
 require('trumbowyg/dist/langs/fr.min.js');
+require('trumbowyg/dist/plugins/cleanpaste/trumbowyg.cleanpaste.min.js');
 require('./enable_page_exit_confirmation.js');
 require('./stepper.js');
 require ('../../../form/input-maxlength.js');
@@ -58,7 +59,11 @@ $(function(){
             ['unorderedList', 'orderedList'],
             ['removeformat'],            
             ['fullscreen']
-        ]
+        ],
+        plugins: {
+            // nettoyage texte word
+            cleanpaste: true
+        }
     });
 });
 

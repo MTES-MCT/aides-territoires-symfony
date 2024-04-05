@@ -7,9 +7,11 @@
 
     <td>{{ project.timeObtained|date("Y")}}</td>
     <td>
+        {% if project.organization %}
         <a href="#">
             {{ project.organization.name }}
         </a>
+        {% endif %}
     </td>
     <td>
         {% if project.project %}

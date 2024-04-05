@@ -151,7 +151,6 @@ class AidController extends FrontController
                 'showInSearch' => true
             ]
         );
-
         
         // nb vues des aides du user
         $nbAidsViews = $logAidViewRepository->countCustom(
@@ -333,7 +332,8 @@ class AidController extends FrontController
                 // les aides
                 $aids = $aidRepository->findCustom(
                     [
-                        'author' => $user
+                        'author' => $user,
+                        'showInSearch' => true
                     ]
                 );
 
@@ -775,30 +775,33 @@ class AidController extends FrontController
         LogAidViewRepository $logAidViewRepository,
         LogAidApplicationUrlClickRepository $logAidApplicationUrlClickRepository,
         LogAidOriginUrlClickRepository $logAidOriginUrlClickRepository,
-        AidProjectRepository $aidProjectRepository
+        AidProjectRepository $aidProjectRepository,
+        AidService $aidService
     ) {
         // le user
         $user = $userService->getUserLogged();
 
         // l'aide
         $aid = $aidRepository->findOneBy([
-            'author' => $user,
             'slug' => $slug
         ]);
         if (!$aid instanceof Aid) {
             throw new NotFoundHttpException('Cette aide n\'exite pas');
         }
 
+        // verifie que l'utilisateur appartienne à la structure de l'aide, oue que l'utilisateur est l'auteur de l'aide ou que l'utilisateur est un admin
+        if (!$aidService->canUserAccessStatsPage($user, $aid)) {
+            $this->addFlash(FrontController::FLASH_ERROR, 'Vous n\'avez pas accès à cette page');
+            return $this->redirectToRoute('app_user_aid_publications');
+        }
+
+
         // formulaire periode
         $dateMinGet = $requestStack->getCurrentRequest()->get('dateMin', null);
         $dateMaxGet = $requestStack->getCurrentRequest()->get('dateMax', null);
-        try {
-            $dateMin = new \DateTime(date($dateMinGet));
-            $dateMax = new \DateTime(date($dateMaxGet));
-        } catch (\Exception $e) {
-            $dateMin = null;
-            $dateMax = null;
-        }
+        $dateMin = $dateMinGet ? new \DateTime(date($dateMinGet)) : new \DateTime('-1 month');
+        $dateMax = $dateMaxGet ? new \DateTime(date($dateMaxGet)) : new \DateTime(date('Y-m-d'));
+
         $formAidStatsPeriod = $this->createForm(AidStatsPeriodType::class);
         if ($dateMin) {
             $formAidStatsPeriod->get('dateMin')->setData($dateMin);
@@ -813,8 +816,11 @@ class AidController extends FrontController
         $formAidStatsPeriod->handleRequest($requestStack->getCurrentRequest());
         if ($formAidStatsPeriod->isSubmitted()) {
             if ($formAidStatsPeriod->isValid()) {
-                $periodParams['dateMin'] = $formAidStatsPeriod->get('dateMin')->getData();
-                $periodParams['dateMax'] = $formAidStatsPeriod->get('dateMax')->getData();
+                return $this->redirectToRoute('app_user_aid_stats', [
+                    'slug' => $aid->getSlug(),
+                    'dateMin' => $formAidStatsPeriod->get('dateMin')->getData()->format('Y-m-d'),
+                    'dateMax' => $formAidStatsPeriod->get('dateMax')->getData()->format('Y-m-d')
+                ]);
             }
         }
 
@@ -896,7 +902,8 @@ class AidController extends FrontController
         LogAidViewRepository $logAidViewRepository,
         LogAidApplicationUrlClickRepository $logAidApplicationUrlClickRepository,
         LogAidOriginUrlClickRepository $logAidOriginUrlClickRepository,
-        AidProjectRepository $aidProjectRepository
+        AidProjectRepository $aidProjectRepository,
+        AidService $aidService
     )
     {
         // le user
@@ -905,13 +912,18 @@ class AidController extends FrontController
         // l'aide
         $aid = $aidRepository->findOneBy(
             [
-                'author' => $user,
                 'slug' => $slug
             ]
         );
         if (!$aid instanceof Aid) {
             throw new NotFoundHttpException('Cette aide n\'existe pas');
         }
+        // verifie que l'utilisateur appartienne à la structure de l'aide, oue que l'utilisateur est l'auteur de l'aide ou que l'utilisateur est un admin
+        if (!$aidService->canUserAccessStatsPage($user, $aid)) {
+            $this->addFlash(FrontController::FLASH_ERROR, 'Vous n\'avez pas accès à cette page');
+            return $this->redirectToRoute('app_user_aid_publications');
+        }
+
 
         $dateMinGet = $requestStack->getCurrentRequest()->get('dateMin', null);
         $dateMaxGet = $requestStack->getCurrentRequest()->get('dateMax', null);
@@ -922,10 +934,8 @@ class AidController extends FrontController
             throw new NotFoundHttpException('Cette aide n\'existe pas');
         }
 
-
-
         // nom de fichier
-        $filename = 'Aides-territoires-statistiques.xlxs';
+        $filename = 'Aides-territoires-statistiques';
 
         $response = new StreamedResponse(function () use (
             $aid,

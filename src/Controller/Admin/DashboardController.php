@@ -34,6 +34,9 @@ use App\Entity\Log\LogUserLogin;
 use App\Entity\Organization\Organization;
 use App\Entity\Organization\OrganizationType;
 use App\Entity\Organization\OrganizationTypeGroup;
+use App\Entity\Page\Faq;
+use App\Entity\Page\FaqCategory;
+use App\Entity\Page\FaqQuestionAnswser;
 use App\Entity\Page\Page;
 use App\Entity\Perimeter\FinancialData;
 use App\Entity\Perimeter\Perimeter;
@@ -223,6 +226,9 @@ class DashboardController extends AbstractDashboardController
         yield MenuItem::subMenu('Programmes', 'fas fa-table')->setSubItems([
             MenuItem::linkToCrud('Onglets', 'fas fa-list', PageTab::class),
             MenuItem::linkToCrud('Programmes', 'fas fa-list', Program::class),
+            MenuItem::linkToCrud('Faqs', 'fas fa-list', Faq::class),
+            MenuItem::linkToCrud('Faqs Catégories', 'fas fa-list', FaqCategory::class),
+            MenuItem::linkToCrud('Faqs Questions', 'fas fa-list', FaqQuestionAnswser::class),
         ]);
 
         yield MenuItem::subMenu('Projets', 'fas fa-table')->setSubItems([
@@ -266,13 +272,15 @@ class DashboardController extends AbstractDashboardController
         yield MenuItem::subMenu('Configuration système', 'fas fa-cogs')->setSubItems([
             MenuItem::linkToCrud('Exports de données', 'fas fa-list', DataExport::class),
             MenuItem::linkToCrud('Sources de données', 'fas fa-list', DataSource::class),
+            MenuItem::linkToRoute('Logs Symfony', 'fas fa-list', 'admin_log_symfony_download', [])
         ]);
 
         yield MenuItem::subMenu('Statistiques', 'fas fa-chart-line')->setSubItems([
             MenuItem::linkToRoute('Globale', 'fas fa-list', 'admin_statistics_dashboard', []),
             MenuItem::linkToRoute('Aides', 'fas fa-list', 'admin_log_aids_logs', []),
             MenuItem::linkToRoute('Blog', 'fas fa-list', 'admin_statistics_blog_dashboard', []),
-            MenuItem::linkToRoute('Recherche', 'fas fa-list', 'admin_statistics_log_aid_search', [])
+            MenuItem::linkToRoute('Recherche', 'fas fa-list', 'admin_statistics_log_aid_search', []),
+            MenuItem::linkToRoute('Porteurs d\'aides', 'fas fa-list', 'admin_statistics_backer_dashboard', [])
         ]);
 
         yield MenuItem::subMenu('Obsolète - Mots clés', 'fas fa-table')->setSubItems([
