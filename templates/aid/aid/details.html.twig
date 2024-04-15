@@ -601,7 +601,7 @@
                 <h2 class="fr-h3 fr-mb-2w">Contact</h2>
                 <div>
                     {% if aid.contact %}
-                    {{ aid.contact|raw }}
+                    {{ addMailtoToEmailLinks(aid.contact)|raw }}
                     {% endif %}
     
                     <ul class="fr-btns-group fr-btns-group--inline-md fr-btns-group--right">

@@ -131,6 +131,7 @@ class AppExtension extends AbstractExtension
             new TwigFunction('getParameter', [$this, 'getParameter']),
             new TwigFunction('isUserGranted', [$this, 'isUserGranted']),
             new TwigFunction('optimizeHtmlFromWysiwyg', [$this, 'optimizeHtmlFromWysiwyg']),
+            new TwigFunction('addMailtoToEmailLinks', [$this, 'addMailtoToEmailLinks']),
             new TwigFunction('addNonceToInlineCss', [$this, 'addNonceToInlineCss']),
             new TwigFunction('getPerimeterScale', [$this, 'getPerimeterScale']),
             new TwigFunction('categoriesToMetas', [$this, 'categoriesToMetas']),
@@ -168,6 +169,33 @@ class AppExtension extends AbstractExtension
         } catch (\Exception $e) {
             return $html;
         }
+    }
+
+    public function addMailtoToEmailLinks($html)
+    {
+        $dom = new \DOMDocument();
+        // pour garder le utf-8
+        $dom->loadHTML(mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8'), LIBXML_HTML_NODEFDTD);
+        $x = new \DOMXPath($dom);
+
+        foreach($x->query("//a") as $node)
+        {
+            $href = $node->getAttribute('href');
+            // Vérifie si le href est une adresse e-mail
+            if (preg_match('/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/', $href)) {
+                // Ajoute mailto: au début du href
+                $node->setAttribute('href', 'mailto:' . $href);
+            }
+        }
+
+        // Sélectionner uniquement le contenu intérieur de la balise <body>
+        $body = $x->query('//body')->item(0);
+        $newHtml = '';
+        foreach ($body->childNodes as $childNode) {
+            $newHtml .= $dom->saveHTML($childNode);
+        }
+
+        return $newHtml;
     }
 
     public function addNonceToInlineCss($html)
