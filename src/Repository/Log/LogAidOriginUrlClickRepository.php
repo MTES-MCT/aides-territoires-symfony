@@ -64,6 +64,7 @@ class LogAidOriginUrlClickRepository extends ServiceEntityRepository
     {
         $dateMin = $params['dateMin'] ?? null;
         $dateMax = $params['dateMax'] ?? null;
+        $dateCreate = $params['dateCreate'] ?? null;
         $author = $params['author'] ?? null;
         $aid = $params['aid'] ?? null;
 
@@ -84,6 +85,13 @@ class LogAidOriginUrlClickRepository extends ServiceEntityRepository
             ;
         }
         
+        if ($dateCreate instanceof \DateTime) {
+            $qb
+                ->andWhere('laouc.dateCreate = :dateCreate')
+                ->setParameter('dateCreate', $dateCreate)
+            ;
+        }
+
         if ($dateMin instanceof \DateTime) {
             $qb
                 ->andWhere('laouc.dateCreate >= :dateMin')

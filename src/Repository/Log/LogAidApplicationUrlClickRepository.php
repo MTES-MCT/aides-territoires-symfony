@@ -64,6 +64,7 @@ class LogAidApplicationUrlClickRepository extends ServiceEntityRepository
     {
         $dateMin = $params['dateMin'] ?? null;
         $dateMax = $params['dateMax'] ?? null;
+        $dateCreate = $params['dateCreate'] ?? null;
         $author = $params['author'] ?? null;
         $aid = $params['aid'] ?? null;
 
@@ -84,6 +85,13 @@ class LogAidApplicationUrlClickRepository extends ServiceEntityRepository
             ;
         }
         
+        if ($dateCreate instanceof \DateTime) {
+            $qb
+                ->andWhere('laau.dateCreate = :dateCreate')
+                ->setParameter('dateCreate', $dateCreate)
+            ;
+        }
+
         if ($dateMin instanceof \DateTime) {
             $qb
                 ->andWhere('laau.dateCreate >= :dateMin')

@@ -22,7 +22,7 @@
             <tr>
                 <td  class="highlightable">
                     <a href="{{ path('app_aid_aid_details', {'slug': aid.slug}) }}{% if integration is defined %}?integration=integration{% endif %}">
-                    {{ aid.name }}
+                    {{ aid.name }} {% if app.user and app.user and isUserGranted(app.user, constant('App\\Entity\\User\\User::ROLE_ADMIN')) %}(st: {{ aid.scoreTotal}}, so: {{ aid.scoreObjects}}){% endif %}
                     </a>
                 </td>
                 <td>

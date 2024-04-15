@@ -277,6 +277,12 @@ class SpreadsheetExporterService
                         if (is_array($counties)) {
                             $counties = implode(',', $counties);
                         }
+
+                        $projectTypes = [];
+                        foreach ($result->getKeywordSynonymlists() as $keywordSynonymlist) {
+                            $projectTypes[] = $keywordSynonymlist->getName();
+                        }
+
                         $datas[] = [
                             'Nom' => $result->getName(),
                             'Organisation' => $result->getOrganization() ? $result->getOrganization()->getName() : '',
@@ -286,6 +292,8 @@ class SpreadsheetExporterService
                             'Périmètre (Département)' => $counties,
                             'Est public' => $result->isIsPublic() ? 'Oui' : 'Non',
                             'Date création' => $result->getTimeCreate() ? $result->getTimeCreate()->format('d/m/Y H:i:s') : '',
+                            'Projet référent' => $result->getProjectReference() ? $result->getProjectReference()->getName() : '',
+                            'Types de projet (ancien système)' => join(',', $projectTypes),
                         ];
                         unset($results[$key]);
                     }

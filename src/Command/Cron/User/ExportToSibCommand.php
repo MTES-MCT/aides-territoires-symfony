@@ -49,7 +49,8 @@ class ExportToSibCommand extends Command
 
         try  {
             if ($this->kernelInterface->getEnvironment() != 'prod') {
-                throw new \Exception('Commande uniquement disponible en prod');
+                $io->info('Uniquement en prod');
+                return Command::FAILURE;
             }
             // generate menu
             $this->cronTask($input, $output);

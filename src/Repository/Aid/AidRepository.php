@@ -10,6 +10,7 @@ use App\Entity\Aid\AidType;
 use App\Entity\Aid\AidTypeGroup;
 use App\Entity\Backer\Backer;
 use App\Entity\Backer\BackerCategory;
+use App\Entity\Category\Category;
 use App\Entity\Keyword\Keyword;
 use App\Entity\Organization\OrganizationType;
 use App\Entity\Perimeter\Perimeter;
@@ -222,7 +223,7 @@ class AidRepository extends ServiceEntityRepository
 
     public function countByUser(User $user, array $params = null): int
     {
-        $isLive = $params['isLive'] ?? null;
+        $showInSearch = $params['showInSearch'] ?? null;
 
         $qb = $this->createQueryBuilder('a')
             ->select('COUNT(a.id) AS nb')
@@ -231,8 +232,8 @@ class AidRepository extends ServiceEntityRepository
             ->setParameter('user', $user)
             ->setParameter('delete', Aid::STATUS_DELETED);
 
-        if ($isLive !== null) {
-            $qb->addCriteria(AidRepository::liveCriteria('a.'));
+        if ($showInSearch !== null) {
+            $qb->addCriteria(AidRepository::showInSearchCriteria('a.'));
         }
         $result = $qb
             ->getQuery()
@@ -464,6 +465,21 @@ class AidRepository extends ServiceEntityRepository
                 $qb->setParameter('originalName', $originalName);
             }
 
+            // Projets référents
+            if ($projectReference instanceof ProjectReference) {
+                $sqlProjectReference = '
+                CASE 
+                    WHEN :projectReference MEMBER OF a.projectReferences THEN 90 
+                    ELSE 0 
+                END
+                ';
+
+                $qb
+                ->setParameter('projectReference', $projectReference)
+                ;
+            }
+            
+            $sqlObjects = '';
             if ($objectsString) {
                 $oldKeywordsString .= $objectsString;
                 $sqlObjects = '
@@ -482,34 +498,22 @@ class AidRepository extends ServiceEntityRepository
                         CASE WHEN (a.name LIKE :objects'.$i.') THEN 30 ELSE 0 END +
                         CASE WHEN (a.nameInitial LIKE :objects'.$i.') THEN 20 ELSE 0 END
                     ';
-                    if ($projectReference instanceof ProjectReference) {
-                        $sqlObjects .= '
-                        + 
-                        CASE 
-                            WHEN :projectReferenceScO MEMBER OF a.projectReferences THEN 90 
-                            ELSE 0 
-                        END
-                        ';
-        
-                        $qb
-                        ->setParameter('projectReferenceScO', $projectReference)
-                        ;
-                    }
-                    // $sqlObjects .= '
-                    //     CASE WHEN (a.name LIKE :objects'.$i.') THEN 10 ELSE 0 END +
-                    //     CASE WHEN (a.description LIKE :objects'.$i.') THEN 2 ELSE 0 END +
-                    //     CASE WHEN (a.eligibility LIKE :objects'.$i.') THEN 2 ELSE 0 END
-                    // ';
+
                     if ($i < count($objects) - 1) {
                         $sqlObjects .= ' + ';
                     }
                     $qb->setParameter('objects'.$i, '%'.$objects[$i].'%');
                 }
 
+                if (isset($sqlProjectReference) && $sqlProjectReference !== '') {
+                    $sqlObjects .= ' + '.$sqlProjectReference;
+                }
+
                 $qb->addSelect('('.$sqlObjects.') as score_objects');
                 $qb->setParameter('objects_string', $objectsString);
                 $qb->andHaving('score_objects >= '.$scoreObjectsMin);
             }
+
 
             if ($intentionsString && $objectsString) {
                 $oldKeywordsString .= ' '.$intentionsString;
@@ -527,111 +531,34 @@ class AidRepository extends ServiceEntityRepository
                 CASE WHEN (MATCH_AGAINST(a.nameInitial) AGAINST(:simple_words_string IN BOOLEAN MODE) > 1) THEN 30 ELSE 0 END +
                 CASE WHEN (MATCH_AGAINST(a.description, a.eligibility, a.projectExamples) AGAINST(:simple_words_string IN BOOLEAN MODE) > 1) THEN 5 ELSE 0 END 
                 ';
-
-                $simpleWords = str_getcsv($simpleWordsString, ' ', '"');
-                // if (count($simpleWords) > 0) {
-                //     $sqlSimpleWords .= ' + ';
-                // }
-                // for ($i = 0; $i<count($simpleWords); $i++) {
-                //     $sqlSimpleWords .= '
-                //         CASE WHEN (a.name LIKE :simple_word'.$i.') THEN 30 ELSE 0 END +
-                //         CASE WHEN (a.description LIKE :simple_word'.$i.') THEN 4 ELSE 0 END +
-                //         CASE WHEN (a.eligibility LIKE :simple_word'.$i.') THEN 4 ELSE 0 END +
-                //         CASE WHEN (a.projectExamples LIKE :simple_word'.$i.') THEN 4 ELSE 0 END
-                //     ';
-                //     if ($i < count($simpleWords) - 1) {
-                //         $sqlSimpleWords .= ' + ';
-                //     }
-                //     $qb->setParameter('simple_word'.$i, '%'.$simpleWords[$i].'%');
-                // }
-
                 $qb->setParameter('simple_words_string', $simpleWordsString);
             }
 
             // Les catégories
-            if ($objectsString) {
-                $qb->leftJoin('a.categories', 'categoriesKeyword');
+            $categoriesSynonyms = $this->getEntityManager()->getRepository(Category::class)->findFromSynonyms($synonyms);
+            if (count($categoriesSynonyms) > 0) {
                 $sqlCategories = '
-                    CASE WHEN (MATCH_AGAINST(categoriesKeyword.name) AGAINST(:objects_string IN BOOLEAN MODE) > 1) THEN 30 ELSE 0 END 
-                ';
-                if ($intentionsString) {
-                    $sqlCategories .= '
-                    +
-                    CASE WHEN (MATCH_AGAINST(categoriesKeyword.name) AGAINST(:intentions_string IN BOOLEAN MODE) > 1) THEN 10 ELSE 0 END
-                    ';
-                }
-            } else {
-                if ($simpleWordsString) {
-                    $qb->leftJoin('a.categories', 'categoriesKeyword');
-                    $sqlCategories = '
-                        CASE WHEN (MATCH_AGAINST(categoriesKeyword.name) AGAINST(:simple_words_string IN BOOLEAN MODE) > 1) THEN 20 ELSE 0 END 
-                    ';
-                }
-            }
-
-            // les keywordReferences
-            if ($objectsString) {
-                $keywordReferences = $this->getEntityManager()->getRepository(KeywordReference::class)->findFromString($objectsString);
-                if (count($keywordReferences) > 0) {
-                    // $qb
-                    // ->leftJoin('a.keywordReferences', 'keywordReferencesOs')
-                    // ->setParameter('keywordReferences', $keywordReferences)
-                    // ;
-                    // $sqlKeywordReferences = '
-                    //     CASE WHEN (:keywordReferences IN (keywordReferencesOs)) THEN 60 ELSE 0 END 
-                    // ';
-                    $sqlKeywordReferences = '
-                    CASE 
-                        WHEN :keywordReferences MEMBER OF a.keywordReferences THEN 60 
-                        ELSE 0 
-                    END
-                    ';
-                $qb->setParameter('keywordReferences', $keywordReferences)
-                ;
-                    if ($intentionsString) {
-                        $keywordReferences = $this->getEntityManager()->getRepository(KeywordReference::class)->findFromString($intentionsString);
-                        if (count($keywordReferences) > 0) {
-                            $sqlKeywordReferences .= '
-                            +
-                            CASE 
-                                WHEN :keywordReferences MEMBER OF a.keywordReferences THEN 20 
-                                ELSE 0 
-                            END
-                            ';
-                        }
-                    }
-                }
-            } else {
-                if ($simpleWordsString) {
-                    $keywordReferences = $this->getEntityManager()->getRepository(KeywordReference::class)->findFromString($simpleWordsString);
-                    if (count($keywordReferences) > 0) {
-                        $sqlKeywordReferences = '
-                        CASE 
-                            WHEN :keywordReferences MEMBER OF a.keywordReferences THEN 20 
-                            ELSE 0 
-                        END
-                        ';
-
-                        $qb
-                        ->leftJoin('a.keywordReferences', 'keywordReferences')
-                        ->setParameter('keywordReferences', $keywordReferences)
-                        ;
-                    }
-                }
-            }
-
-            if ($projectReference instanceof ProjectReference) {
-                $sqlProjectReference = '
                 CASE 
-                    WHEN :projectReference MEMBER OF a.projectReferences THEN 90 
+                    WHEN :categoriesSynonyms MEMBER OF a.categories THEN 60
                     ELSE 0 
                 END
                 ';
-
-                $qb
-                ->setParameter('projectReference', $projectReference)
-                ;
+                $qb->setParameter('categoriesSynonyms', $categoriesSynonyms);
             }
+
+            // les keywordReferences
+            $keywordReferencesSynonyms = $this->getEntityManager()->getRepository(KeywordReference::class)->findFromSynonyms($synonyms);
+            if (count($keywordReferencesSynonyms) > 0) {
+                $sqlKeywordReferences = '
+                CASE 
+                    WHEN :keywordReferences MEMBER OF a.keywordReferences THEN 60 
+                    ELSE 0 
+                END
+                ';
+                $qb->setParameter('keywordReferences', $keywordReferencesSynonyms);
+            }
+
+
 
             $sqlTotal = '';
             if ($originalName) {
@@ -678,9 +605,9 @@ class AidRepository extends ServiceEntityRepository
             }
 
             if ($sqlTotal !== '') {
+                $scoreTotalAvailable = true;
                 $qb->addSelect('('.$sqlTotal.') as score_total');
                 $qb->andHaving('score_total >= '.$scoreTotalMin);
-                $qb->orderBy('score_total', 'DESC');
             }
         }
 
@@ -953,6 +880,13 @@ class AidRepository extends ServiceEntityRepository
                 ->addSelect('CASE WHEN a.dateSubmissionDeadline IS NULL THEN 1 ELSE 0 END as HIDDEN priority_is_null')
                 ->addOrderBy('priority_is_null', 'ASC')
                 ->addOrderBy('a.dateSubmissionDeadline', 'ASC')
+            ;
+        }
+
+        // si aucun tri mais qu'on a le score total
+        if ($orderBy == null && $orderByDateSubmissionDeadline == null && isset($scoreTotalAvailable) && $scoreTotalAvailable === true) {
+            $qb
+                ->addOrderBy('score_total', 'DESC')
             ;
         }
 

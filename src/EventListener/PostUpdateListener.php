@@ -45,8 +45,13 @@ class PostUpdateListener
             if ($firewallConfig->getName() == LogAdminAction::FIREWALL_ADMIN_NAME && !$args->getObject() instanceof LogAdminAction) {
     
                 $logAdminAction = new LogAdminAction();
+                // vérification du format id
+                $objectId = null;
+                if (method_exists($args->getObject(), 'getId') && $args->getObject()->getId() && is_int($args->getObject()->getId())) {
+                    $objectId = $args->getObject()->getId();
+                }
                 $logAdminAction->setObjectClass(get_class($args->getObject()));
-                $logAdminAction->setObjectId($args->getObject()->getId() ?? null);
+                $logAdminAction->setObjectId($objectId);
                 if (method_exists($args->getObject(), '__toString')) {
                     $objectRepr = $args->getObject()->__toString();
                 } else {

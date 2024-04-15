@@ -367,6 +367,7 @@ class ProjectController extends FrontController
             // regarde si le projet à un projet référent associé pour écraser la recherche
             if ($project->getProjectReference() instanceof ProjectReference && $project->getProjectReference()->getName()) {
                     $aidParams['keyword'] = $project->getProjectReference()->getName();
+                    $aidParams['projectReference'] = $project->getProjectReference();
                     $searchParams['keyword'] = $aidParams['keyword'];
             }
 

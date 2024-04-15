@@ -5,7 +5,9 @@ namespace App\Repository\Project;
 use App\Entity\Organization\Organization;
 use App\Entity\Perimeter\Perimeter;
 use App\Entity\Project\Project;
+use App\Entity\Reference\ProjectReference;
 use App\Entity\User\User;
+use App\Service\Reference\ReferenceService;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\QueryBuilder;
@@ -21,7 +23,10 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class ProjectRepository extends ServiceEntityRepository
 {
-    public function __construct(ManagerRegistry $registry)
+    public function __construct(
+        ManagerRegistry $registry,
+        protected ReferenceService $referenceService
+    )
     {
         parent::__construct($registry, Project::class);
     }
@@ -114,7 +119,19 @@ class ProjectRepository extends ServiceEntityRepository
     public function findCustom(?array $params = null): array
     {
         $qb = $this->getQueryBuilder($params);
-        return $qb->getQuery()->getResult();
+        $results = $qb->getQuery()->getResult();
+        $return = [];
+        foreach ($results as $result) {
+            if ($result instanceof Project) {
+                $return[] = $result;
+            } else if (is_array($result) && isset($result[0]) && $result[0] instanceof Project) {
+                if (isset($result['score_total'])) {
+                    $result[0]->setScoreTotal($result['score_total']);
+                }
+                $return[] = $result[0];
+            }
+        }
+        return $return;
     }
 
     public function getQueryBuilder(array $params = null): QueryBuilder
@@ -129,9 +146,12 @@ class ProjectRepository extends ServiceEntityRepository
         $keywordSynonymlistSearch = $params['keywordSynonymlistSearch'] ?? null;
         $orderBy = (isset($params['orderBy']) && isset($params['orderBy']['sort']) && isset($params['orderBy']['order'])) ? $params['orderBy'] : null;
         $limit = $params['limit'] ?? null;
-        $intentions_string = $params['intentions_string'] ?? null;
-        $objects_string = $params['objects_string'] ?? null;
-        $simple_words_string = $params['simple_words_string'] ?? null;
+        // $intentions_string = $params['intentions_string'] ?? null;
+        // $objects_string = $params['objects_string'] ?? null;
+        // $simple_words_string = $params['simple_words_string'] ?? null;
+        $search = $params['search'] ?? null;
+        $scoreTotalMin = $params['scoreTotalMin'] ?? 30;
+        $projectReference = $params['projectReference'] ?? null;
         $radius = $params['radius'] ?? null;
         $exclude = $params['exclude'] ?? null;
         $dateCreateMin = $params['dateCreateMin'] ?? null;
@@ -140,6 +160,109 @@ class ProjectRepository extends ServiceEntityRepository
 
         $qb = $this->createQueryBuilder('p');
 
+        if ($search !== null) {
+            $synonyms = $this->referenceService->getSynonymes($search);
+            $originalName = (isset($synonyms['original_name']) && trim($synonyms['original_name']) !== '')  ? $synonyms['original_name'] : null;
+            $intentionsString = (isset($synonyms['intentions_string']) && trim($synonyms['intentions_string']) !== '')  ? $synonyms['intentions_string'] : null;
+            $objectsString = (isset($synonyms['objects_string']) && trim($synonyms['objects_string']) !== '')  ? $synonyms['objects_string'] : null;
+            $simpleWordsString = (isset($synonyms['simple_words_string']) && trim($synonyms['simple_words_string']) !== '')  ? $synonyms['simple_words_string'] : null;
+
+            if ($originalName) {
+                $sqlOriginalName = '
+                CASE WHEN (p.name = :originalName) THEN 500 ELSE 0 END 
+                ';
+                $qb->setParameter('originalName', $originalName);
+            }
+
+            if ($objectsString) {
+                $sqlObjects = '
+                CASE WHEN (MATCH_AGAINST(p.name) AGAINST(:objects_string IN BOOLEAN MODE) > 1) THEN 90 ELSE 0 END +
+                CASE WHEN (MATCH_AGAINST(p.description) AGAINST(:objects_string IN BOOLEAN MODE) > 1) THEN 10 ELSE 0 END 
+                ';
+
+                $objects = str_getcsv($objectsString, ' ', '"');
+                if (count($objects) > 0) {
+                    $sqlObjects .= ' + ';
+                }
+                for ($i = 0; $i<count($objects); $i++) {
+
+                    $sqlObjects .= '
+                        CASE WHEN (p.name LIKE :objects'.$i.') THEN 30 ELSE 0 END
+                    ';
+                    if ($i < count($objects) - 1) {
+                        $sqlObjects .= ' + ';
+                    }
+                    $qb->setParameter('objects'.$i, '%'.$objects[$i].'%');
+                }
+
+                $qb->setParameter('objects_string', $objectsString);
+            }
+            if ($intentionsString && $objectsString) {
+                $sqlIntentions = '
+                CASE WHEN (MATCH_AGAINST(p.name) AGAINST(:intentions_string IN BOOLEAN MODE) > 1) THEN 5 ELSE 0 END +
+                CASE WHEN (MATCH_AGAINST(p.description) AGAINST(:intentions_string IN BOOLEAN MODE) > 1) THEN 1 ELSE 0 END 
+                ';
+                $qb->setParameter('intentions_string', $intentionsString);
+            }
+
+            if ($simpleWordsString) {
+                $sqlSimpleWords = '
+                CASE WHEN (MATCH_AGAINST(p.name) AGAINST(:simple_words_string IN BOOLEAN MODE) > 1) THEN 30 ELSE 0 END +
+                CASE WHEN (MATCH_AGAINST(p.description) AGAINST(:simple_words_string IN BOOLEAN MODE) > 1) THEN 5 ELSE 0 END 
+                ';
+                $qb->setParameter('simple_words_string', $simpleWordsString);
+            }
+
+            if ($projectReference instanceof ProjectReference) {
+                $sqlProjectReference = '
+                CASE 
+                    WHEN :projectReference = p.projectReference THEN 90 
+                    ELSE 0 
+                END
+                ';
+
+                $qb
+                ->setParameter('projectReference', $projectReference)
+                ;
+            }
+
+            $sqlTotal = '';
+            if ($originalName) {
+                $sqlTotal .= $sqlOriginalName;
+            }
+            if ($objectsString) {
+                if ($originalName) {
+                    $sqlTotal .= ' + ';
+                }
+                $sqlTotal .= $sqlObjects;
+            }
+            if ($intentionsString && $objectsString) {
+                if ($originalName || $objectsString) {
+                    $sqlTotal .= ' + ';
+                }
+                $sqlTotal .= $sqlIntentions;
+            }
+            if (isset($sqlSimpleWords)) {
+                if ($originalName || $objectsString || $intentionsString) {
+                    $sqlTotal .= ' + ';
+                }
+                $sqlTotal .= $sqlSimpleWords;
+            }
+
+            if (isset($sqlProjectReference)) {
+                if ($originalName || $objectsString || $intentionsString || isset($sqlSimpleWords) || isset($sqlCategories) || isset($sqlKeywordReferences)) {
+                    $sqlTotal .= ' + ';
+                }
+                $sqlTotal .= $sqlProjectReference;
+            }
+
+            if ($sqlTotal !== '') {
+                $scoreTotalAvailable = true;
+                $qb->addSelect('('.$sqlTotal.') as score_total');
+                $qb->andHaving('score_total >= '.$scoreTotalMin);
+            }
+        }
+        
         if ($organizations !== null) {
             $qb
                 ->andWhere('p.organization IN (:organizations)')
@@ -174,26 +297,6 @@ class ProjectRepository extends ServiceEntityRepository
                 ->having('dist <= :distanceKm')
                 ->setParameter('distanceKm', $radius)
                 ->orderBy('dist', 'ASC');
-            ;
-        }
-
-        if ($objects_string !== null && $objects_string !== '') {
-            $qb
-                ->andWhere('
-                MATCH_AGAINST(p.name) AGAINST (:objects_string IN BOOLEAN MODE) > 5
-                OR MATCH_AGAINST(p.description) AGAINST (:objects_string IN BOOLEAN MODE) > 5
-                ')
-                ->setParameter('objects_string', $objects_string)
-            ;
-        }
-
-        if ($simple_words_string !== null && $objects_string == '') {
-            $qb
-                ->andWhere('
-                MATCH_AGAINST(p.name) AGAINST (:simple_words_string IN BOOLEAN MODE) > 2
-                OR MATCH_AGAINST(p.description) AGAINST (:simple_words_string IN BOOLEAN MODE) > 2
-                ')
-                ->setParameter('simple_words_string', $simple_words_string)
             ;
         }
 
@@ -247,10 +350,13 @@ class ProjectRepository extends ServiceEntityRepository
                 ;
         }
 
+        if (isset($scoreTotalAvailable)) {
+            $qb->orderBy('score_total', 'DESC');
+        }
         if ($orderBy !== null) {
             $qb->addOrderBy($orderBy['sort'], $orderBy['order']);
         }
-
+        
         if ($limit !== null) {
             $qb->setMaxResults($limit);
         }

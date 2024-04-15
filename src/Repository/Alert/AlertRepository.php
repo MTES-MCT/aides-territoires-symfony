@@ -44,6 +44,29 @@ class AlertRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult();
     }
 
+    public function findToSendDaily(array $params = null) : array {
+        $yesterday = new \DateTime(date('Y-m-d', strtotime('-1 day')));
+
+        $params['dateLatestAlertMin'] = $yesterday;
+        $params['hasQueryString'] = true;
+        $params['alertFrequency'] = Alert::FREQUENCY_DAILY_SLUG;
+        $qb = $this->getQueryBuilder($params);
+
+        return $qb->getQuery()->getResult();
+    }
+
+    public function findToSendWeekly(array $params = null) : array {
+        $yesterday = new \DateTime(date('Y-m-d', strtotime('-7 day')));
+
+        $params['dateLatestAlertMin'] = $yesterday;
+        $params['hasQueryString'] = true;
+        $params['alertFrequency'] = Alert::FREQUENCY_WEEKLY_SLUG;
+        
+        $qb = $this->getQueryBuilder($params);
+
+        return $qb->getQuery()->getResult();
+    }
+
     public function  getQueryBuilder(array $params = null) : QueryBuilder
     {
         $dailyMinDate = $params['dailyMinDate'] ?? null;
@@ -51,15 +74,23 @@ class AlertRepository extends ServiceEntityRepository
         $dateCreateMin = $params['dateCreateMin'] ?? null;
         $dateCreateMax = $params['dateCreateMax'] ?? null;
         $hasQueryString = $params['hasQueryString'] ?? null;
-        
+        $dateLatestAlertMin = $params['dateLatestAlertMin'] ?? null;
+        $alertFrequency = $params['alertFrequency'] ?? null;
+
         $email = $params['email'] ?? null;
 
         $qb = $this->createQueryBuilder('a');
         
+        if ($alertFrequency !== null) {
+            $qb
+                ->andWhere('a.alertFrequency = :alertFrequency')
+                ->setParameter('alertFrequency', $alertFrequency)
+                ;
+        }
+
         if ($hasQueryString) {
             $qb
-                ->andWhere('a.queryString IS NOT NULL')
-                ->andWhere('a.queryString !== ""')
+                ->andWhere('a.querystring IS NOT NULL AND a.querystring <> \'\'')
                 ;
         }
         if ($email !== null)
@@ -84,6 +115,12 @@ class AlertRepository extends ServiceEntityRepository
             ;
         }
 
+        if ($dateLatestAlertMin instanceof \DateTime) {
+            $qb
+            ->andWhere('a.dateLatestAlert >= :dateLatestAlertMin OR a.dateLatestAlert IS NULL')
+            ->setParameter('dateLatestAlertMin', $dateLatestAlertMin)
+            ;
+        }
 
         if ($dailyMinDate instanceof \DateTime && $weeklyMinDate instanceof \DateTime) {
             $qb
