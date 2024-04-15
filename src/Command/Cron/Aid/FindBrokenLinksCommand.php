@@ -50,7 +50,7 @@ class FindBrokenLinksCommand extends Command
         $io->title($this->commandTextStart);
 
         try  {
-            if (!$this->kernelInterface->getEnvironment() != 'prod') {
+            if ($this->kernelInterface->getEnvironment() != 'prod') {
                 $io->info('Uniquement en prod');
                 return Command::FAILURE;
             }
