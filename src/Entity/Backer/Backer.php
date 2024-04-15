@@ -578,9 +578,6 @@ class Backer
 
     private ?array $aidsTechnical = [];
 
-    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
-    private ?\DateTimeInterface $timeUpdate = null;
-
     #[ORM\Column(nullable: true)]
     private ?int $nbAids = null;
 
