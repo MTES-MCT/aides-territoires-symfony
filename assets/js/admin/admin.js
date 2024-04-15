@@ -15,6 +15,7 @@ import Routing from 'fos-router';
 // plugin chartJS
 // import { Chart, registerables } from 'chart.js';
 import annotationPlugin from 'chartjs-plugin-annotation';
+import { trumbowyg } from 'jquery';
 document.addEventListener('chartjs:init', function (event) {
     const Chart = event.detail.Chart;
     Chart.register(annotationPlugin);
@@ -86,7 +87,7 @@ $(function(){
 function launchTrumbowyg()
 {
 // wysiwyg
-$('textarea:not(.trumbowyg-textarea)').trumbowyg({
+$('textarea:not(.trumbowyg-textarea):not(.not-trumbowyg)').trumbowyg({
     svgPath: '/build/trumbowyg/icons.svg',
     lang: 'fr',
     btnsDef: {
