@@ -82,7 +82,7 @@ class AidSearchTypeV2 extends AbstractType
             ])
             ->add('keyword', TextType::class, [
                 'required' => false,
-                'label' => 'Mot-clés',
+                'label' => 'Projet référent ou Mot-clés',
                 'attr' => [
                     'data-controller' => 'custom-autocomplete',
                     'placeholder' => 'Projet référent ou mot-clé'
