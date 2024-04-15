@@ -111,6 +111,7 @@ class KeywordReferenceRepository extends ServiceEntityRepository
         
         return $qb;
     }
+
 	public function getAllSynonyms($searchText)
 	{
         $sql="SELECT distinct(k.name),k.intention

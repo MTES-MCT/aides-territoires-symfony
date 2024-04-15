@@ -10,10 +10,12 @@ use App\Form\Reference\ProjectReferenceSearchType;
 use App\Repository\Aid\AidRepository;
 use App\Repository\Project\ProjectRepository;
 use App\Repository\Project\ProjectValidatedRepository;
+use App\Repository\Reference\KeywordReferenceRepository;
 use App\Repository\Reference\ProjectReferenceRepository;
 use App\Service\Aid\AidService;
 use App\Service\Reference\ReferenceService;
 use App\Service\Various\StringService;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Persistence\ManagerRegistry;
 use Pagerfanta\Adapter\ArrayAdapter;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -366,11 +368,13 @@ class ProjectReferenceController extends FrontController
     #[Route('/projets-references/ajax-ux-autocomplete/', name: 'app_project_reference_ajax_ux_autocomplete')]
     public function ajaxUxAutocomplete(
         ProjectReferenceRepository $projectReferenceRepository,
+        KeywordReferenceRepository $keywordReferenceRepository,
         RequestStack $requestStack
     ): JsonResponse
     {
         $query = $requestStack->getCurrentRequest()->get('query', null);
 
+        // recherche les projets référents correspondants
         $projectReferences = $projectReferenceRepository->findCustom([
             'nameLike' => $query,
             'orderBy' => [
@@ -383,9 +387,33 @@ class ProjectReferenceController extends FrontController
         foreach ($projectReferences as $projectReference) {
             $results[] = [
                 'value' => $projectReference->getName(),
-                'text' => $projectReference->getName()
+                'text' => '(PR) '.$projectReference->getName()
             ];
         }
+
+        // recherche les mots clés référents correspondants
+        $keywordReferences = $keywordReferenceRepository->findCustom([
+            'nameLike' => $query,
+            'orderBy' => [
+                'sort' => 'kr.name',
+                'order' => 'ASC'
+            ]
+        ]);
+        $parents = new ArrayCollection();
+        foreach ($keywordReferences as $keywordReference) {
+            if (!$parents->contains($keywordReference->getParent())) {
+                $parents->add($keywordReference->getParent());
+            }
+        }
+        foreach ($parents as $parent) {
+            if ($parent) {
+                $results[] = [
+                    'value' => $parent->getName(),
+                    'text' => '(MC) '.$parent->getName(). ' et synonymes'
+                ];
+            }
+        }
+
         $return = [
             'results' => $results
         ];
