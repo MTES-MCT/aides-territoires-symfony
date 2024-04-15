@@ -16,6 +16,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\HtmlSanitizer\HtmlSanitizerInterface;
+use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 #[AsCommand(name: 'at:import_flux:generic', description: 'Import de flux générique, à étendre à chaque nouveau flux')]
@@ -42,6 +43,7 @@ class ImportFluxCommand extends Command
     protected \DateTime $dateImportStart;
 
     public function __construct(
+        protected KernelInterface $kernelInterface,
         protected ManagerRegistry $managerRegistry,
         protected EmailService $emailService,
         protected ParamService $paramService,
@@ -70,6 +72,11 @@ class ImportFluxCommand extends Command
 
         $io = new SymfonyStyle($input, $output);
         $io->title($this->commandTextStart);
+
+        if (!$this->kernelInterface->getEnvironment() != 'prod') {
+            $io->info('Uniquement en prod');
+            return Command::FAILURE;
+        }
 
         try  {
             // set la dataSource
