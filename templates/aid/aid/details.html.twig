@@ -186,53 +186,44 @@
             </div>
             {% endif %}
 
-            {# {% if aid.subventionRateMin or aid.subventionRateMax %}
-                <h3 class="fr-mb-1w fr-mt-3w fr-text--lg at-text--bold at-uppercase">
-                    <span class="ri-percent-line ri-xl at-color--blue at-icon-align--sub fr-mr-1w" aria-hidden="true"></span>
-                    Taux de subvention
-                </h3>
-                <ul class="fr-p-0">
-                    {% if aid.subventionRateMin %}
-                        <li class="fr-list__none"><strong>Min :</strong> {{ aid.subventionRateMin }}%</li>
-                    {% endif %}
-                    {% if aid.subventionRateMax %}
-                        <li class="fr-list__none"><strong>Max :</strong> {{ aid.subventionRateMax }}%</li>
-                    {% endif %}
-                </ul>
-            {% endif %} #}
-
             {% if aid.aidTypes|length > 0 %}
-            <div class="aid-type fr-grid-row fr-mb-4w">
-                <div class="fr-col-1">
-                    <span class="ri-hand-coin-line ri-xl" aria-hidden="true"></span>
-                </div>
-                <div class="fr-col-11">
-                    <h2 class="fr-text--md fr-text--normal fr-mb-0 fr-ml-1w">
-                        {% for aidType in aid.aidTypes %}
-                            {% if aidType.slug == constant('App\\Entity\\Aid\\AidType::SLUG_GRANT') %}
-                                <strong>Subvention</strong> 
-                                {% if aid.subventionRateMin and aid.subventionRateMax %}
-                                (min : {{ aid.subventionRateMin }}% - max : {{ aid.subventionRateMax }}%)
-                                {% elseif aid.subventionRateMin and not aid.subventionRateMax %}
-                                (min : {{ aid.subventionRateMin }}%)
-                                {% elseif not aid.subventionRateMin and aid.subventionRateMax %}
-                                (max : {{ aid.subventionRateMax }}%)
-                                {% endif %}
-                                {% if aid.subventionComment %}
-                                <br />
-                                {{ aid.subventionComment }}
-                                {% endif %}
-                                <br />
-                            {% elseif aidType.slug == constant('App\\Entity\\Aid\\AidType::SLUG_RECOVERABLE_ADVANCE') %}
-                                <strong>Avance récupérable</strong> {% if aid.recoverableAdvanceAmount %} (jusqu'à {{ aid.recoverableAdvanceAmount }} €){% endif %}<br />
-                            {% elseif aidType.slug == constant('App\\Entity\\Aid\\AidType::SLUG_LOAN') %}
-                                <strong>Prêt</strong> {% if aid.loanAmount %} (jusqu'à {{ aid.loanAmount }} €){% endif %}<br />
-                            {% elseif aidType.slug == constant('App\\Entity\\Aid\\AidType::SLUG_OTHER') %}
-                                <strong>Autre aide financière</strong> {% if aid.otherFinancialAidComment %} {{ aid.otherFinancialAidComment }}{% endif %}<br />                        
-                            {% endif %}
-                        {% endfor %}
-                    </h2>
-                </div>
+            <div class="aid-type fr-mb-4w">
+                {% for aidType in aid.aidTypes %}
+                    <div class="fr-grid-row fr-mb-2w">
+                        <div class="fr-col-1">
+                            <span class="ri-hand-coin-line ri-xl" aria-hidden="true"></span>
+                        </div>
+                        <div class="fr-col-11">
+                            <h2 class="fr-text--md fr-text--normal fr-mb-0 fr-ml-1w">
+                                
+                                    {% if aidType.slug == constant('App\\Entity\\Aid\\AidType::SLUG_GRANT') %}
+                                        <strong>Subvention</strong> 
+                                        {% if aid.subventionRateMin and aid.subventionRateMax %}
+                                        (min : {{ aid.subventionRateMin }}% - max : {{ aid.subventionRateMax }}%)
+                                        {% elseif aid.subventionRateMin and not aid.subventionRateMax %}
+                                        (min : {{ aid.subventionRateMin }}%)
+                                        {% elseif not aid.subventionRateMin and aid.subventionRateMax %}
+                                        (max : {{ aid.subventionRateMax }}%)
+                                        {% endif %}
+                                        {% if aid.subventionComment %}
+                                        <br />
+                                        {{ aid.subventionComment }}
+                                        {% endif %}
+                                        <br />
+                                    {% elseif aidType.slug == constant('App\\Entity\\Aid\\AidType::SLUG_RECOVERABLE_ADVANCE') %}
+                                        <strong>Avance récupérable</strong> {% if aid.recoverableAdvanceAmount %} (jusqu'à {{ aid.recoverableAdvanceAmount }} €){% endif %}<br />
+                                    {% elseif aidType.slug == constant('App\\Entity\\Aid\\AidType::SLUG_LOAN') %}
+                                        <strong>Prêt</strong> {% if aid.loanAmount %} (jusqu'à {{ aid.loanAmount }} €){% endif %}<br />
+                                    {% elseif aidType.slug == constant('App\\Entity\\Aid\\AidType::SLUG_OTHER') %}
+                                        <strong>Autre aide financière</strong> {% if aid.otherFinancialAidComment %} {{ aid.otherFinancialAidComment }}{% endif %}<br />                        
+                                    {% else %}
+                                        <strong>{{ aidType.name }}</strong><br />
+                                    {% endif %}
+                                
+                            </h2>
+                        </div>
+                    </div>
+                {% endfor %}
             </div>
             {% endif %}
 
@@ -373,38 +364,10 @@
                         <h2 class="fr-text--md fr-text--normal fr-ml-1w">
                             <strong>Mot(s)-clé(s) :</strong>
                         </h2>
-                        <div class="fr-list__none fr-mb-4w">
+                        <div class="fr-list__none">
                             {% for keyword in aid.keywordReferences %}
 
                             {% set aidUrlParams = {'text': keyword.name} %}
-                            
-                            {% if app.user %}
-                                {% set userSearchPreferences = app.user.getSearchPreferencesString() %}
-                                {% if userSearchPreferences.target_audiences is defined %}
-                                    {% set aidUrlParams = aidUrlParams|merge({'target_audiences': userSearchPreferences.target_audiences}) %}
-                                {% endif %}
-                                {% if userSearchPreferences.perimeter is defined %}
-                                    {% set aidUrlParams = aidUrlParams|merge({'perimeter': userSearchPreferences.perimeter}) %}
-                                {% endif %}
-                            {% endif %}
-                            <a href="{{ path('app_aid_aid', aidUrlParams) }}" class="fr-tag fr-mb-1w" title="Lancer une recherche avec le mot-clé « {{ keyword.name }} »">{{ keyword.name }}</a>
-                            {% endfor %}
-                        </div>
-                    </div>
-                </div>
-                {% elseif aid.categories|length > 0 %}
-                <div class="fr-mb-4w fr-grid-row">
-                    <div class="fr-col-1">
-                        <span class="ri-double-quotes-r ri-xl"></span>
-                    </div>
-                    <div class="fr-col-11" id="logos-programs">
-                        <h2 class="fr-text--md fr-text--normal fr-ml-1w">
-                            <strong>Mot(s)-clé(s) :</strong>
-                        </h2>
-                        <div class="fr-list__none fr-mb-4w">
-                            {% for keyword in aid.categories %}
-
-                            {% set aidUrlParams = {'categorysearch[]': keyword.id} %}
                             
                             {% if app.user %}
                                 {% set userSearchPreferences = app.user.getSearchPreferencesString() %}
@@ -429,10 +392,40 @@
                         <h2 class="fr-text--md fr-text--normal fr-ml-1w">
                             <strong>Mot(s)-clé(s) :</strong>
                         </h2>
-                        <div class="fr-list__none fr-mb-4w">
+                        <div class="fr-list__none">
                             {% for keyword in aid.keywords %}
 
                             {% set aidUrlParams = {'text': keyword.name} %}
+                            
+                            {% if app.user %}
+                                {% set userSearchPreferences = app.user.getSearchPreferencesString() %}
+                                {% if userSearchPreferences.target_audiences is defined %}
+                                    {% set aidUrlParams = aidUrlParams|merge({'target_audiences': userSearchPreferences.target_audiences}) %}
+                                {% endif %}
+                                {% if userSearchPreferences.perimeter is defined %}
+                                    {% set aidUrlParams = aidUrlParams|merge({'perimeter': userSearchPreferences.perimeter}) %}
+                                {% endif %}
+                            {% endif %}
+                            <a href="{{ path('app_aid_aid', aidUrlParams) }}" class="fr-tag fr-mb-1w" title="Lancer une recherche avec le mot-clé « {{ keyword.name }} »">{{ keyword.name }}</a>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+
+            {% if aid.categories|length > 0 %}
+                <div class="fr-mb-4w fr-grid-row">
+                    <div class="fr-col-1">
+                        <span class="ri-double-quotes-r ri-xl"></span>
+                    </div>
+                    <div class="fr-col-11" id="logos-programs">
+                        <h2 class="fr-text--md fr-text--normal fr-ml-1w">
+                            <strong>Thématiques :</strong>
+                        </h2>
+                        <div class="fr-list__none">
+                            {% for keyword in aid.categories %}
+
+                            {% set aidUrlParams = {'categorysearch[]': keyword.id} %}
                             
                             {% if app.user %}
                                 {% set userSearchPreferences = app.user.getSearchPreferencesString() %}
