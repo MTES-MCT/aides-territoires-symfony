@@ -871,8 +871,10 @@ class Backer
     public function setUsefulLinks(?string $usefulLinks): static
     {
         $this->usefulLinks = $usefulLinks;
+        
+        return $this;
     }
-  
+
     public function getNbAidsLive(): ?int
     {
         return $this->nbAidsLive;
