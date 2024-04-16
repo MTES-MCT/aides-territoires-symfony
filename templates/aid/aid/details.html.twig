@@ -468,12 +468,15 @@
                     {% endif %}
                     {% if aid.originUrl %}
                         <li>
-                            <a class="fr-btn fr-btn--secondary" id="origin_url_btn" target="_blank" rel="noopener" title="Lien vers plus d’informations - ouvre une nouvelle fenêtre" href="{{ aid.originUrl }}">
-                                {% if aid.programs[0] is defined and aid.programs[0].slug == "fonds-vert" and aid.originUrl|split('.')|last == ".pdf" %}
-                                Cahier d’accompagnement
-                                {% else %}
-                                {% if aid.originUrlText %}{{ aid.originUrlText }}{% else %}Plus d’informations{% endif %}
+                            {% set defaultOriginUrlText = 'Plus d’informations' %}
+                            {% for program in aid.programs %}
+                                {% if program.slug == 'fonds-vert' and aid.originUrl|split('.')|last == 'pdf' %}
+                                    {% set defaultOriginUrlText = 'Cahier d’accompagnement' %}
                                 {% endif %}
+                            {% endfor %}
+                            {% set currentOriginUrlText = aid.originUrlText ?? defaultOriginUrlText %}
+                            <a class="fr-btn fr-btn--secondary" id="origin_url_btn" target="_blank" rel="noopener" title="Lien vers {{ currentOriginUrlText }} - ouvre une nouvelle fenêtre" href="{{ aid.originUrl }}">
+                                {{ currentOriginUrlText }}
                             </a>
                         </li>
                     {% endif %}
@@ -625,12 +628,15 @@
                     <ul class="fr-btns-group fr-btns-group--inline-md fr-btns-group--right">
                         {% if aid.originUrl %}
                             <li>
-                                <a class="fr-btn fr-btn--secondary" id="origin_url_btn" target="_blank" rel="noopener" title="Lien vers plus d’informations - ouvre une nouvelle fenêtre" href="{{ aid.originUrl }}">
-                                    {% if aid.programs[0] is defined and aid.programs[0].slug == "fonds-vert" and aid.originUrl|split('.')|last == ".pdf" %}
-                                    Cahier d’accompagnement
-                                    {% else %}
-                                    {% if aid.originUrlText %}{{ aid.originUrlText }}{% else %}Plus d’informations{% endif %}
+                                {% set defaultOriginUrlText = 'Plus d’informations' %}
+                                {% for program in aid.programs %}
+                                    {% if program.slug == 'fonds-vert' and aid.originUrl|split('.')|last == 'pdf' %}
+                                        {% set defaultOriginUrlText = 'Cahier d’accompagnement' %}
                                     {% endif %}
+                                {% endfor %}
+                                {% set currentOriginUrlText = aid.originUrlText ?? defaultOriginUrlText %}
+                                <a class="fr-btn fr-btn--secondary" id="origin_url_btn" target="_blank" rel="noopener" title="Lien vers {{ currentOriginUrlText }} - ouvre une nouvelle fenêtre" href="{{ aid.originUrl }}">
+                                    {{ currentOriginUrlText }}
                                 </a>
                             </li>
                         {% endif %}
