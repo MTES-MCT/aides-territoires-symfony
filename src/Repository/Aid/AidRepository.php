@@ -451,10 +451,11 @@ class AidRepository extends ServiceEntityRepository
         }
 
         if (isset($synonyms)) {
-            $originalName = (isset($synonyms['original_name']) && trim($synonyms['original_name']) !== '')  ? $synonyms['original_name'] : null;
-            $intentionsString = (isset($synonyms['intentions_string']) && trim($synonyms['intentions_string']) !== '')  ? $synonyms['intentions_string'] : null;
-            $objectsString = (isset($synonyms['objects_string']) && trim($synonyms['objects_string']) !== '')  ? $synonyms['objects_string'] : null;
-            $simpleWordsString = (isset($synonyms['simple_words_string']) && trim($synonyms['simple_words_string']) !== '')  ? $synonyms['simple_words_string'] : null;
+            $forbiddenChars = ['@'];
+            $originalName = (isset($synonyms['original_name']) && str_replace($forbiddenChars, [''], trim($synonyms['original_name'])) !== '')  ? str_replace($forbiddenChars, [''], trim($synonyms['original_name'])) : null;
+            $intentionsString = (isset($synonyms['intentions_string']) && str_replace($forbiddenChars, [''], trim($synonyms['intentions_string'])) !== '')  ? str_replace($forbiddenChars, [''], trim($synonyms['intentions_string'])) : null;
+            $objectsString = (isset($synonyms['objects_string']) && str_replace($forbiddenChars, [''], trim($synonyms['objects_string'])) !== '')  ? str_replace($forbiddenChars, [''], trim($synonyms['objects_string'])) : null;
+            $simpleWordsString = (isset($synonyms['simple_words_string']) && str_replace($forbiddenChars, [''], trim($synonyms['simple_words_string'])) !== '')  ? str_replace($forbiddenChars, [''], trim($synonyms['simple_words_string'])) : null;
             $oldKeywordsString = '';
 
             if ($originalName) {
