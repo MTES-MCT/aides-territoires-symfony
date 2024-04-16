@@ -25,9 +25,13 @@ class KeywordReferenceService
             return $keyword;
         }
 
-        $return = $keywordReference->getName();
-        foreach ($keywordReference->getKeywordReferences() as $synonym) {
-            if ($synonym->getName() !== $keywordReference->getName()) {
+        if (!$keywordReference->getParent()) {
+            return $keywordReference->getName();
+        }
+
+        $return = $keywordReference->getParent()->getName();
+        foreach ($keywordReference->getParent()->getKeywordReferences() as $synonym) {
+            if ($synonym->getName() !== $keywordReference->getParent()->getName()) {
                 $return .= ', ' . $synonym->getName();
             }
         }

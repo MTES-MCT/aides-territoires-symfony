@@ -387,7 +387,7 @@ class ProjectReferenceController extends FrontController
         foreach ($projectReferences as $projectReference) {
             $results[] = [
                 'value' => $projectReference->getName(),
-                'text' => '(PR) '.$projectReference->getName()
+                'text' => $projectReference->getName()
             ];
         }
 
@@ -399,6 +399,7 @@ class ProjectReferenceController extends FrontController
                 'order' => 'ASC'
             ]
         ]);
+
         $parents = new ArrayCollection();
         foreach ($keywordReferences as $keywordReference) {
             if (!$parents->contains($keywordReference->getParent())) {
@@ -407,9 +408,14 @@ class ProjectReferenceController extends FrontController
         }
         foreach ($parents as $parent) {
             if ($parent) {
+                if ($parent->getName() != $query) {
+                    $text = $parent->getName(). ', '.$query.' et synonymes';
+                } else {
+                    $text = $parent->getName(). ' et synonymes';
+                }
                 $results[] = [
                     'value' => $parent->getName(),
-                    'text' => '(MC) '.$parent->getName(). ' et synonymes'
+                    'text' => $text
                 ];
             }
         }
