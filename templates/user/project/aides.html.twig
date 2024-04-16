@@ -157,14 +157,20 @@
 
                     <div class="fr-alert fr-alert--info fr-alert--sm fr-mt-5w">
                         <h3 class="fr-h6 _fr-mt-1w">Découvrez toutes vos opportunités 🌟</h3>
-                        {# <p>Si nous avons sélectionné pour vous des aides spécifiques, n'oubliez pas que d'autres opportunités pourraient vous attendre dans notre base de données. Chaque projet est unique, et une aide insoupçonnée pourrait être la clé de votre réussite.</p> #}
                         <p>Si vous avez sélectionné des aides spécifiques, n'oubliez pas que d'autres opportunités pourraient vous attendre dans notre base de données. Chaque projet est unique, et une aide insoupçonnée pourrait être la clé de votre réussite.</p>
                         <div class="fr-mt-2w fr-mb-2w">
                             {% if project.projectReference %}
-                            <a class="fr-btn fr-fi-search-line fr-btn--icon-left" href="{{ path('app_aid_aid', {'keyword': project.projectReference.name}) }}" title="Trouver des aides">Explorer toutes les aides</a>
+                                {% set aidsUrlParams = {'keyword': project.projectReference.name} %}
                             {% else %}
-                            <a class="fr-btn fr-fi-search-line fr-btn--icon-left" href="{{ path('app_aid_aid', {'keyword': project.name}) }}" title="Trouver des aides">Explorer toutes les aides</a>
+                                {% set aidsUrlParams = {'keyword': project.name} %}
                             {% endif %}
+                            {% if project.organization and project.organization.perimeter %}
+                                {% set aidsUrlParams = aidsUrlParams|merge({'searchPerimeter': project.organization.perimeter.id}) %}
+                            {% endif %}
+                            {% if project.organization and project.organization.organizationType %}
+                                {% set aidsUrlParams = aidsUrlParams|merge({'organizationType': project.organization.organizationType.slug}) %}
+                            {% endif %}
+                            <a class="fr-btn fr-fi-search-line fr-btn--icon-left" href="{{ path('app_aid_aid', aidsUrlParams) }}" title="Trouver des aides">Explorer toutes les aides</a>
                         </div>
                     </div>
                 </div>
