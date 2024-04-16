@@ -360,23 +360,8 @@ class AidCrudController extends AtCrudController
         ->setColumns(12);
 
         //-------------------------------------------------------
-        yield FormField::addTab('Descriptions');
-
-
-        yield FormField::addFieldset('Description de l’aide');
-
-
-        yield TrumbowygField::new('description', 'Description complète de l’aide et de ses objectifs')
-        ->hideOnIndex()
-        ->setColumns(12);
-        yield TrumbowygField::new('projectExamples', 'Exemples d’applications ou de projets réalisés grâce à cette aide')
-        ->setHelp('Afin d’aider les territoires à mieux comprendre votre aide, donnez ici quelques exemples concrets de projets réalisables ou réalisés.')
-        ->hideOnIndex()
-        ->setColumns(12);
-        yield TrumbowygField::new('eligibility', 'Conditions d’éligibilité')
-        ->hideOnIndex()
-        ->setColumns(12);
-
+        yield FormField::addTab('Contacts');
+        
         yield FormField::addFieldset('Contact et démarches');
         yield UrlField::new('originUrl', 'Plus d’informations')
         ->hideOnIndex()
@@ -399,6 +384,26 @@ class AidCrudController extends AtCrudController
         ->setHelp('N’hésitez pas à ajouter plusieurs contacts')
         ->hideOnIndex()
         ->setColumns(12);
+        
+        //-------------------------------------------------------
+        yield FormField::addTab('Descriptions');
+
+
+        yield FormField::addFieldset('Description de l’aide');
+
+
+        yield TrumbowygField::new('description', 'Description complète de l’aide et de ses objectifs')
+        ->hideOnIndex()
+        ->setColumns(12);
+        yield TrumbowygField::new('projectExamples', 'Exemples d’applications ou de projets réalisés grâce à cette aide')
+        ->setHelp('Afin d’aider les territoires à mieux comprendre votre aide, donnez ici quelques exemples concrets de projets réalisables ou réalisés.')
+        ->hideOnIndex()
+        ->setColumns(12);
+        yield TrumbowygField::new('eligibility', 'Conditions d’éligibilité')
+        ->hideOnIndex()
+        ->setColumns(12);
+
+
         yield TextField::new('contactPhone', 'Numéro de téléphone')
         ->hideOnIndex()
         ->setColumns(12);
