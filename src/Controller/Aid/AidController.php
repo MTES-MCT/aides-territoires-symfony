@@ -320,7 +320,8 @@ class AidController extends FrontController
     public function genericToLocal(
         $slug,
         AidRepository $aidRepository,
-        UserService $userService
+        UserService $userService,
+        AidService $aidService
     ): Response
     {
         // charge l'aide et verifie qu'elle soit générique
@@ -340,117 +341,8 @@ class AidController extends FrontController
             return $this->redirect($aid->getUrl());
         }
 
-        // duplique l'aide en aide locale
-        $newAid = new Aid();
-        $newAid->setName($aid->getName());
-        // le slug est automatique
-        $newAid->setDescription($aid->getDescription());
-        $newAid->setStatus(Aid::STATUS_DRAFT);
-        $newAid->setOriginUrl($aid->getOriginUrl());
-        foreach ($aid->getAidAudiences() as $aidAudience) {
-            $newAid->addAidAudience($aidAudience);
-        }
-        foreach ($aid->getAidTypes() as $aidType) {
-            $newAid->addAidType($aidType);
-        }
-        foreach ($aid->getAidDestinations() as $aidDestination) {
-            $newAid->addAidDestination($aidDestination);
-        }
-        $newAid->setDateStart($aid->getDateStart());
-        $newAid->setDatePredeposit($aid->getDatePredeposit());
-        $newAid->setDateSubmissionDeadline($aid->getDateSubmissionDeadline());
-        $newAid->setContactEmail($aid->getContactEmail());
-        $newAid->setContactPhone($aid->getContactPhone());
-        $newAid->setContactDetail($aid->getContactDetail());
-        $newAid->setAuthor($user);
-        foreach ($aid->getAidSteps() as $aidStep) {
-            $newAid->addAidStep($aidStep);
-        }
-        $newAid->setEligibility($aid->getEligibility());
-        $newAid->setAidRecurrence($aid->getAidRecurrence());
-        $newAid->setPerimeter($aid->getPerimeter());
-        $newAid->setApplicationUrl($aid->getApplicationUrl());
-        // foce à false
-        $newAid->setIsImported(false);
-        // force a null
-        $newAid->setImportUniqueid(null);
-        $newAid->setFinancerSuggestion($aid->getFinancerSuggestion());
-        $newAid->setImportDataUrl($aid->getImportDataUrl());
-        $newAid->setDateImportLastAccess($aid->getDateImportLastAccess());
-        $newAid->setImportShareLicence($aid->getImportShareLicence());
-        $newAid->setIsCallForProject($aid->isIsCallForProject());
-        $newAid->setAmendedAid($aid->getAmendedAid());
-        $newAid->setIsAmendment($aid->isIsAmendment());
-        $newAid->setAmendmentAuthorName($aid->getAmendmentAuthorName());
-        $newAid->setAmendmentComment($aid->getAmendmentComment());
-        $newAid->setAmendmentAuthorEmail($aid->getAmendmentAuthorEmail());
-        $newAid->setAmendmentAuthorOrg($aid->getAmendmentAuthorOrg());
-        $newAid->setSubventionRateMin($aid->getSubventionRateMin());
-        $newAid->setSubventionRateMax($aid->getSubventionRateMax());
-        $newAid->setSubventionComment($aid->getSubventionComment());
-        $newAid->setContact($aid->getContact());
-        $newAid->setInstructorSuggestion($aid->getInstructorSuggestion());
-        $newAid->setProjectExamples($aid->getProjectExamples());
-        $newAid->setPerimeterSuggestion($aid->getPerimeterSuggestion());
-        $newAid->setShortTitle($aid->getShortTitle());
-        $newAid->setInFranceRelance($aid->isInFranceRelance());
-        $newAid->setGenericAid($aid->getGenericAid());
-        $newAid->setLocalCharacteristics($aid->getLocalCharacteristics());
-        $newAid->setImportDataSource($aid->getImportDataSource());
-        $newAid->setEligibilityTest($aid->getEligibilityTest());
-        $newAid->setIsGeneric(false);
-        $newAid->setImportRawObject($aid->getImportRawObject());
-        $newAid->setLoanAmount($aid->getLoanAmount());
-        $newAid->setOtherFinancialAidComment($aid->getOtherFinancialAidComment());
-        $newAid->setRecoverableAdvanceAmount($aid->getRecoverableAdvanceAmount());
-        $newAid->setNameInitial($aid->getNameInitial());
-        $newAid->setAuthorNotification($aid->isAuthorNotification());
-        $newAid->setImportRawObjectCalendar($aid->getImportRawObjectCalendar());
-        $newAid->setImportRawObjectTemp($aid->getImportRawObjectTemp());
-        $newAid->setImportRawObjectTempCalendar($aid->getImportRawObjectTempCalendar());
-        $newAid->setEuropeanAid($aid->getEuropeanAid());
-        $newAid->setImportDataMention($aid->getImportDataMention());
-        $newAid->setHasBrokenLink($aid->isHasBrokenLink());
-        $newAid->setIsCharged($aid->isIsCharged());
-        $newAid->setImportUpdated($aid->isImportUpdated());
-        $newAid->setDsId($aid->getDsId());
-        $newAid->setDsMapping($aid->getDsMapping());
-        $newAid->setDsSchemaExists($aid->isDsSchemaExists());
-        $newAid->setContactInfoUpdated($aid->isContactInfoUpdated());
-        // on ne reprends pas timePublished
-        foreach ($aid->getCategories() as $category) {
-            $newAid->addCategory($category);
-        }
-        foreach ($aid->getKeywords() as $keyWord) {
-            $newAid->addKeyword($keyWord);
-        }
-        foreach ($aid->getPrograms() as $program) {
-            $newAid->addProgram($program);
-        }
-        foreach ($aid->getAidFinancers() as $aidFinancer) {
-            $newAidFinancer = new AidFinancer();
-            $newAidFinancer->setBacker($aidFinancer->getBacker());
-            $newAidFinancer->setPosition($aidFinancer->getPosition());
-            $newAid->addAidFinancer($newAidFinancer);
-        }
-        foreach ($aid->getAidInstructors() as $aidInstructor) {
-            $newAidInstructor = new AidInstructor();
-            $newAidInstructor->setBacker($aidInstructor->getBacker());
-            $newAidInstructor->setPosition($aidInstructor->getPosition());
-            $newAid->addAidInstructor($newAidInstructor);
-        }
-        // on ne reprends pas aidProjects
-        // on ne reprends pas aidSuggestedAidProjects
-        foreach ($aid->getBundles() as $bundle) {
-            $newAid->addBundle($bundle);
-        }
-        foreach ($aid->getExcludedSearchPages() as $excludedSearchPage) {
-            $newAid->addExcludedSearchPage($excludedSearchPage);
-        }
-        foreach ($aid->getHighlightedSearchPages() as $highlitedSearchPage) {
-            $newAid->addHighlightedSearchPage($highlitedSearchPage);
-        }
-        // on ne reprends pas tous les logs
+        // duplique l'aide 
+        $newAid = $aidService->duplicateAid($aid, $user);
 
         // on met les infos de l'aide generic
         $newAid->setGenericAid($aid);

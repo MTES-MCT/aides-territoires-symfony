@@ -3,6 +3,8 @@
 namespace App\Service\Aid;
 
 use App\Entity\Aid\Aid;
+use App\Entity\Aid\AidFinancer;
+use App\Entity\Aid\AidInstructor;
 use App\Entity\Organization\Organization;
 use App\Entity\Organization\OrganizationType;
 use App\Entity\Perimeter\Perimeter;
@@ -28,6 +30,132 @@ class AidService
     )
     {
         
+    }
+
+    public function duplicateAid(?Aid $aid, ?User $user): Aid
+    {
+        if (!$aid instanceof Aid) {
+            return new Aid();
+        }
+
+        // nouvel auteur ou ancien
+        $aidUser = $user instanceof User ? $user : $aid->getAuthor();
+
+        $newAid = new Aid();
+        $newAid->setName($aid->getName());
+        // le slug est automatique
+        $newAid->setDescription($aid->getDescription());
+        $newAid->setStatus(Aid::STATUS_DRAFT);
+        $newAid->setOriginUrl($aid->getOriginUrl());
+        foreach ($aid->getAidAudiences() as $aidAudience) {
+            $newAid->addAidAudience($aidAudience);
+        }
+        foreach ($aid->getAidTypes() as $aidType) {
+            $newAid->addAidType($aidType);
+        }
+        foreach ($aid->getAidDestinations() as $aidDestination) {
+            $newAid->addAidDestination($aidDestination);
+        }
+        $newAid->setDateStart($aid->getDateStart());
+        $newAid->setDatePredeposit($aid->getDatePredeposit());
+        $newAid->setDateSubmissionDeadline($aid->getDateSubmissionDeadline());
+        $newAid->setContactEmail($aid->getContactEmail());
+        $newAid->setContactPhone($aid->getContactPhone());
+        $newAid->setContactDetail($aid->getContactDetail());
+        $newAid->setAuthor($aidUser);
+        foreach ($aid->getAidSteps() as $aidStep) {
+            $newAid->addAidStep($aidStep);
+        }
+        $newAid->setEligibility($aid->getEligibility());
+        $newAid->setAidRecurrence($aid->getAidRecurrence());
+        $newAid->setPerimeter($aid->getPerimeter());
+        $newAid->setApplicationUrl($aid->getApplicationUrl());
+        // foce à false
+        $newAid->setIsImported(false);
+        // force a null
+        $newAid->setImportUniqueid(null);
+        $newAid->setFinancerSuggestion($aid->getFinancerSuggestion());
+        $newAid->setImportDataUrl($aid->getImportDataUrl());
+        $newAid->setDateImportLastAccess($aid->getDateImportLastAccess());
+        $newAid->setImportShareLicence($aid->getImportShareLicence());
+        $newAid->setIsCallForProject($aid->isIsCallForProject());
+        $newAid->setAmendedAid($aid->getAmendedAid());
+        $newAid->setIsAmendment($aid->isIsAmendment());
+        $newAid->setAmendmentAuthorName($aid->getAmendmentAuthorName());
+        $newAid->setAmendmentComment($aid->getAmendmentComment());
+        $newAid->setAmendmentAuthorEmail($aid->getAmendmentAuthorEmail());
+        $newAid->setAmendmentAuthorOrg($aid->getAmendmentAuthorOrg());
+        $newAid->setSubventionRateMin($aid->getSubventionRateMin());
+        $newAid->setSubventionRateMax($aid->getSubventionRateMax());
+        $newAid->setSubventionComment($aid->getSubventionComment());
+        $newAid->setContact($aid->getContact());
+        $newAid->setInstructorSuggestion($aid->getInstructorSuggestion());
+        $newAid->setProjectExamples($aid->getProjectExamples());
+        $newAid->setPerimeterSuggestion($aid->getPerimeterSuggestion());
+        $newAid->setShortTitle($aid->getShortTitle());
+        $newAid->setInFranceRelance($aid->isInFranceRelance());
+        $newAid->setGenericAid($aid->getGenericAid());
+        $newAid->setLocalCharacteristics($aid->getLocalCharacteristics());
+        $newAid->setImportDataSource($aid->getImportDataSource());
+        $newAid->setEligibilityTest($aid->getEligibilityTest());
+        $newAid->setIsGeneric(false);
+        $newAid->setImportRawObject($aid->getImportRawObject());
+        $newAid->setLoanAmount($aid->getLoanAmount());
+        $newAid->setOtherFinancialAidComment($aid->getOtherFinancialAidComment());
+        $newAid->setRecoverableAdvanceAmount($aid->getRecoverableAdvanceAmount());
+        $newAid->setNameInitial($aid->getNameInitial());
+        $newAid->setAuthorNotification($aid->isAuthorNotification());
+        $newAid->setImportRawObjectCalendar($aid->getImportRawObjectCalendar());
+        $newAid->setImportRawObjectTemp($aid->getImportRawObjectTemp());
+        $newAid->setImportRawObjectTempCalendar($aid->getImportRawObjectTempCalendar());
+        $newAid->setEuropeanAid($aid->getEuropeanAid());
+        $newAid->setImportDataMention($aid->getImportDataMention());
+        $newAid->setHasBrokenLink($aid->isHasBrokenLink());
+        $newAid->setIsCharged($aid->isIsCharged());
+        $newAid->setImportUpdated($aid->isImportUpdated());
+        $newAid->setDsId($aid->getDsId());
+        $newAid->setDsMapping($aid->getDsMapping());
+        $newAid->setDsSchemaExists($aid->isDsSchemaExists());
+        $newAid->setContactInfoUpdated($aid->isContactInfoUpdated());
+        // on ne reprends pas timePublished
+        foreach ($aid->getCategories() as $category) {
+            $newAid->addCategory($category);
+        }
+        foreach ($aid->getProjectReferences() as $projectReference) {
+            $newAid->addProjectReference($projectReference);
+        }
+        foreach ($aid->getKeywords() as $keyWord) {
+            $newAid->addKeyword($keyWord);
+        }
+        foreach ($aid->getPrograms() as $program) {
+            $newAid->addProgram($program);
+        }
+        foreach ($aid->getAidFinancers() as $aidFinancer) {
+            $newAidFinancer = new AidFinancer();
+            $newAidFinancer->setBacker($aidFinancer->getBacker());
+            $newAidFinancer->setPosition($aidFinancer->getPosition());
+            $newAid->addAidFinancer($newAidFinancer);
+        }
+        foreach ($aid->getAidInstructors() as $aidInstructor) {
+            $newAidInstructor = new AidInstructor();
+            $newAidInstructor->setBacker($aidInstructor->getBacker());
+            $newAidInstructor->setPosition($aidInstructor->getPosition());
+            $newAid->addAidInstructor($newAidInstructor);
+        }
+        // on ne reprends pas aidProjects
+        // on ne reprends pas aidSuggestedAidProjects
+        foreach ($aid->getBundles() as $bundle) {
+            $newAid->addBundle($bundle);
+        }
+        foreach ($aid->getExcludedSearchPages() as $excludedSearchPage) {
+            $newAid->addExcludedSearchPage($excludedSearchPage);
+        }
+        foreach ($aid->getHighlightedSearchPages() as $highlitedSearchPage) {
+            $newAid->addHighlightedSearchPage($highlitedSearchPage);
+        }
+        // on ne reprends pas tous les logs
+
+        return $newAid;
     }
 
     public function canUserAccessStatsPage(?User $user, Aid $aid) : bool
