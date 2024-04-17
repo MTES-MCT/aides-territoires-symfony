@@ -623,6 +623,7 @@ class AidCrudController extends AtCrudController
         return parent::configureCrud($crud)
         ->overrideTemplate('crud/edit', 'admin/aid/edit.html.twig')  
         ->overrideTemplate('crud/index', 'admin/aid/index.html.twig')  
+        ->setPaginatorPageSize(50)
         ;
     }
 
