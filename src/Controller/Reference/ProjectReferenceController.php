@@ -393,7 +393,7 @@ class ProjectReferenceController extends FrontController
 
         // recherche les mots clés référents correspondants
         $keywordReferences = $keywordReferenceRepository->findCustom([
-            'nameLike' => $query,
+            'name' => $query,
             'orderBy' => [
                 'sort' => 'kr.name',
                 'order' => 'ASC'
