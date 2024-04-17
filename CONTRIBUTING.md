@@ -5,7 +5,7 @@
 Une documentation détaillée de l'installation en local est disponible sur [ONBOARDING.md](./ONBOARDING.md).
 
 ```
-git clone https://github.com/MTES-MCT/aides-territoires
+git clone https://github.com/MTES-MCT/aides-territoires-symfony
 cd aides-territoires
 ```
 
@@ -179,14 +179,7 @@ En staging et en production, les variables d'environments sont spécifiées dire
 
 ### Envoi d'email
 
-Les emails transactionnels sont envoyés via SendingBlue.
-Pour les environnements de Staging, il existe un mécanisme qui permet de n'envoyer les emails qu'à une liste restreinte d'adresses.
-Cette "Whitelist" est définie dans les `settings`.
-Pour connaître le fonctionnement historique de ce filtrage : https://github.com/MTES-MCT/aides-territoires/pull/399
-
-En local vous avez la possibilité de visualiser les emails dont le template n'est pas hébergé sur Brevo depuis le terminal. Pour ce faire la variable `EMAIL_BACKEND` doit être définie avec `django.core.mail.backends.console.EmailBackend` dans votre fichier `.env.local`
-
-Alternativement, définir la variable `EMAIL_BACKEND` à `emails.backends.WhitelistEmailBackend` permet d’envoyer les emails aux adresses définies dans la liste blanche `EMAIL_WHITELIST`.
+Les emails transactionnels sont envoyés via Brevo.
 
 ### Fichiers media
 
