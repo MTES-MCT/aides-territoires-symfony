@@ -40,11 +40,8 @@ global.launchTrumbowyg = function(elt)
         plugins: {
             // Image upload
             upload: {
-                serverPath: Routing.generate('app_admin_upload_image'),
+                serverPath: Routing.generate('app_upload_image'),
                 fileFieldName: 'image',
-                // headers: {
-                //     'Authorization': 'Client-ID xxxxxxxxxxxx'
-                // },
                 urlPropertyName: 'data.link'
             },
             // nettoyage texte word
