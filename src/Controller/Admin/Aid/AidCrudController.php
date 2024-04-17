@@ -8,6 +8,7 @@ use App\Controller\Admin\Filter\Aid\AidBackerFilter;
 use App\Controller\Admin\Filter\Aid\AidPerimeterFilter;
 use App\Controller\Admin\Filter\Aid\AidGenericFilter;
 use App\Controller\Admin\Filter\Aid\AidInstructorFilter;
+use App\Controller\Admin\Filter\Aid\AidReferenceSearchFilter;
 use App\Controller\Admin\Filter\Aid\AidStateFilter;
 use App\Entity\Aid\Aid;
 use App\Entity\Perimeter\Perimeter;
@@ -91,6 +92,7 @@ class AidCrudController extends AtCrudController
             ->add('categories')
             ->add('aidTypes')
             ->add('projectReferences')
+            ->add(AidReferenceSearchFilter::new('referenceSearch', 'Recherche de référence'))
             // most of the times there is no need to define the
             // filter type because EasyAdmin can guess it automatically
             // ->add(BooleanFilter::new('published'))
