@@ -67,9 +67,15 @@ class KeywordReferenceRepository extends ServiceEntityRepository
         $nameLike = $params['nameLike'] ?? null;
         $onlyParent = $params['onlyParent'] ?? false;
         $orderBy = (isset($params['orderBy']) && isset($params['orderBy']['sort']) && isset($params['orderBy']['order'])) ? $params['orderBy'] : null;
-        
+        $noIntention = $params['noIntention'] ?? null;
+
         $qb = $this->createQueryBuilder('kr');
 
+        if ($noIntention === true) {
+            $qb
+                ->andWhere('kr.intention = 0')
+                ;
+        }
         if ($nameLike !== null) {
             $qb->andWhere('kr.name LIKE :nameLike')
                 ->setParameter('nameLike', '%'.$nameLike.'%')
