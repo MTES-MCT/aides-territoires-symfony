@@ -131,7 +131,7 @@ class AidEditType extends AbstractType
                 }
             } else {
                 // si aide existante, on empêche de changer d'organisation pour une non valide
-                if ($organization->getId() === $aid->getOrganization()->getId()) {
+                if ($organization && $aid->getOrganization() && $organization->getId() === $aid->getOrganization()->getId()) {
                     return [];
                 } else if (!$organization->getBacker()) {
                     return ['disabled' => true];
