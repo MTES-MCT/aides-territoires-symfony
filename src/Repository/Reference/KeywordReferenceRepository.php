@@ -62,6 +62,7 @@ class KeywordReferenceRepository extends ServiceEntityRepository
     public function getQueryBuilder(?array $params = null) : QueryBuilder
     {
         $string = $params['string'] ?? null;
+        $name = $params['name'] ?? null;
         $names = $params['names'] ?? null;
         $words = $params['words'] ?? null;
         $nameLike = $params['nameLike'] ?? null;
@@ -76,6 +77,13 @@ class KeywordReferenceRepository extends ServiceEntityRepository
                 ->andWhere('kr.intention = 0')
                 ;
         }
+      
+        if ($name !== null) {
+            $qb->andWhere('kr.name = :name')
+            ->setParameter('name', $name)
+            ;
+        }
+      
         if ($nameLike !== null) {
             $qb->andWhere('kr.name LIKE :nameLike')
                 ->setParameter('nameLike', '%'.$nameLike.'%')
@@ -117,6 +125,7 @@ class KeywordReferenceRepository extends ServiceEntityRepository
         
         return $qb;
     }
+
 	public function getAllSynonyms($searchText)
 	{
         $sql="SELECT distinct(k.name),k.intention

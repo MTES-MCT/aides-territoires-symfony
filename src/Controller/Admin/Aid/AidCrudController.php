@@ -185,6 +185,27 @@ class AidCrudController extends AtCrudController
     {
         $entity = $this->getContext()->getEntity()->getInstance() ?? null;
 
+        //-------------------------------------------------------
+        yield FormField::addTab('Informations générales');
+
+        yield FormField::addFieldset('Statut');
+        $statusChoices = [];
+        foreach (Aid::STATUSES as $status) {
+            $statusChoices[$status['name']] = $status['slug'];
+        }
+        yield ChoiceField::new('status', 'Statut')
+        ->setChoices($statusChoices)
+        ->hideOnIndex()
+        ->setColumns(12);
+        yield TextField::new('status', 'Statut')
+        ->onlyOnIndex()
+        ->setColumns(12);
+        yield BooleanField::new('authorNotification', 'Envoyer un email à l’auteur de l’aide ?')
+        ->setHelp('Un email doit-il être envoyé à l’auteur de cette aide au moment de sa publication ?')
+        ->hideOnIndex()
+        ->setColumns(12);
+
+        yield FormField::addFieldset('Noms');
         yield IdField::new('id')->onlyOnIndex();
         yield TextLengthCountField::new('name', 'Nom')
         ->setHelp('Le titre doit commencer par un verbe à l’infinitif pour que l’objectif de l’aide soit explicite vis-à-vis de ses bénéficiaires.')
@@ -196,27 +217,13 @@ class AidCrudController extends AtCrudController
             ->hideOnIndex()
             ->setColumns(12)
         ;
-        yield BooleanField::new('inFranceRelance', 'France Relance')
-        ->setHelp('Cette aide est-elle éligible au programme France Relance ?')
-        ->hideOnIndex()
-        ->setColumns(12);
-        $europeanAidChoices = [];
-        foreach (Aid::LABELS_EUROPEAN as $slug => $name) {
-            $europeanAidChoices[$name] = $slug;
-        }
-        yield ChoiceField::new('europeanAid', 'Aide européenne ?')
-        ->setChoices($europeanAidChoices)
-        ->setHelp('* Les fonds structurels (FEDER, FSE+...) sont les aides gérées par les conseils régionaux.')
-        ->hideOnIndex()
-        ->setColumns(12);
         yield TextField::new('nameInitial', 'Nom initial')
         ->setHelp('Comment cette aide s’intitule-t-elle au sein de votre structure ? Exemple : AAP Mob’Biodiv')
         ->hideOnIndex()
         ->setColumns(12);
-        yield TextField::new('shortTitle', 'Titre du programme')
-        ->setFormTypeOption('attr', ['placeholder' => 'Ex: Appel à projet innovation continue'])
-        ->hideOnIndex()
-        ->setColumns(12);
+
+        yield FormField::addFieldset('Associations');
+
         yield AssociationField::new('categories', 'Thématiques')
         ->setFormTypeOption('choice_label', function($entity) {
             $return = '';
@@ -237,6 +244,7 @@ class AidCrudController extends AtCrudController
         ])
         ->hideOnIndex()
         ->setColumns(12);
+
         yield AssociationField::new('projectReferences', 'Projets référents')
         ->hideOnIndex();
         yield ArrayField::new('projectReferences', 'Projets référents')
@@ -253,7 +261,22 @@ class AidCrudController extends AtCrudController
         }, $value->toArray()));
         })
         ->onlyOnIndex();
-
+        yield AssociationField::new('keywordReferences', 'Mots clés références')
+        ->setFormTypeOptions([
+            'query_builder' => function (EntityRepository $er) {
+                return $er->createQueryBuilder('k')
+                ->orderBy('k.name', 'ASC');
+            },
+            'choice_label' => function ($entity) {
+                $label = $entity->getName();
+                if ($entity->getParent()) {
+                    $label .= ' ('.$entity->getParent()->getName().')';
+                }
+                return $label;
+            }
+        ])
+        ->hideOnIndex()
+        ->setColumns(12);
         yield AssociationField::new('aidAudiences', 'Bénéficiaires de l’aide')
         ->setFormTypeOption('choice_label', function($entity) {
             $return = '';
@@ -275,22 +298,150 @@ class AidCrudController extends AtCrudController
         ->hideOnIndex()
         ->setColumns(12)
         ;
-        yield AssociationField::new('author', 'Auteur')
-        ->autocomplete();
-        $nbAidsLive = 0;
-        if ($entity && $entity->getAuthor()) {
-            $nbAidsLive = $entity->getAuthor()->getNbAidsLive();
-        }
-        yield IntegerField::new('nbAidsLive', 'Du même auteur')
-        ->setHelp('Nb. d\'aides live créées par le même utilisateur')
+        yield AssociationField::new('programs', 'Programmes')
+        ->autocomplete()
+        ->hideOnIndex()
+        ->setColumns(12);
+        yield AssociationField::new('aidTypes', 'Types d\'aide')
+        ->setFormTypeOption('choice_label', function ($entity) {
+            $return = '';
+            if ($entity) {
+                if ($entity->getAidTypeGroup()) {
+                    $return .= $entity->getAidTypeGroup()->getName(). ' > ';
+                }
+                $return .= $entity->getName();
+            }
+            return $return;
+        })
         ->setFormTypeOptions([
-            'data' => $nbAidsLive,
-            'attr' => ['readonly' => true],
-            'mapped' => false
+            'query_builder' => function (EntityRepository $er) {
+                return $er->createQueryBuilder('at')
+                ->innerJoin('at.aidTypeGroup', 'aidTypeGroup')
+                ->orderBy('aidTypeGroup.name', 'ASC');
+            },
         ])
-        ->setColumns(12)
-        ->hideOnIndex();
+        ->setHelp('Précisez le ou les types de l’aide.')
+        ->hideOnIndex()
+        ->setColumns(12);
 
+                
+        yield AssociationField::new('aidSteps', 'État d’avancement du projet pour bénéficier du dispositif ')
+        ->hideOnIndex()
+        ->setColumns(12);
+        yield AssociationField::new('aidDestinations', 'Types de dépenses / actions couvertes')
+        ->setHelp('Obligatoire pour les aides financières')
+        ->hideOnIndex()
+        ->setColumns(12);
+
+
+        yield FormField::addFieldset('Périmètre de l’aide');
+        yield AssociationField::new('perimeter', 'Périmètre')
+        ->autocomplete()
+        ->setColumns(12)
+        ->formatValue(function ($value) {
+            /** @var Perimeter $value */
+            if ($value) {
+                $name = $value->getName();
+                if ($value->getScale() == Perimeter::SCALE_COUNTY) {
+                    $name .= ' (Département)';
+                } else if ($value->getScale() == Perimeter::SCALE_REGION) {
+                    $name .= ' (Région)';
+                } else if ($value->getScale() == Perimeter::SCALE_COMMUNE) {
+                    $name .= ' (Commune)';
+                } else if ($value->getScale() == Perimeter::SCALE_ADHOC) {
+                    $name .= ' (Adhoc)';
+                }
+                $display = strlen($name) < 20 ? $name : substr($name, 0, 20).'...';
+                return sprintf('<span title="%s">%s</span>', $name, $display);
+            } else {
+                return '';
+            }
+        })   
+        ;
+
+        yield TextField::new('perimeterSuggestion', 'Périmètre suggéré')
+        ->setHelp('Le contributeur suggère ce nouveau périmètre')
+        ->hideOnIndex()
+        ->setColumns(12);
+
+        //-------------------------------------------------------
+        yield FormField::addTab('Contacts');
+        
+        yield FormField::addFieldset('Contact et démarches');
+        yield UrlField::new('originUrl', 'Plus d’informations')
+        ->hideOnIndex()
+        ->setColumns(12);
+        yield TextField::new('originUrlText', 'Texte du bouton plus d’informations')
+        ->setHelp('Texte du bouton plus d’informations. Laisser vide pour utiliser le texte par défaut.')
+        ->onlyOnForms()
+        ->setColumns(12);
+
+        yield UrlField::new('applicationUrl', 'Candidater à l’aide')
+        ->hideOnIndex()
+        ->setColumns(12);
+        yield TextField::new('applicationUrlText', 'Texte du bouton de candidature')
+        ->setHelp('Texte du bouton de candidature. Laisser vide pour utiliser le texte par défaut.')
+        ->onlyOnForms()
+        ->setColumns(12);
+
+
+        yield TrumbowygField::new('contact', 'Contact pour candidater')
+        ->setHelp('N’hésitez pas à ajouter plusieurs contacts')
+        ->hideOnIndex()
+        ->setColumns(12);
+        
+        //-------------------------------------------------------
+        yield FormField::addTab('Descriptions');
+
+
+        yield FormField::addFieldset('Description de l’aide');
+
+
+        yield TrumbowygField::new('description', 'Description complète de l’aide et de ses objectifs')
+        ->hideOnIndex()
+        ->setColumns(12);
+        yield TrumbowygField::new('projectExamples', 'Exemples d’applications ou de projets réalisés grâce à cette aide')
+        ->setHelp('Afin d’aider les territoires à mieux comprendre votre aide, donnez ici quelques exemples concrets de projets réalisables ou réalisés.')
+        ->hideOnIndex()
+        ->setColumns(12);
+        yield TrumbowygField::new('eligibility', 'Conditions d’éligibilité')
+        ->hideOnIndex()
+        ->setColumns(12);
+
+
+        yield TextField::new('contactPhone', 'Numéro de téléphone')
+        ->hideOnIndex()
+        ->setColumns(12);
+        yield TextField::new('contactEmail', 'Adresse e-mail de contact')
+        ->hideOnIndex()
+        ->setColumns(12);
+        yield TextField::new('contactDetail', 'Contact (détail)')
+        ->hideOnIndex()
+        ->setColumns(12);
+        
+        //-------------------------------------------------------
+        yield FormField::addTab('Calendrier');
+
+        yield FormField::addFieldset('Calendrier de l’aide');
+        yield AssociationField::new('aidRecurrence', 'Récurrence')
+        ->setHelp('L’aide est-elle ponctuelle, permanente, ou récurrente ?')
+        ->hideOnIndex()
+        ->setColumns(12);
+        yield DateField::new('dateStart', 'Date d’ouverture')
+        ->setHelp('À quelle date l’aide est-elle ouverte aux candidatures ?')
+        ->hideOnIndex()
+        ->setColumns(12);
+        yield DateField::new('datePredeposit', 'Date de pré-dépôt')
+        ->setHelp('Quelle est la date de pré-dépôt des dossiers, si applicable ?')
+        ->hideOnIndex()
+        ->setColumns(12);
+        yield DateField::new('dateSubmissionDeadline', 'Date de clôture')
+        ->setHelp('Quelle est la date de clôture de dépôt des dossiers ?')
+        ->hideOnIndex()
+        ->setColumns(12);
+
+        //-------------------------------------------------------
+        yield FormField::addTab('Porteurs');
         yield FormField::addFieldset('Porteurs d’aides');
         yield CollectionField::new('aidFinancers', 'Porteurs d\'aides')
         ->useEntryCrudForm(AidFinancerAddBackerToAidCrudController::class)
@@ -322,86 +473,50 @@ class AidCrudController extends AtCrudController
         ->hideOnIndex()
         ->setColumns(12);
 
-        yield FormField::addFieldset('Périmètre de l’aide');
-        yield AssociationField::new('perimeter', 'Périmètre')
-        ->autocomplete()
+        //-------------------------------------------------------
+        yield FormField::addTab('Informations complémentaires');
+
+
+        yield BooleanField::new('inFranceRelance', 'France Relance')
+        ->setHelp('Cette aide est-elle éligible au programme France Relance ?')
+        ->hideOnIndex()
+        ->setColumns(12);
+        $europeanAidChoices = [];
+        foreach (Aid::LABELS_EUROPEAN as $slug => $name) {
+            $europeanAidChoices[$name] = $slug;
+        }
+        yield ChoiceField::new('europeanAid', 'Aide européenne ?')
+        ->setChoices($europeanAidChoices)
+        ->setHelp('* Les fonds structurels (FEDER, FSE+...) sont les aides gérées par les conseils régionaux.')
+        ->hideOnIndex()
+        ->setColumns(12);
+
+        yield TextField::new('shortTitle', 'Titre du programme')
+        ->setFormTypeOption('attr', ['placeholder' => 'Ex: Appel à projet innovation continue'])
+        ->hideOnIndex()
+        ->setColumns(12);
+
+        yield AssociationField::new('author', 'Auteur')
+        ->autocomplete();
+        $nbAidsLive = 0;
+        if ($entity && $entity->getAuthor()) {
+            $nbAidsLive = $entity->getAuthor()->getNbAidsLive();
+        }
+        yield IntegerField::new('nbAidsLive', 'Du même auteur')
+        ->setHelp('Nb. d\'aides live créées par le même utilisateur')
+        ->setFormTypeOptions([
+            'data' => $nbAidsLive,
+            'attr' => ['readonly' => true],
+            'mapped' => false
+        ])
         ->setColumns(12)
-        ->formatValue(function ($value) {
-            /** @var Perimeter $value */
-            if ($value) {
-                $name = $value->getName();
-                if ($value->getScale() == Perimeter::SCALE_COUNTY) {
-                    $name .= ' (Département)';
-                } else if ($value->getScale() == Perimeter::SCALE_REGION) {
-                    $name .= ' (Région)';
-                } else if ($value->getScale() == Perimeter::SCALE_COMMUNE) {
-                    $name .= ' (Commune)';
-                } else if ($value->getScale() == Perimeter::SCALE_ADHOC) {
-                    $name .= ' (Adhoc)';
-                }
-                $display = strlen($name) < 20 ? $name : substr($name, 0, 20).'...';
-                return sprintf('<span title="%s">%s</span>', $name, $display);
-            } else {
-                return '';
-            }
-        })   
-        ;
-        yield TextField::new('perimeterSuggestion', 'Périmètre suggéré')
-        ->setHelp('Le contributeur suggère ce nouveau périmètre')
-        ->hideOnIndex()
-        ->setColumns(12);
+        ->hideOnIndex();
 
-        yield FormField::addFieldset('Calendrier de l’aide');
-        yield AssociationField::new('aidRecurrence', 'Récurrence')
-        ->setHelp('L’aide est-elle ponctuelle, permanente, ou récurrente ?')
-        ->hideOnIndex()
-        ->setColumns(12);
-        yield DateField::new('dateStart', 'Date d’ouverture')
-        ->setHelp('À quelle date l’aide est-elle ouverte aux candidatures ?')
-        ->hideOnIndex()
-        ->setColumns(12);
-        yield DateField::new('datePredeposit', 'Date de pré-dépôt')
-        ->setHelp('Quelle est la date de pré-dépôt des dossiers, si applicable ?')
-        ->hideOnIndex()
-        ->setColumns(12);
-        yield DateField::new('dateSubmissionDeadline', 'Date de clôture')
-        ->setHelp('Quelle est la date de clôture de dépôt des dossiers ?')
-        ->hideOnIndex()
-        ->setColumns(12);
-
-        yield FormField::addFieldset('Description de l’aide');
-        yield BooleanField::new('isCallForProject', 'Appel à projet / Manifestation d’intérêt')
-        ->hideOnIndex()
-        ->setColumns(12);
         yield BooleanField::new('isCharged', 'Aide Payante')
         ->setHelp('Ne pas cocher pour les aides sous adhésion et ajouter la mention « *sous adhésion » dans les critères d’éligibilité.')
         ->hideOnIndex()
         ->setColumns(12);
-        yield AssociationField::new('programs', 'Programmes')
-        ->autocomplete()
-        ->hideOnIndex()
-        ->setColumns(12);
-        yield AssociationField::new('aidTypes', 'Types d\'aide')
-        ->setFormTypeOption('choice_label', function ($entity) {
-            $return = '';
-            if ($entity) {
-                if ($entity->getAidTypeGroup()) {
-                    $return .= $entity->getAidTypeGroup()->getName(). ' > ';
-                }
-                $return .= $entity->getName();
-            }
-            return $return;
-        })
-        ->setFormTypeOptions([
-            'query_builder' => function (EntityRepository $er) {
-                return $er->createQueryBuilder('at')
-                ->innerJoin('at.aidTypeGroup', 'aidTypeGroup')
-                ->orderBy('aidTypeGroup.name', 'ASC');
-            },
-        ])
-        ->setHelp('Précisez le ou les types de l’aide.')
-        ->hideOnIndex()
-        ->setColumns(12);
+        
         yield IntegerField::new('subventionRateMin', 'Taux de subvention min. (en %, nombre entier)')
         ->hideOnIndex()
         ->setColumns(12);
@@ -421,120 +536,17 @@ class AidCrudController extends AtCrudController
         yield TextField::new('otherFinancialAidComment', 'Autre aide financière (commentaire optionnel)')
         ->hideOnIndex()
         ->setColumns(12);
-        yield AssociationField::new('aidSteps', 'État d’avancement du projet pour bénéficier du dispositif ')
-        ->hideOnIndex()
-        ->setColumns(12);
-        yield AssociationField::new('aidDestinations', 'Types de dépenses / actions couvertes')
-        ->setHelp('Obligatoire pour les aides financières')
-        ->hideOnIndex()
-        ->setColumns(12);
-        yield TrumbowygField::new('description', 'Description complète de l’aide et de ses objectifs')
-        ->hideOnIndex()
-        ->setColumns(12);
-        yield TrumbowygField::new('projectExamples', 'Exemples d’applications ou de projets réalisés grâce à cette aide')
-        ->setHelp('Afin d’aider les territoires à mieux comprendre votre aide, donnez ici quelques exemples concrets de projets réalisables ou réalisés.')
-        ->hideOnIndex()
-        ->setColumns(12);
-        yield TrumbowygField::new('eligibility', 'Conditions d’éligibilité')
-        ->hideOnIndex()
-        ->setColumns(12);
-        yield AssociationField::new('keywordReferences', 'Mots clés références')
-        ->setFormTypeOptions([
-            'query_builder' => function (EntityRepository $er) {
-                return $er->createQueryBuilder('k')
-                ->orderBy('k.name', 'ASC');
-            },
-            'choice_label' => function ($entity) {
-                $label = $entity->getName();
-                if ($entity->getParent()) {
-                    $label .= ' ('.$entity->getParent()->getName().')';
-                }
-                return $label;
-            }
-        ])
-        ->hideOnIndex()
-        ->setColumns(12);
 
-        yield FormField::addFieldset('Contact et démarches');
-        yield UrlField::new('originUrl', 'Plus d’informations')
+        yield BooleanField::new('isCallForProject', 'Appel à projet / Manifestation d’intérêt')
         ->hideOnIndex()
-        ->setColumns(12);
-        yield TextField::new('originUrlText', 'Texte du bouton plus d’informations')
-        ->setHelp('Texte du bouton plus d’informations. Laisser vide pour utiliser le texte par défaut.')
-        ->onlyOnForms()
-        ->setColumns(12);
-
-        yield UrlField::new('applicationUrl', 'Candidater à l’aide')
-        ->hideOnIndex()
-        ->setColumns(12);
-        yield TextField::new('applicationUrlText', 'Texte du bouton de candidature')
-        ->setHelp('Texte du bouton de candidature. Laisser vide pour utiliser le texte par défaut.')
-        ->onlyOnForms()
         ->setColumns(12);
 
         yield BooleanField::new('hasBrokenLink', 'Contient un lien cassé ?')
         ->hideOnIndex()
         ->setColumns(12);
-        yield TrumbowygField::new('contact', 'Contact pour candidater')
-        ->setHelp('N’hésitez pas à ajouter plusieurs contacts')
-        ->hideOnIndex()
-        ->setColumns(12);
-        yield TextField::new('contactPhone', 'Numéro de téléphone')
-        ->hideOnIndex()
-        ->setColumns(12);
-        yield TextField::new('contactEmail', 'Adresse e-mail de contact')
-        ->hideOnIndex()
-        ->setColumns(12);
-        yield TextField::new('contactDetail', 'Contact (détail)')
-        ->hideOnIndex()
-        ->setColumns(12);
+
         yield BooleanField::new('contactInfoUpdated', 'En attente de revue des données de contact mises à jour')
         ->setHelp('Cette aide est en attente d’une revue des données de contact')
-        ->hideOnIndex()
-        ->setColumns(12);
-
-        yield FormField::addFieldset('Uniquement pour les aides sur Démarches-Simplifiées');
-        yield BooleanField::new('dsSchemaExists', 'Schéma existant')
-        ->setHelp('Un schéma pour l’api de pré-remplissagede Démarches-Simplifiées est-il renseigné ?')
-        ->hideOnIndex()
-        ->setColumns(12);
-        yield IntegerField::new('dsId', 'Identifiant de la démarche')
-        ->setHelp('Identifiant de la démarche sur Démarches-Simplifiées')
-        ->hideOnIndex()
-        ->setColumns(12);
-
-        yield JsonField::new('dsMapping', 'Mapping JSON de la démarche')
-        ->setHelp('Mapping JSON pour pré-remplissage sur Démarches-Simplifiées')
-        ->hideOnIndex()
-        ->setColumns(12)
-        ;
-
-        yield FormField::addFieldset('Éligibilité');
-        yield AssociationField::new('eligibilityTest', 'Test d’éligibilité')
-        ->autocomplete()
-        ->hideOnIndex()
-        ->setColumns(12);
-
-        yield FormField::addFieldset('Administration de l’aide');
-        $statusChoices = [];
-        foreach (Aid::STATUSES as $status) {
-            $statusChoices[$status['name']] = $status['slug'];
-        }
-        yield ChoiceField::new('status', 'Statut')
-        ->setChoices($statusChoices)
-        ->hideOnIndex()
-        ->setColumns(12);
-        yield BooleanField::new('importUpdated', 'En attente de revue des données importées mises à jour')
-        ->setHelp('Cette aide est en attente d’une revue des mises à jour proposées par l’outil d’import')
-        ->hideOnIndex()
-        ->setColumns(12);
-        yield BooleanField::new('importUpdated', 'Revue à faire')
-        ->setHelp('Cette aide est en attente d’une revue des mises à jour proposées par l’outil d’import')
-        ->onlyOnIndex()
-        ->setColumns(12);
-
-        yield BooleanField::new('authorNotification', 'Envoyer un email à l’auteur de l’aide ?')
-        ->setHelp('Un email doit-il être envoyé à l’auteur de cette aide au moment de sa publication ?')
         ->hideOnIndex()
         ->setColumns(12);
 
@@ -563,7 +575,73 @@ class AidCrudController extends AtCrudController
         ->hideOnIndex()
         ->setColumns(12);
 
+
+        
+
+        ///-------------------------------------------------------
+        yield FormField::addTab('Démarches Simplifiées');
+
+        yield FormField::addFieldset('Uniquement pour les aides sur Démarches-Simplifiées');
+        yield BooleanField::new('dsSchemaExists', 'Schéma existant')
+        ->setHelp('Un schéma pour l’api de pré-remplissagede Démarches-Simplifiées est-il renseigné ?')
+        ->hideOnIndex()
+        ->setColumns(12);
+        yield IntegerField::new('dsId', 'Identifiant de la démarche')
+        ->setHelp('Identifiant de la démarche sur Démarches-Simplifiées')
+        ->hideOnIndex()
+        ->setColumns(12);
+
+        yield JsonField::new('dsMapping', 'Mapping JSON de la démarche')
+        ->setHelp('Mapping JSON pour pré-remplissage sur Démarches-Simplifiées')
+        ->hideOnIndex()
+        ->setColumns(12)
+        ;
+
+        ///-------------------------------------------------------
+        yield FormField::addTab('Autres');
+
+
+
+        yield FormField::addFieldset('Données diverses');
+        yield DateTimeField::new('timeCreate', 'Date de création')
+        ->setFormTypeOption('attr', ['readonly' => true])
+        ->hideOnIndex()
+        ->setColumns(12)
+        ->hideWhenCreating();
+        yield DateTimeField::new('timeUpdate', 'Date de mise à jour')
+        ->setFormTypeOption('attr', ['readonly' => true])
+        ->hideOnIndex()
+        ->hideWhenCreating()
+        ->setColumns(12);
+        yield DateTimeField::new('timePublished', 'Première date et heure de publication')
+        ->setFormTypeOption('attr', ['readonly' => true])
+        ->setColumns(12)
+        ->hideOnIndex();
+        yield DateTimeField::new('datePublished', 'Première date de publication')
+        ->setFormTypeOption('attr', ['readonly' => true])
+        ->setColumns(12);
+
+
+        yield FormField::addFieldset('Éligibilité (obsolète)');
+        yield AssociationField::new('eligibilityTest', 'Test d’éligibilité')
+        ->autocomplete()
+        ->hideOnIndex()
+        ->setColumns(12);
+        
+        ///-------------------------------------------------------
+        yield FormField::addTab('Import');
+        
         yield FormField::addFieldset('Données liées à l’import');
+
+        yield BooleanField::new('importUpdated', 'En attente de revue des données importées mises à jour')
+        ->setHelp('Cette aide est en attente d’une revue des mises à jour proposées par l’outil d’import')
+        ->hideOnIndex()
+        ->setColumns(12);
+        yield BooleanField::new('importUpdated', 'Revue à faire')
+        ->setHelp('Cette aide est en attente d’une revue des mises à jour proposées par l’outil d’import')
+        ->onlyOnIndex()
+        ->setColumns(12);
+
         yield BooleanField::new('isImported', 'Importé')
         ->hideOnIndex()
         ->setColumns(12);
@@ -594,27 +672,7 @@ class AidCrudController extends AtCrudController
         // yield ArrayField::new('importRawObjectTempCalendar', 'Donnée brute importée temporaire pour le calendrie')
         // ->hideOnIndex();
 
-        yield FormField::addFieldset('Données diverses');
-        yield DateTimeField::new('timeCreate', 'Date de création')
-        ->setFormTypeOption('attr', ['readonly' => true])
-        ->hideOnIndex()
-        ->setColumns(12)
-        ->hideWhenCreating();
-        yield DateTimeField::new('timeUpdate', 'Date de mise à jour')
-        ->setFormTypeOption('attr', ['readonly' => true])
-        ->hideOnIndex()
-        ->hideWhenCreating()
-        ->setColumns(12);
-        yield DateTimeField::new('timePublished', 'Première date et heure de publication')
-        ->setFormTypeOption('attr', ['readonly' => true])
-        ->setColumns(12)
-        ->hideOnIndex();
-        yield DateTimeField::new('datePublished', 'Première date de publication')
-        ->setFormTypeOption('attr', ['readonly' => true])
-        ->setColumns(12);
-        yield TextField::new('status', 'Statut')
-        ->onlyOnIndex()
-        ->setColumns(12);
+
     }
 
 

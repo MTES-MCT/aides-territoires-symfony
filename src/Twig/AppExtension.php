@@ -10,6 +10,7 @@ use App\Entity\User\User;
 use App\Service\Category\CategoryService;
 use App\Service\Matomo\MatomoService;
 use App\Service\Perimeter\PerimeterService;
+use App\Service\Reference\KeywordReferenceService;
 use App\Service\User\UserService;
 use App\Service\Various\Breadcrumb;
 use App\Service\Various\ParamService;
@@ -32,7 +33,8 @@ class AppExtension extends AbstractExtension
         private ManagerRegistry $managerRegistry,
         private StringService $stringService,
         private MatomoService $matomoService,
-        private ContentSecurityPolicyListener $contentSecurityPolicyListener
+        private ContentSecurityPolicyListener $contentSecurityPolicyListener,
+        private KeywordReferenceService $keywordReferenceService
     ) {
         
     }
@@ -138,6 +140,7 @@ class AppExtension extends AbstractExtension
             new TwigFunction('getEntityById', [$this, 'getEntityById']),
             new TwigFunction('getUserSibEmailId', [$this, 'getUserSibEmailId']),
             new TwigFunction('getMatomoGoalId', [$this, 'getMatomoGoalId']),
+            new TwigFunction('getKeywordReferenceAndSynonyms', [$this, 'getKeywordReferenceAndSynonyms']),
         ];
     }
 
@@ -285,4 +288,11 @@ class AppExtension extends AbstractExtension
         return $this->matomoService->getGoal();
     }
 
+    public function getKeywordReferenceAndSynonyms(?string $keyword): string{
+        if (!$keyword) {
+            return '';
+        }
+
+        return $this->keywordReferenceService->getKeywordReferenceAndSynonyms($keyword);
+    }
 }
