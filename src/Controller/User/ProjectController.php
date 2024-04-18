@@ -6,6 +6,7 @@ use App\Controller\FrontController;
 use App\Entity\Aid\AidProject;
 use App\Entity\Perimeter\Perimeter;
 use App\Entity\Project\Project;
+use App\Entity\Reference\ProjectReference;
 use App\Form\Project\ProjectEditType;
 use App\Form\User\Project\AidProjectDeleteType;
 use App\Form\User\Project\AidProjectStatusType;
@@ -15,6 +16,8 @@ use App\Repository\Aid\AidProjectRepository;
 use App\Repository\Aid\AidRepository;
 use App\Repository\Project\ProjectRepository;
 use App\Repository\Project\ProjectValidatedRepository;
+use App\Repository\Reference\ProjectReferenceRepository;
+use App\Service\Aid\AidService;
 use App\Service\Export\SpreadsheetExporterService;
 use App\Service\File\FileService;
 use App\Service\Image\ImageService;
@@ -315,14 +318,15 @@ class ProjectController extends FrontController
     public function aides(
         $id,
         ProjectRepository $ProjectRepository,
-        AidRepository $aidRepository,
+        ProjectReferenceRepository $projectReferenceRepository,
         UserService $userService,
         RequestStack $requestStack,
         AidProjectRepository $aidProjectRepository,
         ManagerRegistry $managerRegistry,
         NotificationService $notificationService,
         ReferenceService $referenceService,
-        SpreadsheetExporterService $spreadsheetExporterService
+        SpreadsheetExporterService $spreadsheetExporterService,
+        AidService $aidService
     ): Response
     {
         $projectCreated = $requestStack->getCurrentRequest()->get('projectCreated', 0);
@@ -334,7 +338,7 @@ class ProjectController extends FrontController
         );
         $user = $userService->getUserLogged();
         
-        if (!$project instanceof Project || $project->getOrganization()->getId()!=$user->getDefaultOrganization()->getId()) {
+        if (!$project instanceof Project || !$userService->isMemberOfOrganization($project->getOrganization(), $user)) {
             return $this->redirectToRoute('app_user_project_structure');
         }
 
@@ -356,11 +360,18 @@ class ProjectController extends FrontController
                     $aidParams['organizationType'] = $project->getOrganization()->getOrganizationType();
                     $searchParams['organizationType'] = $aidParams['organizationType']->getSlug();
                 }
-                $aidParams['keyword'] = $project->getName();
-                $searchParams['keyword'] = $aidParams['keyword'];
+            }
+            $aidParams['keyword'] = $project->getName();
+            $searchParams['keyword'] = $aidParams['keyword'];
+
+            // regarde si le projet à un projet référent associé pour écraser la recherche
+            if ($project->getProjectReference() instanceof ProjectReference && $project->getProjectReference()->getName()) {
+                    $aidParams['keyword'] = $project->getProjectReference()->getName();
+                    $aidParams['projectReference'] = $project->getProjectReference();
+                    $searchParams['keyword'] = $aidParams['keyword'];
             }
 
-            $aidsSuggested = $aidRepository->findCustom($aidParams);
+            $aidsSuggested = $aidService->searchAids($aidParams);
             if (count($aidsSuggested) > 0) {
                 $requestStack->getCurrentRequest()->getSession()->set('highlightedWords', $referenceService->getHighlightedWords($aidParams['keyword']));
             }
@@ -373,24 +384,25 @@ class ProjectController extends FrontController
             if ($formAidProjectDelete->isValid()) {
                 // suppression
                 $aidProject = $aidProjectRepository->find($formAidProjectDelete->get('idAidProject')->getData());
-                if ($aidProject instanceof AidProject && $aidProject->getProject()->getId() == $project->getId()) {
+                if ($aidProject instanceof AidProject && $aidProject->getProject() && $aidProject->getProject()->getId() == $project->getId()) {
                     $managerRegistry->getManager()->remove($aidProject);
                     $managerRegistry->getManager()->flush();
                 }
 
-                foreach ($project->getOrganization()->getBeneficiairies() as $beneficiary) {
-                    if ($beneficiary->getId() != $user->getId()) {
-                        $notificationService->addNotification(
-                            $beneficiary,
-                            'Une aide a été supprimée d’un projet',
-                            '<p>
-                            '.$user->getFirstname().' '.$user->getLastname().' a supprimé une aide du projet
-                            <a href="'.$this->generateUrl('app_user_project_details_fiche_projet', ['id' => $project->getId(), 'slug' => $project->getSlug()], UrlGeneratorInterface::ABSOLUTE_URL).'">'.$project->getName().'</a>.
-                            </p>'
-                        );
+                if ($project->getOrganization()) {
+                    foreach ($project->getOrganization()->getBeneficiairies() as $beneficiary) {
+                        if ($beneficiary->getId() != $user->getId()) {
+                            $notificationService->addNotification(
+                                $beneficiary,
+                                'Une aide a été supprimée d’un projet',
+                                '<p>
+                                '.$user->getFirstname().' '.$user->getLastname().' a supprimé une aide du projet
+                                <a href="'.$this->generateUrl('app_user_project_details_fiche_projet', ['id' => $project->getId(), 'slug' => $project->getSlug()], UrlGeneratorInterface::ABSOLUTE_URL).'">'.$project->getName().'</a>.
+                                </p>'
+                            );
+                        }
                     }
                 }
-
                 // message
                 $this->addFlash(
                     FrontController::FLASH_SUCCESS,
@@ -558,7 +570,7 @@ class ProjectController extends FrontController
         );
         $user = $userService->getUserLogged();
         
-        if (!$project instanceof Project || $project->getOrganization()->getId()!=$user->getDefaultOrganization()->getId()) {
+        if (!$project instanceof Project || !$userService->isMemberOfOrganization($project->getOrganization(), $user)) {
             return $this->redirectToRoute('app_user_project_structure');
         }
 

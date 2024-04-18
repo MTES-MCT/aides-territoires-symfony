@@ -11,12 +11,12 @@
                     <span class="deadline deadline-delta fr-tag">J-{{ aid.daysBeforeDeadline }}</span>
                 {% endif %}
 
-                {% if aid.perimeter.code == "PVD" %}
+                {% if aid.perimeter and aid.perimeter.code == "PVD" %}
                     <span class="deadline deadline-delta fr-tag"><span class="fr-icon-flashlight-line fr-icon--sm" aria-hidden="true"></span>Spécifique PVD</span>
                 {% endif %}
 
                 <a class="fr-card__link highlightable" href="{{ path('app_aid_aid_details', aidUrlParams) }}" title="Voir l'aide">
-                    {% if aid.europeanAid %}<span title="aide européenne" aria-hidden="true">🇪🇺 </span>{% endif %}{{ aid.name }}
+                    {% if aid.europeanAid %}<span title="aide européenne" aria-hidden="true">🇪🇺 </span>{% endif %}{{ aid.name }} {% if app.user and app.user and isUserGranted(app.user, constant('App\\Entity\\User\\User::ROLE_ADMIN')) %}(st: {{ aid.scoreTotal}}, so: {{ aid.scoreObjects}}){% endif %}
                 </a>
             </h2>
             <div class="fr-card__desc">

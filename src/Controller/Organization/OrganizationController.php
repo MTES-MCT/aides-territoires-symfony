@@ -75,6 +75,9 @@ class OrganizationController extends FrontController
             }
         }
         $form = $this->createForm(RegisterType::class, $user, ['onlyOrganization' => true]);
+        if ($form->has('mlConsent')) {
+            $form->remove('mlConsent');
+        }
         if ($organization instanceof Organization) {
             $form->get('organizationType')->setData($organization->getOrganizationType());
             $form->get('organizationName')->setData($organization->getName());
@@ -253,6 +256,10 @@ class OrganizationController extends FrontController
         $formInvitation->handleRequest($requestStack->getCurrentRequest());
         if ($formInvitation->isSubmitted()) {
             if ($formInvitation->isValid()) {
+                if ($formInvitation->has('organization')) {
+                    $organization = $formInvitation->get('organization')->getData();
+                }
+
                 // vérifie que email pas déjà invité
                 $organizationInvitationCheck = $organizationInvitationRepository->findOneBy([
                     'email' => $organizationInvitation->getEmail(),
@@ -266,9 +273,20 @@ class OrganizationController extends FrontController
                     );
                     return $this->redirectToRoute('app_organization_collaborateurs');
                 }
+
+                // verifie que la personne ne fait pas déjà partie de l'organization
+                if ($organization->getBeneficiairies()->filter(function($beneficiary) use ($organizationInvitation) {
+                    return $beneficiary->getEmail() === $organizationInvitation->getEmail();
+                })->count()) {
+                    $this->addFlash(
+                        FrontController::FLASH_ERROR,
+                        'Cette personne fait déjà partie de cette organization.'
+                    );
+                    return $this->redirectToRoute('app_organization_collaborateurs');
+                }
                 // sauvegarde
                 $organizationInvitation->setAuthor($user);
-                $organizationInvitation->setOrganization($user->getDefaultOrganization());
+                $organizationInvitation->setOrganization($organization);
                 $managerRegistry->getManager()->persist($organizationInvitation);
                 $managerRegistry->getManager()->flush();
 

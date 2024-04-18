@@ -22,6 +22,11 @@ class LogAidSearchRepository extends ServiceEntityRepository
         parent::__construct($registry, LogAidSearch::class);
     }
 
+    public function findKeywordSearchWithFewResults(?array $params = null) : array {
+        $qb = $this->getQueryBuilder($params);
+
+        return $qb->getQuery()->getResult();
+    }
     public function countCustom(?array $params = null): int
     {   
         $qb = $this->getQueryBuilder($params);
@@ -35,6 +40,9 @@ class LogAidSearchRepository extends ServiceEntityRepository
     {
         $dateCreateMin = $params['dateCreateMin'] ?? null;
         $dateCreateMax = $params['dateCreateMax'] ?? null;
+        $hasSearch = $params['hasSearch'] ?? null;
+        $resultsCountMax = $params['resultsCountMax'] ?? null;
+        $orderBy = (isset($params['orderBy']) && isset($params['orderBy']['sort']) && isset($params['orderBy']['order'])) ? $params['orderBy'] : null;
 
         $qb = $this->createQueryBuilder('l');
 
@@ -51,6 +59,24 @@ class LogAidSearchRepository extends ServiceEntityRepository
                 ->setParameter('dateCreateMax', $dateCreateMax)
                 ;
         }
+
+        if ($hasSearch) {
+            $qb
+                ->andWhere('l.search IS NOT NULL')
+            ;
+        }
+
+        if ($resultsCountMax) {
+            $qb
+                ->andWhere('l.resultsCount <= :resultsCountMax')
+                ->setParameter('resultsCountMax', $resultsCountMax)
+            ;
+        }
+
+        if ($orderBy !== null) {
+            $qb->addOrderBy($orderBy['sort'], $orderBy['order']);
+        }
+
 
         return $qb;
     }

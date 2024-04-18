@@ -9,6 +9,7 @@ use Brevo\Client\Api\TransactionalEmailsApi;
 use Brevo\Client\Configuration;
 use Brevo\Client\Model\CreateContact;
 use Brevo\Client\Model\CreateDoiContact;
+use Brevo\Client\Model\GetContactDetails;
 use Brevo\Client\Model\SendSmtpEmail;
 use Brevo\Client\Model\UpdateContact;
 use GuzzleHttp\Client;
@@ -239,6 +240,30 @@ class EmailService
         try {
             $apiInstance->updateContact($identifier, $updateContact);
             return true;
+        } catch (\Exception $e) {
+            return false;
+        }
+    }
+
+    public function isUserMlConsent($user) : bool {
+        // Configure API key authorization: api-key
+        $config = Configuration::getDefaultConfiguration()->setApiKey('api-key', $this->paramService->get('sib_api_key'));
+
+        $apiInstance = new ContactsApi(
+            // If you want use custom http client, pass your client which implements `GuzzleHttp\ClientInterface`.
+            // This is optional, `GuzzleHttp\Client` will be used as default.
+            new Client(),
+            $config
+        );
+
+        try {
+            $result = $apiInstance->getContactInfo($user->getEmail());
+            foreach ($result['listIds'] as $listId) {
+                if (in_array($listId, explode(',', $this->paramService->get('sib_newsletter_list_ids')))) {
+                    return true;
+                }
+            }
+            return false;
         } catch (\Exception $e) {
             return false;
         }

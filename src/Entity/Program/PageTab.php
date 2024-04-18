@@ -2,10 +2,14 @@
 
 namespace App\Entity\Program;
 
+use App\Entity\Page\Faq;
 use App\Entity\Program\Program;
 use App\Repository\Program\PageTabRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ORM\Mapping\JoinColumn;
 use Gedmo\Mapping\Annotation as Gedmo;
 
 #[ORM\Entity(repositoryClass: PageTabRepository::class)]
@@ -32,6 +36,17 @@ class PageTab
 
     #[ORM\ManyToOne(inversedBy: 'pageTabs')]
     private ?Program $program = null;
+
+    #[ORM\Column]
+    private ?bool $active = false;
+
+    #[ORM\OneToMany(mappedBy: 'pageTab', targetEntity: Faq::class)]
+    private Collection $faqs;
+
+    public function __construct()
+    {
+        $this->faqs = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -94,6 +109,57 @@ class PageTab
     public function setProgram(?Program $program): static
     {
         $this->program = $program;
+
+        return $this;
+    }
+
+    public function  __toString(): string
+    {
+        $name = $this->getName();
+        if ($this->getProgram() instanceof Program) {
+            $name .= ' (' . $this->getProgram()->getName() . ')';
+        }
+        return $name;
+    }
+
+    public function isActive(): ?bool
+    {
+        return $this->active;
+    }
+
+    public function setActive(bool $active): static
+    {
+        $this->active = $active;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Faq>
+     */
+    public function getFaqs(): Collection
+    {
+        return $this->faqs;
+    }
+
+    public function addFaq(Faq $faq): static
+    {
+        if (!$this->faqs->contains($faq)) {
+            $this->faqs->add($faq);
+            $faq->setPageTab($this);
+        }
+
+        return $this;
+    }
+
+    public function removeFaq(Faq $faq): static
+    {
+        if ($this->faqs->removeElement($faq)) {
+            // set the owning side to null (unless already changed)
+            if ($faq->getPageTab() === $this) {
+                $faq->setPageTab(null);
+            }
+        }
 
         return $this;
     }

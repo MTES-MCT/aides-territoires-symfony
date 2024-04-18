@@ -137,6 +137,13 @@ class AidSearchFormService
 
         if ($aidSearchClass->getKeyword()) {
             $aidParams['keyword'] = $aidSearchClass->getKeyword();
+            // si pas de projet référent, on vérifie si on ne trouve pas avec le keyword
+            if (!$aidSearchClass->getProjectReference()) {
+                $projectReference = $this->managerRegistry->getRepository(ProjectReference::class)->findOneBy(['name' => $aidSearchClass->getKeyword()]);
+                if ($projectReference instanceof ProjectReference) {
+                    $aidParams['projectReference'] = $projectReference;
+                }
+            }
         }
 
         if ($aidSearchClass->getCategorySearch()) {
@@ -203,7 +210,8 @@ class AidSearchFormService
         // < les paramètres en query
         $query = '';
         if (isset($params['querystring'])) {
-            $query = $params['querystring'];
+            // on nettoie la chaine car certaines anciennes alertes ont des caractères HTML
+            $query = strip_tags(str_replace(['&amp;'], ['&'], urldecode($params['querystring'])));
         } else {
             if ($this->requestStack->getCurrentRequest()) {
                 $query = parse_url($this->requestStack->getCurrentRequest()->getRequestUri(), PHP_URL_QUERY) ?? null;
@@ -381,6 +389,7 @@ class AidSearchFormService
 
         // via l'api on peu avoir un groupe d'aide
         if (isset($queryParams['aid_type'])) {
+            $queryParams['aid_type'] = str_replace(['_'], ['-'], $queryParams['aid_type']);
             $aidTypes = [];
             if ($queryParams['aid_type'] == AidTypeGroup::SLUG_FINANCIAL) {
                 $aidTypes = $this->managerRegistry->getRepository(AidType::class)->findBy([

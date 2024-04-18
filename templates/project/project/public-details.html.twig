@@ -43,9 +43,9 @@
                 </div>
                 {% endif %}
                 <div class="fr-col-12 fr-col-md-5">
-                    <h2 class="fr-text--md fr-text--normal fr-mb-0 fr-mt-5w"><strong>Structure porteuse :</strong> {{ project.organization.name }}</h2>
+                    {% if project.organization %}<h2 class="fr-text--md fr-text--normal fr-mb-0 fr-mt-5w"><strong>Structure porteuse :</strong> {{ project.organization.name }}</h2>{% endif %}
                     {% if project.otherProjectOwner%}<h2 class="fr-text--md fr-text--normal fr-mb-0 fr-mt-2w"><strong>Autre maître d’ouvrage :</strong> {{ project.otherProjectOwner }}</h2>{% endif %}
-                    <h2 class="fr-text--md fr-text--normal fr-mb-0 fr-mt-2w"><strong>Territoire du projet :</strong> {{ project.organization.perimeter.name }} ({{ project.organization.ZipCode }})</h2>
+                    {% if project.organization %}<h2 class="fr-text--md fr-text--normal fr-mb-0 fr-mt-2w"><strong>Territoire du projet :</strong> {{ project.organization.perimeter.name }} ({{ project.organization.zipCode }})</h2>{% endif %}
                     <h2 class="fr-text--md fr-text--normal fr-mb-0 fr-mt-2w"><strong>État d’avancement du projet :</strong>  {% if project.step %}{{  constant('App\\Entity\\Project\\Project::PROJECT_STEPS_BY_SLUG')[project.step] }}{% else %}aucun{% endif %}</h2>
                     <h2 class="fr-text--md fr-text--normal fr-mb-5w fr-mt-2w"><strong>Budget prévisionnel :</strong>  {% if project.budget %}{{ project.budget|format_number }} €{% else %}non renseigné{% endif %}</h2>
                 </div>
@@ -54,7 +54,7 @@
             <div class="fr-grid-row fr-grid-row--gutters fr-my-5w">
                 <div class="fr-col-12 fr-col-md-7">
                     <h2 class="fr-h4">Description du projet</h2>
-                    <div>
+                    <div class="wysiwyg-wrapper">
                         {{ project.description|sanitize_html|raw }}
                     </div>
                 </div>

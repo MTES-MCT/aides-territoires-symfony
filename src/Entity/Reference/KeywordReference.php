@@ -24,7 +24,7 @@ class KeywordReference
     private ?string $name = null;
 
     #[ORM\Column]
-    private ?bool $intention = null;
+    private ?bool $intention = false;
 
     #[ORM\ManyToOne(targetEntity: self::class, inversedBy: 'keywordReferences')]
     private ?self $parent = null;

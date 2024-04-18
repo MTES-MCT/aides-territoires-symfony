@@ -559,6 +559,12 @@ class Backer
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $timeUpdate = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?int $nbAids = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?int $nbAidsLive = null;
     public function getAidsTechnical() : ?array
     {
         if (count($this->aidsTechnical) > 0) {
@@ -764,6 +770,30 @@ class Backer
     public function setDeleteLogo(?bool $deleteLogo): static
     {
         $this->deleteLogo = $deleteLogo;
+
+        return $this;
+    }
+
+    public function getNbAids(): ?int
+    {
+        return $this->nbAids;
+    }
+
+    public function setNbAids(?int $nbAids): static
+    {
+        $this->nbAids = $nbAids;
+
+        return $this;
+    }
+
+    public function getNbAidsLive(): ?int
+    {
+        return $this->nbAidsLive;
+    }
+
+    public function setNbAidsLive(?int $nbAidsLive): static
+    {
+        $this->nbAidsLive = $nbAidsLive;
 
         return $this;
     }

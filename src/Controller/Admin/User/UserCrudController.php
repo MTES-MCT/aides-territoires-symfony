@@ -65,7 +65,8 @@ class UserCrudController extends AtCrudController
         yield TextField::new('contributorContactPhone', 'Numéro de téléphone')
         ->hideOnIndex();
         yield IntegerField::new('nbAids', 'Nombre d\'aides')
-        ->setFormTypeOption('attr', ['readonly' => true]);
+        ->setFormTypeOption('attr', ['readonly' => true])
+        ->onlyOnForms();
 
         yield FormField::addFieldset('Espace bénéficiaire');
 

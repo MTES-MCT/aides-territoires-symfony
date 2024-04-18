@@ -109,9 +109,21 @@ class UserService
         $log->setType($params['type'] ?? null);
         $log->setData1($params['data1'] ?? null);
         $log->setData2($params['data2'] ?? null);
-        $log->setIp($_SERVER['REMOTE_ADDR'] ?? null);
-        $log->setUserAgent($_SERVER['HTTP_USER_AGENT'] ?? null);
-        $log->setReferer($_SERVER['HTTP_REFERER'] ?? null);
+        $remoteAddr = $_SERVER['REMOTE_ADDR'] ?? null;
+        if ($remoteAddr && strlen($remoteAddr) > 50) {
+            $remoteAddr = substr($remoteAddr, 0, 50);
+        }
+        $log->setIp($remoteAddr);
+        $userAgent = $_SERVER['HTTP_USER_AGENT'] ?? null;
+        if ($userAgent && strlen($userAgent) > 255) {
+            $userAgent = substr($userAgent, 0, 255);
+        }
+        $log->setUserAgent($userAgent);
+        $referer = $_SERVER['HTTP_REFERER'] ?? null;
+        if ($referer && strlen($referer) > 255) {
+            $referer = substr($referer, 0, 255);
+        }
+        $log->setReferer($referer);
 
         $this->entityManagerInterface->persist($log);
         $noFlush = $params['noFlush'] ?? null;

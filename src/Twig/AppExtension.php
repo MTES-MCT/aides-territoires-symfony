@@ -10,6 +10,7 @@ use App\Entity\User\User;
 use App\Service\Category\CategoryService;
 use App\Service\Matomo\MatomoService;
 use App\Service\Perimeter\PerimeterService;
+use App\Service\Reference\KeywordReferenceService;
 use App\Service\User\UserService;
 use App\Service\Various\Breadcrumb;
 use App\Service\Various\ParamService;
@@ -32,7 +33,8 @@ class AppExtension extends AbstractExtension
         private ManagerRegistry $managerRegistry,
         private StringService $stringService,
         private MatomoService $matomoService,
-        private ContentSecurityPolicyListener $contentSecurityPolicyListener
+        private ContentSecurityPolicyListener $contentSecurityPolicyListener,
+        private KeywordReferenceService $keywordReferenceService
     ) {
         
     }
@@ -131,12 +133,14 @@ class AppExtension extends AbstractExtension
             new TwigFunction('getParameter', [$this, 'getParameter']),
             new TwigFunction('isUserGranted', [$this, 'isUserGranted']),
             new TwigFunction('optimizeHtmlFromWysiwyg', [$this, 'optimizeHtmlFromWysiwyg']),
+            new TwigFunction('addMailtoToEmailLinks', [$this, 'addMailtoToEmailLinks']),
             new TwigFunction('addNonceToInlineCss', [$this, 'addNonceToInlineCss']),
             new TwigFunction('getPerimeterScale', [$this, 'getPerimeterScale']),
             new TwigFunction('categoriesToMetas', [$this, 'categoriesToMetas']),
             new TwigFunction('getEntityById', [$this, 'getEntityById']),
             new TwigFunction('getUserSibEmailId', [$this, 'getUserSibEmailId']),
             new TwigFunction('getMatomoGoalId', [$this, 'getMatomoGoalId']),
+            new TwigFunction('getKeywordReferenceAndSynonyms', [$this, 'getKeywordReferenceAndSynonyms']),
         ];
     }
 
@@ -168,6 +172,33 @@ class AppExtension extends AbstractExtension
         } catch (\Exception $e) {
             return $html;
         }
+    }
+
+    public function addMailtoToEmailLinks($html)
+    {
+        $dom = new \DOMDocument();
+        // pour garder le utf-8
+        $dom->loadHTML(mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8'), LIBXML_HTML_NODEFDTD);
+        $x = new \DOMXPath($dom);
+
+        foreach($x->query("//a") as $node)
+        {
+            $href = $node->getAttribute('href');
+            // Vérifie si le href est une adresse e-mail
+            if (preg_match('/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/', $href)) {
+                // Ajoute mailto: au début du href
+                $node->setAttribute('href', 'mailto:' . $href);
+            }
+        }
+
+        // Sélectionner uniquement le contenu intérieur de la balise <body>
+        $body = $x->query('//body')->item(0);
+        $newHtml = '';
+        foreach ($body->childNodes as $childNode) {
+            $newHtml .= $dom->saveHTML($childNode);
+        }
+
+        return $newHtml;
     }
 
     public function addNonceToInlineCss($html)
@@ -257,4 +288,11 @@ class AppExtension extends AbstractExtension
         return $this->matomoService->getGoal();
     }
 
+    public function getKeywordReferenceAndSynonyms(?string $keyword): string{
+        if (!$keyword) {
+            return '';
+        }
+
+        return $this->keywordReferenceService->getKeywordReferenceAndSynonyms($keyword);
+    }
 }

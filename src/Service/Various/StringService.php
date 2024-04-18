@@ -11,7 +11,7 @@ class StringService
      */
     public function cleanString($string): string
     {
-        return strip_tags($string);
+        return trim(strip_tags($string));
     }
 
     /**

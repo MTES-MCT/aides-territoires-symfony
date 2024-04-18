@@ -236,9 +236,16 @@ class BackerRepository extends ServiceEntityRepository
         $nameLike = $params['nameLike'] ?? null;
         $hasFinancedAids = $params['hasFinancedAids'] ?? null;
         $hasPublishedFinancedAids = $params['hasPublishedFinancedAids'] ?? null;
-
+        $nbAidsLiveMin = $params['nbAidsLiveMin'] ?? null;
+        $orderBy = (isset($params['orderBy']) && isset($params['orderBy']['sort']) && isset($params['orderBy']['order'])) ? $params['orderBy'] : null;
         $qb = $this->createQueryBuilder('b');
 
+        if ($nbAidsLiveMin !== null) {
+            $qb
+                ->andWhere('b.nbAidsLive >= :nbAidsLiveMin')
+                ->setParameter('nbAidsLiveMin', $nbAidsLiveMin)
+            ;
+        }
         if ($hasLogo === true) {
             $qb
                 ->andWhere('b.logo IS NOT NULL')
@@ -289,6 +296,10 @@ class BackerRepository extends ServiceEntityRepository
 
         if ($orderRand === true) {
             $qb->orderBy('RAND()');
+        }
+
+        if ($orderBy !== null) {
+            $qb->orderBy($orderBy['sort'], $orderBy['order']);
         }
 
         if ($firstResult !== null) {

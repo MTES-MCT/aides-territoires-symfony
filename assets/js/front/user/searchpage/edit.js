@@ -1,10 +1,6 @@
-require('trumbowyg/dist/trumbowyg.min.js');
-require('trumbowyg/dist/langs/fr.min.js');
+require('../../form/trumbowyg.js');
 
 $(function() {
-    // wysiwyg
-    launchTrumbowyg('.trumbowyg');
-    
     /**
      * Supprimer collection item
      */
@@ -43,21 +39,4 @@ $(function() {
         launchTrumbowyg(newElem.find('textarea'));
     });
 
-})
-
-function launchTrumbowyg(elt)
-{
-    $(elt).trumbowyg({
-        svgPath: '/build/trumbowyg/icons.svg',
-        lang: 'fr',
-        // Redefine the button pane
-        btns: [
-            ['formatting'],
-            ['strong', 'em'],
-            ['link'],
-            ['unorderedList', 'orderedList'],
-            ['removeformat'],            
-            ['fullscreen']
-        ]
-    });
-}
+});

@@ -151,7 +151,6 @@ class AidController extends FrontController
                 'showInSearch' => true
             ]
         );
-
         
         // nb vues des aides du user
         $nbAidsViews = $logAidViewRepository->countCustom(
@@ -333,7 +332,8 @@ class AidController extends FrontController
                 // les aides
                 $aids = $aidRepository->findCustom(
                     [
-                        'author' => $user
+                        'author' => $user,
+                        'showInSearch' => true
                     ]
                 );
 
@@ -640,117 +640,8 @@ class AidController extends FrontController
             throw new NotFoundHttpException('Cette aide n\'exite pas');
         }
 
-        // TODO Revoir pour compléter
-        // limlitation des champs à ce qui était fait dans Django
-        $newAid = new Aid();
-        $newAid->setName($aid->getName());
-        // $newAid->setDescription($aid->getDescription());
-        $newAid->setStatus(Aid::STATUS_DRAFT);
-        // $newAid->setOriginUrl($aid->getOriginUrl());
-        // foreach ($aid->getAidAudiences() as $aidAudience) {
-        //     $newAid->addAidAudience($aidAudience);
-        // }
-        // foreach ($aid->getAidTypes() as $aidType) {
-        //     $newAid->addAidType($aidType);
-        // }
-        // foreach ($aid->getAidDestinations() as $aidDestination) {
-        //     $newAid->addAidDestination($aidDestination);
-        // }
-        // $newAid->setDateStart($aid->getDateStart());
-        // $newAid->setDatePredeposit($aid->getDatePredeposit());
-        // $newAid->setDateSubmissionDeadline($aid->getDateSubmissionDeadline());
-        // $newAid->setContactEmail($aid->getContactEmail());
-        // $newAid->setContactPhone($aid->getContactPhone());
-        // $newAid->setContactDetail($aid->getContactDetail());
-        $newAid->setAuthor($aid->getAuthor());
-        // foreach ($aid->getAidSteps() as $aidStep) {
-        //     $newAid->addAidStep($aidStep);
-        // }
-        // $newAid->setEligibility($aid->getEligibility());
-        // $newAid->setAidRecurrence($aid->getAidRecurrence());
-        // $newAid->setPerimeter($aid->getPerimeter());
-        // $newAid->setApplicationUrl($aid->getApplicationUrl());
-        // foce à false
-        $newAid->setIsImported(false);
-        // force a null
-        $newAid->setImportUniqueid(null);
-        // $newAid->setFinancerSuggestion($aid->getFinancerSuggestion());
-        // $newAid->setImportDataUrl($aid->getImportDataUrl());
-        // $newAid->setDateImportLastAccess($aid->getDateImportLastAccess());
-        // $newAid->setImportShareLicence($aid->getImportShareLicence());
-        // $newAid->setIsCallForProject($aid->isIsCallForProject());
-        // $newAid->setAmendedAid($aid->getAmendedAid());
-        // $newAid->setIsAmendment($aid->isIsAmendment());
-        // $newAid->setAmendmentAuthorName($aid->getAmendmentAuthorName());
-        // $newAid->setAmendmentComment($aid->getAmendmentComment());
-        // $newAid->setAmendmentAuthorEmail($aid->getAmendmentAuthorEmail());
-        // $newAid->setAmendmentAuthorOrg($aid->getAmendmentAuthorOrg());
-        // $newAid->setSubventionRateMin($aid->getSubventionRateMin());
-        // $newAid->setSubventionRateMax($aid->getSubventionRateMax());
-        // $newAid->setSubventionComment($aid->getSubventionComment());
-        // $newAid->setContact($aid->getContact());
-        // $newAid->setInstructorSuggestion($aid->getInstructorSuggestion());
-        // $newAid->setProjectExamples($aid->getProjectExamples());
-        // $newAid->setPerimeterSuggestion($aid->getPerimeterSuggestion());
-        // $newAid->setShortTitle($aid->getShortTitle());
-        // $newAid->setInFranceRelance($aid->isInFranceRelance());
-        // $newAid->setGenericAid($aid->getGenericAid());
-        // $newAid->setLocalCharacteristics($aid->getLocalCharacteristics());
-        // $newAid->setImportDataSource($aid->getImportDataSource());
-        // $newAid->setEligibilityTest($aid->getEligibilityTest());
-        // $newAid->setIsGeneric($aid->isIsGeneric());
-        // $newAid->setImportRawObject($aid->getImportRawObject());
-        // $newAid->setLoanAmount($aid->getLoanAmount());
-        // $newAid->setOtherFinancialAidComment($aid->getOtherFinancialAidComment());
-        // $newAid->setRecoverableAdvanceAmount($aid->getRecoverableAdvanceAmount());
-        // $newAid->setNameInitial($aid->getNameInitial());
-        // $newAid->setAuthorNotification($aid->isAuthorNotification());
-        // $newAid->setImportRawObjectCalendar($aid->getImportRawObjectCalendar());
-        // $newAid->setImportRawObjectTemp($aid->getImportRawObjectTemp());
-        // $newAid->setImportRawObjectTempCalendar($aid->getImportRawObjectTempCalendar());
-        // $newAid->setEuropeanAid($aid->getEuropeanAid());
-        // $newAid->setImportDataMention($aid->getImportDataMention());
-        // $newAid->setHasBrokenLink($aid->isHasBrokenLink());
-        // $newAid->setIsCharged($aid->isIsCharged());
-        // $newAid->setImportUpdated($aid->isImportUpdated());
-        // $newAid->setDsId($aid->getDsId());
-        // $newAid->setDsMapping($aid->getDsMapping());
-        // $newAid->setDsSchemaExists($aid->isDsSchemaExists());
-        // $newAid->setContactInfoUpdated($aid->isContactInfoUpdated());
-        // // on ne reprends pas timePublished
-        // foreach ($aid->getCategories() as $category) {
-        //     $newAid->addCategory($category);
-        // }
-        // foreach ($aid->getKeywords() as $keyWord) {
-        //     $newAid->addKeyword($keyWord);
-        // }
-        // foreach ($aid->getPrograms() as $program) {
-        //     $newAid->addProgram($program);
-        // }
-        // foreach ($aid->getAidFinancers() as $aidFinancer) {
-        //     $newAidFinancer = new AidFinancer();
-        //     $newAidFinancer->setBacker($aidFinancer->getBacker());
-        //     $newAidFinancer->setPosition($aidFinancer->getPosition());
-        //     $newAid->addAidFinancer($newAidFinancer);
-        // }
-        // foreach ($aid->getAidInstructors() as $aidInstructor) {
-        //     $newAidInstructor = new AidInstructor();
-        //     $newAidInstructor->setBacker($aidInstructor->getBacker());
-        //     $newAidInstructor->setPosition($aidInstructor->getPosition());
-        //     $newAid->addAidInstructor($newAidInstructor);
-        // }
-        // // on ne reprends pas aidProjects
-        // // on ne reprends pas aidSuggestedAidProjects
-        // foreach ($aid->getBundles() as $bundle) {
-        //     $newAid->addBundle($bundle);
-        // }
-        // foreach ($aid->getExcludedSearchPages() as $excludedSearchPage) {
-        //     $newAid->addExcludedSearchPage($excludedSearchPage);
-        // }
-        // foreach ($aid->getHighlightedSearchPages() as $highlitedSearchPage) {
-        //     $newAid->addHighlightedSearchPage($highlitedSearchPage);
-        // }
-        // on ne reprends pas tous les logs
+        // duplique l'aide 
+        $newAid = $aidService->duplicateAid($aid, $user);
 
         // sauvegarde
         $managerRegistry->getManager()->persist($newAid);
@@ -775,30 +666,33 @@ class AidController extends FrontController
         LogAidViewRepository $logAidViewRepository,
         LogAidApplicationUrlClickRepository $logAidApplicationUrlClickRepository,
         LogAidOriginUrlClickRepository $logAidOriginUrlClickRepository,
-        AidProjectRepository $aidProjectRepository
+        AidProjectRepository $aidProjectRepository,
+        AidService $aidService
     ) {
         // le user
         $user = $userService->getUserLogged();
 
         // l'aide
         $aid = $aidRepository->findOneBy([
-            'author' => $user,
             'slug' => $slug
         ]);
         if (!$aid instanceof Aid) {
             throw new NotFoundHttpException('Cette aide n\'exite pas');
         }
 
+        // verifie que l'utilisateur appartienne à la structure de l'aide, oue que l'utilisateur est l'auteur de l'aide ou que l'utilisateur est un admin
+        if (!$aidService->canUserAccessStatsPage($user, $aid)) {
+            $this->addFlash(FrontController::FLASH_ERROR, 'Vous n\'avez pas accès à cette page');
+            return $this->redirectToRoute('app_user_aid_publications');
+        }
+
+
         // formulaire periode
         $dateMinGet = $requestStack->getCurrentRequest()->get('dateMin', null);
         $dateMaxGet = $requestStack->getCurrentRequest()->get('dateMax', null);
-        try {
-            $dateMin = new \DateTime(date($dateMinGet));
-            $dateMax = new \DateTime(date($dateMaxGet));
-        } catch (\Exception $e) {
-            $dateMin = null;
-            $dateMax = null;
-        }
+        $dateMin = $dateMinGet ? new \DateTime(date($dateMinGet)) : new \DateTime('-1 month');
+        $dateMax = $dateMaxGet ? new \DateTime(date($dateMaxGet)) : new \DateTime(date('Y-m-d'));
+
         $formAidStatsPeriod = $this->createForm(AidStatsPeriodType::class);
         if ($dateMin) {
             $formAidStatsPeriod->get('dateMin')->setData($dateMin);
@@ -813,8 +707,11 @@ class AidController extends FrontController
         $formAidStatsPeriod->handleRequest($requestStack->getCurrentRequest());
         if ($formAidStatsPeriod->isSubmitted()) {
             if ($formAidStatsPeriod->isValid()) {
-                $periodParams['dateMin'] = $formAidStatsPeriod->get('dateMin')->getData();
-                $periodParams['dateMax'] = $formAidStatsPeriod->get('dateMax')->getData();
+                return $this->redirectToRoute('app_user_aid_stats', [
+                    'slug' => $aid->getSlug(),
+                    'dateMin' => $formAidStatsPeriod->get('dateMin')->getData()->format('Y-m-d'),
+                    'dateMax' => $formAidStatsPeriod->get('dateMax')->getData()->format('Y-m-d')
+                ]);
             }
         }
 
@@ -896,7 +793,8 @@ class AidController extends FrontController
         LogAidViewRepository $logAidViewRepository,
         LogAidApplicationUrlClickRepository $logAidApplicationUrlClickRepository,
         LogAidOriginUrlClickRepository $logAidOriginUrlClickRepository,
-        AidProjectRepository $aidProjectRepository
+        AidProjectRepository $aidProjectRepository,
+        AidService $aidService
     )
     {
         // le user
@@ -905,13 +803,18 @@ class AidController extends FrontController
         // l'aide
         $aid = $aidRepository->findOneBy(
             [
-                'author' => $user,
                 'slug' => $slug
             ]
         );
         if (!$aid instanceof Aid) {
             throw new NotFoundHttpException('Cette aide n\'existe pas');
         }
+        // verifie que l'utilisateur appartienne à la structure de l'aide, oue que l'utilisateur est l'auteur de l'aide ou que l'utilisateur est un admin
+        if (!$aidService->canUserAccessStatsPage($user, $aid)) {
+            $this->addFlash(FrontController::FLASH_ERROR, 'Vous n\'avez pas accès à cette page');
+            return $this->redirectToRoute('app_user_aid_publications');
+        }
+
 
         $dateMinGet = $requestStack->getCurrentRequest()->get('dateMin', null);
         $dateMaxGet = $requestStack->getCurrentRequest()->get('dateMax', null);
@@ -922,10 +825,8 @@ class AidController extends FrontController
             throw new NotFoundHttpException('Cette aide n\'existe pas');
         }
 
-
-
         // nom de fichier
-        $filename = 'Aides-territoires-statistiques.xlxs';
+        $filename = 'Aides-territoires-statistiques';
 
         $response = new StreamedResponse(function () use (
             $aid,

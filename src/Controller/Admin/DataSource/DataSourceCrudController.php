@@ -9,6 +9,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ChoiceField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\DateField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
@@ -28,6 +29,7 @@ class DataSourceCrudController extends AtCrudController
     {
         yield IdField::new('id')->onlyOnIndex();
         yield TextField::new('name', 'Nom');
+        yield BooleanField::new('active', 'Actif');
         yield TextareaField::new('description', 'Description complète de la source de données')
         ->onlyOnForms();
         yield TextareaField::new('importDetails', 'Détails additionels concernant l\'import')

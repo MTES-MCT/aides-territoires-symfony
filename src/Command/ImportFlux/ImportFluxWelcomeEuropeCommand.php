@@ -9,10 +9,8 @@ use App\Entity\Aid\AidRecurrence;
 use App\Entity\Aid\AidStep;
 use App\Entity\Aid\AidType;
 use App\Entity\Category\Category;
-use App\Entity\Keyword\Keyword;
 use App\Entity\Organization\OrganizationType;
 use App\Entity\Reference\KeywordReference;
-use Symfony\Component\DomCrawler\Crawler;
 
 #[AsCommand(name: 'at:import_flux:welcome_europe', description: 'Import de flux welcome europe')]
 class ImportFluxWelcomeEuropeCommand extends ImportFluxCommand
@@ -79,11 +77,6 @@ class ImportFluxWelcomeEuropeCommand extends ImportFluxCommand
             }
         }
         $importRawObject = $aidToImport;
-        foreach ($keys as $key) {
-            if (isset($aidToImport[$key])) {
-                unset($aidToImport[$key]);
-            }
-        }
 
         $description = '';
         if (isset($aidToImport['relations_programmes'])) {
@@ -130,6 +123,9 @@ class ImportFluxWelcomeEuropeCommand extends ImportFluxCommand
                 }
             }
         }
+        if (!$dateStart instanceof \DateTime) {
+            $dateStart = null;
+        }
 
         $dateSubmissionDeadline = null;
         $keys = ['dates_deadline-4', 'dates_deadline-3', 'dates_deadline-2', 'dates_deadline1', 'deadline1'];
@@ -142,7 +138,9 @@ class ImportFluxWelcomeEuropeCommand extends ImportFluxCommand
                 }
             }
         }
-
+        if (!$dateSubmissionDeadline instanceof \DateTime) {
+            $dateSubmissionDeadline = null;
+        }
 
         $contact = null;
         if (isset($aidToImport['info_utile'])) {
@@ -181,9 +179,9 @@ class ImportFluxWelcomeEuropeCommand extends ImportFluxCommand
             'importRawObjectCalendar' => $importRawObjectCalendar,
             'importRawObject' => $importRawObject,
             'europeanAid' => Aid::SLUG_EUROPEAN_SECTORIAL,
-            'name' => isset($aidToImport['post_title']) ? strip_tags($aidToImport['post_title']) : null,
-            'nameInitial' => isset($aidToImport['post_title']) ? strip_tags($aidToImport['post_title']) : null,
-            'shortTitle' => isset($aidToImport['info_references']) ? strip_tags($aidToImport['info_references']) : null,
+            'name' => isset($aidToImport['post_title']) ? $this->cleanName($aidToImport['post_title']) : null,
+            'nameInitial' => isset($aidToImport['post_title']) ? $this->cleanName($aidToImport['post_title']) : null,
+            'shortTitle' => isset($aidToImport['info_references']) ? $this->cleanName($aidToImport['info_references']) : null,
             'description' => $description,
             'eligibility' => $this->getCleanHtml($aidToImport['info_info-regions']),
             'isCallForProject' => true,
@@ -208,6 +206,7 @@ class ImportFluxWelcomeEuropeCommand extends ImportFluxCommand
             if (!$keyword instanceof KeywordReference) {
                 $keyword = new KeywordReference();
                 $keyword->setName($category);
+                $this->managerRegistry->getManager()->persist($keyword);
             }
             $aid->addKeywordReference($keyword);
         }
@@ -383,7 +382,7 @@ class ImportFluxWelcomeEuropeCommand extends ImportFluxCommand
             ]
         ];
 
-        $audiences = explode(';', $aidToImport['filtres_beneficiaries']);
+        $audiences = explode(';', html_entity_decode($aidToImport['filtres_beneficiaries']));
 
         if (is_array($audiences)) {
             foreach ($audiences as $audience) {

@@ -553,7 +553,7 @@ class Aid
     #[ORM\OneToMany(mappedBy: 'aid', targetEntity: ProjectValidated::class)]
     private Collection $projectValidateds;
 
-    #[ORM\OneToMany(mappedBy: 'aid', targetEntity: AidProject::class)]
+    #[ORM\OneToMany(mappedBy: 'aid', targetEntity: AidProject::class, orphanRemoval: true)]
     private Collection $aidProjects;
 
     #[ORM\OneToMany(mappedBy: 'aid', targetEntity: AidSuggestedAidProject::class)]
@@ -615,7 +615,7 @@ class Aid
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $originUrlText = null;
 
-    #[ORM\ManyToMany(targetEntity: KeywordReference::class, inversedBy: 'aids')]
+    #[ORM\ManyToMany(targetEntity: KeywordReference::class, inversedBy: 'aids', cascade:['persist'])]
     private Collection $keywordReferences;
 
     #[ORM\ManyToMany(targetEntity: ProjectReference::class, inversedBy: 'aids')]

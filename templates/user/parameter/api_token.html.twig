@@ -31,6 +31,15 @@
                     <p>Votre Token API :</p>
                     <p><strong>{{ app.user.apiToken }}</strong></p>
                 </div>
+
+                <p>Ce token vous permettra de vous identifier sur l'api en appellant l'url : http://aides-territoires.beta.gouv.fr/api/connexion/</p>
+                <p>L'appel se fait en POST avec dans les <strong>HEADERS</strong> le paramètre <strong>X-AUTH-TOKEN</strong> = votre token</p>
+                <p>Ceci vous donnera un <strong>"Bearer Token"</strong>, valable <strong>24h</strong> à inclure dans tous vos appels de l'API.</p>
+                <p class="fr-alert fr-alert--info">
+                    Dans le Swagger de l'api (https://aides-territoires.beta.gouv.fr/api) pour utiliser le bouton "Authorize" vous devrez mettre en valeur : Bearer VotreTokenBearer</p>
+                </p>
+                <p>Voici un fichier contenant des examples pour le client <a href="https://github.com/ArchGPT/insomnium" target="_blank" title="Le client Insomnium - Ouvre une nouvelle fenêtre">Insomnium</a></p>
+                <p><a href="{{ asset('build/docs/Insomnium_2024-03-08.json') }}" download="{{ asset('build/docs/Insomnium_2024-03-08.json') }}" title="Fichier d'exemple Insomnium">Fichier d'exemple Insomnium</a></p>
             {% endif %}
 
             <div class="fr-alert fr-alert--info">

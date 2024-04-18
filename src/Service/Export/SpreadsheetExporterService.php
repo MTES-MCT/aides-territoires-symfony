@@ -226,33 +226,41 @@ class SpreadsheetExporterService
             case User::class:
                 /** @var User $result */
                 foreach ($results as $key => $result) {
+                    $projectsHaveAids = false;
+                    if ($result->getDefaultOrganization() && $result->getDefaultOrganization()->getProjects()) {
+                        foreach ($result->getDefaultOrganization()->getProjects() as $project) {
+                            if ($project->getAidProjects()) {
+                                $projectsHaveAids = true;
+                                break;
+                            }
+                        }
+                    }
                     $datas[] = [
                         'id' => $result->getId(),
-                        'email' => $result->getEmail(),
-                        'firstname' => $result->getFirstname(),
-                        'lastname' => $result->getLastname(),
-                        'isBeneficiary' => $result->isIsBeneficiary() ? 'Oui' : 'Non',
-                        'isContributor' => $result->isIsContributor() ? 'Oui' : 'Non',
-                        'roles' => implode(',', $result->getRoles()),
-                        'isCertified' => $result->isIsCertified() ? 'Oui' : 'Non',
-                        'mlConsent' => $result->isMlConsent() ? 'Oui' : 'Non',
-                        'timeLastLogin' => $result->getTimeLastLogin() ? $result->getTimeLastLogin()->format('d/m/Y H:i:s') : '',
-                        'timeCreate' => $result->getTimeCreate() ? $result->getTimeCreate()->format('d/m/Y H:i:s') : '',
-                        'timeUpdate' => $result->getTimeUpdate() ? $result->getTimeUpdate()->format('d/m/Y H:i:s') : '',
-                        'invitationTime' => $result->getInvitationTime() ? $result->getInvitationTime()->format('d/m/Y H:i:s') : '',
-                        'timeJoinOrganization' => $result->getTimeJoinOrganization() ? $result->getTimeJoinOrganization()->format('d/m/Y H:i:s') : '',
-                        'acquisitionChannel' => $result->getAcquisitionChannel(),
-                        'acquisitionChannelComment' => $result->getAcquisitionChannelComment(),
-                        'notificationCounter' => $result->getNotificationCounter(),
-                        'notificationEmailFrequency' => $result->getNotificationEmailFrequency(),
-                        'contributorContactPhone' => $result->getContributorContactPhone(),
-                        'contributorOrganization' => $result->getContributorOrganization(),
-                        'contributorRole' => $result->getContributorRole(),
-                        'beneficiaryFunction' => $result->getBeneficiaryFunction(),
-                        'beneficiaryRole' => $result->getBeneficiaryRole(),
-                        'perimeter' => $result->getPerimeter() ? $result->getPerimeter()->getName() : '',
-                        'invitationAuthor' => $result->getInvitationAuthor() ? $result->getInvitationAuthor()->getEmail() : '',
-                        
+                        'Prénom' => $result->getFirstname(),
+                        'Nom' => $result->getLastname(),
+                        'Adresse e-mail' => $result->getEmail(),
+                        'Numéro de téléphone' => $result->getContributorContactPhone(),
+                        'Périmètre de l\'organization' => ($result->getDefaultOrganization() && $result->getDefaultOrganization()->getPerimeter()) ? $result->getDefaultOrganization()->getPerimeter()->getName() : '', 
+                        'Périmètre (region)' => ($result->getDefaultOrganization() && $result->getDefaultOrganization()->getPerimeterRegion()) ? $result->getDefaultOrganization()->getPerimeterRegion()->getName() : '', 
+                        'Périmètre (Département)' => ($result->getDefaultOrganization() && $result->getDefaultOrganization()->getPerimeterDepartment()) ? $result->getDefaultOrganization()->getPerimeterDepartment()->getName() : '', 
+                        'Périmètre (Population)' => ($result->getDefaultOrganization() && $result->getDefaultOrganization()->getPerimeter()) ? $result->getDefaultOrganization()->getPerimeter()->getPopulation() : '', 
+                        'Contributeur ?' => $result->isIsContributor() ? 'Oui' : 'Non',
+                        'Bénéficiaire ?' => $result->isIsBeneficiary() ? 'Oui' : 'Non',
+                        'Nombre d\'aides' => $result->getAids() ? count($result->getAids()) : 0,
+                        'Structure du bénéficiaire' => $result->getDefaultOrganization() ? $result->getDefaultOrganization()->getName() : '',
+                        'ID de l\'organisation' => $result->getDefaultOrganization() ? $result->getDefaultOrganization()->getId() : '',
+                        'Nombre de projets de l\'organisation' => ($result->getDefaultOrganization() && $result->getDefaultOrganization()->getProjects()) ? count($result->getDefaultOrganization()->getProjects()) : 0,
+                        'Présence d\'aides associées à un projet' => $projectsHaveAids ? 'VRAI' : '',
+                        'Organisme (ancien champ)' => $result->getContributorOrganization(),
+                        'Fonction du bénéficiaire' => $result->getBeneficiaryFunction(),
+                        'Rôle (ancien champ)' => $result->getContributorRole(),
+                        'Rôle du bénéficiaire' => $result->getBeneficiaryRole(),
+                        'Date de création' => $result->getTimeCreate() ? $result->getTimeCreate()->format('Y-m-d H:i:s') : '',
+                        'Date de mise à jour' => $result->getTimeUpdate() ? $result->getTimeUpdate()->format('Y-m-d H:i:s') : '',
+                        'dernière connexion' => $result->getTimeLastLogin() ? $result->getTimeLastLogin()->format('Y-m-d H:i:s') : '',
+                        'Type de structure' => ($result->getDefaultOrganization() && $result->getDefaultOrganization()->getOrganizationType()) ? $result->getDefaultOrganization()->getOrganizationType()->getName() : '',
+                        'Code postal de la structure' => $result->getDefaultOrganization() ? $result->getDefaultOrganization()->getZipCode() : '',
                     ];
                     unset($results[$key]);
                 }
@@ -269,6 +277,12 @@ class SpreadsheetExporterService
                         if (is_array($counties)) {
                             $counties = implode(',', $counties);
                         }
+
+                        $projectTypes = [];
+                        foreach ($result->getKeywordSynonymlists() as $keywordSynonymlist) {
+                            $projectTypes[] = $keywordSynonymlist->getName();
+                        }
+
                         $datas[] = [
                             'Nom' => $result->getName(),
                             'Organisation' => $result->getOrganization() ? $result->getOrganization()->getName() : '',
@@ -278,6 +292,8 @@ class SpreadsheetExporterService
                             'Périmètre (Département)' => $counties,
                             'Est public' => $result->isIsPublic() ? 'Oui' : 'Non',
                             'Date création' => $result->getTimeCreate() ? $result->getTimeCreate()->format('d/m/Y H:i:s') : '',
+                            'Projet référent' => $result->getProjectReference() ? $result->getProjectReference()->getName() : '',
+                            'Types de projet (ancien système)' => join(',', $projectTypes),
                         ];
                         unset($results[$key]);
                     }

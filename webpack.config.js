@@ -52,11 +52,14 @@ Encore
     .addEntry('front/aid/aid/index', './assets/js/front/aid/aid/index.js')
     .addEntry('front/aid/aid/edit', './assets/js/front/aid/aid/edit.js')
     .addEntry('front/organization/collaborateurs', './assets/js/front/organization/collaborateurs.js')
+    .addEntry('front/portal/stats', './assets/js/front/portal/stats.js')
     .addEntry('front/project/project', './assets/js/front/project/project.js')
     .addEntry('front/reference/projets_subventionnes', './assets/js/front/reference/projets_subventionnes.js')
     .addEntry('front/program/index', './assets/js/front/program/index.js')
+    .addEntry('front/program/tab_url_parameters', './assets/js/front/program/tab_url_parameters.js')
     .addEntry('front/aid/aid/detail', './assets/js/front/aid/aid/detail.js')
     .addEntry('front/user/register', './assets/js/front/user/register.js')
+    .addEntry('front/user/aid/publications', './assets/js/front/user/aid/publications.js')
     .addEntry('front/user/register-commune', './assets/js/front/user/register-commune.js')
     .addEntry('front/user/project/index', './assets/js/front/user/project/index.js')
     .addEntry('front/user/project/aides', './assets/js/front/user/project/aides.js')
@@ -86,6 +89,7 @@ Encore
     .addEntry('import-scss/aid/aid/detail', './assets/js/import-scss/aid/aid/detail.js')
     .addEntry('import-scss/aid/aid/edit', './assets/js/import-scss/aid/aid/edit.js')
     .addEntry('import-scss/program/program-details', './assets/js/import-scss/program/program-details.js')
+    .addEntry('import-scss/user/aid/publications', './assets/js/import-scss/user/aid/publications.js')
     .addEntry('import-scss/user/register', './assets/js/import-scss/user/register.js')
     .addEntry('import-scss/user/register-commune', './assets/js/import-scss/user/register-commune.js')
     .addEntry('import-scss/user/project/fiche_projet', './assets/js/import-scss/user/project/fiche_projet.js')
@@ -172,6 +176,19 @@ Encore
 
         // only copy files matching this pattern
         pattern: /\.(pdf)$/
+    })
+
+    .copyFiles({
+        from: './assets/docs',
+
+        // optional target path, relative to the output dir
+        // to: 'images/[path][name].[ext]',
+
+        // if versioning is enabled, add the file hash too
+        to: 'docs/[path][name].[hash:8].[ext]',
+
+        // only copy files matching this pattern
+        pattern: /\.(json)$/
     })
 ;
 

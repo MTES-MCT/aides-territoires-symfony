@@ -16,6 +16,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\HtmlSanitizer\HtmlSanitizerInterface;
+use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 #[AsCommand(name: 'at:import_flux:generic', description: 'Import de flux générique, à étendre à chaque nouveau flux')]
@@ -42,6 +43,7 @@ class ImportFluxCommand extends Command
     protected \DateTime $dateImportStart;
 
     public function __construct(
+        protected KernelInterface $kernelInterface,
         protected ManagerRegistry $managerRegistry,
         protected EmailService $emailService,
         protected ParamService $paramService,
@@ -70,6 +72,11 @@ class ImportFluxCommand extends Command
 
         $io = new SymfonyStyle($input, $output);
         $io->title($this->commandTextStart);
+
+        if ($this->kernelInterface->getEnvironment() != 'prod') {
+            $io->info('Uniquement en prod');
+            return Command::FAILURE;
+        }
 
         try  {
             // set la dataSource
@@ -100,7 +107,9 @@ class ImportFluxCommand extends Command
 
         // met à jour le last access
         $this->dataSource->setTimeLastAccess(new \DateTime(date('Y-m-d H:i:s')));
-
+        $this->managerRegistry->getManager()->persist($this->dataSource);
+        $this->managerRegistry->getManager()->flush();
+        
         $timeEnd = microtime(true);
         $time = $timeEnd - $timeStart;
 
@@ -350,6 +359,29 @@ class ImportFluxCommand extends Command
                 $entityUpdated = true;
             }
 
+            // on regarde si modification des audiences
+            $oldArray = $aid->getAidAudiences()->toArray();
+            $aid = $this->setAidAudiences($aidToImport, $aid);
+            $newArray = $aid->getAidAudiences()->toArray();
+
+            $diff = array_diff($oldArray, $newArray);
+            if (!empty($diff)) {
+                $entityUpdated = true;
+            }
+            //-----------------------------------------------------
+
+
+            // on regarde si modification des categories
+            $oldArray = $aid->getCategories()->toArray();
+            $aid = $this->setCategories($aidToImport, $aid);
+            $newArray = $aid->getCategories()->toArray();
+
+            $diff = array_diff($oldArray, $newArray);
+            if (!empty($diff)) {
+                $entityUpdated = true;
+            }
+            //-----------------------------------------------------
+
             if ($entityUpdated) {
                 // notifie que l'aide à été modifié suite à l'import
                 $aid->setImportUpdated(true);
@@ -471,6 +503,15 @@ class ImportFluxCommand extends Command
             $date = null;
         }
         return $date;
+    }
+
+    protected function cleanName(string $name): string
+    {
+        $name = $this->stringService->cleanString($name);
+        if (strlen($name) > 255) {
+            $name = $this->stringService->truncate($name, 255);
+        }
+        return $name;
     }
 
     protected function getHtmlOrNull(string $html): ?string

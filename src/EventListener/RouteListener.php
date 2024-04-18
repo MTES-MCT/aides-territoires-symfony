@@ -3,7 +3,6 @@
 namespace App\EventListener;
 
 use App\Controller\Page\PageController;
-use App\Controller\Portal\PortalController;
 use App\Entity\Page\Page;
 use App\Entity\Program\Program;
 use App\Entity\Search\SearchPage;
@@ -11,12 +10,10 @@ use App\Repository\Page\PageRepository;
 use App\Repository\Search\SearchPageRepository;
 use App\Service\Various\ParamService;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\Asset\Packages;
 use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
-use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
-use Symfony\Component\Routing\Generator\UrlGenerator;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 
@@ -28,7 +25,8 @@ final class RouteListener
         private SearchPageRepository $searchPageRepository,
         private RouterInterface $routerInterface,
         private KernelInterface $kernelInterface,
-        private ParamService $paramService
+        private ParamService $paramService,
+        private Packages $packages
     )
     {
         
@@ -64,7 +62,7 @@ final class RouteListener
         // Le sous-domaine est le premier composant
         $subdomain = $hostParts[0] ?? null;
 
-        if ($subdomain && $host != $subdomain) {
+        if ($subdomain) {
             // spe life-europe.aides-territoires.beta.gouv.fr :
             if ($subdomain == 'life-europe') {
                 $program = $this->entityManagerInterface->getRepository(Program::class)->findOneBy(['slug' => 'life']);
@@ -105,11 +103,13 @@ final class RouteListener
 
                 }
             } else {
-                // // // portail non existant, on redirige vers la page d'accueil
-                // $url = $this->routerInterface->generate('app_home', [], UrlGeneratorInterface::ABSOLUTE_URL);
-                // $response = new RedirectResponse($url);
-                // $event->setResponse($response);
-                // return;
+                if ($host != $this->paramService->get('prod_host')) {
+                    // // // portail non existant, on redirige vers la page d'accueil
+                    $url = $this->routerInterface->generate('app_home', [], UrlGeneratorInterface::ABSOLUTE_URL);
+                    $response = new RedirectResponse($url);
+                    $event->setResponse($response);
+                    return;
+                }
             }
         }
 
@@ -136,6 +136,28 @@ final class RouteListener
                 );
             } catch (\Exception $e) {
 
+            }
+        }
+
+        // 404 static Django
+        $known404 = [
+            '/static/img/logo_AT_og.png' => $this->packages->getUrl('build/images/logo/logo_AT_og.png'),
+            '/static/favicons/favicon.93b88edf055e.svg' => $this->packages->getUrl('build/images/favicon/favicon.svg'),
+            '/static/favicons/favicon-32x32.05f90bae01cd.png' => $this->packages->getUrl('build/images/favicon/favicon.svg'),
+            '/static/favicons/favicon.12acb9fc12ee.ico' => $this->packages->getUrl('build/images/favicon/favicon.ico'),
+            '/static/favicons/favicon.05f90bae01cd.png' => $this->packages->getUrl('build/images/favicon/favicon.svg'),
+            '/favicon.ico' => $this->packages->getUrl('build/images/favicon/favicon.ico'),
+            '/favicon.svg' => $this->packages->getUrl('build/images/favicon/favicon.svg'),
+            '/apple-touch-icon.png' => $this->packages->getUrl('build/images/favicon/apple-touch-icon.png'),
+            '/recherche/trouver-des-aides' => $this->routerInterface->generate('app_aid_aid')
+        ];
+
+        if (isset($known404[$url])) {
+            try {
+                $response = new RedirectResponse($known404[$url]);
+                $event->setResponse($response);
+                return;
+            } catch (\Exception $e) {
             }
         }
     }

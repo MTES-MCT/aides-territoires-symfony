@@ -9,9 +9,9 @@ $(function(){
     }, 'select');
 
     if(typeof commune_search !== 'undefined' && commune_search){
-        var order = [[ 0, 'asc' ], [ 2, 'asc' ], [ 1, 'asc' ]];
+        var order = [[ 0, 'asc' ]];
     }else{
-        var order = [[ 1, 'asc' ], [ 0, 'asc' ]];
+        var order = [[ 1, 'asc' ]];
     }
 
     $('#validated_projects_table').DataTable({

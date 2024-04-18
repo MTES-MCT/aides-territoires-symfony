@@ -6,6 +6,7 @@ use App\Controller\Admin\AtCrudController;
 use App\Entity\Program\PageTab;
 use App\Field\TrumbowygField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\DateTimeField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\FormField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
@@ -21,12 +22,13 @@ class PageTabCrudController extends AtCrudController
     public function configureFields(string $pageName): iterable
     {
         yield IdField::new('id')->onlyOnIndex();
+        yield TextField::new('name', 'Nom');
         yield AssociationField::new('program', 'Program')
         ->autocomplete()
         ->setHelp('Programme lié à cette page.');
-        yield TextField::new('name', 'Nom');
         yield TrumbowygField::new('description', 'Contenu')
         ->hideOnIndex();
+        yield BooleanField::new('active', 'Actif');
         
         yield FormField::addFieldset('A propos de cet onglet');
         yield DateTimeField::new('timeCreate', 'Date de création')

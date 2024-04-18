@@ -6,6 +6,7 @@ use App\Controller\FrontController;
 use App\Entity\Perimeter\Perimeter;
 use App\Entity\Aid\AidSuggestedAidProject;
 use App\Entity\Project\Project;
+use App\Entity\Reference\ProjectReference;
 use App\Form\Program\CountySelectType;
 use App\Form\Project\AddToFavoriteType;
 use App\Form\Project\AidSuggestedType;
@@ -16,15 +17,17 @@ use App\Form\Project\RemoveFromFavoriteType;
 use App\Repository\Aid\AidRepository;
 use App\Repository\Project\ProjectRepository;
 use App\Repository\Project\ProjectValidatedRepository;
+use App\Repository\Reference\ProjectReferenceRepository;
 use App\Service\Log\LogService;
+use App\Service\Project\ProjectService;
 use App\Service\Reference\ReferenceService;
 use App\Service\Various\StringService;
 use App\Service\User\UserService;
 use Doctrine\Persistence\ManagerRegistry;
+use Pagerfanta\Adapter\ArrayAdapter;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Pagerfanta\Doctrine\ORM\QueryAdapter;
 use Pagerfanta\Pagerfanta;
 
 class ProjectController extends FrontController
@@ -36,10 +39,12 @@ class ProjectController extends FrontController
     #[Route('/projets/projets-publics/', name: 'app_project_project_public')]
     public function public(
         ProjectRepository $projectRepository,
+        ProjectReferenceRepository $projectReferenceRepository,
         RequestStack $requestStack,
         LogService $logService,
         UserService $userService,
         ReferenceService $referenceService,
+        ProjectService $projectService
     ): Response
     {
         // le user
@@ -64,23 +69,29 @@ class ProjectController extends FrontController
                     $projectsParams['contractLink'] = $formProjectSearch->get('contractLink')->getData();
                 }
                 if($formProjectSearch->get('name')->getData()){
+                    $projectsParams['search'] = $formProjectSearch->get('name')->getData();
                     $projectsParams = array_merge($projectsParams, $referenceService->getSynonymes($formProjectSearch->get('name')->getData()));
                 }
-            
+                $projectRerence = $projectReferenceRepository->findOneBy(['name' => $formProjectSearch->get('name')->getData()]);
+                if ($projectRerence instanceof ProjectReference) {
+                    $projectsParams['projectReference'] = $projectRerence;
+                }
             }
         }
 
         // parametres recherche
         $projectsParams['isPublic'] = true;
         $projectsParams['status'] = Project::STATUS_PUBLISHED;
-        $projectsParams['limit'] = $params['limit'] ?? 3;
+        // $projectsParams['limit'] = $params['limit'] ?? 3;
         $projectsParams['orderBy'] = [
             'sort' => 'p.timeCreate',
             'order' => 'DESC'
         ];
 
+        $projects = $projectService->searchProjects($projectsParams);
+        
          // le paginateur
-        $adapter = new QueryAdapter($projectRepository->getQuerybuilder($projectsParams));
+        $adapter = new ArrayAdapter($projects);
         $pagerfanta = new Pagerfanta($adapter);
         $pagerfanta->setMaxPerPage(self::NB_PROJECT_BY_PAGE);
         $pagerfanta->setCurrentPage($currentPage);
@@ -343,13 +354,13 @@ class ProjectController extends FrontController
                     $project_perimeter = $formProjectSearch->get('project_perimeter')->getData();
                 }
                 if($formProjectSearch->get('text')->getData()){
-                    $keyword=$formProjectSearch->get('text')->getData()->getName();
+                    $keyword = $formProjectSearch->get('text')->getData();
                 }
 
-                $projects=$projectValidatedRepository->findProjectInRadius(
+                $projects = $projectValidatedRepository->findProjectInRadius(
                     [
                     'perimeter' => $project_perimeter,
-                    'keyword' => $keyword,
+                    'search' => $keyword,
                     'radius' => 30
                     ]
                 );

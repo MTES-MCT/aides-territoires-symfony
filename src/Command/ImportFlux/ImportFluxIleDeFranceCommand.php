@@ -333,6 +333,7 @@ class ImportFluxIleDeFranceCommand extends ImportFluxCommand
             if (!$keyword instanceof KeywordReference) {
                 $keyword = new KeywordReference();
                 $keyword->setName($category['title']);
+                $this->managerRegistry->getManager()->persist($keyword);
             }
             $aid->addKeywordReference($keyword);
         }

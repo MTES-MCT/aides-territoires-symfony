@@ -1,5 +1,17 @@
 {% extends 'base.html.twig' %}
 
+
+{% block stylesheets %}
+	{{ parent() }}
+	{{ encore_entry_link_tags('import-scss/user/aid/publications') }}
+{% endblock %}
+
+{% block javascripts %}
+	{{ parent() }}
+	{{ encore_entry_script_tags('front/user/aid/publications') }}
+{% endblock %}
+
+
 {% block title %}Mon portefeuille d’aides | {{ parent() }}{% endblock %}
 
 {% block body %}
@@ -41,7 +53,7 @@
             {{ form_end(formAidFilter)}}
 
             <div class="fr-table">
-                <table class="sortable-table data-table">
+                <table class="sortable-table data-table" id="table-aids">
                     <caption class="fr-sr-only">
                         La liste de vos aides publiées
                         <br />
@@ -50,6 +62,7 @@
                     <thead>
                         <tr>
                             <th scope="col" class="aid-name-column" title="Trier par Nom de l’aide">Nom de l’aide</th>
+                            <th scope="col" title="Trier par structure">Structure</th>
                             <th scope="col" title="Trier par Périmètre">Périmètre</th>
                             <th scope="col" title="Trier par Créée le">Créée le</th>
                             <th scope="col" title="Trier par Modifiée le">Modifiée le</th>
@@ -70,10 +83,13 @@
                                     <p class="fr-badge fr-badge--success fr-badge--sm">Affichée</p>
                                 {% endif %}
                             </td>
+                            <td>
+                                {% if aid.organization %}{{ aid.organization.name }}{% endif %}
+                            </td>
                             <td>{% if aid.perimeter %}{{ aid.perimeter.name }}{% endif %}</td>
-                            <td data-sort="{{ aid.dateCreate|date('Y-m-d') }}">{{ aid.dateCreate|date('d/m/Y') }}</td>
-                            <td data-sort="{{ aid.timeUpdate|date('Y-m-d') }}">{{ aid.timeUpdate|date('d/m/Y') }}</td>
-                            <td class="nowrap-cell" data-sort="{{ aid.dateSubmissionDeadline|date('Y-m-d') }}">
+                            <td data-sort="{{ aid.dateCreate|date('Ymd') }}">{{ aid.dateCreate|date('d/m/Y') }}</td>
+                            <td data-sort="{{ aid.timeUpdate|date('Ymd') }}">{{ aid.timeUpdate|date('d/m/Y') }}</td>
+                            <td class="nowrap-cell" data-sort="{{ aid.dateSubmissionDeadline|date('Ymd') }}">
                                 {% if aid.dateSubmissionDeadline %}<span>{{ aid.dateSubmissionDeadline|date('d/m/Y') }}</span>{% endif %}
                                 {% if aid.isOngoing %}
                                     <p class="fr-badge fr-badge--info fr-badge--sm">Permanente</p>
@@ -102,9 +118,9 @@
             id="export-aids-btn"
             data-fr-opened="false"
             aria-controls="export-aids-modal-{{ app.user.id }}"
-            {% if app.user.organizations|length == 0 %}disabled="disabled"{% endif %}
+            {% if app.user.organizations|length == 0 or nbAidsLive == 0 %}disabled="disabled"{% endif %}
             >
-            Exporter toutes les aides de votre structure
+            Exporter toutes les aides publiées de votre structure
             </button>    
         </div>
     </div>

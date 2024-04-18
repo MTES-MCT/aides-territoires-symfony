@@ -53,7 +53,7 @@ class AidProjectRepository extends ServiceEntityRepository
     public function getQueryBuilder(array $params = null): QueryBuilder
     {
         $aid = $params['aid'] ?? null;
-        $projectPublic = $params['projecctPublic'] ?? null;
+        $projectPublic = $params['projectPublic'] ?? null;
         $dateMin = $params['dateMin'] ?? null;
         $dateMax = $params['dateMax'] ?? null;
         $dateCreate = $params['dateCreate'] ?? null;
@@ -69,9 +69,8 @@ class AidProjectRepository extends ServiceEntityRepository
 
         if ($projectPublic !== null) {
             $qb
-                ->innerJoin('ap.aid', 'aidForProjectPublic')
-                ->innerJoin('aidForProjectPublic.project', 'projectForPublic')
-                ->andWhere('projectForPublic = :projectPublic')
+                ->innerJoin('ap.project', 'projectForPublic')
+                ->andWhere('projectForPublic.isPublic = :projectPublic')
                 ->setParameter('projectPublic', $projectPublic)
             ;
         }

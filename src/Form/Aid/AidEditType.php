@@ -126,7 +126,7 @@ class AidEditType extends AbstractType
                 'expanded' => true
             ])
             ->add('financers', EntityType::class, [
-                'required' => $isDraft ? false : true,
+                'required' => false,
                 'mapped' => false,
                 'label' => 'Porteurs d\'aides',
                 'help' => 'Saisissez quelques caractères et sélectionnez une valeur parmi les suggestions.',
@@ -239,7 +239,10 @@ class AidEditType extends AbstractType
             ])
             ->add('subventionComment', TextType::class, [
                 'required' => false,
-                'label' => 'Taux de subvention (commentaire optionnel)'
+                'label' => 'Taux de subvention (commentaire optionnel)',
+                'constraints' => [
+                    new Length(max: 255)
+                ]
             ])
             ->add('loanAmount', TypeIntegerType::class, [
                 'required' => false,
@@ -394,7 +397,7 @@ class AidEditType extends AbstractType
                 ]
             ])
             ->add('perimeter', PerimeterAutocompleteType::class, [
-                'required' => $isDraft ? false : true,
+                'required' => false,
                 'label' => 'Zone géographique couverte par l’aide',
                 'help' => 'La zone géographique sur laquelle l\'aide est disponible.<br />
                 Exemples de zones valides :
@@ -420,14 +423,16 @@ class AidEditType extends AbstractType
                 'required' => $isDraft ? false : true,
                 'label' => 'Lien vers plus d’information (url d’origine, site du porteur d’aides)',
                 'constraints' => [
-                    new Url()
+                    new Url(),
+                    new Length(max: 255)
                 ],
             ])
             ->add('applicationUrl', TextType::class, [
                 'required' => false,
                 'label' => 'Lien vers une démarche en ligne pour candidater',
                 'constraints' => [
-                    new Url()
+                    new Url(),
+                    new Length(max: 255)
                 ],
             ])
             ->add('contact', TextareaType::class, [
@@ -504,14 +509,12 @@ class AidEditType extends AbstractType
         $status = $event->getForm()->get('status')->getData();
 
         $fieldsToSwitch = [
-            'financers',
             'aidAudiences',
             'aidTypes',
             'description',
             'categories',
             'aidRecurrence',
             'aidSteps',
-            'perimeter',
             'originUrl',
             'contact',
         ];
@@ -565,6 +568,16 @@ class AidEditType extends AbstractType
                 if ($event->getForm()->has('dateSubmissionDeadline') && !$event->getForm()->get('dateSubmissionDeadline')->getData()) {
                     $event->getForm()->get('dateSubmissionDeadline')->addError(new FormError('Ce champ est obligatoire pour les aides ponctuelles ou récurrentes'));
                 }
+            }
+
+            // porteurs d'aide ou suggesiton porteur d'aide obligatoire
+            if ($event->getForm()->has('financers') && !count($event->getForm()->get('financers')->getData()) && !$event->getForm()->get('financerSuggestion')->getData()) {
+                $event->getForm()->get('financers')->addError(new FormError('Veuillez choisir un porteur d\'aides ou suggérer un nouveau porteur'));
+            }
+
+            // perimetre ou suggestion de périmètre obligatoire
+            if ($event->getForm()->has('perimeter') && !$event->getForm()->get('perimeter')->getData() && !$event->getForm()->get('perimeterSuggestion')->getData()) {
+                $event->getForm()->get('perimeter')->addError(new FormError('Veuillez choisir un périmètre ou suggérer un nouveau périmètre'));
             }
         }
     }

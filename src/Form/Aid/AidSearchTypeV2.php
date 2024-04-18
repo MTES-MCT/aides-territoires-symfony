@@ -27,8 +27,6 @@ use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Form\FormEvent;
-use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Routing\RouterInterface;
 
@@ -84,9 +82,10 @@ class AidSearchTypeV2 extends AbstractType
             ])
             ->add('keyword', TextType::class, [
                 'required' => false,
-                'label' => 'Mot-clés',
+                'label' => 'Projet référent ou mot-clé',
                 'attr' => [
-                    'data-controller' => 'custom-autocomplete'
+                    'data-controller' => 'custom-autocomplete',
+                    'placeholder' => 'Projet référent ou mot-clé'
                 ],
                 'autocomplete' => true,
                 'autocomplete_url' => $this->routerInterface->generate('app_project_reference_ajax_ux_autocomplete'),

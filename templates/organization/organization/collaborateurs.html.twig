@@ -118,6 +118,9 @@
                                 {{ form_row(formInvitation.firstname )}}
                                 {{ form_row(formInvitation.lastname )}}
                                 {{ form_row(formInvitation.email )}}
+                                {% if formInvitation.organization is defined %}
+                                    {{ form_row(formInvitation.organization ) }}
+                                {% endif %}
                                 <footer>
                                     <button class="fr-btn fr-mt-2w" type="submit">
                                         Inviter ce collaborateur

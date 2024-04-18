@@ -11,9 +11,12 @@ use App\Form\Aid\AidSearchTypeV2;
 use App\Repository\Aid\AidRepository;
 use App\Repository\Program\ProgramRepository;
 use App\Repository\Search\SearchPageRepository;
+use App\Service\Page\FaqService;
+use App\Service\Aid\AidSearchClass;
 use App\Service\Aid\AidSearchFormService;
 use App\Service\Aid\AidService;
 use App\Service\Log\LogService;
+use App\Service\Reference\ReferenceService;
 use App\Service\User\UserService;
 use Doctrine\Common\Collections\ArrayCollection;
 use Pagerfanta\Adapter\ArrayAdapter;
@@ -56,9 +59,14 @@ class ProgramController extends FrontController
         AidSearchFormService $aidSearchFormService,
         AidService $aidService,
         UserService $userService,
-        LogService $logService
+        LogService $logService,
+        ReferenceService $referenceService,
+        FaqService $faqService
     ): Response
     {
+        // si onglet selectionne
+        $tabSelected = $requestStack->getCurrentRequest()->get('tab', null);
+
         // gestion pagination
         $currentPage = (int) $requestStack->getCurrentRequest()->get('page', 1);
         
@@ -77,27 +85,6 @@ class ProgramController extends FrontController
                 return $this->redirectToRoute('app_portal_portal_details', ['slug' => $searchPage->getSlug()]);
             }
         }
-
-        // FAQ
-        $faq_questions_answers_date_updated = date('2000-01-01');
-
-        $faqsCategoriesById = [];
-
-        foreach($program->getFaqQuestionAnswsers() as $faq){
-            if($faq->getTimeUpdate()>$faq_questions_answers_date_updated){
-                $faq_questions_answers_date_updated = $faq->getTimeUpdate();
-            }
-            if(!isset($faqsCategoriesById[$faq->getFaqCategory()->getId()])){
-                $faqsCategoriesById[$faq->getFaqCategory()->getId()] = array(
-                    'position' => $faq->getFaqCategory()->getPosition(),
-                    'category' => $faq->getFaqCategory(),
-                    'faqs'  => []
-                );
-            }
-            $faqsCategoriesById[$faq->getFaqCategory()->getId()]['faqs'][] = $faq;
-        }
-
-        usort($faqsCategoriesById, [$this, 'compareByPosition']);
 
         // form recherche d'aide
         $formAidSearchParams = [
@@ -153,6 +140,7 @@ class ProgramController extends FrontController
             'backers' => $aidParams['backers'] ?? null,
             'categories' => $aidParams['categories'] ?? null,
             'programs' => $aidParams['programs'] ?? null,
+            'source' => $program->getSlug()
         ];
         $themes = new ArrayCollection();
         if (isset($aidParams['categories']) && is_array($aidParams['categories'])) {
@@ -197,19 +185,76 @@ class ProgramController extends FrontController
                 $categoriesName[] = $category->getName();
             }
         }
-            
+
+        // pour avoir la recherche surlignée
+        $highlightedWords = $requestStack->getCurrentRequest()->getSession()->get('highlightedWords', []);
+
+        if (isset($aidSearchClass) and $aidSearchClass instanceof AidSearchClass) {
+            $highlightedWords = [];
+            if ($aidSearchClass->getKeyword()) {
+                // on va chercher les synonymes
+                $synonyms = $referenceService->getSynonymes($aidSearchClass->getKeyword());
+                if (isset($synonyms['intentions_string'])) {
+                    $keywords = str_getcsv($synonyms['intentions_string'], ' ', '"');
+                    foreach ($keywords as $keyword) {
+                        if ($keyword && trim($keyword) !== '') {
+                            $highlightedWords[] = $keyword;
+                        }
+                    }
+                } 
+                if (isset($synonyms['objects_string'])) {
+                    $keywords = str_getcsv($synonyms['objects_string'], ' ', '"');
+                    foreach ($keywords as $keyword) {
+                        if ($keyword && trim($keyword) !== '') {
+                            $highlightedWords[] = $keyword;
+                        }
+                    }
+                } 
+                if (isset($synonyms['simple_words_string'])) {
+                    $keywords = str_getcsv($synonyms['simple_words_string'], ' ', '"');
+                    foreach ($keywords as $keyword) {
+                        if ($keyword && trim($keyword) !== '') {
+                            $highlightedWords[] = $keyword;
+                        }
+                    }
+                }
+
+                // si la gestion des synonymes n'a pas fonctionné, on met directement la recherche
+                if (count($highlightedWords) == 0) {
+                    // on met la recherche dans les highlights
+                    $keywords = explode(' ', $aidSearchClass->getKeyword());
+                    foreach ($keywords as $keyword) {
+                        if ($keyword && trim($keyword) !== '' && strlen($keyword) > 2) {
+                            $highlightedWords[] = $keyword;
+                        }
+                    }
+                }
+            }
+        }
+
+        $requestStack->getCurrentRequest()->getSession()->set('highlightedWords', $highlightedWords);
+
+        // date de dernière mise à jour des FAQ
+        foreach ($program->getPageTabs() as $pageTab) {
+            foreach ($pageTab->getFaqs() as $faq) {
+                $faq->setLatestUpdateTime($faqService->getLatestUpdateTime($faq));
+            }
+        }
+
         // rendu template
         return $this->render('program/program/details.html.twig', [
             'program' => $program,
-            'faq_questions_answers_date_updated' => $faq_questions_answers_date_updated,
-            'faqsCategoriesById'   => $faqsCategoriesById,
+            // 'faq_questions_answers_date_updated' => $faq_questions_answers_date_updated,
+            // 'faqsCategoriesById'   => $faqsCategoriesById,
             'myPager' => $pagerfanta,
             'formAidSearch' => $formAidSearch->createView(),
             'formAidSearchNoOrder' => true,
             'showExtended' => $showExtended,
             'querystring' => $query,
             'perimeterName' => (isset($aidParams['perimeterFrom']) && $aidParams['perimeterFrom'] instanceof Perimeter) ? $aidParams['perimeterFrom']->getName() : '',
-            'categoriesName' => $categoriesName
+            'categoriesName' => $categoriesName,
+            'tabSelected' => $tabSelected,
+            'highlightedWords' => $highlightedWords
         ]);
     }
 

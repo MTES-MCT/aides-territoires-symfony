@@ -1,6 +1,0 @@
-lexik_maintenance:
-    authorized:
-        query: { '%env(MAINTENANCE_QUERY_ATTRIBUTE)%': '%env(MAINTENANCE_QUERY_VALUE)%' }
-    driver:
-        # Database driver:
-        class: 'Lexik\Bundle\MaintenanceBundle\Drivers\DatabaseDriver'  

@@ -107,24 +107,24 @@
 							<ul>
 
 								<li>
-									<a href="/comptes/inscription/">Création de compte</a>
+									<a href="{{ path('app_user_user_register') }}" title="Création de compte">Création de compte</a>
 								</li>
 								<li>
-									<a href="/comptes/inscription-mairie/">Création de compte (version spéciale municipalités)</a>
+									<a href="{{ path('app_user_user_register_commune') }}" title="Création de compte (version spéciale municipalités)">Création de compte (version spéciale municipalités)</a>
 								</li>
 								<li>
-									<a href="/comptes/connexion/">Connexion au compte</a>
+									<a href="{{ path('app_login') }}" title="Connexion au compte">Connexion au compte</a>
 								</li>
 								<li>
 									<span class="fr-icon-account-line" title="Page réservée aux utilisateurs connectés" aria-hidden="true"></span>
-									<a href="/comptes/moncompte/">
+									<a href="{{ path('app_user_dashboard') }}" title="Tableau de bord utilisateur">
 										Tableau de bord utilisateur
 										<span class="fr-sr-only">(Page réservée aux utilisateurs connectés)</span>
 									</a>
 								</li>
 								<li>
 									<span class="fr-icon-account-line" title="Page réservée aux utilisateurs connectés" aria-hidden="true"></span>
-									<a href="/comptes/monprofil/">
+									<a href="{{ path('app_user_parameter_profil') }}" title="Profil utilisateur">
 										Profil utilisateur
 										<span class="fr-sr-only">(Page réservée aux utilisateurs connectés)</span>
 									</a>
@@ -139,15 +139,16 @@
 
 								<li>
 									<span class="fr-icon-account-line" title="Page réservée aux utilisateurs connectés" aria-hidden="true"></span>
-									<a href="/alertes/vos-alertes/">
+									<a href="{{ path('app_user_alert') }}" title="Gestion des alertes et souscriptions">
 										Gestion des alertes et souscriptions
 										<span class="fr-sr-only">(Page réservée aux utilisateurs connectés)</span>
 									</a>
 								</li>
-								<li>Structure
+								{# <li>Structure
 									<ul>
 										<li>
 											<span class="fr-icon-account-line" title="Page réservée aux utilisateurs connectés" aria-hidden="true"></span>
+											TODO refaire le lien apres merge edit_backers
 											<a href="/comptes/collaborateurs/">
 												Liste des collaborateurs
 												<span class="fr-sr-only">(Page réservée aux utilisateurs connectés)</span>
@@ -155,13 +156,14 @@
 										</li>
 										<li>
 											<span class="fr-icon-account-line" title="Page réservée aux utilisateurs connectés" aria-hidden="true"></span>
+											TODO refaire le lien apres merge edit_backers
 											<a href="/comptes/rejoindre-une-organisation/">
 												Invitation à rejoindre une autre structure
 												<span class="fr-sr-only">(Page réservée aux utilisateurs connectés)</span>
 											</a>
 										</li>
 									</ul>
-								</li>
+								</li> #}
 								<li>
 									<span class="fr-icon-account-line" title="Page réservée aux utilisateurs connectés" aria-hidden="true"></span>
 									<a href="{{ path('app_user_parameter_history_log') }}">
@@ -171,21 +173,21 @@
 								</li>
 								<li>
 									<span class="fr-icon-account-line" title="Page réservée aux utilisateurs connectés" aria-hidden="true"></span>
-									<a href="/comptes/journal-de-connexion/">
+									<a href="{{ path('app_user_parameter_history_log') }}" title="Journal de connexion">
 										Journal de connexion
 										<span class="fr-sr-only">(Page réservée aux utilisateurs connectés)</span>
 									</a>
 								</li>
 								<li>
 									<span class="fr-icon-account-line" title="Page réservée aux utilisateurs connectés" aria-hidden="true"></span>
-									<a href="/comptes/deconnexion/">
+									<a href="{{ path('app_logout') }}">
 										Déconnexion du compte
 										<span class="fr-sr-only">(Page réservée aux utilisateurs connectés)</span>
 									</a>
 								</li>
 								<li>
 									<span class="fr-icon-account-line" title="Page réservée aux utilisateurs connectés" aria-hidden="true"></span>
-									<a href="/comptes/suppression-compte/">
+									<a href="{{ path('app_user_parameter_profil') }}" title="Suppression du compte">
 										Suppression du compte
 										<span class="fr-sr-only">(Page réservée aux utilisateurs connectés)</span>
 									</a>
@@ -204,14 +206,14 @@
 									<ul>
 										<li>
 											<span class="fr-icon-account-line" title="Page réservée aux utilisateurs connectés" aria-hidden="true"></span>
-											<a href="/aides/publier/">
+											<a href="{{ path('app_user_aid_detail_publish') }}" title="Publication d’une aide">
 												Publication d’une aide
 												<span class="fr-sr-only">(Page réservée aux utilisateurs connectés)</span>
 											</a>
 										</li>
 										<li>
 											<span class="fr-icon-account-line" title="Page réservée aux utilisateurs connectés" aria-hidden="true"></span>
-											<a href="/aides/publications/">
+											<a href="{{ path('app_user_aid_publications') }}" title="Portefeuille d’aides">
 												Portefeuille d’aides
 												<span class="fr-sr-only">(Page réservée aux utilisateurs connectés)</span>
 											</a>
@@ -225,7 +227,7 @@
 
 							<h2>Blog</h2>
 							<ul>
-								<li><a href="/blog/">Liste des billets</a></li>
+								<li><a href="{{ path('app_blog_blog') }}" title="Liste des billets">Liste des billets</a></li>
 							</ul>
 						</section>
 
@@ -233,7 +235,7 @@
 
 							<h2>Cartographie</h2>
 							<ul>
-								<li><a href="/cartographie/">Cartographie</a></li>
+								<li><a href="{{ path('app_cartography_cartography') }}" title="Cartographie">Cartographie</a></li>
 							</ul>
 						</section>
 
@@ -241,8 +243,8 @@
 
 							<h2>Portails</h2>
 							<ul>
-								<li><a href="/portails/">Les portails</a></li>
-								<li><a href="/portails/europe/">Les financements européens 2021-2027</a></li>
+								<li><a href="/portails/" title="Les portails">Les portails</a></li>
+								<li><a href="/portails/europe/" title="Les financements européens 2021-2027">Les financements européens 2021-2027</a></li>
 							</ul>
 						</section>
 
@@ -250,7 +252,7 @@
 
 							<h2>Programmes</h2>
 							<ul>
-								<li><a href="/programmes/">Liste des programmes</a></li>
+								<li><a href="{{ path('app_program_program') }}" title="Liste des programmes">Liste des programmes</a></li>
 							</ul>
 						</section>
 
@@ -259,12 +261,12 @@
 							<h2>Projets</h2>
 							<ul>
 								<li>
-									<a href="/projets/projets-publics/">
+									<a href="{{ path('app_project_project_public') }}" title="Liste des projets publics">
 										Liste des projets publics
 									</a>
 								</li>
 								<li>
-									<a href="/projets/projets-subventionnes/">
+									<a href="{{ path('app_project_project_subsidized') }}" title="Liste des projets subventionnés">
 										Liste des projets subventionnés
 									</a>
 								</li>
@@ -273,21 +275,21 @@
 									<ul>
 										<li>
 											<span class="fr-icon-account-line" title="Page réservée aux utilisateurs connectés" aria-hidden="true"></span>
-											<a href="/projets/vos-projets/">
+											<a href="{{ path('app_user_project_structure') }}" title="Liste des projets de l’utilisateur">
 												Liste des projets de l’utilisateur
 												<span class="fr-sr-only">(Page réservée aux utilisateurs connectés)</span>
 											</a>
 										</li>
 										<li>
 											<span class="fr-icon-account-line" title="Page réservée aux utilisateurs connectés" aria-hidden="true"></span>
-											<a href="/projets/cr%C3%A9er/">
+											<a href="{{ path('app_user_project_creation_projet') }}" title="Création d’un nouveau projet">
 												Création d’un nouveau projet
 												<span class="fr-sr-only">(Page réservée aux utilisateurs connectés)</span>
 											</a>
 										</li>
 										<li>
 											<span class="fr-icon-account-line" title="Page réservée aux utilisateurs connectés" aria-hidden="true"></span>
-											<a href="/projets/projets-favoris/">
+											<a href="{{ path('app_user_project_favoris') }}" title="Liste des projets favoris">
 												Liste des projets favoris
 												<span class="fr-sr-only">(Page réservée aux utilisateurs connectés)</span>
 											</a>
