@@ -1,6 +1,4 @@
-require('trumbowyg/dist/trumbowyg.min.js');
-require('trumbowyg/dist/langs/fr.min.js');
-require('trumbowyg/dist/plugins/cleanpaste/trumbowyg.cleanpaste.min.js');
+require('../../form/trumbowyg.js');
 require('./enable_page_exit_confirmation.js');
 require('./stepper.js');
 require ('../../../form/input-maxlength.js');
@@ -44,27 +42,6 @@ $(function(){
             $('#aid_edit_status').val($(this).attr('data-status'));
         }
     }, '.submit-change-status');
-
-
-
-    // wysiwyg
-    $('.trumbowyg').trumbowyg({
-        svgPath: '/build/trumbowyg/icons.svg',
-        lang: 'fr',
-        // Redefine the button pane
-        btns: [
-            ['formatting'],
-            ['strong', 'em'],
-            ['link'],
-            ['unorderedList', 'orderedList'],
-            ['removeformat'],            
-            ['fullscreen']
-        ],
-        plugins: {
-            // nettoyage texte word
-            cleanpaste: true
-        }
-    });
 });
 
 function toggleElements(parent, value, checked)

@@ -110,7 +110,7 @@ $('textarea:not(.trumbowyg-textarea):not(.not-trumbowyg)').trumbowyg({
         ['justifyLeft', 'justifyCenter', 'justifyRight'],
     ],
     plugins: {
-        // Add imagur parameters to upload plugin for demo purposes
+        // Image upload
         upload: {
             serverPath: Routing.generate('app_admin_upload_image'),
             fileFieldName: 'image',
