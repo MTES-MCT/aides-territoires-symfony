@@ -4,13 +4,11 @@ namespace App\Form\Type;
 
 use App\Entity\Perimeter\Perimeter;
 use App\Repository\Perimeter\PerimeterRepository;
-use App\Service\User\UserService;
 use Doctrine\ORM\QueryBuilder;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\UX\Autocomplete\Form\AsEntityAutocompleteField;
 use Symfony\UX\Autocomplete\Form\BaseEntityAutocompleteType;
-use Symfony\UX\Autocomplete\Form\ParentEntityAutocompleteType;
 
 #[AsEntityAutocompleteField]
 class PerimeterCityAutocompleteType extends AbstractType
@@ -22,8 +20,14 @@ class PerimeterCityAutocompleteType extends AbstractType
             'placeholder' => 'Toutes les communes',
             'choice_label' => function($entity){
 
-                if($entity->getScale()==1){
-                    return $entity->getName().' (COMMUNE - '.implode(',', $entity->getZipcodes()).')';
+                if($entity->getScale() == 1){
+                    $return = $entity->getName();
+                    if (is_array($entity->getZipcodes())) {
+                        $return .= ' (COMMUNE - '.implode(',', $entity->getZipcodes()).')';
+                    } else {
+                        $return .=  ' (COMMUNE - '.(string) $entity->getZipcodes().')';
+                    }
+                    return $return;
                 }else{
                     if(isset(Perimeter::SCALES_FOR_SEARCH[$entity->getScale()]['name'])){
                         return $entity->getName(). ' ('.Perimeter::SCALES_FOR_SEARCH[$entity->getScale()]['name'].')';
