@@ -35,8 +35,8 @@ class ProjectEditType extends AbstractType
     {
         $builder
         ->add('name', TextType::class, [
-            'label'=>'Nom du projet :*',
-            'required'=>false,
+            'label'=>'Nom du projet :',
+            'required' => true,
             'help' => 'Donnez un nom explicite : préférez \'végétalisation du quartier des coteaux\' à \'quartier des coteaux\'',
             'sanitize_html' => true,
         ])
