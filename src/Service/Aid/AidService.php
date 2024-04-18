@@ -219,9 +219,11 @@ class AidService
 
     public function userCanSee(Aid $aid, ?User $user) : bool {
         if (!$aid->isPublished()) {
-            if ($user && $aid->getAuthor() && ($user->getId() == $aid->getAuthor()->getId())) {
+            if ($user && $aid->getAuthor() && ($user->getId() == $aid->getAuthor()->getId())) { // c'est l'auteur
                 return true;
-            } else if ($user && $this->userService->isUserGranted($user, User::ROLE_ADMIN)) {
+            } else if ($user && $aid->getOrganization() && $aid->getOrganization()->getBeneficiairies() && $aid->getOrganization()->getBeneficiairies()->contains($user)) { // le user fait parti de l'organization de l'aide
+                return true;
+            } else if ($user && $this->userService->isUserGranted($user, User::ROLE_ADMIN)) { // c'est un admin
                 return true;
             } else {
                 return false;
