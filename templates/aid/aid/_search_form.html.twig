@@ -26,10 +26,15 @@
                             </div>
 
                             <div id="search-form-extra-fields" class="{% if showExtended %}show{% endif %}">
-                                <div class="fr-grid-row fr-grid-row--gutters fr-grid-row--center fr-mb-2w">
+                                <div class="fr-grid-row fr-grid-row--gutters fr-grid-row--left fr-grid-row--bottom fr-mb-2w">
                                     <div class="fr-col-12 fr-col-md-3">
                                         {{ form_row(formAidSearch.aidTypes)}}
                                     </div>
+                                    {% if formAidSearch.aidTypeSupport is defined %}
+                                    <div class="fr-col-12 fr-col-md-3">
+                                        {{ form_row(formAidSearch.aidTypeSupport)}}
+                                    </div>
+                                    {% endif %}
                                     <div class="fr-col-12 fr-col-md-3">
                                         {{ form_row(formAidSearch.backerschoice)}}
                                     </div>
@@ -54,10 +59,11 @@
                                     <div class="fr-col-12 fr-col-md-3">
                                         {{ form_row(formAidSearch.europeanAid)}}
                                     </div>   
+                                    <div class="fr-col-12 fr-col-md-9">
+                                        {{ form_row(formAidSearch.isCallForProject)}}
+                                    </div>  
                                     {% endif %}                              
                                 </div>
-
-                                {{ form_row(formAidSearch.isCallForProject)}}
                             </div>
 
                             <div class="fr-mt-2w">

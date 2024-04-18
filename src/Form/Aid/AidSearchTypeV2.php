@@ -7,6 +7,7 @@ use App\Entity\Aid\AidDestination;
 use App\Entity\Aid\AidStep;
 use App\Entity\Aid\AidType;
 use App\Entity\Aid\AidTypeGroup;
+use App\Entity\Aid\AidTypeSupport;
 use App\Entity\Backer\Backer;
 use App\Entity\Category\Category;
 use App\Entity\Category\CategoryTheme;
@@ -170,12 +171,19 @@ class AidSearchTypeV2 extends AbstractType
                         return $entityRepository   
                         ->createQueryBuilder('at')
                         ->innerJoin('at.aidTypeGroup', 'aidTypeGroup')
-                        ->orderBy('aidTypeGroup.name', 'ASC')
-                        ->addorderBy('at.name', 'ASC')
+                        ->orderBy('aidTypeGroup.position', 'ASC')
+                        ->addorderBy('at.position', 'ASC')
                         ;
                     },
                     'multiple' => true,
                     'expanded' => true
+                ])
+                ->add('aidTypeSupport', EntityType::class, [
+                    'required' => false,
+                    'label' => 'Type de l\'aide',
+                    'placeholder' => 'Toutes les types d\'aide',
+                    'class' => AidTypeSupport::class,
+                    'choice_label' => 'name',
                 ])
                 ->add('backerschoice', EntityType::class, [
                     'required' => false,

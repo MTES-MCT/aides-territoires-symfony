@@ -7,6 +7,7 @@ use App\Entity\Aid\AidRecurrence;
 use App\Entity\Aid\AidStep;
 use App\Entity\Aid\AidType;
 use App\Entity\Aid\AidTypeGroup;
+use App\Entity\Aid\AidTypeSupport;
 use App\Entity\Backer\Backer;
 use App\Entity\Category\Category;
 use App\Entity\Keyword\KeywordSynonymlist;
@@ -78,6 +79,11 @@ class AidSearchFormService
             }
             $params['aidTypes'] = $aidTypes;
         }
+
+        if ($aidSearchClass->getAidTypeSupport()) {
+            $params['aidTypeSupport'] = $aidSearchClass->getAidTypeSupport()->getId();
+        }
+
         if ($aidSearchClass->getBackerschoice()) {
             $backers = [];
             foreach ($aidSearchClass->getBackerschoice() as $backer) {
@@ -152,6 +158,10 @@ class AidSearchFormService
 
         if ($aidSearchClass->getAidTypes()) {
             $aidParams['aidTypes'] = $aidSearchClass->getAidTypes();
+        }
+
+        if ($aidSearchClass->getAidTypeSupport()) {
+            $aidParams['aidTypeSupport'] = $aidSearchClass->getAidTypeSupport();
         }
 
         if ($aidSearchClass->getOrderBy()) {
@@ -422,6 +432,20 @@ class AidSearchFormService
 
         /**
          * > AidType
+        */
+
+        /**
+         * > AidTypeSupport
+        */
+        if (isset($queryParams['aidTypeSupport'])) {
+            $aidTypeSupport = $this->managerRegistry->getRepository(AidTypeSupport::class)->find((int) $queryParams['aidTypeSupport']);
+            if ($aidTypeSupport instanceof AidTypeSupport) {
+                $aidSearchClass->setAidTypeSupport($aidTypeSupport);
+            }
+        }
+
+        /**
+         * < AidTypeSupport
         */
         
         /**
@@ -806,6 +830,13 @@ class AidSearchFormService
             unset($params['aidTypes[]']);
         }
 
+        if (isset($params['aidTypeSupport'])) {
+            $aidTypeSupport = $this->managerRegistry->getRepository(AidTypeSupport::class)->find((int) $params['aidTypeSupport']);
+            if ($aidTypeSupport instanceof AidTypeSupport) {
+                $params['aidTypeSupport'] = $aidTypeSupport;
+            }
+        }
+
         if (isset($params['backers[]']) && is_array($params['backers[]'])) {
             $backers = [];
             foreach ($params['backers[]'] as $idBacker) {
@@ -930,7 +961,7 @@ class AidSearchFormService
     public function setShowExtended(Form $formAidSearch): bool
     {
         $showExtended = false;
-        $fields = ['aidTypes', 'backers', 'applyBefore', 'programs', 'aidSteps', 'aidDestinations', 'isCharged', 'europeanAid', 'isCallForProject'];
+        $fields = ['aidTypes', 'aidTypeSupport', 'backers', 'applyBefore', 'programs', 'aidSteps', 'aidDestinations', 'isCharged', 'europeanAid', 'isCallForProject'];
         foreach ($fields as $field) {
             if ($formAidSearch->has($field) && $formAidSearch->get($field)->getData()) {
                 if ($formAidSearch->get($field)->getData() instanceof ArrayCollection) {
@@ -950,6 +981,7 @@ class AidSearchFormService
     {
         if (
             $aidSearchClass->getAidTypes() ||
+            $aidSearchClass->getAidTypeSupport() ||
             $aidSearchClass->getBackerschoice() ||
             $aidSearchClass->getApplyBefore() ||
             $aidSearchClass->getPrograms() ||

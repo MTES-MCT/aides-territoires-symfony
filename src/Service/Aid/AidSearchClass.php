@@ -6,6 +6,7 @@ use App\Entity\Aid\AidDestination;
 use App\Entity\Aid\AidRecurrence;
 use App\Entity\Aid\AidStep;
 use App\Entity\Aid\AidType;
+use App\Entity\Aid\AidTypeSupport;
 use App\Entity\Backer\Backer;
 use App\Entity\Category\Category;
 use App\Entity\Organization\OrganizationType;
@@ -30,6 +31,11 @@ class AidSearchClass
      */
     private $aidTypes;
     
+    /**
+     * @var ?AidTypeSupport
+     */
+    private $aidTypeSupport;
+
     /**
      * @var ?ArrayCollection|AidType[]
      */
@@ -62,6 +68,7 @@ class AidSearchClass
         $this->categorysearch = null;
         $this->newIntegration = null;
         $this->aidTypes = null;
+        $this->aidTypeSupport = null;
         $this->orderBy = null;
         $this->backerschoice = null;
         $this->applyBefore = null;
@@ -163,6 +170,16 @@ class AidSearchClass
         if (!$this->aidTypes->contains($aidType)) {
             $this->aidTypes->add($aidType);
         }
+    }
+
+    public function getAidTypeSupport(): ?AidTypeSupport
+    {
+        return $this->aidTypeSupport;
+    }
+
+    public function setAidTypeSupport(?AidTypeSupport $aidTypeSupport): void
+    {
+        $this->aidTypeSupport = $aidTypeSupport;
     }
 
     public function getBackerschoice(): ?ArrayCollection

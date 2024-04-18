@@ -297,7 +297,7 @@ class AidCrudController extends AtCrudController
         ->autocomplete()
         ->hideOnIndex()
         ->setColumns(12);
-        yield AssociationField::new('aidTypes', 'Types d\'aide')
+        yield AssociationField::new('aidTypes', 'Nautres de l\'aide')
         ->setFormTypeOption('choice_label', function ($entity) {
             $return = '';
             if ($entity) {
@@ -312,13 +312,23 @@ class AidCrudController extends AtCrudController
             'query_builder' => function (EntityRepository $er) {
                 return $er->createQueryBuilder('at')
                 ->innerJoin('at.aidTypeGroup', 'aidTypeGroup')
-                ->orderBy('aidTypeGroup.name', 'ASC');
+                ->orderBy('aidTypeGroup.position', 'ASC')
+                ->addOrderBy('at.position', 'ASC')
+                ;
             },
         ])
         ->setHelp('Précisez le ou les types de l’aide.')
         ->hideOnIndex()
         ->setColumns(12);
-
+        yield AssociationField::new('aidTypeSupport', 'Type de l\'aide')
+        ->setFormTypeOption('choice_label', function ($entity) {
+            return $entity->getName();
+        })
+        ->setFormTypeOption('attr', [
+            'placeholder' => 'Tous les types'
+        ])
+        ->hideOnIndex()
+        ->setColumns(12);
                 
         yield AssociationField::new('aidSteps', 'État d’avancement du projet pour bénéficier du dispositif ')
         ->hideOnIndex()
@@ -511,10 +521,7 @@ class AidCrudController extends AtCrudController
         ->setHelp('Ne pas cocher pour les aides sous adhésion et ajouter la mention « *sous adhésion » dans les critères d’éligibilité.')
         ->hideOnIndex()
         ->setColumns(12);
-        yield AssociationField::new('aidTypeSupport', 'Type d\'appui')
-        ->setFormTypeOption('choice_label', function ($entity) {
-            return $entity->getName();
-        });
+
         
         yield IntegerField::new('subventionRateMin', 'Taux de subvention min. (en %, nombre entier)')
         ->hideOnIndex()
