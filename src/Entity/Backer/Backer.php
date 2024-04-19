@@ -801,8 +801,9 @@ class Backer
     public function setActive(bool $active): static
     {
         $this->active = $active;
+        return $this;
     }
-  
+
     public function getNbAids(): ?int
     {
         return $this->nbAids;
