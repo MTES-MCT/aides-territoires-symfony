@@ -3,6 +3,7 @@
 namespace App\Controller\Admin;
 
 use App\Controller\Admin\Aid\AidCrudController;
+use App\Controller\Admin\Backer\BackerCrudController;
 use App\Controller\Admin\Page\PageCrudController;
 use App\Controller\Admin\Project\ProjectCrudController;
 use App\Controller\Admin\User\ApiTokenAskCrudController;
@@ -141,6 +142,15 @@ class DashboardController extends AbstractDashboardController
             ->set('filters[status][comparison]', '=')
             ->generateUrl();
 
+        // Fiches porteurs d'aides en attente de validation
+        $nbBackersInReview = $this->managerRegistry->getRepository(Backer::class)->countReviewable();
+        $urlBackersInReview = $this->adminUrlGenerator
+            ->setController(BackerCrudController::class)
+            ->setAction(Action::INDEX)
+            ->set('filters[active][value]', false)
+            ->generateUrl();
+
+        // rendu template
         return $this->render('admin/dashboard.html.twig', [
             'nbAidsInReview' => $nbAidsInReview,
             'urlAidsInReview' => $urlAidsInReview,
@@ -150,7 +160,9 @@ class DashboardController extends AbstractDashboardController
             'urlApiTokenAsk' => $urlApiTokenAsk,
             'chart' => $chart,
             'nbProjectsInReview' => $nbProjectsInReview,
-            'urlProjectsInReview' => $urlProjectsInReview
+            'urlProjectsInReview' => $urlProjectsInReview,
+            'nbBackersInReview' => $nbBackersInReview,
+            'urlBackersInReview' => $urlBackersInReview,
         ]);
     }
     public function configureAssets(): Assets

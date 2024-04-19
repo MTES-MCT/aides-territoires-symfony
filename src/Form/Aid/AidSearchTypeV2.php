@@ -16,6 +16,7 @@ use App\Service\User\UserService;
 use App\Form\Type\EntityCheckboxAbsoluteType;
 use App\Form\Type\EntityCheckboxGroupAbsoluteType;
 use App\Form\Type\PerimeterAutocompleteType;
+use App\Repository\Backer\BackerRepository;
 use App\Service\Aid\AidSearchClass;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -186,9 +187,15 @@ class AidSearchTypeV2 extends AbstractType
                     ],
                     'autocomplete' => true,
                     'multiple' => true,
-                    'query_builder' => function(EntityRepository $entityRepository) {
-                        return $entityRepository->createQueryBuilder('b')->orderBy('b.name', 'ASC');
-                    }
+                    'query_builder' => function(BackerRepository $backerRepository) {
+                        return $backerRepository->getQueryBuilder([
+                            'active' => true,
+                            'orderBy' => [
+                                'sort' => 'b.name',
+                                'order' => 'ASC'
+                            ]
+                        ]);
+                    },
                 ])
                 ->add('applyBefore', DateType::class, [
                     'required' => false,

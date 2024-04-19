@@ -6,12 +6,14 @@ use App\Controller\Admin\AtCrudController;
 use App\Entity\Backer\Backer;
 use App\Field\TextLengthCountField;
 use App\Field\TrumbowygField;
+use App\Form\Admin\Backer\BackerUserCollectionType;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Filters;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\CollectionField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\FormField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ImageField;
@@ -30,6 +32,7 @@ class BackerCrudController extends AtCrudController
     public function configureFilters(Filters $filters): Filters
     {
         return $filters
+            ->add('active')
             ->add('isSpotlighted')
         ;
     }
@@ -42,9 +45,21 @@ class BackerCrudController extends AtCrudController
             ->setFormTypeOption('attr', ['readonly' => true, 'autocomplete' => 'off'])
             ->setHelp('Laisser vide pour autoremplir.')
         ;
+        yield BooleanField::new('active', 'Actif')
+            ->setHelp('Un porteur d’aides actif est visible sur le site');
         yield TrumbowygField::new('description', 'Description')
         ->onlyOnForms();
-        
+        yield TrumbowygField::new('backerType', 'Type de porteur')
+        ->onlyOnForms();
+        yield TrumbowygField::new('projectsExamples', 'Exemples de projets accompagnés par le porteur')
+        ->onlyOnForms();
+        yield TrumbowygField::new('internalOperation', 'Mode de fonctionnement interne pour obtenir une aide')
+        ->onlyOnForms();
+        yield TrumbowygField::new('contact', 'Contact')
+        ->onlyOnForms();
+        yield TrumbowygField::new('usefulLinks', 'Liens utiles')
+        ->onlyOnForms();
+
         yield ImageField::new('logoFile', 'Logo du porteur')
         ->setHelp('Évitez les fichiers trop lourds. Préférez les fichiers SVG.')
         ->setUploadDir($this->fileService->getUploadTmpDirRelative())

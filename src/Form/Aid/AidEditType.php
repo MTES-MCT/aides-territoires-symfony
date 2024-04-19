@@ -20,6 +20,7 @@ use App\Form\Type\EntityCheckboxAbsoluteType;
 use App\Form\Type\EntityCheckboxGroupAbsoluteType;
 use App\Form\Type\EntityGroupedType;
 use App\Form\Type\PerimeterAutocompleteType;
+use App\Repository\Backer\BackerRepository;
 use App\Service\User\UserService;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -36,7 +37,7 @@ use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Validator\Constraints\Count as ConstraintsCount;
+use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\PositiveOrZero;
 use Symfony\Component\Validator\Constraints\Url;
@@ -45,13 +46,25 @@ class AidEditType extends AbstractType
 {
     public function __construct(
         protected ManagerRegistry $managerRegistry,
-        protected UserService $userService
+        protected UserService $userService,
+        protected RouterInterface $routerInterface
     )
     {
         
     }
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        // regarde si l'utilisateur à rempli toutes ses fiches porteur d'aides
+        $user = $this->userService->getUserLogged();
+        $needUpdateBacker = false;
+        /** @var Organization $organization */
+        foreach ($user->getOrganizations() as $organization) {
+            if (!$organization->getBacker()) {
+                $needUpdateBacker = true;
+            }
+        }
+
+        // l'aide
         $aid = $options['data'] ?? null;
         $isDraft = ($aid instanceof Aid && $aid->getStatus() === Aid::STATUS_DRAFT) || ($aid instanceof Aid && !$aid->getId());
 
@@ -84,6 +97,62 @@ class AidEditType extends AbstractType
             }
         }
 
+        // paramètres organization
+        $organizationParams = [
+            'required' => true,
+            'label' => 'La structure pour laquelle vous publiez cette aide',
+            'class' => Organization::class,
+            'choice_label' => function(Organization $organization) {
+                $return = $organization->getName();
+                if (!$organization->getBacker()) {
+                    $return .= ' (fiche porteur d\'aides à compléter)';
+                } else if ($organization->getBacker() && !$organization->getBacker()->isActive()) {
+                    $return .= ' (fiche porteur d\'aides en attente de validation)';
+                }
+                return $return;
+            },
+            'query_builder' => function(EntityRepository $entityRepository) {
+                return $entityRepository->createQueryBuilder('o')
+                ->innerJoin('o.beneficiairies', 'beneficiairies')
+                ->andWhere('beneficiairies = :user')
+                ->setParameter('user', $this->userService->getUserLogged())
+                ->orderBy('o.name', 'ASC')
+                ;
+            },
+            'placeholder' => 'Choisissez une structure',
+        ];
+        $organizationParams['choice_attr'] = function(Organization $organization) use ($aid) {
+            // bloquage pour les nouvelles aides
+            if (!$aid->getId()) {
+                if (!$organization->getBacker()) {
+                    return ['disabled' => true];
+                } else {
+                    return [];
+                }
+            } else {
+                // si aide existante, on empêche de changer d'organisation pour une non valide
+                if ($organization && $aid->getOrganization() && $organization->getId() === $aid->getOrganization()->getId()) {
+                    return [];
+                } else if (!$organization->getBacker()) {
+                    return ['disabled' => true];
+                } else {
+                    return [];
+                }
+            }
+        };
+
+        if ($needUpdateBacker) {
+            $help = '<div class="fr-alert fr-alert--info">Pour choisir une structure, vous devez avoir remplir sa fiche Porteur d\'aides';
+            foreach ($user->getOrganizations() as $organization) {
+                if (!$organization->getBacker()) {
+                    $help .= '<br />- <a href="' . $this->routerInterface->generate('app_organization_backer_edit', ['id' => $organization->getId(), 'idBacker' => 0]) . '">' . $organization->getName() . '</a>';
+                }
+            }
+            $help .= '</div>';
+            $organizationParams['help'] = $help;
+            $organizationParams['help_html'] = true;
+        }
+
         $builder
             ->add('name', TextType::class, [
                 'required' => true,
@@ -101,20 +170,7 @@ class AidEditType extends AbstractType
                 'label' => 'Nom initial',
                 'help' => 'Comment cette aide s’intitule-t-elle au sein de votre structure ? Exemple : AAP Mob’Biodiv',
             ])
-            ->add('organization', EntityType::class, [
-                'required' => true,
-                'label' => 'L\'organisation pour laquelle vous publiez cette aide',
-                'class' => Organization::class,
-                'choice_label' => 'name',
-                'query_builder' => function(EntityRepository $entityRepository) {
-                    return $entityRepository->createQueryBuilder('o')
-                    ->innerJoin('o.beneficiairies', 'beneficiairies')
-                    ->andWhere('beneficiairies = :user')
-                    ->setParameter('user', $this->userService->getUserLogged())
-                    ->orderBy('o.name', 'ASC')
-                    ;
-                },
-            ])
+            ->add('organization', EntityType::class, $organizationParams)
             ->add('programs', EntityCheckboxAbsoluteType::class, [
                 'required' => false,
                 'label' => 'Programmes d\'aides',
@@ -136,8 +192,14 @@ class AidEditType extends AbstractType
                 ],
                 'autocomplete' => true,
                 'multiple' => true,
-                'query_builder' => function(EntityRepository $entityRepository) {
-                    return $entityRepository->createQueryBuilder('b')->orderBy('b.name', 'ASC');
+                'query_builder' => function(BackerRepository $backerRepository) {
+                    return $backerRepository->getQueryBuilder([
+                        'active' => true,
+                        'orderBy' => [
+                            'sort' => 'b.name',
+                            'order' => 'ASC'
+                        ]
+                    ]);
                 },
                 'data' => $financers
             ])
@@ -158,8 +220,14 @@ class AidEditType extends AbstractType
                 ],
                 'autocomplete' => true,
                 'multiple' => true,
-                'query_builder' => function(EntityRepository $entityRepository) {
-                    return $entityRepository->createQueryBuilder('b')->orderBy('b.name', 'ASC');
+                'query_builder' => function(BackerRepository $backerRepository) {
+                    return $backerRepository->getQueryBuilder([
+                        'active' => true,
+                        'orderBy' => [
+                            'sort' => 'b.name',
+                            'order' => 'ASC'
+                        ]
+                    ]);
                 },
                 'data' => $instructors
             ])

@@ -1,0 +1,84 @@
+{% extends 'base.html.twig' %}
+
+{% block stylesheets %}
+	{{ parent() }}
+	{{ encore_entry_link_tags('import-scss/user/backer/edit') }}
+{% endblock %}
+
+{% block javascripts %}
+	{{ parent() }}
+	{{ encore_entry_script_tags('front/user/backer/edit') }}
+{% endblock %}
+
+{% block title %}Editer votre fiche porteur d'aide | {{ parent() }}{% endblock %}
+
+{% block body %}
+<div class="fr-container fr-mb-5w fr-mt-0">
+    <div class="fr-grid-row">
+        {% include "user/_menu_user.html.twig" %}
+        
+        <div class="fr-col-12 fr-col-md-9">
+            <h1>Editer la fiche du porteur {% if backer.name %}{{ backer.name }}{% else %}d'aide{% endif %}</h1>
+
+            <div class="fr-tabs fr-mt-0w fr-mb-5w">
+                {% include 'organization/organization/_menu_organization.html.twig' with { organization_backer: true} %}
+
+                <div id="tabpanel_backer" class="fr-tabs__panel" role="tabpanel" aria-labelledby="tabpanel_backer" tabindex="0">
+                    <p>Pour la structure <strong>{{ organization.name }}</strong></p>
+                    {% if not backer.id %}
+                        <div class="fr-alert fr-alert--info fr-alert--sm fr-my-2w">
+                            <p>
+                                Afin de vous présenter sur le site, nous vous invitons à créer votre fiche porteur d'aide.
+                            </p>
+                            <p>
+                                Une fois validée par nos équipes, vous pourrez l'associer à vos aides.
+                            </p>
+                            <p>Les membres de votre structure peuvent également participer au contenu de cette fiche</p>
+                        </div>
+                    {% endif %}
+
+
+                    {% if backer.id and backer.slug %}
+                        {% if backer.active %}
+                        <p class="at-align-end"><a href="{{ path('app_backer_details', {'id': backer.id, 'slug': backer.slug})}}" class="fr-btn fr-btn--secondary" title="Voir la fiche sur le site - Ouvre une nouvelle fenêtre" target="_blank">Voir la fiche sur le site</a></p>
+                        {% else %}
+                        <p class="at-align-end">
+                            Votre fiche n'est pas encore publiée sur le site.
+                            <br />
+                            <p class="at-align-end"><a href="{{ path('app_backer_details', {'id': backer.id, 'slug': backer.slug})}}" class="fr-btn fr-btn--secondary" title="Prévisualiser la fiche sur le site - Ouvre une nouvelle fenêtre" target="_blank">Prévisualiser la fiche sur le site</a></p>
+                        </p>
+                        {% endif %}
+                    {% endif %}
+                    
+                    
+
+                    {{ form_start(form) }}
+                        {{ form_row(form.name) }}
+                        {{ form_row(form.isCorporate) }}
+                        {{ form_row(form.externalLink) }}
+
+                        {% if backer and backer.logo %}
+                        <p><img src="{{ getParameter('cloud_image_url') }}{{ backer.logo }}" class="img-backer" alt="Image de votre porteur d'aides" /></p>
+                        {% endif %}
+                        {{ form_row(form.logoFile) }}
+                        {{ form_row(form.description) }}
+                        {{ form_row(form.perimeter) }}
+
+                        {{ form_row(form.backerType) }}
+                        {{ form_row(form.projectsExamples) }}
+                        {{ form_row(form.internalOperation) }}
+                        {{ form_row(form.contact) }}
+                        {{ form_row(form.usefulLinks) }}
+
+                        <footer class="fr-mt-2w">
+                            <button type="submit" class="fr-btn">{% if backer.id %}Modifier{% else %}Créer{% endif %}</button>
+                        </footer>
+
+                        <p class="fr-hint-text fr-mt-2w">Les champs marqués d’un astérisque (*) sont obligatoires.</p>
+                    {{ form_end(form) }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

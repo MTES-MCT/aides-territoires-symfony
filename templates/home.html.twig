@@ -42,20 +42,9 @@
 						<li role="presentation">
 							<button id="tabpanel-projects" class="fr-tabs__tab" tabindex="-1" role="tab" aria-selected="false" aria-controls="tabpanel-projects-panel" data-fr-js-tab-button="true">Projets</button>
 						</li>
-						{# <li role="presentation" class="at-tab-message">
-							<span>NOUVEAU ! Trouvez de l’inspiration avec les projets d’autres collectivités</span>
-						</li> #}
 					</ul>
 					<div id="tabpanel-aids-panel" class="fr-tabs__panel at-tabs__panel--opaque fr-tabs__panel--selected" role="tabpanel" aria-labelledby="tabpanel-aids" tabindex="0" data-fr-js-tab-panel="true" data-select2-id="tabpanel-aids-panel">
 						{{ form_start(formAidSearch) }}
-						{# <form id="search-form" method="get" action="/aides/" autocomplete="off" data-select2-id="search-form"> #}
-
-						{# <input type="hidden" name="integration" id="id_integration"> #}
-
-
-						<div class="other-actions fr-mb-2w fr-grid-row fr-grid-row--middle"></div>
-
-
 						<div class="form-container" data-select2-id="15">
 							<div class="form-body" data-select2-id="14">
 
@@ -111,7 +100,6 @@
 
 							</div>
 						</div>
-						{# </form> #}
 						{{ form_end(formAidSearch) }}
 					</div>
 
@@ -138,7 +126,6 @@
 										{{ form_row(formProjectReferenceSearch.name) }}
 									</div>
 								</div>
-
 								<div class="fr-mt-5w">
 									<ul class="fr-btns-group fr-btns-group--center fr-btns-group--inline">
 										<li>

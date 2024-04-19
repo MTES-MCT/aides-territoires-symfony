@@ -10,3 +10,7 @@
     <p class="fr-mb-0">Vous pouvez créer votre aide et <strong>demander la publication immédiatement,</strong> ou <strong>l’enregistrer en tant que brouillon.</strong></p>
 </div>
 {% endblock before_section %}
+
+{% block modal %}
+    {% include 'user/dashboard/_modal_organization_not_complete.html.twig' %}
+{% endblock %}

@@ -61,7 +61,7 @@ final class WithoutOrganizationListener
                 }
 
                 // sinon on redirige vers la page d'information de la structure
-                $event->setResponse(new RedirectResponse($this->routerInterface->generate('app_organization_structure_information')));
+                $event->setResponse(new RedirectResponse($this->routerInterface->generate('app_organization_structure_information', ['id' => 0])));
             }
         }
         

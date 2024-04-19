@@ -3,52 +3,72 @@
 namespace App\Controller\Organization;
 
 use App\Controller\FrontController;
+use App\Entity\Backer\Backer;
 use App\Entity\Organization\Organization;
 use App\Entity\Organization\OrganizationInvitation;
 use App\Entity\Perimeter\Perimeter;
-use App\Entity\User\User;
+use App\Form\Backer\BackerEditType;
 use App\Form\Organization\OrganizationDatasType;
+use App\Form\Organization\OrganizationEditType;
 use App\Form\Organization\OrganizationInvitationSendType;
 use App\Form\User\OrganizationChoiceType;
-use App\Form\User\RegisterType;
+use App\Repository\Backer\BackerRepository;
 use App\Repository\Organization\OrganizationInvitationRepository;
+use App\Repository\Organization\OrganizationRepository;
 use App\Repository\Perimeter\PerimeterDataRepository;
 use App\Repository\Perimeter\PerimeterRepository;
+use App\Service\Backer\BackerService;
 use App\Service\Email\EmailService;
+use App\Service\Image\ImageService;
 use App\Service\Notification\NotificationService;
 use App\Service\Organization\OrganizationService;
 use App\Service\User\UserService;
 use Doctrine\Persistence\ManagerRegistry;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 class OrganizationController extends FrontController
 {
-    #[Route('/comptes/structure/information/', name: 'app_organization_structure_information')]
-    public function structureInformation(
+    #[Route('/comptes/structure/information/{id?}', name: 'app_organization_structure_information', requirements: ['id' => '\d+'])]
+    public function informationEdit(
         UserService $userService,
         ManagerRegistry $managerRegistry,
+        OrganizationRepository $organizationRepository,
+        OrganizationService $organizationService,
         RequestStack $requestStack,
         PerimeterRepository $perimeterRepository,
-        PerimeterDataRepository $perimeterDataRepository
-    ): Response
-    {
-        $this->breadcrumb->add('Mon compte',$this->generateUrl('app_user_dashboard'));
-        $this->breadcrumb->add('Ma structure');
-        
+        PerimeterDataRepository $perimeterDataRepository,
+        ?int $id = null
+    ) : Response {
+        // le user        
         $user = $userService->getUserLogged();
-        $organization = $user->getDefaultOrganization();
-        if ($user instanceof User && $organization instanceof Organization) {
+
+        // l'organization
+        $organization = null;
+        if ($id) {
+            $organization = $organizationRepository->find($id);
+        }
+        if (!$organization) {
+            $organization = new Organization();
+        }
+
+        // si organization on verifie que l'utilisateur peut éditer
+        if ($organization->getId()) {
+            if (!$organizationService->canEdit($user, $organization)) {
+                return $this->redirectToRoute('app_user_dashboard');
+            }
+
+            // si le user n'as pas de périmètre on essaye de lui en attribuer un à partir de l'organization
             if ($organization->getPerimeter() && !$user->getPerimeter()) {
                 $user->setPerimeter($organization->getPerimeter());
                 $managerRegistry->getManager()->persist($user);
                 $managerRegistry->getManager()->flush();
             }
-        }
 
-        // si on a des infos manquantes, on va voir si elles sont dans les autres tables
-        if ($organization instanceof Organization) {
+
+            // si on a des infos manquantes, on va voir si elles sont dans les autres tables
             if (!$organization->getSirenCode() || !$organization->getSiretCode() || !$organization->getApeCode() || $organization->getInseeCode()) {
                 if ($organization->getPerimeter() && $organization->getOrganizationType()) {
                     if (!$organization->getSirenCode() && $organization->getPerimeter()->getSiren()) {
@@ -74,78 +94,49 @@ class OrganizationController extends FrontController
                 }
             }
         }
-        $form = $this->createForm(RegisterType::class, $user, ['onlyOrganization' => true]);
-        if ($form->has('mlConsent')) {
-            $form->remove('mlConsent');
-        }
-        if ($organization instanceof Organization) {
-            $form->get('organizationType')->setData($organization->getOrganizationType());
-            $form->get('organizationName')->setData($organization->getName());
-            $form->get('intercommunalityType')->setData($organization->getIntercommunalityType());
-            $form->get('address')->setData($organization->getAddress());
-            $form->get('cityName')->setData($organization->getCityName());
-            $form->get('zipCode')->setData($organization->getZipCode());
-            $form->get('address')->setData($organization->getAddress());
-            $form->get('cityName')->setData($organization->getCityName());
-            $form->get('zipCode')->setData($organization->getZipCode());
-            $form->get('sirenCode')->setData($organization->getSirenCode());
-            $form->get('siretCode')->setData($organization->getSiretCode());
-            $form->get('apeCode')->setData($organization->getApeCode());
-            $form->get('inseeCode')->setData($organization->getInseeCode());
-        }
+
+        // formulaire edition organization
+        $form = $this->createForm(OrganizationEditType::class, $organization);
         $form->handleRequest($requestStack->getCurrentRequest());
         if ($form->isSubmitted()) {
             if ($form->isValid()) {
-                $organization = $user->getDefaultOrganization() ?? new Organization();
-
-                try {
-                    if ($form->get('organizationName')->getData() && $form->get('organizationType')->getData()) {
-                        $organization->setName($form->get('organizationName')->getData());
-                        $organization->setOrganizationType($form->get('organizationType')->getData());
-                        $organization->setPerimeter($user->getPerimeter());
-                        $departementsCode = ($organization->getPerimeter()) ? $organization->getPerimeter()->getDepartments() : null;
-                        $departementCode = $departementsCode[0] ?? null;
-                        if ($departementCode) {
-                            $departement = $perimeterRepository->findOneBy([
-                                'code' => $departementCode,
-                                'scale' => Perimeter::SCALE_COUNTY
-                            ]);
-                            if ($departement instanceof Perimeter) {
-                                $organization->setPerimeterDepartment($departement);
-                            }
-                        }
-            
-                        $regionsCode = ($organization->getPerimeter()) ? $organization->getPerimeter()->getRegions() : null;
-                        $regionCode = $regionsCode[0] ?? null;
-                        if ($regionCode) {
-                            $region = $perimeterRepository->findOneBy([
-                                'code' => $regionCode,
-                                'scale' => Perimeter::SCALE_REGION
-                            ]);
-                            if ($region instanceof Perimeter) {
-                                $organization->setPerimeterRegion($region);
-                            }
-                        }
-                        $organization->setIntercommunalityType($form->get('intercommunalityType')->getData());
-                        $organization->setAddress($form->get('address')->getData());
-                        $organization->setCityName($form->get('cityName')->getData());
-                        $organization->setZipCode($form->get('zipCode')->getData());
-                        $organization->setSirenCode($form->get('sirenCode')->getData());
-                        $organization->setSiretCode($form->get('siretCode')->getData());
-                        $organization->setApeCode($form->get('apeCode')->getData());
-                        $organization->setInseeCode($form->get('inseeCode')->getData());
-                        
-                        // si nouvelle organization
-                        if (!$user->getDefaultOrganization()) {
-                            $user->addOrganization($organization);
+                // essaye de déterminer le departement
+                if ($organization->getPerimeter() && $organization->getPerimeter()->getDepartments()) {
+                    $departementsCode = $organization->getPerimeter()->getDepartments() ;
+                    $departementCode = $departementsCode[0] ?? null;
+                    if ($departementCode) {
+                        $departement = $perimeterRepository->findOneBy([
+                            'code' => $departementCode,
+                            'scale' => Perimeter::SCALE_COUNTY
+                        ]);
+                        if ($departement instanceof Perimeter) {
+                            $organization->setPerimeterDepartment($departement);
                         }
                     }
-                } catch (\Exception $e) {
                 }
-                
-    
+
+                // essaye de determiner la region
+                if ($organization->getPerimeter() && $organization->getPerimeter()->getRegions()) {
+                    $regionsCode = $organization->getPerimeter()->getRegions();
+                    $regionCode = $regionsCode[0] ?? null;
+                    if ($regionCode) {
+                        $region = $perimeterRepository->findOneBy([
+                            'code' => $regionCode,
+                            'scale' => Perimeter::SCALE_REGION
+                        ]);
+                        if ($region instanceof Perimeter) {
+                            $organization->setPerimeterRegion($region);
+                        }
+                    }
+                }
+
+                // si nouvelle organization
+                if (!$user->getDefaultOrganization()) {
+                    $user->addOrganization($organization);
+                }
+
                 // sauvegarde
-                $managerRegistry->getManager()->persist($user); 
+                $managerRegistry->getManager()->persist($organization); 
                 $managerRegistry->getManager()->flush();
     
                 // message retour
@@ -155,7 +146,7 @@ class OrganizationController extends FrontController
                 );
     
                 // redirection
-                return $this->redirectToRoute('app_organization_structure_information');
+                return $this->redirectToRoute('app_organization_structure_information', ['id' => $organization->getId()]);
             } else {
                 $this->addFlash(
                     FrontController::FLASH_ERROR,
@@ -164,21 +155,25 @@ class OrganizationController extends FrontController
             }
         }
 
-        $params = [
-            'form' => $form->createView(),
-            'organization' => $organization,
-        ];
-        // if (!$organization) {
-            // $params['hideMenu'] = true;
-        // }
-        return $this->render('organization/organization/structure_information.html.twig', $params);
-    }
+        // fil arianne
+        $this->breadcrumb->add('Mon compte',$this->generateUrl('app_user_dashboard'));
+        $this->breadcrumb->add($organization->getId() ? $organization->getName() : 'Nouvelle structure');
 
+        // rendu template
+        return $this->render('organization/organization/structure_information.html.twig', [
+            'form' => $form,
+            'organization' => $organization,
+            'organization_edited_id' => $organization->getId(),
+        ]);
+    }
     #[Route('/comptes/structure/donnees-cles/', name: 'app_organization_donnees_cles')]
     public function donneesCles(
         RequestStack $requestStack
     ): Response
     {
+        // page obsolète
+        return $this->redirectToRoute('app_user_dashboard');
+
         $this->breadcrumb->add('Mon compte',$this->generateUrl('app_user_dashboard'));
         $this->breadcrumb->add('Ma structure',$this->generateUrl('app_organization_structure_information'));
         $this->breadcrumb->add('Données clés');
@@ -199,23 +194,26 @@ class OrganizationController extends FrontController
 
     #[Route('/comptes/structure/donnees-cles/{id}', name: 'app_organization_donnees_cles_details', requirements: ['id' => '[0-9]+'])]
     public function donneesClesDetails(
+        int $id,
         UserService $userService,
         ManagerRegistry $managerRegistry,
         RequestStack $requestStack,
         OrganizationService $organizationService
     ): Response
     {
-        $this->breadcrumb->add('Mon compte',$this->generateUrl('app_user_dashboard'));
-        $this->breadcrumb->add('Ma structure',$this->generateUrl('app_organization_structure_information'));
-        $this->breadcrumb->add('Données clés');
-        
+        // le user
         $user = $userService->getUserLogged();
-        $organization = $managerRegistry->getRepository(Organization::class)->find($requestStack->getCurrentRequest()->get('id'));
+        // la structure
+        $organization = $managerRegistry->getRepository(Organization::class)->find($id);
+        if (!$organization instanceof Organization) {
+            return $this->redirectToRoute('app_user_dashboard');
+        }
+        // on verifie que l'utilisateur peut éditer
         if (!$organizationService->canEdit($user, $organization)) {
             return $this->redirectToRoute('app_organization_donnees_cles');
         }
 
-        
+        // formulaire
         $formOrganizationDatas = $this->createForm(OrganizationDatasType::class, $organization);
         $formOrganizationDatas->handleRequest($requestStack->getCurrentRequest());
         if ($formOrganizationDatas->isSubmitted()) {
@@ -229,27 +227,42 @@ class OrganizationController extends FrontController
             }
         }
 
+        // fil d'arianne
+        $this->breadcrumb->add('Mon compte',$this->generateUrl('app_user_dashboard'));
+        $this->breadcrumb->add('Ma structure',$this->generateUrl('app_organization_structure_information'));
+        $this->breadcrumb->add('Données clés');
+
+        // rendu template
         return $this->render('organization/organization/donnees_cles_details.html.twig', [
             'form' => $formOrganizationDatas,
-            'organization' => $organization
+            'organization' => $organization,
         ]);
     }
 
-    #[Route('/comptes/structure/collaborateurs/', name: 'app_organization_collaborateurs')]
-    public function Collaborateurs(
+    #[Route('/comptes/structure/collaborateurs/{id}', name: 'app_organization_collaborateurs', requirements: ['id' => '[0-9]+'])]
+    public function collaborateurs(
+        $id,
         UserService $userService, 
         ManagerRegistry $managerRegistry, 
         RequestStack $requestStack,
         EmailService $emailService,
-        OrganizationInvitationRepository $organizationInvitationRepository
+        OrganizationInvitationRepository $organizationInvitationRepository,
+        OrganizationRepository $organizationRepository,
+        OrganizationService $organizationService
         ): Response
-    {
-        $this->breadcrumb->add('Mon compte',$this->generateUrl('app_user_dashboard'));
-        $this->breadcrumb->add('Ma structure',$this->generateUrl('app_organization_structure_information'));
-        $this->breadcrumb->add('Collaborateurs');
-        
+    {        
         $user = $userService->getUserLogged();
-        $organization = $user->getDefaultOrganization();
+        $organization = $organizationRepository->find($id);
+
+        // verifie l'organization
+        if (!$organization instanceof Organization) {
+            return $this->redirectToRoute('app_user_dashboard');
+        }
+
+        // verifie que l'utilisateur peut éditer
+        if (!$organizationService->canEdit($user, $organization)) {
+            return $this->redirectToRoute('app_user_dashboard');
+        }
 
         $organizationInvitation = new OrganizationInvitation();
         $formInvitation = $this->createForm(OrganizationInvitationSendType::class, $organizationInvitation);
@@ -271,7 +284,7 @@ class OrganizationController extends FrontController
                         FrontController::FLASH_ERROR,
                         'Cette personne a déjà été invitée à rejoindre cette organization.'
                     );
-                    return $this->redirectToRoute('app_organization_collaborateurs');
+                    return $this->redirectToRoute('app_organization_collaborateurs', ['id' => $organization->getId()]);
                 }
 
                 // verifie que la personne ne fait pas déjà partie de l'organization
@@ -282,7 +295,7 @@ class OrganizationController extends FrontController
                         FrontController::FLASH_ERROR,
                         'Cette personne fait déjà partie de cette organization.'
                     );
-                    return $this->redirectToRoute('app_organization_collaborateurs');
+                    return $this->redirectToRoute('app_organization_collaborateurs', ['id' => $organization->getId()]);
                 }
                 // sauvegarde
                 $organizationInvitation->setAuthor($user);
@@ -307,7 +320,7 @@ class OrganizationController extends FrontController
                 );
 
                 // redirection
-                return $this->redirectToRoute('app_organization_collaborateurs');
+                return $this->redirectToRoute('app_organization_collaborateurs', ['id' => $organization->getId()]);
             } else {
                 // message retour
                 $this->addFlash(
@@ -390,10 +403,17 @@ class OrganizationController extends FrontController
             ];
         }
 
+        // fil arianne
+        $this->breadcrumb->add('Mon compte',$this->generateUrl('app_user_dashboard'));
+        $this->breadcrumb->add('Ma structure',$this->generateUrl('app_organization_structure_information'));
+        $this->breadcrumb->add('Collaborateurs');
+        
+        // rendu template
         return $this->render('organization/organization/collaborateurs.html.twig', [
             'formInvitation' => $formInvitation,
             'collaborators' => $collaborators,
             'user' => $user,
+            'organization' => $organization,
         ]);
     }
 
@@ -562,7 +582,131 @@ class OrganizationController extends FrontController
         // sauvegarde
         $managerRegistry->getManager()->flush();
 
-        return $this->redirectToRoute('app_organization_collaborateurs');
+        return $this->redirectToRoute('app_organization_collaborateurs', ['id' => $organizationInvitation->getOrganization()->getId()]);
     }
 
+    #[Route('/comptes/structure/{id}/porteur/{idBacker?}/', name: 'app_organization_backer_edit', requirements: ['id' => '\d+', 'idBacker' => '\d+'])]
+    public function backerEdit(
+        int $id,
+        int $idBacker = null,
+        RequestStack $requestStack,
+        BackerRepository $backerRepository,
+        ImageService $imageService,
+        UserService $userService,
+        ManagerRegistry $managerRegistry,
+        OrganizationRepository $organizationRepository,
+        OrganizationService $organizationService,
+        NotificationService $notificationService,
+        BackerService $backerService
+    )
+    {
+        // le user
+        $user = $userService->getUserLogged();
+
+        // l'organization
+        $organization = $organizationRepository->find($id);
+        
+        if (!$organizationService->canEdit($user, $organization)) {
+            $this->addFlash(FrontController::FLASH_ERROR, 'Vous n\'avez pas les droits pour éditer cette fiche porteur d\'aide.');
+            return $this->redirectToRoute('app_user_dashboard');
+        }
+
+        // regarde si backer
+        $backer = null;
+        if ($idBacker) {
+            $backer = $backerRepository->find($idBacker);
+            // on vérifie que le porteur d'aide peu bien être éditer par l'utilisateur de cette organization
+            if (!$backerService->userCanEdit($user, $backer)) {
+                $this->addFlash(FrontController::FLASH_ERROR, 'Vous n\'avez pas les droits pour éditer cette fiche porteur d\'aide.');
+                return $this->redirectToRoute('app_user_dashboard');
+            }
+        }
+        if (!$backer instanceof Backer) {
+            $backer = new Backer();
+            $create = true;
+        }
+    
+        // formulaire edition porteur
+        $form = $this->createForm(BackerEditType::class, $backer);
+        if (!$backer->getId() && $organization) {
+            $form->get('name')->setData($organization->getName());
+            if ($organization->getPerimeter()) {
+                $form->get('perimeter')->setData($organization->getPerimeter());
+            }
+        }
+        $form->handleRequest($requestStack->getCurrentRequest());
+        if ($form->isSubmitted()) {
+            if ($form->isValid()) {
+                // traitement image
+                $logoFile = $form->get('logoFile')->getData();
+                if ($logoFile instanceof UploadedFile) {
+                    $backer->setLogo(Backer::FOLDER.'/'.$imageService->getSafeFileName($logoFile->getClientOriginalName()));
+                    $backer->setLogoFile(null);
+                    $imageService->sendUploadedImageToCloud($logoFile, Backer::FOLDER, $backer->getLogo());
+                }
+
+                $managerRegistry->getManager()->persist($backer);
+
+                // assigne le porteur d'aide à l'organization
+                $organization->setBacker($backer);
+                $managerRegistry->getManager()->persist($organization);
+
+                 // sauvegarde
+                $managerRegistry->getManager()->flush();
+
+                // on envoi une notification à tous les membres de l'organization pour les prévenir de l'update
+                foreach ($organization->getBeneficiairies() as $beneficiary) {
+                    if ($beneficiary->getId() != $user->getId()) {
+                        if (isset($create)) {
+                            $notificationService->addNotification(
+                                $beneficiary,
+                                'La fiche du porteur d\'aide '.$backer->getName().' à été créee',
+                                '<p>
+                                '.$user->getFirstname().' '.$user->getLastname().' de la structure '.$organization->getName(). ' a créé la fiche du porteur d\'aide '.$backer->getName().'.
+                                </p>'
+                            );
+                        } else {
+                            $notificationService->addNotification(
+                                $beneficiary,
+                                'La fiche du porteur d\'aide '.$backer->getName().' à été modifiée',
+                                '<p>
+                                '.$user->getFirstname().' '.$user->getLastname().' de la structure '.$organization->getName(). ' a mis à jour la fiche du porteur d\'aide '.$backer->getName().'.
+                                </p>'
+                            );
+                        }
+                    }
+                }
+
+                // message ok
+                if (isset($create)) {
+                    $this->addFlash(FrontController::FLASH_SUCCESS, 'La fiche porteur d\'aide a bien été créée. Elle sera validée par un administrateur avant d\'être publiée');
+                } else {
+                    $this->addFlash(FrontController::FLASH_SUCCESS, 'La fiche porteur d\'aide a bien été modifiée.');
+                }
+                
+
+                // redirection
+                return $this->redirectToRoute('app_organization_backer_edit', ['id' => $organization->getId(), 'idBacker' => $backer->getId()]);
+            } else {
+                $this->addFlash(FrontController::FLASH_ERROR, 'Le formulaire contient des erreurs.');
+            }
+        }
+
+        // fil arianne
+        $this->breadcrumb->add(
+            'Mon compte',
+            $this->generateUrl('app_user_dashboard')
+        );
+        $this->breadcrumb->add(
+            'Edition fiche porteur d\'aide'
+        );
+
+        return $this->render('user/backer/edit.html.twig', [
+            'organization' => $organization,
+            'backer' => $backer,
+            'form' => $form,
+            'user_backer' => true,
+            'user_backer_id' => $backer instanceof Backer ? $backer->getId() : null,
+        ]);
+    }
 }

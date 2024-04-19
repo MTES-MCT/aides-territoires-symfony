@@ -95,7 +95,7 @@ class Backer
     private ?string $externalLink = null;
 
     #[ORM\Column]
-    private ?bool $isSpotlighted = null;
+    private ?bool $isSpotlighted = false;
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $logo = null;
@@ -143,6 +143,9 @@ class Backer
     #[ORM\ManyToOne(inversedBy: 'backers')]
     private ?BackerGroup $backerGroup = null;
 
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
+    private ?\DateTimeInterface $timeUpdate = null;
+
     #[ORM\ManyToMany(targetEntity: LogAidSearch::class, mappedBy: 'backers')]
     #[ORM\JoinColumn(onDelete:'SET NULL')]
     private Collection $logAidSearches;
@@ -151,6 +154,24 @@ class Backer
     #[ORM\JoinColumn(onDelete:'SET NULL')]
     private Collection $logBackerViews;
     
+    #[ORM\Column]
+    private ?bool $active = false;
+
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    private ?string $backerType = null;
+
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    private ?string $projectsExamples = null;
+
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    private ?string $internalOperation = null;
+
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    private ?string $contact = null;
+
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    private ?string $usefulLinks = null;
+
     /**
      * Champs non en base
      */
@@ -557,14 +578,12 @@ class Backer
 
     private ?array $aidsTechnical = [];
 
-    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
-    private ?\DateTimeInterface $timeUpdate = null;
-
     #[ORM\Column(nullable: true)]
     private ?int $nbAids = null;
 
     #[ORM\Column(nullable: true)]
     private ?int $nbAidsLive = null;
+
     public function getAidsTechnical() : ?array
     {
         if (count($this->aidsTechnical) > 0) {
@@ -774,6 +793,16 @@ class Backer
         return $this;
     }
 
+    public function isActive(): ?bool
+    {
+        return $this->active;
+    }
+
+    public function setActive(bool $active): static
+    {
+        $this->active = $active;
+    }
+  
     public function getNbAids(): ?int
     {
         return $this->nbAids;
@@ -783,6 +812,66 @@ class Backer
     {
         $this->nbAids = $nbAids;
 
+        return $this;
+    }
+
+    public function getBackerType(): ?string
+    {
+        return $this->backerType;
+    }
+
+    public function setBackerType(?string $backerType): static
+    {
+        $this->backerType = $backerType;
+
+        return $this;
+    }
+
+    public function getProjectsExamples(): ?string
+    {
+        return $this->projectsExamples;
+    }
+
+    public function setProjectsExamples(?string $projectsExamples): static
+    {
+        $this->projectsExamples = $projectsExamples;
+
+        return $this;
+    }
+
+    public function getInternalOperation(): ?string
+    {
+        return $this->internalOperation;
+    }
+
+    public function setInternalOperation(?string $internalOperation): static
+    {
+        $this->internalOperation = $internalOperation;
+
+        return $this;
+    }
+
+    public function getContact(): ?string
+    {
+        return $this->contact;
+    }
+
+    public function setContact(?string $contact): static
+    {
+        $this->contact = $contact;
+
+        return $this;
+    }
+
+    public function getUsefulLinks(): ?string
+    {
+        return $this->usefulLinks;
+    }
+
+    public function setUsefulLinks(?string $usefulLinks): static
+    {
+        $this->usefulLinks = $usefulLinks;
+        
         return $this;
     }
 

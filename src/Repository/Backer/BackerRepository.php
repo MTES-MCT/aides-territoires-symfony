@@ -9,9 +9,11 @@ use App\Entity\Backer\Backer;
 use App\Entity\Backer\BackerCategory;
 use App\Entity\Organization\OrganizationType;
 use App\Entity\Perimeter\Perimeter;
+use App\Entity\User\User;
 use App\Repository\Aid\AidRepository;
 use App\Repository\Perimeter\PerimeterRepository;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -30,6 +32,33 @@ class BackerRepository extends ServiceEntityRepository
         parent::__construct($registry, Backer::class);
     }
 
+    public static function activeCriteria($alias = 'b.'): Criteria
+    {
+        return Criteria::create()
+            ->andWhere(Criteria::expr()->eq($alias.'active', true))
+        ;
+    }
+
+    public static function unactiveCriteria($alias = 'b.'): Criteria
+    {
+        return Criteria::create()
+            ->andWhere(Criteria::expr()->eq($alias.'active', false))
+        ;
+    }
+
+    public function countReviewable(?array $params = null): int
+    {
+        $params['active'] = false;
+        try {
+            $qb = $this->getQueryBuilder($params);
+            $qb->select('IFNULL(COUNT(b.id), 0) AS nb');
+
+            return $qb->getQuery()->getResult()[0]['nb'] ?? 0;
+        } catch (\Exception $e) {
+            return 0;
+        }
+    }
+
     public function countBackerWithAidInCounty(array $params = null)
     {
 
@@ -37,6 +66,7 @@ class BackerRepository extends ServiceEntityRepository
 
         $queryBuilder
             ->select('COUNT(DISTINCT(b.id)) as nb')
+            ->addCriteria(self::activeCriteria())
             ->innerJoin('b.aidFinancers', 'aidFinancers')
             ->innerJoin('aidFinancers.aid', 'aid')
             ->addCriteria(AidRepository::liveCriteria('aid.'))
@@ -57,11 +87,19 @@ class BackerRepository extends ServiceEntityRepository
         $categoryIds = $params['categoryIds'] ?? null;
         $perimeterScales = $params['perimeterScales'] ?? null;
         $backerCategory = $params['backerCategory'] ?? null;
-    
+        $active = $params['active'] ?? null;
         $orderBy = (isset($params['orderBy']) && isset($params['orderBy']['sort']) && isset($params['orderBy']['order'])) ? $params['orderBy'] : null;
 
         $qb = $this->createQueryBuilder('b');
 
+        if ($active == true) {
+            $qb
+                ->addCriteria(self::activeCriteria());
+        } else if ($active == false) {
+            $qb
+                ->addCriteria(self::unactiveCriteria());
+        }
+        
         $qb
             ->innerJoin('b.aidFinancers', 'aidFinancers')
             ->innerJoin('aidFinancers.aid', 'aid')
@@ -135,6 +173,7 @@ class BackerRepository extends ServiceEntityRepository
 
         $qb
             ->select('IFNULL(COUNT(DISTINCT(b.id)), 0) AS nb')
+            ->addCriteria(self::activeCriteria())
             ->innerJoin('b.aidFinancers', 'aidFinancers')
         ;
 
@@ -236,6 +275,22 @@ class BackerRepository extends ServiceEntityRepository
         $nameLike = $params['nameLike'] ?? null;
         $hasFinancedAids = $params['hasFinancedAids'] ?? null;
         $hasPublishedFinancedAids = $params['hasPublishedFinancedAids'] ?? null;
+
+        $active = $params['active'] ?? null;
+
+        $qb = $this->createQueryBuilder('b');
+
+        if ($active === true) {
+            $qb
+                ->addCriteria(self::activeCriteria());
+            ;
+        } else if ($active === false) {
+            $qb
+                ->addCriteria(self::unactiveCriteria());
+            ;
+        }
+
+
         $nbAidsLiveMin = $params['nbAidsLiveMin'] ?? null;
         $orderBy = (isset($params['orderBy']) && isset($params['orderBy']['sort']) && isset($params['orderBy']['order'])) ? $params['orderBy'] : null;
         $qb = $this->createQueryBuilder('b');
@@ -246,6 +301,7 @@ class BackerRepository extends ServiceEntityRepository
                 ->setParameter('nbAidsLiveMin', $nbAidsLiveMin)
             ;
         }
+
         if ($hasLogo === true) {
             $qb
                 ->andWhere('b.logo IS NOT NULL')

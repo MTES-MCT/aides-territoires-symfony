@@ -12,6 +12,7 @@ use App\Repository\Backer\BackerRepository;
 use App\Repository\Category\CategoryRepository;
 use App\Repository\Perimeter\PerimeterRepository;
 use App\Repository\Program\ProgramRepository;
+use App\Service\Aid\AidService;
 use App\Service\Perimeter\PerimeterService;
 use App\Service\Various\StringService;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -92,7 +93,8 @@ class CartographyController extends FrontController
         StringService $stringService,
         AidRepository $aidRepository,
         PerimeterService $perimeterService,
-        CategoryRepository $categoryRepository
+        CategoryRepository $categoryRepository,
+        AidService $aidService
     ): Response
     {
         // departement courant
@@ -118,6 +120,7 @@ class CartographyController extends FrontController
 
         // les porteurs d'aides du département
         $backerParams = [
+            'active' => true,
             'perimeterFrom' => $current_dep,
             'orderBy' => [
                 'sort' => 'b.name',
@@ -161,6 +164,8 @@ class CartographyController extends FrontController
             'categoryIds' => $backerParams['categoryIds'] ?? null,
             'perimeterScales' => $backerParams['perimeterScales'] ?? null,
             'backerCategory' => $backerParams['backerCategory'] ?? null,
+            'notRelaunch' => true,
+            'notPostPopulate' => true,
         ];
         switch ($aidTypeGroupSlug) {
             case AidTypeGroup::SLUG_FINANCIAL:
@@ -192,7 +197,7 @@ class CartographyController extends FrontController
         foreach ($backers as $key => $backer) {
             $aidsParams['backer'] = $backer;
             // défini les aides lives, à partir de quoi on pourra récupérer les financières, techniques, les thématiques
-            $backer->setAidsLive($aidRepository->findCustom($aidsParams));
+            $backer->setAidsLive($aidService->searchAids($aidsParams));
             // si pas d'aide live on retire la ligne
             if (count($backer->getAidsLive()) == 0) {
                 unset($backers[$key]);

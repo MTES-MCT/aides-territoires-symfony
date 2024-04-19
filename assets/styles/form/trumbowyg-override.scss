@@ -1,3 +1,8 @@
 .fr-input-group .trumbowyg-box .trumbowyg-editor {
     min-height: 16rem;
 }
+
+.trumbowyg-editor[contenteditable=true]:empty:before {
+    content: attr(placeholder);
+    color: #999;
+}

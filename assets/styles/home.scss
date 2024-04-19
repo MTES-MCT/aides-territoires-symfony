@@ -31,12 +31,20 @@
         &:before{
             box-shadow: none;
         }
+
         &.classic{
             overflow: hidden;
         }
 
+        .fr-tabs__panel{
+            border-bottom: 1px solid var(--border-default-grey);
+        }
         >.fr-tabs__list{
             --tab-list-height: 48px;
+        }
+
+        &:before{
+            height: auto;
         }
     }
 }

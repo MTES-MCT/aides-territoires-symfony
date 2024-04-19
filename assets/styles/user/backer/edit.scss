@@ -1,0 +1,11 @@
+@import 'trumbowyg/dist/ui/trumbowyg.min.css';
+@import '../../_variables';
+@import '../../_mixins';
+@import '../../form/tom-select-override';
+@import '../../form/trumbowyg-override';
+@import '../../form/label';
+@import '../../form/legend';
+
+.img-backer{
+    max-width: 200px;
+}

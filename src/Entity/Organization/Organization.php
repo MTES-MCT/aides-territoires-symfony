@@ -23,6 +23,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ORM\Mapping\JoinColumn;
 use Gedmo\Mapping\Annotation as Gedmo;
 
 #[ORM\Entity(repositoryClass: OrganizationRepository::class)]
@@ -212,6 +213,7 @@ class Organization
     private ?int $tennisCourtNumber = null;
 
     #[ORM\ManyToOne(inversedBy: 'organizations')]
+    #[JoinColumn(onDelete: 'SET NULL')]
     private ?Backer $backer = null;
 
     #[ORM\Column(length: 50, nullable: true)]
