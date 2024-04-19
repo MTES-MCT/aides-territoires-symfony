@@ -108,8 +108,6 @@ class ProjectCrudController extends AtCrudController
         yield CollectionField::new('aidProjects', 'Aides associées')
         ->setEntryIsComplex()
         ->useEntryCrudForm(AidProjectDisplayCrudController::class)
-        ->allowDelete(false)
-        ->allowAdd(false)
         ->hideOnIndex()
         ;
         yield BooleanField::new('isPublic', 'Projet public');
