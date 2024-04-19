@@ -98,6 +98,9 @@ class SpreadsheetToExportCommand extends Command
                 foreach ($cronExportSpreadsheet->getSqlParams() as $param) {
                     if (isset($param['name']) && isset($param['value'])) {
                         $sqlParams[$param['name']] = $param['value'];
+                        if (isset($param['value']['date'])) {
+                            $sqlParams[$param['name']] = new \DateTime($param['value']['date']);
+                        }
                     }
                 }
             }
