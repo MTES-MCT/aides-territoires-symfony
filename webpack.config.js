@@ -44,6 +44,7 @@ Encore
     .addEntry('admin/statistics/carto', './assets/js/admin/statistics/carto.js')
     .addEntry('admin/statistics/blog/dashboard', './assets/js/admin/statistics/blog/dashboard.js')
     .addEntry('admin/aid/associate', './assets/js/admin/aid/associate.js')
+    .addEntry('admin/program/faq-order', './assets/js/admin/program/faq-order.js')
 
     .addEntry('front/home', './assets/js/front/home.js')
     .addEntry('front/cartography/cartography', './assets/js/front/cartography/cartography.js')
@@ -78,6 +79,7 @@ Encore
     .addEntry('import-scss/admin/perimeter/combine', './assets/js/import-scss/admin/perimeter/combine.js')
     .addEntry('import-scss/admin/statistics/carto', './assets/js/import-scss/admin/statistics/carto.js')
     .addEntry('import-scss/admin/aid/associate', './assets/js/import-scss/admin/aid/associate.js')
+    .addEntry('import-scss/admin/include/_order_items', './assets/js/import-scss/admin/include/_order_items.js')
 
     .addEntry('import-scss/home', './assets/js/import-scss/home.js')
     .addEntry('import-scss/contact/index', './assets/js/import-scss/contact/index.js')

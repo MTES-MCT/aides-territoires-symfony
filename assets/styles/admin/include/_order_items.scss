@@ -1,0 +1,52 @@
+@import '../../_variables';
+@import '../../_mixins';
+
+.order-items{
+    border: 1px solid #eee;
+    background: #eee;
+
+    li{
+        margin: 0 0 5px 0;
+        cursor: move;
+
+    }
+    >li{
+        span{
+            display: inline-block;
+            padding: 10px 5px;
+        }
+        >span{
+            &::after{
+                content: "\25B6";
+                display: inline-block;
+                transform: rotate(90deg);
+                margin-left: 5px;
+                transition: transform 0.3s;
+            }
+        }
+
+        ul{
+            max-height: 0;
+            transition: max-height 0.3s ease-out;
+
+            overflow: hidden;
+            li{
+                border: 1px solid #ccc;
+                background: #ccc;
+            }
+        }
+
+        &.expanded{
+            ul{
+                max-height: 999px;
+                transition: max-height 0.5s ease-in;
+            }
+
+            >span{
+                &::after{
+                    transform: rotate(-90deg);
+                }
+            }
+        }
+    }
+}

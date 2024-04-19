@@ -19,5 +19,7 @@ class AidProjectDisplayCrudController extends AtCrudController
         ->setFormTypeOption('attr', ['readonly' => true])
         ->autocomplete(true)
         ;
+        yield AssociationField::new('creator', 'Auteur association')
+        ->autocomplete(true);
     }
 }

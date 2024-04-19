@@ -72,6 +72,7 @@ class AtCrudController extends AbstractCrudController
         ->addFormTheme('form/text_length_count_type.html.twig')
         ->addFormTheme('form/url_click_type.html.twig')
         ->addFormTheme('form/image_field_preview.html.twig')
+        ->addFormTheme('form/add_new_type.html.twig')
         ->setDefaultSort(['id' => 'DESC']) // modifie le tri
         ->showEntityActionsInlined() // met les actions affichées directement       
         ;

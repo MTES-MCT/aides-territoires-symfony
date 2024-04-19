@@ -4,11 +4,15 @@ namespace App\Controller\Admin\Program;
 
 use App\Controller\Admin\AtCrudController;
 use App\Entity\Page\Faq;
-use App\Form\Admin\Faq\FaqEditType;
+use App\Entity\Page\FaqCategory;
+use App\Entity\Page\FaqQuestionAnswser;
 use App\Form\Admin\Program\FaqCategoryCollectionType;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
+use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\CollectionField;
-use EasyCorp\Bundle\EasyAdminBundle\Field\DateTimeField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 
@@ -40,5 +44,85 @@ class FaqCrudController extends AtCrudController
         // yield DateTimeField::new('timeUpdate', 'Date de mise à jour')
         // ->setFormTypeOption('attr', ['readonly' => true])
         // ->onlyWhenUpdating();
+    }
+
+    public function configureActions(Actions $actions): Actions
+    {
+        $order = Action::new('order', 'Ordre', 'fa fa-sort')
+            ->linkToCrudAction('order')
+            ->displayIf(fn ($entity) => $entity instanceof Faq)
+            ;
+
+        return $actions
+            ->add(Crud::PAGE_INDEX, $order)
+            ->add(Crud::PAGE_DETAIL, $order)
+            ->add(Crud::PAGE_EDIT, $order)
+            ;
+    }
+    public function order(
+        AdminContext $adminContext
+    )
+    {
+        // la faq choisie
+        $faq = $adminContext->getEntity()->getInstance();
+
+        $orderToSave = $adminContext->getRequest()->get('orderToSave', null);
+        if ($orderToSave) {
+            $orderToSave = json_decode($orderToSave);
+            if (is_array($orderToSave)) {
+                foreach ($orderToSave as $key => $value) {
+                    $faqItem = $this->managerRegistry->getRepository(Faq::class)->find($value->id);
+                    if (!$faqItem instanceof Faq) {
+                        continue;
+                    }
+                    if (isset($value->children) && is_array($value->children)) {
+                        $positionCategory = 0;
+                        foreach ($value->children as $faqCategoryItem) {
+                            $faqCategory = $this->managerRegistry->getRepository(FaqCategory::class)->find($faqCategoryItem->id);
+                            if ($faqCategory instanceof FaqCategory) {
+                                $faqCategory->setPosition($positionCategory);
+                                $positionCategory++;
+                                $this->managerRegistry->getManager()->persist($faqCategory);
+
+                                if (isset($faqCategoryItem->children) && is_array($faqCategoryItem->children)) {
+                                    $positionQuestion = 0;
+                                    foreach ($faqCategoryItem->children as $faqQuestionAnswserItem) {
+                                        $faqQuestionAnswser = $this->managerRegistry->getRepository(FaqQuestionAnswser::class)->find($faqQuestionAnswserItem->id);
+                                        if ($faqQuestionAnswser instanceof FaqQuestionAnswser) {
+                                            $faqQuestionAnswser->setPosition($positionQuestion);
+                                            $positionQuestion++;
+                                            $this->managerRegistry->getManager()->persist($faqQuestionAnswser);
+                                        }
+                                    }
+                                
+                                }
+                            }
+                        }
+                    }
+
+                }
+                $this->managerRegistry->getManager()->flush();
+                $this->addFlash('success', 'L\'ordre des catégories de questions a été enregistré.');
+
+                return $this->redirect(
+                    $this->adminUrlGenerator
+                        ->setController(FaqCrudController::class)
+                        ->setAction('order')
+                        ->setEntityId($faq->getId())
+                        ->generateUrl()
+                );
+
+                return $this->redirectToRoute('admin', [
+                    'menuIndex' => 1,
+                    'submenuIndex' => 1,
+                    'entity' => Faq::class
+                ]);
+            
+            
+            }
+        }
+        return $this->render('admin/program/faq-order.html.twig', [
+            'faq' => $faq
+        ]);
     }
 }

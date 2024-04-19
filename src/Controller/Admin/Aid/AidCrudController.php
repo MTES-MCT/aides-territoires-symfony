@@ -3,6 +3,7 @@
 namespace App\Controller\Admin\Aid;
 
 use App\Controller\Admin\AtCrudController;
+use App\Controller\Admin\Backer\BackerCrudController;
 use App\Controller\Admin\Filter\Aid\AidAuthorFilter;
 use App\Controller\Admin\Filter\Aid\AidBackerFilter;
 use App\Controller\Admin\Filter\Aid\AidPerimeterFilter;
@@ -14,6 +15,7 @@ use App\Controller\Admin\Filter\Aid\AidStateFilter;
 use App\Entity\Aid\Aid;
 use App\Entity\Perimeter\Perimeter;
 use App\Entity\Reference\ProjectReference;
+use App\Field\AddNewField;
 use App\Field\JsonField;
 use App\Field\TextLengthCountField;
 use App\Field\TrumbowygField;
@@ -443,6 +445,19 @@ class AidCrudController extends AtCrudController
         //-------------------------------------------------------
         yield FormField::addTab('Porteurs');
         yield FormField::addFieldset('Porteurs d’aides');
+        yield AddNewField::new('newBacker', 'Nouveau porteur')
+        ->setFormTypeOptions([
+            'mapped' => false,
+            'attr' => [
+                'new_url' => $this->adminUrlGenerator
+                ->setController(BackerCrudController::class)
+                ->setAction(Action::NEW)
+                ->setEntityId(null)
+                ->generateUrl(),
+                'new_text' => 'Créer un nouveau porteur'
+            ]
+        ])
+        ;
         yield CollectionField::new('aidFinancers', 'Porteurs d\'aides')
         ->useEntryCrudForm(AidFinancerAddBackerToAidCrudController::class)
         ->setColumns(12)
@@ -450,6 +465,7 @@ class AidCrudController extends AtCrudController
             return implode('<br>', $value->toArray());
         })
         ;
+        
 
         yield FormField::addFieldset('Porteurs d\'aides suggérés');
         yield TextField::new('financerSuggestion', 'Porteurs suggérés')

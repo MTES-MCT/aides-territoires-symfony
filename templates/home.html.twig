@@ -191,7 +191,7 @@
 									<div class="fr-card__body">
 										<div class="fr-card__content">
 											<h4 class="fr-card__title">
-												<a href="{{ path('app_blog_post_details', {'slug': blogPost.slug}) }}" title="Lire l'article">{{ blogPost.name }}</a>
+												<a href="{{ path('app_blog_post_details', {'slug': blogPost.slug}) }}" title="Lire l'article {{ blogPost.name }}">{{ blogPost.name|myTruncate(80) }}</a>
 											</h4>
 										</div>
 									</div>

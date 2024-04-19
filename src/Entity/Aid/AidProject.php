@@ -222,4 +222,18 @@ class AidProject
         return $this;
     }
 
+    public function __toString(): string
+    {
+        $name = '';
+        if ($this->getAid() instanceof Aid) {
+            $name .= '(aide) '.$this->getAid()->__toString();
+        }
+        if ($this->getProject()) {
+            $name .= ' | (projet) '.$this->getProject()->__toString();
+        }
+        if ($name == '') {
+            $name = 'Aide projet';
+        }
+        return $name;
+    }
 }

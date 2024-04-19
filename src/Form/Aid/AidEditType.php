@@ -246,13 +246,10 @@ class AidEditType extends AbstractType
                 },
                 'expanded' => true,
                 'multiple' => true,
-                // 'constraints' => [
-                //     new ConstraintsCount(null, 1)
-                // ]
             ])
             ->add('aidTypes', EntityGroupedType::class, [
                 'required' => $isDraft ? false : true,
-                'label' => 'Types daide',
+                'label' => 'Types d\'aide',
                 'help' => 'Précisez le ou les types de l’aide.',
                 'class' => AidType::class,
                 'choice_label' => 'name',
@@ -261,9 +258,6 @@ class AidEditType extends AbstractType
                 },
                 'expanded' => true,
                 'multiple' => true,
-                // 'constraints' => [
-                //     new ConstraintsCount(null, 1)
-                // ]
             ])
             ->add('subventionRateMin', TypeIntegerType::class, [
                 'required' => false,
