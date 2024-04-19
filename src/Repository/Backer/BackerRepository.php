@@ -48,10 +48,10 @@ class BackerRepository extends ServiceEntityRepository
 
     public function countReviewable(?array $params = null): int
     {
-        $params['active'] = false;
         try {
             $qb = $this->getQueryBuilder($params);
             $qb->select('IFNULL(COUNT(b.id), 0) AS nb');
+            $qb->addCriteria(self::unactiveCriteria());
 
             return $qb->getQuery()->getResult()[0]['nb'] ?? 0;
         } catch (\Exception $e) {
@@ -87,7 +87,7 @@ class BackerRepository extends ServiceEntityRepository
         $categoryIds = $params['categoryIds'] ?? null;
         $perimeterScales = $params['perimeterScales'] ?? null;
         $backerCategory = $params['backerCategory'] ?? null;
-        $active = $params['active'] ?? null;
+        $active = isset($params['active']) ? $params['active'] : null;
         $orderBy = (isset($params['orderBy']) && isset($params['orderBy']['sort']) && isset($params['orderBy']['order'])) ? $params['orderBy'] : null;
 
         $qb = $this->createQueryBuilder('b');
@@ -275,18 +275,17 @@ class BackerRepository extends ServiceEntityRepository
         $nameLike = $params['nameLike'] ?? null;
         $hasFinancedAids = $params['hasFinancedAids'] ?? null;
         $hasPublishedFinancedAids = $params['hasPublishedFinancedAids'] ?? null;
-
-        $active = $params['active'] ?? null;
+        $active = isset($params['active']) ? $params['active'] : null;
 
         $qb = $this->createQueryBuilder('b');
 
         if ($active === true) {
             $qb
-                ->addCriteria(self::activeCriteria());
+                ->addCriteria(BackerRepository::activeCriteria());
             ;
         } else if ($active === false) {
             $qb
-                ->addCriteria(self::unactiveCriteria());
+                ->addCriteria(BackerRepository::unactiveCriteria());
             ;
         }
 
