@@ -1,0 +1,45 @@
+{% extends "@EasyAdmin/page/content.html.twig" %}
+
+
+{% block head_javascript %}
+    {{ parent() }}
+    {{ encore_entry_script_tags('admin/program/faq-order') }}
+{% endblock head_javascript %}
+
+
+{% block head_stylesheets %}
+    {{ parent() }}
+    {{ encore_entry_link_tags('import-scss/admin/include/_order_items') }}
+{% endblock head_stylesheets %}
+
+{% block main %}
+    <main>
+        <div class="container">
+            <h1 class="title">Tri de la FAQ "{{ faq.name }}"</h1>
+
+            <div class="faq-container">
+                <ul class="nested-sortable order-items" data-id="{{ faq.id }}" data-entity="Page\Faq">
+                {% for faqCategory in faq.faqCategories %}
+                    <li class="expandable expanded">
+                        <span class="expandable-trigger" data-id="{{ faqCategory.id }}"  data-entity="Page\FaqCategory">{{ faqCategory.name }}</span>
+                        {% if faqCategory.faqQuestionAnswsers|length > 0 %}
+                        <ul class="nested-sortable">
+                            {% for faqQuestionAnswser in faqCategory.faqQuestionAnswsers %}
+                                <li><span data-id="{{ faqQuestionAnswser.id }}" data-entity="Page\FaqQuestionAnswer">{{ faqQuestionAnswser.question }}</span></li>
+                            {% endfor %}
+                        </ul>
+                        {% endif %}
+                    </li>
+                {% endfor %}
+                </ul>
+            </div>
+
+            <form method="post">
+            <textarea name="orderToSave" id="orderToSave" class="not-trumbowyg" style="display: none;"></textarea>
+            <button type="button" class="btn btn-success" id="save-order">
+                <i class="fas fa-save"></i> Enregistrer l'ordre
+            </button>
+            </form>
+        </div>
+    </main>
+{% endblock main %}

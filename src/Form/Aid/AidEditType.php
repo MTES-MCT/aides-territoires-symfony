@@ -246,9 +246,6 @@ class AidEditType extends AbstractType
                 },
                 'expanded' => true,
                 'multiple' => true,
-                // 'constraints' => [
-                //     new ConstraintsCount(null, 1)
-                // ]
             ])
             ->add('aidTypes', EntityGroupedType::class, [
                 'required' => $isDraft ? false : true,
