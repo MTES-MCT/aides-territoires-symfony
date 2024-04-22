@@ -283,6 +283,9 @@ class Organization
     #[ORM\JoinColumn(onDelete:'SET NULL')]
     private Collection $logProjectValidatedSearches;
 
+    #[ORM\OneToMany(mappedBy: 'organization', targetEntity: OrganizationAccess::class, orphanRemoval: true)]
+    private Collection $organizationAccesses;
+
     public function __construct()
     {
         $this->favoriteProjects = new ArrayCollection();
@@ -301,6 +304,7 @@ class Organization
         $this->logProjectValidatedSearches = new ArrayCollection();
         $this->organizationInvitations = new ArrayCollection();
         $this->aids = new ArrayCollection();
+        $this->organizationAccesses = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -1458,5 +1462,35 @@ class Organization
             return null;
         }    
         return $this->beneficiairies->first() ?? null;
+    }
+
+    /**
+     * @return Collection<int, OrganizationAccess>
+     */
+    public function getOrganizationAccesses(): Collection
+    {
+        return $this->organizationAccesses;
+    }
+
+    public function addOrganizationAccess(OrganizationAccess $organizationAccess): static
+    {
+        if (!$this->organizationAccesses->contains($organizationAccess)) {
+            $this->organizationAccesses->add($organizationAccess);
+            $organizationAccess->setOrganization($this);
+        }
+
+        return $this;
+    }
+
+    public function removeOrganizationAccess(OrganizationAccess $organizationAccess): static
+    {
+        if ($this->organizationAccesses->removeElement($organizationAccess)) {
+            // set the owning side to null (unless already changed)
+            if ($organizationAccess->getOrganization() === $this) {
+                $organizationAccess->setOrganization(null);
+            }
+        }
+
+        return $this;
     }
 }

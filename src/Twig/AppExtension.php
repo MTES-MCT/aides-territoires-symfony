@@ -4,11 +4,13 @@ namespace App\Twig;
 
 use App\Entity\Aid\Aid;
 use App\Entity\Alert\Alert;
+use App\Entity\Organization\Organization;
 use App\Entity\Perimeter\Perimeter;
 use App\Entity\Project\Project;
 use App\Entity\User\User;
 use App\Service\Category\CategoryService;
 use App\Service\Matomo\MatomoService;
+use App\Service\Organization\OrganizationService;
 use App\Service\Perimeter\PerimeterService;
 use App\Service\Reference\KeywordReferenceService;
 use App\Service\User\UserService;
@@ -34,7 +36,8 @@ class AppExtension extends AbstractExtension
         private StringService $stringService,
         private MatomoService $matomoService,
         private ContentSecurityPolicyListener $contentSecurityPolicyListener,
-        private KeywordReferenceService $keywordReferenceService
+        private KeywordReferenceService $keywordReferenceService,
+        private OrganizationService $organizationService
     ) {
         
     }
@@ -141,6 +144,7 @@ class AppExtension extends AbstractExtension
             new TwigFunction('getUserSibEmailId', [$this, 'getUserSibEmailId']),
             new TwigFunction('getMatomoGoalId', [$this, 'getMatomoGoalId']),
             new TwigFunction('getKeywordReferenceAndSynonyms', [$this, 'getKeywordReferenceAndSynonyms']),
+            new TwigFunction('userAdminOfOrganization', [$this, 'userAdminOfOrganization']),
         ];
     }
 
@@ -294,5 +298,10 @@ class AppExtension extends AbstractExtension
         }
 
         return $this->keywordReferenceService->getKeywordReferenceAndSynonyms($keyword);
+    }
+
+    public function userAdminOfOrganization(?User $user, ?Organization $organization): bool
+    {
+        return $this->organizationService->userAdminOf($user, $organization);
     }
 }

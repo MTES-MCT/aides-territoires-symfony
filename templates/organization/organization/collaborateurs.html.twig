@@ -39,14 +39,85 @@
                         </p>
                     </div>
 
-                    <button class="fr-btn fr-my-5w" data-fr-opened="false" aria-controls="invite-collaborator-modal">
-                        Ajouter un collaborateur
-                    </button>
+                    {% if userAdminOf %}
+                        {{ form_start(formAccesses) }}
+                            <div class="fr-table">
+                                <table class="data-table">
+                                    <caption>
+                                        Liste des membres de la structure
+                                    </caption>
+                                    {% include 'organization/organization/_collaborteurs_thead.html.twig' %}
+                                    <tbody>
+                                        {% for organizationAccess in formAccesses.organizationAccesses %}
+                                            <tr>
+                                                <td>
+                                                {% if organizationAccess.vars.value and organizationAccess.vars.value.user %}
+                                                    {{ organizationAccess.vars.value.user.firstname }} {{ organizationAccess.vars.value.user.lastname }}<br />
+                                                    {{ organizationAccess.vars.value.user.email }}
+                                                {% endif %}
+                                                </td>
+                                                <td>
+                                                {{ form_row(organizationAccess.administrator) }}</td>
+                                                <td>{{ form_row(organizationAccess.editAid) }}</td>
+                                                <td>{{ form_row(organizationAccess.editPortal) }}</td>
+                                                <td>{{ form_row(organizationAccess.editBacker) }}</td>
+                                                <td>{{ form_row(organizationAccess.editProject) }}</td>
+                                                <td>
+                                                    {% if organizationAccess.vars.value.user and not userAdminOfOrganization(organizationAccess.vars.value.user, organization) %}
+                                                        <button type="button" class="fr-icon-delete-line btn-delete-collaborator">Supprimer</button>
+                                                    {% endif %}
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div class="fr-grid-row fr-grid-row--gutters fr-mb-10w ">
+                                <div class="fr-col">
+                                    <button type="submit" class="fr-btn fr-btn--icon-left fr-icon-save-fill">
+                                        Enregistrer les modifications
+                                    </button>
+                                </div>
+                                <div class="fr-col">
+                                    <button type="button" class="fr-btn fr-btn--icon-left fr-icon-add-line" data-fr-opened="false" aria-controls="invite-collaborator-modal">
+                                        Ajouter un collaborateur
+                                    </button>
+                                </div>
+                            </div>
+                        {{ form_end(formAccesses) }}
+                    {% else %}
+                            <div class="fr-table">
+                                <table class="data-table">
+                                    <caption>
+                                        Liste des membres de la structure
+                                    </caption>
+                                    {% include 'organization/organization/_collaborteurs_thead.html.twig' %}
+                                    <tbody>
+                                        {% for organizationAccess in organization.organizationAccesses %}
+                                            <tr>
+                                                <td>
+                                                {% if organizationAccess.user %}
+                                                    {{ organizationAccess.user.firstname }} {{ organizationAccess.user.lastname }}<br />
+                                                    {{ organizationAccess.user.email }}
+                                                {% endif %}
+                                                </td>
+                                                <td class="text-center">{% if organizationAccess.administrator %}<span class="fr-icon-success-line" aria-hidden="true"></span>{% endif %}</td>
+                                                <td>{% if organizationAccess.editAid %}<span class="fr-icon-success-line" aria-hidden="true"></span>{% endif %}</td>
+                                                <td>{% if organizationAccess.editPortal %}<span class="fr-icon-success-line" aria-hidden="true"></span>{% endif %}</td>
+                                                <td>{% if organizationAccess.editBacker %}<span class="fr-icon-success-line" aria-hidden="true"></span>{% endif %}</td>
+                                                <td>{% if organizationAccess.editProject %}<span class="fr-icon-success-line" aria-hidden="true"></span>{% endif %}</td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                    {% endif %}
 
                     <div class="fr-table">
                         <table class="data-table">
                             <caption>
-                                Liste des personnes inscrites ou en attente de validation
+                                Liste des personnes invitées
                             </caption>
                             <thead>
                                 <tr>
@@ -83,12 +154,6 @@
                                     </td>
                                     <td>
                                         {{ collaborator.status}}
-                                        {% if collaborator.excludable %}
-                                            <br />
-                                            <button data-url="{{ path('app_organization_invitations_exclude', {'id': collaborator.invitationId})}}" class="fr-m-1w fr-tag _fr-tag--md fr-text--sd fr-icon-delete-line _fr-tag--icon-left exclude-collaborators-modal-btn" id="exclude-collaborators-modal-btn-{{ collaborator.invitationId }}" data-fr-opened="false" aria-controls="exclude-collaborators-modal">
-                                                Exclure le membre
-                                            </button>
-                                        {% endif %}
                                     </td>
                                 </tr>
                                 {% endfor %}
@@ -207,6 +272,132 @@
                             </li>
                         </ul>
                     </footer>
+                </div>
+            </div>
+        </div>
+    </div>
+</dialog>
+
+<dialog aria-labelledby="fr-modal-title-collaborators-admin" role="dialog" id="admin-collaborators-modal" class="fr-modal">
+    <div class="fr-container fr-container--fluid fr-container-md">
+        <div class="fr-grid-row fr-grid-row--center">
+            <div class="fr-col-12 fr-col-md-8 fr-col-lg-6">
+                <div class="fr-modal__body">
+                    <div class="fr-modal__header">
+                        <button class="fr-btn fr-btn--close fr-link" title="Fermer la fenêtre modale" aria-controls="admin-collaborators-modal">Fermer</button>
+                    </div>
+                    <div class="fr-modal__content">
+                        <h2 id="fr-modal-title-collaborators" class="fr-modal__title fr-mb-5w"><span class="fr-icon-arrow-right-line fr-icon--lg"></span>Administrateur</h2>
+
+                            <section>
+                                <div class="content">
+                                    <ul>
+                                        <li>Peu éditer la fiche de la structure</li>
+                                        <li>Peu ajouter ou retirer des collaborateurs</li>
+                                    </ul>
+                                </div>
+                            </section>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</dialog>
+
+<dialog aria-labelledby="fr-modal-title-collaborators-edit-aid" role="dialog" id="edit-aid-collaborators-modal" class="fr-modal">
+    <div class="fr-container fr-container--fluid fr-container-md">
+        <div class="fr-grid-row fr-grid-row--center">
+            <div class="fr-col-12 fr-col-md-8 fr-col-lg-6">
+                <div class="fr-modal__body">
+                    <div class="fr-modal__header">
+                        <button class="fr-btn fr-btn--close fr-link" title="Fermer la fenêtre modale" aria-controls="edit-aid-collaborators-modal">Fermer</button>
+                    </div>
+                    <div class="fr-modal__content">
+                        <h2 id="fr-modal-title-collaborators" class="fr-modal__title fr-mb-5w"><span class="fr-icon-arrow-right-line fr-icon--lg"></span>Aides</h2>
+
+                            <section>
+                                <div class="content">
+                                    <ul>
+                                        <li>Peu publier et modifier les aides de la structure</li>
+                                    </ul>
+                                </div>
+                            </section>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</dialog>
+
+<dialog aria-labelledby="fr-modal-title-collaborators-edit-portal" role="dialog" id="edit-portal-collaborators-modal" class="fr-modal">
+    <div class="fr-container fr-container--fluid fr-container-md">
+        <div class="fr-grid-row fr-grid-row--center">
+            <div class="fr-col-12 fr-col-md-8 fr-col-lg-6">
+                <div class="fr-modal__body">
+                    <div class="fr-modal__header">
+                        <button class="fr-btn fr-btn--close fr-link" title="Fermer la fenêtre modale" aria-controls="edit-portal-collaborators-modal">Fermer</button>
+                    </div>
+                    <div class="fr-modal__content">
+                        <h2 id="fr-modal-title-collaborators" class="fr-modal__title fr-mb-5w"><span class="fr-icon-arrow-right-line fr-icon--lg"></span>Portails</h2>
+
+                            <section>
+                                <div class="content">
+                                    <ul>
+                                        <li>Peu modifier les portails de la structure</li>
+                                    </ul>
+                                </div>
+                            </section>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</dialog>
+
+<dialog aria-labelledby="fr-modal-title-collaborators-edit-backer" role="dialog" id="edit-backer-collaborators-modal" class="fr-modal">
+    <div class="fr-container fr-container--fluid fr-container-md">
+        <div class="fr-grid-row fr-grid-row--center">
+            <div class="fr-col-12 fr-col-md-8 fr-col-lg-6">
+                <div class="fr-modal__body">
+                    <div class="fr-modal__header">
+                        <button class="fr-btn fr-btn--close fr-link" title="Fermer la fenêtre modale" aria-controls="edit-backer-collaborators-modal">Fermer</button>
+                    </div>
+                    <div class="fr-modal__content">
+                        <h2 id="fr-modal-title-collaborators" class="fr-modal__title fr-mb-5w"><span class="fr-icon-arrow-right-line fr-icon--lg"></span>Fiche porteur d'aides</h2>
+
+                            <section>
+                                <div class="content">
+                                    <ul>
+                                        <li>Peu modifier la fiche porteur d'aides de la structure</li>
+                                    </ul>
+                                </div>
+                            </section>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</dialog>
+
+<dialog aria-labelledby="fr-modal-title-collaborators-edit-project" role="dialog" id="edit-project-collaborators-modal" class="fr-modal">
+    <div class="fr-container fr-container--fluid fr-container-md">
+        <div class="fr-grid-row fr-grid-row--center">
+            <div class="fr-col-12 fr-col-md-8 fr-col-lg-6">
+                <div class="fr-modal__body">
+                    <div class="fr-modal__header">
+                        <button class="fr-btn fr-btn--close fr-link" title="Fermer la fenêtre modale" aria-controls="edit-project-collaborators-modal">Fermer</button>
+                    </div>
+                    <div class="fr-modal__content">
+                        <h2 id="fr-modal-title-collaborators" class="fr-modal__title fr-mb-5w"><span class="fr-icon-arrow-right-line fr-icon--lg"></span>Projets</h2>
+
+                            <section>
+                                <div class="content">
+                                    <ul>
+                                        <li>Peu publier et éditer les projets de la structure</li>
+                                    </ul>
+                                </div>
+                            </section>
+                    </div>
                 </div>
             </div>
         </div>

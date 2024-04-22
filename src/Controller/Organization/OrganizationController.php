@@ -8,6 +8,8 @@ use App\Entity\Organization\Organization;
 use App\Entity\Organization\OrganizationInvitation;
 use App\Entity\Perimeter\Perimeter;
 use App\Form\Backer\BackerEditType;
+use App\Form\Organization\OrganizationAccessCollectionType;
+use App\Form\Organization\OrganizationAccessEditTableType;
 use App\Form\Organization\OrganizationDatasType;
 use App\Form\Organization\OrganizationEditType;
 use App\Form\Organization\OrganizationInvitationSendType;
@@ -264,6 +266,19 @@ class OrganizationController extends FrontController
             return $this->redirectToRoute('app_user_dashboard');
         }
 
+        $formAccesses = $this->createForm(OrganizationAccessCollectionType::class, $organization);
+        $formAccesses->handleRequest($requestStack->getCurrentRequest());
+        if ($formAccesses->isSubmitted()) {
+            if ($formAccesses->isValid()) {
+                $managerRegistry->getManager()->persist($organization);
+                $managerRegistry->getManager()->flush();
+                $this->addFlash(FrontController::FLASH_SUCCESS, 'Vos modifications ont été enregistrées avec succès.');
+                return $this->redirectToRoute('app_organization_collaborateurs', ['id' => $organization->getId()]);
+            } else {
+                $this->addFlash(FrontController::FLASH_ERROR, 'Le formulaire contient des erreurs.');
+            }
+        }
+
         $organizationInvitation = new OrganizationInvitation();
         $formInvitation = $this->createForm(OrganizationInvitationSendType::class, $organizationInvitation);
         $formInvitation->handleRequest($requestStack->getCurrentRequest());
@@ -414,6 +429,9 @@ class OrganizationController extends FrontController
             'collaborators' => $collaborators,
             'user' => $user,
             'organization' => $organization,
+            // 'formsAccess' => $formsAccess,
+            'formAccesses' => $formAccesses,
+            'userAdminOf' => $organizationService->userAdminOf($user, $organization),
         ]);
     }
 

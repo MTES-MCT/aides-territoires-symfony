@@ -26,6 +26,10 @@
     }
 }
 
+.no-wrap{
+    white-space: nowrap;
+}
+
 #tooltip {
     position: absolute;
     background-color: var(--border-action-high-grey);
@@ -62,4 +66,8 @@ select{
 }
 .number_one_line{
     white-space: nowrap;
+}
+
+.tooltip-color{
+    color: var(--text-action-high-blue-france);
 }

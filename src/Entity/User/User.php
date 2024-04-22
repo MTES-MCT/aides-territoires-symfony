@@ -24,6 +24,7 @@ use App\Entity\Log\LogPublicProjectView;
 use App\Entity\Log\LogUserAction;
 use App\Entity\Log\LogUserLogin;
 use App\Entity\Organization\Organization;
+use App\Entity\Organization\OrganizationAccess;
 use App\Entity\Organization\OrganizationInvitation;
 use App\Entity\Organization\OrganizationType;
 use App\Entity\Perimeter\Perimeter;
@@ -299,6 +300,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: CronExportSpreadsheet::class)]
     private Collection $cronExportSpreadsheets;
 
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: OrganizationAccess::class, orphanRemoval: true)]
+    private Collection $organizationAccesses;
+
     public function __construct()
     {
         $this->logUserLogins = new ArrayCollection();
@@ -335,6 +339,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
         $this->organizationGuests = new ArrayCollection();
         $this->apiTokenAsks = new ArrayCollection();
         $this->cronExportSpreadsheets = new ArrayCollection();
+        $this->organizationAccesses = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -1910,5 +1915,35 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
             }
         }
         return '';
+    }
+
+    /**
+     * @return Collection<int, OrganizationAccess>
+     */
+    public function getOrganizationAccesses(): Collection
+    {
+        return $this->organizationAccesses;
+    }
+
+    public function addOrganizationAccess(OrganizationAccess $organizationAccess): static
+    {
+        if (!$this->organizationAccesses->contains($organizationAccess)) {
+            $this->organizationAccesses->add($organizationAccess);
+            $organizationAccess->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeOrganizationAccess(OrganizationAccess $organizationAccess): static
+    {
+        if ($this->organizationAccesses->removeElement($organizationAccess)) {
+            // set the owning side to null (unless already changed)
+            if ($organizationAccess->getUser() === $this) {
+                $organizationAccess->setUser(null);
+            }
+        }
+
+        return $this;
     }
 }
