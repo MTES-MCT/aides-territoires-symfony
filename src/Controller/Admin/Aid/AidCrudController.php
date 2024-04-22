@@ -457,6 +457,7 @@ class AidCrudController extends AtCrudController
                 'new_text' => 'Créer un nouveau porteur'
             ]
         ])
+        ->hideOnIndex()
         ;
         yield CollectionField::new('aidFinancers', 'Porteurs d\'aides')
         ->useEntryCrudForm(AidFinancerAddBackerToAidCrudController::class)
@@ -513,7 +514,8 @@ class AidCrudController extends AtCrudController
         ->setColumns(12);
 
         yield AssociationField::new('author', 'Auteur')
-        ->autocomplete();
+        ->autocomplete()
+        ->hideOnIndex();
         $nbAidsLive = 0;
         if ($entity && $entity->getAuthor()) {
             $nbAidsLive = $entity->getAuthor()->getNbAidsLive();
@@ -629,11 +631,11 @@ class AidCrudController extends AtCrudController
         ->hideOnIndex()
         ->hideWhenCreating()
         ->setColumns(12);
-        yield DateTimeField::new('timePublished', 'Première date et heure de publication')
+        yield DateTimeField::new('timePublished', '1ère date et heure de publication')
         ->setFormTypeOption('attr', ['readonly' => true])
         ->setColumns(12)
         ->hideOnIndex();
-        yield DateTimeField::new('datePublished', 'Première date de publication')
+        yield DateTimeField::new('datePublished', '1ère date de publication')
         ->setFormTypeOption('attr', ['readonly' => true])
         ->setColumns(12);
 
