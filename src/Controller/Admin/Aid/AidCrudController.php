@@ -9,6 +9,7 @@ use App\Controller\Admin\Filter\Aid\AidBackerFilter;
 use App\Controller\Admin\Filter\Aid\AidPerimeterFilter;
 use App\Controller\Admin\Filter\Aid\AidGenericFilter;
 use App\Controller\Admin\Filter\Aid\AidInstructorFilter;
+use App\Controller\Admin\Filter\Aid\AidKeywordReferenceSearchFilter;
 use App\Controller\Admin\Filter\Aid\AidNoReferenceFilter;
 use App\Controller\Admin\Filter\Aid\AidReferenceSearchFilter;
 use App\Controller\Admin\Filter\Aid\AidStateFilter;
@@ -21,7 +22,6 @@ use App\Field\TextLengthCountField;
 use App\Field\TrumbowygField;
 use App\Form\Admin\Aid\KeywordReferenceAssociationType;
 use App\Form\Admin\Aid\ProjectReferenceAssociationType;
-use App\Form\Admin\Filter\Aid\AidNoReferenceFilterType;
 use App\Service\Export\SpreadsheetExporterService;
 use Doctrine\ORM\EntityRepository;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
@@ -96,8 +96,10 @@ class AidCrudController extends AtCrudController
             ->add('categories')
             ->add('aidTypes')
             ->add('projectReferences')
+            ->add(AidKeywordReferenceSearchFilter::new('keyReferenceSearch', 'Recherche de mot-clé référence'))
             ->add(AidReferenceSearchFilter::new('referenceSearch', 'Recherche de référence'))
             ->add(AidNoReferenceFilter::new('noReference', 'Pas de projet référent associé'))
+            
             // most of the times there is no need to define the
             // filter type because EasyAdmin can guess it automatically
             // ->add(BooleanFilter::new('published'))
