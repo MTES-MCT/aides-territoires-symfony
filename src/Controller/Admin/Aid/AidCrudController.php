@@ -9,6 +9,7 @@ use App\Controller\Admin\Filter\Aid\AidBackerFilter;
 use App\Controller\Admin\Filter\Aid\AidPerimeterFilter;
 use App\Controller\Admin\Filter\Aid\AidGenericFilter;
 use App\Controller\Admin\Filter\Aid\AidInstructorFilter;
+use App\Controller\Admin\Filter\Aid\AidKeywordReferenceSearchFilter;
 use App\Controller\Admin\Filter\Aid\AidNoReferenceFilter;
 use App\Controller\Admin\Filter\Aid\AidReferenceSearchFilter;
 use App\Controller\Admin\Filter\Aid\AidStateFilter;
@@ -21,7 +22,6 @@ use App\Field\TextLengthCountField;
 use App\Field\TrumbowygField;
 use App\Form\Admin\Aid\KeywordReferenceAssociationType;
 use App\Form\Admin\Aid\ProjectReferenceAssociationType;
-use App\Form\Admin\Filter\Aid\AidNoReferenceFilterType;
 use App\Service\Export\SpreadsheetExporterService;
 use Doctrine\ORM\EntityRepository;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
@@ -96,8 +96,10 @@ class AidCrudController extends AtCrudController
             ->add('categories')
             ->add('aidTypes')
             ->add('projectReferences')
+            ->add(AidKeywordReferenceSearchFilter::new('keyReferenceSearch', 'Recherche de mot-clé référence'))
             ->add(AidReferenceSearchFilter::new('referenceSearch', 'Recherche de référence'))
             ->add(AidNoReferenceFilter::new('noReference', 'Pas de projet référent associé'))
+            
             // most of the times there is no need to define the
             // filter type because EasyAdmin can guess it automatically
             // ->add(BooleanFilter::new('published'))
@@ -457,6 +459,7 @@ class AidCrudController extends AtCrudController
                 'new_text' => 'Créer un nouveau porteur'
             ]
         ])
+        ->hideOnIndex()
         ;
         yield CollectionField::new('aidFinancers', 'Porteurs d\'aides')
         ->useEntryCrudForm(AidFinancerAddBackerToAidCrudController::class)
@@ -513,7 +516,8 @@ class AidCrudController extends AtCrudController
         ->setColumns(12);
 
         yield AssociationField::new('author', 'Auteur')
-        ->autocomplete();
+        ->autocomplete()
+        ->hideOnIndex();
         $nbAidsLive = 0;
         if ($entity && $entity->getAuthor()) {
             $nbAidsLive = $entity->getAuthor()->getNbAidsLive();
@@ -629,11 +633,11 @@ class AidCrudController extends AtCrudController
         ->hideOnIndex()
         ->hideWhenCreating()
         ->setColumns(12);
-        yield DateTimeField::new('timePublished', 'Première date et heure de publication')
+        yield DateTimeField::new('timePublished', '1ère date et heure de publication')
         ->setFormTypeOption('attr', ['readonly' => true])
         ->setColumns(12)
         ->hideOnIndex();
-        yield DateTimeField::new('datePublished', 'Première date de publication')
+        yield DateTimeField::new('datePublished', '1ère date de publication')
         ->setFormTypeOption('attr', ['readonly' => true])
         ->setColumns(12);
 

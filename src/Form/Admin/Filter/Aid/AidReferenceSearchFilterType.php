@@ -2,7 +2,6 @@
 
 namespace App\Form\Admin\Filter\Aid;
 
-use App\Entity\Backer\Backer;
 use App\Entity\Reference\ProjectReference;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
