@@ -32,10 +32,12 @@ class UserProfilType extends AbstractType
     {
         $builder
             ->add('firstname', TextType::class, [
+                'required' => true,
                 'label'=>'Votre prénom :',
                 'sanitize_html' => true,
             ])
             ->add('lastname', TextType::class, [
+                'required' => true,
                 'label'=>'Votre nom :',
                 'sanitize_html' => true,
             ])
@@ -61,6 +63,7 @@ class UserProfilType extends AbstractType
             
             ])
             ->add('beneficiaryRole', TextType::class, [
+                'required' => false,
                 'label'=>'Votre fonction :',
                 'sanitize_html' => true,
             ])

@@ -62,6 +62,8 @@ class OrganizationInvitation
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $timeExclude = null;
 
+    private string $statusTxt = '';
+
     public function getId(): ?int
     {
         return $this->id;
@@ -220,6 +222,17 @@ class OrganizationInvitation
     {
         $this->timeExclude = $timeExclude;
 
+        return $this;
+    }
+
+    public function getStatusTxt(): string
+    {
+        return $this->statusTxt;
+    }
+
+    public function setStatusTxt(string $statusTxt): static
+    {
+        $this->statusTxt = $statusTxt;
         return $this;
     }
 }

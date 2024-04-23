@@ -48,8 +48,9 @@ class OrganizationInvitationSendType extends AbstractType
                     'placeholder' => 'Choisissez une organisation',
                     'query_builder' => function (\Doctrine\ORM\EntityRepository $er) use ($user) {
                         return $er->createQueryBuilder('o')
-                            ->innerJoin('o.beneficiairies', 'beneficiairies')
-                            ->where('beneficiairies = :user')
+                            ->innerJoin('o.organizationAccesses', 'organizationAccesses')
+                            ->where('organizationAccesses.user = :user')
+                            ->andWhere('organizationAccesses.administrator = 1')
                             ->setParameter('user', $user)
                             ->orderBy('o.name', 'ASC')
                         ;

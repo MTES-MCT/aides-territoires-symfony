@@ -10,7 +10,9 @@ use App\Form\User\DeleteType;
 use App\Form\User\TransfertAidType;
 use App\Form\User\TransfertProjectType;
 use App\Form\User\UserProfilType;
+use App\Repository\Aid\AidRepository;
 use App\Repository\Log\LogUserLoginRepository;
+use App\Repository\Project\ProjectRepository;
 use App\Repository\User\ApiTokenAskRepository;
 use App\Service\Email\EmailService;
 use App\Service\User\UserService;
@@ -180,7 +182,9 @@ class ParameterController extends FrontController
         RequestStack $requestStack,
         TokenStorageInterface $tokenStorageInterface,
         Session $session,
-        EmailService $emailService
+        EmailService $emailService,
+        ProjectRepository $projectRepository,
+        AidRepository $aidRepository
     ): Response
     {
         // le user
@@ -188,85 +192,91 @@ class ParameterController extends FrontController
 
         $formTransfertProjects = [];
         $formTransfertAids = [];
-        foreach ($user->getOrganizations() as $organization) {
-            $formTransfertProjects['project-'.$organization->getId()] = $this->createForm(TransfertProjectType::class, null, [
-                'attr' => [
-                    'id' => 'formTransfertProject-'.$organization->getSlug(),
-                ],
-                'organization' => $organization
-            ]);
-
-            $formTransfertAids['aid-'.$organization->getId()] = $this->createForm(TransfertAidType::class, null, [
-                'attr' => [
-                    'id' => 'formTransfertAid-'.$organization->getSlug(),
-                ],
-                'organization' => $organization
-            ]);
-        }
-
-        // ecouteurs des form transferts de projets
-        foreach ($formTransfertProjects as $formTransfertProject) {
-            $formTransfertProject->handleRequest($requestStack->getCurrentRequest());
-            if ($formTransfertProject->isSubmitted()) {
-                if ($formTransfertProject->isValid()) {
-                    $userProjects = $managerRegistry->getRepository(Project::class)->findBy(['author' => $user]);
-                    foreach ($userProjects as $project) {
-                        if (!$project->getOrganization() || $project->getOrganization()->getId() !== (int) $formTransfertProject->get('idOrganization')->getData()) {
-                            continue;
+        foreach ($user->getOrganizationAccesses() as $organizationAccess) {
+            if (!$organizationAccess->getOrganization()) {
+                continue;
+            }
+            $organization = $organizationAccess->getOrganization();
+            if (count($organization->getOrganizationAccesses()) > 1) { // l'utilisateur n'est pas seul dans cette organization
+                $formTransfertProjects['project-'.$organization->getId()] = $this->createForm(TransfertProjectType::class, null, [
+                    'attr' => [
+                        'id' => 'formTransfertProject-'.$organization->getId(),
+                    ],
+                    'organization' => $organization,
+                ]);
+                $formTransfertProjects['project-'.$organization->getId()]->handleRequest($requestStack->getCurrentRequest());
+                if ($formTransfertProjects['project-'.$organization->getId()]->isSubmitted() && $formTransfertProjects['project-'.$organization->getId()]->get('idOrganization')->getData() == $organization->getId()) {
+                    if ($formTransfertProjects['project-'.$organization->getId()]->isValid()) {
+                        // recupère tous les projets de ce user pour cette organizations
+                        $projects = $projectRepository->findBy([
+                            'author' => $user,
+                            'organization' => $organization,
+                        ]);
+                        foreach ($projects as $project) {
+                            $project->setAuthor($formTransfertProjects['project-'.$organization->getId()]->get('user')->getData());
+                            $managerRegistry->getManager()->persist($project);
                         }
-                        $project->setAuthor($formTransfertProject->get('user')->getData());
-                        $managerRegistry->getManager()->persist($project);
+
+                        // sauvegarde
+                        $managerRegistry->getManager()->flush();
+
+                        // message
+                        $this->addFlash(
+                            FrontController::FLASH_SUCCESS,
+                            'Votre / Vos projet(s) de l\'organization '.$organization->getName().' ont été transférés avec succès.'
+                        );
+
+                        // redirection
+                        return $this->redirectToRoute('app_user_parameter_delete');
+                    } else {
+                        // message
+                        $this->addFlash(
+                            FrontController::FLASH_ERROR,
+                            'Impossible de transférer votre / vos projet(s) de l\'organization '.$organization->getName().' à cet utilisateur'
+                        );
                     }
-                    $managerRegistry->getManager()->flush();
-                    // message
-                    $this->addFlash(
-                        FrontController::FLASH_SUCCESS,
-                        'Votre / Vos projet(s) de l\'organization '.$organization->getName().' ont été transférés avec succès.'
-                    );
+                }
     
-                    // redirection
-                    return $this->redirectToRoute('app_user_parameter_delete');
-                } else {
-                    // message
-                    $this->addFlash(
-                        FrontController::FLASH_ERROR,
-                        'Impossible de transférer votre / vos projet(s) de l\'organization '.$organization->getName().' à cet utilisateur'
-                    );
+                $formTransfertAids['aid-'.$organization->getId()] = $this->createForm(TransfertAidType::class, null, [
+                    'attr' => [
+                        'id' => 'formTransfertAid-'.$organization->getId(),
+                    ],
+                    'organization' => $organization,
+                ]);
+                $formTransfertAids['aid-'.$organization->getId()]->handleRequest($requestStack->getCurrentRequest());
+                if ($formTransfertAids['aid-'.$organization->getId()]->isSubmitted() && $formTransfertAids['aid-'.$organization->getId()]->get('idOrganization')->getData() == $organization->getId()) {
+                    if ($formTransfertAids['aid-'.$organization->getId()]->isValid()) {
+                        // recupère toutes les aides de ce user pour cette organizations
+                        $aids = $aidRepository->findBy([
+                            'author' => $user,
+                            'organization' => $organization,
+                        ]);
+                        foreach ($aids as $aid) {
+                            $aid->setAuthor($formTransfertAids['aid-'.$organization->getId()]->get('user')->getData());
+                            $managerRegistry->getManager()->persist($aid);
+                        }
+
+                        // sauvegarde
+                        $managerRegistry->getManager()->flush();
+                        
+                        // message
+                        $this->addFlash(
+                            FrontController::FLASH_SUCCESS,
+                            'Votre / Vos aide(s) de l\'organization '.$organization->getName().' ont été transférés avec succès.'
+                        );
+
+                        // redirection
+                        return $this->redirectToRoute('app_user_parameter_delete');
+                    } else {
+                        // message
+                        $this->addFlash(
+                            FrontController::FLASH_ERROR,
+                            'Impossible de transférer votre / vos aide(s) de l\'organization '.$organization->getName().' à cet utilisateur'
+                        );
+                    }
                 }
             }
-        }
-
-        // ecouteurs des form transferts d'aides
-        foreach ($formTransfertAids as $formTransfertAid) {
-            $formTransfertAid->handleRequest($requestStack->getCurrentRequest());
-            if ($formTransfertAid->isSubmitted()) {
-                if ($formTransfertAid->isValid()) {
-                    foreach ($user->getAids() as $aid) {
-                        if (!$aid->getOrganization() || $aid->getOrganization()->getId() !== (int) $formTransfertAid->get('idOrganization')->getData()) {
-                            continue;
-                        }
-                        $aid->setAuthor($formTransfertAid->get('user')->getData());
-                        $managerRegistry->getManager()->persist($aid);
-                    }
-                    $managerRegistry->getManager()->flush();
-
-                    // message
-                    $this->addFlash(
-                        FrontController::FLASH_SUCCESS,
-                        'Votre / Vos aide(s) de l\'organization '.$organization->getName().' ont été transférés avec succès.'
-                    );
-    
-                    // redirection
-                    return $this->redirectToRoute('app_user_parameter_delete');
-                } else {
-                    // message
-                    $this->addFlash(
-                        FrontController::FLASH_ERROR,
-                        'Impossible de transférer votre / vos aide(s) de l\'organization '.$organization->getName().' à cet utilisateur'
-                    );
-                }
-            }
-        }
+        }        
 
         // formulaire suppression
         $formDelete = $this->createForm(DeleteType::class);

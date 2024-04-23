@@ -3,6 +3,7 @@
 namespace App\Service\Backer;
 
 use App\Entity\Backer\Backer;
+use App\Entity\Organization\OrganizationAccess;
 use App\Entity\User\User;
 
 class BackerService
@@ -20,10 +21,12 @@ class BackerService
             }
         }
 
-        // si membre de l'organization
+        // si membre de l'organization et à les droits
         foreach ($backer->getOrganizations() as $organization) {
-            if ($organization->getBeneficiairies()->contains($user)) {
-                return true;
+            foreach ($organization->getOrganizationAccesses() as $organizationAccess) {
+                if ($organizationAccess->getUser()->getId() == $user->getId()) {
+                    return true;
+                }
             }
         }
         
@@ -37,8 +40,11 @@ class BackerService
         }
 
         foreach ($backer->getOrganizations() as $organization) {
-            if ($organization->getBeneficiairies()->contains($user)) {
-                return true;
+            /** @var OrganizationAccess $organizationAccess */
+            foreach ($organization->getOrganizationAccesses() as $organizationAccess) {
+                if ($organizationAccess->getUser()->getId() == $user->getId() && $organizationAccess->isEditBacker()) {
+                    return true;
+                }
             }
         }
         return false;

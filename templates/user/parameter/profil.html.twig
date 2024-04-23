@@ -1,18 +1,21 @@
 {% extends 'base.html.twig' %}
 
+{% block stylesheets %}
+    {{ parent() }}
+    {{ encore_entry_link_tags('import-scss/user/register') }}
+{% endblock %}
+
 {% block title %}Votre profil | {{ parent() }}{% endblock %}
 
 {% block body %}
-
-
 <div class="fr-container fr-mb-5w fr-mt-0">
     <div class="fr-grid-row">
 
-       {% include "user/_menu_user.html.twig" with { user_parameter:true, user_profile:true } %}
+        {% include "user/_menu_user.html.twig" with { user_parameter:true, user_profile:true } %}
 
         <div class="fr-col-12 fr-col-md-9">
             <h1 class="fr-h3">Votre profil</h1>
-      
+
             <p>Les champs marqués d’un astérisque (*) sont obligatoires.</p>
             {{ form_start(form) }}
             {{ form_row(form.firstname )}}

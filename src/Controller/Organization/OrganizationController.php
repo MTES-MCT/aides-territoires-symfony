@@ -5,8 +5,10 @@ namespace App\Controller\Organization;
 use App\Controller\FrontController;
 use App\Entity\Backer\Backer;
 use App\Entity\Organization\Organization;
+use App\Entity\Organization\OrganizationAccess;
 use App\Entity\Organization\OrganizationInvitation;
 use App\Entity\Perimeter\Perimeter;
+use App\Entity\User\User;
 use App\Form\Backer\BackerEditType;
 use App\Form\Organization\OrganizationAccessCollectionType;
 use App\Form\Organization\OrganizationAccessEditTableType;
@@ -303,15 +305,14 @@ class OrganizationController extends FrontController
                 }
 
                 // verifie que la personne ne fait pas déjà partie de l'organization
-                if ($organization->getBeneficiairies()->filter(function($beneficiary) use ($organizationInvitation) {
-                    return $beneficiary->getEmail() === $organizationInvitation->getEmail();
-                })->count()) {
+                if ($organizationService->emailMemberOf($organizationInvitation->getEmail(), $organization)) {
                     $this->addFlash(
                         FrontController::FLASH_ERROR,
                         'Cette personne fait déjà partie de cette organization.'
                     );
                     return $this->redirectToRoute('app_organization_collaborateurs', ['id' => $organization->getId()]);
                 }
+
                 // sauvegarde
                 $organizationInvitation->setAuthor($user);
                 $organizationInvitation->setOrganization($organization);
@@ -345,77 +346,20 @@ class OrganizationController extends FrontController
             }
         }
 
-        $collaborators = [];
-        $collaboratorsEmails = [];
-        // les personnes déjà dans l'organization
-        if ($organization) {
-            foreach ($organization->getBeneficiairies() as $beneficiary) {
-                $invitationId = null;
-                $userInvitation = $organizationInvitationRepository->findOneBy([
-                    'email' => $beneficiary->getEmail(),
-                    'organization' => $organization
-                ]);
-                if ($userInvitation) {
-                    $invitationId = $userInvitation->getId();
-                }
-                $excludable = false;
-                $status = '';
-                if ($userInvitation && $userInvitation->getTimeExclude()) {
-                    $status = 'Exclu le '.$userInvitation->getTimeExclude()->format('d/m/Y');
-                } elseif ($userInvitation && $userInvitation->getTimeAccept()) {
-                    $status = 'Accepté le '.$userInvitation->getTimeAccept()->format('d/m/Y');
-                    if ($userInvitation->getGuest() !== $user) {
-                        $excludable = true;
-                    }
-                } elseif ($userInvitation && $userInvitation->getTimeRefuse()) {
-                    $status = 'Refusé le '.$userInvitation->getTimeRefuse()->format('d/m/Y');
-                }
-                $collaborators[] = [
-                    'name' => $beneficiary->getFirstname().' '.$beneficiary->getLastname(),
-                    'email' => $beneficiary->getEmail(),
-                    'role' => $beneficiary->getBeneficiaryRole() ?? '',
-                    'dateInvite' => ($userInvitation && $userInvitation->getDateCreate()) ? $userInvitation->getDateCreate()->format('d/m/Y') : '',
-                    'status' => $status,
-                    'excludable' => $excludable,
-                    'invitationId' => $invitationId,
-                ];
-
-                $collaboratorsEmails[] = $beneficiary->getEmail();
-            }
-        }
-
-        $organizationInvitations = $organizationInvitationRepository->findBy([
-            'organization' => $organization
-        ]);
-
-        /** @var OrganizationInvitation $organizationInvitation */
-        foreach ($organizationInvitations as $organizationInvitation) {
-            if (in_array($organizationInvitation->getEmail(), $collaboratorsEmails)) {
-                continue;
-            }
-            $excludable = false;
+        foreach ($organization->getOrganizationInvitations() as $organizationInvitation) {
             $status = '';
             if ($organizationInvitation->getGuest()) {
                 if ($organizationInvitation && $organizationInvitation->getTimeExclude()) {
                     $status = 'Exclu le '.$organizationInvitation->getTimeExclude()->format('d/m/Y');
                 } elseif ($organizationInvitation && $organizationInvitation->getTimeAccept()) {
                     $status = 'Accepté le '.$organizationInvitation->getTimeAccept()->format('d/m/Y');
-                    $excludable = true;
                 } elseif ($organizationInvitation && $organizationInvitation->getTimeRefuse()) {
                     $status = 'Refusé le '.$organizationInvitation->getTimeRefuse()->format('d/m/Y');
                 }
             } else {
                 $status = 'En attente';
             }
-            $collaborators[] = [
-                'name' => $organizationInvitation->getFirstname().' '.$organizationInvitation->getLastname(),
-                'email' => $organizationInvitation->getEmail(),
-                'role' => '',
-                'dateInvite' => ($organizationInvitation->getDateCreate()) ? $organizationInvitation->getDateCreate()->format('d/m/Y') : '',
-                'status' => $status,
-                'excludable' => $excludable,
-                'invitationId' => $organizationInvitation->getId(),
-            ];
+            $organizationInvitation->setStatusTxt($status);
         }
 
         // fil arianne
@@ -426,10 +370,8 @@ class OrganizationController extends FrontController
         // rendu template
         return $this->render('organization/organization/collaborateurs.html.twig', [
             'formInvitation' => $formInvitation,
-            'collaborators' => $collaborators,
             'user' => $user,
             'organization' => $organization,
-            // 'formsAccess' => $formsAccess,
             'formAccesses' => $formAccesses,
             'userAdminOf' => $organizationService->userAdminOf($user, $organization),
         ]);
@@ -463,15 +405,22 @@ class OrganizationController extends FrontController
     {
         $user = $userService->getUserLogged();
 
+        // vérifie l'email
         $organizationInvitation = $organizationInvitationRepository->find($id);
         if ($organizationInvitation->getEmail() !== $user->getEmail()) {
             return $this->redirectToRoute('app_organization_invitations');
         }
 
+        // vérifie l'organization
+        if (!$organizationInvitation->getOrganization()) {
+            return $this->redirectToRoute('app_organization_invitations');
+        }
+
         // ajoute le user à l'organization
-        $organization = $organizationInvitation->getOrganization();
-        $organization->addBeneficiairy($user);
-        $managerRegistry->getManager()->persist($organization);
+        $organizationAccess = new OrganizationAccess();
+        $organizationAccess->setUser($user);
+        $organizationAccess->setOrganization($organizationInvitation->getOrganization());
+        $managerRegistry->getManager()->persist($organizationAccess);
         
         // met à jour l'invitation
         $organizationInvitation->setGuest($user);
@@ -484,25 +433,28 @@ class OrganizationController extends FrontController
         $message = '
         <p>
             '.$user->getFirstname().' '.$user->getLastname().' a accepté votre invitation et vient de
-            rejoindre votre structure '.$organization->getName().'.
+            rejoindre votre structure '.$organizationInvitation->getOrganization()->getName().'.
         </p>
         ';
         $notificationService->addNotification($organizationInvitation->getAuthor(), 'Votre invitation a été acceptée', $message);
 
         // notification aux autres membres de l'organization
-        foreach ($organization->getBeneficiairies() as $beneficiary) {
+        foreach ($organizationInvitation->getOrganization()->getOrganizationAccesses() as $organizationAccess) {
+            if (!$organizationAccess->getUser() instanceof User) {
+                continue;
+            }
             // on ne notifie pas le user et l'auteur de l'invitation
-            if (in_array($beneficiary->getId(), [$user->getId(), $organizationInvitation->getAuthor()->getId()])) {
+            if (in_array($organizationAccess->getUser()->getId(), [$user->getId(), $organizationInvitation->getAuthor()->getId()])) {
                 continue;
             }
 
             $message = '
             <p>
             '.$user->getFirstname().' '.$user->getLastname().' a accepté l’invitation de '.$organizationInvitation->getAuthor()->getFirstname().' '.$organizationInvitation->getAuthor()->getLastname().'
-            et vient de rejoindre votre structure '.$organization->getName().'.
+            et vient de rejoindre votre structure '.$organizationInvitation->getOrganization()->getName().'.
             </p>
             ';
-            $notificationService->addNotification($beneficiary, 'Une invitation a été acceptée', $message);
+            $notificationService->addNotification($organizationAccess->getUser(), 'Une invitation a été acceptée', $message);
         }
         // message
         $this->addFlash(
@@ -552,57 +504,6 @@ class OrganizationController extends FrontController
         return $this->redirectToRoute('app_organization_invitations');
     }
 
-
-    #[Route('/comptes/structure/invitations/{id}/exclure/', name: 'app_organization_invitations_exclude')]
-    public function excludeInvitation(
-        $id,
-        UserService $userService,
-        OrganizationInvitationRepository $organizationInvitationRepository,
-        ManagerRegistry $managerRegistry,
-        NotificationService $notificationService
-    ): Response
-    {
-        $user = $userService->getUserLogged();
-
-        // on vérifie que c'est bien l'auteur
-        $organizationInvitation = $organizationInvitationRepository->find($id);
-        if ($organizationInvitation->getAuthor() !== $user) {
-            return $this->redirectToRoute('app_organization_invitations');
-        }
-
-        // ajout notification a l'utilisation de l'invitation
-        $organizationName = $organizationInvitation->getOrganization() ? $organizationInvitation->getOrganization()->getName() : 'une structure';
-        $message = '
-        <p>
-            '.$user->getFirstname().' '.$user->getLastname().' vous à exclu de l\'organization '.$organizationName.'.
-        </p>
-        ';
-
-        if ($organizationInvitation->getGuest()) {
-            $notificationService->addNotification($organizationInvitation->getGuest(), 'Vous avez été exclu de '.$organizationName, $message);
-        }
-        
-        // message
-        $this->addFlash(
-            FrontController::FLASH_SUCCESS,
-            'Vous avez exclu '.$organizationInvitation->getFirstname().' '.$organizationInvitation->getLastname().' de l\'organization.'
-        );
-
-        // retire l'organization à l'utilisateur
-        $organizationInvitation->getOrganization()->removeBeneficiairy($organizationInvitation->getGuest());
-        $managerRegistry->getManager()->persist($organizationInvitation->getOrganization());
-
-        // l'exclusion
-        $organizationInvitation->setTimeExclude(new \DateTime());
-        $organizationInvitation->setGuest(null);
-        $managerRegistry->getManager()->persist($organizationInvitation);
-        
-        // sauvegarde
-        $managerRegistry->getManager()->flush();
-
-        return $this->redirectToRoute('app_organization_collaborateurs', ['id' => $organizationInvitation->getOrganization()->getId()]);
-    }
-
     #[Route('/comptes/structure/{id}/porteur/{idBacker?}/', name: 'app_organization_backer_edit', requirements: ['id' => '\d+', 'idBacker' => '\d+'])]
     public function backerEdit(
         int $id,
@@ -614,8 +515,7 @@ class OrganizationController extends FrontController
         ManagerRegistry $managerRegistry,
         OrganizationRepository $organizationRepository,
         OrganizationService $organizationService,
-        NotificationService $notificationService,
-        BackerService $backerService
+        NotificationService $notificationService
     )
     {
         // le user
@@ -624,7 +524,7 @@ class OrganizationController extends FrontController
         // l'organization
         $organization = $organizationRepository->find($id);
         
-        if (!$organizationService->canEdit($user, $organization)) {
+        if (!$organizationService->canViewEdit($user, $organization)) {
             $this->addFlash(FrontController::FLASH_ERROR, 'Vous n\'avez pas les droits pour éditer cette fiche porteur d\'aide.');
             return $this->redirectToRoute('app_user_dashboard');
         }
@@ -633,19 +533,20 @@ class OrganizationController extends FrontController
         $backer = null;
         if ($idBacker) {
             $backer = $backerRepository->find($idBacker);
-            // on vérifie que le porteur d'aide peu bien être éditer par l'utilisateur de cette organization
-            if (!$backerService->userCanEdit($user, $backer)) {
-                $this->addFlash(FrontController::FLASH_ERROR, 'Vous n\'avez pas les droits pour éditer cette fiche porteur d\'aide.');
-                return $this->redirectToRoute('app_user_dashboard');
-            }
         }
         if (!$backer instanceof Backer) {
             $backer = new Backer();
             $create = true;
         }
+
+        // regarde si le user peu editer la fiche porteur d'aide
+        $userCanEditBacker = $organizationService->canEditBacker($user, $organization);
     
         // formulaire edition porteur
-        $form = $this->createForm(BackerEditType::class, $backer);
+        $formOptions = [
+            'is_readonly' => !$userCanEditBacker
+        ];
+        $form = $this->createForm(BackerEditType::class, $backer, $formOptions);
         if (!$backer->getId() && $organization) {
             $form->get('name')->setData($organization->getName());
             if ($organization->getPerimeter()) {
@@ -654,7 +555,7 @@ class OrganizationController extends FrontController
         }
         $form->handleRequest($requestStack->getCurrentRequest());
         if ($form->isSubmitted()) {
-            if ($form->isValid()) {
+            if ($form->isValid() && $userCanEditBacker) {
                 // traitement image
                 $logoFile = $form->get('logoFile')->getData();
                 if ($logoFile instanceof UploadedFile) {
@@ -672,28 +573,29 @@ class OrganizationController extends FrontController
                  // sauvegarde
                 $managerRegistry->getManager()->flush();
 
-                // on envoi une notification à tous les membres de l'organization pour les prévenir de l'update
-                foreach ($organization->getBeneficiairies() as $beneficiary) {
-                    if ($beneficiary->getId() != $user->getId()) {
-                        if (isset($create)) {
-                            $notificationService->addNotification(
-                                $beneficiary,
-                                'La fiche du porteur d\'aide '.$backer->getName().' à été créee',
-                                '<p>
-                                '.$user->getFirstname().' '.$user->getLastname().' de la structure '.$organization->getName(). ' a créé la fiche du porteur d\'aide '.$backer->getName().'.
-                                </p>'
-                            );
-                        } else {
-                            $notificationService->addNotification(
-                                $beneficiary,
-                                'La fiche du porteur d\'aide '.$backer->getName().' à été modifiée',
-                                '<p>
-                                '.$user->getFirstname().' '.$user->getLastname().' de la structure '.$organization->getName(). ' a mis à jour la fiche du porteur d\'aide '.$backer->getName().'.
-                                </p>'
-                            );
-                        }
-                    }
+                // on envoi une notification à tous les membres de l'organization pour les prévenir de l'update, sauf l'auteur de la modication
+                if (isset($create)) {
+                    $title = 'La fiche du porteur d\'aide '.$backer->getName().' à été créee';
+                    $message = 
+                    '<p>
+                    '.$user->getFirstname().' '.$user->getLastname().' de la structure '.$organization->getName(). ' a créé la fiche du porteur d\'aide '.$backer->getName().'.
+                    </p>'
+                    ;
+                } else {
+                    $title = 'La fiche du porteur d\'aide '.$backer->getName().' à été modifiée';
+                    $message = 
+                    '<p>
+                    '.$user->getFirstname().' '.$user->getLastname().' de la structure '.$organization->getName(). ' a mis à jour la fiche du porteur d\'aide '.$backer->getName().'.
+                    </p>'
+                    ;
                 }
+
+                $organizationService->sendNotificationToMembers(
+                    $organization,
+                    $title,
+                    $message,
+                    [$user]
+                );
 
                 // message ok
                 if (isset($create)) {
@@ -725,6 +627,7 @@ class OrganizationController extends FrontController
             'form' => $form,
             'user_backer' => true,
             'user_backer_id' => $backer instanceof Backer ? $backer->getId() : null,
+            'userCanEditBacker' => $userCanEditBacker
         ]);
     }
 }

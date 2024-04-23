@@ -300,7 +300,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: CronExportSpreadsheet::class)]
     private Collection $cronExportSpreadsheets;
 
-    #[ORM\OneToMany(mappedBy: 'user', targetEntity: OrganizationAccess::class, orphanRemoval: true)]
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: OrganizationAccess::class, orphanRemoval: true, cascade: ['persist'])]
     private Collection $organizationAccesses;
 
     public function __construct()
@@ -1351,7 +1351,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
 
     public function getDefaultOrganization(): ?Organization
     {
-        return $this->organizations[0] ?? null;
+        foreach ($this->organizationAccesses as $organizationAccess) {
+            if ($organizationAccess->getOrganization()) {
+                return $organizationAccess->getOrganization();
+            }
+        }
+
+        return null;
     }
 
     /**

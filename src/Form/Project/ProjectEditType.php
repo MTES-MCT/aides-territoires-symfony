@@ -47,8 +47,9 @@ class ProjectEditType extends AbstractType
             'choice_label' => 'name',
             'query_builder' => function(EntityRepository $entityRepository) {
                 return $entityRepository->createQueryBuilder('o')
-                ->innerJoin('o.beneficiairies', 'beneficiairies')
-                ->andWhere('beneficiairies = :user')
+                ->innerJoin('o.organizationAccesses', 'organizationAccesses')
+                ->andWhere('organizationAccesses.user = :user')
+                ->andWhere('organizationAccesses.editProject = 1')
                 ->setParameter('user', $this->userService->getUserLogged())
                 ->orderBy('o.name', 'ASC')
                 ;

@@ -4,6 +4,7 @@ namespace App\Controller\User;
 
 use App\Controller\FrontController;
 use App\Entity\Organization\Organization;
+use App\Entity\Organization\OrganizationAccess;
 use App\Entity\Organization\OrganizationInvitation;
 use App\Entity\Organization\OrganizationType;
 use App\Entity\Perimeter\Perimeter;
@@ -98,8 +99,17 @@ class UserController extends FrontController
                         }
                     }
                     $organization->setIntercommunalityType($formRegister->get('intercommunalityType')->getData());
+                    $managerRegistry->getManager()->persist($organization);
 
-                    $user->addOrganization($organization);
+                    // l'accès admin à la structure
+                    $organizationAccess = new OrganizationAccess();
+                    $organizationAccess->setOrganization($organization);
+                    $organizationAccess->setAdministrator(true);
+                    $organizationAccess->setEditAid(true);
+                    $organizationAccess->setEditPortal(true);
+                    $organizationAccess->setEditBacker(true);
+                    $organizationAccess->setEditProject(true);
+                    $user->addOrganizationAccess($organizationAccess);
                 }
 
                 // sauvegarde le user et son organization
@@ -176,7 +186,6 @@ class UserController extends FrontController
         // nouvelle organization commune
         $organization = new Organization();
         $organization->setOrganizationType($organizationTypeRepository->findOneBy(['slug' => OrganizationType::SLUG_COMMUNE]));
-        $user->addOrganization($organization);
 
         // formulaire inscription
         $formRegisterCommune = $this->createForm(RegisterCommuneType::class, $user);
@@ -217,6 +226,19 @@ class UserController extends FrontController
                         $organization->setPerimeterRegion($region);
                     }
                 }
+
+                // persist organization
+                $managerRegistry->getManager()->persist($organization);
+
+                // l'accès admin à la structure
+                $organizationAccess = new OrganizationAccess();
+                $organizationAccess->setOrganization($organization);
+                $organizationAccess->setAdministrator(true);
+                $organizationAccess->setEditAid(true);
+                $organizationAccess->setEditPortal(true);
+                $organizationAccess->setEditBacker(true);
+                $organizationAccess->setEditProject(true);
+                $user->addOrganizationAccess($organizationAccess);
 
                 // on sauvegarde le nouveau user et on organization
                 $managerRegistry->getManager()->persist($user);

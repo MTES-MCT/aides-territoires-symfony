@@ -27,6 +27,15 @@ class UserService
         
     }
 
+    public function getOrganizations(User $user): array{
+        $organizations = [];
+        foreach ($user->getOrganizationAccesses() as $organizationAccess) {
+            if ($organizationAccess->getOrganization()) {
+                $organizations[] = $organizationAccess->getOrganization();
+            }
+        }
+        return $organizations;
+    }
     public function isMemberOfOrganization(?Organization $organization, User $user) : bool
     {
         $isMember = false;
@@ -35,8 +44,8 @@ class UserService
             return true;
         }
         
-        foreach ($user->getOrganizations() as $userOrganization) {
-            if ($userOrganization->getId() === $organization->getId()) {
+        foreach ($user->getOrganizationAccesses() as $organizationAccess) {
+            if ($organizationAccess->getOrganization() && $organizationAccess->getOrganization()->getId() === $organization->getId()) {
                 $isMember = true;
             }
         }

@@ -20,11 +20,12 @@
                 </p>
             </div>
 
-            <h2 class="fr-h2">Structure{% if user.organizations|length > 1 %}s{% endif %}</h2>
-            {% for organization in user.organizations %}
+            <h2 class="fr-h2">Structure{% if user.organizationAccesses|length > 1 %}s{% endif %}</h2>
+            {% for organizationAccess in user.organizationAccesses %}
+                {% set organization = organizationAccess.organization %}
                 <h3 class="fr-h3">{{ organization.name }}</h2>
 
-                {% if organization.beneficiairies|length > 0 %}
+                {% if organization.organizationAccesses|length > 1 %}
                     <p>
                         La structure « <strong>{{ organization.name }}</strong> » compte d’autres membres que vous : elle ne sera donc pas supprimée.
                     </p>
@@ -37,11 +38,11 @@
 
                 {% if organization.projectsOfUser(user)|length > 0 %}
                     <h3 id="projects" class="fr-h3">Projets</h3>
-                    {% if organization.beneficiairies|length > 0 %}
+                    {% if organization.organizationAccesses|length > 1 %}
                         <p>Vous pouvez transférer la propriété
                         {% if organization.projectsOfUser(user)|length == 1 %}du projet suivant{% else %}des projets suivants{% endif %}
                         à un autre membre de votre structure  « {{ organization }} ».</p>
-                        {% if organization.beneficiairies|length > 1 %}
+                        {% if organization.projectsOfUser(user)|length > 1 %}
                         <p>Sinon ils seront <strong>supprimés</strong>.</p>
                         {% else %}
                         <p>Sinon il sera <strong>supprimé.</strong></p>
@@ -86,14 +87,14 @@
                         </table>
                     </div>
 
-                    {% if organization.beneficiairies|length > 1 %}                     
+                    {% if organization.organizationAccesses|length > 1 %}                     
                         {% if formTransfertProjects['project-'~organization.id] is defined %}
                             {% set formTransfertProject = formTransfertProjects['project-'~organization.id].createView %}
                             {{ form_start(formTransfertProject) }}
                                 {{ form_row(formTransfertProject.user) }}
                                 {{ form_row(formTransfertProject.idOrganization) }}
                                 <div class="fr-input-group">
-                                    <button type="submit" class="fr-btn fr-btn--secondary">
+                                    <button type="submit" class="fr-btn fr-btn--secondary" name="submit_project_{{ organization.id }}">
                                         Transférer la propriété
                                         {% if organization.projectsOfUser(user)|length == 1 %}du projet{% else %}des projets{% endif %}
                                     </button>
@@ -154,7 +155,7 @@
                         </table>
                     </div>
 
-                    {% if organization.beneficiairies|length > 0 %}
+                    {% if organization.organizationAccesses|length > 1 %}
                         {% if formTransfertAids['aid-'~organization.id] is defined %}
                             {% set formTransfertAid = formTransfertAids['aid-'~organization.id].createView %}
                             {{ form_start(formTransfertAid) }}

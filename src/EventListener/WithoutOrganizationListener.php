@@ -44,7 +44,7 @@ final class WithoutOrganizationListener
             $user = $this->userService->getUserLogged();
 
             // utilisateur connecté sans organization
-            if ($user && !$user->getDefaultOrganization()) {
+            if ($user && count($user->getOrganizationAccesses()) == 0) {
                 $session =  new Session();
                 $session->getFlashBag()->add(
                     FrontController::FLASH_ERROR,

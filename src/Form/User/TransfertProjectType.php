@@ -32,8 +32,8 @@ class TransfertProjectType extends AbstractType
                     },
                     'query_builder' => function ($er) use ($options) {
                         return $er->createQueryBuilder('u')
-                            ->innerJoin('u.organizations', 'organizations')
-                            ->andWhere('organizations = :organization')
+                            ->innerJoin('u.organizationAccesses', 'organizationAccesses')
+                            ->andWhere('organizationAccesses.organization = :organization')
                             ->andWhere('u != :user')
                             ->setParameter('organization', $options['organization'])
                             ->setParameter('user', $this->userService->getUserLogged())
@@ -45,6 +45,7 @@ class TransfertProjectType extends AbstractType
                 ->add('idOrganization', HiddenType::class, [
                     'required' => true,
                     'data' => $options['organization']->getId(),
+                    'allow_extra_fields' => true
                 ])
             ;
         }
@@ -53,7 +54,7 @@ class TransfertProjectType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'organization' => null
+            'organization' => null,
         ]);
     }
 }

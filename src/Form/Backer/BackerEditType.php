@@ -24,7 +24,10 @@ class BackerEditType extends AbstractType
         $builder
             ->add('name', TextType::class, [
                 'required' => true,
-                'label' => 'Nom du porteur'
+                'label' => 'Nom du porteur',
+                'attr' => [
+                    'readonly' => $options['is_readonly'] ? 'readonly' : false
+                ]
             ])
             ->add('isCorporate', ChoiceType::class, [
                 'required' => true,
@@ -33,7 +36,10 @@ class BackerEditType extends AbstractType
                     'Oui' => true,
                     'Non' => false
                 ],
-                'expanded' => true
+                'expanded' => true,
+                'attr' => [
+                    'readonly' => $options['is_readonly'] ? 'readonly' : false
+                ]
             ])
             ->add('externalLink', TextType::class, [
                 'required' => false,
@@ -42,6 +48,9 @@ class BackerEditType extends AbstractType
                 'constraints' => [
                     new Url()
                 ],
+                'attr' => [
+                    'readonly' => $options['is_readonly'] ? 'readonly' : false
+                ]
             ])
             ->add('logoFile', FileType::class, [
                 'label' => 'Ajoutez le logo de votre structure',
@@ -58,6 +67,9 @@ class BackerEditType extends AbstractType
                         'mimeTypesMessage' => 'Veuillez télécharger un fichier JPG ou PNG valide.',
                     ]),
                 ],
+                'attr' => [
+                    'readonly' => $options['is_readonly'] ? 'readonly' : false
+                ]
             ])
             ->add('description', TextareaType::class, [
                 'required' => true,
@@ -69,7 +81,8 @@ class BackerEditType extends AbstractType
                     informations, essayez de donner des éléments de réponses dans cet espace.',
                     'class' => 'trumbowyg',
                     'cols' => 40,
-                    'rows' => 10
+                    'rows' => 10,
+                    'readonly' => $options['is_readonly'] ? 'readonly' : false
                 ],
                 'sanitize_html' => true,
             ])
@@ -90,6 +103,9 @@ class BackerEditType extends AbstractType
                 'help_html' => true,
                 'placeholder' => 'Tapez les premiers caractères',
                 'class' => Perimeter::class,
+                'attr' => [
+                    'readonly' => $options['is_readonly'] ? 'readonly' : false
+                ]
             ])
             ->add('backerType', TextareaType::class, [
                 'required' => false,
@@ -98,7 +114,8 @@ class BackerEditType extends AbstractType
                     'class' => 'trumbowyg',
                     'cols' => 40,
                     'rows' => 10,
-                    'placeholder' => 'Indiquez la nature juridique de votre structure : collectivité, établissement public (et le cas échéant votre tutelle), association, entreprise …'
+                    'placeholder' => 'Indiquez la nature juridique de votre structure : collectivité, établissement public (et le cas échéant votre tutelle), association, entreprise …',
+                    'readonly' => $options['is_readonly'] ? 'readonly' : false
                 ],
                 'sanitize_html' => true,
             ])
@@ -108,7 +125,8 @@ class BackerEditType extends AbstractType
                 'attr' => [
                     'class' => 'trumbowyg',
                     'cols' => 40,
-                    'rows' => 10
+                    'rows' => 10,
+                    'readonly' => $options['is_readonly'] ? 'readonly' : false
                 ],
                 'sanitize_html' => true,
             ])
@@ -119,7 +137,8 @@ class BackerEditType extends AbstractType
                     'class' => 'trumbowyg',
                     'cols' => 40,
                     'rows' => 10,
-                    'placeholder' => 'Donnez ici des explications sur les modalités de saisine de vos équipes, votre fonctionnement (centralisé, déconcentré ou autre), l\'utilisation ou non de plateformes de dépôt de dossier : en bref tous les bons conseils pour une collectivité qui voudrait demander une aide !'
+                    'placeholder' => 'Donnez ici des explications sur les modalités de saisine de vos équipes, votre fonctionnement (centralisé, déconcentré ou autre), l\'utilisation ou non de plateformes de dépôt de dossier : en bref tous les bons conseils pour une collectivité qui voudrait demander une aide !',
+                    'readonly' => $options['is_readonly'] ? 'readonly' : false
                 ],
                 'sanitize_html' => true,
             ])
@@ -130,7 +149,8 @@ class BackerEditType extends AbstractType
                     'class' => 'trumbowyg',
                     'cols' => 40,
                     'rows' => 10,
-                    'placeholder' => 'Indiquez ici des coordonnées de contact, si possible génériques et non nominatives contact@nouvellestructuretest'
+                    'placeholder' => 'Indiquez ici des coordonnées de contact, si possible génériques et non nominatives contact@nouvellestructuretest',
+                    'readonly' => $options['is_readonly'] ? 'readonly' : false
                 ],
                 'sanitize_html' => true,
             ])
@@ -141,7 +161,8 @@ class BackerEditType extends AbstractType
                     'class' => 'trumbowyg',
                     'cols' => 40,
                     'rows' => 10,
-                    'placeholder' => 'Les éventuels raccourcis vers des documents disponibles en ligne, sur votre site web ...'
+                    'placeholder' => 'Les éventuels raccourcis vers des documents disponibles en ligne, sur votre site web ...',
+                    'readonly' => $options['is_readonly'] ? 'readonly' : false
                 ],
                 'sanitize_html' => true,
             ])
@@ -152,6 +173,7 @@ class BackerEditType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => Backer::class,
+            'is_readonly' => false
         ]);
     }
 }

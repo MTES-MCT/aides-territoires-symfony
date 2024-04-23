@@ -6,6 +6,7 @@ use App\Controller\FrontController;
 use App\Entity\Aid\Aid;
 use App\Entity\Aid\AidFinancer;
 use App\Entity\Aid\AidInstructor;
+use App\Entity\Organization\Organization;
 use App\Entity\User\User;
 use App\Form\Aid\AidDeleteType;
 use App\Form\Aid\AidEditType;
@@ -27,7 +28,6 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Dompdf\Dompdf;
 use Dompdf\Options;
-use Symfony\Component\HtmlSanitizer\HtmlSanitizerInterface;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -104,10 +104,15 @@ class AidController extends FrontController
     ) : Response {
         // le user
         $user = $userService->getUserLogged();
-
+        $organizations = [];
+        foreach ($user->getOrganizationAccesses() as $organizationAccess) {
+            if ($organizationAccess->getOrganization() instanceof Organization) {
+                $organizations[] = $organizationAccess->getOrganization();
+            }
+        }
         // paramètre filtre aides
         $aidsParams = [
-            'author' => $user,
+            'organizations' => $organizations,
             'orderBy' => [
                 'sort' => 'a.dateCreate',
                 'order' => 'DESC'

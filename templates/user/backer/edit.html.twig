@@ -71,7 +71,15 @@
                         {{ form_row(form.usefulLinks) }}
 
                         <footer class="fr-mt-2w">
-                            <button type="submit" class="fr-btn">{% if backer.id %}Modifier{% else %}Créer{% endif %}</button>
+                            {% if not userCanEditBacker %}
+                                <div class="fr-alert fr-alert--info fr-alert--sm fr-my-2w">
+                                    <p>
+                                        Seul les personnes autorisées peuvent mettre à jour.
+                                    </p>
+                                </div>
+                            {% endif %}
+
+                            <button type="submit" class="fr-btn" {% if not userCanEditBacker %}disabled="disabled"{% endif %}>{% if backer.id %}Modifier{% else %}Créer{% endif %}</button>
                         </footer>
 
                         <p class="fr-hint-text fr-mt-2w">Les champs marqués d’un astérisque (*) sont obligatoires.</p>

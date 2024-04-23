@@ -63,6 +63,7 @@
                         <tr>
                             <th scope="col" class="aid-name-column" title="Trier par Nom de l’aide">Nom de l’aide</th>
                             <th scope="col" title="Trier par structure">Structure</th>
+                            <th scope="col" title="Trier par auteur">Auteur</th>
                             <th scope="col" title="Trier par Périmètre">Périmètre</th>
                             <th scope="col" title="Trier par Créée le">Créée le</th>
                             <th scope="col" title="Trier par Modifiée le">Modifiée le</th>
@@ -85,6 +86,9 @@
                             </td>
                             <td>
                                 {% if aid.organization %}{{ aid.organization.name }}{% endif %}
+                            </td>
+                            <td>
+                                {% if aid.author %}{{ aid.author.email }}{% endif %}
                             </td>
                             <td>{% if aid.perimeter %}{{ aid.perimeter.name }}{% endif %}</td>
                             <td data-sort="{{ aid.dateCreate|date('Ymd') }}">{{ aid.dateCreate|date('d/m/Y') }}</td>

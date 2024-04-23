@@ -131,7 +131,7 @@ class UserListener
 
         foreach ($user->getOrganizations() as $organization) {
             // pas d'autre membres, on supprimera également l'organisation
-            if (count($organization->getBeneficiairies()) === 1) {
+            if (count($organization->getOrganizationAccesses()) === 1) {
                 $this->managerRegistry->getManager()->remove($organization);
             }
         }

@@ -22,6 +22,7 @@ use App\Service\Export\SpreadsheetExporterService;
 use App\Service\File\FileService;
 use App\Service\Image\ImageService;
 use App\Service\Notification\NotificationService;
+use App\Service\Organization\OrganizationService;
 use App\Service\Reference\ReferenceService;
 use App\Service\User\UserService;
 use Doctrine\Persistence\ManagerRegistry;
@@ -52,7 +53,8 @@ class ProjectController extends FrontController
         ProjectRepository $projectRepository,
         RequestStack $requestStack,
         ManagerRegistry $managerRegistry,
-        NotificationService $notificationService
+        NotificationService $notificationService,
+        OrganizationService $organizationService
     ): Response
     {
         $user = $userService->getUserLogged();
@@ -67,17 +69,14 @@ class ProjectController extends FrontController
                 // notification aux autres membres de l'organization
                 $project = $projectRepository->find($formDeleteProject->get('idProject')->getData());
                 if ($project instanceof Project && $project->getOrganization()) {
-                    foreach ($project->getOrganization()->getBeneficiairies() as $beneficiary) {
-                        if ($beneficiary->getId() != $user->getId()) {
-                            $notificationService->addNotification(
-                                $beneficiary,
-                                'Un projet a été supprimé',
-                                '<p>
-                                '.$user->getFirstname().' '.$user->getLastname().' a supprimé le projet '.$project->getName().'.
-                                </p>'
-                            );
-                        }
-                    }
+                    $organizationService->sendNotificationToMembers(
+                        $project->getOrganization(),
+                        'Un projet a été supprimé',
+                        '<p>
+                        '.$user->getFirstname().' '.$user->getLastname().' a supprimé le projet '.$project->getName().'.
+                        </p>',
+                        [$user]
+                    );
                 }
 
                 // suppression
@@ -103,7 +102,7 @@ class ProjectController extends FrontController
         // projets
         $projects = $projectRepository->findCustom(
             [
-                'organizations' => $user->getOrganizations(),
+                'organizations' => $userService->getOrganizations($user),
                 'orderBy' => [
                     'sort' => 'p.timeCreate',
                     'order' => 'DESC'

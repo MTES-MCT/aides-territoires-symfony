@@ -128,45 +128,40 @@
                                     <th scope="col">Statut</th>
                                 </tr>
                             </thead>
-                            {% if collaborators|length > 0 %}
                             <tbody>
-                                {% for collaborator in collaborators %}
-                                <tr>
-                                    <td>
-                                        {% if collaborator.email == app.user.email %}
-                                            Vous
-                                        {% else %}
-                                            {{ collaborator.name }}
-                                        {% endif %}
-                                    </td>
-                                    <td>
-                                        {{ collaborator.email }}
-                                    </td>
-                                    <td>
-                                    {% if collaborator.role != '' %}
-                                        {{ collaborator.role }}
-                                    {% else %}
-                                        Ce collaborateur n’a pas encore renseigné sa fonction
-                                    {% endif %}
-                                    </td>
-                                    <td>
-                                        {{ collaborator.dateInvite }}
-                                    </td>
-                                    <td>
-                                        {{ collaborator.status}}
-                                    </td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                            {% else %}
-                            <tbody>
-                                <tr>
-                                    <td colspan="5" class="at-centered-important">
-                                        Vous n’avez aucun collaborateur pour le moment
-                                    </td>
-                                </tr>
-                            </tbody>
-                            {% endif %}
+                                {% if organization.organizationInvitations|length > 0 %}
+                                    {% for invitation in organization.organizationInvitations %}
+                                        <tr>
+                                            <td>
+                                                {% if invitation.email == user.email %}
+                                                Vous
+                                                {% else %}
+                                                    {{ invitation.firstname }} {{ invitation.lastname }}
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                {{ invitation.email }}
+                                            </td>
+                                            <td>
+                                                {% if invitation.guest and invitation.guest.beneficiaryRole %}
+                                                    {{ invitation.guest.beneficiaryRole }}
+                                                {% else %}
+                                                    Ce collaborateur n’a pas encore renseigné sa fonction
+                                                {% endif %}
+                                            </td>
+                                            <td>{{ invitation.dateCreate|date('d/m/Y') }}</td>
+                                            <td>{{ invitation.statusTxt }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                {% else %}
+                                    <tbody>
+                                        <tr>
+                                            <td colspan="5" class="at-centered-important">
+                                                Vous n’avez envoyé aucune invitation
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                {% endif %}
                         </table>
                     </div>
                 </div>

@@ -113,8 +113,8 @@ class AidEditType extends AbstractType
             },
             'query_builder' => function(EntityRepository $entityRepository) {
                 return $entityRepository->createQueryBuilder('o')
-                ->innerJoin('o.beneficiairies', 'beneficiairies')
-                ->andWhere('beneficiairies = :user')
+                ->innerJoin('o.organizationAccesses', 'organizationAccesses')
+                ->andWhere('organizationAccesses.user = :user')
                 ->setParameter('user', $this->userService->getUserLogged())
                 ->orderBy('o.name', 'ASC')
                 ;

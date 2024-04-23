@@ -357,6 +357,7 @@ class AidRepository extends ServiceEntityRepository
         $showInSearch = $params['showInSearch'] ?? null;
         $organizationType = $params['organizationType'] ?? null;
         $organizationTypeSlugs = $params['organizationTypeSlugs'] ?? null;
+        $organizations = $params['organizations'] ?? null;
         $perimeterFrom = $params['perimeterFrom'] ?? null;
         $perimeterFromId = $params['perimeterFromId'] ?? null;
         $perimeterTo = $params['perimeterTo'] ?? null;
@@ -681,6 +682,13 @@ class AidRepository extends ServiceEntityRepository
             ->innerJoin('a.aidAudiences', 'aidAudiencesSlug')
             ->andWhere('aidAudiencesSlug.slug IN (:organizationTypeSlugs)')
             ->setParameter('organizationTypeSlugs', $organizationTypeSlugs);
+        }
+
+        if (is_array($organizations) && count($organizations) > 0) {
+            $qb
+                ->andWhere('a.organization IN (:organizations)')
+                ->setParameter('organizations', $organizations)
+            ;
         }
         
 

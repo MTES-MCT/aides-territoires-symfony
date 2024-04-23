@@ -67,15 +67,17 @@
                 {% endif %}
 
                 <li class="fr-sidemenu__item">
-                    <button class="fr-sidemenu__btn"  {% if structure is defined %} aria-expanded="true" {% else %} aria-expanded="false" {% endif %} aria-controls="fr-sidemenu-item-4">{% if app.user.organizations and app.user.organizations|length > 1 %}Mes structures{% else %}Ma structure{% endif %}</button>
+                    <button class="fr-sidemenu__btn"  {% if structure is defined %} aria-expanded="true" {% else %} aria-expanded="false" {% endif %} aria-controls="fr-sidemenu-item-4">{% if app.user.organizationAccesses|length > 1 %}Mes structures{% else %}Ma structure{% endif %}</button>
                     <div class="fr-collapse" id="fr-sidemenu-item-4">
                         <ul class="fr-sidemenu__list">
-                            {% for userOrganization in app.user.organizations %}
-                                <li class="fr-sidemenu__item {% if organization is defined and userOrganization.id == organization.id %}fr-sidemenu__item--active{% endif %}">
-                                    <a class="fr-sidemenu__link" href="{{ path('app_organization_structure_information', {'id': userOrganization.id}) }}" target="_self" {% if organization is defined and organization.id == userOrganization.id %}aria-current="page"{% endif %} rel="noopener" title="{{ userOrganization.name }}">{{ userOrganization.name }}</a>
+                            {% for organizationAccess in app.user.organizationAccesses %}
+                                {% if organizationAccess.organization %}
+                                <li class="fr-sidemenu__item {% if organization is defined and organizationAccess.organization.id == organization.id %}fr-sidemenu__item--active{% endif %}">
+                                    <a class="fr-sidemenu__link" href="{{ path('app_organization_structure_information', {'id': organizationAccess.organization.id}) }}" target="_self" {% if organization is defined and organization.id == organizationAccess.organization.id %}aria-current="page"{% endif %} rel="noopener" title="{{ organizationAccess.organization.name }}">{{ organizationAccess.organization.name }}</a>
                                 </li>
+                                {% endif %}
                             {% endfor %}
-                            {% if app.user and app.user.organizations|length == 0 %}
+                            {% if app.user.organizationAccesses|length == 0 %}
                             <li class="fr-sidemenu__item {% if organization is defined and organization == null %}fr-sidemenu__item--active{% endif %}">
                                 <a class="fr-sidemenu__link" href="{{ path('app_organization_structure_information') }}" target="_self" {% if organization is defined and organization.id == null %}aria-current="page"{% endif %} rel="noopener" title="Nouvelle structure">Nouvelle structure</a>
                             </li>

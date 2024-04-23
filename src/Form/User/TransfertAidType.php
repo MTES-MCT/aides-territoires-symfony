@@ -32,15 +32,15 @@ class TransfertAidType extends AbstractType
                     },
                     'query_builder' => function ($er) use ($options) {
                         return $er->createQueryBuilder('u')
-                            ->innerJoin('u.organizations', 'organizations')
-                            ->andWhere('organizations = :organization')
+                            ->innerJoin('u.organizationAccesses', 'organizationAccesses')
+                            ->andWhere('organizationAccesses.organization = :organization')
                             ->andWhere('u != :user')
                             ->setParameter('organization', $options['organization'])
                             ->setParameter('user', $this->userService->getUserLogged())
                             ->orderBy('u.lastname', 'ASC')
                             ->addOrderBy('u.firstname', 'ASC')
                         ;
-                    }
+                    },
                 ])
                 ->add('idOrganization', HiddenType::class, [
                     'required' => true,

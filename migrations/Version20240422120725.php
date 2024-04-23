@@ -29,6 +29,7 @@ final class Version20240422120725 extends AbstractMigration
         select ou.user_id , ou.organization_id, 1, 1, 1, 1, 1, \'2024-04-22 14:15:00\'
         from organization_user ou 
         ');
+        $this->addSql('TRUNCATE organization_user');
     }
 
     public function down(Schema $schema): void

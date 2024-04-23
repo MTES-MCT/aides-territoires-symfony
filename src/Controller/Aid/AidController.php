@@ -103,10 +103,10 @@ class AidController extends FrontController
         // le paginateur
         $aids = $aidService->searchAids($aidParams);
         try {
-        $adapter = new ArrayAdapter($aids);
-        $pagerfanta = new Pagerfanta($adapter);
-        $pagerfanta->setMaxPerPage(self::NB_AID_BY_PAGE);
-        $pagerfanta->setCurrentPage($currentPage);
+            $adapter = new ArrayAdapter($aids);
+            $pagerfanta = new Pagerfanta($adapter);
+            $pagerfanta->setMaxPerPage(self::NB_AID_BY_PAGE);
+            $pagerfanta->setCurrentPage($currentPage);
         } catch (OutOfRangeCurrentPageException $e) {
             $this->addFlash(
                 FrontController::FLASH_ERROR,
@@ -114,7 +114,6 @@ class AidController extends FrontController
             );
             $newUrl = preg_replace('/(page=)[^\&]+/', 'page=' . $pagerfanta->getNbPages(), $requestStack->getCurrentRequest()->getRequestUri());
             return new RedirectResponse($newUrl);
-            // dd($e);
         }
         // Log recherche
         $logParams = [
