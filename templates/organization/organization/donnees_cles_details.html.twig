@@ -168,7 +168,14 @@
                     </fieldset>
 
                     <footer>
-                        <button type="submit" class="fr-btn">Mettre à jour</button>
+                        {% if not userAdminOf %}
+                            <div class="fr-alert fr-alert--info fr-alert--sm fr-my-2w">
+                                <p>
+                                    Seul un administrateur de l'organisation peu mettre à jour.
+                                </p>
+                            </div>
+                        {% endif %}
+                        <button type="submit" class="fr-btn" {% if not userAdminOf %}disabled="disabled"{% endif %}>Mettre à jour</button>
                     </footer>
                     {{ form_end(form) }}
                 {% else %}

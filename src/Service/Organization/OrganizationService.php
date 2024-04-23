@@ -17,6 +17,15 @@ class OrganizationService
         return $organization->getBeneficiairies()->contains($user);
     }
 
+    public function canViewEdit(?User $user, ?Organization $organization): bool
+    {
+        if (!$user instanceof User || !$organization instanceof Organization) {
+            return false;
+        }
+
+        return $organization->getBeneficiairies()->contains($user);
+    }
+
     public function userAdminOf(?User $user, ?Organization $organization): bool
     {
         if (!$user instanceof User || !$organization instanceof Organization) {

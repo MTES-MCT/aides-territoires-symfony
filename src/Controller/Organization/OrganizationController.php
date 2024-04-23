@@ -58,7 +58,7 @@ class OrganizationController extends FrontController
 
         // si organization on verifie que l'utilisateur peut éditer
         if ($organization->getId()) {
-            if (!$organizationService->canEdit($user, $organization)) {
+            if (!$organizationService->canViewEdit($user, $organization)) {
                 return $this->redirectToRoute('app_user_dashboard');
             }
 
@@ -97,11 +97,17 @@ class OrganizationController extends FrontController
             }
         }
 
+        // regarde si le user est admin de l'organsation
+        $userAdminOf = $organizationService->userAdminOf($user, $organization);
+
         // formulaire edition organization
-        $form = $this->createForm(OrganizationEditType::class, $organization);
+        $formOptions = [
+            'is_readonly' => !$userAdminOf
+        ];
+        $form = $this->createForm(OrganizationEditType::class, $organization, $formOptions);
         $form->handleRequest($requestStack->getCurrentRequest());
         if ($form->isSubmitted()) {
-            if ($form->isValid()) {
+            if ($form->isValid() && $userAdminOf) {
                 // essaye de déterminer le departement
                 if ($organization->getPerimeter() && $organization->getPerimeter()->getDepartments()) {
                     $departementsCode = $organization->getPerimeter()->getDepartments() ;
@@ -166,6 +172,7 @@ class OrganizationController extends FrontController
             'form' => $form,
             'organization' => $organization,
             'organization_edited_id' => $organization->getId(),
+            'userAdminOf' => $userAdminOf
         ]);
     }
     #[Route('/comptes/structure/donnees-cles/', name: 'app_organization_donnees_cles')]
@@ -175,23 +182,6 @@ class OrganizationController extends FrontController
     {
         // page obsolète
         return $this->redirectToRoute('app_user_dashboard');
-
-        $this->breadcrumb->add('Mon compte',$this->generateUrl('app_user_dashboard'));
-        $this->breadcrumb->add('Ma structure',$this->generateUrl('app_organization_structure_information'));
-        $this->breadcrumb->add('Données clés');
-
-        $formOrganizationChoice = $this->createForm(OrganizationChoiceType::class);
-        $formOrganizationChoice->handleRequest($requestStack->getCurrentRequest());
-        if ($formOrganizationChoice->isSubmitted()) {
-            if ($formOrganizationChoice->isValid()) {
-                $organization = $formOrganizationChoice->get('organization')->getData();
-                return $this->redirectToRoute('app_organization_donnees_cles_details', ['id' => $organization->getId()]);
-            }
-        }
-
-        return $this->render('organization/organization/donnees_cles.html.twig', [
-            'formOrganizationChoice' => $formOrganizationChoice,
-        ]);
     }
 
     #[Route('/comptes/structure/donnees-cles/{id}', name: 'app_organization_donnees_cles_details', requirements: ['id' => '[0-9]+'])]
@@ -211,15 +201,21 @@ class OrganizationController extends FrontController
             return $this->redirectToRoute('app_user_dashboard');
         }
         // on verifie que l'utilisateur peut éditer
-        if (!$organizationService->canEdit($user, $organization)) {
+        if (!$organizationService->canViewEdit($user, $organization)) {
             return $this->redirectToRoute('app_organization_donnees_cles');
         }
 
+        // regarde si le user est admin de l'organsation
+        $userAdminOf = $organizationService->userAdminOf($user, $organization);
+
         // formulaire
-        $formOrganizationDatas = $this->createForm(OrganizationDatasType::class, $organization);
+        $formOptions = [
+            'is_readonly' => !$userAdminOf
+        ];
+        $formOrganizationDatas = $this->createForm(OrganizationDatasType::class, $organization, $formOptions);
         $formOrganizationDatas->handleRequest($requestStack->getCurrentRequest());
         if ($formOrganizationDatas->isSubmitted()) {
-            if ($formOrganizationDatas->isValid()) {
+            if ($formOrganizationDatas->isValid() && $userAdminOf) {
                 $managerRegistry->getManager()->persist($organization); 
                 $managerRegistry->getManager()->flush();
                 $this->addFlash(FrontController::FLASH_SUCCESS, 'Vos modifications ont été enregistrées avec succès.');
@@ -238,6 +234,7 @@ class OrganizationController extends FrontController
         return $this->render('organization/organization/donnees_cles_details.html.twig', [
             'form' => $formOrganizationDatas,
             'organization' => $organization,
+            'userAdminOf' => $userAdminOf
         ]);
     }
 
@@ -262,14 +259,17 @@ class OrganizationController extends FrontController
         }
 
         // verifie que l'utilisateur peut éditer
-        if (!$organizationService->canEdit($user, $organization)) {
+        if (!$organizationService->canViewEdit($user, $organization)) {
             return $this->redirectToRoute('app_user_dashboard');
         }
+
+        // regarde si le user est admin de l'organisation
+        $userAdminOf = $organizationService->userAdminOf($user, $organization);
 
         $formAccesses = $this->createForm(OrganizationAccessCollectionType::class, $organization);
         $formAccesses->handleRequest($requestStack->getCurrentRequest());
         if ($formAccesses->isSubmitted()) {
-            if ($formAccesses->isValid()) {
+            if ($formAccesses->isValid() && $userAdminOf) {
                 $managerRegistry->getManager()->persist($organization);
                 $managerRegistry->getManager()->flush();
                 $this->addFlash(FrontController::FLASH_SUCCESS, 'Vos modifications ont été enregistrées avec succès.');
@@ -283,7 +283,7 @@ class OrganizationController extends FrontController
         $formInvitation = $this->createForm(OrganizationInvitationSendType::class, $organizationInvitation);
         $formInvitation->handleRequest($requestStack->getCurrentRequest());
         if ($formInvitation->isSubmitted()) {
-            if ($formInvitation->isValid()) {
+            if ($formInvitation->isValid() && $userAdminOf) {
                 if ($formInvitation->has('organization')) {
                     $organization = $formInvitation->get('organization')->getData();
                 }

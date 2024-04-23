@@ -2,13 +2,9 @@
 
 namespace App\Form\Organization;
 
-use App\Entity\Backer\Backer;
 use App\Entity\Organization\Organization;
 use App\Entity\Organization\OrganizationType;
 use App\Entity\Organization\OrganizationTypeGroup;
-use App\Entity\Perimeter\Perimeter;
-use App\Entity\Project\Project;
-use App\Entity\User\User;
 use App\Form\Type\PerimeterAutocompleteType;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
@@ -41,36 +37,57 @@ class OrganizationEditType extends AbstractType
                     return $er->createQueryBuilder('ot')
                         ->orderBy('ot.name', 'ASC');
                 },
+                'attr' => [
+                    'readonly' => $options['is_readonly'] ? 'readonly' : false
+                ]
             ])
             ->add('intercommunalityType', ChoiceType::class, [
                 'required' => false,
                 'mapped' => false,
                 'label' => 'Type d’intercommunalité', 
                 'placeholder' => 'Sélectionnez une valeur',
-                'choices' => $choicesIntercommunalityType
+                'choices' => $choicesIntercommunalityType,
+                'attr' => [
+                    'readonly' => $options['is_readonly'] ? 'readonly' : false
+                ]
             ])
             ->add('perimeter', PerimeterAutocompleteType::class, [
                 'required' => true,
                 'label' => 'Territoire de la structure',
                 'help' => 'Tous les périmètres géographiques sont disponibles : CA, CU, CC, pays, parc, etc. Contactez-nous si vous ne trouvez pas le vôtre.',
                 'placeholder' => 'Tapez les premiers caractères',
+                'attr' => [
+                    'readonly' => $options['is_readonly'] ? 'readonly' : false
+                ]
             ])
             ->add('name', TextType::class, [
                 'required' => true,
                 'label' => 'Nom de la structure',
                 'help' => 'En fonction des informations saisies précédemment, nous pouvons, parfois pré-remplir ce champ automatiquement. Vous pouvez cependant corriger le nom proposé si besoin.',
+                'attr' => [
+                    'readonly' => $options['is_readonly'] ? 'readonly' : false
+                ]
             ])
             ->add('address', TextType::class, [
                 'label' => 'Adresse postale',
                 'required' => true,
+                'attr' => [
+                    'readonly' => $options['is_readonly'] ? 'readonly' : false
+                ]
             ])
             ->add('cityName', TextType::class, [
                 'label' => 'Ville',
                 'required' => true,
+                'attr' => [
+                    'readonly' => $options['is_readonly'] ? 'readonly' : false
+                ]
             ])
             ->add('zipCode', TextType::class, [
                 'label' => 'Code postal',
                 'required' => true,
+                'attr' => [
+                    'readonly' => $options['is_readonly'] ? 'readonly' : false
+                ]
             ])
             ->add('sirenCode', TextType::class, [
                 'label' => 'Code SIREN',
@@ -79,6 +96,9 @@ class OrganizationEditType extends AbstractType
                 'constraints' => [
                     new Length(9)
                 ],
+                'attr' => [
+                    'readonly' => $options['is_readonly'] ? 'readonly' : false
+                ]
             ])
             ->add('siretCode', TextType::class, [
                 'label' => 'Code SIRET',
@@ -87,6 +107,9 @@ class OrganizationEditType extends AbstractType
                 'constraints' => [
                     new Length(14)
                 ],
+                'attr' => [
+                    'readonly' => $options['is_readonly'] ? 'readonly' : false
+                ]
             ])
             ->add('apeCode', TextType::class, [
                 'label' => 'Code APE',
@@ -94,6 +117,9 @@ class OrganizationEditType extends AbstractType
                 'constraints' => [
                     new Length(max: 10)
                 ],
+                'attr' => [
+                    'readonly' => $options['is_readonly'] ? 'readonly' : false
+                ]
             ])
             ->add('inseeCode', TextType::class, [
                 'label' => 'Code INSEE',
@@ -101,6 +127,9 @@ class OrganizationEditType extends AbstractType
                 'constraints' => [
                     new Length(5)
                 ],
+                'attr' => [
+                    'readonly' => $options['is_readonly'] ? 'readonly' : false
+                ]
             ])
 
             ->addEventListener(
@@ -129,6 +158,7 @@ class OrganizationEditType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => Organization::class,
+            'is_readonly' => false
         ]);
     }
 }
