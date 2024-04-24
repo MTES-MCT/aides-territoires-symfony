@@ -283,7 +283,7 @@ class Organization
     #[ORM\JoinColumn(onDelete:'SET NULL')]
     private Collection $logProjectValidatedSearches;
 
-    #[ORM\OneToMany(mappedBy: 'organization', targetEntity: OrganizationAccess::class, orphanRemoval: true)]
+    #[ORM\OneToMany(mappedBy: 'organization', targetEntity: OrganizationAccess::class, orphanRemoval: true, cascade: ['persist'])]
     private Collection $organizationAccesses;
 
     public function __construct()

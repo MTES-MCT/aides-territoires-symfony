@@ -6,6 +6,8 @@ use App\Controller\Admin\AtCrudController;
 use App\Controller\Admin\Filter\UserAdministratorOfSearchPageFilter;
 use App\Controller\Admin\Filter\UserCountyFilter;
 use App\Controller\Admin\Filter\UserRoleFilter;
+use App\Controller\Admin\Organization\OrganizationAccessCrudCollectionController;
+use App\Controller\Admin\Organization\OrganizationAccessCrudController;
 use App\Entity\User\User;
 use App\Service\Export\SpreadsheetExporterService;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
@@ -16,6 +18,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ChoiceField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\CollectionField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\DateTimeField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\FormField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
@@ -81,11 +84,12 @@ class UserCrudController extends AtCrudController
         ->hideOnIndex();
         yield TextField::new('beneficiaryRole', 'Rôle du bénéficiaire ')
         ->hideOnIndex();
-        yield AssociationField::new('organizations', 'Structure(s) du bénéficiaire')
-        ->autocomplete()
-        ->setHelp('A quelle(s) structure(s) appartient le bénéficiaire ?')
-        ->hideOnIndex()
-        ->setFormTypeOption('by_reference', false);
+
+        yield CollectionField::new('organizationAccesses', 'Structure(s) du bénéficiaire')
+        ->onlyOnForms()
+        ->setEntryIsComplex()
+        ->useEntryCrudForm(OrganizationAccessCrudCollectionController::class)
+        ;
 
         yield FormField::addFieldset('Fusion d\'organisation');
         yield AssociationField::new('proposedOrganization', 'Structure proposée')

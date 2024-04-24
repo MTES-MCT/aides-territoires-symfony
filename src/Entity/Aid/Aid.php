@@ -606,6 +606,7 @@ class Aid
     private ArrayCollection $instructors;
 
     #[ORM\ManyToOne(inversedBy: 'aids')]
+    #[ORM\JoinColumn(onDelete:'SET NULL')]
     private ?Organization $organization = null;
 
     #[ORM\Column(length: 255, nullable: true)]

@@ -8,6 +8,7 @@ use App\Entity\Perimeter\Perimeter;
 use App\Repository\Perimeter\PerimeterRepository;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\CollectionField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\DateTimeField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\FormField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
@@ -32,9 +33,13 @@ class OrganizationCrudController extends AtCrudController
         ;
         yield AssociationField::new('organizationType', 'Type')
         ->setFormTypeOption('choice_label', 'name');
-        yield AssociationField::new('beneficiairies', 'Membres')
-        ->autocomplete()
-        ->onlyOnForms();
+
+        yield CollectionField::new('organizationAccesses', 'Membres')
+        ->onlyOnForms()
+        ->setEntryIsComplex()
+        ->useEntryCrudForm(OrganizationAccessCrudCollectionFromOrganizationController::class)
+        ;
+
         yield AssociationField::new('backer', 'Porteur d\'aide')
         ->autocomplete()
         ->onlyOnForms();
