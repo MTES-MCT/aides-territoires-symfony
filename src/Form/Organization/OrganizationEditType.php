@@ -87,6 +87,9 @@ class OrganizationEditType extends AbstractType
                 'required' => true,
                 'attr' => [
                     'readonly' => $options['is_readonly'] ? 'readonly' : false
+                ],
+                'constraints' => [
+                    new Length(max: 10)
                 ]
             ])
             ->add('sirenCode', TextType::class, [
