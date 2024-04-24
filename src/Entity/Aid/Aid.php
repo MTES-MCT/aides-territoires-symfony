@@ -626,6 +626,9 @@ class Aid
 
     private ArrayCollection $aidsFromGenericLive;
 
+    #[ORM\OneToMany(mappedBy: 'aid', targetEntity: AidLock::class, orphanRemoval: true)]
+    private Collection $aidLocks;
+
     /**
      * <Non Database Fields
      */
@@ -659,6 +662,7 @@ class Aid
         $this->financers = new ArrayCollection();
         $this->keywordReferences = new ArrayCollection();
         $this->projectReferences = new ArrayCollection();
+        $this->aidLocks = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -2472,6 +2476,36 @@ class Aid
             }
         }
         return $aids;
+    }
+
+    /**
+     * @return Collection<int, AidLock>
+     */
+    public function getAidLocks(): Collection
+    {
+        return $this->aidLocks;
+    }
+
+    public function addAidLock(AidLock $aidLock): static
+    {
+        if (!$this->aidLocks->contains($aidLock)) {
+            $this->aidLocks->add($aidLock);
+            $aidLock->setAid($this);
+        }
+
+        return $this;
+    }
+
+    public function removeAidLock(AidLock $aidLock): static
+    {
+        if ($this->aidLocks->removeElement($aidLock)) {
+            // set the owning side to null (unless already changed)
+            if ($aidLock->getAid() === $this) {
+                $aidLock->setAid(null);
+            }
+        }
+
+        return $this;
     }
     
 }

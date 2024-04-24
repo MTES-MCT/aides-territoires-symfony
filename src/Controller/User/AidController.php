@@ -13,6 +13,7 @@ use App\Form\Aid\AidEditType;
 use App\Form\User\Aid\AidExportType;
 use App\Form\User\Aid\AidFilterType;
 use App\Form\User\Aid\AidStatsPeriodType;
+use App\Repository\Aid\AidLockRepository;
 use App\Repository\Aid\AidProjectRepository;
 use App\Repository\Aid\AidRepository;
 use App\Repository\Log\LogAidApplicationUrlClickRepository;
@@ -28,6 +29,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Dompdf\Dompdf;
 use Dompdf\Options;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -229,6 +231,13 @@ class AidController extends FrontController
             return $this->redirectToRoute('app_user_aid_publications');
         }
 
+        $isLockedByAnother = $aidService->isLockedByAnother($aid, $user);
+        $getLock = null;
+        if (!$isLockedByAnother) {
+        } else {
+            $getLock = $aidService->getLock($aid);
+        }
+
         // regarde si aide(s) avec meme originUrl
         $aidDuplicates = [];
         if ($aid->getOriginUrl()) {
@@ -313,8 +322,109 @@ class AidController extends FrontController
             'formDelete' => $formDelete->createView(),
             'formAid' => $formAid->createView(),
             'aid' => $aid,
-            'aidDuplicates' => $aidDuplicates
+            'aidDuplicates' => $aidDuplicates,
+            'isLockedByAnother' => $isLockedByAnother,
+            'getLock' => $getLock
         ]);
+    }
+
+    #[Route('/comptes/aides/ajax-lock/', name: 'app_user_aid_ajax_lock', options: ['expose' => true])]
+    public function ajaxLock(
+        RequestStack $requestStack,
+        AidRepository $aidRepository,
+        AidService $aidService,
+        UserService $userService
+    ) : JsonResponse
+    {
+        try {
+            // verification requete interne
+            $request = $requestStack->getCurrentRequest();
+            $origin = $request->headers->get('origin');
+            $infosOrigin = parse_url($origin);
+            $hostOrigin = $infosOrigin['host'] ?? null;
+            $serverName = $request->getHost();
+    
+            if ($hostOrigin !== $serverName) {
+                // La requête n'est pas interne, retourner une erreur
+                throw $this->createAccessDeniedException('This action can only be performed by the server itself.');
+            }
+            
+            // recupere id
+            $id = (int) $requestStack->getCurrentRequest()->get('id', 0);
+            if (!$id) {
+                throw new \Exception('Id manquant');
+            }
+
+            // le user
+            $user = $userService->getUserLogged();
+            if (!$user) {
+                throw new \Exception('User manquant');
+            }
+
+            // charge aide
+            $aid = $aidRepository->find($id);
+
+            // regarde si deja lock
+            $isLockedByAnother = $aidService->isLockedByAnother($aid, $user);
+            if ($isLockedByAnother) {
+                throw new \Exception('Aide déjà lock');
+            }
+            
+            // la débloque
+            $aidService->lockAid($aid, $user);
+
+            // retour
+            return new JsonResponse([
+                'success' => true
+            ]);
+        } catch (\Exception $e) {
+            return new JsonResponse([
+                'success' => false
+            ]);
+        }
+    }
+
+    #[Route('/comptes/aides/ajax-unlock/', name: 'app_user_aid_ajax_unlock', options: ['expose' => true])]
+    public function ajaxUnlock(
+        RequestStack $requestStack,
+        AidRepository $aidRepository,
+        AidService $aidService
+    ) : JsonResponse
+    {
+        try {
+            // verification requete interne
+            $request = $requestStack->getCurrentRequest();
+            $origin = $request->headers->get('origin');
+            $infosOrigin = parse_url($origin);
+            $hostOrigin = $infosOrigin['host'] ?? null;
+            $serverName = $request->getHost();
+    
+            if ($hostOrigin !== $serverName) {
+                // La requête n'est pas interne, retourner une erreur
+                throw $this->createAccessDeniedException('This action can only be performed by the server itself.');
+            }
+            
+            // recupere id
+            $id = (int) $requestStack->getCurrentRequest()->get('id', 0);
+            if (!$id) {
+                throw new \Exception('Id manquant');
+            }
+
+            // charge aide
+            $aid = $aidRepository->find($id);
+
+            // la débloque
+            $aidService->unlockAid($aid);
+
+            // retour
+            return new JsonResponse([
+                'success' => true
+            ]);
+        } catch (\Exception $e) {
+            return new JsonResponse([
+                'success' => false
+            ]);
+        }
     }
 
     #[Route('/comptes/aides/exporter-aides/', name: 'app_user_aids_export')]

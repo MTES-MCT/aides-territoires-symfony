@@ -22,6 +22,7 @@
 
     {% block before_section %}{% endblock before_section %}
 
+    {% if not isLockedByAnother %}
     <section id="aid-edit" class="fr-container">
         {% include 'user/aid/_aid_edit_stepper.html.twig' %}
 
@@ -204,5 +205,15 @@
             </div>
         {{ form_end(formAid)}}
     </section>
+    {% endif %}
 </div>
+{% endblock %}
+
+{% block javascriptsBottom %}
+    {{ parent() }}
+    {% cspscript %}
+        <script type="text/javascript">
+            let idAid = {{ aid.id }};
+        </script>
+    {% endcspscript %}
 {% endblock %}

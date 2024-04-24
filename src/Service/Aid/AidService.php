@@ -5,6 +5,7 @@ namespace App\Service\Aid;
 use App\Entity\Aid\Aid;
 use App\Entity\Aid\AidFinancer;
 use App\Entity\Aid\AidInstructor;
+use App\Entity\Aid\AidLock;
 use App\Entity\Organization\Organization;
 use App\Entity\Organization\OrganizationType;
 use App\Entity\Perimeter\Perimeter;
@@ -30,6 +31,58 @@ class AidService
     )
     {
         
+    }
+
+    public function getLock(Aid $aid): ?AidLock
+    {
+        $aidLocks = $this->managerRegistry->getRepository(AidLock::class)->findBy(['aid' => $aid]);
+        foreach ($aidLocks as $aidLock) {
+            return $aidLock;
+        }
+
+        return null;
+    }
+    public function isLockedByAnother(Aid $aid, User $user): bool
+    {
+        $aidLocks = $this->managerRegistry->getRepository(AidLock::class)->findBy(['aid' => $aid]);
+        foreach ($aidLocks as $aidLock) {
+            if ($aidLock->getUser() != $user) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public function isLocked(Aid $aid): bool
+    {
+        $aidLocks = $this->managerRegistry->getRepository(AidLock::class)->findBy(['aid' => $aid]);
+        return count($aidLocks) > 0;
+    }
+    
+    public function lockAid(Aid $aid, User $user): void
+    {
+        try {
+            // vérifie que l'aide n'est pas déjà lock
+            $aidLocks = $this->managerRegistry->getRepository(AidLock::class)->findBy(['aid' => $aid]);
+
+            if (count($aidLocks) == 0) {
+                $aidLock = new AidLock();
+                $aidLock->setAid($aid);
+                $aidLock->setUser($user);
+                $this->managerRegistry->getManager()->persist($aidLock);
+                $this->managerRegistry->getManager()->flush();
+            }
+        } catch (\Exception $e) {
+        }
+    }
+
+    public function unlockAid(Aid $aid): void
+    {
+        $aidLocks = $this->managerRegistry->getRepository(AidLock::class)->findBy(['aid' => $aid]);
+        foreach ($aidLocks as $aidLock) {
+            $this->managerRegistry->getManager()->remove($aidLock);
+        }
+        $this->managerRegistry->getManager()->flush();
     }
 
     public function duplicateAid(?Aid $aid, ?User $user): Aid
@@ -345,6 +398,9 @@ class AidService
         if ($user->getId() == $aid->getAuthor()->getId() || $this->userService->isUserGranted($user, User::ROLE_ADMIN)) {
             return true;
         }
+        if ($user && $aid->getOrganization() && $this->userService->isMemberOfOrganization($aid->getOrganization(), $user)) { // le user fait parti de l'organization de l'aide
+            return true;
+        }
         return false;
     }
 
@@ -373,6 +429,15 @@ class AidService
         // si c'est l'auteur ou un admin
         if ($aid->getAuthor() == $user || $this->userService->isUserGranted($user, User::ROLE_ADMIN)) {
             return true;
+        }
+
+        // si il appartiens à l'organisation et peu editer les aides
+        if ($aid->getOrganization()) {
+            foreach ($aid->getOrganization()->getOrganizationAccesses() as $organizationAccess) {
+                if ($organizationAccess->getUser() == $user && $organizationAccess->isEditAid()) {
+                    return true;
+                }
+            }
         }
 
         return false;

@@ -3,6 +3,7 @@
 namespace App\Entity\User;
 
 use App\Entity\Aid\Aid;
+use App\Entity\Aid\AidLock;
 use App\Entity\Aid\AidProject;
 use App\Entity\Aid\AidSuggestedAidProject;
 use App\Entity\Bundle\Bundle;
@@ -303,6 +304,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: OrganizationAccess::class, orphanRemoval: true, cascade: ['persist'])]
     private Collection $organizationAccesses;
 
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: AidLock::class, orphanRemoval: true)]
+    private Collection $aidLocks;
+
     public function __construct()
     {
         $this->logUserLogins = new ArrayCollection();
@@ -340,6 +344,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
         $this->apiTokenAsks = new ArrayCollection();
         $this->cronExportSpreadsheets = new ArrayCollection();
         $this->organizationAccesses = new ArrayCollection();
+        $this->aidLocks = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -1947,6 +1952,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
             // set the owning side to null (unless already changed)
             if ($organizationAccess->getUser() === $this) {
                 $organizationAccess->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, AidLock>
+     */
+    public function getAidLocks(): Collection
+    {
+        return $this->aidLocks;
+    }
+
+    public function addAidLock(AidLock $aidLock): static
+    {
+        if (!$this->aidLocks->contains($aidLock)) {
+            $this->aidLocks->add($aidLock);
+            $aidLock->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeAidLock(AidLock $aidLock): static
+    {
+        if ($this->aidLocks->removeElement($aidLock)) {
+            // set the owning side to null (unless already changed)
+            if ($aidLock->getUser() === $this) {
+                $aidLock->setUser(null);
             }
         }
 

@@ -3,6 +3,13 @@
 {% block page_title %}<h1>Modifiez une aide</h1>{% endblock page_title %}
 
 {% block before_section %}
+    {% if isLockedByAnother %}
+        <div class="fr-alert fr-alert--info fr-alert--sm fr-my-2w">
+            <p>
+                L'aide est en cours d'édition {% if getLock %}par {{ getLock.user.email }} depuis {{ getLock.timeStart|date('d/m/Y H:i:s') }}{% endif %}
+            </p>
+        </div>
+    {% else %}
     <div class="fr-container">
         <div class="actions fr-grid-row fr-grid-row--center fr-mb-5w fr-grid-row--gutters">
             <div class="sidebar-actions fr-col-12 fr-col-md-4">
@@ -49,18 +56,21 @@
             </div>
         </div>
     </div>
+    {% endif %}
 {% endblock before_section %}
 
 {% block form_actions %}
-<div class="form-actions fr-grid-row fr-grid-row--gutters fr-mt-2w fr-mb-6w fr-background-main">
-    <div class="submit-buttons fr-col-md-8">
-        <button type="submit" class="fr-btn">Enregistrer vos modifications</button>
-        <a href="{{ path('app_user_aid_duplicate', {'slug': aid.slug}) }}" class="fr-btn">Dupliquer cette aide</a>
+    {% if not isLockedByAnother %}
+    <div class="form-actions fr-grid-row fr-grid-row--gutters fr-mt-2w fr-mb-6w fr-background-main">
+        <div class="submit-buttons fr-col-md-8">
+            <button type="submit" class="fr-btn">Enregistrer vos modifications</button>
+            <a href="{{ path('app_user_aid_duplicate', {'slug': aid.slug}) }}" class="fr-btn">Dupliquer cette aide</a>
+        </div>
+        <div class="fr-col-md-4 fr-grid-row fr-grid-row--right">
+            <a href="{{ path('app_user_aid_publications') }}" class="fr-btn fr-btn--tertiary">Retour à votre portefeuille d’aides</a>
+        </div>
     </div>
-    <div class="fr-col-md-4 fr-grid-row fr-grid-row--right">
-        <a href="{{ path('app_user_aid_publications') }}" class="fr-btn fr-btn--tertiary">Retour à votre portefeuille d’aides</a>
-    </div>
-</div>
+    {% endif %}
 {% endblock form_actions %}
 
 {% block modal %}

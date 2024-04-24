@@ -3,6 +3,7 @@ require('./enable_page_exit_confirmation.js');
 require('./stepper.js');
 require ('../../../form/input-maxlength.js');
 
+import Routing from 'fos-router';
 
 $(function(){
     $('.widget-autocomplete-multiple-wrapper').checkbox_multiple_search();
@@ -42,7 +43,44 @@ $(function(){
             $('#aid_edit_status').val($(this).attr('data-status'));
         }
     }, '.submit-change-status');
+
+    // quand on arrive sur la page prete, on lock
+    lockAid();
 });
+
+// quand on quitte la page
+$(window).on('unload', function() {
+    unlockAid();
+});
+$(window).on('pagehide', function() {
+    unlockAid();
+});
+
+function lockAid()
+{
+    if (typeof idAid !== 'undefined') {
+        $.ajax({
+            url: Routing.generate('app_user_aid_ajax_lock'),
+            type: 'POST',
+            data: {
+                'id': idAid
+            }
+        });
+    }
+}
+
+function unlockAid()
+{
+    if (typeof idAid !== 'undefined') {
+        $.ajax({
+            url: Routing.generate('app_user_aid_ajax_unlock'),
+            type: 'POST',
+            data: {
+                'id': idAid
+            }
+        });
+    }
+}
 
 function toggleElements(parent, value, checked)
 {
