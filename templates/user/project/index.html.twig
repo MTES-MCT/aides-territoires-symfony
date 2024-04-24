@@ -1,5 +1,11 @@
 {% extends 'base.html.twig' %}
 
+{% block stylesheets %}
+	{{ parent() }}
+	{{ encore_entry_link_tags('import-scss/user/project/index') }}
+{% endblock %}
+
+
 {% block javascripts %}
 	{{ parent() }}
 	{{ encore_entry_script_tags('front/user/project/index') }}
@@ -24,8 +30,8 @@
             <a href="{{ path('app_user_project_creation_projet') }}" class="fr-btn fr-icon-add-circle-line fr-btn--icon-left fr-mb-5w fr-mt-4w" id="create-project-btn">Ajouter un projet</a>
 
             <div class="fr-table">
-                <table class="data-table at-table--xl">
-                    <caption>
+                <table class="data-table at-table--xl" id="table-projects">
+                    <caption class="fr-sr-only">
                         Liste de vos projets en cours
                     </caption>
                     <thead>

@@ -3,6 +3,7 @@
 namespace App\DataFixtures;
 
 use App\Entity\Organization\Organization;
+use App\Entity\Organization\OrganizationAccess;
 use App\Entity\Perimeter\Perimeter;
 use App\Entity\User\User;
 use App\Service\Various\StringService;
@@ -61,7 +62,16 @@ class AppFixtures extends Fixture
         $user->setPassword($this->passwordEncoder->hashPassword($user, '#123Password'));
         $user->addRole(User::ROLE_USER);
         $user->setPerimeter($perimeter);
-        $organization->addBeneficiairy($user);
+
+        $organizationAccess = new OrganizationAccess();
+        $organizationAccess->setOrganization($organization);
+        $organizationAccess->setAdministrator(true);
+        $organizationAccess->setEditAid(true);
+        $organizationAccess->setEditPortal(true);
+        $organizationAccess->setEditBacker(true);
+        $organizationAccess->setEditProject(true);
+
+        $user->addOrganizationAccess($organizationAccess);
         $manager->persist($user);
 
         /**

@@ -95,6 +95,7 @@ Encore
     .addEntry('import-scss/user/aid/publications', './assets/js/import-scss/user/aid/publications.js')
     .addEntry('import-scss/user/register', './assets/js/import-scss/user/register.js')
     .addEntry('import-scss/user/register-commune', './assets/js/import-scss/user/register-commune.js')
+    .addEntry('import-scss/user/project/index', './assets/js/import-scss/user/project/index.js')
     .addEntry('import-scss/user/project/fiche_projet', './assets/js/import-scss/user/project/fiche_projet.js')
     .addEntry('import-scss/user/searchpage/edit', './assets/js/import-scss/user/searchpage/edit.js')
     .addEntry('import-scss/user/backer/edit', './assets/js/import-scss/user/backer/edit.js')

@@ -168,7 +168,10 @@ class AidService
         if(
             $aid->getAuthor() == $user
             || $this->userService->isUserGranted($user, User::ROLE_ADMIN)
-            || ($aid->getOrganization() && $aid->getOrganization()->getBeneficiairies()->contains($user))
+            || (
+                $aid->getOrganization()
+                && $this->userService->isMemberOfOrganization($aid->getOrganization(), $user)
+            )
         ) {
             $access = true;
         }
@@ -349,7 +352,7 @@ class AidService
         if (!$aid->isPublished()) {
             if ($user && $aid->getAuthor() && ($user->getId() == $aid->getAuthor()->getId())) { // c'est l'auteur
                 return true;
-            } else if ($user && $aid->getOrganization() && $aid->getOrganization()->getBeneficiairies() && $aid->getOrganization()->getBeneficiairies()->contains($user)) { // le user fait parti de l'organization de l'aide
+            } else if ($user && $aid->getOrganization() && $this->userService->isMemberOfOrganization($aid->getOrganization(), $user)) { // le user fait parti de l'organization de l'aide
                 return true;
             } else if ($user && $this->userService->isUserGranted($user, User::ROLE_ADMIN)) { // c'est un admin
                 return true;

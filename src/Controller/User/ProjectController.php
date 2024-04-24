@@ -13,7 +13,6 @@ use App\Form\User\Project\AidProjectStatusType;
 use App\Form\User\Project\ProjectDeleteType;
 use App\Form\User\Project\ProjectExportType;
 use App\Repository\Aid\AidProjectRepository;
-use App\Repository\Aid\AidRepository;
 use App\Repository\Project\ProjectRepository;
 use App\Repository\Project\ProjectValidatedRepository;
 use App\Repository\Reference\ProjectReferenceRepository;
@@ -53,7 +52,6 @@ class ProjectController extends FrontController
         ProjectRepository $projectRepository,
         RequestStack $requestStack,
         ManagerRegistry $managerRegistry,
-        NotificationService $notificationService,
         OrganizationService $organizationService
     ): Response
     {
@@ -142,7 +140,7 @@ class ProjectController extends FrontController
         UserService $userService,
         ManagerRegistry $managerRegistry,
         ImageService $imageService,
-        NotificationService $notificationService
+        OrganizationService $organizationService
     ): Response
     {
         $project = $ProjectRepository->findOneBy(
@@ -185,18 +183,14 @@ class ProjectController extends FrontController
 
                 // notification aux autres membres de l'organization
                 if ($project->getOrganization()) {
-                    foreach ($project->getOrganization()->getBeneficiairies() as $beneficiary) {
-                        if ($beneficiary->getId() != $user->getId()) {
-                            $notificationService->addNotification(
-                                $beneficiary,
-                                'Un projet a été mis à jour',
-                                '<p>
-                                '.$user->getFirstname().' '.$user->getLastname().' a modifié les informations du projet
-                                <a href="'.$this->generateUrl('app_user_project_details_fiche_projet', ['id' => $project->getId(), 'slug' => $project->getSlug()], UrlGeneratorInterface::ABSOLUTE_URL).'">'.$project->getName().'</a>.
-                                </p>'
-                            );
-                        }
-                    }
+                    $organizationService->sendNotificationToMembers(
+                        $project->getOrganization(),
+                        'Un projet a été mis à jour',
+                        '<p>
+                        '.$user->getFirstname().' '.$user->getLastname().' a modifié les informations du projet '.$project->getName().'.
+                        </p>',
+                        [$user]
+                    );
                 }
 
                 // message
@@ -234,7 +228,7 @@ class ProjectController extends FrontController
         UserService $userService,
         ManagerRegistry $managerRegistry,
         ImageService $imageService,
-        NotificationService $notificationService
+        OrganizationService $organizationService
     ): Response
     {
         $project = new Project();
@@ -269,19 +263,18 @@ class ProjectController extends FrontController
                 $managerRegistry->getManager()->flush();
 
                 // notification aux autres membres de l'organization
-                foreach ($project->getOrganization()->getBeneficiairies() as $beneficiary) {
-                    if ($beneficiary->getId() != $user->getId()) {
-                        $notificationService->addNotification(
-                            $beneficiary,
-                            'Un projet a été créé',
-                            '<p>
-                            '.$user->getFirstname().' '.$user->getLastname().' a créé le projet
-                            <a href="'.$this->generateUrl('app_user_project_details_fiche_projet', ['id' => $project->getId(), 'slug' => $project->getSlug()], UrlGeneratorInterface::ABSOLUTE_URL).'">'.$project->getName().'</a>.
-                            </p>'
-                        );
-                    }
+                if ($project->getOrganization()) {
+                    $organizationService->sendNotificationToMembers(
+                        $project->getOrganization(),
+                        'Un projet a été créé',
+                        '<p>
+                        '.$user->getFirstname().' '.$user->getLastname().' a créé le projet
+                        <a href="'.$this->generateUrl('app_user_project_details_fiche_projet', ['id' => $project->getId(), 'slug' => $project->getSlug()], UrlGeneratorInterface::ABSOLUTE_URL).'">'.$project->getName().'</a>.
+                        </p>',
+                        [$user]
+                    );
                 }
-
+                
                 // message
                 $this->addFlash(
                     FrontController::FLASH_SUCCESS,
@@ -317,12 +310,11 @@ class ProjectController extends FrontController
     public function aides(
         $id,
         ProjectRepository $ProjectRepository,
-        ProjectReferenceRepository $projectReferenceRepository,
         UserService $userService,
         RequestStack $requestStack,
         AidProjectRepository $aidProjectRepository,
         ManagerRegistry $managerRegistry,
-        NotificationService $notificationService,
+        OrganizationService $organizationService,
         ReferenceService $referenceService,
         SpreadsheetExporterService $spreadsheetExporterService,
         AidService $aidService
@@ -389,19 +381,17 @@ class ProjectController extends FrontController
                 }
 
                 if ($project->getOrganization()) {
-                    foreach ($project->getOrganization()->getBeneficiairies() as $beneficiary) {
-                        if ($beneficiary->getId() != $user->getId()) {
-                            $notificationService->addNotification(
-                                $beneficiary,
-                                'Une aide a été supprimée d’un projet',
-                                '<p>
-                                '.$user->getFirstname().' '.$user->getLastname().' a supprimé une aide du projet
-                                <a href="'.$this->generateUrl('app_user_project_details_fiche_projet', ['id' => $project->getId(), 'slug' => $project->getSlug()], UrlGeneratorInterface::ABSOLUTE_URL).'">'.$project->getName().'</a>.
-                                </p>'
-                            );
-                        }
-                    }
+                    $organizationService->sendNotificationToMembers(
+                        $project->getOrganization(),
+                        'Une aide a été supprimée d’un projet',
+                        '<p>
+                        '.$user->getFirstname().' '.$user->getLastname().' a supprimé une aide du projet
+                        <a href="'.$this->generateUrl('app_user_project_details_fiche_projet', ['id' => $project->getId(), 'slug' => $project->getSlug()], UrlGeneratorInterface::ABSOLUTE_URL).'">'.$project->getName().'</a>.
+                        </p>',
+                        [$user]
+                    );
                 }
+                
                 // message
                 $this->addFlash(
                     FrontController::FLASH_SUCCESS,

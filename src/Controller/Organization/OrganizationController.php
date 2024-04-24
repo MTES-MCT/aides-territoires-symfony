@@ -142,7 +142,15 @@ class OrganizationController extends FrontController
 
                 // si nouvelle organization
                 if (!$user->getDefaultOrganization()) {
-                    $user->addOrganization($organization);
+                    $organizationAccess = new OrganizationAccess();
+                    $organizationAccess->setOrganization($organization);
+                    $organizationAccess->setAdministrator(true);
+                    $organizationAccess->setEditAid(true);
+                    $organizationAccess->setEditPortal(true);
+                    $organizationAccess->setEditBacker(true);
+                    $organizationAccess->setEditProject(true);
+                    $user->addOrganizationAccess($organizationAccess);
+                    $managerRegistry->getManager()->persist($user);
                 }
 
                 // sauvegarde

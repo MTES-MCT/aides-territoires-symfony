@@ -28,6 +28,7 @@ use App\Service\Email\EmailService;
 use App\Service\Log\LogService;
 use App\Service\Matomo\MatomoService;
 use App\Service\Notification\NotificationService;
+use App\Service\Organization\OrganizationService;
 use App\Service\Reference\ReferenceService;
 use App\Service\User\UserService;
 use App\Service\Various\Breadcrumb;
@@ -374,7 +375,7 @@ class AidController extends FrontController
         MatomoService $matomoService,
         ProjectRepository $projectRepository,
         LogService $logService,
-        NotificationService $notificationService
+        OrganizationService $organizationService
     ): Response
     {
         // le user si dispo
@@ -430,19 +431,15 @@ class AidController extends FrontController
 
                         // envoi notification à tous les autres membres de l'oganisation
                         if ($project->getOrganization()) {
-                            foreach ($project->getOrganization()->getBeneficiairies() as $beneficiary) {
-                                if ($beneficiary->getId() == $user->getId()) {
-                                    continue;
-                                }
-                                $notificationService->addNotification(
-                                    $beneficiary,
-                                    'Nouvelle aide ajoutée à un projet',
-                                    '<p>
-                                    '.$user->getFirstname().' '.$user->getLastname().' a ajouté une aide au projet
-                                    <a href="'.$this->generateUrl('app_user_project_details_fiche_projet', ['id' => $project->getId(), 'slug' => $project->getSlug()], UrlGeneratorInterface::ABSOLUTE_URL).'">'.$project->getName().'</a>.
-                                    </p>'
-                                );
-                            }
+                            $organizationService->sendNotificationToMembers(
+                                $project->getOrganization(),
+                                'Nouvelle aide ajoutée à un projet',
+                                '<p>
+                                '.$user->getFirstname().' '.$user->getLastname().' a ajouté une aide au projet
+                                <a href="'.$this->generateUrl('app_user_project_details_fiche_projet', ['id' => $project->getId(), 'slug' => $project->getSlug()], UrlGeneratorInterface::ABSOLUTE_URL).'">'.$project->getName().'</a>.
+                                </p>',
+                                [$user]
+                            );
                         }
                         // message
                         $this->addFlash(
