@@ -174,12 +174,21 @@ class AidCrudController extends AtCrudController
         $batchAssociateKeyword = Action::new('batchAssociateKeyword', 'Associé Mot clés')
         ->linkToCrudAction('batchAssociateKeyword');
 
+        // unlock
+        $unlockAction = Action::new('unlock', 'Débloquer', 'fas fa-lock-open')
+            ->displayIf(function ($entity) {
+                return count($entity->getAidLocks());
+            })
+            ->linkToCrudAction('unlock');
+
+        // retour
         return parent::configureActions($actions)
             ->add(Crud::PAGE_INDEX, $displayOnFront)
             ->add(Crud::PAGE_INDEX, $displayStats)
             ->add(Crud::PAGE_EDIT, $displayOnFront)
             ->add(Crud::PAGE_INDEX, $exportCsvAction)
             ->add(Crud::PAGE_INDEX, $exportXlsxAction)
+            ->add(Crud::PAGE_INDEX, $unlockAction)
             ->addBatchAction($batchAssociate)
             ->addBatchAction($batchAssociateKeyword)
         ;
@@ -703,6 +712,27 @@ class AidCrudController extends AtCrudController
         ->overrideTemplate('crud/index', 'admin/aid/index.html.twig')  
         ->setPaginatorPageSize(50)
         ;
+    }
+
+    public function unlock(AdminContext $context): RedirectResponse
+    {
+        $aid = $context->getEntity()->getInstance();
+        if ($aid instanceof Aid) {
+            foreach ($aid->getAidLocks() as $aidLock) {
+                $this->managerRegistry->getManager()->remove($aidLock);
+            }
+            $this->managerRegistry->getManager()->flush();
+        }
+        
+        $this->addFlash('success', 'L’aide a été déverrouillée.');
+
+        // redirection sur listing aides
+        $url = $this->adminUrlGenerator
+            ->setController(AidCrudController::class)
+            ->setAction(Action::INDEX)
+            ->generateUrl();
+
+        return new RedirectResponse($url);
     }
 
     public function exportXlsx(AdminContext $context, SpreadsheetExporterService $spreadsheetExporterService, string $filename = 'aides')
