@@ -31,7 +31,7 @@ class ProjectService
             return false;
         }
 
-        if ($this->organizationService->canEditAid($user, $project->getOrganization())) {
+        if ($this->organizationService->canEditProject($user, $project->getOrganization())) {
             return true;
         }
 

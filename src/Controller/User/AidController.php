@@ -492,7 +492,7 @@ class AidController extends FrontController
             // verifie que le user peut lock
             $canLock = $aidService->canUserLock($aid, $user);
             if (!$canLock) {
-                throw new \Exception('Vous ne pouvez pas lock cette aide');
+                throw new \Exception('Vous ne pouvez pas débloquer cette aide');
             }
 
             // la débloque

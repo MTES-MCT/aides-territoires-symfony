@@ -704,7 +704,7 @@ class OrganizationController extends FrontController
             // verifie que le user peut lock
             $canLock = $backerService->canUserLock($backer, $user);
             if (!$canLock) {
-                throw new \Exception('Vous ne pouvez pas lock cette fiche porteur');
+                throw new \Exception('Vous ne pouvez pas bloquer cette fiche porteur');
             }
 
             // regarde si deja lock
@@ -721,15 +721,18 @@ class OrganizationController extends FrontController
                 'success' => true
             ]);
         } catch (\Exception $e) {
+            dd($e->getMessage());
             return new JsonResponse([
                 'success' => false
             ]);
         }
     }
 
-    #[Route('/comptes/structure/porteur/{id}/unlock/', name: 'app_organization_backer_unlock', requirements: ['id' => '\d+'])]
+    #[Route('/comptes/structure/{id}/porteur/{idBacker}/unlock/', name: 'app_organization_backer_unlock', requirements: ['id' => '\d+', 'idBacker' => '\d+'])]
     public function unlock(
         $id,
+        $idBacker,
+        OrganizationRepository $organizationRepository,
         BackerRepository $backerRepository,
         OrganizationService $organizationService,
         UserService $userService,
@@ -743,20 +746,20 @@ class OrganizationController extends FrontController
                 throw new \Exception('User invalid');
             }
 
-            // l'aide
-            $backer = $backerRepository->find($id);
+            // l'organization
+            $organization = $organizationRepository->find($id);
+            if (!$organization instanceof Organization) {
+                throw new \Exception('Structure invalide');
+            }
+
+            // la fiche porteur
+            $backer = $backerRepository->find($idBacker);
             if (!$backer instanceof Backer) {
                 throw new \Exception('Fiche invalide');
             }
 
-            // verifie que le user est admin de l'organization qui gère l'aide
-            $adminOf = false;
-            foreach ($backer->getOrganizations() as $organization) {
-                if ($organizationService->userAdminOf($user, $organization)) {
-                    $adminOf = true;
-                }
-            }
-            if (!$adminOf) {
+            // verifie que le user est admin de l'organization qui gère la fiche porteur
+            if (!$organizationService->userAdminOf($user, $organization)) {
                 throw new \Exception('Utilisateur non autorisé');
             }
 
@@ -773,15 +776,11 @@ class OrganizationController extends FrontController
             $this->addFlash(FrontController::FLASH_ERROR, 'Impossible de débloquer la fiche porteur d\'aides');
 
             // retour
-            if (isset($backer->getOrganizations()[0])) {
-                return $this->redirectToRoute('app_organization_backer_edit', ['id' => $backer->getOrganizations()[0]->getId(), 'idBacker' => $backer->getId()]);
-            } else {
-                return $this->redirectToRoute('app_user_dashboard');
-            }
+            return $this->redirectToRoute('app_organization_backer_edit', ['id' => $organization->getId(), 'idBacker' => $backer->getId()]);
         }
     }
 
-    #[Route('/comptes/aides/ajax-unlock/', name: 'app_user_aid_ajax_unlock', options: ['expose' => true])]
+    #[Route('/comptes/structure/porteur/ajax-unlock/', name: 'app_organization_backer_ajax_unlock', options: ['expose' => true])]
     public function ajaxUnlock(
         RequestStack $requestStack,
         BackerRepository $backerRepository,

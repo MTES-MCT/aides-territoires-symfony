@@ -67,7 +67,7 @@ class BackerService
         }
 
         foreach ($backer->getOrganizations() as $organization) {
-            if ($this->organizationService->canEditAid($user, $organization)) {
+            if ($this->organizationService->canEditBacker($user, $organization)) {
                 return true;
             }
         }
