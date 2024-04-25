@@ -7,6 +7,7 @@ use App\Repository\Aid\AidRepository;
 use App\Repository\Organization\OrganizationRepository;
 use App\Repository\Project\ProjectRepository;
 use App\Service\User\UserService;
+use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -20,20 +21,39 @@ class DashboardController extends FrontController
         AidRepository $aidRepository
         ): Response
     {   
-        /* @var User $user */
         $user = $userService->getUserLogged();
-        $aidsNumber = 0;
-        if ($user->isIsContributor()){
-            $aidsNumber = $aidRepository->countByUser($userService->getUserLogged());
+
+        // les organizations du user
+        $organizations = $userService->getOrganizations($user);
+
+        // les aides du user et de ses organizations
+        $aids = $aidRepository->findCustom([
+            'organizations' => $organizations
+        ]);
+
+        // les projets du user
+        $projects = $projectRepository->findCustom([
+            'organizations' => $organizations
+        ]);
+
+        // les collaborateurs du user
+        $collaborators = new ArrayCollection();
+        foreach ($organizations as $organization) {
+            foreach ($organization->getOrganizationAccesses() as $organizationsAccess) {
+                if ($organizationsAccess->getUser() !== $user && !$collaborators->contains($organizationsAccess->getUser())) {
+                    $collaborators->add($organizationsAccess->getUser());
+                }
+            }
         }
-        $projectsNumber = $projectRepository->countByOrganization($user->getDefaultOrganization());
-        $collaboratorsNumber = $organizationRepository->countCollaborators($userService->getUserLogged());
         
-        $this->breadcrumb->add("Mon compte",null);
+        // fil arianne
+        $this->breadcrumb->add("Mon compte", null);
+
+        // retour template
         return $this->render('user/dashboard/index.html.twig', [
-            'aidsNumber' => $aidsNumber,
-            'projectsNumber' => $projectsNumber,
-            'collaboratorsNumber' => $collaboratorsNumber
+            'aids' => $aids,
+            'projects' => $projects,
+            'nbCollaborators' => $collaborators->count()
         ]);
     }
 }

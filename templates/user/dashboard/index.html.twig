@@ -19,7 +19,7 @@
                         <h2 class="fr-tile__title">
                             <a class="fr-tile__link" href="{{ path('app_user_aid_publications') }}" title="Diffuser mes aides">Diffuser mes aides</a>
                         </h2>
-                        <p class="fr-tile__desc fr-h4 fr-pb-2w">{{ aidsNumber }}</p>
+                        <p class="fr-tile__desc fr-h4 fr-pb-2w">{{ aids|length }} {% if app.user.organizationAccesses|length > 1 %}dans {{ app.user.organizationAccesses|length }} structures{% endif %}</p>
                     </div>
                 </div>
             </div>
@@ -31,7 +31,7 @@
                         <h2 class="fr-tile__title">
                             <a class="fr-tile__link" href="{{ path('app_user_project_structure') }}" title="Gérer mes projets">Gérer mes projets</a>
                         </h2>
-                        <p class="fr-tile__desc fr-h4 fr-pb-2w">{{ projectsNumber }}</p>
+                        <p class="fr-tile__desc fr-h4 fr-pb-2w">{{ projects|length }} {% if app.user.organizationAccesses|length > 1 %}dans {{ app.user.organizationAccesses|length }} structures{% endif %}</p>
                     </div>
                 </div>    
             </div>
@@ -43,7 +43,7 @@
                         <h2 class="fr-tile__title">
                             <a class="fr-tile__link" href="{{ path('app_organization_collaborateurs', {'id': app.user.defaultOrganization.id}) }}" title="Mes collaborateurs">Mes collaborateurs</a>
                         </h2>
-                        <p class="fr-tile__desc fr-h4 fr-pb-2w">{{ collaboratorsNumber }}</p>
+                        <p class="fr-tile__desc fr-h4 fr-pb-2w">{{ nbCollaborators }} {% if app.user.organizationAccesses|length > 1 %}dans {{ app.user.organizationAccesses|length }} structures{% endif %}</p>
                     </div>
                 </div>
             </div>
