@@ -3,8 +3,13 @@
 namespace App\Form\User\SearchPage;
 
 use App\Entity\Aid\Aid;
+use App\Entity\Organization\Organization;
 use App\Entity\Search\SearchPage;
 use App\Form\Type\AidAutocompleteType;
+use App\Service\Organization\OrganizationService;
+use App\Service\User\UserService;
+use Doctrine\ORM\EntityRepository;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
@@ -16,13 +21,47 @@ use Symfony\Component\Validator\Constraints\Count;
 class SearchPageEditType extends AbstractType
 {
     public function __construct(
-        private RouterInterface $routerInterface)
+        private RouterInterface $routerInterface,
+        private UserService $userService,
+        private OrganizationService $organizationService
+    )
     {
         
     }
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $user = $this->userService->getUserlogged();
+
         $builder
+            ->add('organization', EntityType::class, [
+                'required' => false,
+                'class' => Organization::class,
+                'label' => 'Structure :',
+                'help' => 'Afin de gérer cette page à plusieurs, vous pouvez la lier à une de vos structures',
+                'choice_label' => 'name',
+                'query_builder' => function(EntityRepository $entityRepository) {
+                    return $entityRepository->createQueryBuilder('o')
+                    ->innerJoin('o.organizationAccesses', 'organizationAccesses')
+                    ->andWhere('organizationAccesses.user = :user')
+                    ->setParameter('user', $this->userService->getUserLogged())
+                    ->orderBy('o.name', 'ASC')
+                    ;
+                },
+                'choice_label' => function(Organization $organization) use ($user) {
+                    $return = $organization->getName();
+                    if(!$this->organizationService->canEditPortal($user, $organization)) {
+                        $return .= ' (vous n\'avez pas les droits pour gérer un portail pour cette structure)';
+                    }
+                    return $return;
+                },
+                'choice_attr' => function(Organization $organization) use ($user) {
+                    // si il ne peu pas editer d'aide pour cette organization
+                    if (!$this->organizationService->canEditPortal($user, $organization)) {
+                        return ['disabled' => true];
+                    }
+                    return [];
+                }
+            ])
             ->add('description', TextareaType::class, [
                 'required' => true,
                 'label' => 'Contenu de la page :',

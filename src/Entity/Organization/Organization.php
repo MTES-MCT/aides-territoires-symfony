@@ -17,6 +17,7 @@ use App\Entity\Log\LogPublicProjectView;
 use App\Entity\Perimeter\Perimeter;
 use App\Entity\Project\Project;
 use App\Entity\Project\ProjectValidated;
+use App\Entity\Search\SearchPage;
 use App\Entity\User\User;
 use App\Repository\Organization\OrganizationRepository;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -286,6 +287,9 @@ class Organization
     #[ORM\OneToMany(mappedBy: 'organization', targetEntity: OrganizationAccess::class, orphanRemoval: true, cascade: ['persist'])]
     private Collection $organizationAccesses;
 
+    #[ORM\OneToMany(mappedBy: 'organization', targetEntity: SearchPage::class)]
+    private Collection $searchPages;
+
     public function __construct()
     {
         $this->favoriteProjects = new ArrayCollection();
@@ -305,6 +309,7 @@ class Organization
         $this->organizationInvitations = new ArrayCollection();
         $this->aids = new ArrayCollection();
         $this->organizationAccesses = new ArrayCollection();
+        $this->searchPages = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -1488,6 +1493,36 @@ class Organization
             // set the owning side to null (unless already changed)
             if ($organizationAccess->getOrganization() === $this) {
                 $organizationAccess->setOrganization(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, SearchPage>
+     */
+    public function getSearchPages(): Collection
+    {
+        return $this->searchPages;
+    }
+
+    public function addSearchPage(SearchPage $searchPage): static
+    {
+        if (!$this->searchPages->contains($searchPage)) {
+            $this->searchPages->add($searchPage);
+            $searchPage->setOrganization($this);
+        }
+
+        return $this;
+    }
+
+    public function removeSearchPage(SearchPage $searchPage): static
+    {
+        if ($this->searchPages->removeElement($searchPage)) {
+            // set the owning side to null (unless already changed)
+            if ($searchPage->getOrganization() === $this) {
+                $searchPage->setOrganization(null);
             }
         }
 

@@ -40,6 +40,10 @@ class SearchPageCrudController extends AtCrudController
         yield IdField::new('id')->onlyOnIndex();
         yield TextField::new('slug', 'Url')
         ->setHelp('Par exemple, « /a_propos/contact/ ». Vérifiez la présence du caractère « / » en début et en fin de chaîne.');
+        yield AssociationField::new('organization', 'Structure')
+        ->autocomplete(true)
+        ->hideOnIndex()
+        ;
         yield TrumbowygField::new('description', 'Contenu de la page')
         ->setHelp('Description complète de la page. Sera affichée au dessus des résultats.')
         ->hideOnIndex();

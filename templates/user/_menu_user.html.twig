@@ -49,15 +49,15 @@
                     <a class="fr-sidemenu__link" href="{{ path('app_user_user_notification') }}" target="_self" rel="noopener" {% if menu_notification is defined %}aria-current="page"{% endif %} title="Voir mes notifications">Voir mes notifications</a>
                 </li>
 
-                {% if app.user.searchPages and app.user.searchPages|length > 0 %}
+                {% if app.user.allPortals|length > 0 %}
                 <li class="fr-sidemenu__item">
                     <button class="fr-sidemenu__btn" {% if user_portals is defined %} aria-expanded="true" {% else %} aria-expanded="false" {% endif %} aria-controls="fr-sidemenu-item-portals">Gérer mes portails</button>
                     <div class="fr-collapse" id="fr-sidemenu-item-portals">
                         <ul class="fr-sidemenu__list">
-                            {% for searchPage in app.user.searchPages %}
-                            <li class="fr-sidemenu__item {% if user_portal_selected is defined and user_portal_selected == searchPage.id is defined %}fr-sidemenu__item--active{% endif %}">
-                                <a class="fr-sidemenu__link" href="{{ path('app_user_portal_edit', {'id': searchPage.id}) }}" target="_self" {% if user_portal_selected is defined and user_portal_selected == searchPage.id %}aria-current="page"{% endif %} rel="noopener" title="{{ searchPage.name }}">
-                                    {{ searchPage.name }}
+                            {% for portal in app.user.allPortals %}
+                            <li class="fr-sidemenu__item {% if user_portal_selected is defined and user_portal_selected == portal.id is defined %}fr-sidemenu__item--active{% endif %}">
+                                <a class="fr-sidemenu__link" href="{{ path('app_user_portal_edit', {'id': portal.id}) }}" target="_self" {% if user_portal_selected is defined and user_portal_selected == portal.id %}aria-current="page"{% endif %} rel="noopener" title="{{ portal.name }}">
+                                    {{ portal.name }}
                                 </a>
                             </li>
                             {% endfor %}                         

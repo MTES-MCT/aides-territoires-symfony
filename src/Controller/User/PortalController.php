@@ -10,6 +10,8 @@ use App\Form\User\SearchPage\SearchPageEditType;
 use App\Repository\Search\SearchPageRepository;
 use App\Service\Aid\AidSearchFormService;
 use App\Service\Aid\AidService;
+use App\Service\Organization\OrganizationService;
+use App\Service\SearchPage\SearchPageService;
 use App\Service\User\UserService;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -26,7 +28,9 @@ class PortalController extends FrontController
         UserService $userService,
         ManagerRegistry $managerRegistry,
         AidSearchFormService $aidSearchFormService,
-        AidService $aidService
+        AidService $aidService,
+        SearchPageService $searchPageService,
+        OrganizationService $organizationService
     ): Response
     {
         // verification user
@@ -35,11 +39,28 @@ class PortalController extends FrontController
             return $this->redirectToRoute('app_user_dashboard');
         }
 
-        // verification searchPage et administrateur
+        // verification searchPage
         $searchPage = $searchPageRepository->find((int) $id);
-        if (!$searchPage instanceof SearchPage || $searchPage->getAdministrator() !== $user) {
+        if (!$searchPage instanceof SearchPage) {
             return $this->redirectToRoute('app_user_dashboard');
         }
+
+        // verification si l'utilisateur peut voir la page
+        if (!$searchPageService->userCanViewEdit($searchPage, $user)) {
+            return $this->redirectToRoute('app_user_dashboard');
+        }
+
+        // si le user peu editer
+        $userCanEditPortal = false;
+        if ($searchPage->getOrganization()) {
+            if ($organizationService->canEditPortal($user, $searchPage->getOrganization())) {
+                $userCanEditPortal = true;
+            }
+        }
+        if ($searchPage->getAdministrator() && $searchPage->getAdministrator() == $user) {
+            $userCanEditPortal = true;
+        }
+
 
         // compte les aides
         $queryString = null;
@@ -70,7 +91,7 @@ class PortalController extends FrontController
         $form = $this->createForm(SearchPageEditType::class, $searchPage);
         $form->handleRequest($requestStack->getCurrentRequest());
         if ($form->isSubmitted()) {
-            if ($form->isValid()) {
+            if ($form->isValid() && $userCanEditPortal) {
                 // sauvegarde
                 $managerRegistry->getManager()->persist($searchPage);
                 $managerRegistry->getManager()->flush();
@@ -94,7 +115,8 @@ class PortalController extends FrontController
             'form' => $form,
             'searchPage' => $searchPage,
             'nbAids' => $nbAids,
-            'nbLocals' => $nbLocals
+            'nbLocals' => $nbLocals,
+            'userCanEditPortal' => $userCanEditPortal
         ]);
     }
 }

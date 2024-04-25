@@ -34,6 +34,7 @@ use App\Entity\Perimeter\PerimeterImport;
 use App\Entity\Project\Project;
 use App\Entity\Project\ProjectLock;
 use App\Entity\Search\SearchPage;
+use App\Entity\Search\SearchPageLock;
 use App\Repository\User\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -315,6 +316,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: ProjectLock::class, orphanRemoval: true)]
     private Collection $projectLocks;
 
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: SearchPageLock::class, orphanRemoval: true)]
+    private Collection $searchPageLocks;
+
+    private ArrayCollection $allPortals;
+
     public function __construct()
     {
         $this->logUserLogins = new ArrayCollection();
@@ -355,6 +361,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
         $this->aidLocks = new ArrayCollection();
         $this->backerLocks = new ArrayCollection();
         $this->projectLocks = new ArrayCollection();
+        $this->searchPageLocks = new ArrayCollection();
+        $this->allPortals = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -2056,5 +2064,55 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
         }
 
         return $this;
+    }
+
+    /**
+     * @return Collection<int, SearchPageLock>
+     */
+    public function getSearchPageLocks(): Collection
+    {
+        return $this->searchPageLocks;
+    }
+
+    public function addSearchPageLock(SearchPageLock $searchPageLock): static
+    {
+        if (!$this->searchPageLocks->contains($searchPageLock)) {
+            $this->searchPageLocks->add($searchPageLock);
+            $searchPageLock->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeSearchPageLock(SearchPageLock $searchPageLock): static
+    {
+        if ($this->searchPageLocks->removeElement($searchPageLock)) {
+            // set the owning side to null (unless already changed)
+            if ($searchPageLock->getUser() === $this) {
+                $searchPageLock->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getAllPortals(): ArrayCollection
+    {
+        $allPortals = new ArrayCollection();
+        foreach ($this->getSearchPages() as $searchPage) {
+            $allPortals->add($searchPage);
+        }
+
+        foreach ($this->getOrganizationAccesses() as $organizationAccess) {
+            if ($organizationAccess->getOrganization()) {
+                foreach ($organizationAccess->getOrganization()->getSearchPages() as $portal) {
+                    if (!$allPortals->contains($portal)) {
+                        $allPortals->add($portal);
+                    }
+                }
+            }
+        }
+
+        return $allPortals;
     }
 }

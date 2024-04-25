@@ -4,6 +4,7 @@ namespace App\Entity\Search;
 
 use App\Entity\Aid\Aid;
 use App\Entity\Category\Category;
+use App\Entity\Organization\Organization;
 use App\Entity\Organization\OrganizationType;
 use App\Entity\Page\Page;
 use App\Entity\User\User;
@@ -156,6 +157,13 @@ class SearchPage
     #[ORM\JoinColumn(onDelete: 'SET NULL')]
     private ?self $searchPageRedirect = null;
 
+    #[ORM\ManyToOne(inversedBy: 'searchPages')]
+    #[ORM\JoinColumn(onDelete: 'SET NULL')]
+    private ?Organization $organization = null;
+
+    #[ORM\OneToMany(mappedBy: 'searchPage', targetEntity: SearchPageLock::class, orphanRemoval: true)]
+    private Collection $searchPageLocks;
+
     public function __construct()
     {
         $this->organizationTypes = new ArrayCollection();
@@ -163,6 +171,7 @@ class SearchPage
         $this->excludedAids = new ArrayCollection();
         $this->highlightedAids = new ArrayCollection();
         $this->pages = new ArrayCollection();
+        $this->searchPageLocks = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -740,6 +749,48 @@ class SearchPage
     public function setSearchPageRedirect(?self $searchPageRedirect): static
     {
         $this->searchPageRedirect = $searchPageRedirect;
+
+        return $this;
+    }
+
+    public function getOrganization(): ?Organization
+    {
+        return $this->organization;
+    }
+
+    public function setOrganization(?Organization $organization): static
+    {
+        $this->organization = $organization;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, SearchPageLock>
+     */
+    public function getSearchPageLocks(): Collection
+    {
+        return $this->searchPageLocks;
+    }
+
+    public function addSearchPageLock(SearchPageLock $searchPageLock): static
+    {
+        if (!$this->searchPageLocks->contains($searchPageLock)) {
+            $this->searchPageLocks->add($searchPageLock);
+            $searchPageLock->setSearchPage($this);
+        }
+
+        return $this;
+    }
+
+    public function removeSearchPageLock(SearchPageLock $searchPageLock): static
+    {
+        if ($this->searchPageLocks->removeElement($searchPageLock)) {
+            // set the owning side to null (unless already changed)
+            if ($searchPageLock->getSearchPage() === $this) {
+                $searchPageLock->setSearchPage(null);
+            }
+        }
 
         return $this;
     }
