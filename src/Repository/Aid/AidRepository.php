@@ -12,6 +12,7 @@ use App\Entity\Backer\Backer;
 use App\Entity\Backer\BackerCategory;
 use App\Entity\Category\Category;
 use App\Entity\Keyword\Keyword;
+use App\Entity\Organization\Organization;
 use App\Entity\Organization\OrganizationType;
 use App\Entity\Perimeter\Perimeter;
 use App\Entity\Program\Program;
@@ -358,6 +359,7 @@ class AidRepository extends ServiceEntityRepository
         $organizationType = $params['organizationType'] ?? null;
         $organizationTypeSlugs = $params['organizationTypeSlugs'] ?? null;
         $organizations = $params['organizations'] ?? null;
+        $organization = $params['organization'] ?? null;
         $perimeterFrom = $params['perimeterFrom'] ?? null;
         $perimeterFromId = $params['perimeterFromId'] ?? null;
         $perimeterTo = $params['perimeterTo'] ?? null;
@@ -682,6 +684,13 @@ class AidRepository extends ServiceEntityRepository
             ->innerJoin('a.aidAudiences', 'aidAudiencesSlug')
             ->andWhere('aidAudiencesSlug.slug IN (:organizationTypeSlugs)')
             ->setParameter('organizationTypeSlugs', $organizationTypeSlugs);
+        }
+
+        if ($organization instanceof Organization && $organization->getId()) {
+            $qb
+                ->andWhere('a.organization = :organization')
+                ->setParameter('organization', $organization)
+            ;
         }
 
         if (is_array($organizations) && count($organizations) > 0) {

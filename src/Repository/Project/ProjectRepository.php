@@ -157,6 +157,8 @@ class ProjectRepository extends ServiceEntityRepository
         $dateCreateMin = $params['dateCreateMin'] ?? null;
         $dateCreateMax = $params['dateCreateMax'] ?? null;
         $organizations = $params['organizations'] ?? null;
+        $organization = $params['organization'] ?? null;
+        $author = $params['author'] ?? null;
 
         $qb = $this->createQueryBuilder('p');
 
@@ -267,6 +269,20 @@ class ProjectRepository extends ServiceEntityRepository
             $qb
                 ->andWhere('p.organization IN (:organizations)')
                 ->setParameter('organizations', $organizations)
+                ;
+        }
+
+        if ($organization !== null) {
+            $qb
+                ->andWhere('p.organization = :organization')
+                ->setParameter('organization', $organization)
+                ;
+        }
+
+        if ($author instanceof User && $author->getId()) {
+            $qb
+                ->andWhere('p.author = :author')
+                ->setParameter('author', $author)
                 ;
         }
 
