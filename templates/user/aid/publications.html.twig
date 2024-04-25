@@ -79,7 +79,14 @@
                             <td>
                                 <p>
                                     <a href="{{ path('app_user_aid_edit', {'slug': aid.slug}) }}">
-                                        {{ aid.name }} <span class="fr-icon-ball-pen-line" aria-hidden="true"></span>
+                                        {{ aid.name }} 
+                                        {% if aid.aidLocks|length > 0 %}
+                                            {% for aidLock in aid.aidLocks %}
+                                            <span title="Edition en cours par {{ aidLock.user.email }}" class="fr-icon-git-repository-private-line" aria-hidden="true"></span>
+                                        {% endfor %}
+                                        {% else %}
+                                            <span class="fr-icon-ball-pen-line" aria-hidden="true"></span>
+                                        {% endif %}
                                     </a>
                                 </p>
                                 {% if aid.isLive %}
@@ -87,9 +94,6 @@
                                 {% else %}
                                     <p class="fr-badge fr-badge--info fr-badge--sm"><a href="{{ aid.url }}" target="_blank" title="Prévisualiser">En édition</a></p>
                                 {% endif %}
-                                {% for aidLock in aid.aidLocks %}
-                                    <span title="Edition en cours par {{ aidLock.user.email }}" class="fr-icon-git-repository-private-line" aria-hidden="true"></span>
-                                {% endfor %}
                             </td>
                             <td>
                                 {% if aid.organization %}{{ aid.organization.name }}{% endif %}
