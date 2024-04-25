@@ -7,6 +7,7 @@ use App\Entity\Organization\Organization;
 use App\Entity\Project\Project;
 use App\Entity\Reference\ProjectReference;
 use App\Service\Image\ImageService;
+use App\Service\Organization\OrganizationService;
 use App\Service\User\UserService;
 use Doctrine\ORM\EntityRepository;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
@@ -27,20 +28,16 @@ class ProjectEditType extends AbstractType
 {
     public function __construct(
         protected ImageService $imageService,
-        protected UserService $userService
+        protected UserService $userService,
+        protected OrganizationService $organizationService
     ) {  
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $builder
-        ->add('name', TextType::class, [
-            'label'=>'Nom du projet :',
-            'required' => true,
-            'help' => 'Donnez un nom explicite : préférez \'végétalisation du quartier des coteaux\' à \'quartier des coteaux\'',
-            'sanitize_html' => true,
-        ])
-        ->add('organization', EntityType::class, [
+        $user = $this->userService->getUserLogged();
+
+        $organizationParams = [
             'required' => true,
             'label' => 'L\'organisation pour laquelle vous publiez ce projet',
             'class' => Organization::class,
@@ -49,12 +46,34 @@ class ProjectEditType extends AbstractType
                 return $entityRepository->createQueryBuilder('o')
                 ->innerJoin('o.organizationAccesses', 'organizationAccesses')
                 ->andWhere('organizationAccesses.user = :user')
-                ->andWhere('organizationAccesses.editProject = 1')
                 ->setParameter('user', $this->userService->getUserLogged())
                 ->orderBy('o.name', 'ASC')
                 ;
             },
+            'choice_label' => function(Organization $organization) use ($user) {
+                $return = $organization->getName();
+                if(!$this->organizationService->canEditProject($user, $organization)) {
+                    $return .= ' (vous n\'avez pas les droits pour publier un projet pour cette structure)';
+                }
+                return $return;
+            },
+            'choice_attr' => function(Organization $organization) use ($user) {
+                // si il ne peu pas editer d'aide pour cette organization
+                if (!$this->organizationService->canEditProject($user, $organization)) {
+                    return ['disabled' => true];
+                }
+                return [];
+            }
+        ];
+
+        $builder
+        ->add('name', TextType::class, [
+            'label'=>'Nom du projet :',
+            'required' => true,
+            'help' => 'Donnez un nom explicite : préférez \'végétalisation du quartier des coteaux\' à \'quartier des coteaux\'',
+            'sanitize_html' => true,
         ])
+        ->add('organization', EntityType::class, $organizationParams)
 
         ->add('projectReference', EntityType::class, [
             'required' => false,
