@@ -50,8 +50,7 @@ class AidService
     
     public function getLock(Aid $aid): ?AidLock
     {
-        $aidLocks = $this->managerRegistry->getRepository(AidLock::class)->findBy(['aid' => $aid]);
-        foreach ($aidLocks as $aidLock) {
+        foreach ($aid->getAidLocks() as $aidLock) {
             return $aidLock;
         }
 
@@ -59,8 +58,7 @@ class AidService
     }
     public function isLockedByAnother(Aid $aid, User $user): bool
     {
-        $aidLocks = $this->managerRegistry->getRepository(AidLock::class)->findBy(['aid' => $aid]);
-        foreach ($aidLocks as $aidLock) {
+        foreach ($aid->getAidLocks() as $aidLock) {
             if ($aidLock->getUser() != $user) {
                 return true;
             }
@@ -70,17 +68,14 @@ class AidService
 
     public function isLocked(Aid $aid): bool
     {
-        $aidLocks = $this->managerRegistry->getRepository(AidLock::class)->findBy(['aid' => $aid]);
-        return count($aidLocks) > 0;
+        return count($aid->getAidLocks()) > 0;
     }
     
-    public function lockAid(Aid $aid, User $user): void
+    public function lock(Aid $aid, User $user): void
     {
         try {
             // vérifie que l'aide n'est pas déjà lock
-            $aidLocks = $this->managerRegistry->getRepository(AidLock::class)->findBy(['aid' => $aid]);
-
-            if (count($aidLocks) == 0) {
+            if (count($aid->getAidLocks()) == 0) {
                 $aidLock = new AidLock();
                 $aidLock->setAid($aid);
                 $aidLock->setUser($user);
@@ -91,10 +86,9 @@ class AidService
         }
     }
 
-    public function unlockAid(Aid $aid): void
+    public function unlock(Aid $aid): void
     {
-        $aidLocks = $this->managerRegistry->getRepository(AidLock::class)->findBy(['aid' => $aid]);
-        foreach ($aidLocks as $aidLock) {
+        foreach ($aid->getAidLocks() as $aidLock) {
             $this->managerRegistry->getManager()->remove($aidLock);
         }
         $this->managerRegistry->getManager()->flush();
@@ -449,7 +443,7 @@ class AidService
         // si il appartiens à l'organisation et peu editer les aides
         if ($aid->getOrganization()) {
             foreach ($aid->getOrganization()->getOrganizationAccesses() as $organizationAccess) {
-                if ($organizationAccess->getUser() == $user && $organizationAccess->isEditAid()) {
+                if ($organizationAccess->getUser() == $user && ($organizationAccess->isEditAid() || $organizationAccess->isAdministrator())) {
                     return true;
                 }
             }

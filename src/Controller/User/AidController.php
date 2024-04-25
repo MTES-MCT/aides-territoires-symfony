@@ -230,7 +230,7 @@ class AidController extends FrontController
             throw new NotFoundException('Cette aide n\'existe pas');
         }
 
-        // verifie que l'aide appartienne à l'utilisateur ou que l'utilisateur est un admin
+        // verifie les droits de l'utilisateur
         if (!$aidService->userCanEdit($aid, $user)) {
             return $this->redirectToRoute('app_user_aid_publications');
         }
@@ -387,7 +387,7 @@ class AidController extends FrontController
             }
             
             // la débloque
-            $aidService->lockAid($aid, $user);
+            $aidService->lock($aid, $user);
 
             // retour
             return new JsonResponse([
@@ -406,7 +406,8 @@ class AidController extends FrontController
         AidRepository $aidRepository,
         OrganizationService $organizationService,
         UserService $userService,
-        ManagerRegistry $managerRegistry
+        ManagerRegistry $managerRegistry,
+        AidService $aidService
     ): Response
     {
         try {
@@ -431,10 +432,7 @@ class AidController extends FrontController
             }
 
             // suppression du lock
-            foreach ($aid->getAidLocks() as $aidLock) {
-                $managerRegistry->getManager()->remove($aidLock);
-            }
-            $managerRegistry->getManager()->flush();
+            $aidService->unlock($aid);
 
             // message
             $this->addFlash(FrontController::FLASH_SUCCESS, 'Aide débloquée');
@@ -497,7 +495,7 @@ class AidController extends FrontController
             }
 
             // la débloque
-            $aidService->unlockAid($aid);
+            $aidService->unlock($aid);
 
             // retour
             return new JsonResponse([

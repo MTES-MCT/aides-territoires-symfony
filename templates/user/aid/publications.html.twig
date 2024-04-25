@@ -77,11 +77,15 @@
                         {% for aid in aids %}
                         <tr>
                             <td>
-                                <a href="{{ path('app_user_aid_edit', {'slug': aid.slug}) }}">
-                                    {{ aid.name }}
-                                </a>
+                                <p>
+                                    <a href="{{ path('app_user_aid_edit', {'slug': aid.slug}) }}">
+                                        {{ aid.name }} <span class="fr-icon-ball-pen-line" aria-hidden="true"></span>
+                                    </a>
+                                </p>
                                 {% if aid.isLive %}
-                                    <p class="fr-badge fr-badge--success fr-badge--sm">Affichée</p>
+                                    <p class="fr-badge fr-badge--success fr-badge--sm"><a href="{{ aid.url }}" target="_blank" title="Afficher">Affichée</a></p>
+                                {% else %}
+                                    <p class="fr-badge fr-badge--info fr-badge--sm"><a href="{{ aid.url }}" target="_blank" title="Prévisualiser">En édition</a></p>
                                 {% endif %}
                                 {% for aidLock in aid.aidLocks %}
                                     <span title="Edition en cours par {{ aidLock.user.email }}" class="fr-icon-git-repository-private-line" aria-hidden="true"></span>
