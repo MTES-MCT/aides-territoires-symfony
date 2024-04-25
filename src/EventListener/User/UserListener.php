@@ -129,10 +129,10 @@ class UserListener
         /** @var User $user */
         $user = $args->getObject();
 
-        foreach ($user->getOrganizations() as $organization) {
+        foreach ($user->getOrganizationAccesses() as $organizationAccess) {
             // pas d'autre membres, on supprimera également l'organisation
-            if (count($organization->getOrganizationAccesses()) === 1) {
-                $this->managerRegistry->getManager()->remove($organization);
+            if (count($organizationAccess->getOrganization()->getOrganizationAccesses()) === 1) {
+                $this->managerRegistry->getManager()->remove($organizationAccess->getOrganization());
             }
         }
     }

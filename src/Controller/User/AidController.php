@@ -92,7 +92,8 @@ class AidController extends FrontController
         return $this->render('user/aid/publish.html.twig', [
             'no_breadcrumb' => true,
             'formAid' => $formAid->createView(),
-            'aid' => $aid
+            'aid' => $aid,
+            'isLockedByAnother' => false
         ]);
     }
 

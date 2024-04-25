@@ -21,6 +21,7 @@ use App\Form\Type\EntityCheckboxGroupAbsoluteType;
 use App\Form\Type\EntityGroupedType;
 use App\Form\Type\PerimeterAutocompleteType;
 use App\Repository\Backer\BackerRepository;
+use App\Service\Organization\OrganizationService;
 use App\Service\User\UserService;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -47,7 +48,8 @@ class AidEditType extends AbstractType
     public function __construct(
         protected ManagerRegistry $managerRegistry,
         protected UserService $userService,
-        protected RouterInterface $routerInterface
+        protected RouterInterface $routerInterface,
+        protected OrganizationService $organizationService
     )
     {
         
@@ -102,10 +104,12 @@ class AidEditType extends AbstractType
             'required' => true,
             'label' => 'La structure pour laquelle vous publiez cette aide',
             'class' => Organization::class,
-            'choice_label' => function(Organization $organization) {
+            'choice_label' => function(Organization $organization) use ($user) {
                 $return = $organization->getName();
                 if (!$organization->getBacker()) {
                     $return .= ' (fiche porteur d\'aides à compléter)';
+                } else if(!$this->organizationService->canEditAid($user, $organization)) {
+                    $return .= ' (vous n\'avez pas les droits pour publier une aide pour cette structure)';
                 } else if ($organization->getBacker() && !$organization->getBacker()->isActive()) {
                     $return .= ' (fiche porteur d\'aides en attente de validation)';
                 }
@@ -121,7 +125,11 @@ class AidEditType extends AbstractType
             },
             'placeholder' => 'Choisissez une structure',
         ];
-        $organizationParams['choice_attr'] = function(Organization $organization) use ($aid) {
+        $organizationParams['choice_attr'] = function(Organization $organization) use ($aid, $user) {
+            // si il ne peu pas editer d'aide pour cette organization
+            if (!$this->organizationService->canEditAid($user, $organization)) {
+                return ['disabled' => true];
+            }
             // bloquage pour les nouvelles aides
             if (!$aid->getId()) {
                 if (!$organization->getBacker()) {
