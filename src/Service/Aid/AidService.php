@@ -11,6 +11,7 @@ use App\Entity\Organization\OrganizationType;
 use App\Entity\Perimeter\Perimeter;
 use App\Entity\Search\SearchPage;
 use App\Entity\User\User;
+use App\Service\Organization\OrganizationService;
 use App\Service\Reference\ReferenceService;
 use App\Service\User\UserService;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -27,12 +28,26 @@ class AidService
         protected UserService $userService,
         protected RouterInterface $routerInterface,
         protected ReferenceService $referenceService,
-        protected ManagerRegistry $managerRegistry
+        protected ManagerRegistry $managerRegistry,
+        protected OrganizationService $organizationService
     )
     {
         
     }
 
+    public function canUserLock(Aid $aid, User $user): bool
+    {
+        if (!$aid->getOrganization()) {
+            return false;
+        }
+
+        if ($this->organizationService->canEditAid($user, $aid->getOrganization())) {
+            return true;
+        }
+
+        return false;
+    }
+    
     public function getLock(Aid $aid): ?AidLock
     {
         $aidLocks = $this->managerRegistry->getRepository(AidLock::class)->findBy(['aid' => $aid]);

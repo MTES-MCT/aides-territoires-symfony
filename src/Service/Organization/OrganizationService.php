@@ -26,7 +26,7 @@ class OrganizationService
         }
 
         return $organization->getOrganizationAccesses()->exists(function (int $key, OrganizationAccess $organizationAccess) use ($user) {
-            return $organizationAccess->getUser() === $user && $organizationAccess->isEditAid();
+            return $organizationAccess->getUser() === $user && ($organizationAccess->isEditAid() || $organizationAccess->isAdministrator());
         });
     }
 
@@ -37,7 +37,7 @@ class OrganizationService
         }
 
         return $organization->getOrganizationAccesses()->exists(function (int $key, OrganizationAccess $organizationAccess) use ($user) {
-            return $organizationAccess->getUser() === $user && $organizationAccess->isEditPortal();
+            return $organizationAccess->getUser() === $user && ($organizationAccess->isEditPortal() || $organizationAccess->isAdministrator());
         });
     }
 
@@ -48,7 +48,7 @@ class OrganizationService
         }
 
         return $organization->getOrganizationAccesses()->exists(function (int $key, OrganizationAccess $organizationAccess) use ($user) {
-            return $organizationAccess->getUser() === $user && $organizationAccess->isEditBacker();
+            return $organizationAccess->getUser() === $user && ($organizationAccess->isEditBacker() || $organizationAccess->isAdministrator());
         });
     }
 
@@ -59,7 +59,7 @@ class OrganizationService
         }
 
         return $organization->getOrganizationAccesses()->exists(function (int $key, OrganizationAccess $organizationAccess) use ($user) {
-            return $organizationAccess->getUser() === $user && $organizationAccess->isEditProject();
+            return $organizationAccess->getUser() === $user && ($organizationAccess->isEditProject() || $organizationAccess->isAdministrator());
         });
     }
 

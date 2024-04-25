@@ -357,12 +357,21 @@ class AidController extends FrontController
 
             // le user
             $user = $userService->getUserLogged();
-            if (!$user) {
+            if (!$user instanceof User) {
                 throw new \Exception('User manquant');
             }
 
             // charge aide
             $aid = $aidRepository->find($id);
+            if (!$aid instanceof Aid) {
+                throw new \Exception('Aide manquante');
+            }
+
+            // verifie que le user peut lock
+            $canLock = $aidService->canUserLock($aid, $user);
+            if (!$canLock) {
+                throw new \Exception('Vous ne pouvez pas lock cette aide');
+            }
 
             // regarde si deja lock
             $isLockedByAnother = $aidService->isLockedByAnother($aid, $user);
@@ -388,7 +397,8 @@ class AidController extends FrontController
     public function ajaxUnlock(
         RequestStack $requestStack,
         AidRepository $aidRepository,
-        AidService $aidService
+        AidService $aidService,
+        UserService $userService
     ) : JsonResponse
     {
         try {
@@ -410,8 +420,23 @@ class AidController extends FrontController
                 throw new \Exception('Id manquant');
             }
 
+            // user
+            $user = $userService->getUserLogged();
+            if (!$user instanceof User) {
+                throw new \Exception('User manquant');
+            }
+
             // charge aide
             $aid = $aidRepository->find($id);
+            if (!$aid instanceof Aid) {
+                throw new \Exception('Aide manquante');
+            }
+
+            // verifie que le user peut lock
+            $canLock = $aidService->canUserLock($aid, $user);
+            if (!$canLock) {
+                throw new \Exception('Vous ne pouvez pas lock cette aide');
+            }
 
             // la débloque
             $aidService->unlockAid($aid);
