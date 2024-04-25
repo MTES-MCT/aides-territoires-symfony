@@ -11,6 +11,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Filters;
+use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ChoiceField;
@@ -24,6 +25,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\TextareaField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use EasyCorp\Bundle\EasyAdminBundle\Filter\ChoiceFilter;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class ProjectCrudController extends AtCrudController
@@ -163,11 +165,41 @@ class ProjectCrudController extends AtCrudController
         $exportCsvAction = $this->getExportCsvAction();
         $exportXlsxAction = $this->getExportXlsxAction();
 
+        // unlock
+        $unlockAction = Action::new('unlock', 'Débloquer', 'fas fa-lock-open')
+        ->displayIf(function ($entity) {
+            return count($entity->getProjectLocks());
+        })
+        ->linkToCrudAction('unlock');
+        
         return parent::configureActions($actions)
             ->add(Crud::PAGE_INDEX, $displayOnFront)
             ->add(Crud::PAGE_EDIT, $displayOnFront)
             ->add(Crud::PAGE_INDEX, $exportCsvAction)
             ->add(Crud::PAGE_INDEX, $exportXlsxAction)
+            ->add(Crud::PAGE_INDEX, $unlockAction)
         ;
+    }
+
+
+    public function unlock(AdminContext $context): RedirectResponse
+    {
+        $project = $context->getEntity()->getInstance();
+        if ($project instanceof Project) {
+            foreach ($project->getProjectLocks() as $projectLock) {
+                $this->managerRegistry->getManager()->remove($projectLock);
+            }
+            $this->managerRegistry->getManager()->flush();
+        }
+        
+        $this->addFlash('success', 'Le projet a été déverrouillé.');
+
+        // redirection sur listing aides
+        $url = $this->adminUrlGenerator
+            ->setController(ProjectCrudController::class)
+            ->setAction(Action::INDEX)
+            ->generateUrl();
+
+        return new RedirectResponse($url);
     }
 }

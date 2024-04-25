@@ -6,20 +6,20 @@ use App\Controller\Admin\AtCrudController;
 use App\Entity\Backer\Backer;
 use App\Field\TextLengthCountField;
 use App\Field\TrumbowygField;
-use App\Form\Admin\Backer\BackerUserCollectionType;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Filters;
+use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
-use EasyCorp\Bundle\EasyAdminBundle\Field\CollectionField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\FormField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ImageField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\UrlField;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class BackerCrudController extends AtCrudController
@@ -124,11 +124,42 @@ class BackerCrudController extends AtCrudController
         $exportCsvAction = $this->getExportCsvAction();
         $exportXlsxAction = $this->getExportXlsxAction();
 
+        // unlock
+        $unlockAction = Action::new('unlock', 'Débloquer', 'fas fa-lock-open')
+        ->displayIf(function ($entity) {
+            return count($entity->getBackerLocks());
+        })
+        ->linkToCrudAction('unlock');
+
+        
         return parent::configureActions($actions)
             ->add(Crud::PAGE_INDEX, $displayOnFront)
             ->add(Crud::PAGE_EDIT, $displayOnFront)
             ->add(Crud::PAGE_INDEX, $exportCsvAction)
             ->add(Crud::PAGE_INDEX, $exportXlsxAction)
+            ->add(Crud::PAGE_INDEX, $unlockAction)
         ;
+    }
+
+
+    public function unlock(AdminContext $context): RedirectResponse
+    {
+        $backer = $context->getEntity()->getInstance();
+        if ($backer instanceof Backer) {
+            foreach ($backer->getBackerLocks() as $backerLock) {
+                $this->managerRegistry->getManager()->remove($backerLock);
+            }
+            $this->managerRegistry->getManager()->flush();
+        }
+        
+        $this->addFlash('success', 'La fiche porteur d\'aides a été déverrouillée.');
+
+        // redirection sur listing backers
+        $url = $this->adminUrlGenerator
+            ->setController(BackerCrudController::class)
+            ->setAction(Action::INDEX)
+            ->generateUrl();
+
+        return new RedirectResponse($url);
     }
 }
