@@ -83,6 +83,9 @@
                                 {% if aid.isLive %}
                                     <p class="fr-badge fr-badge--success fr-badge--sm">Affichée</p>
                                 {% endif %}
+                                {% for aidLock in aid.aidLocks %}
+                                    <span title="Edition en cours par {{ aidLock.user.email }}" class="fr-icon-git-repository-private-line" aria-hidden="true"></span>
+                                {% endfor %}
                             </td>
                             <td>
                                 {% if aid.organization %}{{ aid.organization.name }}{% endif %}

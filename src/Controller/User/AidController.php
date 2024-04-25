@@ -20,6 +20,7 @@ use App\Repository\Log\LogAidApplicationUrlClickRepository;
 use App\Repository\Log\LogAidOriginUrlClickRepository;
 use App\Repository\Log\LogAidViewRepository;
 use App\Service\Aid\AidService;
+use App\Service\Organization\OrganizationService;
 use App\Service\User\UserService;
 use App\Service\Various\StringService;
 use Doctrine\Persistence\ManagerRegistry;
@@ -30,6 +31,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use Dompdf\Dompdf;
 use Dompdf\Options;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -214,6 +216,7 @@ class AidController extends FrontController
         AidService $aidService,
         RequestStack $requestStack,
         ManagerRegistry $managerRegistry,
+        OrganizationService $organizationService,
         AidRepository $aidRepository
     ) : Response {
         // user
@@ -238,6 +241,8 @@ class AidController extends FrontController
         } else {
             $getLock = $aidService->getLock($aid);
         }
+
+        $userAdminOf = $aid->getOrganization() ? $organizationService->userAdminOf($user, $aid->getOrganization()) : false;
 
         // regarde si aide(s) avec meme originUrl
         $aidDuplicates = [];
@@ -325,7 +330,8 @@ class AidController extends FrontController
             'aid' => $aid,
             'aidDuplicates' => $aidDuplicates,
             'isLockedByAnother' => $isLockedByAnother,
-            'getLock' => $getLock
+            'getLock' => $getLock,
+            'userAdminOf' => $userAdminOf
         ]);
     }
 
@@ -392,6 +398,57 @@ class AidController extends FrontController
                 'success' => false
             ]);
         }
+    }
+
+    #[Route('/comptes/aides/{id}/unlock/', name: 'app_user_aid_unlock', requirements: ['id' => '\d+'])]
+    public function unlock(
+        $id,
+        AidRepository $aidRepository,
+        OrganizationService $organizationService,
+        UserService $userService,
+        ManagerRegistry $managerRegistry
+    ): Response
+    {
+        try {
+            // le user
+            $user = $userService->getUserLogged();
+            if (!$user instanceof User) {
+                throw new \Exception('User invalid');
+            }
+
+            // l'aide
+            $aid = $aidRepository->find($id);
+            if (!$aid instanceof Aid) {
+                throw new \Exception('Aide invalide');
+            }
+
+            // verifie que le user est admin de l'organization qui gère l'aide
+            if (!$aid->getOrganization()) {
+                throw new \Exception('Organization manquante');
+            }
+            if (!$organizationService->userAdminOf($user, $aid->getOrganization())) {
+                throw new \Exception('Utilisateur non autorisé');
+            }
+
+            // suppression du lock
+            foreach ($aid->getAidLocks() as $aidLock) {
+                $managerRegistry->getManager()->remove($aidLock);
+            }
+            $managerRegistry->getManager()->flush();
+
+            // message
+            $this->addFlash(FrontController::FLASH_SUCCESS, 'Aide débloquée');
+
+            // retour
+            return $this->redirectToRoute('app_user_aid_publications');
+        } catch (\Exception $e) {
+            // message
+            $this->addFlash(FrontController::FLASH_ERROR, 'Impossible de débloquer l\'aide');
+
+            // retour
+            return $this->redirectToRoute('app_user_aid_edit', ['slug' => $aid->getSlug()]);
+        }
+
     }
 
     #[Route('/comptes/aides/ajax-unlock/', name: 'app_user_aid_ajax_unlock', options: ['expose' => true])]
