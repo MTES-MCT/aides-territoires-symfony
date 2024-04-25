@@ -29,6 +29,7 @@ use App\Service\Organization\OrganizationService;
 use App\Service\User\UserService;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -523,7 +524,7 @@ class OrganizationController extends FrontController
         ManagerRegistry $managerRegistry,
         OrganizationRepository $organizationRepository,
         OrganizationService $organizationService,
-        NotificationService $notificationService
+        BackerService $backerService,
     )
     {
         // le user
@@ -550,6 +551,25 @@ class OrganizationController extends FrontController
         // regarde si le user peu editer la fiche porteur d'aide
         $userCanEditBacker = $organizationService->canEditBacker($user, $organization);
     
+        $isLockedByAnother = false;
+        $getLock = null;
+        $userAdminOf = false;
+        if ($backer instanceOf Backer) {
+            // gestion lock
+            $isLockedByAnother = $backerService->isLockedByAnother($backer, $user);
+            if (!$isLockedByAnother) {
+            } else {
+                $getLock = $backerService->getLock($backer);
+            }
+
+            // utilisateur admin de l'organization
+            foreach ($backer->getOrganizations() as $organization) {
+                if ($organizationService->userAdminOf($user, $organization)) {
+                    $userAdminOf = true;
+                }
+            }
+        }
+
         // formulaire edition porteur
         $formOptions = [
             'is_readonly' => !$userCanEditBacker
@@ -635,7 +655,188 @@ class OrganizationController extends FrontController
             'form' => $form,
             'user_backer' => true,
             'user_backer_id' => $backer instanceof Backer ? $backer->getId() : null,
-            'userCanEditBacker' => $userCanEditBacker
+            'userCanEditBacker' => $userCanEditBacker,
+            'isLockedByAnother' => $isLockedByAnother,
+            'getLock' => $getLock,
+            'userAdminOf' => $userAdminOf
         ]);
+    }
+
+    #[Route('/comptes/structure/porteur/ajax-lock/', name: 'app_organization_backer_ajax_lock', options: ['expose' => true])]
+    public function ajaxLock(
+        RequestStack $requestStack,
+        BackerRepository $backerRepository,
+        BackerService $backerService,
+        UserService $userService
+    ) : JsonResponse
+    {
+        try {
+            // verification requete interne
+            $request = $requestStack->getCurrentRequest();
+            $origin = $request->headers->get('origin');
+            $infosOrigin = parse_url($origin);
+            $hostOrigin = $infosOrigin['host'] ?? null;
+            $serverName = $request->getHost();
+    
+            if ($hostOrigin !== $serverName) {
+                // La requête n'est pas interne, retourner une erreur
+                throw $this->createAccessDeniedException('This action can only be performed by the server itself.');
+            }
+            
+            // recupere id
+            $id = (int) $requestStack->getCurrentRequest()->get('id', 0);
+            if (!$id) {
+                throw new \Exception('Id manquant');
+            }
+
+            // le user
+            $user = $userService->getUserLogged();
+            if (!$user instanceof User) {
+                throw new \Exception('User manquant');
+            }
+
+            // charge backer
+            $backer = $backerRepository->find($id);
+            if (!$backer instanceof Backer) {
+                throw new \Exception('Fiche manquante');
+            }
+
+            // verifie que le user peut lock
+            $canLock = $backerService->canUserLock($backer, $user);
+            if (!$canLock) {
+                throw new \Exception('Vous ne pouvez pas lock cette fiche porteur');
+            }
+
+            // regarde si deja lock
+            $isLockedByAnother = $backerService->isLockedByAnother($backer, $user);
+            if ($isLockedByAnother) {
+                throw new \Exception('Fiche déjà lock');
+            }
+            
+            // la débloque
+            $backerService->lock($backer, $user);
+
+            // retour
+            return new JsonResponse([
+                'success' => true
+            ]);
+        } catch (\Exception $e) {
+            return new JsonResponse([
+                'success' => false
+            ]);
+        }
+    }
+
+    #[Route('/comptes/structure/porteur/{id}/unlock/', name: 'app_organization_backer_unlock', requirements: ['id' => '\d+'])]
+    public function unlock(
+        $id,
+        BackerRepository $backerRepository,
+        OrganizationService $organizationService,
+        UserService $userService,
+        BackerService $backerService
+    ): Response
+    {
+        try {
+            // le user
+            $user = $userService->getUserLogged();
+            if (!$user instanceof User) {
+                throw new \Exception('User invalid');
+            }
+
+            // l'aide
+            $backer = $backerRepository->find($id);
+            if (!$backer instanceof Backer) {
+                throw new \Exception('Fiche invalide');
+            }
+
+            // verifie que le user est admin de l'organization qui gère l'aide
+            $adminOf = false;
+            foreach ($backer->getOrganizations() as $organization) {
+                if ($organizationService->userAdminOf($user, $organization)) {
+                    $adminOf = true;
+                }
+            }
+            if (!$adminOf) {
+                throw new \Exception('Utilisateur non autorisé');
+            }
+
+            // suppression du lock
+            $backerService->unlock($backer);
+
+            // message
+            $this->addFlash(FrontController::FLASH_SUCCESS, 'Fiche porteur d\'aides débloquée');
+
+            // retour
+            return $this->redirectToRoute('app_user_dashboard');
+        } catch (\Exception $e) {
+            // message
+            $this->addFlash(FrontController::FLASH_ERROR, 'Impossible de débloquer la fiche porteur d\'aides');
+
+            // retour
+            if (isset($backer->getOrganizations()[0])) {
+                return $this->redirectToRoute('app_organization_backer_edit', ['id' => $backer->getOrganizations()[0]->getId(), 'idBacker' => $backer->getId()]);
+            } else {
+                return $this->redirectToRoute('app_user_dashboard');
+            }
+        }
+    }
+
+    #[Route('/comptes/aides/ajax-unlock/', name: 'app_user_aid_ajax_unlock', options: ['expose' => true])]
+    public function ajaxUnlock(
+        RequestStack $requestStack,
+        BackerRepository $backerRepository,
+        BackerService $backerService,
+        UserService $userService
+    ) : JsonResponse
+    {
+        try {
+            // verification requete interne
+            $request = $requestStack->getCurrentRequest();
+            $origin = $request->headers->get('origin');
+            $infosOrigin = parse_url($origin);
+            $hostOrigin = $infosOrigin['host'] ?? null;
+            $serverName = $request->getHost();
+    
+            if ($hostOrigin !== $serverName) {
+                // La requête n'est pas interne, retourner une erreur
+                throw $this->createAccessDeniedException('This action can only be performed by the server itself.');
+            }
+            
+            // recupere id
+            $id = (int) $requestStack->getCurrentRequest()->get('id', 0);
+            if (!$id) {
+                throw new \Exception('Id manquant');
+            }
+
+            // user
+            $user = $userService->getUserLogged();
+            if (!$user instanceof User) {
+                throw new \Exception('User manquant');
+            }
+
+            // charge backer
+            $backer = $backerRepository->find($id);
+            if (!$backer instanceof Backer) {
+                throw new \Exception('Fiche porteur manquante');
+            }
+
+            // verifie que le user peut lock
+            $canLock = $backerService->canUserLock($backer, $user);
+            if (!$canLock) {
+                throw new \Exception('Vous ne pouvez pas bloquer cette fiche porteur d\'aide');
+            }
+
+            // la débloque
+            $backerService->unlock($backer);
+
+            // retour
+            return new JsonResponse([
+                'success' => true
+            ]);
+        } catch (\Exception $e) {
+            return new JsonResponse([
+                'success' => false
+            ]);
+        }
     }
 }

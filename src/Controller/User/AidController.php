@@ -235,6 +235,7 @@ class AidController extends FrontController
             return $this->redirectToRoute('app_user_aid_publications');
         }
 
+        // gestion lock
         $isLockedByAnother = $aidService->isLockedByAnother($aid, $user);
         $getLock = null;
         if (!$isLockedByAnother) {
@@ -242,6 +243,7 @@ class AidController extends FrontController
             $getLock = $aidService->getLock($aid);
         }
 
+        // utilisateur admin de l'organization
         $userAdminOf = $aid->getOrganization() ? $organizationService->userAdminOf($user, $aid->getOrganization()) : false;
 
         // regarde si aide(s) avec meme originUrl
@@ -406,7 +408,6 @@ class AidController extends FrontController
         AidRepository $aidRepository,
         OrganizationService $organizationService,
         UserService $userService,
-        ManagerRegistry $managerRegistry,
         AidService $aidService
     ): Response
     {

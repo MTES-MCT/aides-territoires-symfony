@@ -90,3 +90,12 @@
     </div>
 </div>
 {% endblock %}
+
+{% block javascriptsBottom %}
+    {{ parent() }}
+    {% cspscript %}
+        <script type="text/javascript">
+            let idBacker = {{ backer.id }};
+        </script>
+    {% endcspscript %}
+{% endblock %}
