@@ -9,7 +9,7 @@ use Doctrine\ORM\Event\PostRemoveEventArgs;
 use Doctrine\ORM\Events;
 
 #[AsDoctrineListener(event: Events::postRemove, priority: 500, connection: 'default')]
-class PreRemoveListener
+class PostRemoveListener
 {
     public function __construct(
         protected OrganizationAccessListener $organizationAccessListener,

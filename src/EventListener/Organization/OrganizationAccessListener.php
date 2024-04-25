@@ -42,6 +42,7 @@ class OrganizationAccessListener
                 'email' => $email,
                 'organization' => $organization
             ]);
+
             foreach ($organizationInvitations as $organizationInvitation) {
                 $this->managerRegistry->getManager()->remove($organizationInvitation);
             }   
@@ -74,6 +75,7 @@ class OrganizationAccessListener
 
             // si on a un admin
             if ($admin instanceof User) {
+                $needFlush = false;
                 $aids = $this->managerRegistry->getRepository(Aid::class)->findCustom([
                     'organization' => $organization,
                     'author' => $entity->getUser()
@@ -82,6 +84,7 @@ class OrganizationAccessListener
                 foreach ($aids as $aid) {
                     $aid->setAuthor($admin);
                     $this->managerRegistry->getManager()->persist($aid);
+                    $needFlush = true;
                 }
 
                 $projects = $this->managerRegistry->getRepository(Project::class)->findCustom([
@@ -92,12 +95,17 @@ class OrganizationAccessListener
                 foreach ($projects as $project) {
                     $project->setAuthor($admin);
                     $this->managerRegistry->getManager()->persist($project);
+                    $needFlush = true;
                 }
+            }
+
+            if ($needFlush) {
+                // sauvegarde modifs
+                $this->managerRegistry->getManager()->flush();
             }
         }
         
-        // sauvegarde modifs
-        $this->managerRegistry->getManager()->flush();
+
 
         // notifie les autres membtres
         if ($entity->getOrganization() instanceof Organization) {
