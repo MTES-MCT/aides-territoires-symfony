@@ -14,7 +14,6 @@
 {% block title %}Editer votre projet | {{ parent() }}{% endblock %}
 
 {% block body %}
-
 <div class="fr-container fr-mb-5w fr-mt-0">
     <div class="fr-grid-row">
         {% include "user/_menu_user.html.twig" with { user_project:true, user_project_structure:true } %}
@@ -38,58 +37,82 @@
               {% include "user/project/_menu_project.html.twig" with { fiche_projet: true, project_id: project.id, project_slug: project.slug } %}
               <div id="tabpanel_fiche_projet" class="fr-tabs__panel" role="tabpanel" aria-labelledby="tabpanel_fiche_projet" tabindex="0">
 
-              {{ form_start(form) }}
-              {{ form_row(form.name )}}
-              {{ form_row(form.organization )}}
-              <div class="fr-grid-row fr-grid-row--gutters fr-grid-row--middle fr-mb-3w">
-                <div class="fr-col-12 fr-col-md-12">
-                  <label for="id_project_types">
-                    <span class="at-field-label at-required--label">Projet référent :*</span>
-                    <span class="fr-hint-text">
-                      Cette information nous aide à vous faire gagner du temps en vous proposant les meilleures aides pour votre projet.
-                      Si vous ne trouvez pas le type de projet qui vous correspond, cochez la case "Je n'ai pas trouvé de projet référent".</span>
-                    </label>
-                </div>
-                <div class="fr-col-12 fr-col-md-6">
-                  {{ form_row(form.projectReference )}}
-                </div>
-                <div class="fr-col-12 fr-col-md-6">
-                  {{ form_row(form.referentNotFound )}}
-                </div>
-                <div class="fr-col-12 fr-col-md-6">
-                  {{ form_row(form.step )}}
-                </div>
-                <div class="fr-col-12 fr-col-md-6">
-                  {{ form_row(form.contract_link )}}
-                </div>
-                
-              </div>
-              
-              {{ form_row(form.description )}}
-              
-              <div class="fr-grid-row fr-grid-row--gutters fr-grid-row--middle fr-mb-3w">
-                  <div class="fr-col-md-7"> 
-                      {{ form_row(form.isPublic, {'render_rest': false}) }}
-                  </div>
-                  <div class="fr-col-md-5" style="display: flex; align-items: center;"> 
-                      <button type="button" class="fr-tag fr-fi-information-line fr-tag--icon-left" data-fr-opened="false" aria-controls="public-project-modal">&nbsp;information</button>
-                  </div>
-              </div>
+                  {% if isLockedByAnother %}
+                      <div class="fr-alert fr-alert--info fr-alert--sm fr-my-2w">
+                          <p>
+                              La projet est en cours d'édition {% if getLock %}par {{ getLock.user.email }} depuis {{ getLock.timeStart|date('d/m/Y H:i:s') }}{% endif %}
+                          </p>
+                          {% if userAdminOf is defined and userAdminOf %}
+                              <p>Vous pouvez forcer le débloquage si vous pensez qu'il s'agit d'une erreur</p>
+                              <p><a href="{{ path('app_user_project_unlock', {'id': project.id })}}" title="Débloquer le projet">Débloquer le projet</a></p>
+                          {% else %}
+                              {% if project.organization %}
+                                  <p>Vous pouvez demander à un administrateur de la structure {{ project.organization.name }} de le débloquer.</p>
+                              {% endif %}
+                          {% endif %}
+                      </div>
+                  {% else %}
+                    {{ form_start(form) }}
+                      {{ form_row(form.name )}}
+                      {{ form_row(form.organization )}}
+                      <div class="fr-grid-row fr-grid-row--gutters fr-grid-row--middle fr-mb-3w">
+                        <div class="fr-col-12 fr-col-md-12">
+                          <label for="id_project_types">
+                            <span class="at-field-label at-required--label">Projet référent :*</span>
+                            <span class="fr-hint-text">
+                              Cette information nous aide à vous faire gagner du temps en vous proposant les meilleures aides pour votre projet.
+                              Si vous ne trouvez pas le type de projet qui vous correspond, cochez la case "Je n'ai pas trouvé de projet référent".</span>
+                            </label>
+                        </div>
+                        <div class="fr-col-12 fr-col-md-6">
+                          {{ form_row(form.projectReference )}}
+                        </div>
+                        <div class="fr-col-12 fr-col-md-6">
+                          {{ form_row(form.referentNotFound )}}
+                        </div>
+                        <div class="fr-col-12 fr-col-md-6">
+                          {{ form_row(form.step )}}
+                        </div>
+                        <div class="fr-col-12 fr-col-md-6">
+                          {{ form_row(form.contract_link )}}
+                        </div>
+                        
+                      </div>
+                      
+                      {{ form_row(form.description )}}
+                      
+                      <div class="fr-grid-row fr-grid-row--gutters fr-grid-row--middle fr-mb-3w">
+                          <div class="fr-col-md-7"> 
+                              {{ form_row(form.isPublic, {'render_rest': false}) }}
+                          </div>
+                          <div class="fr-col-md-5" style="display: flex; align-items: center;"> 
+                              <button type="button" class="fr-tag fr-fi-information-line fr-tag--icon-left" data-fr-opened="false" aria-controls="public-project-modal">&nbsp;information</button>
+                          </div>
+                      </div>
 
-              {{ form_row(form.private_description )}}
+                      {{ form_row(form.private_description )}}
 
-              {% if project and project.image %}
-              <p><img src="{{ getParameter('cloud_image_url') }}{{ project.image }}" class="fr-responsive-img" alt="Image de votre projet" /></p>
-              {% endif %}
-              {{ form_row(form.imageUploadedFile )}}
-                                    
-              <footer class="fr-mt-2w">
-                  <button type="submit" class="fr-btn">Modifier</button>
-              </footer>
+                      {% if project and project.image %}
+                      <p><img src="{{ getParameter('cloud_image_url') }}{{ project.image }}" class="fr-responsive-img" alt="Image de votre projet" /></p>
+                      {% endif %}
+                      {{ form_row(form.imageUploadedFile )}}
+                                            
+                      <footer class="fr-mt-2w">
+                          {% if not userCanEditProject %}
+                              <div class="fr-alert fr-alert--info fr-alert--sm fr-my-2w">
+                                  <p>
+                                      Seul les personnes autorisées peuvent mettre à jour.
+                                  </p>
+                              </div>
+                          {% endif %}
 
-              <p class="fr-hint-text fr-mt-2w">Les champs marqués d’un astérisque (*) sont obligatoires.</p>
+                          <button type="submit" class="fr-btn" {% if not userCanEditProject %}disabled="disabled"{% endif %}>Modifier</button>
+                      </footer>
 
-              {{ form_end(form) }}
+                      <p class="fr-hint-text fr-mt-2w">Les champs marqués d’un astérisque (*) sont obligatoires.</p>
+
+                      {{ form_end(form) }}
+                  {% endif %}
               </div> <!-- fin tabpanel-->
             </div>
         </div>
@@ -149,4 +172,13 @@
   </div>
 </dialog>
 
+{% endblock %}
+
+{% block javascriptsBottom %}
+    {{ parent() }}
+    {% cspscript %}
+        <script type="text/javascript">
+            let idProject = {{ project.id }};
+        </script>
+    {% endcspscript %}
 {% endblock %}

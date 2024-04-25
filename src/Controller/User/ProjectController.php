@@ -143,7 +143,8 @@ class ProjectController extends FrontController
         UserService $userService,
         ManagerRegistry $managerRegistry,
         ImageService $imageService,
-        OrganizationService $organizationService
+        OrganizationService $organizationService,
+        ProjectService $projectService
     ): Response
     {
         $project = $ProjectRepository->findOneBy(
@@ -156,6 +157,32 @@ class ProjectController extends FrontController
         
         if (!$project instanceof Project || !$userService->isMemberOfOrganization($project->getOrganization(), $user)) {
             return $this->redirectToRoute('app_user_project_structure');
+        }
+
+        $isLockedByAnother = false;
+        $getLock = null;
+        $userAdminOf = false;
+        if ($project instanceOf Project) {
+            // gestion lock
+            $isLockedByAnother = $projectService->isLockedByAnother($project, $user);
+            if (!$isLockedByAnother) {
+            } else {
+                $getLock = $projectService->getLock($project);
+            }
+
+            // utilisateur admin de l'organization
+            $userAdminOf = false;
+            if ($project->getOrganization()) {
+                $userAdminOf = $organizationService->userAdminOf($user, $project->getOrganization());
+            }
+        }
+
+        // peu editer les projets
+        $userCanEditProject = true;
+        if ($project->getOrganization()) {
+            if (!$organizationService->canEditProject($user, $project->getOrganization())) {
+                $userCanEditProject = false;
+            }
         }
         
         $form = $this->createForm(ProjectEditType::class, $project);
@@ -222,6 +249,10 @@ class ProjectController extends FrontController
             'project' => $project,
             'form' => $form->createView(),
             'formErrors' => $formErrors ?? false,
+            'userCanEditProject' => $userCanEditProject,
+            'isLockedByAnother' => $isLockedByAnother,
+            'getLock' => $getLock,
+            'userAdminOf' => $userAdminOf
         ]);
     }
 

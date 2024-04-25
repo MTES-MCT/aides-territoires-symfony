@@ -58,7 +58,7 @@
                             </p>
                             {% if userAdminOf is defined and userAdminOf %}
                                 <p>Vous pouvez forcer le débloquage si vous pensez qu'il s'agit d'une erreur</p>
-                                <p><a href="{{ path('app_organization_backer_unlock', {'id': organization.id, 'idBacker': backer.id })}}" title="Débloquer l'aide">Débloquer l'aide</a></p>
+                                <p><a href="{{ path('app_organization_backer_unlock', {'id': organization.id, 'idBacker': backer.id })}}" title="Débloquer la fiche porteur d'aides">Débloquer la fiche porteurs d'aides</a></p>
                             {% else %}
                                 {% if organization %}
                                     <p>Vous pouvez demander à un administrateur de la structure {{ organization.name }} de la débloquer.</p>
