@@ -329,7 +329,13 @@ class AidSearchFormService
         }
         // nouveau paramètre
         if (isset($queryParams['keyword'])) {
-            $keyword = (string) $queryParams['keyword'];
+            $keywordString = '';
+            if (is_array($queryParams['keyword'])) {
+                foreach ($queryParams['keyword'] as $currentKeyword) {
+                    $keywordString .= $currentKeyword. ' ';
+                }
+            }
+            $keyword = trim($keywordString);
         }
         $aidSearchClass->setKeyword($keyword);
 
