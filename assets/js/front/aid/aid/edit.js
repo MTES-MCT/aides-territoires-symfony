@@ -45,18 +45,21 @@ $(function(){
     }, '.submit-change-status');
 
     // quand on arrive sur la page prete, on lock
-    lockAid();
+    lock();
 });
 
 // quand on quitte la page
+$(window).on('beforeunload', function() {
+    unlock();
+});
 $(window).on('unload', function() {
-    unlockAid();
+    unlock();
 });
 $(window).on('pagehide', function() {
-    unlockAid();
+    unlock();
 });
 
-function lockAid()
+function lock()
 {
     if (typeof idAid !== 'undefined') {
         $.ajax({
@@ -69,7 +72,7 @@ function lockAid()
     }
 }
 
-function unlockAid()
+function unlock()
 {
     if (typeof idAid !== 'undefined') {
         $.ajax({

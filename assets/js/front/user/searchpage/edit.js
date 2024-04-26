@@ -46,10 +46,7 @@ $(function() {
 });
 
 // quand on quitte la page
-$(window).on('unload', function() {
-    unlock();
-});
-$(window).on('pagehide', function() {
+$(window).on('beforeunload', function() {
     unlock();
 });
 

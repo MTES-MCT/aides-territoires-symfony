@@ -13,7 +13,6 @@ use App\Form\Aid\AidEditType;
 use App\Form\User\Aid\AidExportType;
 use App\Form\User\Aid\AidFilterType;
 use App\Form\User\Aid\AidStatsPeriodType;
-use App\Repository\Aid\AidLockRepository;
 use App\Repository\Aid\AidProjectRepository;
 use App\Repository\Aid\AidRepository;
 use App\Repository\Log\LogAidApplicationUrlClickRepository;
@@ -31,7 +30,6 @@ use Symfony\Component\Routing\Annotation\Route;
 use Dompdf\Dompdf;
 use Dompdf\Options;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -232,6 +230,7 @@ class AidController extends FrontController
 
         // verifie les droits de l'utilisateur
         if (!$aidService->userCanEdit($aid, $user)) {
+            $this->addFlash(FrontController::FLASH_ERROR, 'Vous n\'avez pas accès à cette page, contactez l\'administrateur de la structure pour plus d\'informations.');
             return $this->redirectToRoute('app_user_aid_publications');
         }
 
@@ -260,7 +259,7 @@ class AidController extends FrontController
         $formDelete = $this->createForm(AidDeleteType::class);
         $formDelete->handleRequest($requestStack->getCurrentRequest());
         if ($formDelete->isSubmitted()) {
-            if ($formDelete->isValid()) {
+            if ($formDelete->isValid() && !$isLockedByAnother) {
                 // suppression aide
                 $managerRegistry->getManager()->remove($aid);
                 $managerRegistry->getManager()->flush();
@@ -280,7 +279,7 @@ class AidController extends FrontController
         $formAid = $this->createForm(AidEditType::class, $aid, ['allowStatusPublished' => true]);
         $formAid->handleRequest($requestStack->getCurrentRequest());
         if ($formAid->isSubmitted()) {
-            if ($formAid->isValid()) {
+            if ($formAid->isValid() && !$isLockedByAnother) {
                 // les financers
                 foreach ($aid->getAidFinancers() as $aidFinancer) {
                     $aid->removeAidFinancer($aidFinancer);

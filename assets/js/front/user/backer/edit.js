@@ -24,12 +24,16 @@ $(function() {
 
 
 // quand on quitte la page
-$(window).on('unload', function() {
+$(window).on('beforeunload', function() {
+    unlock();
+});
+$(window).on('buload', function() {
     unlock();
 });
 $(window).on('pagehide', function() {
     unlock();
 });
+
 
 function lock()
 {
