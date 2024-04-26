@@ -771,11 +771,6 @@ class ProjectController extends FrontController
         }
 
         // Projets subventionnés
-        $synonyms = ($project->getProjectReference())
-            ? $referenceService->getSynonymes($project->getProjectReference()->getName())
-            : null
-        ;
-
         $project_perimeter = ($user->getDefaultOrganization() && $user->getDefaultOrganization()->getPerimeter())
             ? $user->getDefaultOrganization()->getPerimeter()
             : null
@@ -786,11 +781,12 @@ class ProjectController extends FrontController
                 'perimeter' => $project_perimeter,
                 'radius' => 30
             ];
-            if ($synonyms) {
-                $projectParams = array_merge($projectParams, $synonyms);
-            }
+            $projectParams['search'] = $project->getProjectReference() ? $project->getProjectReference()->getName() : null;
+            $projectParams['projectReference'] = $project->getProjectReference() ?? null;
+
             $projects = $projectValidatedRepository->findProjectInRadius($projectParams);
         }
+
 
         // pagination project validés
         $adapter = new ArrayAdapter($projects);
@@ -801,27 +797,29 @@ class ProjectController extends FrontController
         
         // Projets publics : 
         $projets_publics = [];
-        if ($synonyms) {
-            $projectParams = $synonyms;
-            $projectParams['exclude'] = $project;
-            $projectsParams['limit'] = 12;
-            $projectsParams['orderBy'] = [
-                'sort' => 'p.timeCreate',
-                'order' => 'DESC'
-            ];
-            if ($project_perimeter instanceof Perimeter) {
-                $projectParams['perimeterRadius'] = $project_perimeter;
-                $projectParams['radius'] = 30;
-            }
+        $projectParams = [];
+        $projectParams['exclude'] = $project;
+        $projectsParams['limit'] = 12;
+        $projectsParams['orderBy'] = [
+            'sort' => 'p.timeCreate',
+            'order' => 'DESC'
+        ];
+        $projectParams['search'] = $project->getProjectReference() ? $project->getProjectReference()->getName() : null;
+        $projectParams['projectReference'] = $project->getProjectReference() ?? null;
+        
+        if ($project_perimeter instanceof Perimeter) {
+            $projectParams['perimeterRadius'] = $project_perimeter;
+            $projectParams['radius'] = 30;
+        }
 
+        $projets_publics = $projectRepository->findPublicProjects($projectParams);
+
+        // Si rien à 30 km, on élargit à 300 km
+        if (count($projets_publics) == 0 && $project_perimeter instanceof Perimeter) {
+            $projectParams['radius'] = 300;
             $projets_publics = $projectRepository->findPublicProjects($projectParams);
-
-            // Si rien à 30 km, on élargit à 300 km
-            if (count($projets_publics) == 0 && $project_perimeter instanceof Perimeter) {
-                $projectParams['radius'] = 300;
-                $projets_publics = $projectRepository->findPublicProjects($projectParams);
-            }
-        }   
+        }
+        
         
         // fil d'arianne
         $this->breadcrumb->add("Mon compte",$this->generateUrl('app_user_dashboard'));

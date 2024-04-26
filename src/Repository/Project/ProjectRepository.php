@@ -146,11 +146,8 @@ class ProjectRepository extends ServiceEntityRepository
         $keywordSynonymlistSearch = $params['keywordSynonymlistSearch'] ?? null;
         $orderBy = (isset($params['orderBy']) && isset($params['orderBy']['sort']) && isset($params['orderBy']['order'])) ? $params['orderBy'] : null;
         $limit = $params['limit'] ?? null;
-        // $intentions_string = $params['intentions_string'] ?? null;
-        // $objects_string = $params['objects_string'] ?? null;
-        // $simple_words_string = $params['simple_words_string'] ?? null;
         $search = $params['search'] ?? null;
-        $scoreTotalMin = $params['scoreTotalMin'] ?? 30;
+        $scoreTotalMin = $params['scoreTotalMin'] ?? 35;
         $projectReference = $params['projectReference'] ?? null;
         $radius = $params['radius'] ?? null;
         $exclude = $params['exclude'] ?? null;
@@ -199,13 +196,13 @@ class ProjectRepository extends ServiceEntityRepository
 
                 $qb->setParameter('objects_string', $objectsString);
             }
-            if ($intentionsString && $objectsString) {
-                $sqlIntentions = '
-                CASE WHEN (MATCH_AGAINST(p.name) AGAINST(:intentions_string IN BOOLEAN MODE) > 1) THEN 5 ELSE 0 END +
-                CASE WHEN (MATCH_AGAINST(p.description) AGAINST(:intentions_string IN BOOLEAN MODE) > 1) THEN 1 ELSE 0 END 
-                ';
-                $qb->setParameter('intentions_string', $intentionsString);
-            }
+            // if ($intentionsString && $objectsString) {
+            //     $sqlIntentions = '
+            //     CASE WHEN (MATCH_AGAINST(p.name) AGAINST(:intentions_string IN BOOLEAN MODE) > 1) THEN 5 ELSE 0 END +
+            //     CASE WHEN (MATCH_AGAINST(p.description) AGAINST(:intentions_string IN BOOLEAN MODE) > 1) THEN 1 ELSE 0 END 
+            //     ';
+            //     $qb->setParameter('intentions_string', $intentionsString);
+            // }
 
             if ($simpleWordsString) {
                 $sqlSimpleWords = '
@@ -238,12 +235,12 @@ class ProjectRepository extends ServiceEntityRepository
                 }
                 $sqlTotal .= $sqlObjects;
             }
-            if ($intentionsString && $objectsString) {
-                if ($originalName || $objectsString) {
-                    $sqlTotal .= ' + ';
-                }
-                $sqlTotal .= $sqlIntentions;
-            }
+            // if ($intentionsString && $objectsString) {
+            //     if ($originalName || $objectsString) {
+            //         $sqlTotal .= ' + ';
+            //     }
+            //     $sqlTotal .= $sqlIntentions;
+            // }
             if (isset($sqlSimpleWords)) {
                 if ($originalName || $objectsString || $intentionsString) {
                     $sqlTotal .= ' + ';
@@ -310,7 +307,7 @@ class ProjectRepository extends ServiceEntityRepository
                 ->innerJoin('organizationForDistance.perimeter', 'perimeterForDistance')
                 ->setParameter('lat', $perimeterRadius->getLatitude())
                 ->setParameter('lng', $perimeterRadius->getLongitude())
-                ->having('dist <= :distanceKm')
+                ->andHaving('dist <= :distanceKm')
                 ->setParameter('distanceKm', $radius)
                 ->orderBy('dist', 'ASC');
             ;
