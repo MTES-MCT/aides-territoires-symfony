@@ -379,16 +379,16 @@ class AidController extends FrontController
             // verifie que le user peut lock
             $canLock = $aidService->canUserLock($aid, $user);
             if (!$canLock) {
-                throw new \Exception('Vous ne pouvez pas lock cette aide');
+                throw new \Exception('Vous ne pouvez pas bloquer cette aide');
             }
 
             // regarde si deja lock
             $isLockedByAnother = $aidService->isLockedByAnother($aid, $user);
             if ($isLockedByAnother) {
-                throw new \Exception('Aide déjà lock');
+                throw new \Exception('Aide déjà bloquée');
             }
             
-            // la débloque
+            // le bloque
             $aidService->lock($aid, $user);
 
             // retour
