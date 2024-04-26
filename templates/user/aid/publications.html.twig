@@ -80,10 +80,9 @@
                                 <p>
                                     <a href="{{ path('app_user_aid_edit', {'slug': aid.slug}) }}">
                                         {{ aid.name }} 
-                                        {% if aid.aidLocks|length > 0 %}
-                                            {% for aidLock in aid.aidLocks %}
+                                        {% set aidLock = aidGetLockedByAnother(aid) %}
+                                        {% if aidLock %}
                                             <span title="Edition en cours par {{ aidLock.user.email }}" class="fr-icon-git-repository-private-line" aria-hidden="true"></span>
-                                        {% endfor %}
                                         {% else %}
                                             <span class="fr-icon-ball-pen-line" aria-hidden="true"></span>
                                         {% endif %}

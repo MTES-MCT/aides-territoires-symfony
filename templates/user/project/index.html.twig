@@ -53,10 +53,9 @@
                             <td class="fr-text">
                                 <a  href="{{ path('app_user_project_details_fiche_projet', {'id': project.id, 'slug': project.slug}) }}" id="project-{{ project.id }}">
                                     {{ project.name }}
-                                    {% if project.projectLocks|length > 0 %}
-                                        {% for projectLock in project.projectLocks %}
+                                    {% set projectLock = projectGetLockedByAnother(project) %}
+                                    {% if projectLock %}
                                         <span title="Edition en cours par {{ projectLock.user.email }}" class="fr-icon-git-repository-private-line" aria-hidden="true"></span>
-                                    {% endfor %}
                                     {% else %}
                                         <span class="fr-icon-ball-pen-line" aria-hidden="true"></span>
                                     {% endif %}

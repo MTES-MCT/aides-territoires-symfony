@@ -85,7 +85,16 @@ class BackerService
     }
     public function isLockedByAnother(Backer $backer, User $user): bool
     {
+        $now = new \DateTime(date('Y-m-d H:i:s'));
+        $minutesMax = 5;
         foreach ($backer->getBackerLocks() as $backerLock) {
+            // si le lock a plus de 5 min, on le supprime
+            if ($backerLock->getTimeStart() < $now->sub(new \DateInterval('PT'.$minutesMax.'M'))) {
+                $this->managerRegistry->getManager()->remove($backerLock);
+                $this->managerRegistry->getManager()->flush();
+                continue;
+            }
+            
             if ($backerLock->getUser() != $user) {
                 return true;
             }
@@ -107,6 +116,18 @@ class BackerService
                 $backerLock->setUser($user);
                 $this->managerRegistry->getManager()->persist($backerLock);
                 $this->managerRegistry->getManager()->flush();
+            } else {
+                $backerLock = (isset($backer->getBackerLocks()[0]) && $backer->getBackerLocks()[0] instanceof BackerLock)
+                            ? $backer->getBackerLocks()[0]
+                            : null;
+                // on met à jour le lock si le user et l'aide sont bien les mêmes
+                if ($backerLock && $backerLock->getUser() == $user && $backerLock->getBacker() == $backer) {
+                    $backerLock->setTimeStart(new \DateTime(date('Y-m-d H:i:s')));
+                    $backerLock->setBacker($backer);
+                    $backerLock->setUser($user);
+                    $this->managerRegistry->getManager()->persist($backerLock);
+                    $this->managerRegistry->getManager()->flush();
+                }
             }
         } catch (\Exception $e) {
         }

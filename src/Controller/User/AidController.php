@@ -494,8 +494,10 @@ class AidController extends FrontController
                 throw new \Exception('Vous ne pouvez pas débloquer cette aide');
             }
 
-            // la débloque
-            $aidService->unlock($aid);
+            // la débloque si pas bloqué par un autre
+            if (!$aidService->isLockedByAnother($aid, $user)) {
+                $aidService->unlock($aid);
+            }
 
             // retour
             return new JsonResponse([

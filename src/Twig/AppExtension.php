@@ -3,16 +3,22 @@
 namespace App\Twig;
 
 use App\Entity\Aid\Aid;
+use App\Entity\Aid\AidLock;
 use App\Entity\Alert\Alert;
 use App\Entity\Organization\Organization;
 use App\Entity\Perimeter\Perimeter;
 use App\Entity\Project\Project;
+use App\Entity\Project\ProjectLock;
 use App\Entity\User\User;
+use App\Service\Aid\AidService;
+use App\Service\Backer\BackerService;
 use App\Service\Category\CategoryService;
 use App\Service\Matomo\MatomoService;
 use App\Service\Organization\OrganizationService;
 use App\Service\Perimeter\PerimeterService;
+use App\Service\Project\ProjectService;
 use App\Service\Reference\KeywordReferenceService;
+use App\Service\SearchPage\SearchPageService;
 use App\Service\User\UserService;
 use App\Service\Various\Breadcrumb;
 use App\Service\Various\ParamService;
@@ -37,7 +43,9 @@ class AppExtension extends AbstractExtension
         private MatomoService $matomoService,
         private ContentSecurityPolicyListener $contentSecurityPolicyListener,
         private KeywordReferenceService $keywordReferenceService,
-        private OrganizationService $organizationService
+        private OrganizationService $organizationService,
+        private AidService $aidService,
+        private ProjectService $projectService
     ) {
         
     }
@@ -145,6 +153,8 @@ class AppExtension extends AbstractExtension
             new TwigFunction('getMatomoGoalId', [$this, 'getMatomoGoalId']),
             new TwigFunction('getKeywordReferenceAndSynonyms', [$this, 'getKeywordReferenceAndSynonyms']),
             new TwigFunction('userAdminOfOrganization', [$this, 'userAdminOfOrganization']),
+            new TwigFunction('aidGetLockedByAnother', [$this, 'aidGetLockedByAnother']),
+            new TwigFunction('projectGetLockedByAnother', [$this, 'projectGetLockedByAnother']),
         ];
     }
 
@@ -303,5 +313,23 @@ class AppExtension extends AbstractExtension
     public function userAdminOfOrganization(?User $user, ?Organization $organization): bool
     {
         return $this->organizationService->userAdminOf($user, $organization);
+    }
+
+    public function aidGetLockedByAnother(Aid $aid): ?AidLock
+    {
+        if ($this->aidService->isLockedByAnother($aid, $this->userService->getUserLogged())) {
+            return $this->aidService->getLock($aid);
+        } else {
+            return null;
+        }
+    }
+
+    public function projectGetLockedByAnother(Project $project): ?ProjectLock
+    {
+        if ($this->projectService->isLockedByAnother($project, $this->userService->getUserLogged())) {
+            return $this->projectService->getLock($project);
+        } else {
+            return null;
+        }
     }
 }

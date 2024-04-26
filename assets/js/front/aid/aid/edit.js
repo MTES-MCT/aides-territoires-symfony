@@ -46,6 +46,10 @@ $(function(){
 
     // quand on arrive sur la page prete, on lock
     lock();
+    // toutes les 2 minutes, on update le lock en le relancant
+    setInterval(function() {
+        lock();
+    }, 2 * 60 * 1000);
 });
 
 // quand on quitte la page

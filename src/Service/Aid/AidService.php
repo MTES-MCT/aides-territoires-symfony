@@ -58,7 +58,16 @@ class AidService
     }
     public function isLockedByAnother(Aid $aid, User $user): bool
     {
+        $now = new \DateTime(date('Y-m-d H:i:s'));
+        $minutesMax = 5;
         foreach ($aid->getAidLocks() as $aidLock) {
+            // si le lock a plus de 5 min, on le supprime
+            if ($aidLock->getTimeStart() < $now->sub(new \DateInterval('PT'.$minutesMax.'M'))) {
+                $this->managerRegistry->getManager()->remove($aidLock);
+                $this->managerRegistry->getManager()->flush();
+                continue;
+            }
+
             if ($aidLock->getUser() != $user) {
                 return true;
             }
@@ -81,6 +90,18 @@ class AidService
                 $aidLock->setUser($user);
                 $this->managerRegistry->getManager()->persist($aidLock);
                 $this->managerRegistry->getManager()->flush();
+            } else {
+                $aidLock = (isset($aid->getAidLocks()[0]) && $aid->getAidLocks()[0] instanceof AidLock)
+                            ? $aid->getAidLocks()[0]
+                            : null;
+                // on met à jour le lock si le user et l'aide sont bien les mêmes
+                if ($aidLock && $aidLock->getUser() == $user && $aidLock->getAid() == $aid) {
+                    $aidLock->setTimeStart(new \DateTime(date('Y-m-d H:i:s')));
+                    $aidLock->setAid($aid);
+                    $aidLock->setUser($user);
+                    $this->managerRegistry->getManager()->persist($aidLock);
+                    $this->managerRegistry->getManager()->flush();
+                }
             }
         } catch (\Exception $e) {
         }

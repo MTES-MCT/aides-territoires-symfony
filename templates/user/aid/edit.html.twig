@@ -6,7 +6,10 @@
     {% if isLockedByAnother %}
         <div class="fr-alert fr-alert--info fr-alert--sm fr-my-2w">
             <p>
-                L'aide est en cours d'édition {% if getLock %}par {{ getLock.user.email }} depuis {{ getLock.timeStart|date('d/m/Y H:i:s') }}{% endif %}
+                L'aide est en cours d'édition {% if getLock %}par {{ getLock.user.email }} depuis {{ getLock.timeStart|date('d/m/Y H:i:s') }}{% endif %}. 
+            </p>
+            <p>
+                Le déverouillage peu prendre jusqu'à 5 minutes.
             </p>
             {% if userAdminOf is defined and userAdminOf %}
                 <p>Vous pouvez forcer le débloquage si vous pensez qu'il s'agit d'une erreur</p>
