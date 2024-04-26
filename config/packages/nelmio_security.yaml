@@ -19,6 +19,11 @@ nelmio_security:
                 enabled: false
             #recevoir les rapports sans appliquer la politique de sécurité de contenu.
             #report-uri: '%router.request_context.base_url%/nelmio/csp/report'
+            frame-ancestors:
+                - 'self'
+                - 'https://aides-territoires-stage.s3.fr-par.scw.cloud'
+                - 'https://aides-territoires-prod.s3.fr-par.scw.cloud'
+
             #définit la politique par défaut utilisée dans tous les cas (fonts, CSS, JavaScript, Frames, etc.) lorsqu’elle a la valeur ‘self’.
             default-src:
                 - 'self'
