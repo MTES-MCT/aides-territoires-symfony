@@ -37,13 +37,17 @@ $(function() {
         // newElem.appendTo(list);
 
         // launchTrumbowyg(newElem.find('textarea'));
+        var range = document.createRange();
+        var fragment = range.createContextualFragment(newWidget);
 
-        var newElem = document.createElement('div');
-        $(newElem).addClass('collection-item-wrapper-generic fr-mb-2w');
-        newElem.innerHTML = newWidget;
-        list.append(newElem);
+        var wrapper = document.createElement('div');
+        wrapper.className = 'collection-item-wrapper-generic fr-mb-2w';
+        wrapper.appendChild(fragment);
 
-        launchTrumbowyg($(newElem).find('textarea'));
+        list.append(wrapper);
+        
+
+        launchTrumbowyg($(wrapper).find('textarea'));
     });
 
 });
