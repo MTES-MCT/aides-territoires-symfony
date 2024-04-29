@@ -32,13 +32,15 @@ $(function() {
         // And store it, the length cannot be used if deleting widgets is allowed
         list.data('widget-counter', counter);
 
-        // create a new list element and add it to the list
-        // var newElem = jQuery(jQuery(list.attr('data-widget-tags')).html(newWidget));
-        // newElem.appendTo(list);
-
-        // launchTrumbowyg(newElem.find('textarea'));
         var range = document.createRange();
-        var fragment = range.createContextualFragment(newWidget);
+        var fragment = range.createContextualFragment('');
+        var tempDiv = document.createElement('div');
+        tempDiv.innerHTML = newWidget;
+
+        while (tempDiv.firstChild) {
+            fragment.appendChild(tempDiv.firstChild);
+        }
+
 
         var wrapper = document.createElement('div');
         wrapper.className = 'collection-item-wrapper-generic fr-mb-2w';
