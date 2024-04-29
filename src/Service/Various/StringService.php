@@ -35,8 +35,9 @@ class StringService
 
         $return = implode(array_slice($parts, 0, $last_part));
         if (strlen($text) > $length) {
-            $return .= '...';
+            $return = substr($return, 0, $length - 3) . '...';
         }
+
         return $return;
     }
 
