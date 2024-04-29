@@ -26,6 +26,55 @@ class PerimeterRepository extends ServiceEntityRepository
         parent::__construct($registry, Perimeter::class);
     }
 
+    public function countNbByOrganization(array $params = []): array
+    {
+        $scalePerimeter = $params['scalePerimeter'] ?? null;
+        $organizationTypeSlug = $params['organizationTypeSlug'] ?? null;
+        if (!$scalePerimeter) {
+            return [];
+        }
+        $sqlParams = [
+            'scalePerimeter' => $scalePerimeter
+        ];
+
+        if ($organizationTypeSlug) {
+            $subSqlOrganization = '
+                SELECT count(o.id)
+                FROM organization o 
+                INNER JOIN organization_type on organization_type.id = o.organization_type_id
+                WHERE o.perimeter_id = p.id
+                AND organization_type.slug = :organizationTypeSlug
+            ';
+            $sqlParams['organizationTypeSlug'] = $organizationTypeSlug;
+        } else {
+            $subSqlOrganization = '
+                SELECT count(o.id)
+                FROM organization o 
+                WHERE o.perimeter_id = p.id
+            ';
+        }
+
+
+        $sql = '
+        SELECT COUNT(name) as nb_perimeter, nb_organization
+        FROM (
+            SELECT DISTINCT (p.name) as name,
+            (
+                '. $subSqlOrganization .'
+            ) as nb_organization
+            FROM perimeter p 
+            WHERE p.`scale`  = :scalePerimeter
+        ) t
+        GROUP BY nb_organization
+        ORDER BY nb_organization;
+        ';
+        // lance la requete sql
+        $stmt = $this->getEntityManager()->getConnection()->prepare($sql);
+        $result = $stmt->executeQuery($sqlParams);
+
+        return $result->fetchAllAssociative();
+    }
+
     public function getIdPerimetersContainedIn(array $params = null) : array {
         $ids = [];
         
