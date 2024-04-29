@@ -33,7 +33,7 @@ $(function() {
         list.data('widget-counter', counter);
 
         // create a new list element and add it to the list
-        var newElem = jQuery(list.attr('data-widget-tags')).html(newWidget);
+        var newElem = jQuery(list.attr('data-widget-tags')).append(newWidget);
         newElem.appendTo(list);
 
         launchTrumbowyg(newElem.find('textarea'));
