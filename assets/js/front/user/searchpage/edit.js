@@ -33,10 +33,21 @@ $(function() {
         list.data('widget-counter', counter);
 
         // create a new list element and add it to the list
-        var newElem = jQuery(list.attr('data-widget-tags')).html(newWidget);
-        newElem.appendTo(list);
+        // var newElem = jQuery(jQuery(list.attr('data-widget-tags')).html(newWidget));
+        // newElem.appendTo(list);
 
-        launchTrumbowyg(newElem.find('textarea'));
+        // launchTrumbowyg(newElem.find('textarea'));
+        var range = document.createRange();
+        var fragment = range.createContextualFragment(newWidget);
+
+        var wrapper = document.createElement('div');
+        wrapper.className = 'collection-item-wrapper-generic fr-mb-2w';
+        wrapper.appendChild(fragment);
+
+        list.append(wrapper);
+        
+
+        launchTrumbowyg($(wrapper).find('textarea'));
     });
 
 });
