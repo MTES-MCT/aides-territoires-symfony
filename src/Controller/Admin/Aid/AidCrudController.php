@@ -12,6 +12,7 @@ use App\Controller\Admin\Filter\Aid\AidInstructorFilter;
 use App\Controller\Admin\Filter\Aid\AidKeywordReferenceSearchFilter;
 use App\Controller\Admin\Filter\Aid\AidNoReferenceFilter;
 use App\Controller\Admin\Filter\Aid\AidReferenceSearchFilter;
+use App\Controller\Admin\Filter\Aid\AidReferenceSearchObjectFilter;
 use App\Controller\Admin\Filter\Aid\AidStateFilter;
 use App\Entity\Aid\Aid;
 use App\Entity\Perimeter\Perimeter;
@@ -98,6 +99,7 @@ class AidCrudController extends AtCrudController
             ->add('projectReferences')
             ->add(AidKeywordReferenceSearchFilter::new('keyReferenceSearch', 'Recherche de mot-clé référence'))
             ->add(AidReferenceSearchFilter::new('referenceSearch', 'Recherche de référence'))
+            ->add(AidReferenceSearchObjectFilter::new('referenceSearchObject', 'Recherche de référence (objets uniquement)'))
             ->add(AidNoReferenceFilter::new('noReference', 'Pas de projet référent associé'))
             
             // most of the times there is no need to define the
