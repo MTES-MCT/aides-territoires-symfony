@@ -5,9 +5,20 @@
 
 {% block stats_content %}
 <section class="container">
-    <h1>Statistiques Communes</h1>
-    <div class="my-4 chart-max-size">{{ render_chart(chartRegistrationByMonth) }}</div>
+    <h1>Statistiques Utilisateurs</h1>
     <div class="my-4">
+    <ul>
+        <li>{{ nbUsers }} utilisateurs enregistrés en base</li>
+        <li>{{ nbLoggedAtLeastOnce }} ({{ percentNbLoggedAtLeastOnce }}%) se sont connecté au moins une fois</li>
+        <li>{{ nbUsersLoggedOnce }} ({{ percentNbUsersLoggedOnce }}%) ne se sont connecté qu'une seule fois</li>
+    </ul>
+        
+    </div>
+
+    <div class="my-4 chart-max-size">{{ render_chart(chartLoginsByQuarter) }}</div>
+    <div class="my-4 chart-max-size">{{ render_chart(chartLoginsByMonth) }}</div>
+    <div class="my-4 chart-max-size">{{ render_chart(chartLoginsByWeek) }}</div>
+    {#<div class="my-4">
         <a href="{{ url('admin_statistics_commune_export_registration_by_month') }}" class="btn btn-primary">
             <i class="fas fa-file-csv"></i> Export CSV
         </a>
@@ -18,6 +29,6 @@
         <a href="{{ path('admin_statistics_commune_export_nb_ap_by_month') }}" class="btn btn-primary">
             <i class="fas fa-file-csv"></i> Export CSV
         </a>
-    </div>
+    </div> #}
 </section>
 {% endblock %}
