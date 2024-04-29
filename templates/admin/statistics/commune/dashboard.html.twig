@@ -8,7 +8,8 @@
     <h1>Communes statistiques</h1>
     <div class="my-4 chart-max-size">{{ render_chart(chartRegistrationByMonth) }}</div>
     <div class="my-4">
-        <a href="{{ path('admin_statistics_commune_export_registration_by_month') }}" class="btn btn-primary">
+        {# <a href="{{ url('admin_statistics_commune_export_registration_by_month') }}" class="btn btn-primary"> #}
+        <a href="{{ ea_url().setController('App\\Controller\\Admin\\Statistics\\CommuneController::class').setAction('exportRegistrationByMonth') }}" class="btn btn-primary">
             <i class="fas fa-file-csv"></i> Export CSV
         </a>
     </div>

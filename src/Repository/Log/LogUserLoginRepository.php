@@ -24,6 +24,49 @@ class LogUserLoginRepository extends ServiceEntityRepository
         parent::__construct($registry, LogUserLogin::class);
     }
 
+    public function getLoginFrequencies()
+    {
+        $qb = $this->createQueryBuilder('l');
+
+        // Une fois seulement
+        $once = $qb->select('count(distinct l.user)')
+            ->from(LogUserLogin::class, 'l')
+            ->groupBy('l.user')
+            ->having('count(l.user) = 1')
+            ->getQuery()
+            ->getSingleScalarResult();
+
+        // Une fois par trimestre
+        $quarterly = $qb->select('count(distinct l.user)')
+            ->from(LogUserLogin::class, 'l')
+            ->groupBy('l.user')
+            ->having('count(l.user) <= 4')
+            ->getQuery()
+            ->getSingleScalarResult();
+
+        // Une fois par mois
+        $monthly = $qb->select('count(distinct l.user)')
+            ->from(LogUserLogin::class, 'l')
+            ->groupBy('l.user')
+            ->having('count(l.user) <= 12')
+            ->getQuery()
+            ->getSingleScalarResult();
+
+        // Au moins une fois par semaine
+        $weekly = $qb->select('count(distinct l.user)')
+            ->from(LogUserLogin::class, 'l')
+            ->groupBy('l.user')
+            ->having('count(l.user) > 52')
+            ->getQuery()
+            ->getSingleScalarResult();
+
+        return [
+            'once' => $once,
+            'quarterly' => $quarterly,
+            'monthly' => $monthly,
+            'weekly' => $weekly,
+        ];
+    }
     public function countCustom(?array $params = null): int
     {   
         $distinctUser = $params['distinctUser'] ?? null;

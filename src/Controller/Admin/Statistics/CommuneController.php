@@ -8,7 +8,6 @@ use App\Entity\Organization\Organization;
 use App\Entity\Organization\OrganizationType;
 use App\Entity\Perimeter\Perimeter;
 use Doctrine\Persistence\ManagerRegistry;
-use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractDashboardController;
 use OpenSpout\Common\Entity\Cell;
 use OpenSpout\Common\Entity\Row;
@@ -18,18 +17,17 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\UX\Chartjs\Builder\ChartBuilderInterface;
 use Symfony\UX\Chartjs\Model\Chart;
 
-class CommuneController extends AbstractDashboardController
+class CommuneController extends DashboardController
 {
-    public function __construct(
-        protected ManagerRegistry $managerRegistry,
-        protected ChartBuilderInterface $chartBuilderInterface,
-    )
-    {   
-    }
+    // public function __construct(
+    //     protected ManagerRegistry $managerRegistry,
+    //     protected ChartBuilderInterface $chartBuilderInterface,
+    // )
+    // {   
+    // }
 
     #[Route('/admin/statistics/commune/dashboard', name: 'admin_statistics_commune_dashboard')]
     public function communeDashboard(
-        AdminContext $adminContext,
     ): Response
     {
         // compte les inscriptions de commune mois par mois
