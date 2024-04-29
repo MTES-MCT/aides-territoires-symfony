@@ -3,7 +3,11 @@ $(function(t) {
         submit: function(e) {
             n = document.querySelectorAll('input[type="checkbox"].form-batch-checkbox:checked');
             n.forEach((function(e, i) {
-                $('#form-project-reference-association').append('<input type="hidden" name="batchActionEntityIds['+i+']" value="'+e.value+'">');
+                $('<input>', {
+                    type: 'hidden',
+                    name: 'batchActionEntityIds['+i+']',
+                    value: e.value
+                }).appendTo('#form-project-reference-association');
             }));
         }
     }, '#form-project-reference-association');
@@ -12,7 +16,11 @@ $(function(t) {
         submit: function(e) {
             n = document.querySelectorAll('input[type="checkbox"].form-batch-checkbox:checked');
             n.forEach((function(e, i) {
-                $('#form-keyword-reference-association').append('<input type="hidden" name="batchActionEntityIds['+i+']" value="'+e.value+'">');
+                $('<input>', {
+                    type: 'hidden',
+                    name: 'batchActionEntityIds['+i+']',
+                    value: e.value
+                }).appendTo('#form-keyword-reference-association');
             }));
         }
     }, '#form-keyword-reference-association');
