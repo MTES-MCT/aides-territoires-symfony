@@ -40,6 +40,7 @@ doctrine:
                 IF: DoctrineExtensions\Query\Mysql\IfElse
                 WEEK: DoctrineExtensions\Query\Mysql\Week
                 JSON_CONTAINS: DoctrineExtensions\Query\Mysql\JsonContains
+                EXTRACT: DoctrineExtensions\Query\Mysql\Extract
 
 when@test:
     doctrine:

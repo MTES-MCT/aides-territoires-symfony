@@ -50,6 +50,30 @@ class AidProjectRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult()[0]['nb'] ?? 0;
     }
 
+    public function countCreatedByMonth(array $params = []): array
+    {
+        $organizationTypeSlug = $params['organizationTypeSlug'] ?? null;
+
+        $qb = $this->getQueryBuilder($params);
+        $qb
+        ->select('COUNT(DISTINCT(ap.id)) as nb, DATE_FORMAT(ap.dateCreate, \'%Y-%m\') as mois')
+        ->innerJoin('ap.project', 'project')
+        ->innerJoin('project.organization', 'organization')
+        ;
+        if ($organizationTypeSlug) {
+            $qb
+            ->innerJoin('organization.organizationType', 'organizationType')
+            ->andWhere('organizationType.slug = :organizationTypeSlug')
+            ->setParameter('organizationTypeSlug', $organizationTypeSlug)
+            ;
+        }
+        $qb
+        ->groupBy('mois')
+        ->orderBy('mois', 'ASC')
+        ;
+        return $qb->getQuery()->getResult();
+    }
+
     public function getQueryBuilder(array $params = null): QueryBuilder
     {
         $aid = $params['aid'] ?? null;

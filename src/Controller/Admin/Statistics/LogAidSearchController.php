@@ -41,7 +41,7 @@ class LogAidSearchController extends DashboardController
             'dateCreateMin' => $dateMin,
             'dateCreateMax' => $dateMax,
             'hasSearch' => true,
-            'resultsCountMax' => 30,
+            'resultsCountMax' => 10,
             'orderBy' => [
                 'sort' => 'l.timeCreate',
                 'order' => 'DESC'

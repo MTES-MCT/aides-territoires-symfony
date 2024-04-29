@@ -51,6 +51,19 @@ class OrganizationRepository extends ServiceEntityRepository
         // return $this->countCustom($params);        
     }
 
+    public function countRegistrationsByMonth(array $params = []) : array
+    {
+        $params['perimeterIsObsolete'] = false;
+        $params['isImported'] = false;
+        $qb = $this->getQueryBuilder($params);
+        $qb
+        ->select('IFNULL(COUNT(DISTINCT(o.id)), 0) AS nb, DATE_FORMAT(o.dateCreate, \'%Y-%m\') AS month')
+        ->addGroupBy('month')
+        ->orderBy('month', 'ASC')
+        ;
+        return $qb->getQuery()->getResult();
+    }
+
     public function findCommunes(?array $params = null) : array
     {
         $params['typeSlug'] = OrganizationType::SLUG_COMMUNE;

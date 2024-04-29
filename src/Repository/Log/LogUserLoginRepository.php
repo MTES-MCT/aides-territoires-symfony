@@ -24,6 +24,110 @@ class LogUserLoginRepository extends ServiceEntityRepository
         parent::__construct($registry, LogUserLogin::class);
     }
 
+    public function getUniqueLoginsByYear(): array
+    {
+        return 
+            $this->createQueryBuilder('l')
+            ->select('
+            EXTRACT(YEAR FROM l.dateCreate) AS year,
+            COUNT(DISTINCT l.user) AS unique_users
+            ')
+            ->groupBy('year')
+            ->orderBy('year', 'ASC')
+            ->getQuery()
+            ->getResult()
+        ;
+    }
+
+    public function getUniqueLoginsByQuarters(): array
+    {
+        return 
+            $this->createQueryBuilder('l')
+            ->select('
+            EXTRACT(YEAR FROM l.dateCreate) AS year,
+            EXTRACT(QUARTER FROM l.dateCreate) AS quarter,
+            EXTRACT(MONTH FROM l.dateCreate) AS month,
+            COUNT(DISTINCT l.user) AS unique_users
+            ')
+            ->groupBy('year')
+            ->addGroupBy('quarter')
+            ->addGroupBy('month')
+            ->orderBy('year', 'ASC')
+            ->addOrderBy('quarter', 'ASC')
+            ->getQuery()
+            ->getResult()
+        ;
+    }
+
+    public function getUniqueLoginsByMonth(): array
+    {
+        return 
+            $this->createQueryBuilder('l')
+            ->select('
+            EXTRACT(YEAR FROM l.dateCreate) AS year,
+            EXTRACT(MONTH FROM l.dateCreate) AS month,
+            COUNT(DISTINCT l.user) AS unique_users
+            ')
+            ->groupBy('year')
+            ->addGroupBy('month')
+            ->orderBy('year', 'ASC')
+            ->addOrderBy('month', 'ASC')
+            ->getQuery()
+            ->getResult()
+        ;
+    }
+
+    public function getUniqueLoginsByWeek(): array
+    {
+        return 
+            $this->createQueryBuilder('l')
+            ->select('
+            EXTRACT(YEAR FROM l.dateCreate) AS year,
+            EXTRACT(WEEK FROM l.dateCreate) AS week,
+            EXTRACT(MONTH FROM l.dateCreate) AS month,
+            COUNT(DISTINCT l.user) AS unique_users
+            ')
+            ->groupBy('year')
+            ->addGroupBy('week')
+            ->addGroupBy('month')
+            ->orderBy('year', 'ASC')
+            ->addOrderBy('week', 'ASC')
+            ->getQuery()
+            ->getResult()
+        ;
+    }
+
+    public function countUsersLoggedAtLeastOnce(): int
+    {
+        return
+        $this->createQueryBuilder('l')
+        ->select('COUNT(DISTINCT l.user)')
+        ->getQuery()
+        ->getSingleScalarResult()
+        ;
+    }
+    public function countUsersLoggedOnce(): int
+    {
+        $sql = '
+        SELECT 
+            COUNT(*) AS nb
+        FROM (
+            SELECT 
+                user_id
+            FROM 
+                log_user_login
+            GROUP BY 
+                user_id
+            HAVING 
+                COUNT(*) = 1
+        ) AS users_once;
+        ';
+        // lance la requete sql
+        $stmt = $this->getEntityManager()->getConnection()->prepare($sql);
+        $result = $stmt->executeQuery();
+        $results = $result->fetchAllAssociative();
+        return (isset($results[0]) && isset($results[0]['nb'])) ? $results[0]['nb'] : 0;
+    }
     public function countCustom(?array $params = null): int
     {   
         $distinctUser = $params['distinctUser'] ?? null;
