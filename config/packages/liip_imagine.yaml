@@ -11,12 +11,12 @@ liip_imagine:
     twig:
         mode: lazy
 
-    default_filter_set_settings: 
-        format: webp        
+    # default_filter_set_settings: 
+    #     format: webp        
 
     # configure webp
-    webp:
-        generate: true
+    # webp:
+    #     generate: true
         
     resolvers :
         default :
