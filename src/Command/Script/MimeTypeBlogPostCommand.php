@@ -3,6 +3,7 @@
 namespace App\Command\Script;
 
 use App\Entity\Blog\BlogPost;
+use App\Service\File\FileService;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -27,7 +28,8 @@ class MimeTypeBlogPostCommand extends Command
 
     public function __construct(
         protected ManagerRegistry $managerRegistry,
-        protected ParamService $paramService
+        protected ParamService $paramService,
+        protected FileService $fileService
     )
     {
         ini_set('max_execution_time', 60*60);
@@ -118,7 +120,7 @@ class MimeTypeBlogPostCommand extends Command
                         $url = $this->paramService->get('cloud_image_url').$blogPost->getLogo();
 
                         // Télécharge le fichier à un emplacement temporaire
-                        $tempPath = tempnam(sys_get_temp_dir(), 'downloaded');
+                        $tempPath = tempnam($this->fileService->getUploadTmpDir(), '');
                         file_put_contents($tempPath, file_get_contents($url));
 
                         // Nom original du fichier tel que fourni par le client
