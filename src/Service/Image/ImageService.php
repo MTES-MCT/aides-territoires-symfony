@@ -22,16 +22,11 @@ class ImageService
     {
     }
 
-        /**
+    /**
      * Envoi une image (deja uploadee / traitee sur le serveur) sur le cloud
-     *
-     * @param UploadedFile $file
-     * @param string $uploadDir
-     * @param string $fileName
-     * @return boolean
      */
     public function sendImageToCloud(
-        UploadedFile $file,
+        string $file,
         string $uploadDir,
         string $fileName
     ): bool
