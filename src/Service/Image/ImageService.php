@@ -31,7 +31,7 @@ class ImageService
      * @return boolean
      */
     public function sendImageToCloud(
-        string $file,
+        UploadedFile $file,
         string $uploadDir,
         string $fileName
     ): bool
@@ -73,6 +73,7 @@ class ImageService
                 'Key'    => $fileName,
                 'SourceFile' => $file,
                 'ACL'    => 'public-read',
+                'ContentType' => mime_content_type($file)
             ]);
 
             // suppression fichier temporaire
@@ -175,6 +176,7 @@ class ImageService
                 'Key'    => $fileName,
                 'SourceFile' => $tmpFile,
                 'ACL'    => 'public-read',
+                'ContentType' => mime_content_type($file)
             ]);
             
             // suppression fichier temporaire

@@ -32,4 +32,5 @@ return [
     Knp\Bundle\GaufretteBundle\KnpGaufretteBundle::class => ['all' => true],
     Gregwar\CaptchaBundle\GregwarCaptchaBundle::class => ['all' => true],
     Sentry\SentryBundle\SentryBundle::class => ['prod' => true],
+    League\FlysystemBundle\FlysystemBundle::class => ['all' => true],
 ];

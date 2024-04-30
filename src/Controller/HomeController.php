@@ -14,6 +14,7 @@ use App\Repository\Program\ProgramRepository;
 use App\Repository\Project\ProjectRepository;
 use App\Service\Aid\AidSearchFormService;
 use App\Service\Various\StringService;
+use Liip\ImagineBundle\Service\FilterService;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;

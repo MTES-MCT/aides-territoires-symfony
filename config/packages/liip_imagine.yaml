@@ -1,12 +1,17 @@
 # Documentation on how to configure the bundle can be found at: https://symfony.com/doc/current/bundles/LiipImagineBundle/basic-usage.html
 liip_imagine:
+    loaders:
+        s3_loader:
+            flysystem:
+                filesystem_service: 's3.storage'
+
     # valid drivers options include "gd" or "gmagick" or "imagick"
     driver: "gd"
 
     twig:
         mode: lazy
 
-    default_filter_set_settings:
+    default_filter_set_settings: 
         format: webp        
 
     # configure webp
@@ -16,19 +21,32 @@ liip_imagine:
     resolvers :
         default :
             web_path : ~
-
+        s3_resolver:
+            flysystem:
+                filesystem_service: 's3.storage'
+                root_url: '%env(CLOUD_IMAGE_URL)%'
+                cache_prefix: 'imagine'
     filter_sets :
         # cache : ~
         
         # the name of the "filter set"
-        product_thumb :
-        
-            # adjust the image quality to 75%
+        blog_thumb_desktop :
+            data_loader: 's3_loader'
+            cache: 's3_resolver'
             quality : 75
-
-            # list of transformations to apply (the "filters")
             filters :
+                thumbnail  : { size : [234, 196], mode : outbound }
 
-                # create a thumbnail: set size to 120x90 and use the "outbound" mode
-                # to crop the image when the size ratio of the input differs
-                thumbnail  : { size : [350, 350], mode : outbound }
+        blog_thumb_mobile :
+            data_loader: 's3_loader'
+            cache: 's3_resolver'
+            quality : 75
+            filters :
+                thumbnail  : { size : [394, 221], mode : outbound }
+
+        blog_preview_desktop :
+            data_loader: 's3_loader'
+            cache: 's3_resolver'
+            quality : 75
+            filters :
+                thumbnail  : { size : [399, 268], mode : outbound }

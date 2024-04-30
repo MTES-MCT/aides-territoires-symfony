@@ -53,11 +53,11 @@
         <div class="fr-card__header">
             <div class="fr-card__img">
                 {% if project.image %}
-                <img class="fr-responsive-img" src="{{ getParameter('cloud_image_url') }}{{ project.image }}" alt="Logo {{ project.name }}"/>    
+                <img class="fr-responsive-img" src="{{ getParameter('cloud_image_url') }}{{ project.image }}" alt="Logo {{ project.name }}" loading="lazy" />    
                 {% else %}
                 <picture>
                     <source srcset="{{ asset('build/images/project/project_illustration.webp') }}">
-                    <img src="{{ asset('build/images/project/project_illustration.png') }}" class="fr-responsive-img" alt="Logo par défaut" />
+                    <img src="{{ asset('build/images/project/project_illustration.png') }}" class="fr-responsive-img" alt="Logo par défaut" loading="lazy" />
                 </picture>
                 {% endif %}
             </div>
