@@ -150,6 +150,7 @@ class MimeTypeBlogPostCommand extends Command
 
 
             } catch (\Exception $e) {
+                $io->error($blogPost->getLogo());
                 // $io->error($e->getMessage());
                 continue;
             }
