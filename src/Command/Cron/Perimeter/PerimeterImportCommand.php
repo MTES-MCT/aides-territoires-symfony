@@ -44,14 +44,14 @@ class PerimeterImportCommand extends Command
         $io = new SymfonyStyle($input, $output);
 
         try {
-            $perimeterImport = $this->managerRegistry->getRepository(PerimeterImport::class)->find(88);
-        
             // la demande d'import de périmètre adhoc la plus récente
             $perimeterImport = $this->managerRegistry->getRepository(PerimeterImport::class)->findNextToImport();
             if (!$perimeterImport instanceof PerimeterImport) {
-                $io->error('Erreur : périmètre introuvable');
+                $io->error('Erreur : rien a importer');
                 return Command::SUCCESS;
             }
+
+            dd($perimeterImport);
     
             if ($perimeterImport->isImportProcessing()) {
                 $io->error('Erreur : périmètre déjà en cours d\'import');
