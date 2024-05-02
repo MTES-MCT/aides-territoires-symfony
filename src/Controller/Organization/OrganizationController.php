@@ -281,9 +281,14 @@ class OrganizationController extends FrontController
         $formAccesses->handleRequest($requestStack->getCurrentRequest());
         if ($formAccesses->isSubmitted()) {
             if ($formAccesses->isValid() && $userAdminOf) {
-                $managerRegistry->getManager()->persist($organization);
-                $managerRegistry->getManager()->flush();
-                $this->addFlash(FrontController::FLASH_SUCCESS, 'Vos modifications ont été enregistrées avec succès.');
+                // vérifie qu'il reste au moins 1 admin dans le groupe
+                if (!$organizationService->hasOneAdminAtLeast($organization)) {
+                    $this->addFlash(FrontController::FLASH_ERROR, 'Il doit y avoir au moins un administrateur.');
+                } else {
+                    $managerRegistry->getManager()->persist($organization);
+                    $managerRegistry->getManager()->flush();
+                    $this->addFlash(FrontController::FLASH_SUCCESS, 'Vos modifications ont été enregistrées avec succès.');
+                }
                 return $this->redirectToRoute('app_organization_collaborateurs', ['id' => $organization->getId()]);
             } else {
                 $this->addFlash(FrontController::FLASH_ERROR, 'Le formulaire contient des erreurs.');

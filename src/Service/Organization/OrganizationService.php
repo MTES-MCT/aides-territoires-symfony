@@ -14,6 +14,17 @@ class OrganizationService
     ) {
     }
 
+    public function hasOneAdminAtLeast(Organization $organization): bool
+    {
+        foreach ($organization->getOrganizationAccesses() as $organizationAccess) {
+            if ($organizationAccess->isAdministrator()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+    
     public function canViewEdit(?User $user, ?Organization $organization): bool
     {
         return $this->userMemberOf($user, $organization);
