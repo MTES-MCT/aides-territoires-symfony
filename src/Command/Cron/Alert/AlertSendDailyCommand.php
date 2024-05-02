@@ -71,6 +71,8 @@ class AlertSendDailyCommand extends Command
 
     protected function cronTask($input, $output)
     {
+        $timeStart = microtime(true);
+
         $io = new SymfonyStyle($input, $output);
 
         // donne le contexte au router pour generer l'url beta ou prod
@@ -101,6 +103,8 @@ class AlertSendDailyCommand extends Command
             $aidParams =[
                 'showInSearch' => true,
                 'publishedAfter' => $publishedAfter,
+                'noRelaunch' => true,
+                'noPostPopulate' => true
             ];
             $aidParams = array_merge($aidParams, $this->aidSearchFormService->convertAidSearchClassToAidParams($aidSearchClass));
 
@@ -149,7 +153,11 @@ class AlertSendDailyCommand extends Command
         $admin = $this->managerRegistry->getRepository(User::class)->findOneBy(['email' => $this->paramService->get('email_super_admin')]);
         $this->notificationService->addNotification($admin, 'Envoi des alertes quotidiennes', $nbAlertSend. ' alertes envoyées pour les aides publiées après le ' . $publishedAfter->format('d/m/Y') . ' inclus');
         
+        $timeEnd = microtime(true);
+        $time = $timeEnd - $timeStart;
+
         // success
+        $io->success('Temps écoulé : '.gmdate("H:i:s", $timeEnd).' ('.gmdate("H:i:s", intval($time)).')');
         $io->success($nbAlertSend. ' alertes envoyées');
         $io->success('Mémoire maximale utilisée : ' . round(memory_get_peak_usage() / 1024 / 1024) . ' MB');
     }
