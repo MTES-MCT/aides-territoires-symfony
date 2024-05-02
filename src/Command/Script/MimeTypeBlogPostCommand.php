@@ -81,6 +81,7 @@ class MimeTypeBlogPostCommand extends Command
         $blogPosts = $this->managerRegistry->getRepository(BlogPost::class)->findBy(
             [],
             ['id' => 'DESC'],
+            2
 
         );
         foreach ($blogPosts as $blogPost) {
