@@ -150,7 +150,9 @@
                 "opcache.preload=config/preload.php",
                 "opcache.preload_user=appsdeck",
                 "realpath_cache_size=4096K",
-                "realpath_cache_ttl=600"
+                "realpath_cache_ttl=600",
+                "date.timezone=Europe/Paris",
+                "session.gc_maxlifetime=7200"
             ],
             "nginx-includes": [
                 ".scalingo/nginx/server.location"
