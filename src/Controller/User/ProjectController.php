@@ -189,6 +189,15 @@ class ProjectController extends FrontController
 
         $form->handleRequest($requestStack->getCurrentRequest());
         if ($form->isSubmitted()) {
+            // vérifie que fiche non bloqué avant la sauvegarde
+            if ($isLockedByAnother) {
+                $this->addFlash(FrontController::FLASH_ERROR, 'La fiche est actuellement verouillée par un autre utilisateur.');
+                // redirection
+                return $this->redirectToRoute('app_user_project_details_fiche_projet', [
+                    'id' => $id,
+                    'slug' => $slug
+                ]);
+            }
             if ($form->isValid()) {
                 // traitement image
                 $imageFile = $form->get('imageUploadedFile')->getData();
@@ -733,13 +742,6 @@ class ProjectController extends FrontController
         $response->headers->set('Content-Disposition', 'inline; filename="'.$filename.'.pdf"');
 
         return $response;
-
-        // // Output the generated PDF to Browser (inline view)
-        // $response = $dompdf->stream($filename.'.pdf', [
-        //     "Attachment" => false
-        // ]);
-
-        // return $response;
     }
 
 
@@ -751,8 +753,7 @@ class ProjectController extends FrontController
         UserService $userService,
         ProjectValidatedRepository $projectValidatedRepository,
         ProjectRepository $projectRepository,
-        RequestStack $requestStack,
-        ReferenceService $referenceService
+        RequestStack $requestStack
     ): Response
     {
         // gestion pagination

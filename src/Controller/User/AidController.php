@@ -259,6 +259,12 @@ class AidController extends FrontController
         $formDelete = $this->createForm(AidDeleteType::class);
         $formDelete->handleRequest($requestStack->getCurrentRequest());
         if ($formDelete->isSubmitted()) {
+            // vérifie que fiche non bloqué avant la sauvegarde
+            if ($isLockedByAnother) {
+                $this->addFlash(FrontController::FLASH_ERROR, 'La fiche est actuellement verouillée par un autre utilisateur.');
+                // redirection
+                return $this->redirectToRoute('app_user_aid_publications');
+            }
             if ($formDelete->isValid() && !$isLockedByAnother) {
                 // suppression aide
                 $managerRegistry->getManager()->remove($aid);
@@ -279,7 +285,13 @@ class AidController extends FrontController
         $formAid = $this->createForm(AidEditType::class, $aid, ['allowStatusPublished' => true]);
         $formAid->handleRequest($requestStack->getCurrentRequest());
         if ($formAid->isSubmitted()) {
-            if ($formAid->isValid() && !$isLockedByAnother) {
+            // vérifie que fiche non bloqué avant la sauvegarde
+            if ($isLockedByAnother) {
+                $this->addFlash(FrontController::FLASH_ERROR, 'La fiche est actuellement verouillée par un autre utilisateur.');
+                // redirection
+                return $this->redirectToRoute('app_user_aid_edit', ['slug' => $aid->getSlug()]);
+            }
+            if ($formAid->isValid()) {
                 // les financers
                 foreach ($aid->getAidFinancers() as $aidFinancer) {
                     $aid->removeAidFinancer($aidFinancer);

@@ -588,6 +588,12 @@ class OrganizationController extends FrontController
         }
         $form->handleRequest($requestStack->getCurrentRequest());
         if ($form->isSubmitted()) {
+            // vérifie que fiche non bloqué avant la sauvegarde
+            if ($isLockedByAnother) {
+                $this->addFlash(FrontController::FLASH_ERROR, 'La fiche est actuellement verouillée par un autre utilisateur.');
+                // redirection
+                return $this->redirectToRoute('app_organization_backer_edit', ['id' => $organization->getId(), 'idBacker' => $backer->getId()]);
+            }
             if ($form->isValid() && $userCanEditBacker) {
                 // traitement image
                 $logoFile = $form->get('logoFile')->getData();
@@ -726,7 +732,6 @@ class OrganizationController extends FrontController
                 'success' => true
             ]);
         } catch (\Exception $e) {
-            dd($e->getMessage());
             return new JsonResponse([
                 'success' => false
             ]);

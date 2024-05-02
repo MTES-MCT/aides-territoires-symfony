@@ -105,6 +105,12 @@ class PortalController extends FrontController
         $form = $this->createForm(SearchPageEditType::class, $searchPage);
         $form->handleRequest($requestStack->getCurrentRequest());
         if ($form->isSubmitted()) {
+            // vérifie que fiche non bloqué avant la sauvegarde
+            if ($isLockedByAnother) {
+                $this->addFlash(FrontController::FLASH_ERROR, 'La fiche est actuellement verouillée par un autre utilisateur.');
+                // redirection
+                return $this->redirectToRoute('app_user_portal_edit', ['id' => $id]);
+            }
             if ($form->isValid() && $userCanEditPortal) {
                 // sauvegarde
                 $managerRegistry->getManager()->persist($searchPage);
