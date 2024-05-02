@@ -47,11 +47,11 @@ class AlertRepository extends ServiceEntityRepository
     public function findToSendDaily(array $params = null) : array {
         $yesterday = new \DateTime(date('Y-m-d', strtotime('-1 day')));
 
-        $params['dateLatestAlertMin'] = $yesterday;
+        // $params['dateLatestAlertMin'] = $yesterday;
         $params['hasQueryString'] = true;
         $params['alertFrequency'] = Alert::FREQUENCY_DAILY_SLUG;
         $qb = $this->getQueryBuilder($params);
-
+dd($qb->getQuery()->getSql());
         return $qb->getQuery()->getResult();
     }
 
