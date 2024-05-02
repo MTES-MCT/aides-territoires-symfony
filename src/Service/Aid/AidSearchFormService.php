@@ -74,7 +74,7 @@ class AidSearchFormService
         if ($aidSearchClass->getAidTypes()) {
             $aidTypes = [];
             foreach ($aidSearchClass->getAidTypes() as $aidType) {
-                $aidTypes[] = $aidType->getSlug();
+                $aidTypes[] = $aidType->getId();
             }
             $params['aidTypes'] = $aidTypes;
         }
@@ -236,7 +236,6 @@ class AidSearchFormService
             }
         }
 
-
         // > les paramètres en query
 
         // < le user
@@ -371,6 +370,18 @@ class AidSearchFormService
         /**
          * > AidType
         */
+        if (isset($queryParams['aidTypes[]'])) {
+            if (!is_array($queryParams['aidTypes[]'])) {
+                $queryParams['aidTypes[]'] = [$queryParams['aidTypes[]']];
+            }
+            foreach ($queryParams['aidTypes[]'] as $idAidType) {
+                $aidType = $this->managerRegistry->getRepository(AidType::class)->find($idAidType);
+                if ($aidType instanceof AidType) {
+                    $aidSearchClass->addAidType($aidType);
+                }
+            }
+        }
+
         if (isset($queryParams['aidTypeGroup'])) {
             $aidTypeGroup = $this->managerRegistry->getRepository(AidTypeGroup::class)->findOneBy(['slug' => $queryParams['aidTypeGroup']]);
             if ($aidTypeGroup instanceof AidTypeGroup) {
@@ -731,7 +742,6 @@ class AidSearchFormService
                 }
             }
         }
-
 
         // clé qu'on veu pas garder
         $keysToDelete = [

@@ -200,7 +200,6 @@ class AidController extends FrontController
                 if ($user) {
                     try {
                         $queryString = trim($aidSearchFormService->convertAidSearchClassToQueryString($aidSearchClass));
-
                         if ($queryString == '') {
                             throw new \Exception('Veuillez sélectionner au moins un critère de recherche');
                         }
