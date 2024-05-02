@@ -2,8 +2,11 @@
 
 namespace App\Command\Cron\Alert;
 
+use App\Entity\Aid\Aid;
 use App\Entity\Alert\Alert;
+use App\Entity\Perimeter\Perimeter;
 use App\Entity\User\User;
+use App\Service\Aid\AidSearchClass;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputInterface;
@@ -55,10 +58,10 @@ class AlertSendDailyCommand extends Command
         $io->title($this->commandTextStart);
 
         try  {
-            if ($this->kernelInterface->getEnvironment() != 'prod') {
-                $io->info('Uniquement en prod');
-                return Command::FAILURE;
-            }
+            // if ($this->kernelInterface->getEnvironment() != 'prod') {
+            //     $io->info('Uniquement en prod');
+            //     return Command::FAILURE;
+            // }
             // generate menu
             $this->cronTask($input, $output);
         } catch (\Exception $exception) {
@@ -85,18 +88,52 @@ class AlertSendDailyCommand extends Command
         // pour le retour
         $nbAlertSend = 0;
 
-        // prépare les deux dates de publication à checker
+        // prépare la date de publication à checker
         $publishedAfter = new \DateTime(date('Y-m-d', strtotime('-1 day')));
 
+        // parametres pour requetes aides
+        $aidParams =[
+            'showInSearch' => true,
+            'publishedAfter' => $publishedAfter,
+        ];
+        // recupere les nouvelles aides qui correspondent à l'alerte
+        $aids = $this->aidService->searchAids($aidParams);
+        // les ids de périmètres de chaque aides
+        $aidsPerimeterIds = [];
+        foreach ($aids as $aid) {
+            $aidsPerimeterIds[$aid->getId()] = $this->managerRegistry->getRepository(Perimeter::class)->getIdPerimetersContainedIn([
+                'perimeter' => $aid->getPerimeter()
+            ]);
+        }
+
+        dump('avant filtre', count($aids));
         // pour chaque alerte on regarde si de nouvelles aide (datePublished = hier) correspondent
         /**@var Alert $alert */
         foreach ($alerts as $key => $alert) {
+            /** @var AidSearchClass $aidSearchClass */
             $aidSearchClass = $this->aidSearchFormService->getAidSearchClass(
                 params: [
                     'querystring' => $alert->getQuerystring(),
                     ]
             );
+            $aidParams = $this->aidSearchFormService->convertAidSearchClassToAidParams($aidSearchClass);
 
+            // on filtre les aides avec les paramètre de l'alerte
+            $alertAids = [];
+            foreach ($aids as $aid) {
+                if ($this->aidMatchAidSearchClass(
+                        $aid,
+                        $aidSearchClass,
+                        [
+                            'aidsPerimeterIds' => $aidsPerimeterIds[$aid->getId()] ?? []
+                        ]
+                    )
+                ) {
+                    $alertAids[] = $aid;
+                }
+            }
+
+            dd('apres filtre', count($alertAids));
             // parametres pour requetes aides
             $aidParams =[
                 'showInSearch' => true,
@@ -117,25 +154,25 @@ class AlertSendDailyCommand extends Command
                 $today = new \DateTime(date('Y-m-d H:i:s'));
                 $emailSubject = $emailSubjectPrefix . ' '. $today->format('d/m/Y') . ' — De nouvelles aides correspondent à vos recherches';
                 $subject = count($aids).' résultat'.(count($aids) > 1 ? 's' : '').' pour votre alerte';
-                // $this->emailService->sendEmail(
-                //     $alert->getEmail(),
-                //     $emailSubject,
-                //     'emails/alert/alert_send.html.twig',
-                //     [
-                //         'subject' => $subject,
-                //         'alert' => $alert,
-                //         'aids' => $aids,
-                //         'aidsDisplay' => array_slice($aids, 0, 3)
-                //     ]
-                // );
+                $this->emailService->sendEmail(
+                    $alert->getEmail(),
+                    $emailSubject,
+                    'emails/alert/alert_send.html.twig',
+                    [
+                        'subject' => $subject,
+                        'alert' => $alert,
+                        'aids' => $aids,
+                        'aidsDisplay' => array_slice($aids, 0, 3)
+                    ]
+                );
 
-                // $alert->setTimeLatestAlert($today);
-                // $alert->setDateLatestAlert($today);
-                // $this->managerRegistry->getManager()->persist($alert);
-                // // sauvegarde
-                // $this->managerRegistry->getManager()->flush();
-                // // libère mémoire
-                // $this->managerRegistry->getManager()->clear();
+                $alert->setTimeLatestAlert($today);
+                $alert->setDateLatestAlert($today);
+                $this->managerRegistry->getManager()->persist($alert);
+                // sauvegarde
+                $this->managerRegistry->getManager()->flush();
+                // libère mémoire
+                $this->managerRegistry->getManager()->clear();
                 // incrémente le compteur
                 $nbAlertSend++;
             }
@@ -152,6 +189,30 @@ class AlertSendDailyCommand extends Command
         // success
         $io->success($nbAlertSend. ' alertes envoyées');
         $io->success('Mémoire maximale utilisée : ' . round(memory_get_peak_usage() / 1024 / 1024) . ' MB');
+    }
+
+    private function aidMatchAidSearchClass(Aid $aid, AidSearchClass $aidSearchClass, array $params = []): bool
+    {
+        if ($aidSearchClass->getOrganizationType()) {
+            if ($aidSearchClass->getOrganizationType() != $aid->getOrganizationType()) {
+                return false;
+            }
+        }
+
+        if ($aidSearchClass->getSearchPerimeter()) {
+            if (!isset($params['aidsPerimeterIds'])) {
+                return false;
+            }
+            if (!in_array($aidSearchClass->getSearchPerimeter()->getId(), $params['aidsPerimeterIds'])) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private function aidMatchKeyword(Aid $aid, string $keyword)
+    {
+        
     }
 
 }
