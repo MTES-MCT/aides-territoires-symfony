@@ -104,11 +104,11 @@ class AidEditType extends AbstractType
             'class' => Organization::class,
             'choice_label' => function(Organization $organization) {
                 $return = $organization->getName();
-                if (!$organization->getBacker()) {
-                    $return .= ' (fiche porteur d\'aides à compléter)';
-                } else if ($organization->getBacker() && !$organization->getBacker()->isActive()) {
-                    $return .= ' (fiche porteur d\'aides en attente de validation)';
-                }
+                // if (!$organization->getBacker()) {
+                //     $return .= ' (fiche porteur d\'aides à compléter)';
+                // } else if ($organization->getBacker() && !$organization->getBacker()->isActive()) {
+                //     $return .= ' (fiche porteur d\'aides en attente de validation)';
+                // }
                 return $return;
             },
             'query_builder' => function(EntityRepository $entityRepository) {
@@ -124,33 +124,35 @@ class AidEditType extends AbstractType
         $organizationParams['choice_attr'] = function(Organization $organization) use ($aid) {
             // bloquage pour les nouvelles aides
             if (!$aid->getId()) {
-                if (!$organization->getBacker()) {
-                    return ['disabled' => true];
-                } else {
-                    return [];
-                }
+                return [];
+                // if (!$organization->getBacker()) {
+                //     return ['disabled' => true];
+                // } else {
+                //     return [];
+                // }
             } else {
+                return [];
                 // si aide existante, on empêche de changer d'organisation pour une non valide
-                if ($organization && $aid->getOrganization() && $organization->getId() === $aid->getOrganization()->getId()) {
-                    return [];
-                } else if (!$organization->getBacker()) {
-                    return ['disabled' => true];
-                } else {
-                    return [];
-                }
+                // if ($organization && $aid->getOrganization() && $organization->getId() === $aid->getOrganization()->getId()) {
+                //     return [];
+                // } else if (!$organization->getBacker()) {
+                //     return ['disabled' => true];
+                // } else {
+                //     return [];
+                // }
             }
         };
 
         if ($needUpdateBacker) {
-            $help = '<div class="fr-alert fr-alert--info">Pour choisir une structure, vous devez avoir remplir sa fiche Porteur d\'aides';
-            foreach ($user->getOrganizations() as $organization) {
-                if (!$organization->getBacker()) {
-                    $help .= '<br />- <a href="' . $this->routerInterface->generate('app_organization_backer_edit', ['id' => $organization->getId(), 'idBacker' => 0]) . '">' . $organization->getName() . '</a>';
-                }
-            }
-            $help .= '</div>';
-            $organizationParams['help'] = $help;
-            $organizationParams['help_html'] = true;
+            // $help = '<div class="fr-alert fr-alert--info">Pour choisir une structure, vous devez avoir remplir sa fiche Porteur d\'aides';
+            // foreach ($user->getOrganizations() as $organization) {
+            //     if (!$organization->getBacker()) {
+            //         $help .= '<br />- <a href="' . $this->routerInterface->generate('app_organization_backer_edit', ['id' => $organization->getId(), 'idBacker' => 0]) . '">' . $organization->getName() . '</a>';
+            //     }
+            // }
+            // $help .= '</div>';
+            // $organizationParams['help'] = $help;
+            // $organizationParams['help_html'] = true;
         }
 
         $builder
