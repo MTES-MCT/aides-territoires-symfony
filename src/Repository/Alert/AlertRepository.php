@@ -125,7 +125,7 @@ class AlertRepository extends ServiceEntityRepository
 
         if ($dateLatestAlertMax instanceof \DateTime) {
             $qb
-            ->andWhere('a.dateLatestAlert < :dateLatestAlertMax OR a.dateLatestAlertMax IS NULL')
+            ->andWhere('a.dateLatestAlert < :dateLatestAlertMax OR a.dateLatestAlert IS NULL')
             ->setParameter('dateLatestAlertMax', $dateLatestAlertMax)
             ;
         }
