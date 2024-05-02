@@ -50,8 +50,6 @@ class PerimeterImportCommand extends Command
                 $io->error('Erreur : rien a importer');
                 return Command::SUCCESS;
             }
-
-            dd($perimeterImport);
     
             if ($perimeterImport->isImportProcessing()) {
                 $io->error('Erreur : périmètre déjà en cours d\'import');
