@@ -47,7 +47,7 @@ liip_imagine:
             filters :
                 thumbnail  : { size : [394, 221], mode : outbound }
 
-        blog_preview_desktop :
+        blog_preview :
             data_loader: 's3_loader'
             cache: 's3_resolver'
             quality : 75

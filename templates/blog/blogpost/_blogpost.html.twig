@@ -17,7 +17,7 @@
 
     <div class="fr-card__header">
         <div class="fr-card__img">
-            <img src="{{ getParameter('cloud_image_url') }}{{ blogPost.logo }}" class="fr-responsive-img" alt="Illustration article {{ blogPost.name }}" loading="lazy" data-fr-js-ratio="true">
+            <img src="{{ blogPost.logo|imagine_filter('blog_preview') }}" class="fr-responsive-img" alt="Illustration article {{ blogPost.name }}" loading="lazy" data-fr-js-ratio="true">
         </div>
     </div>
 </div>
