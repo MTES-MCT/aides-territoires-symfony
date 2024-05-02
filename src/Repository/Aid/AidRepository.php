@@ -263,7 +263,7 @@ class AidRepository extends ServiceEntityRepository
             'sort' => 'a.timeCreate',
             'order' => 'DESC'
         ];
-        $params['isLive'] = true;
+        $params['showInSearch'] = true;
 
         $qb = $this->getQueryBuilder($params);
 
