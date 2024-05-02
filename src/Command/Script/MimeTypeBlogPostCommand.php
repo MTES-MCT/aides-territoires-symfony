@@ -147,8 +147,10 @@ class MimeTypeBlogPostCommand extends Command
 
                         $io->success("Fixed MIME type for {$blogPost->getLogo()}");
                     } else {
-                        $io->success("{$blogPost->getLogo()} à déjà {$mimeType}");
+                        $io->warning("{$blogPost->getLogo()} dans aucun type myme reconnu");
                     }
+                } else {
+                    $io->success("{$blogPost->getLogo()} à déjà {$mimeType}");
                 }
 
 
