@@ -121,25 +121,25 @@ class AlertSendDailyCommand extends Command
                 $today = new \DateTime(date('Y-m-d H:i:s'));
                 $emailSubject = $emailSubjectPrefix . ' '. $today->format('d/m/Y') . ' — De nouvelles aides correspondent à vos recherches';
                 $subject = count($aids).' résultat'.(count($aids) > 1 ? 's' : '').' pour votre alerte';
-                // $this->emailService->sendEmail(
-                //     $alert->getEmail(),
-                //     $emailSubject,
-                //     'emails/alert/alert_send.html.twig',
-                //     [
-                //         'subject' => $subject,
-                //         'alert' => $alert,
-                //         'aids' => $aids,
-                //         'aidsDisplay' => array_slice($aids, 0, 3)
-                //     ]
-                // );
+                $this->emailService->sendEmail(
+                    $alert->getEmail(),
+                    $emailSubject,
+                    'emails/alert/alert_send.html.twig',
+                    [
+                        'subject' => $subject,
+                        'alert' => $alert,
+                        'aids' => $aids,
+                        'aidsDisplay' => array_slice($aids, 0, 3)
+                    ]
+                );
 
-                // $alert->setTimeLatestAlert($today);
-                // $alert->setDateLatestAlert($today);
-                // $this->managerRegistry->getManager()->persist($alert);
-                // // sauvegarde
-                // $this->managerRegistry->getManager()->flush();
-                // // libère mémoire
-                // $this->managerRegistry->getManager()->clear();
+                $alert->setTimeLatestAlert($today);
+                $alert->setDateLatestAlert($today);
+                $this->managerRegistry->getManager()->persist($alert);
+                // sauvegarde
+                $this->managerRegistry->getManager()->flush();
+                // libère mémoire
+                $this->managerRegistry->getManager()->clear();
                 // incrémente le compteur
                 $nbAlertSend++;
             }
