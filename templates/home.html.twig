@@ -12,13 +12,11 @@
 	let departments_data = {{ departmentsData|json_encode|raw }};
 	</script>
 	{% endcspscript %}
-	{{ encore_entry_script_tags('form/entity-checkbox-absolute-type') }}
 	{{ encore_entry_script_tags('front/home') }}
 {% endblock %}
 
 {% block body %}
 	<main role="main" class="fr-container-fluid" id="at-main" data-select2-id="at-main">
-
 		<div id="intro" class="fr-pb-4w">
 			<div class="fr-container">
 				<div class="fr-grid-row fr-grid-row--center">
@@ -167,7 +165,7 @@
 										</div>
 										<div class="fr-card__header">
 											<div class="fr-card__img">
-												<img class="fr-responsive-img" src="{{ getParameter('cloud_image_url') }}{{ program.logo }}" alt="Illustration programme {{ program.name }}" loading="lazy" data-fr-js-ratio="true">
+												<img class="fr-responsive-img" src="{{ (getParameter('cloud_image_url') ~ program.logo) }}" alt="Illustration programme {{ program.name }}" loading="lazy" data-fr-js-ratio="true">
 											</div>
 										</div>
 									</div>
@@ -198,7 +196,11 @@
 
 									<div class="fr-card__header">
 										<div class="fr-card__img">
-											<img src="{{ getParameter('cloud_image_url') }}{{ blogPost.logo }}" class="fr-responsive-img" alt="Illustration article {{ blogPost.name }}" loading="lazy" data-fr-js-ratio="true">
+											<img src="{{ getParameter('cloud_image_url') ~ blogPost.logo }}" class="fr-responsive-img" alt="Illustration article {{ blogPost.name }}" loading="lazy" data-fr-js-ratio="true" />
+											{# <picture>
+												<source srcset="{{ blogPost.logo|imagine_filter('blog_thumb_mobile') }}" media="(max-width: 768px)" />
+												<img src="{{ blogPost.logo|imagine_filter('blog_thumb_desktop') }}" class="fr-responsive-img" alt="Illustration article {{ blogPost.name }}" loading="lazy" data-fr-js-ratio="true" />
+											</picture> #}
 										</div>
 									</div>
 								</div>

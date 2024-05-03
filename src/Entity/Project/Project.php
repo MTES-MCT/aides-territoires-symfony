@@ -20,6 +20,7 @@ use Symfony\Component\Serializer\Annotation\Ignore;
 
 #[ORM\Index(columns: ['status'], name: 'status_project')]
 #[ORM\Index(columns: ['is_public'], name: 'is_public_project')]
+#[ORM\Index(columns: ['date_create'], name: 'date_create_project')]
 #[ORM\Index(columns: ['name'], name: 'name_project_fulltext', flags: ['fulltext'])]
 #[ORM\Index(columns: ['description'], name: 'description_project_fulltext', flags: ['fulltext'])]
 #[ORM\Index(columns: ['name', 'description'], name: 'name_description_project_fulltext', flags: ['fulltext'])]

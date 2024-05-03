@@ -260,10 +260,10 @@ class AidRepository extends ServiceEntityRepository
     {
         $params['limit'] = $params['limit'] ?? 3;
         $params['orderBy'] = [
-            'sort' => 'a.timeCreate',
+            'sort' => 'a.datePublished',
             'order' => 'DESC'
         ];
-        $params['isLive'] = true;
+        $params['showInSearch'] = true;
 
         $qb = $this->getQueryBuilder($params);
 

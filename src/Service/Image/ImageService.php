@@ -22,13 +22,8 @@ class ImageService
     {
     }
 
-        /**
+    /**
      * Envoi une image (deja uploadee / traitee sur le serveur) sur le cloud
-     *
-     * @param UploadedFile $file
-     * @param string $uploadDir
-     * @param string $fileName
-     * @return boolean
      */
     public function sendImageToCloud(
         string $file,
@@ -73,6 +68,7 @@ class ImageService
                 'Key'    => $fileName,
                 'SourceFile' => $file,
                 'ACL'    => 'public-read',
+                'ContentType' => mime_content_type($file)
             ]);
 
             // suppression fichier temporaire
@@ -175,6 +171,7 @@ class ImageService
                 'Key'    => $fileName,
                 'SourceFile' => $tmpFile,
                 'ACL'    => 'public-read',
+                'ContentType' => mime_content_type($file)
             ]);
             
             // suppression fichier temporaire

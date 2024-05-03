@@ -1,4 +1,5 @@
 require ('./perimeter/map.js');
+require ('../form/entity-checkbox-absolute-type.js');
 
 $(function(){
     $('form[name="county_select"]').on({
