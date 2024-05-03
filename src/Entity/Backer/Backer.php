@@ -30,6 +30,7 @@ use App\Filter\AtSearchFilter;
 use App\Filter\Backer\HasFinancedAidsFilter;
 use App\Filter\Backer\HasPublishedFinancedAidsFilter;
 
+#[ORM\Index(columns: ['is_spotlighted'], name: 'is_spotlighted_backer')]
 #[ApiResource(
     // shortName: 'Porteurs',
     operations: [
