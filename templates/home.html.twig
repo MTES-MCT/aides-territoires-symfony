@@ -165,7 +165,10 @@
 										</div>
 										<div class="fr-card__header">
 											<div class="fr-card__img">
-												<img class="fr-responsive-img" src="{{ (getParameter('cloud_image_url') ~ program.logo) }}" alt="Illustration programme {{ program.name }}" loading="lazy" data-fr-js-ratio="true">
+												<picture>
+													<source srcset="{{ program.logo|imagine_filter('program_thumb_desktop') }}" media="(max-width: 768px)" />
+													<img src="{{ program.logo|imagine_filter('program_thumb_mobile') }}" class="fr-responsive-img" alt="Illustration programme {{ program.name }}" loading="lazy" data-fr-js-ratio="true" />
+												</picture>
 											</div>
 										</div>
 									</div>
@@ -196,11 +199,10 @@
 
 									<div class="fr-card__header">
 										<div class="fr-card__img">
-											<img src="{{ getParameter('cloud_image_url') ~ blogPost.logo }}" class="fr-responsive-img" alt="Illustration article {{ blogPost.name }}" loading="lazy" data-fr-js-ratio="true" />
-											{# <picture>
+											<picture>
 												<source srcset="{{ blogPost.logo|imagine_filter('blog_thumb_mobile') }}" media="(max-width: 768px)" />
 												<img src="{{ blogPost.logo|imagine_filter('blog_thumb_desktop') }}" class="fr-responsive-img" alt="Illustration article {{ blogPost.name }}" loading="lazy" data-fr-js-ratio="true" />
-											</picture> #}
+											</picture>
 										</div>
 									</div>
 								</div>
