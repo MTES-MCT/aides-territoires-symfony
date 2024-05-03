@@ -21,6 +21,7 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\OpenApi\Model;
 use App\Controller\Api\Program\ProgramController;
 
+#[ORM\Index(columns: ['is_spotlighted'], name: 'is_spotlighted_program')]
 #[ApiResource(
     operations: [
         new GetCollection(
