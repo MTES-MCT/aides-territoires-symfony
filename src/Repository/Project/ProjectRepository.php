@@ -69,6 +69,16 @@ class ProjectRepository extends ServiceEntityRepository
         return $result[0]['nb'] ?? 0;
     }
 
+    public function findImageToFix(array $params = []): array
+    {
+        $qb = $this->createQueryBuilder('p')
+        ->andWhere('(p.image LIKE :jpg OR p.image LIKE :png)')
+        ->setParameter('jpg', '%-jpg')
+        ->setParameter('png', '%-png')
+        ;
+        return $qb->getQuery()->getResult();
+    }
+
     public function countReviewable(?array $params = null): int
     {
         $params['status'] = Project::STATUS_REVIEWABLE;
