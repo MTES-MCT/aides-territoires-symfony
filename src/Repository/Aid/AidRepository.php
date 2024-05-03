@@ -470,7 +470,7 @@ class AidRepository extends ServiceEntityRepository
             if ($projectReference instanceof ProjectReference) {
                 $sqlProjectReference = '
                 CASE 
-                    WHEN :projectReference MEMBER OF a.projectReferences THEN 90 
+                    WHEN :projectReference MEMBER OF a.projectReferences THEN 300 
                     ELSE 0 
                 END
                 ';
