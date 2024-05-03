@@ -2,7 +2,7 @@
 
 namespace App\Command\Script;
 
-use App\Entity\Blog\BlogPost;
+use App\Entity\Program\Program;
 use App\Service\File\FileService;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -15,8 +15,8 @@ use App\Service\Various\ParamService;
 use Aws\Credentials\Credentials;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
-#[AsCommand(name: 'at:script:mime_type_blog_post_fix', description: 'Fix des mimes types sur s3')]
-class MimeTypeBlogPostCommand extends Command
+#[AsCommand(name: 'at:script:mime_type_program_fix', description: 'Fix des mimes types sur s3')]
+class MimeTypeProgramCommand extends Command
 {
 
     protected InputInterface $input;
@@ -77,28 +77,28 @@ class MimeTypeBlogPostCommand extends Command
             'use_path_style_endpoint' => true
         ]);
         
-        // recupere tous les blogPost
-        $blogPosts = $this->managerRegistry->getRepository(BlogPost::class)->findBy(
+        // recupere tous les programs
+        $programs = $this->managerRegistry->getRepository(Program::class)->findBy(
             [],
             ['id' => 'DESC'],
         );
-        foreach ($blogPosts as $blogPost) {
-            if (!$blogPost->getLogo()) {
+        foreach ($programs as $program) {
+            if (!$program->getLogo()) {
                 continue;
             }
             try {
                 $result = $s3->getObject([
                     'Bucket' => $this->paramService->get('aws_storage_bucket_name'),
-                    'Key'    => $blogPost->getLogo(),
+                    'Key'    => $program->getLogo(),
                 ]);
         
                 // le mimeType actuel
                 $mimeType = $result['ContentType'];
                 
-                if (!in_array($mimeType, ['image/jpeg', 'image/png', 'image/gif', 'image/svg+xml', 'application/pdf', 'text/csv', 'application/json'])) {
+                if (!in_array($mimeType, ['image/jpeg', 'image/png', 'image/gif', 'image/svg+xml'])) {
                     // Vérifiez si l'objet est une image, un PDF, un CSV ou un JSON en fonction de son extension
-                    $extension = pathinfo($blogPost->getLogo(), PATHINFO_EXTENSION);
-                    if (in_array($extension, ['jpg', 'jpeg', 'png', 'gif', 'svg', 'pdf', 'csv', 'json'])) {
+                    $extension = pathinfo($program->getLogo(), PATHINFO_EXTENSION);
+                    if (in_array($extension, ['jpg', 'jpeg', 'png', 'gif', 'svg'])) {
                         // Déterminez le type MIME en fonction de l'extension
                         $mimeType = 'image/jpeg';
                         if ($extension == 'png') {
@@ -107,23 +107,17 @@ class MimeTypeBlogPostCommand extends Command
                             $mimeType = 'image/gif';
                         } elseif ($extension == 'svg') {
                             $mimeType = 'image/svg+xml';
-                        } elseif ($extension == 'pdf') {
-                            $mimeType = 'application/pdf';
-                        } elseif ($extension == 'csv') {
-                            $mimeType = 'text/csv';
-                        } elseif ($extension == 'json') {
-                            $mimeType = 'application/json';
                         }
             
                         // Chemin vers le fichier temporaire
-                        $url = $this->paramService->get('cloud_image_url').$blogPost->getLogo();
+                        $url = $this->paramService->get('cloud_image_url').$program->getLogo();
 
                         // Télécharge le fichier à un emplacement temporaire
                         $tempPath = tempnam($this->fileService->getUploadTmpDir(), '');
                         file_put_contents($tempPath, file_get_contents($url));
 
                         // Nom original du fichier tel que fourni par le client
-                        $originalName = basename($blogPost->getLogo());
+                        $originalName = basename($program->getLogo());
 
 
                         // Taille du fichier en octets
@@ -137,23 +131,23 @@ class MimeTypeBlogPostCommand extends Command
                         // re-upload l'objet sur lui même
                         $s3->putObject([
                             'Bucket' => $this->paramService->get('aws_storage_bucket_name'),
-                            'Key'    => $blogPost->getLogo(),
+                            'Key'    => $program->getLogo(),
                             'SourceFile' => $file,
                             'ACL'    => 'public-read',
                             'ContentType' => $mimeType
                         ]);
 
-                        $io->success("Fixed MIME type for {$blogPost->getLogo()}");
+                        $io->success("Fixed MIME type for {$program->getLogo()}");
                     } else {
-                        $io->warning("{$blogPost->getLogo()} dans aucun type myme reconnu");
+                        $io->warning("{$program->getLogo()} dans aucun type myme reconnu");
                     }
                 } else {
-                    $io->success("{$blogPost->getLogo()} à déjà {$mimeType}");
+                    $io->success("{$program->getLogo()} à déjà {$mimeType}");
                 }
 
 
             } catch (\Exception $e) {
-                $io->error($blogPost->getLogo());
+                $io->error($program->getLogo());
                 continue;
             }
         }
