@@ -96,7 +96,7 @@ class ProjectRepository extends ServiceEntityRepository
         $params['status'] = Project::STATUS_PUBLISHED;
         $params['limit'] = $params['limit'] ?? null;
         $params['orderBy'] = [
-            'sort' => 'p.timeCreate',
+            'sort' => 'p.dateCreate',
             'order' => 'DESC'
         ];
 
