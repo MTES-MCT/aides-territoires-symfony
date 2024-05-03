@@ -238,7 +238,7 @@
 							{% for backerLogo in backerLogos %}
 								<div class="fr-col-xs-12 fr-p-3w">
 									<a href="{{ path('app_backer_details', {'id': backerLogo.id, 'slug': backerLogo.slug }) }}" title="{{ backerLogo.name }}" class="at-link__nodecorator">
-										<img src="{{ getParameter('cloud_image_url') }}{{ backerLogo.logo }}" alt="Logo {{ backerLogo.name }}" loading="lazy">
+										<img src="{{ backerLogo.logo|imagine_filter('backer_thumb') }}" alt="Logo {{ backerLogo.name }}" loading="lazy">
 									</a>
 								</div>
 							{% endfor %}
@@ -257,7 +257,7 @@
 							{% for programLogo in programLogos %}
 								<div class="fr-col-xs-12 fr-p-3w">
 									<a href="{{ path('app_program_details', {'slug': programLogo.slug }) }}" title="{{ programLogo.name }}" class="at-link__nodecorator">
-										<img src="{{ getParameter('cloud_image_url') }}{{ programLogo.logo }}" alt="Logo {{ programLogo.name }}" loading="lazy"/>
+										<img src="{{ programLogo.logo|imagine_filter('program_thumb_mini') }}" alt="Logo {{ programLogo.name }}" loading="lazy"/>
 									</a>
 								</div>
 							{% endfor %}
