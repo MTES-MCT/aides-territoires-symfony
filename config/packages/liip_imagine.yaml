@@ -67,3 +67,19 @@ liip_imagine:
             quality : 75
             filters :
                 thumbnail  : { size : [394, 222], mode : outbound }
+
+        program_thumb_mini:
+            data_loader: 's3_loader'
+            cache: 's3_resolver'
+            quality : 75
+            filters :
+                scale:
+                    dim: [null, 70]
+
+        backer_thumb:
+            data_loader: 's3_loader'
+            cache: 's3_resolver'
+            quality : 75
+            filters :
+                scale:
+                    dim: [null, 70]
