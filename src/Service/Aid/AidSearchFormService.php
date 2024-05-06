@@ -118,6 +118,12 @@ class AidSearchFormService
         if ($aidSearchClass->getIsCallForProject()) {
             $params['isCallForProject'] = $aidSearchClass->getIsCallForProject();
         }
+        if ($aidSearchClass->getProjectReference()) {
+            $params['project_reference_id'] = $aidSearchClass->getProjectReference()->getId();
+            if (!$aidSearchClass->getKeyword()) {
+                $params['keyword'] = $aidSearchClass->getProjectReference()->getName();
+            }
+        }
 
         $querystring = http_build_query($params);
         return $querystring;
