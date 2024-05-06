@@ -109,11 +109,8 @@ class BackerGroup
 
     public function removeBacker(Backer $backer): static
     {
-        if ($this->backers->removeElement($backer)) {
-            // set the owning side to null (unless already changed)
-            if ($backer->getBackerGroup() === $this) {
-                $backer->setBackerGroup(null);
-            }
+        if ($this->backers->removeElement($backer) && $backer->getBackerGroup() === $this) {
+            $backer->setBackerGroup(null);
         }
 
         return $this;

@@ -25,7 +25,7 @@ use Doctrine\ORM\Mapping\OrderBy;
             controller: CategoryThemeController::class,
             normalizationContext: ['groups' => self::API_GROUP_LIST],
             openapi: new Model\Operation(
-                summary: 'Lister toutes les thématiques (avec leur liste de sous-thématiques)', 
+                summary: 'Lister toutes les thématiques (avec leur liste de sous-thématiques)',
             ),
         ),
     ],
@@ -126,11 +126,8 @@ class CategoryTheme
 
     public function removeCategory(Category $category): static
     {
-        if ($this->categories->removeElement($category)) {
-            // set the owning side to null (unless already changed)
-            if ($category->getCategoryTheme() === $this) {
-                $category->setCategoryTheme(null);
-            }
+        if ($this->categories->removeElement($category) && $category->getCategoryTheme() === $this) {
+            $category->setCategoryTheme(null);
         }
 
         return $this;

@@ -628,9 +628,7 @@ class Backer // NOSONAR too much methods
         $iterator->uasort(function ($a, $b) {
             return ($a->getSlug() < $b->getSlug()) ? -1 : 1;
         });
-        $thematics = new ArrayCollection(iterator_to_array($iterator));
-
-        return $thematics;
+        return new ArrayCollection(iterator_to_array($iterator));
     }
 
     public function setAidsThematics(?ArrayCollection $aidsThematics): static
@@ -686,43 +684,48 @@ class Backer // NOSONAR too much methods
 
     public function removeLogBackerView(LogBackerView $logBackerView): static
     {
-        if ($this->logBackerViews->removeElement($logBackerView)) {
-            // set the owning side to null (unless already changed)
-            if ($logBackerView->getBacker() === $this) {
-                $logBackerView->setBacker(null);
-            }
+        if ($this->logBackerViews->removeElement($logBackerView) && $logBackerView->getBacker() === $this) {
+            $logBackerView->setBacker(null);
         }
 
         return $this;
     }
 
-
-
-
     public function getCategories(): ArrayCollection
     {
         $categories = new ArrayCollection();
+    
+        $this->addAidFinancerCategories($categories);
+        $this->addAidInstructorCategories($categories);
+    
+        return $categories;
+    }
+    
+    private function addAidFinancerCategories($categories)
+    {
         foreach ($this->getAidFinancers() as $aidFinancer) {
             if ($aidFinancer->getAid()) {
-                foreach ($aidFinancer->getAid()->getCategories() as $category) {
-                    if (!$categories->contains($category)) {
-                        $categories->add($category);
-                    }
-                }
+                $this->addCategories($aidFinancer->getAid()->getCategories(), $categories);
             }
         }
-
+    }
+    
+    private function addAidInstructorCategories($categories)
+    {
         foreach ($this->getAidInstructors() as $aidInstructor) {
             if ($aidInstructor->getAid()) {
-                foreach ($aidInstructor->getAid()->getCategories() as $category) {
-                    if (!$categories->contains($category)) {
-                        $categories->add($category);
-                    }
-                }
+                $this->addCategories($aidInstructor->getAid()->getCategories(), $categories);
             }
         }
-
-        return $categories;
+    }
+    
+    private function addCategories($newCategories, $categories)
+    {
+        foreach ($newCategories as $category) {
+            if (!$categories->contains($category)) {
+                $categories->add($category);
+            }
+        }
     }
 
     public function setCategories(ArrayCollection $categories): void
@@ -733,28 +736,38 @@ class Backer // NOSONAR too much methods
     public function getPrograms(): ArrayCollection
     {
         $programs = new ArrayCollection();
-
+    
+        $this->addAidFinancerPrograms($programs);
+        $this->addAidInstructorPrograms($programs);
+    
+        return $programs;
+    }
+    
+    private function addAidFinancerPrograms($programs)
+    {
         foreach ($this->getAidFinancers() as $aidFinancer) {
             if ($aidFinancer->getAid()) {
-                foreach ($aidFinancer->getAid()->getPrograms() as $program) {
-                    if (!$programs->contains($program)) {
-                        $programs->add($program);
-                    }
-                }
+                $this->addPrograms($aidFinancer->getAid()->getPrograms(), $programs);
             }
         }
-
+    }
+    
+    private function addAidInstructorPrograms($programs)
+    {
         foreach ($this->getAidInstructors() as $aidInstructor) {
             if ($aidInstructor->getAid()) {
-                foreach ($aidInstructor->getAid()->getPrograms() as $program) {
-                    if (!$programs->contains($program)) {
-                        $programs->add($program);
-                    }
-                }
+                $this->addPrograms($aidInstructor->getAid()->getPrograms(), $programs);
             }
         }
-
-        return $programs;
+    }
+    
+    private function addPrograms($newPrograms, $programs)
+    {
+        foreach ($newPrograms as $program) {
+            if (!$programs->contains($program)) {
+                $programs->add($program);
+            }
+        }
     }
 
     public function setPrograms(ArrayCollection $programs): void

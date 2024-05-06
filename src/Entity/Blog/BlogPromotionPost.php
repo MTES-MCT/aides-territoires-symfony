@@ -20,7 +20,7 @@ use Gedmo\Mapping\Annotation as Gedmo;
 #[ORM\Entity(repositoryClass: BlogPromotionPostRepository::class)]
 #[ORM\Index(columns: ['status'], name: 'status_blog_promotion_post')]
 #[ORM\Index(columns: ['slug'], name: 'slug_blog_promotion_post')]
-class BlogPromotionPost
+class BlogPromotionPost // NOSONAR too much methods
 {
     const FOLDER = 'promotion';
     const STATUS_DRAFT = 'draft';
@@ -395,11 +395,8 @@ class BlogPromotionPost
 
     public function removeLogBlogPromotionPostClick(LogBlogPromotionPostClick $logBlogPromotionPostClick): static
     {
-        if ($this->logBlogPromotionPostClicks->removeElement($logBlogPromotionPostClick)) {
-            // set the owning side to null (unless already changed)
-            if ($logBlogPromotionPostClick->getBlogPromotionPost() === $this) {
-                $logBlogPromotionPostClick->setBlogPromotionPost(null);
-            }
+        if ($this->logBlogPromotionPostClicks->removeElement($logBlogPromotionPostClick) && $logBlogPromotionPostClick->getBlogPromotionPost() === $this) {
+            $logBlogPromotionPostClick->setBlogPromotionPost(null);
         }
 
         return $this;
@@ -425,11 +422,8 @@ class BlogPromotionPost
 
     public function removeLogBlogPromotionPostDisplay(LogBlogPromotionPostDisplay $logBlogPromotionPostDisplay): static
     {
-        if ($this->logBlogPromotionPostDisplays->removeElement($logBlogPromotionPostDisplay)) {
-            // set the owning side to null (unless already changed)
-            if ($logBlogPromotionPostDisplay->getBlogPromotionPost() === $this) {
-                $logBlogPromotionPostDisplay->setBlogPromotionPost(null);
-            }
+        if ($this->logBlogPromotionPostDisplays->removeElement($logBlogPromotionPostDisplay) && $logBlogPromotionPostDisplay->getBlogPromotionPost() === $this) {
+            $logBlogPromotionPostDisplay->setBlogPromotionPost(null);
         }
 
         return $this;

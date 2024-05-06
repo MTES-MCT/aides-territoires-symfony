@@ -9,7 +9,6 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
-// TODO voir utilite, faire BO si besoin
 #[ORM\Entity(repositoryClass: BundleRepository::class)]
 class Bundle
 {

@@ -113,11 +113,8 @@ class BackerCategory
 
     public function removeBackerSubcategory(BackerSubcategory $backerSubcategory): static
     {
-        if ($this->backerSubcategories->removeElement($backerSubcategory)) {
-            // set the owning side to null (unless already changed)
-            if ($backerSubcategory->getBackerCategory() === $this) {
-                $backerSubcategory->setBackerCategory(null);
-            }
+        if ($this->backerSubcategories->removeElement($backerSubcategory) && $backerSubcategory->getBackerCategory() === $this) {
+            $backerSubcategory->setBackerCategory(null);
         }
 
         return $this;

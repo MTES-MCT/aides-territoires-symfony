@@ -14,7 +14,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
 
 #[ORM\Entity(repositoryClass: DataSourceRepository::class)]
-class DataSource
+class DataSource // NOSONAR too much methods
 {
     const SLUG_LICENCE_UNKNOWN = 'unknown';
     const SLUG_LICENCE_OPENLICENCE20 = 'openlicence20';
@@ -280,11 +280,8 @@ class DataSource
 
     public function removeAid(Aid $aid): static
     {
-        if ($this->aids->removeElement($aid)) {
-            // set the owning side to null (unless already changed)
-            if ($aid->getImportDataSource() === $this) {
-                $aid->setImportDataSource(null);
-            }
+        if ($this->aids->removeElement($aid) && $aid->getImportDataSource() === $this) {
+            $aid->setImportDataSource(null);
         }
 
         return $this;
