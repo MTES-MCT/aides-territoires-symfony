@@ -43,6 +43,7 @@ use App\Filter\Aid\AidFinancialAidFilter;
 use App\Filter\Aid\AidIsChargedFilter;
 use App\Filter\Aid\AidMobilizationStepFilter;
 use App\Filter\Aid\AidPerimeterFilter;
+use App\Filter\Aid\AidProjectReferenceFilter;
 use App\Filter\Aid\AidPublishedAfterFilter;
 use App\Filter\Aid\AidRecurrenceFilter;
 use App\Filter\Aid\AidTargetedAudiencesFilter;
@@ -104,6 +105,7 @@ use App\Filter\Aid\AidTypeGroupFilter;
 #[ApiFilter(AidCallForProjectOnlyFilter::class)]
 #[ApiFilter(AidIsChargedFilter::class)]
 #[ApiFilter(AidPerimeterFilter::class)]
+#[ApiFilter(AidProjectReferenceFilter::class)]
 class Aid
 {
     const API_OPERATION_GET_BY_SLUG = 'api_aid_get_by_slug';
@@ -617,6 +619,7 @@ class Aid
     #[ORM\ManyToMany(targetEntity: KeywordReference::class, inversedBy: 'aids', cascade:['persist'])]
     private Collection $keywordReferences;
 
+    #[Groups([self::API_GROUP_LIST, self::API_GROUP_ITEM])]
     #[ORM\ManyToMany(targetEntity: ProjectReference::class, inversedBy: 'aids')]
     private Collection $projectReferences;
 

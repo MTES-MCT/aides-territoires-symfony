@@ -2,32 +2,66 @@
 
 namespace App\Entity\Reference;
 
+use ApiPlatform\Metadata\ApiFilter;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\OpenApi\Model;
+use App\Controller\Api\Reference\ProjectReferenceController;
 use App\Entity\Aid\Aid;
 use App\Entity\Project\Project;
-use App\Repository\Aid\AidRepository;
+use App\Filter\Reference\ProjectReferenceCategoryFilter;
+use App\Filter\Reference\ProjectReferenceTextFilter;
 use App\Repository\Reference\ProjectReferenceRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
+use Symfony\Component\Serializer\Attribute\Groups;
 
+#[ApiResource(
+    shortName: 'Projets référents',
+    operations: [
+        new GetCollection(
+            uriTemplate: '/project-references/',
+            controller: ProjectReferenceController::class,
+            normalizationContext: ['groups' => self::API_GROUP_LIST],
+            openapi: new Model\Operation(
+                summary: self::API_DESCRIPTION, 
+                description: self::API_DESCRIPTION,
+            ),
+            paginationEnabled: true,
+            paginationItemsPerPage: 50,
+            paginationClientItemsPerPage: true
+        )
+    ]
+)]
+#[ApiFilter(ProjectReferenceTextFilter::class)]
+#[ApiFilter(ProjectReferenceCategoryFilter::class)]
 #[ORM\Index(columns: ['name'], name: 'name_pr_fulltext', flags: ['fulltext'])]
 #[ORM\Index(columns: ['slug'], name: 'slug_pr')]
 #[ORM\Entity(repositoryClass: ProjectReferenceRepository::class)]
 class ProjectReference
 {
+    const API_GROUP_LIST = 'project_reference:list';
+    const API_GROUP_ITEM = 'project_reference:item';
+    const API_DESCRIPTION = 'Lister tous les projets référents';
+
+    #[Groups([self::API_GROUP_LIST, self::API_GROUP_ITEM, Aid::API_GROUP_LIST, Aid::API_GROUP_ITEM])]
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
 
+    #[Groups([self::API_GROUP_LIST, self::API_GROUP_ITEM, Aid::API_GROUP_LIST, Aid::API_GROUP_ITEM])]
     #[ORM\Column(length: 150)]
     private ?string $name = null;
 
+    #[Groups([self::API_GROUP_LIST, self::API_GROUP_ITEM, Aid::API_GROUP_LIST, Aid::API_GROUP_ITEM])]
     #[Gedmo\Slug(fields: ['name'])]
     #[ORM\Column(length: 255)]
     private ?string $slug = null;
 
+    #[Groups([self::API_GROUP_LIST, self::API_GROUP_ITEM])]
     #[ORM\ManyToOne(inversedBy: 'projectReferences')]
     private ?ProjectReferenceCategory $projectReferenceCategory = null;
 
