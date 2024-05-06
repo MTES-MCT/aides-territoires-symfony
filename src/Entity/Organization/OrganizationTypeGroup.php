@@ -115,11 +115,8 @@ class OrganizationTypeGroup
 
     public function removeOrganizationType(OrganizationType $organizationType): static
     {
-        if ($this->organizationTypes->removeElement($organizationType)) {
-            // set the owning side to null (unless already changed)
-            if ($organizationType->getOrganizationTypeGroup() === $this) {
-                $organizationType->setOrganizationTypeGroup(null);
-            }
+        if ($this->organizationTypes->removeElement($organizationType) && $organizationType->getOrganizationTypeGroup() === $this) {
+            $organizationType->setOrganizationTypeGroup(null);
         }
 
         return $this;

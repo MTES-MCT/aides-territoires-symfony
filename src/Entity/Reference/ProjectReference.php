@@ -26,7 +26,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
             controller: ProjectReferenceController::class,
             normalizationContext: ['groups' => self::API_GROUP_LIST],
             openapi: new Model\Operation(
-                summary: self::API_DESCRIPTION, 
+                summary: self::API_DESCRIPTION,
                 description: self::API_DESCRIPTION,
             ),
             paginationEnabled: true,
@@ -129,11 +129,8 @@ class ProjectReference
 
     public function removeProject(Project $project): static
     {
-        if ($this->projects->removeElement($project)) {
-            // set the owning side to null (unless already changed)
-            if ($project->getProjectReference() === $this) {
-                $project->setProjectReference(null);
-            }
+        if ($this->projects->removeElement($project) && $project->getProjectReference() === $this) {
+            $project->setProjectReference(null);
         }
 
         return $this;

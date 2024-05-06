@@ -8,7 +8,6 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Doctrine\ORM\Mapping\JoinColumn;
 use Doctrine\ORM\Mapping\OrderBy;
 use Gedmo\Mapping\Annotation as Gedmo;
 
@@ -107,11 +106,8 @@ class Faq
 
     public function removeFaqCategory(FaqCategory $faqCategory): static
     {
-        if ($this->faqCategories->removeElement($faqCategory)) {
-            // set the owning side to null (unless already changed)
-            if ($faqCategory->getFaq() === $this) {
-                $faqCategory->setFaq(null);
-            }
+        if ($this->faqCategories->removeElement($faqCategory) && $faqCategory->getFaq() === $this) {
+            $faqCategory->setFaq(null);
         }
 
         return $this;

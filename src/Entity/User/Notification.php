@@ -3,6 +3,7 @@
 namespace App\Entity\User;
 
 use App\Repository\User\NotificationRepository;
+use App\Service\Doctrine\DoctrineConstants;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
@@ -32,7 +33,7 @@ class Notification
     private ?\DateTimeInterface $timeEmail = null;
 
     #[ORM\ManyToOne(inversedBy: 'notifications')]
-    #[ORM\JoinColumn(onDelete:'SET NULL')]
+    #[ORM\JoinColumn(onDelete:DoctrineConstants::SET_NULL)]
     private ?User $user = null;
 
 

@@ -107,11 +107,8 @@ class KeywordReference
 
     public function removeKeywordReference(self $keywordReference): static
     {
-        if ($this->keywordReferences->removeElement($keywordReference)) {
-            // set the owning side to null (unless already changed)
-            if ($keywordReference->getParent() === $this) {
-                $keywordReference->setParent(null);
-            }
+        if ($this->keywordReferences->removeElement($keywordReference) && $keywordReference->getParent() === $this) {
+            $keywordReference->setParent(null);
         }
 
         return $this;
