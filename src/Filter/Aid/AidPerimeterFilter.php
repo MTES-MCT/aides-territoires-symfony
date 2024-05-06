@@ -12,6 +12,7 @@ use Symfony\Component\PropertyInfo\Type;
 
 final class AidPerimeterFilter extends AbstractFilter
 {
+    // empty method
     protected function filterProperty(string $property, $value, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, Operation $operation = null, array $context = []): void
     {
     }
@@ -43,4 +44,3 @@ final class AidPerimeterFilter extends AbstractFilter
         ];
     }
 }
-?>

@@ -27,6 +27,7 @@ use ApiPlatform\OpenApi\Model;
 use App\Controller\Api\Perimeter\PerimeterController;
 use App\Filter\Perimeter\PerimeterScaleFilter;
 use App\Filter\Perimeter\PerimeterTextFilter;
+use App\Service\Doctrine\DoctrineConstants;
 
 #[ApiResource(
     shortName: 'Périmètres',
@@ -36,7 +37,7 @@ use App\Filter\Perimeter\PerimeterTextFilter;
             controller: PerimeterController::class,
             normalizationContext: ['groups' => self::API_GROUP_LIST],
             openapi: new Model\Operation(
-                summary: self::API_DESCRIPTION, 
+                summary: self::API_DESCRIPTION,
                 description: self::API_DESCRIPTION,
             ),
             paginationEnabled: true,
@@ -59,39 +60,49 @@ use App\Filter\Perimeter\PerimeterTextFilter;
 #[ORM\Index(columns: ['code'], name: 'codpe_peri')]
 #[ORM\Index(columns: ['name'], name: 'name_peri')]
 #[ORM\Index(columns: ['name'], name: 'name_peri_fulltext', flags: ['fulltext'])]
-class Perimeter
+class Perimeter // NOSONAR too much methods
 {
     const API_GROUP_LIST = 'perimeter:list';
     const API_GROUP_ITEM = 'perimeter:item';
     const API_DESCRIPTION = 'Lister tous les périmètres';
 
-    CONST SCALES_TUPLE = [
-        ['scale' => 1, 'slug' => 'commune', 'name' => 'Commune'],
-        ['scale' => 5, 'slug' => 'epci', 'name' => 'EPCI'],
-        ['scale' => 8, 'slug' => 'basin', 'name' => 'Bassin hydrographique'],
-        ['scale' => 10, 'slug' => 'department', 'name' => 'Département'],
-        ['scale' => 15, 'slug' => 'region', 'name' => 'Région'],
-        ['scale' => 16, 'slug' => 'overseas', 'name' => 'Outre-mer'],
-        ['scale' => 17, 'slug' => 'mainland', 'name' => 'Métropole'],
-        ['scale' => 18, 'slug' => 'adhoc', 'name' => 'Ad-hoc'],
-        ['scale' => 20, 'slug' => 'country', 'name' => 'Pays'],
-        ['scale' => 25, 'slug' => 'continent', 'name' => 'Continent']
+    const SCALE_COMMUNE_NAME = 'commune';
+    const SCALE_EPCI_NAME = 'epci';
+    const SCALE_BASIN_NAME = 'Bassin hydrographique';
+    const SCALE_DEPARTMENT_NAME = 'Département';
+    const SCALE_REGION_NAME = 'Région';
+    const SCALE_OVERSEAS_NAME = 'Outre-mer';
+    const SCALE_MAINLAND_NAME = 'Métropole';
+    const SCALE_ADHOC_NAME = 'Ad-hoc';
+    const SCALE_COUNTRY_NAME = 'Pays';
+    const SCALE_CONTINENT_NAME = 'Continent';
+
+    const SCALES_TUPLE = [
+        ['scale' => 1, 'slug' => 'commune', 'name' => self::SCALE_COMMUNE_NAME],
+        ['scale' => 5, 'slug' => 'epci', 'name' => self::SCALE_EPCI_NAME],
+        ['scale' => 8, 'slug' => 'basin', 'name' => self::SCALE_BASIN_NAME],
+        ['scale' => 10, 'slug' => 'department', 'name' => self::SCALE_DEPARTMENT_NAME],
+        ['scale' => 15, 'slug' => 'region', 'name' => self::SCALE_REGION_NAME],
+        ['scale' => 16, 'slug' => 'overseas', 'name' => self::SCALE_OVERSEAS_NAME],
+        ['scale' => 17, 'slug' => 'mainland', 'name' => self::SCALE_MAINLAND_NAME],
+        ['scale' => 18, 'slug' => 'adhoc', 'name' => self::SCALE_ADHOC_NAME],
+        ['scale' => 20, 'slug' => 'country', 'name' => self::SCALE_COUNTRY_NAME],
+        ['scale' => 25, 'slug' => 'continent', 'name' => self::SCALE_CONTINENT_NAME]
     ];
 
 
-    CONST SCALES_FOR_SEARCH = [
-        1 => ['slug' => 'commune', 'name' => 'Commune'],
-        5 => ['slug' => 'epci', 'name' => 'EPCI'],
-        8 => ['slug' => 'basin', 'name' => 'Bassin hydrographique'],
-        10 => ['slug' => 'department', 'name' => 'Département'],
-        15 => ['slug' => 'region', 'name' => 'Région'],
-        16 => ['slug' => 'overseas', 'name' => 'Outre-mer'],
-        17 => ['slug' => 'mainland', 'name' => 'Métropole'],
-        18 => ['slug' => 'adhoc', 'name' => 'Ad-hoc'],
-        20 => ['slug' => 'country', 'name' => 'Pays'],
-        25 => ['slug' => 'continent', 'name' => 'Continent']
+    const SCALES_FOR_SEARCH = [
+        1 => ['slug' => 'commune', 'name' => self::SCALE_COMMUNE_NAME],
+        5 => ['slug' => 'epci', 'name' => self::SCALE_EPCI_NAME],
+        8 => ['slug' => 'basin', 'name' => self::SCALE_BASIN_NAME],
+        10 => ['slug' => 'department', 'name' => self::SCALE_DEPARTMENT_NAME],
+        15 => ['slug' => 'region', 'name' => self::SCALE_REGION_NAME],
+        16 => ['slug' => 'overseas', 'name' => self::SCALE_OVERSEAS_NAME],
+        17 => ['slug' => 'mainland', 'name' => self::SCALE_MAINLAND_NAME],
+        18 => ['slug' => 'adhoc', 'name' => self::SCALE_ADHOC_NAME],
+        20 => ['slug' => 'country', 'name' => self::SCALE_COUNTRY_NAME],
+        25 => ['slug' => 'continent', 'name' => self::SCALE_CONTINENT_NAME]
     ];
-
 
     const SCALE_COUNTY = 10;
     const SCALE_COMMUNE = 1;
@@ -102,20 +113,20 @@ class Perimeter
     
     const SLUG_LOCAL_GROUP = 'local_group';
     const SCALES_LOCAL_GROUP = [
-        ['scale' => 1, 'slug' => 'commune', 'name' => 'Commune'],
-        ['scale' => 5, 'slug' => 'epci', 'name' => 'EPCI'],
-        ['scale' => 8, 'slug' => 'basin', 'name' => 'Bassin hydrographique'],
-        ['scale' => 10, 'slug' => 'department', 'name' => 'Département'],
-        ['scale' => 15, 'slug' => 'region', 'name' => 'Région'],
-        ['scale' => 16, 'slug' => 'overseas', 'name' => 'Outre-mer'],
-        ['scale' => 18, 'slug' => 'adhoc', 'name' => 'Ad-hoc'],
+        ['scale' => 1, 'slug' => 'commune', 'name' => self::SCALE_COMMUNE_NAME],
+        ['scale' => 5, 'slug' => 'epci', 'name' => self::SCALE_EPCI_NAME],
+        ['scale' => 8, 'slug' => 'basin', 'name' => self::SCALE_BASIN_NAME],
+        ['scale' => 10, 'slug' => 'department', 'name' => self::SCALE_DEPARTMENT_NAME],
+        ['scale' => 15, 'slug' => 'region', 'name' => self::SCALE_REGION_NAME],
+        ['scale' => 16, 'slug' => 'overseas', 'name' => self::SCALE_OVERSEAS_NAME],
+        ['scale' => 18, 'slug' => 'adhoc', 'name' => self::SCALE_ADHOC_NAME],
     ];
 
     const SLUG_NATIONAL_GROUP = 'national_group';
     const SCALES_NATIONAL_GROUP = [
-        ['scale' => 17, 'slug' => 'mainland', 'name' => 'Métropole'],
-        ['scale' => 20, 'slug' => 'country', 'name' => 'Pays'],
-        ['scale' => 25, 'slug' => 'continent', 'name' => 'Continent']
+        ['scale' => 17, 'slug' => 'mainland', 'name' => self::SCALE_MAINLAND_NAME],
+        ['scale' => 20, 'slug' => 'country', 'name' => self::SCALE_COUNTRY_NAME],
+        ['scale' => 25, 'slug' => 'continent', 'name' => self::SCALE_CONTINENT_NAME]
     ];
 
     const SLUG_CONTINENT_DEFAULT = 'EU';
@@ -258,7 +269,7 @@ class Perimeter
     private Collection $perimetersTo;
 
     /**
-     * 
+     *
      * Les périmètres enfants
      * ceux contenu dans ce périmètre
      * ex: si ce périmètre = Esonne, perimetersFrom contiendra Fontenay-les-briis, Evry, ...
@@ -282,15 +293,15 @@ class Perimeter
     private Collection $financialData;
 
     #[ORM\OneToMany(mappedBy: 'perimeter', targetEntity: LogAidSearch::class)]
-    #[ORM\JoinColumn(onDelete:'SET NULL')]
+    #[ORM\JoinColumn(onDelete: DoctrineConstants::SET_NULL)]
     private Collection $logAidSearches;
 
     #[ORM\OneToMany(mappedBy: 'perimeter', targetEntity: LogPublicProjectSearch::class)]
-    #[ORM\JoinColumn(onDelete:'SET NULL')]
+    #[ORM\JoinColumn(onDelete: DoctrineConstants::SET_NULL)]
     private Collection $logPublicProjectSearches;
 
     #[ORM\OneToMany(mappedBy: 'perimeter', targetEntity: LogProjectValidatedSearch::class)]
-    #[ORM\JoinColumn(onDelete:'SET NULL')]
+    #[ORM\JoinColumn(onDelete: DoctrineConstants::SET_NULL)]
     private Collection $logProjectValidatedSearches;
 
 
@@ -390,11 +401,8 @@ class Perimeter
 
     public function removeUser(User $user): static
     {
-        if ($this->users->removeElement($user)) {
-            // set the owning side to null (unless already changed)
-            if ($user->getPerimeter() === $this) {
-                $user->setPerimeter(null);
-            }
+        if ($this->users->removeElement($user) && $user->getPerimeter() === $this) {
+            $user->setPerimeter(null);
         }
 
         return $this;
@@ -420,11 +428,8 @@ class Perimeter
 
     public function removeOrganization(Organization $organization): static
     {
-        if ($this->organizations->removeElement($organization)) {
-            // set the owning side to null (unless already changed)
-            if ($organization->getPerimeter() === $this) {
-                $organization->setPerimeter(null);
-            }
+        if ($this->organizations->removeElement($organization) && $organization->getPerimeter() === $this) {
+            $organization->setPerimeter(null);
         }
 
         return $this;
@@ -450,11 +455,8 @@ class Perimeter
 
     public function removeOrganizationDepartment(Organization $organizationDepartment): static
     {
-        if ($this->organizationDepartments->removeElement($organizationDepartment)) {
-            // set the owning side to null (unless already changed)
-            if ($organizationDepartment->getPerimeterDepartment() === $this) {
-                $organizationDepartment->setPerimeterDepartment(null);
-            }
+        if ($this->organizationDepartments->removeElement($organizationDepartment) && $organizationDepartment->getPerimeterDepartment() === $this) {
+            $organizationDepartment->setPerimeterDepartment(null);
         }
 
         return $this;
@@ -480,11 +482,8 @@ class Perimeter
 
     public function removeOrganizationRegion(Organization $organizationRegion): static
     {
-        if ($this->organizationRegions->removeElement($organizationRegion)) {
-            // set the owning side to null (unless already changed)
-            if ($organizationRegion->getPerimeterRegion() === $this) {
-                $organizationRegion->setPerimeterRegion(null);
-            }
+        if ($this->organizationRegions->removeElement($organizationRegion) && $organizationRegion->getPerimeterRegion() === $this) {
+            $organizationRegion->setPerimeterRegion(null);
         }
 
         return $this;
@@ -510,11 +509,8 @@ class Perimeter
 
     public function removeBacker(Backer $backer): static
     {
-        if ($this->backers->removeElement($backer)) {
-            // set the owning side to null (unless already changed)
-            if ($backer->getPerimeter() === $this) {
-                $backer->setPerimeter(null);
-            }
+        if ($this->backers->removeElement($backer) && $backer->getPerimeter() === $this) {
+            $backer->setPerimeter(null);
         }
 
         return $this;
@@ -876,11 +872,8 @@ class Perimeter
 
     public function removePerimeterData(PerimeterData $perimeterData): static
     {
-        if ($this->perimeterDatas->removeElement($perimeterData)) {
-            // set the owning side to null (unless already changed)
-            if ($perimeterData->getPerimeter() === $this) {
-                $perimeterData->setPerimeter(null);
-            }
+        if ($this->perimeterDatas->removeElement($perimeterData) && $perimeterData->getPerimeter() === $this) {
+            $perimeterData->setPerimeter(null);
         }
 
         return $this;
@@ -906,11 +899,8 @@ class Perimeter
 
     public function removePerimeterImport(PerimeterImport $perimeterImport): static
     {
-        if ($this->perimeterImports->removeElement($perimeterImport)) {
-            // set the owning side to null (unless already changed)
-            if ($perimeterImport->getAdhocPerimeter() === $this) {
-                $perimeterImport->setAdhocPerimeter(null);
-            }
+        if ($this->perimeterImports->removeElement($perimeterImport) && $perimeterImport->getAdhocPerimeter() === $this) {
+            $perimeterImport->setAdhocPerimeter(null);
         }
 
         return $this;
@@ -987,11 +977,8 @@ class Perimeter
 
     public function removeProgram(Program $program): static
     {
-        if ($this->programs->removeElement($program)) {
-            // set the owning side to null (unless already changed)
-            if ($program->getPerimeter() === $this) {
-                $program->setPerimeter(null);
-            }
+        if ($this->programs->removeElement($program) && $program->getPerimeter() === $this) {
+            $program->setPerimeter(null);
         }
 
         return $this;
@@ -1017,11 +1004,8 @@ class Perimeter
 
     public function removeDataSource(DataSource $dataSource): static
     {
-        if ($this->dataSources->removeElement($dataSource)) {
-            // set the owning side to null (unless already changed)
-            if ($dataSource->getPerimeter() === $this) {
-                $dataSource->setPerimeter(null);
-            }
+        if ($this->dataSources->removeElement($dataSource) && $dataSource->getPerimeter() === $this) {
+            $dataSource->setPerimeter(null);
         }
 
         return $this;
@@ -1047,11 +1031,8 @@ class Perimeter
 
     public function removeAid(Aid $aid): static
     {
-        if ($this->aids->removeElement($aid)) {
-            // set the owning side to null (unless already changed)
-            if ($aid->getPerimeter() === $this) {
-                $aid->setPerimeter(null);
-            }
+        if ($this->aids->removeElement($aid) && $aid->getPerimeter() === $this) {
+            $aid->setPerimeter(null);
         }
 
         return $this;
@@ -1077,11 +1058,8 @@ class Perimeter
 
     public function removeBlogPromotionPost(BlogPromotionPost $blogPromotionPost): static
     {
-        if ($this->blogPromotionPosts->removeElement($blogPromotionPost)) {
-            // set the owning side to null (unless already changed)
-            if ($blogPromotionPost->getPerimeter() === $this) {
-                $blogPromotionPost->setPerimeter(null);
-            }
+        if ($this->blogPromotionPosts->removeElement($blogPromotionPost) && $blogPromotionPost->getPerimeter() === $this) {
+            $blogPromotionPost->setPerimeter(null);
         }
 
         return $this;
@@ -1107,11 +1085,8 @@ class Perimeter
 
     public function removeFinancialData(FinancialData $financialData): static
     {
-        if ($this->financialData->removeElement($financialData)) {
-            // set the owning side to null (unless already changed)
-            if ($financialData->getPerimeter() === $this) {
-                $financialData->setPerimeter(null);
-            }
+        if ($this->financialData->removeElement($financialData) && $financialData->getPerimeter() === $this) {
+            $financialData->setPerimeter(null);
         }
 
         return $this;
@@ -1139,15 +1114,15 @@ class Perimeter
         $name = $this->getName();
         if ($this->getScale() == self::SCALE_COUNTY) {
             $name .= ' (Département)';
-        } else if ($this->getScale() == Perimeter::SCALE_REGION) {
+        } elseif ($this->getScale() == Perimeter::SCALE_REGION) {
             $name .= ' (Région)';
-        } else if ($this->getScale() == Perimeter::SCALE_COMMUNE) {
+        } elseif ($this->getScale() == Perimeter::SCALE_COMMUNE) {
             $name .= ' (Commune)';
-        } else if ($this->getScale() == Perimeter::SCALE_ADHOC) {
+        } elseif ($this->getScale() == Perimeter::SCALE_ADHOC) {
             $name .= ' (Adhoc)';
         }
 
-        return $name;   
+        return $name;
     }
 
     /**
@@ -1170,11 +1145,8 @@ class Perimeter
 
     public function removeLogAidSearch(LogAidSearch $logAidSearch): static
     {
-        if ($this->logAidSearches->removeElement($logAidSearch)) {
-            // set the owning side to null (unless already changed)
-            if ($logAidSearch->getPerimeter() === $this) {
-                $logAidSearch->setPerimeter(null);
-            }
+        if ($this->logAidSearches->removeElement($logAidSearch) && $logAidSearch->getPerimeter() === $this) {
+            $logAidSearch->setPerimeter(null);
         }
 
         return $this;
@@ -1200,11 +1172,8 @@ class Perimeter
 
     public function removeLogPublicProjectSearch(LogPublicProjectSearch $logPublicProjectSearch): static
     {
-        if ($this->logPublicProjectSearches->removeElement($logPublicProjectSearch)) {
-            // set the owning side to null (unless already changed)
-            if ($logPublicProjectSearch->getPerimeter() === $this) {
-                $logPublicProjectSearch->setPerimeter(null);
-            }
+        if ($this->logPublicProjectSearches->removeElement($logPublicProjectSearch) && $logPublicProjectSearch->getPerimeter() === $this) {
+            $logPublicProjectSearch->setPerimeter(null);
         }
 
         return $this;
@@ -1230,11 +1199,8 @@ class Perimeter
 
     public function removeLogProjectValidatedSearch(LogProjectValidatedSearch $logProjectValidatedSearch): static
     {
-        if ($this->logProjectValidatedSearches->removeElement($logProjectValidatedSearch)) {
-            // set the owning side to null (unless already changed)
-            if ($logProjectValidatedSearch->getPerimeter() === $this) {
-                $logProjectValidatedSearch->setPerimeter(null);
-            }
+        if ($this->logProjectValidatedSearches->removeElement($logProjectValidatedSearch) && $logProjectValidatedSearch->getPerimeter() === $this) {
+            $logProjectValidatedSearch->setPerimeter(null);
         }
 
         return $this;
@@ -1245,5 +1211,11 @@ class Perimeter
     public function getScaleName(): ?string
     {
         return self::SCALES_FOR_SEARCH[$this->getScale()]['name'] ?? null;
+    }
+
+    public function setScaleName(?string $scaleName): static
+    {
+        $this->scaleName = $scaleName;
+        return $this;
     }
 }

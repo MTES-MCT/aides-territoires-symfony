@@ -21,7 +21,7 @@ use App\Controller\Api\Aid\AidTypeController;
             uriTemplate: '/aids/types/',
             controller: AidTypeController::class,
             openapi: new Model\Operation(
-                summary: self::API_DESCRIPTION, 
+                summary: self::API_DESCRIPTION,
                 description: self::API_DESCRIPTION,
             ),
         ),
@@ -34,7 +34,7 @@ class AidType
     const API_DESCRIPTION = 'Lister tous les choix de types d\'aides';
 
     const TYPE_FINANCIAL_SLUGS = ['grant', 'loan', 'recoverable-advance', 'other', 'cee'];
-    CONST TYPE_TECHNICAL_SLUG = ['technical-engineering', 'financial-engineering', 'legal-engineering'];
+    const TYPE_TECHNICAL_SLUG = ['technical-engineering', 'financial-engineering', 'legal-engineering'];
     
     const SLUG_GRANT = 'grant';
     const SLUG_LOAN = 'loan';

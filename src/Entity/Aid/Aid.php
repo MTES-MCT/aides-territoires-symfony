@@ -50,6 +50,7 @@ use App\Filter\Aid\AidTargetedAudiencesFilter;
 use App\Filter\Aid\AidTechnicalAidFilter;
 use App\Filter\Aid\AidTextFilter;
 use App\Filter\Aid\AidTypeGroupFilter;
+use App\Service\Doctrine\DoctrineConstants;
 
 #[ORM\Entity(repositoryClass: AidRepository::class)]
 #[ORM\Index(columns: ['status'], name: 'status_aid')]
@@ -74,7 +75,7 @@ use App\Filter\Aid\AidTypeGroupFilter;
             controller: AidAidController::class,
             normalizationContext: ['groups' => self::API_GROUP_LIST],
             openapi: new Model\Operation(
-                summary: 'Lister toutes les aides actuellement publiées', 
+                summary: 'Lister toutes les aides actuellement publiées',
                 description: 'Lister toutes les aides actuellement publiées',
             )
         ),
@@ -106,7 +107,7 @@ use App\Filter\Aid\AidTypeGroupFilter;
 #[ApiFilter(AidIsChargedFilter::class)]
 #[ApiFilter(AidPerimeterFilter::class)]
 #[ApiFilter(AidProjectReferenceFilter::class)]
-class Aid
+class Aid // NOSONAR too much methods
 {
     const API_OPERATION_GET_BY_SLUG = 'api_aid_get_by_slug';
     const API_OPERATION_GET_COLLECTION_PUBLISHED = 'api_aids_published';
@@ -260,7 +261,7 @@ class Aid
     private ?\DateTimeInterface $timeCreate = null;
 
     #[ORM\ManyToOne(inversedBy: 'aids')]
-    #[ORM\JoinColumn(onDelete: 'SET NULL')]
+    #[ORM\JoinColumn(onDelete: DoctrineConstants::SET_NULL)]
     private ?User $author = null;
 
     #[Groups([Aid::API_GROUP_LIST, Aid::API_GROUP_ITEM])]
@@ -570,27 +571,27 @@ class Aid
     private Collection $highlightedSearchPages;
 
     #[ORM\OneToMany(mappedBy: 'aid', targetEntity: LogAidView::class)]
-    #[ORM\JoinColumn(onDelete:'SET NULL')]
+    #[ORM\JoinColumn(onDelete: DoctrineConstants::SET_NULL)]
     private Collection $logAidViews;
 
     #[ORM\OneToMany(mappedBy: 'aid', targetEntity: LogAidApplicationUrlClick::class)]
-    #[ORM\JoinColumn(onDelete:'SET NULL')]
+    #[ORM\JoinColumn(onDelete: DoctrineConstants::SET_NULL)]
     private Collection $logAidApplicationUrlClicks;
 
     #[ORM\OneToMany(mappedBy: 'aid', targetEntity: LogAidOriginUrlClick::class)]
-    #[ORM\JoinColumn(onDelete:'SET NULL')]
-    private Collection $logAidOriginUrlClicks; 
+    #[ORM\JoinColumn(onDelete: DoctrineConstants::SET_NULL)]
+    private Collection $logAidOriginUrlClicks;
 
     #[ORM\OneToMany(mappedBy: 'aid', targetEntity: LogAidContactClick::class)]
-    #[ORM\JoinColumn(onDelete:'SET NULL')]
+    #[ORM\JoinColumn(onDelete: DoctrineConstants::SET_NULL)]
     private Collection $logAidContactClicks;
 
     #[ORM\OneToMany(mappedBy: 'aid', targetEntity: LogAidCreatedsFolder::class)]
-    #[ORM\JoinColumn(onDelete:'SET NULL')]
+    #[ORM\JoinColumn(onDelete: DoctrineConstants::SET_NULL)]
     private Collection $logAidCreatedsFolders;
 
     #[ORM\OneToMany(mappedBy: 'aid', targetEntity: LogAidEligibilityTest::class)]
-    #[ORM\JoinColumn(onDelete:'SET NULL')]
+    #[ORM\JoinColumn(onDelete: DoctrineConstants::SET_NULL)]
     private Collection $logAidEligibilityTests;
     
     /**
@@ -728,7 +729,6 @@ class Aid
     {
         if (!$this->aidAudiences->contains($aidAudience)) {
             $this->aidAudiences->add($aidAudience);
-            // $this->setTimeUpdate(new \DateTime(date('Y-m-d H:i:s')));
         }
 
         return $this;
@@ -1097,11 +1097,8 @@ class Aid
 
     public function removeAidsAmended(self $aidsAmended): static
     {
-        if ($this->aidsAmended->removeElement($aidsAmended)) {
-            // set the owning side to null (unless already changed)
-            if ($aidsAmended->getAmendedAid() === $this) {
-                $aidsAmended->setAmendedAid(null);
-            }
+        if ($this->aidsAmended->removeElement($aidsAmended) && $aidsAmended->getAmendedAid() === $this) {
+            $aidsAmended->setAmendedAid(null);
         }
 
         return $this;
@@ -1271,11 +1268,8 @@ class Aid
 
     public function removeAidsFromGeneric(self $aidsFromGeneric): static
     {
-        if ($this->aidsFromGeneric->removeElement($aidsFromGeneric)) {
-            // set the owning side to null (unless already changed)
-            if ($aidsFromGeneric->getGenericAid() === $this) {
-                $aidsFromGeneric->setGenericAid(null);
-            }
+        if ($this->aidsFromGeneric->removeElement($aidsFromGeneric) && $aidsFromGeneric->getGenericAid() === $this) {
+            $aidsFromGeneric->setGenericAid(null);
         }
 
         return $this;
@@ -1617,7 +1611,6 @@ class Aid
     {
         if (!$this->categories->contains($category)) {
             $this->categories->add($category);
-            // $this->setTimeUpdate(new \DateTime(date('Y-m-d H:i:s')));
         }
 
         return $this;
@@ -1698,11 +1691,8 @@ class Aid
 
     public function removeAidFinancer(AidFinancer $aidFinancer): static
     {
-        if ($this->aidFinancers->removeElement($aidFinancer)) {
-            // set the owning side to null (unless already changed)
-            if ($aidFinancer->getAid() === $this) {
-                $aidFinancer->setAid(null);
-            }
+        if ($this->aidFinancers->removeElement($aidFinancer) && $aidFinancer->getAid() === $this) {
+            $aidFinancer->setAid(null);
         }
 
         return $this;
@@ -1728,11 +1718,8 @@ class Aid
 
     public function removeAidInstructor(AidInstructor $aidInstructor): static
     {
-        if ($this->aidInstructors->removeElement($aidInstructor)) {
-            // set the owning side to null (unless already changed)
-            if ($aidInstructor->getAid() === $this) {
-                $aidInstructor->setAid(null);
-            }
+        if ($this->aidInstructors->removeElement($aidInstructor) && $aidInstructor->getAid() === $this) {
+            $aidInstructor->setAid(null);
         }
 
         return $this;
@@ -1758,11 +1745,8 @@ class Aid
 
     public function removeProjectValidated(ProjectValidated $projectValidated): static
     {
-        if ($this->projectValidateds->removeElement($projectValidated)) {
-            // set the owning side to null (unless already changed)
-            if ($projectValidated->getAid() === $this) {
-                $projectValidated->setAid(null);
-            }
+        if ($this->projectValidateds->removeElement($projectValidated) && $projectValidated->getAid() === $this) {
+            $projectValidated->setAid(null);
         }
 
         return $this;
@@ -1788,11 +1772,8 @@ class Aid
 
     public function removeAidProject(AidProject $aidProject): static
     {
-        if ($this->aidProjects->removeElement($aidProject)) {
-            // set the owning side to null (unless already changed)
-            if ($aidProject->getAid() === $this) {
-                $aidProject->setAid(null);
-            }
+        if ($this->aidProjects->removeElement($aidProject) && $aidProject->getAid() === $this) {
+            $aidProject->setAid(null);
         }
 
         return $this;
@@ -1818,11 +1799,8 @@ class Aid
 
     public function removeAidSuggestedAidProject(AidSuggestedAidProject $aidSuggestedAidProject): static
     {
-        if ($this->aidSuggestedAidProjects->removeElement($aidSuggestedAidProject)) {
-            // set the owning side to null (unless already changed)
-            if ($aidSuggestedAidProject->getAid() === $this) {
-                $aidSuggestedAidProject->setAid(null);
-            }
+        if ($this->aidSuggestedAidProjects->removeElement($aidSuggestedAidProject) && $aidSuggestedAidProject->getAid() === $this) {
+            $aidSuggestedAidProject->setAid(null);
         }
 
         return $this;
@@ -1929,11 +1907,8 @@ class Aid
 
     public function removeLogAidView(LogAidView $logAidView): static
     {
-        if ($this->logAidViews->removeElement($logAidView)) {
-            // set the owning side to null (unless already changed)
-            if ($logAidView->getAid() === $this) {
-                $logAidView->setAid(null);
-            }
+        if ($this->logAidViews->removeElement($logAidView) && $logAidView->getAid() === $this) {
+            $logAidView->setAid(null);
         }
 
         return $this;
@@ -1945,37 +1920,33 @@ class Aid
      */
 
     public function isApproachingDeadline() : bool {
-        if (!$this->getDateSubmissionDeadline()) {
-            return false;
-        }
+        $result = false;
 
-        try {
+        if ($this->getDateSubmissionDeadline()) {
             $today = new \DateTime(date('Y-m-d'));
             $interval = $this->getDateSubmissionDeadline()->diff($today);
-
+    
             if ($interval->days <= self::APPROACHING_DEADLINE_DELTA) {
-                return true;
+                $result = true;
             }
-        } catch (\Exception $e) {
         }
-
-        return false;
+    
+        return $result;
     }
 
     public function getDaysBeforeDeadline() : int {
-        if (!$this->getDateSubmissionDeadline()) {
-            return 0;
-        }
+        $result = 0;
 
-        try {
+        if ($this->getDateSubmissionDeadline()) {
             $today = new \DateTime(date('Y-m-d'));
             $interval = $this->getDateSubmissionDeadline()->diff($today);
-
-            return $interval->days;
-        } catch (\Exception $e) {
+    
+            if ($interval->days <= self::APPROACHING_DEADLINE_DELTA) {
+                $result = $interval->days;
+            }
         }
-
-        return 0;
+    
+        return $result;
     }
 
     public function isFinancial(): bool
@@ -2022,7 +1993,7 @@ class Aid
     public function isLive(): bool
     {
         $today = new \DateTime(date('Y-m-d'));
-        // return $this->dateStart > $today;
+
         if (
             $this->status == self::STATUS_PUBLISHED
             && (($this->dateStart && $this->dateStart <= $today) || !$this->dateStart)
@@ -2036,10 +2007,8 @@ class Aid
 
     public function isOnGoing(): bool
     {
-        if ($this->getAidRecurrence()) {
-            if ($this->aidRecurrence->getSlug() == AidRecurrence::SLUG_ONGOING) {
-                return true;
-            }
+        if ($this->getAidRecurrence() && $this->aidRecurrence->getSlug() == AidRecurrence::SLUG_ONGOING) {
+            return true;
         }
 
         return false;
@@ -2047,10 +2016,8 @@ class Aid
 
     public function isRecurring(): bool
     {
-        if ($this->getAidRecurrence()) {
-            if ($this->aidRecurrence->getSlug() == AidRecurrence::SLUG_RECURRING) {
-                return true;
-            }
+        if ($this->getAidRecurrence() && $this->aidRecurrence->getSlug() == AidRecurrence::SLUG_RECURRING) {
+            return true;
         }
 
         return false;
@@ -2083,7 +2050,7 @@ class Aid
         return false;
     }
 
-    public function  hasCalendar() : bool 
+    public function  hasCalendar() : bool
     {
         if ($this->isOnGoing()) {
             return false;
@@ -2145,16 +2112,26 @@ class Aid
         foreach ($this->getAidFinancers() as $aidFinancer) {
             $financers->add($aidFinancer->getBacker());
         }
-        return $financers;    
+        return $financers;
     }
-
+    public function setFinancers(ArrayCollection $financers): static
+    {
+        $this->financers = $financers;
+        return $this;
+    }
+    
     public function getInstructors() : ArrayCollection
     {
         $instructors = new ArrayCollection();
         foreach ($this->getAidInstructors() as $aidInstructor) {
             $instructors->add($aidInstructor->getBacker());
         }
-        return $instructors;    
+        return $instructors;
+    }
+    public function setInstructors(Collection $instructors): static
+    {
+        $this->instructors = $instructors;
+        return $this;
     }
 
     public function getNbViews() : int {
@@ -2186,11 +2163,8 @@ class Aid
 
     public function removeLogAidApplicationUrlClick(LogAidApplicationUrlClick $logAidApplicationUrlClick): static
     {
-        if ($this->logAidApplicationUrlClicks->removeElement($logAidApplicationUrlClick)) {
-            // set the owning side to null (unless already changed)
-            if ($logAidApplicationUrlClick->getAid() === $this) {
-                $logAidApplicationUrlClick->setAid(null);
-            }
+        if ($this->logAidApplicationUrlClicks->removeElement($logAidApplicationUrlClick) && $logAidApplicationUrlClick->getAid() === $this) {
+            $logAidApplicationUrlClick->setAid(null);
         }
 
         return $this;
@@ -2216,11 +2190,8 @@ class Aid
 
     public function removeLogAidOriginUrlClick(LogAidOriginUrlClick $logAidOriginUrlClick): static
     {
-        if ($this->logAidOriginUrlClicks->removeElement($logAidOriginUrlClick)) {
-            // set the owning side to null (unless already changed)
-            if ($logAidOriginUrlClick->getAid() === $this) {
-                $logAidOriginUrlClick->setAid(null);
-            }
+        if ($this->logAidOriginUrlClicks->removeElement($logAidOriginUrlClick) && $logAidOriginUrlClick->getAid() === $this) {
+            $logAidOriginUrlClick->setAid(null);
         }
 
         return $this;
@@ -2246,11 +2217,8 @@ class Aid
 
     public function removeLogAidContactClick(LogAidContactClick $logAidContactClick): static
     {
-        if ($this->logAidContactClicks->removeElement($logAidContactClick)) {
-            // set the owning side to null (unless already changed)
-            if ($logAidContactClick->getAid() === $this) {
-                $logAidContactClick->setAid(null);
-            }
+        if ($this->logAidContactClicks->removeElement($logAidContactClick) && $logAidContactClick->getAid() === $this) {
+            $logAidContactClick->setAid(null);
         }
 
         return $this;
@@ -2276,11 +2244,8 @@ class Aid
 
     public function removeLogAidCreatedsFolder(LogAidCreatedsFolder $logAidCreatedsFolder): static
     {
-        if ($this->logAidCreatedsFolders->removeElement($logAidCreatedsFolder)) {
-            // set the owning side to null (unless already changed)
-            if ($logAidCreatedsFolder->getAid() === $this) {
-                $logAidCreatedsFolder->setAid(null);
-            }
+        if ($this->logAidCreatedsFolders->removeElement($logAidCreatedsFolder) && $logAidCreatedsFolder->getAid() === $this) {
+            $logAidCreatedsFolder->setAid(null);
         }
 
         return $this;
@@ -2306,11 +2271,8 @@ class Aid
 
     public function removeLogAidEligibilityTest(LogAidEligibilityTest $logAidEligibilityTest): static
     {
-        if ($this->logAidEligibilityTests->removeElement($logAidEligibilityTest)) {
-            // set the owning side to null (unless already changed)
-            if ($logAidEligibilityTest->getAid() === $this) {
-                $logAidEligibilityTest->setAid(null);
-            }
+        if ($this->logAidEligibilityTests->removeElement($logAidEligibilityTest) && $logAidEligibilityTest->getAid() === $this) {
+            $logAidEligibilityTest->setAid(null);
         }
 
         return $this;

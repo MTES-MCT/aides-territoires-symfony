@@ -21,7 +21,7 @@ use ApiPlatform\OpenApi\Model;
             uriTemplate: '/aids/recurrences/',
             controller: AidRecurrenceController::class,
             openapi: new Model\Operation(
-                summary: self::API_DESCRIPTION, 
+                summary: self::API_DESCRIPTION,
                 description: self::API_DESCRIPTION,
             ),
         ),
@@ -155,11 +155,8 @@ class AidRecurrence
 
     public function removeAid(Aid $aid): static
     {
-        if ($this->aids->removeElement($aid)) {
-            // set the owning side to null (unless already changed)
-            if ($aid->getAidRecurrence() === $this) {
-                $aid->setAidRecurrence(null);
-            }
+        if ($this->aids->removeElement($aid) && $aid->getAidRecurrence() === $this) {
+            $aid->setAidRecurrence(null);
         }
 
         return $this;

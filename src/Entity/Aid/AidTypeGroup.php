@@ -138,11 +138,8 @@ class AidTypeGroup
 
     public function removeAidType(AidType $aidType): static
     {
-        if ($this->aidTypes->removeElement($aidType)) {
-            // set the owning side to null (unless already changed)
-            if ($aidType->getAidTypeGroup() === $this) {
-                $aidType->setAidTypeGroup(null);
-            }
+        if ($this->aidTypes->removeElement($aidType) && $aidType->getAidTypeGroup() === $this) {
+            $aidType->setAidTypeGroup(null);
         }
 
         return $this;

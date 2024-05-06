@@ -10,7 +10,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
 
 #[ORM\Entity(repositoryClass: AidProjectRepository::class)]
-class AidProject
+class AidProject // NOSONAR too much methods
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
