@@ -4,6 +4,7 @@ namespace App\Repository\Reference;
 
 use App\Entity\Reference\ProjectReferenceCategory;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -21,28 +22,42 @@ class ProjectReferenceCategoryRepository extends ServiceEntityRepository
         parent::__construct($registry, ProjectReferenceCategory::class);
     }
 
-//    /**
-//     * @return ProjectReferenceCategory[] Returns an array of ProjectReferenceCategory objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('p')
-//            ->andWhere('p.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('p.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
+    public function countCustom(?array $params = null): int
+    {
+        return $this->getQueryBuilder($params)
+            ->select('COUNT(prc.id)')
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
 
-//    public function findOneBySomeField($value): ?ProjectReferenceCategory
-//    {
-//        return $this->createQueryBuilder('p')
-//            ->andWhere('p.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
+    public function findCustom(?array $params = null): array
+    {
+        return $this->getQueryBuilder($params)
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function getQueryBuilder(?array $params = null): QueryBuilder
+    {
+        $nameLike = $params['nameLike'] ?? null;
+        $firstResult = $params['firstResult'] ?? null;
+        $maxResults = $params['maxResults'] ?? null;
+
+        $qb = $this->createQueryBuilder('prc');
+
+        if ($nameLike !== null) {
+            $qb->andWhere('prc.name LIKE :nameLike')
+                ->setParameter('nameLike', '%' . $nameLike . '%');
+        }
+
+        if ($firstResult !== null) {
+            $qb->setFirstResult($firstResult);
+        }
+
+        if ($maxResults !== null) {
+            $qb->setMaxResults($maxResults);
+        }
+
+        return $qb;
+    }
 }

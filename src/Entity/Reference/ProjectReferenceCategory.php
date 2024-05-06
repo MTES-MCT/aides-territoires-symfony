@@ -2,19 +2,47 @@
 
 namespace App\Entity\Reference;
 
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\OpenApi\Model;
+use App\Controller\Api\Reference\ProjectReferenceCategoryController;
 use App\Repository\Reference\ProjectReferenceCategoryRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Attribute\Groups;
 
+#[ApiResource(
+    shortName: 'Projets référents',
+    operations: [
+        new GetCollection(
+            uriTemplate: '/project-reference-categories/',
+            controller: ProjectReferenceCategoryController::class,
+            normalizationContext: ['groups' => self::API_GROUP_LIST],
+            openapi: new Model\Operation(
+                summary: self::API_DESCRIPTION, 
+                description: self::API_DESCRIPTION,
+            ),
+            paginationEnabled: true,
+            paginationItemsPerPage: 50,
+            paginationClientItemsPerPage: true
+        )
+    ]
+)]
 #[ORM\Entity(repositoryClass: ProjectReferenceCategoryRepository::class)]
 class ProjectReferenceCategory
 {
+    const API_GROUP_LIST = 'project_reference_category:list';
+    const API_GROUP_ITEM = 'project_reference_category:item';
+    const API_DESCRIPTION = 'Lister toutes les catégories de projet référent';
+
+    #[Groups([self::API_GROUP_LIST, self::API_GROUP_ITEM, ProjectReference::API_GROUP_LIST, ProjectReference::API_GROUP_ITEM])]
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
 
+    #[Groups([self::API_GROUP_LIST, self::API_GROUP_ITEM, ProjectReference::API_GROUP_LIST, ProjectReference::API_GROUP_ITEM])]
     #[ORM\Column(length: 150)]
     private ?string $name = null;
 

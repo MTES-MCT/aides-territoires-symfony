@@ -3,6 +3,7 @@
 namespace App\Repository\Reference;
 
 use App\Entity\Reference\ProjectReference;
+use App\Entity\Reference\ProjectReferenceCategory;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
@@ -22,6 +23,13 @@ class ProjectReferenceRepository extends ServiceEntityRepository
         parent::__construct($registry, ProjectReference::class);
     }
 
+    public function countCustom(?array $params = null): int
+    {
+        $qb = $this->getQueryBuilder($params);
+
+        return (int) $qb->select('COUNT(pr.id)')->getQuery()->getSingleScalarResult();
+    }
+
     public function findCustom(?array $params = null): array
     {
         $qb = $this->getQueryBuilder($params);
@@ -31,13 +39,22 @@ class ProjectReferenceRepository extends ServiceEntityRepository
 
     public function getQueryBuilder(?array $params = null): QueryBuilder
     {
+        $projectReferenceCategory = $params['projectReferenceCategory'] ?? null;
         $nameMatchAgainst = $params['nameMatchAgainst'] ?? null;
         $nameLike = $params['nameLike'] ?? null;
         $excludes = $params['excludes'] ?? null;
         $orderBy = (isset($params['orderBy']) && isset($params['orderBy']['sort']) && isset($params['orderBy']['order'])) ? $params['orderBy'] : null;
         $addOrderBy = $params['addOrderBy'] ?? null;
+        $firstResult = $params['firstResult'] ?? null;
+        $maxResults = $params['maxResults'] ?? null;
 
         $qb = $this->createQueryBuilder('pr');
+
+        if ($projectReferenceCategory instanceof ProjectReferenceCategory && $projectReferenceCategory->getId()) {
+            $qb
+            ->andWhere('pr.projectReferenceCategory = :projectReferenceCategory')
+            ->setParameter('projectReferenceCategory', $projectReferenceCategory);
+        }
 
         if ($nameMatchAgainst !== null)
         {
@@ -71,6 +88,14 @@ class ProjectReferenceRepository extends ServiceEntityRepository
             foreach ($addOrderBy as $order) {
                 $qb->addOrderBy($order['sort'], $order['order']);
             }
+        }
+
+        if ($firstResult !== null) {
+            $qb->setFirstResult($firstResult);
+        }
+
+        if ($maxResults !== null) {
+            $qb->setMaxResults($maxResults);
         }
 
         return $qb;
