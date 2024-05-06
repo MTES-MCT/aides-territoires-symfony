@@ -62,6 +62,7 @@ class AidController extends ApiController
 
         // Log recherche
         $query = $aidSearchFormService->convertAidSearchClassToQueryString($aidSearchClass);
+
         $user = $userService->getUserLogged();
         $logParams = [
             'organizationTypes' => (isset($aidParams['organizationType'])) ? [$aidParams['organizationType']] : null,
@@ -75,6 +76,7 @@ class AidController extends ApiController
             'backers' => $aidParams['backers'] ?? null,
             'categories' => $aidParams['categories'] ?? null,
             'programs' => $aidParams['programs'] ?? null,
+            'projectReference' => $aidParams['projectReference'] ?? null
         ];
         $themes = new ArrayCollection();
         if (isset($aidParams['categories']) && is_array($aidParams['categories'])) {
@@ -228,6 +230,11 @@ class AidController extends ApiController
             foreach ($result->getAidDestinations() as $aidDestination) {
                 $destinations[] = $aidDestination->getName();
             }
+
+            $projectReferences = [];
+            foreach ($result->getProjectReferences() as $projectReference) {
+                $projectReferences[] = $projectReference->getName();
+            }
             $resultsSpe[] = [
                 'id' => $result->getId(),
                 'slug' => $result->getSlug(),
@@ -265,6 +272,7 @@ class AidController extends ApiController
                 'import_share_licence' => $result->getImportShareLicence(),
                 'date_created' => $result->getTimeCreate()->format(\DateTime::ATOM),
                 'date_updated' => $result->getTimeUpdate() ? $result->getTimeUpdate()->format(\DateTime::ATOM) : null,
+                'project_references' => $projectReferences
             ];
         }
 
