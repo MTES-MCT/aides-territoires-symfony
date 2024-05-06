@@ -31,12 +31,12 @@ use Symfony\Component\Serializer\Attribute\MaxDepth;
             controller: AidAudienceController::class,
             normalizationContext: ['groups' => self::API_GROUP_LIST],
             openapi: new Model\Operation(
-                summary: self::API_DESCRIPTION, 
+                summary: self::API_DESCRIPTION,
             ),
         ),
     ],
 )]
-class OrganizationType
+class OrganizationType // NOSONAR too much methods
 {
     const API_GROUP_LIST = 'organization_type:list';
     const API_DESCRIPTION = 'Lister tous les choix de bénéficiaires';
@@ -199,11 +199,8 @@ class OrganizationType
 
     public function removeOrganization(Organization $organization): static
     {
-        if ($this->organizations->removeElement($organization)) {
-            // set the owning side to null (unless already changed)
-            if ($organization->getOrganizationType() === $this) {
-                $organization->setOrganizationType(null);
-            }
+        if ($this->organizations->removeElement($organization) && $organization->getOrganizationType() === $this) {
+            $organization->setOrganizationType(null);
         }
 
         return $this;

@@ -7,6 +7,7 @@ use App\Entity\Organization\Organization;
 use App\Entity\Organization\OrganizationType;
 use App\Entity\User\User;
 use App\Repository\Log\LogAidViewRepository;
+use App\Service\Doctrine\DoctrineConstants;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
@@ -37,18 +38,18 @@ class LogAidView
     private ?\DateTimeInterface $dateCreate = null;
 
     #[ORM\ManyToOne(inversedBy: 'logAidViews')]
-    #[ORM\JoinColumn(onDelete:'SET NULL')]
+    #[ORM\JoinColumn(onDelete:DoctrineConstants::SET_NULL)]
     private ?Aid $aid = null;
 
     #[ORM\ManyToMany(targetEntity: OrganizationType::class, inversedBy: 'logAidViews')]
     private Collection $organizationTypes;
 
     #[ORM\ManyToOne(inversedBy: 'logAidViews')]
-    #[ORM\JoinColumn(onDelete:'SET NULL')]
+    #[ORM\JoinColumn(onDelete:DoctrineConstants::SET_NULL)]
     private ?Organization $organization = null;
 
     #[ORM\ManyToOne(inversedBy: 'logAidViews')]
-    #[ORM\JoinColumn(onDelete:'SET NULL')]
+    #[ORM\JoinColumn(onDelete:DoctrineConstants::SET_NULL)]
     private ?User $user = null;
 
     public function __construct()

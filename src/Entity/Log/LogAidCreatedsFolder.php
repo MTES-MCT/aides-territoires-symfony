@@ -6,6 +6,7 @@ use App\Entity\Aid\Aid;
 use App\Entity\Organization\Organization;
 use App\Entity\User\User;
 use App\Repository\Log\LogAidCreatedsFolderRepository;
+use App\Service\Doctrine\DoctrineConstants;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
@@ -38,15 +39,15 @@ class LogAidCreatedsFolder
     private ?\DateTimeInterface $dateCreate = null;
 
     #[ORM\ManyToOne(inversedBy: 'logAidCreatedsFolders')]
-    #[ORM\JoinColumn(onDelete:'SET NULL')]
+    #[ORM\JoinColumn(onDelete:DoctrineConstants::SET_NULL)]
     private ?Aid $aid = null;
 
     #[ORM\ManyToOne(inversedBy: 'logAidCreatedsFolders')]
-    #[ORM\JoinColumn(onDelete:'SET NULL')]
+    #[ORM\JoinColumn(onDelete:DoctrineConstants::SET_NULL)]
     private ?Organization $organization = null;
 
     #[ORM\ManyToOne(inversedBy: 'logAidCreatedsFolders')]
-    #[ORM\JoinColumn(onDelete:'SET NULL')]
+    #[ORM\JoinColumn(onDelete:DoctrineConstants::SET_NULL)]
     private ?User $user = null;
 
     public function getId(): ?int

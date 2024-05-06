@@ -12,9 +12,8 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
 
-// TODO voir utilite, faire BO si besoin
 #[ORM\Entity(repositoryClass: EligibilityTestRepository::class)]
-class EligibilityTest
+class EligibilityTest // NOSONAR too much methods
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -186,11 +185,8 @@ class EligibilityTest
 
     public function removeEligibilityTestQuestion(EligibilityTestQuestion $eligibilityTestQuestion): static
     {
-        if ($this->eligibilityTestQuestions->removeElement($eligibilityTestQuestion)) {
-            // set the owning side to null (unless already changed)
-            if ($eligibilityTestQuestion->getEligibilityTest() === $this) {
-                $eligibilityTestQuestion->setEligibilityTest(null);
-            }
+        if ($this->eligibilityTestQuestions->removeElement($eligibilityTestQuestion) && $eligibilityTestQuestion->getEligibilityTest() === $this) {
+            $eligibilityTestQuestion->setEligibilityTest(null);
         }
 
         return $this;
@@ -216,11 +212,8 @@ class EligibilityTest
 
     public function removeAid(Aid $aid): static
     {
-        if ($this->aids->removeElement($aid)) {
-            // set the owning side to null (unless already changed)
-            if ($aid->getEligibilityTest() === $this) {
-                $aid->setEligibilityTest(null);
-            }
+        if ($this->aids->removeElement($aid) && $aid->getEligibilityTest() === $this) {
+            $aid->setEligibilityTest(null);
         }
 
         return $this;
@@ -246,11 +239,8 @@ class EligibilityTest
 
     public function removeLogAidEligibilityTest(LogAidEligibilityTest $logAidEligibilityTest): static
     {
-        if ($this->logAidEligibilityTests->removeElement($logAidEligibilityTest)) {
-            // set the owning side to null (unless already changed)
-            if ($logAidEligibilityTest->getEligibilityTest() === $this) {
-                $logAidEligibilityTest->setEligibilityTest(null);
-            }
+        if ($this->logAidEligibilityTests->removeElement($logAidEligibilityTest) && $logAidEligibilityTest->getEligibilityTest() === $this) {
+            $logAidEligibilityTest->setEligibilityTest(null);
         }
 
         return $this;
@@ -259,6 +249,6 @@ class EligibilityTest
 
     public function  __toString(): string
     {
-        return $this->name ?? 'EligibilityTest';   
+        return $this->name ?? 'EligibilityTest';
     }
 }
