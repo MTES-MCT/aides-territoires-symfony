@@ -9,7 +9,6 @@ use App\Entity\Aid\AidRecurrence;
 use App\Entity\Aid\AidStep;
 use App\Entity\Aid\AidType;
 use App\Entity\Category\Category;
-use App\Entity\Keyword\Keyword;
 use App\Entity\Organization\OrganizationType;
 use App\Entity\Reference\KeywordReference;
 
@@ -28,11 +27,10 @@ class ImportFluxMinistereCultureCommand extends ImportFluxCommand
         if (!isset($aidToImport['id'])) {
             return null;
         }
-        $importUniqueid = $this->importUniqueidPrefix . $aidToImport['id'];
-        return $importUniqueid;
+        return $this->importUniqueidPrefix . $aidToImport['id'];
     }
 
-    protected function getFieldsMapping(array $aidToImport, array $params = null): array
+    protected function getFieldsMapping(array $aidToImport, array $params = null): array // NOSONAR too complex
     {
         try {
             $importRaws = $this->getImportRaws($aidToImport, ['deadline']);
@@ -101,7 +99,7 @@ class ImportFluxMinistereCultureCommand extends ImportFluxCommand
             ];
             if (isset($params['context']) && $params['context'] == 'create') {
                 $return['dateSubmissionDeadline'] = $dateSubmissionDeadline;
-            } else if (isset($params['context']) && $params['context'] == 'update') {
+            } elseif (isset($params['context']) && $params['context'] == 'update') {
                 // en cas d'update on ne met à jour la date de clôture que si elle n'est pas déjà renseignée
                 if ($dateSubmissionDeadline && isset($params['aid']) && !$params['aid']->getDateSubmissionDeadline()) {
                     $return['dateSubmissionDeadline'] = $dateSubmissionDeadline;
@@ -298,7 +296,7 @@ class ImportFluxMinistereCultureCommand extends ImportFluxCommand
         return $aid;
     }
 
-    private function getMappingCategories(): array
+    private function getMappingCategories(): array // NOSONAR too complex
     {
         return [
             'Démocratisation' => [

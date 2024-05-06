@@ -39,10 +39,6 @@ class CountLiveCommand extends Command
         parent::__construct();
     }
 
-    protected function configure() : void
-    {
-    }
-
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->input = $input;
@@ -116,7 +112,6 @@ class CountLiveCommand extends Command
             $io->success('Comptage effectué');
             $io->success('Mémoire maximale utilisée : ' . round(memory_get_peak_usage() / 1024 / 1024) . ' MB');
         } catch (\Exception $e) {
-            dd($e);
             throw new \Exception($e->getMessage());
         }
     }

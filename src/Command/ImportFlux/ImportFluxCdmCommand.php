@@ -10,7 +10,6 @@ use App\Entity\Aid\AidRecurrence;
 use App\Entity\Aid\AidStep;
 use App\Entity\Aid\AidType;
 use App\Entity\Category\Category;
-use App\Entity\Keyword\Keyword;
 use App\Entity\Organization\OrganizationType;
 use App\Entity\Reference\KeywordReference;
 
@@ -28,8 +27,7 @@ class ImportFluxCdmCommand extends ImportFluxCommand
         if (!isset($aidToImport['id'])) {
             return null;
         }
-        $importUniqueid = $this->importUniqueidPrefix . $aidToImport['id'];
-        return $importUniqueid;
+        return $this->importUniqueidPrefix . $aidToImport['id'];
     }
 
     protected function getFieldsMapping(array $aidToImport, array $params = null): array
@@ -170,7 +168,7 @@ class ImportFluxCdmCommand extends ImportFluxCommand
         }
         foreach($aidToImport['destinations'] as $destinationName) {
             // on a un problème avec les apostrophes
-            $destinationName = preg_replace("/'/", "’", $destinationName);
+            $destinationName = str_replace("'", "’", $destinationName);
             $destination = $this->managerRegistry->getRepository(OrganizationType::class)->findOneBy(['name' => $destinationName]);
             if ($destination instanceof AidDestination) {
                 $aid->addAidDestination($destination);

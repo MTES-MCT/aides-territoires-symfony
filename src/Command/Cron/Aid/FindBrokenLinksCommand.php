@@ -37,10 +37,6 @@ class FindBrokenLinksCommand extends Command
         parent::__construct();
     }
 
-    protected function configure() : void
-    {
-    }
-
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->input = $input;
@@ -64,7 +60,7 @@ class FindBrokenLinksCommand extends Command
         return Command::SUCCESS;
     }
 
-    protected function cronTask($input, $output)
+    protected function cronTask($input, $output) // NOSONAR too complex
     {
         $io = new SymfonyStyle($input, $output);
         $timeStart = microtime(true);

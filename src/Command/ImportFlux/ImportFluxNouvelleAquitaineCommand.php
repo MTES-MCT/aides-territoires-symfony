@@ -5,9 +5,6 @@ namespace App\Command\ImportFlux;
 use Symfony\Component\Console\Attribute\AsCommand;
 use App\Command\ImportFlux\ImportFluxCommand;
 use App\Entity\Aid\Aid;
-use App\Entity\Aid\AidRecurrence;
-use App\Entity\Aid\AidStep;
-use App\Entity\Aid\AidType;
 use App\Entity\Category\Category;
 use App\Entity\Organization\OrganizationType;
 
@@ -25,8 +22,7 @@ class ImportFluxNouvelleAquitaineCommand extends ImportFluxCommand
         if (!isset($aidToImport['guid'])) {
             return null;
         }
-        $importUniqueid = $this->importUniqueidPrefix . md5($aidToImport['guid']);
-        return $importUniqueid;
+        return $this->importUniqueidPrefix . md5($aidToImport['guid']);
     }
 
     protected function callApi()

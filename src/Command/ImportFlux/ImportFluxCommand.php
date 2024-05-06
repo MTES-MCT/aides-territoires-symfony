@@ -20,7 +20,7 @@ use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 #[AsCommand(name: 'at:import_flux:generic', description: 'Import de flux générique, à étendre à chaque nouveau flux')]
-class ImportFluxCommand extends Command
+class ImportFluxCommand extends Command // NOSONAR too much methods
 {
     protected InputInterface $input;
     protected OutputInterface $output;
@@ -57,10 +57,6 @@ class ImportFluxCommand extends Command
         ini_set('memory_limit', '1G');
         parent::__construct();
         $this->dateImportStart = new \DateTime(date('Y-m-d H:i:s'));
-    }
-
-    protected function configure() : void
-    {
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -118,7 +114,7 @@ class ImportFluxCommand extends Command
 
         $io->title($this->commandTextEnd);
         return Command::SUCCESS;
-    }    
+    }
 
     protected function importFlux($input, $output): void
     {
@@ -142,7 +138,6 @@ class ImportFluxCommand extends Command
                 $this->dataSource->getImportApiUrl(),
                 $this->getApiOptions()
             );
-            $content = $response->getContent();
             $content = $response->toArray();
             $nbItems = $content['count'] ?? 0;
             if (!$nbItems) {
@@ -268,7 +263,7 @@ class ImportFluxCommand extends Command
             // recup auto des champ import_..._temp si non renseigné
             if (!$aid->getImportRawObjectTemp()) {
                 $aid->setImportRawObjectTemp($aid->getImportRawObject());
-            } 
+            }
             if (!$aid->getImportRawObjectTempCalendar()) {
                 $aid->setImportRawObjectTempCalendar($aid->getImportRawObjectCalendar());
             }
@@ -288,7 +283,6 @@ class ImportFluxCommand extends Command
             }
         catch (\Exception $e) {
             throw new \Exception('Impossible de créer l\'aide : ' . $e->getMessage());
-            return false;
         }
     }
 
@@ -323,7 +317,7 @@ class ImportFluxCommand extends Command
                 */
                 $keepValues = ['dateStart', 'dateSubmissionDeadline', 'nameInitial', 'importRawObject', 'importRawObjectCalendar'];
                 $aid->setImportUpdated(true);
-            } else if (
+            } elseif (
                 isset($newValues['importRawObjectCalendar'])
                 && $newValues['importRawObjectCalendar'] != $aid->getImportRawObjectCalendar()
                 && $this->idDataSource !== 2
@@ -350,7 +344,7 @@ class ImportFluxCommand extends Command
                 if ($field == 'importRawObject') {
                     $aid->setImportRawObjectTemp($value);
                     unset($newValues[$field]);
-                } else if ($field == 'importRawObjectCalendar') {
+                } elseif ($field == 'importRawObjectCalendar') {
                     $aid->setImportRawObjectTempCalendar($value);
                     unset($newValues[$field]);
                 } else {
@@ -395,7 +389,6 @@ class ImportFluxCommand extends Command
             return true;
         } catch (\Exception $e) {
             throw new \Exception('Impossible de mettre à jour l\'aide : ' . $e->getMessage());
-            return false;
         }
     }
 
@@ -424,42 +417,42 @@ class ImportFluxCommand extends Command
         return $aid;
     }
 
-    protected function setAidTypes(array $aidToImport, Aid $aid): Aid
+    protected function setAidTypes(array $aidToImport, Aid $aid): Aid // NOSONAR methode generique pour surcharge
     {
         return $aid;
     }
 
-    protected function setAidRecurrence(array $aidToImport, Aid $aid): Aid
+    protected function setAidRecurrence(array $aidToImport, Aid $aid): Aid // NOSONAR methode generique pour surcharge
     {
         return $aid;
     }
 
-    protected function setAidSteps(array $aidToImport, Aid $aid): Aid
+    protected function setAidSteps(array $aidToImport, Aid $aid): Aid // NOSONAR methode generique pour surcharge
     {
         return $aid;
     }
 
-    protected function setAidAudiences(array $aidToImport, Aid $aid): Aid
+    protected function setAidAudiences(array $aidToImport, Aid $aid): Aid // NOSONAR methode generique pour surcharge
     {
         return $aid;
     }
 
-    protected function setKeywords(array $aidToImport, Aid $aid): Aid
+    protected function setKeywords(array $aidToImport, Aid $aid): Aid // NOSONAR methode generique pour surcharge
     {
         return $aid;
     }
 
-    protected function setAidDestinations(array $aidToImport, Aid $aid): Aid
+    protected function setAidDestinations(array $aidToImport, Aid $aid): Aid // NOSONAR methode generique pour surcharge
     {
         return $aid;
     }
 
-    protected function setPerimeter(array $aidToImport, Aid $aid): Aid
+    protected function setPerimeter(array $aidToImport, Aid $aid): Aid // NOSONAR methode generique pour surcharge
     {
         return $aid;
     }
 
-    protected function setIsCallForProject(array $aidToImport, Aid $aid): Aid
+    protected function setIsCallForProject(array $aidToImport, Aid $aid): Aid // NOSONAR methode generique pour surcharge
     {
         return $aid;
     }
@@ -475,7 +468,7 @@ class ImportFluxCommand extends Command
                 $importRawObjectCalendar[$key] = $aidToImport[$key];
             }
         }
-        if (count($importRawObjectCalendar) == 0) {
+        if (empty($importRawObjectCalendar)) {
             $importRawObjectCalendar = null;
         }
 
@@ -544,5 +537,4 @@ class ImportFluxCommand extends Command
 
         return $html !== '' ? $html : null;
     }
-    
 }

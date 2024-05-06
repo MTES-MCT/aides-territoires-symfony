@@ -35,10 +35,6 @@ class ExportToSibCommand extends Command
         parent::__construct();
     }
 
-    protected function configure() : void
-    {
-    }
-
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->input = $input;
@@ -62,7 +58,7 @@ class ExportToSibCommand extends Command
         return Command::SUCCESS;
     }
 
-    protected function cronTask($input, $output)
+    protected function cronTask($input, $output) // NOSONAR too complex
     {
         $io = new SymfonyStyle($input, $output);
 
@@ -131,7 +127,7 @@ class ExportToSibCommand extends Command
             }
         }
 
-        if (count($errors) > 0) {
+        if (!empty($errors)) {
             // envoi un mail à l'admin
             $this->emailService->sendEmail(
                 $this->paramService->get('email_super_admin'),

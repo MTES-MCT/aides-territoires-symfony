@@ -4,17 +4,11 @@ namespace App\Controller\Api\Perimeter;
 
 use App\Controller\Api\ApiController;
 use App\Entity\Perimeter\Perimeter;
-use App\Repository\Perimeter\PerimeterDataRepository;
 use App\Repository\Perimeter\PerimeterRepository;
 use App\Service\Perimeter\PerimeterService;
-use App\Service\Various\StringService;
-use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Attribute\AsController;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Routing\RouterInterface;
-use Symfony\Component\Serializer\SerializerInterface;
 
 #[AsController]
 class PerimeterController extends ApiController

@@ -26,8 +26,7 @@ class ImportFluxWelcomeEuropeCommand extends ImportFluxCommand
         if (!isset($aidToImport['ID'])) {
             return null;
         }
-        $importUniqueid = $this->importUniqueidPrefix . $aidToImport['ID'];
-        return $importUniqueid;
+        return $this->importUniqueidPrefix . $aidToImport['ID'];
     }
 
     protected function callApi()
@@ -65,7 +64,7 @@ class ImportFluxWelcomeEuropeCommand extends ImportFluxCommand
 
 
 
-    protected function getFieldsMapping(array $aidToImport, array $params = null): array
+    protected function getFieldsMapping(array $aidToImport, array $params = null): array // NOSONAR too complex
     {
         $importRawObjectCalendar = [];
         $importRawObject = [];
@@ -80,7 +79,6 @@ class ImportFluxWelcomeEuropeCommand extends ImportFluxCommand
 
         $description = '';
         if (isset($aidToImport['relations_programmes'])) {
-            $programs_list = explode(';', $aidToImport['relations_programmes']);
             $programs = '<p>' . '<br/>' . $aidToImport['relations_programmes'] . '</p>';
             $banner_chapeau = $aidToImport['banner_cheapeau'] ?? null;
             $banner_budget = $aidToImport['banner_budget'] ?? null;
@@ -88,7 +86,7 @@ class ImportFluxWelcomeEuropeCommand extends ImportFluxCommand
             $info_amorce = $aidToImport['info_amorce'] ?? null;
             $info_priories = $aidToImport['info_priories'] ?? null;
 
-            $description = 
+            $description =
                 '<div>'
                 . $programs
                 ;
@@ -144,7 +142,7 @@ class ImportFluxWelcomeEuropeCommand extends ImportFluxCommand
 
         $contact = null;
         if (isset($aidToImport['info_utile'])) {
-            $info_utile_tmp = preg_replace('/<\/a>/', '</a>|%|', $aidToImport['info_utile']);
+            $info_utile_tmp = str_replace('</a>', '</a>|%|', $aidToImport['info_utile']);
             $info_utile_list = explode('|%|', $info_utile_tmp);
             $info_utile = '';
             foreach ($info_utile_list as $key => $value) {
@@ -187,7 +185,7 @@ class ImportFluxWelcomeEuropeCommand extends ImportFluxCommand
             'isCallForProject' => true,
             'dateStart' => $dateStart,
             'dateSubmissionDeadline' => $dateSubmissionDeadline,
-            'contact' => $contact,         
+            'contact' => $contact,
         ];
     }
 
@@ -226,7 +224,7 @@ class ImportFluxWelcomeEuropeCommand extends ImportFluxCommand
         return $aid;
     }
 
-    protected function setAidAudiences(array $aidToImport, Aid $aid): Aid
+    protected function setAidAudiences(array $aidToImport, Aid $aid): Aid // NOSONAR too complex
     {
         /*
             Exemple of string to process:
@@ -400,7 +398,7 @@ class ImportFluxWelcomeEuropeCommand extends ImportFluxCommand
         return $aid;
     }
 
-    protected function setAidTypes(array $aidToImport, Aid $aid): Aid
+    protected function setAidTypes(array $aidToImport, Aid $aid): Aid // NOSONAR too complex
     {
         /*
         Exemple of string to process: "Appel à propositions"
@@ -442,7 +440,7 @@ class ImportFluxWelcomeEuropeCommand extends ImportFluxCommand
         return $aid;
     }
 
-    protected function setCategories(array $aidToImport, Aid $aid): Aid
+    protected function setCategories(array $aidToImport, Aid $aid): Aid // NOSONAR too complex
     {
         /*
             Exemple of string to process:

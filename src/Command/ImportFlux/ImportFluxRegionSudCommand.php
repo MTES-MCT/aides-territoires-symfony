@@ -25,8 +25,7 @@ class ImportFluxRegionSudCommand extends ImportFluxCommand
         if (!isset($aidToImport['Uid'])) {
             return null;
         }
-        $importUniqueid = $this->importUniqueidPrefix . $aidToImport['Uid'];
-        return $importUniqueid;
+        return $this->importUniqueidPrefix . $aidToImport['Uid'];
     }
 
     protected function callApi()
@@ -58,10 +57,8 @@ class ImportFluxRegionSudCommand extends ImportFluxCommand
             }
         }
 
-
         return $aidsFromImport;
     }
-
 
 
     protected function getFieldsMapping(array $aidToImport, array $params = null): array
@@ -90,7 +87,7 @@ class ImportFluxRegionSudCommand extends ImportFluxCommand
         ];
     }
 
-    protected function setCategories(array $aidToImport, Aid $aid): Aid
+    protected function setCategories(array $aidToImport, Aid $aid): Aid // NOSONAR too complex
     {
         if (!isset($aidToImport['Les thématiques'])) {
             return $aid;
@@ -127,7 +124,7 @@ class ImportFluxRegionSudCommand extends ImportFluxCommand
                 'emploi'
             ],
             'Transports' => [
-                'mobilite-pour-tous',                
+                'mobilite-pour-tous',
             ],
             'Formation' => [
                 'formation'
@@ -198,12 +195,10 @@ class ImportFluxRegionSudCommand extends ImportFluxCommand
             }
         }
 
-        
-        
         return $aid;
     }
 
-    protected function setAidAudiences(array $aidToImport, Aid $aid): Aid
+    protected function setAidAudiences(array $aidToImport, Aid $aid): Aid // NOSONAR too complex
     {
         if (!isset($aidToImport['Pour qui'])) {
             return $aid;
@@ -328,5 +323,4 @@ class ImportFluxRegionSudCommand extends ImportFluxCommand
 
         return $aid;
     }
-
 }

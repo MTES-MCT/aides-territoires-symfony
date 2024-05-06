@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace App\ApiResource\Aid;
 
@@ -17,7 +17,7 @@ use App\Entity\Aid\Aid;
             controller: AidController::class,
             normalizationContext: ['groups' => Aid::API_GROUP_LIST],
             openapi: new Model\Operation(
-                summary: 'Lister toutes les aides', 
+                summary: 'Lister toutes les aides',
             )
         ),
     ],

@@ -40,10 +40,6 @@ class NotificationSendDailyCommand extends Command
         parent::__construct();
     }
 
-    protected function configure() : void
-    {
-    }
-
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->input = $input;
@@ -87,8 +83,8 @@ class NotificationSendDailyCommand extends Command
         // Pour chaque utilisateurs on lui envoi un email avec toutes les notifications non envoyées
         foreach ($users as $user) {
             $notifications = $this->managerRegistry->getRepository(Notification::class)->findToSend(['user' => $user]);
-            if (count($notifications) > 0) {
-                $subject = (count($notifications) > 1) 
+            if (!empty($notifications)) {
+                $subject = (count($notifications) > 1)
                     ? 'Vous avez des notifications non lues'
                     : 'Vous avez une notification non lue';
 
