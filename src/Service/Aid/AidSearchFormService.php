@@ -217,6 +217,7 @@ class AidSearchFormService
                 $query = parse_url($this->requestStack->getCurrentRequest()->getRequestUri(), PHP_URL_QUERY) ?? null;
             }
         }
+
         $queryParams = [];
         $queryItems = explode('&', $query);
 
@@ -566,9 +567,9 @@ class AidSearchFormService
         */
 
         if (isset($queryParams['is_charged'])) {
-            if (trim(strtolower((string) $queryParams['is_charged'])) === 'false') {
+            if (trim(strtolower((string) $queryParams['is_charged'])) === 'false' || (int) $queryParams['is_charged'] == 0) {
                 $aidSearchClass->setIsCharged(false);
-            } else if (trim(strtolower((string) $queryParams['is_charged'])) === 'true') {
+            } else if (trim(strtolower((string) $queryParams['is_charged'])) === 'true' || (int) $queryParams['is_charged'] == 1) {
                 $aidSearchClass->setIsCharged(true);
             }
         }
@@ -617,6 +618,14 @@ class AidSearchFormService
         // si il y a un mot clé on va regarder si c'est le nom exact d'un projet référent
         if ($aidSearchClass->getKeyword()) {
             $projectReference = $this->managerRegistry->getRepository(ProjectReference::class)->findOneBy(['name' => $aidSearchClass->getKeyword()]);
+            if ($projectReference instanceof ProjectReference) {
+                $aidSearchClass->setProjectReference($projectReference);
+            }
+        }
+        
+        // depuis api
+        if (isset($queryParams['project_reference_id'])) {
+            $projectReference = $this->managerRegistry->getRepository(ProjectReference::class)->find((int) $queryParams['project_reference_id']);
             if ($projectReference instanceof ProjectReference) {
                 $aidSearchClass->setProjectReference($projectReference);
             }

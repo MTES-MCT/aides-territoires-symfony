@@ -612,6 +612,18 @@ class AidRepository extends ServiceEntityRepository
             }
         }
 
+        // recherche sur projet référent strict
+        if ($projectReference instanceof ProjectReference
+            && $projectReference->getId()
+            && !isset($synonyms)
+        ) {
+            $qb
+                ->innerJoin('a.projectReferences', 'projectReferences')
+                ->andWhere('projectReferences = :projectReference')
+                ->setParameter('projectReference', $projectReference)
+            ;
+        }
+
         if ($aidRecurrence instanceof AidRecurrence && $aidRecurrence->getId()) {
             $qb
                 ->innerJoin('a.aidRecurrence', 'aidRecurrence')
