@@ -55,10 +55,10 @@ class AlertSendDailyCommand extends Command
         $io->title($this->commandTextStart);
 
         try  {
-            if ($this->kernelInterface->getEnvironment() != 'prod') {
-                $io->info('Uniquement en prod');
-                return Command::FAILURE;
-            }
+            // if ($this->kernelInterface->getEnvironment() != 'prod') {
+            //     $io->info('Uniquement en prod');
+            //     return Command::FAILURE;
+            // }
             // generate menu
             $this->cronTask($input, $output);
         } catch (\Exception $exception) {
@@ -110,40 +110,41 @@ class AlertSendDailyCommand extends Command
 
             // recupere les nouvelles aides qui correspondent à l'alerte
             $aids = $this->aidService->searchAids($aidParams);
-
-            // il y a de nouvelles aides
-            if (count($aids) > 0) {
-                if ($alert->getTitle() === $this->paramService->get('addna_alert_title')) {
-                    $emailSubjectPrefix = $this->paramService->get('addna_alert_email_subject_prefix');
-                } else {
-                    $emailSubjectPrefix = $this->paramService->get('email_subject_prefix');
-                }
-                $today = new \DateTime(date('Y-m-d H:i:s'));
-                $emailSubject = $emailSubjectPrefix . ' '. $today->format('d/m/Y') . ' — De nouvelles aides correspondent à vos recherches';
-                $subject = count($aids).' résultat'.(count($aids) > 1 ? 's' : '').' pour votre alerte';
-                $this->emailService->sendEmail(
-                    $alert->getEmail(),
-                    $emailSubject,
-                    'emails/alert/alert_send.html.twig',
-                    [
-                        'subject' => $subject,
-                        'alert' => $alert,
-                        'aids' => $aids,
-                        'aidsDisplay' => array_slice($aids, 0, 3)
-                    ]
-                );
-
-                $alert->setTimeLatestAlert($today);
-                $alert->setDateLatestAlert($today);
-                $this->managerRegistry->getManager()->persist($alert);
-                // sauvegarde
-                $this->managerRegistry->getManager()->flush();
-                // libère mémoire
-                $this->managerRegistry->getManager()->clear();
-                // incrémente le compteur
-                $nbAlertSend++;
+            if (empty($aids)) {
+                $io->success('envoi PAS '.$alert->getTitle());
+                continue;
             }
 
+            // il y a de nouvelles aides
+            if ($alert->getTitle() === $this->paramService->get('addna_alert_title')) {
+                $emailSubjectPrefix = $this->paramService->get('addna_alert_email_subject_prefix');
+            } else {
+                $emailSubjectPrefix = $this->paramService->get('email_subject_prefix');
+            }
+            $today = new \DateTime(date('Y-m-d H:i:s'));
+            $emailSubject = $emailSubjectPrefix . ' '. $today->format('d/m/Y') . ' — De nouvelles aides correspondent à vos recherches';
+            $subject = count($aids).' résultat'.(count($aids) > 1 ? 's' : '').' pour votre alerte';
+            $this->emailService->sendEmail(
+                $alert->getEmail(),
+                $emailSubject,
+                'emails/alert/alert_send.html.twig',
+                [
+                    'subject' => $subject,
+                    'alert' => $alert,
+                    'aids' => $aids,
+                    'aidsDisplay' => array_slice($aids, 0, 3)
+                ]
+            );
+            $io->success('envoi '.$alert->getTitle());
+            $alert->setTimeLatestAlert($today);
+            $alert->setDateLatestAlert($today);
+            $this->managerRegistry->getManager()->persist($alert);
+
+            // sauvegarde
+            $this->managerRegistry->getManager()->flush();
+            // incrémente le compteur
+            $nbAlertSend++;
+            
             // libère mémoire
             unset($aids);
             unset($alerts[$key]);
