@@ -42,10 +42,6 @@ class AlertSendDailyCommand extends Command
         parent::__construct();
     }
 
-    protected function configure() : void
-    {
-    }
-
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->input = $input;
@@ -162,5 +158,4 @@ class AlertSendDailyCommand extends Command
         $io->success($nbAlertSend. ' alertes envoyées');
         $io->success('Mémoire maximale utilisée : ' . round(memory_get_peak_usage() / 1024 / 1024) . ' MB');
     }
-
 }

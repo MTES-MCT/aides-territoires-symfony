@@ -21,7 +21,7 @@ use App\Controller\Api\Aid\AidStepController;
             uriTemplate: '/aids/steps/',
             controller: AidStepController::class,
             openapi: new Model\Operation(
-                summary: self::API_DESCRIPTION, 
+                summary: self::API_DESCRIPTION,
                 description: self::API_DESCRIPTION,
             ),
         ),

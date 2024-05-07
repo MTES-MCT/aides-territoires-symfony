@@ -29,13 +29,13 @@ use App\Controller\Api\Program\ProgramController;
             controller: ProgramController::class,
             normalizationContext: ['groups' => self::API_GROUP_LIST],
             openapi: new Model\Operation(
-                summary: 'Lister tous les programmes d\'aides', 
+                summary: 'Lister tous les programmes d\'aides',
             ),
         ),
     ],
 )]
 #[ORM\Entity(repositoryClass: ProgramRepository::class)]
-class Program
+class Program // NOSONAR too much methods
 {
     const FOLDER = 'programs';
     
@@ -332,11 +332,8 @@ class Program
 
     public function removeFaqQuestionAnswser(FaqQuestionAnswser $faqQuestionAnswser): static
     {
-        if ($this->faqQuestionAnswsers->removeElement($faqQuestionAnswser)) {
-            // set the owning side to null (unless already changed)
-            if ($faqQuestionAnswser->getProgram() === $this) {
-                $faqQuestionAnswser->setProgram(null);
-            }
+        if ($this->faqQuestionAnswsers->removeElement($faqQuestionAnswser) && $faqQuestionAnswser->getProgram() === $this) {
+            $faqQuestionAnswser->setProgram(null);
         }
 
         return $this;
@@ -362,11 +359,8 @@ class Program
 
     public function removePageTab(PageTab $pageTab): static
     {
-        if ($this->pageTabs->removeElement($pageTab)) {
-            // set the owning side to null (unless already changed)
-            if ($pageTab->getProgram() === $this) {
-                $pageTab->setProgram(null);
-            }
+        if ($this->pageTabs->removeElement($pageTab) && $pageTab->getProgram() === $this) {
+            $pageTab->setProgram(null);
         }
 
         return $this;
@@ -419,11 +413,8 @@ class Program
 
     public function removeLogProgramView(LogProgramView $logProgramView): static
     {
-        if ($this->logProgramViews->removeElement($logProgramView)) {
-            // set the owning side to null (unless already changed)
-            if ($logProgramView->getProgram() === $this) {
-                $logProgramView->setProgram(null);
-            }
+        if ($this->logProgramViews->removeElement($logProgramView) && $logProgramView->getProgram() === $this) {
+            $logProgramView->setProgram(null);
         }
 
         return $this;
@@ -442,6 +433,12 @@ class Program
         } catch (\Exception $e) {
             return null;
         }
+    }
+
+    public function setNbAids(?int $nbAids): static
+    {
+        $this->nbAids = $nbAids;
+        return $this;
     }
 
     public function getTimeUpdate(): ?\DateTimeInterface

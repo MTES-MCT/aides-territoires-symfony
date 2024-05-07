@@ -51,6 +51,7 @@ class AidController extends ApiController
         // spécifique
         $resultsSpe = $this->getResultsSpe($results, $aidService);
         
+
         // le retour
         $data = [
             'count' => $count,
@@ -180,7 +181,7 @@ class AidController extends ApiController
         // pour eviter que les urls ne soient ecodées
         $response->setEncodingOptions(JSON_UNESCAPED_SLASHES);
         return $response;
-    } 
+    }
 
 
     private function getResultsSpe(array $results, AidService $aidService): array

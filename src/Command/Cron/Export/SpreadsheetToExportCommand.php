@@ -39,10 +39,6 @@ class SpreadsheetToExportCommand extends Command
         parent::__construct();
     }
 
-    protected function configure() : void
-    {
-    }
-
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->input = $input;
@@ -113,7 +109,7 @@ class SpreadsheetToExportCommand extends Command
             // le fichier d'export
             $fileTarget = $this->spreadsheetExporterService->exportToFile(
                 results: $query->getResult(),
-                entityFqcn: $cronExportSpreadsheet->getEntityFqcn(), 
+                entityFqcn: $cronExportSpreadsheet->getEntityFqcn(),
                 filename: $cronExportSpreadsheet->getFilename(),
                 format: $cronExportSpreadsheet->getFormat(),
             );

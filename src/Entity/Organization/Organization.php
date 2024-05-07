@@ -19,6 +19,7 @@ use App\Entity\Project\Project;
 use App\Entity\Project\ProjectValidated;
 use App\Entity\User\User;
 use App\Repository\Organization\OrganizationRepository;
+use App\Service\Doctrine\DoctrineConstants;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
@@ -29,7 +30,7 @@ use Gedmo\Mapping\Annotation as Gedmo;
 #[ORM\Entity(repositoryClass: OrganizationRepository::class)]
 #[ORM\Index(columns: ['is_imported'], name: 'organization_is_imported')]
 #[ORM\Index(columns: ['intercommunality_type'], name: 'intercommunality_type_organization')]
-class Organization
+class Organization // NOSONAR too much methods
 {
     const INTERCOMMUNALITY_TYPES = [
         ['slug' => 'CC', 'name' => 'Communauté de communes (CC)'],
@@ -213,7 +214,7 @@ class Organization
     private ?int $tennisCourtNumber = null;
 
     #[ORM\ManyToOne(inversedBy: 'organizations')]
-    #[JoinColumn(onDelete: 'SET NULL')]
+    #[JoinColumn(onDelete: DoctrineConstants::SET_NULL)]
     private ?Backer $backer = null;
 
     #[ORM\Column(length: 50, nullable: true)]
@@ -244,43 +245,43 @@ class Organization
     private Collection $organizationInvitations;
 
     #[ORM\OneToMany(mappedBy: 'organization', targetEntity: Aid::class)]
-    #[ORM\JoinColumn(onDelete:'SET NULL')]
+    #[ORM\JoinColumn(onDelete:DoctrineConstants::SET_NULL)]
     private Collection $aids;
 
     #[ORM\OneToMany(mappedBy: 'organization', targetEntity: LogAidView::class)]
-    #[ORM\JoinColumn(onDelete:'SET NULL')]
+    #[ORM\JoinColumn(onDelete:DoctrineConstants::SET_NULL)]
     private Collection $logAidViews;
 
     #[ORM\OneToMany(mappedBy: 'organization', targetEntity: LogAidCreatedsFolder::class)]
-    #[ORM\JoinColumn(onDelete:'SET NULL')]
+    #[ORM\JoinColumn(onDelete:DoctrineConstants::SET_NULL)]
     private Collection $logAidCreatedsFolders;
 
     #[ORM\OneToMany(mappedBy: 'organization', targetEntity: LogAidSearch::class)]
-    #[ORM\JoinColumn(onDelete:'SET NULL')]
+    #[ORM\JoinColumn(onDelete:DoctrineConstants::SET_NULL)]
     private Collection $logAidSearches;
 
     #[ORM\OneToMany(mappedBy: 'organization', targetEntity: LogBackerView::class)]
-    #[ORM\JoinColumn(onDelete:'SET NULL')]
+    #[ORM\JoinColumn(onDelete:DoctrineConstants::SET_NULL)]
     private Collection $logBackerViews;
 
     #[ORM\OneToMany(mappedBy: 'organization', targetEntity: LogBlogPostView::class)]
-    #[ORM\JoinColumn(onDelete:'SET NULL')]
+    #[ORM\JoinColumn(onDelete:DoctrineConstants::SET_NULL)]
     private Collection $logBlogPostViews;
 
     #[ORM\OneToMany(mappedBy: 'organization', targetEntity: LogProgramView::class)]
-    #[ORM\JoinColumn(onDelete:'SET NULL')]
+    #[ORM\JoinColumn(onDelete:DoctrineConstants::SET_NULL)]
     private Collection $logProgramViews;
 
     #[ORM\OneToMany(mappedBy: 'organization', targetEntity: LogPublicProjectSearch::class)]
-    #[ORM\JoinColumn(onDelete:'SET NULL')]
+    #[ORM\JoinColumn(onDelete:DoctrineConstants::SET_NULL)]
     private Collection $logPublicProjectSearches;
 
     #[ORM\OneToMany(mappedBy: 'organization', targetEntity: LogPublicProjectView::class)]
-    #[ORM\JoinColumn(onDelete:'SET NULL')]
+    #[ORM\JoinColumn(onDelete:DoctrineConstants::SET_NULL)]
     private Collection $logPublicProjectViews;
 
     #[ORM\OneToMany(mappedBy: 'organization', targetEntity: LogProjectValidatedSearch::class)]
-    #[ORM\JoinColumn(onDelete:'SET NULL')]
+    #[ORM\JoinColumn(onDelete:DoctrineConstants::SET_NULL)]
     private Collection $logProjectValidatedSearches;
 
     public function __construct()
@@ -1000,11 +1001,8 @@ class Organization
 
     public function removeProject(Project $project): static
     {
-        if ($this->projects->removeElement($project)) {
-            // set the owning side to null (unless already changed)
-            if ($project->getOrganization() === $this) {
-                $project->setOrganization(null);
-            }
+        if ($this->projects->removeElement($project) && $project->getOrganization() === $this) {
+            $project->setOrganization(null);
         }
 
         return $this;
@@ -1030,11 +1028,8 @@ class Organization
 
     public function removeProjectValidated(ProjectValidated $projectValidated): static
     {
-        if ($this->projectValidateds->removeElement($projectValidated)) {
-            // set the owning side to null (unless already changed)
-            if ($projectValidated->getOrganization() === $this) {
-                $projectValidated->setOrganization(null);
-            }
+        if ($this->projectValidateds->removeElement($projectValidated) && $projectValidated->getOrganization() === $this) {
+            $projectValidated->setOrganization(null);
         }
 
         return $this;
@@ -1084,11 +1079,8 @@ class Organization
 
     public function removeDirectory(Directory $directory): static
     {
-        if ($this->directories->removeElement($directory)) {
-            // set the owning side to null (unless already changed)
-            if ($directory->getOrganization() === $this) {
-                $directory->setOrganization(null);
-            }
+        if ($this->directories->removeElement($directory) && $directory->getOrganization() === $this) {
+            $directory->setOrganization(null);
         }
 
         return $this;
@@ -1114,11 +1106,8 @@ class Organization
 
     public function removeLogAidView(LogAidView $logAidView): static
     {
-        if ($this->logAidViews->removeElement($logAidView)) {
-            // set the owning side to null (unless already changed)
-            if ($logAidView->getOrganization() === $this) {
-                $logAidView->setOrganization(null);
-            }
+        if ($this->logAidViews->removeElement($logAidView) && $logAidView->getOrganization() === $this) {
+            $logAidView->setOrganization(null);
         }
 
         return $this;
@@ -1144,11 +1133,8 @@ class Organization
 
     public function removeLogAidCreatedsFolder(LogAidCreatedsFolder $logAidCreatedsFolder): static
     {
-        if ($this->logAidCreatedsFolders->removeElement($logAidCreatedsFolder)) {
-            // set the owning side to null (unless already changed)
-            if ($logAidCreatedsFolder->getOrganization() === $this) {
-                $logAidCreatedsFolder->setOrganization(null);
-            }
+        if ($this->logAidCreatedsFolders->removeElement($logAidCreatedsFolder) && $logAidCreatedsFolder->getOrganization() === $this) {
+            $logAidCreatedsFolder->setOrganization(null);
         }
 
         return $this;
@@ -1174,11 +1160,8 @@ class Organization
 
     public function removeLogAidSearch(LogAidSearch $logAidSearch): static
     {
-        if ($this->logAidSearches->removeElement($logAidSearch)) {
-            // set the owning side to null (unless already changed)
-            if ($logAidSearch->getOrganization() === $this) {
-                $logAidSearch->setOrganization(null);
-            }
+        if ($this->logAidSearches->removeElement($logAidSearch) && $logAidSearch->getOrganization() === $this) {
+            $logAidSearch->setOrganization(null);
         }
 
         return $this;
@@ -1204,11 +1187,8 @@ class Organization
 
     public function removeLogBackerView(LogBackerView $logBackerView): static
     {
-        if ($this->logBackerViews->removeElement($logBackerView)) {
-            // set the owning side to null (unless already changed)
-            if ($logBackerView->getOrganization() === $this) {
-                $logBackerView->setOrganization(null);
-            }
+        if ($this->logBackerViews->removeElement($logBackerView) && $logBackerView->getOrganization() === $this) {
+            $logBackerView->setOrganization(null);
         }
 
         return $this;
@@ -1234,11 +1214,8 @@ class Organization
 
     public function removeLogBlogPostView(LogBlogPostView $logBlogPostView): static
     {
-        if ($this->logBlogPostViews->removeElement($logBlogPostView)) {
-            // set the owning side to null (unless already changed)
-            if ($logBlogPostView->getOrganization() === $this) {
-                $logBlogPostView->setOrganization(null);
-            }
+        if ($this->logBlogPostViews->removeElement($logBlogPostView) && $logBlogPostView->getOrganization() === $this) {
+            $logBlogPostView->setOrganization(null);
         }
 
         return $this;
@@ -1264,11 +1241,8 @@ class Organization
 
     public function removeLogProgramView(LogProgramView $logProgramView): static
     {
-        if ($this->logProgramViews->removeElement($logProgramView)) {
-            // set the owning side to null (unless already changed)
-            if ($logProgramView->getOrganization() === $this) {
-                $logProgramView->setOrganization(null);
-            }
+        if ($this->logProgramViews->removeElement($logProgramView) && $logProgramView->getOrganization() === $this) {
+            $logProgramView->setOrganization(null);
         }
 
         return $this;
@@ -1294,11 +1268,8 @@ class Organization
 
     public function removeLogPublicProjectSearch(LogPublicProjectSearch $logPublicProjectSearch): static
     {
-        if ($this->logPublicProjectSearches->removeElement($logPublicProjectSearch)) {
-            // set the owning side to null (unless already changed)
-            if ($logPublicProjectSearch->getOrganization() === $this) {
-                $logPublicProjectSearch->setOrganization(null);
-            }
+        if ($this->logPublicProjectSearches->removeElement($logPublicProjectSearch) && $logPublicProjectSearch->getOrganization() === $this) {
+            $logPublicProjectSearch->setOrganization(null);
         }
 
         return $this;
@@ -1324,11 +1295,8 @@ class Organization
 
     public function removeLogPublicProjectView(LogPublicProjectView $logPublicProjectView): static
     {
-        if ($this->logPublicProjectViews->removeElement($logPublicProjectView)) {
-            // set the owning side to null (unless already changed)
-            if ($logPublicProjectView->getOrganization() === $this) {
-                $logPublicProjectView->setOrganization(null);
-            }
+        if ($this->logPublicProjectViews->removeElement($logPublicProjectView) && $logPublicProjectView->getOrganization() === $this) {
+            $logPublicProjectView->setOrganization(null);
         }
 
         return $this;
@@ -1354,11 +1322,8 @@ class Organization
 
     public function removeLogProjectValidatedSearch(LogProjectValidatedSearch $logProjectValidatedSearch): static
     {
-        if ($this->logProjectValidatedSearches->removeElement($logProjectValidatedSearch)) {
-            // set the owning side to null (unless already changed)
-            if ($logProjectValidatedSearch->getOrganization() === $this) {
-                $logProjectValidatedSearch->setOrganization(null);
-            }
+        if ($this->logProjectValidatedSearches->removeElement($logProjectValidatedSearch) && $logProjectValidatedSearch->getOrganization() === $this) {
+            $logProjectValidatedSearch->setOrganization(null);
         }
 
         return $this;
@@ -1390,11 +1355,8 @@ class Organization
 
     public function removeOrganizationInvitation(OrganizationInvitation $organizationInvitation): static
     {
-        if ($this->organizationInvitations->removeElement($organizationInvitation)) {
-            // set the owning side to null (unless already changed)
-            if ($organizationInvitation->getOrganization() === $this) {
-                $organizationInvitation->setOrganization(null);
-            }
+        if ($this->organizationInvitations->removeElement($organizationInvitation) && $organizationInvitation->getOrganization() === $this) {
+            $organizationInvitation->setOrganization(null);
         }
 
         return $this;
@@ -1420,11 +1382,8 @@ class Organization
 
     public function removeAid(Aid $aid): static
     {
-        if ($this->aids->removeElement($aid)) {
-            // set the owning side to null (unless already changed)
-            if ($aid->getOrganization() === $this) {
-                $aid->setOrganization(null);
-            }
+        if ($this->aids->removeElement($aid) && $aid->getOrganization() === $this) {
+            $aid->setOrganization(null);
         }
 
         return $this;
@@ -1456,7 +1415,7 @@ class Organization
     {
         if (!$this->beneficiairies) {
             return null;
-        }    
+        }
         return $this->beneficiairies->first() ?? null;
     }
 }

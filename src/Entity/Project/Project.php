@@ -25,7 +25,7 @@ use Symfony\Component\Serializer\Annotation\Ignore;
 #[ORM\Index(columns: ['description'], name: 'description_project_fulltext', flags: ['fulltext'])]
 #[ORM\Index(columns: ['name', 'description'], name: 'name_description_project_fulltext', flags: ['fulltext'])]
 #[ORM\Entity(repositoryClass: ProjectRepository::class)]
-class Project
+class Project // NOSONAR too much methods
 {
     const FOLDER = 'projects';
     
@@ -470,11 +470,8 @@ class Project
 
     public function removeProjectValidated(ProjectValidated $projectValidated): static
     {
-        if ($this->projectValidateds->removeElement($projectValidated)) {
-            // set the owning side to null (unless already changed)
-            if ($projectValidated->getProject() === $this) {
-                $projectValidated->setProject(null);
-            }
+        if ($this->projectValidateds->removeElement($projectValidated) && $projectValidated->getProject() === $this) {
+            $projectValidated->setProject(null);
         }
 
         return $this;
@@ -500,11 +497,8 @@ class Project
 
     public function removeAidProject(AidProject $aidProject): static
     {
-        if ($this->aidProjects->removeElement($aidProject)) {
-            // set the owning side to null (unless already changed)
-            if ($aidProject->getProject() === $this) {
-                $aidProject->setProject(null);
-            }
+        if ($this->aidProjects->removeElement($aidProject) && $aidProject->getProject() === $this) {
+            $aidProject->setProject(null);
         }
 
         return $this;
@@ -530,11 +524,8 @@ class Project
 
     public function removeAidSuggestedAidProject(AidSuggestedAidProject $aidSuggestedAidProject): static
     {
-        if ($this->aidSuggestedAidProjects->removeElement($aidSuggestedAidProject)) {
-            // set the owning side to null (unless already changed)
-            if ($aidSuggestedAidProject->getProject() === $this) {
-                $aidSuggestedAidProject->setProject(null);
-            }
+        if ($this->aidSuggestedAidProjects->removeElement($aidSuggestedAidProject) && $aidSuggestedAidProject->getProject() === $this) {
+            $aidSuggestedAidProject->setProject(null);
         }
 
         return $this;
@@ -560,11 +551,8 @@ class Project
 
     public function removeLogPublicProjectView(LogPublicProjectView $logPublicProjectView): static
     {
-        if ($this->logPublicProjectViews->removeElement($logPublicProjectView)) {
-            // set the owning side to null (unless already changed)
-            if ($logPublicProjectView->getProject() === $this) {
-                $logPublicProjectView->setProject(null);
-            }
+        if ($this->logPublicProjectViews->removeElement($logPublicProjectView) && $logPublicProjectView->getProject() === $this) {
+            $logPublicProjectView->setProject(null);
         }
 
         return $this;
@@ -608,6 +596,11 @@ class Project
         }
     }
 
+    public function setNbAids(?int $nbAids): static
+    {
+        $this->nbAids = $nbAids;
+        return $this;
+    }
 
     public function getProjectReference(): ?ProjectReference
     {

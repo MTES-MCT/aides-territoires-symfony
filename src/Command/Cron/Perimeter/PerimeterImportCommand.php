@@ -30,10 +30,6 @@ class PerimeterImportCommand extends Command
         parent::__construct();
     }
 
-    protected function configure() : void
-    {
-    }
-
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->input = $input;
@@ -85,7 +81,7 @@ class PerimeterImportCommand extends Command
                 // ex: si perimetreToAdd = commune, alors on ajoute le perimetre adhoc dans le departement, la region, etc.
                 foreach ($perimeterToAdd->getPerimetersTo() as $parentToAdd) {
                     if (
-                        $parentToAdd->getId() !== $perimeterImport->getAdhocPerimeter()->getId() 
+                        $parentToAdd->getId() !== $perimeterImport->getAdhocPerimeter()->getId()
                         && $parentToAdd->getScale() <= Perimeter::SCALE_ADHOC
                     ) {
                     $perimeterImport->getAdhocPerimeter()->addPerimetersTo($parentToAdd);

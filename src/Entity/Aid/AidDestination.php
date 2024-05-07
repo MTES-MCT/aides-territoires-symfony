@@ -21,7 +21,7 @@ use ApiPlatform\OpenApi\Model;
             uriTemplate: '/aids/destinations/',
             controller: AidDestinationController::class,
             openapi: new Model\Operation(
-                summary: self::API_DESCRIPTION, 
+                summary: self::API_DESCRIPTION,
                 description: self::API_DESCRIPTION,
             ),
         ),

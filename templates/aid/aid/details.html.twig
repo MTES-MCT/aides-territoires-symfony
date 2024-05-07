@@ -271,7 +271,7 @@
                     </h2>
                     <p class="fr-mb-0 fr-ml-1w">
                     {% for aidAudience in aid.aidAudiences %}
-                    {{ aidAudience.name }},
+                    {{ aidAudience.name }}{% if not loop.last %}, {% endif %}
                     {% endfor %}
                     </p>
                 </div>

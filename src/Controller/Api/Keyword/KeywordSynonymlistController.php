@@ -38,7 +38,6 @@ class KeywordSynonymlistController extends ApiController
         $resultsSpe = [];
         /** @var KeywordSynonymlist $result */
         foreach ($results as $result) {
-            // TODO n'importe quoi sur l'id ?
             $resultsSpe[] = [
                 'id' => $result->getId().'-synonyms-'.$result->getName(),
                 'text' => $keywordSynonymlistService->getSmartName($result),
@@ -63,15 +62,11 @@ class KeywordSynonymlistController extends ApiController
 
     #[Route('/api/synonymlists/classic-list/', name: 'api_keyword_synonymlist_list_classic', priority: 5)]
     public function classic(
-        KeywordSynonymlistRepository $keywordSynonymlistRepository,
-        KeywordSynonymlistService $keywordSynonymlistService
+        KeywordSynonymlistRepository $keywordSynonymlistRepository
     ): JsonResponse
     {
         // les filtres
         $params = [];
-
-        // requete pour compter sans la pagination
-        $count = $keywordSynonymlistRepository->countCustom($params);
 
         // requete pour les résultats avec la pagination
         $params['orderBy'] = ['sort' => 'ks.name', 'order' => 'ASC'];
@@ -95,5 +90,4 @@ class KeywordSynonymlistController extends ApiController
         $response->setEncodingOptions(JSON_UNESCAPED_SLASHES);
         return $response;
     }
-
 }

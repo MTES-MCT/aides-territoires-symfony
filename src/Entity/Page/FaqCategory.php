@@ -119,11 +119,8 @@ class FaqCategory
 
     public function removeFaqQuestionAnswser(FaqQuestionAnswser $faqQuestionAnswser): static
     {
-        if ($this->faqQuestionAnswsers->removeElement($faqQuestionAnswser)) {
-            // set the owning side to null (unless already changed)
-            if ($faqQuestionAnswser->getFaqCategory() === $this) {
-                $faqQuestionAnswser->setFaqCategory(null);
-            }
+        if ($this->faqQuestionAnswsers->removeElement($faqQuestionAnswser) && $faqQuestionAnswser->getFaqCategory() === $this) {
+            $faqQuestionAnswser->setFaqCategory(null);
         }
 
         return $this;

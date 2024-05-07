@@ -72,12 +72,12 @@ class DataExport
     
     public function getUrlExportedFile() : ?string
     {
-        return $this->urlExportedFile;    
+        return $this->urlExportedFile;
     }
 
     public function setUrlExportedFile(string $urlExportedFile) : static
     {
         $this->urlExportedFile = $urlExportedFile;
-        return $this;   
+        return $this;
     }
 }

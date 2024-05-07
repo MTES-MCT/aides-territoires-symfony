@@ -8,7 +8,6 @@ use App\Repository\Directory\DirectoryRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
-// TODO voir utilite, faire BO si besoin
 #[ORM\Entity(repositoryClass: DirectoryRepository::class)]
 class Directory
 {
@@ -36,7 +35,7 @@ class Directory
     private ?string $mobile = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    private ?\DateTimeInterface $time_create = null;
+    private ?\DateTimeInterface $timeCreate = null;
 
     #[ORM\ManyToOne(inversedBy: 'directories')]
     private ?User $author = null;
@@ -124,12 +123,12 @@ class Directory
 
     public function getTimeCreate(): ?\DateTimeInterface
     {
-        return $this->time_create;
+        return $this->timeCreate;
     }
 
     public function setTimeCreate(\DateTimeInterface $time_create): static
     {
-        $this->time_create = $time_create;
+        $this->timeCreate = $time_create;
 
         return $this;
     }

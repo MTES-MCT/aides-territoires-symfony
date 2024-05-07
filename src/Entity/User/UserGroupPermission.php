@@ -7,7 +7,6 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
-// TODO a supprimer
 #[ORM\Entity(repositoryClass: UserGroupPermissionRepository::class)]
 class UserGroupPermission
 {

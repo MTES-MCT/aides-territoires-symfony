@@ -7,7 +7,6 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
-// TODO a supprimer
 #[ORM\Entity(repositoryClass: UserGroupRepository::class)]
 class UserGroup
 {
@@ -101,6 +100,6 @@ class UserGroup
 
     public function __toString(): string
     {
-        return $this->name;   
+        return $this->name;
     }
 }

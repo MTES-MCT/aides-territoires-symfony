@@ -22,7 +22,7 @@ use App\Filter\PerimeterData\PerimeterDataPerimeterIdFilter;
             controller: PerimeterDataController::class,
             normalizationContext: ['groups' => self::API_GROUP_LIST],
             openapi: new Model\Operation(
-                summary: 'Lister les données supplémentaires sur un périmètre', 
+                summary: 'Lister les données supplémentaires sur un périmètre',
             )
         ),
     ],

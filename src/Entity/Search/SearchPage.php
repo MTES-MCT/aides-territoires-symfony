@@ -17,7 +17,7 @@ use Gedmo\Mapping\Annotation as Gedmo;
 
 #[ORM\Index(columns: ['slug'], name: 'slug_search_page')]
 #[ORM\Entity(repositoryClass: SearchPageRepository::class)]
-class SearchPage
+class SearchPage // NOSONAR too much methods
 {
     const FOLDER = 'minisites';
     
@@ -672,22 +672,18 @@ class SearchPage
 
     public function removePage(Page $page): static
     {
-        if ($this->pages->removeElement($page)) {
-            // set the owning side to null (unless already changed)
-            if ($page->getSearchPage() === $this) {
-                $page->setSearchPage(null);
-            }
+        if ($this->pages->removeElement($page) && $page->getSearchPage() === $this) {
+            $page->setSearchPage(null);
         }
 
         return $this;
     }
 
-
-
     public function getNbAids(): int
     {
         return $this->nbAids;
     }
+    
     public function setNbAids(int $nbAids) : static {
         $this->nbAids = $nbAids;
         return $this;

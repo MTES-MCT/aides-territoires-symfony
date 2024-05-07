@@ -9,7 +9,6 @@ use App\Entity\Aid\AidRecurrence;
 use App\Entity\Aid\AidStep;
 use App\Entity\Aid\AidType;
 use App\Entity\Category\Category;
-use App\Entity\Keyword\Keyword;
 use App\Entity\Organization\OrganizationType;
 use App\Entity\Perimeter\Perimeter;
 use App\Entity\Reference\KeywordReference;
@@ -28,11 +27,10 @@ class ImportFluxAdemeAgirCommand extends ImportFluxCommand
         if (!isset($aidToImport['id'])) {
             return null;
         }
-        $importUniqueid = $this->importUniqueidPrefix . $aidToImport['id'];
-        return $importUniqueid;
+        return $this->importUniqueidPrefix . $aidToImport['id'];
     }
 
-    protected function getFieldsMapping(array $aidToImport, array $params = null): array
+    protected function getFieldsMapping(array $aidToImport, array $params = null): array // NOSONAR too complex
     {
         $keys = ['date_debut', 'date_fin'];
 
@@ -42,7 +40,7 @@ class ImportFluxAdemeAgirCommand extends ImportFluxCommand
                 $importRawObjectCalendar[$key] = $aidToImport[$key];
             }
         }
-        if (count($importRawObjectCalendar) == 0) {
+        if (empty($importRawObjectCalendar)) {
             $importRawObjectCalendar = null;
         }
 
@@ -111,7 +109,7 @@ class ImportFluxAdemeAgirCommand extends ImportFluxCommand
         $apiOptions['headers']['client_id'] = $this->paramService->get('ademe_agir_api_username');
         $apiOptions['headers']['client_secret'] = $this->paramService->get('ademe_agir_api_password');
         return $apiOptions;
-    }   
+    }
 
     protected function setAidTypes(array $aidToImport, Aid $aid): Aid
     {
@@ -155,7 +153,7 @@ class ImportFluxAdemeAgirCommand extends ImportFluxCommand
         return $aid;
     }
 
-    protected function setPerimeter(array $aidToImport, Aid $aid): Aid
+    protected function setPerimeter(array $aidToImport, Aid $aid): Aid // NOSONAR too complex
     {
         $couvertureGeo = isset($aidToImport['couverture_geo']) && isset($aidToImport['couverture_geo']['code'])
                     ? $aidToImport['couverture_geo']['code']
@@ -163,16 +161,16 @@ class ImportFluxAdemeAgirCommand extends ImportFluxCommand
 
         if ((int) $couvertureGeo == 1) {
             $perimeter = $this->managerRegistry->getRepository(Perimeter::class)->findOneBy(['code' => Perimeter::CODE_FRANCE]);
-        } else if ((int) $couvertureGeo == 2 || (int) $couvertureGeo == 3) {
+        } elseif ((int) $couvertureGeo == 2 || (int) $couvertureGeo == 3) {
             $perimeter = $this->managerRegistry->getRepository(Perimeter::class)->findOneBy(['code' => Perimeter::CODE_EUROPE]);
-        } else if ((int) $couvertureGeo == 4) {
+        } elseif ((int) $couvertureGeo == 4) {
             $regionCodes = $aidToImport['regions'] ?? [];
             if (count($regionCodes) == 1) {
                 $perimeter = $this->managerRegistry->getRepository(Perimeter::class)->findOneBy([
                     'code' => $regionCodes[0],
                     'scale' => Perimeter::SCALE_REGION
                 ]);
-            } else if (count($regionCodes) > 1) {
+            } elseif (count($regionCodes) > 1) {
                 $perimeterName = $this->perimeterService->getAdhocNameFromRegionCodes($regionCodes);
                 $perimeter = $this->managerRegistry->getRepository(Perimeter::class)->findOneBy([
                     'name' => $perimeterName,
@@ -310,7 +308,7 @@ class ImportFluxAdemeAgirCommand extends ImportFluxCommand
         return $aid;
     }
 
-    private function getCategoriesMapping(): array
+    private function getCategoriesMapping(): array // NOSONAR too complex
     {
         return [
             'ALIBIO' => [
@@ -327,7 +325,7 @@ class ImportFluxAdemeAgirCommand extends ImportFluxCommand
                 [
                     'name' => 'Economie locale et circuits courts',
                     'slug' => 'circuits-courts-filieres',
-                ],    
+                ],
             ],
             'PRODUR' => [
                 [
@@ -389,7 +387,7 @@ class ImportFluxAdemeAgirCommand extends ImportFluxCommand
                 [
                     'name' => 'Réseaux de chaleur',
                     'slug' => 'reseaux-de-chaleur'
-                ],               
+                ],
             ],
             'ENRAUT' => [
                 [
@@ -401,13 +399,13 @@ class ImportFluxAdemeAgirCommand extends ImportFluxCommand
                 [
                     'name' => 'Réseaux de chaleur',
                     'slug' => 'reseaux-de-chaleur'
-                ],   
+                ],
             ],
             'RESCHF' => [
                 [
                     'name' => 'Réseaux de chaleur',
                     'slug' => 'reseaux-de-chaleur'
-                ],   
+                ],
             ],
             'SOLAIR' => [
                 [
@@ -423,47 +421,47 @@ class ImportFluxAdemeAgirCommand extends ImportFluxCommand
                 [
                     'name' => 'Mobilité partagée',
                     'slug' => 'mobilite-partagee',
-                ],               
+                ],
                 [
                     'name' => 'Mobilité pour tous',
                     'slug' => 'mobilite-pour-tous',
-                ],                    
+                ],
             ],
             'QUA' => [
                 [
                     'name' => 'Qualité de l\'air',
                     'slug' => 'qualite-de-lair',
-                ],  
+                ],
             ],
             'SAF' => [
                 [
                     'name' => 'Sols',
                     'slug' => 'sols',
-                ],  
+                ],
                 [
                     'name' => 'Agriculture et agroalimentaire',
                     'slug' => 'agriculture',
-                ],                  
+                ],
                 [
                     'name' => 'Forêts',
                     'slug' => 'forets',
-                ],                   
+                ],
             ],
             'TOU' => [
                 [
                     'name' => 'Tourisme',
                     'slug' => 'tourisme'
-                ],  
+                ],
             ],
             'HRBTOU' => [
                 [
                     'name' => 'Tourisme',
                     'slug' => 'tourisme'
-                ],  
+                ],
                 [
                     'name' => 'Logement et habitat',
                     'slug' => 'logement-habitat'
-                ],  
+                ],
             ],
             'RESTAU' => [
                 [
@@ -473,13 +471,13 @@ class ImportFluxAdemeAgirCommand extends ImportFluxCommand
                 [
                     'name' => 'Tourisme',
                     'slug' => 'tourisme'
-                ],  
+                ],
             ],
             'SLOTOU' => [
                 [
                     'name' => 'Tourisme',
                     'slug' => 'tourisme'
-                ],  
+                ],
                 [
                     'name' => 'Transition énergétique',
                     'slug' => 'transition-energetique',
@@ -489,7 +487,7 @@ class ImportFluxAdemeAgirCommand extends ImportFluxCommand
                 [
                     'name' => 'Bâtiments et construction',
                     'slug' =>  'batiments-construction',
-                ],  
+                ],
             ],
             'CCL' => [
                 [

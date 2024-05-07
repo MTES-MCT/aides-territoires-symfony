@@ -40,7 +40,6 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Gedmo\Mapping\Annotation as Gedmo;
 use App\Validator as AtAssert;
-use Doctrine\ORM\Mapping\JoinColumn;
 use Doctrine\ORM\Mapping\OrderBy;
 use Scheb\TwoFactorBundle\Model\Totp\TotpConfiguration;
 use Scheb\TwoFactorBundle\Model\Totp\TotpConfigurationInterface;
@@ -55,7 +54,7 @@ use Scheb\TwoFactorBundle\Model\Totp\TwoFactorInterface;
 #[ORM\Index(columns: ['date_create'], name: 'date_create_u')]
 #[ORM\Index(columns: ['date_last_login'], name: 'date_last_login_u')]
 #[ORM\Index(columns: ['api_token'], name: 'api_token_u')]
-class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFactorInterface
+class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFactorInterface // NOSONAR too much methods
 {
     const ROLE_ADMIN = 'ROLE_ADMIN';
     const ROLE_USER = 'ROLE_USER';
@@ -64,7 +63,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
     const NOTIFICATION_WEEKLY = 'weekly';
     const NOTIFICATION_NEVER = 'never';
 
-    CONST FUNCTION_TYPES = [
+    const FUNCTION_TYPES = [
         ['slug' => "mayor", 'name' => "Maire"],
         ['slug' => "deputy_mayor", 'name' => "Adjoint au maire"],
         ['slug' => "municipal_councilor", 'name' => "Conseiller municipal"],
@@ -445,11 +444,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
 
     public function removeLogUserLogin(LogUserLogin $logUserLogin): static
     {
-        if ($this->logUserLogins->removeElement($logUserLogin)) {
-            // set the owning side to null (unless already changed)
-            if ($logUserLogin->getUser() === $this) {
-                $logUserLogin->setUser(null);
-            }
+        if ($this->logUserLogins->removeElement($logUserLogin) && $logUserLogin->getUser() === $this) {
+            $logUserLogin->setUser(null);
         }
 
         return $this;
@@ -475,11 +471,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
 
     public function removeLogUserAction(LogUserAction $logUserAction): static
     {
-        if ($this->logUserActions->removeElement($logUserAction)) {
-            // set the owning side to null (unless already changed)
-            if ($logUserAction->getUser() === $this) {
-                $logUserAction->setUser(null);
-            }
+        if ($this->logUserActions->removeElement($logUserAction) && $logUserAction->getUser() === $this) {
+            $logUserAction->setUser(null);
         }
 
         return $this;
@@ -673,11 +666,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
 
     public function removeGuest(self $guest): static
     {
-        if ($this->guests->removeElement($guest)) {
-            // set the owning side to null (unless already changed)
-            if ($guest->getInvitationAuthor() === $this) {
-                $guest->setInvitationAuthor(null);
-            }
+        if ($this->guests->removeElement($guest) && $guest->getInvitationAuthor() === $this) {
+            $guest->setInvitationAuthor(null);
         }
 
         return $this;
@@ -838,11 +828,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
 
     public function removePerimeterImport(PerimeterImport $perimeterImport): static
     {
-        if ($this->perimeterImports->removeElement($perimeterImport)) {
-            // set the owning side to null (unless already changed)
-            if ($perimeterImport->getAuthor() === $this) {
-                $perimeterImport->setAuthor(null);
-            }
+        if ($this->perimeterImports->removeElement($perimeterImport) && $perimeterImport->getAuthor() === $this) {
+            $perimeterImport->setAuthor(null);
         }
 
         return $this;
@@ -904,11 +891,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
 
     public function removeEligibilityTest(EligibilityTest $eligibilityTest): static
     {
-        if ($this->eligibilityTests->removeElement($eligibilityTest)) {
-            // set the owning side to null (unless already changed)
-            if ($eligibilityTest->getAuthor() === $this) {
-                $eligibilityTest->setAuthor(null);
-            }
+        if ($this->eligibilityTests->removeElement($eligibilityTest) && $eligibilityTest->getAuthor() === $this) {
+            $eligibilityTest->setAuthor(null);
         }
 
         return $this;
@@ -934,11 +918,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
 
     public function removeEligibilityQuestion(EligibilityQuestion $eligibilityQuestion): static
     {
-        if ($this->eligibilityQuestions->removeElement($eligibilityQuestion)) {
-            // set the owning side to null (unless already changed)
-            if ($eligibilityQuestion->getAuthor() === $this) {
-                $eligibilityQuestion->setAuthor(null);
-            }
+        if ($this->eligibilityQuestions->removeElement($eligibilityQuestion) && $eligibilityQuestion->getAuthor() === $this) {
+            $eligibilityQuestion->setAuthor(null);
         }
 
         return $this;
@@ -964,11 +945,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
 
     public function removeDataSourceContactTeam(DataSource $dataSourceContactTeam): static
     {
-        if ($this->dataSourceContactTeams->removeElement($dataSourceContactTeam)) {
-            // set the owning side to null (unless already changed)
-            if ($dataSourceContactTeam->getContactTeam() === $this) {
-                $dataSourceContactTeam->setContactTeam(null);
-            }
+        if ($this->dataSourceContactTeams->removeElement($dataSourceContactTeam) && $dataSourceContactTeam->getContactTeam() === $this) {
+            $dataSourceContactTeam->setContactTeam(null);
         }
 
         return $this;
@@ -994,11 +972,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
 
     public function removeDataSourceAidAuthor(DataSource $dataSourceAidAuthor): static
     {
-        if ($this->dataSourceAidAuthors->removeElement($dataSourceAidAuthor)) {
-            // set the owning side to null (unless already changed)
-            if ($dataSourceAidAuthor->getAidAuthor() === $this) {
-                $dataSourceAidAuthor->setAidAuthor(null);
-            }
+        if ($this->dataSourceAidAuthors->removeElement($dataSourceAidAuthor) && $dataSourceAidAuthor->getAidAuthor() === $this) {
+            $dataSourceAidAuthor->setAidAuthor(null);
         }
 
         return $this;
@@ -1024,11 +999,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
 
     public function removeAid(Aid $aid): static
     {
-        if ($this->aids->removeElement($aid)) {
-            // set the owning side to null (unless already changed)
-            if ($aid->getAuthor() === $this) {
-                $aid->setAuthor(null);
-            }
+        if ($this->aids->removeElement($aid) && $aid->getAuthor() === $this) {
+            $aid->setAuthor(null);
         }
 
         return $this;
@@ -1051,11 +1023,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
 
     public function removeProject(Project $project): static
     {
-        if ($this->projects->removeElement($project)) {
-            // set the owning side to null (unless already changed)
-            if ($project->getAuthor() === $this) {
-                $project->setAuthor(null);
-            }
+        if ($this->projects->removeElement($project) && $project->getAuthor() === $this) {
+            $project->setAuthor(null);
         }
 
         return $this;
@@ -1081,11 +1050,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
 
     public function removeAidProject(AidProject $aidProject): static
     {
-        if ($this->aidProjects->removeElement($aidProject)) {
-            // set the owning side to null (unless already changed)
-            if ($aidProject->getCreator() === $this) {
-                $aidProject->setCreator(null);
-            }
+        if ($this->aidProjects->removeElement($aidProject) && $aidProject->getCreator() === $this) {
+            $aidProject->setCreator(null);
         }
 
         return $this;
@@ -1111,11 +1077,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
 
     public function removeAidSuggestedAidProject(AidSuggestedAidProject $aidSuggestedAidProject): static
     {
-        if ($this->aidSuggestedAidProjects->removeElement($aidSuggestedAidProject)) {
-            // set the owning side to null (unless already changed)
-            if ($aidSuggestedAidProject->getCreator() === $this) {
-                $aidSuggestedAidProject->setCreator(null);
-            }
+        if ($this->aidSuggestedAidProjects->removeElement($aidSuggestedAidProject) && $aidSuggestedAidProject->getCreator() === $this) {
+            $aidSuggestedAidProject->setCreator(null);
         }
 
         return $this;
@@ -1150,11 +1113,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
 
     public function removeBundle(Bundle $bundle): static
     {
-        if ($this->bundles->removeElement($bundle)) {
-            // set the owning side to null (unless already changed)
-            if ($bundle->getOwner() === $this) {
-                $bundle->setOwner(null);
-            }
+        if ($this->bundles->removeElement($bundle) && $bundle->getOwner() === $this) {
+            $bundle->setOwner(null);
         }
 
         return $this;
@@ -1180,11 +1140,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
 
     public function removeDataExport(DataExport $dataExport): static
     {
-        if ($this->dataExports->removeElement($dataExport)) {
-            // set the owning side to null (unless already changed)
-            if ($dataExport->getAuthor() === $this) {
-                $dataExport->setAuthor(null);
-            }
+        if ($this->dataExports->removeElement($dataExport) && $dataExport->getAuthor() === $this) {
+            $dataExport->setAuthor(null);
         }
 
         return $this;
@@ -1265,11 +1222,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
 
     public function removeSearchPage(SearchPage $searchPage): static
     {
-        if ($this->searchPages->removeElement($searchPage)) {
-            // set the owning side to null (unless already changed)
-            if ($searchPage->getAdministrator() === $this) {
+        if ($this->searchPages->removeElement($searchPage) && $searchPage->getAdministrator() === $this) {
                 $searchPage->setAdministrator(null);
-            }
         }
 
         return $this;
@@ -1295,11 +1249,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
 
     public function removeNotification(Notification $notification): static
     {
-        if ($this->notifications->removeElement($notification)) {
-            // set the owning side to null (unless already changed)
-            if ($notification->getUser() === $this) {
-                $notification->setUser(null);
-            }
+        if ($this->notifications->removeElement($notification) && $notification->getUser() === $this) {
+            $notification->setUser(null);
         }
 
         return $this;
@@ -1325,11 +1276,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
 
     public function removeLogAdminAction(LogAdminAction $logAdminAction): static
     {
-        if ($this->logAdminActions->removeElement($logAdminAction)) {
-            // set the owning side to null (unless already changed)
-            if ($logAdminAction->getAdmin() === $this) {
-                $logAdminAction->setAdmin(null);
-            }
+        if ($this->logAdminActions->removeElement($logAdminAction) && $logAdminAction->getAdmin() === $this) {
+            $logAdminAction->setAdmin(null);
         }
 
         return $this;
@@ -1369,11 +1317,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
 
     public function removeDirectory(\App\Entity\Directory\Directory $directory): static
     {
-        if ($this->directories->removeElement($directory)) {
-            // set the owning side to null (unless already changed)
-            if ($directory->getAuthor() === $this) {
-                $directory->setAuthor(null);
-            }
+        if ($this->directories->removeElement($directory) && $directory->getAuthor() === $this) {
+            $directory->setAuthor(null);
         }
 
         return $this;
@@ -1420,11 +1365,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
 
     public function removeUserRegisterConfirmation(UserRegisterConfirmation $userRegisterConfirmation): static
     {
-        if ($this->userRegisterConfirmations->removeElement($userRegisterConfirmation)) {
-            // set the owning side to null (unless already changed)
-            if ($userRegisterConfirmation->getUser() === $this) {
-                $userRegisterConfirmation->setUser(null);
-            }
+        if ($this->userRegisterConfirmations->removeElement($userRegisterConfirmation) && $userRegisterConfirmation->getUser() === $this) {
+            $userRegisterConfirmation->setUser(null);
         }
 
         return $this;
@@ -1450,11 +1392,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
 
     public function removeLogAidView(LogAidView $logAidView): static
     {
-        if ($this->logAidViews->removeElement($logAidView)) {
-            // set the owning side to null (unless already changed)
-            if ($logAidView->getUser() === $this) {
-                $logAidView->setUser(null);
-            }
+        if ($this->logAidViews->removeElement($logAidView) && $logAidView->getUser() === $this) {
+            $logAidView->setUser(null);
         }
 
         return $this;
@@ -1480,11 +1419,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
 
     public function removeLogAidCreatedsFolder(LogAidCreatedsFolder $logAidCreatedsFolder): static
     {
-        if ($this->logAidCreatedsFolders->removeElement($logAidCreatedsFolder)) {
-            // set the owning side to null (unless already changed)
-            if ($logAidCreatedsFolder->getUser() === $this) {
-                $logAidCreatedsFolder->setUser(null);
-            }
+        if ($this->logAidCreatedsFolders->removeElement($logAidCreatedsFolder) && $logAidCreatedsFolder->getUser() === $this) {
+            $logAidCreatedsFolder->setUser(null);
         }
 
         return $this;
@@ -1510,11 +1446,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
 
     public function removeLogAidSearch(LogAidSearch $logAidSearch): static
     {
-        if ($this->logAidSearches->removeElement($logAidSearch)) {
-            // set the owning side to null (unless already changed)
-            if ($logAidSearch->getUser() === $this) {
-                $logAidSearch->setUser(null);
-            }
+        if ($this->logAidSearches->removeElement($logAidSearch) && $logAidSearch->getUser() === $this) {
+            $logAidSearch->setUser(null);
         }
 
         return $this;
@@ -1540,11 +1473,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
 
     public function removeLogBackerView(LogBackerView $logBackerView): static
     {
-        if ($this->logBackerViews->removeElement($logBackerView)) {
-            // set the owning side to null (unless already changed)
-            if ($logBackerView->getUser() === $this) {
-                $logBackerView->setUser(null);
-            }
+        if ($this->logBackerViews->removeElement($logBackerView) && $logBackerView->getUser() === $this) {
+            $logBackerView->setUser(null);
         }
 
         return $this;
@@ -1570,11 +1500,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
 
     public function removeLogBlogPostView(LogBlogPostView $logBlogPostView): static
     {
-        if ($this->logBlogPostViews->removeElement($logBlogPostView)) {
-            // set the owning side to null (unless already changed)
-            if ($logBlogPostView->getUser() === $this) {
-                $logBlogPostView->setUser(null);
-            }
+        if ($this->logBlogPostViews->removeElement($logBlogPostView) && $logBlogPostView->getUser() === $this) {
+            $logBlogPostView->setUser(null);
         }
 
         return $this;
@@ -1600,11 +1527,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
 
     public function removeLogProgramView(LogProgramView $logProgramView): static
     {
-        if ($this->logProgramViews->removeElement($logProgramView)) {
-            // set the owning side to null (unless already changed)
-            if ($logProgramView->getUser() === $this) {
-                $logProgramView->setUser(null);
-            }
+        if ($this->logProgramViews->removeElement($logProgramView) && $logProgramView->getUser() === $this) {
+            $logProgramView->setUser(null);
         }
 
         return $this;
@@ -1630,11 +1554,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
 
     public function removeLogPublicProjectSearch(LogPublicProjectSearch $logPublicProjectSearch): static
     {
-        if ($this->logPublicProjectSearches->removeElement($logPublicProjectSearch)) {
-            // set the owning side to null (unless already changed)
-            if ($logPublicProjectSearch->getUser() === $this) {
-                $logPublicProjectSearch->setUser(null);
-            }
+        if ($this->logPublicProjectSearches->removeElement($logPublicProjectSearch) && $logPublicProjectSearch->getUser() === $this) {
+            $logPublicProjectSearch->setUser(null);
         }
 
         return $this;
@@ -1660,11 +1581,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
 
     public function removeLogPublicProjectView(LogPublicProjectView $logPublicProjectView): static
     {
-        if ($this->logPublicProjectViews->removeElement($logPublicProjectView)) {
-            // set the owning side to null (unless already changed)
-            if ($logPublicProjectView->getUser() === $this) {
-                $logPublicProjectView->setUser(null);
-            }
+        if ($this->logPublicProjectViews->removeElement($logPublicProjectView) && $logPublicProjectView->getUser() === $this) {
+            $logPublicProjectView->setUser(null);
         }
 
         return $this;
@@ -1690,11 +1608,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
 
     public function removeLogProjectValidatedSearch(LogProjectValidatedSearch $logProjectValidatedSearch): static
     {
-        if ($this->logProjectValidatedSearches->removeElement($logProjectValidatedSearch)) {
-            // set the owning side to null (unless already changed)
-            if ($logProjectValidatedSearch->getUser() === $this) {
-                $logProjectValidatedSearch->setUser(null);
-            }
+        if ($this->logProjectValidatedSearches->removeElement($logProjectValidatedSearch) && $logProjectValidatedSearch->getUser() === $this) {
+            $logProjectValidatedSearch->setUser(null);
         }
 
         return $this;
@@ -1706,6 +1621,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
         } catch (\Exception $e) {
             return 0;
         }
+    }
+    public function setNbAids(int $nbAids): static
+    {
+        $this->nbAids = $nbAids;
+        return $this;
     }
 
     public function getNbAidsLive() : int {
@@ -1720,6 +1640,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
         } catch (\Exception $e) {
             return 0;
         }
+    }
+    public function setNbAidsLive(int $nbAidsLive): static
+    {
+        $this->nbAidsLive = $nbAidsLive;
+        return $this;
     }
 
 
@@ -1748,6 +1673,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
         return $signature;
     }
 
+    public function setNotificationSignature(string $notificationSignature): static
+    {
+        $this->notificationSignature = $notificationSignature;
+        return $this;
+    }
+
     public function getFullName() : string {
         return $this->getFirstname() . ' ' . $this->getLastname();
     }
@@ -1772,11 +1703,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
 
     public function removeOrganizationInvitation(OrganizationInvitation $organizationInvitation): static
     {
-        if ($this->organizationInvitations->removeElement($organizationInvitation)) {
-            // set the owning side to null (unless already changed)
-            if ($organizationInvitation->getAuthor() === $this) {
-                $organizationInvitation->setAuthor(null);
-            }
+        if ($this->organizationInvitations->removeElement($organizationInvitation) && $organizationInvitation->getAuthor() === $this) {
+            $organizationInvitation->setAuthor(null);
         }
 
         return $this;
@@ -1802,11 +1730,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
 
     public function removeOrganizationGuest(OrganizationInvitation $organizationGuest): static
     {
-        if ($this->organizationGuests->removeElement($organizationGuest)) {
-            // set the owning side to null (unless already changed)
-            if ($organizationGuest->getGuest() === $this) {
-                $organizationGuest->setGuest(null);
-            }
+        if ($this->organizationGuests->removeElement($organizationGuest) && $organizationGuest->getGuest() === $this) {
+            $organizationGuest->setGuest(null);
         }
 
         return $this;
@@ -1832,11 +1757,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
 
     public function removeApiTokenAsk(ApiTokenAsk $apiTokenAsk): static
     {
-        if ($this->apiTokenAsks->removeElement($apiTokenAsk)) {
-            // set the owning side to null (unless already changed)
-            if ($apiTokenAsk->getUser() === $this) {
-                $apiTokenAsk->setUser(null);
-            }
+        if ($this->apiTokenAsks->removeElement($apiTokenAsk) && $apiTokenAsk->getUser() === $this) {
+            $apiTokenAsk->setUser(null);
         }
 
         return $this;
@@ -1892,11 +1814,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
 
     public function removeCronExportSpreadsheet(CronExportSpreadsheet $cronExportSpreadsheet): static
     {
-        if ($this->cronExportSpreadsheets->removeElement($cronExportSpreadsheet)) {
-            // set the owning side to null (unless already changed)
-            if ($cronExportSpreadsheet->getUser() === $this) {
-                $cronExportSpreadsheet->setUser(null);
-            }
+        if ($this->cronExportSpreadsheets->removeElement($cronExportSpreadsheet) && $cronExportSpreadsheet->getUser() === $this) {
+            $cronExportSpreadsheet->setUser(null);
         }
 
         return $this;

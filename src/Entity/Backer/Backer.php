@@ -39,7 +39,7 @@ use App\Filter\Backer\HasPublishedFinancedAidsFilter;
             controller: BackerController::class,
             normalizationContext: ['groups' => Backer::API_GROUP_LIST],
             openapi: new Model\Operation(
-                summary: self::API_DESCRIPTION, 
+                summary: self::API_DESCRIPTION,
                 description: self::API_DESCRIPTION,
             ),
             paginationEnabled: true,
@@ -49,7 +49,7 @@ use App\Filter\Backer\HasPublishedFinancedAidsFilter;
     ]
 )]
 #[ApiFilter(
-    AtSearchFilter::class, 
+    AtSearchFilter::class,
     properties: ['name' => 'partial'],
     arguments: [
         'swaggerDescription' => [
@@ -69,7 +69,7 @@ use App\Filter\Backer\HasPublishedFinancedAidsFilter;
 #[ApiFilter(HasFinancedAidsFilter::class)]
 #[ApiFilter(HasPublishedFinancedAidsFilter::class)]
 #[ORM\Entity(repositoryClass: BackerRepository::class)]
-class Backer
+class Backer // NOSONAR too much methods
 {
     const API_DESCRIPTION = 'Lister tous les porteurs d\'aides';
     const API_GROUP_LIST = 'backer:list';
@@ -366,11 +366,8 @@ class Backer
 
     public function removeOrganization(Organization $organization): static
     {
-        if ($this->organizations->removeElement($organization)) {
-            // set the owning side to null (unless already changed)
-            if ($organization->getBacker() === $this) {
-                $organization->setBacker(null);
-            }
+        if ($this->organizations->removeElement($organization) && $organization->getBacker() === $this) {
+            $organization->setBacker(null);
         }
 
         return $this;
@@ -396,11 +393,8 @@ class Backer
 
     public function removeDataSource(DataSource $dataSource): static
     {
-        if ($this->dataSources->removeElement($dataSource)) {
-            // set the owning side to null (unless already changed)
-            if ($dataSource->getBacker() === $this) {
-                $dataSource->setBacker(null);
-            }
+        if ($this->dataSources->removeElement($dataSource) && $dataSource->getBacker() === $this) {
+            $dataSource->setBacker(null);
         }
 
         return $this;
@@ -426,11 +420,8 @@ class Backer
 
     public function removeAidFinancer(AidFinancer $aidFinancer): static
     {
-        if ($this->aidFinancers->removeElement($aidFinancer)) {
-            // set the owning side to null (unless already changed)
-            if ($aidFinancer->getBacker() === $this) {
-                $aidFinancer->setBacker(null);
-            }
+        if ($this->aidFinancers->removeElement($aidFinancer) && $aidFinancer->getBacker() === $this) {
+            $aidFinancer->setBacker(null);
         }
 
         return $this;
@@ -456,11 +447,8 @@ class Backer
 
     public function removeAidInstructor(AidInstructor $aidInstructor): static
     {
-        if ($this->aidInstructors->removeElement($aidInstructor)) {
-            // set the owning side to null (unless already changed)
-            if ($aidInstructor->getBacker() === $this) {
-                $aidInstructor->setBacker(null);
-            }
+        if ($this->aidInstructors->removeElement($aidInstructor) && $aidInstructor->getBacker() === $this) {
+            $aidInstructor->setBacker(null);
         }
 
         return $this;
@@ -486,11 +474,8 @@ class Backer
 
     public function removeProjectValidated(ProjectValidated $projectValidated): static
     {
-        if ($this->projectValidateds->removeElement($projectValidated)) {
-            // set the owning side to null (unless already changed)
-            if ($projectValidated->getFinancer() === $this) {
-                $projectValidated->setFinancer(null);
-            }
+        if ($this->projectValidateds->removeElement($projectValidated) && $projectValidated->getFinancer() === $this) {
+            $projectValidated->setFinancer(null);
         }
 
         return $this;
@@ -560,10 +545,8 @@ class Backer
         $aidsFinancial = new ArrayCollection();
         foreach ($this->getAidsLive() as $aid) {
             foreach ($aid->getAidTypes() as $aidType) {
-                if ($aidType->getAidTypeGroup()->getSlug() == AidTypeGroup::SLUG_FINANCIAL) {
-                    if (!$aidsFinancial->contains($aid)) {
+                if ($aidType->getAidTypeGroup()->getSlug() == AidTypeGroup::SLUG_FINANCIAL && !$aidsFinancial->contains($aid)) {
                         $aidsFinancial->add($aid);
-                    }
                 }
             }
         }
@@ -593,10 +576,8 @@ class Backer
         $aidsTechnical = new ArrayCollection();
         foreach ($this->getAidsLive() as $aid) {
             foreach ($aid->getAidTypes() as $aidType) {
-                if ($aidType->getAidTypeGroup()->getSlug() == AidTypeGroup::SLUG_TECHNICAL) {
-                    if (!$aidsTechnical->contains($aid)) {
-                        $aidsTechnical->add($aid);
-                    }
+                if ($aidType->getAidTypeGroup()->getSlug() == AidTypeGroup::SLUG_TECHNICAL && !$aidsTechnical->contains($aid)) {
+                    $aidsTechnical->add($aid);
                 }
             }
         }
@@ -647,9 +628,13 @@ class Backer
         $iterator->uasort(function ($a, $b) {
             return ($a->getSlug() < $b->getSlug()) ? -1 : 1;
         });
-        $thematics = new ArrayCollection(iterator_to_array($iterator));
+        return new ArrayCollection(iterator_to_array($iterator));
+    }
 
-        return $thematics;
+    public function setAidsThematics(?ArrayCollection $aidsThematics): static
+    {
+        $this->aidsThematics = $aidsThematics;
+        return $this;
     }
 
     /**
@@ -699,75 +684,95 @@ class Backer
 
     public function removeLogBackerView(LogBackerView $logBackerView): static
     {
-        if ($this->logBackerViews->removeElement($logBackerView)) {
-            // set the owning side to null (unless already changed)
-            if ($logBackerView->getBacker() === $this) {
-                $logBackerView->setBacker(null);
-            }
+        if ($this->logBackerViews->removeElement($logBackerView) && $logBackerView->getBacker() === $this) {
+            $logBackerView->setBacker(null);
         }
 
         return $this;
     }
 
-
-
-
     public function getCategories(): ArrayCollection
     {
         $categories = new ArrayCollection();
+    
+        $this->addAidFinancerCategories($categories);
+        $this->addAidInstructorCategories($categories);
+    
+        return $categories;
+    }
+    
+    private function addAidFinancerCategories($categories)
+    {
         foreach ($this->getAidFinancers() as $aidFinancer) {
             if ($aidFinancer->getAid()) {
-                foreach ($aidFinancer->getAid()->getCategories() as $category) {
-                    if (!$categories->contains($category)) {
-                        $categories->add($category);
-                    }
-                }
+                $this->addCategories($aidFinancer->getAid()->getCategories(), $categories);
             }
         }
-
+    }
+    
+    private function addAidInstructorCategories($categories)
+    {
         foreach ($this->getAidInstructors() as $aidInstructor) {
             if ($aidInstructor->getAid()) {
-                foreach ($aidInstructor->getAid()->getCategories() as $category) {
-                    if (!$categories->contains($category)) {
-                        $categories->add($category);
-                    }
-                }
+                $this->addCategories($aidInstructor->getAid()->getCategories(), $categories);
             }
         }
+    }
+    
+    private function addCategories($newCategories, $categories)
+    {
+        foreach ($newCategories as $category) {
+            if (!$categories->contains($category)) {
+                $categories->add($category);
+            }
+        }
+    }
 
-        return $categories;
+    public function setCategories(ArrayCollection $categories): void
+    {
+        $this->categories = $categories;
     }
 
     public function getPrograms(): ArrayCollection
     {
         $programs = new ArrayCollection();
-
-        foreach ($this->getAidFinancers() as $aidFinancer) {
-            if ($aidFinancer->getAid()) {
-                foreach ($aidFinancer->getAid()->getPrograms() as $program) {
-                    if (!$programs->contains($program)) {
-                        $programs->add($program);
-                    }
-                }
-            }
-        }
-
-        foreach ($this->getAidInstructors() as $aidInstructor) {
-            if ($aidInstructor->getAid()) {
-                foreach ($aidInstructor->getAid()->getPrograms() as $program) {
-                    if (!$programs->contains($program)) {
-                        $programs->add($program);
-                    }
-                }
-            }
-        }
-
+    
+        $this->addAidFinancerPrograms($programs);
+        $this->addAidInstructorPrograms($programs);
+    
         return $programs;
     }
-
-    public function  __toString(): string
+    
+    private function addAidFinancerPrograms($programs)
     {
-        return $this->getName() ?? 'Backer';
+        foreach ($this->getAidFinancers() as $aidFinancer) {
+            if ($aidFinancer->getAid()) {
+                $this->addPrograms($aidFinancer->getAid()->getPrograms(), $programs);
+            }
+        }
+    }
+    
+    private function addAidInstructorPrograms($programs)
+    {
+        foreach ($this->getAidInstructors() as $aidInstructor) {
+            if ($aidInstructor->getAid()) {
+                $this->addPrograms($aidInstructor->getAid()->getPrograms(), $programs);
+            }
+        }
+    }
+    
+    private function addPrograms($newPrograms, $programs)
+    {
+        foreach ($newPrograms as $program) {
+            if (!$programs->contains($program)) {
+                $programs->add($program);
+            }
+        }
+    }
+
+    public function setPrograms(ArrayCollection $programs): void
+    {
+        $this->programs = $programs;
     }
 
     public function getTimeUpdate(): ?\DateTimeInterface
@@ -887,5 +892,10 @@ class Backer
         $this->nbAidsLive = $nbAidsLive;
 
         return $this;
+    }
+
+    public function  __toString(): string
+    {
+        return $this->getName() ?? 'Backer';
     }
 }

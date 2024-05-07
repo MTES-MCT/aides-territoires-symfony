@@ -154,11 +154,8 @@ class PageTab
 
     public function removeFaq(Faq $faq): static
     {
-        if ($this->faqs->removeElement($faq)) {
-            // set the owning side to null (unless already changed)
-            if ($faq->getPageTab() === $this) {
-                $faq->setPageTab(null);
-            }
+        if ($this->faqs->removeElement($faq) && $faq->getPageTab() === $this) {
+            $faq->setPageTab(null);
         }
 
         return $this;

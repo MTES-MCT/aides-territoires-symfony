@@ -71,13 +71,7 @@ class AidFinancer
     public function __toString(): string
     {
         $name = '';
-        // if ($this->getAid()) {
-        //     $name .= $this->getAid()->getName();
-        // }
         if ($this->getBacker()) {
-            // if ($this->getAid()) {
-            //     $name .= ' | ';
-            // }
             $name .= $this->getBacker()->getName();
         }
 

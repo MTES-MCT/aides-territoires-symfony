@@ -10,9 +10,8 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
 
-// TODO voir utilite, faire BO si besoin
 #[ORM\Entity(repositoryClass: EligibilityQuestionRepository::class)]
-class EligibilityQuestion
+class EligibilityQuestion // NOSONAR too much methods
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -190,11 +189,8 @@ class EligibilityQuestion
 
     public function removeEligibilityTestQuestion(EligibilityTestQuestion $eligibilityTestQuestion): static
     {
-        if ($this->eligibilityTestQuestions->removeElement($eligibilityTestQuestion)) {
-            // set the owning side to null (unless already changed)
-            if ($eligibilityTestQuestion->getEligibilityQuestion() === $this) {
-                $eligibilityTestQuestion->setEligibilityQuestion(null);
-            }
+        if ($this->eligibilityTestQuestions->removeElement($eligibilityTestQuestion) && $eligibilityTestQuestion->getEligibilityQuestion() === $this) {
+            $eligibilityTestQuestion->setEligibilityQuestion(null);
         }
 
         return $this;

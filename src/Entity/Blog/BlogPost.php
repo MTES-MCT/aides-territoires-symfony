@@ -14,7 +14,7 @@ use Gedmo\Mapping\Annotation as Gedmo;
 #[ORM\Entity(repositoryClass: BlogPostRepository::class)]
 #[ORM\Index(columns: ['status'], name: 'status_blog')]
 #[ORM\Index(columns: ['slug'], name: 'slug_blog')]
-class BlogPost
+class BlogPost // NOSONAR too much methods
 {
     const FOLDER = 'blog';
     
@@ -299,11 +299,8 @@ class BlogPost
 
     public function removeLogBlogPostView(LogBlogPostView $logBlogPostView): static
     {
-        if ($this->logBlogPostViews->removeElement($logBlogPostView)) {
-            // set the owning side to null (unless already changed)
-            if ($logBlogPostView->getBlogPost() === $this) {
-                $logBlogPostView->setBlogPost(null);
-            }
+        if ($this->logBlogPostViews->removeElement($logBlogPostView) && $logBlogPostView->getBlogPost() === $this) {
+            $logBlogPostView->setBlogPost(null);
         }
 
         return $this;

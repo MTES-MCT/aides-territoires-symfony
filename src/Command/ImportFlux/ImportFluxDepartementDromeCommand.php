@@ -25,11 +25,10 @@ class ImportFluxDepartementDromeCommand extends ImportFluxCommand
         if (!isset($aidToImport['id'])) {
             return null;
         }
-        $importUniqueid = $this->importUniqueidPrefix . $aidToImport['id'];
-        return $importUniqueid;
+        return $this->importUniqueidPrefix . $aidToImport['id'];
     }
 
-    protected function getFieldsMapping(array $aidToImport, array $params = null): array
+    protected function getFieldsMapping(array $aidToImport, array $params = null): array // NOSONAR too complex
     {
         $keys = ['start_date', 'predeposit_date', 'submission_deadline', 'recurrence'];
 
@@ -39,7 +38,7 @@ class ImportFluxDepartementDromeCommand extends ImportFluxCommand
                 $importRawObjectCalendar[$key] = $aidToImport[$key];
             }
         }
-        if (count($importRawObjectCalendar) == 0) {
+        if (empty($importRawObjectCalendar)) {
             $importRawObjectCalendar = null;
         }
 

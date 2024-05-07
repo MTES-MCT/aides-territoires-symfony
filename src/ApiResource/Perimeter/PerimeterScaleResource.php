@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace App\ApiResource\Perimeter;
 
@@ -16,7 +16,7 @@ use App\Controller\Api\Perimeter\PerimeterController;
             controller: PerimeterController::class,
             normalizationContext: ['groups' => self::API_GROUP_LIST],
             openapi: new Model\Operation(
-                summary: 'Lister tous les choix d\'échelles', 
+                summary: 'Lister tous les choix d\'échelles',
             )
         ),
     ],

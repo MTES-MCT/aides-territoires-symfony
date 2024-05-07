@@ -81,7 +81,6 @@ class ProjectReferenceRepository extends ServiceEntityRepository
                 $qb->leftJoin('pr.projectReferenceCategory', 'projectReferenceCategory');
             }
             $qb->addOrderBy($orderBy['sort'], $orderBy['order']);
-            ;
         }
 
         if ($addOrderBy !== null) {

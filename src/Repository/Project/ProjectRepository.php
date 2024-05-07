@@ -134,7 +134,7 @@ class ProjectRepository extends ServiceEntityRepository
         foreach ($results as $result) {
             if ($result instanceof Project) {
                 $return[] = $result;
-            } else if (is_array($result) && isset($result[0]) && $result[0] instanceof Project) {
+            } elseif (is_array($result) && isset($result[0]) && $result[0] instanceof Project) {
                 if (isset($result['score_total'])) {
                     $result[0]->setScoreTotal($result['score_total']);
                 }
@@ -144,7 +144,7 @@ class ProjectRepository extends ServiceEntityRepository
         return $return;
     }
 
-    public function getQueryBuilder(array $params = null): QueryBuilder
+    public function getQueryBuilder(array $params = null): QueryBuilder // NOSONAR too complex
     {
         $isPublic = $params['isPublic'] ?? null;
         $isTypesSuggested = $params['project_types_suggestion'] ?? null;
@@ -156,9 +156,6 @@ class ProjectRepository extends ServiceEntityRepository
         $keywordSynonymlistSearch = $params['keywordSynonymlistSearch'] ?? null;
         $orderBy = (isset($params['orderBy']) && isset($params['orderBy']['sort']) && isset($params['orderBy']['order'])) ? $params['orderBy'] : null;
         $limit = $params['limit'] ?? null;
-        // $intentions_string = $params['intentions_string'] ?? null;
-        // $objects_string = $params['objects_string'] ?? null;
-        // $simple_words_string = $params['simple_words_string'] ?? null;
         $search = $params['search'] ?? null;
         $scoreTotalMin = $params['scoreTotalMin'] ?? 30;
         $projectReference = $params['projectReference'] ?? null;
@@ -179,7 +176,7 @@ class ProjectRepository extends ServiceEntityRepository
 
             if ($originalName) {
                 $sqlOriginalName = '
-                CASE WHEN (p.name = :originalName) THEN 500 ELSE 0 END 
+                CASE WHEN (p.name = :originalName) THEN 500 ELSE 0 END
                 ';
                 $qb->setParameter('originalName', $originalName);
             }
@@ -187,11 +184,11 @@ class ProjectRepository extends ServiceEntityRepository
             if ($objectsString) {
                 $sqlObjects = '
                 CASE WHEN (MATCH_AGAINST(p.name) AGAINST(:objects_string IN BOOLEAN MODE) > 1) THEN 90 ELSE 0 END +
-                CASE WHEN (MATCH_AGAINST(p.description) AGAINST(:objects_string IN BOOLEAN MODE) > 1) THEN 10 ELSE 0 END 
+                CASE WHEN (MATCH_AGAINST(p.description) AGAINST(:objects_string IN BOOLEAN MODE) > 1) THEN 10 ELSE 0 END
                 ';
 
                 $objects = str_getcsv($objectsString, ' ', '"');
-                if (count($objects) > 0) {
+                if (!empty($objects)) {
                     $sqlObjects .= ' + ';
                 }
                 for ($i = 0; $i<count($objects); $i++) {
@@ -210,7 +207,7 @@ class ProjectRepository extends ServiceEntityRepository
             if ($intentionsString && $objectsString) {
                 $sqlIntentions = '
                 CASE WHEN (MATCH_AGAINST(p.name) AGAINST(:intentions_string IN BOOLEAN MODE) > 1) THEN 5 ELSE 0 END +
-                CASE WHEN (MATCH_AGAINST(p.description) AGAINST(:intentions_string IN BOOLEAN MODE) > 1) THEN 1 ELSE 0 END 
+                CASE WHEN (MATCH_AGAINST(p.description) AGAINST(:intentions_string IN BOOLEAN MODE) > 1) THEN 1 ELSE 0 END
                 ';
                 $qb->setParameter('intentions_string', $intentionsString);
             }
@@ -218,16 +215,16 @@ class ProjectRepository extends ServiceEntityRepository
             if ($simpleWordsString) {
                 $sqlSimpleWords = '
                 CASE WHEN (MATCH_AGAINST(p.name) AGAINST(:simple_words_string IN BOOLEAN MODE) > 1) THEN 30 ELSE 0 END +
-                CASE WHEN (MATCH_AGAINST(p.description) AGAINST(:simple_words_string IN BOOLEAN MODE) > 1) THEN 5 ELSE 0 END 
+                CASE WHEN (MATCH_AGAINST(p.description) AGAINST(:simple_words_string IN BOOLEAN MODE) > 1) THEN 5 ELSE 0 END
                 ';
                 $qb->setParameter('simple_words_string', $simpleWordsString);
             }
 
             if ($projectReference instanceof ProjectReference) {
                 $sqlProjectReference = '
-                CASE 
-                    WHEN :projectReference = p.projectReference THEN 90 
-                    ELSE 0 
+                CASE
+                    WHEN :projectReference = p.projectReference THEN 90
+                    ELSE 0
                 END
                 ';
 
@@ -306,13 +303,13 @@ class ProjectRepository extends ServiceEntityRepository
                 ->setParameter('lng', $perimeterRadius->getLongitude())
                 ->having('dist <= :distanceKm')
                 ->setParameter('distanceKm', $radius)
-                ->orderBy('dist', 'ASC');
+                ->orderBy('dist', 'ASC')
             ;
         }
 
         if ($isPublic !== null) {
             $qb
-                ->andWhere('p.isPublic = :isPublic') 
+                ->andWhere('p.isPublic = :isPublic')
                 ->setParameter('isPublic', $isPublic)
                 ;
         }

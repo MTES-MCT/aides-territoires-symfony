@@ -12,7 +12,7 @@ use Gedmo\Mapping\Annotation as Gedmo;
 #[ORM\Index(columns: ['email'], name: 'email_alert')]
 #[ORM\Index(columns: ['date_latest_alert'], name: 'date_latest_alert_alert')]
 #[ORM\Entity(repositoryClass: AlertRepository::class)]
-class Alert
+class Alert // NOSONAR too much methods
 {
     const FREQUENCIES = [
         ['slug' => 'daily', 'name' => 'Quotidiennement'],
@@ -41,7 +41,6 @@ class Alert
     #[ORM\Column(length: 32)]
     private ?string $alertFrequency = null;
 
-    // TODO ancien systeme, a supprimer
     #[ORM\Column]
     private ?bool $validated = false;
 
@@ -59,7 +58,6 @@ class Alert
     #[Gedmo\Timestampable(on: 'update')]
     private ?\DateTimeInterface $timeUpdate = null;
 
-    // TODO ancien systeme, a supprimer
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $timeValidated = null;
 

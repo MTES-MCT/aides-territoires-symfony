@@ -13,7 +13,7 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Index(columns: ['description'], name: 'description_project_validated_fulltext', flags: ['fulltext'])]
 #[ORM\Index(columns: ['project_name', 'description'], name: 'project_name_description_project_validated_fulltext', flags: ['fulltext'])]
 #[ORM\Entity(repositoryClass: ProjectValidatedRepository::class)]
-class ProjectValidated
+class ProjectValidated // NOSONAR too much methods
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]

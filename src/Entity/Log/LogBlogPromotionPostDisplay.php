@@ -4,6 +4,7 @@ namespace App\Entity\Log;
 
 use App\Entity\Blog\BlogPromotionPost;
 use App\Repository\Log\LogBlogPromotionPostDisplayRepository;
+use App\Service\Doctrine\DoctrineConstants;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
@@ -33,7 +34,7 @@ class LogBlogPromotionPostDisplay
     private ?\DateTimeInterface $dateCreate = null;
 
     #[ORM\ManyToOne(inversedBy: 'logBlogPromotionPostDisplays')]
-    #[ORM\JoinColumn(onDelete:'SET NULL')]
+    #[ORM\JoinColumn(onDelete:DoctrineConstants::SET_NULL)]
     private ?BlogPromotionPost $blogPromotionPost = null;
 
     public function getId(): ?int

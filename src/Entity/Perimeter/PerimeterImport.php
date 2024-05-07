@@ -11,7 +11,7 @@ use Symfony\Component\HttpFoundation\File\File;
 
 #[ORM\Index(columns: ['ask_processing'], name: 'ask_processing_perimeter_import')]
 #[ORM\Entity(repositoryClass: PerimeterImportRepository::class)]
-class PerimeterImport
+class PerimeterImport // NOSONAR too much methods
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -174,7 +174,7 @@ class PerimeterImport
         $this->file = $file;
 
         return $this;
-    }   
+    }
 
     public function getAdhocPerimeterName(): ?string
     {

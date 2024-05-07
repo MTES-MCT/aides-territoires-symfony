@@ -13,7 +13,7 @@ use App\Validator as AtAssert;
 #[ORM\Entity(repositoryClass: PageRepository::class)]
 #[UniqueEntity(fields: ['url'], message: 'Cette url existe déjà')]
 #[ORM\Index(columns: ['url'], name: 'url_page')]
-class Page
+class Page // NOSONAR too much methods
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -181,7 +181,7 @@ class Page
 
 
     /**
-     * Pour avoir le nom 
+     * Pour avoir le nom
      *
      * @return string
      */

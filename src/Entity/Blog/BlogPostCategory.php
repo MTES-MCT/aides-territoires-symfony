@@ -119,11 +119,8 @@ class BlogPostCategory
 
     public function removeBlogPost(BlogPost $blogPost): static
     {
-        if ($this->blogPosts->removeElement($blogPost)) {
-            // set the owning side to null (unless already changed)
-            if ($blogPost->getBlogPostCategory() === $this) {
-                $blogPost->setBlogPostCategory(null);
-            }
+        if ($this->blogPosts->removeElement($blogPost) && $blogPost->getBlogPostCategory() === $this) {
+            $blogPost->setBlogPostCategory(null);
         }
 
         return $this;

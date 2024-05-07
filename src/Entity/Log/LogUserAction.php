@@ -17,7 +17,7 @@ use Gedmo\Mapping\Annotation as Gedmo;
 #[ORM\Index(columns: ['ip'], name: 'ip_lua')]
 #[ORM\Index(columns: ['referer'], name: 'referer_lua')]
 #[ORM\Index(columns: ['request_uri'], name: 'request_uri_lua')]
-class LogUserAction
+class LogUserAction // NOSONAR too much methods
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]

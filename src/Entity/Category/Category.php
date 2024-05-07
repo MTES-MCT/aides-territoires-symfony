@@ -17,7 +17,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 #[ORM\Index(columns: ['name'], name: 'name_aid')]
 #[ORM\Index(columns: ['name'], name: 'name_category_fulltext', flags: ['fulltext'])]
 #[ORM\Entity(repositoryClass: CategoryRepository::class)]
-class Category
+class Category // NOSONAR too much methods
 {
     const API_GROUP_LIST = 'category:list';
 

@@ -11,6 +11,7 @@ use App\Entity\Perimeter\Perimeter;
 use App\Entity\Program\Program;
 use App\Entity\User\User;
 use App\Repository\Log\LogAidSearchRepository;
+use App\Service\Doctrine\DoctrineConstants;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
@@ -21,7 +22,7 @@ use Gedmo\Mapping\Annotation as Gedmo;
 #[ORM\Index(columns: ['date_create'], name: 'date_create_las')]
 #[ORM\Index(columns: ['source'], name: 'source_las')]
 #[ORM\Index(columns: ['search'], name: 'source_las')]
-class LogAidSearch
+class LogAidSearch // NOSONAR too much methods
 {
     const SOURCE_API = 'api';
     
@@ -51,15 +52,15 @@ class LogAidSearch
     private ?string $search = null;
 
     #[ORM\ManyToOne(inversedBy: 'logAidSearches')]
-    #[ORM\JoinColumn(onDelete:'SET NULL')]
+    #[ORM\JoinColumn(onDelete: DoctrineConstants::SET_NULL)]
     private ?Perimeter $perimeter = null;
 
     #[ORM\ManyToOne(inversedBy: 'logAidSearches')]
-    #[ORM\JoinColumn(onDelete:'SET NULL')]
+    #[ORM\JoinColumn(onDelete: DoctrineConstants::SET_NULL)]
     private ?Organization $organization = null;
 
     #[ORM\ManyToOne(inversedBy: 'logAidSearches')]
-    #[ORM\JoinColumn(onDelete:'SET NULL')]
+    #[ORM\JoinColumn(onDelete: DoctrineConstants::SET_NULL)]
     private ?User $user = null;
 
     #[ORM\ManyToMany(targetEntity: OrganizationType::class, inversedBy: 'logAidSearches')]

@@ -11,7 +11,7 @@ use Gedmo\Mapping\Annotation as Gedmo;
 #[ORM\Index(columns: ['date_create'], name: 'date_create_oi')]
 #[ORM\Index(columns: ['date_accept'], name: 'date_accept_oi')]
 #[ORM\Entity(repositoryClass: OrganizationInvitationRepository::class)]
-class OrganizationInvitation
+class OrganizationInvitation // NOSONAR too much methods
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
