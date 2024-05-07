@@ -130,8 +130,6 @@ class AlertSendWeeklyCommand extends Command
                 $this->managerRegistry->getManager()->persist($alert);
                 // sauvegarde
                 $this->managerRegistry->getManager()->flush();
-                // libère mémoire
-                $this->managerRegistry->getManager()->clear();
                 // incrémente le compteur
                 $nbAlertSend++;
             }

@@ -51,11 +51,11 @@ class AlertSendDailyCommand extends Command
         $io->title($this->commandTextStart);
 
         try  {
-            // if ($this->kernelInterface->getEnvironment() != 'prod') {
-            //     $io->info('Uniquement en prod');
-            //     return Command::FAILURE;
-            // }
-            // generate menu
+            if ($this->kernelInterface->getEnvironment() != 'prod') {
+                $io->info('Uniquement en prod');
+                return Command::FAILURE;
+            }
+            // tache
             $this->cronTask($input, $output);
         } catch (\Exception $exception) {
             $io->error($exception->getMessage());
