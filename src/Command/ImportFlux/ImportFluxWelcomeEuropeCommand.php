@@ -422,7 +422,7 @@ class ImportFluxWelcomeEuropeCommand extends ImportFluxCommand
             ],
         ];
 
-        $types = explode(',', $aidToImport['info_categorie']);
+        $types = explode(';', html_entity_decode($aidToImport['info_categorie']));
 
         if (is_array($types)) {
             foreach ($types as $type) {
@@ -556,7 +556,7 @@ class ImportFluxWelcomeEuropeCommand extends ImportFluxCommand
             ]
         ];
 
-        $categories = explode(';', $aidToImport['filtres_sectors']);
+        $categories = explode(';', html_entity_decode($aidToImport['filtres_sectors']));
 
         if (is_array($categories)) {
             foreach ($categories as $category) {
