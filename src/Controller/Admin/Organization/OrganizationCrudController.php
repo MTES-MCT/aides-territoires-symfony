@@ -5,6 +5,8 @@ namespace App\Controller\Admin\Organization;
 use App\Controller\Admin\AtCrudController;
 use App\Controller\Admin\Filter\Organization\EmailDomainFilter;
 use App\Controller\Admin\Filter\Organization\HasNoBackerFilter;
+use App\Controller\Admin\Filter\Organization\HasUserBeneficiaryFilter;
+use App\Controller\Admin\Filter\Organization\HasUserContributorFilter;
 use App\Entity\Backer\Backer;
 use App\Entity\Organization\Organization;
 use App\Entity\Perimeter\Perimeter;
@@ -54,6 +56,8 @@ class OrganizationCrudController extends AtCrudController
             ->add('backer', 'Porteur d\'aide')
             ->add(HasNoBackerFilter::new('hasNoBacker', 'Pas de porteur associé'))
             ->add(EmailDomainFilter::new('emailDomainFilter', 'Domaine email utilisateur'))
+            ->add(HasUserContributorFilter::new('hasUserContributor', 'Contributeurs'))
+            ->add(HasUserBeneficiaryFilter::new('hasUserBeneficiary', 'Bénéficiaires'))
         ;
     }
 
