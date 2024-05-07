@@ -26,7 +26,7 @@ class ImportFluxIleDeFranceCommand extends ImportFluxCommand
         if (!isset($aidToImport['referenceAdministrative'])) {
             return null;
         }
-        return $this->importUniqueidPrefix . md5($aidToImport['referenceAdministrative']);
+        return $this->importUniqueidPrefix . $aidToImport['referenceAdministrative'];
     }
 
     protected function callApi()
