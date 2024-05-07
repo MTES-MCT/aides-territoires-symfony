@@ -3,9 +3,20 @@
 namespace App\Controller\Admin\Organization;
 
 use App\Controller\Admin\AtCrudController;
+use App\Controller\Admin\Filter\Organization\EmailDomainFilter;
+use App\Controller\Admin\Filter\Organization\HasNoBackerFilter;
+use App\Entity\Backer\Backer;
 use App\Entity\Organization\Organization;
 use App\Entity\Perimeter\Perimeter;
+use App\Form\Admin\Organization\BackerAssociationType;
 use App\Repository\Perimeter\PerimeterRepository;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Assets;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Filters;
+use EasyCorp\Bundle\EasyAdminBundle\Config\KeyValueStore;
+use EasyCorp\Bundle\EasyAdminBundle\Dto\BatchActionDto;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\DateTimeField;
@@ -13,12 +24,56 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\FormField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IntegerField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 
 class OrganizationCrudController extends AtCrudController
 {
     public static function getEntityFqcn(): string
     {
         return Organization::class;
+    }
+
+    public function configureAssets(Assets $assets): Assets
+    {
+        $assets = parent::configureAssets($assets);
+        return $assets
+            ->addWebpackEncoreEntry('admin/organization/associate')
+        ;
+    }
+
+    public function  configureCrud(Crud $crud): Crud
+    {
+        return parent::configureCrud($crud)
+        ->overrideTemplate('crud/index', 'admin/organization/index.html.twig')
+        ;
+    }
+
+    public function configureFilters(Filters $filters): Filters
+    {
+        return $filters
+            ->add('backer', 'Porteur d\'aide')
+            ->add(HasNoBackerFilter::new('hasNoBacker', 'Pas de porteur associé'))
+            ->add(EmailDomainFilter::new('emailDomainFilter', 'Domaine email utilisateur'))
+        ;
+    }
+
+    public function configureActions(Actions $actions): Actions
+    {
+        $batchOrganizationAssociateBacker = Action::new('batchOrganizationAssociateBacker', 'Associé Porteur')
+        ->linkToCrudAction('batchOrganizationAssociateBacker');
+
+        return parent::configureActions($actions)
+            ->addBatchAction($batchOrganizationAssociateBacker)
+        ;
+    }
+
+    public function configureResponseParameters(KeyValueStore $responseParameters): KeyValueStore
+    {
+        // formulaire association backer en batch
+        $formOrganizationAssociateBacker = $this->createForm(BackerAssociationType::class);
+        $responseParameters->setIfNotSet('formOrganizationAssociateBacker', $formOrganizationAssociateBacker);
+
+        return $responseParameters;
     }
 
     public function configureFields(string $pageName): iterable
@@ -37,7 +92,7 @@ class OrganizationCrudController extends AtCrudController
         ->onlyOnForms();
         yield AssociationField::new('backer', 'Porteur d\'aide')
         ->autocomplete()
-        ->onlyOnForms();
+        ;
         yield TextField::new('intercommunalityType', 'Type d\'inter-communalité')
         ->onlyOnForms();
         yield TextField::new('densityTypology', 'Typologie de densité')
@@ -178,5 +233,31 @@ class OrganizationCrudController extends AtCrudController
             ]
         )
         ->onlyOnForms();
+    }
+
+
+    public function batchOrganizationAssociateBacker(BatchActionDto $batchActionDto): RedirectResponse
+    {
+        $form = $this->createForm(BackerAssociationType::class);
+        $form->handleRequest($this->getContext()->getRequest());
+        if ($form->isSubmitted()) {
+            if ($form->isValid()) {
+                $backer = $form->get('backer')->getData();
+                if ($backer instanceof Backer) {
+                    foreach ($batchActionDto->getEntityIds() as $id) {
+                        $organization = $this->managerRegistry->getRepository(Organization::class)->find($id);
+                        if ($organization instanceof Organization) {
+                            $backer->addOrganization($organization);
+                            $organization->setBacker($backer);
+                            $this->managerRegistry->getManager()->persist($backer);
+                            $this->managerRegistry->getManager()->persist($organization);
+                        }
+                    }
+                    $this->managerRegistry->getManager()->flush();
+                }
+            }
+        }
+
+        return $this->redirect($batchActionDto->getReferrerUrl());
     }
 }

@@ -60,9 +60,9 @@ class AidCrudController extends AtCrudController
     {
         $assets = parent::configureAssets($assets);
         return $assets
-            ->addWebpackEncoreEntry('import-scss/admin/aid/associate')          
-            ->addWebpackEncoreEntry('form/entity-checkbox-absolute-type')     
-            ->addWebpackEncoreEntry('admin/aid/associate')        
+            ->addWebpackEncoreEntry('import-scss/admin/aid/associate')
+            ->addWebpackEncoreEntry('form/entity-checkbox-absolute-type')
+            ->addWebpackEncoreEntry('admin/aid/associate')
         ;
     }
 
