@@ -7,6 +7,7 @@ use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints as Assert;
 
 class BlogPostCategoryFilterType extends AbstractType
 {
@@ -21,7 +22,12 @@ class BlogPostCategoryFilterType extends AbstractType
                 'placeholder' => 'Filtrer les articles par catégorie',
                 'attr' => [
                     'title' => 'Filtrer les articles par catégorie - La sélection recharge la page'
-                ]
+                ],
+                'constraints' => [
+                    new Assert\NotBlank([
+                        'message' => 'Veuillez choisir une catégorie.',
+                    ]),
+                ],
             ])
 
         ;
