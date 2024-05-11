@@ -12,6 +12,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Validator\Constraints\Count;
+use Symfony\Component\Validator\Constraints as Assert;
 
 class SearchPageEditType extends AbstractType
 {
@@ -33,6 +34,11 @@ class SearchPageEditType extends AbstractType
                     'rows' => 10
                 ],
                 'sanitize_html' => true,
+                'constraints' => [
+                    new Assert\NotBlank([
+                        'message' => 'Veuillez saisir la description.',
+                    ]),
+                ]
             ])
             ->add('moreContent', TextareaType::class, [
                 'required' => false,

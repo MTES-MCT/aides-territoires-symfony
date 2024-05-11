@@ -9,6 +9,7 @@ use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints as Assert;
 
 class OrganizationChoiceType extends AbstractType
 {
@@ -34,6 +35,11 @@ class OrganizationChoiceType extends AbstractType
                     ->orderBy('o.name', 'ASC')
                     ;
                 },
+                'constraints' => [
+                    new Assert\NotBlank([
+                        'message' => 'Veuillez coisir la structure.',
+                    ]),
+                ]
             ])
         ;
     }

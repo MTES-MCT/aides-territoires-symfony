@@ -27,7 +27,7 @@ class NotificationDeleteType extends AbstractType
         $builder
         ->add('idNotification', HiddenType::class, [
             'required' => true,
-            'label' => false
+            'label' => false,
         ])
 
         ->addEventListener(

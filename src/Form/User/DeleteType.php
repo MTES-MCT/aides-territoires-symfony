@@ -12,6 +12,7 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Component\Validator\Constraints as Assert;
 
 class DeleteType extends AbstractType
 {
@@ -31,12 +32,22 @@ class DeleteType extends AbstractType
                 'attr' => [
                     'autocomplete' => 'off'
                 ],
-                'toggle' => true
+                'toggle' => true,
+                'constraints' => [
+                    new Assert\NotBlank([
+                        'message' => 'Veuillez confirmer votre mot de passe.',
+                    ]),
+                ]
             ])
             ->add('accept', CheckboxType::class, [
                 'required' => true,
                 'label' => 'Je confirme la suppression <strong>définitive</strong> de <strong>toutes</strong> mes données. <strong>Elle ne seront pas récupérables.</strong>',
-                'label_html' => true
+                'label_html' => true,
+                'constraints' => [
+                    new Assert\IsTrue([
+                        'message' => 'Veuillez confirmer la suppression.',
+                    ]),
+                ]
             ])
 
             ->addEventListener(

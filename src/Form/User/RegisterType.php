@@ -7,7 +7,6 @@ use App\Entity\Organization\OrganizationType;
 use App\Entity\Perimeter\Perimeter;
 use App\Entity\User\User;
 use App\Form\Type\PerimeterAutocompleteType;
-use App\Validator\Password;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
@@ -19,6 +18,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\Length;
+use Symfony\Component\Validator\Constraints as Assert;
 
 class RegisterType extends AbstractType
 {
@@ -46,12 +46,20 @@ class RegisterType extends AbstractType
             ->add('firstname', TextType::class, [
                 'required' => true,
                 'label' => 'Votre prénom',
-                // 'sanitize_html' => true,
+                'constraints' => [
+                    new Assert\NotBlank([
+                        'message' => 'Veuillez entrer votre prénom.',
+                    ]),
+                ]
             ])
             ->add('lastname', TextType::class, [
                 'required' => true,
                 'label' => 'Votre nom',
-                // 'sanitize_html' => true,
+                'constraints' => [
+                    new Assert\NotBlank([
+                        'message' => 'Veuillez entrer votre nom.',
+                    ]),
+                ]
             ])
             ->add('email', EmailType::class, [
                 'required' => true,
@@ -60,7 +68,15 @@ class RegisterType extends AbstractType
                 'help_html' => true,
                 'attr' => [
                     'placeholder' => 'Merci de bien vérifier l\'adresse saisie'
-                ]
+                ],
+                'constraints' => [
+                    new Assert\NotBlank([
+                        'message' => 'Veuillez entrer votre email.',
+                    ]),
+                    new Assert\Email([
+                        'message' => 'L\'email "{{ value }}" n\'est pas une adresse email valide.',
+                    ]),
+                ],
             ])
             ->add('password', RepeatedType::class, [
                 'required'      => true,
@@ -112,6 +128,11 @@ class RegisterType extends AbstractType
                 'help' => 'Tous les périmètres géographiques sont disponibles : CA, CU, CC, pays, parc, etc. Contactez-nous si vous ne trouvez pas le vôtre.',
                 'placeholder' => 'Tapez les premiers caractères',
                 'class' => Perimeter::class,
+                'constraints' => [
+                    new Assert\NotBlank([
+                        'message' => 'Veuillez choisir votre territoire.',
+                    ]),
+                ],
             ])
             ->add('organizationName', TextType::class, [
                 'required' => false,
@@ -129,7 +150,6 @@ class RegisterType extends AbstractType
             ->add('beneficiaryRole', TextType::class, [
                 'required' => false,
                 'label' => 'Votre rôle',
-                // 'sanitize_html' => true,
             ])
             ->add('isBeneficiary', CheckboxType::class, [
                 'required' => false,
@@ -148,7 +168,6 @@ class RegisterType extends AbstractType
             ->add('acquisitionChannelComment', TextType::class, [
                 'required' => false,
                 'label' => 'Précisez comment vous avez connu Aides-territoires',
-                // 'sanitize_html' => true,
             ])
             ->add('mlConsent', CheckboxType::class, [
                 'required' => false,
@@ -168,19 +187,31 @@ class RegisterType extends AbstractType
                     'label' => 'Adresse postale',
                     'required' => true,
                     'mapped' => false,
-                    // 'sanitize_html' => true,
+                    'constraints' => [
+                        new Assert\NotBlank([
+                            'message' => 'Veuillez saisir votre adresse postale.',
+                        ]),
+                    ],
                 ])
                 ->add('cityName', TextType::class, [
                     'label' => 'Ville',
                     'required' => true,
                     'mapped' => false,
-                    // 'sanitize_html' => true,
+                    'constraints' => [
+                        new Assert\NotBlank([
+                            'message' => 'Veuillez saisir votre ville.',
+                        ]),
+                    ],
                 ])
                 ->add('zipCode', TextType::class, [
                     'label' => 'Code postal',
                     'required' => true,
                     'mapped' => false,
-                    // 'sanitize_html' => true,
+                    'constraints' => [
+                        new Assert\NotBlank([
+                            'message' => 'Veuillez saisir votre code postal.',
+                        ]),
+                    ],
                 ])
                 ->add('sirenCode', TextType::class, [
                     'label' => 'Code SIREN',
@@ -190,7 +221,6 @@ class RegisterType extends AbstractType
                     'constraints' => [
                         new Length(9)
                     ],
-                    // 'sanitize_html' => true,
                 ])
                 ->add('siretCode', TextType::class, [
                     'label' => 'Code SIRET',
@@ -200,13 +230,11 @@ class RegisterType extends AbstractType
                     'constraints' => [
                         new Length(14)
                     ],
-                    // 'sanitize_html' => true,
                 ])
                 ->add('apeCode', TextType::class, [
                     'label' => 'Code APE',
                     'required' => false,
                     'mapped' => false,
-                    // 'sanitize_html' => true,
                     'constraints' => [
                         new Length(max: 10)
                     ],
@@ -216,9 +244,11 @@ class RegisterType extends AbstractType
                     'required' => true,
                     'mapped' => false,
                     'constraints' => [
-                        new Length(5)
+                        new Length(5),
+                        new Assert\NotBlank([
+                            'message' => 'Veuillez saisir votre code INSEE.',
+                        ]),
                     ],
-                    // 'sanitize_html' => true,
                 ])
             ;
         }

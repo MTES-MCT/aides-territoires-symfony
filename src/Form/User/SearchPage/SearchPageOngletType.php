@@ -3,14 +3,13 @@
 namespace App\Form\User\SearchPage;
 
 use App\Entity\Page\Page;
-use App\Entity\Search\SearchPage;
-use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ButtonType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints as Assert;
 
 class SearchPageOngletType extends AbstractType
 {
@@ -19,7 +18,12 @@ class SearchPageOngletType extends AbstractType
         $builder
             ->add('name', TextType::class, [
                 'required' => true,
-                'label' => 'Titre :'
+                'label' => 'Titre :',
+                'constraints' => [
+                    new Assert\NotBlank([
+                        'message' => 'Veuillez saisir le titre.',
+                    ]),
+                ]
             ])
             ->add('description', TextareaType::class, [
                 'required' => true,
@@ -30,9 +34,13 @@ class SearchPageOngletType extends AbstractType
                     'rows' => 10
                 ],
                 'sanitize_html' => true,
+                'constraints' => [
+                    new Assert\NotBlank([
+                        'message' => 'Veuillez saisir la description.',
+                    ]),
+                ]
             ])
             ->add('delete', ButtonType::class, [
-                'label_html' => true,
                 'label' => 'Supprimer onglet',
                 'attr' => [
                     'class' => 'btn-delete-collection-generic fr-btn fr-btn--secondary fr-btn--icon-left fr-icon-delete-line'
