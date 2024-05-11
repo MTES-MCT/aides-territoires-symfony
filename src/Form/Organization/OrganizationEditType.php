@@ -2,13 +2,9 @@
 
 namespace App\Form\Organization;
 
-use App\Entity\Backer\Backer;
 use App\Entity\Organization\Organization;
 use App\Entity\Organization\OrganizationType;
 use App\Entity\Organization\OrganizationTypeGroup;
-use App\Entity\Perimeter\Perimeter;
-use App\Entity\Project\Project;
-use App\Entity\User\User;
 use App\Form\Type\PerimeterAutocompleteType;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
@@ -20,6 +16,7 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\Length;
+use Symfony\Component\Validator\Constraints as Assert;
 
 class OrganizationEditType extends AbstractType
 {
@@ -41,6 +38,11 @@ class OrganizationEditType extends AbstractType
                     return $er->createQueryBuilder('ot')
                         ->orderBy('ot.name', 'ASC');
                 },
+                'constraints' => [
+                    new Assert\NotBlank([
+                        'message' => 'Veuillez choisir le type de votre structure.',
+                    ]),
+                ],
             ])
             ->add('intercommunalityType', ChoiceType::class, [
                 'required' => false,
@@ -54,23 +56,48 @@ class OrganizationEditType extends AbstractType
                 'label' => 'Territoire de la structure',
                 'help' => 'Tous les périmètres géographiques sont disponibles : CA, CU, CC, pays, parc, etc. Contactez-nous si vous ne trouvez pas le vôtre.',
                 'placeholder' => 'Tapez les premiers caractères',
+                'constraints' => [
+                    new Assert\NotBlank([
+                        'message' => 'Veuillez choisir le territoire de la structure.',
+                    ]),
+                ],
             ])
             ->add('name', TextType::class, [
                 'required' => true,
                 'label' => 'Nom de la structure',
                 'help' => 'En fonction des informations saisies précédemment, nous pouvons, parfois pré-remplir ce champ automatiquement. Vous pouvez cependant corriger le nom proposé si besoin.',
+                'constraints' => [
+                    new Assert\NotBlank([
+                        'message' => 'Veuillez saisir le nom de la structure.',
+                    ]),
+                ],
             ])
             ->add('address', TextType::class, [
                 'label' => 'Adresse postale',
                 'required' => true,
+                'constraints' => [
+                    new Assert\NotBlank([
+                        'message' => 'Veuillez saisir l\'adresse postale de votre structure.',
+                    ]),
+                ],
             ])
             ->add('cityName', TextType::class, [
                 'label' => 'Ville',
                 'required' => true,
+                'constraints' => [
+                    new Assert\NotBlank([
+                        'message' => 'Veuillez saisir la ville de votre structure.',
+                    ]),
+                ],
             ])
             ->add('zipCode', TextType::class, [
                 'label' => 'Code postal',
                 'required' => true,
+                'constraints' => [
+                    new Assert\NotBlank([
+                        'message' => 'Veuillez saisir le code postal de votre structure.',
+                    ]),
+                ],
             ])
             ->add('sirenCode', TextType::class, [
                 'label' => 'Code SIREN',

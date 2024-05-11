@@ -6,6 +6,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints as Assert;
 
 class AidExportType extends AbstractType
 {
@@ -20,7 +21,12 @@ class AidExportType extends AbstractType
                     'Tableur Excel' => 'xlsx',
                     'Document PDF' => 'pdf'
                 ],
-                'expanded' => true
+                'expanded' => true,
+                'constraints' => [
+                    new Assert\NotBlank([
+                        'message' => 'Veuillez choisir un format.',
+                    ]),
+                ]
             ])
         ;
     }
