@@ -41,6 +41,7 @@ use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\PositiveOrZero;
 use Symfony\Component\Validator\Constraints\Url;
+use Symfony\Component\Validator\Constraints as Assert;
 
 class AidEditType extends AbstractType
 {
@@ -54,18 +55,9 @@ class AidEditType extends AbstractType
     }
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        // regarde si l'utilisateur à rempli toutes ses fiches porteur d'aides
-        $user = $this->userService->getUserLogged();
-        $needUpdateBacker = false;
-        /** @var Organization $organization */
-        foreach ($user->getOrganizations() as $organization) {
-            if (!$organization->getBacker()) {
-                $needUpdateBacker = true;
-            }
-        }
-
         // l'aide
         $aid = $options['data'] ?? null;
+        // est en brouillon ?
         $isDraft = ($aid instanceof Aid && $aid->getStatus() === Aid::STATUS_DRAFT) || ($aid instanceof Aid && !$aid->getId());
 
         // les catégories
@@ -85,6 +77,7 @@ class AidEditType extends AbstractType
             }
         }
         
+        // les financers et instructeurs
         $aid = $options['data'] ?? null;
         $financers = [];
         $instructors = [];
@@ -103,13 +96,7 @@ class AidEditType extends AbstractType
             'label' => 'La structure pour laquelle vous publiez cette aide',
             'class' => Organization::class,
             'choice_label' => function(Organization $organization) {
-                $return = $organization->getName();
-                // if (!$organization->getBacker()) {
-                //     $return .= ' (fiche porteur d\'aides à compléter)';
-                // } else if ($organization->getBacker() && !$organization->getBacker()->isActive()) {
-                //     $return .= ' (fiche porteur d\'aides en attente de validation)';
-                // }
-                return $return;
+                return $organization->getName();
             },
             'query_builder' => function(EntityRepository $entityRepository) {
                 return $entityRepository->createQueryBuilder('o')
@@ -121,39 +108,6 @@ class AidEditType extends AbstractType
             },
             'placeholder' => 'Choisissez une structure',
         ];
-        $organizationParams['choice_attr'] = function(Organization $organization) use ($aid) {
-            // bloquage pour les nouvelles aides
-            if (!$aid->getId()) {
-                return [];
-                // if (!$organization->getBacker()) {
-                //     return ['disabled' => true];
-                // } else {
-                //     return [];
-                // }
-            } else {
-                return [];
-                // si aide existante, on empêche de changer d'organisation pour une non valide
-                // if ($organization && $aid->getOrganization() && $organization->getId() === $aid->getOrganization()->getId()) {
-                //     return [];
-                // } else if (!$organization->getBacker()) {
-                //     return ['disabled' => true];
-                // } else {
-                //     return [];
-                // }
-            }
-        };
-
-        if ($needUpdateBacker) {
-            // $help = '<div class="fr-alert fr-alert--info">Pour choisir une structure, vous devez avoir remplir sa fiche Porteur d\'aides';
-            // foreach ($user->getOrganizations() as $organization) {
-            //     if (!$organization->getBacker()) {
-            //         $help .= '<br />- <a href="' . $this->routerInterface->generate('app_organization_backer_edit', ['id' => $organization->getId(), 'idBacker' => 0]) . '">' . $organization->getName() . '</a>';
-            //     }
-            // }
-            // $help .= '</div>';
-            // $organizationParams['help'] = $help;
-            // $organizationParams['help_html'] = true;
-        }
 
         $builder
             ->add('name', TextType::class, [
@@ -164,7 +118,10 @@ class AidEditType extends AbstractType
                     'maxlength' => 180,
                 ],
                 'constraints' => [
-                    new Length(null, null, 180)
+                    new Length(null, null, 180),
+                    new Assert\NotBlank([
+                        'message' => 'Veuillez saisir le nom de votre aide.',
+                    ]),
                 ],
             ])
             ->add('nameInitial', TextType::class, [
