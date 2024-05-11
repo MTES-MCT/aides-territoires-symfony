@@ -12,6 +12,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\Length;
+use Symfony\Component\Validator\Constraints as Assert;
 
 class ContactType extends AbstractType
 {
@@ -33,15 +34,33 @@ class ContactType extends AbstractType
             ->add('firstname', TextType::class, [
                 'label' => 'Votre prénom :',
                 'required' => true,
+                'constraints' => [
+                    new Assert\NotBlank([
+                        'message' => 'Veuillez entrer votre prénom.',
+                    ]),
+                ]
             ])
             ->add('lastname', TextType::class, [
                 'label' => 'Votre nom :',
                 'required' => true,
+                'constraints' => [
+                    new Assert\NotBlank([
+                        'message' => 'Veuillez entrer votre nom.',
+                    ]),
+                ]
             ])
             ->add('email', EmailType::class, [
                 'label' => 'Votre email :',
                 'required' => true,
                 'help' => 'Par exemple : prenom.nom@domaine.fr',
+                'constraints' => [
+                    new Assert\NotBlank([
+                        'message' => 'Veuillez entrer votre email.',
+                    ]),
+                    new Assert\Email([
+                        'message' => 'L\'email "{{ value }}" n\'est pas une adresse email valide.',
+                    ]),
+                ],
             ])
             ->add('phoneNumber', TextType::class, [
                 'required' => false,
@@ -56,6 +75,11 @@ class ContactType extends AbstractType
                 'attr' => [
                     'placeholder' => 'Exemple: Mairie de Château-Thierry / Chargé de mission habitat'
                 ],
+                'constraints' => [
+                    new Assert\NotBlank([
+                        'message' => 'Veuillez entrer votre structure et fonction.',
+                    ]),
+                ]
             ])
             ->add('subject', ChoiceType::class, [
                 'choices' => [
@@ -70,12 +94,22 @@ class ContactType extends AbstractType
                 'placeholder' => '---',
                 'label' => 'Sujet :',
                 'required' => true,
+                'constraints' => [
+                    new Assert\NotBlank([
+                        'message' => 'Veuillez sélectionner un sujet.',
+                    ]),
+                ],
             ])
             ->add('message', TextareaType::class, [
                 'label' => 'Votre question ou message :',
                 'required' => true,
                 'attr' => ['class' => 'fr-input', 'cols' => 40, 'rows' => 10],
                 'sanitize_html' => true,
+                'constraints' => [
+                    new Assert\NotBlank([
+                        'message' => 'Veuillez saisir un message.',
+                    ]),
+                ],
             ])
             ->add('captcha', CaptchaType::class)
         ;
