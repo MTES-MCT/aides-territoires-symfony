@@ -1,0 +1,27 @@
+{% extends '@EasyAdmin/crud/index.html.twig' %}
+{% block batch_actions %}
+    {% if has_batch_actions %}
+        <div class="batch-actions d-none">
+            <div class="d-flex align-items-start">
+            {% for action in batch_actions %}
+                {% if action.name == 'batchOrganizationAssociateBacker' %}
+                    <div class="col me-2">
+                    {{ form_start(formOrganizationAssociateBacker, {'method': 'POST', 'attr': {'action': action.linkUrl, 'id': 'form-backer-association'}}) }}
+                        {{ form_widget(formOrganizationAssociateBacker.backer, {'attr': {'style': 'max-width:200px;'}}) }}
+                        {{ form_widget(formOrganizationAssociateBacker.batchActionName, {'value': action.htmlAttributes['data-action-name']}) }}
+                        {{ form_widget(formOrganizationAssociateBacker.entityFqcn, {'value': action.htmlAttributes['data-entity-fqcn']}) }}
+                        {{ form_widget(formOrganizationAssociateBacker.batchActionUrl, {'value': action.htmlAttributes['data-action-url']}) }}
+                        {{ form_widget(formOrganizationAssociateBacker.batchActionCsrfToken, {'value': action.htmlAttributes['data-action-csrf-token'].value}) }}
+                        <button type="submit" class="btn btn-info text-nowrap">Associer la sélection</button>
+                    {{ form_end(formOrganizationAssociateBacker)}}
+                    </div>
+                {% else %}
+                    <div class="col">
+                    {{ include(action.templatePath, { action: action }, with_context = false) }}
+                    </div>
+                {% endif %}
+            {% endfor %}
+            </div>
+        </div>
+    {% endif %}
+{% endblock %}

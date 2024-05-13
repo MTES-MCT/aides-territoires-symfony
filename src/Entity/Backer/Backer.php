@@ -123,7 +123,7 @@ class Backer // NOSONAR too much methods
     #[ORM\ManyToOne(inversedBy: 'backers')]
     private ?Perimeter $perimeter = null;
 
-    #[ORM\OneToMany(mappedBy: 'backer', targetEntity: Organization::class)]
+    #[ORM\OneToMany(mappedBy: 'backer', targetEntity: Organization::class, cascade: ['persist'])]
     private Collection $organizations;
 
     #[ORM\OneToMany(mappedBy: 'backer', targetEntity: DataSource::class)]

@@ -3,17 +3,16 @@
 namespace App\Controller\Admin\Backer;
 
 use App\Controller\Admin\AtCrudController;
+use App\Controller\Admin\Filter\Backer\HasNoOrganizationFilter;
 use App\Entity\Backer\Backer;
 use App\Field\TextLengthCountField;
 use App\Field\TrumbowygField;
-use App\Form\Admin\Backer\BackerUserCollectionType;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Filters;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
-use EasyCorp\Bundle\EasyAdminBundle\Field\CollectionField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\FormField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ImageField;
@@ -34,6 +33,7 @@ class BackerCrudController extends AtCrudController
         return $filters
             ->add('active')
             ->add('isSpotlighted')
+            ->add(HasNoOrganizationFilter::new('hasNoOrganization', 'Pas de structure associée'))
         ;
     }
 
@@ -44,9 +44,19 @@ class BackerCrudController extends AtCrudController
         yield TextField::new('slug', 'Slug')
             ->setFormTypeOption('attr', ['readonly' => true, 'autocomplete' => 'off'])
             ->setHelp('Laisser vide pour autoremplir.')
+            ->hideOnIndex()
         ;
         yield BooleanField::new('active', 'Actif')
             ->setHelp('Un porteur d’aides actif est visible sur le site');
+        yield AssociationField::new('organizations', 'Organizations')
+        ->autocomplete(true)
+        ->formatValue(function ($value, $entity) {
+            $return = '';
+            foreach ($entity->getOrganizations() as $organization) {
+                $return .= '- '.$organization->getName().'<br />';
+            }
+            return $return;
+        });
         yield TrumbowygField::new('description', 'Description')
         ->onlyOnForms();
         yield TrumbowygField::new('backerType', 'Type de porteur')
@@ -99,6 +109,7 @@ class BackerCrudController extends AtCrudController
         yield FormField::addFieldset('Groupe de porteurs');
         yield AssociationField::new('backerGroup', 'Groupe de porteurs')
         ->setFormTypeOption('choice_label', 'name')
+        ->hideOnIndex()
         ;
     }
 

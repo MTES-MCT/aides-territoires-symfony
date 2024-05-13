@@ -44,6 +44,7 @@ Encore
     .addEntry('admin/statistics/carto', './assets/js/admin/statistics/carto.js')
     .addEntry('admin/statistics/blog/dashboard', './assets/js/admin/statistics/blog/dashboard.js')
     .addEntry('admin/aid/associate', './assets/js/admin/aid/associate.js')
+    .addEntry('admin/organization/associate', './assets/js/admin/organization/associate.js')
     .addEntry('admin/program/faq-order', './assets/js/admin/program/faq-order.js')
 
     .addEntry('front/home', './assets/js/front/home.js')
