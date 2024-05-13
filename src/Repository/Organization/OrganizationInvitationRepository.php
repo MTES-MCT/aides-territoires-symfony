@@ -3,6 +3,7 @@
 namespace App\Repository\Organization;
 
 use App\Entity\Organization\OrganizationInvitation;
+use App\Entity\User\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -21,28 +22,14 @@ class OrganizationInvitationRepository extends ServiceEntityRepository
         parent::__construct($registry, OrganizationInvitation::class);
     }
 
-//    /**
-//     * @return OrganizationInvitation[] Returns an array of OrganizationInvitation objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('o')
-//            ->andWhere('o.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('o.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
-
-//    public function findOneBySomeField($value): ?OrganizationInvitation
-//    {
-//        return $this->createQueryBuilder('o')
-//            ->andWhere('o.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
+    public function userHasPendingInvitation(User $user): bool
+    {
+        return $this->createQueryBuilder('oi')
+            ->select('COUNT(oi.id)')
+            ->where('oi.email = :email')
+            ->andWhere('oi.dateRefuse IS NULL AND oi.dateAccept IS NULL')
+            ->setParameter('email', $user->getEmail())
+            ->getQuery()
+            ->getSingleScalarResult() > 0;
+    }
 }

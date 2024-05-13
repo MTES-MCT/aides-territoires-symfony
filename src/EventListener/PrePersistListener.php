@@ -18,11 +18,9 @@ class PrePersistListener
     {
         $entity = $args->getObject();
         // Position
-        if (method_exists($entity, 'getPosition')) {
-            if (!$entity->getPosition()) {
-                $entityCount = $this->em->getRepository(get_class($entity))->count([]); // compte les entites
-                $entity->setPosition($entityCount);
-            }
+        if (method_exists($entity, 'getPosition') && !$entity->getPosition()) {
+            $entityCount = $this->em->getRepository(get_class($entity))->count([]); // compte les entites
+            $entity->setPosition($entityCount);
         }
     }
 }

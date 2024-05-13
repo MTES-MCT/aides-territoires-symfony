@@ -25,10 +25,13 @@ class BackerListener
         /** @var Backer $backer */
         $backer = $args->getObject();
         // les champs qui ont été modifiés
-        $changeSet = $args->getObjectManager()->getUnitOfWork()->getEntityChangeSet($backer);
+        /** @var EntityManager $manager */
+        $manager = $args->getObjectManager();
+        $changeSet = $manager->getUnitOfWork()->getEntityChangeSet($backer);
+
         foreach ($changeSet as $field => $change) {
             // Publication d'une aide
-            if ($field == 'active' && isset($change[1]) && $change[1] == true) {
+            if ($field == 'active' && isset($change[1]) && $change[1]) {
                 $backerUrl = $this->routerInterface->generate('app_backer_details', ['id' => $backer->getId(), 'slug' => $backer->getSlug()], UrlGeneratorInterface::ABSOLUTE_URL);
                 // recupere la structure du porteur d'aides
                 foreach ($backer->getOrganizations() as $organization) {

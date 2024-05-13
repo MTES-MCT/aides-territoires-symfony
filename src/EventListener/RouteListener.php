@@ -6,8 +6,10 @@ use App\Controller\Page\PageController;
 use App\Entity\Page\Page;
 use App\Entity\Program\Program;
 use App\Entity\Search\SearchPage;
+use App\Entity\User\User;
 use App\Repository\Page\PageRepository;
 use App\Repository\Search\SearchPageRepository;
+use App\Service\Notification\NotificationService;
 use App\Service\Various\ParamService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Asset\Packages;
@@ -26,7 +28,8 @@ final class RouteListener
         private RouterInterface $routerInterface,
         private KernelInterface $kernelInterface,
         private ParamService $paramService,
-        private Packages $packages
+        private Packages $packages,
+        private NotificationService $notificationService
     )
     {
         
@@ -61,7 +64,17 @@ final class RouteListener
 
         // Le sous-domaine est le premier composant
         $subdomain = $hostParts[0] ?? null;
+        $this->handleSubdomain($event, $subdomain);
 
+        // regarde si une page corresponds à l'url demandée
+        $this->handlePage($event);
+
+        // 404 static Django
+        $this->handleDjangoStatic($event);
+    }
+
+    private function handleSubdomain(RequestEvent $event, ?string $subdomain): void
+    {
         if ($subdomain) {
             // spe life-europe.aides-territoires.beta.gouv.fr :
             if ($subdomain == 'life-europe') {
@@ -100,7 +113,8 @@ final class RouteListener
                     $event->setResponse($response);
                     return;
                 } catch (\Exception $e) {
-
+                    $admin = $this->entityManagerInterface->getRepository(User::class)->findOneBy(['email' => $this->paramService->get('email_super_admin')]);
+                    $this->notificationService->addNotification($admin, 'Erreur redirection portail', 'Portail : '.$searchPage->getName());
                 }
             } else {
                 if ($host != $this->paramService->get('prod_host')) {
@@ -112,10 +126,10 @@ final class RouteListener
                 }
             }
         }
+    }
 
-        //----------------------------------------------------------------------------------
-        // regarde si une page corresponds à l'url demandée
-        
+    private function handlePage(RequestEvent $event): void
+    {
         // url demandée
         $url = urldecode($event->getRequest()->getRequestUri()) ?? null;
         
@@ -135,19 +149,25 @@ final class RouteListener
                     PageController::class . '::index'
                 );
             } catch (\Exception $e) {
-
+                $admin = $this->entityManagerInterface->getRepository(User::class)->findOneBy(['email' => $this->paramService->get('email_super_admin')]);
+                $this->notificationService->addNotification($admin, 'Erreur redirection page', 'Page : '.$url);
             }
         }
+    }
 
-        // 404 static Django
+    private function handleDjangoStatic(RequestEvent $event): void
+    {
+        $url = urldecode($event->getRequest()->getRequestUri()) ?? null;
+
+        $newFaviconSvg = 'build/images/favicon/favicon.svg';
         $known404 = [
             '/static/img/logo_AT_og.png' => $this->packages->getUrl('build/images/logo/logo_AT_og.png'),
-            '/static/favicons/favicon.93b88edf055e.svg' => $this->packages->getUrl('build/images/favicon/favicon.svg'),
+            '/static/favicons/favicon.93b88edf055e.svg' => $this->packages->getUrl($newFaviconSvg),
             '/static/favicons/favicon-32x32.05f90bae01cd.png' => $this->packages->getUrl('build/images/favicon/favicon.svg'),
             '/static/favicons/favicon.12acb9fc12ee.ico' => $this->packages->getUrl('build/images/favicon/favicon.ico'),
-            '/static/favicons/favicon.05f90bae01cd.png' => $this->packages->getUrl('build/images/favicon/favicon.svg'),
+            '/static/favicons/favicon.05f90bae01cd.png' => $this->packages->getUrl($newFaviconSvg),
             '/favicon.ico' => $this->packages->getUrl('build/images/favicon/favicon.ico'),
-            '/favicon.svg' => $this->packages->getUrl('build/images/favicon/favicon.svg'),
+            '/favicon.svg' => $this->packages->getUrl($newFaviconSvg),
             '/apple-touch-icon.png' => $this->packages->getUrl('build/images/favicon/apple-touch-icon.png'),
             '/recherche/trouver-des-aides' => $this->routerInterface->generate('app_aid_aid')
         ];
@@ -158,6 +178,8 @@ final class RouteListener
                 $event->setResponse($response);
                 return;
             } catch (\Exception $e) {
+                $admin = $this->entityManagerInterface->getRepository(User::class)->findOneBy(['email' => $this->paramService->get('email_super_admin')]);
+                $this->notificationService->addNotification($admin, 'Erreur redirection static django', 'Url : '.$url);
             }
         }
     }
