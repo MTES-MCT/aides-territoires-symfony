@@ -58,6 +58,7 @@ class OrganizationCrudController extends AtCrudController
             ->add(EmailDomainFilter::new('emailDomainFilter', 'Domaine email utilisateur'))
             ->add(HasUserContributorFilter::new('hasUserContributor', 'Contributeurs'))
             ->add(HasUserBeneficiaryFilter::new('hasUserBeneficiary', 'Bénéficiaires'))
+            ->add('organizationType')
         ;
     }
 
