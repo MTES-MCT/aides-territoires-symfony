@@ -2,12 +2,9 @@
 
 namespace App\Form\User;
 
-use App\Entity\Organization\Organization;
 use App\Entity\Perimeter\Perimeter;
 use App\Entity\User\User;
-use App\Entity\User\UserGroup;
 use App\Form\Type\PerimeterCityAutocompleteType;
-use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
@@ -16,6 +13,7 @@ use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints as Assert;
 
 class RegisterCommuneType extends AbstractType
 {
@@ -43,12 +41,22 @@ class RegisterCommuneType extends AbstractType
                 'label' => 'Votre commune',
                 'placeholder' => 'Tapez les premiers caractères',
                 'class' => Perimeter::class,
+                'constraints' => [
+                    new Assert\NotBlank([
+                        'message' => 'Veuillez choisir votre commune.',
+                    ]),
+                ]
             ])
             ->add('firstname', TextType::class, [
                 'required' => true,
                 'label' => 'Votre prénom',
                 'attr' => [
                     'autocomplete' => 'off'
+                ],
+                'constraints' => [
+                    new Assert\NotBlank([
+                        'message' => 'Veuillez saisir votre prénom.',
+                    ]),
                 ]
             ])
             ->add('lastname', TextType::class, [
@@ -56,6 +64,11 @@ class RegisterCommuneType extends AbstractType
                 'label' => 'Votre nom',
                 'attr' => [
                     'autocomplete' => 'off'
+                ],
+                'constraints' => [
+                    new Assert\NotBlank([
+                        'message' => 'Veuillez saisir votre nom.',
+                    ]),
                 ]
             ])
             ->add('email', EmailType::class, [
@@ -66,7 +79,15 @@ class RegisterCommuneType extends AbstractType
                 'attr' => [
                     'placeholder' => 'Merci de bien vérifier l\'adresse saisie',
                     'autocomplete' => 'off'
-                ]
+                ],
+                'constraints' => [
+                    new Assert\NotBlank([
+                        'message' => 'Veuillez entrer votre email.',
+                    ]),
+                    new Assert\Email([
+                        'message' => 'L\'email "{{ value }}" n\'est pas une adresse email valide.',
+                    ]),
+                ],
             ])
             ->add('password', RepeatedType::class, [
                 'required'      => true,

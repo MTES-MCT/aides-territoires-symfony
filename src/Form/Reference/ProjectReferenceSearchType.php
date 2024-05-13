@@ -4,8 +4,6 @@ namespace App\Form\Reference;
 
 use App\Entity\Organization\OrganizationType;
 use App\Entity\Perimeter\Perimeter;
-use App\Entity\Reference\ProjectReference;
-use App\Form\Type\PerimeterAutocompleteType;
 use App\Form\Type\PerimeterCityAutocompleteType;
 use App\Service\User\UserService;
 use Doctrine\ORM\EntityRepository;
@@ -13,10 +11,9 @@ use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Form\FormEvent;
-use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Validator\Constraints as Assert;
 
 class ProjectReferenceSearchType extends AbstractType
 {
@@ -47,6 +44,11 @@ class ProjectReferenceSearchType extends AbstractType
                     ->setParameter('slugCommune', OrganizationType::SLUG_COMMUNE)
                     ->orderBy('ot.name', 'ASC');
             },
+            'constraints' => [
+                new Assert\NotBlank([
+                    'message' => 'Veuillez saisir un type de structure.',
+                ]),
+            ],
         ];
         if ($options['forceOrganizationType'] !== false) {
             $organizationTypeParams['data'] = $options['forceOrganizationType'];
@@ -83,6 +85,11 @@ class ProjectReferenceSearchType extends AbstractType
                 'createOnBlur' => true,
                 'maxItems' => 1,
                 'delimiter' => '$%§'
+            ],
+            'constraints' => [
+                new Assert\NotBlank([
+                    'message' => 'Veuillez choisir le nom du projet.',
+                ]),
             ],
         ];
         if ($options['forceName'] !== false) {

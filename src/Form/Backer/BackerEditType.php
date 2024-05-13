@@ -3,10 +3,8 @@
 namespace App\Form\Backer;
 
 use App\Entity\Backer\Backer;
-use App\Entity\Backer\BackerGroup;
 use App\Entity\Perimeter\Perimeter;
 use App\Form\Type\PerimeterAutocompleteType;
-use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
@@ -16,6 +14,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\File;
 use Symfony\Component\Validator\Constraints\Url;
+use Symfony\Component\Validator\Constraints as Assert;
 
 class BackerEditType extends AbstractType
 {
@@ -24,7 +23,12 @@ class BackerEditType extends AbstractType
         $builder
             ->add('name', TextType::class, [
                 'required' => true,
-                'label' => 'Nom du porteur'
+                'label' => 'Nom du porteur',
+                'constraints' => [
+                    new Assert\NotBlank([
+                        'message' => 'Veuillez saisir le nom du porteur.',
+                    ]),
+                ],
             ])
             ->add('isCorporate', ChoiceType::class, [
                 'required' => true,
@@ -33,7 +37,12 @@ class BackerEditType extends AbstractType
                     'Oui' => true,
                     'Non' => false
                 ],
-                'expanded' => true
+                'expanded' => true,
+                'constraints' => [
+                    new Assert\NotBlank([
+                        'message' => 'Veuillez indiquer si le porteur est privé ou non.',
+                    ]),
+                ],
             ])
             ->add('externalLink', TextType::class, [
                 'required' => false,
@@ -46,7 +55,7 @@ class BackerEditType extends AbstractType
             ->add('logoFile', FileType::class, [
                 'label' => 'Ajoutez le logo de votre structure',
                 'help' => 'Taille maximale : 10 Mio. Formats supportés : jpeg, jpg, png',
-                'required' => false, 
+                'required' => false,
                 'constraints' => [
                     new File([
                         'maxSize' => '10M', // Limite la taille à 10 Mo
@@ -90,6 +99,11 @@ class BackerEditType extends AbstractType
                 'help_html' => true,
                 'placeholder' => 'Tapez les premiers caractères',
                 'class' => Perimeter::class,
+                'constraints' => [
+                    new Assert\NotBlank([
+                        'message' => 'Veuillez choisir le périmètre',
+                    ]),
+                ],
             ])
             ->add('backerType', TextareaType::class, [
                 'required' => false,

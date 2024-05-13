@@ -114,7 +114,6 @@ class AidController extends FrontController
             );
             $newUrl = preg_replace('/(page=)[^\&]+/', 'page=' . $pagerfanta->getNbPages(), $requestStack->getCurrentRequest()->getRequestUri());
             return new RedirectResponse($newUrl);
-            // dd($e);
         }
         // Log recherche
         $logParams = [

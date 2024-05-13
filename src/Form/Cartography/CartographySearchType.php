@@ -17,6 +17,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints as Assert;
 
 class CartographySearchType extends AbstractType
 {
@@ -45,9 +46,6 @@ class CartographySearchType extends AbstractType
                 $categoriesByTheme[$categoryTheme->getName()][] = [$category->getName() => $category->getId()];
             }
         }
-        
-        /** @var User $user */
-        $user = $this->userService->getUserLogged();
 
         $departementParams = [
             'required' => true,
@@ -62,6 +60,11 @@ class CartographySearchType extends AbstractType
                     'orderby' => ['p.code' => 'ASC']
                 ]);
             },
+            'constraints' => [
+                new Assert\NotBlank([
+                    'message' => 'Veuillez choisir un département.',
+                ]),
+            ],
         ];
 
         if($options['forceDepartement']!==false){

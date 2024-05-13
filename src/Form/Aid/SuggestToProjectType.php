@@ -11,7 +11,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\Count as ConstraintsCount;
-
+use Symfony\Component\Validator\Constraints as Assert;
 class SuggestToProjectType extends AbstractType
 {
     public function __construct(
@@ -51,6 +51,11 @@ class SuggestToProjectType extends AbstractType
                     'rows' => 10
                 ],
                 'sanitize_html' => true,
+                'constraints' => [
+                    new Assert\NotBlank([
+                        'message' => 'Veuillez saisir un message.',
+                    ]),
+                ],
             ])
         ;
     }

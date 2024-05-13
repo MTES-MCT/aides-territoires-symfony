@@ -3,7 +3,6 @@
 namespace App\Form\Reference;
 
 use App\Entity\Reference\KeywordReference;
-use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -15,10 +14,6 @@ class KeywordReferenceEditType extends AbstractType
         $builder
             ->add('name')
             ->add('intention')
-//             ->add('parent', EntityType::class, [
-//                 'class' => KeywordReference::class,
-// 'choice_label' => 'id',
-//             ])
         ;
     }
 

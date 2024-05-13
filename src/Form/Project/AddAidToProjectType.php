@@ -19,7 +19,7 @@ class AddAidToProjectType extends AbstractType
         protected UserService $userService,
         protected ManagerRegistry $managerRegistry
     )
-    {   
+    {
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void

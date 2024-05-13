@@ -8,6 +8,7 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints as Assert;
 
 class ProjectExportType extends AbstractType
 {
@@ -23,6 +24,11 @@ class ProjectExportType extends AbstractType
                     'Document PDF ' => FileService::FORMAT_PDF
                 ],
                 'expanded' => true,
+                'constraints' => [
+                    new Assert\NotBlank([
+                        'message' => 'Veuillez choisir le format.',
+                    ]),
+                ]
             ])
             ->add('idProject', HiddenType::class)
         ;

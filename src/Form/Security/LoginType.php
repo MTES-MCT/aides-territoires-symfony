@@ -9,6 +9,7 @@ use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints as Assert;
 
 class LoginType extends AbstractType
 {
@@ -23,7 +24,15 @@ class LoginType extends AbstractType
                     'maxlength' => 254,
                     'autocomplete' => 'email'
                 ],
-                'help' => 'Par exemple : prenom.nom@domaine.fr'
+                'help' => 'Par exemple : prenom.nom@domaine.fr',
+                'constraints' => [
+                    new Assert\NotBlank([
+                        'message' => 'Veuillez entrer votre email.',
+                    ]),
+                    new Assert\Email([
+                        'message' => 'L\'email "{{ value }}" n\'est pas une adresse email valide.',
+                    ]),
+                ],
             ])
             ->add('_password', PasswordType::class, [
                 'required' => true,
@@ -31,6 +40,11 @@ class LoginType extends AbstractType
                 'toggle' => true,
                 'hidden_label' => 'Cacher',
                 'visible_label' => 'Montrer',
+                'constraints' => [
+                    new Assert\NotBlank([
+                        'message' => 'Veuillez saisir votre mot de passe.',
+                    ]),
+                ],
             ])
             ->add('_remember_me', CheckboxType::class, [
                 'required' => false,

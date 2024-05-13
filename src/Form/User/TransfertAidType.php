@@ -10,6 +10,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints as Assert;
 
 class TransfertAidType extends AbstractType
 {
@@ -40,7 +41,12 @@ class TransfertAidType extends AbstractType
                             ->orderBy('u.lastname', 'ASC')
                             ->addOrderBy('u.firstname', 'ASC')
                         ;
-                    }
+                    },
+                    'constraints' => [
+                        new Assert\NotBlank([
+                            'message' => 'Veuillez choisir un utilisateur.',
+                        ]),
+                    ]
                 ])
                 ->add('idOrganization', HiddenType::class, [
                     'required' => true,

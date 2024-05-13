@@ -9,6 +9,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\Url;
+use Symfony\Component\Validator\Constraints as Assert;
 
 class ApiTokenAskCreateType extends AbstractType
 {
@@ -22,6 +23,11 @@ class ApiTokenAskCreateType extends AbstractType
                     'cols' => 40,
                     'rows' => 10,
                     'placeholder' => 'Merci de décrire précisément l’usage que vous allez avoir de l’API Aides-territoires.'
+                ],
+                'constraints' => [
+                    new Assert\NotBlank([
+                        'message' => 'Veuillez saisir la description.',
+                    ]),
                 ]
             ])
             ->add('urlService', TextType::class, [

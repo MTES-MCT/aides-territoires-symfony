@@ -11,6 +11,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Validator\Constraints as Assert;
 
 class ProjectValidatedSearchType extends AbstractType
 {
@@ -40,6 +41,11 @@ class ProjectValidatedSearchType extends AbstractType
         $perimeterParams = [
             'required' => true,
             'label' => 'Commune du projet',
+            'constraints' => [
+                new Assert\NotBlank([
+                    'message' => 'Veuillez choisir une commune.',
+                ]),
+            ],
         ];
         if ($options['forcePerimeter'] !== false) {
             $perimeterParams['data'] = $options['forcePerimeter'];

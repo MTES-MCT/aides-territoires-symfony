@@ -18,6 +18,7 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Component\Validator\Constraints as Assert;
 
 class UserProfilType extends AbstractType
 {
@@ -33,17 +34,32 @@ class UserProfilType extends AbstractType
         $builder
             ->add('firstname', TextType::class, [
                 'label'=>'Votre prénom :',
-                'sanitize_html' => true,
+                'constraints' => [
+                    new Assert\NotBlank([
+                        'message' => 'Veuillez saisir votre prénom.',
+                    ]),
+                ]
             ])
             ->add('lastname', TextType::class, [
                 'label'=>'Votre nom :',
-                'sanitize_html' => true,
+                'constraints' => [
+                    new Assert\NotBlank([
+                        'message' => 'Veuillez saisir votre nom.',
+                    ]),
+                ]
             ])
             ->add('email', EmailType::class, [
                 'label'=>'Votre email :',
                 'required'=>true,
                 'help' => 'Par exemple : prenom.nom@domaine.fr',
-                // 'sanitize_html' => true,
+                'constraints' => [
+                    new Assert\NotBlank([
+                        'message' => 'Veuillez entrer votre email.',
+                    ]),
+                    new Assert\Email([
+                        'message' => 'L\'email "{{ value }}" n\'est pas une adresse email valide.',
+                    ]),
+                ],
             ])
             ->add('beneficiaryFunction', ChoiceType::class, [
                 'choices' => [
@@ -62,7 +78,11 @@ class UserProfilType extends AbstractType
             ])
             ->add('beneficiaryRole', TextType::class, [
                 'label'=>'Votre fonction :',
-                'sanitize_html' => true,
+                'constraints' => [
+                    new Assert\NotBlank([
+                        'message' => 'Veuillez saisir votre fonction.',
+                    ]),
+                ]
             ])
             ->add('isBeneficiary',CheckboxType::class,['label'=>'Trouver des aides', 'required'=>false])
             ->add('isContributor',CheckboxType::class,['label'=>'Publier des aides', 'required'=>false])

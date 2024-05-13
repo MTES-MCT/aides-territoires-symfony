@@ -6,6 +6,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints as Assert;
 
 class AidDeleteType extends AbstractType
 {
@@ -14,7 +15,12 @@ class AidDeleteType extends AbstractType
         $builder
             ->add('confirm', CheckboxType::class, [
                 'required' => true,
-                'label' => 'Je comprends'
+                'label' => 'Je comprends',
+                'constraints' => [
+                    new Assert\IsTrue([
+                        'message' => 'Vous devez cocher cette case pour confirmer.',
+                    ]),
+                ],
             ])
         ;
     }

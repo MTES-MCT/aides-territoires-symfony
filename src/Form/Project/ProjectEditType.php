@@ -2,7 +2,6 @@
 
 namespace App\Form\Project;
 
-use App\Entity\Keyword\KeywordSynonymlist;
 use App\Entity\Organization\Organization;
 use App\Entity\Project\Project;
 use App\Entity\Reference\ProjectReference;
@@ -22,13 +21,14 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\File;
+use Symfony\Component\Validator\Constraints as Assert;
 
 class ProjectEditType extends AbstractType
 {
     public function __construct(
         protected ImageService $imageService,
         protected UserService $userService
-    ) {  
+    ) {
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -39,10 +39,15 @@ class ProjectEditType extends AbstractType
             'required' => true,
             'help' => 'Donnez un nom explicite : préférez \'végétalisation du quartier des coteaux\' à \'quartier des coteaux\'',
             'sanitize_html' => true,
+            'constraints' => [
+                new Assert\NotBlank([
+                    'message' => 'Veuillez saisir un message.',
+                ]),
+            ],
         ])
         ->add('organization', EntityType::class, [
             'required' => true,
-            'label' => 'L\'organisation pour laquelle vous publiez ce projet',
+            'label' => 'La structure pour laquelle vous publiez ce projet',
             'class' => Organization::class,
             'choice_label' => 'name',
             'query_builder' => function(EntityRepository $entityRepository) {
@@ -53,6 +58,11 @@ class ProjectEditType extends AbstractType
                 ->orderBy('o.name', 'ASC')
                 ;
             },
+            'constraints' => [
+                new Assert\NotBlank([
+                    'message' => 'Veuillez choisir une structure.',
+                ]),
+            ],
         ])
 
         ->add('projectReference', EntityType::class, [
@@ -79,13 +89,18 @@ class ProjectEditType extends AbstractType
             'choices' => array_column(Project::PROJECT_STEPS, 'slug','name' ),
             'label' => 'État d’avancement du projet :', 
             'placeholder' => 'À quel stade est ce projet ?',
-            'required' => true,                
+            'required' => true,
+            'constraints' => [
+                new Assert\NotBlank([
+                    'message' => 'Veuillez choisir l\'état d\'avancement du projet.',
+                ]),
+            ],
         ])
         ->add('contract_link', ChoiceType::class, [
             'choices' => array_column(Project::CONTRACT_LINK, 'slug','name' ),
             'label' => 'Ce projet appartient-il à un programme ?', 
             'placeholder' => 'Si oui, faites votre choix...',
-            'required' => false,                
+            'required' => false,
         ])
         ->add('description', TextareaType::class, [
             'required' => true,
@@ -98,6 +113,11 @@ class ProjectEditType extends AbstractType
                 'rows' => 10
             ],
             'sanitize_html' => true,
+            'constraints' => [
+                new Assert\NotBlank([
+                    'message' => 'Veuillez saisir la description du projet.',
+                ]),
+            ],
         ])
         ->add('private_description', TextareaType::class, [
             'required' => false,
@@ -114,7 +134,7 @@ class ProjectEditType extends AbstractType
         ->add('imageUploadedFile', FileType::class, [
             'label' => 'Ajouter une photo représentant votre projet',
             'help' => 'Taille maximale : 10 Mio. Formats supportés : jpeg, jpg, png',
-            'required' => false, 
+            'required' => false,
             'constraints' => [
                 new File([
                     'maxSize' => '10M', // Limite la taille à 10 Mo
