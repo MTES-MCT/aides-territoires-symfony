@@ -119,6 +119,7 @@ class UserCrudController extends AtCrudController
             'Utilisateur' => User::ROLE_USER,
             'Banni' => User::ROLE_BANNED,
         ])
+        ->setHelp('Le role Utilisateur ne peu pas être retiré')
         ->allowMultipleChoices()
         ->renderExpanded()
         ->hideOnIndex()
