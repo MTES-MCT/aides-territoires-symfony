@@ -49,7 +49,7 @@ class UserCrudController extends AtCrudController
     }
     
     public function configureFields(string $pageName): iterable
-    {       
+    {
         yield IdField::new('id')->onlyOnIndex();
         yield TextField::new('email', 'Email');
         yield BooleanField::new('isCertified', 'Certifié')
@@ -116,7 +116,8 @@ class UserCrudController extends AtCrudController
         yield ChoiceField::new('roles', 'Rôles')
         ->setChoices([
             'Administrateur' => User::ROLE_ADMIN,
-            'Utilisateur' => User::ROLE_USER
+            'Utilisateur' => User::ROLE_USER,
+            'Banni' => User::ROLE_BANNED,
         ])
         ->allowMultipleChoices()
         ->renderExpanded()

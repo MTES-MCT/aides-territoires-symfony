@@ -58,6 +58,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
 {
     const ROLE_ADMIN = 'ROLE_ADMIN';
     const ROLE_USER = 'ROLE_USER';
+    const ROLE_BANNED = 'ROLE_BANNED';
     
     const NOTIFICATION_DAILY = 'daily';
     const NOTIFICATION_WEEKLY = 'weekly';

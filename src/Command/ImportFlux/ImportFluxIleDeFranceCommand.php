@@ -117,7 +117,9 @@ class ImportFluxIleDeFranceCommand extends ImportFluxCommand
 
     protected function setAidSteps(array $aidToImport, Aid $aid): Aid
     {
-        $aidSteps = $this->managerRegistry->getRepository(AidStep::class)->findCustom([
+        /** @var AidStepRepository $aidStepRepo */
+        $aidStepRepo = $this->managerRegistry->getRepository(AidStep::class);
+        $aidSteps = $aidStepRepo->findCustom([
             'slugs' => [
                 AidStep::SLUG_PREOP,
                 AidStep::SLUG_OP,
