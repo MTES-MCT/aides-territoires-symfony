@@ -3,7 +3,6 @@
 namespace App\EventListener\User;
 
 use ApiPlatform\Api\UrlGeneratorInterface;
-use App\Entity\User\Notification;
 use App\Entity\User\User;
 use App\Entity\User\UserRegisterConfirmation;
 use App\Service\Email\EmailService;
@@ -122,7 +121,16 @@ class UserListener
             // Matomo trackGoal
             $this->matomoService->trackGoal($this->paramService->get('goal_register_id'));
         } catch (\Exception $e) {
-        }  
+            // notif admin
+            /** @var User $entity */
+            $entity = $args->getObject();
+            $message = 'Erreur dans le postPersist User';
+            if ($entity->getEmail()) {
+                $message .= 'Pour le user '.$entity->getEmail();
+            }
+            $admin = $this->managerRegistry->getRepository(User::class)->findOneBy(['email' => $this->paramService->get('email_super_admin')]);
+            $this->notificationService->addNotification($admin, 'Erreur postPersist User', $message);
+        }
     }
 
     public function  onPreRemove(PreRemoveEventArgs $args) : void {

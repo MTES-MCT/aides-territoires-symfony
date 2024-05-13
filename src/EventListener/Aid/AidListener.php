@@ -6,6 +6,7 @@ use App\Entity\Aid\Aid;
 use App\Service\Aid\AidService;
 use App\Service\Email\EmailService;
 use App\Service\Various\ParamService;
+use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Event\PostLoadEventArgs;
 use Doctrine\ORM\Event\PostUpdateEventArgs;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -32,7 +33,9 @@ class AidListener
         /** @var Aid $aid */
         $aid = $args->getObject();
         // les champs qui ont été modifiés
-        $changeSet = $args->getObjectManager()->getUnitOfWork()->getEntityChangeSet($aid);
+        /** @var EntityManager $manager */
+        $manager = $args->getObjectManager();
+        $changeSet = $manager->getUnitOfWork()->getEntityChangeSet($aid);
         foreach ($changeSet as $field => $change) {
             // Publication d'une aide
             if ($field == 'status' && isset($change[1]) && $change[1] == Aid::STATUS_PUBLISHED) {

@@ -8,25 +8,27 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Symfony\Component\Security\Core\Security;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 class BannedUserSubscriber implements EventSubscriberInterface
 {
     private $urlGenerator;
-    private $security;
+    private $tokenStorage;
 
-    public function __construct(UrlGeneratorInterface $urlGenerator, Security $security)
+    public function __construct(UrlGeneratorInterface $urlGenerator, TokenStorageInterface $tokenStorage)
     {
         $this->urlGenerator = $urlGenerator;
-        $this->security = $security;
+        $this->tokenStorage = $tokenStorage;
     }
 
     public function onKernelRequest(RequestEvent $event)
     {
-        $user = $this->security->getUser();
+        $token = $this->tokenStorage->getToken();
+        $user = $token ? $token->getUser() : null;
         $currentRoute = $event->getRequest()->attributes->get('_route');
-    
-        if ($user && in_array(User::ROLE_BANNED, $user->getRoles()) && $currentRoute !== 'app_user_banned') {
+
+        // si utilisateur banni on redirige vers la page (sauf si déjà dessus)
+        if ($user instanceof User && in_array(User::ROLE_BANNED, $user->getRoles()) && $currentRoute !== 'app_user_banned') {
             $response = new RedirectResponse($this->urlGenerator->generate('app_user_banned'));
             $event->setResponse($response);
         }
