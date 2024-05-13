@@ -18,6 +18,7 @@ use App\Repository\Log\LogAidApplicationUrlClickRepository;
 use App\Repository\Log\LogAidOriginUrlClickRepository;
 use App\Repository\Log\LogAidViewRepository;
 use App\Service\Aid\AidService;
+use App\Service\Security\SecurityService;
 use App\Service\User\UserService;
 use App\Service\Various\StringService;
 use Doctrine\Persistence\ManagerRegistry;
@@ -28,6 +29,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use Dompdf\Dompdf;
 use Dompdf\Options;
 use Symfony\Component\HtmlSanitizer\HtmlSanitizerInterface;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -903,5 +905,166 @@ class AidController extends FrontController
         $response->headers->set('Content-Disposition', 'attachment; filename="'.$filename.'.xlsx"');
 
         return $response;
+    }
+
+    #[Route('/comptes/aides/ajax-lock/', name: 'app_user_aid_ajax_lock', options: ['expose' => true])]
+    public function ajaxLock(
+        RequestStack $requestStack,
+        AidRepository $aidRepository,
+        AidService $aidService,
+        UserService $userService,
+        SecurityService $securityService
+    ) : JsonResponse
+    {
+        try {
+            // verification requete interne
+            if (!$securityService->validHostOrgin($requestStack)) {
+                // La requête n'est pas interne, retourner une erreur
+                throw $this->createAccessDeniedException('This action can only be performed by the server itself.');
+            }
+            
+            // recupere id
+            $id = (int) $requestStack->getCurrentRequest()->get('id', 0);
+            if (!$id) {
+                throw new \Exception('Id manquant');
+            }
+
+            // le user
+            $user = $userService->getUserLogged();
+            if (!$user instanceof User) {
+                throw new \Exception('User manquant');
+            }
+
+            // charge aide
+            $aid = $aidRepository->find($id);
+            if (!$aid instanceof Aid) {
+                throw new \Exception('Aide manquante');
+            }
+
+            // verifie que le user peut lock
+            $canLock = $aidService->canUserLock($aid, $user);
+            if (!$canLock) {
+                throw new \Exception('Vous ne pouvez pas bloquer cette aide');
+            }
+
+            // regarde si deja lock
+            $isLockedByAnother = $aidService->isLockedByAnother($aid, $user);
+            if ($isLockedByAnother) {
+                throw new \Exception('Aide déjà bloquée');
+            }
+            
+            // le bloque
+            $aidService->lock($aid, $user);
+
+            // retour
+            return new JsonResponse([
+                'success' => true
+            ]);
+        } catch (\Exception $e) {
+            return new JsonResponse([
+                'success' => false
+            ]);
+        }
+    }
+
+    #[Route('/comptes/aides/{id}/unlock/', name: 'app_user_aid_unlock', requirements: ['id' => '\d+'])]
+    public function unlock(
+        $id,
+        AidRepository $aidRepository,
+        UserService $userService,
+        AidService $aidService
+    ): Response
+    {
+        try {
+            // le user
+            $user = $userService->getUserLogged();
+            if (!$user instanceof User) {
+                throw new \Exception('User invalid');
+            }
+
+            // l'aide
+            $aid = $aidRepository->find($id);
+            if (!$aid instanceof Aid) {
+                throw new \Exception('Aide invalide');
+            }
+
+            // verifie que le user peut lock
+            $canLock = $aidService->canUserLock($aid, $user);
+            if (!$canLock) {
+                throw new \Exception('Vous ne pouvez pas bloquer cette aide');
+            }
+
+            // suppression du lock
+            $aidService->unlock($aid);
+
+            // message
+            $this->addFlash(FrontController::FLASH_SUCCESS, 'Aide débloquée');
+
+            // retour
+            return $this->redirectToRoute('app_user_aid_publications');
+        } catch (\Exception $e) {
+            // message
+            $this->addFlash(FrontController::FLASH_ERROR, 'Impossible de débloquer l\'aide');
+
+            // retour
+            return $this->redirectToRoute('app_user_aid_edit', ['slug' => $aid->getSlug()]);
+        }
+
+    }
+
+    #[Route('/comptes/aides/ajax-unlock/', name: 'app_user_aid_ajax_unlock', options: ['expose' => true])]
+    public function ajaxUnlock(
+        RequestStack $requestStack,
+        AidRepository $aidRepository,
+        AidService $aidService,
+        UserService $userService,
+        SecurityService $securityService
+    ) : JsonResponse
+    {
+        try {
+            // verification requete interne
+            if (!$securityService->validHostOrgin($requestStack)) {
+                // La requête n'est pas interne, retourner une erreur
+                throw $this->createAccessDeniedException('This action can only be performed by the server itself.');
+            }
+            
+            // recupere id
+            $id = (int) $requestStack->getCurrentRequest()->get('id', 0);
+            if (!$id) {
+                throw new \Exception('Id manquant');
+            }
+
+            // user
+            $user = $userService->getUserLogged();
+            if (!$user instanceof User) {
+                throw new \Exception('User manquant');
+            }
+
+            // charge aide
+            $aid = $aidRepository->find($id);
+            if (!$aid instanceof Aid) {
+                throw new \Exception('Aide manquante');
+            }
+
+            // verifie que le user peut lock
+            $canLock = $aidService->canUserLock($aid, $user);
+            if (!$canLock) {
+                throw new \Exception('Vous ne pouvez pas débloquer cette aide');
+            }
+
+            // la débloque si pas bloqué par un autre
+            if (!$aidService->isLockedByAnother($aid, $user)) {
+                $aidService->unlock($aid);
+            }
+
+            // retour
+            return new JsonResponse([
+                'success' => true
+            ]);
+        } catch (\Exception $e) {
+            return new JsonResponse([
+                'success' => false
+            ]);
+        }
     }
 }
