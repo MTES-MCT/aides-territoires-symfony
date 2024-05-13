@@ -1,5 +1,7 @@
 require('../../form/trumbowyg.js');
 
+import Routing from 'fos-router';
+
 $(function() {
     /**
      * Supprimer collection item
@@ -52,4 +54,49 @@ $(function() {
         launchTrumbowyg($(wrapper).find('textarea'));
     });
 
+    // quand on arrive sur la page prete, on lock
+    lock();
+    // toutes les 2 minutes, on update le lock en le relancant
+    setInterval(function() {
+        lock();
+    }, 2 * 60 * 1000);
 });
+
+
+// quand on quitte la page
+$(window).on('beforeunload', function() {
+    unlock();
+});
+$(window).on('unload', function() {
+    unlock();
+});
+$(window).on('pagehide', function() {
+    unlock();
+});
+
+function lock()
+{
+    if (typeof idSearchPage !== 'undefined') {
+        $.ajax({
+            url: Routing.generate('app_user_portal_ajax_lock'),
+            type: 'POST',
+            data: {
+                'id': idSearchPage
+            }
+        });
+    }
+}
+
+function unlock()
+{
+    alert('unlock '+idSearchPage);
+    if (typeof idSearchPage !== 'undefined') {
+        $.ajax({
+            url: Routing.generate('app_user_portal_ajax_unlock'),
+            type: 'POST',
+            data: {
+                'id': idSearchPage
+            }
+        });
+    }
+}

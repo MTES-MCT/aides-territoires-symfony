@@ -105,3 +105,12 @@
     </div>
 </div>
 {% endblock %}
+
+{% block javascriptsBottom %}
+    {{ parent() }}
+    {% cspscript %}
+        <script type="text/javascript">
+            let idSearchPage = {{ searchPage.id }};
+        </script>
+    {% endcspscript %}
+{% endblock %}

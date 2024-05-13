@@ -5,6 +5,7 @@ namespace App\Service\Aid;
 use App\Entity\Aid\Aid;
 use App\Entity\Aid\AidFinancer;
 use App\Entity\Aid\AidInstructor;
+use App\Entity\Aid\AidLock;
 use App\Entity\Organization\Organization;
 use App\Entity\Organization\OrganizationType;
 use App\Entity\Perimeter\Perimeter;
@@ -541,5 +542,82 @@ class AidService
         }
 
         return null;
+    }
+
+    public function canUserLock(Aid $aid, User $user): bool
+    {
+        if ($aid->getAuthor() == $user || $this->userService->isUserGranted($user, User::ROLE_ADMIN)) {
+            return true;
+        }
+
+        if ($aid->getOrganization() && $aid->getOrganization()->getBeneficiairies()->contains($user)) {
+            return true;
+        }
+
+        return false;
+    }
+    
+    public function getLock(Aid $aid): ?AidLock
+    {
+        foreach ($aid->getAidLocks() as $aidLock) {
+            return $aidLock;
+        }
+
+        return null;
+    }
+    public function isLockedByAnother(Aid $aid, User $user): bool
+    {
+        $now = new \DateTime(date('Y-m-d H:i:s'));
+        $minutesMax = 5;
+        foreach ($aid->getAidLocks() as $aidLock) {
+            // si le lock a plus de 5 min, on le supprime
+            if ($aidLock->getTimeStart() < $now->sub(new \DateInterval('PT'.$minutesMax.'M'))) {
+                $this->managerRegistry->getManager()->remove($aidLock);
+                $this->managerRegistry->getManager()->flush();
+                continue;
+            }
+
+            if ($aidLock->getUser() != $user) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public function isLocked(Aid $aid): bool
+    {
+        return !$aid->getAidLocks()->isEmpty();
+    }
+    
+    public function lock(Aid $aid, User $user): void
+    {
+        // vérifie que l'aide n'est pas déjà lock
+        if ($aid->getAidLocks()->isEmpty()) {
+            $aidLock = new AidLock();
+            $aidLock->setAid($aid);
+            $aidLock->setUser($user);
+            $this->managerRegistry->getManager()->persist($aidLock);
+            $this->managerRegistry->getManager()->flush();
+        } else {
+            $aidLock = (isset($aid->getAidLocks()[0]) && $aid->getAidLocks()[0] instanceof AidLock)
+                        ? $aid->getAidLocks()[0]
+                        : null;
+            // on met à jour le lock si le user et l'aide sont bien les mêmes
+            if ($aidLock && $aidLock->getUser() == $user && $aidLock->getAid() == $aid) {
+                $aidLock->setTimeStart(new \DateTime(date('Y-m-d H:i:s')));
+                $aidLock->setAid($aid);
+                $aidLock->setUser($user);
+                $this->managerRegistry->getManager()->persist($aidLock);
+                $this->managerRegistry->getManager()->flush();
+            }
+        }
+    }
+
+    public function unlock(Aid $aid): void
+    {
+        foreach ($aid->getAidLocks() as $aidLock) {
+            $this->managerRegistry->getManager()->remove($aidLock);
+        }
+        $this->managerRegistry->getManager()->flush();
     }
 }

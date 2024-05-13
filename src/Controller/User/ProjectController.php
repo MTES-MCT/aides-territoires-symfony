@@ -7,6 +7,7 @@ use App\Entity\Aid\AidProject;
 use App\Entity\Perimeter\Perimeter;
 use App\Entity\Project\Project;
 use App\Entity\Reference\ProjectReference;
+use App\Entity\User\User;
 use App\Form\Project\ProjectEditType;
 use App\Form\User\Project\AidProjectDeleteType;
 use App\Form\User\Project\AidProjectStatusType;
@@ -22,7 +23,9 @@ use App\Service\Export\SpreadsheetExporterService;
 use App\Service\File\FileService;
 use App\Service\Image\ImageService;
 use App\Service\Notification\NotificationService;
+use App\Service\Project\ProjectService;
 use App\Service\Reference\ReferenceService;
+use App\Service\Security\SecurityService;
 use App\Service\User\UserService;
 use Doctrine\Persistence\ManagerRegistry;
 use Dompdf\Dompdf;
@@ -33,6 +36,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
@@ -638,5 +642,164 @@ class ProjectController extends FrontController
             'projets_publics' => $projets_publics,
             'myPager' => $pagerfanta,
         ]);
+    }
+
+    #[Route('/comptes/projets/ajax-lock/', name: 'app_user_project_ajax_lock', options: ['expose' => true])]
+    public function ajaxLock(
+        RequestStack $requestStack,
+        ProjectRepository $projectRepository,
+        ProjectService $projectService,
+        UserService $userService,
+        SecurityService $securityService
+    ) : JsonResponse
+    {
+        try {
+            // verification requete interne
+            if (!$securityService->validHostOrgin($requestStack)) {
+                // La requête n'est pas interne, retourner une erreur
+                throw $this->createAccessDeniedException('This action can only be performed by the server itself.');
+            }
+            
+            // recupere id
+            $id = (int) $requestStack->getCurrentRequest()->get('id', 0);
+            if (!$id) {
+                throw new \Exception('Id manquant');
+            }
+
+            // le user
+            $user = $userService->getUserLogged();
+            if (!$user instanceof User) {
+                throw new \Exception('User manquant');
+            }
+
+            // charge projet
+            $project = $projectRepository->find($id);
+            if (!$project instanceof Project) {
+                throw new \Exception('Projet manquant');
+            }
+
+            // verifie que le user peut lock
+            $canLock = $projectService->canUserLock($project, $user);
+            if (!$canLock) {
+                throw new \Exception('Vous ne pouvez pas bloquer ce projet');
+            }
+
+            // regarde si deja lock
+            $isLockedByAnother = $projectService->isLockedByAnother($project, $user);
+            if ($isLockedByAnother) {
+                throw new \Exception('Projet déjà bloqué');
+            }
+            
+            // la débloque
+            $projectService->lock($project, $user);
+
+            // retour
+            return new JsonResponse([
+                'success' => true
+            ]);
+        } catch (\Exception $e) {
+            return new JsonResponse([
+                'success' => false
+            ]);
+        }
+    }
+
+    #[Route('/comptes/projets/{id}/unlock/', name: 'app_user_project_unlock', requirements: ['id' => '\d+'])]
+    public function unlock(
+        $id,
+        ProjectRepository $projectRepository,
+        UserService $userService,
+        ProjectService $projectService
+    ): Response
+    {
+        try {
+            // le user
+            $user = $userService->getUserLogged();
+            if (!$user instanceof User) {
+                throw new \Exception('User invalid');
+            }
+
+            // le projet
+            $project = $projectRepository->find($id);
+            if (!$project instanceof Project) {
+                throw new \Exception('Projet invalide');
+            }
+
+            // verifie que le user peut lock
+            $canLock = $projectService->canUserLock($project, $user);
+            if (!$canLock) {
+                throw new \Exception('Vous ne pouvez pas bloquer ce projet');
+            }
+
+            // suppression du lock
+            $projectService->unlock($project);
+
+            // message
+            $this->addFlash(FrontController::FLASH_SUCCESS, 'Projet débloqué');
+
+            // retour
+            return $this->redirectToRoute('app_user_project_structure');
+        } catch (\Exception $e) {
+            // message
+            $this->addFlash(FrontController::FLASH_ERROR, 'Impossible de débloquer le projet');
+
+            // retour
+            return $this->redirectToRoute('app_user_project_details_fiche_projet', ['id' => $project->getId(), 'slug' => $project->getSlug()]);
+        }
+
+    }
+
+    #[Route('/comptes/projets/ajax-unlock/', name: 'app_user_project_ajax_unlock', options: ['expose' => true])]
+    public function ajaxUnlock(
+        RequestStack $requestStack,
+        ProjectRepository $projectRepository,
+        ProjectService $projectService,
+        UserService $userService,
+        SecurityService $securityService
+    ) : JsonResponse
+    {
+        try {
+            // verification requete interne
+            if (!$securityService->validHostOrgin($requestStack)) {
+                // La requête n'est pas interne, retourner une erreur
+                throw $this->createAccessDeniedException('This action can only be performed by the server itself.');
+            }
+            
+            // recupere id
+            $id = (int) $requestStack->getCurrentRequest()->get('id', 0);
+            if (!$id) {
+                throw new \Exception('Id manquant');
+            }
+
+            // user
+            $user = $userService->getUserLogged();
+            if (!$user instanceof User) {
+                throw new \Exception('User manquant');
+            }
+
+            // charge projet
+            $project = $projectRepository->find($id);
+            if (!$project instanceof Project) {
+                throw new \Exception('Projet manquant');
+            }
+
+            // verifie que le user peut lock
+            $canLock = $projectService->canUserLock($project, $user);
+            if (!$canLock) {
+                throw new \Exception('Vous ne pouvez pas débloquer ce projet');
+            }
+
+            // la débloque
+            $projectService->unlock($project);
+
+            // retour
+            return new JsonResponse([
+                'success' => true
+            ]);
+        } catch (\Exception $e) {
+            return new JsonResponse([
+                'success' => false
+            ]);
+        }
     }
 }

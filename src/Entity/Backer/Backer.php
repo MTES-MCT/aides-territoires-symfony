@@ -194,6 +194,7 @@ class Backer // NOSONAR too much methods
         $this->logBackerViews = new ArrayCollection();
         $this->categories = new ArrayCollection();
         $this->programs = new ArrayCollection();
+        $this->backerLocks = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -568,6 +569,9 @@ class Backer // NOSONAR too much methods
     #[ORM\Column(nullable: true)]
     private ?int $nbAidsLive = null;
 
+    #[ORM\OneToMany(mappedBy: 'backer', targetEntity: BackerLock::class, orphanRemoval: true)]
+    private Collection $backerLocks;
+
     public function getAidsTechnical() : ?array
     {
         if (count($this->aidsTechnical) > 0) {
@@ -897,5 +901,35 @@ class Backer // NOSONAR too much methods
     public function  __toString(): string
     {
         return $this->getName() ?? 'Backer';
+    }
+
+    /**
+     * @return Collection<int, BackerLock>
+     */
+    public function getBackerLocks(): Collection
+    {
+        return $this->backerLocks;
+    }
+
+    public function addBackerLock(BackerLock $backerLock): static
+    {
+        if (!$this->backerLocks->contains($backerLock)) {
+            $this->backerLocks->add($backerLock);
+            $backerLock->setBacker($this);
+        }
+
+        return $this;
+    }
+
+    public function removeBackerLock(BackerLock $backerLock): static
+    {
+        if ($this->backerLocks->removeElement($backerLock)) {
+            // set the owning side to null (unless already changed)
+            if ($backerLock->getBacker() === $this) {
+                $backerLock->setBacker(null);
+            }
+        }
+
+        return $this;
     }
 }

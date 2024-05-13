@@ -148,5 +148,13 @@
     </div>
   </div>
 </dialog>
+{% endblock %}
 
+{% block javascriptsBottom %}
+    {{ parent() }}
+    {% cspscript %}
+        <script type="text/javascript">
+            let idProject = {{ project.id }};
+        </script>
+    {% endcspscript %}
 {% endblock %}

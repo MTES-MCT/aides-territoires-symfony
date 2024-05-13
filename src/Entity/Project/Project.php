@@ -169,6 +169,9 @@ class Project // NOSONAR too much methods
     private ?float $distance = null;
     private ?int $scoreTotal = 0;
 
+    #[ORM\OneToMany(mappedBy: 'project', targetEntity: ProjectLock::class, orphanRemoval: true)]
+    private Collection $projectLocks;
+
     public function __construct()
     {
         $this->keywordSynonymlists = new ArrayCollection();
@@ -176,6 +179,7 @@ class Project // NOSONAR too much methods
         $this->aidProjects = new ArrayCollection();
         $this->aidSuggestedAidProjects = new ArrayCollection();
         $this->logPublicProjectViews = new ArrayCollection();
+        $this->projectLocks = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -652,6 +656,36 @@ class Project // NOSONAR too much methods
     public function setScoreTotal(?int $scoreTotal): static
     {
         $this->scoreTotal = $scoreTotal;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, ProjectLock>
+     */
+    public function getProjectLocks(): Collection
+    {
+        return $this->projectLocks;
+    }
+
+    public function addProjectLock(ProjectLock $projectLock): static
+    {
+        if (!$this->projectLocks->contains($projectLock)) {
+            $this->projectLocks->add($projectLock);
+            $projectLock->setProject($this);
+        }
+
+        return $this;
+    }
+
+    public function removeProjectLock(ProjectLock $projectLock): static
+    {
+        if ($this->projectLocks->removeElement($projectLock)) {
+            // set the owning side to null (unless already changed)
+            if ($projectLock->getProject() === $this) {
+                $projectLock->setProject(null);
+            }
+        }
 
         return $this;
     }

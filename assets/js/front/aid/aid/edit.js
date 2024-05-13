@@ -3,6 +3,7 @@ require('./enable_page_exit_confirmation.js');
 require('./stepper.js');
 require ('../../../form/input-maxlength.js');
 
+import Routing from 'fos-router';
 
 $(function(){
     $('.widget-autocomplete-multiple-wrapper').checkbox_multiple_search();
@@ -42,7 +43,54 @@ $(function(){
             $('#aid_edit_status').val($(this).attr('data-status'));
         }
     }, '.submit-change-status');
+
+
+    // quand on arrive sur la page prete, on lock
+    lock();
+    // toutes les 2 minutes, on update le lock en le relancant
+    setInterval(function() {
+        lock();
+    }, 2 * 60 * 1000);
 });
+
+// quand on quitte la page
+$(window).on('beforeunload', function() {
+    unlock();
+});
+$(window).on('unload', function() {
+    unlock();
+});
+$(window).on('pagehide', function() {
+    unlock();
+});
+
+
+function lock()
+{
+    if (typeof idAid !== 'undefined') {
+        $.ajax({
+            url: Routing.generate('app_user_aid_ajax_lock'),
+            type: 'POST',
+            data: {
+                'id': idAid
+            }
+        });
+    }
+}
+
+function unlock()
+{
+    if (typeof idAid !== 'undefined') {
+        $.ajax({
+            url: Routing.generate('app_user_aid_ajax_unlock'),
+            type: 'POST',
+            data: {
+                'id': idAid
+            }
+        });
+    }
+}
+
 
 function toggleElements(parent, value, checked)
 {

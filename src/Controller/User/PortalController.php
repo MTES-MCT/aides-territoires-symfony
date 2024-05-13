@@ -10,8 +10,11 @@ use App\Form\User\SearchPage\SearchPageEditType;
 use App\Repository\Search\SearchPageRepository;
 use App\Service\Aid\AidSearchFormService;
 use App\Service\Aid\AidService;
+use App\Service\SearchPage\SearchPageService;
+use App\Service\Security\SecurityService;
 use App\Service\User\UserService;
 use Doctrine\Persistence\ManagerRegistry;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -96,5 +99,164 @@ class PortalController extends FrontController
             'nbAids' => $nbAids,
             'nbLocals' => $nbLocals
         ]);
+    }
+
+    #[Route('/comptes/portails/ajax-lock/', name: 'app_user_portal_ajax_lock', options: ['expose' => true])]
+    public function ajaxLock(
+        RequestStack $requestStack,
+        SearchPageRepository $searchPageRepository,
+        SearchPageService $searchPageService,
+        UserService $userService,
+        SecurityService $securityService
+    ) : JsonResponse
+    {
+        try {
+            // verification requete interne
+            if (!$securityService->validHostOrgin($requestStack)) {
+                // La requête n'est pas interne, retourner une erreur
+                throw $this->createAccessDeniedException('This action can only be performed by the server itself.');
+            }
+            
+            // recupere id
+            $id = (int) $requestStack->getCurrentRequest()->get('id', 0);
+            if (!$id) {
+                throw new \Exception('Id manquant');
+            }
+
+            // le user
+            $user = $userService->getUserLogged();
+            if (!$user instanceof User) {
+                throw new \Exception('User manquant');
+            }
+
+            // charge portal
+            $searchPage = $searchPageRepository->find($id);
+            if (!$searchPage instanceof SearchPage) {
+                throw new \Exception('Portail manquant');
+            }
+
+            // verifie que le user peut lock
+            $canLock = $searchPageService->canUserLock($searchPage, $user);
+            if (!$canLock) {
+                throw new \Exception('Vous ne pouvez pas bloquer ce portail');
+            }
+
+            // regarde si deja lock
+            $isLockedByAnother = $searchPageService->isLockedByAnother($searchPage, $user);
+            if ($isLockedByAnother) {
+                throw new \Exception('Portail déjà bloqué');
+            }
+            
+            // le bloque
+            $searchPageService->lock($searchPage, $user);
+
+            // retour
+            return new JsonResponse([
+                'success' => true
+            ]);
+        } catch (\Exception $e) {
+            return new JsonResponse([
+                'success' => false
+            ]);
+        }
+    }
+
+    #[Route('/comptes/portails/{id}/unlock/', name: 'app_user_portal_unlock', requirements: ['id' => '\d+'])]
+    public function unlock(
+        $id,
+        SearchPageRepository $searchPageRepository,
+        UserService $userService,
+        SearchPageService $searchPageService
+    ): Response
+    {
+        try {
+            // le user
+            $user = $userService->getUserLogged();
+            if (!$user instanceof User) {
+                throw new \Exception('User invalid');
+            }
+
+            // le portail
+            $searchPage = $searchPageRepository->find($id);
+            if (!$searchPage instanceof SearchPage) {
+                throw new \Exception('Portail invalide');
+            }
+
+            // verifie que le user peut lock
+            $canLock = $searchPageService->canUserLock($searchPage, $user);
+            if (!$canLock) {
+                throw new \Exception('Vous ne pouvez pas bloquer ce portail');
+            }
+
+            // suppression du lock
+            $searchPageService->unlock($searchPage);
+
+            // message
+            $this->addFlash(FrontController::FLASH_SUCCESS, 'Portail débloqué');
+
+            // retour
+            return $this->redirectToRoute('app_user_dashboard');
+        } catch (\Exception $e) {
+            // message
+            $this->addFlash(FrontController::FLASH_ERROR, 'Impossible de débloquer le portail');
+
+            // retour
+            return $this->redirectToRoute('app_user_portal_edit', ['id' => $searchPage->getId()]);
+        }
+
+    }
+
+    #[Route('/comptes/portails/ajax-unlock/', name: 'app_user_portal_ajax_unlock', options: ['expose' => true])]
+    public function ajaxUnlock(
+        RequestStack $requestStack,
+        SearchPageRepository $searchPageRepository,
+        SearchPageService $searchPageService,
+        UserService $userService,
+        SecurityService $securityService
+    ) : JsonResponse
+    {
+        try {
+            // verification requete interne
+            if (!$securityService->validHostOrgin($requestStack)) {
+                // La requête n'est pas interne, retourner une erreur
+                throw $this->createAccessDeniedException('This action can only be performed by the server itself.');
+            }
+            
+            // recupere id
+            $id = (int) $requestStack->getCurrentRequest()->get('id', 0);
+            if (!$id) {
+                throw new \Exception('Id manquant');
+            }
+
+            // user
+            $user = $userService->getUserLogged();
+            if (!$user instanceof User) {
+                throw new \Exception('User manquant');
+            }
+
+            // charge portail
+            $searchPage = $searchPageRepository->find($id);
+            if (!$searchPage instanceof SearchPage) {
+                throw new \Exception('Portail manquant');
+            }
+
+            // verifie que le user peut lock
+            $canLock = $searchPageService->canUserLock($searchPage, $user);
+            if (!$canLock) {
+                throw new \Exception('Vous ne pouvez pas débloquer ce portail');
+            }
+
+            // le débloque
+            $searchPageService->unlock($searchPage);
+
+            // retour
+            return new JsonResponse([
+                'success' => true
+            ]);
+        } catch (\Exception $e) {
+            return new JsonResponse([
+                'success' => false
+            ]);
+        }
     }
 }
