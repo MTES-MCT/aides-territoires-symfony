@@ -35,7 +35,6 @@ class PostPersistListener
         if ($this->requestStack && $this->requestStack->getCurrentRequest()) {
             $firewallConfig = $this->firewallMapInterface->getFirewallConfig($this->requestStack->getCurrentRequest());
             if ($firewallConfig->getName() == LogAdminAction::FIREWALL_ADMIN_NAME && !$args->getObject() instanceof LogAdminAction) {
-    
                 $logAdminAction = new LogAdminAction();
                 // vérification du format id
                 $objectId = null;

@@ -40,39 +40,30 @@ class PostUpdateListener
         }
         
         // LOG ADMIN
+        $this->logAdmin($args);
+    }
+
+    private function logAdmin(PostUpdateEventArgs $args): void
+    {
         if ($this->requestStack && $this->requestStack->getCurrentRequest()) {
             $firewallConfig = $this->firewallMapInterface->getFirewallConfig($this->requestStack->getCurrentRequest());
             if ($firewallConfig->getName() == LogAdminAction::FIREWALL_ADMIN_NAME && !$args->getObject() instanceof LogAdminAction) {
-    
-                $logAdminAction = new LogAdminAction();
-                // vérification du format id
-                $objectId = null;
-                if (method_exists($args->getObject(), 'getId') && $args->getObject()->getId() && is_int($args->getObject()->getId())) {
-                    $objectId = $args->getObject()->getId();
-                }
-                $logAdminAction->setObjectClass(get_class($args->getObject()));
-                $logAdminAction->setObjectId($objectId);
-                if (method_exists($args->getObject(), '__toString')) {
-                    $objectRepr = $args->getObject()->__toString();
-                } else {
-                    $objectRepr = get_class($args->getObject()). ' : ' . $args->getObject()->getId();
-                }
-                $logAdminAction->setObjectRepr($objectRepr);
-                $logAdminAction->setActionFlag(LogAdminAction::ACTION_FLAG_UPDATE);
-                $logAdminAction->setAdmin($this->userService->getUserLogged());
-    
+                // l'action d'amin a loguer
+                $logAdminAction = $this->getLogAdminAction($args);
+                
                 $changeMessage = [
                     'changed' => [
                         'fields' => []
                     ]
                 ];
-                $changeSet = $args->getObjectManager()->getUnitOfWork()->getEntityChangeSet($args->getObject());
+                /** @var EntityManager $manager */
+                $manager = $args->getObjectManager();
+                $changeSet = $manager->getUnitOfWork()->getEntityChangeSet($args->getObject());
                 foreach ($changeSet as $field => $change) {
                     if (!in_array($field, LogAdminAction::NOT_ADMIN_LOGGED_FIELDS)) {
                         $changeMessage['changed']['fields'][] = $field;
                     }
                 }
-                // $logAdminAction->setChangeMessage(json_encode($changeMessage));
                 $logAdminAction->setChangeMessage($changeMessage);
     
     
@@ -81,5 +72,27 @@ class PostUpdateListener
                 $args->getObjectManager()->flush();
             }
         }
+    }
+
+    private function getLogAdminAction(PostUpdateEventArgs $args): LogAdminAction
+    {
+        $logAdminAction = new LogAdminAction();
+        // vérification du format id
+        $objectId = null;
+        if (method_exists($args->getObject(), 'getId') && $args->getObject()->getId() && is_int($args->getObject()->getId())) {
+            $objectId = $args->getObject()->getId();
+        }
+        $logAdminAction->setObjectClass(get_class($args->getObject()));
+        $logAdminAction->setObjectId($objectId);
+        if (method_exists($args->getObject(), '__toString')) {
+            $objectRepr = $args->getObject()->__toString();
+        } else {
+            $objectRepr = get_class($args->getObject()). ' : ' . $args->getObject()->getId();
+        }
+        $logAdminAction->setObjectRepr($objectRepr);
+        $logAdminAction->setActionFlag(LogAdminAction::ACTION_FLAG_UPDATE);
+        $logAdminAction->setAdmin($this->userService->getUserLogged());
+
+        return $logAdminAction;
     }
 }

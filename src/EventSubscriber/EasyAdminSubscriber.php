@@ -61,9 +61,6 @@ class EasyAdminSubscriber implements EventSubscriberInterface
             $perimeter->setCode(uniqid());
             $entity->setAdhocPerimeter($perimeter);
         }
-
-        // $slug = $this->slugger->slugify($entity->getTitle());
-        // $entity->setSlug($slug);
     }
 
 
@@ -72,40 +69,29 @@ class EasyAdminSubscriber implements EventSubscriberInterface
         // l'entite
         $entity = $event->getEntityInstance();
 
-        if ($entity instanceof Backer) {
-            if ($entity->getDeleteLogo()) {
-                $this->imageService->deleteImageFromCloud($entity->getLogo());
-                $entity->setLogo(null);
-            }
+        if ($entity instanceof Backer && $entity->getDeleteLogo()) {
+            $this->imageService->deleteImageFromCloud($entity->getLogo());
+            $entity->setLogo(null);
         }
 
-        if ($entity instanceof BlogPost) {
-            if ($entity->getDeleteLogo()) {
-                $this->imageService->deleteImageFromCloud($entity->getLogo());
-                $entity->setLogo(null);
-            }
+        if ($entity instanceof BlogPost && $entity->getDeleteLogo()) {
+            $this->imageService->deleteImageFromCloud($entity->getLogo());
+            $entity->setLogo(null);
         }
 
-        if ($entity instanceof BlogPromotionPost) {
-            if ($entity->getDeleteImage()) {
-                $this->imageService->deleteImageFromCloud($entity->getImage());
-                $entity->setImage(null);
-            }
-            // $this->handleBlogPromotionPostBeforeUpdate($event);
+        if ($entity instanceof BlogPromotionPost && $entity->getDeleteImage()) {
+            $this->imageService->deleteImageFromCloud($entity->getImage());
+            $entity->setImage(null);
         }
 
-        if ($entity instanceof Program) {
-            if ($entity->getDeleteLogo()) {
-                $this->imageService->deleteImageFromCloud($entity->getLogo());
-                $entity->setLogo(null);
-            }
+        if ($entity instanceof Program && $entity->getDeleteLogo()) {
+            $this->imageService->deleteImageFromCloud($entity->getLogo());
+            $entity->setLogo(null);
         }
 
-        if ($entity instanceof Project) {
-            if ($entity->getDeleteImage()) {
-                $this->imageService->deleteImageFromCloud($entity->getImage());
-                $entity->setImage(null);
-            }
+        if ($entity instanceof Project && $entity->getDeleteImage()) {
+            $this->imageService->deleteImageFromCloud($entity->getImage());
+            $entity->setImage(null);
         }
 
         if ($entity instanceof SearchPage) {
@@ -118,45 +104,5 @@ class EasyAdminSubscriber implements EventSubscriberInterface
                 $entity->setMetaImage(null);
             }
         }
-
-        // return;
-    }
-
-    private function handleBlogPromotionPostBeforeUpdate(BeforeEntityUpdatedEvent $event)
-    {
-        // l'entite
-        $entity = $event->getEntityInstance();
-
-        // les champs modifiés
-        $uow = $this->entityManagerInterface->getUnitOfWork();
-        $uow->computeChangeSets();
-        $changeset = $uow->getEntityChangeSet($entity);
-
-        $todo = false;
-        if (isset($changeset['image']) && $todo) {
-            if ($changeset['image'][0] == null) { // Si l'image était vide
-
-            } else { // Si l'image n'était pas vide
-                // Si la nouvelle image est vide
-                if ($changeset['image'][1] == null) {
-                    if (
-                        isset($_POST['BlogPromotionPost'])
-                        && isset($_POST['BlogPromotionPost']['image']) 
-                        && isset($_POST['BlogPromotionPost']['image']['delete'])
-                        && $_POST['BlogPromotionPost']['image']['delete'] == 1
-                    ) { // on veu supprimer l'image
-                    } else { // on veu garder l'ancienne image
-                        $entity->setImage($changeset['image'][0]);
-                    }
-                } else {
-
-                }
-            }
-            
-
-        } else {
-
-        }
-        // return;
     }
 }
