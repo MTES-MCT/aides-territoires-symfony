@@ -65,12 +65,12 @@ class ProjectService
 
     public function isLocked(Project $project): bool
     {
-        return !empty($project->getProjectLocks());
+        return !$project->getProjectLocks()->isEmpty();
     }
     
     public function lock(Project $project, User $user): void
     {
-        if (empty($project->getProjectLocks())) {
+        if ($project->getProjectLocks()->isEmpty()) {
             $projectLock = new ProjectLock();
             $projectLock->setProject($project);
             $projectLock->setUser($user);

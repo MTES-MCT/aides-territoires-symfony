@@ -64,13 +64,13 @@ class SearchPageService
 
     public function isLocked(SearchPage $searchPage): bool
     {
-        return !empty($searchPage->getSearchPageLocks());
+        return !$searchPage->getSearchPageLocks()->isEmpty();
     }
     
     public function lock(SearchPage $searchPage, User $user): void
     {
         // vérifie que l'aide n'est pas déjà lock
-        if (empty($searchPage->getSearchPageLocks())) {
+        if ($searchPage->getSearchPageLocks()->isEmpty()) {
             $searchPageLock = new SearchPageLock();
             $searchPageLock->setSearchPage($searchPage);
             $searchPageLock->setUser($user);

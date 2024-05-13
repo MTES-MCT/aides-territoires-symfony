@@ -85,12 +85,12 @@ class BackerService
 
     public function isLocked(Backer $backer): bool
     {
-        return !empty($backer->getBackerLocks());
+        return !$backer->getBackerLocks()->isEmpty();
     }
     
     public function lock(Backer $backer, User $user): void
     {
-        if (empty($backer->getBackerLocks())) {
+        if ($backer->getBackerLocks()->isEmpty()) {
             $backerLock = new BackerLock();
             $backerLock->setBacker($backer);
             $backerLock->setUser($user);

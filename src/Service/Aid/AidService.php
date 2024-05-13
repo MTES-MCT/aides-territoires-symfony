@@ -586,13 +586,13 @@ class AidService
 
     public function isLocked(Aid $aid): bool
     {
-        return !empty($aid->getAidLocks());
+        return !$aid->getAidLocks()->isEmpty();
     }
     
     public function lock(Aid $aid, User $user): void
     {
         // vérifie que l'aide n'est pas déjà lock
-        if (empty($aid->getAidLocks())) {
+        if ($aid->getAidLocks()->isEmpty()) {
             $aidLock = new AidLock();
             $aidLock->setAid($aid);
             $aidLock->setUser($user);

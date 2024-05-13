@@ -206,3 +206,12 @@
     </section>
 </div>
 {% endblock %}
+
+{% block javascriptsBottom %}
+    {{ parent() }}
+    {% cspscript %}
+        <script type="text/javascript">
+            let idAid = {{ aid.id }};
+        </script>
+    {% endcspscript %}
+{% endblock %}
