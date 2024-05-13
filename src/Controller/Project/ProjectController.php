@@ -58,7 +58,7 @@ class ProjectController extends FrontController
         $formProjectSearch = $this->createForm(ProjectPublicSearchType::class, null, ['method' => 'GET']);
         $formProjectSearch->handleRequest($requestStack->getCurrentRequest());
         if ($formProjectSearch->isSubmitted()) {
-            if ($formProjectSearch->isValid()) {                
+            if ($formProjectSearch->isValid()) {
                 if($formProjectSearch->get('step')->getData()){
                     $projectsParams['step'] = $formProjectSearch->get('step')->getData();
                 }
@@ -76,13 +76,14 @@ class ProjectController extends FrontController
                 if ($projectRerence instanceof ProjectReference) {
                     $projectsParams['projectReference'] = $projectRerence;
                 }
+            } else {
+                $this->addFlash(FrontController::FLASH_ERROR, 'Une erreur est survenue lors de la recherche de projets publics.');
             }
         }
 
         // parametres recherche
         $projectsParams['isPublic'] = true;
         $projectsParams['status'] = Project::STATUS_PUBLISHED;
-        // $projectsParams['limit'] = $params['limit'] ?? 3;
         $projectsParams['orderBy'] = [
             'sort' => 'p.timeCreate',
             'order' => 'DESC'
@@ -96,21 +97,18 @@ class ProjectController extends FrontController
         $pagerfanta->setMaxPerPage(self::NB_PROJECT_BY_PAGE);
         $pagerfanta->setCurrentPage($currentPage);
 
-        if ($formProjectSearch->isSubmitted()) {
-            if ($formProjectSearch->isValid()) {  
-
-                // Log recherche
-                $logService->log(
-                    type: LogService::PROJECT_PUBLIC_SEARCH,
-                    params: [
-                        'querystring' => parse_url($requestStack->getCurrentRequest()->getRequestUri(), PHP_URL_QUERY) ?? null,
-                        'resultsCount' => $pagerfanta->getNbResults(),
-                        'perimeter' => (isset($projectsParams['perimeter']) && $projectsParams['perimeter'] instanceof Perimeter) ? $projectsParams['perimeter'] : null,
-                        'user' => $user,
-                        'organization' => ($user && $user->getDefaultOrganization()) ? $user->getDefaultOrganization() : null
-                    ],
-                );
-            }
+        if ($formProjectSearch->isSubmitted() && $formProjectSearch->isValid()) {
+            // Log recherche
+            $logService->log(
+                type: LogService::PROJECT_PUBLIC_SEARCH,
+                params: [
+                    'querystring' => parse_url($requestStack->getCurrentRequest()->getRequestUri(), PHP_URL_QUERY) ?? null,
+                    'resultsCount' => $pagerfanta->getNbResults(),
+                    'perimeter' => (isset($projectsParams['perimeter']) && $projectsParams['perimeter'] instanceof Perimeter) ? $projectsParams['perimeter'] : null,
+                    'user' => $user,
+                    'organization' => ($user && $user->getDefaultOrganization()) ? $user->getDefaultOrganization() : null
+                ],
+            );
         }
                 
         // fil arianne
