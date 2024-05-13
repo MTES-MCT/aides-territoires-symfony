@@ -52,10 +52,9 @@ final class WithoutOrganizationListener
                 );
 
                 // regarde si cet utilisateur à été invité à rejoindre une structure
-                $invitations = $this->entityManagerInterface->getRepository(OrganizationInvitation::class)->findBy([
-                    'email' => $user->getEmail(),
-                ]);
-                if (count($invitations) > 0) {
+                $organizationInvitationRepo = $this->entityManagerInterface->getRepository(OrganizationInvitation::class);
+                $hasPendingInvitations = $organizationInvitationRepo->userHasPendingInvitation($user);
+                if ($hasPendingInvitations) {
                     $event->setResponse(new RedirectResponse($this->routerInterface->generate('app_organization_invitations')));
                     return;
                 }
