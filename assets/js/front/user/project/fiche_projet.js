@@ -23,6 +23,9 @@ $(function() {
 
 
 // quand on quitte la page
+$(window).on('beforeunload', function() {
+    unlock();
+});
 $(window).on('unload', function() {
     unlock();
 });

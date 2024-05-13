@@ -31,7 +31,7 @@ $(function() {
 $(window).on('beforeunload', function() {
     unlock();
 });
-$(window).on('buload', function() {
+$(window).on('unload', function() {
     unlock();
 });
 $(window).on('pagehide', function() {

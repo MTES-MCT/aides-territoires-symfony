@@ -67,6 +67,12 @@ $(function() {
 $(window).on('beforeunload', function() {
     unlock();
 });
+$(window).on('unload', function() {
+    unlock();
+});
+$(window).on('pagehide', function() {
+    unlock();
+});
 
 function lock()
 {
