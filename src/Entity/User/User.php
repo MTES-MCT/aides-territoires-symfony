@@ -3,8 +3,10 @@
 namespace App\Entity\User;
 
 use App\Entity\Aid\Aid;
+use App\Entity\Aid\AidLock;
 use App\Entity\Aid\AidProject;
 use App\Entity\Aid\AidSuggestedAidProject;
+use App\Entity\Backer\BackerLock;
 use App\Entity\Bundle\Bundle;
 use App\Entity\Cron\CronExportSpreadsheet;
 use App\Entity\DataExport\DataExport;
@@ -29,7 +31,9 @@ use App\Entity\Organization\OrganizationType;
 use App\Entity\Perimeter\Perimeter;
 use App\Entity\Perimeter\PerimeterImport;
 use App\Entity\Project\Project;
+use App\Entity\Project\ProjectLock;
 use App\Entity\Search\SearchPage;
+use App\Entity\Search\SearchPageLock;
 use App\Repository\User\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -299,6 +303,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: CronExportSpreadsheet::class)]
     private Collection $cronExportSpreadsheets;
 
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: AidLock::class, orphanRemoval: true)]
+    private Collection $aidLocks;
+
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: BackerLock::class, orphanRemoval: true)]
+    private Collection $backerLocks;
+
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: ProjectLock::class, orphanRemoval: true)]
+    private Collection $projectLocks;
+
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: SearchPageLock::class, orphanRemoval: true)]
+    private Collection $searchPageLocks;
+
     public function __construct()
     {
         $this->logUserLogins = new ArrayCollection();
@@ -335,6 +351,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
         $this->organizationGuests = new ArrayCollection();
         $this->apiTokenAsks = new ArrayCollection();
         $this->cronExportSpreadsheets = new ArrayCollection();
+        $this->aidLocks = new ArrayCollection();
+        $this->backerLocks = new ArrayCollection();
+        $this->projectLocks = new ArrayCollection();
+        $this->searchPageLocks = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -1830,5 +1850,125 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
             }
         }
         return '';
+    }
+
+    /**
+     * @return Collection<int, AidLock>
+     */
+    public function getAidLocks(): Collection
+    {
+        return $this->aidLocks;
+    }
+
+    public function addAidLock(AidLock $aidLock): static
+    {
+        if (!$this->aidLocks->contains($aidLock)) {
+            $this->aidLocks->add($aidLock);
+            $aidLock->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeAidLock(AidLock $aidLock): static
+    {
+        if ($this->aidLocks->removeElement($aidLock)) {
+            // set the owning side to null (unless already changed)
+            if ($aidLock->getUser() === $this) {
+                $aidLock->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, BackerLock>
+     */
+    public function getBackerLocks(): Collection
+    {
+        return $this->backerLocks;
+    }
+
+    public function addBackerLock(BackerLock $backerLock): static
+    {
+        if (!$this->backerLocks->contains($backerLock)) {
+            $this->backerLocks->add($backerLock);
+            $backerLock->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeBackerLock(BackerLock $backerLock): static
+    {
+        if ($this->backerLocks->removeElement($backerLock)) {
+            // set the owning side to null (unless already changed)
+            if ($backerLock->getUser() === $this) {
+                $backerLock->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, ProjectLock>
+     */
+    public function getProjectLocks(): Collection
+    {
+        return $this->projectLocks;
+    }
+
+    public function addProjectLock(ProjectLock $projectLock): static
+    {
+        if (!$this->projectLocks->contains($projectLock)) {
+            $this->projectLocks->add($projectLock);
+            $projectLock->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeProjectLock(ProjectLock $projectLock): static
+    {
+        if ($this->projectLocks->removeElement($projectLock)) {
+            // set the owning side to null (unless already changed)
+            if ($projectLock->getUser() === $this) {
+                $projectLock->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, SearchPageLock>
+     */
+    public function getSearchPageLocks(): Collection
+    {
+        return $this->searchPageLocks;
+    }
+
+    public function addSearchPageLock(SearchPageLock $searchPageLock): static
+    {
+        if (!$this->searchPageLocks->contains($searchPageLock)) {
+            $this->searchPageLocks->add($searchPageLock);
+            $searchPageLock->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeSearchPageLock(SearchPageLock $searchPageLock): static
+    {
+        if ($this->searchPageLocks->removeElement($searchPageLock)) {
+            // set the owning side to null (unless already changed)
+            if ($searchPageLock->getUser() === $this) {
+                $searchPageLock->setUser(null);
+            }
+        }
+
+        return $this;
     }
 }
