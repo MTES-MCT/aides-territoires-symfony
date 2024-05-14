@@ -36,8 +36,9 @@ class AidController extends ApiController
         $aidParams = [
             'showInSearch' => true,
         ];
+        
         $aidParams = array_merge($aidParams, $aidSearchFormService->convertAidSearchClassToAidParams($aidSearchClass));
-
+        dd($aidParams);
         // requete pour compter sans la pagination
         $countParams = $aidParams;
         $count = $aidRepository->countAfterSelect($countParams);
