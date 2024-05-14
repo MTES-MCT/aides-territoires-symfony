@@ -287,6 +287,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
     private Collection $logPublicProjectSearches;
 
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: LogPublicProjectView::class)]
+    #[ORM\OrderBy(['timeCreate' => 'DESC'])]
     private Collection $logPublicProjectViews;
 
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: LogProjectValidatedSearch::class)]

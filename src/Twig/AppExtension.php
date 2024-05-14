@@ -4,6 +4,7 @@ namespace App\Twig;
 
 use App\Entity\Aid\Aid;
 use App\Entity\Alert\Alert;
+use App\Entity\Log\LogPublicProjectView;
 use App\Entity\Perimeter\Perimeter;
 use App\Entity\Project\Project;
 use App\Entity\User\User;
@@ -141,6 +142,7 @@ class AppExtension extends AbstractExtension
             new TwigFunction('getUserSibEmailId', [$this, 'getUserSibEmailId']),
             new TwigFunction('getMatomoGoalId', [$this, 'getMatomoGoalId']),
             new TwigFunction('getKeywordReferenceAndSynonyms', [$this, 'getKeywordReferenceAndSynonyms']),
+            new TwigFunction('getUserPublicProjectLatestView', [$this, 'getUserPublicProjectLatestView']),
         ];
     }
 
@@ -294,5 +296,12 @@ class AppExtension extends AbstractExtension
         }
 
         return $this->keywordReferenceService->getKeywordReferenceAndSynonyms($keyword);
+    }
+
+    public function getUserPublicProjectLatestView(?User $user, ?Project $project): ?LogPublicProjectView {
+        if (!$user || !$project) {
+            return null;
+        }
+        return $this->userService->getPublicProjectLatestView($user, $project);
     }
 }

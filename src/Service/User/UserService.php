@@ -1,10 +1,12 @@
 <?php
 namespace App\Service\User;
 
+use App\Entity\Log\LogPublicProjectView;
 use App\Entity\Log\LogUserAction;
 use App\Entity\Log\LogUserLogin;
 use App\Entity\Organization\Organization;
 use App\Entity\Organization\OrganizationType;
+use App\Entity\Project\Project;
 use App\Entity\User\User;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
@@ -161,5 +163,16 @@ class UserService
         }
     
         return $result;
+    }
+
+    public function getPublicProjectLatestView(User $user, Project $project): ?LogPublicProjectView
+    {
+        foreach ($user->getLogPublicProjectViews() as $publicProjectView) {
+            if ($publicProjectView->getProject()->getId() === $project->getId()) {
+                return $publicProjectView;
+            }
+        }
+
+        return null;
     }
 }
