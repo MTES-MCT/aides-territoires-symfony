@@ -12,18 +12,20 @@ use App\Service\Various\ParamService;
 use Doctrine\ORM\Event\PostPersistEventArgs;
 use Doctrine\ORM\Event\PreRemoveEventArgs;
 use Doctrine\Persistence\ManagerRegistry;
+use Psr\Log\LoggerInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class UserListener
 {
     public function __construct(
-        protected ManagerRegistry $managerRegistry,
-        protected UrlGeneratorInterface $urlGeneratorInterface,
-        protected ParamService $paramService,
-        protected HttpClientInterface $httpClientInterface,
-        protected EmailService $emailService,
-        protected MatomoService $matomoService,
-        protected NotificationService $notificationService
+        private ManagerRegistry $managerRegistry,
+        private UrlGeneratorInterface $urlGeneratorInterface,
+        private ParamService $paramService,
+        private HttpClientInterface $httpClientInterface,
+        private EmailService $emailService,
+        private MatomoService $matomoService,
+        private NotificationService $notificationService,
+        private LoggerInterface $loggerInterface
     ) {
         
     }
@@ -121,6 +123,11 @@ class UserListener
             // Matomo trackGoal
             $this->matomoService->trackGoal($this->paramService->get('goal_register_id'));
         } catch (\Exception $e) {
+            $this->loggerInterface->error('Erreur dans le postPersist User', [
+                'exception' => $e,
+                'user' => $entity->getEmail()
+            ]);
+
             // notif admin
             /** @var User $entity */
             $entity = $args->getObject();
