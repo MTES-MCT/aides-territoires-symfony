@@ -108,7 +108,7 @@ class ImportFluxMinistereCultureCommand extends ImportFluxCommand
     
             return $return;
         } catch (\Exception $e) {
-            dd($e, $aidToImport);
+            // dd($e, $aidToImport);
         }
 
     }
