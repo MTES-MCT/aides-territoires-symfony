@@ -603,6 +603,8 @@ class OrganizationController extends FrontController
         BackerService $backerService
     )
     {
+        // redirection temporaire
+        return $this->redirectToRoute('app_organization_structure_information', ['id' => $id]);
         // le user
         $user = $userService->getUserLogged();
 
