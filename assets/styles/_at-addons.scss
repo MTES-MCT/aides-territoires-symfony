@@ -66,4 +66,18 @@ select{
 
 .already-seen{
     opacity: 0.7;
+    .fr-card__title{
+        &::after {
+            content: "\f06e";
+            font-family: "Font Awesome 5 Free";
+            font-weight: normal;
+            // content: '\2713';
+            display: inline-block;
+            margin-left: 0.5rem;
+            font-size: 1rem;
+            // font-weight: 500;
+            line-height: 0.1rem;
+            color: #666;
+          }
+    }
 }
