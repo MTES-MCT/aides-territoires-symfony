@@ -31,7 +31,7 @@ final class AidTargetedAudiencesFilter extends AbstractFilter
                 'property' => 'targeted_audiences',
                 'type' => Type::BUILTIN_TYPE_STRING,
                 'required' => false,
-                'description' => '<div class="renderedMarkdown"><p>La structure pour laquelle vous recherchez des aides.<br><br>Voir aussi <code>/api/aids/audiences/</code> pour la liste complète.</p></div>',
+                'description' => '<div class="renderedMarkdown"><p>Le type de structure pour lequelle vous recherchez des aides. Vous pouvez passer plusieurs fois ce paramètre pour rechercher sur plusieurs types, ex : ...&targeted_audiences=commune&targeted_audiences=epci...<br><br>Voir aussi <code>/api/aids/audiences/</code> pour la liste complète.</p></div>',
                 'openapi' => [
                     'examples' => $examples,
                 ],

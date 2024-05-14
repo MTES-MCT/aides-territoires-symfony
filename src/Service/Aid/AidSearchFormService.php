@@ -136,6 +136,9 @@ class AidSearchFormService
         if ($aidSearchClass->getOrganizationType()) {
             $aidParams['organizationType'] = $aidSearchClass->getOrganizationType();
         }
+        if ($aidSearchClass->getAudiences()) {
+            $aidParams['organizationTypes'] = $aidSearchClass->getAudiences();
+        }
 
         if ($aidSearchClass->getSearchPerimeter()) {
             $aidParams['perimeterFrom'] = $aidSearchClass->getSearchPerimeter();
@@ -233,7 +236,7 @@ class AidSearchFormService
                 if (isset($param[0]) && isset($param[1])) {
                     if (isset($queryParams[$param[0]]) && is_array($queryParams[$param[0]])) {
                         $queryParams[$param[0]][] = $param[1];
-                    } else if (isset($queryParams[$param[0]]) && !is_array($queryParams[$param[0]])) {
+                    } elseif (isset($queryParams[$param[0]]) && !is_array($queryParams[$param[0]])) {
                         $queryParams[$param[0]] = [$queryParams[$param[0]]];
                         $queryParams[$param[0]][] = $param[1];
                     } else {
@@ -256,11 +259,18 @@ class AidSearchFormService
         // si ancien paramètre
         if (isset($queryParams['targeted_audiences'])) {
             if (is_array($queryParams['targeted_audiences'])) {
+                foreach ($queryParams['targeted_audiences'] as $slugAudience) {
+                    $organizationType = $this->managerRegistry->getRepository(OrganizationType::class)->findOneBy(['slug' => $this->stringService->getSlug($slugAudience)]);
+                    if ($organizationType instanceof OrganizationType) {
+                        $aidSearchClass->addAudience($organizationType);
+                    }
+                }
+            } else {
                 $queryParams['targeted_audiences'] = $queryParams['targeted_audiences'][0];
-            }
-            $organizationType = $this->managerRegistry->getRepository(OrganizationType::class)->findOneBy(['slug' => $this->stringService->getSlug((string) $queryParams['targeted_audiences'])]);
-            if ($organizationType instanceof OrganizationType) {
-                $aidSearchClass->setOrganizationType($organizationType);
+                $organizationType = $this->managerRegistry->getRepository(OrganizationType::class)->findOneBy(['slug' => $this->stringService->getSlug((string) $queryParams['targeted_audiences'])]);
+                if ($organizationType instanceof OrganizationType) {
+                    $aidSearchClass->setOrganizationType($organizationType);
+                }
             }
         }
         
@@ -377,6 +387,7 @@ class AidSearchFormService
         /**
          * > AidType
         */
+
         if (isset($queryParams['aidTypes[]'])) {
             if (!is_array($queryParams['aidTypes[]'])) {
                 $queryParams['aidTypes[]'] = [$queryParams['aidTypes[]']];
@@ -407,17 +418,38 @@ class AidSearchFormService
 
         // via l'api on peu avoir un groupe d'aide
         if (isset($queryParams['aid_type'])) {
-            $queryParams['aid_type'] = str_replace(['_'], ['-'], $queryParams['aid_type']);
-            $aidTypes = [];
-            if ($queryParams['aid_type'] == AidTypeGroup::SLUG_FINANCIAL) {
-                $aidTypes = $this->managerRegistry->getRepository(AidType::class)->findBy([
-                    'aidTypeGroup' => $this->managerRegistry->getRepository(AidTypeGroup::class)->findOneBy(['slug' => AidTypeGroup::SLUG_FINANCIAL])
-                ]);
-            } else if ($queryParams['aid_type'] == AidTypeGroup::SLUG_TECHNICAL) {
-                $aidTypes = $this->managerRegistry->getRepository(AidType::class)->findBy([
-                    'aidTypeGroup' => $this->managerRegistry->getRepository(AidTypeGroup::class)->findOneBy(['slug' => AidTypeGroup::SLUG_FINANCIAL])
-                ]);
+            $aidTypeSlugs = [];
+            if (is_array($queryParams['aid_type'])) {
+                foreach ($queryParams['aid_type'] as $slug) {
+                    $aidTypeSlugs[] = str_replace(['_'], ['-'], $slug);
+                }
+            } else {
+                $aidTypeSlugs[] = str_replace(['_'], ['-'], $queryParams['aid_type']);
             }
+            $aidTypes = [];
+            foreach ($aidTypeSlugs as $slug) {
+                if ($slug == AidTypeGroup::SLUG_FINANCIAL) {
+                    $aidTypesFromGroup = $this->managerRegistry->getRepository(AidType::class)->findBy([
+                        'aidTypeGroup' => $this->managerRegistry->getRepository(AidTypeGroup::class)->findOneBy(['slug' => AidTypeGroup::SLUG_FINANCIAL])
+                    ]);
+                    foreach ($aidTypesFromGroup as $aidType) {
+                        $aidTypes[] = $aidType;
+                    }
+                } elseif ($slug == AidTypeGroup::SLUG_TECHNICAL) {
+                    $aidTypesFromGroup = $this->managerRegistry->getRepository(AidType::class)->findBy([
+                        'aidTypeGroup' => $this->managerRegistry->getRepository(AidTypeGroup::class)->findOneBy(['slug' => AidTypeGroup::SLUG_TECHNICAL])
+                    ]);
+                    foreach ($aidTypesFromGroup as $aidType) {
+                        $aidTypes[] = $aidType;
+                    }
+                } else {
+                    $aidType = $this->managerRegistry->getRepository(AidType::class)->findOneBy(['slug' => $slug]);
+                    if ($aidType instanceof AidType) {
+                        $aidTypes[] = $aidType;
+                    }
+                }
+            }
+
             foreach ($aidTypes as $aidType) {
                 $aidSearchClass->addAidType($aidType);
             }
