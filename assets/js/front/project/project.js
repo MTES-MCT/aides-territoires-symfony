@@ -19,4 +19,10 @@ $(function(){
         "order": order,
         "language": datatables_fr_strings,
     });
+
+    $('#projects-list').on({
+        click: function() {
+            $(this).parents('.project-public-card').addClass('already-seen');
+        }
+    }, '.fr-card__link');
 });
