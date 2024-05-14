@@ -17,9 +17,13 @@ use Doctrine\Common\Collections\ArrayCollection;
 class AidSearchClass
 {
     private ?OrganizationType $organizationType;
+    /**
+     * @var ?ArrayCollection|OrganizationType[]
+     */
+    private ?ArrayCollection $audiences;
     private ?Perimeter $searchPerimeter;
     private ?string $keyword;
-        /**
+    /**
      * @var ?ArrayCollection|Category[]
      */
     private $categorysearch;
@@ -57,6 +61,7 @@ class AidSearchClass
     public function  __construct()
     {
         $this->organizationType = null;
+        $this->audiences = null;
         $this->searchPerimeter = null;
         $this->keyword = null;
         $this->categorysearch = null;
@@ -83,6 +88,26 @@ class AidSearchClass
     public function setOrganizationType(?OrganizationType $organizationType): void
     {
         $this->organizationType = $organizationType;
+    }
+
+    public function getAudiences(): ?ArrayCollection
+    {
+        return $this->audiences;
+    }
+
+    public function setAudiences(?ArrayCollection $audiences): void
+    {
+        $this->audiences = $audiences;
+    }
+
+    public function addAudience(OrganizationType $audience): void
+    {
+        if (!$this->audiences) {
+            $this->audiences = new ArrayCollection();
+        }
+        if (!$this->audiences->contains($audience)) {
+            $this->audiences->add($audience);
+        }
     }
 
     public function getSearchPerimeter(): ?Perimeter

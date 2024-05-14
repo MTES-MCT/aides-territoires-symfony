@@ -23,7 +23,6 @@ class AidController extends ApiController
 {
     #[Route('/api/aids/', name: 'api_aid_aids', priority: 5)]
     public function index(
-        AidRepository $aidRepository,
         AidService $aidService,
         AidSearchFormService $aidSearchFormService,
         LogService $logService,
@@ -39,19 +38,15 @@ class AidController extends ApiController
         $aidParams = array_merge($aidParams, $aidSearchFormService->convertAidSearchClassToAidParams($aidSearchClass));
 
         // requete pour compter sans la pagination
-        $countParams = $aidParams;
-        $count = $aidRepository->countAfterSelect($countParams);
+        $results = $aidService->searchAids($aidParams);
+        $count = count($results);
 
         // requete pour les résultats avec la pagination
-        $aidParams['firstResult'] = ($this->getPage() - 1) * $this->getItemsPerPage();
-        $aidParams['maxResults'] = $this->getItemsPerPage();
-        
-        $results = $aidService->searchAids($aidParams);
+        $results = array_slice($results, ($this->getPage() - 1) * $this->getItemsPerPage(), $this->getItemsPerPage());
 
         // spécifique
         $resultsSpe = $this->getResultsSpe($results, $aidService);
         
-
         // le retour
         $data = [
             'count' => $count,
@@ -59,7 +54,6 @@ class AidController extends ApiController
             'next' => $this->getNext($count),
             'results' => $resultsSpe
         ];
-
 
         // Log recherche
         $query = $aidSearchFormService->convertAidSearchClassToQueryString($aidSearchClass);
@@ -102,23 +96,20 @@ class AidController extends ApiController
 
     #[Route('/api/aids/all/', name: 'api_aid_all', priority: 5)]
     public function all(
-        AidRepository $aidRepository,
         AidService $aidService
     ): JsonResponse
     {
         $params = [];
-        $params['status'] = Aid::STATUS_PUBLISHED;
+        $params['showInSearch'] = true;
         $params['orderBy'] = ['sort' => 'a.id', 'order' => 'DESC'];
 
         // requete pour compter sans la pagination
-        $count = $aidRepository->countCustom($params);
+        $results = $aidService->searchAids($params);
+        $count = count($results);
         
         // requete pour les résultats avec la pagination
-        $params['firstResult'] = ($this->getPage() - 1) * $this->getItemsPerPage();
-        $params['maxResults'] = $this->getItemsPerPage();
-    
-        $results = $aidRepository->findCustom($params);
-        
+        $results = array_slice($results, ($this->getPage() - 1) * $this->getItemsPerPage(), $this->getItemsPerPage());
+
         // spécifique
         $resultsSpe = $this->getResultsSpe($results, $aidService);
         

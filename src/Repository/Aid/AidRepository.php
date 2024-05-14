@@ -356,6 +356,7 @@ class AidRepository extends ServiceEntityRepository
         $isLive = $params['isLive'] ?? null;
         $showInSearch = $params['showInSearch'] ?? null;
         $organizationType = $params['organizationType'] ?? null;
+        $organizationTypes = $params['organizationTypes'] ?? null;
         $organizationTypeSlugs = $params['organizationTypeSlugs'] ?? null;
         $perimeterFrom = $params['perimeterFrom'] ?? null;
         $perimeterFromId = $params['perimeterFromId'] ?? null;
@@ -678,7 +679,7 @@ class AidRepository extends ServiceEntityRepository
             $qb
                 ->andWhere('a.slug = :slug')
                 ->setParameter('slug', $slug)
-            ;    
+            ;
         }
         
         if ($organizationType instanceof OrganizationType && $organizationType->getId()) {
@@ -686,6 +687,13 @@ class AidRepository extends ServiceEntityRepository
                 ->innerJoin('a.aidAudiences', 'aidAudiences')
                 ->andWhere('aidAudiences IN (:organizationType)')
                 ->setParameter('organizationType', $organizationType);
+        }
+
+        if ($organizationTypes) {
+            $qb
+                ->innerJoin('a.aidAudiences', 'aidAudiences')
+                ->andWhere('aidAudiences IN (:organizationTypes)')
+                ->setParameter('organizationTypes', $organizationTypes);
         }
 
         if (is_array($organizationTypeSlugs) && count($organizationTypeSlugs) > 0) {
