@@ -17,6 +17,7 @@ use App\Entity\Aid\AidType;
 use App\Entity\Aid\AidTypeGroup;
 use App\Entity\Alert\Alert;
 use App\Entity\Backer\Backer;
+use App\Entity\Backer\BackerAskAssociate;
 use App\Entity\Backer\BackerCategory;
 use App\Entity\Backer\BackerGroup;
 use App\Entity\Backer\BackerSubcategory;
@@ -221,6 +222,7 @@ class DashboardController extends AbstractDashboardController
             MenuItem::linkToCrud('Sous-Catégories', 'fas fa-list', BackerSubcategory::class),
             MenuItem::linkToCrud('Groupes', 'fas fa-list', BackerGroup::class),
             MenuItem::linkToCrud('Porteurs', 'fas fa-list', Backer::class),
+            MenuItem::linkToCrud('Demandes association', 'fas fa-list', BackerAskAssociate::class),
         ]);
 
         yield MenuItem::subMenu('Programmes', 'fas fa-table')->setSubItems([

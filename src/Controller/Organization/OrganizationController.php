@@ -4,15 +4,18 @@ namespace App\Controller\Organization;
 
 use App\Controller\FrontController;
 use App\Entity\Backer\Backer;
+use App\Entity\Backer\BackerAskAssociate;
 use App\Entity\Organization\Organization;
 use App\Entity\Organization\OrganizationInvitation;
 use App\Entity\Perimeter\Perimeter;
 use App\Entity\User\User;
+use App\Form\Backer\BackerAskAssociateType;
 use App\Form\Backer\BackerEditType;
 use App\Form\Organization\OrganizationDatasType;
 use App\Form\Organization\OrganizationEditType;
 use App\Form\Organization\OrganizationInvitationSendType;
 use App\Form\User\OrganizationChoiceType;
+use App\Repository\Backer\BackerAskAssociateRepository;
 use App\Repository\Backer\BackerRepository;
 use App\Repository\Organization\OrganizationInvitationRepository;
 use App\Repository\Organization\OrganizationRepository;
@@ -253,7 +256,7 @@ class OrganizationController extends FrontController
         OrganizationRepository $organizationRepository,
         OrganizationService $organizationService
         ): Response
-    {        
+    {
         $user = $userService->getUserLogged();
         $organization = $organizationRepository->find($id);
 
@@ -594,6 +597,7 @@ class OrganizationController extends FrontController
         int $idBacker = null,
         RequestStack $requestStack,
         BackerRepository $backerRepository,
+        BackerAskAssociateRepository $backerAskAssociateRepository,
         ImageService $imageService,
         UserService $userService,
         ManagerRegistry $managerRegistry,
@@ -628,6 +632,33 @@ class OrganizationController extends FrontController
             $backer = new Backer();
             $create = true;
         }
+
+        // demandes d'associations à un porteur refusées
+        $backerAskAssociatesRefused = $backerAskAssociateRepository->findOrganizationRefused($organization);
+
+        // demande d'association à un porteur en attente
+        $backerAskAssociatePending = $backerAskAssociateRepository->findOrganizationPending($organization);
+
+        if (
+            !$backerAskAssociatePending // si pas de demande d'association en attente
+        ) {
+            $backerAskAssociate = new BackerAskAssociate();
+            $backerAskAssociate->setUser($user);
+            $backerAskAssociate->setOrganization($organization);
+            $formAskAssociate = $this->createForm(BackerAskAssociateType::class, $backerAskAssociate);
+            $formAskAssociate->handleRequest($requestStack->getCurrentRequest());
+            if ($formAskAssociate->isSubmitted()) {
+                if ($formAskAssociate->isValid()) {
+                    $managerRegistry->getManager()->persist($backerAskAssociate);
+                    $managerRegistry->getManager()->flush();
+                    $this->addFlash(FrontController::FLASH_SUCCESS, 'Votre demande d\'association a bien été envoyée.');
+                    return $this->redirectToRoute('app_organization_backer_edit', ['id' => $organization->getId(), 'idBacker' => 0]);
+                } else {
+                    $this->addFlash(FrontController::FLASH_ERROR, 'Le formulaire contient des erreurs.');
+                }
+            }
+        }
+
     
         // formulaire edition porteur
         $form = $this->createForm(BackerEditType::class, $backer);
@@ -710,6 +741,9 @@ class OrganizationController extends FrontController
             'form' => $form,
             'user_backer' => true,
             'user_backer_id' => $backer instanceof Backer ? $backer->getId() : null,
+            'formAskAssociate' => $formAskAssociate ?? null,
+            'backerAskAssociatePending' => $backerAskAssociatePending,
+            'backerAskAssociatesRefused' => $backerAskAssociatesRefused
         ]);
     }
 

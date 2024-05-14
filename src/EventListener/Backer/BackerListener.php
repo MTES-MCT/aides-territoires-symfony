@@ -3,7 +3,6 @@
 namespace App\EventListener\Backer;
 
 use App\Entity\Backer\Backer;
-use App\Entity\Organization\Organization;
 use App\Service\Notification\NotificationService;
 use App\Service\Various\ParamService;
 use Doctrine\ORM\Event\PostUpdateEventArgs;

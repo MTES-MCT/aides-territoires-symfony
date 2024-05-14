@@ -195,6 +195,7 @@ class Backer // NOSONAR too much methods
         $this->categories = new ArrayCollection();
         $this->programs = new ArrayCollection();
         $this->backerLocks = new ArrayCollection();
+        $this->backerAskAssociates = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -572,6 +573,9 @@ class Backer // NOSONAR too much methods
     #[ORM\OneToMany(mappedBy: 'backer', targetEntity: BackerLock::class, orphanRemoval: true)]
     private Collection $backerLocks;
 
+    #[ORM\OneToMany(mappedBy: 'backer', targetEntity: BackerAskAssociate::class, orphanRemoval: true)]
+    private Collection $backerAskAssociates;
+
     public function getAidsTechnical() : ?array
     {
         if (count($this->aidsTechnical) > 0) {
@@ -927,6 +931,36 @@ class Backer // NOSONAR too much methods
             // set the owning side to null (unless already changed)
             if ($backerLock->getBacker() === $this) {
                 $backerLock->setBacker(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, BackerAskAssociate>
+     */
+    public function getBackerAskAssociates(): Collection
+    {
+        return $this->backerAskAssociates;
+    }
+
+    public function addBackerAskAssociate(BackerAskAssociate $backerAskAssociate): static
+    {
+        if (!$this->backerAskAssociates->contains($backerAskAssociate)) {
+            $this->backerAskAssociates->add($backerAskAssociate);
+            $backerAskAssociate->setBacker($this);
+        }
+
+        return $this;
+    }
+
+    public function removeBackerAskAssociate(BackerAskAssociate $backerAskAssociate): static
+    {
+        if ($this->backerAskAssociates->removeElement($backerAskAssociate)) {
+            // set the owning side to null (unless already changed)
+            if ($backerAskAssociate->getBacker() === $this) {
+                $backerAskAssociate->setBacker(null);
             }
         }
 

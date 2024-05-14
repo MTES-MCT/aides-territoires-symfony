@@ -24,17 +24,65 @@
                 {% include 'organization/organization/_menu_organization.html.twig' with { organization_backer: true} %}
 
                 <div id="tabpanel_backer" class="fr-tabs__panel" role="tabpanel" aria-labelledby="tabpanel_backer" tabindex="0">
-                    <p>Pour la structure <strong>{{ organization.name }}</strong></p>
-                    {% if not backer.id %}
+                    {% if backer.organizations and backer.organizations|length > 1 %}
                         <div class="fr-alert fr-alert--info fr-alert--sm fr-my-2w">
-                            <p>
-                                Afin de vous présenter sur le site, nous vous invitons à créer votre fiche porteur d'aide.
-                            </p>
-                            <p>
-                                Une fois validée par nos équipes, vous pourrez l'associer à vos aides.
-                            </p>
-                            <p>Les membres de votre structure peuvent également participer au contenu de cette fiche</p>
+                            <p>Les structures suivantes sont rattachée à cette fiche porteur d'aide :</p>
+                            <ul>
+                                {% for bOrganization in backer.organizations %}
+                                    <li>{% if bOrganization.id == organization.id %}<strong>{% endif %}{{ bOrganization.name }}{% if bOrganization.id == organization.id %}</strong>{% endif %}</li>
+                                {% endfor %}
+                            </ul>
                         </div>
+                    {% endif %}
+                    {% if not backer.id %}
+                        {% if not backerAskAssociatePending %}
+                            <div class="fr-alert fr-alert--info fr-alert--sm fr-my-2w">
+                                <p>
+                                    Afin de vous présenter sur le site, nous vous invitons à créer votre fiche porteur d'aide.
+                                </p>
+                                <p>
+                                    Une fois validée par nos équipes, vous pourrez l'associer à vos aides.
+                                </p>
+                                <p>Les membres de votre structure peuvent également participer au contenu de cette fiche</p>
+                            </div>
+                        {% endif %}
+
+                        {% for backerAskAssociateRefused in backerAskAssociatesRefused %}
+                            <div class="fr-alert fr-alert--error fr-alert--sm fr-my-2w">
+                                <p>L'association demandée le <strong>{{ backerAskAssociateRefused.timeCreate|date('d/m/Y') }}</strong> avec le porteur <strong>{{ backerAskAssociateRefused.backer.name }}</strong> vous à été refusée.</p>
+                                {% if backerAskAssociateRefused.refusedDescription %}
+                                    <p>Pour le motif suivant :</p>
+                                    <div>{{ backerAskAssociateRefused.refusedDescription|raw }}</div>
+                                {% endif %}
+                            </div>                        
+                        {% endfor %}
+
+                        {% if backerAskAssociatePending %}
+                            <div class="fr-alert fr-alert--info fr-alert--sm fr-my-2w">
+                                <p>Vous avez demander l'association avec le porteur <strong>{{ backerAskAssociatePending.backer.name }}</strong> le <strong>{{ backerAskAssociatePending.timeCreate|date('d/m/Y') }}</strong></p>
+                                <p>Votre demande sera traité prochainement par nos équipes.</p>
+                            </div>
+                        {% endif %}
+
+                        {% if formAskAssociate %}
+                        <div class="fr-alert fr-alert--warning fr-alert--sm fr-my-2w">
+                            <p>
+                                Avant de créer une nouvelle fiche porteur, veuillez vous assurer qu'elle n'est pas déjà existante.
+                            </p>
+                            <p>
+                                Si c'est le cas, vous pouvez demander à être rattachée à cette fiche.
+                            </p>
+                        </div>
+
+                        {{ form_start(formAskAssociate)}}
+                            {{ form_row(formAskAssociate.backer)}}
+                            {{ form_row(formAskAssociate.description)}}
+
+                            <footer class="fr-mt-2w">
+                                <button type="submit" class="fr-btn">Demander l'association</button>
+                            </footer>
+                        {{ form_end(formAskAssociate)}}
+                        {% endif %}
                     {% endif %}
 
 
@@ -52,30 +100,41 @@
                     
                     
 
-                    {{ form_start(form) }}
-                        {{ form_row(form.name) }}
-                        {{ form_row(form.isCorporate) }}
-                        {{ form_row(form.externalLink) }}
-
-                        {% if backer and backer.logo %}
-                        <p><img src="{{ getParameter('cloud_image_url') }}{{ backer.logo }}" class="img-backer" alt="Image de votre porteur d'aides" /></p>
+                    
+                    {% if not backerAskAssociatePending %}
+                        {% if not backer.id %}
+                            <div class="fr-alert fr-alert--warning fr-alert--sm fr-my-4w">
+                                <p>
+                                    Si le porteur d'aide correpsondant à votre structure n'existe pas, vous pouvez créer une nouvelle fiche porteur d'aide.
+                                </p>
+                            </div>
                         {% endif %}
-                        {{ form_row(form.logoFile) }}
-                        {{ form_row(form.description) }}
-                        {{ form_row(form.perimeter) }}
 
-                        {{ form_row(form.backerType) }}
-                        {{ form_row(form.projectsExamples) }}
-                        {{ form_row(form.internalOperation) }}
-                        {{ form_row(form.contact) }}
-                        {{ form_row(form.usefulLinks) }}
+                        {{ form_start(form) }}
+                            {{ form_row(form.name) }}
+                            {{ form_row(form.isCorporate) }}
+                            {{ form_row(form.externalLink) }}
 
-                        <footer class="fr-mt-2w">
-                            <button type="submit" class="fr-btn">{% if backer.id %}Modifier{% else %}Créer{% endif %}</button>
-                        </footer>
+                            {% if backer and backer.logo %}
+                            <p><img src="{{ getParameter('cloud_image_url') }}{{ backer.logo }}" class="img-backer" alt="Image de votre porteur d'aides" /></p>
+                            {% endif %}
+                            {{ form_row(form.logoFile) }}
+                            {{ form_row(form.description) }}
+                            {{ form_row(form.perimeter) }}
 
-                        <p class="fr-hint-text fr-mt-2w">Les champs marqués d’un astérisque (*) sont obligatoires.</p>
-                    {{ form_end(form) }}
+                            {{ form_row(form.backerType) }}
+                            {{ form_row(form.projectsExamples) }}
+                            {{ form_row(form.internalOperation) }}
+                            {{ form_row(form.contact) }}
+                            {{ form_row(form.usefulLinks) }}
+
+                            <footer class="fr-mt-2w">
+                                <button type="submit" class="fr-btn">{% if backer.id %}Modifier{% else %}Créer{% endif %}</button>
+                            </footer>
+
+                            <p class="fr-hint-text fr-mt-2w">Les champs marqués d’un astérisque (*) sont obligatoires.</p>
+                        {{ form_end(form) }}
+                    {% endif %}
                 </div>
             </div>
         </div>
