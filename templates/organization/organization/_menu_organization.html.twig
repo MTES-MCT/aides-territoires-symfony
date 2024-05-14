@@ -11,12 +11,12 @@
         <li role="presentation">
             <a href="{{ path('app_organization_collaborateurs', {'id': organization.id}) }}"  id="tabpanel-30" class="fr-tabs__tab _fr-icon-checkbox-line fr-tabs__tab--icon-left" tabindex="-1" role="tab" aria-selected="{% if organization_collaborateurs is defined %}true{% else %}false{% endif %}" aria-controls="tabpanel_collaborateurs">Collaborateurs</a>
         </li>
-        <li role="presentation">
+        {# <li role="presentation">
             {% if organization.backer %}
                 <a href="{{ path('app_organization_backer_edit', {'id': organization.id, 'idBacker': organization.backer.id}) }}" id="tabpanel-40" class="fr-tabs__tab _fr-icon-checkbox-line fr-tabs__tab--icon-left" tabindex="-1" role="tab" aria-selected="{% if organization_backer is defined %}true{% else %}false{% endif %}" aria-controls="tabpanel_backer">Fiche porteur d'aides</a>
             {% else %}
                 <a href="{{ path('app_organization_backer_edit', {'id': organization.id, 'idBacker': 0}) }}" id="tabpanel-40" class="fr-tabs__tab _fr-icon-checkbox-line fr-tabs__tab--icon-left fr-icon-warning-fill" tabindex="-1" role="tab" aria-selected="{% if organization_backer is defined %}true{% else %}false{% endif %}" aria-controls="tabpanel_backer">Fiche porteur d'aides</a>
             {% endif %}
-        </li>
+        </li> #}
     {% endif %}
 </ul>
