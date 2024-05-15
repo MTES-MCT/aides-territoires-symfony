@@ -20,7 +20,9 @@ class BackerController extends ApiController
     ): JsonResponse
     {
         // les filtres
-        $params = [];
+        $params = [
+            'active' => true
+        ];
         $q = $this->requestStack->getCurrentRequest()->get('q', null);
         if ($q) {
             $params['nameLike'] = $q;
@@ -54,16 +56,13 @@ class BackerController extends ApiController
                 'logo' => $result->getLogo() ? $paramService->get('cloud_image_url').$result->getLogo() : null,
             ];
         }
-        // on serialize pour ne garder que les champs voulus
-        // $results = $this->serializerInterface->serialize($results, static::SERIALIZE_FORMAT, ['groups' => Backer::API_GROUP_LIST]);
-        
+
         // le retour
         $data = [
             'count' => $count,
             'previous' => $this->getPrevious(),
             'next' => $this->getNext($count),
             'results' => $resultsSpe
-            // 'results' => json_decode($results)
         ];
 
         // la réponse
