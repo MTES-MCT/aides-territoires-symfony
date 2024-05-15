@@ -3,7 +3,9 @@
 namespace App\Controller\Api\Backer;
 
 use App\Controller\Api\ApiController;
+use App\Entity\Backer\Backer;
 use App\Repository\Backer\BackerRepository;
+use App\Service\Various\ParamService;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Attribute\AsController;
 use Symfony\Component\Routing\Annotation\Route;
@@ -14,6 +16,7 @@ class BackerController extends ApiController
     #[Route('/api/backers/', name: 'api_backer_backer', priority: 5)]
     public function index(
         BackerRepository $backerRepository,
+        ParamService $paramService
     ): JsonResponse
     {
         // les filtres
@@ -42,11 +45,13 @@ class BackerController extends ApiController
 
         // spécifique backer
         $resultsSpe = [];
+        /** @var Backer $result */
         foreach ($results as $result) {
             $resultsSpe[] = [
                 'id' => $result->getId().'-'.$result->getSlug(),
                 'text' => $result->getName(),
-                'perimeter' => $result->getPerimeter() ? $result->getPerimeter()->getName() : null
+                'perimeter' => $result->getPerimeter() ? $result->getPerimeter()->getName() : null,
+                'logo' => $result->getLogo() ? $paramService->get('cloud_image_url').$result->getLogo() : null,
             ];
         }
         // on serialize pour ne garder que les champs voulus
