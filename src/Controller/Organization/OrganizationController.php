@@ -618,6 +618,11 @@ class OrganizationController extends FrontController
             return $this->redirectToRoute('app_user_dashboard');
         }
 
+        // si l'organization à un porteur associé mais qu'on a pas l'id en paramètre, on redirige
+        if ($organization->getBacker() && !$idBacker) {
+            return $this->redirectToRoute('app_organization_backer_edit', ['id' => $organization->getId(), 'idBacker' => $organization->getBacker()->getId()]);
+        }
+
         // regarde si backer
         $backer = null;
         if ($idBacker) {

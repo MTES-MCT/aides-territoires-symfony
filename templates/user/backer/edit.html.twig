@@ -47,15 +47,17 @@
                             </div>
                         {% endif %}
 
-                        {% for backerAskAssociateRefused in backerAskAssociatesRefused %}
-                            <div class="fr-alert fr-alert--error fr-alert--sm fr-my-2w">
-                                <p>L'association demandée le <strong>{{ backerAskAssociateRefused.timeCreate|date('d/m/Y') }}</strong> avec le porteur <strong>{{ backerAskAssociateRefused.backer.name }}</strong> vous à été refusée.</p>
-                                {% if backerAskAssociateRefused.refusedDescription %}
-                                    <p>Pour le motif suivant :</p>
-                                    <div>{{ backerAskAssociateRefused.refusedDescription|raw }}</div>
-                                {% endif %}
-                            </div>                        
-                        {% endfor %}
+                        {% if not backer.id %}
+                            {% for backerAskAssociateRefused in backerAskAssociatesRefused %}
+                                <div class="fr-alert fr-alert--error fr-alert--sm fr-my-2w">
+                                    <p>L'association demandée le <strong>{{ backerAskAssociateRefused.timeCreate|date('d/m/Y') }}</strong> avec le porteur <strong>{{ backerAskAssociateRefused.backer.name }}</strong> vous à été refusée.</p>
+                                    {% if backerAskAssociateRefused.refusedDescription %}
+                                        <p>Pour le motif suivant :</p>
+                                        <div>{{ backerAskAssociateRefused.refusedDescription|raw }}</div>
+                                    {% endif %}
+                                </div>                        
+                            {% endfor %}
+                        {% endif %}
 
                         {% if backerAskAssociatePending %}
                             <div class="fr-alert fr-alert--info fr-alert--sm fr-my-2w">
