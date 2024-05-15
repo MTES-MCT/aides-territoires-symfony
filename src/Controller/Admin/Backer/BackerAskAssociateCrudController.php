@@ -40,12 +40,8 @@ class BackerAskAssociateCrudController extends AtCrudController
         yield AssociationField::new('user', 'Utilisateur')
         ->autocomplete(true);
         yield DateTimeField::new('timeCreate', 'Date de création');
-        yield BooleanField::new('accepted', 'Est accepté')
-        ->renderAsSwitch(false)
-        ->setFormTypeOption('label_translation_parameters', ['%value%' => 'Oui/Non']);
-        yield BooleanField::new('refused', 'Est refusé')
-        ->renderAsSwitch(false)
-        ->setFormTypeOption('label_translation_parameters', ['%value%' => 'Oui/Non']);
+        yield BooleanField::new('accepted', 'Est accepté');
+        yield BooleanField::new('refused', 'Est refusé');
         yield TextareaField::new('refusedDescription', 'Motif du refus')
         ->formatValue(function ($value) {
             return html_entity_decode($value);

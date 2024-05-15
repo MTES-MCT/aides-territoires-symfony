@@ -3,6 +3,7 @@
 namespace App\Controller\Admin;
 
 use App\Controller\Admin\Aid\AidCrudController;
+use App\Controller\Admin\Backer\BackerAskAssociateCrudController;
 use App\Controller\Admin\Backer\BackerCrudController;
 use App\Controller\Admin\Page\PageCrudController;
 use App\Controller\Admin\Project\ProjectCrudController;
@@ -52,6 +53,7 @@ use App\Entity\Reference\ProjectReferenceCategory;
 use App\Entity\Search\SearchPage;
 use App\Entity\User\ApiTokenAsk;
 use App\Entity\User\User;
+use App\Repository\Backer\BackerAskAssociateRepository;
 use App\Service\User\UserService;
 use Doctrine\Persistence\ManagerRegistry;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
@@ -151,6 +153,17 @@ class DashboardController extends AbstractDashboardController
             ->set('filters[active][value]', false)
             ->generateUrl();
 
+        // demande d'association en attente
+        /** @var BackerAskAssociateRepository $backerAskAssociateRepo */
+        $backerAskAssociateRepo = $this->managerRegistry->getRepository(BackerAskAssociate::class);
+        $nbBackerAskAssociatePending = $backerAskAssociateRepo->countPendings();
+        $urlBackerAskAssociatePending = $this->adminUrlGenerator
+            ->setController(BackerAskAssociateCrudController::class)
+            ->setAction(Action::INDEX)
+            ->set('filters[accepted][value]', false)
+            ->set('filters[refused][value]', false)
+            ->generateUrl();
+
         // rendu template
         return $this->render('admin/dashboard.html.twig', [
             'nbAidsInReview' => $nbAidsInReview,
@@ -164,6 +177,8 @@ class DashboardController extends AbstractDashboardController
             'urlProjectsInReview' => $urlProjectsInReview,
             'nbBackersInReview' => $nbBackersInReview,
             'urlBackersInReview' => $urlBackersInReview,
+            'nbBackerAskAssociatePending' => $nbBackerAskAssociatePending,
+            'urlBackerAskAssociatePending' => $urlBackerAskAssociatePending
         ]);
     }
     public function configureAssets(): Assets

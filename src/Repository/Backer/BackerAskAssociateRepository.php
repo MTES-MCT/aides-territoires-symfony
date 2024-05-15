@@ -23,6 +23,21 @@ class BackerAskAssociateRepository extends ServiceEntityRepository
         parent::__construct($registry, BackerAskAssociate::class);
     }
 
+    public function countPendings(): int
+    {
+        $qb = $this->getQueryBuilder([
+            'accepted' => false,
+            'refused' => false,
+        ]);
+        $qb
+            ->select('COUNT(baa.id)')
+        ;
+        return (int) $qb
+            ->getQuery()
+            ->getSingleScalarResult()
+        ;
+    }
+    
     public function findOrganizationRefused(Organization $organization): array
     {
         $params = [
