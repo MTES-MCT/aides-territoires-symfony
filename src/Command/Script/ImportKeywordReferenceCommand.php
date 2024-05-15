@@ -30,10 +30,6 @@ class ImportKeywordReferenceCommand extends Command
         parent::__construct();
     }
 
-    protected function configure() : void
-    {
-    }
-
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->input = $input;
@@ -52,11 +48,10 @@ class ImportKeywordReferenceCommand extends Command
 
         $io->title($this->commandTextEnd);
         return Command::SUCCESS;
-    }    
+    }
 
     protected function importKeyword($input, $output): void
     {
-       
         $object_projects = array(
             "accessibilité" => array("accessibilités","adaptabilité","adaptabilités","facilité l'accès","fauteuil roulant","handicap","handicapé","handicaps","mise aux normes","mobilité réduite","pmr"),
             "activités cour école" => array("amusements récréation","jeux de cours","jeux récréatifs"),
@@ -252,5 +247,4 @@ class ImportKeywordReferenceCommand extends Command
             
             $this->managerRegistry->getManager()->flush();
     }
-
 }

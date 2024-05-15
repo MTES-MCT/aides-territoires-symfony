@@ -10,6 +10,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use App\Entity\Cron\CronExportSpreadsheet;
+use App\Repository\Cron\CronExportSpreadsheetRepository;
 use App\Service\Email\EmailService;
 use App\Service\Export\SpreadsheetExporterService;
 use App\Service\Various\ParamService;
@@ -62,9 +63,12 @@ class SpreadsheetToExportCommand extends Command
     {
         $io = new SymfonyStyle($input, $output);
 
+        /** @var CronExportSpreadsheetRepository $cronExportSpreadsheetRepo */
+        $cronExportSpreadsheetRepo = $this->managerRegistry->getRepository(CronExportSpreadsheet::class);
+
         // charge le dernier export à traiter
         /** @var CronExportSpreadsheet $cronExportSpreadsheet */
-        $cronExportSpreadsheet = $this->managerRegistry->getRepository(CronExportSpreadsheet::class)->findOneToExport();
+        $cronExportSpreadsheet = $cronExportSpreadsheetRepo->findOneToExport();
         if ($cronExportSpreadsheet === null) {
             $io->success('Aucun export à traiter');
             return;

@@ -2,8 +2,8 @@
 
 namespace App\Command\Script;
 
-use App\Entity\Program\Program;
 use App\Entity\Project\Project;
+use App\Repository\Project\ProjectRepository;
 use App\Service\File\FileService;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -38,10 +38,6 @@ class ImageNameProjectCommand extends Command
         parent::__construct();
     }
 
-    protected function configure() : void
-    {
-    }
-
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->input = $input;
@@ -60,7 +56,7 @@ class ImageNameProjectCommand extends Command
 
         $io->title($this->commandTextEnd);
         return Command::SUCCESS;
-    }    
+    }
 
     protected function fixMimesTypes($input, $output): void
     {
@@ -78,8 +74,11 @@ class ImageNameProjectCommand extends Command
             'use_path_style_endpoint' => true
         ]);
         
+        /** @var ProjectRepository $projectRepo */
+        $projectRepo = $this->managerRegistry->getRepository(Project::class);
+
         // recupere tous les programs
-        $projects = $this->managerRegistry->getRepository(Project::class)->findImageToFix();
+        $projects = $projectRepo->findImageToFix();
         foreach ($projects as $project) {
             if (!$project->getImage()) {
                 continue;
@@ -139,5 +138,4 @@ class ImageNameProjectCommand extends Command
             $this->managerRegistry->getManager()->flush();
         }
     }
-
 }

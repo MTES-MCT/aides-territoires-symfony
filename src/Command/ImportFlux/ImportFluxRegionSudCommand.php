@@ -10,6 +10,8 @@ use App\Entity\Aid\AidStep;
 use App\Entity\Aid\AidType;
 use App\Entity\Category\Category;
 use App\Entity\Organization\OrganizationType;
+use App\Repository\Aid\AidStepRepository;
+use App\Repository\Aid\AidTypeRepository;
 
 #[AsCommand(name: 'at:import_flux:region_sud', description: 'Import de flux région sud')]
 class ImportFluxRegionSudCommand extends ImportFluxCommand
@@ -270,7 +272,10 @@ class ImportFluxRegionSudCommand extends ImportFluxCommand
 
     protected function setAidTypes(array $aidToImport, Aid $aid): Aid
     {
-        $aidTypes = $this->managerRegistry->getRepository(AidType::class)->findCustom([
+        /** @var AidTypeRepository $aidTypeRepo */
+        $aidTypeRepo = $this->managerRegistry->getRepository(AidType::class);
+
+        $aidTypes = $aidTypeRepo->findCustom([
             'slugs' => [
                 AidType::SLUG_OTHER,
             ]
@@ -298,7 +303,10 @@ class ImportFluxRegionSudCommand extends ImportFluxCommand
 
     protected function setAidSteps(array $aidToImport, Aid $aid): Aid
     {
-        $aidSteps = $this->managerRegistry->getRepository(AidStep::class)->findCustom([
+        /** @var AidStepRepository $aidStepRepo */
+        $aidStepRepo = $this->managerRegistry->getRepository(AidStep::class);
+
+        $aidSteps = $aidStepRepo->findCustom([
             'slugs' => [
                 AidStep::SLUG_PREOP,
                 AidStep::SLUG_OP,

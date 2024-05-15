@@ -4,6 +4,7 @@ namespace App\Command\Script;
 
 use App\Entity\Aid\Aid;
 use App\Entity\Reference\KeywordReference;
+use App\Repository\Aid\AidRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -31,10 +32,6 @@ class AidsAddKeywordReferencesCommand extends Command
         parent::__construct();
     }
 
-    protected function configure() : void
-    {
-    }
-
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->input = $input;
@@ -53,11 +50,14 @@ class AidsAddKeywordReferencesCommand extends Command
 
         $io->title($this->commandTextEnd);
         return Command::SUCCESS;
-    }    
+    }
 
     protected function importKeyword($input, $output): void
     {
-        $aids = $this->managerRegistry->getRepository(Aid::class)->findWithKeywords();
+        /** @var AidRepository $aidRepo */
+        $aidRepo = $this->managerRegistry->getRepository(Aid::class);
+
+        $aids = $aidRepo->findWithKeywords();
 
         /** @var Aid $aid */
         foreach ($aids as $aid) {
@@ -73,5 +73,4 @@ class AidsAddKeywordReferencesCommand extends Command
 
         $this->managerRegistry->getManager()->flush();
     }
-
 }

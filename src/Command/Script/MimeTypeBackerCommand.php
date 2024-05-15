@@ -37,10 +37,6 @@ class MimeTypeBackerCommand extends Command
         parent::__construct();
     }
 
-    protected function configure() : void
-    {
-    }
-
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->input = $input;
@@ -59,7 +55,7 @@ class MimeTypeBackerCommand extends Command
 
         $io->title($this->commandTextEnd);
         return Command::SUCCESS;
-    }    
+    }
 
     protected function fixMimesTypes($input, $output): void
     {
@@ -152,5 +148,4 @@ class MimeTypeBackerCommand extends Command
             }
         }
     }
-
 }

@@ -5,6 +5,7 @@ namespace App\Command\Cron\Aid;
 use App\Entity\Aid\Aid;
 use App\Entity\Log\LogEvent;
 use App\Entity\Search\SearchPage;
+use App\Repository\Aid\AidRepository;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputInterface;
@@ -16,6 +17,7 @@ use App\Service\Aid\AidSearchFormService;
 use App\Service\Aid\AidService;
 use App\Service\Email\EmailService;
 use App\Service\Various\ParamService;
+use Psr\Log\LoggerInterface;
 
 #[AsCommand(name: 'at:cron:aid:count_live', description: 'Compte les aides lives')]
 class CountLiveCommand extends Command
@@ -26,12 +28,13 @@ class CountLiveCommand extends Command
     protected string $commandTextEnd = '>Cron';
 
     public function __construct(
-        protected KernelInterface $kernelInterface,
-        protected ManagerRegistry $managerRegistry,
-        protected AidService $aidService,
-        protected AidSearchFormService $aidSearchFormService,
-        protected EmailService $emailService,
-        protected ParamService $paramService,
+        private KernelInterface $kernelInterface,
+        private ManagerRegistry $managerRegistry,
+        private AidService $aidService,
+        private AidSearchFormService $aidSearchFormService,
+        private EmailService $emailService,
+        private ParamService $paramService,
+        private LoggerInterface $loggerInterface
     )
     {
         ini_set('max_execution_time', 60*60);
@@ -68,8 +71,11 @@ class CountLiveCommand extends Command
         try {
             $io = new SymfonyStyle($input, $output);
 
+            /** @var AidRepository $aidRepo */
+            $aidRepo = $this->managerRegistry->getRepository(Aid::class);
+            
             // charge les aides publiées sans lien cassé de noté
-            $nbAids = $this->managerRegistry->getRepository(Aid::class)->countLives();
+            $nbAids = $aidRepo->countLives();
 
             $logEvent = new LogEvent();
             $logEvent->setCategory('aid');
@@ -94,7 +100,7 @@ class CountLiveCommand extends Command
                 );
 
                 $aidParams = array_merge($aidParams, $this->aidSearchFormService->convertAidSearchClassToAidParams($aidSearchClass));
-                $nbAids = $this->managerRegistry->getRepository(Aid::class)->countAfterSelect($aidParams);
+                $nbAids = $aidRepo->countAfterSelect($aidParams);
 
                 $logEvent = new LogEvent();
                 $logEvent->setCategory('aid');
@@ -112,7 +118,7 @@ class CountLiveCommand extends Command
             $io->success('Comptage effectué');
             $io->success('Mémoire maximale utilisée : ' . round(memory_get_peak_usage() / 1024 / 1024) . ' MB');
         } catch (\Exception $e) {
-            throw new \Exception($e->getMessage());
+            $this->loggerInterface->error($e->getMessage());
         }
     }
 }

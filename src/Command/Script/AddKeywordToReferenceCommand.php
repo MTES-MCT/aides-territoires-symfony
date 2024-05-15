@@ -33,10 +33,6 @@ class AddKeywordToReferenceCommand extends Command
         parent::__construct();
     }
 
-    protected function configure() : void
-    {
-    }
-
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->input = $input;
@@ -55,7 +51,7 @@ class AddKeywordToReferenceCommand extends Command
 
         $io->title($this->commandTextEnd);
         return Command::SUCCESS;
-    }    
+    }
 
     protected function importKeyword($input, $output): void
     {
@@ -223,12 +219,12 @@ class AddKeywordToReferenceCommand extends Command
                 // on reboucle pour ajouter les synonymes
                 foreach ($items as $key => $item) {
                     if ($keySelected !== $key) {
-                        $KeywordReferenceSub = $this->managerRegistry->getRepository(KeywordReference::class)->findOneBy(['name' => trim($item)]);
-                        if (!$KeywordReferenceSub instanceof KeywordReference) {
-                            $KeywordReferenceSub = new KeywordReference();
-                            $KeywordReferenceSub->setName(trim($item));
-                            $KeywordReferenceSub->setIntention(false);
-                            $keywordReference->addKeywordReference($KeywordReferenceSub);
+                        $keywordReferenceSub = $this->managerRegistry->getRepository(KeywordReference::class)->findOneBy(['name' => trim($item)]);
+                        if (!$keywordReferenceSub instanceof KeywordReference) {
+                            $keywordReferenceSub = new KeywordReference();
+                            $keywordReferenceSub->setName(trim($item));
+                            $keywordReferenceSub->setIntention(false);
+                            $keywordReference->addKeywordReference($keywordReferenceSub);
                             $this->managerRegistry->getManager()->persist($keywordReference);
                         }
                     }

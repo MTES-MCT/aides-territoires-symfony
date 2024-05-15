@@ -4,6 +4,7 @@ namespace App\Command\Cron\Alert;
 
 use App\Entity\Alert\Alert;
 use App\Entity\User\User;
+use App\Repository\Alert\AlertRepository;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputInterface;
@@ -77,8 +78,10 @@ class AlertSendDailyCommand extends Command
         $context->setHost($host);
         $context->setScheme('https');
         
+        /** @var AlertRepository $alertRepo */
+        $alertRepo = $this->managerRegistry->getRepository(Alert::class);
         // charge les alertes
-        $alerts = $this->managerRegistry->getRepository(Alert::class)->findToSendDaily();
+        $alerts = $alertRepo->findToSendDaily();
 
         // pour le retour
         $nbAlertSend = 0;

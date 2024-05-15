@@ -10,6 +10,7 @@ use App\Entity\Aid\AidStep;
 use App\Entity\Aid\AidType;
 use App\Entity\Category\Category;
 use App\Entity\Organization\OrganizationType;
+use App\Repository\Aid\AidStepRepository;
 
 #[AsCommand(name: 'at:import_flux:cddr', description: 'Import de flux conseil départemental de la drôme')]
 class ImportFluxDepartementDromeCommand extends ImportFluxCommand
@@ -181,7 +182,10 @@ class ImportFluxDepartementDromeCommand extends ImportFluxCommand
 
     protected function setAidSteps(array $aidToImport, Aid $aid): Aid
     {
-        $aidSteps = $this->managerRegistry->getRepository(AidStep::class)->findCustom([
+        /** @var AidStepRepository $aidStepRepo */
+        $aidStepRepo = $this->managerRegistry->getRepository(AidStep::class);
+
+        $aidSteps = $aidStepRepo->findCustom([
             'slugs' => [
                 AidStep::SLUG_PREOP,
                 AidStep::SLUG_OP,

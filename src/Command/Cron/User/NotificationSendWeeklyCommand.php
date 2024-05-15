@@ -11,6 +11,7 @@ use Symfony\Component\HttpKernel\KernelInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use App\Entity\User\Notification;
 use App\Entity\User\User;
+use App\Repository\User\UserRepository;
 use App\Service\Aid\AidSearchFormService;
 use App\Service\Aid\AidService;
 use App\Service\Email\EmailService;
@@ -67,8 +68,11 @@ class NotificationSendWeeklyCommand extends Command
     {
         $io = new SymfonyStyle($input, $output);
 
+        /** @var UserRepository $userRepo */
+        $userRepo = $this->managerRegistry->getRepository(User::class);
+
         // charge les utilisateurs avec des notificaitons non envoyées
-        $users = $this->managerRegistry->getRepository(User::class)->findWithUnsentNotification(['notificationEmailFrequency' => User::NOTIFICATION_WEEKLY]);
+        $users = $userRepo->findWithUnsentNotification(['notificationEmailFrequency' => User::NOTIFICATION_WEEKLY]);
 
         // pour le retour
         $nbOk = 0;
@@ -80,9 +84,12 @@ class NotificationSendWeeklyCommand extends Command
         $context->setHost($host);
         $context->setScheme('https');
         
+        /** @var NotificationRepository $notificationRepo */
+        $notificationRepo = $this->managerRegistry->getRepository(Notification::class);
+        
         // Pour chaque utilisateurs on lui envoi un email avec toutes les notifications non envoyées
         foreach ($users as $user) {
-            $notifications = $this->managerRegistry->getRepository(Notification::class)->findToSend(['user' => $user]);
+            $notifications = $notificationRepo->findToSend(['user' => $user]);
             if (!empty($notifications)) {
                 $subject = (count($notifications) > 1)
                     ? 'Vous avez des notifications non lues'

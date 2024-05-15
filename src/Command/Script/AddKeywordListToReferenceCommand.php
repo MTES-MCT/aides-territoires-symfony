@@ -33,10 +33,6 @@ class AddKeywordListToReferenceCommand extends Command
         parent::__construct();
     }
 
-    protected function configure() : void
-    {
-    }
-
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->input = $input;
@@ -55,7 +51,7 @@ class AddKeywordListToReferenceCommand extends Command
 
         $io->title($this->commandTextEnd);
         return Command::SUCCESS;
-    }    
+    }
 
     protected function importKeyword($input, $output): void
     {
@@ -97,5 +93,4 @@ class AddKeywordListToReferenceCommand extends Command
             $this->managerRegistry->getManager()->flush();
         }
     }
-
 }

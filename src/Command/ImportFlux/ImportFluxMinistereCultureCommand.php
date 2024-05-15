@@ -11,6 +11,7 @@ use App\Entity\Aid\AidType;
 use App\Entity\Category\Category;
 use App\Entity\Organization\OrganizationType;
 use App\Entity\Reference\KeywordReference;
+use App\Repository\Aid\AidStepRepository;
 
 #[AsCommand(name: 'at:import_flux:ministere_culture', description: 'Import de flux du ministère de la culture')]
 class ImportFluxMinistereCultureCommand extends ImportFluxCommand
@@ -108,14 +109,17 @@ class ImportFluxMinistereCultureCommand extends ImportFluxCommand
     
             return $return;
         } catch (\Exception $e) {
-            // dd($e, $aidToImport);
+            return [];
         }
 
     }
 
     protected function setAidSteps(array $aidToImport, Aid $aid): Aid
     {
-        $aidSteps = $this->managerRegistry->getRepository(AidStep::class)->findCustom([
+        /** @var AidStepRepository $aidStepRepo */
+        $aidStepRepo = $this->managerRegistry->getRepository(AidStep::class);
+
+        $aidSteps = $aidStepRepo->findCustom([
             'slugs' => [
                 AidStep::SLUG_PREOP,
                 AidStep::SLUG_OP,
