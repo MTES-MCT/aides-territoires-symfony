@@ -55,7 +55,7 @@ class MatomoService
     /**
      *   Get stats of all Page Urls from Matomo.
      *   from_date_string & to_date_string must have YYYY-MM-DD format.
-     *    
+     *
      *   API Method examples:
      *   - 'Actions.getPageUrls' (views per page url)
      *   - 'Actions.getPageTitles' (views per page title)
@@ -65,9 +65,9 @@ class MatomoService
      *   https://developer.matomo.org/api-reference/reporting-api-segmentation
      *   - 'pageUrl=@actioncoeurdeville.aides-territoires.beta.gouv.fr' (url must contain string)
      *   - 'pageTitle==Aides-territoires | Recherche avancée'
-     * 
+     *
      *   Usage example:
-     *   get_matomo_stats_from_page_title('Actions.getPageUrls', from_date_string='2020-01-01', to_date_string='2020-12-31') 
+     *   get_matomo_stats_from_page_title('Actions.getPageUrls', from_date_string='2020-01-01', to_date_string='2020-12-31')
      *
      * @param [type] $api_method
      * @param string $custom_segment
@@ -112,10 +112,10 @@ class MatomoService
                     'query' => $params
                 ]
             );
-// dd(json_decode($response->getContent()));
+
             return json_decode($response->getContent());
         } catch (\Exception $e) {
             return null;
         }
-    }    
+    }
 }

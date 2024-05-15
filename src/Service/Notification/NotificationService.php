@@ -5,11 +5,13 @@ namespace App\Service\Notification;
 use App\Entity\User\Notification;
 use App\Entity\User\User;
 use Doctrine\Persistence\ManagerRegistry;
+use Psr\Log\LoggerInterface;
 
 class NotificationService
 {
     public function __construct(
-        protected ManagerRegistry $managerRegistry
+        private ManagerRegistry $managerRegistry,
+        private LoggerInterface $loggerInterface
     )
     {
     }
@@ -28,6 +30,7 @@ class NotificationService
     
             $this->managerRegistry->getManager()->flush();
         } catch (\Exception $e) {
+            $this->loggerInterface->error($e->getMessage());
         }
     }
 }

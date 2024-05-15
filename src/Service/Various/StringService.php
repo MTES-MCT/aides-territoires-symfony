@@ -21,7 +21,7 @@ class StringService
      */
     public function truncate(string $text, int $length): string
     {
-        $parts = preg_split('/([\s\n\r]+)/u', $text, -1, PREG_SPLIT_DELIM_CAPTURE);
+        $parts = preg_split('/(\s+)/u', $text, -1, PREG_SPLIT_DELIM_CAPTURE);
         $parts_count = count($parts);
 
         $lengthCalcul = 0;

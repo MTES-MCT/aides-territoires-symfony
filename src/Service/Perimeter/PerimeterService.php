@@ -102,7 +102,7 @@ class PerimeterService
             foreach (Perimeter::SCALES_LOCAL_GROUP as $scale) {
                 $scales[] = $scale['scale'];
             }
-        } else if ($scaleGroup == Perimeter::SLUG_NATIONAL_GROUP) {
+        } elseif ($scaleGroup == Perimeter::SLUG_NATIONAL_GROUP) {
             foreach (Perimeter::SCALES_NATIONAL_GROUP as $scale) {
                 $scales[] = $scale['scale'];
             }

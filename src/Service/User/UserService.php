@@ -14,7 +14,6 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-use Symfony\Component\Security\Core\User\UserInterface;
 
 class UserService
 {
@@ -42,7 +41,7 @@ class UserService
                 $isMember = true;
             }
         }
-        return $isMember;    
+        return $isMember;
     }
 
     public function generateApiToken() : string {
@@ -72,7 +71,7 @@ class UserService
             return false;
         }
         $token = new UsernamePasswordToken($user, 'none', $user->getRoles());
-        return ($this->accessDecisionManager->decide($token, [$role], $user));
+        return $this->accessDecisionManager->decide($token, [$role], $user);
     }
 
 
@@ -156,10 +155,13 @@ class UserService
     
         $result = "";
     
-        if ($user && $user->getDefaultOrganization() && $user->getDefaultOrganization()->getOrganizationType()) {
-            if (in_array($user->getDefaultOrganization()->getOrganizationType()->getSlug(), $targetOrganizationTypeSlugs)) {
-                $result = $user->getEmail();
-            }
+        if (
+            $user
+            && $user->getDefaultOrganization()
+            && $user->getDefaultOrganization()->getOrganizationType()
+            && in_array($user->getDefaultOrganization()->getOrganizationType()->getSlug(), $targetOrganizationTypeSlugs)
+            ) {
+            $result = $user->getEmail();
         }
     
         return $result;

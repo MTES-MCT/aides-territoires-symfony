@@ -2,6 +2,7 @@
 namespace App\Validator;
 
 use App\Entity\Aid\Aid;
+use App\Repository\Aid\AidRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Validator\Constraint;
@@ -37,7 +38,9 @@ class AidValidUrlValidator extends ConstraintValidator
             }
 
             // check base
-            $aidTest = $this->managerRegistry->getRepository(Aid::class)->findOneCustom([
+            /** @var AidRepository $aidRepo */
+            $aidRepo = $this->managerRegistry->getRepository(Aid::class);
+            $aidTest = $aidRepo->findOneCustom([
                 'showInSearch' => true,
                 'slug' => $matches[1]
             ]);
