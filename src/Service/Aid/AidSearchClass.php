@@ -14,7 +14,7 @@ use App\Entity\Program\Program;
 use App\Entity\Reference\ProjectReference;
 use Doctrine\Common\Collections\ArrayCollection;
 
-class AidSearchClass
+class AidSearchClass // NOSONAR too much methods
 {
     private ?OrganizationType $organizationType;
     /**

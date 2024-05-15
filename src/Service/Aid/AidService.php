@@ -11,23 +11,26 @@ use App\Entity\Organization\OrganizationType;
 use App\Entity\Perimeter\Perimeter;
 use App\Entity\Search\SearchPage;
 use App\Entity\User\User;
+use App\Repository\Aid\AidRepository;
 use App\Service\Reference\ReferenceService;
 use App\Service\User\UserService;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Persistence\ManagerRegistry;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
-class AidService
+class AidService // NOSONAR too complex
 {
     public function __construct(
-        protected HttpClientInterface $httpClientInterface,
-        protected UserService $userService,
-        protected RouterInterface $routerInterface,
-        protected ReferenceService $referenceService,
-        protected ManagerRegistry $managerRegistry
+        private HttpClientInterface $httpClientInterface,
+        private UserService $userService,
+        private RouterInterface $routerInterface,
+        private ReferenceService $referenceService,
+        private ManagerRegistry $managerRegistry,
+        private LoggerInterface $loggerInterface
     )
     {
         
@@ -180,17 +183,21 @@ class AidService
 
     public function searchAids(array $aidParams): array
     {
-        $aids = $this->managerRegistry->getRepository(Aid::class)->findCustom($aidParams);
+        /** @var AidRepository $aidRepo */
+        $aidRepo = $this->managerRegistry->getRepository(Aid::class);
+        $aids = $aidRepo->findCustom($aidParams);
 
-        if (!isset($aidParams['noRelaunch']) && !isset($params['notRelaunch'])) {
-            if (count($aids) <= 10) {
-                $aidParams['scoreTotalMin'] = 1;
-                $aidParams['scoreObjectsMin'] = 0;
-                $aids = $this->managerRegistry->getRepository(Aid::class)->findCustom($aidParams);
-            }
+        if (
+            !isset($aidParams['noRelaunch'])
+            && !isset($aidParams['notRelaunch'])
+            && count($aids) <= 10
+            ) {
+            $aidParams['scoreTotalMin'] = 1;
+            $aidParams['scoreObjectsMin'] = 0;
+            $aids = $aidRepo->findCustom($aidParams);
         }
 
-        if (!isset($aidParams['noPostPopulate']) && !isset($params['notPostPopulate'])) {
+        if (!isset($aidParams['noPostPopulate']) && !isset($aidParams['notPostPopulate'])) {
             $aids = $this->postPopulateAids($aids, $aidParams);
         }
 
@@ -222,7 +229,6 @@ class AidService
         }
 
         $aid->setDescription($newHtml);
-        // $aid->setInlineStyles($styles);
         return $aid;
     }
 
@@ -240,7 +246,7 @@ class AidService
     }
 
     // pour les portails il y a des aides mises en avant et des aides à exclures
-    public function handleSearchPageRules(array $aids, $params): array
+    public function handleSearchPageRules(array $aids, $params): array // NOSONAR too complex
     {
         if (isset($params['searchPage']) && $params['searchPage'] instanceof SearchPage) {
             // aides à exclures
@@ -282,7 +288,7 @@ class AidService
         Lorsque la recherche porte sur une zone plus petite que le périmètre de l'aide locale,
             nous affichons la version locale.
     */
-    public function unDuplicateGenerics(array $aids, ?Perimeter $perimeter) : array
+    public function unDuplicateGenerics(array $aids, ?Perimeter $perimeter) : array // NOSONAR too complex
     {
         // Si on n'a pas de périmètre de recherche
         if (!$perimeter instanceof Perimeter) {
@@ -317,7 +323,7 @@ class AidService
                         $aids->remove($aid);
                     }
                 }
-            } else if ($searchWider) {
+            } elseif ($searchWider) {
                 // Si c'est une aide locale et que la liste contiens l'aide générique, on la retire de la listes
                 if ($aid->getGenericAid() && $aids->contains($aid->getGenericAid())) {
                     $aids->remove($keyAid);
@@ -350,9 +356,9 @@ class AidService
         if (!$aid->isPublished()) {
             if ($user && $aid->getAuthor() && ($user->getId() == $aid->getAuthor()->getId())) { // c'est l'auteur
                 return true;
-            } else if ($user && $aid->getOrganization() && $aid->getOrganization()->getBeneficiairies() && $aid->getOrganization()->getBeneficiairies()->contains($user)) { // le user fait parti de l'organization de l'aide
+            } elseif ($user && $aid->getOrganization() && $aid->getOrganization()->getBeneficiairies() && $aid->getOrganization()->getBeneficiairies()->contains($user)) { // le user fait parti de l'organization de l'aide
                 return true;
-            } else if ($user && $this->userService->isUserGranted($user, User::ROLE_ADMIN)) { // c'est un admin
+            } elseif ($user && $this->userService->isUserGranted($user, User::ROLE_ADMIN)) { // c'est un admin
                 return true;
             } else {
                 return false;
@@ -378,16 +384,7 @@ class AidService
 
     public function userCanDuplicate(Aid $aid, ?User $user) : bool
     {
-        if (!$user instanceof User) {
-            return false;
-        }
-
-        // si c'est l'auteur ou un admin
-        if ($aid->getAuthor() == $user || $this->userService->isUserGranted($user, User::ROLE_ADMIN)) {
-            return true;
-        }
-
-        return false;
+        return $this->userCanEdit($aid, $user);
     }
 
     /**
@@ -422,14 +419,19 @@ class AidService
         if (in_array($organizationType->getSlug(), [OrganizationType::SLUG_COMMUNE, OrganizationType::SLUG_EPCI])) {
             try {
                 $response = $this->postPrepopulateData($aid->getDsId(), $aid->getDsMapping(), $user, $organization);
-                $content = json_decode($response->getContent());
+                $content = json_decode((string) $response->getContent());
 
                 $datas['prepopulate_application_url'] = $content->dossier_url ?? null;
                 $datas['ds_folder_id'] = $content->dossier_id ?? null;
                 $datas['ds_folder_number'] = $content->dossier_number ?? null;
 
             } catch (\Exception $e) {
-                
+                $this->loggerInterface->error('Erreur getDatasFromDs', [
+                    'exception' => $e,
+                    'idAid' => $aid->getId(),
+                    'idUser' => $user->getId(),
+                    'idOrganization' => $organization->getId()
+                ]);
             }
         }
         
@@ -443,13 +445,12 @@ class AidService
      * @param array $dsMapping
      * @param UserInterface|null $user
      * @param Organization|null $organization
-     * @return void
      */
     public function postPrepopulateData(int $dsId, array $dsMapping, ?UserInterface $user, ?Organization $organization): mixed
     {
         $datas = $this->prepopulateDsFolder($dsMapping, $user, $organization);
 
-        $response = $this->httpClientInterface->request(
+        return $this->httpClientInterface->request(
             'POST',
             'https://www.demarches-simplifiees.fr/api/public/v1/demarches/'.$dsId.'/dossiers',
             [
@@ -459,8 +460,6 @@ class AidService
                 'json' => $datas
             ]
         );
-
-        return $response;
     }
 
     /**
@@ -479,7 +478,7 @@ class AidService
             foreach ($dsMapping['FieldsList'] as $field) {
                 if (isset($field['response_value']) && !empty($field['response_value'])) {
                     $datas[$field['ds_field_id']] = $field['response_value'];
-                } else if (
+                } elseif (
                     isset($field['at_model']) && !empty($field['at_model'])
                     && isset($field['at_model_attr']) && !empty($field['at_model_attr'])
                 ) {
@@ -488,10 +487,12 @@ class AidService
                             $value = $this->getFieldValue($field['at_model_attr'], $user);
                             break;
 
-
                         case 'Organization':
                             $value = $this->getFieldValue($field['at_model_attr'], $organization);
                             break;
+
+                        default:
+                        break;
                     }
                     if ($value) {
                         $datas[$field['ds_field_id']] = $value;
@@ -532,12 +533,13 @@ class AidService
                 case 'email':
                     return $entity->getEmail();
                 break;
-            }
-        } else if ($entity instanceof Organization) {
-            switch ($oldField) {
-                case 'organizationType':
-                    return $entity->getOrganizationType() ? $entity->getOrganizationType()->getName() : null;
+
+                default:
                 break;
+            }
+        } elseif ($entity instanceof Organization) {
+            if ($oldField == 'organizationType') {
+                return $entity->getOrganizationType() ? $entity->getOrganizationType()->getName() : null;
             }
         }
 

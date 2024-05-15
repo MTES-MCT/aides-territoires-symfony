@@ -7,14 +7,17 @@ use App\Entity\Backer\Backer;
 use App\Entity\Cron\CronExportSpreadsheet;
 use App\Entity\Project\Project;
 use App\Entity\User\User;
+use App\Repository\Aid\AidRepository;
 use App\Service\File\FileService;
 use App\Service\User\UserService;
+use App\Src\Exception\InvalidFileFormatException;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use OpenSpout\Common\Entity\Cell;
 use OpenSpout\Common\Entity\Row;
 use OpenSpout\Writer\XLSX\Entity\SheetView;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\HtmlSanitizer\HtmlSanitizerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
@@ -22,17 +25,21 @@ use Twig\Environment;
 
 class SpreadsheetExporterService
 {
+    const EXCEPTION_FORMAT_NOT_SUPPORTED_MESSAGE = 'Format non supporté';
+    const TODAY_DATE_FORMAT = 'Y-m-d H:i:s';
+
     public function __construct(
-        protected Environment $twig,
-        protected UserService $userService,
-        protected ManagerRegistry $managerRegistry,
-        protected FileService $fileService,
-        protected HtmlSanitizerInterface $htmlSanitizerInterface
+        private Environment $twig,
+        private UserService $userService,
+        private ManagerRegistry $managerRegistry,
+        private FileService $fileService,
+        private HtmlSanitizerInterface $htmlSanitizerInterface,
+        private LoggerInterface $loggerInterface
     )
     {
         
     }
-    public function  createResponseFromQueryBuilder(
+    public function  createResponseFromQueryBuilder( // NOSONAR too complex
         QueryBuilder $queryBuilder,
         mixed $entityFcqn,
         string $filename,
@@ -76,8 +83,8 @@ class SpreadsheetExporterService
             $this->managerRegistry->getManager()->flush();
 
             $content = $this->twig->render('admin/cron/cron-launched.html.twig', [
-                
             ]);
+
             return new Response($content);
         }
 
@@ -95,14 +102,14 @@ class SpreadsheetExporterService
                 $options->FIELD_ENCLOSURE = '"';
     
                 $writer = new \OpenSpout\Writer\CSV\Writer($options);
-            } else if ($format == FileService::FORMAT_XLSX) {
-                $sheetView = new SheetView();               
+            } elseif ($format == FileService::FORMAT_XLSX) {
+                $sheetView = new SheetView();
                 $writer = new \OpenSpout\Writer\XLSX\Writer();
             } else {
-                throw new \Exception('Format not supported');
+                throw new InvalidFileFormatException(self::EXCEPTION_FORMAT_NOT_SUPPORTED_MESSAGE);
             }
 
-            $now = new \DateTime(date('Y-m-d H:i:s'));
+            $now = new \DateTime(date(self::TODAY_DATE_FORMAT));
             $writer->openToBrowser('export_'.$filename.'_at_'.$now->format('d_m_Y').'.'.$format);
 
             if ($format == FileService::FORMAT_XLSX) {
@@ -137,7 +144,7 @@ class SpreadsheetExporterService
         return $response;
     }
 
-    public function getDatasFromEntityType(mixed $entity, mixed $results): array
+    public function getDatasFromEntityType(mixed $entity, mixed $results): array // NOSONAR too complex
     {
         $datas = [];
         switch (get_class($entity)) {
@@ -206,7 +213,7 @@ class SpreadsheetExporterService
                         'Date d\'ouverture' => $result->getDateStart() ? $result->getDateStart()->format('d/m/Y') : '',
                         'Date de clôture' => $result->getDateSubmissionDeadline() ? $result->getDateSubmissionDeadline()->format('d/m/Y') : '',
                         
-                        'Conditions d\'éligibilité' => $this->truncateHtml($result->getEligibility()), 
+                        'Conditions d\'éligibilité' => $this->truncateHtml($result->getEligibility()),
                         'État d\'avancement du projet pour bénéficier du dispositif' => join("\n", $aidSteps),
                         'Types de dépenses / actions couvertes' => join("\n", $destinations),
                         'Zone géographique couverte par l\'aide*' => $result->getPerimeter() ? $result->getPerimeter()->getName() : '',
@@ -241,10 +248,10 @@ class SpreadsheetExporterService
                         'Nom' => $result->getLastname(),
                         'Adresse e-mail' => $result->getEmail(),
                         'Numéro de téléphone' => $result->getContributorContactPhone(),
-                        'Périmètre de l\'organization' => ($result->getDefaultOrganization() && $result->getDefaultOrganization()->getPerimeter()) ? $result->getDefaultOrganization()->getPerimeter()->getName() : '', 
-                        'Périmètre (region)' => ($result->getDefaultOrganization() && $result->getDefaultOrganization()->getPerimeterRegion()) ? $result->getDefaultOrganization()->getPerimeterRegion()->getName() : '', 
-                        'Périmètre (Département)' => ($result->getDefaultOrganization() && $result->getDefaultOrganization()->getPerimeterDepartment()) ? $result->getDefaultOrganization()->getPerimeterDepartment()->getName() : '', 
-                        'Périmètre (Population)' => ($result->getDefaultOrganization() && $result->getDefaultOrganization()->getPerimeter()) ? $result->getDefaultOrganization()->getPerimeter()->getPopulation() : '', 
+                        'Périmètre de l\'organization' => ($result->getDefaultOrganization() && $result->getDefaultOrganization()->getPerimeter()) ? $result->getDefaultOrganization()->getPerimeter()->getName() : '',
+                        'Périmètre (region)' => ($result->getDefaultOrganization() && $result->getDefaultOrganization()->getPerimeterRegion()) ? $result->getDefaultOrganization()->getPerimeterRegion()->getName() : '',
+                        'Périmètre (Département)' => ($result->getDefaultOrganization() && $result->getDefaultOrganization()->getPerimeterDepartment()) ? $result->getDefaultOrganization()->getPerimeterDepartment()->getName() : '',
+                        'Périmètre (Population)' => ($result->getDefaultOrganization() && $result->getDefaultOrganization()->getPerimeter()) ? $result->getDefaultOrganization()->getPerimeter()->getPopulation() : '',
                         'Contributeur ?' => $result->isIsContributor() ? 'Oui' : 'Non',
                         'Bénéficiaire ?' => $result->isIsBeneficiary() ? 'Oui' : 'Non',
                         'Nombre d\'aides' => $result->getAids() ? count($result->getAids()) : 0,
@@ -256,90 +263,94 @@ class SpreadsheetExporterService
                         'Fonction du bénéficiaire' => $result->getBeneficiaryFunction(),
                         'Rôle (ancien champ)' => $result->getContributorRole(),
                         'Rôle du bénéficiaire' => $result->getBeneficiaryRole(),
-                        'Date de création' => $result->getTimeCreate() ? $result->getTimeCreate()->format('Y-m-d H:i:s') : '',
-                        'Date de mise à jour' => $result->getTimeUpdate() ? $result->getTimeUpdate()->format('Y-m-d H:i:s') : '',
-                        'dernière connexion' => $result->getTimeLastLogin() ? $result->getTimeLastLogin()->format('Y-m-d H:i:s') : '',
+                        'Date de création' => $result->getTimeCreate() ? $result->getTimeCreate()->format(self::TODAY_DATE_FORMAT) : '',
+                        'Date de mise à jour' => $result->getTimeUpdate() ? $result->getTimeUpdate()->format(self::TODAY_DATE_FORMAT) : '',
+                        'dernière connexion' => $result->getTimeLastLogin() ? $result->getTimeLastLogin()->format(self::TODAY_DATE_FORMAT) : '',
                         'Type de structure' => ($result->getDefaultOrganization() && $result->getDefaultOrganization()->getOrganizationType()) ? $result->getDefaultOrganization()->getOrganizationType()->getName() : '',
                         'Code postal de la structure' => $result->getDefaultOrganization() ? $result->getDefaultOrganization()->getZipCode() : '',
                     ];
                     unset($results[$key]);
                 }
-                break;
+            break;
 
-                case Project::class:
-                    /** @var Project $result */
-                    foreach ($results as $key => $result) {
-                        $regions = ($result->getOrganization() && $result->getOrganization()->getPerimeter()) ? $result->getOrganization()->getPerimeter()->getRegions() : '';
-                        if (is_array($regions)) {
-                            $regions = implode(',', $regions);
-                        }
-                        $counties = ($result->getOrganization() && $result->getOrganization()->getPerimeter()) ? $result->getOrganization()->getPerimeter()->getDepartments() : '';
-                        if (is_array($counties)) {
-                            $counties = implode(',', $counties);
-                        }
-
-                        $projectTypes = [];
-                        foreach ($result->getKeywordSynonymlists() as $keywordSynonymlist) {
-                            $projectTypes[] = $keywordSynonymlist->getName();
-                        }
-
-                        $datas[] = [
-                            'Nom' => $result->getName(),
-                            'Organisation' => $result->getOrganization() ? $result->getOrganization()->getName() : '',
-                            'Description' => $result->getDescription(),
-                            'Périmètre du porteur de projet' => ($result->getOrganization() && $result->getOrganization()->getPerimeter()) ? $result->getOrganization()->getPerimeter()->getName() : '',
-                            'Périmètre (Région)' => $regions,
-                            'Périmètre (Département)' => $counties,
-                            'Est public' => $result->isIsPublic() ? 'Oui' : 'Non',
-                            'Date création' => $result->getTimeCreate() ? $result->getTimeCreate()->format('d/m/Y H:i:s') : '',
-                            'Projet référent' => $result->getProjectReference() ? $result->getProjectReference()->getName() : '',
-                            'Types de projet (ancien système)' => join(',', $projectTypes),
-                        ];
-                        unset($results[$key]);
+            case Project::class:
+                /** @var Project $result */
+                foreach ($results as $key => $result) {
+                    $regions = ($result->getOrganization() && $result->getOrganization()->getPerimeter()) ? $result->getOrganization()->getPerimeter()->getRegions() : '';
+                    if (is_array($regions)) {
+                        $regions = implode(',', $regions);
                     }
-                    break;
-
-                    case Backer::class:
-                    /** @var Backer $result */
-                    foreach ($results as $key => $result) {
-                        $regions = ($result->getPerimeter()) ? $result->getPerimeter()->getRegions() : '';
-                        if (is_array($regions)) {
-                            $regions = implode(',', $regions);
-                        }
-                        $counties = ($result->getPerimeter()) ? $result->getPerimeter()->getDepartments() : '';
-                        if (is_array($counties)) {
-                            $counties = implode(',', $counties);
-                        }
-
-                        $aidsParams = [
-                            'backer' => $result,
-                        ];
-                        $aids = $this->managerRegistry->getRepository(Aid::class)->findCustom($aidsParams);
-                        $nbAidsLive = 0;
-                        foreach ($aids as $aid) {
-                            if ($aid->isLive()) {
-                                $nbAidsLive++;
-                            }
-                        }
-
-                        
-                        $datas[] = [
-                            'Nom du porteur' => $result->getName(),
-                            'Périmètre' => $result->getPerimeter() ? $result->getPerimeter()->getName() : '',
-                            'Périmètre (région)' => $regions,
-                            'Périmètre (département)' => $counties,
-                            'Groupe de porteur' => $result->getBackerGroup() ? $result->getBackerGroup()->getName() : '',
-                            'Nombre d’aides' => count($aids),
-                            'Nombre d’aides publiées' => $nbAidsLive
-                        ];
-                        unset($results[$key]);
+                    $counties = ($result->getOrganization() && $result->getOrganization()->getPerimeter()) ? $result->getOrganization()->getPerimeter()->getDepartments() : '';
+                    if (is_array($counties)) {
+                        $counties = implode(',', $counties);
                     }
-                        break;
-        }
+
+                    $projectTypes = [];
+                    foreach ($result->getKeywordSynonymlists() as $keywordSynonymlist) {
+                        $projectTypes[] = $keywordSynonymlist->getName();
+                    }
+
+                    $datas[] = [
+                        'Nom' => $result->getName(),
+                        'Organisation' => $result->getOrganization() ? $result->getOrganization()->getName() : '',
+                        'Description' => $result->getDescription(),
+                        'Périmètre du porteur de projet' => ($result->getOrganization() && $result->getOrganization()->getPerimeter()) ? $result->getOrganization()->getPerimeter()->getName() : '',
+                        'Périmètre (Région)' => $regions,
+                        'Périmètre (Département)' => $counties,
+                        'Est public' => $result->isIsPublic() ? 'Oui' : 'Non',
+                        'Date création' => $result->getTimeCreate() ? $result->getTimeCreate()->format('d/m/Y H:i:s') : '',
+                        'Projet référent' => $result->getProjectReference() ? $result->getProjectReference()->getName() : '',
+                        'Types de projet (ancien système)' => join(',', $projectTypes),
+                    ];
+                    unset($results[$key]);
+                }
+            break;
+
+            case Backer::class:
+                /** @var Backer $result */
+                foreach ($results as $key => $result) {
+                    $regions = ($result->getPerimeter()) ? $result->getPerimeter()->getRegions() : '';
+                    if (is_array($regions)) {
+                        $regions = implode(',', $regions);
+                    }
+                    $counties = ($result->getPerimeter()) ? $result->getPerimeter()->getDepartments() : '';
+                    if (is_array($counties)) {
+                        $counties = implode(',', $counties);
+                    }
+
+                    $aidsParams = [
+                        'backer' => $result,
+                    ];
+                    /** @var AidRepository $aidRepo */
+                    $aidRepo = $this->managerRegistry->getRepository(Aid::class);
+                    $aids = $aidRepo->findCustom($aidsParams);
+                    $nbAidsLive = 0;
+                    foreach ($aids as $aid) {
+                        if ($aid->isLive()) {
+                            $nbAidsLive++;
+                        }
+                    }
+
+                    
+                    $datas[] = [
+                        'Nom du porteur' => $result->getName(),
+                        'Périmètre' => $result->getPerimeter() ? $result->getPerimeter()->getName() : '',
+                        'Périmètre (région)' => $regions,
+                        'Périmètre (département)' => $counties,
+                        'Groupe de porteur' => $result->getBackerGroup() ? $result->getBackerGroup()->getName() : '',
+                        'Nombre d’aides' => count($aids),
+                        'Nombre d’aides publiées' => $nbAidsLive
+                    ];
+                    unset($results[$key]);
+                }
+            break;
+            default:
+            break;
+                    }
         return $datas;
     }
 
-    public function exportProjectAids(Project $project, string $format = 'csv')
+    public function exportProjectAids(Project $project, string $format = 'csv') // NOSONAR too complex
     {
         try {
             if ($format == FileService::FORMAT_CSV) {
@@ -348,14 +359,14 @@ class SpreadsheetExporterService
                 $options->FIELD_ENCLOSURE = '"';
     
                 $writer = new \OpenSpout\Writer\CSV\Writer($options);
-            } else if ($format == FileService::FORMAT_XLSX) {
-                $sheetView = new SheetView();               
+            } elseif ($format == FileService::FORMAT_XLSX) {
+                $sheetView = new SheetView();
                 $writer = new \OpenSpout\Writer\XLSX\Writer();
             } else {
-                throw new \Exception('Format not supported');
+                throw new InvalidFileFormatException(self::EXCEPTION_FORMAT_NOT_SUPPORTED_MESSAGE);
             }
 
-            $now = new \DateTime(date('Y-m-d H:i:s'));
+            $now = new \DateTime(date(self::TODAY_DATE_FORMAT));
             $writer->openToBrowser('Aides-territoires_-_'.$now->format('Y-m-d').'_-_'.$project->getSlug());
 
             if ($format == FileService::FORMAT_XLSX) {
@@ -394,7 +405,7 @@ class SpreadsheetExporterService
                 if (!$aidProject->getAid() instanceof Aid) {
                     continue;
                 }
-                // $projectStep = $project->getStep() && isset(Project::PROJECT_STEPS_BY_SLUG[$project->getStep()]) ? Project::PROJECT_STEPS_BY_SLUG[$project->getStep()] : '';
+
                 $aidSteps = [];
                 foreach ($aidProject->getAid()->getAidSteps() as $aidStep) {
                     $aidSteps[] = $aidStep->getName();
@@ -465,6 +476,10 @@ class SpreadsheetExporterService
             $writer->close();
             exit;
         } catch (\Exception $e) {
+            $this->loggerInterface->error('Erreur exportProjectAids', [
+                'exception' => $e,
+                'idProject' => $project->getId(),
+            ]);
         }
     }
 
@@ -473,7 +488,7 @@ class SpreadsheetExporterService
         try {
             $entity = new $entityFqcn();
             $datas = $this->getDatasFromEntityType($entity, $results);
-            $now = new \DateTime(date('Y-m-d H:i:s'));
+            $now = new \DateTime(date(self::TODAY_DATE_FORMAT));
             $tmpFolder = $this->fileService->getUploadTmpDir();
             if (!is_dir($tmpFolder)) {
                 mkdir($tmpFolder, 0777, true);
@@ -486,12 +501,12 @@ class SpreadsheetExporterService
                 $fileTarget .= '.'.FileService::FORMAT_CSV;
     
                 $writer = new \OpenSpout\Writer\CSV\Writer($options);
-            } else if ($format == FileService::FORMAT_XLSX) {
-                $sheetView = new SheetView();               
+            } elseif ($format == FileService::FORMAT_XLSX) {
+                $sheetView = new SheetView();
                 $writer = new \OpenSpout\Writer\XLSX\Writer();
                 $fileTarget .= '.'.FileService::FORMAT_XLSX;
             } else {
-                throw new \Exception('Format not supported');
+                throw new InvalidFileFormatException(self::EXCEPTION_FORMAT_NOT_SUPPORTED_MESSAGE);
             }
     
             $writer->openToFile($fileTarget);
@@ -525,6 +540,9 @@ class SpreadsheetExporterService
             $writer->close();
             return $fileTarget;
         } catch (\Exception $e) {
+            $this->loggerInterface->error('Erreur exportToFile', [
+                'exception' => $e
+            ]);
             return null;
         }
     }
@@ -537,8 +555,6 @@ class SpreadsheetExporterService
         $truncatedHtml = substr($html, 0, $length);
 
         // Assainit le HTML tronqué
-        $cleanHtml = $this->htmlSanitizerInterface->sanitize($truncatedHtml);
-
-        return $cleanHtml;
+        return $this->htmlSanitizerInterface->sanitize($truncatedHtml);
     }
 }

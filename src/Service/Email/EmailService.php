@@ -7,9 +7,7 @@ use App\Service\Various\ParamService;
 use Brevo\Client\Api\ContactsApi;
 use Brevo\Client\Api\TransactionalEmailsApi;
 use Brevo\Client\Configuration;
-use Brevo\Client\Model\CreateContact;
 use Brevo\Client\Model\CreateDoiContact;
-use Brevo\Client\Model\GetContactDetails;
 use Brevo\Client\Model\SendSmtpEmail;
 use Brevo\Client\Model\UpdateContact;
 use GuzzleHttp\Client;
@@ -117,20 +115,20 @@ class EmailService
         }
 
         // si parametres
-        if (is_array($params) && count($params) > 0) {
+        if (is_array($params) && empty($params)) {
             $sendSmtpEmail['params'] = $params;
         }
 
-        if (is_array($headers) && count($headers) > 0) {
+        if (is_array($headers) && empty($headers)) {
             $sendSmtpEmail['headers'] = $headers;
         }
 
-        if (is_array($tags) && count($tags) > 0) {
+        if (is_array($tags) && empty($tags)) {
             $sendSmtpEmail['tags'] = $tags;
         }
 
         try {
-            $result = $apiInstance->sendTransacEmail($sendSmtpEmail);
+            $apiInstance->sendTransacEmail($sendSmtpEmail);
             return true;
         } catch (\Exception $e) {
             return false;

@@ -15,7 +15,7 @@ class InternalApiService
         private RequestStack $requestStack,
         private ParamService $paramService
     )
-    {    
+    {
     }
 
     private function getAPiBaseUrl(): string
@@ -31,8 +31,6 @@ class InternalApiService
         } catch (\Exception $e) {
             return '';
         }
-
-
     }
 
     private function getBearerToken(bool $force = false): string
@@ -63,11 +61,6 @@ class InternalApiService
         }
     }
 
-    private function setBearerToken(string $bearerToken): void
-    {
-        $this->bearerToken = $bearerToken;
-    }
-
     public function callApi(
         string $url,
         ?array $params = null,
@@ -93,6 +86,6 @@ class InternalApiService
         }
 
         // retour
-        return $response->getBody()->getContents();        
+        return $response->getBody()->getContents();
     }
 }

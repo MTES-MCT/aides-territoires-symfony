@@ -41,7 +41,7 @@ class ImageService
         }
 
         try {
-            // resize image avec \Imagick   
+            // resize image avec \Imagick
             $imagick = new \Imagick($file);
             $imagick = $this->imagickAutorotate($imagick);
             $maxWidth = 1024;
@@ -143,7 +143,7 @@ class ImageService
             );
             $tmpFile = $tmpFolder . preg_replace('/' . preg_quote($uploadDir, '/') . '/', '', $fileName);
 
-            // resize image avec \Imagick   
+            // resize image avec \Imagick
             $imagick = new \Imagick($tmpFile);
             $imagick = $this->imagickAutorotate($imagick);
             $maxWidth = 1024;
