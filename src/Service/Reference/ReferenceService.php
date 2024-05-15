@@ -4,7 +4,6 @@ namespace App\Service\Reference;
 
 use App\Entity\Reference\KeywordReference;
 use App\Repository\Reference\KeywordReferenceRepository;
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 class ReferenceService
 {
@@ -44,10 +43,9 @@ class ReferenceService
         $project_name = str_replace(array("/","(",")",",",":","–","-"), " ",strtolower($project_name));
         $projet_keywords_combinaisons=$this->genererCombinaisons($project_name, $this->articles);
         // Tri du tableau pour d'abord chercher des expressions complètes "terrain de football" aura la priorité sur "terrain"
-        usort($projet_keywords_combinaisons, array($this,"compare_length"));
+        usort($projet_keywords_combinaisons, array($this,"compareLength"));
       
         // Affichage du tableau trié
-        // dump($projet_keywords_combinaisons);
         $intentions=array();
         $objects=array();
 
@@ -58,13 +56,15 @@ class ReferenceService
           $isContain = array_filter($synonym_found, function($value) use ($synonym) {
             return strpos($value, $synonym) !== false;
           });
-          if (count($result)){
-            if (empty($isContain))
+          if (count($result)) {
+            if (empty($isContain)) {
               $synonym_found[]=$synonym;
-            else
+            } else {
               continue;
+            }
+          } else {
+            continue;
           }
-          else continue;
       
           if ($result[0]["intention"]==1){
               $intentions = array_unique(array_merge($intentions,  array_column($result, 'name')));
@@ -75,15 +75,14 @@ class ReferenceService
         }
         $intentions_string = $this->arrayToStringWithQuotes($intentions);
         $objects_string = $this->arrayToStringWithQuotes($objects);
-        $simple_words_string = $this->enleverArticles($project_name, $this->articles); // $simple_words_string = $project_name;
+        $simple_words_string = $this->enleverArticles($project_name, $this->articles);
         return [
           'intentions_string' => $intentions_string,
           'objects_string' => $objects_string,
           'simple_words_string' => $simple_words_string,
           'original_name' => $original_name,
         ];
-      
-    }   
+    }
     
 
     public function getHighlightedWords(?string $keyword): array
@@ -111,20 +110,19 @@ class ReferenceService
         return trim(preg_replace('/\s+/', ' ', $content));
     }
     
-    private function remove_article($text, $articles) {
+    private function removeArticle($text, $articles) {
       // Normaliser les apostrophes et passer en minuscules
       $text = str_replace(array("/","(",")",",",":","–"), " ",strtolower($text));
       $text = str_replace(array("‘", "’"), "'", strtolower($text));
   
       $words = explode(" ", $text);
-      // $words = preg_split('/(?<=\')\b|\s+/', $text);
   
       // Vérifier si le premier mot est un article et le supprimer
-      if (count($words) > 0 && in_array($words[0], $articles)) {
+      if (empty($words) && in_array($words[0], $articles)) {
           array_shift($words);
       }
       // Vérifier si le dernier mot est un article et le supprimer
-      if (count($words) > 0 && in_array(end($words), $articles)) {
+      if (empty($words) && in_array(end($words), $articles)) {
           array_pop($words);
       }
       return implode(" ", $words);
@@ -140,9 +138,10 @@ class ReferenceService
     for ($i = 0; $i < $nombreDeMots; $i++) {
         for ($j = $i; $j < $nombreDeMots; $j++) {
             $combinaison = implode(" ", array_slice($mots, $i, $j - $i + 1));
-            $combinaison=trim($this->remove_article($combinaison, $articles));
-            if ($combinaison)
+            $combinaison=trim($this->removeArticle($combinaison, $articles));
+            if ($combinaison) {
               $combinaisons[] = trim($combinaison);
+            }
         }
     }
     return array_unique($combinaisons);
@@ -151,7 +150,6 @@ class ReferenceService
   
   private function arrayToStringWithQuotes($array) {
       $transformed = array_map(function($item) {
-        // $item = str_replace("'", "\\'", $item);
         if (strpos($item, ' ') !== false) {
           return '"' . $item . '"';
         }
@@ -160,7 +158,7 @@ class ReferenceService
       return implode(' ', $transformed);
   }
   
-  private function compare_length($a, $b) {
+  private function compareLength($a, $b) {
     return strlen($b) - strlen($a);
   }
 }

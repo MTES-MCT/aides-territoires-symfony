@@ -7,7 +7,7 @@ use App\Entity\Blog\BlogPromotionPost;
 class BlogPromotionPostService
 {
     // Si les bloc promotion on des prér-requis, ex : uniquement pour la catégogrie "voirie" il ne faut pas qu'elle soit affiché si la recherche n'as pas de critère catégorie
-    public function handleRequires(array $blogPromotionPosts, array $aidParams = null)
+    public function handleRequires(array $blogPromotionPosts, array $aidParams = null) // NOSONAR too complex
     {
         /** @var BlogPromotionPost $blogPromotionPost */
         foreach ($blogPromotionPosts as $key => $blogPromotionPost) {
@@ -29,7 +29,6 @@ class BlogPromotionPostService
             }
             if (($blogPromotionPost->getKeywordReferences() && count($blogPromotionPost->getKeywordReferences()) > 0) && (!isset($aidParams['keyword']) || $aidParams['keyword'] === null)) {
                 unset($blogPromotionPosts[$key]);
-                continue;
             }
         }
 

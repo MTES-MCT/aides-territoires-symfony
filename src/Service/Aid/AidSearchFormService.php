@@ -9,13 +9,10 @@ use App\Entity\Aid\AidType;
 use App\Entity\Aid\AidTypeGroup;
 use App\Entity\Backer\Backer;
 use App\Entity\Category\Category;
-use App\Entity\Keyword\KeywordSynonymlist;
-use App\Entity\Organization\Organization;
 use App\Entity\Organization\OrganizationType;
 use App\Entity\Perimeter\Perimeter;
 use App\Entity\Program\Program;
 use App\Entity\Reference\ProjectReference;
-use App\Form\Aid\AidSearchType;
 use App\Repository\Category\CategoryRepository;
 use App\Repository\Keyword\KeywordSynonymlistRepository;
 use App\Repository\Organization\OrganizationTypeRepository;
@@ -23,7 +20,6 @@ use App\Repository\Perimeter\PerimeterRepository;
 use App\Service\User\UserService;
 use App\Service\Various\StringService;
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\ORM\Query\Expr\Func;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormFactoryInterface;
@@ -31,6 +27,13 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class AidSearchFormService
 {
+    const CATEGORY_SEARCH_PARAM_NAME = 'categorysearch[]';
+    const AID_TYPE_PARAM_NAME = 'aidTypes[]';
+    const BACKERS_PARAM_NAME = 'backers[]';
+    const PROGRAMS_PARAM_NAME = 'programs[]';
+    const AID_STEPS_PARAM_NAME = 'aidSteps[]';
+    const AID_DESTINATIONS_PARAM_NAME = 'aidDestinations[]';
+
     public function __construct(
         protected RequestStack $requestStack,
         protected PerimeterRepository $perimeterRepository,
@@ -46,7 +49,7 @@ class AidSearchFormService
         
     }
 
-    public function convertAidSearchClassToQueryString(AidSearchClass $aidSearchClass): string{
+    public function convertAidSearchClassToQueryString(AidSearchClass $aidSearchClass): string{ // NOSONAR too complex
         $params = [];
 
         if ($aidSearchClass->getOrganizationType()) {
@@ -125,11 +128,10 @@ class AidSearchFormService
             }
         }
 
-        $querystring = http_build_query($params);
-        return $querystring;
+        return http_build_query($params);
     }
 
-    public function convertAidSearchClassToAidParams(AidSearchClass $aidSearchClass): array
+    public function convertAidSearchClassToAidParams(AidSearchClass $aidSearchClass): array // NOSONAR too complex
     {
         $aidParams = [];
 
@@ -210,7 +212,7 @@ class AidSearchFormService
         return $aidParams;
     }
 
-    public function getAidSearchClass(?AidSearchClass $aidSearchClass = null, ?array $params = null): AidSearchClass
+    public function getAidSearchClass(?AidSearchClass $aidSearchClass = null, ?array $params = null): AidSearchClass // NOSONAR too complex
     {
         if (!$aidSearchClass) {
             $aidSearchClass = new AidSearchClass();
@@ -283,16 +285,22 @@ class AidSearchFormService
         }
 
         // si pas de paramètre et pas de paramètres dans l'url on pends le type de l'organisation par défaut du user (on viens direcement sur l'url de recherche d'aide ou page d'accueil)
-        if (!$aidSearchClass->getOrganizationType() && count($queryParams) == 0) {
-            if ($user && $user->getDefaultOrganization() && $user->getDefaultOrganization()->getOrganizationType()) {
-                $aidSearchClass->setOrganizationType($user->getDefaultOrganization()->getOrganizationType());
-            }
+        if (
+            !$aidSearchClass->getOrganizationType()
+            && empty($queryParams)
+            && $user
+            && $user->getDefaultOrganization()
+            && $user->getDefaultOrganization()->getOrganizationType()
+            ) {
+            $aidSearchClass->setOrganizationType($user->getDefaultOrganization()->getOrganizationType());
         }
 
-        if (is_array($params)) {
-            if (array_key_exists('forceOrganizationType', $params) && !$aidSearchClass->getOrganizationType()) {
-                $aidSearchClass->setOrganizationType($params['forceOrganizationType']);
-            }
+        if (
+            is_array($params)
+            && array_key_exists('forceOrganizationType', $params)
+            && !$aidSearchClass->getOrganizationType()
+            ) {
+            $aidSearchClass->setOrganizationType($params['forceOrganizationType']);
         }
         
         if (isset($queryParams['forceOrganizationType']) && $queryParams['forceOrganizationType'] == 'null' && !$aidSearchClass->getOrganizationType()) {
@@ -325,10 +333,15 @@ class AidSearchFormService
         }
 
         // si pas de paramètre on pends le périmètre de l'organisation par défaut du user
-        if (!$aidSearchClass->getSearchPerimeter() && !isset($params['dontUseUserPerimeter']) && count($queryParams) == 0){
-            if ($user && $user->getDefaultOrganization() && $user->getDefaultOrganization()->getPerimeter()) {
-                $aidSearchClass->setSearchPerimeter($user->getDefaultOrganization()->getPerimeter());
-            }
+        if (
+            !$aidSearchClass->getSearchPerimeter()
+            && !isset($params['dontUseUserPerimeter'])
+            && empty($queryParams)
+            && $user
+            && $user->getDefaultOrganization()
+            && $user->getDefaultOrganization()->getPerimeter()
+            ){
+            $aidSearchClass->setSearchPerimeter($user->getDefaultOrganization()->getPerimeter());
         }
 
         /**
@@ -368,11 +381,11 @@ class AidSearchFormService
             }
         }
 
-        if (isset($queryParams['categorysearch[]'])) {
-            if (!is_array($queryParams['categorysearch[]'])) {
-                $queryParams['categorysearch[]'] = [$queryParams['categorysearch[]']];
+        if (isset($queryParams[self::CATEGORY_SEARCH_PARAM_NAME])) {
+            if (!is_array($queryParams[self::CATEGORY_SEARCH_PARAM_NAME])) {
+                $queryParams[self::CATEGORY_SEARCH_PARAM_NAME] = [$queryParams[self::CATEGORY_SEARCH_PARAM_NAME]];
             }
-            foreach ($queryParams['categorysearch[]'] as $categoryId) {
+            foreach ($queryParams[self::CATEGORY_SEARCH_PARAM_NAME] as $categoryId) {
                 $category = $this->managerRegistry->getRepository(Category::class)->find((int) $categoryId);
                 if ($category instanceof Category) {
                     $aidSearchClass->addCategorySearch($category);
@@ -388,11 +401,11 @@ class AidSearchFormService
          * > AidType
         */
 
-        if (isset($queryParams['aidTypes[]'])) {
-            if (!is_array($queryParams['aidTypes[]'])) {
-                $queryParams['aidTypes[]'] = [$queryParams['aidTypes[]']];
+        if (isset($queryParams[self::AID_TYPE_PARAM_NAME])) {
+            if (!is_array($queryParams[self::AID_TYPE_PARAM_NAME])) {
+                $queryParams[self::AID_TYPE_PARAM_NAME] = [$queryParams[self::AID_TYPE_PARAM_NAME]];
             }
-            foreach ($queryParams['aidTypes[]'] as $idAidType) {
+            foreach ($queryParams[self::AID_TYPE_PARAM_NAME] as $idAidType) {
                 $aidType = $this->managerRegistry->getRepository(AidType::class)->find($idAidType);
                 if ($aidType instanceof AidType) {
                     $aidSearchClass->addAidType($aidType);
@@ -607,7 +620,7 @@ class AidSearchFormService
         if (isset($queryParams['is_charged'])) {
             if (trim(strtolower((string) $queryParams['is_charged'])) === 'false' || (int) $queryParams['is_charged'] == 0) {
                 $aidSearchClass->setIsCharged(false);
-            } else if (trim(strtolower((string) $queryParams['is_charged'])) === 'true' || (int) $queryParams['is_charged'] == 1) {
+            } elseif (trim(strtolower((string) $queryParams['is_charged'])) === 'true' || (int) $queryParams['is_charged'] == 1) {
                 $aidSearchClass->setIsCharged(true);
             }
         }
@@ -632,16 +645,23 @@ class AidSearchFormService
          * < isCallForProject
         */
 
-        if (isset($queryParams['call_for_projects_only'])) {
-            if ($queryParams['call_for_projects_only'] == 'on') {
-                $aidSearchClass->setIsCallForProject(true);
-            }
-        }
-
-        if (isset($queryParams['call_for_projects_only']) && (string) $queryParams['call_for_projects_only'] == 'true') {
+        if (
+            isset($queryParams['call_for_projects_only'])
+            && $queryParams['call_for_projects_only'] == 'on'
+            ) {
             $aidSearchClass->setIsCallForProject(true);
         }
-        if (isset($queryParams['call_for_projects_only']) && (string) $queryParams['call_for_projects_only'] == 'false') {
+
+        if (
+            isset($queryParams['call_for_projects_only'])
+            && (string) $queryParams['call_for_projects_only'] == 'true'
+            ) {
+            $aidSearchClass->setIsCallForProject(true);
+        }
+        if (
+            isset($queryParams['call_for_projects_only'])
+            && (string) $queryParams['call_for_projects_only'] == 'false'
+            ) {
             $aidSearchClass->setIsCallForProject(false);
         }
         /**
@@ -696,13 +716,15 @@ class AidSearchFormService
                 case 'relevance':
                     $aidParams['orderBy'] = ['sort' => 'score_total', 'order' => 'DESC'];
                 break;
+                default:
+                break;
             }
         }
 
         return $aidParams;
     }
 
-    public function convertQuerystringToParams(string $querystring): array
+    public function convertQuerystringToParams(string $querystring): array // NOSONAR too complex
     {
         $params = [];
         // transforme la querystring en tableau
@@ -726,16 +748,16 @@ class AidSearchFormService
         
         // converti les noms des clés
         $keysMapping = [
-            'categorysearch[]' => 'categories',
+            self::CATEGORY_SEARCH_PARAM_NAME => 'categories',
             'perimeter' => 'searchPerimeter',
             'targeted_audiences' => 'organizationType',
-            'programs' => 'programs[]',
+            'programs' => self::PROGRAMS_PARAM_NAME,
             'aid_type' => 'aidTypeSlugs',
             'text' => 'keyword',
-            'backers' => 'backers[]', // ancien système utilise le schéma {id]-{slug}
+            'backers' => self::BACKERS_PARAM_NAME, // ancien système utilise le schéma {id]-{slug}
             'apply_before' => 'applyBefore',
-            'mobilization_step' => 'aidSteps[]',
-            'destinations' => 'aidDestinations[]',
+            'mobilization_step' => self::AID_STEPS_PARAM_NAME,
+            'destinations' => self::AID_DESTINATIONS_PARAM_NAME,
             'european_aid' => 'europeanAid'
         ];
         foreach ($params as $key => $value) {
@@ -761,12 +783,11 @@ class AidSearchFormService
         // force certains paramètres en tableau
         $keysForceArray = [
             'categories',
-            // 'programSlugs',
-            'aidTypes[]',
-            'backers[]',
-            'programs[]',
-            'aidSteps[]',
-            'aidDestinations[]',
+            self::AID_TYPE_PARAM_NAME,
+            self::BACKERS_PARAM_NAME,
+            self::PROGRAMS_PARAM_NAME,
+            self::AID_STEPS_PARAM_NAME,
+            self::AID_DESTINATIONS_PARAM_NAME,
         ];
         foreach ($params as $key => $param) {
             if (in_array($key, $keysForceArray) && !is_array($params[$key])) {
@@ -776,11 +797,11 @@ class AidSearchFormService
 
         // gestion de prolbème avec les tableaux, ex: aidTypes[] ou aidTypes
         $keysMapping = [
-            'programs' => 'programs[]',
-            'backers' => 'backers[]',
-            'aidTypes' => 'aidTypes[]',
-            'aidSteps' => 'aidSteps[]',
-            'aidDestinations' => 'aidDestinations[]',
+            'programs' => self::PROGRAMS_PARAM_NAME,
+            'backers' => self::BACKERS_PARAM_NAME,
+            'aidTypes' => self::AID_TYPE_PARAM_NAME,
+            'aidSteps' => self::AID_STEPS_PARAM_NAME,
+            'aidDestinations' => self::AID_DESTINATIONS_PARAM_NAME,
         ];
         foreach ($params as $key => $value) {
             foreach ($keysMapping as $keyMapping => $keyMappingValue) {
@@ -851,28 +872,28 @@ class AidSearchFormService
             $params['aidTypes'] = $aidTypes;
             unset($params['aidTypeSlugs']);
         }
-        if (isset($params['aidTypes[]']) && is_array($params['aidTypes[]'])) {
+        if (isset($params[self::AID_TYPE_PARAM_NAME]) && is_array($params[self::AID_TYPE_PARAM_NAME])) {
             $aidTypes = [];
-            foreach ($params['aidTypes[]'] as $idAidType) {
+            foreach ($params[self::AID_TYPE_PARAM_NAME] as $idAidType) {
                 $aidType = $this->managerRegistry->getRepository(AidType::class)->find((int) $idAidType);
                 if ($aidType instanceof AidType) {
                     $aidTypes[] = $aidType;
                 }
             }
             $params['aidTypes'] = $aidTypes;
-            unset($params['aidTypes[]']);
+            unset($params[self::AID_TYPE_PARAM_NAME]);
         }
 
-        if (isset($params['backers[]']) && is_array($params['backers[]'])) {
+        if (isset($params[self::BACKERS_PARAM_NAME]) && is_array($params[self::BACKERS_PARAM_NAME])) {
             $backers = [];
-            foreach ($params['backers[]'] as $idBacker) {
+            foreach ($params[self::BACKERS_PARAM_NAME] as $idBacker) {
                 $backer = $this->managerRegistry->getRepository(Backer::class)->find((int) $idBacker);
                 if ($backer instanceof Backer) {
                     $backers[] = $backer;
                 }
             }
             $params['backers'] = $backers;
-            unset($params['backers[]']);
+            unset($params[self::BACKERS_PARAM_NAME]);
         }
 
         // conversion string en datetime
@@ -886,9 +907,9 @@ class AidSearchFormService
             }
         }
 
-        if (isset($params['programs[]']) && is_array($params['programs[]'])) {
+        if (isset($params[self::PROGRAMS_PARAM_NAME]) && is_array($params[self::PROGRAMS_PARAM_NAME])) {
             $programs = [];
-            foreach ($params['programs[]'] as $idProgram) {
+            foreach ($params[self::PROGRAMS_PARAM_NAME] as $idProgram) {
                 // si entier
                 if ($idProgram == (int) $idProgram) {
                     $program = $this->managerRegistry->getRepository(Program::class)->find((int) $idProgram);
@@ -904,16 +925,16 @@ class AidSearchFormService
                 }
             }
             $params['programs'] = $programs;
-            unset($params['programs[]']);
+            unset($params[self::PROGRAMS_PARAM_NAME]);
         }
 
-        if (isset($params['aidSteps[]']) && is_array($params['aidSteps[]'])) {
+        if (isset($params[self::AID_STEPS_PARAM_NAME]) && is_array($params[self::AID_STEPS_PARAM_NAME])) {
             $aidSteps = [];
-            foreach ($params['aidSteps[]'] as $idAidStep) {
+            foreach ($params[self::AID_STEPS_PARAM_NAME] as $idAidStep) {
                 $aidStep = null;
                 if (is_int($idAidStep)) {
                     $aidStep = $this->managerRegistry->getRepository(AidStep::class)->find((int) $idAidStep);
-                } else if (is_string($idAidStep)) {
+                } elseif (is_string($idAidStep)) {
                     $aidStep = $this->managerRegistry->getRepository(AidStep::class)->findOneBy(['slug' => (string) $idAidStep]);
                 }
                 if ($aidStep instanceof AidStep) {
@@ -921,16 +942,16 @@ class AidSearchFormService
                 }
             }
             $params['aidSteps'] = $aidSteps;
-            unset($params['aidSteps[]']);
+            unset($params[self::AID_STEPS_PARAM_NAME]);
         }
 
-        if (isset($params['aidDestinations[]']) && is_array($params['aidDestinations[]'])) {
+        if (isset($params[self::AID_DESTINATIONS_PARAM_NAME]) && is_array($params[self::AID_DESTINATIONS_PARAM_NAME])) {
             $aidDestinations = [];
-            foreach ($params['aidDestinations[]'] as $idAidDestination) {
+            foreach ($params[self::AID_DESTINATIONS_PARAM_NAME] as $idAidDestination) {
                 $aidDestination = null;
                 if (is_int($idAidDestination)) {
                     $aidDestination = $this->managerRegistry->getRepository(AidDestination::class)->find((int) $idAidDestination);
-                } else if (is_string($idAidDestination)) {
+                } elseif (is_string($idAidDestination)) {
                     $aidDestination = $this->managerRegistry->getRepository(AidDestination::class)->findOneBy(['slug' => (string) $idAidDestination]);
                 }
                 if ($aidDestination instanceof AidDestination) {
@@ -938,21 +959,21 @@ class AidSearchFormService
                 }
             }
             $params['aidDestinations'] = $aidDestinations;
-            unset($params['aidDestinations[]']);
+            unset($params[self::AID_DESTINATIONS_PARAM_NAME]);
         }
 
         // isCharged
         if (isset($params['isCharged'])) {
             if ((int) $params['isCharged'] == 1) {
                 $params['isCharged'] = true;
-            } else if ((int) $params['isCharged'] == 0) {
+            } elseif ((int) $params['isCharged'] == 0) {
                 $params['isCharged'] = false;
             }
         }
         if (isset($params['is_charged'])) {
             if (trim(strtolower((string) $params['is_charged'])) === 'false') {
                 $params['isCharged'] = false;
-            } else if (trim(strtolower((string) $params['is_charged'])) === 'true') {
+            } elseif (trim(strtolower((string) $params['is_charged'])) === 'true') {
                 $params['isCharged'] = true;
             }
             unset($params['is_charged']);
@@ -962,14 +983,14 @@ class AidSearchFormService
         if (isset($params['isCallForProject'])) {
             if ((int) $params['isCallForProject'] == 1) {
                 $params['isCallForProject'] = true;
-            } else if ((int) $params['isCallForProject'] == 0) {
+            } elseif ((int) $params['isCallForProject'] == 0) {
                 $params['isCallForProject'] = false;
             }
         }
         if (isset($params['call_for_projects_only'])) {
             if (trim(strtolower((string) $params['call_for_projects_only'])) == 'on') {
                 $params['isCallForProject'] = true;
-            } else if (trim(strtolower((string) $params['call_for_projects_only'])) == 'off') {
+            } elseif (trim(strtolower((string) $params['call_for_projects_only'])) == 'off') {
                 $params['isCallForProject'] = false;
             }
             unset($params['call_for_projects_only']);
@@ -979,119 +1000,12 @@ class AidSearchFormService
     }
 
     /**
-     * Transforme les items de la query en data pour le formulaire de recherche d'aide
-     *
-     * @param array $formAidSearchParams
-     * @param string $formKey
-     * @param string $queryItem
-     * @return mixed
-     */
-    private function convertQueryItemtoData(array $formAidSearchParams, string $formKey, string $realKey, string $queryItem): mixed
-    {
-        try {
-            switch ($formKey) {
-                case 'organizationType':
-                    $organization = $this->managerRegistry->getRepository(Organization::class)->findOneBy([
-                        'slug' => $queryItem
-                    ]);
-                    if ($organization instanceof Organization) {
-                        $formAidSearchParams['forceOrganizationType'] = $organization;
-                    }
-                    break;
-
-                case 'searchPerimeter':
-                    $perimeter = $this->managerRegistry->getRepository(Perimeter::class)->find($queryItem);
-                    if ($perimeter instanceof Perimeter) {
-                        $formAidSearchParams['forcePerimeter'] = $perimeter;
-                    }
-                    break;
-
-                case 'keyword':
-                    $formAidSearchParams['forceKeyword'] = strip_tags($queryItem);
-                    break;
-
-                // se gère en automatique via les paramètres GET
-                case 'categorysearch':
-                    break;
-
-                // se gère en automatique via les paramètres GET
-                case 'aidTypes':
-                    break;
-
-                case 'backers':
-                    if (!isset($formAidSearchParams['forceBackers'])) {
-                        $formAidSearchParams['forceBackers'] = [];
-                    }
-                    $backer = $this->managerRegistry->getRepository(Backer::class)->find($queryItem);
-                    if ($backer instanceof Backer) {
-                        $formAidSearchParams['forceBackers'][] = $backer;
-                    }
-                    break;
-    
-                case 'applyBefore':
-                    $date = new \DateTime(date($queryItem));
-                    $formAidSearchParams['forceApplyBefore'] = $date;
-                    break;
-                    
-                case 'programs':
-                    $program = $this->managerRegistry->getRepository(Program::class)->findOneBy(['slug' => $queryItem]);
-                    if ($program instanceof Program) {
-                        $formAidSearchParams['forcePrograms'][] = $program;
-                    }
-                    break;
-                
-                case 'aidSteps':
-                    if (!isset($formAidSearchParams['forceAidSteps'])) {
-                        $formAidSearchParams['forceAidSteps'] = [];
-                    }
-                    $aidStep = $this->managerRegistry->getRepository(AidStep::class)->find($queryItem);
-                    if ($aidStep instanceof AidStep) {
-                        $formAidSearchParams['forceAidSteps'][] = $aidStep;
-                    }
-                    break;
-                    
-                case 'aidDestinations':
-                    if (!isset($formAidSearchParams['forceAidDestinations'])) {
-                        $formAidSearchParams['forceAidDestinations'] = [];
-                    }
-                    $aidDestination = $this->managerRegistry->getRepository(AidDestination::class)->find($queryItem);
-                    if ($aidDestination instanceof AidDestination) {
-                        $formAidSearchParams['forceAidDestinations'][] = $aidDestination;
-                    }
-                    break;
-
-                case 'isCharged':
-                    $formAidSearchParams['forceIsCharged'] = strip_tags($queryItem);
-                    break;
-                    
-                case 'europeanAid':
-                    $formAidSearchParams['forceEuropeanAid'] = strip_tags($queryItem);
-                    break;
-
-                case 'isCallForProject':
-                    // uniquement si coché
-                    if ($queryItem) {
-                        $formAidSearchParams['forceIsCallForProject'] = (bool) $queryItem;
-                    }
-                    break;
-                        
-                default:
-                    break;
-            }
-    
-            return $formAidSearchParams;
-        } catch (\Exception $e) {
-            return $formAidSearchParams;
-        }
-    }
-
-    /**
      * Complète le tableau de paramètres pour la requête qui va récuprer les aides
      *
      * @param Form $formAidSearch
      * @return array
      */
-    public function completeAidParams(Form $formAidSearch) : array {
+    public function completeAidParams(Form $formAidSearch) : array { // NOSONAR too complex
         $aidParams = [];
         if ($formAidSearch->get('organizationType')->getData()) {
             $aidParams['organizationType'] = $formAidSearch->get('organizationType')->getData();
@@ -1171,7 +1085,7 @@ class AidSearchFormService
                     }
                 } else {
                     $showExtended = true;
-                }               
+                }
             }
         }
 
@@ -1180,8 +1094,7 @@ class AidSearchFormService
 
     public function setShowExtendedV2(AidSearchClass $aidSearchClass): bool
     {
-        if (
-            $aidSearchClass->getAidTypes() ||
+        return $aidSearchClass->getAidTypes() ||
             $aidSearchClass->getBackerschoice() ||
             $aidSearchClass->getApplyBefore() ||
             $aidSearchClass->getPrograms() ||
@@ -1189,11 +1102,6 @@ class AidSearchFormService
             $aidSearchClass->getAidDestinations() ||
             $aidSearchClass->getIsCharged() !== null ||
             $aidSearchClass->getEuropeanAid() ||
-            $aidSearchClass->getIsCallForProject()
-        ) {
-            return true;
-        } else {
-            return false;
-        }
+            $aidSearchClass->getIsCallForProject();
     }
 }

@@ -21,6 +21,7 @@ use App\Entity\Log\LogPublicProjectView;
 use App\Entity\Organization\Organization;
 use App\Entity\User\User;
 use Doctrine\Persistence\ManagerRegistry;
+use Psr\Log\LoggerInterface;
 
 class LogService
 {
@@ -36,12 +37,13 @@ class LogService
     const PROJECT_PUBLIC_VIEW = 'projectPublicView';
 
     public function __construct(
-        private ManagerRegistry $managerRegistry
+        private ManagerRegistry $managerRegistry,
+        private LoggerInterface $loggerInterface
     )
     {
     }
 
-    public function log(
+    public function log( // NOSONAR too complex
         ?string $type,
         ?array $params,
     ): void
@@ -241,7 +243,7 @@ class LogService
                             $log->setProject($params['project'] ?? null);
                             $log->setOrganization($params['organization'] ?? null);
                             $log->setUser($params['user'] ?? null);
-                            break;                            
+                            break;
 
                 default:
                     // Code à exécuter si aucune des conditions précédentes n'est remplie
@@ -251,6 +253,9 @@ class LogService
             $this->managerRegistry->getManager()->persist($log);
             $this->managerRegistry->getManager()->flush();
         } catch (\Exception $exception) {
+            $this->loggerInterface->error('Erreur log', [
+                'exception' => $exception
+            ]);
         }
     }
 

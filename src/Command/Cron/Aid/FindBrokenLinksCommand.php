@@ -3,6 +3,7 @@
 namespace App\Command\Cron\Aid;
 
 use App\Entity\Aid\Aid;
+use App\Repository\Aid\AidRepository;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputInterface;
@@ -66,8 +67,11 @@ class FindBrokenLinksCommand extends Command
         $timeStart = microtime(true);
 
         $today = new \DateTime(date('Y-m-d'));
+
+        /** @var AidRepository $aidRepo */
+        $aidRepo = $this->managerRegistry->getRepository(Aid::class);
         // charge les aides publiées sans lien cassé de noté
-        $aids = $this->managerRegistry->getRepository(Aid::class)->findPublishedWithNoBrokenLink([
+        $aids = $aidRepo->findPublishedWithNoBrokenLink([
             'dateCheckBrokenLinkMax' => $today
         ]);
 

@@ -4,6 +4,7 @@ namespace App\Command\Cron\Backer;
 
 use App\Entity\Aid\Aid;
 use App\Entity\Backer\Backer;
+use App\Repository\Aid\AidRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -61,11 +62,14 @@ class BackerCountAidsCommand extends Command
         // charge les porteurs d'aides
         $backers = $this->managerRegistry->getRepository(Backer::class)->findAll();
 
+        /** @var AidRepository $aidRepo */
+        $aidRepo = $this->managerRegistry->getRepository(Aid::class);
+
         // pour chaque backer, compte le nombre d'aides
         /** @var Backer $backer */
         foreach ($backers as $backer) {
-            $backer->setNbAids($this->managerRegistry->getRepository(Aid::class)->countCustom(['backer' => $backer]));
-            $backer->setNbAidsLive($this->managerRegistry->getRepository(Aid::class)->countCustom(['backer' => $backer, 'showInSearch' => true]));
+            $backer->setNbAids($aidRepo->countCustom(['backer' => $backer]));
+            $backer->setNbAidsLive($aidRepo->countCustom(['backer' => $backer, 'showInSearch' => true]));
             $this->managerRegistry->getManager()->persist($backer);
         }
 

@@ -11,6 +11,7 @@ use App\Entity\Aid\AidType;
 use App\Entity\Category\Category;
 use App\Entity\Organization\OrganizationType;
 use App\Entity\Reference\KeywordReference;
+use App\Repository\Aid\AidStepRepository;
 
 #[AsCommand(name: 'at:import_flux:welcome_europe', description: 'Import de flux welcome europe')]
 class ImportFluxWelcomeEuropeCommand extends ImportFluxCommand
@@ -153,10 +154,10 @@ class ImportFluxWelcomeEuropeCommand extends ImportFluxCommand
             }
         }
         if (isset($aidToImport['info_contact']) && trim($aidToImport['info_contact']) != '') {
-            $info_contact = '<p>' . $aidToImport['info_contact'] . '</p>'; 
+            $info_contact = '<p>' . $aidToImport['info_contact'] . '</p>';
         }
         if (isset($aidToImport['info_advice']) && trim($aidToImport['info_advice']) != '') {
-            $info_advice = '<p>' . $aidToImport['info_advice'] . '</p>'; 
+            $info_advice = '<p>' . $aidToImport['info_advice'] . '</p>';
         }
         if (isset($info_utile) || isset($info_contact) || isset($info_advice)) {
             $contact = '<div>';
@@ -576,7 +577,10 @@ class ImportFluxWelcomeEuropeCommand extends ImportFluxCommand
 
     protected function setAidSteps(array $aidToImport, Aid $aid): Aid
     {
-        $aidSteps = $this->managerRegistry->getRepository(AidStep::class)->findCustom([
+        /** @var AidStepRepository $aidStepRepo */
+        $aidStepRepo = $this->managerRegistry->getRepository(AidStep::class);
+
+        $aidSteps = $aidStepRepo->findCustom([
             'slugs' => [
                 AidStep::SLUG_PREOP,
                 AidStep::SLUG_OP,

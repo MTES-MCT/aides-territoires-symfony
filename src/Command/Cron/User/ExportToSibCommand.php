@@ -4,6 +4,7 @@ namespace App\Command\Cron\User;
 
 use App\Entity\Aid\Aid;
 use App\Entity\User\User;
+use App\Repository\User\UserRepository;
 use App\Service\Email\EmailService;
 use App\Service\Various\ParamService;
 use DateTime;
@@ -62,8 +63,11 @@ class ExportToSibCommand extends Command
     {
         $io = new SymfonyStyle($input, $output);
 
+        /** @var UserRepository $userRepo */
+        $userRepo = $this->managerRegistry->getRepository(User::class);
+
         // charge les utilisateurs connectés au moins 1 fois
-        $users = $this->managerRegistry->getRepository(User::class)->findUsersConnectedSinceYesterday();
+        $users = $userRepo->findUsersConnectedSinceYesterday();
 
         $nbOk = 0;
         $nbError = 0;

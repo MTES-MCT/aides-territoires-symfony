@@ -4,6 +4,8 @@ namespace App\Command\Cron\Perimeter;
 
 use App\Entity\Backer\Backer;
 use App\Entity\Perimeter\Perimeter;
+use App\Repository\Backer\BackerRepository;
+use App\Repository\Perimeter\PerimeterRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -57,12 +59,18 @@ class CountiesNbBackersCronCommand extends Command
     {
         $io = new SymfonyStyle($input, $output);
 
+        /** @var PerimeterRepository $perimeterRepo */
+        $perimeterRepo = $this->managerRegistry->getRepository(Perimeter::class);
+
+        /** @var BackerRepository $backerRepo */
+        $backerRepo = $this->managerRegistry->getRepository(Backer::class);
+
         // charge les départements
-        $counties = $this->managerRegistry->getRepository(Perimeter::class)->findCounties();
+        $counties = $perimeterRepo->findCounties();
 
         // pour chaque département, compte le nombre de backer
         foreach ($counties as $county) {
-            $county->setBackersCount($this->managerRegistry->getRepository(Backer::class)->countBackerWithAidInCounty(['id' => $county->getId()]));
+            $county->setBackersCount($backerRepo->countBackerWithAidInCounty(['id' => $county->getId()]));
             $this->managerRegistry->getManager()->persist($county);
         }
 

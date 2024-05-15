@@ -4,6 +4,7 @@ namespace App\Command\Cron\Perimeter;
 
 use App\Entity\Perimeter\Perimeter;
 use App\Entity\Perimeter\PerimeterImport;
+use App\Repository\Perimeter\PerimeterImportRepository;
 use App\Service\Email\EmailService;
 use App\Service\Various\ParamService;
 use Doctrine\Persistence\ManagerRegistry;
@@ -39,9 +40,12 @@ class PerimeterImportCommand extends Command
 
         $io = new SymfonyStyle($input, $output);
 
+        /** @var PerimeterImportRepository $perimeterImportRepo */
+        $perimeterImportRepo = $this->managerRegistry->getRepository(PerimeterImport::class);
+
         try {
             // la demande d'import de périmètre adhoc la plus récente
-            $perimeterImport = $this->managerRegistry->getRepository(PerimeterImport::class)->findNextToImport();
+            $perimeterImport = $perimeterImportRepo->findNextToImport();
             if (!$perimeterImport instanceof PerimeterImport) {
                 $io->error('Erreur : rien a importer');
                 return Command::SUCCESS;

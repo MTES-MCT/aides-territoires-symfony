@@ -23,7 +23,7 @@ use Twig\TwigFilter;
 use Twig\TwigFunction;
 use Nelmio\SecurityBundle\EventListener\ContentSecurityPolicyListener;
 
-class AppExtension extends AbstractExtension
+class AppExtension extends AbstractExtension // NOSONAR too much methods
 {
     public function __construct(
         public Breadcrumb $breadcrumb,
@@ -107,7 +107,7 @@ class AppExtension extends AbstractExtension
     }
 
     public function alertFrequencyDisplay(string $slug) : string {
-        foreach (Alert::FREQUENCIES as $key => $frequency) {
+        foreach (Alert::FREQUENCIES as $frequency) {
             if ($frequency['slug'] == $slug) {
                 return $frequency['name'] ?? '';
             }
@@ -116,7 +116,7 @@ class AppExtension extends AbstractExtension
     }
 
     public function projectStepDisplay(string $string) : string {
-        foreach (Project::PROJECT_STEPS as $key => $step) {
+        foreach (Project::PROJECT_STEPS as $step) {
             if ($step['slug'] == $string) {
                 return $step['name'];
             }
@@ -163,7 +163,7 @@ class AppExtension extends AbstractExtension
     public function isUserGranted($user, $role): bool
     {
         return $this->userService->isUserGranted($user, $role);
-    }    
+    }
 
     public function optimizeHtmlFromWysiwyg(string $html): string
     {
@@ -211,16 +211,16 @@ class AppExtension extends AbstractExtension
         $x = new \DOMXPath($dom);
         
         foreach($x->query("//*[@style]") as $node)
-        {   
+        {
             $styles = explode(';', $node->getAttribute('style'));
 
             $classesToAdd = [];
             foreach ($styles as $style) {
                 if ($style == 'text-align: left') {
                     $classesToAdd[] = 'text-left';
-                } else if ($style == 'text-align: right') {
+                } elseif ($style == 'text-align: right') {
                     $classesToAdd[] = 'text-right';
-                } else if ($style == 'text-align: center') {
+                } elseif ($style == 'text-align: center') {
                     $classesToAdd[] = 'text-center';
                 }
             }
@@ -259,7 +259,7 @@ class AppExtension extends AbstractExtension
         $x = new \DOMXPath($dom);
         
         foreach($x->query("//img") as $node)
-        {   
+        {
             $node->setAttribute("loading","lazy");
         }
         return substr($dom->saveHTML(), 12, -15);

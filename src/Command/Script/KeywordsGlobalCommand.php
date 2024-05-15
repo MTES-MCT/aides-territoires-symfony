@@ -32,10 +32,6 @@ class KeywordsGlobalCommand extends Command
         parent::__construct();
     }
 
-    protected function configure() : void
-    {
-    }
-
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->input = $input;
@@ -86,5 +82,5 @@ class KeywordsGlobalCommand extends Command
 
         $io->title($this->commandTextEnd);
         return Command::SUCCESS;
-    }    
+    }
 }
