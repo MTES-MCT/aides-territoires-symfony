@@ -61,34 +61,7 @@ class UserListener
 
             // si optin envoi à sendinblue
             if ($entity->isMlConsent()) {
-                $sibApiKey = $this->paramService->get('sib_api_key');
-                $sibNewsletterId = $this->paramService->get('sib_newsletter_id');
-                $sibNewsletterConfirmTemplateId = $this->paramService->get('sib_newsletter_confirm_template_id');
-                $url = $this->paramService->get('sib_endpoint').'doubleOptinConfirmation';
-                $redirectionUrl = $this->urlGeneratorInterface->generate('app_newsletter_register_success', [], UrlGeneratorInterface::ABS_URL);
-
-                if (trim($sibApiKey) !== '') {
-                    $this->httpClientInterface->request(
-                        'POST',
-                        $url,
-                        [
-                            'headers' => [
-                                'Content-Type' => 'application/json',
-                                'Accept' => 'application/json',
-                                'api-key' => $sibApiKey
-                            ],
-                            'json' => [
-                                'attributes' => [
-                                    'DOUBLE_OPT_IN' => 1,
-                                    'includeListIds' => $sibNewsletterId,
-                                    'email' => $entity->getEmail(),
-                                    'templateId' => $sibNewsletterConfirmTemplateId,
-                                    'redirectionUrl' => $redirectionUrl
-                                ]
-                            ]
-                        ]
-                    );
-                }
+                $this->emailService->subscribeUser($entity);
             }
 
             // Mail confirmation inscription
