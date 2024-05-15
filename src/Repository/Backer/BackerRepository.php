@@ -185,7 +185,6 @@ class BackerRepository extends ServiceEntityRepository
         $qb = $this->getQueryBuilder($params);
 
         $qb->select('IFNULL(COUNT(DISTINCT(b.id)), 0) AS nb');
-
         return $qb->getQuery()->getResult()[0]['nb'] ?? 0;
     }
 
@@ -203,8 +202,6 @@ class BackerRepository extends ServiceEntityRepository
         ->andWhere('(aid.dateStart <= :today OR aid.dateStart IS NULL)')
         ->andWhere('(aid.dateSubmissionDeadline > :today OR aid.dateSubmissionDeadline IS NULL)')
         ->setParameter('today', new \DateTime(date('Y-m-d')))
-        /*->andWhere('aidTypeGroup.slug IN (:slugsFinancial)')
-        ->setParameter('slugsFinancial', AidType::TYPE_FINANCIAL_SLUGS)*/
         ->andWhere('b = :backer')
         ->setParameter('backer', $params['backer'])
         ;
@@ -276,23 +273,20 @@ class BackerRepository extends ServiceEntityRepository
         $hasFinancedAids = $params['hasFinancedAids'] ?? null;
         $hasPublishedFinancedAids = $params['hasPublishedFinancedAids'] ?? null;
         $active = isset($params['active']) ? $params['active'] : null;
-
+        $nbAidsLiveMin = $params['nbAidsLiveMin'] ?? null;
+        $orderBy = (isset($params['orderBy']) && isset($params['orderBy']['sort']) && isset($params['orderBy']['order'])) ? $params['orderBy'] : null;
+        
         $qb = $this->createQueryBuilder('b');
 
         if ($active === true) {
             $qb
-                ->addCriteria(BackerRepository::activeCriteria());
+                ->addCriteria(BackerRepository::activeCriteria())
             ;
-        } else if ($active === false) {
+        } elseif ($active === false) {
             $qb
-                ->addCriteria(BackerRepository::unactiveCriteria());
+                ->addCriteria(BackerRepository::unactiveCriteria())
             ;
         }
-
-
-        $nbAidsLiveMin = $params['nbAidsLiveMin'] ?? null;
-        $orderBy = (isset($params['orderBy']) && isset($params['orderBy']['sort']) && isset($params['orderBy']['order'])) ? $params['orderBy'] : null;
-        $qb = $this->createQueryBuilder('b');
 
         if ($nbAidsLiveMin !== null) {
             $qb
