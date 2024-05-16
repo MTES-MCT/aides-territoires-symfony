@@ -84,6 +84,7 @@ class AlertSendDailyCommand extends Command
         $alerts = $alertRepo->findToSendDaily();
 
         // pour le retour
+        $nbAlertTotal = count($alerts);
         $nbAlertSend = 0;
 
         // prépare les deux dates de publication à checker
@@ -159,7 +160,7 @@ class AlertSendDailyCommand extends Command
 
         // success
         $io->success('Temps écoulé : '.gmdate("H:i:s", $timeEnd).' ('.gmdate("H:i:s", intval($time)).')');
-        $io->success($nbAlertSend. ' alertes envoyées');
+        $io->success($nbAlertSend.'/'.$nbAlertTotal. ' alertes envoyées');
         $io->success('Mémoire maximale utilisée : ' . round(memory_get_peak_usage() / 1024 / 1024) . ' MB');
     }
 }

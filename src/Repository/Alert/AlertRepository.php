@@ -57,8 +57,13 @@ class AlertRepository extends ServiceEntityRepository
 
     public function findToSendWeekly(array $params = null) : array {
         $today = new \DateTime(date('Y-m-d'));
-
-        $params['dateLatestAlertMax'] = $today;
+        $weekNumber = $today->format('W');
+        $year = $today->format('o');
+        
+        $startOfWeek = new \DateTime();
+        $startOfWeek->setISODate($year, $weekNumber, 1);
+        
+        $params['dateLatestAlertMax'] = $startOfWeek;
         $params['hasQueryString'] = true;
         $params['alertFrequency'] = Alert::FREQUENCY_WEEKLY_SLUG;
         

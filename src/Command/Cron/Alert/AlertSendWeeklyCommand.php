@@ -83,10 +83,19 @@ class AlertSendWeeklyCommand extends Command
         $alerts = $alertRepo->findToSendWeekly();
 
         // pour le retour
+        $nbAlertTotal = count($alerts);
         $nbAlertSend = 0;
 
-        // prépare les deux dates de publication à checker
-        $publishedAfter = new \DateTime(date('Y-m-d', strtotime('-7 day')));
+        // prépare la date de publication à checker
+        $today = new \DateTime(date('Y-m-d'));
+        $weekNumber = $today->format('W');
+        $year = $today->format('o');
+        
+        $startOfWeek = new \DateTime();
+        $startOfWeek->setISODate($year, $weekNumber, 1);
+
+        $publishedAfter = clone $startOfWeek;
+        $publishedAfter->modify('-7 days');
 
         // pour chaque alerte on regarde si de nouvelles aide (datePublished = hier) correspondent
         /**@var Alert $alert */
@@ -112,7 +121,7 @@ class AlertSendWeeklyCommand extends Command
                 unset($alerts[$key]);
                 continue;
             }
-            
+
             // il y a de nouvelles aides
             if ($alert->getTitle() === $this->paramService->get('addna_alert_title')) {
                 $emailSubjectPrefix = $this->paramService->get('addna_alert_email_subject_prefix');
@@ -153,7 +162,7 @@ class AlertSendWeeklyCommand extends Command
         $this->notificationService->addNotification($admin, 'Envoi des alertes hebdomadaires', $nbAlertSend. ' alertes envoyées pour les aides publiées après le ' . $publishedAfter->format('d/m/Y') . ' inclus');
         
         // success
-        $io->success($nbAlertSend. ' alertes envoyées');
+        $io->success($nbAlertSend.'/'.$nbAlertTotal. ' alertes envoyées');
         $io->success('Mémoire maximale utilisée : ' . round(memory_get_peak_usage() / 1024 / 1024) . ' MB');
     }
 }
