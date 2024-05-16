@@ -80,7 +80,7 @@ class AlertRelaunchWeeklyCommand extends Command
         $alertRepo = $this->managerRegistry->getRepository(Alert::class);
         
         // charge les alertes
-        $alerts = $alertRepo->findToSendWeekly(['email' => 'barret.remi.pro@gmail.com']);
+        $alerts = $alertRepo->findToSendWeekly();
 
         // pour le retour
         $nbAlertTotal = count($alerts);
@@ -132,6 +132,13 @@ class AlertRelaunchWeeklyCommand extends Command
             $today = new \DateTime(date('Y-m-d H:i:s'));
             $emailSubject = $emailSubjectPrefix . ' '. $today->format('d/m/Y') . ' — De nouvelles aides correspondent à vos recherches';
             $subject = count($aids).' résultat'.(count($aids) > 1 ? 's' : '').' pour votre alerte';
+                        
+            // Force le tri par date de publication DESC
+            parse_str($alert->getQuerystring(), $params);
+            $params['orderBy'] = 'publication_date';
+            $querystringOrdered = http_build_query($params);
+
+            // email
             $this->emailService->sendEmail(
                 $alert->getEmail(),
                 $emailSubject,
@@ -140,7 +147,8 @@ class AlertRelaunchWeeklyCommand extends Command
                     'subject' => $subject,
                     'alert' => $alert,
                     'aids' => $aids,
-                    'aidsDisplay' => array_slice($aids, 0, 3)
+                    'aidsDisplay' => array_slice($aids, 0, 3),
+                    'querystringOrdered' => $querystringOrdered
                 ]
             );
 
