@@ -19,23 +19,29 @@ class KeywordReferenceService
             return '';
         }
 
-        $keywordReference = $this->keywordReferenceRepository->findOneBy(['name' => $keyword]);
-
-        if (!$keywordReference instanceof KeywordReference) {
+        // on recupère tous les mots clés correspondants
+        $keywordReferences = $this->keywordReferenceRepository->findBy(['name' => $keyword]);
+        // ça ne correspons à aucun mot clé
+        if (empty($keywordReferences)) {
             return $keyword;
         }
 
-        if (!$keywordReference->getParent()) {
-            return $keywordReference->getName();
-        }
+        $return = [];
+        foreach ($keywordReferences as $keywordReference) {
+            if (!$keywordReference->getParent()) {
+                $return[] = $keywordReference->getName();
+                continue;
+            }
 
-        $return = $keywordReference->getParent()->getName();
-        foreach ($keywordReference->getParent()->getKeywordReferences() as $synonym) {
-            if ($synonym->getName() !== $keywordReference->getParent()->getName()) {
-                $return .= ', ' . $synonym->getName();
+            $return[] = $keywordReference->getParent()->getName();
+            foreach ($keywordReference->getParent()->getKeywordReferences() as $synonym) {
+                if ($synonym->getName() !== $keywordReference->getParent()->getName()) {
+                    $return[] = $synonym->getName();
+                }
             }
         }
 
-        return $return;
+        $return = array_unique($return);
+        return join(', ', $return);
     }
 }
