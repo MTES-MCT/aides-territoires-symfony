@@ -110,7 +110,8 @@ class AlertSendDailyCommand extends Command
             // recupere les nouvelles aides qui correspondent à l'alerte
             $aids = $this->aidService->searchAids($aidParams);
             if (empty($aids)) {
-                $io->success('envoi PAS '.$alert->getTitle());
+                // libère mémoire
+                unset($alerts[$key]);
                 continue;
             }
 
@@ -134,7 +135,7 @@ class AlertSendDailyCommand extends Command
                     'aidsDisplay' => array_slice($aids, 0, 3)
                 ]
             );
-            $io->success('envoi '.$alert->getTitle());
+
             $alert->setTimeLatestAlert($today);
             $alert->setDateLatestAlert($today);
             $this->managerRegistry->getManager()->persist($alert);
