@@ -80,7 +80,7 @@ class AlertRelaunchWeeklyCommand extends Command
         $alertRepo = $this->managerRegistry->getRepository(Alert::class);
         
         // charge les alertes
-        $alerts = $alertRepo->findToSendWeekly(['email' => 'barret.remi.pro@gmail.com']);
+        $alerts = $alertRepo->findToSendWeekly();
 
         // pour le retour
         $nbAlertTotal = count($alerts);
