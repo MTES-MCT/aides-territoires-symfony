@@ -19,6 +19,7 @@ use App\Entity\Perimeter\Perimeter;
 use App\Entity\Program\Program;
 use App\Entity\Project\ProjectValidated;
 use App\Entity\Reference\KeywordReference;
+use App\Entity\Reference\KeywordReferenceSuggested;
 use App\Entity\Reference\ProjectReference;
 use App\Entity\Search\SearchPage;
 use App\Entity\User\User;
@@ -632,6 +633,9 @@ class Aid // NOSONAR too much methods
     #[ORM\OneToMany(mappedBy: 'aid', targetEntity: AidLock::class, orphanRemoval: true)]
     private Collection $aidLocks;
 
+    #[ORM\OneToMany(mappedBy: 'aid', targetEntity: KeywordReferenceSuggested::class, orphanRemoval: true)]
+    private Collection $keywordReferenceSuggesteds;
+
     /**
      * <Non Database Fields
      */
@@ -666,6 +670,7 @@ class Aid // NOSONAR too much methods
         $this->keywordReferences = new ArrayCollection();
         $this->projectReferences = new ArrayCollection();
         $this->aidLocks = new ArrayCollection();
+        $this->keywordReferenceSuggesteds = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -2466,6 +2471,36 @@ class Aid // NOSONAR too much methods
             // set the owning side to null (unless already changed)
             if ($aidLock->getAid() === $this) {
                 $aidLock->setAid(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, KeywordReferenceSuggested>
+     */
+    public function getKeywordReferenceSuggesteds(): Collection
+    {
+        return $this->keywordReferenceSuggesteds;
+    }
+
+    public function addKeywordReferenceSuggested(KeywordReferenceSuggested $keywordReferenceSuggested): static
+    {
+        if (!$this->keywordReferenceSuggesteds->contains($keywordReferenceSuggested)) {
+            $this->keywordReferenceSuggesteds->add($keywordReferenceSuggested);
+            $keywordReferenceSuggested->setAid($this);
+        }
+
+        return $this;
+    }
+
+    public function removeKeywordReferenceSuggested(KeywordReferenceSuggested $keywordReferenceSuggested): static
+    {
+        if ($this->keywordReferenceSuggesteds->removeElement($keywordReferenceSuggested)) {
+            // set the owning side to null (unless already changed)
+            if ($keywordReferenceSuggested->getAid() === $this) {
+                $keywordReferenceSuggested->setAid(null);
             }
         }
 

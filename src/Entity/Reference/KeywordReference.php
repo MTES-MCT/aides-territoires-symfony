@@ -38,12 +38,16 @@ class KeywordReference
     #[ORM\ManyToMany(targetEntity: Aid::class, mappedBy: 'keywordReferences')]
     private Collection $aids;
 
+    #[ORM\OneToMany(mappedBy: 'keywordReference', targetEntity: KeywordReferenceSuggested::class, orphanRemoval: true)]
+    private Collection $keywordReferenceSuggesteds;
+
 
     public function __construct()
     {
         $this->keywordReferences = new ArrayCollection();
         $this->blogPromotionPosts = new ArrayCollection();
         $this->aids = new ArrayCollection();
+        $this->keywordReferenceSuggesteds = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -168,6 +172,36 @@ class KeywordReference
     {
         if ($this->aids->removeElement($aid)) {
             $aid->removeKeywordReference($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, KeywordReferenceSuggested>
+     */
+    public function getKeywordReferenceSuggesteds(): Collection
+    {
+        return $this->keywordReferenceSuggesteds;
+    }
+
+    public function addKeywordReferenceSuggested(KeywordReferenceSuggested $keywordReferenceSuggested): static
+    {
+        if (!$this->keywordReferenceSuggesteds->contains($keywordReferenceSuggested)) {
+            $this->keywordReferenceSuggesteds->add($keywordReferenceSuggested);
+            $keywordReferenceSuggested->setKeywordReference($this);
+        }
+
+        return $this;
+    }
+
+    public function removeKeywordReferenceSuggested(KeywordReferenceSuggested $keywordReferenceSuggested): static
+    {
+        if ($this->keywordReferenceSuggesteds->removeElement($keywordReferenceSuggested)) {
+            // set the owning side to null (unless already changed)
+            if ($keywordReferenceSuggested->getKeywordReference() === $this) {
+                $keywordReferenceSuggested->setKeywordReference(null);
+            }
         }
 
         return $this;

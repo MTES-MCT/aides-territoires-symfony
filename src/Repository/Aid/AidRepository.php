@@ -419,6 +419,7 @@ class AidRepository extends ServiceEntityRepository
         $projectReference = $params['projectReference'] ?? null;
         $dateCheckBrokenLinkMax = $params['dateCheckBrokenLinkMax'] ?? null;
         $nameLike = $params['nameLike'] ?? null;
+        $hasNoKeywordReference = $params['hasNoKeywordReference'] ?? null;
 
         $qb = $this->createQueryBuilder('a');
 
@@ -1082,12 +1083,19 @@ class AidRepository extends ServiceEntityRepository
                     ;
                     break;
 
-                case 'live': 
+                case 'live':
                     $qb
                         ->addCriteria(self::liveCriteria('a.'))
                     ;
                     break;
             }
+        }
+
+        if ($hasNoKeywordReference) {
+            $qb
+                ->leftJoin('a.keywordReferences', 'keywordReferencesNotSet')
+                ->andWhere('keywordReferencesNotSet.id IS NULL')
+                ;
         }
 
         if ($status !== null)
