@@ -1,31 +1,30 @@
 <?php
 
-namespace App\Form\Admin\Filter\Aid;
+namespace App\Form\Admin\Filter\Reference;
 
-use App\Entity\Perimeter\Perimeter;
-use App\Form\Type\PerimeterAutocompleteType;
-use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+use App\Entity\Aid\Aid;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\UX\Autocomplete\Form\AsEntityAutocompleteField;
 use Symfony\UX\Autocomplete\Form\BaseEntityAutocompleteType;
 
-#[AsEntityAutocompleteField]
-class AidPerimeterFilterType extends AbstractType
+#[AsEntityAutocompleteField()]
+class KeywordReferenceSuggestedAidFilterType extends AbstractType
 {
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'class' => Perimeter::class,
+            'class' => Aid::class,
             'autocomplete' => true,
+            'preload' => false,
             'attr' => [
-                'placeholder' => 'Choix périmètre'
+                'placeholder' => 'Choix aide'
             ]
         ]);
     }
 
-    public function getParent(): ?string
+    public function getParent(): string
     {
-        return PerimeterAutocompleteType::class;
+        return BaseEntityAutocompleteType::class;
     }
 }

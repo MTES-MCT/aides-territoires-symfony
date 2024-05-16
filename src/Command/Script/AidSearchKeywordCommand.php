@@ -3,8 +3,6 @@
 namespace App\Command\Script;
 
 use App\Entity\Aid\Aid;
-use App\Entity\Keyword\KeywordSynonymlist;
-use App\Entity\Reference\KeywordReference;
 use App\Message\Aid\AidExtractKeyword;
 use App\Repository\Aid\AidRepository;
 use App\Service\Reference\ReferenceService;
@@ -60,6 +58,8 @@ class AidSearchKeywordCommand extends Command
 
     protected function sendToQueue($input, $output): void
     {
+        $timeStart = microtime(true);
+
         $io = new SymfonyStyle($input, $output);
 
         /** @var AidRepository $aidRepository */
@@ -71,7 +71,7 @@ class AidSearchKeywordCommand extends Command
                 'hasNoKeywordReference' => true,
             ]
         );
-
+        $nbAids = count($aids);
         
         $batchSize = 100;
         $aidsChunks = array_chunk($aids, $batchSize);
@@ -84,6 +84,11 @@ class AidSearchKeywordCommand extends Command
             $this->managerRegistry->getManager()->clear();
         }
 
-        $io->success(count($aids). ' aides envoyées pour analyses');
+        $timeEnd = microtime(true);
+        $time = $timeEnd - $timeStart;
+
+        $io->success($nbAids. ' aides envoyées pour analyses');
+        $io->success('Fin : '.gmdate("H:i:s", $timeEnd).' ('.gmdate("H:i:s", intval($time)).')');
+        $io->success('Mémoire maximale utilisée : ' . intval(round(memory_get_peak_usage() / 1024 / 1024)) . ' MB');
     }
 }
