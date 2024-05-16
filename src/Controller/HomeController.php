@@ -6,6 +6,7 @@ use App\Entity\Perimeter\Perimeter;
 use App\Form\Aid\AidSearchTypeV2;
 use App\Form\Program\CountySelectType;
 use App\Form\Reference\ProjectReferenceSearchType;
+use App\Message\SendNotification;
 use App\Repository\Aid\AidRepository;
 use App\Repository\Backer\BackerRepository;
 use App\Repository\Blog\BlogPostRepository;
@@ -16,6 +17,7 @@ use App\Service\Aid\AidSearchFormService;
 use App\Service\Various\StringService;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Routing\Annotation\Route;
 
 class HomeController extends FrontController
@@ -30,9 +32,13 @@ class HomeController extends FrontController
         AidRepository $aidRepository,
         ProjectRepository $projectRepository,
         StringService $stringService,
-        AidSearchFormService $aidSearchFormService
+        AidSearchFormService $aidSearchFormService,
+        MessageBusInterface $bus
     ): Response
     {
+        // will cause the SmsNotificationHandler to be called
+        $bus->dispatch(new SendNotification('Titre test', 'Look! I created a message!'));
+        
         $formAidSearch = $this->createForm(
             AidSearchTypeV2::class,
             $aidSearchFormService->getAidSearchClass(),
