@@ -44,38 +44,32 @@ class ReferenceService
         $projet_keywords_combinaisons=$this->genererCombinaisons($project_name, $this->articles);
         // Tri du tableau pour d'abord chercher des expressions complètes "terrain de football" aura la priorité sur "terrain"
         usort($projet_keywords_combinaisons, array($this,"compareLength"));
-      
-        // Affichage du tableau trié
-        $intentions=array();
-        $objects=array();
 
-        $synonym_found=array();
+        // Affichage du tableau trié
+        $intentions = [];
+        $objects = [];
+
         foreach ($projet_keywords_combinaisons as $synonym) {
-          $result = $this->keywordReferenceRepository->getAllSynonyms($synonym);
-          
-          $isContain = array_filter($synonym_found, function($value) use ($synonym) {
-            return strpos($value, $synonym) !== false;
-          });
-          if (count($result)) {
-            if (empty($isContain)) {
-              $synonym_found[]=$synonym;
-            } else {
-              continue;
+          $results = $this->keywordReferenceRepository->getAllSynonyms($synonym);
+          foreach ($results as $result) {
+            if ((int) $result['intention'] === 1) {
+              $intentions[] = $result['name'];
+            } elseif ((int) $result['intention'] === 0) {
+              $objects[] = $result['name'];
             }
-          } else {
-            continue;
-          }
-      
-          if ($result[0]["intention"]==1){
-              $intentions = array_unique(array_merge($intentions,  array_column($result, 'name')));
-          }
-          if ($result[0]["intention"]==0){
-              $objects = array_unique(array_merge($objects,  array_column($result, 'name')));
           }
         }
+
+        // rends les tableaux unique
+        $intentions = array_unique($intentions);
+        $objects = array_unique($objects);
+
+        // transforme les tableau en string
         $intentions_string = $this->arrayToStringWithQuotes($intentions);
         $objects_string = $this->arrayToStringWithQuotes($objects);
         $simple_words_string = $this->enleverArticles($project_name, $this->articles);
+
+        // retour
         return [
           'intentions_string' => $intentions_string,
           'objects_string' => $objects_string,
