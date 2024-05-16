@@ -408,6 +408,7 @@ class AidRepository extends ServiceEntityRepository
         $slug = $params['slug'] ?? null;
         $textSearch = $params['textSearch'] ?? null;
         $publishedAfter = $params['publishedAfter'] ?? null;
+        $publishedBefore = $params['publishedBefore'] ?? null;
         $aidRecurrence = $params['aidRecurrence'] ?? null;
         $inAdmin = $params['inAdmin'] ?? null;
         $hasBrokenLink= $params['hasBrokenLink'] ?? null;
@@ -640,8 +641,15 @@ class AidRepository extends ServiceEntityRepository
             ;
         }
 
+        if ($publishedBefore instanceof \DateTime) {
+            $qb
+                ->andWhere('a.datePublished <= :publishedBefore')
+                ->setParameter('publishedBefore', $publishedBefore)
+            ;
+        }
+
         if ($textSearch !== null) {
-            $texts = explode(',', $textSearch); 
+            $texts = explode(',', $textSearch);
             $i=1;
             foreach ($texts as $text) {
                 $qb->leftJoin('a.keywords', 'keywordsForTextSearch');
@@ -653,7 +661,7 @@ class AidRepository extends ServiceEntityRepository
                     OR keywordsForTextSearch.name LIKE :text$i
                     OR categoriesForTextSearch.name LIKE :text$i
                 ")
-                ->setParameter("text$i", '%'.$text.'%');
+                ->setParameter("text$i", '%'.$text.'%')
                 ;
                 $i++;
             }
