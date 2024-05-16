@@ -7,8 +7,7 @@
       "command": "30 1 * * * php bin/console at:cron:backer:count_aids"
     },
     {
-      "command": "30 04 * * * php bin/console at:cron:alert:send_daily",
-      "size": "2XL"
+      "command": "30 04 * * * php bin/console at:cron:alert:send_daily"
     },
     {
       "command": "30 5 * * 1 php bin/console at:cron:alert:send_weekly",
