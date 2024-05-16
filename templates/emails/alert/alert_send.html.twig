@@ -21,7 +21,7 @@
 {% if aids|length > 3 %}
     <p>
         Attention, il semble qu’il y ait encore d’autres aides disponibles ! <br />
-        <a href="{{ absolute_url(url('app_aid_aid')) }}?{{ alert.querystring }}">
+        <a href="{{ absolute_url(url('app_aid_aid')) }}?{% if querystringOrdered is defined %}{{ querystringOrdered }}{% else %}{{ alert.querystring }}{% endif %}">
             Rendez-vous sur Aides-territoires pour les découvrir.
         </a>
     </p>
