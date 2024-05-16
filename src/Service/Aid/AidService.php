@@ -669,7 +669,7 @@ class AidService // NOSONAR too complex
             if ($keyword instanceof KeywordReference && $keyword->getParent() && !$keywords->contains($keyword->getParent())) {
                 $keywords->add($keyword->getParent());
                 $keywordsReturn[] = [
-                    'keyword' => $keyword,
+                    'keyword' => $keyword->getParent(),
                     'freq' => $freq
                 ];
             }
