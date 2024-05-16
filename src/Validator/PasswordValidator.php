@@ -2,7 +2,7 @@
 
 namespace App\Validator;
 
-use App\Src\Exception\CustomValidatorException;
+use App\Exception\CustomValidatorException;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Contracts\Translation\TranslatorInterface;
