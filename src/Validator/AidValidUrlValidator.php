@@ -4,7 +4,7 @@ namespace App\Validator;
 
 use App\Entity\Aid\Aid;
 use App\Repository\Aid\AidRepository;
-use App\Src\Exception\CustomValidatorException;
+use App\Exception\CustomValidatorException;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Validator\Constraint;
