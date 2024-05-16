@@ -46,6 +46,7 @@ class AlertRepository extends ServiceEntityRepository
 
     public function findToSendDaily(array $params = null) : array {
         $today = new \DateTime(date('Y-m-d'));
+        $today->setTime(0, 0, 0);
 
         $params['dateLatestAlertMax'] = $today;
         $params['hasQueryString'] = true;
@@ -62,7 +63,8 @@ class AlertRepository extends ServiceEntityRepository
         
         $startOfWeek = new \DateTime();
         $startOfWeek->setISODate($year, $weekNumber, 1);
-        
+        $startOfWeek->setTime(0, 0, 0);
+
         $params['dateLatestAlertMax'] = $startOfWeek;
         $params['hasQueryString'] = true;
         $params['alertFrequency'] = Alert::FREQUENCY_WEEKLY_SLUG;
@@ -82,7 +84,6 @@ class AlertRepository extends ServiceEntityRepository
         $dateLatestAlertMin = $params['dateLatestAlertMin'] ?? null;
         $dateLatestAlertMax = $params['dateLatestAlertMax'] ?? null;
         $alertFrequency = $params['alertFrequency'] ?? null;
-
         $email = $params['email'] ?? null;
 
         $qb = $this->createQueryBuilder('a');
