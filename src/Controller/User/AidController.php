@@ -87,11 +87,28 @@ class AidController extends FrontController
             }
         }
 
+        // regarde si des fiches porteurs ne sont pas complètes
+        $organizationBackersNotComplete = [];
+        foreach ($user->getOrganizations() as $organization) {
+            dump('orga : '.$organization->getName());
+            dump('backer : '.$organization->getBacker()->getName());
+            if ($organization->getBacker()
+                && (
+                    !$organization->getBacker()->getName()
+                    || $organization->getBacker()->isIsCorporate() === null
+                    || !$organization->getBacker()->getDescription()
+                )
+            ) {
+                $organizationBackersNotComplete[] = $organization;
+            }
+        }
+
         // rendu template
         return $this->render('user/aid/publish.html.twig', [
             'no_breadcrumb' => true,
             'formAid' => $formAid->createView(),
-            'aid' => $aid
+            'aid' => $aid,
+            'organizationBackersNotComplete' => $organizationBackersNotComplete
         ]);
     }
 

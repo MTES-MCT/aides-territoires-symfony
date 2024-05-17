@@ -25,6 +25,25 @@
     <section id="aid-edit" class="fr-container">
         {% include 'user/aid/_aid_edit_stepper.html.twig' %}
 
+        {% if organizationBackersNotComplete|length > 0 %}
+        <div class="fr-alert fr-alert--info">
+            {% if organizationBackersNotComplete|length > 1 %}
+                <p>Les structures suivantes n'ont pas leur fiche porteur d'aide renseigné correctement :</p>
+            {% else %}
+                <p>Votre fiche porteur d'aide n'est pas renseigné correctement :</p>
+            {% endif %}
+
+            <ul>
+                {% for organizationBackerNotComplete in organizationBackersNotComplete %}
+                <li>
+                    <a href="{{ path('app_organization_backer_edit', {'id': organizationBackerNotComplete.id, 'idBacker': organizationBackerNotComplete.backer.id})}}" title="Compléter votre fiche porteur d'aide">{{ organizationBackerNotComplete.backer.name }}</a>
+                </li>
+                {% endfor %}
+            </ul>
+
+        </div>
+        {% endif %}
+
         {{ form_start(formAid, {'attr': {'class': 'form-aid'}} )}}
             {% block form_header %}{% endblock form_header %}
 

@@ -426,6 +426,30 @@ class AidCrudController extends AtCrudController
         ->setColumns(12);
         
         //-------------------------------------------------------
+        yield FormField::addTab('Auteur');
+
+        yield AssociationField::new('organization', 'Structure')
+        ->autocomplete()
+        ;
+        
+        yield AssociationField::new('author', 'Auteur')
+        ->autocomplete()
+        ->hideOnIndex();
+        $nbAidsLive = 0;
+        if ($entity && $entity->getAuthor()) {
+            $nbAidsLive = $entity->getAuthor()->getNbAidsLive();
+        }
+        yield IntegerField::new('nbAidsLive', 'Du même auteur')
+        ->setHelp('Nb. d\'aides live créées par le même utilisateur')
+        ->setFormTypeOptions([
+            'data' => $nbAidsLive,
+            'attr' => ['readonly' => true],
+            'mapped' => false
+        ])
+        ->setColumns(12)
+        ->hideOnIndex();
+
+        //-------------------------------------------------------
         yield FormField::addTab('Calendrier');
 
         yield FormField::addFieldset('Calendrier de l’aide');
@@ -516,23 +540,6 @@ class AidCrudController extends AtCrudController
         ->setFormTypeOption('attr', ['placeholder' => 'Ex: Appel à projet innovation continue'])
         ->hideOnIndex()
         ->setColumns(12);
-
-        yield AssociationField::new('author', 'Auteur')
-        ->autocomplete()
-        ->hideOnIndex();
-        $nbAidsLive = 0;
-        if ($entity && $entity->getAuthor()) {
-            $nbAidsLive = $entity->getAuthor()->getNbAidsLive();
-        }
-        yield IntegerField::new('nbAidsLive', 'Du même auteur')
-        ->setHelp('Nb. d\'aides live créées par le même utilisateur')
-        ->setFormTypeOptions([
-            'data' => $nbAidsLive,
-            'attr' => ['readonly' => true],
-            'mapped' => false
-        ])
-        ->setColumns(12)
-        ->hideOnIndex();
 
         yield BooleanField::new('isCharged', 'Aide Payante')
         ->setHelp('Ne pas cocher pour les aides sous adhésion et ajouter la mention « *sous adhésion » dans les critères d’éligibilité.')
