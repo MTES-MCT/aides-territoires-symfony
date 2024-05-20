@@ -87,8 +87,7 @@ class HomeController extends FrontController
                 'backers_count' => $county->getBackersCount()
             ];
         }
-        
-        
+    
         // nb aides
         $nbAids = $aidRepository->countLives();
 

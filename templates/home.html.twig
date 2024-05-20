@@ -7,11 +7,6 @@
 
 {% block javascripts %}
 	{{ parent() }}
-	{% cspscript %}
-	<script type="text/javascript">
-	let departments_data = {{ departmentsData|json_encode|raw }};
-	</script>
-	{% endcspscript %}
 	{{ encore_entry_script_tags('front/home') }}
 {% endblock %}
 
@@ -375,4 +370,13 @@
 		{% endif %}
 		
 	</main>
+{% endblock %}
+
+{% block javascriptsBottom %}
+	{{ parent() }}
+	{% cspscript %}
+	<script>
+	let departments_data = {{ departmentsData|json_encode|raw }};
+	</script>
+	{% endcspscript %}
 {% endblock %}

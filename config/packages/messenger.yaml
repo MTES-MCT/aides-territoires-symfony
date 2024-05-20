@@ -23,3 +23,4 @@ framework:
             # Route your messages to the transports
             'App\Message\SendNotification': async
             'App\Message\Aid\AidExtractKeyword': async
+            'App\Message\Alert\AlertMessage': async
