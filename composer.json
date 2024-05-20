@@ -24,10 +24,10 @@
         "getbrevo/brevo-php": "1.x.x",
         "gregwar/captcha-bundle": "^2.2",
         "knplabs/knp-gaufrette-bundle": "^0.9.0",
-        "league/flysystem-aws-s3-v3": "*",
+        "league/flysystem-aws-s3-v3": "^3.23",
         "league/flysystem-bundle": "*",
         "lexik/jwt-authentication-bundle": "^2.19",
-        "liip/imagine-bundle": "^2.12",
+        "liip/imagine-bundle": "^2.11",
         "nelmio/cors-bundle": "^2.3",
         "nelmio/security-bundle": "^3.0",
         "openspout/openspout": "*",
@@ -83,8 +83,7 @@
         "twig/intl-extra": "^3.7",
         "twig/string-extra": "^3.7",
         "twig/twig": "^2.12|^3.0",
-        "vich/uploader-bundle": "^2.2",
-        "yooper/php-text-analysis": "^1.9"
+        "vich/uploader-bundle": "^2.2"
     },
     "config": {
         "allow-plugins": {
