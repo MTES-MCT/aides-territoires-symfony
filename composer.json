@@ -29,7 +29,7 @@
         "lexik/jwt-authentication-bundle": "^2.19",
         "liip/imagine-bundle": "^2.12",
         "nelmio/cors-bundle": "^2.3",
-        "nelmio/security-bundle": "^3.0",
+        "nelmio/security-bundle": "3.1.0",
         "openspout/openspout": "*",
         "pagerfanta/pagerfanta": "^4.2",
         "pagerfanta/twig": "*",
@@ -82,7 +82,7 @@
         "twig/extra-bundle": "^2.12|^3.0",
         "twig/intl-extra": "^3.7",
         "twig/string-extra": "^3.7",
-        "twig/twig": "^2.12|^3.0",
+        "twig/twig": "3.8.0",
         "vich/uploader-bundle": "^2.2",
         "yooper/php-text-analysis": "^1.9"
     },
