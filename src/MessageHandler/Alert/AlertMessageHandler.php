@@ -31,6 +31,7 @@ class AlertMessageHandler
         /** @var AlertRepository $alertRepository */
         $alertRepository = $this->managerRegistry->getRepository(Alert::class);
 
+        // charge alerte
         $alert = $alertRepository->find($message->getIdAlert());
         if ($alert instanceof Alert) {
             // donne le contexte au router pour generer l'url beta ou prod
