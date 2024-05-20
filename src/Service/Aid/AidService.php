@@ -9,6 +9,7 @@ use App\Entity\Aid\AidLock;
 use App\Entity\Organization\Organization;
 use App\Entity\Organization\OrganizationType;
 use App\Entity\Perimeter\Perimeter;
+use App\Entity\Reference\KeywordReference;
 use App\Entity\Search\SearchPage;
 use App\Entity\User\User;
 use App\Repository\Aid\AidRepository;
@@ -621,5 +622,59 @@ class AidService // NOSONAR too complex
             $this->managerRegistry->getManager()->remove($aidLock);
         }
         $this->managerRegistry->getManager()->flush();
+    }
+
+    public function extractKeywords(Aid $aid): array
+    {
+        // concatene les textes bruts
+        $text = $aid->getName(). ' '
+                . strip_tags($aid->getDescription()). ' '
+                . strip_tags($aid->getEligibility()). ' '
+                . strip_tags($aid->getContact())
+                ;
+        
+        $commonWords = [
+            'pour', 'des', 'ces', 'que', 'qui', 'nous', 'vous', 'mais', 'avec', 'cette', 'dans', 'sur', 'fait', 'elle', 'tout', 'son', 'sont', 'aux', 'par', 'comme', 'peut', 'plus', 'sans', 'ses', 'donc', 'quand', 'depuis', 'leur', 'sous', 'tous', 'très', 'fait', 'était', 'aussi', 'cela', 'entre', 'avant', 'après', 'tous', 'autre', 'trop', 'encore', 'alors', 'ainsi', 'chez', 'leurs', 'dont', 'cette', 'faire', 'part', 'quel', 'elle', 'même', 'moins', 'peu', 'car', 'aucun', 'chaque', 'toute', 'fois', 'quelque', 'manière', 'chose', 'autres', 'beaucoup', 'toutes', 'ceux', 'celles', 'devant', 'depuis', 'derrière', 'dessous', 'dessus', 'contre', 'pendant', 'malgré', 'hors', 'parmi', 'sans', 'sauf', 'selon', 'sous', 'vers'
+        ];
+        
+        // Retirer les caractères spéciaux sauf les caractères accentués
+        $text = preg_replace('/[^a-z0-9\sàâäéèêëïîôöùûüÿç]/ui', '', $text);
+        
+        // Retirer les mots de moins de 3 lettres
+        $text = preg_replace('/\b\w{1,2}\b/u', '', $text);
+        
+        // Retirer les mots communs
+        $commonWordsPattern = '/\b(' . implode('|', $commonWords) . ')\b/ui';
+        $text = preg_replace($commonWordsPattern, '', $text);
+
+        /** @var KeywordReferenceRepository $keywordReferenceRepository */
+        $keywordReferenceRepository = $this->managerRegistry->getRepository(KeywordReference::class);
+
+        // Tokenize la description
+        $tokens = tokenize($text);
+
+        // rempli un tableau avec les mots importants
+        $keywords = new ArrayCollection();
+        $keywordsReturn = [];
+        $freqDist = freq_dist($tokens);
+        foreach ($freqDist->getKeyValuesByFrequency() as $item => $freq) {
+            if ($freq < 2) {
+                continue;
+            }
+
+            $keyword = $keywordReferenceRepository->findOneBy([
+                'name' => $item,
+                'intention' => false
+            ]);
+            if ($keyword instanceof KeywordReference && $keyword->getParent() && !$keywords->contains($keyword->getParent())) {
+                $keywords->add($keyword->getParent());
+                $keywordsReturn[] = [
+                    'keyword' => $keyword->getParent(),
+                    'freq' => $freq
+                ];
+            }
+        }
+
+        return $keywordsReturn;
     }
 }

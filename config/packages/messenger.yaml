@@ -4,8 +4,8 @@ framework:
 
         transports:
             # https://symfony.com/doc/current/messenger.html#transport-configuration
-            #async:
-            #    dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
+            async:
+                dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
             #    options:
             #        use_notify: true
             #        check_delayed_interval: 60000
@@ -21,4 +21,5 @@ framework:
             #Symfony\Component\Notifier\Message\SmsMessage: async
 
             # Route your messages to the transports
-            # 'App\Message\YourMessage': async
+            'App\Message\SendNotification': async
+            'App\Message\Aid\AidExtractKeyword': async

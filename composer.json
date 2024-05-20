@@ -53,6 +53,7 @@
         "symfony/http-client": "6.4.*",
         "symfony/intl": "6.4.*",
         "symfony/mailer": "6.4.*",
+        "symfony/messenger": "6.4.*",
         "symfony/mime": "6.4.*",
         "symfony/monolog-bundle": "^3.0",
         "symfony/notifier": "6.4.*",
@@ -82,7 +83,8 @@
         "twig/intl-extra": "^3.7",
         "twig/string-extra": "^3.7",
         "twig/twig": "^2.12|^3.0",
-        "vich/uploader-bundle": "^2.2"
+        "vich/uploader-bundle": "^2.2",
+        "yooper/php-text-analysis": "^1.9"
     },
     "config": {
         "allow-plugins": {
