@@ -269,6 +269,12 @@ class AidEditType extends AbstractType
             ->add('otherFinancialAidComment', TextType::class, [
                 'required' => false,
                 'label' => 'Autre aide financière (commentaire optionnel)',
+                'attr' => [
+                    'maxlength' => 255,
+                ],
+                'constraints' => [
+                    new Length(['max' => 255]),
+                ],
             ])
 
             ->add('isCharged', CheckboxType::class, [
