@@ -6,6 +6,7 @@ class AlertMessage
 {
     private $idAlert;
 
+    // id alert est une string
     public function __construct(string $idAlert)
     {
         $this->idAlert = $idAlert;
