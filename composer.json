@@ -83,7 +83,8 @@
         "twig/intl-extra": "^3.7",
         "twig/string-extra": "^3.7",
         "twig/twig": "^2.12|^3.0",
-        "vich/uploader-bundle": "^2.2"
+        "vich/uploader-bundle": "^2.2",
+        "yooper/php-text-analysis": "^1.9"
     },
     "config": {
         "allow-plugins": {
