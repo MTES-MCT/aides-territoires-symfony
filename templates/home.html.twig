@@ -374,9 +374,9 @@
 
 {% block javascriptsBottom %}
 	{{ parent() }}
-
+	{% cspscript %}
 	<script>
 	let departments_data = {{ departmentsData|json_encode|raw }};
 	</script>
-
+	{% endcspscript %}
 {% endblock %}
