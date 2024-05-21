@@ -5,6 +5,7 @@ namespace App\Command\Cron\Alert;
 use App\Entity\Alert\Alert;
 use App\Entity\User\User;
 use App\Message\Alert\AlertMessage;
+use App\Message\Alert\AlertResume;
 use App\Repository\Alert\AlertRepository;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -104,6 +105,9 @@ class AlertSendWeeklyCommand extends Command
         // notif admin
         $admin = $this->managerRegistry->getRepository(User::class)->findOneBy(['email' => $this->paramService->get('email_super_admin')]);
         $this->notificationService->addNotification($admin, 'Envoi des alertes hebdomadaires', $nbAlertTotal. ' alertes envoyées pour vérification des aides publiées après le ' . $publishedAfter->format('d/m/Y') . ' inclus');
+        
+        // on ajoute le resume à la file d'attente
+        $this->bus->dispatch(new AlertResume(Alert::FREQUENCY_WEEKLY_SLUG));
         
         // le temps passé
         $timeEnd = microtime(true);

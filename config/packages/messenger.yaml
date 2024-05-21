@@ -24,3 +24,4 @@ framework:
             'App\Message\SendNotification': async
             'App\Message\Aid\AidExtractKeyword': async
             'App\Message\Alert\AlertMessage': async
+            'App\Message\Alert\AlertResume': async

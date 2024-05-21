@@ -31,7 +31,6 @@ class AlertRepository extends ServiceEntityRepository
     }
 
     public function findToSend(array $params = null) : array {
-        $today = new \DateTime(date('Y-m-d'));
         $yesterday = new \DateTime(date('Y-m-d', strtotime('-1 day')));
         $lastWeek = new \DateTime(date('Y-m-d', strtotime('-7 day')));
 
@@ -83,6 +82,7 @@ class AlertRepository extends ServiceEntityRepository
         $hasQueryString = $params['hasQueryString'] ?? null;
         $dateLatestAlertMin = $params['dateLatestAlertMin'] ?? null;
         $dateLatestAlertMax = $params['dateLatestAlertMax'] ?? null;
+        $dateLatestAlert = $params['dateLatestAlert'] ?? null;
         $alertFrequency = $params['alertFrequency'] ?? null;
         $email = $params['email'] ?? null;
 
@@ -133,6 +133,13 @@ class AlertRepository extends ServiceEntityRepository
             $qb
             ->andWhere('a.dateLatestAlert < :dateLatestAlertMax OR a.dateLatestAlert IS NULL')
             ->setParameter('dateLatestAlertMax', $dateLatestAlertMax)
+            ;
+        }
+
+        if ($dateLatestAlert instanceof \DateTime) {
+            $qb
+            ->andWhere('a.dateLatestAlert = :dateLatestAlert')
+            ->setParameter('dateLatestAlert', $dateLatestAlert)
             ;
         }
 
