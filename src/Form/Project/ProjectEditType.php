@@ -43,6 +43,10 @@ class ProjectEditType extends AbstractType
                 new Assert\NotBlank([
                     'message' => 'Veuillez saisir un message.',
                 ]),
+                new Assert\Length([
+                    'max' => 255,
+                    'maxMessage' => 'Le nom du projet ne peut pas dépasser {{ limit }} caractères.',
+                ])
             ],
         ])
         ->add('organization', EntityType::class, [
