@@ -57,11 +57,11 @@ class AidEditType extends AbstractType
     {
         // regarde si l'utilisateur à rempli toutes ses fiches porteur d'aides
         $user = $this->userService->getUserLogged();
-        $needUpdateBacker = false;
+        $nbBackerNeedUpdate = 0;
         /** @var Organization $organization */
         foreach ($user->getOrganizations() as $organization) {
             if (!$organization->getBacker()) {
-                $needUpdateBacker = true;
+                $nbBackerNeedUpdate++;
             }
         }
 
@@ -123,28 +123,13 @@ class AidEditType extends AbstractType
             },
             'placeholder' => 'Choisissez une structure',
         ];
-        $organizationParams['choice_attr'] = function(Organization $organization) use ($aid) {
-            // bloquage pour les nouvelles aides
-            if (!$aid->getId()) {
-                if (!$organization->getBacker()) {
-                    return ['disabled' => true];
-                } else {
-                    return [];
-                }
-            } else {
-                // si aide existante, on empêche de changer d'organisation pour une non valide
-                if ($organization && $aid->getOrganization() && $organization->getId() === $aid->getOrganization()->getId()) {
-                    return [];
-                } elseif (!$organization->getBacker()) {
-                    return ['disabled' => true];
-                } else {
-                    return [];
-                }
-            }
-        };
 
-        if ($needUpdateBacker) {
-            $help = '<div class="fr-alert fr-alert--warning">Pour choisir une structure, vous devez avoir renseigner sa fiche Porteur d\'aides';
+        if ($nbBackerNeedUpdate > 0) {
+            $message = ($nbBackerNeedUpdate > 1)
+                        ? 'Les fiches porteurs des structures suivantes ne sont pas renseignées :'
+                        : 'La fiche porteur de la structure suivante n\'est pas renseignée :'
+                        ;
+            $help = '<div class="fr-alert fr-alert--warning">'.$message;
             foreach ($user->getOrganizations() as $organization) {
                 if (!$organization->getBacker()) {
                     $help .= '<br />- <a href="' . $this->routerInterface->generate('app_organization_backer_edit', ['id' => $organization->getId(), 'idBacker' => 0]) . '">' . $organization->getName() . '</a>';
@@ -199,7 +184,6 @@ class AidEditType extends AbstractType
                 'multiple' => true,
                 'query_builder' => function(BackerRepository $backerRepository) {
                     return $backerRepository->getQueryBuilder([
-                        'active' => true,
                         'orderBy' => [
                             'sort' => 'b.name',
                             'order' => 'ASC'
@@ -227,7 +211,6 @@ class AidEditType extends AbstractType
                 'multiple' => true,
                 'query_builder' => function(BackerRepository $backerRepository) {
                     return $backerRepository->getQueryBuilder([
-                        'active' => true,
                         'orderBy' => [
                             'sort' => 'b.name',
                             'order' => 'ASC'

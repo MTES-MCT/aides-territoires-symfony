@@ -51,6 +51,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class AidCrudController extends AtCrudController
 {
+    private $symbolWarning = '&#9888;';
     public static function getEntityFqcn(): string
     {
         return Aid::class;
@@ -190,7 +191,8 @@ class AidCrudController extends AtCrudController
     public function configureFields(string $pageName): iterable
     {
         $entity = $this->getContext()->getEntity()->getInstance() ?? null;
-
+        $badgeNoBackerAssociate = '<span class="badge badge-warning">(pas de porteur associé)</span>';
+        $badgeNoBackerValid = '<span class="badge badge-warning">(porteur associé non validé)</span>';
         //-------------------------------------------------------
         yield FormField::addTab('Informations générales');
 
@@ -202,7 +204,8 @@ class AidCrudController extends AtCrudController
         yield ChoiceField::new('status', 'Statut')
         ->setChoices($statusChoices)
         ->hideOnIndex()
-        ->setColumns(12);
+        ->setColumns(12)
+        ;
         yield TextField::new('status', 'Statut')
         ->onlyOnIndex()
         ->setColumns(12);
@@ -426,10 +429,34 @@ class AidCrudController extends AtCrudController
         ->setColumns(12);
         
         //-------------------------------------------------------
-        yield FormField::addTab('Auteur');
+        
+        $hasNoBacker = ($entity && $entity->getOrganization() && !$entity->getOrganization()->getBacker()) ? true : false;
+        $hasBackerNotValide = ($entity && $entity->getOrganization() && $entity->getOrganization()->getBacker() && !$entity->getOrganization()->getBacker()->isActive()) ? true : false;
+        $symbol = ($hasNoBacker || $hasBackerNotValide) ? ' '.$this->symbolWarning : '';
+        yield FormField::addTab('Auteur'.$symbol);
 
-        yield AssociationField::new('organization', 'Structure')
+        $currentAction = $this->getContext()->getCrud()->getCurrentAction();
+        $label = 'Structure';
+
+        if ($currentAction == Crud::PAGE_EDIT && $hasNoBacker) {
+            $label .= ' '.$badgeNoBackerAssociate;
+        } elseif ($currentAction == Crud::PAGE_EDIT && $hasBackerNotValide) {
+            $label .= ' '.$badgeNoBackerValid;
+        }
+        yield AssociationField::new('organization', $label)
         ->autocomplete()
+        ->formatValue(function ($value) use ($badgeNoBackerAssociate, $badgeNoBackerValid) {
+            $return = $value ? $value->getName() : '';
+            if ($value && !$value->getBacker()) {
+                $return .= ' '.$badgeNoBackerAssociate;
+            } elseif ($value && $value->getBacker() && !$value->getBacker()->isActive()) {
+                $return .= ' '.$badgeNoBackerValid;
+            }
+            return $return;
+        })
+        ->setFormTypeOptions([
+            'label_html' => true
+        ])
         ;
         
         yield AssociationField::new('author', 'Auteur')
@@ -471,7 +498,8 @@ class AidCrudController extends AtCrudController
         ->setColumns(12);
 
         //-------------------------------------------------------
-        yield FormField::addTab('Porteurs');
+        $symbol = ($entity && $entity->getAidFinancers()->isEmpty()) ? ' '.$this->symbolWarning : '';
+        yield FormField::addTab('Porteurs'.$symbol);
         yield FormField::addFieldset('Porteurs d’aides');
         yield AddNewField::new('newBacker', 'Nouveau porteur')
         ->setFormTypeOptions([
