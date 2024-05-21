@@ -10,6 +10,7 @@ use App\Entity\Organization\Organization;
 use App\Entity\Organization\OrganizationType;
 use App\Entity\Perimeter\Perimeter;
 use App\Entity\Reference\KeywordReference;
+use App\Entity\Reference\ProjectReference;
 use App\Entity\Search\SearchPage;
 use App\Entity\User\User;
 use App\Repository\Aid\AidRepository;
@@ -188,15 +189,24 @@ class AidService // NOSONAR too complex
         $aidRepo = $this->managerRegistry->getRepository(Aid::class);
         $aids = $aidRepo->findCustom($aidParams);
 
-        if (
-            !isset($aidParams['noRelaunch'])
-            && !isset($aidParams['notRelaunch'])
-            && count($aids) <= 10
-            ) {
-            $aidParams['scoreTotalMin'] = 1;
-            $aidParams['scoreObjectsMin'] = 0;
-            $aids = $aidRepo->findCustom($aidParams);
+        if (isset($aidParams['projectReference']) && $aidParams['projectReference'] instanceof ProjectReference) {
+            /** @var Aid $aid */
+            foreach ($aids as $aid) {
+                if ($aid->getProjectReferences()->contains($aidParams['projectReference'])) {
+                    $aid->setProjectReferencesAssociated(true);
+                    break;
+                }
+            }
         }
+        // if (
+        //     !isset($aidParams['noRelaunch'])
+        //     && !isset($aidParams['notRelaunch'])
+        //     && count($aids) <= 10
+        //     ) {
+        //     $aidParams['scoreTotalMin'] = 1;
+        //     $aidParams['scoreObjectsMin'] = 0;
+        //     $aids = $aidRepo->findCustom($aidParams);
+        // }
 
         if (!isset($aidParams['noPostPopulate']) && !isset($aidParams['notPostPopulate'])) {
             $aids = $this->postPopulateAids($aids, $aidParams);

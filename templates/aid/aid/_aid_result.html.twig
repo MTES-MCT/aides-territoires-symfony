@@ -6,6 +6,11 @@
 <div class="fr-card fr-enlarge-link  fr-card--grey">
     <div class="fr-card__body">
         <div class="fr-card__content">
+            {% if aid.isProjectReferencesAssociated %}
+            {# <span class="badge-project-associated fr-icon-success-line fr-icon--lg " aria-hidden="true" title="Cette aide est associé au projet référent que vous recherchez"></span> #}
+            <div class="circle_container"><span class="fr-icon-star-fill" aria-hidden="true"></span></div>
+            {% endif %}
+
             <h2 class="fr-card__title fr-mb-1w">
                 {% if aid.isApproachingDeadline %}
                     <span class="deadline deadline-delta fr-tag">J-{{ aid.daysBeforeDeadline }}</span>

@@ -601,6 +601,7 @@ class Aid // NOSONAR too much methods
     private int $nbViews = 0;
     private int $scoreTotal = 0;
     private int $scoreObjects = 0;
+    private bool $projectReferencesAssociated =false;
 
     #[Groups([self::API_GROUP_LIST, self::API_GROUP_ITEM])]
     private ?string $url = null;
@@ -2506,5 +2507,15 @@ class Aid // NOSONAR too much methods
 
         return $this;
     }
-    
+ 
+    public function isProjectReferencesAssociated(): bool
+    {
+        return $this->projectReferencesAssociated;
+    }
+
+    public function setProjectReferencesAssociated(bool $projectReferencesAssociated): static
+    {
+        $this->projectReferencesAssociated = $projectReferencesAssociated;
+        return $this;
+    }
 }
