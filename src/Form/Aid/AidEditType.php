@@ -118,7 +118,7 @@ class AidEditType extends AbstractType
                     'maxlength' => 180,
                 ],
                 'constraints' => [
-                    new Length(null, null, 180),
+                    new Length(max: 180),
                     new Assert\NotBlank([
                         'message' => 'Veuillez saisir le nom de votre aide.',
                     ]),
@@ -128,6 +128,9 @@ class AidEditType extends AbstractType
                 'required' => false,
                 'label' => 'Nom initial',
                 'help' => 'Comment cette aide s’intitule-t-elle au sein de votre structure ? Exemple : AAP Mob’Biodiv',
+                'constraints' => [
+                    new Length(max: 255)
+                ],
             ])
             ->add('organization', EntityType::class, $organizationParams)
             ->add('programs', EntityCheckboxAbsoluteType::class, [
@@ -166,6 +169,9 @@ class AidEditType extends AbstractType
                 'required' => false,
                 'label' => 'Suggérer un nouveau porteur',
                 'help' => 'Suggérez un porteur si vous ne trouvez pas votre choix dans la liste principale.',
+                'constraints' => [
+                    new Length(max: 255)
+                ],
             ])
             ->add('instructors', EntityType::class, [
                 'required' => false,
@@ -194,6 +200,9 @@ class AidEditType extends AbstractType
                 'required' => false,
                 'label' => 'Suggérer un nouvel instructeur',
                 'help' => 'Suggérez un instructeur si vous ne trouvez pas votre choix dans la liste principale.',
+                'constraints' => [
+                    new Length(max: 255)
+                ],
             ])
             ->add('aidAudiences', EntityGroupedType::class, [
                 'required' => $isDraft ? false : true,
@@ -420,6 +429,9 @@ class AidEditType extends AbstractType
                 'required' => false,
                 'label' => 'Vous ne trouvez pas de zone géographique appropriée ?',
                 'help' => 'Si vous ne trouvez pas de zone géographique suffisamment précise dans la liste existante, spécifiez « France » et décrivez brièvement ici le périmètre souhaité.',
+                'constraints' => [
+                    new Length(max: 255)
+                ],
             ])
             ->add('originUrl', TextType::class, [
                 'required' => $isDraft ? false : true,

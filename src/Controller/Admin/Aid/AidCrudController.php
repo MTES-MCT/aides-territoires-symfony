@@ -362,7 +362,7 @@ class AidCrudController extends AtCrudController
             } else {
                 return '';
             }
-        })   
+        })
         ;
 
         yield TextField::new('perimeterSuggestion', 'Périmètre suggéré')
