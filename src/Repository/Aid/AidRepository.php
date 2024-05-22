@@ -483,20 +483,19 @@ class AidRepository extends ServiceEntityRepository
             }
             
             $sqlObjects = '';
-            $objectsSearch = $objectsString ?? $intentionsString;
-            if ($objectsSearch) {
+            if ($objectsString) {
                 $sqlObjects = '
-                CASE WHEN (MATCH_AGAINST(a.name) AGAINST(:objectsSearch IN BOOLEAN MODE) > 1) THEN 90 ELSE 0 END +
-                CASE WHEN (MATCH_AGAINST(a.nameInitial) AGAINST(:objectsSearch IN BOOLEAN MODE) > 1) THEN 60 ELSE 0 END +
-                CASE WHEN (MATCH_AGAINST(a.description, a.eligibility, a.projectExamples) AGAINST(:objectsSearch IN BOOLEAN MODE) > 1) THEN 10 ELSE 0 END 
+                CASE WHEN (MATCH_AGAINST(a.name) AGAINST(:objects_string IN BOOLEAN MODE) > 1) THEN 90 ELSE 0 END +
+                CASE WHEN (MATCH_AGAINST(a.nameInitial) AGAINST(:objects_string IN BOOLEAN MODE) > 1) THEN 60 ELSE 0 END +
+                CASE WHEN (MATCH_AGAINST(a.description, a.eligibility, a.projectExamples) AGAINST(:objects_string IN BOOLEAN MODE) > 1) THEN 10 ELSE 0 END 
                 ';
 
-                $objects = str_getcsv($objectsSearch, ' ', '"');
+                $objects = str_getcsv($objectsString, ' ', '"');
                 if (!empty($objects)) {
                     $sqlObjects .= ' + ';
                 }
-
                 for ($i = 0; $i<count($objects); $i++) {
+
                     $sqlObjects .= '
                         CASE WHEN (a.name LIKE :objects'.$i.') THEN 30 ELSE 0 END +
                         CASE WHEN (a.nameInitial LIKE :objects'.$i.') THEN 20 ELSE 0 END
@@ -513,7 +512,7 @@ class AidRepository extends ServiceEntityRepository
                 }
 
                 $qb->addSelect('('.$sqlObjects.') as score_objects');
-                $qb->setParameter('objectsSearch', $objectsSearch);
+                $qb->setParameter('objects_string', $objectsString);
                 $qb->andHaving('score_objects >= '.$scoreObjectsMin);
             }
 
@@ -538,11 +537,11 @@ class AidRepository extends ServiceEntityRepository
 
             // Les catégories
             $categoriesSynonyms = $this->getEntityManager()->getRepository(Category::class)->findFromSynonyms($synonyms);
-            if (!empty($categoriesSynonyms)) {
+            if (count($categoriesSynonyms) > 0) {
                 $sqlCategories = '
-                CASE
+                CASE 
                     WHEN :categoriesSynonyms MEMBER OF a.categories THEN 60
-                    ELSE 0
+                    ELSE 0 
                 END
                 ';
                 $qb->setParameter('categoriesSynonyms', $categoriesSynonyms);
@@ -552,9 +551,9 @@ class AidRepository extends ServiceEntityRepository
             $keywordReferencesSynonyms = $this->getEntityManager()->getRepository(KeywordReference::class)->findFromSynonyms($synonyms);
             if (count($keywordReferencesSynonyms) > 0) {
                 $sqlKeywordReferences = '
-                CASE
-                    WHEN :keywordReferences MEMBER OF a.keywordReferences THEN 60
-                    ELSE 0
+                CASE 
+                    WHEN :keywordReferences MEMBER OF a.keywordReferences THEN 60 
+                    ELSE 0 
                 END
                 ';
                 $qb->setParameter('keywordReferences', $keywordReferencesSynonyms);
