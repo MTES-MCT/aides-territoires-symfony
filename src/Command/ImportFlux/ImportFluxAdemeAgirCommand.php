@@ -301,15 +301,10 @@ class ImportFluxAdemeAgirCommand extends ImportFluxCommand
                     $keyword = $this->managerRegistry->getRepository(KeywordReference::class)->findOneBy([
                         'name' => $category['name']
                     ]);
-                    if (!$keyword instanceof KeywordReference) {
-                        // nouveau keyword, on le créer
-                        $keyword = new KeywordReference();
-                        $keyword->setName($category['name']);
-                        $this->managerRegistry->getManager()->persist($keyword);
+                    if ($keyword instanceof KeywordReference) {
+                        // ajoute le keyword à l'aide
+                        $aid->addKeywordReference($keyword->getParent() ?? $keyword);
                     }
-
-                    // ajoute le keyword à l'aide
-                    $aid->addKeywordReference($keyword);
                 }
             }
         }

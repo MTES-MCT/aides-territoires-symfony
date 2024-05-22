@@ -286,14 +286,8 @@ class ImportFluxMinistereCultureCommand extends ImportFluxCommand
         }
 
         foreach ($aidToImport['eztag_theme'] as $thematique) {
-            if (!isset($keywordsByName[$thematique])) {
-                $keyword = new KeywordReference();
-                $keyword->setName($thematique);
-                $this->managerRegistry->getManager()->persist($keyword);
-                $keywordsByName[$thematique] = $keyword;
-            }
-            if ($keywordsByName[$thematique] instanceof KeywordReference) {
-                $aid->addKeywordReference($keywordsByName[$thematique]);
+            if (isset($keywordsByName[$thematique])) {
+                $aid->addKeywordReference($keywordsByName[$thematique]->getParent() ?? $keywordsByName[$thematique]);
             }
         }
 
