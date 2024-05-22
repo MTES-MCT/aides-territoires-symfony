@@ -50,12 +50,30 @@ class ReferenceService
         $objects = [];
 
         foreach ($projet_keywords_combinaisons as $synonym) {
-          $results = $this->keywordReferenceRepository->getAllSynonyms($synonym);
+          $results = $this->keywordReferenceRepository->findCustom([
+            'name' => $synonym
+          ]);
+          /** @var KeywordReference $result */
           foreach ($results as $result) {
-            if ((int) $result['intention'] === 1) {
-              $intentions[] = $result['name'];
-            } elseif ((int) $result['intention'] === 0) {
-              $objects[] = $result['name'];
+            if ($result->isIntention()) {
+              $intentions[] = $result->getName();
+            } else {
+              $objects[] = $result->getName();
+            }
+            foreach ($result->getKeywordReferences() as $keywordReference) {
+              if ($keywordReference->isIntention()) {
+                $intentions[] = $keywordReference->getName();
+              } else {
+                $objects[] = $keywordReference->getName();
+              }
+              foreach ($keywordReference->getKeywordReferences() as $subKeyword) {
+                if ($subKeyword->isIntention()) {
+                  $intentions[] = $subKeyword->getName();
+                } else {
+                  $objects[] = $subKeyword->getName();
+                }
+              
+              }
             }
           }
         }
