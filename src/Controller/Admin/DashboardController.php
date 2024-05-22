@@ -264,7 +264,7 @@ class DashboardController extends AbstractDashboardController
         ]);
 
         yield MenuItem::subMenu('Pages Personnalisées', 'fas fa-newspaper')->setSubItems([
-            MenuItem::linkToCrud('Pages Personnalisées', 'fas fa-list', SearchPage::class),            
+            MenuItem::linkToCrud('Pages Personnalisées', 'fas fa-list', SearchPage::class),
         ]);
 
         yield MenuItem::subMenu('Alertes', 'far fa-bell')->setSubItems([
@@ -280,11 +280,13 @@ class DashboardController extends AbstractDashboardController
         yield MenuItem::subMenu('Statistiques', 'fas fa-chart-line')->setSubItems([
             MenuItem::linkToRoute('Globale', 'fas fa-list', 'admin_statistics_dashboard', []),
             MenuItem::linkToRoute('Aides', 'fas fa-list', 'admin_log_aids_logs', []),
-            MenuItem::linkToRoute('Blog', 'fas fa-list', 'admin_statistics_blog_dashboard', []),
-            MenuItem::linkToRoute('Recherche', 'fas fa-list', 'admin_statistics_log_aid_search', []),
-            MenuItem::linkToRoute('Porteurs d\'aides', 'fas fa-list', 'admin_statistics_backer_dashboard', []),
             MenuItem::linkToRoute('Communes', 'fas fa-list', 'admin_statistics_commune_dashboard', []),
+            MenuItem::linkToRoute('Blog', 'fas fa-list', 'admin_statistics_blog_dashboard', []),
+            MenuItem::linkToRoute('Projets référents', 'fas fa-list', 'admin_statistics_project_reference_dashboard', []),
+            MenuItem::linkToRoute('Porteurs d\'aides', 'fas fa-list', 'admin_statistics_backer_dashboard', []),
+            MenuItem::linkToRoute('Recherche', 'fas fa-list', 'admin_statistics_log_aid_search', []),
             MenuItem::linkToRoute('Utilisateurs', 'fas fa-list', 'admin_statistics_user_dashboard', []),
+            
         ]);
 
         yield MenuItem::subMenu('Obsolète - Mots clés', 'fas fa-table')->setSubItems([
