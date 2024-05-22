@@ -38,19 +38,16 @@
                         {% if not backerAskAssociatePending %}
                             <div class="fr-alert fr-alert--info fr-alert--sm fr-my-2w">
                                 <p>
-                                    Afin de vous présenter sur le site, nous vous invitons à créer votre fiche porteur d'aide.
+                                    Nous vous invitons à créer votre fiche porteur d'aides pour présenter votre structure sur Aides-territoires. Une fois validée par nos équipes, vous pourrez l'associer à vos aides.
                                 </p>
-                                <p>
-                                    Une fois validée par nos équipes, vous pourrez l'associer à vos aides.
-                                </p>
-                                <p>Les membres de votre structure peuvent également participer au contenu de cette fiche</p>
+                                <p>Les membres de votre structure peuvent également modifier le contenu de cette fiche. </p>
                             </div>
                         {% endif %}
 
                         {% if not backer.id %}
                             {% for backerAskAssociateRefused in backerAskAssociatesRefused %}
                                 <div class="fr-alert fr-alert--error fr-alert--sm fr-my-2w">
-                                    <p>L'association demandée le <strong>{{ backerAskAssociateRefused.timeCreate|date('d/m/Y') }}</strong> avec le porteur <strong>{{ backerAskAssociateRefused.backer.name }}</strong> vous à été refusée.</p>
+                                    <p>L'association demandée le <strong>{{ backerAskAssociateRefused.timeCreate|date('d/m/Y') }}</strong> avec le porteur <strong>{{ backerAskAssociateRefused.backer.name }}</strong> vous a été refusée.</p>
                                     {% if backerAskAssociateRefused.refusedDescription %}
                                         <p>Pour le motif suivant :</p>
                                         <div>{{ backerAskAssociateRefused.refusedDescription|raw }}</div>
@@ -61,18 +58,15 @@
 
                         {% if backerAskAssociatePending %}
                             <div class="fr-alert fr-alert--info fr-alert--sm fr-my-2w">
-                                <p>Vous avez demander l'association avec le porteur <strong>{{ backerAskAssociatePending.backer.name }}</strong> le <strong>{{ backerAskAssociatePending.timeCreate|date('d/m/Y') }}</strong></p>
-                                <p>Votre demande sera traité prochainement par nos équipes.</p>
+                                <p>Vous avez demandé l'association avec le porteur <strong>{{ backerAskAssociatePending.backer.name }}</strong> le <strong>{{ backerAskAssociatePending.timeCreate|date('d/m/Y') }}</strong></p>
+                                <p>Votre demande sera traitée prochainement par nos équipes.</p>
                             </div>
                         {% endif %}
 
                         {% if formAskAssociate %}
                         <div class="fr-alert fr-alert--warning fr-alert--sm fr-my-2w">
                             <p>
-                                Avant de créer une nouvelle fiche porteur, veuillez vous assurer qu'elle n'est pas déjà existante.
-                            </p>
-                            <p>
-                                Si c'est le cas, vous pouvez demander à être rattachée à cette fiche.
+                                Avant de créer une nouvelle fiche porteur d’aides, veuillez vous assurer qu'elle n'existe pas déjà. Si c'est le cas, vous pouvez demander à être rattachée à cette fiche en cherchant votre porteur d’aides. 
                             </p>
                         </div>
 
@@ -107,7 +101,13 @@
                         {% if not backer.id %}
                             <div class="fr-alert fr-alert--warning fr-alert--sm fr-my-4w">
                                 <p>
-                                    Si le porteur d'aide correpsondant à votre structure n'existe pas, vous pouvez créer une nouvelle fiche porteur d'aide.
+                                    Si le porteur d'aide correspondant à votre structure n'existe pas, vous pouvez créer une nouvelle fiche porteur d'aides en complétant les champs suivants. 
+                                </p>
+                            </div>
+                        {% else %}
+                            <div class="fr-alert fr-alert--warning fr-alert--sm fr-my-4w">
+                                <p>
+                                    Attention : toute modification de la fiche porteur que vous enregistrez sera immédiatement visible par les utilisateurs. Aucune version antérieure ne pourra être restaurée.
                                 </p>
                             </div>
                         {% endif %}
