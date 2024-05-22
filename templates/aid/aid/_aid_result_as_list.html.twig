@@ -24,20 +24,31 @@
                     <a href="{{ path('app_aid_aid_details', {'slug': aid.slug}) }}{% if integration is defined %}?integration=integration{% endif %}">
                     {{ aid.name }} {% if app.user and app.user and isUserGranted(app.user, constant('App\\Entity\\User\\User::ROLE_ADMIN')) %}(st: {{ aid.scoreTotal}}, so: {{ aid.scoreObjects}}){% endif %}
                     </a>
+                    {% if aid.isProjectReferencesAssociated %}
+                    <div class="badge-aid-associated"><span class="fr-icon-thumb-up-fill fr-icon--sm" aria-hidden="true" title="Cette aide est associé au projet référent que vous recherchez"></span></div>
+                    {% endif %}
                 </td>
                 <td>
                     {% if aid.aidFinancers %}
                     <ul>
-                    {% for aidfinancer in aid.aidFinancers %}
-                    <li>
-                        {{ aidfinancer.backer.name }}                        
-                    </li>
+                    {% set maxDisplay = 3 %}
+                    {% set totalFinancers = aid.aidFinancers|length %}
+                    {% for financer in aid.aidFinancers|slice(0, maxDisplay) %}
+                        <li>
+                            {{ financer.backer.name }}
+                            {% if financer.backer.isCorporate %}
+                                (Privé)
+                            {% endif %}
+                        </li>
                     {% endfor %}
+                    {% if totalFinancers > maxDisplay %}
+                        <li>+{{ totalFinancers - maxDisplay }} autres</li>
+                    {% endif %}
                     </ul>
                 {% endif %}
                 </td>
                 <td>
-                    {{ aid.perimeter.name|u.truncate(40, '...') }}
+                    {% if aid.perimeter %}{{ aid.perimeter.name|u.truncate(40, '...') }}{% endif %}
                 </td>
                 <td>
                     {% if aid.isGrant %}

@@ -194,7 +194,6 @@ class AidService // NOSONAR too complex
             foreach ($aids as $aid) {
                 if ($aid->getProjectReferences()->contains($aidParams['projectReference'])) {
                     $aid->setProjectReferencesAssociated(true);
-                    break;
                 }
             }
         }

@@ -493,11 +493,11 @@ class AidRepository extends ServiceEntityRepository
                 ';
 
                 $objects = str_getcsv($objectsString, ' ', '"');
-                if (count($objects) > 0) {
+                if (!empty($objects)) {
                     $sqlObjects .= ' + ';
                 }
-                for ($i = 0; $i<count($objects); $i++) {
 
+                for ($i = 0; $i<count($objects); $i++) {
                     $sqlObjects .= '
                         CASE WHEN (a.name LIKE :objects'.$i.') THEN 30 ELSE 0 END +
                         CASE WHEN (a.nameInitial LIKE :objects'.$i.') THEN 20 ELSE 0 END
@@ -540,11 +540,11 @@ class AidRepository extends ServiceEntityRepository
 
             // Les catégories
             $categoriesSynonyms = $this->getEntityManager()->getRepository(Category::class)->findFromSynonyms($synonyms);
-            if (count($categoriesSynonyms) > 0) {
+            if (!empty($categoriesSynonyms)) {
                 $sqlCategories = '
-                CASE 
+                CASE
                     WHEN :categoriesSynonyms MEMBER OF a.categories THEN 60
-                    ELSE 0 
+                    ELSE 0
                 END
                 ';
                 $qb->setParameter('categoriesSynonyms', $categoriesSynonyms);
@@ -554,9 +554,9 @@ class AidRepository extends ServiceEntityRepository
             $keywordReferencesSynonyms = $this->getEntityManager()->getRepository(KeywordReference::class)->findFromSynonyms($synonyms);
             if (count($keywordReferencesSynonyms) > 0) {
                 $sqlKeywordReferences = '
-                CASE 
-                    WHEN :keywordReferences MEMBER OF a.keywordReferences THEN 60 
-                    ELSE 0 
+                CASE
+                    WHEN :keywordReferences MEMBER OF a.keywordReferences THEN 60
+                    ELSE 0
                 END
                 ';
                 $qb->setParameter('keywordReferences', $keywordReferencesSynonyms);

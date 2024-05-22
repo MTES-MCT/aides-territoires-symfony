@@ -7,8 +7,7 @@
     <div class="fr-card__body">
         <div class="fr-card__content">
             {% if aid.isProjectReferencesAssociated %}
-            {# <span class="badge-project-associated fr-icon-success-line fr-icon--lg " aria-hidden="true" title="Cette aide est associé au projet référent que vous recherchez"></span> #}
-            <div class="circle_container"><span class="fr-icon-star-fill" aria-hidden="true"></span></div>
+            <div class="badge-aid-associated in-absolute"><span class="fr-icon-thumb-up-fill" aria-hidden="true" title="Cette aide est associé au projet référent que vous recherchez"></span></div>
             {% endif %}
 
             <h2 class="fr-card__title fr-mb-1w">
@@ -35,7 +34,9 @@
                         Porteur{% if aid.aidFinancers|length > 1 %}s{% endif %} d’aides
                     </h3>
                     <ul class="financers fr-p-0">
-                    {% for financer in aid.aidFinancers %}
+                    {% set maxDisplay = 3 %}
+                    {% set totalFinancers = aid.aidFinancers|length %}
+                    {% for financer in aid.aidFinancers|slice(0, maxDisplay) %}
                         <li class="fr-list__none">
                             {{ financer.backer.name }}
                             {% if financer.backer.isCorporate %}
@@ -43,6 +44,9 @@
                             {% endif %}
                         </li>
                     {% endfor %}
+                    {% if totalFinancers > maxDisplay %}
+                        <li class="fr-list__none">+{{ totalFinancers - maxDisplay }} autres</li>
+                    {% endif %}
                     </ul>
                 {% endif %}
 

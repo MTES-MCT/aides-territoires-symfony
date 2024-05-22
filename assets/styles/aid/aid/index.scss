@@ -16,63 +16,28 @@
     }
 }
 
-
-// .badge-project-associated{
-//     position: absolute;
-//     z-index: 2;
-//     top: 5px;
-//     right: 5px;
-//     width: 40px;
-//     height: 40px;
-//     border-radius: 21px;
-//     border: 3px solid #fff;
-    
-//     color: white;
-//     line-height: 80px;
-//     text-align: center;
-//     background: #266c30;
-//     box-shadow: 0 0 0 3px #266c30;
-
-//     >span{
-//         font-size: 15px;
-//     }
-// }
-
-
-.badge-project-associated{
-    position: absolute;
-    z-index: 2;
-    top: 5px;
-    right: 5px;
-    padding: 1px;
-    border-radius: 20px;
-    background: #266c30;
-    box-shadow: 0 0 0 3px #266c30;
-    color: white;
-
-    &:before{
-        border-radius: 20px;
-    }
-
-}
-
-
-.circle_container {
+.badge-aid-associated {
     display: flex;
     justify-content: center;
     align-items: center;
-    position: absolute;
-    z-index: 2;
-    top: 5px;
-    right: 5px;
-    width: 30px;
-    height: 30px;
-    border-radius: 16px;
+
+    width: 25px;
+    height: 25px;
+    border-radius: 13px;
     border: 2px solid #fff;
-    font-size: 11px;
     color: white;
-    line-height: 30px;
+    line-height: 25px;
     text-align: center;
-    background: #266c30;
-    box-shadow: 0 0 0 3px #266c30; 
+    background: var(--background-flat-success);
+    box-shadow: 0 0 0 3px var(--background-flat-success);
+
+    &.in-absolute{
+        position: absolute;
+        z-index: 2;
+        top: 5px;
+        right: 5px;
+        width: 35px;
+        height: 35px;
+        border-radius: 18px;
+    }
 }
