@@ -459,7 +459,6 @@ class AidRepository extends ServiceEntityRepository
             $intentionsString = (isset($synonyms['intentions_string']) && str_replace($forbiddenChars, [''], trim($synonyms['intentions_string'])) !== '')  ? str_replace($forbiddenChars, [''], trim($synonyms['intentions_string'])) : null;
             $objectsString = (isset($synonyms['objects_string']) && str_replace($forbiddenChars, [''], trim($synonyms['objects_string'])) !== '')  ? str_replace($forbiddenChars, [''], trim($synonyms['objects_string'])) : null;
             $simpleWordsString = (isset($synonyms['simple_words_string']) && str_replace($forbiddenChars, [''], trim($synonyms['simple_words_string'])) !== '')  ? str_replace($forbiddenChars, [''], trim($synonyms['simple_words_string'])) : null;
-            $oldKeywordsString = '';
 
             if ($originalName) {
                 $sqlOriginalName = '
@@ -484,15 +483,15 @@ class AidRepository extends ServiceEntityRepository
             }
             
             $sqlObjects = '';
-            if ($objectsString) {
-                $oldKeywordsString .= $objectsString;
+            $objectsSearch = $objectsString ?? $intentionsString;
+            if ($objectsSearch) {
                 $sqlObjects = '
-                CASE WHEN (MATCH_AGAINST(a.name) AGAINST(:objects_string IN BOOLEAN MODE) > 1) THEN 90 ELSE 0 END +
-                CASE WHEN (MATCH_AGAINST(a.nameInitial) AGAINST(:objects_string IN BOOLEAN MODE) > 1) THEN 60 ELSE 0 END +
-                CASE WHEN (MATCH_AGAINST(a.description, a.eligibility, a.projectExamples) AGAINST(:objects_string IN BOOLEAN MODE) > 1) THEN 10 ELSE 0 END 
+                CASE WHEN (MATCH_AGAINST(a.name) AGAINST(:objectsSearch IN BOOLEAN MODE) > 1) THEN 90 ELSE 0 END +
+                CASE WHEN (MATCH_AGAINST(a.nameInitial) AGAINST(:objectsSearch IN BOOLEAN MODE) > 1) THEN 60 ELSE 0 END +
+                CASE WHEN (MATCH_AGAINST(a.description, a.eligibility, a.projectExamples) AGAINST(:objectsSearch IN BOOLEAN MODE) > 1) THEN 10 ELSE 0 END 
                 ';
 
-                $objects = str_getcsv($objectsString, ' ', '"');
+                $objects = str_getcsv($objectsSearch, ' ', '"');
                 if (!empty($objects)) {
                     $sqlObjects .= ' + ';
                 }
@@ -514,13 +513,12 @@ class AidRepository extends ServiceEntityRepository
                 }
 
                 $qb->addSelect('('.$sqlObjects.') as score_objects');
-                $qb->setParameter('objects_string', $objectsString);
+                $qb->setParameter('objectsSearch', $objectsSearch);
                 $qb->andHaving('score_objects >= '.$scoreObjectsMin);
             }
 
 
             if ($intentionsString && $objectsString) {
-                $oldKeywordsString .= ' '.$intentionsString;
                 $sqlIntentions = '
                 CASE WHEN (MATCH_AGAINST(a.name) AGAINST(:intentions_string IN BOOLEAN MODE) > 1) THEN 5 ELSE 0 END +
                 CASE WHEN (MATCH_AGAINST(a.nameInitial) AGAINST(:intentions_string IN BOOLEAN MODE) > 1) THEN 5 ELSE 0 END +
