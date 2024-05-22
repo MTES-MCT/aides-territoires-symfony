@@ -4,6 +4,7 @@ namespace App\Service\Reference;
 
 use App\Entity\Reference\KeywordReference;
 use App\Repository\Reference\KeywordReferenceRepository;
+use Doctrine\Inflector\InflectorFactory;
 
 class ReferenceService
 {

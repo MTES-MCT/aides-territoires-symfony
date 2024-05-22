@@ -22,6 +22,7 @@ use App\Service\Reference\ReferenceService;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Criteria;
+use Doctrine\Inflector\InflectorFactory;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -482,8 +483,43 @@ class AidRepository extends ServiceEntityRepository
                 ;
             }
             
+            // Les catégories
+            $categoriesSynonyms = $this->getEntityManager()->getRepository(Category::class)->findFromSynonyms($synonyms);
+            if (count($categoriesSynonyms) > 0) {
+                $sqlCategories = '
+                CASE
+                    WHEN :categoriesSynonyms MEMBER OF a.categories THEN 60
+                    ELSE 0
+                END
+                ';
+                $qb->setParameter('categoriesSynonyms', $categoriesSynonyms);
+            }
+
+            // les keywordReferences
+            $keywordReferencesSynonyms = $this->getEntityManager()->getRepository(KeywordReference::class)->findFromSynonyms($synonyms);
+            if (count($keywordReferencesSynonyms) > 0) {
+                $sqlKeywordReferences = '
+                CASE
+                    WHEN :keywordReferences MEMBER OF a.keywordReferences THEN 60
+                    ELSE 0
+                END
+                ';
+                $qb->setParameter('keywordReferences', $keywordReferencesSynonyms);
+            }
+            
             $sqlObjects = '';
             if ($objectsString) {
+                // gestion pluriels des objets
+                $inflector = InflectorFactory::create()->build();
+                $objects = str_getcsv($objectsString, ' ', '"');
+                foreach ($objects as $object) {
+                    $plural = $inflector->pluralize($object);
+                    if ($plural !== $object) {
+                    $objects[] = $plural;
+                    }
+                }
+                $objectsString = '"' . implode('" "', $objects) . '"';
+
                 $sqlObjects = '
                 CASE WHEN (MATCH_AGAINST(a.name) AGAINST(:objects_string IN BOOLEAN MODE) > 1) THEN 90 ELSE 0 END +
                 CASE WHEN (MATCH_AGAINST(a.nameInitial) AGAINST(:objects_string IN BOOLEAN MODE) > 1) THEN 60 ELSE 0 END +
@@ -534,32 +570,6 @@ class AidRepository extends ServiceEntityRepository
                 ';
                 $qb->setParameter('simple_words_string', $simpleWordsString);
             }
-
-            // Les catégories
-            $categoriesSynonyms = $this->getEntityManager()->getRepository(Category::class)->findFromSynonyms($synonyms);
-            if (count($categoriesSynonyms) > 0) {
-                $sqlCategories = '
-                CASE 
-                    WHEN :categoriesSynonyms MEMBER OF a.categories THEN 60
-                    ELSE 0 
-                END
-                ';
-                $qb->setParameter('categoriesSynonyms', $categoriesSynonyms);
-            }
-
-            // les keywordReferences
-            $keywordReferencesSynonyms = $this->getEntityManager()->getRepository(KeywordReference::class)->findFromSynonyms($synonyms);
-            if (count($keywordReferencesSynonyms) > 0) {
-                $sqlKeywordReferences = '
-                CASE 
-                    WHEN :keywordReferences MEMBER OF a.keywordReferences THEN 60 
-                    ELSE 0 
-                END
-                ';
-                $qb->setParameter('keywordReferences', $keywordReferencesSynonyms);
-            }
-
-
 
             $sqlTotal = '';
             if ($originalName) {
