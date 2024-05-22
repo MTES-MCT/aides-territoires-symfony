@@ -18,6 +18,7 @@ use App\Entity\Program\Program;
 use App\Entity\Reference\KeywordReference;
 use App\Entity\Reference\ProjectReference;
 use App\Entity\User\User;
+use App\Service\Reference\KeywordReferenceService;
 use App\Service\Reference\ReferenceService;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -38,7 +39,8 @@ class AidRepository extends ServiceEntityRepository
 {
     public function __construct(
         ManagerRegistry $registry,
-        private ReferenceService $referenceService
+        private ReferenceService $referenceService,
+        private KeywordReferenceService $keywordReferenceService
     )
     {
         parent::__construct($registry, Aid::class);
@@ -454,7 +456,187 @@ class AidRepository extends ServiceEntityRepository
             ;
         }
 
-        if (isset($synonyms)) {
+
+/******************************************************************************************** */
+if (isset($synonyms)) {
+    $forbiddenChars = ['@'];
+    $originalName = (isset($synonyms['original_name']) && str_replace($forbiddenChars, [''], trim($synonyms['original_name'])) !== '')  ? str_replace($forbiddenChars, [''], trim($synonyms['original_name'])) : null;
+    $intentionsString = (isset($synonyms['intentions_string']) && str_replace($forbiddenChars, [''], trim($synonyms['intentions_string'])) !== '')  ? str_replace($forbiddenChars, [''], trim($synonyms['intentions_string'])) : null;
+    $objectsString = (isset($synonyms['objects_string']) && str_replace($forbiddenChars, [''], trim($synonyms['objects_string'])) !== '')  ? str_replace($forbiddenChars, [''], trim($synonyms['objects_string'])) : null;
+    $simpleWordsString = (isset($synonyms['simple_words_string']) && str_replace($forbiddenChars, [''], trim($synonyms['simple_words_string'])) !== '')  ? str_replace($forbiddenChars, [''], trim($synonyms['simple_words_string'])) : null;
+
+    if ($originalName) {
+        $sqlOriginalName = '
+        CASE WHEN (a.name = :originalName) THEN 500 ELSE 0 END +
+        CASE WHEN (a.nameInitial = :originalName) THEN 400 ELSE 0 END
+        ';
+        $qb->setParameter('originalName', $originalName);
+    }
+
+    // Projets référents
+    if ($projectReference instanceof ProjectReference) {
+        $sqlProjectReference = '
+        CASE
+            WHEN :projectReference MEMBER OF a.projectReferences THEN 300
+            ELSE 0
+        END
+        ';
+
+        $qb
+        ->setParameter('projectReference', $projectReference)
+        ;
+    }
+    
+    // Les catégories
+    // $categoriesSynonyms = $this->getEntityManager()->getRepository(Category::class)->findFromSynonyms($synonyms);
+    // if (count($categoriesSynonyms) > 0) {
+    //     $sqlCategories = '
+    //     CASE
+    //         WHEN :categoriesSynonyms MEMBER OF a.categories THEN 60
+    //         ELSE 0
+    //     END
+    //     ';
+    //     $qb->setParameter('categoriesSynonyms', $categoriesSynonyms);
+    // }
+
+    // les keywordReferences
+    $keywordReferencesSynonyms = $this->getEntityManager()->getRepository(KeywordReference::class)->findFromSynonyms($synonyms);
+    if (!empty($keywordReferencesSynonyms)) {
+        $sqlKeywordReferences = '
+        CASE
+            WHEN :keywordReferences MEMBER OF a.keywordReferences THEN 60
+            ELSE 0
+        END
+        ';
+        $qb->setParameter('keywordReferences', $keywordReferencesSynonyms);
+    }
+    
+    $sqlObjects = '';
+    if ($objectsString) {
+        // gestion pluriels des objets
+        $inflector = InflectorFactory::create()->build();
+        $objects = str_getcsv($objectsString, ' ', '"');
+        foreach ($objects as $object) {
+            $plural = $inflector->pluralize($object);
+            if ($plural !== $object) {
+            $objects[] = $plural;
+            }
+        }
+        $objectsString = '"' . implode('" "', $objects) . '"';
+
+        $sqlObjects = '
+        CASE WHEN (MATCH_AGAINST(a.name) AGAINST(:objects_string IN BOOLEAN MODE) > 1) THEN 90 ELSE 0 END +
+        CASE WHEN (MATCH_AGAINST(a.nameInitial) AGAINST(:objects_string IN BOOLEAN MODE) > 1) THEN 60 ELSE 0 END +
+        CASE WHEN (MATCH_AGAINST(a.description, a.eligibility, a.projectExamples) AGAINST(:objects_string IN BOOLEAN MODE) > 1) THEN 10 ELSE 0 END 
+        ';
+
+        $objects = str_getcsv($objectsString, ' ', '"');
+        if (!empty($objects)) {
+            $sqlObjects .= ' + ';
+        }
+        for ($i = 0; $i<count($objects); $i++) {
+
+            $sqlObjects .= '
+                CASE WHEN (a.name LIKE :objects'.$i.') THEN 30 ELSE 0 END +
+                CASE WHEN (a.nameInitial LIKE :objects'.$i.') THEN 20 ELSE 0 END +
+                CASE WHEN (a.description LIKE :objects'.$i.') THEN 60 ELSE 0 END
+            ';
+
+            if ($i < count($objects) - 1) {
+                $sqlObjects .= ' + ';
+            }
+            $qb->setParameter('objects'.$i, '%'.$objects[$i].'%');
+        }
+
+        if (isset($sqlProjectReference) && $sqlProjectReference !== '') {
+            $sqlObjects .= ' + '.$sqlProjectReference;
+        }
+
+        $qb->addSelect('('.$sqlObjects.') as score_objects');
+        $qb->setParameter('objects_string', $objectsString);
+        $qb->andHaving('score_objects >= '.$scoreObjectsMin);
+    }
+
+
+    if ($intentionsString && $objectsString) {
+        $sqlIntentions = '
+        CASE WHEN (MATCH_AGAINST(a.name) AGAINST(:intentions_string IN BOOLEAN MODE) > 1) THEN 5 ELSE 0 END +
+        CASE WHEN (MATCH_AGAINST(a.nameInitial) AGAINST(:intentions_string IN BOOLEAN MODE) > 1) THEN 5 ELSE 0 END +
+        CASE WHEN (MATCH_AGAINST(a.description, a.eligibility, a.projectExamples) AGAINST(:intentions_string IN BOOLEAN MODE) > 1) THEN 1 ELSE 0 END 
+        ';
+        // $qb->setParameter('intentions_string', $intentionsString);
+
+        $scoreIntentionMin = 1;
+        $qb->addSelect('('.$sqlIntentions.') as score_intentions');
+        $qb->setParameter('intentions_string', $intentionsString);
+        $qb->andHaving('score_intentions >= '.$scoreIntentionMin);
+    }
+
+    if ($simpleWordsString) {
+        $sqlSimpleWords = '
+        CASE WHEN (MATCH_AGAINST(a.name) AGAINST(:simple_words_string IN BOOLEAN MODE) > 1) THEN 30 ELSE 0 END +
+        CASE WHEN (MATCH_AGAINST(a.nameInitial) AGAINST(:simple_words_string IN BOOLEAN MODE) > 1) THEN 30 ELSE 0 END +
+        CASE WHEN (MATCH_AGAINST(a.description, a.eligibility, a.projectExamples) AGAINST(:simple_words_string IN BOOLEAN MODE) > 1) THEN 5 ELSE 0 END 
+        ';
+        $qb->setParameter('simple_words_string', $simpleWordsString);
+    }
+
+    $sqlTotal = '';
+    if ($originalName) {
+        $sqlTotal .= $sqlOriginalName;
+    }
+    if ($objectsString) {
+        if ($originalName) {
+            $sqlTotal .= ' + ';
+        }
+        $sqlTotal .= $sqlObjects;
+    }
+    if ($intentionsString && $objectsString) {
+        if ($originalName || $objectsString) {
+            $sqlTotal .= ' + ';
+        }
+        $sqlTotal .= $sqlIntentions;
+    }
+    if (isset($sqlSimpleWords)) {
+        if ($originalName || $objectsString || $intentionsString) {
+            $sqlTotal .= ' + ';
+        }
+        $sqlTotal .= $sqlSimpleWords;
+    }
+
+    if (isset($sqlCategories)) {
+        if ($originalName || $objectsString || $intentionsString || isset($sqlSimpleWords)) {
+            $sqlTotal .= ' + ';
+        }
+        $sqlTotal .= $sqlCategories;
+    }
+
+    if (isset($sqlKeywordReferences)) {
+        if ($originalName || $objectsString || $intentionsString || isset($sqlSimpleWords) || isset($sqlCategories)) {
+            $sqlTotal .= ' + ';
+        }
+        $sqlTotal .= $sqlKeywordReferences;
+    }
+
+    if (isset($sqlProjectReference)) {
+        if ($originalName || $objectsString || $intentionsString || isset($sqlSimpleWords) || isset($sqlCategories) || isset($sqlKeywordReferences)) {
+            $sqlTotal .= ' + ';
+        }
+        $sqlTotal .= $sqlProjectReference;
+    }
+
+    if ($sqlTotal !== '') {
+        $scoreTotalAvailable = true;
+        $qb->addSelect('('.$sqlTotal.') as score_total');
+        $qb->andHaving('score_total >= '.$scoreTotalMin);
+    }
+}
+
+/******************************************************************************************** */
+
+        $toto = null;
+        
+        if ($toto && isset($synonyms)) {
             $forbiddenChars = ['@'];
             $originalName = (isset($synonyms['original_name']) && str_replace($forbiddenChars, [''], trim($synonyms['original_name'])) !== '')  ? str_replace($forbiddenChars, [''], trim($synonyms['original_name'])) : null;
             $intentionsString = (isset($synonyms['intentions_string']) && str_replace($forbiddenChars, [''], trim($synonyms['intentions_string'])) !== '')  ? str_replace($forbiddenChars, [''], trim($synonyms['intentions_string'])) : null;
@@ -472,9 +654,9 @@ class AidRepository extends ServiceEntityRepository
             // Projets référents
             if ($projectReference instanceof ProjectReference) {
                 $sqlProjectReference = '
-                CASE 
-                    WHEN :projectReference MEMBER OF a.projectReferences THEN 300 
-                    ELSE 0 
+                CASE
+                    WHEN :projectReference MEMBER OF a.projectReferences THEN 300
+                    ELSE 0
                 END
                 ';
 
