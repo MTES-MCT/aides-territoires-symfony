@@ -16,6 +16,7 @@
     <div class="alert alert-info my-5">
         <ul>
             <li>La recherche est faite sans structure, sans périmètre.</li>
+            <li>La recherche étant trop lourde pour scalingo, elle est pré-calculée chaque nuit.</li>
             <li>Si le delta est négatif c'est probablement que certaines aides ne sont pas affichées sur le site.</li>
             <li>Si le delta est trop grand, il est possible que le projet référent ne soit pas associé à toutes les aides OU qu'il y a des mots clés à exclure.</li>
         </ul>
@@ -41,15 +42,15 @@
                     {% endif %}
                     </td>
                     <td>
-                        {% if nbResultsbyProjectReferenceId[projectReference.id] is defined %}
-                            <a href="{{ path('app_aid_aid', {'keyword': projectReference.name})}}" target="_blank">{{ nbResultsbyProjectReferenceId[projectReference.id] }}</a>
+                        {% if projectReference.nbSearchResult %}
+                            <a href="{{ path('app_aid_aid', {'keyword': projectReference.name})}}" target="_blank">{{ projectReference.nbSearchResult }}</a>
                         {% endif %}
                     </td>
                     <td>
-                        {% if nbResultsbyProjectReferenceId[projectReference.id] is defined %}
-                            {{ nbResultsbyProjectReferenceId[projectReference.id] - projectReference.aids|length }}
+                        {% if projectReference.nbSearchResult %}
+                        {{ projectReference.nbSearchResult - projectReference.aids|length }}
                         {% else %}
-                        N/A
+                        N/a
                         {% endif %}
                     </td>
                 </tr>

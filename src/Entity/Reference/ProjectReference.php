@@ -77,6 +77,9 @@ class ProjectReference
     #[ORM\JoinTable(name: 'project_reference_excluded_keyword_reference')]
     private Collection $excludedKeywordReferences;
 
+    #[ORM\Column(nullable: true)]
+    private ?int $nbSearchResult = null;
+
     public function __construct()
     {
         $this->projects = new ArrayCollection();
@@ -211,6 +214,18 @@ class ProjectReference
     public function removeExcludedKeywordReference(KeywordReference $excludedKeywordReference): static
     {
         $this->excludedKeywordReferences->removeElement($excludedKeywordReference);
+
+        return $this;
+    }
+
+    public function getNbSearchResult(): ?int
+    {
+        return $this->nbSearchResult;
+    }
+
+    public function setNbSearchResult(?int $nbSearchResult): static
+    {
+        $this->nbSearchResult = $nbSearchResult;
 
         return $this;
     }

@@ -43,22 +43,10 @@ class ProjectReferenceController extends AbstractController
             ->generateUrl();
         }
 
-        // pour chaque projet on va voir combien de résultats donne la recherche
-        $nbResultsbyProjectReferenceId = [];
-        foreach ($projectReferences as $projectReference) {
-            $aidParams = [
-                'keyword' => $projectReference->getName(),
-                'projectReference' => $projectReference,
-                'showInSearch' => true
-            ];
-            $aids = $this->aidService->searchAids($aidParams);
-            $nbResultsbyProjectReferenceId[$projectReference->getId()] = count($aids);
-        }
         // retour template
         return $this->render('admin/statistics/project_reference/dashboard.html.twig', [
             'projectReferences' => $projectReferences,
-            'aidsUrlByProjectReferenceId' => $aidsUrlByProjectReferenceId,
-            'nbResultsbyProjectReferenceId' => $nbResultsbyProjectReferenceId
+            'aidsUrlByProjectReferenceId' => $aidsUrlByProjectReferenceId
         ]);
     }
 }
