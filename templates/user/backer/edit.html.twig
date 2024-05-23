@@ -118,7 +118,7 @@
                             {{ form_row(form.externalLink) }}
 
                             {% if backer and backer.logo %}
-                            <p><img src="{{ getParameter('cloud_image_url') }}{{ backer.logo }}" class="img-backer" alt="Image de votre porteur d'aides" /></p>
+                                <p><img src="{{ getParameter('cloud_image_url') }}{{ backer.logo }}" class="img-backer" alt="Logo de votre porteur d'aides" /></p>
                             {% endif %}
                             {{ form_row(form.logoFile) }}
                             {{ form_row(form.description) }}

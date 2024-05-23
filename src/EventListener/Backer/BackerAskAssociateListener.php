@@ -47,6 +47,18 @@ class BackerAskAssociateListener
                         );
                     }
                 }
+            } elseif ($field == 'refused' && isset($change[1]) && $change[1]) {
+                // envoi de la notification à tous les utilisateurs de la structure
+                $messageRefus = $entity->getRefusedDescription() ? $entity->getRefusedDescription() : 'Votre demande à été refusée.';
+                foreach ($entity->getBacker()->getOrganizations() as $organization) {
+                    foreach ($organization->getBeneficiairies() as $beneficiairy) {
+                        $this->notificationService->addNotification(
+                            $beneficiairy,
+                            'Refus de l\'association de la structure '.$organization->getName(). ' avec le porteur d\'aides '.$entity->getBacker()->getName(),
+                            $messageRefus
+                        );
+                    }
+                }
             }
         }
     }
