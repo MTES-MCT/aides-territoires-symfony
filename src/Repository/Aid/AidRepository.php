@@ -417,6 +417,7 @@ class AidRepository extends ServiceEntityRepository
         $hasBrokenLink= $params['hasBrokenLink'] ?? null;
         $scoreTotalMin = $params['scoreTotalMin'] ?? 60;
         $scoreObjectsMin = $params['scoreObjectsMin'] ?? 30;
+        $scoreIntentionMin = $params['scoreIntentionMin'] ?? 1;
         $dateCreateMin = $params['dateCreateMin'] ?? null;
         $dateCreateMax = $params['dateCreateMax'] ?? null;
         $projectReference = $params['projectReference'] ?? null;
@@ -524,15 +525,16 @@ if (isset($synonyms)) {
         }
         for ($i = 0; $i<count($objects); $i++) {
             $sqlObjects .= '
-                CASE WHEN (a.name LIKE :objects'.$i.') THEN 60 ELSE 0 END +
-                CASE WHEN (a.nameInitial LIKE :objects'.$i.') THEN 62 ELSE 0 END +
-                CASE WHEN (a.description LIKE :objects'.$i.') THEN 30 ELSE 0 END
+                CASE WHEN (REGEXP(a.name, :objects'.$i.') = 1) THEN 60 ELSE 0 END +
+                CASE WHEN (REGEXP(a.nameInitial, :objects'.$i.') = 1) THEN 60 ELSE 0 END +
+                CASE WHEN (REGEXP(a.description, :objects'.$i.') = 1) THEN 60 ELSE 0 END
             ';
 
             if ($i < count($objects) - 1) {
                 $sqlObjects .= ' + ';
             }
-            $qb->setParameter('objects'.$i, '%'.$objects[$i].'%');
+
+            $qb->setParameter('objects'.$i, '\\b'.$objects[$i].'\\b');
         }
 
         if (isset($sqlProjectReference) && $sqlProjectReference !== '') {
@@ -544,12 +546,14 @@ if (isset($synonyms)) {
         $qb->andHaving('score_objects >= '.$scoreObjectsMin);
     }
 
-
     if ($intentionsString && $objectsString) {
         $sqlIntentions = '
-        CASE WHEN (MATCH_AGAINST(a.name, a.nameInitial, a.description, a.eligibility, a.projectExamples) AGAINST(:intentions_string IN BOOLEAN MODE) > 10) THEN 1 ELSE 0 END 
+        CASE WHEN (MATCH_AGAINST(a.name, a.nameInitial, a.description, a.eligibility, a.projectExamples) AGAINST(:intentions_string IN BOOLEAN MODE) > 1) THEN 1 ELSE 0 END 
         ';
-        $scoreIntentionMin = 1;
+        if (isset($sqlProjectReference) && $sqlProjectReference !== '') {
+            $sqlIntentions .= ' + '.$sqlProjectReference;
+        }
+        
         $qb->addSelect('('.$sqlIntentions.') as score_intentions');
         $qb->setParameter('intentions_string', $intentionsString);
         $qb->andHaving('score_intentions >= '.$scoreIntentionMin);

@@ -17,7 +17,7 @@
         <ul>
             <li>La recherche est faite sans structure, sans périmètre.</li>
             <li>La recherche étant trop lourde pour scalingo, elle est pré-calculée chaque nuit.</li>
-            <li>Si le delta est négatif c'est probablement que certaines aides ne sont pas affichées sur le site.</li>
+            <li>Si le delta est négatif c'est probablement du au dédoublonnage des aides génériques / locales. A vérifier au cas par cas.</li>
             <li>Si le delta est trop grand, il est possible que le projet référent ne soit pas associé à toutes les aides OU qu'il y a des mots clés à exclure.</li>
         </ul>
     </div>
@@ -25,7 +25,7 @@
         <thead>
             <tr>
                 <th>Projet référent</th>
-                <th>Nombre d'aides associées</th>
+                <th>Nombre d'aides associées (live)</th>
                 <th>Nombre de résultas de recherche</th>
                 <th>Delta</th>
             </tr>
@@ -36,9 +36,9 @@
                     <td>{{ projectReference.name }}</td>
                     <td>
                     {% if aidsUrlByProjectReferenceId[projectReference.id] is defined %}
-                        <a href="{{ aidsUrlByProjectReferenceId[projectReference.id] }}">{{ projectReference.aids|length }}</a>
+                        <a href="{{ aidsUrlByProjectReferenceId[projectReference.id] }}">{{ projectReference.aids|length }} ({{ projectReference.aidsLive|length }})</a>
                     {% else %}
-                    {{ projectReference.aids|length }}
+                    {{ projectReference.aids|length }}  ({{ projectReference.aidsLive|length }})
                     {% endif %}
                     </td>
                     <td>
@@ -48,7 +48,7 @@
                     </td>
                     <td>
                         {% if projectReference.nbSearchResult %}
-                        {{ projectReference.nbSearchResult - projectReference.aids|length }}
+                        {{ projectReference.nbSearchResult - projectReference.aidsLive|length }}
                         {% else %}
                         N/a
                         {% endif %}
