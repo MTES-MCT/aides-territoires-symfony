@@ -12,11 +12,21 @@
 {% block stats_content %}
 <section class="container">
     <h1>Statistiques Projets référents</h1>
+
+    <div class="alert alert-info my-5">
+        <ul>
+            <li>La recherche est faite sans structure, sans périmètre.</li>
+            <li>Si le delta est négatif c'est probablement que certaines aides ne sont pas affichées sur le site.</li>
+            <li>Si le delta est trop grand, il est possible que le projet référent ne soit pas associé à toutes les aides OU qu'il y a des mots clés à exclure.</li>
+        </ul>
+    </div>
     <table class="table table-striped dataTable">
         <thead>
             <tr>
                 <th>Projet référent</th>
                 <th>Nombre d'aides associées</th>
+                <th>Nombre de résultas de recherche</th>
+                <th>Delta</th>
             </tr>
         </thead>
         <tbody>
@@ -29,6 +39,18 @@
                     {% else %}
                     {{ projectReference.aids|length }}
                     {% endif %}
+                    </td>
+                    <td>
+                        {% if nbResultsbyProjectReferenceId[projectReference.id] is defined %}
+                            <a href="{{ path('app_aid_aid', {'keyword': projectReference.name})}}" target="_blank">{{ nbResultsbyProjectReferenceId[projectReference.id] }}</a>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if nbResultsbyProjectReferenceId[projectReference.id] is defined %}
+                            {{ nbResultsbyProjectReferenceId[projectReference.id] - projectReference.aids|length }}
+                        {% else %}
+                        N/A
+                        {% endif %}
                     </td>
                 </tr>
             {% endfor %}

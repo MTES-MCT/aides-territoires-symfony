@@ -73,11 +73,16 @@ class ProjectReference
 
     private Collection $aidsLive;
 
+    #[ORM\ManyToMany(targetEntity: KeywordReference::class, inversedBy: 'excludedProjectReferences')]
+    #[ORM\JoinTable(name: 'project_reference_excluded_keyword_reference')]
+    private Collection $excludedKeywordReferences;
+
     public function __construct()
     {
         $this->projects = new ArrayCollection();
         $this->aids = new ArrayCollection();
         $this->aidsLive = new ArrayCollection();
+        $this->excludedKeywordReferences = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -184,5 +189,29 @@ class ProjectReference
     {
         $this->aidsLive = $this->aids->filter(fn(Aid $aid) => $aid->isLive());
         return $this->aidsLive;
+    }
+
+    /**
+     * @return Collection<int, KeywordReference>
+     */
+    public function getExcludedKeywordReferences(): Collection
+    {
+        return $this->excludedKeywordReferences;
+    }
+
+    public function addExcludedKeywordReference(KeywordReference $excludedKeywordReference): static
+    {
+        if (!$this->excludedKeywordReferences->contains($excludedKeywordReference)) {
+            $this->excludedKeywordReferences->add($excludedKeywordReference);
+        }
+
+        return $this;
+    }
+
+    public function removeExcludedKeywordReference(KeywordReference $excludedKeywordReference): static
+    {
+        $this->excludedKeywordReferences->removeElement($excludedKeywordReference);
+
+        return $this;
     }
 }

@@ -68,6 +68,7 @@ use App\Service\Doctrine\DoctrineConstants;
 #[ORM\Index(columns: ['eligibility'], name: 'eligibility_aid_fulltext', flags: ['fulltext'])]
 #[ORM\Index(columns: ['name','description','eligibility'], name: 'synonym_aid_nde_fulltext', flags: ['fulltext'])]
 #[ORM\Index(columns: ['description','eligibility','project_examples'], name: 'synonym_aid_fulltext', flags: ['fulltext'])]
+#[ORM\Index(columns: ['name', 'name_initial', 'description','eligibility','project_examples'], name: 'synonym_aid_all_fulltext', flags: ['fulltext'])]
 #[ApiResource(
     operations: [
         new GetCollection(

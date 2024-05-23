@@ -3,7 +3,10 @@
 namespace App\Controller\Admin\Statistics;
 
 use App\Controller\Admin\Aid\AidCrudController;
+use App\Entity\Aid\Aid;
 use App\Entity\Reference\ProjectReference;
+use App\Repository\Aid\AidRepository;
+use App\Service\Aid\AidService;
 use Doctrine\Persistence\ManagerRegistry;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
@@ -16,7 +19,8 @@ class ProjectReferenceController extends AbstractController
 {
     public function __construct(
         private ManagerRegistry $managerRegistry,
-        private AdminUrlGenerator $adminUrlGenerator
+        private AdminUrlGenerator $adminUrlGenerator,
+        private AidService $aidService
     )
     {
     }
@@ -37,12 +41,24 @@ class ProjectReferenceController extends AbstractController
             ->set('filters[projectReferences][value][]', $projectReference->getId())
             ->set('filters[projectReferences][comparison]', '=')
             ->generateUrl();
+        }
 
+        // pour chaque projet on va voir combien de résultats donne la recherche
+        $nbResultsbyProjectReferenceId = [];
+        foreach ($projectReferences as $projectReference) {
+            $aidParams = [
+                'keyword' => $projectReference->getName(),
+                'projectReference' => $projectReference,
+                'showInSearch' => true
+            ];
+            $aids = $this->aidService->searchAids($aidParams);
+            $nbResultsbyProjectReferenceId[$projectReference->getId()] = count($aids);
         }
         // retour template
         return $this->render('admin/statistics/project_reference/dashboard.html.twig', [
             'projectReferences' => $projectReferences,
-            'aidsUrlByProjectReferenceId' => $aidsUrlByProjectReferenceId
+            'aidsUrlByProjectReferenceId' => $aidsUrlByProjectReferenceId,
+            'nbResultsbyProjectReferenceId' => $nbResultsbyProjectReferenceId
         ]);
     }
 }

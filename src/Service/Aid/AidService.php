@@ -197,15 +197,6 @@ class AidService // NOSONAR too complex
                 }
             }
         }
-        // if (
-        //     !isset($aidParams['noRelaunch'])
-        //     && !isset($aidParams['notRelaunch'])
-        //     && count($aids) <= 10
-        //     ) {
-        //     $aidParams['scoreTotalMin'] = 1;
-        //     $aidParams['scoreObjectsMin'] = 0;
-        //     $aids = $aidRepo->findCustom($aidParams);
-        // }
 
         if (!isset($aidParams['noPostPopulate']) && !isset($aidParams['notPostPopulate'])) {
             $aids = $this->postPopulateAids($aids, $aidParams);

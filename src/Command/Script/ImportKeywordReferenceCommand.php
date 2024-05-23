@@ -78,14 +78,13 @@ class ImportKeywordReferenceCommand extends Command
             "canalisation eaux usées" => array("canalisations eaux usées","eau pluviale","eau potable","eaux usées","infrastructure sanitaire","infrastructures sanitaires","réseau d'assainissement","réseaux d'assainissement","système épuration"),
             "capteurs solaires" => array("cellules solaires","champ photovoltaique","énergie solaire","modules solaires","panneaux photovoltaïques","panneaux solaires","photovoltaique","solaire","capteurs photovoltaïques"),
             "cassis" => array("coussin berlinois","coussins berlinois","dos d'âne","gendarme couché","ralentisseur","ralentisseurs"),
-            "centre médical" => array("clinique","cliniques","maison de santé","maisons de santé","maison médicale","maisons médicales","pôle santé","santé pluri-professionnels","santé pluridisciplinaires","MSP"),
+            "centre médical" => array("clinique","cliniques","maison de santé","maisons de santé","maison médicale","maisons médicales","pôle santé","santé pluri-professionnels","santé pluridisciplinaires","MSP","Clinique", "Centre médical", "Centre de soins", "Centre de santé", "Établissement de santé", "Polyclinique", "Hôpital de jour", "Dispensaire", "soin", "soins", "santé"),
             "centre sportif" => array("complexe sportif","gymnase","gymnases","salle de sport","salle des sports","pôle sportif"),
             "chapelle" => array("chapelles","cimetière","cimetières","columbarium","columbariums","église","l'église","églises","enterrement","enterrements","funéraille","funérailles","funéraire","funéraires","funérarium","funérariums","monument morts","obsèque","obsèques","pierre tombale","presbytère","presbytères","sépulture","sépultures","tombe","tombes"),
             "chaudière" => array("chaudières","chauffage","chauffage urbain","distributionde chaleur","réseau de chaleur","système de chauffage collectif"),
             "chaussée" => array("chaussées","feux tricolores","parking","parkings","réseau routier","signalétique","signalétiques","voirie","voiries"),
             "chemin piétonnier" => array("chemins piétonniers","cyclable","cyclables","liaison douce","piste cyclable","piste vélo","piste verte","plan vélo","sentier non motorisé","vélovoie","vélovoies","voie cyclable","voie douce","voie vélo","voie verte", "voirie"),
             "city park" => array("city stade","espace vert municipal","jardin public","parc urbain","skate park","streetpark","terrains multisports","terrain multisport","l'aire de loisir","l'aire de loisirs","aires de jeux","aire de jeux","aires de loisirs","espace ludique","espaces ludiques","parc de jeux","parcs de jeux","terrain de jeux","terrains de jeux"),
-            "consultation ligne" => array("santé numérique","soins distance","télémedecine"),
             "cour d'école" => array("cours d'école","espace extérieur scolaire","playground scolaire","préau","préaux"),
             "couverture solaire" => array("protection solaire","toile tendue","voile ombrage"),
             "crèche" => array("crèches","garderie","garderies","halte garderie","jardin enfants"),
@@ -102,7 +101,11 @@ class ImportKeywordReferenceCommand extends Command
             "passerelle" => array("passerelles","pont","ponts","structure franchissement","viaduc","viaducs"),
             "réhabilitation environnementale" => array("renaturation","restauration écologique","restauration écosystème"),
             "secteur basse pollution" => array("zfe","zone de circulation restreinte","zone à faible émission","zone verte","zones de circulation restreinte","zones à faibles émissions","zones vertes"),
-            "terrain de foot" => array("stade de football","stade de foot","terrain de football","stades de football","stades de foot","terrains de foot","terrains de football","pelouse de football")
+            "terrain de foot" => array("stade de football","stade de foot","terrain de football","stades de football","stades de foot","terrains de foot","terrains de football","pelouse de football"),
+            // ajout remi 2024-05-23
+            'Logement' => ['Habitation', 'Domicile', 'Résidence', 'Maison', 'Appartement', 'Demeure', 'Pavillon', 'Hébergement'],
+            'Bus' => ["Autobus", "Autocar", "Minibus", "Navette", "Transport en commun", "Véhicule de transport collectif", "Trolleybus"],
+            'Télémédecine' => ["E-santé", "Téléconsultation", "Télésoin", "Télésanté", "Médecine à distance", 'Soins à distance', "Téléassistance médicale", "Santé numérique", 'Consultation en ligne']
             );
             
             $verbs_synonyms_array = array(
@@ -169,7 +172,7 @@ class ImportKeywordReferenceCommand extends Command
             "comporter" => array("engagement","engagements","engager","entraîner","implication","implications","impliquer","inclure","inclusion","inclusions","nécessiter","signification","significations","signifier"),
             "composer" => array("constituer","construction","constructions","construire","création","créations","créer","établir","établissement","établissements","former","installation","installations","installer","instituer","institution","institutions","poser","pose"),
             "conservation" => array("conservations","conserver","garde","garder","gardes","maintenir","maintien","maintiens","préservation","préservations","préserver","protection","protections","protéger","sauvegarde","sauvegarder","sauvegardes","sécurisation","sécurisations","sécuriser"),
-            "conservation" => array("conservations","conserver","entretenir","entretien","entretiens","maintenir","maintien","maintiens","préservation","préservations","préserver","rénovation","rénovations","rénover","réparation","réparations","réparer","soigner","soin","soins","soutenir","soutien","soutiens"),
+            "conservation" => array("conservations","conserver","entretenir","entretien","entretiens","maintenir","maintien","maintiens","préservation","préservations","préserver","rénovation","rénovations","rénover","réparation","réparations","réparer","soutenir","soutien","soutiens"),
             "contestation" => array("contestations","contester","réplique","répliquer","répliques","répondre","réponse","réponses","rétorque","rétorquer","rétorques","retour","retourner","retours","satisfaction","satisfactions","satisfaire"),
             "contrôle" => array("contrôler","contrôles","épiage","épiages","épier","examen","examens","examiner","guet","guets","guetter","inspecter","inspection","inspections","observation","observations","observer","surveillance","surveillances","surveiller","vérification","vérifications","vérifier"),
             "cultiver" => array("culture","cultures"),

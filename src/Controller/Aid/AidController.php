@@ -248,19 +248,19 @@ class AidController extends FrontController
         // pour avoir la recherche surlignée
         $highlightedWords = $requestStack->getCurrentRequest()->getSession()->get('highlightedWords', []);
         
-        if (isset($aidSearchClass) and $aidSearchClass instanceof AidSearchClass) {
+        if (isset($aidSearchClass) && $aidSearchClass instanceof AidSearchClass) {
             $highlightedWords = [];
             if ($aidSearchClass->getKeyword()) {
                 // on va chercher les synonymes
                 $synonyms = $referenceService->getSynonymes($aidSearchClass->getKeyword());
-                if (isset($synonyms['intentions_string'])) {
+                if (isset($synonyms['intentions_string']) && isset($synonyms['objects_string'])) {
                     $keywords = str_getcsv($synonyms['intentions_string'], ' ', '"');
                     foreach ($keywords as $keyword) {
                         if ($keyword && trim($keyword) !== '') {
                             $highlightedWords[] = $keyword;
                         }
                     }
-                } 
+                }
                 if (isset($synonyms['objects_string'])) {
                     $keywords = str_getcsv($synonyms['objects_string'], ' ', '"');
                     foreach ($keywords as $keyword) {
@@ -268,8 +268,8 @@ class AidController extends FrontController
                             $highlightedWords[] = $keyword;
                         }
                     }
-                } 
-                if (isset($synonyms['simple_words_string'])) {
+                }
+                if (isset($synonyms['simple_words_string']) && !isset($synonyms['objects_string'])) {
                     $keywords = str_getcsv($synonyms['simple_words_string'], ' ', '"');
                     foreach ($keywords as $keyword) {
                         if ($keyword && trim($keyword) !== '') {
@@ -279,7 +279,7 @@ class AidController extends FrontController
                 }
 
                 // si la gestion des synonymes n'a pas fonctionné, on met directement la recherche
-                if (count($highlightedWords) == 0) {
+                if (empty($highlightedWords)) {
                     // on met la recherche dans les highlights
                     $keywords = explode(' ', $aidSearchClass->getKeyword());
                     foreach ($keywords as $keyword) {

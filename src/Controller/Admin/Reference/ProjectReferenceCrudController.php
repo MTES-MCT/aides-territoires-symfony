@@ -23,5 +23,6 @@ class ProjectReferenceCrudController extends AtCrudController
         ->hideOnIndex()
         ->setFormTypeOption('attr', ['readonly' => true]);
         yield AssociationField::new('projectReferenceCategory', 'Catégorie');
+        yield AssociationField::new('excludedKeywordReferences', 'Mots clés exclus');
     }
 }

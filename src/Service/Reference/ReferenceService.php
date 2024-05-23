@@ -3,14 +3,17 @@
 namespace App\Service\Reference;
 
 use App\Entity\Reference\KeywordReference;
+use App\Entity\Reference\ProjectReference;
 use App\Repository\Reference\KeywordReferenceRepository;
+use App\Repository\Reference\ProjectReferenceRepository;
 use Doctrine\Inflector\InflectorFactory;
 
 class ReferenceService
 {
 
     public function __construct(
-        protected KeywordReferenceRepository $keywordReferenceRepository
+        private KeywordReferenceRepository $keywordReferenceRepository,
+        private ProjectReferenceRepository $projectReferenceRepository
     )
     {
     }
@@ -41,14 +44,45 @@ class ReferenceService
     public function getSynonymes(string $project_name): ?array
     {
         $original_name = $project_name;
-        $project_name = str_replace(array("/","(",")",",",":","–","-"), " ",strtolower($project_name));
-        $projet_keywords_combinaisons=$this->genererCombinaisons($project_name, $this->articles);
-        // Tri du tableau pour d'abord chercher des expressions complètes "terrain de football" aura la priorité sur "terrain"
-        usort($projet_keywords_combinaisons, array($this,"compareLength"));
+
+        // on regarde si c'est un mot clé de la base de données
+        $keywordReference = $this->keywordReferenceRepository->findOneBy([
+            'name' => $project_name
+        ]);
+
+        // regarde si c'est un projet référent
+        $projectReference = $this->projectReferenceRepository->findOneBy([
+            'name' => $project_name
+        ]);
+      
+
+        if ($keywordReference instanceof KeywordReference) {
+          $projet_keywords_combinaisons = [$project_name];
+        } else {
+          $project_name = str_replace(array("/","(",")",",",":","–","-"), " ",strtolower($project_name));
+          $projet_keywords_combinaisons=$this->genererCombinaisons($project_name, $this->articles);
+          // Tri du tableau pour d'abord chercher des expressions complètes "terrain de football" aura la priorité sur "terrain"
+          usort($projet_keywords_combinaisons, array($this,"compareLength"));
+        }
 
         // Prépare deux tableaux pour les intentions et les objets
         $intentions = [];
         $objects = [];
+
+        // on fait un tableau avec les mots clés exlus
+        $excludedKeywordReferences = [];
+        if ($projectReference instanceof ProjectReference) {
+          foreach ($projectReference->getExcludedKeywordReferences() as $excludedKeywordReference) {
+            $excludedKeywordReferences[] = $excludedKeywordReference->getName();
+          }
+        }
+
+        // on enlève les mots exclus du projet rérérent le cas échéant
+        foreach ($projet_keywords_combinaisons as $key => $synonym) {
+          if (in_array($synonym, $excludedKeywordReferences)) {
+            unset($projet_keywords_combinaisons[$key]);
+          }
+        }
 
         // Parcours les combinaisons de mots
         foreach ($projet_keywords_combinaisons as $synonym) {
