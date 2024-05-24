@@ -80,12 +80,16 @@ class ProjectReference
     #[ORM\Column(nullable: true)]
     private ?int $nbSearchResult = null;
 
+    #[ORM\ManyToMany(targetEntity: KeywordReference::class, inversedBy: 'requiredProjectReferences')]
+    private Collection $requiredKeywordReferences;
+
     public function __construct()
     {
         $this->projects = new ArrayCollection();
         $this->aids = new ArrayCollection();
         $this->aidsLive = new ArrayCollection();
         $this->excludedKeywordReferences = new ArrayCollection();
+        $this->requiredKeywordReferences = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -226,6 +230,30 @@ class ProjectReference
     public function setNbSearchResult(?int $nbSearchResult): static
     {
         $this->nbSearchResult = $nbSearchResult;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, KeywordReference>
+     */
+    public function getRequiredKeywordReferences(): Collection
+    {
+        return $this->requiredKeywordReferences;
+    }
+
+    public function addRequiredKeywordReference(KeywordReference $requiredKeywordReference): static
+    {
+        if (!$this->requiredKeywordReferences->contains($requiredKeywordReference)) {
+            $this->requiredKeywordReferences->add($requiredKeywordReference);
+        }
+
+        return $this;
+    }
+
+    public function removeRequiredKeywordReference(KeywordReference $requiredKeywordReference): static
+    {
+        $this->requiredKeywordReferences->removeElement($requiredKeywordReference);
 
         return $this;
     }

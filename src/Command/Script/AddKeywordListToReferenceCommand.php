@@ -57,6 +57,8 @@ class AddKeywordListToReferenceCommand extends Command
     {
         $keywordSynonyms = $this->managerRegistry->getRepository(KeywordSynonymlist::class)->findAll();
 
+        $intentions = ['Désimperméabilisation', 'Construction d\'un bâtiment'];
+
         /** @var KeywordSynonymlist $keywordSynonym */
         foreach ($keywordSynonyms as $keywordSynonym) {
             $synonyms = explode(',', $keywordSynonym->getKeywordsList());
@@ -64,31 +66,49 @@ class AddKeywordListToReferenceCommand extends Command
             $keywodReference = $this->managerRegistry->getRepository(KeywordReference::class)->findOneBy(['name' => $keywordSynonym->getName()]);
             // si on a pas trouvé on regarde avec les synonymes
             $keywodReference = $keywodReference ?? $this->managerRegistry->getRepository(KeywordReference::class)->findCustom(['names' => $synonyms]);
+
+            // gestion intention
+            $intention = false;
+            if (in_array($keywordSynonym->getName(), $intentions)) {
+                $intention = true;
+            }
+            
             // déjà présent, on va voir pour lui ajouter les synonymes
             if ($keywodReference instanceof KeywordReference) {
                 
                 foreach ($synonyms as $synonym) {
                     $synonym = trim($synonym);
+                    if ($synonym == '') {
+                        continue;
+                    }
                     if (!$this->referenceService->keywordHasSynonym($keywodReference, $synonym)) {
                         $newKeyword = new KeywordReference();
                         $newKeyword->setName($synonym);
-                        $newKeyword->setIntention(false);
+                        $newKeyword->setIntention($intention);
                         $keywodReference->addKeywordReference($newKeyword);
                     }
                 }
             } else { // c'est un nouveau
                 $keywodReference = new KeywordReference();
                 $keywodReference->setName(trim($keywordSynonym->getName()));
-                $keywodReference->setIntention(false);
+                $keywodReference->setIntention($intention);
                 foreach ($synonyms as $synonym) {
                     $synonym = trim($synonym);
+                    if ($synonym == '' || $synonym == 'rénovation') {
+                        continue;
+                    }
                     $newKeyword = new KeywordReference();
                     $newKeyword->setName($synonym);
-                    $newKeyword->setIntention(false);
+                    $newKeyword->setIntention($intention);
                     $keywodReference->addKeywordReference($newKeyword);
                 }
             }
 
+            $this->managerRegistry->getManager()->persist($keywodReference);
+            $this->managerRegistry->getManager()->flush();
+
+            // on le réassigne en tant que son propre parent
+            $keywodReference->setParent($keywodReference);
             $this->managerRegistry->getManager()->persist($keywodReference);
             $this->managerRegistry->getManager()->flush();
         }

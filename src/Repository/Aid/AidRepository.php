@@ -424,6 +424,7 @@ class AidRepository extends ServiceEntityRepository
         $dateCheckBrokenLinkMax = $params['dateCheckBrokenLinkMax'] ?? null;
         $nameLike = $params['nameLike'] ?? null;
         $hasNoKeywordReference = $params['hasNoKeywordReference'] ?? null;
+        $withOldKeywords = $params['withOldKeywords'] ?? null;
 
         $qb = $this->createQueryBuilder('a');
 
@@ -434,6 +435,12 @@ class AidRepository extends ServiceEntityRepository
                 ;
         }
 
+        if ($withOldKeywords) {
+            $qb
+                ->innerJoin('a.keywords', 'oldKeywords')
+                ;
+        }
+        
         if ($dateCheckBrokenLinkMax instanceof \DateTime) {
             $qb
                 ->andWhere('a.dateCheckBrokenLink < :dateCheckBrokenLinkMax OR a.dateCheckBrokenLink IS NULL')
@@ -486,6 +493,28 @@ if (isset($synonyms)) {
         $qb
         ->setParameter('projectReference', $projectReference)
         ;
+
+        if (!$projectReference->getRequiredKeywordReferences()->isEmpty()) {
+            $requiredKeywordReferencesName = [];
+            foreach ($projectReference->getRequiredKeywordReferences() as $keywordReference) {
+                $requiredKeywordReferencesName[] = $keywordReference->getName();
+            }
+            $requiredKeywordReferencesName = array_unique($requiredKeywordReferencesName);
+            $requiredKeywordReferencesNameString = implode('|', $requiredKeywordReferencesName);
+
+            $qb->andWhere(
+                '
+                REGEXP(a.name, :requireKeywordReferencesString) = 1
+                OR REGEXP(a.nameInitial, :requireKeywordReferencesString) = 1
+                OR REGEXP(a.description, :requireKeywordReferencesString) = 1
+                OR REGEXP(a.eligibility, :requireKeywordReferencesString) = 1
+                OR REGEXP(a.projectExamples, :requireKeywordReferencesString) = 1
+                OR :projectReference MEMBER OF a.projectReferences
+                '
+            );
+            $qb->setParameter('requireKeywordReferencesString', '\\b'.$requiredKeywordReferencesNameString.'\\b');
+        }
+
     }
     
     // les keywordReferences

@@ -44,6 +44,9 @@ class KeywordReference
     #[ORM\ManyToMany(targetEntity: ProjectReference::class, mappedBy: 'excludedKeywordReferences')]
     private Collection $excludedProjectReferences;
 
+    #[ORM\ManyToMany(targetEntity: ProjectReference::class, mappedBy: 'requiredKeywordReferences')]
+    private Collection $requiredProjectReferences;
+
     public function __construct()
     {
         $this->keywordReferences = new ArrayCollection();
@@ -51,6 +54,7 @@ class KeywordReference
         $this->aids = new ArrayCollection();
         $this->keywordReferenceSuggesteds = new ArrayCollection();
         $this->excludedProjectReferences = new ArrayCollection();
+        $this->requiredProjectReferences = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -232,6 +236,33 @@ class KeywordReference
     {
         if ($this->excludedProjectReferences->removeElement($excludedProjectReference)) {
             $excludedProjectReference->removeExcludedKeywordReference($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, ProjectReference>
+     */
+    public function getRequiredProjectReferences(): Collection
+    {
+        return $this->requiredProjectReferences;
+    }
+
+    public function addRequiredProjectReference(ProjectReference $requiredProjectReference): static
+    {
+        if (!$this->requiredProjectReferences->contains($requiredProjectReference)) {
+            $this->requiredProjectReferences->add($requiredProjectReference);
+            $requiredProjectReference->addRequiredKeywordReference($this);
+        }
+
+        return $this;
+    }
+
+    public function removeRequiredProjectReference(ProjectReference $requiredProjectReference): static
+    {
+        if ($this->requiredProjectReferences->removeElement($requiredProjectReference)) {
+            $requiredProjectReference->removeRequiredKeywordReference($this);
         }
 
         return $this;

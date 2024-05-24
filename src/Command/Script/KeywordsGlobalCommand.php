@@ -42,10 +42,11 @@ class KeywordsGlobalCommand extends Command
 
 
         $commands = [
-            'at:script:keyword_import_references',
-            'at:script:keyword_synonyms_to_reference',
-            'at:script:keywords_to_reference',
-            'at:script:import_keyword_aid'
+            'at:script:keyword_import_references', // les nouveaux mots clés référent
+            'at:script:keyword_synonyms_to_reference', // on recupere les keywordsynonyms pour les ajouter aux keyword references
+            'at:script:import_keyword_aid', // on associe les mots clés aux aides
+            'at:script:keywords_to_reference', // ancien keywords en kewordReference
+            'at:script:project_reference:keywords' // on gestion mots clés / projets référents
         ];
 
         $timeStart = microtime(true);
