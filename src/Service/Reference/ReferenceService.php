@@ -20,11 +20,11 @@ class ReferenceService
 
     public function keywordHasSynonym(KeywordReference $keywordReference, string $synonym): bool
     {
-        if ($keywordReference->getName() == $synonym) {
+        if (strtolower($keywordReference->getName()) == strtolower($synonym)) {
             return true;
         }
         foreach ($keywordReference->getKeywordReferences() as $keywordReferenceChild) {
-            if ($keywordReferenceChild->getName() == $synonym) {
+            if (strtolower($keywordReferenceChild->getName()) == strtolower($synonym)) {
                 return true;
             }
         }

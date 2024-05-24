@@ -62,6 +62,9 @@ class AddKeywordListToReferenceCommand extends Command
         /** @var KeywordSynonymlist $keywordSynonym */
         foreach ($keywordSynonyms as $keywordSynonym) {
             $synonyms = explode(',', $keywordSynonym->getKeywordsList());
+            foreach ($synonyms as $key => $synonym) {
+                $synonyms[$key] = trim($synonym);
+            }
             // on regarde si déjà présent
             $keywodReference = $this->managerRegistry->getRepository(KeywordReference::class)->findOneBy(['name' => $keywordSynonym->getName()]);
             // si on a pas trouvé on regarde avec les synonymes
@@ -75,7 +78,6 @@ class AddKeywordListToReferenceCommand extends Command
             
             // déjà présent, on va voir pour lui ajouter les synonymes
             if ($keywodReference instanceof KeywordReference) {
-                
                 foreach ($synonyms as $synonym) {
                     $synonym = trim($synonym);
                     if ($synonym == '') {
@@ -102,13 +104,13 @@ class AddKeywordListToReferenceCommand extends Command
                     $newKeyword->setIntention($intention);
                     $keywodReference->addKeywordReference($newKeyword);
                 }
+
+                // on le réassigne en tant que son propre parent
+                $keywodReference->setParent($keywodReference);
+                $this->managerRegistry->getManager()->persist($keywodReference);
+                $this->managerRegistry->getManager()->flush();
             }
 
-            $this->managerRegistry->getManager()->persist($keywodReference);
-            $this->managerRegistry->getManager()->flush();
-
-            // on le réassigne en tant que son propre parent
-            $keywodReference->setParent($keywodReference);
             $this->managerRegistry->getManager()->persist($keywodReference);
             $this->managerRegistry->getManager()->flush();
         }
