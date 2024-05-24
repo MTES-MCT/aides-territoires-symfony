@@ -24,6 +24,17 @@
                 {% include 'organization/organization/_menu_organization.html.twig' with { organization_backer: true} %}
 
                 <div id="tabpanel_backer" class="fr-tabs__panel" role="tabpanel" aria-labelledby="tabpanel_backer" tabindex="0">
+                    {% if backer.lastLogBackerEdit %}
+                    {% set messageLastEdit = 'Dernière édition le <strong>' ~ backer.lastLogBackerEdit.timeCreate|format_datetime('long', 'short', locale='fr') ~ '</strong>' %}
+                    {% if backer.lastLogBackerEdit.user %}
+                        {% set messageLastEdit = messageLastEdit ~ ' par <strong>' ~ backer.lastLogBackerEdit.user.firstname ~ ' ' ~ backer.lastLogBackerEdit.user.lastname ~ '</strong>' %}
+                    {% endif %}
+                    {% if backer.lastLogBackerEdit.organization %}
+                        {% set messageLastEdit = messageLastEdit ~ ' pour la structure <strong>' ~ backer.lastLogBackerEdit.organization.name ~ '</strong>' %}
+                    {% endif %}
+                    <p class="fr-alert fr-alert--info fr-alert--sm fr-my-2w">{{ messageLastEdit|raw }}</p>
+                    {% endif %}
+
                     {% if backer.organizations and backer.organizations|length > 1 %}
                         <div class="fr-alert fr-alert--info fr-alert--sm fr-my-2w">
                             <p>Les structures suivantes sont rattachée à cette fiche porteur d'aide :</p>

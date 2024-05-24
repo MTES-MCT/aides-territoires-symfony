@@ -9,6 +9,7 @@ use App\Entity\Directory\Directory;
 use App\Entity\Log\LogAidCreatedsFolder;
 use App\Entity\Log\LogAidSearch;
 use App\Entity\Log\LogAidView;
+use App\Entity\Log\LogBackerEdit;
 use App\Entity\Log\LogBackerView;
 use App\Entity\Log\LogBlogPostView;
 use App\Entity\Log\LogProgramView;
@@ -288,6 +289,9 @@ class Organization // NOSONAR too much methods
     #[ORM\OneToMany(mappedBy: 'organization', targetEntity: BackerAskAssociate::class, orphanRemoval: true)]
     private Collection $backerAskAssociates;
 
+    #[ORM\OneToMany(mappedBy: 'organization', targetEntity: LogBackerEdit::class)]
+    private Collection $logBackerEdits;
+
     public function __construct()
     {
         $this->favoriteProjects = new ArrayCollection();
@@ -307,6 +311,7 @@ class Organization // NOSONAR too much methods
         $this->organizationInvitations = new ArrayCollection();
         $this->aids = new ArrayCollection();
         $this->backerAskAssociates = new ArrayCollection();
+        $this->logBackerEdits = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -1448,6 +1453,36 @@ class Organization // NOSONAR too much methods
             // set the owning side to null (unless already changed)
             if ($backerAskAssociate->getOrganization() === $this) {
                 $backerAskAssociate->setOrganization(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, LogBackerEdit>
+     */
+    public function getLogBackerEdits(): Collection
+    {
+        return $this->logBackerEdits;
+    }
+
+    public function addLogBackerEdit(LogBackerEdit $logBackerEdit): static
+    {
+        if (!$this->logBackerEdits->contains($logBackerEdit)) {
+            $this->logBackerEdits->add($logBackerEdit);
+            $logBackerEdit->setOrganization($this);
+        }
+
+        return $this;
+    }
+
+    public function removeLogBackerEdit(LogBackerEdit $logBackerEdit): static
+    {
+        if ($this->logBackerEdits->removeElement($logBackerEdit)) {
+            // set the owning side to null (unless already changed)
+            if ($logBackerEdit->getOrganization() === $this) {
+                $logBackerEdit->setOrganization(null);
             }
         }
 

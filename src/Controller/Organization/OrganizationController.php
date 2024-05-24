@@ -5,6 +5,7 @@ namespace App\Controller\Organization;
 use App\Controller\FrontController;
 use App\Entity\Backer\Backer;
 use App\Entity\Backer\BackerAskAssociate;
+use App\Entity\Log\LogBackerEdit;
 use App\Entity\Organization\Organization;
 use App\Entity\Organization\OrganizationInvitation;
 use App\Entity\Perimeter\Perimeter;
@@ -715,6 +716,14 @@ class OrganizationController extends FrontController
                         }
                     }
                 }
+
+                // log
+                $logBackerEdit = new LogBackerEdit();
+                $logBackerEdit->setBacker($backer);
+                $logBackerEdit->setUser($user);
+                $logBackerEdit->setOrganization($organization);
+                $managerRegistry->getManager()->persist($logBackerEdit);
+                $managerRegistry->getManager()->flush();
 
                 // message ok
                 if (isset($create)) {

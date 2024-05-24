@@ -13,6 +13,7 @@ use App\Entity\Aid\AidTypeGroup;
 use App\Entity\Blog\BlogPromotionPost;
 use App\Entity\DataSource\DataSource;
 use App\Entity\Log\LogAidSearch;
+use App\Entity\Log\LogBackerEdit;
 use App\Entity\Log\LogBackerView;
 use App\Entity\Organization\Organization;
 use App\Entity\Perimeter\Perimeter;
@@ -181,6 +182,8 @@ class Backer // NOSONAR too much methods
 
     private ArrayCollection $programs;
     private ?ArrayCollection $aidsThematics;
+
+    private ?LogBackerEdit $lastLogBackerEdit = null;
     
     public function __construct()
     {
@@ -196,6 +199,7 @@ class Backer // NOSONAR too much methods
         $this->programs = new ArrayCollection();
         $this->backerLocks = new ArrayCollection();
         $this->backerAskAssociates = new ArrayCollection();
+        $this->logBackerEdits = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -575,6 +579,10 @@ class Backer // NOSONAR too much methods
 
     #[ORM\OneToMany(mappedBy: 'backer', targetEntity: BackerAskAssociate::class, orphanRemoval: true)]
     private Collection $backerAskAssociates;
+
+    #[ORM\OneToMany(mappedBy: 'backer', targetEntity: LogBackerEdit::class, orphanRemoval: true)]
+    #[ORM\OrderBy(['timecreate' => 'DESC'])]
+    private Collection $logBackerEdits;
 
     public function getAidsTechnical() : ?array
     {
@@ -964,6 +972,47 @@ class Backer // NOSONAR too much methods
             }
         }
 
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, LogBackerEdit>
+     */
+    public function getLogBackerEdits(): Collection
+    {
+        return $this->logBackerEdits;
+    }
+
+    public function addLogBackerEdit(LogBackerEdit $logBackerEdit): static
+    {
+        if (!$this->logBackerEdits->contains($logBackerEdit)) {
+            $this->logBackerEdits->add($logBackerEdit);
+            $logBackerEdit->setBacker($this);
+        }
+
+        return $this;
+    }
+
+    public function removeLogBackerEdit(LogBackerEdit $logBackerEdit): static
+    {
+        if ($this->logBackerEdits->removeElement($logBackerEdit)) {
+            // set the owning side to null (unless already changed)
+            if ($logBackerEdit->getBacker() === $this) {
+                $logBackerEdit->setBacker(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getLastLogBackerEdit(): ?LogBackerEdit
+    {
+        return $this->logBackerEdits->first() ? $this->logBackerEdits->first() : null;
+    }
+
+    public function setLastLogBackerEdit(?LogBackerEdit $lastLogBackerEdit): static
+    {
+        $this->lastLogBackerEdit = $lastLogBackerEdit;
         return $this;
     }
 }
