@@ -49,7 +49,11 @@
                         {% if not backerAskAssociatePending %}
                             <div class="fr-alert fr-alert--info fr-alert--sm fr-my-2w">
                                 <p>
-                                    Nous vous invitons à créer votre fiche porteur d'aides pour présenter votre structure sur Aides-territoires. Une fois validée par nos équipes, vous pourrez l'associer à vos aides.
+                                    Nous vous invitons : 
+                                    <ul>
+                                        <li>à vérifier si votre porteur d'aides existe.  Si c'est le cas, vous pouvez demander à y être rattaché.</li>
+                                        <li>sinon à créer votre fiche porteur d'aides pour présenter votre structure sur Aides-territoires.</li>
+                                    </ul>
                                 </p>
                                 <p>Les membres de votre structure peuvent également modifier le contenu de cette fiche. </p>
                             </div>
@@ -75,12 +79,6 @@
                         {% endif %}
 
                         {% if formAskAssociate %}
-                        <div class="fr-alert fr-alert--warning fr-alert--sm fr-my-2w">
-                            <p>
-                                Avant de créer une nouvelle fiche porteur d’aides, veuillez vous assurer qu'elle n'existe pas déjà. Si c'est le cas, vous pouvez demander à être rattachée à cette fiche en cherchant votre porteur d’aides. 
-                            </p>
-                        </div>
-
                         {{ form_start(formAskAssociate)}}
                             {{ form_row(formAskAssociate.backer)}}
                             {{ form_row(formAskAssociate.description)}}
