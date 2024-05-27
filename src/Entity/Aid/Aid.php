@@ -52,6 +52,7 @@ use App\Filter\Aid\AidTechnicalAidFilter;
 use App\Filter\Aid\AidTextFilter;
 use App\Filter\Aid\AidTypeGroupFilter;
 use App\Service\Doctrine\DoctrineConstants;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: AidRepository::class)]
 #[ORM\Index(columns: ['status'], name: 'status_aid')]
@@ -161,6 +162,8 @@ class Aid // NOSONAR too much methods
     #[Groups([self::API_GROUP_LIST, self::API_GROUP_ITEM])]
     private ?string $status = null;
 
+    #[Assert\Url()]
+    #[Assert\Length(max: 700, maxMessage: 'Le lien ne doit pas dépasser {{ limit }} caractères')]
     #[ApiProperty(
         openapiContext: [
             'description' => 'Lien vers plus d\'informations',
@@ -168,7 +171,7 @@ class Aid // NOSONAR too much methods
         ]
     )]
     #[Groups([self::API_GROUP_LIST, self::API_GROUP_ITEM])]
-    #[ORM\Column(length: 255, nullable: true)]
+    #[ORM\Column(length: 700, nullable: true)]
     private ?string $originUrl = null;
 
     #[ApiProperty(
@@ -299,8 +302,9 @@ class Aid // NOSONAR too much methods
     #[ORM\ManyToOne(inversedBy: 'aids')]
     private ?Perimeter $perimeter = null;
 
+    #[Assert\Length(max: 700, maxMessage: 'Le lien ne doit pas dépasser {{ limit }} caractères')]
     #[Groups([self::API_GROUP_LIST, self::API_GROUP_ITEM])]
-    #[ORM\Column(length: 255, nullable: true)]
+    #[ORM\Column(length: 700, nullable: true)]
     private ?string $applicationUrl = null;
 
     #[Groups([self::API_GROUP_LIST, self::API_GROUP_ITEM])]
