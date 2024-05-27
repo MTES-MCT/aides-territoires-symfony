@@ -25,7 +25,7 @@ class ImageService
         /**
      * Envoi une image (deja uploadee / traitee sur le serveur) sur le cloud
      *
-     * @param UploadedFile $file
+     * @param string $file
      * @param string $uploadDir
      * @param string $fileName
      * @return boolean
@@ -43,17 +43,37 @@ class ImageService
         try {
             // resize image avec \Imagick
             $imagick = new \Imagick($file);
-            $imagick = $this->imagickAutorotate($imagick);
-            $maxWidth = 1024;
-            $maxHeight = 1024;
-            // image trop grande, on la reisze
-            if ($imagick->getImageWidth() > $maxWidth || $imagick->getImageHeight() > $maxHeight) {
-                $imagick->resizeImage($maxWidth, $maxHeight, \Imagick::FILTER_LANCZOS, 1, true);
+            if ($imagick->getImageMimeType() == 'image/svg+xml') {
+                // Charge le fichier SVG comme un document XML
+                $svg = simplexml_load_file($file);
+
+                // Supprime les éléments script
+                foreach ($svg->xpath('//script') as $script) {
+                    unset($script[0]);
+                }
+
+                // Supprime les éléments de métadonnées
+                foreach ($svg->xpath('//metadata') as $metadata) {
+                    unset($metadata[0]);
+                }
+
+                // Écrit le document XML nettoyé dans le fichier
+                file_put_contents($file, $svg->asXML());
             } else {
-                // si pas besoin de rezie, on la remet au même format pour nettoyer les métadonnées
-                $imagick->cropThumbnailImage($imagick->getImageWidth(), $imagick->getImageHeight(), true);
+                $imagick = $this->imagickAutorotate($imagick);
+                $maxWidth = 1024;
+                $maxHeight = 1024;
+                // image trop grande, on la reisze
+                if ($imagick->getImageWidth() > $maxWidth || $imagick->getImageHeight() > $maxHeight) {
+                    $imagick->resizeImage($maxWidth, $maxHeight, \Imagick::FILTER_LANCZOS, 1, true);
+                } else {
+                    // si pas besoin de rezie, on la remet au même format pour nettoyer les métadonnées
+                    $imagick->cropThumbnailImage($imagick->getImageWidth(), $imagick->getImageHeight(), true);
+                }
+                $imagick->writeImage($file);
             }
-            $imagick->writeImage($file);
+            $imagick->clear();
+
 
             // Créer un objet Credentials en utilisant les clés d'accès AWS
             $credentials = new Credentials($this->paramService->get('aws_access_key_id'), $this->paramService->get('aws_secret_access_key'));
@@ -141,29 +161,41 @@ class ImageService
                 $tmpFolder,
                 preg_replace('/' . preg_quote($uploadDir, '/') . '/', '', $fileName)
             );
-            $tmpFile = $tmpFolder . preg_replace('/' . preg_quote($uploadDir, '/') . '/', '', $fileName);
-
+            $tmpFile = rtrim($tmpFolder, '/') . '/' . ltrim(preg_replace('/' . preg_quote($uploadDir, '/') . '/', '', $fileName), '/');
+            
             // resize image avec \Imagick
             $imagick = new \Imagick($tmpFile);
-            $imagick = $this->imagickAutorotate($imagick);
-            $maxWidth = 1024;
-            $maxHeight = 1024;
-            // image trop grande, on la reisze
-            if ($imagick->getImageWidth() > $maxWidth || $imagick->getImageHeight() > $maxHeight) {
-                $imagick->resizeImage($maxWidth, $maxHeight, \Imagick::FILTER_LANCZOS, 1, true);
-            } else {
-                // si pas besoin de rezie, on la remet au même format pour nettoyer les métadonnées
-                $imagick->cropThumbnailImage($imagick->getImageWidth(), $imagick->getImageHeight(), true);
-            }
-
             if ($imagick->getImageMimeType() == 'image/svg+xml') {
-                // Copie le fichier SVG sans utiliser Imagick car cela provoque une erreur : Failed to read the file
-                copy($tmpFile, $tmpFile);
+                // Charge le fichier SVG comme un document XML
+                $svg = simplexml_load_file($tmpFile);
+
+                // Supprime les éléments script
+                foreach ($svg->xpath('//script') as $script) {
+                    unset($script[0]);
+                }
+
+                // Supprime les éléments de métadonnées
+                foreach ($svg->xpath('//metadata') as $metadata) {
+                    unset($metadata[0]);
+                }
+
+                // Écrit le document XML nettoyé dans le fichier
+                file_put_contents($tmpFile, $svg->asXML());
             } else {
+                $imagick = $this->imagickAutorotate($imagick);
+                $maxWidth = 1024;
+                $maxHeight = 1024;
+                // image trop grande, on la reisze
+                if ($imagick->getImageWidth() > $maxWidth || $imagick->getImageHeight() > $maxHeight) {
+                    $imagick->resizeImage($maxWidth, $maxHeight, \Imagick::FILTER_LANCZOS, 1, true);
+                } else {
+                    // si pas besoin de rezie, on la remet au même format pour nettoyer les métadonnées
+                    $imagick->cropThumbnailImage($imagick->getImageWidth(), $imagick->getImageHeight(), true);
+                }
                 $imagick->writeImage($tmpFile);
             }
             $imagick->clear();
-            
+
             // Créer un objet Credentials en utilisant les clés d'accès AWS
             $credentials = new Credentials($this->paramService->get('aws_access_key_id'), $this->paramService->get('aws_secret_access_key'));
             

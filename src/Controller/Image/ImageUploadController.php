@@ -50,28 +50,14 @@ class ImageUploadController extends FrontController {
             }
 
             // si file, on la met dans le dossier temporaire
-            $tmpFile = null;
             if ($image) {
                 $tmpFolder = $fileService->getUploadTmpDir();
                 $image->move(
                     $tmpFolder,
                     $newFilename
                 );
-                $tmpFile = $tmpFolder.'/'.$newFilename;
             }
 
-            $imagickSrc = $tmpFile;
-
-            // ouvre l'image avec imagick
-            $imagick = new \Imagick($imagickSrc);
-            // auto-rotate
-            $imagick = $this->imagickAutorotate($imagick);
-            // format jpg par défaut
-            $imagick->setImageFormat('jpg');
-            // force resize pour nettoyer code malveillant
-            $imagick->cropThumbnailImage($imagick->getImageWidth(), $imagick->getImageHeight());
-            // ecriture image dans dossier temporaire
-            $imagick->writeImage($fileService->getUploadTmpDir().'/'.$newFilename);
             // envoi au cloud
             $imageService->sendImageToCloud(
                 $fileService->getUploadTmpDir().'/'.$newFilename,
