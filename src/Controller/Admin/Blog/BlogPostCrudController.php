@@ -66,7 +66,7 @@ class BlogPostCrudController extends AtCrudController
         ->setBasePath($this->paramService->get('cloud_image_url'))
         ->setUploadedFileNamePattern(BlogPost::FOLDER.'/[slug]-[timestamp].[extension]')
         ->setFormTypeOption('upload_new', function(UploadedFile $file, string $uploadDir, string $fileName) {
-            $this->imageService->sendImageToCloud($file, BlogPost::FOLDER, $fileName);
+            $this->imageService->sendUploadedImageToCloud($file, BlogPost::FOLDER, $fileName);
             $this->getContext()->getEntity()->getInstance()->setLogo($fileName);
         })
         ->onlyOnForms()

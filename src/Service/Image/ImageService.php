@@ -155,8 +155,15 @@ class ImageService
                 // si pas besoin de rezie, on la remet au même format pour nettoyer les métadonnées
                 $imagick->cropThumbnailImage($imagick->getImageWidth(), $imagick->getImageHeight(), true);
             }
-            $imagick->writeImage($tmpFile);
 
+            if ($imagick->getImageMimeType() == 'image/svg+xml') {
+                // Copie le fichier SVG sans utiliser Imagick car cela provoque une erreur : Failed to read the file
+                copy($tmpFile, $tmpFile);
+            } else {
+                $imagick->writeImage($tmpFile);
+            }
+            $imagick->clear();
+            
             // Créer un objet Credentials en utilisant les clés d'accès AWS
             $credentials = new Credentials($this->paramService->get('aws_access_key_id'), $this->paramService->get('aws_secret_access_key'));
             

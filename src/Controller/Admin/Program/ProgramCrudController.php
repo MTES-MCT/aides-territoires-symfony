@@ -50,7 +50,7 @@ class ProgramCrudController extends AtCrudController
         ->setBasePath($this->paramService->get('cloud_image_url'))
         ->setUploadedFileNamePattern(Program::FOLDER.'/[slug]-[timestamp].[extension]')
         ->setFormTypeOption('upload_new', function(UploadedFile $file, string $uploadDir, string $fileName) {
-            $this->imageService->sendImageToCloud($file, Program::FOLDER, $fileName);
+            $this->imageService->sendUploadedImageToCloud($file, Program::FOLDER, $fileName);
             $this->getContext()->getEntity()->getInstance()->setLogo($fileName);
         })
         ->onlyOnForms()
