@@ -32,32 +32,17 @@ class UploadController extends FrontController {
             $newFilename = $safeFilename.'-'.uniqid().'.'.$image->guessExtension();
         }
 
+        // si file, on la met dans le dossier temporaire
+        if ($image) {
+            $tmpFolder = $fileService->getUploadTmpDir();
+            $image->move(
+                $tmpFolder,
+                $newFilename
+            );
+        }
+        
         // gestion de l'image
         try {
-            // si file, on la met dans le dossier temporaire
-            $tmpFile = null;
-            if ($image) {
-                $tmpFolder = $fileService->getUploadTmpDir();
-                $image->move(
-                    $tmpFolder,
-                    $newFilename
-                );
-                $tmpFile = $tmpFolder.'/'.$newFilename;
-            }
-
-            $imagickSrc = $tmpFile;
-
-            // ouvre l'image avec imagick
-            $imagick = new \Imagick($imagickSrc);
-            // auto-rotate
-            $imagick = $this->imagickAutorotate($imagick);
-            // format jpg par défaut
-            $imagick->setImageFormat('jpg');
-            // force resize pour nettoyer code malveillant
-            $imagick->cropThumbnailImage($imagick->getImageWidth(), $imagick->getImageHeight());
-
-            $imagick->writeImage($fileService->getUploadTmpDir().'/'.$newFilename);
-
             $imageService->sendImageToCloud(
                 $fileService->getUploadTmpDir().'/'.$newFilename,
                 'upload',
