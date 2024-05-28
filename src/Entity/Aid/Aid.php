@@ -602,7 +602,7 @@ class Aid // NOSONAR too much methods
     private int $nbViews = 0;
     private int $scoreTotal = 0;
     private int $scoreObjects = 0;
-    private bool $projectReferencesAssociated =false;
+    private ?ArrayCollection $projectReferencesSearched = null;
 
     #[Groups([self::API_GROUP_LIST, self::API_GROUP_ITEM])]
     private ?string $url = null;
@@ -673,6 +673,7 @@ class Aid // NOSONAR too much methods
         $this->projectReferences = new ArrayCollection();
         $this->aidLocks = new ArrayCollection();
         $this->keywordReferenceSuggesteds = new ArrayCollection();
+        $this->projectReferencesSearched = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -2508,15 +2509,36 @@ class Aid // NOSONAR too much methods
 
         return $this;
     }
- 
-    public function isProjectReferencesAssociated(): bool
+
+    /**
+     * @return Collection|ProjectReferenceSearched[]
+     */
+    public function getProjectReferencesSearched(): Collection
     {
-        return $this->projectReferencesAssociated;
+        if (!$this->projectReferencesSearched) {
+            $this->projectReferencesSearched = new ArrayCollection();
+        }
+        return $this->projectReferencesSearched;
     }
 
-    public function setProjectReferencesAssociated(bool $projectReferencesAssociated): static
+    public function addProjectReferenceSearched(ProjectReference $projectReferenceSearched): self
     {
-        $this->projectReferencesAssociated = $projectReferencesAssociated;
+        if (!$this->projectReferencesSearched) {
+            $this->projectReferencesSearched = new ArrayCollection();
+        }
+        if (!$this->projectReferencesSearched->contains($projectReferenceSearched)) {
+            $this->projectReferencesSearched[] = $projectReferenceSearched;
+        }
+
+        return $this;
+    }
+
+    public function removeProjectReferenceSearched(ProjectReference $projectReferenceSearched): self
+    {
+        if (!$this->projectReferencesSearched) {
+            $this->projectReferencesSearched = new ArrayCollection();
+        }
+        $this->projectReferencesSearched->removeElement($projectReferenceSearched);
         return $this;
     }
 }

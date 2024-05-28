@@ -24,16 +24,6 @@
                     <a href="{{ path('app_aid_aid_details', {'slug': aid.slug}) }}{% if integration is defined %}?integration=integration{% endif %}">
                     {{ aid.name }} {% if app.user and app.user and isUserGranted(app.user, constant('App\\Entity\\User\\User::ROLE_ADMIN')) %}(st: {{ aid.scoreTotal}}, so: {{ aid.scoreObjects}}){% endif %}
                     </a>
-                    {% if aid.isProjectReferencesAssociated %}
-                        {% set styleBadge = random(1, 3) %}
-                        {% if styleBadge == 2 %}
-                            <div class="badge-aid-associated-2"><span class="fr-icon-award-fill fr-icon--lg" title="Cette aide est associé au projet référent que vous recherchez"></span></div>
-                        {% elseif styleBadge == 1 %}
-                            <div class="badge-aid-associated-1"><span class="fr-icon-thumb-up-fill" title="Cette aide est associé au projet référent que vous recherchez"></span></div>
-                        {% else %}
-                            <div class="badge-aid-associated-3"><span title="Cette aide est associé au projet référent que vous recherchez">Certifié</span></div>
-                        {% endif %}
-                    {% endif %}
                 </td>
                 <td>
                     {% if aid.aidFinancers %}
