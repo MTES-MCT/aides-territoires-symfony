@@ -32,7 +32,7 @@
                             {% set titleOthers = titleOthers ~ projectReference.name ~ ', ' %}
                         {% endif %}
                     {% endfor %}
-                    <span class="fr-badge fr-badge--sm fr-badge--new fr-badge--no-icon" title="{{ titleOthers }}">+{{ totalProjectReferences - maxDisplay }} autre{% if totalProjectReferences - maxDisplay > 1 %}s{% endif %}</span>
+                    <span class="fr-badge fr-badge--sm fr-badge--new fr-badge--no-icon" title="{{ titleOthers }}">+{{ totalProjectReferences - maxDisplay }} {% if totalProjectReferences - maxDisplay > 1 %}autres projets{% else %}autre projet{% endif %}</span>
                 {% endif %}
             </div>
 
