@@ -329,7 +329,7 @@ class AidEditType extends AbstractType
                 'attr' => [
                     'placeholder' => 'Si vous avez un descriptif, n’hésitez pas à le copier ici.
                     Essayez de compléter le descriptif avec le maximum d’informations.
-                    Si l’on vous contacte régulièrement pour vous demander les mêmes "
+                    Si l’on vous contacte régulièrement pour vous demander les mêmes 
                     informations, essayez de donner des éléments de réponses dans cet espace.',
                     'class' => 'trumbowyg',
                     'cols' => 40,

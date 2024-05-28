@@ -77,8 +77,8 @@ class OrganizationRepository extends ServiceEntityRepository
         );
         $qb->innerJoin('o.perimeter', 'perimeter');
         $qb->addSelect('perimeter.code AS perimeter__code, perimeter.name as perimeter__name');
-        $qb->innerJoin('o.beneficiairies', 'beneficiairies');
-        $qb->addSelect('beneficiairies.email AS user__email');
+        $qb->innerJoin('o.beneficiairies', 'beneficiairiesForCommune');
+        $qb->addSelect('beneficiairiesForCommune.email AS user__email');
         $qb->addSelect('organizationType.name AS organization_type');
 
         return $qb->getQuery()->getResult();       
@@ -124,8 +124,8 @@ class OrganizationRepository extends ServiceEntityRepository
         );
         $qb->innerJoin('o.perimeter', 'perimeter');
         $qb->addSelect('perimeter.id AS perimeter__id, perimeter.code AS perimeter__code, perimeter.name as perimeter__name');
-        $qb->innerJoin('o.beneficiairies', 'beneficiairies');
-        $qb->addSelect('beneficiairies.email AS user__email');
+        $qb->innerJoin('o.beneficiairies', 'beneficiairiesForEpcis');
+        $qb->addSelect('beneficiairiesForEpcis.email AS user__email');
         $qb->addSelect('organizationType.name AS organization_type');
 
         return $qb->getQuery()->getResult();       
@@ -154,10 +154,10 @@ class OrganizationRepository extends ServiceEntityRepository
     {
         $result = $this->createQueryBuilder('o')
         ->select('COUNT(o.id) AS nb')
-        ->innerJoin('o.beneficiairies','beneficiairies')
+        ->innerJoin('o.beneficiairies','beneficiairiesForCollaborators')
         ->andWhere('o = :userOrganization')
         ->setParameter('userOrganization', $user->getDefaultOrganization())
-        ->andWhere('beneficiairies != :user')
+        ->andWhere('beneficiairiesForCollaborators != :user')
         ->setParameter('user', $user)
         ->getQuery()
         ->getResult()
