@@ -170,7 +170,7 @@ class UserService
     public function getPublicProjectLatestView(User $user, Project $project): ?LogPublicProjectView
     {
         foreach ($user->getLogPublicProjectViews() as $publicProjectView) {
-            if ($publicProjectView->getProject()->getId() === $project->getId()) {
+            if ($publicProjectView->getProject() && $publicProjectView->getProject()->getId() === $project->getId()) {
                 return $publicProjectView;
             }
         }
