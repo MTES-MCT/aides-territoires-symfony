@@ -6,6 +6,7 @@ use App\Entity\Aid\Aid;
 use App\Entity\Aid\AidLock;
 use App\Entity\Aid\AidProject;
 use App\Entity\Aid\AidSuggestedAidProject;
+use App\Entity\Backer\BackerAskAssociate;
 use App\Entity\Backer\BackerLock;
 use App\Entity\Bundle\Bundle;
 use App\Entity\Cron\CronExportSpreadsheet;
@@ -17,6 +18,7 @@ use App\Entity\Log\LogAdminAction;
 use App\Entity\Log\LogAidCreatedsFolder;
 use App\Entity\Log\LogAidSearch;
 use App\Entity\Log\LogAidView;
+use App\Entity\Log\LogBackerEdit;
 use App\Entity\Log\LogBackerView;
 use App\Entity\Log\LogBlogPostView;
 use App\Entity\Log\LogProgramView;
@@ -316,6 +318,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: SearchPageLock::class, orphanRemoval: true)]
     private Collection $searchPageLocks;
 
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: BackerAskAssociate::class, orphanRemoval: true)]
+    private Collection $backerAskAssociates;
+
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: LogBackerEdit::class)]
+    private Collection $logBackerEdits;
+
     public function __construct()
     {
         $this->logUserLogins = new ArrayCollection();
@@ -356,6 +364,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
         $this->backerLocks = new ArrayCollection();
         $this->projectLocks = new ArrayCollection();
         $this->searchPageLocks = new ArrayCollection();
+        $this->backerAskAssociates = new ArrayCollection();
+        $this->logBackerEdits = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -1967,6 +1977,66 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
             // set the owning side to null (unless already changed)
             if ($searchPageLock->getUser() === $this) {
                 $searchPageLock->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, BackerAskAssociate>
+     */
+    public function getBackerAskAssociates(): Collection
+    {
+        return $this->backerAskAssociates;
+    }
+
+    public function addBackerAskAssociate(BackerAskAssociate $backerAskAssociate): static
+    {
+        if (!$this->backerAskAssociates->contains($backerAskAssociate)) {
+            $this->backerAskAssociates->add($backerAskAssociate);
+            $backerAskAssociate->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeBackerAskAssociate(BackerAskAssociate $backerAskAssociate): static
+    {
+        if ($this->backerAskAssociates->removeElement($backerAskAssociate)) {
+            // set the owning side to null (unless already changed)
+            if ($backerAskAssociate->getUser() === $this) {
+                $backerAskAssociate->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, LogBackerEdit>
+     */
+    public function getLogBackerEdits(): Collection
+    {
+        return $this->logBackerEdits;
+    }
+
+    public function addLogBackerEdit(LogBackerEdit $logBackerEdit): static
+    {
+        if (!$this->logBackerEdits->contains($logBackerEdit)) {
+            $this->logBackerEdits->add($logBackerEdit);
+            $logBackerEdit->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeLogBackerEdit(LogBackerEdit $logBackerEdit): static
+    {
+        if ($this->logBackerEdits->removeElement($logBackerEdit)) {
+            // set the owning side to null (unless already changed)
+            if ($logBackerEdit->getUser() === $this) {
+                $logBackerEdit->setUser(null);
             }
         }
 

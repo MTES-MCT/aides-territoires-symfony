@@ -4,8 +4,10 @@ namespace App\EventListener;
 
 use App\Entity\Aid\Aid;
 use App\Entity\Backer\Backer;
+use App\Entity\Backer\BackerAskAssociate;
 use App\Entity\Log\LogAdminAction;
 use App\EventListener\Aid\AidListener;
+use App\EventListener\Backer\BackerAskAssociateListener;
 use App\EventListener\Backer\BackerListener;
 use App\Service\User\UserService;
 use Doctrine\Bundle\DoctrineBundle\Attribute\AsDoctrineListener;
@@ -19,12 +21,13 @@ use Symfony\Component\Security\Http\FirewallMapInterface;
 class PostUpdateListener
 {
     public function __construct(
-        protected RequestStack $requestStack,
-        protected UserService $userService,
-        protected FirewallMapInterface $firewallMapInterface,
-        protected ManagerRegistry $managerRegistry,
-        protected AidListener $aidListener,
-        protected BackerListener $backerListener
+        private RequestStack $requestStack,
+        private UserService $userService,
+        private FirewallMapInterface $firewallMapInterface,
+        private ManagerRegistry $managerRegistry,
+        private AidListener $aidListener,
+        private BackerListener $backerListener,
+        private BackerAskAssociateListener $backerAskAssociateListener
     ) {}
 
     public function postUpdate(PostUpdateEventArgs $args): void
@@ -37,6 +40,11 @@ class PostUpdateListener
         // Porteurs d'aides
         if ($args->getObject() instanceof Backer) {
             $this->backerListener->onPostUpdate($args);
+        }
+
+        // demande association porteur
+        if ($args->getObject() instanceof BackerAskAssociate) {
+            $this->backerAskAssociateListener->onPostUpdate($args);
         }
         
         // LOG ADMIN

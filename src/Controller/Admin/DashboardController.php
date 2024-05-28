@@ -3,6 +3,7 @@
 namespace App\Controller\Admin;
 
 use App\Controller\Admin\Aid\AidCrudController;
+use App\Controller\Admin\Backer\BackerAskAssociateCrudController;
 use App\Controller\Admin\Backer\BackerCrudController;
 use App\Controller\Admin\Page\PageCrudController;
 use App\Controller\Admin\Project\ProjectCrudController;
@@ -17,6 +18,7 @@ use App\Entity\Aid\AidType;
 use App\Entity\Aid\AidTypeGroup;
 use App\Entity\Alert\Alert;
 use App\Entity\Backer\Backer;
+use App\Entity\Backer\BackerAskAssociate;
 use App\Entity\Backer\BackerCategory;
 use App\Entity\Backer\BackerGroup;
 use App\Entity\Backer\BackerSubcategory;
@@ -52,6 +54,7 @@ use App\Entity\Reference\ProjectReferenceCategory;
 use App\Entity\Search\SearchPage;
 use App\Entity\User\ApiTokenAsk;
 use App\Entity\User\User;
+use App\Repository\Backer\BackerAskAssociateRepository;
 use App\Service\User\UserService;
 use Doctrine\Persistence\ManagerRegistry;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
@@ -151,6 +154,17 @@ class DashboardController extends AbstractDashboardController
             ->set('filters[active][value]', false)
             ->generateUrl();
 
+        // demande d'association en attente
+        /** @var BackerAskAssociateRepository $backerAskAssociateRepo */
+        $backerAskAssociateRepo = $this->managerRegistry->getRepository(BackerAskAssociate::class);
+        $nbBackerAskAssociatePending = $backerAskAssociateRepo->countPendings();
+        $urlBackerAskAssociatePending = $this->adminUrlGenerator
+            ->setController(BackerAskAssociateCrudController::class)
+            ->setAction(Action::INDEX)
+            ->set('filters[accepted][value]', false)
+            ->set('filters[refused][value]', false)
+            ->generateUrl();
+
         // rendu template
         return $this->render('admin/dashboard.html.twig', [
             'nbAidsInReview' => $nbAidsInReview,
@@ -164,6 +178,8 @@ class DashboardController extends AbstractDashboardController
             'urlProjectsInReview' => $urlProjectsInReview,
             'nbBackersInReview' => $nbBackersInReview,
             'urlBackersInReview' => $urlBackersInReview,
+            'nbBackerAskAssociatePending' => $nbBackerAskAssociatePending,
+            'urlBackerAskAssociatePending' => $urlBackerAskAssociatePending
         ]);
     }
     public function configureAssets(): Assets
@@ -222,6 +238,7 @@ class DashboardController extends AbstractDashboardController
             MenuItem::linkToCrud('Sous-Catégories', 'fas fa-list', BackerSubcategory::class),
             MenuItem::linkToCrud('Groupes', 'fas fa-list', BackerGroup::class),
             MenuItem::linkToCrud('Porteurs', 'fas fa-list', Backer::class),
+            MenuItem::linkToCrud('Demandes association', 'fas fa-list', BackerAskAssociate::class),
         ]);
 
         yield MenuItem::subMenu('Programmes', 'fas fa-table')->setSubItems([

@@ -39,7 +39,7 @@ class BackerEditType extends AbstractType
                 ],
                 'expanded' => true,
                 'constraints' => [
-                    new Assert\NotBlank([
+                    new Assert\NotNull([
                         'message' => 'Veuillez indiquer si le porteur est privé ou non.',
                     ]),
                 ],

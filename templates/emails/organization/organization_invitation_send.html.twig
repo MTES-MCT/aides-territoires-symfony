@@ -8,10 +8,10 @@
 <p>En rejoignant sa structure, vous pourrez gérer en commun des projets et des collaborateurs avec {{ organizationInvitation.author.firstname }} {{ organizationInvitation.author.lastname }}.</p>
 
 {% if not organizationInvitation.guest %}
-    <p>Pour ce faire, il vous suffit de vous inscrire puis d'accepter son ivitation dans Mon Compte > Ma Structure > Mes invitations :</p>
+    <p>Pour ce faire, il vous suffit de vous inscrire puis d'accepter son invitation dans Mon Compte > Ma Structure > Mes invitations :</p>
     <p><a href="{{ absolute_url(url('app_user_user_register')) }}" title="S'inscrire">{{ absolute_url(url('app_user_user_register')) }}</a></p>
 {% else %}
-    <p>Pour ce faire, il vous suffit d'accepter son ivitation dans Mon Compte > Ma Structure > Mes invitations :</p>
+    <p>Pour ce faire, il vous suffit d'accepter son invitation dans Mon Compte > Ma Structure > Mes invitations :</p>
     <p><a href="{{ absolute_url(url('app_organization_invitations')) }}" title="Gérer l'invitation">{{ absolute_url(url('app_organization_invitations')) }}</a></p>
 {% endif %}
 

@@ -54,6 +54,17 @@ class AidEditType extends AbstractType
     }
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        // regarde si l'utilisateur à rempli toutes ses fiches porteur d'aides
+        $user = $this->userService->getUserLogged();
+        $nbBackerNeedUpdate = 0;
+        /** @var Organization $organization */
+        foreach ($user->getOrganizations() as $organization) {
+            if (!$organization->getBacker()) {
+                $nbBackerNeedUpdate++;
+            }
+        }
+
+        
         // l'aide
         $aid = $options['data'] ?? null;
         // est en brouillon ?
@@ -95,7 +106,11 @@ class AidEditType extends AbstractType
             'label' => 'La structure pour laquelle vous publiez cette aide',
             'class' => Organization::class,
             'choice_label' => function(Organization $organization) {
-                return $organization->getName();
+                $return = $organization->getName();
+                if (!$organization->getBacker()) {
+                    $return .= ' (fiche porteur d\'aides à renseigner)';
+                }
+                return $return;
             },
             'query_builder' => function(EntityRepository $entityRepository) {
                 return $entityRepository->createQueryBuilder('o')
@@ -107,6 +122,22 @@ class AidEditType extends AbstractType
             },
             'placeholder' => 'Choisissez une structure',
         ];
+
+        if ($nbBackerNeedUpdate > 0) {
+            $message = ($nbBackerNeedUpdate > 1)
+                        ? 'Les fiches porteurs des structures suivantes ne sont pas renseignées :'
+                        : 'La fiche porteur de la structure suivante n\'est pas renseignée :'
+                        ;
+            $help = '<div class="fr-alert fr-alert--warning">'.$message;
+            foreach ($user->getOrganizations() as $organization) {
+                if (!$organization->getBacker()) {
+                    $help .= '<br />- <a href="' . $this->routerInterface->generate('app_organization_backer_edit', ['id' => $organization->getId(), 'idBacker' => 0]) . '">' . $organization->getName() . '</a>';
+                }
+            }
+            $help .= '</div>';
+            $organizationParams['help'] = $help;
+            $organizationParams['help_html'] = true;
+        }
 
         $builder
             ->add('name', TextType::class, [
@@ -155,7 +186,6 @@ class AidEditType extends AbstractType
                 'multiple' => true,
                 'query_builder' => function(BackerRepository $backerRepository) {
                     return $backerRepository->getQueryBuilder([
-                        'active' => true,
                         'orderBy' => [
                             'sort' => 'b.name',
                             'order' => 'ASC'
@@ -186,7 +216,6 @@ class AidEditType extends AbstractType
                 'multiple' => true,
                 'query_builder' => function(BackerRepository $backerRepository) {
                     return $backerRepository->getQueryBuilder([
-                        'active' => true,
                         'orderBy' => [
                             'sort' => 'b.name',
                             'order' => 'ASC'

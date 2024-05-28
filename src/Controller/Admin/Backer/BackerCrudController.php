@@ -56,7 +56,11 @@ class BackerCrudController extends AtCrudController
                 $return .= '- '.$organization->getName().'<br />';
             }
             return $return;
-        });
+        })
+        ->setFormTypeOptions([
+            'by_reference' => false,
+        ])
+        ;
         yield TrumbowygField::new('description', 'Description')
         ->onlyOnForms();
         yield TrumbowygField::new('backerType', 'Type de porteur')
