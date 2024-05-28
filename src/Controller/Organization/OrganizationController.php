@@ -73,33 +73,6 @@ class OrganizationController extends FrontController
                 $managerRegistry->getManager()->persist($user);
                 $managerRegistry->getManager()->flush();
             }
-
-
-            // si on a des infos manquantes, on va voir si elles sont dans les autres tables
-            if (!$organization->getSirenCode() || !$organization->getSiretCode() || !$organization->getApeCode() || $organization->getInseeCode()) {
-                if ($organization->getPerimeter() && $organization->getOrganizationType()) {
-                    if (!$organization->getSirenCode() && $organization->getPerimeter()->getSiren()) {
-                        $organization->setSirenCode($organization->getPerimeter()->getSiren());
-                    }
-                    if (!$organization->getSiretCode() && $organization->getPerimeter()->getSiret()) {
-                        $organization->setSiretCode($organization->getPerimeter()->getSiret());
-                    }
-                    if (!$organization->getInseeCode() && $organization->getPerimeter()->getInsee()) {
-                        $organization->setInseeCode($organization->getPerimeter()->getInsee());
-                    }
-                    if (!$organization->getApeCode()) {
-                        $perimeterDatas = $perimeterDataRepository->findBy([
-                            'perimeter' => $organization->getPerimeter(),
-                        ]);
-                        foreach ($perimeterDatas as $perimeterData) {
-                            if ($perimeterData->getProp() == 'ape_code') {
-                                $organization->setApeCode($perimeterData->getValue());
-                                break;
-                            }
-                        }
-                    }
-                }
-            }
         }
 
         // formulaire edition organization
