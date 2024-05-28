@@ -6,10 +6,35 @@
 <div class="fr-card fr-enlarge-link  fr-card--grey">
     <div class="fr-card__body">
         <div class="fr-card__content">
-            
-            {% for projectReference in aid.projectReferencesSearched %}
-                <span class="fr-badge fr-badge--sm fr-badge--new fr-badge--no-icon">{{ projectReference.name }}</span>
-            {% endfor %}
+            <div class="badges-wrapper">
+                {% set maxDisplay = 2 %}
+                {% set totalProjectReferences = aid.projectReferences|length %}
+                {% set projectReferencesDisplayed = [] %}
+                {% set count = 0 %}
+                {% for projectReference in aid.projectReferencesSearched %}
+                    {% if count < maxDisplay %}
+                        <span class="fr-badge fr-badge--sm fr-badge--success fr-badge--no-icon">{{ projectReference.name }}</span>
+                        {% set count = count + 1 %}
+                    {% endif %}
+                    {% set projectReferencesDisplayed = projectReferencesDisplayed|merge([projectReference]) %}
+                {% endfor %}
+                {% for projectReference in aid.projectReferences %}
+                    {% if projectReference not in aid.projectReferencesSearched and count < maxDisplay %}
+                        <span class="fr-badge fr-badge--sm fr-badge--new fr-badge--no-icon">{{ projectReference.name }}</span>
+                        {% set projectReferencesDisplayed = projectReferencesDisplayed|merge([projectReference]) %}
+                        {% set count = count + 1 %}
+                    {% endif %}
+                {% endfor %}
+                {% if totalProjectReferences > maxDisplay %}
+                    {% set titleOthers = '' %}
+                    {% for projectReference in aid.projectReferences %}
+                        {% if projectReference not in projectReferencesDisplayed %}
+                            {% set titleOthers = titleOthers ~ projectReference.name ~ ', ' %}
+                        {% endif %}
+                    {% endfor %}
+                    <span class="fr-badge fr-badge--sm fr-badge--new fr-badge--no-icon" title="{{ titleOthers }}">+{{ totalProjectReferences - maxDisplay }} autre{% if totalProjectReferences - maxDisplay > 1 %}s{% endif %}</span>
+                {% endif %}
+            </div>
 
             <h2 class="fr-card__title fr-mb-1w">
                 {% if aid.isApproachingDeadline %}
