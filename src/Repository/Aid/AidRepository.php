@@ -590,9 +590,9 @@ if (isset($synonyms)) {
 
     if ($simpleWordsString && !$objectsString) {
         $sqlSimpleWords = '
-        CASE WHEN (MATCH_AGAINST(a.name) AGAINST(:simple_words_string IN BOOLEAN MODE) > 1) THEN 30 ELSE 0 END +
-        CASE WHEN (MATCH_AGAINST(a.nameInitial) AGAINST(:simple_words_string IN BOOLEAN MODE) > 1) THEN 30 ELSE 0 END +
-        CASE WHEN (MATCH_AGAINST(a.description, a.eligibility, a.projectExamples) AGAINST(:simple_words_string IN BOOLEAN MODE) > 1) THEN 5 ELSE 0 END 
+        CASE WHEN (MATCH_AGAINST(a.name) AGAINST(:simple_words_string IN BOOLEAN MODE) > 1) THEN 120 ELSE 0 END +
+        CASE WHEN (MATCH_AGAINST(a.nameInitial) AGAINST(:simple_words_string IN BOOLEAN MODE) > 1) THEN 120 ELSE 0 END +
+        CASE WHEN (MATCH_AGAINST(a.description, a.eligibility, a.projectExamples) AGAINST(:simple_words_string IN BOOLEAN MODE) > 1) THEN 60 ELSE 0 END
         ';
         $qb->setParameter('simple_words_string', $simpleWordsString);
     }
