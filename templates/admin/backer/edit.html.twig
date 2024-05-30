@@ -18,6 +18,23 @@
                 <table class="table table-striped table-hover">
                     <tbody>
                         <tr scope="row">
+                            <td>Editions</td>
+                            <td>
+                            <ul>
+                            {% if entity.instance.logBackerEdits|length > 0 %}
+                            {% for logBackerEdit in entity.instance.logBackerEdits %}
+                                {% if logBackerEdit.user %}
+                                    <li>{{ logBackerEdit.user.email }} le {{ logBackerEdit.timecreate|date('d/m/Y H:i') }}</li>
+                                {% endif %}
+                            {% endfor %}
+                            </ul>
+                            {% else %}
+                            Aucune édition
+                            {% endif %}
+                            </td>
+                        </tr>
+
+                        <tr scope="row">
                             <td>Aides financées</td>
                             <td>{{ entity.instance.aidFinancers|length }}</td>
                         </tr>
