@@ -94,13 +94,13 @@ class KeywordReferenceRepository extends ServiceEntityRepository
             $qb->andWhere('kr.parent = kr');
         }
 
-        if (is_array($names) && count($names) > 0) {
+        if (is_array($names) && !empty($names)) {
             $qb->andWhere('kr.name IN (:names)')
                 ->setParameter('names', $names)
                 ;
         }
 
-        if (is_array($words) && count($words) > 0) {
+        if (is_array($words) && !empty($words)) {
             $qb->andWhere('kr.name IN (:words)')
                 ->setParameter('words', $words)
                 ;
@@ -108,7 +108,7 @@ class KeywordReferenceRepository extends ServiceEntityRepository
 
         if ($string) {
             $words = str_getcsv($string, ' ', '"');
-            if (is_array($words) && count($words) > 0) {
+            if (is_array($words) && !empty($words)) {
                 $qb->andWhere('kr.name IN (:words)')
                     ->setParameter('words', $words)
                     ;
