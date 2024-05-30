@@ -39,6 +39,9 @@ class BackerCrudController extends AtCrudController
 
     public function configureFields(string $pageName): iterable
     {
+        //-------------------------------------------------------
+        yield FormField::addTab('Général');
+        
         yield IdField::new('id')->onlyOnIndex();
         yield TextField::new('name', 'Nom');
         yield TextField::new('slug', 'Slug')
@@ -61,6 +64,16 @@ class BackerCrudController extends AtCrudController
             'by_reference' => false,
         ])
         ;
+
+        yield AssociationField::new('backerGroup', 'Groupe de porteurs')
+        ->setFormTypeOption('choice_label', 'name')
+        ->hideOnIndex()
+        ;
+
+        //-------------------------------------------------------
+        yield FormField::addTab('Description');
+
+        
         yield TrumbowygField::new('description', 'Description')
         ->onlyOnForms();
         yield TrumbowygField::new('backerType', 'Type de porteur')
@@ -74,6 +87,9 @@ class BackerCrudController extends AtCrudController
         yield TrumbowygField::new('usefulLinks', 'Liens utiles')
         ->onlyOnForms();
 
+        //-------------------------------------------------------
+        yield FormField::addTab('Divers');
+        
         yield ImageField::new('logoFile', 'Logo du porteur')
         ->setHelp('Évitez les fichiers trop lourds. Préférez les fichiers SVG.')
         ->setUploadDir($this->fileService->getUploadTmpDirRelative())
@@ -98,6 +114,10 @@ class BackerCrudController extends AtCrudController
         yield BooleanField::new('isSpotlighted', 'Le porteur est-il mis en avant ?')
         ->setHelp('Si le porteur est mis en avant, son logo apparaît sur la page d’accueil');
 
+        //-------------------------------------------------------
+        yield FormField::addTab('SEO');
+
+        
         yield FormField::addFieldset('SEO');
         yield TextLengthCountField::new('metaTitle', 'Titre (balise meta)')
         ->setHelp('Le titre qui sera affiché dans les SERPs. Il est recommandé de le garder < 60 caractères. Laissez vide pour réutiliser le nom du porteur d’aides.')
@@ -110,11 +130,6 @@ class BackerCrudController extends AtCrudController
         ->onlyOnForms()
         ;
 
-        yield FormField::addFieldset('Groupe de porteurs');
-        yield AssociationField::new('backerGroup', 'Groupe de porteurs')
-        ->setFormTypeOption('choice_label', 'name')
-        ->hideOnIndex()
-        ;
     }
 
     public function  configureCrud(Crud $crud): Crud
