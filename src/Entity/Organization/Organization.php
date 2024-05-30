@@ -28,6 +28,7 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\JoinColumn;
 use Gedmo\Mapping\Annotation as Gedmo;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: OrganizationRepository::class)]
 #[ORM\Index(columns: ['is_imported'], name: 'organization_is_imported')]
@@ -61,9 +62,11 @@ class Organization // NOSONAR too much methods
     #[ORM\Column]
     private ?int $id = null;
 
+    #[Assert\Length(max: 255)]
     #[ORM\Column(length: 255)]
     private ?string $name = null;
 
+    #[Assert\Length(max: 255)]
     #[ORM\Column(length: 255)]
     #[Gedmo\Slug(fields: ['name'])]
     private ?string $slug = null;
@@ -71,21 +74,27 @@ class Organization // NOSONAR too much methods
     #[ORM\ManyToOne(inversedBy: 'organizations')]
     private ?OrganizationType $organizationType = null;
 
+    #[Assert\Length(max: 255)]
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $address = null;
 
+    #[Assert\Length(max: 255)]
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $cityName = null;
 
+    #[Assert\Length(max: 10)]
     #[ORM\Column(length: 10, nullable: true)]
     private ?string $zipCode = null;
 
+    #[Assert\Length(exactly: 9)]
     #[ORM\Column(length: 9, nullable: true)]
     private ?string $sirenCode = null;
 
+    #[Assert\Length(exactly: 14)]
     #[ORM\Column(length: 14, nullable: true)]
     private ?string $siretCode = null;
 
+    #[Assert\Length(max: 10)]
     #[ORM\Column(length: 10, nullable: true)]
     private ?string $apeCode = null;
 
@@ -219,12 +228,15 @@ class Organization // NOSONAR too much methods
     #[JoinColumn(onDelete: DoctrineConstants::SET_NULL)]
     private ?Backer $backer = null;
 
+    #[Assert\Length(max: 50)]
     #[ORM\Column(length: 50, nullable: true)]
     private ?string $densityTypology = null;
 
+    #[Assert\Length(exactly: 5)]
     #[ORM\Column(length: 5, nullable: true)]
     private ?string $inseeCode = null;
 
+    #[Assert\Length(max: 15)]
     #[ORM\Column(length: 15, nullable: true)]
     private ?string $populationStrata = null;
 
