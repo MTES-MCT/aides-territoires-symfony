@@ -103,31 +103,19 @@ class OrganizationEditType extends AbstractType
                 'label' => 'Code SIREN',
                 'required' => false,
                 'help' => 'constitué de 9 chiffres',
-                'constraints' => [
-                    new Length(9)
-                ],
             ])
             ->add('siretCode', TextType::class, [
                 'label' => 'Code SIRET',
                 'required' => false,
                 'help' => 'constitué de 14 chiffres',
-                'constraints' => [
-                    new Length(14)
-                ],
             ])
             ->add('apeCode', TextType::class, [
                 'label' => 'Code APE',
                 'required' => false,
-                'constraints' => [
-                    new Length(max: 10)
-                ],
             ])
             ->add('inseeCode', TextType::class, [
                 'label' => 'Code INSEE',
                 'required' => false,
-                'constraints' => [
-                    new Length(5)
-                ],
             ])
 
             ->addEventListener(
