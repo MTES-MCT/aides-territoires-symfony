@@ -25,7 +25,7 @@ class InternalApiService
             $baseUrl =  $request->getSchemeAndHttpHost();
             // gestion problème Docker
             if (preg_match('/localhost:8080/', $baseUrl)) {
-                $baseUrl = 'http://172.27.0.4';
+                $baseUrl = 'http://172.27.0.4'; // DevSkim: ignore DS137138
             }
             return $baseUrl;
         } catch (\Exception $e) {
