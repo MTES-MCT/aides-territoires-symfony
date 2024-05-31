@@ -15,19 +15,19 @@ class BlogPromotionPostService
                 unset($blogPromotionPosts[$key]);
                 continue;
             }
-            if (($blogPromotionPost->getBackers() && count($blogPromotionPost->getBackers()) > 0) && (!isset($aidParams['backers']) || $aidParams['backers'] === null || count($aidParams['backers']) == 0)) {
+            if (($blogPromotionPost->getBackers() && !$blogPromotionPost->getBackers()->isEmpty()) && (!isset($aidParams['backers']) || $aidParams['backers'] === null || count($aidParams['backers']) == 0)) {
                 unset($blogPromotionPosts[$key]);
                 continue;
             }
-            if (($blogPromotionPost->getCategories() && count($blogPromotionPost->getCategories()) > 0) && (!isset($aidParams['categories']) || $aidParams['categories'] === null || count($aidParams['categories']) == 0)) {
+            if (($blogPromotionPost->getCategories() && !$blogPromotionPost->getCategories()->isEmpty()) && (!isset($aidParams['categories']) || $aidParams['categories'] === null || count($aidParams['categories']) == 0)) {
                 unset($blogPromotionPosts[$key]);
                 continue;
             }
-            if (($blogPromotionPost->getPrograms() && count($blogPromotionPost->getPrograms()) > 0) && (!isset($aidParams['programs']) || $aidParams['programs'] === null || count($aidParams['programs']) == 0)) {
+            if (($blogPromotionPost->getPrograms() && !$blogPromotionPost->getPrograms()->isEmpty()) && (!isset($aidParams['programs']) || $aidParams['programs'] === null || count($aidParams['programs']) == 0)) {
                 unset($blogPromotionPosts[$key]);
                 continue;
             }
-            if (($blogPromotionPost->getKeywordReferences() && count($blogPromotionPost->getKeywordReferences()) > 0) && (!isset($aidParams['keyword']) || $aidParams['keyword'] === null)) {
+            if (($blogPromotionPost->getKeywordReferences() && !$blogPromotionPost->getKeywordReferences()->isEmpty()) && (!isset($aidParams['keyword']) || $aidParams['keyword'] === null)) {
                 unset($blogPromotionPosts[$key]);
             }
         }
