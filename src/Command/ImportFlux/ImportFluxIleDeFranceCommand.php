@@ -85,6 +85,9 @@ class ImportFluxIleDeFranceCommand extends ImportFluxCommand
                     $dateStart = \DateTime::createFromFormat("Y-m-d\TH:i:s\Z", $aidToImport["dateOuvertureCampagne"]);
                 }
             }
+            if (!$dateStart instanceof \DateTime) {
+                $dateStart = null;
+            }
                 
             $dateSubmissionDeadline = null;
             if (isset($aidToImport["dateFinCampagne"])) {
@@ -94,7 +97,10 @@ class ImportFluxIleDeFranceCommand extends ImportFluxCommand
                     $dateSubmissionDeadline = \DateTime::createFromFormat("Y-m-d\TH:i:s\Z", $aidToImport["dateFinCampagne"]);
                 }
             }
-    
+            if (!$dateSubmissionDeadline instanceof \DateTime) {
+                $dateSubmissionDeadline = null;
+            }
+
             return [
                 'importDataMention' => 'Ces données sont mises à disposition par le Conseil Régional d\'Île-de-France.',
                 'importRawObjectCalendar' => $importRawObjectCalendar,
