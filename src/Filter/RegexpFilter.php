@@ -27,9 +27,8 @@ final class RegexpFilter extends AbstractFilter
 
         $parameterName = $queryNameGenerator->generateParameterName($property); // Generate a unique parameter name to avoid collisions with other filters
         $queryBuilder
-            ->andWhere('o.id = 150687');
-            // ->andWhere(sprintf('REGEXP(o.%s, :%s) = 1', $property, $parameterName))
-            // ->setParameter($parameterName, $value);
+            ->andWhere(sprintf('REGEXP(o.%s, :%s) = 1', $property, $parameterName))
+            ->setParameter($parameterName, $value);
     }
 
     // This function is only used to hook in documentation generators (supported by Swagger and Hydra)

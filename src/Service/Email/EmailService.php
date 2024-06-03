@@ -115,15 +115,15 @@ class EmailService
         }
 
         // si parametres
-        if (is_array($params) && empty($params)) {
+        if (is_array($params) && !empty($params)) {
             $sendSmtpEmail['params'] = $params;
         }
 
-        if (is_array($headers) && empty($headers)) {
+        if (is_array($headers) && !empty($headers)) {
             $sendSmtpEmail['headers'] = $headers;
         }
 
-        if (is_array($tags) && empty($tags)) {
+        if (is_array($tags) && !empty($tags)) {
             $sendSmtpEmail['tags'] = $tags;
         }
 
