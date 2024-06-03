@@ -172,17 +172,36 @@ class UserCrudController extends AtCrudController
         $showQrCode = Action::new('showQrCode', 'Afficher le QrCode', 'fas fa-qrcode')
             ->setHtmlAttributes(['title' => 'Afficher le QrCode', 'target' => '_blank']) // titre
             ->linkToCrudAction('showQrCode') // l'action appellée
-            ->displayIf(fn ($entity) => $this->userService->isUserGranted($entity, User::ROLE_ADMIN)); // condition d'affichage
+            ->displayIf(fn ($entity) => $this->userService->isUserGranted($entity, User::ROLE_ADMIN)) // condition d'affichage
             ;
 
         $exportCsvAction = $this->getExportCsvAction();
         $exportXlsxAction = $this->getExportXlsxAction();
         
+        $changePassword = Action::new('changePassword', 'Changer le mot de passe')
+        ->linkToCrudAction('changePassword')
+        ;
+
         return $actions
             ->add(Crud::PAGE_INDEX, $showQrCode)
             ->add(Crud::PAGE_INDEX, $exportCsvAction)
             ->add(Crud::PAGE_INDEX, $exportXlsxAction)
+            ->add(Crud::PAGE_INDEX, $changePassword)
+            ->add(Crud::PAGE_EDIT, $changePassword)
         ;
+    }
+
+    public function changePassword(AdminContext $context): Response
+    {
+        $user = $context->getEntity()->getInstance();
+
+        // Redirige vers le formulaire de changement de mot de passe.
+        $url = $this->adminUrlGenerator
+            ->setController(ChangePasswordCrudController::class)
+            ->setAction(Action::EDIT)
+            ->set('idUser', $user->getId())
+            ->generateUrl();
+        return $this->redirect($url);
     }
 
     public function showQrCode(AdminContext $context): Response
