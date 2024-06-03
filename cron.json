@@ -1,17 +1,13 @@
 {
   "jobs": [
     {
-      "command": "0 1 * * * php bin/console at:cron:perimeter:counties_nb_backers"
-    },
-    {
-      "command": "30 1 * * * php bin/console at:cron:backer:count_aids"
+      "command": "0 1 * * * php bin/console at:cron:site:datas"
     },
     {
       "command": "30 04 * * * php bin/console at:cron:alert:send_daily"
     },
     {
-      "command": "30 5 * * 1 php bin/console at:cron:alert:send_weekly",
-      "size": "2XL"
+      "command": "30 5 * * 1 php bin/console at:cron:alert:send_weekly"
     },
     {
       "command": "10 04 * * * php bin/console at:cron:user:export_to_sib"
@@ -30,9 +26,6 @@
     },
     {
       "command": "*/30 * * * SUN php bin/console at:cron:aid:find_broken_links"
-    },
-    {
-      "command": "30 12 * * MON php bin/console at:cron:aid:count_live"
     },
     {
       "command": "0 5 * * SUN php bin/console at:import_flux:welcome_europe"

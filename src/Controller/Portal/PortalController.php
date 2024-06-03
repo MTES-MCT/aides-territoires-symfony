@@ -217,7 +217,7 @@ class PortalController extends FrontController
         // pour avoir la recherche surlignée
         $highlightedWords = $requestStack->getCurrentRequest()->getSession()->get('highlightedWords', []);
 
-        if (isset($aidSearchClass) and $aidSearchClass instanceof AidSearchClass) {
+        if (isset($aidSearchClass) && $aidSearchClass instanceof AidSearchClass) {
             $highlightedWords = [];
             if ($aidSearchClass->getKeyword()) {
                 // on va chercher les synonymes
