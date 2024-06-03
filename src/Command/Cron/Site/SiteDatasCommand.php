@@ -2,8 +2,10 @@
 
 namespace App\Command\Cron\Site;
 
+use App\Entity\Backer\Backer;
 use App\Entity\Perimeter\Perimeter;
 use App\Entity\Reference\ProjectReference;
+use App\Message\Backer\BackerCountAid;
 use App\Message\Perimeter\CountyCountBacker;
 use App\Message\Reference\ProjectReferenceCountAids;
 use App\Repository\Reference\ProjectReferenceRepository;
@@ -59,11 +61,14 @@ class SiteDatasCommand extends Command
         $io = new SymfonyStyle($input, $output);
         
         // Les projets référents
-        $this->projectReferences();
+        // $this->projectReferences();
 
         // comptage des porteurs par département
-        $this->countyCountBacker();
-        
+        // $this->countyCountBacker();
+
+        // comptage d'aide par porteur
+        $this->backerCountAid();
+
         // le temps passé
         $timeEnd = microtime(true);
         $time = $timeEnd - $timeStart;
@@ -98,6 +103,18 @@ class SiteDatasCommand extends Command
         // pour chaque département, compte le nombre de backer
         foreach ($counties as $county) {
             $this->bus->dispatch(new CountyCountBacker($county->getId()));
+        }
+    }
+
+    private function backerCountAid()
+    {
+        // charge les porteurs d'aides
+        $backers = $this->managerRegistry->getRepository(Backer::class)->findAll();
+
+        // pour chaque backer, compte le nombre d'aides
+        /** @var Backer $backer */
+        foreach ($backers as $backer) {
+            $this->bus->dispatch(new BackerCountAid($backer->getId()));
         }
     }
 }
