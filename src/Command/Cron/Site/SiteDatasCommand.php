@@ -2,7 +2,9 @@
 
 namespace App\Command\Cron\Site;
 
+use App\Entity\Perimeter\Perimeter;
 use App\Entity\Reference\ProjectReference;
+use App\Message\Perimeter\CountyCountBacker;
 use App\Message\Reference\ProjectReferenceCountAids;
 use App\Repository\Reference\ProjectReferenceRepository;
 use Symfony\Component\Console\Command\Command;
@@ -57,6 +59,23 @@ class SiteDatasCommand extends Command
         $io = new SymfonyStyle($input, $output);
         
         // Les projets référents
+        $this->projectReferences();
+
+        // comptage des porteurs par département
+        $this->countyCountBacker();
+        
+        // le temps passé
+        $timeEnd = microtime(true);
+        $time = $timeEnd - $timeStart;
+
+        // success
+        $io->success('Temps écoulé : '.gmdate("H:i:s", $timeEnd).' ('.gmdate("H:i:s", intval($time)).')');
+        $io->success('Mémoire maximale utilisée : ' . round(memory_get_peak_usage() / 1024 / 1024) . ' MB');
+    }
+
+    // envoi les projets référents pour compter le nombre de résultats de recherche
+    private function projectReferences()
+    {
         /** @var ProjectReferenceRepository $projectReferenceRepository */
         $projectReferenceRepository = $this->managerRegistry->getRepository(ProjectReference::class);
 
@@ -66,14 +85,19 @@ class SiteDatasCommand extends Command
             // on envoi le projet pour comptage
             $this->bus->dispatch(new ProjectReferenceCountAids($projectReference->getId()));
         }
+    }
 
+    private function countyCountBacker()
+    {
+        /** @var PerimeterRepository $perimeterRepo */
+        $perimeterRepo = $this->managerRegistry->getRepository(Perimeter::class);
 
-        // le temps passé
-        $timeEnd = microtime(true);
-        $time = $timeEnd - $timeStart;
+        // charge les départements
+        $counties = $perimeterRepo->findCounties();
 
-        // success
-        $io->success('Temps écoulé : '.gmdate("H:i:s", $timeEnd).' ('.gmdate("H:i:s", intval($time)).')');
-        $io->success('Mémoire maximale utilisée : ' . round(memory_get_peak_usage() / 1024 / 1024) . ' MB');
+        // pour chaque département, compte le nombre de backer
+        foreach ($counties as $county) {
+            $this->bus->dispatch(new CountyCountBacker($county->getId()));
+        }
     }
 }

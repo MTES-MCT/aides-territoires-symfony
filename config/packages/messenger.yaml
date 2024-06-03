@@ -26,3 +26,4 @@ framework:
             'App\Message\Alert\AlertMessage': async
             'App\Message\Alert\AlertResume': async
             'App\Message\Reference\ProjectReferenceCountAids': async
+            'App\Message\Perimeter\CountyCountBacker': async
