@@ -41,6 +41,11 @@ class KeywordReference
     #[ORM\OneToMany(mappedBy: 'keywordReference', targetEntity: KeywordReferenceSuggested::class, orphanRemoval: true)]
     private Collection $keywordReferenceSuggesteds;
 
+    #[ORM\ManyToMany(targetEntity: ProjectReference::class, mappedBy: 'excludedKeywordReferences')]
+    private Collection $excludedProjectReferences;
+
+    #[ORM\ManyToMany(targetEntity: ProjectReference::class, mappedBy: 'requiredKeywordReferences')]
+    private Collection $requiredProjectReferences;
 
     public function __construct()
     {
@@ -48,6 +53,8 @@ class KeywordReference
         $this->blogPromotionPosts = new ArrayCollection();
         $this->aids = new ArrayCollection();
         $this->keywordReferenceSuggesteds = new ArrayCollection();
+        $this->excludedProjectReferences = new ArrayCollection();
+        $this->requiredProjectReferences = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -202,6 +209,60 @@ class KeywordReference
             if ($keywordReferenceSuggested->getKeywordReference() === $this) {
                 $keywordReferenceSuggested->setKeywordReference(null);
             }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, ProjectReference>
+     */
+    public function getExcludedProjectReferences(): Collection
+    {
+        return $this->excludedProjectReferences;
+    }
+
+    public function addExcludedProjectReference(ProjectReference $excludedProjectReference): static
+    {
+        if (!$this->excludedProjectReferences->contains($excludedProjectReference)) {
+            $this->excludedProjectReferences->add($excludedProjectReference);
+            $excludedProjectReference->addExcludedKeywordReference($this);
+        }
+
+        return $this;
+    }
+
+    public function removeExcludedProjectReference(ProjectReference $excludedProjectReference): static
+    {
+        if ($this->excludedProjectReferences->removeElement($excludedProjectReference)) {
+            $excludedProjectReference->removeExcludedKeywordReference($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, ProjectReference>
+     */
+    public function getRequiredProjectReferences(): Collection
+    {
+        return $this->requiredProjectReferences;
+    }
+
+    public function addRequiredProjectReference(ProjectReference $requiredProjectReference): static
+    {
+        if (!$this->requiredProjectReferences->contains($requiredProjectReference)) {
+            $this->requiredProjectReferences->add($requiredProjectReference);
+            $requiredProjectReference->addRequiredKeywordReference($this);
+        }
+
+        return $this;
+    }
+
+    public function removeRequiredProjectReference(ProjectReference $requiredProjectReference): static
+    {
+        if ($this->requiredProjectReferences->removeElement($requiredProjectReference)) {
+            $requiredProjectReference->removeRequiredKeywordReference($this);
         }
 
         return $this;

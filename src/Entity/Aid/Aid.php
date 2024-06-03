@@ -69,6 +69,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Index(columns: ['eligibility'], name: 'eligibility_aid_fulltext', flags: ['fulltext'])]
 #[ORM\Index(columns: ['name','description','eligibility'], name: 'synonym_aid_nde_fulltext', flags: ['fulltext'])]
 #[ORM\Index(columns: ['description','eligibility','project_examples'], name: 'synonym_aid_fulltext', flags: ['fulltext'])]
+#[ORM\Index(columns: ['name', 'name_initial', 'description','eligibility','project_examples'], name: 'synonym_aid_all_fulltext', flags: ['fulltext'])]
 #[ApiResource(
     operations: [
         new GetCollection(
@@ -605,6 +606,7 @@ class Aid // NOSONAR too much methods
     private int $nbViews = 0;
     private int $scoreTotal = 0;
     private int $scoreObjects = 0;
+    private ?ArrayCollection $projectReferencesSearched = null;
 
     #[Groups([self::API_GROUP_LIST, self::API_GROUP_ITEM])]
     private ?string $url = null;
@@ -675,6 +677,7 @@ class Aid // NOSONAR too much methods
         $this->projectReferences = new ArrayCollection();
         $this->aidLocks = new ArrayCollection();
         $this->keywordReferenceSuggesteds = new ArrayCollection();
+        $this->projectReferencesSearched = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -2510,5 +2513,36 @@ class Aid // NOSONAR too much methods
 
         return $this;
     }
-    
+
+    /**
+     * @return Collection|ProjectReferenceSearched[]
+     */
+    public function getProjectReferencesSearched(): Collection
+    {
+        if (!$this->projectReferencesSearched) {
+            $this->projectReferencesSearched = new ArrayCollection();
+        }
+        return $this->projectReferencesSearched;
+    }
+
+    public function addProjectReferenceSearched(ProjectReference $projectReferenceSearched): self
+    {
+        if (!$this->projectReferencesSearched) {
+            $this->projectReferencesSearched = new ArrayCollection();
+        }
+        if (!$this->projectReferencesSearched->contains($projectReferenceSearched)) {
+            $this->projectReferencesSearched[] = $projectReferenceSearched;
+        }
+
+        return $this;
+    }
+
+    public function removeProjectReferenceSearched(ProjectReference $projectReferenceSearched): self
+    {
+        if (!$this->projectReferencesSearched) {
+            $this->projectReferencesSearched = new ArrayCollection();
+        }
+        $this->projectReferencesSearched->removeElement($projectReferenceSearched);
+        return $this;
+    }
 }

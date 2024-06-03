@@ -37,7 +37,7 @@ class CategoryRepository extends ServiceEntityRepository
             if ($intentionsString) {
                 $words = array_merge($words, str_getcsv($intentionsString, ' ', '"'));
             }
-        } else if ($simpleWordsString) {
+        } elseif ($simpleWordsString) {
             $words = array_merge($words, str_getcsv($simpleWordsString, ' ', '"'));
         }
 
