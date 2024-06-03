@@ -7,8 +7,7 @@
       "command": "30 04 * * * php bin/console at:cron:alert:send_daily"
     },
     {
-      "command": "30 5 * * 1 php bin/console at:cron:alert:send_weekly",
-      "size": "2XL"
+      "command": "30 5 * * 1 php bin/console at:cron:alert:send_weekly"
     },
     {
       "command": "10 04 * * * php bin/console at:cron:user:export_to_sib"
