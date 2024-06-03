@@ -105,7 +105,8 @@ class ImportKeywordReferenceCommand extends Command
             // ajout remi 2024-05-23
             'Logement' => ['Habitation', 'Domicile', 'Résidence', 'Maison', 'Appartement', 'Demeure', 'Pavillon', 'Hébergement'],
             'Bus' => ["Autobus", "Autocar", "Minibus", "Navette", "Transport en commun", "Véhicule de transport collectif", "Trolleybus"],
-            'Télémédecine' => ["E-santé", "Téléconsultation", "Télésoin", "Télésanté", "Médecine à distance", 'Soins à distance', "Téléassistance médicale", "Santé numérique", 'Consultation en ligne']
+            'Télémédecine' => ["E-santé", "Téléconsultation", "Télésoin", "Télésanté", "Médecine à distance", 'Soins à distance', "Téléassistance médicale", "Santé numérique", 'Consultation en ligne'],
+            'piéton' => ['piétons', 'passant', 'passants', 'piétonne', 'piétonnes', 'passante', 'passantes'],
             );
             
             $verbs_synonyms_array = array(
