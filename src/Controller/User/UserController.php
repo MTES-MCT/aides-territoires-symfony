@@ -65,7 +65,7 @@ class UserController extends FrontController
                             FrontController::FLASH_ERROR,
                             'Une erreur s\'est produite lors de votre inscription à la newsletter'
                         );
-                    }                    
+                    }
                 }
                 
                 // si infos organization
