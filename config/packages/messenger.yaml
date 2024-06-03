@@ -28,3 +28,4 @@ framework:
             'App\Message\Reference\ProjectReferenceCountAids': async
             'App\Message\Perimeter\CountyCountBacker': async
             'App\Message\Backer\BackerCountAid': async
+            'App\Message\SearchPage\SearchPageCountAid': async

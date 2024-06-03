@@ -22,6 +22,24 @@ class LogEventRepository extends ServiceEntityRepository
         parent::__construct($registry, LogEvent::class);
     }
 
+    public function getLatestSiteCountAidLives(): int
+    {
+        $params['category'] = 'aid';
+        $params['event'] = 'live_count';
+        $params['source'] = 'aides-territoires';
+        $params['orderBy'] = [
+            'sort' => 'le.dateCreate',
+            'order' => 'DESC'
+        ];
+        $params['maxResults'] = 1;
+
+        $qb = $this->getQueryBuilder($params);
+
+        $result = $qb->getQuery()->getOneOrNullResult();
+
+        return $result ? $result->getValue() : 4000;
+    }
+
     public function countAlertSent(array $params = null)
     {
         $params['category'] = 'alert';
@@ -46,6 +64,9 @@ class LogEventRepository extends ServiceEntityRepository
     {
         $category = $params['category'] ?? null;
         $event = $params['event'] ?? null;
+        $source = $params['source'] ?? null;
+        $orderBy = (isset($params['orderBy']) && isset($params['orderBy']['sort']) && isset($params['orderBy']['order'])) ? $params['orderBy'] : null;
+        $maxResults = $params['maxResults'] ?? null;
 
         $qb = $this->createQueryBuilder('le');
 
@@ -61,6 +82,20 @@ class LogEventRepository extends ServiceEntityRepository
             ;
         }
 
+        if ($source !== null) {
+            $qb ->andWhere('le.source = :source')
+                ->setParameter('source', $source)
+            ;
+        }
+
+        if ($orderBy !== null) {
+            $qb->addOrderBy($orderBy['sort'], $orderBy['order']);
+        }
+
+        if ($maxResults !== null) {
+            $qb->setMaxResults($maxResults);
+        }
+
         return $qb;
-    }    
+    }
 }

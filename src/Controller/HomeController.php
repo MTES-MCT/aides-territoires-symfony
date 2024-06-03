@@ -9,6 +9,7 @@ use App\Form\Reference\ProjectReferenceSearchType;
 use App\Repository\Aid\AidRepository;
 use App\Repository\Backer\BackerRepository;
 use App\Repository\Blog\BlogPostRepository;
+use App\Repository\Log\LogEventRepository;
 use App\Repository\Perimeter\PerimeterRepository;
 use App\Repository\Program\ProgramRepository;
 use App\Repository\Project\ProjectRepository;
@@ -30,7 +31,8 @@ class HomeController extends FrontController
         AidRepository $aidRepository,
         ProjectRepository $projectRepository,
         StringService $stringService,
-        AidSearchFormService $aidSearchFormService
+        AidSearchFormService $aidSearchFormService,
+        LogEventRepository $logEventRepository
     ): Response
     {
         $formAidSearch = $this->createForm(
@@ -89,7 +91,7 @@ class HomeController extends FrontController
         }
     
         // nb aides
-        $nbAids = $aidRepository->countLives();
+        $nbAids = $logEventRepository->getLatestSiteCountAidLives();
 
         // nb porteur
         $nbBackers = $backerRepository->countWithAids();

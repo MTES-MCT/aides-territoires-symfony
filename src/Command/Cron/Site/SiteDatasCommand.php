@@ -2,12 +2,16 @@
 
 namespace App\Command\Cron\Site;
 
+use App\Entity\Aid\Aid;
 use App\Entity\Backer\Backer;
+use App\Entity\Log\LogEvent;
 use App\Entity\Perimeter\Perimeter;
 use App\Entity\Reference\ProjectReference;
+use App\Entity\Search\SearchPage;
 use App\Message\Backer\BackerCountAid;
 use App\Message\Perimeter\CountyCountBacker;
 use App\Message\Reference\ProjectReferenceCountAids;
+use App\Message\SearchPage\SearchPageCountAid;
 use App\Repository\Reference\ProjectReferenceRepository;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -67,7 +71,10 @@ class SiteDatasCommand extends Command
         // $this->countyCountBacker();
 
         // comptage d'aide par porteur
-        $this->backerCountAid();
+        // $this->backerCountAid();
+
+        // compte les aides lives totales et par portail
+        $this->countAidsLive();
 
         // le temps passé
         $timeEnd = microtime(true);
@@ -115,6 +122,29 @@ class SiteDatasCommand extends Command
         /** @var Backer $backer */
         foreach ($backers as $backer) {
             $this->bus->dispatch(new BackerCountAid($backer->getId()));
+        }
+    }
+
+    private function countAidsLive()
+    {
+        /** @var AidRepository $aidRepo */
+        $aidRepo = $this->managerRegistry->getRepository(Aid::class);
+        
+        // charge les aides publiées sans lien cassé de noté
+        $nbAids = $aidRepo->countLives();
+
+        $logEvent = new LogEvent();
+        $logEvent->setCategory('aid');
+        $logEvent->setEvent('live_count');
+        $logEvent->setSource('aides-territoires');
+        $logEvent->setValue($nbAids);
+        $this->managerRegistry->getManager()->persist($logEvent);
+        $this->managerRegistry->getManager()->flush();
+        
+        $searchPages = $this->managerRegistry->getRepository(SearchPage::class)->findAll();
+        /** @var SearchPage $searchPage */
+        foreach ($searchPages as $searchPage) {
+            $this->bus->dispatch(new SearchPageCountAid($searchPage->getId()));
         }
     }
 }

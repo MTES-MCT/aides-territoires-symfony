@@ -29,9 +29,6 @@
       "command": "*/30 * * * SUN php bin/console at:cron:aid:find_broken_links"
     },
     {
-      "command": "30 12 * * MON php bin/console at:cron:aid:count_live"
-    },
-    {
       "command": "0 5 * * SUN php bin/console at:import_flux:welcome_europe"
     },
     {

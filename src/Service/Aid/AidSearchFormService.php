@@ -396,6 +396,16 @@ class AidSearchFormService
             }
         }
 
+        $paramThemes = $queryParams['themes'] ?? null;
+        if ($paramThemes && is_array($paramThemes)) {
+            foreach ($paramThemes as $paramTheme) {
+                $category = $this->managerRegistry->getRepository(Category::class)->findOneBy(['slug' => $paramTheme]);
+                if ($category instanceof Category) {
+                    $aidSearchClass->addCategorySearch($category);
+                }
+            }
+        }
+
         /**
          * > Categories
         */
