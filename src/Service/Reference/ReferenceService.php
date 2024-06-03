@@ -251,11 +251,11 @@ class ReferenceService
       $words = explode(" ", $text);
   
       // Vérifier si le premier mot est un article et le supprimer
-      if (empty($words) && in_array($words[0], $articles)) {
+      if (!empty($words) && in_array($words[0], $articles)) {
           array_shift($words);
       }
       // Vérifier si le dernier mot est un article et le supprimer
-      if (empty($words) && in_array(end($words), $articles)) {
+      if (!empty($words) && in_array(end($words), $articles)) {
           array_pop($words);
       }
       return implode(" ", $words);
