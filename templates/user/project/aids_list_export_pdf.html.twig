@@ -74,7 +74,9 @@ projets des collectivités territoriales en regroupant les dispositifs auxquels 
                 <section class="fr-mb-5w">
                     <h3>Description du projet</h3>
                     <div id="project-description">
-                        {{ project.description|sanitize_html|raw }}
+                        {% if project.description %}
+                            {{ project.description|sanitize_html|raw }}
+                        {% endif %}
                     </div>
                 </section>
             {% endif %}
@@ -134,8 +136,10 @@ projets des collectivités territoriales en regroupant les dispositifs auxquels 
                     {# name is an obsolete attribute for web but it is the correct one for PDFs #}
                     <a name="anchor-aid-{{ aidProject.aid.id }}"></a>
                     <h3>{{ aidProject.aid.name }}</h3>
-                    <p>{{ aidProject.aid.description|sanitize_html|raw }}</p>
-
+                    {% if aidProject.aid.description %}
+                        <p>{{ aidProject.aid.description|sanitize_html|raw }}</p>
+                    {% endif %}
+                    
                     {% if aidProject.aid.isLocal and aidProject.aid.localCharacteristics %}
                         <h4>Spécificités locales</h4>
 
