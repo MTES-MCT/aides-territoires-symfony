@@ -46,6 +46,9 @@ class ChangePasswordCrudController extends AbstractCrudController implements Eve
                     new Password(),
                 ],
                 'mapped' => false,
+                'attr' => [
+                    'autocomplete' => 'new-password',
+                ]
             ])
             ->onlyOnForms();
     }
