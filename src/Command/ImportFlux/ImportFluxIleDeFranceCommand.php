@@ -11,6 +11,7 @@ use App\Entity\Aid\AidType;
 use App\Entity\Category\Category;
 use App\Entity\Organization\OrganizationType;
 use App\Entity\Reference\KeywordReference;
+use Symfony\Component\HttpClient\CurlHttpClient;
 
 #[AsCommand(name: 'at:import_flux:ile_de_france', description: 'Import de flux ile de france')]
 class ImportFluxIleDeFranceCommand extends ImportFluxCommand
@@ -32,6 +33,7 @@ class ImportFluxIleDeFranceCommand extends ImportFluxCommand
     protected function callApi()
     {
         $aidsFromImport = [];
+        $client = $this->getClient();
 
         for ($i=0; $i<$this->nbPages; $i++) {
             $this->currentPage = $i;
@@ -40,7 +42,7 @@ class ImportFluxIleDeFranceCommand extends ImportFluxCommand
                 $importUrl .= '?limit=' . $this->nbByPages . '&offset=' . ($this->currentPage * $this->nbByPages);
             }
             try {
-                $response = $this->httpClientInterface->request(
+                $response = $client->request(
                     'GET',
                     $importUrl,
                     $this->getApiOptions()
@@ -62,6 +64,24 @@ class ImportFluxIleDeFranceCommand extends ImportFluxCommand
         return $aidsFromImport;
     }
 
+    protected function getClient(): CurlHttpClient
+    {
+        // place le certificat dans un fichier temporaire
+        $cerificate = $this->paramService->get('certificat_ile_de_france');
+        $certificatePath = $this->fileService->getUploadTmpDir() . '/certificat_ile_de_france.pem';
+        file_put_contents($certificatePath, $cerificate);
+
+        // combine les options avec le certificat
+        $apiOptions = array_merge(
+            [
+                'cafile' => $certificatePath,
+            ],
+            $this->getApiOptions()
+        );
+
+        // creer le client
+        return new CurlHttpClient($apiOptions);
+    }
 
 
     protected function getFieldsMapping(array $aidToImport, array $params = null): array

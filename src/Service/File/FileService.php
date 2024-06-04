@@ -42,4 +42,9 @@ class FileService
     {
         return $this->kernelInterface->getEnvironment();
     }
+
+    public function getProjectDir(): string
+    {
+        return $this->kernelInterface->getProjectDir();
+    }
 }
