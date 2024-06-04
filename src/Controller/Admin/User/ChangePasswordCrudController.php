@@ -79,7 +79,7 @@ class ChangePasswordCrudController extends AbstractCrudController implements Eve
     }
 
     public function hasPassword($entity, $newPassword) {
-        if (!($entity instanceof User || !$newPassword)) {
+        if (!$entity instanceof User || !$newPassword) {
             return;
         }
 
