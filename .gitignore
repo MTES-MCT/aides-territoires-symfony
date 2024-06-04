@@ -52,3 +52,7 @@ yarn-error.log
 ###> vscode ###
 /.vscode
 ###> vscode ###
+
+###> certificats ###
+.docker/php/Certigna_Combined.pem
+###> certificats ###

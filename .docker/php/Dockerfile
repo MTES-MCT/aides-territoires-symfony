@@ -66,6 +66,13 @@ RUN docker-php-ext-install \
 RUN pecl install excimer
 # end Excimer pour Sentry
 
+# Copier le certificat combiné dans le conteneur, le .* permet de gérer la présence du fichier.
+# il n'est pas commité pour des raisons de sécurité.
+COPY Certigna_Combined.* /usr/local/share/ca-certificates/Certigna_Combined.crt
+
+# Mettre à jour le magasin de certificats de confiance
+RUN update-ca-certificates
+
 # Imagick
 RUN apt-get update && apt-get install -y libmagickwand-6.q16-dev --no-install-recommends \
  && ln -s /usr/lib/x86_64-linux-gnu/ImageMagick-6.8.9/bin-Q16/MagickWand-config /usr/bin \
