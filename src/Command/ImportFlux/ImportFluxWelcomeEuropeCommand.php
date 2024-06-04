@@ -33,6 +33,7 @@ class ImportFluxWelcomeEuropeCommand extends ImportFluxCommand
     protected function callApi()
     {
         $aidsFromImport = [];
+        $client = $this->getClient();
 
         for ($i=0; $i<$this->nbPages; $i++) {
             $this->currentPage = $i;
@@ -41,7 +42,7 @@ class ImportFluxWelcomeEuropeCommand extends ImportFluxCommand
                 $importUrl .= '?limit=' . $this->nbByPages . '&offset=' . ($this->currentPage * $this->nbByPages);
             }
             try {
-                $response = $this->httpClientInterface->request(
+                $response = $client->request(
                     'GET',
                     $importUrl,
                     $this->getApiOptions()

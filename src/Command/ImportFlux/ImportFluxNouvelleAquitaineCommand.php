@@ -28,13 +28,14 @@ class ImportFluxNouvelleAquitaineCommand extends ImportFluxCommand
     protected function callApi()
     {
         $aidsFromImport = [];
+        $client = $this->getClient();
 
         for ($i=0; $i<$this->nbPages; $i++) {
             $this->currentPage = $i;
             $importUrl = $this->dataSource->getImportApiUrl();
 
             try {
-                $response = $this->httpClientInterface->request(
+                $response = $client->request(
                     'GET',
                     $importUrl,
                     $this->getApiOptions()
