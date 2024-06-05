@@ -24,7 +24,19 @@ class PageController extends FrontController
             ]
         );
         if (!$page instanceof Page) {
-            throw $this->createNotFoundException('Cette page n\'existe pas.');
+            // si pas de / en début et fin de $url, on essaye en les rajoutant
+            if (substr($url, 0, 1) !== '/' && substr($url, -1) !== '/') {
+                $url = '/' . $url . '/';
+                $page = $pageRepository->findOneBy(
+                    [
+                        'url' => $url,
+                    ]
+                );
+                if (!$page instanceof Page) {
+                    throw $this->createNotFoundException('Cette page n\'existe pas.');
+                }
+            }
+            
         }
 
         // fil arianne
