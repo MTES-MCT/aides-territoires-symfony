@@ -642,6 +642,9 @@ class Aid // NOSONAR too much methods
     #[ORM\OneToMany(mappedBy: 'aid', targetEntity: KeywordReferenceSuggested::class, orphanRemoval: true)]
     private Collection $keywordReferenceSuggesteds;
 
+    #[ORM\ManyToMany(targetEntity: SanctuarizedField::class, mappedBy: 'aids')]
+    private Collection $sanctuarizedFields;
+
     /**
      * <Non Database Fields
      */
@@ -678,6 +681,7 @@ class Aid // NOSONAR too much methods
         $this->aidLocks = new ArrayCollection();
         $this->keywordReferenceSuggesteds = new ArrayCollection();
         $this->projectReferencesSearched = new ArrayCollection();
+        $this->sanctuarizedFields = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -2543,6 +2547,33 @@ class Aid // NOSONAR too much methods
             $this->projectReferencesSearched = new ArrayCollection();
         }
         $this->projectReferencesSearched->removeElement($projectReferenceSearched);
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, SanctuarizedField>
+     */
+    public function getSanctuarizedFields(): Collection
+    {
+        return $this->sanctuarizedFields;
+    }
+
+    public function addSanctuarizedField(SanctuarizedField $sanctuarizedField): static
+    {
+        if (!$this->sanctuarizedFields->contains($sanctuarizedField)) {
+            $this->sanctuarizedFields->add($sanctuarizedField);
+            $sanctuarizedField->addAid($this);
+        }
+
+        return $this;
+    }
+
+    public function removeSanctuarizedField(SanctuarizedField $sanctuarizedField): static
+    {
+        if ($this->sanctuarizedFields->removeElement($sanctuarizedField)) {
+            $sanctuarizedField->removeAid($this);
+        }
+
         return $this;
     }
 }

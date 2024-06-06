@@ -8,6 +8,7 @@ use App\Entity\Aid\AidRecurrence;
 use App\Entity\Aid\AidStep;
 use App\Entity\Aid\AidType;
 use App\Entity\Aid\AidTypeGroup;
+use App\Entity\Aid\SanctuarizedField;
 use App\Entity\Backer\Backer;
 use App\Entity\Category\Category;
 use App\Entity\Category\CategoryTheme;
@@ -69,6 +70,14 @@ class AidEditType extends AbstractType
         $aid = $options['data'] ?? null;
         // est en brouillon ?
         $isDraft = ($aid instanceof Aid && $aid->getStatus() === Aid::STATUS_DRAFT) || ($aid instanceof Aid && !$aid->getId());
+
+        // si aide déclinaison locale, on vérifie les champs sanctuarisés
+        $sanctuarizedFields = [];
+        if ($aid instanceof Aid && $aid->getGenericAid()) {
+            foreach ($aid->getGenericAid()->getSanctuarizedFields() as $sanctuarizedField) {
+                $sanctuarizedFields[] = $sanctuarizedField->getName();
+            }
+        }
 
         // les catégories
         $categoryThemes = $this->managerRegistry->getRepository(CategoryTheme::class)->findBy(
@@ -139,13 +148,18 @@ class AidEditType extends AbstractType
             $organizationParams['help_html'] = true;
         }
 
+        $sanctuarizedFieldHelp = '<p class="fr-alert fr-alert--info fr-alert--sm">Ce champ à été sanctuarisé sur l\'aide original. Il ne peu pas être modifié sur ces déclinaisons.</p>';
+
         $builder
             ->add('name', TextType::class, [
                 'required' => true,
                 'label' => 'Nom',
-                'help' => 'Le titre doit commencer par un verbe à l’infinitif pour que l’objectif de l’aide soit explicite vis-à-vis de ses bénéficiaires.',
+                'help_html' => true,
+                'help' => 'Le titre doit commencer par un verbe à l’infinitif pour que l’objectif de l’aide soit explicite vis-à-vis de ses bénéficiaires.'
+                    . in_array('name', $sanctuarizedFields) ? $sanctuarizedFieldHelp : '',
                 'attr' => [
                     'maxlength' => 180,
+                    'readonly' => in_array('name', $sanctuarizedFields) ? true : false
                 ],
                 'constraints' => [
                     new Length(max: 180),
@@ -520,9 +534,25 @@ class AidEditType extends AbstractType
                     'sanitize_html' => true,
                 ]);
             }
+            if ($options['data']->isIsGeneric()) {
+                $builder
+                    ->add('sanctuarizedFields', EntityType::class, [
+                        'required' => false,
+                        'label' => 'Champs sanctuarisés',
+                        'class' => SanctuarizedField::class,
+                        'choice_label' => 'label',
+                        'expanded' => true,
+                        'multiple' => true,
+                        'label_attr' => [
+                            'class' => 'fr-fieldset__legend'
+                        ],
+                        'by_reference' => false,
+                    ])
+                    ;
+            }
         }
     }
-
+    
     public function onSubmit(FormEvent $event): void
     {
         // si aide permanente, on force date ouverture et cloture à null
