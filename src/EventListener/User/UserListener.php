@@ -109,7 +109,9 @@ class UserListener
                 $message .= 'Pour le user '.$entity->getEmail();
             }
             $admin = $this->managerRegistry->getRepository(User::class)->findOneBy(['email' => $this->paramService->get('email_super_admin')]);
-            $this->notificationService->addNotification($admin, 'Erreur postPersist User', $message);
+            if ($admin instanceof User) {
+                $this->notificationService->addNotification($admin, 'Erreur postPersist User', $message);
+            }
         }
     }
 
