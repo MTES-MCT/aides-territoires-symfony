@@ -397,17 +397,19 @@ class AidController extends FrontController
             throw $this->createNotFoundException('Cette aide n\'existe pas');
         }
 
-        // log
-        $logService->log(
-            type: LogService::AID_VIEW,
-            params: [
-                'querystring' => parse_url($requestStack->getCurrentRequest()->getRequestUri(), PHP_URL_QUERY) ?? null,
-                'host' => $requestStack->getCurrentRequest()->getHost(),
-                'aid' => $aid,
-                'organization' => ($user instanceof User && $user->getDefaultOrganization()) ? $user->getDefaultOrganization() : null,
-                'user' => ($user instanceof User) ? $user : null,
-            ]
-        );
+        // log seulement si l'aide à le statut publiée
+        if ($aid->getStatus() == Aid::STATUS_PUBLISHED) {
+            $logService->log(
+                type: LogService::AID_VIEW,
+                params: [
+                    'querystring' => parse_url($requestStack->getCurrentRequest()->getRequestUri(), PHP_URL_QUERY) ?? null,
+                    'host' => $requestStack->getCurrentRequest()->getHost(),
+                    'aid' => $aid,
+                    'organization' => ($user instanceof User && $user->getDefaultOrganization()) ? $user->getDefaultOrganization() : null,
+                    'user' => ($user instanceof User) ? $user : null,
+                ]
+            );
+        }
 
         // formulaire ajouter aux projets
         $formAddToProject = $this->createForm(AddAidToProjectType::class, null, [
