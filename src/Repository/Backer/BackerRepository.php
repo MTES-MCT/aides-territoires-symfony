@@ -92,10 +92,10 @@ class BackerRepository extends ServiceEntityRepository
 
         $qb = $this->createQueryBuilder('b');
 
-        if ($active == true) {
+        if ($active === true) {
             $qb
                 ->addCriteria(self::activeCriteria());
-        } else if ($active == false) {
+        } elseif ($active === false) {
             $qb
                 ->addCriteria(self::unactiveCriteria());
         }
@@ -107,11 +107,13 @@ class BackerRepository extends ServiceEntityRepository
             ->addCriteria(AidRepository::liveCriteria('aid.'))
             ;
             if ($perimeterFrom instanceof Perimeter && $perimeterFrom->getId()) {
+                $ids = $this->getEntityManager()->getRepository(Perimeter::class)->getIdPerimetersContainedIn(array('perimeter' => $perimeterFrom));
+                $ids[] = $perimeterFrom->getId();
+    
                 $qb
-                    ->innerJoin('b.perimeter', 'perimeter')
-                    ->innerJoin('perimeter.perimetersFrom', 'perimetersFrom')
-                    ->andWhere('(perimetersFrom = :perimeter OR perimeter = :perimeter)')
-                    ->setParameter('perimeter', $perimeterFrom)
+                ->innerJoin('b.perimeter', 'perimeter')
+                ->andWhere('perimeter.id IN (:ids)')
+                ->setParameter('ids', $ids)
                 ;
             }
             
