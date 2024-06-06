@@ -3,6 +3,7 @@
 namespace App\Repository\Project;
 
 use App\Entity\Organization\Organization;
+use App\Entity\Organization\OrganizationType;
 use App\Entity\Perimeter\Perimeter;
 use App\Entity\Project\Project;
 use App\Entity\Reference\ProjectReference;
@@ -164,6 +165,7 @@ class ProjectRepository extends ServiceEntityRepository
         $dateCreateMin = $params['dateCreateMin'] ?? null;
         $dateCreateMax = $params['dateCreateMax'] ?? null;
         $organizations = $params['organizations'] ?? null;
+        $organizationType = $params['organizationType'] ?? null;
 
         $qb = $this->createQueryBuilder('p');
 
@@ -270,6 +272,14 @@ class ProjectRepository extends ServiceEntityRepository
             }
         }
         
+        if ($organizationType instanceof OrganizationType && $organizationType->getId()) {
+            $qb
+                ->innerJoin('p.organization', 'organizationForType')
+                ->andWhere('organizationForType.organizationType = :organizationType')
+                ->setParameter('organizationType', $organizationType)
+                ;
+        }
+
         if ($organizations !== null) {
             $qb
                 ->andWhere('p.organization IN (:organizations)')

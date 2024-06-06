@@ -14,4 +14,11 @@ class ManifestController extends FrontController
         $response->headers->set('Content-Type', 'application/json');
         return $response;
     }
+
+    #[Route('/manifest.json', name: 'app_manifest', methods: ['GET'])]
+    public function manifest(
+
+    ) {
+        return $this->faviconManifest();
+    }
 }

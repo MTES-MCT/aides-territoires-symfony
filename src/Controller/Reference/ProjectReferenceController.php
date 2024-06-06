@@ -247,7 +247,13 @@ class ProjectReferenceController extends FrontController
         // chargement des projets publics
         $projectsParams = [];
         if ($name) {
-            $projectsParams = $referenceService->getSynonymes($name);
+            $projectsParams['search'] = $name;
+        }
+        if ($organizationType) {
+            $projectsParams['organizationType'] = $organizationType;
+        }
+        if ($perimeter) {
+            $projectsParams['perimeter'] = $perimeter;
         }
         $projectsParams = array_merge($projectsParams, [
             'limit' => null,
@@ -256,6 +262,7 @@ class ProjectReferenceController extends FrontController
                 'order' => 'DESC'
             ]
         ]);
+        
         $projectsPublics = $projectRepository->findPublicProjects($projectsParams);
 
         // fil arianne
