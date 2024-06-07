@@ -169,7 +169,8 @@ final class RouteListener
             '/favicon.ico' => $this->packages->getUrl('build/images/favicon/favicon.ico'),
             '/favicon.svg' => $this->packages->getUrl($newFaviconSvg),
             '/apple-touch-icon.png' => $this->packages->getUrl('build/images/favicon/apple-touch-icon.png'),
-            '/recherche/trouver-des-aides' => $this->routerInterface->generate('app_aid_aid')
+            '/recherche/trouver-des-aides' => $this->routerInterface->generate('app_aid_aid'),
+            '/recherche/trouver-des-aides/' => $this->routerInterface->generate('app_aid_aid')
         ];
 
         if (isset($known404[$url])) {
