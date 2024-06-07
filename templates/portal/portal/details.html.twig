@@ -86,7 +86,7 @@
             {% for page in search_page.pages %}
                 <div id="tabpanel-{{ page.url }}-panel" class="fr-tabs__panel" role="tabpanel" aria-labelledby="tabpanel-{{ page.url }}" tabindex="0">
                     <div class="wysiwyg-wrapper">
-                        {{ optimizeHtmlFromWysiwyg(page.description)|raw }}
+                        {{ addMailtoToEmailLinks(optimizeHtmlFromWysiwyg(page.description))|raw }}
                     </div>
                 </div>
             {% endfor %}
