@@ -466,7 +466,7 @@ class AidRepository extends ServiceEntityRepository
 
 
         if (isset($synonyms)) {
-            $forbiddenChars = ['@'];
+            $forbiddenChars = ['@', '+', '-'];
             $originalName = (isset($synonyms['original_name']) && str_replace($forbiddenChars, [''], trim($synonyms['original_name'])) !== '')  ? str_replace($forbiddenChars, [''], trim($synonyms['original_name'])) : null;
             $intentionsString = (isset($synonyms['intentions_string']) && str_replace($forbiddenChars, [''], trim($synonyms['intentions_string'])) !== '')  ? str_replace($forbiddenChars, [''], trim($synonyms['intentions_string'])) : null;
             $objectsString = (isset($synonyms['objects_string']) && str_replace($forbiddenChars, [''], trim($synonyms['objects_string'])) !== '')  ? str_replace($forbiddenChars, [''], trim($synonyms['objects_string'])) : null;
