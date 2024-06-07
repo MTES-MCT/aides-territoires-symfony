@@ -156,7 +156,7 @@ class AidEditType extends AbstractType
                 'label' => 'Nom',
                 'help_html' => true,
                 'help' => 'Le titre doit commencer par un verbe à l’infinitif pour que l’objectif de l’aide soit explicite vis-à-vis de ses bénéficiaires.'
-                    . in_array('name', $sanctuarizedFields) ? $sanctuarizedFieldHelp : '',
+                    . (in_array('name', $sanctuarizedFields) ? $sanctuarizedFieldHelp : ''),
                 'attr' => [
                     'maxlength' => 180,
                     'readonly' => in_array('name', $sanctuarizedFields) ? true : false
@@ -547,6 +547,11 @@ class AidEditType extends AbstractType
                             'class' => 'fr-fieldset__legend'
                         ],
                         'by_reference' => false,
+                        'query_builder' => function (EntityRepository $er) {
+                            return $er->createQueryBuilder('sf')
+                                ->orderBy('sf.position', 'ASC')
+                                ;
+                        }
                     ])
                     ;
             }

@@ -24,6 +24,9 @@ class SanctuarizedField
     #[ORM\ManyToMany(targetEntity: Aid::class, inversedBy: 'sanctuarizedFields')]
     private Collection $aids;
 
+    #[ORM\Column(nullable: true)]
+    private ?int $position = null;
+
     public function __construct()
     {
         $this->aids = new ArrayCollection();
@@ -78,6 +81,18 @@ class SanctuarizedField
     public function removeAid(Aid $aid): static
     {
         $this->aids->removeElement($aid);
+
+        return $this;
+    }
+
+    public function getPosition(): ?int
+    {
+        return $this->position;
+    }
+
+    public function setPosition(?int $position): static
+    {
+        $this->position = $position;
 
         return $this;
     }

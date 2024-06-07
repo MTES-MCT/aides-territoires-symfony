@@ -78,5 +78,28 @@ class AidListener
                 }
             }
         }
+
+        // si c'est une aide générique avec des champs sanctuarisés, on va mettre à jour ses déclinaisons
+        if ($aid->isIsGeneric() && !$aid->getSanctuarizedFields()->isEmpty()) {
+            $this->propagateUpdate($aid, $manager);
+        }
+    }
+
+    private function propagateUpdate(Aid $aid, EntityManager $manager) {
+        foreach ($aid->getAidsFromGeneric() as $aidFromGeneric) {
+            foreach ($aid->getSanctuarizedFields() as $sanctuarizedField) {
+                // if ($sanctuarizedField->getName() == 'programs') {
+                //     dd($aid->{'get' . ucfirst($sanctuarizedField->getName())});
+                // }
+                if (
+                    method_exists($aidFromGeneric, 'set' . ucfirst($sanctuarizedField->getName()))
+                    && method_exists($aid, 'get' . ucfirst($sanctuarizedField->getName()))
+                ) {
+                    $aidFromGeneric->{'set' . ucfirst($sanctuarizedField->getName())}($aid->{'get' . ucfirst($sanctuarizedField->getName())}());
+                }
+            }
+            $manager->persist($aidFromGeneric);
+        }
+        $manager->flush();
     }
 }
