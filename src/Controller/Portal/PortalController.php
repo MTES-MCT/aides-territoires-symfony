@@ -124,8 +124,8 @@ class PortalController extends FrontController
         );
         $formAidSearch->handleRequest($requestStack->getCurrentRequest());
 
-        // check si on affiche ou pas le formulaire étendu
-        $showExtended = $aidSearchFormService->setShowExtendedV2($aidSearchClass);
+        // on force le formulaire étendu
+        $showExtended = true;
 
         // parametres pour requetes aides
         $aidParams = array_merge($aidParams, $aidSearchFormService->convertAidSearchClassToAidParams($aidSearchClass));
