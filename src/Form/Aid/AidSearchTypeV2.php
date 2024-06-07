@@ -12,6 +12,7 @@ use App\Entity\Category\Category;
 use App\Entity\Category\CategoryTheme;
 use App\Entity\Organization\OrganizationType;
 use App\Entity\Program\Program;
+use App\Entity\Search\SearchPage;
 use App\Service\User\UserService;
 use App\Form\Type\EntityCheckboxAbsoluteType;
 use App\Form\Type\EntityCheckboxGroupAbsoluteType;
@@ -71,6 +72,15 @@ class AidSearchTypeV2 extends AbstractType
                 'choice_value' => function (?OrganizationType $entity) {
                     return $entity ? $entity->getSlug() : '';
                 },
+                'query_builder' => function(EntityRepository $er) use ($options) {
+                    $qb = $er->createQueryBuilder('ot');
+
+                    if ($options['searchPage'] instanceof SearchPage && !$options['searchPage']->getOrganizationTypes()->isEmpty()) {
+                        $qb->andWhere('ot IN (:organizationTypes)')
+                            ->setParameter('organizationTypes', $options['searchPage']->getOrganizationTypes());
+                    }
+                    return $qb;
+                },
                 'placeholder' => 'Tous types de structures',
             ])
             ->add('searchPerimeter', PerimeterAutocompleteType::class, [
@@ -111,12 +121,18 @@ class AidSearchTypeV2 extends AbstractType
                 'group_by' => function(Category $category) {
                     return $category->getCategoryTheme()->getName();
                 },
-                'query_builder' => function(EntityRepository $er) {
-                    return $er->createQueryBuilder('c')
+                'query_builder' => function(EntityRepository $er) use ($options) {
+                    $qb = $er->createQueryBuilder('c')
                         ->innerJoin('c.categoryTheme', 'categoryTheme')
                         ->orderBy('categoryTheme.name', 'ASC')
                         ->addOrderBy('c.name', 'ASC')
                     ;
+                    if ($options['searchPage'] instanceof SearchPage && !$options['searchPage']->getCategories()->isEmpty()) {
+                        $qb->andWhere('c IN (:categories)')
+                            ->setParameter('categories', $options['searchPage']->getCategories());
+                    }
+
+                    return $qb;
                 },
                 'multiple' => true,
                 'expanded' => true
@@ -276,6 +292,7 @@ class AidSearchTypeV2 extends AbstractType
             'allow_extra_fields' => true,
             'extended' => false,
             'removes' => [],
+            'searchPage' => null
 
         ]);
     }
