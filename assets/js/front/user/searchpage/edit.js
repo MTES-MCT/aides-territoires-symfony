@@ -3,6 +3,8 @@ require('../../form/trumbowyg.js');
 import Routing from 'fos-router';
 
 $(function() {
+    $('.entity-checkbox-absolute-type-wrapper').entity_checkbox_absolute_type();
+    
     /**
      * Supprimer collection item
      */
