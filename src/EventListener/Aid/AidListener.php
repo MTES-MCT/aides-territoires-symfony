@@ -3,6 +3,7 @@
 namespace App\EventListener\Aid;
 
 use App\Entity\Aid\Aid;
+use App\Entity\Aid\AidFinancer;
 use App\Service\Aid\AidService;
 use App\Service\Email\EmailService;
 use App\Service\Various\ParamService;
@@ -27,19 +28,6 @@ class AidListener
     public function onPostLoad(PostLoadEventArgs $args) : void {
         if ($args->getObject() instanceof Aid) {
             $args->getObject()->setUrl($this->aidService->getUrl($args->getObject()));
-        }
-    }
-
-    public function onPreUpdate(PreUpdateEventArgs $args): void
-    {
-        /** @var Aid $aid */
-        $aid = $args->getObject();
-
-        // si c'est une déclinaison locale
-        if ($aid->getGenericAid() instanceof Aid) {
-            foreach ($aid->getGenericAid()->getSanctuarizedFields() as $sanctuarizedField) {
-                $aid->{'set' . ucfirst($sanctuarizedField->getName())}($aid->getGenericAid()->{'get' . ucfirst($sanctuarizedField->getName())}());
-            }
         }
     }
 
@@ -88,14 +76,22 @@ class AidListener
     private function propagateUpdate(Aid $aid, EntityManager $manager) {
         foreach ($aid->getAidsFromGeneric() as $aidFromGeneric) {
             foreach ($aid->getSanctuarizedFields() as $sanctuarizedField) {
-                // if ($sanctuarizedField->getName() == 'programs') {
-                //     dd($aid->{'get' . ucfirst($sanctuarizedField->getName())});
-                // }
-                if (
-                    method_exists($aidFromGeneric, 'set' . ucfirst($sanctuarizedField->getName()))
-                    && method_exists($aid, 'get' . ucfirst($sanctuarizedField->getName()))
-                ) {
-                    $aidFromGeneric->{'set' . ucfirst($sanctuarizedField->getName())}($aid->{'get' . ucfirst($sanctuarizedField->getName())}());
+                if ($sanctuarizedField->getName() == 'aidFinancers') {
+                    foreach ($aidFromGeneric->getAidFinancers() as $aidFinancer) {
+                        $aidFromGeneric->removeAidFinancer($aidFinancer);
+                    }
+                    foreach ($aid->getAidFinancers() as $aidFinancer) {
+                        $newAidFinancer = new AidFinancer();
+                        $newAidFinancer->setBacker($aidFinancer->getBacker());
+                        $aidFromGeneric->addAidFinancer($newAidFinancer);
+                    }
+                } else {
+                    if (
+                        method_exists($aidFromGeneric, 'set' . ucfirst($sanctuarizedField->getName()))
+                        && method_exists($aid, 'get' . ucfirst($sanctuarizedField->getName()))
+                    ) {
+                        $aidFromGeneric->{'set' . ucfirst($sanctuarizedField->getName())}($aid->{'get' . ucfirst($sanctuarizedField->getName())}());
+                    }
                 }
             }
             $manager->persist($aidFromGeneric);

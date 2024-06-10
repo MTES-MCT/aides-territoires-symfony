@@ -4,8 +4,12 @@ require('./stepper.js');
 require ('../../../form/input-maxlength.js');
 
 import Routing from 'fos-router';
+import TomSelect from 'tom-select';
 
 $(function(){
+    var select = new TomSelect('#aid_edit_financers');
+select.disable();
+
     $('.widget-autocomplete-multiple-wrapper').checkbox_multiple_search();
     $('.entity-checkbox-absolute-type-wrapper').entity_checkbox_absolute_type();
 

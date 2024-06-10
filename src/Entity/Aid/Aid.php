@@ -1675,6 +1675,13 @@ class Aid // NOSONAR too much methods
         return $this->programs;
     }
 
+    public function setPrograms(Collection $programs): static
+    {
+        $this->programs = $programs;
+
+        return $this;
+    }
+
     public function addProgram(Program $program): static
     {
         if (!$this->programs->contains($program)) {
@@ -1706,6 +1713,7 @@ class Aid // NOSONAR too much methods
             $aidFinancer->setAid($this);
         }
 
+        $this->timeUpdate = new \DateTime(date('Y-m-d H:i:s'));
         return $this;
     }
 
@@ -1715,6 +1723,7 @@ class Aid // NOSONAR too much methods
             $aidFinancer->setAid(null);
         }
 
+        $this->timeUpdate = new \DateTime(date('Y-m-d H:i:s'));
         return $this;
     }
 
@@ -1733,6 +1742,7 @@ class Aid // NOSONAR too much methods
             $aidInstructor->setAid($this);
         }
 
+        $this->timeUpdate = new \DateTime(date('Y-m-d H:i:s'));
         return $this;
     }
 
@@ -1742,6 +1752,7 @@ class Aid // NOSONAR too much methods
             $aidInstructor->setAid(null);
         }
 
+        $this->timeUpdate = new \DateTime(date('Y-m-d H:i:s'));
         return $this;
     }
 

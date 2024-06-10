@@ -148,7 +148,7 @@ class AidEditType extends AbstractType
             $organizationParams['help_html'] = true;
         }
 
-        $sanctuarizedFieldHelp = '<p class="fr-alert fr-alert--info fr-alert--sm">Ce champ à été sanctuarisé sur l\'aide original. Il ne peu pas être modifié sur ces déclinaisons.</p>';
+        $sanctuarizedFieldHelp = '<p class="fr-alert fr-alert--info fr-alert--sm">Ce champ à été sanctuarisé sur l\'aide original. Il ne peu pas être modifié sur ses déclinaisons.</p>';
 
         $builder
             ->add('name', TextType::class, [
@@ -171,7 +171,12 @@ class AidEditType extends AbstractType
             ->add('nameInitial', TextType::class, [
                 'required' => false,
                 'label' => 'Nom initial',
-                'help' => 'Comment cette aide s’intitule-t-elle au sein de votre structure ? Exemple : AAP Mob’Biodiv',
+                'help_html' => true,
+                'help' => 'Comment cette aide s’intitule-t-elle au sein de votre structure ? Exemple : AAP Mob’Biodiv'
+                . (in_array('nameInitial', $sanctuarizedFields) ? $sanctuarizedFieldHelp : ''),
+                'attr' => [
+                    'readonly' => in_array('nameInitial', $sanctuarizedFields) ? true : false
+                ],
                 'constraints' => [
                     new Length(max: 255)
                 ],
@@ -180,21 +185,29 @@ class AidEditType extends AbstractType
             ->add('programs', EntityCheckboxAbsoluteType::class, [
                 'required' => false,
                 'label' => 'Programmes d\'aides',
+                'help_html' => true,
+                'help' => (in_array('programs', $sanctuarizedFields) ? $sanctuarizedFieldHelp : ''),
                 'placeholder' => 'Tous les programmes',
                 'class' => Program::class,
                 'choice_label' => 'name',
                 'multiple' => true,
-                'expanded' => true
+                'expanded' => true,
+                'attr' => [
+                    'readonly' => in_array('programs', $sanctuarizedFields) ? true : false
+                ],
             ])
             ->add('financers', EntityType::class, [
                 'required' => false,
                 'mapped' => false,
                 'label' => 'Porteurs d\'aides',
-                'help' => 'Saisissez quelques caractères et sélectionnez une valeur parmi les suggestions.',
+                'help_html' => true,
+                'help' => 'Saisissez quelques caractères et sélectionnez une valeur parmi les suggestions.'
+                    . (in_array('aidFinancers', $sanctuarizedFields) ? $sanctuarizedFieldHelp : ''),
                 'class' => Backer::class,
                 'choice_label' => 'name',
                 'attr' => [
                     'placeholder' => 'Sélectionnez le ou les porteurs',
+                    'readonly' => in_array('aidFinancers', $sanctuarizedFields) ? true : false
                 ],
                 'autocomplete' => true,
                 'multiple' => true,
@@ -211,7 +224,12 @@ class AidEditType extends AbstractType
             ->add('financerSuggestion', TextType::class, [
                 'required' => false,
                 'label' => 'Suggérer un nouveau porteur',
-                'help' => 'Suggérez un porteur si vous ne trouvez pas votre choix dans la liste principale.',
+                'help_html' => true,
+                'help' => 'Suggérez un porteur si vous ne trouvez pas votre choix dans la liste principale.'
+                    . (in_array('financerSuggestion', $sanctuarizedFields) ? $sanctuarizedFieldHelp : ''),
+                'attr' => [
+                    'readonly' => in_array('financerSuggestion', $sanctuarizedFields) ? true : false
+                ],
                 'constraints' => [
                     new Length(max: 255)
                 ],
