@@ -91,7 +91,7 @@ class ImportFluxIleDeFranceCommand extends ImportFluxCommand
             $importRawObjectCalendar = $importRaws['importRawObjectCalendar'];
             $importRawObject = $importRaws['importRawObject'];
             $originUrl = 'https://www.iledefrance.fr/aides-appels-a-projets/'
-                        . (isset($aidToImport['reference'])) ? strip_tags($aidToImport['reference']) : '';
+                        . ((isset($aidToImport['reference'])) ? strip_tags($aidToImport['reference']) : '');
             $applicationUrl = $originUrl;
     
     
