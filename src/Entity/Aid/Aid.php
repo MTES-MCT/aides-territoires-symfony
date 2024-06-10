@@ -761,6 +761,13 @@ class Aid // NOSONAR too much methods
         return $this;
     }
 
+    public function setAidAudiences(Collection $aidAudiences): static
+    {
+        $this->aidAudiences = $aidAudiences;
+
+        return $this;
+    }
+
     /**
      * @return Collection<int, AidType>
      */
@@ -785,6 +792,13 @@ class Aid // NOSONAR too much methods
         return $this;
     }
 
+    public function setAidTypes(Collection $aidTypes): static
+    {
+        $this->aidTypes = $aidTypes;
+
+        return $this;
+    }
+
     /**
      * @return Collection<int, AidDestination>
      */
@@ -805,6 +819,13 @@ class Aid // NOSONAR too much methods
     public function removeAidDestination(AidDestination $aidDestination): static
     {
         $this->aidDestinations->removeElement($aidDestination);
+
+        return $this;
+    }
+
+    public function setAidDestinations(Collection $aidDestinations): static
+    {
+        $this->aidDestinations = $aidDestinations;
 
         return $this;
     }
@@ -925,6 +946,13 @@ class Aid // NOSONAR too much methods
     public function removeAidStep(AidStep $aidStep): static
     {
         $this->aidSteps->removeElement($aidStep);
+
+        return $this;
+    }
+
+    public function setAidSteps(Collection $aidSteps): static
+    {
+        $this->aidSteps = $aidSteps;
 
         return $this;
     }
@@ -1632,6 +1660,13 @@ class Aid // NOSONAR too much methods
         if (!$this->categories->contains($category)) {
             $this->categories->add($category);
         }
+
+        return $this;
+    }
+
+    public function setCategories(Collection $categories): static
+    {
+        $this->categories = $categories;
 
         return $this;
     }
@@ -2418,6 +2453,13 @@ class Aid // NOSONAR too much methods
     public function removeProjectReference(ProjectReference $projectReference): static
     {
         $this->projectReferences->removeElement($projectReference);
+
+        return $this;
+    }
+
+    public function setProjectReferences(Collection $projectReferences): static
+    {
+        $this->projectReferences = $projectReferences;
 
         return $this;
     }

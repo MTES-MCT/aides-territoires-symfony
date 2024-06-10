@@ -4,6 +4,7 @@ namespace App\EventListener\Aid;
 
 use App\Entity\Aid\Aid;
 use App\Entity\Aid\AidFinancer;
+use App\Entity\Aid\AidInstructor;
 use App\Service\Aid\AidService;
 use App\Service\Email\EmailService;
 use App\Service\Various\ParamService;
@@ -85,12 +86,26 @@ class AidListener
                         $newAidFinancer->setBacker($aidFinancer->getBacker());
                         $aidFromGeneric->addAidFinancer($newAidFinancer);
                     }
+                } elseif ($sanctuarizedField->getName() == 'aidInstructors') {
+                    foreach ($aidFromGeneric->getAidInstructors() as $aidInstructor) {
+                        $aidFromGeneric->removeAidInstructor($aidInstructor);
+                    }
+                    foreach ($aid->getAidInstructors() as $aidInstructor) {
+                        $newAidInstructor = new AidInstructor();
+                        $newAidInstructor->setBacker($aidInstructor->getBacker());
+                        $aidFromGeneric->addAidInstructor($newAidInstructor);
+                    }
                 } else {
                     if (
                         method_exists($aidFromGeneric, 'set' . ucfirst($sanctuarizedField->getName()))
                         && method_exists($aid, 'get' . ucfirst($sanctuarizedField->getName()))
                     ) {
                         $aidFromGeneric->{'set' . ucfirst($sanctuarizedField->getName())}($aid->{'get' . ucfirst($sanctuarizedField->getName())}());
+                    } elseif (
+                        method_exists($aidFromGeneric, 'set' . ucfirst($sanctuarizedField->getName()))
+                        && method_exists($aid, 'is' . ucfirst($sanctuarizedField->getName()))
+                    ) {
+                        $aidFromGeneric->{'set' . ucfirst($sanctuarizedField->getName())}($aid->{'is' . ucfirst($sanctuarizedField->getName())}());
                     }
                 }
             }
