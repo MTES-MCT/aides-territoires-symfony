@@ -62,7 +62,13 @@
 								{% if update.value is iterable %}
 									{% for subValue in update.value %}
 										{% set updateLoopIndex = updateLoopIndex~ '_' ~ loop.index %}
-										<pre><code id="actual_value_{{ updateLoopIndex }}" style="max-width: 100%;overflow: scroll;">{{ subValue }}</code><button class="btn-copy-clipboard" data-clipboard-target="#actual_value_{{ updateLoopIndex }}"><i class="fas fa-clipboard-check"></i></button></pre>
+										<pre><code id="actual_value_{{ updateLoopIndex }}" style="max-width: 100%;overflow: scroll;">
+											{% if subValue is iterable %}
+												{{ subValue|join(', ') }}
+											{% else %}
+												{{ subValue }}
+											{% endif %}
+										</code><button class="btn-copy-clipboard" data-clipboard-target="#actual_value_{{ updateLoopIndex }}"><i class="fas fa-clipboard-check"></i></button></pre>
 									{% endfor %}
 								{% else %}
 								<pre><code id="actual_value_{{ updateLoopIndex }}" style="max-width: 100%;overflow: scroll;">{{ update.value }}</code><button class="btn-copy-clipboard" data-clipboard-target="#actual_value_{{ updateLoopIndex }}"><i class="fas fa-clipboard-check"></i></button></pre>
