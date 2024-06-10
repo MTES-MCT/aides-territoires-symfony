@@ -416,7 +416,8 @@ class AidEditType extends AbstractType
                     'class' => 'trumbowyg',
                     'cols' => 40,
                     'rows' => 10,
-                    'readonly' => in_array('description', $sanctuarizedFields) ? true : false
+                    'readonly' => in_array('description', $sanctuarizedFields) ? true : false,
+                    'autocomplete' => 'off'
                 ],
                 'sanitize_html' => true,
             ])
