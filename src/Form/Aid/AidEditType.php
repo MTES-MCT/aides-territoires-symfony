@@ -673,7 +673,7 @@ class AidEditType extends AbstractType
             }
             if ($options['data']->isIsGeneric()) {
                 $builder
-                    ->add('sanctuarizedFields', EntityType::class, [
+                    ->add('sanctuarizedFields', EntityCheckboxAbsoluteType::class, [
                         'required' => false,
                         'label' => 'Champs sanctuarisés',
                         'class' => SanctuarizedField::class,
