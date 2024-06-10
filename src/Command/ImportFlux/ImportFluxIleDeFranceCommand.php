@@ -168,11 +168,23 @@ class ImportFluxIleDeFranceCommand extends ImportFluxCommand
             'Associations' => [
                 OrganizationType::SLUG_ASSOCIATION,
             ],
+            'Association' => [
+                OrganizationType::SLUG_ASSOCIATION,
+            ],
             'Chercheurs' => [
                 OrganizationType::SLUG_RESEARCHER,
             ],
             'Collectivités - Institutions' => [
                 OrganizationType::SLUG_EPCI,
+            ],
+            'Commune' => [
+                OrganizationType::SLUG_COMMUNE
+            ],
+            'EPCI' => [
+                OrganizationType::SLUG_EPCI,
+            ],
+            'Département' => [
+                OrganizationType::SLUG_DEPARTMENT,
             ],
             'Entreprises' => [
                 OrganizationType::SLUG_PRIVATE_SECTOR,
@@ -186,10 +198,29 @@ class ImportFluxIleDeFranceCommand extends ImportFluxCommand
             'Particuliers' => [
                 OrganizationType::SLUG_PRIVATE_PERSON,
             ],
+            'Particulier' => [
+                OrganizationType::SLUG_PRIVATE_PERSON,
+            ],
             'Professionnels' => [
                 OrganizationType::SLUG_PRIVATE_SECTOR,
             ],
+            'Professionnel' => [
+                OrganizationType::SLUG_PRIVATE_SECTOR,
+            ],
+            'Établissement de recherche et laboratoire' => [
+                OrganizationType::SLUG_RESEARCHER
+            ]
         ];
+        
+        
+        // manquants
+        // 0 => "Collectivité ou institution - Autre (GIP, copropriété, EPA...)"
+        // 1 => "Collectivité ou institution - Bailleurs sociaux"
+        // 2 => "Collectivité ou institution - EPT / Métropole du Grand Paris"
+        // 3 => "Collectivité ou institution - Office de tourisme intercommunal"
+        // 4 => "Établissement d'enseignement secondaire"
+        // 5 => "Établissement d'enseignement supérieur"
+        // 6 => "Établissement ou organismes de formation (OF, OPCO, FSS, CFA...)"
 
         foreach ($aidToImport['publicsBeneficiaire'] as $publicsBeneficiaire) {
             if (!isset($publicsBeneficiaire['title'])) {

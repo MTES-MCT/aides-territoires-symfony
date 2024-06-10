@@ -198,6 +198,9 @@ class ImportFluxRegionSudCommand extends ImportFluxCommand
             ],
             'Association' => [
                 'association'
+            ],
+            'Particulier' => [
+                'private-person'
             ]
         ];
 
