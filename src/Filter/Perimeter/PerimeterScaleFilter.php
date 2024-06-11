@@ -14,6 +14,7 @@ final class PerimeterScaleFilter extends AbstractFilter
 {
     protected function filterProperty(string $property, $value, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, Operation $operation = null, array $context = []): void
     {
+        // ajouté pour être conforme à l'extends
     }
 
     public function getDescription(string $resourceClass): array
@@ -24,10 +25,10 @@ final class PerimeterScaleFilter extends AbstractFilter
         }
         return [
             'scale' => [
-                'property' => 'scale',
+                'property' => 'scaleold',
                 'type' => Type::BUILTIN_TYPE_STRING,
                 'required' => false,
-                'description' => '<div class="renderedMarkdown"><p>Filtrer par l\'échelle.<br><br>Voir <code>/api/perimeters/scales/</code> pour la liste complète.</p></div>',
+                'description' => '<div class="renderedMarkdown"><p>oldFiltrer par l\'échelle.<br><br>Voir <code>/api/perimeters/scales/</code> pour la liste complète.</p></div>',
                 'openapi' => [
                     'examples' => $examples,
                 ],
@@ -35,4 +36,3 @@ final class PerimeterScaleFilter extends AbstractFilter
         ];
     }
 }
-?>

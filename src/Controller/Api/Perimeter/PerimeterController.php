@@ -19,15 +19,63 @@ class PerimeterController extends ApiController
         PerimeterService $perimeterService
     ): JsonResponse
     {
+        $query = parse_url($this->requestStack->getCurrentRequest()->getRequestUri(), PHP_URL_QUERY) ?? null;
+        $queryItems = explode('&', $query);
+        $queryParams = [];
+        if (is_array($queryItems)) {
+            foreach ($queryItems as $queyItem) {
+                $param = explode('=', urldecode($queyItem));
+                if (isset($param[0]) && isset($param[1])) {
+                    if (isset($queryParams[$param[0]]) && is_array($queryParams[$param[0]])) {
+                        $queryParams[$param[0]][] = $param[1];
+                    } elseif (isset($queryParams[$param[0]]) && !is_array($queryParams[$param[0]])) {
+                        $queryParams[$param[0]] = [$queryParams[$param[0]]];
+                        $queryParams[$param[0]][] = $param[1];
+                    } else {
+                        $queryParams[$param[0]] = $param[1];
+                    }
+                }
+            }
+        }
+
         // les filtres
         $params = [];
-        $q = $this->requestStack->getCurrentRequest()->get('q', null);
-        if ($q) {
+        if (isset($queryParams['q'])) {
+            if (is_array($queryParams['q'])) {
+                $q = implode(' ', $queryParams['q']);
+            } else {
+                $q = $queryParams['q'];
+            }
+            $q = trim(strip_tags($q));
             $params['nameMatchAgainst'] = $q;
         }
-        $scale = $this->requestStack->getCurrentRequest()->get('scale', null);
-        if ($scale) {
+
+        if (isset($queryParams['scale'])) {
+            if (is_array($queryParams['scale'])) {
+                $scale = implode(' ', $queryParams['scale']);
+            } else {
+                $scale = $queryParams['scale'];
+            }
+            $scale = trim(strip_tags($scale));
             $params['scale'] = $perimeterService->getScaleFromSlug($scale)['scale'] ?? null;
+        }
+
+        if (isset($queryParams['zipcodes'])) {
+            if (!is_array($queryParams['zipcodes'])) {
+                $zipcodes = [trim(strip_tags($queryParams['zipcodes']))];
+            } else {
+                $zipcodes = $queryParams['zipcodes'];
+            }
+            $params['zipcodes'] = $zipcodes;
+        }
+
+        if (isset($queryParams['insees'])) {
+            if (!is_array($queryParams['insees'])) {
+                $insees = [trim(strip_tags($queryParams['insees']))];
+            } else {
+                $insees = $queryParams['insees'];
+            }
+            $params['insees'] = $insees;
         }
 
         // requete pour compter sans la pagination

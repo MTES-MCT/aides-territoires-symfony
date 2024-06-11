@@ -9,7 +9,7 @@ use ApiPlatform\OpenApi\Model\Example;
 use Doctrine\ORM\QueryBuilder;
 use Symfony\Component\PropertyInfo\Type;
 
-final class PerimeterTextFilter extends AbstractFilter
+final class PerimeterZipcodesFilter extends AbstractFilter
 {
     protected function filterProperty(string $property, $value, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, Operation $operation = null, array $context = []): void
     {
@@ -18,18 +18,16 @@ final class PerimeterTextFilter extends AbstractFilter
 
     public function getDescription(string $resourceClass): array
     {
+        $examples = [];
+        $examples[] = new Example(91640, null, 91640);
         return [
-            'q' => [
-                'property' => 'q',
+            'zipcodes' => [
+                'property' => 'zipcodes',
                 'type' => Type::BUILTIN_TYPE_STRING,
                 'required' => false,
-                'description' => '<div class="renderedMarkdown"><p>Rechercher par nom.<br><br>Note : il est possible d\'avoir des résultats pertinents avec seulement le début du nom,     ou un nom légerement erroné.</p></div>',
+                'description' => '<div class="renderedMarkdown"><p>Filtrer par code postaux. Vous pouvez passer plusieurs fois le paramètre pour en rechercher plusieurs, ex: &zipcodes=91400&zipcodes=91640</p></div>',
                 'openapi' => [
-                    'examples' => [
-                        new Example('lyon', null, 'lyon'),
-                        new Example('par', null, 'par'),
-                        new Example('grenble', null, 'grenble')
-                    ],
+                    'examples' => $examples,
                 ],
             ],
         ];
