@@ -90,8 +90,13 @@ class ImportFluxIleDeFranceCommand extends ImportFluxCommand
             $importRaws = $this->getImportRaws($aidToImport, ['dateFinCampagne', 'dateOuvertureCampagne', 'dateDebutFuturCampagne', 'datePublicationSouhaitee']);
             $importRawObjectCalendar = $importRaws['importRawObjectCalendar'];
             $importRawObject = $importRaws['importRawObject'];
-            $originUrl = 'https://www.iledefrance.fr/aides-appels-a-projets/'
-                        . ((isset($aidToImport['reference'])) ? strip_tags($aidToImport['reference']) : '');
+
+            $aidName = isset($aidToImport['libelle']) ? strip_tags($aidToImport['libelle']) : null;
+            if (!$aidName) {
+                $aidName = isset($aidToImport['title']) ? strip_tags($aidToImport['title']) : '';
+            }
+
+            $originUrl = 'https://www.iledefrance.fr/aides-et-appels-a-projets/' . $this->stringService->getSlug(str_replace(["'", "’", 'à'], [''], preg_replace('/(\d{2,4})[-.](\d{2})[-.](\d{2,4})/', '$1$2$3', $aidName)));
             $applicationUrl = $originUrl;
     
     
@@ -125,8 +130,8 @@ class ImportFluxIleDeFranceCommand extends ImportFluxCommand
                 'importDataMention' => 'Ces données sont mises à disposition par le Conseil Régional d\'Île-de-France.',
                 'importRawObjectCalendar' => $importRawObjectCalendar,
                 'importRawObject' => $importRawObject,
-                'name' => isset($aidToImport['title']) ? strip_tags($aidToImport['title']) : null,
-                'nameInitial' => isset($aidToImport['title']) ? strip_tags($aidToImport['title']) : null,
+                'name' => $aidName,
+                'nameInitial' => $aidName,
                 'description' => $this->concatHtmlFields($aidToImport, ['engagements', 'entete', 'notes'], '<br/>'),
                 'originUrl' => $originUrl,
                 'applicationUrl' => $applicationUrl,
