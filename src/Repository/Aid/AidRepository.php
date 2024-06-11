@@ -536,11 +536,14 @@ class AidRepository extends ServiceEntityRepository
                 CASE WHEN (MATCH_AGAINST(a.description, a.eligibility, a.projectExamples) AGAINST(:objects_string IN BOOLEAN MODE) > 1) THEN 10 ELSE 0 END 
                 ';
 
-                $objects = str_getcsv($objectsString, ' ', '"');
-                // on limite le nombre d'objets car le server ne tiens pas le coup
-                if (!empty($objects) && count($objects) < 40) {
+                $objects = str_getcsv($objectsString, ' ', '"');       
+                if (!empty($objects)) {
                     $sqlObjects .= ' + ';
                 
+                    // on limite le nombre d'objets car le serveur ne tiens pas le coup
+                    if (count($objects) > 40) {
+                        $objects = array_slice($objects, 0, 40);
+                    }
                     for ($i = 0; $i<count($objects); $i++) {
                         $sqlObjects .= '
                             CASE WHEN (REGEXP(a.name, :objects'.$i.') = 1) THEN 60 ELSE 0 END +
