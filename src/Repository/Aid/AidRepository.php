@@ -537,21 +537,23 @@ class AidRepository extends ServiceEntityRepository
                 ';
 
                 $objects = str_getcsv($objectsString, ' ', '"');
-                if (!empty($objects)) {
+                // on limite le nombre d'objets car le server ne tiens pas le coup
+                if (!empty($objects) && count($objects) < 40) {
                     $sqlObjects .= ' + ';
-                }
-                for ($i = 0; $i<count($objects); $i++) {
-                    $sqlObjects .= '
-                        CASE WHEN (REGEXP(a.name, :objects'.$i.') = 1) THEN 60 ELSE 0 END +
-                        CASE WHEN (REGEXP(a.nameInitial, :objects'.$i.') = 1) THEN 60 ELSE 0 END +
-                        CASE WHEN (REGEXP(a.description, :objects'.$i.') = 1) THEN 60 ELSE 0 END
-                    ';
+                
+                    for ($i = 0; $i<count($objects); $i++) {
+                        $sqlObjects .= '
+                            CASE WHEN (REGEXP(a.name, :objects'.$i.') = 1) THEN 60 ELSE 0 END +
+                            CASE WHEN (REGEXP(a.nameInitial, :objects'.$i.') = 1) THEN 60 ELSE 0 END +
+                            CASE WHEN (REGEXP(a.description, :objects'.$i.') = 1) THEN 60 ELSE 0 END
+                        ';
 
-                    if ($i < count($objects) - 1) {
-                        $sqlObjects .= ' + ';
+                        if ($i < count($objects) - 1) {
+                            $sqlObjects .= ' + ';
+                        }
+
+                        $qb->setParameter('objects'.$i, '\\b'.$objects[$i].'\\b');
                     }
-
-                    $qb->setParameter('objects'.$i, '\\b'.$objects[$i].'\\b');
                 }
 
                 if (isset($sqlProjectReference) && $sqlProjectReference !== '') {
