@@ -355,6 +355,7 @@ class AidRepository extends ServiceEntityRepository
 
     public function getQueryBuilder(array $params = null) : QueryBuilder
     {
+        $id = $params['id'] ?? null;
         $author = $params['author'] ?? null;
         $isLive = $params['isLive'] ?? null;
         $showInSearch = $params['showInSearch'] ?? null;
@@ -428,6 +429,12 @@ class AidRepository extends ServiceEntityRepository
 
         $qb = $this->createQueryBuilder('a');
 
+        if ($id !== null) {
+            $qb
+                ->andWhere('a.id = :id')
+                ->setParameter('id', $id);
+        }
+        
         if ($nameLike !== null) {
             $qb
                 ->andWhere('a.name LIKE :nameLike')

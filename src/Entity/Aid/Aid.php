@@ -39,6 +39,7 @@ use ApiPlatform\Metadata\ApiProperty;
 use App\Controller\Api\Aid\AidController as AidAidController;
 use App\Filter\Aid\AidApplyBeforeFilter;
 use App\Filter\Aid\AidCallForProjectOnlyFilter;
+use App\Filter\Aid\AidCategoriesFilter;
 use App\Filter\Aid\AidDestinationFilter;
 use App\Filter\Aid\AidFinancialAidFilter;
 use App\Filter\Aid\AidIsChargedFilter;
@@ -88,6 +89,12 @@ use Symfony\Component\Validator\Constraints as Assert;
             uriTemplate: '/aids/{slug}/',
             controller: AidAidController::class,
         ),
+        new Get(
+            name: self::API_OPERATION_GET_BY_ID,
+            normalizationContext: ['groups' => self::API_GROUP_ITEM],
+            uriTemplate: '/aids/by-id/{id}/',
+            controller: AidAidController::class,
+        ),
     ],
     order: ['dateStart' => 'DESC', 'id' => 'DESC'],
     paginationEnabled: true,
@@ -98,6 +105,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 #[ApiFilter(AidTextFilter::class)]
 #[ApiFilter(AidTargetedAudiencesFilter::class)]
+#[ApiFilter(AidCategoriesFilter::class)]
 #[ApiFilter(AidApplyBeforeFilter::class)]
 #[ApiFilter(AidPublishedAfterFilter::class)]
 #[ApiFilter(AidTypeGroupFilter::class)]
@@ -112,6 +120,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ApiFilter(AidProjectReferenceFilter::class)]
 class Aid // NOSONAR too much methods
 {
+    const API_OPERATION_GET_BY_ID = 'api_aid_get_by_id';
     const API_OPERATION_GET_BY_SLUG = 'api_aid_get_by_slug';
     const API_OPERATION_GET_COLLECTION_PUBLISHED = 'api_aids_published';
     const API_OPERATION_GET_COLLECTION_ALL = 'api_aids_all';

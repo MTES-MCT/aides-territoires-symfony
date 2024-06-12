@@ -25,8 +25,10 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\OpenApi\Model;
 use App\Controller\Api\Perimeter\PerimeterController;
+use App\Filter\Perimeter\PerimeterInseesFilter;
 use App\Filter\Perimeter\PerimeterScaleFilter;
 use App\Filter\Perimeter\PerimeterTextFilter;
+use App\Filter\Perimeter\PerimeterZipcodesFilter;
 use App\Service\Doctrine\DoctrineConstants;
 
 #[ApiResource(
@@ -53,6 +55,8 @@ use App\Service\Doctrine\DoctrineConstants;
 )]
 #[ApiFilter(PerimeterTextFilter::class)]
 #[ApiFilter(PerimeterScaleFilter::class)]
+#[ApiFilter(PerimeterZipcodesFilter::class)]
+#[ApiFilter(PerimeterInseesFilter::class)]
 #[ORM\Entity(repositoryClass: PerimeterRepository::class)]
 #[ORM\Index(columns: ['date_create'], name: 'date_create_peri')]
 #[ORM\Index(columns: ['scale'], name: 'scale_peri')]

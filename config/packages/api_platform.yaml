@@ -1,7 +1,7 @@
 api_platform:
     title: Api - Aides Territoires
     description: "<h2><strong>Pour l'autorisation sur cet outil, vous devez remplir le champ de la manière suivante : Bearer [token]</strong></h2>"
-    version: 1.7.2
+    version: 1.7.3
     formats:
         jsonld: ['application/ld+json']
         json: ['application/json']
