@@ -159,7 +159,12 @@ class PerimeterController extends ApiController
     {
         $perimeter = $perimeterRepository->find((int) $id);
         if (!$perimeter instanceof Perimeter) {
-            return new JsonResponse('Périmètre non trouvé', 404);
+            return new JsonResponse([
+                'type' => 'about:blank',
+                'title' => 'Not Found',
+                'status' => 404,
+                'detail' => 'Périmètre non trouvé',
+            ], 404);
         }
 
         // spécifique

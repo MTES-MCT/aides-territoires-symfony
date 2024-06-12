@@ -29,7 +29,12 @@ class PerimeterDataController extends ApiController
         if (!empty($perimeterId)) {
             $params['perimeter'] = $this->managerRegistry->getRepository(Perimeter::class)->find($perimeterId);
             if (!$params['perimeter'] instanceof Perimeter) {
-                return new JsonResponse(['error' => 'Perimeter not found'], 404);
+                return new JsonResponse([
+                    'type' => 'about:blank',
+                    'title' => 'Not Found',
+                    'status' => 404,
+                    'detail' => 'Périmètre non trouvé',
+                ], 404);
             }
         }
 

@@ -128,9 +128,10 @@ class AidController extends ApiController
         $response->setEncodingOptions(JSON_UNESCAPED_SLASHES);
         return $response;
     }
-    #[Route('/api/aids/{slug}/', name: 'api_aid_by_slug', priority: 4)]
-    public function bySlug(
-        $slug,
+
+    #[Route('/api/aids/by-id/{id}/', name: 'api_aid_by_id', priority: 4)]
+    public function byId(
+        $id,
         AidRepository $aidRepository,
         AidService $aidService,
         LogService $logService,
@@ -140,7 +141,8 @@ class AidController extends ApiController
     {
         $params = [];
         $params['showInSearch'] = true;
-        $params['slug'] = $slug;
+        $params['id'] = (int) $id;
+        $codeStatus = 200;
         $aid = $aidRepository->findOneCustom($params);
         if ($aid instanceof Aid) {
             $results = [$aid];
@@ -150,8 +152,12 @@ class AidController extends ApiController
             $data = $resultsSpe[0];
         } else {
             $data = [
-                "detail" => "Pas trouvé."
+                'type' => 'about:blank',
+                'title' => 'Not Found',
+                'status' => 404,
+                "detail" => "Cette aide n'existe pas"
             ];
+            $codeStatus = 404;
         }
 
         // log
@@ -169,7 +175,59 @@ class AidController extends ApiController
         );
         
         // la réponse
-        $response =  new JsonResponse($data, 200, [], false);
+        $response =  new JsonResponse($data, $codeStatus, [], false);
+        // pour eviter que les urls ne soient ecodées
+        $response->setEncodingOptions(JSON_UNESCAPED_SLASHES);
+        return $response;
+    }
+
+    #[Route('/api/aids/{slug}/', name: 'api_aid_by_slug', priority: 4)]
+    public function bySlug(
+        $slug,
+        AidRepository $aidRepository,
+        AidService $aidService,
+        LogService $logService,
+        RequestStack $requestStack,
+        UserService $userService
+    ): JsonResponse
+    {
+        $codeStatus = 200;
+        $params = [];
+        $params['showInSearch'] = true;
+        $params['slug'] = $slug;
+        $aid = $aidRepository->findOneCustom($params);
+        if ($aid instanceof Aid) {
+            $results = [$aid];
+        
+            // spécifique
+            $resultsSpe = $this->getResultsSpe($results, $aidService);
+            $data = $resultsSpe[0];
+        } else {
+            $data = [
+                'type' => 'about:blank',
+                'title' => 'Not Found',
+                'status' => 404,
+                "detail" => "Cette aide n'existe pas"
+            ];
+            $codeStatus = 404;
+        }
+
+        // log
+        $user = $userService->getUserLogged();
+        $logService->log(
+            type: LogService::AID_VIEW,
+            params: [
+                'querystring' => parse_url($requestStack->getCurrentRequest()->getRequestUri(), PHP_URL_QUERY) ?? null,
+                'host' => $requestStack->getCurrentRequest()->getHost(),
+                'aid' => $aid,
+                'organization' => ($user instanceof User && $user->getDefaultOrganization()) ? $user->getDefaultOrganization() : null,
+                'user' => ($user instanceof User) ? $user : null,
+                'source' => LogAidSearch::SOURCE_API,
+            ]
+        );
+        
+        // la réponse
+        $response =  new JsonResponse($data, $codeStatus, [], false);
         // pour eviter que les urls ne soient ecodées
         $response->setEncodingOptions(JSON_UNESCAPED_SLASHES);
         return $response;
