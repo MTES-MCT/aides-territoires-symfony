@@ -158,7 +158,8 @@
                 "realpath_cache_ttl=600"
             ],
             "nginx-includes": [
-                ".scalingo/nginx/server.location"
+                ".scalingo/nginx/server.location",
+                ".scalingo/nginx/nginx-ips-filtering.conf"
             ]
         }
     },
