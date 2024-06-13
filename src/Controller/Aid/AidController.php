@@ -4,8 +4,6 @@ namespace App\Controller\Aid;
 
 use App\Controller\FrontController;
 use App\Entity\Aid\Aid;
-use App\Entity\Aid\AidFinancer;
-use App\Entity\Aid\AidInstructor;
 use App\Entity\Aid\AidProject;
 use App\Entity\Aid\AidSuggestedAidProject;
 use App\Entity\Alert\Alert;
@@ -13,6 +11,7 @@ use App\Entity\Perimeter\Perimeter;
 use App\Entity\Project\Project;
 use App\Entity\Reference\ProjectReference;
 use App\Entity\User\User;
+use App\Exception\NotFoundException\AidNotFoundException;
 use App\Form\Aid\AidSearchTypeV2;
 use App\Form\Aid\SuggestToProjectType;
 use App\Form\Alert\AlertCreateType;
@@ -390,11 +389,11 @@ class AidController extends FrontController
             ]
         );
         if (!$aid) {
-            throw $this->createNotFoundException('Cette aide n\'existe pas');
+            throw new AidNotFoundException('Cette aide n\'existe pas');
         }
         // regarde si aide publié et utilisateur = auteur ou utilisateur = admin
         if (!$aidService->userCanSee($aid, $user)) {
-            throw $this->createNotFoundException('Cette aide n\'existe pas');
+            throw new AidNotFoundException('Cette aide n\'existe pas');
         }
 
         // log seulement si l'aide à le statut publiée
