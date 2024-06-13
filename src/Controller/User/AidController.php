@@ -7,6 +7,7 @@ use App\Entity\Aid\Aid;
 use App\Entity\Aid\AidFinancer;
 use App\Entity\Aid\AidInstructor;
 use App\Entity\User\User;
+use App\Exception\NotFoundException\AidNotFoundException;
 use App\Form\Aid\AidDeleteType;
 use App\Form\Aid\AidEditType;
 use App\Form\User\Aid\AidExportType;
@@ -232,7 +233,7 @@ class AidController extends FrontController
             'slug' => $slug
         ]);
         if (!$aid instanceof Aid) {
-            throw new NotFoundException('Cette aide n\'existe pas');
+            throw new AidNotFoundException('Cette aide n\'existe pas');
         }
 
         // verifie que l'aide appartienne à l'utilisateur ou que l'utilisateur est un admin
@@ -611,10 +612,10 @@ class AidController extends FrontController
             ]
             );
         if (!$aid instanceof Aid) {
-            throw new NotFoundException('Cette aide n\'existe pas');
+            throw new AidNotFoundException('Cette aide n\'existe pas');
         }
         if (!$aidService->userCanExportPdf($aid, $user)) {
-            throw $this->createNotFoundException('Cette aide n\'existe pas');
+            throw new AidNotFoundException('Cette aide n\'existe pas');
         }
 
         $pdfOptions = new Options();
