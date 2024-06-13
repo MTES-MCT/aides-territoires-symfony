@@ -17,6 +17,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Serializer\Annotation\Ignore;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Index(columns: ['status'], name: 'status_project')]
 #[ORM\Index(columns: ['is_public'], name: 'is_public_project')]
@@ -76,9 +77,12 @@ class Project // NOSONAR too much methods
     #[ORM\Column]
     private ?int $id = null;
 
+    #[Assert\Length(max: 255)]
+    #[Assert\NotBlank()]
     #[ORM\Column(length: 255)]
     private ?string $name = null;
 
+    #[Assert\Length(max: 255)]
     #[ORM\Column(length: 255)]
     #[Gedmo\Slug(fields: ['name'], updatable: false)]
     private ?string $slug = null;
@@ -104,6 +108,7 @@ class Project // NOSONAR too much methods
     #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $dueDate = null;
 
+    #[Assert\Length(max: 10)]
     #[ORM\Column(length: 10, nullable: true)]
     private ?string $contractLink = null;
 
@@ -113,21 +118,26 @@ class Project // NOSONAR too much methods
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $privateDescription = null;
 
+    #[Assert\Length(max: 255)]
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $projectTypesSuggestion = null;
 
+    #[Assert\Length(max: 10)]
     #[ORM\Column(length: 10)]
     private ?string $status = null;
 
     #[ORM\Column(nullable: true)]
     private ?int $budget = 0;
 
+    #[Assert\Length(max: 180)]
     #[ORM\Column(length: 180, nullable: true)]
     private ?string $otherProjectOwner = null;
 
+    #[Assert\Length(max: 10)]
     #[ORM\Column(length: 10, nullable: true)]
     private ?string $step = null;
 
+    #[Assert\Length(max: 100)]
     #[ORM\Column(length: 100, nullable: true)]
     private ?string $image = null;
 
