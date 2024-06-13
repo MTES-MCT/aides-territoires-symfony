@@ -645,6 +645,7 @@ class Aid // NOSONAR too much methods
     private ArrayCollection $instructors;
 
     #[ORM\ManyToOne(inversedBy: 'aids')]
+    #[ORM\JoinColumn(onDelete: DoctrineConstants::SET_NULL)]
     private ?Organization $organization = null;
 
     #[Assert\Length(max: 255)]
