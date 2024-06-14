@@ -63,24 +63,25 @@ class ImportFluxRegionSudCommand extends ImportFluxCommand
         return $aidsFromImport;
     }
 
-    protected function getClient(): CurlHttpClient
-    {
-        // place le certificat dans un fichier temporaire
-        $cerificate = $this->paramService->get('certificat_region_sud');
-        $certificatePath = $this->fileService->getUploadTmpDir() . '/certificat_region_sud.pem';
-        file_put_contents($certificatePath, $cerificate);
+    // visiblement le certificat à re changer. Je laisse en commentaire pour le moment
+    // protected function getClient(): CurlHttpClient
+    // {
+    //     // place le certificat dans un fichier temporaire
+    //     $cerificate = $this->paramService->get('certificat_region_sud');
+    //     $certificatePath = $this->fileService->getUploadTmpDir() . '/certificat_region_sud.pem';
+    //     file_put_contents($certificatePath, $cerificate);
 
-        // combine les options avec le certificat
-        $apiOptions = array_merge(
-            [
-                'cafile' => $certificatePath,
-            ],
-            $this->getApiOptions()
-        );
+    //     // combine les options avec le certificat
+    //     $apiOptions = array_merge(
+    //         [
+    //             'cafile' => $certificatePath,
+    //         ],
+    //         $this->getApiOptions()
+    //     );
 
-        // creer le client
-        return new CurlHttpClient($apiOptions);
-    }
+    //     // creer le client
+    //     return new CurlHttpClient($apiOptions);
+    // }
 
 
     protected function getFieldsMapping(array $aidToImport, array $params = null): array
