@@ -3,6 +3,7 @@
 namespace App\Controller\User;
 
 use App\Entity\User\User;
+use App\Exception\NotFoundException\ResetPasswordNotFoundException;
 use App\Form\User\ChangePasswordFormType;
 use App\Form\User\ResetPasswordRequestFormType;
 use App\Service\Email\EmailService;
@@ -90,7 +91,7 @@ class ResetPasswordController extends AbstractController
         $token = $this->getTokenFromSession();
 
         if (null === $token) {
-            throw $this->createNotFoundException('No reset password token found in the URL or in the session.');
+            throw new ResetPasswordNotFoundException('No reset password token found in the URL or in the session.');
         }
 
         try {

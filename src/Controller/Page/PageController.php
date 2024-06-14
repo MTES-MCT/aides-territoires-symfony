@@ -4,6 +4,7 @@ namespace App\Controller\Page;
 
 use App\Controller\FrontController;
 use App\Entity\Page\Page;
+use App\Exception\NotFoundException\PageNotFoundException;
 use App\Repository\Page\PageRepository;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -33,7 +34,7 @@ class PageController extends FrontController
                     ]
                 );
                 if (!$page instanceof Page) {
-                    throw $this->createNotFoundException('Cette page n\'existe pas.');
+                    throw new PageNotFoundException('Cette page n\'existe pas.');
                 }
             }
             
