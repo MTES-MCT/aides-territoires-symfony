@@ -108,7 +108,8 @@ class AidSearchTypeV2 extends AbstractType
                     'closeAfterSelect' => true,
                     'sanitize_html' => true,
                     'delimiter' => '$%§'
-                ]
+                ],
+                'sanitize_html' => true,
 
             ])
             ->add('categorysearch', EntityCheckboxGroupAbsoluteType::class, [
