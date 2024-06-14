@@ -6,6 +6,7 @@ use App\Entity\Aid\Aid;
 use App\Entity\Aid\AidFinancer;
 use App\Entity\DataSource\DataSource;
 use App\Service\Email\EmailService;
+use App\Service\File\FileService;
 use App\Service\Perimeter\PerimeterService;
 use App\Service\Various\ParamService;
 use App\Service\Various\StringService;
@@ -50,7 +51,8 @@ class ImportFluxCommand extends Command // NOSONAR too much methods
         protected HttpClientInterface $httpClientInterface,
         protected HtmlSanitizerInterface $htmlSanitizerInterface,
         protected PerimeterService $perimeterService,
-        protected StringService $stringService
+        protected StringService $stringService,
+        protected FileService $fileService
     )
     {
         ini_set('max_execution_time', 60*60);
@@ -132,8 +134,9 @@ class ImportFluxCommand extends Command // NOSONAR too much methods
 
         // si pagination
         if ($this->paginationEnabled) {
+            $client = $this->getClient();
             // on recupère les infos pour la pagination avec un premier appel
-            $response = $this->httpClientInterface->request(
+            $response = $client->request(
                 'GET',
                 $this->dataSource->getImportApiUrl(),
                 $this->getApiOptions()
@@ -194,6 +197,7 @@ class ImportFluxCommand extends Command // NOSONAR too much methods
     protected function callApi()
     {
         $aidsFromImport = [];
+        $client = $this->getClient();
 
         for ($i=0; $i<$this->nbPages; $i++) {
             $this->currentPage = $i;
@@ -202,7 +206,7 @@ class ImportFluxCommand extends Command // NOSONAR too much methods
                 $importUrl .= '?limit=' . $this->nbByPages . '&offset=' . ($this->currentPage * $this->nbByPages);
             }
             try {
-                $response = $this->httpClientInterface->request(
+                $response = $client->request(
                     'GET',
                     $importUrl,
                     $this->getApiOptions()
@@ -392,6 +396,11 @@ class ImportFluxCommand extends Command // NOSONAR too much methods
         }
     }
 
+    protected function getClient(): HttpClientInterface
+    {
+        return $this->httpClientInterface;
+    }
+    
     protected function getApiOptions(): array
     {
         return [

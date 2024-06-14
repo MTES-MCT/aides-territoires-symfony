@@ -23,6 +23,7 @@ use App\Field\TextLengthCountField;
 use App\Field\TrumbowygField;
 use App\Form\Admin\Aid\KeywordReferenceAssociationType;
 use App\Form\Admin\Aid\ProjectReferenceAssociationType;
+use App\Repository\Aid\AidRepository;
 use App\Service\Export\SpreadsheetExporterService;
 use Doctrine\ORM\EntityRepository;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
@@ -102,10 +103,6 @@ class AidCrudController extends AtCrudController
             ->add(AidReferenceSearchFilter::new('referenceSearch', 'Recherche de référence'))
             ->add(AidReferenceSearchObjectFilter::new('referenceSearchObject', 'Recherche de référence (objets uniquement)'))
             ->add(AidNoReferenceFilter::new('noReference', 'Pas de projet référent associé'))
-            
-            // most of the times there is no need to define the
-            // filter type because EasyAdmin can guess it automatically
-            // ->add(BooleanFilter::new('published'))
         ;
     }
 
@@ -353,11 +350,11 @@ class AidCrudController extends AtCrudController
                 $name = $value->getName();
                 if ($value->getScale() == Perimeter::SCALE_COUNTY) {
                     $name .= ' (Département)';
-                } else if ($value->getScale() == Perimeter::SCALE_REGION) {
+                } elseif ($value->getScale() == Perimeter::SCALE_REGION) {
                     $name .= ' (Région)';
-                } else if ($value->getScale() == Perimeter::SCALE_COMMUNE) {
+                } elseif ($value->getScale() == Perimeter::SCALE_COMMUNE) {
                     $name .= ' (Commune)';
-                } else if ($value->getScale() == Perimeter::SCALE_ADHOC) {
+                } elseif ($value->getScale() == Perimeter::SCALE_ADHOC) {
                     $name .= ' (Adhoc)';
                 }
                 $display = strlen($name) < 20 ? $name : substr($name, 0, 20).'...';
@@ -464,7 +461,12 @@ class AidCrudController extends AtCrudController
         ->hideOnIndex();
         $nbAidsLive = 0;
         if ($entity && $entity->getAuthor()) {
-            $nbAidsLive = $entity->getAuthor()->getNbAidsLive();
+            /** @var AidRepository $aidRepository */
+            $aidRepository = $this->managerRegistry->getRepository(Aid::class);
+            $nbAidsLive = $aidRepository->countCustom([
+                'authod' => $entity->getAuthor(),
+                'showInSearch' => true
+            ]);
         }
         yield IntegerField::new('nbAidsLive', 'Du même auteur')
         ->setHelp('Nb. d\'aides live créées par le même utilisateur')
@@ -720,25 +722,15 @@ class AidCrudController extends AtCrudController
         yield DateTimeField::new('dateImportLastAccess', 'Date du dernier accès')
         ->hideOnIndex()
         ->setColumns(12);
-        // yield ArrayField::new('importRawObject', 'Donnée brute importée')
-        // ->hideOnIndex();
-        // yield ArrayField::new('importRawObjectTemp', 'Donnée brute importée temporaire')
-        // ->hideOnIndex();
-        // yield ArrayField::new('importRawObjectCalendar', 'Donnée brute importée pour le calendrier')
-        // ->hideOnIndex();
-        // yield ArrayField::new('importRawObjectTempCalendar', 'Donnée brute importée temporaire pour le calendrie')
-        // ->hideOnIndex();
-
-
     }
 
 
     public function  configureCrud(Crud $crud): Crud
     {
         return parent::configureCrud($crud)
-        ->overrideTemplate('crud/edit', 'admin/aid/edit.html.twig')  
-        ->overrideTemplate('crud/index', 'admin/aid/index.html.twig')  
-        ->setPaginatorPageSize(50)
+            ->overrideTemplate('crud/edit', 'admin/aid/edit.html.twig')
+            ->overrideTemplate('crud/index', 'admin/aid/index.html.twig')
+            ->setPaginatorPageSize(50)
         ;
     }
 
