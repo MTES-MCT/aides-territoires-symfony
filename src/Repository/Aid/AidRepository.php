@@ -270,7 +270,23 @@ class AidRepository extends ServiceEntityRepository
 
         $qb = $this->getQueryBuilder($params);
 
-        return $qb->getQuery()->getResult();
+        $results = $qb->getQuery()->getResult();
+
+        $return = [];
+        foreach ($results as $result) {
+            if ($result instanceof Aid) {
+                $return[] = $result;
+            } elseif (is_array($result) && isset($result[0]) && $result[0] instanceof Aid) {
+                if (isset($result['score_total'])) {
+                    $result[0]->setScoreTotal($result['score_total']);
+                }
+                if (isset($result['score_objects'])) {
+                    $result[0]->setScoreObjects($result['score_objects']);
+                }
+                $return[] = $result[0];
+            }
+        }
+        return $return;
     }
 
     public function findOneCustom(array $params = null) : ?Aid
@@ -383,8 +399,8 @@ class AidRepository extends ServiceEntityRepository
         $keywords = $params['keywords'] ?? null;
 
         $keyword = $params['keyword'] ?? null;
-        $keyword = strip_tags($keyword);
         if ($keyword !== null) {
+            $keyword = strip_tags($keyword);
             $synonyms = $this->referenceService->getSynonymes($keyword);
         }
 
