@@ -236,6 +236,8 @@ class AidSearchFormService
             foreach ($queryItems as $queyItem) {
                 $param = explode('=', urldecode($queyItem));
                 if (isset($param[0]) && isset($param[1])) {
+                    $param[0] = strip_tags($param[0]);
+                    $param[1] = strip_tags($param[1]);
                     if (isset($queryParams[$param[0]]) && is_array($queryParams[$param[0]])) {
                         $queryParams[$param[0]][] = $param[1];
                     } elseif (isset($queryParams[$param[0]]) && !is_array($queryParams[$param[0]])) {
