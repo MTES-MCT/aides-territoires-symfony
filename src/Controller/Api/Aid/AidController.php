@@ -72,7 +72,8 @@ class AidController extends ApiController
             'backers' => $aidParams['backers'] ?? null,
             'categories' => $aidParams['categories'] ?? null,
             'programs' => $aidParams['programs'] ?? null,
-            'projectReference' => $aidParams['projectReference'] ?? null
+            'projectReference' => $aidParams['projectReference'] ?? null,
+            'user' => $user ?? null
         ];
         $themes = new ArrayCollection();
         if (isset($aidParams['categories']) && is_array($aidParams['categories'])) {
