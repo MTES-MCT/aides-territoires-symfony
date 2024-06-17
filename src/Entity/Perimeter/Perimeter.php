@@ -111,6 +111,7 @@ class Perimeter // NOSONAR too much methods
     const SCALE_COUNTY = 10;
     const SCALE_COMMUNE = 1;
     const SCALE_EPCI = 5;
+    const SCALE_DEPARTEMENT = 10;
     const SCALE_REGION = 15;
     const SCALE_ADHOC = 18;
     const SCALE_CONTINENT = 25;
