@@ -153,7 +153,7 @@ class PortalController extends FrontController
             'querystring' => $querystring ?? null,
             'resultsCount' => $pagerfanta->getNbResults(),
             'host' => $requestStack->getCurrentRequest()->getHost(),
-            'perimeter' => $aidParams['perimeter'] ?? null,
+            'perimeter' => $aidParams['perimeterFrom'] ?? null,
             'search' => $aidParams['keyword'] ?? null,
             'organization' => ($user instanceof User && $user->getDefaultOrganization()) ? $user->getDefaultOrganization() : null,
             'backers' => $aidParams['backers'] ?? null,

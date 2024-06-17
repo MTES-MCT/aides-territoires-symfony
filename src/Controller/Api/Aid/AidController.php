@@ -66,7 +66,7 @@ class AidController extends ApiController
             'resultsCount' => $count,
             'host' => $requestStack->getCurrentRequest()->getHost(),
             'source' => LogAidSearch::SOURCE_API,
-            'perimeter' => $aidParams['perimeter'] ?? null,
+            'perimeter' => $aidParams['perimeterFrom'] ?? null,
             'search' => $aidParams['keyword'] ?? null,
             'organization' => ($user instanceof User && $user->getDefaultOrganization()) ? $user->getDefaultOrganization() : null,
             'backers' => $aidParams['backers'] ?? null,
