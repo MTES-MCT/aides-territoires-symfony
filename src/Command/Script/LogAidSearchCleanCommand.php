@@ -20,15 +20,12 @@ class LogAidSearchCleanCommand extends Command
     protected string $commandTextEnd = '>Clean log aid search';
 
     private int $offset = 0;
-    private int $maxResults = 500000;
-    
+    private int $maxResults = 250000;
 
     public function __construct(
         protected ManagerRegistry $managerRegistry,
     )
     {
-        ini_set('max_execution_time', 60*60);
-        ini_set('memory_limit', '1G');
         parent::__construct();
     }
 
@@ -44,28 +41,31 @@ class LogAidSearchCleanCommand extends Command
         $nbByBatch = 20000;
         $pattern = '/(searchPerimeter|perimeter)=([0-9]+)/';
         $perimetersById = [];
-        $logAidSearchRepository = $this->managerRegistry->getRepository(LogAidSearch::class);
+
         $perimeterRepository = $this->managerRegistry->getRepository(Perimeter::class);
         // recupere les x logs avec perimeter_id = null
-        $logAidSearchs = $logAidSearchRepository->findBy(
-            [
-                'perimeter' => null
-            ],
-            ['id' => 'ASC'],
-            $this->maxResults,
-            $this->offset
-        );
-
+        $sql = "SELECT *
+                FROM log_aid_search
+                WHERE perimeter_id IS NULL
+                AND (querystring like '%perimeter%' or querystring like '%searchPerimeter%')
+                LIMIT 0, 300000
+                ";
+        $stmt = $this->managerRegistry->getConnection()->prepare($sql);
+        
+        try {
+            $result = $stmt->executeQuery();
+            $logAidSearchs = $result->fetchAllAssociative();
+        } finally {
+            $result->free();
+        }
+        
         $nbCurrent = 0;
+        $sqlUpdates = [];
         /** @var LogAidSearch $logAidSearch */
-        foreach ($logAidSearchs as $logAidSearch) {
-            if (!$logAidSearch->getQuerystring()) {
-                $nbCurrent++;
-                continue;
-            }
-            if (preg_match($pattern, $logAidSearch->getQuerystring(), $matches)) {
+        foreach ($logAidSearchs as $key => $logAidSearch) {
+            if (preg_match($pattern, $logAidSearch['querystring'], $matches)) {
                 $searchPerimeterValue = $matches[2] ?? null;
-                
+
                 if ($searchPerimeterValue) {
                     if (!isset($perimetersById[$searchPerimeterValue])) {
                         $perimeter = $perimeterRepository->find($searchPerimeterValue);
@@ -75,21 +75,39 @@ class LogAidSearchCleanCommand extends Command
                     }
 
                     if (isset($perimetersById[$searchPerimeterValue])) {
-                        $logAidSearch->setPerimeter($perimetersById[$searchPerimeterValue]);
-                        $this->managerRegistry->getManager()->persist($logAidSearch);
+                        $sqlUpdates[] = "UPDATE log_aid_search SET perimeter_id = ".$perimetersById[$searchPerimeterValue]->getId()." WHERE id = ".$logAidSearch['id'];
                     }
                 }
             }
 
             $nbCurrent++;
+            unset($logAidSearch[$key]);
 
             if ($nbCurrent >= $nbByBatch) {
-                $this->managerRegistry->getManager()->flush();
+
+                if (!empty($sqlUpdates)) {
+                    $stmt = $this->managerRegistry->getConnection()->prepare(implode(';', $sqlUpdates));
+                    
+                    try {
+                        $result = $stmt->executeQuery();
+                    } finally {
+                        $result->free();
+                    }
+                }
                 $nbCurrent = 0;
+                $sqlUpdates = [];
             }
         }
 
-        $this->managerRegistry->getManager()->flush();
+        if (!empty($sqlUpdates)) {
+            $stmt = $this->managerRegistry->getConnection()->prepare(implode(';', $sqlUpdates));
+            
+            try {
+                $result = $stmt->executeQuery();
+            } finally {
+                $result->free();
+            }
+        }
 
         $timeEnd = microtime(true);
         $time = $timeEnd - $timeStart;
