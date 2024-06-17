@@ -26,7 +26,7 @@ class LogUserLoginRepository extends ServiceEntityRepository
 
     public function getUniqueLoginsByYear(): array
     {
-        return 
+        return
             $this->createQueryBuilder('l')
             ->select('
             EXTRACT(YEAR FROM l.dateCreate) AS year,
@@ -41,17 +41,15 @@ class LogUserLoginRepository extends ServiceEntityRepository
 
     public function getUniqueLoginsByQuarters(): array
     {
-        return 
+        return
             $this->createQueryBuilder('l')
             ->select('
             EXTRACT(YEAR FROM l.dateCreate) AS year,
             EXTRACT(QUARTER FROM l.dateCreate) AS quarter,
-            EXTRACT(MONTH FROM l.dateCreate) AS month,
             COUNT(DISTINCT l.user) AS unique_users
             ')
             ->groupBy('year')
             ->addGroupBy('quarter')
-            ->addGroupBy('month')
             ->orderBy('year', 'ASC')
             ->addOrderBy('quarter', 'ASC')
             ->getQuery()
@@ -61,7 +59,7 @@ class LogUserLoginRepository extends ServiceEntityRepository
 
     public function getUniqueLoginsByMonth(): array
     {
-        return 
+        return
             $this->createQueryBuilder('l')
             ->select('
             EXTRACT(YEAR FROM l.dateCreate) AS year,
@@ -79,7 +77,7 @@ class LogUserLoginRepository extends ServiceEntityRepository
 
     public function getUniqueLoginsByWeek(): array
     {
-        return 
+        return
             $this->createQueryBuilder('l')
             ->select('
             EXTRACT(YEAR FROM l.dateCreate) AS year,
@@ -129,7 +127,7 @@ class LogUserLoginRepository extends ServiceEntityRepository
         return (isset($results[0]) && isset($results[0]['nb'])) ? $results[0]['nb'] : 0;
     }
     public function countCustom(?array $params = null): int
-    {   
+    {
         $distinctUser = $params['distinctUser'] ?? null;
         $qb = $this->getQueryBuilder($params);
         if ($distinctUser) {
