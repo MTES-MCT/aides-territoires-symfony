@@ -34,17 +34,20 @@ class UserController extends AbstractController
     public function communeDashboard(
     ): Response
     {
+        // les repository
+        $userRepository = $this->managerRegistry->getRepository(User::class);
+        $logUserLoginRepository = $this->managerRegistry->getRepository(LogUserLogin::class);
+
         // les fréquences de connexions
-        $nbUsers = $this->managerRegistry->getRepository(User::class)->countCustom();
-        $nbLoggedAtLeastOnce = $this->managerRegistry->getRepository(LogUserLogin::class)->countUsersLoggedAtLeastOnce();
+        $nbUsers = $userRepository->countCustom();
+        $nbLoggedAtLeastOnce = $logUserLoginRepository->countUsersLoggedAtLeastOnce();
         $percentNbLoggedAtLeastOnce = $nbUsers > 0 ? round($nbLoggedAtLeastOnce / $nbUsers * 100, 2) : 0;
-        $uniqueLoginsByYear = $this->managerRegistry->getRepository(LogUserLogin::class)->getUniqueLoginsByYear();
-        $uniqueLoginsByQuarter = $this->managerRegistry->getRepository(LogUserLogin::class)->getUniqueLoginsByQuarters();
-        $uniqueLoginsByMonth = $this->managerRegistry->getRepository(LogUserLogin::class)->getUniqueLoginsByMonth();
-        $uniqueLoginsByWeek = $this->managerRegistry->getRepository(LogUserLogin::class)->getUniqueLoginsByWeek();
-        $nbUsersLoggedOnce = $this->managerRegistry->getRepository(LogUserLogin::class)->countUsersLoggedOnce();
+        $uniqueLoginsByYear = $logUserLoginRepository->getUniqueLoginsByYear();
+        $uniqueLoginsByQuarter = $logUserLoginRepository->getUniqueLoginsByQuarters();
+        $uniqueLoginsByMonth = $logUserLoginRepository->getUniqueLoginsByMonth();
+        $uniqueLoginsByWeek = $logUserLoginRepository->getUniqueLoginsByWeek();
+        $nbUsersLoggedOnce = $logUserLoginRepository->countUsersLoggedOnce();
         $percentNbUsersLoggedOnce = $nbUsers > 0 ? round($nbUsersLoggedOnce / $nbUsers * 100, 2) : 0;
-        dump($nbUsers, $nbLoggedAtLeastOnce, $uniqueLoginsByQuarter, $uniqueLoginsByMonth, $uniqueLoginsByWeek, $nbUsersLoggedOnce);
 
         // tableau connexion par année pour pourcentage
         $loginsByYear = [];

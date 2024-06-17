@@ -114,13 +114,14 @@ class AidController extends FrontController
             $newUrl = preg_replace('/(page=)[^\&]+/', 'page=' . $pagerfanta->getNbPages(), $requestStack->getCurrentRequest()->getRequestUri());
             return new RedirectResponse($newUrl);
         }
+
         // Log recherche
         $logParams = [
             'organizationTypes' => (isset($aidParams['organizationType'])) ? [$aidParams['organizationType']] : null,
             'querystring' => $query ?? null,
             'resultsCount' => $pagerfanta->getNbResults(),
             'host' => $requestStack->getCurrentRequest()->getHost(),
-            'perimeter' => $aidParams['perimeter'] ?? null,
+            'perimeter' => $aidParams['perimeterFrom'] ?? null,
             'search' => $aidParams['keyword'] ?? null,
             'organization' => ($user instanceof User && $user->getDefaultOrganization()) ? $user->getDefaultOrganization() : null,
             'backers' => $aidParams['backers'] ?? null,

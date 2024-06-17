@@ -1371,9 +1371,11 @@ class StatisticsController extends DashboardController
             ];
 
             $interco_type_dict["total"] = Organization::TOTAL_BY_INTERCOMMUNALITY_TYPE[$key];
-            $interco_type_dict["current"] = $this->managerRegistry->getRepository(Organization::class)->countInterco([
+            $organizationRepository = $this->managerRegistry->getRepository(Organization::class);
+            $interco_type_dict["current"] = $organizationRepository->countInterco([
                 'intercommunalityType' => $key,
             ]);
+
             $interco_type_dict["percentage"] = round(
                 $interco_type_dict["current"] * 100 / $interco_type_dict["total"],
                 1
@@ -1390,6 +1392,7 @@ class StatisticsController extends DashboardController
         }
 
         $charts = [];
+        
         foreach ($interco_types as $interco_type) {
 
             $chart = $this->getChartObjectif($interco_type['current_chart'], $interco_type['total'], null);
