@@ -1,0 +1,45 @@
+{% extends 'admin/statistics/_stats_base.html.twig' %}
+
+{% block breadcrumb %}
+{% endblock %}
+
+{% block stats_content %}
+<section class="container">
+    <h1>Recherches sur des périmètres sans organizations</h1>
+</section>
+
+<section class="container mt-5">
+    
+    <div class="mt-5">
+        {{ form_start(formDateRange) }}
+        <div class="d-flex">
+            <div class="d-flex me-3">
+            {{ form_row(formDateRange.dateMin) }}
+            </div>
+            <div class="d-flex me-3">
+            {{ form_row(formDateRange.dateMax) }}
+            </div>
+            <div class="d-flex me-3">
+            <button type="submit" class="btn btn-primary">Valider</button>
+            </div>
+        </div>
+        {{ form_end(formDateRange) }}
+    </div>
+
+    <div class="my-4">
+        <a href="{{ url('admin_statistics_log_aid_search_missing_perimeters_export', {'dateMin': dateMin|date('Y-m-d'), 'dateMax': dateMax|date('Y-m-d')}) }}" class="btn btn-primary">
+            <i class="fas fa-file-csv"></i> Export CSV des données complètes
+        </a>
+    </div>
+
+    <div class="row mt-5">
+        <div class="col-md-6">
+            {% if chartByDept %}
+            <div class="charts">
+                {{ render_chart(chartByDept) }}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+{% endblock stats_content %}

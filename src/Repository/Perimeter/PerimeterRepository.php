@@ -26,6 +26,17 @@ class PerimeterRepository extends ServiceEntityRepository
         parent::__construct($registry, Perimeter::class);
     }
 
+    public function getDepartments(?array $params = null): array
+    {
+        $params['scale'] = Perimeter::SCALE_DEPARTEMENT;
+
+        $qb = $this->getQueryBuilder($params)
+            ->orderBy('p.code', 'ASC')
+        ;
+
+        return $qb->getQuery()->getResult();
+    }
+
     public function countNbByOrganization(array $params = []): array
     {
         $scalePerimeter = $params['scalePerimeter'] ?? null;
