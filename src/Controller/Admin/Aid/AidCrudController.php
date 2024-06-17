@@ -464,7 +464,7 @@ class AidCrudController extends AtCrudController
             /** @var AidRepository $aidRepository */
             $aidRepository = $this->managerRegistry->getRepository(Aid::class);
             $nbAidsLive = $aidRepository->countCustom([
-                'authod' => $entity->getAuthor(),
+                'author' => $entity->getAuthor(),
                 'showInSearch' => true
             ]);
         }
