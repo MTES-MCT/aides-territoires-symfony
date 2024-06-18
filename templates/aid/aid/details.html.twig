@@ -494,7 +494,7 @@
                                 {% endif %}
                             {% endfor %}
                             {% set currentOriginUrlText = aid.originUrlText ?? defaultOriginUrlText %}
-                            <a class="fr-btn fr-btn--secondary" id="origin_url_btn" target="_blank" rel="noopener" title="Lien vers {{ currentOriginUrlText }} - ouvre une nouvelle fenêtre" href="{{ aid.originUrl }}">
+                            <a class="fr-btn fr-btn--secondary origin_url_btn" target="_blank" rel="noopener" title="Lien vers {{ currentOriginUrlText }} - ouvre une nouvelle fenêtre" href="{{ aid.originUrl }}">
                                 {{ currentOriginUrlText }}
                             </a>
                         </li>
@@ -654,7 +654,7 @@
                                     {% endif %}
                                 {% endfor %}
                                 {% set currentOriginUrlText = aid.originUrlText ?? defaultOriginUrlText %}
-                                <a class="fr-btn fr-btn--secondary" id="origin_url_btn" target="_blank" rel="noopener" title="Lien vers {{ currentOriginUrlText }} - ouvre une nouvelle fenêtre" href="{{ aid.originUrl }}">
+                                <a class="fr-btn fr-btn--secondary origin_url_btn" target="_blank" rel="noopener" title="Lien vers {{ currentOriginUrlText }} - ouvre une nouvelle fenêtre" href="{{ aid.originUrl }}">
                                     {{ currentOriginUrlText }}
                                 </a>
                             </li>
