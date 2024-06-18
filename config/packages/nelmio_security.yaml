@@ -32,10 +32,11 @@ nelmio_security:
             #définit les sources de scripts autorisées
             script-src:
                 - 'self'
+                - 'nonce'
+                - 'strict-dynamic'
                 - 'https://www.youtube.com'
                 - 'https://sibautomation.com'
                 - 'https://stats.beta.gouv.fr/'
-                - 'unsafe-inline'
             #définit les sources de feuilles de styles (CSS) autorisées
             style-src:
                 - 'self'
