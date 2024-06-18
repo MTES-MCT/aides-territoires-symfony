@@ -143,6 +143,9 @@ class ImportFluxCommand extends Command // NOSONAR too much methods
             );
             $content = $response->toArray();
             $nbItems = $content['count'] ?? 0;
+            if ($nbItems == 0) {
+                $nbItems = $content['total_count'] ?? 0;
+            }
             if (!$nbItems) {
                 throw new \Exception('Erreur sur la pagination, nbItems = 0');
             }
@@ -203,7 +206,11 @@ class ImportFluxCommand extends Command // NOSONAR too much methods
             $this->currentPage = $i;
             $importUrl = $this->dataSource->getImportApiUrl();
             if ($this->paginationEnabled) {
-                $importUrl .= '?limit=' . $this->nbByPages . '&offset=' . ($this->currentPage * $this->nbByPages);
+                if (strpos($importUrl, '?') !== false) {
+                    $importUrl .= '&limit=' . $this->nbByPages . '&offset=' . ($this->currentPage * $this->nbByPages);
+                } else {
+                    $importUrl .= '?limit=' . $this->nbByPages . '&offset=' . ($this->currentPage * $this->nbByPages);
+                }
             }
             try {
                 $response = $client->request(

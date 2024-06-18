@@ -16,13 +16,15 @@ class ImportFluxOccitanieCommand extends ImportFluxCommand
 
     protected ?string $importUniqueidPrefix = 'OCCITANIE_';
     protected ?int $idDataSource = 11;
+    protected bool $paginationEnabled = true;
+    protected int $nbByPages = 100;
 
     protected function getImportUniqueid($aidToImport): ?string
     {
-        if (!isset($aidToImport['recordid'])) {
+        if (!isset($aidToImport['_id'])) {
             return null;
         }
-        $importUniqueid = $this->importUniqueidPrefix . $aidToImport['recordid'];
+        $importUniqueid = $this->importUniqueidPrefix . $aidToImport['_id'];
         return substr($importUniqueid, 0, 200);
     }
 
@@ -30,41 +32,33 @@ class ImportFluxOccitanieCommand extends ImportFluxCommand
     protected function getFieldsMapping(array $aidToImport, array $params = null): array
     {
         try {
-            $timePublished = new \DateTime($aidToImport['fields']['date_publication'] ?? null);
+            $timePublished = new \DateTime($aidToImport['date_publication'] ?? null);
         } catch (\Exception $e) {
             $timePublished = null;
         }
         try {
-            $timeUpdate = new \DateTime($aidToImport['fields']['date_modification'] ?? null);
+            $timeUpdate = new \DateTime($aidToImport['date_modification'] ?? null);
         } catch (\Exception $e) {
             $timeUpdate = null;
         }
 
-        $description = '';
-        if (isset($aidToImport['fields']['chapo'])) {
-            $description .= $this->getCleanHtml($aidToImport['fields']['chapo']);
-        }
-        if (isset($aidToImport['fields']['introduction'])) {
-            $description .= $this->getCleanHtml($aidToImport['fields']['introduction']);
-        }
-
         return [
-            'name' => isset($aidToImport['fields']['titre']) ? html_entity_decode(strip_tags($aidToImport['fields']['titre']), ENT_QUOTES, 'UTF-8') : null,
-            'nameInitial' => isset($aidToImport['fields']['titre']) ? html_entity_decode(strip_tags($aidToImport['fields']['titre']), ENT_QUOTES, 'UTF-8') : null,
+            'name' => isset($aidToImport['titre']) ? html_entity_decode(strip_tags($aidToImport['titre']), ENT_QUOTES, 'UTF-8') : null,
+            'nameInitial' => isset($aidToImport['titre']) ? html_entity_decode(strip_tags($aidToImport['titre']), ENT_QUOTES, 'UTF-8') : null,
             'timePublished' => $timePublished,
             'timeUpdate'=> $timeUpdate,
-            'description' => $description,
-            'originUrl' => $aidToImport['fields']['url'] ?? null,
+            'description' => $this->concatHtmlFields($aidToImport, ['chapo', 'introduction']),
+            'originUrl' => $aidToImport['url'] ?? null,
             'importRawObjectCalendar' => null,
-            'isCallForProject' => (isset($aidToImport['fields']['type']) && $aidToImport['fields']['type'] == 'Appels à projets') ? true : false,
+            'isCallForProject' => (isset($aidToImport['type']) && $aidToImport['type'] == 'Appels à projets') ? true : false,
             'importDataMention' => 'Ces données sont mises à disposition par la Région Occitanie.',
         ];
     }
 
     protected function setCategories(array $aidToImport, Aid $aid): Aid
     {
-        $categories = (isset($aidToImport['fields']['thematiques']) && $aidToImport['fields']['thematiques'])
-                    ? explode(',', $aidToImport['fields']['thematiques'])
+        $categories = (isset($aidToImport['thematiques']) && $aidToImport['thematiques'])
+                    ? explode(',', $aidToImport['thematiques'])
                     : [];
 
         // une partie du mapping à été fait sur les CategoryTheme et non sur les catégories
