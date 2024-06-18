@@ -32,7 +32,6 @@ nelmio_security:
             #définit les sources de scripts autorisées
             script-src:
                 - 'self'
-                - 'strict-dynamic'
                 - 'https://www.youtube.com'
                 - 'https://sibautomation.com'
                 - 'https://stats.beta.gouv.fr/'
