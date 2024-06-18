@@ -19,6 +19,8 @@ nelmio_security:
                 enabled: false
             #recevoir les rapports sans appliquer la politique de sécurité de contenu.
             #report-uri: '%router.request_context.base_url%/nelmio/csp/report'
+            base-url:
+                - 'self'
             frame-ancestors:
                 - 'self'
                 - 'https://aides-territoires-stage.s3.fr-par.scw.cloud'
