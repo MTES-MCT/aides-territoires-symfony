@@ -19,6 +19,8 @@ nelmio_security:
                 enabled: false
             #recevoir les rapports sans appliquer la politique de sécurité de contenu.
             #report-uri: '%router.request_context.base_url%/nelmio/csp/report'
+            base-uri:
+                - 'self'
             frame-ancestors:
                 - 'self'
                 - 'https://aides-territoires-stage.s3.fr-par.scw.cloud'
@@ -32,10 +34,8 @@ nelmio_security:
             #définit les sources de scripts autorisées
             script-src:
                 - 'self'
-                - 'https://www.youtube.com'
                 - 'https://sibautomation.com'
                 - 'https://stats.beta.gouv.fr/'
-                - 'unsafe-inline'
             #définit les sources de feuilles de styles (CSS) autorisées
             style-src:
                 - 'self'
@@ -61,7 +61,6 @@ nelmio_security:
                 - 'https://aides-territoires-stage.s3.fr-par.scw.cloud'
             #frame-src : définit les sources autorisées pour le chargement des trames (frame ou iframe)
             frame-src:
-                - 'https://www.youtube.com'
                 - 'https://stats.data.gouv.fr'
             #font-src : définit les sources autorisées pour le chargement de fichiers de polices
             font-src: 
