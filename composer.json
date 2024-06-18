@@ -159,7 +159,8 @@
             ],
             "nginx-includes": [
                 ".scalingo/nginx/server.location",
-                ".scalingo/nginx/nginx-ips-filtering.conf"
+                ".scalingo/nginx/nginx-ips-filtering.conf",
+                ".scalingo/nginx/permission-policy.conf"
             ]
         }
     },
