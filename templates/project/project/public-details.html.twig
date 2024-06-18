@@ -33,12 +33,12 @@
             {% if app.user %}
             <div class="fr-grid-row fr-grid-row--gutters fr-background-alt">
                 {% if project.image %}
-                <img class="fr-col-12 fr-col-md-7" src="{{ getParameter('cloud_image_url') }}{{ project.image }}" alt="Logo {{ project.name }}" height="450"/>    
+                <img class="fr-col-12 fr-col-md-7" src="{{ getParameter('cloud_image_url') }}{{ project.image }}" alt="Logo {{ project.name }}" />    
                 {% else %}
                 <div class="fr-col-12 fr-col-md-7">
                     <picture>
                         <source srcset="{{ asset('build/images/project/project_illustration.webp') }}">
-                        <img class="fr-responsive-img" src="{{ asset('build/images/project/project_illustration.png') }}" alt="Logo par défaut" height="450" />
+                        <img class="fr-responsive-img" src="{{ asset('build/images/project/project_illustration.png') }}" alt="Logo par défaut" />
                     </picture>
                 </div>
                 {% endif %}
