@@ -148,7 +148,7 @@ class AidEditType extends AbstractType
             $organizationParams['help_html'] = true;
         }
 
-        $sanctuarizedFieldHelp = '<p class="fr-alert fr-alert--info fr-alert--sm">Ce champ à été sanctuarisé sur l\'aide original. Il ne peu pas être modifié sur ses déclinaisons.</p>';
+        $sanctuarizedFieldHelp = '<p class="fr-alert fr-alert--info fr-alert--sm">Ce champ à été sanctuarisé sur l\'aide originale. Il ne peut pas être modifié sur ses déclinaisons.</p>';
 
         $builder
             ->add('name', TextType::class, [
