@@ -230,7 +230,7 @@ class AidSearchFormService
         }
 
         $queryParams = [];
-        $queryItems = explode('&', $query);
+        $queryItems = explode('&', (string) $query);
 
         if (is_array($queryItems)) {
             foreach ($queryItems as $queyItem) {
