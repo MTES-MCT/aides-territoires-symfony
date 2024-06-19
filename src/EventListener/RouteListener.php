@@ -57,7 +57,7 @@ final class RouteListener
             $response = new RedirectResponse($url);
             $event->setResponse($response);
             return;
-        } elseif ($host == 'biodiversite-occitanie.aides-territoires.beta.gouv.fr/') {
+        } elseif ($host == 'biodiversite-occitanie.aides-territoires.beta.gouv.fr') {
             $response = new RedirectResponse($this->routerInterface->generate('app_home', [], UrlGeneratorInterface::ABSOLUTE_URL));
             $event->setResponse($response);
             return;
