@@ -95,6 +95,17 @@ final class RouteListener
                     $event->setResponse($response);
                     return;
                 }
+            } elseif ($subdomain == 'biodiversite-occitanie') { // spe biodiversite occitanie
+                // pour s'assurer de rediriger vers la prod
+                $host = $this->paramService->get('prod_host');
+                $context = $this->routerInterface->getContext();
+                $context->setHost($host);
+                $context->setScheme('https');
+                
+                $url = $this->routerInterface->generate('app_home', [], UrlGeneratorInterface::ABSOLUTE_URL);
+                $response = new RedirectResponse($url);
+                $event->setResponse($response);
+                return;
             }
 
             // on regarde si cela corresponds à un portail
