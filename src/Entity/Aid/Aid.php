@@ -401,6 +401,7 @@ class Aid // NOSONAR too much methods
     #[ORM\Column(nullable: true)]
     private ?int $subventionRateMax = null;
 
+    #[Groups([self::API_GROUP_LIST, self::API_GROUP_ITEM])]
     #[Assert\Length(max: 255)]
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $subventionComment = null;
