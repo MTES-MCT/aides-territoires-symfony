@@ -2,6 +2,7 @@
 
 namespace App\Controller\Api;
 
+use App\Service\Various\ParamService;
 use App\Service\Various\StringService;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -19,7 +20,8 @@ class ApiController extends AbstractController
         protected SerializerInterface $serializerInterface,
         protected RouterInterface $routerInterface,
         protected ManagerRegistry $managerRegistry,
-        protected StringService $stringService
+        protected StringService $stringService,
+        protected ParamService $paramService
     )
     {
     }

@@ -5,6 +5,7 @@ namespace App\Controller\Api\Aid;
 use App\Controller\Api\ApiController;
 use App\Entity\Aid\Aid;
 use App\Entity\Log\LogAidSearch;
+use App\Entity\Perimeter\Perimeter;
 use App\Entity\User\User;
 use App\Repository\Aid\AidRepository;
 use App\Service\Aid\AidSearchFormService;
@@ -226,7 +227,7 @@ class AidController extends ApiController
                 'source' => LogAidSearch::SOURCE_API,
             ]
         );
-        
+
         // la réponse
         $response =  new JsonResponse($data, $codeStatus, [], false);
         // pour eviter que les urls ne soient ecodées
@@ -247,11 +248,33 @@ class AidController extends ApiController
                     $financers[] = $aidFinancer->getBacker()->getName();
                 }
             }
+            $financersFull = [];
+            foreach ($result->getAidFinancers() as $aidFinancer) {
+                if (!$aidFinancer->getBacker()) {
+                    continue;
+                }
+                $financersFull[] = [
+                    'id' => $aidFinancer->getBacker()->getId(),
+                    'name' => $aidFinancer->getBacker()->getName(),
+                    'logo' => $this->paramService->get('cloud_image_url').$aidFinancer->getBacker()->getLogo()
+                ];
+            }
             $instructors = [];
             foreach ($result->getAidInstructors() as $aidInstructor) {
                 if ($aidInstructor->getBacker()) {
                     $instructors[] = $aidInstructor->getBacker()->getName();
                 }
+            }
+            $instructorsFull = [];
+            foreach ($result->getAidInstructors() as $aidInstructor) {
+                if (!$aidInstructor->getBacker()) {
+                    continue;
+                }
+                $instructorsFull[] = [
+                    'id' => $aidInstructor->getBacker()->getId(),
+                    'name' => $aidInstructor->getBacker()->getName(),
+                    'logo' => $this->paramService->get('cloud_image_url').$aidInstructor->getBacker()->getLogo()
+                ];
             }
             $programs = [];
             foreach ($result->getPrograms() as $program) {
@@ -278,6 +301,19 @@ class AidController extends ApiController
             foreach ($result->getAidTypes() as $aidType) {
                 $types[] = $aidType->getName();
             }
+            $typesFull = [];
+            foreach ($result->getAidTypes() as $aidType) {
+                $typesFull[] = [
+                    'id' => $aidType->getId(),
+                    'name' => $aidType->getName(),
+                    'group' => $aidType->getAidTypeGroup()
+                        ? [
+                            'id' => $aidType->getAidTypeGroup()->getId(),
+                            'name' => $aidType->getAidTypeGroup()->getName()
+                        ]
+                    : null
+                ];
+            }
             $destinations = [];
             foreach ($result->getAidDestinations() as $aidDestination) {
                 $destinations[] = $aidDestination->getName();
@@ -295,11 +331,14 @@ class AidController extends ApiController
                 'name_initial' => $result->getNameInitial(),
                 'short_title' => $result->getShortTitle(),
                 'financers' => $financers,
+                'financers_full' => $financersFull,
                 'instructors' => $instructors,
+                'instructors_full' => $instructorsFull,
                 'programs' => $programs,
                 'description' => $result->getDescription(),
                 'eligibility' => $result->getEligibility(),
                 'perimeter' => $result->getPerimeter() ? $result->getPerimeter()->getName() : null,
+                'perimeter_scale' => ($result->getPerimeter() && $result->getPerimeter()->getScale() && isset(Perimeter::SCALES_FOR_SEARCH[$result->getPerimeter()->getScale()])) ? Perimeter::SCALES_FOR_SEARCH[$result->getPerimeter()->getScale()]['name'] : null,
                 'mobilization_steps' => $steps,
                 'origin_url' => $result->getOriginUrl(),
                 'categories' => $categories,
@@ -307,6 +346,7 @@ class AidController extends ApiController
                 'application_url' => $result->getApplicationUrl(),
                 'targeted_audiences' => $audiences,
                 'aid_types' => $types,
+                'aid_types_full' => $typesFull,
                 'is_charged' => $result->isIsCharged(),
                 'destinations' => $destinations,
                 'start_date' => $result->getDateStart() ? $result->getDateStart()->format('Y-m-d') : null,
@@ -314,6 +354,7 @@ class AidController extends ApiController
                 'submission_deadline' => $result->getDateSubmissionDeadline() ? $result->getDateSubmissionDeadline()->format('Y-m-d') : null,
                 'subvention_rate_lower_bound' => $result->getSubventionRateMin(),
                 'subvention_rate_upper_bound' => $result->getSubventionRateMax(),
+                'subvention_comment' => $result->getSubventionComment(),
                 'loan_amount' => $result->getLoanAmount(),
                 'recoverable_advance_amount' => $result->getRecoverableAdvanceAmount(),
                 'contact' => $result->getContact(),
