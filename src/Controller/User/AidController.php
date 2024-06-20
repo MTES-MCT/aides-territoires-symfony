@@ -247,7 +247,9 @@ class AidController extends FrontController
             $aidDuplicates = $aidRepository->findCustom(
                 [
                     'originUrl' => $aid->getOriginUrl(),
-                    'exclude' => $aid
+                    'exclude' => $aid,
+                    'perimeter' => $aid->getPerimeter(),
+                    'showInSearch' => true
                 ]
             );
         }
