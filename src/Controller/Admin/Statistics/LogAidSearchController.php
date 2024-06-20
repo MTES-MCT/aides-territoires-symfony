@@ -4,6 +4,7 @@ namespace App\Controller\Admin\Statistics;
 
 use App\Controller\Admin\DashboardController;
 use App\Entity\Log\LogAidSearch;
+use App\Entity\Perimeter\Perimeter;
 use App\Form\Admin\Filter\DateRangeType;
 use App\Repository\Log\LogAidSearchRepository;
 use App\Repository\Perimeter\PerimeterRepository;
@@ -126,8 +127,15 @@ class LogAidSearchController extends AbstractController
         $departments = $perimeterRepository->getDepartments();
         
         $departmentsByCode = [];
+        $logAidSearchsByDept = [];
         foreach ($departments as $department) {
             $departmentsByCode[$department->getCode()] = $department;
+            $logAidSearchsByDept[$department->getCode()] = [
+                'dept' => $department->getCode(),
+                'count' => 0,
+                'fullName' => $department->getName(),
+                'class' => 'none'
+            ];
         }
 
         // les stats
@@ -136,58 +144,61 @@ class LogAidSearchController extends AbstractController
             'dateCreateMax' => $dateMax
         ]);
 
-        $logAidSearchsByDept = [];
+        
         foreach ($logAidSearchs as $logAidSearch) {
-            $dept = ($logAidSearch['insee']) ? substr($logAidSearch['insee'], 0, 2) : 0;
-            if (!isset($logAidSearchsByDept[$dept])) {
-                $logAidSearchsByDept[$dept] = [
-                    'dept' => $dept,
-                    'count' => 0,
-                    'fullName' => isset($departmentsByCode[$dept]) ? $departmentsByCode[$dept]->getName() : sprintf('Inconnu (%s)', $dept)
-                ];
+            if (!$logAidSearch['insee']) {
+                // on recherche le département dans les parents
+                $perimeter = $perimeterRepository->findOneBy(['id' => $logAidSearch['id']]);
+                if ($perimeter) {
+                    foreach ($perimeter->getPerimetersTo() as $perimeterTo) {
+                        if ($perimeterTo->getScale() == Perimeter::SCALE_DEPARTEMENT) {
+                            $logAidSearch['insee'] = $perimeterTo->getCode();
+                            break;
+                        }
+                    }
+                }
             }
+            
+            // on met les stats par département
+            $dept = ($logAidSearch['insee']) ? substr($logAidSearch['insee'], 0, 2) : 0;
             $logAidSearchsByDept[$dept]['count']++;
         }
 
         if (!empty($logAidSearchsByDept)) {
-            // graphique repartition par département
-            $chartByDept = $chartBuilderInterface->createChart(Chart::TYPE_PIE);
-            foreach ($logAidSearchsByDept as $logAidSearchByDept) {
-                $labels[] = $logAidSearchByDept['fullName'];
-                $datas[] = $logAidSearchByDept['count'];
-                $colors[] = 'rgb('.rand(0, 255).', '.rand(0, 255).', '.rand(0, 255).')';
+            // on reparcours pour récupérer le count max et en déduire des quartiles
+            $countMax = 0;
+            foreach ($logAidSearchsByDept as $byDept) {
+                if ($byDept['count'] > $countMax) {
+                    $countMax = $byDept['count'];
+                }
             }
-            $chartByDept->setData([
-                'labels' => $labels,
-                'datasets' => [
-                    [
-                        'label' => 'Nombre de recherche',
-                        'backgroundColor' => $colors,
-                        'data' => $datas,
-                    ],
-                ],
-            ]);
-
-            $chartByDept->setOptions([
-                'responsive' => true,
-                'plugins' => [
-                    'legend' => [
-                        'position' => 'top',
-                    ],
-                    'title' => [
-                        'display' => true,
-                        'text' => 'Nombre de recherche sur périmètre sans organisation par département',
-                    ],
-                ],
-            ]);
+            $medium = (int) round($countMax / 2, 0);
+            $first = (int) floor($medium / 2);
+            $last = $medium + $first;
+            
+            // on reparcours pour attribuer une clase à chaque dept
+            foreach ($logAidSearchsByDept as $key => $byDept) {
+                if ($byDept['count'] == 0) {
+                    continue;
+                }
+                if ($byDept['count'] <= $first) {
+                    $logAidSearchsByDept[$key]['class'] = 'first';
+                } elseif ($byDept['count'] <= $medium) {
+                    $logAidSearchsByDept[$key]['class'] = 'medium';
+                } elseif ($byDept['count'] <= $last) {
+                    $logAidSearchsByDept[$key]['class'] = 'last';
+                } else {
+                    $logAidSearchsByDept[$key]['class'] = 'more';
+                }
+            }
         }
-
+            
         // rendu template
         return $this->render('admin/statistics/log/aid-search-missing-perimeters.html.twig', [
             'formDateRange' => $formDateRange,
             'dateMin' => $dateMin,
             'dateMax' => $dateMax,
-            'chartByDept' => $chartByDept ?? null,
+            'logAidSearchsByDept' => $logAidSearchsByDept,
         ]);
     }
 
