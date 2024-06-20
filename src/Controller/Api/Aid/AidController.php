@@ -365,7 +365,8 @@ class AidController extends ApiController
                 'import_share_licence' => $result->getImportShareLicence(),
                 'date_created' => $result->getTimeCreate()->format(\DateTime::ATOM),
                 'date_updated' => $result->getTimeUpdate() ? $result->getTimeUpdate()->format(\DateTime::ATOM) : null,
-                'project_references' => $projectReferences
+                'project_references' => $projectReferences,
+                'european_aid' => $result->getEuropeanAid()
             ];
         }
 
