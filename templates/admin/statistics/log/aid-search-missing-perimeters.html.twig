@@ -41,6 +41,15 @@
         <div class="col-md-6">
             {% include "perimeter/_france_departments.svg" %}
         </div>
+        <div class="col-md-6">
+            <ul>
+                <li>Gris : pas de données</li>
+                <li>Vert : <= {{ first }} recherches</li>
+                <li>Bleu : <= {{ medium }} recherches</li>
+                <li>Orange : <= {{ last }} recherches</li>
+                <li>Rouge : > {{ last }} recherches</li>
+            </ul>
+        </div>
     </div>
 
     <div class="row mt-5">
