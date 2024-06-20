@@ -3,6 +3,11 @@
 {% block breadcrumb %}
 {% endblock %}
 
+{% block head_javascript %}
+    {{ parent() }}
+    {{ encore_entry_script_tags('admin/statistics/log/perimeter-missing') }}
+{% endblock head_javascript %}
+
 {% block stats_content %}
 <section class="container">
     <h1>Recherches sur des périmètres sans organizations</h1>
@@ -34,12 +39,38 @@
 
     <div class="row mt-5">
         <div class="col-md-6">
-            {% if chartByDept %}
-            <div class="charts">
-                {{ render_chart(chartByDept) }}
-            </div>
-            {% endif %}
+            {% include "perimeter/_france_departments.svg" %}
         </div>
+    </div>
+
+    <div class="row mt-5">
+        <table class="table table-striped dataTable">
+            <thead>
+                <tr>
+                    <th>Code</th>
+                    <th>Département</th>
+                    <th>Nombre de recherches</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for dept in logAidSearchsByDept %}
+                    <tr>
+                        <td>{{ dept.dept }}</td>
+                        <td>{{ dept.fullName }}</td>
+                        <td>{{ dept.count }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
 </section>
 {% endblock stats_content %}
+
+
+{% block body_javascript %}
+{% cspscript %}
+<script>
+let logAidSearchsByDept = {{ logAidSearchsByDept|json_encode|raw }};
+</script>
+{% endcspscript %}
+{% endblock body_javascript %}

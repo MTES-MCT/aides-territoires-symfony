@@ -6,6 +6,24 @@
 @import '../form/trumbowyg-override.scss';
 @import '../override/dataTable';
 
+#map-svg{
+    path.none{
+        fill: gray;
+    }
+    path.first{
+        fill: green;
+    }
+    path.medium{
+        fill: blue;
+    }
+    path.last{
+        fill: orange;
+    }
+    path.more{
+        fill: red;
+    }
+}
+
 .table{
     &.datagrid {
         tbody{
