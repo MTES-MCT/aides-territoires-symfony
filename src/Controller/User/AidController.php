@@ -244,14 +244,7 @@ class AidController extends FrontController
         // regarde si aide(s) avec meme originUrl
         $aidDuplicates = [];
         if ($aid->getOriginUrl()) {
-            $aidDuplicates = $aidRepository->findCustom(
-                [
-                    'originUrl' => $aid->getOriginUrl(),
-                    'exclude' => $aid,
-                    'perimeter' => $aid->getPerimeter(),
-                    'showInSearch' => true
-                ]
-            );
+            $aidDuplicates = $aidService->getAidDuplicates($aid);
         }
         // formulaire suppression
         $formDelete = $this->createForm(AidDeleteType::class);

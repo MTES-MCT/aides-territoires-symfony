@@ -38,6 +38,23 @@ class AidService // NOSONAR too complex
         
     }
 
+    public function getAidDuplicates(Aid $aid): array
+    {
+        if (!$aid->getOriginUrl()) {
+            return [];
+        }
+
+        $aidRepository = $this->managerRegistry->getRepository(Aid::class);
+        return $aidRepository->findCustom(
+            [
+                'originUrl' => $aid->getOriginUrl(),
+                'exclude' => $aid,
+                'perimeter' => $aid->getPerimeter() ?? null,
+                'showInSearch' => true
+            ]
+        );
+    }
+
     public function duplicateAid(?Aid $aid, ?User $user): Aid
     {
         if (!$aid instanceof Aid) {

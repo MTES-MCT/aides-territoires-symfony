@@ -217,12 +217,35 @@ class AidCrudController extends AtCrudController
         ->setHelp('Le titre doit commencer par un verbe à l’infinitif pour que l’objectif de l’aide soit explicite vis-à-vis de ses bénéficiaires.')
         ->setFormTypeOption('attr', ['maxlength' => 180])
         ->setColumns(12);
+
+        $slugHelp = 'Laisser vide pour autoremplir.';
+        if ($entity instanceof Aid) {
+            $aidDuplicates = $this->aidService->getAidDuplicates($entity);
+            if (!empty($aidDuplicates)) {
+                $slugHelp .= '<div class="alert alert-danger">';
+                $slugHelp .= '<p>Attention ! Nous avons trouvé des aides qui ressemblent à des doublons.</p>';
+                $slugHelp .= '<ul>';
+                foreach ($aidDuplicates as $aidDuplicate) {
+                    $urlEditAid = $this->adminUrlGenerator
+                        ->setController(AidCrudController::class)
+                        ->setAction(Action::EDIT)
+                        ->setEntityId($aidDuplicate->getId())
+                        ->generateUrl();
+                    $slugHelp .= '<li><a href="'.$urlEditAid.'" target="_blank">'.$aidDuplicate->getName().'</a></li>';
+                }
+                $slugHelp .= '</ul>';
+                $slugHelp .= '</div>';
+            }
+        }
+
         yield TextField::new('slug', 'Slug')
             ->setFormTypeOption('attr', ['readonly' => true, 'autocomplete' => 'off'])
-            ->setHelp('Laisser vide pour autoremplir.')
+            ->setHelp($slugHelp)
             ->hideOnIndex()
             ->setColumns(12)
         ;
+
+
         yield TextField::new('nameInitial', 'Nom initial')
         ->setHelp('Comment cette aide s’intitule-t-elle au sein de votre structure ? Exemple : AAP Mob’Biodiv')
         ->hideOnIndex()
