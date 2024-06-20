@@ -16,6 +16,11 @@ class SentryListener
 
     public function onKernelRequest(RequestEvent $event): void
     {
+        // Vérifier si l'environnement est 'prod'
+        if ($_ENV['APP_ENV'] !== 'prod') {
+            return;
+        }
+
         $request = $event->getRequest();
 
         // Ajouter l'IP et le referer en tant que tags ou extra data

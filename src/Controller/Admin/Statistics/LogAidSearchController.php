@@ -161,6 +161,9 @@ class LogAidSearchController extends AbstractController
             
             // on met les stats par département
             $dept = ($logAidSearch['insee']) ? substr($logAidSearch['insee'], 0, 2) : 0;
+            if ($dept >= 97) {
+                $dept = substr($logAidSearch['insee'], 0, 3);
+            }
             $logAidSearchsByDept[$dept]['count']++;
         }
 
@@ -199,6 +202,9 @@ class LogAidSearchController extends AbstractController
             'dateMin' => $dateMin,
             'dateMax' => $dateMax,
             'logAidSearchsByDept' => $logAidSearchsByDept,
+            'first' => $first,
+            'medium' => $medium,
+            'last' => $last
         ]);
     }
 
