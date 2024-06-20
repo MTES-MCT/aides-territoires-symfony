@@ -256,7 +256,7 @@ class AidController extends ApiController
                 $financersFull[] = [
                     'id' => $aidFinancer->getBacker()->getId(),
                     'name' => $aidFinancer->getBacker()->getName(),
-                    'logo' => $this->paramService->get('cloud_image_url').$aidFinancer->getBacker()->getLogo()
+                    'logo' => $aidFinancer->getBacker()->getLogo() ? $this->paramService->get('cloud_image_url').$aidFinancer->getBacker()->getLogo() : null
                 ];
             }
             $instructors = [];
@@ -273,7 +273,7 @@ class AidController extends ApiController
                 $instructorsFull[] = [
                     'id' => $aidInstructor->getBacker()->getId(),
                     'name' => $aidInstructor->getBacker()->getName(),
-                    'logo' => $this->paramService->get('cloud_image_url').$aidInstructor->getBacker()->getLogo()
+                    'logo' => $aidInstructor->getBacker()->getLogo() ? $this->paramService->get('cloud_image_url').$aidInstructor->getBacker()->getLogo() : null
                 ];
             }
             $programs = [];
