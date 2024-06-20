@@ -41,6 +41,7 @@ use App\Filter\Aid\AidApplyBeforeFilter;
 use App\Filter\Aid\AidCallForProjectOnlyFilter;
 use App\Filter\Aid\AidCategoriesFilter;
 use App\Filter\Aid\AidDestinationFilter;
+use App\Filter\Aid\AidEuropeanFilter;
 use App\Filter\Aid\AidFinancialAidFilter;
 use App\Filter\Aid\AidIsChargedFilter;
 use App\Filter\Aid\AidMobilizationStepFilter;
@@ -118,6 +119,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ApiFilter(AidIsChargedFilter::class)]
 #[ApiFilter(AidPerimeterFilter::class)]
 #[ApiFilter(AidProjectReferenceFilter::class)]
+#[ApiFilter(AidEuropeanFilter::class)]
 class Aid // NOSONAR too much methods
 {
     const API_OPERATION_GET_BY_ID = 'api_aid_get_by_id';
@@ -496,6 +498,7 @@ class Aid // NOSONAR too much methods
     #[ORM\Column(nullable: true)]
     private ?array $importRawObjectTempCalendar = null;
 
+    #[Groups([self::API_GROUP_LIST, self::API_GROUP_ITEM])]
     #[ORM\Column(length: 32, nullable: true)]
     private ?string $europeanAid = null;
 
