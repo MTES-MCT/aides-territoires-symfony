@@ -4,6 +4,7 @@ namespace App\Repository\Backer;
 
 use App\Entity\Backer\BackerGroup;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -19,5 +20,19 @@ class BackerGroupRepository extends ServiceEntityRepository
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, BackerGroup::class);
+    }
+
+    public function getQueryBuilder(?array $params = null): QueryBuilder
+    {
+        $orderBy = (isset($params['orderBy']) && isset($params['orderBy']['sort']) && isset($params['orderBy']['order'])) ? $params['orderBy'] : null;
+
+        $qb = $this->createQueryBuilder('bg');
+
+        if ($orderBy !== null) {
+            $qb->orderBy($orderBy['sort'], $orderBy['order']);
+        }
+
+        
+        return $qb;
     }
 }

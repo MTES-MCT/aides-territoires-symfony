@@ -10,6 +10,7 @@ use App\Entity\Aid\AidType;
 use App\Entity\Aid\AidTypeGroup;
 use App\Entity\Backer\Backer;
 use App\Entity\Backer\BackerCategory;
+use App\Entity\Backer\BackerGroup;
 use App\Entity\Category\Category;
 use App\Entity\Keyword\Keyword;
 use App\Entity\Organization\OrganizationType;
@@ -386,6 +387,8 @@ class AidRepository extends ServiceEntityRepository
         $limit = $params['limit'] ?? null;
         $backer = $params['backer'] ?? null;
         $backers = $params['backers'] ?? null;
+        $backerCategory = $params['backerCategory'] ?? null;
+        $backerGroup = $params['backerGroup'] ?? null;
         $isFinancial = $params['isFinancial'] ?? null;
         $isTechnical = $params['isTechnical'] ?? null;
         $aidTypeGroup = $params['aidTypeGroup'] ?? null;
@@ -395,7 +398,6 @@ class AidRepository extends ServiceEntityRepository
         $categoryIds = $params['categoryIds'] ?? null;
         $categories = $params['categories'] ?? null;
         $categorySlugs = $params['categorySlugs'] ?? null;
-        $backerCategory = $params['backerCategory'] ?? null;
         $keywords = $params['keywords'] ?? null;
 
         $keyword = $params['keyword'] ?? null;
@@ -834,6 +836,16 @@ class AidRepository extends ServiceEntityRepository
                 ->innerJoin('aidFinancersB.backer', 'backerB')
                 ->andWhere('backerB IN (:backers)')
                 ->setParameter('backers', $backers)
+            ;
+        }
+
+        if ($backerGroup instanceof BackerGroup && $backerGroup->getId()) {
+            $qb
+                ->innerJoin('a.aidFinancers', 'aidFinancersG')
+                ->innerJoin('aidFinancersG.backer', 'backerG')
+                ->innerJoin('backerG.backerGroup', 'backerGroupG')
+                ->andWhere('backerGroupG = :backerGroup')
+                ->setParameter('backerGroup', $backerGroup)
             ;
         }
 
