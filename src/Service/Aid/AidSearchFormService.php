@@ -516,8 +516,11 @@ class AidSearchFormService
         $backers = [];
         foreach ($queryParams as $key => $value) {
             if (strpos($key, 'backers') !== false) {
-                $backers[] = $value;
-                break;
+                if (is_array($value)) {
+                    $backers = array_merge($backers, $value);
+                } else {
+                    $backers[] = $value;
+                }
             }
         }
 
@@ -534,11 +537,9 @@ class AidSearchFormService
                     if ($backer instanceof Backer) {
                         $aidSearchClass->addBackerchoice($backer);
                     }
-                
                 }
             }
         }
-
         /**
          * > Backers
         */

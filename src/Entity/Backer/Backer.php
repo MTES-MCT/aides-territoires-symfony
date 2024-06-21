@@ -27,7 +27,7 @@ use Gedmo\Mapping\Annotation as Gedmo;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use ApiPlatform\OpenApi\Model;
-use App\Filter\Aid\BackerGroupFilter;
+use App\Filter\Backer\BackerGroupFilter;
 use App\Filter\AtSearchFilter;
 use App\Filter\Backer\HasFinancedAidsFilter;
 use App\Filter\Backer\HasPublishedFinancedAidsFilter;

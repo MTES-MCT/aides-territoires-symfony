@@ -38,7 +38,7 @@ class BackerController extends ApiController
         if ($hasPublishedFinancedAids) {
             $params['hasPublishedFinancedAids'] = $this->stringToBool($hasPublishedFinancedAids);
         }
-        $idBackerGroup = $this->requestStack->getCurrentRequest()->get('backer_group', null);
+        $idBackerGroup = $this->requestStack->getCurrentRequest()->get('backerGroup', null);
         if ($idBackerGroup) {
             $backerGroup = $backerGroupRepository->find((int) $idBackerGroup);
             if ($backerGroup instanceof BackerGroup) {
