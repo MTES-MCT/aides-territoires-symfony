@@ -206,6 +206,7 @@ class AidSearchTypeV2 extends AbstractType
                     'multiple' => true,
                     'query_builder' => function(BackerRepository $backerRepository) {
                         return $backerRepository->getQueryBuilder([
+                            'hasFinancedAids' => true,
                             'active' => true,
                             'orderBy' => [
                                 'sort' => 'b.name',
