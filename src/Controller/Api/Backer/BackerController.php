@@ -4,6 +4,8 @@ namespace App\Controller\Api\Backer;
 
 use App\Controller\Api\ApiController;
 use App\Entity\Backer\Backer;
+use App\Entity\Backer\BackerGroup;
+use App\Repository\Backer\BackerGroupRepository;
 use App\Repository\Backer\BackerRepository;
 use App\Service\Various\ParamService;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -16,6 +18,7 @@ class BackerController extends ApiController
     #[Route('/api/backers/', name: 'api_backer_backer', priority: 5)]
     public function index(
         BackerRepository $backerRepository,
+        BackerGroupRepository $backerGroupRepository,
         ParamService $paramService
     ): JsonResponse
     {
@@ -34,6 +37,13 @@ class BackerController extends ApiController
         $hasPublishedFinancedAids = $this->requestStack->getCurrentRequest()->get('has_published_financed_aids', null);
         if ($hasPublishedFinancedAids) {
             $params['hasPublishedFinancedAids'] = $this->stringToBool($hasPublishedFinancedAids);
+        }
+        $idBackerGroup = $this->requestStack->getCurrentRequest()->get('backer_group', null);
+        if ($idBackerGroup) {
+            $backerGroup = $backerGroupRepository->find((int) $idBackerGroup);
+            if ($backerGroup instanceof BackerGroup) {
+                $params['backerGroup'] = $backerGroup;
+            }
         }
 
         // requete pour compter sans la pagination
@@ -54,6 +64,12 @@ class BackerController extends ApiController
                 'text' => $result->getName(),
                 'perimeter' => $result->getPerimeter() ? $result->getPerimeter()->getName() : null,
                 'logo' => $result->getLogo() ? $paramService->get('cloud_image_url').$result->getLogo() : null,
+                'group' => $result->getBackerGroup()
+                    ? [
+                        'id' => $result->getBackerGroup()->getId(),
+                        'name' => $result->getBackerGroup()->getName()
+                    ]
+                    : null
             ];
         }
 
