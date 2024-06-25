@@ -32,6 +32,14 @@
     </div>
 
     <div class="my-4">
+        <div class="alert alert-info">
+            <p>Cette page présente le nombre de recherches effectuées sur des périmètres sans organisations.</p>
+            <p>L'export CSV contient les données complètes (chaque périmètre).</p> 
+            <p>La carte les réprésentent par département.</p>
+        </div>
+    </div>
+
+    <div class="my-4">
         <a href="{{ url('admin_statistics_log_aid_search_missing_perimeters_export', {'dateMin': dateMin|date('Y-m-d'), 'dateMax': dateMax|date('Y-m-d')}) }}" class="btn btn-primary">
             <i class="fas fa-file-csv"></i> Export CSV des données complètes
         </a>
