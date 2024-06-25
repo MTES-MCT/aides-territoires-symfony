@@ -13,10 +13,10 @@
       "command": "10 04 * * * php bin/console at:cron:user:export_to_sib"
     },
     {
-      "command": "30 7 * * 1-5 php bin/console at:cron:notification:send_daily"
+      "command": "30 6 * * 1-5 php bin/console at:cron:notification:send_daily"
     },
     {
-      "command": "0 8 * * 1 php bin/console at:cron:notification:send_weekly"
+      "command": "0 7 * * 1 php bin/console at:cron:notification:send_weekly"
     },
     {
       "command": "*/10 * * * * php bin/console at:cron:perimeter:perimeter_import"
