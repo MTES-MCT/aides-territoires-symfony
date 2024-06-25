@@ -37,6 +37,18 @@ class LogAidSearchRepository extends ServiceEntityRepository
         return (int) $qb->getQuery()->getSingleScalarResult();
     }
 
+    public function countApiByHourByOrganization(?array $params = null): array
+    {
+        $params['source'] = 'api';
+        $qb = $this->getQueryBuilder($params);
+        $qb->select('COUNT(l.id) as nb, DATE_FORMAT(l.timeCreate, \'%Y-%m-%d\') as dateDay, DATE_FORMAT(l.timeCreate, \'%H\') as dateHour');
+        $qb->innerJoin('l.organization', 'organization');
+        $qb->addSelect('organization.id as organizationId, organization.name as organizationName');
+        $qb->groupBy('dateDay, dateHour, organizationId');
+
+        return $qb->getQuery()->getResult();
+    }
+
     public function getSearchOnPerimeterWithoutOrganization($params) : array {
         $dateCreateMin = $params['dateCreateMin'] ?? null;
         $dateCreateMax = $params['dateCreateMax'] ?? null;
@@ -74,6 +86,7 @@ class LogAidSearchRepository extends ServiceEntityRepository
         $dateCreateMin = $params['dateCreateMin'] ?? null;
         $dateCreateMax = $params['dateCreateMax'] ?? null;
         $hasSearch = $params['hasSearch'] ?? null;
+        $source = $params['source'] ?? null;
         $resultsCountMax = $params['resultsCountMax'] ?? null;
         $orderBy = (isset($params['orderBy']) && isset($params['orderBy']['sort']) && isset($params['orderBy']['order'])) ? $params['orderBy'] : null;
 
@@ -96,6 +109,13 @@ class LogAidSearchRepository extends ServiceEntityRepository
         if ($hasSearch) {
             $qb
                 ->andWhere('l.search IS NOT NULL')
+            ;
+        }
+
+        if ($source !== null) {
+            $qb
+                ->andWhere('l.source = :source')
+                ->setParameter('source', $source)
             ;
         }
 
