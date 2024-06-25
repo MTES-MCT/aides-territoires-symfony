@@ -198,6 +198,23 @@
                 {{ form_row(formAid.contact) }} 
             </fieldset>
 
+            {% if formAid.sanctuarizedFields is defined %}
+            <fieldset class="at-fields-section">
+                <legend class="fr-h2 fr-pt-6w at-anchor--offset">
+                    <span id="aid-advanced" class="at-stepper--section-title"></span>
+                    5 – Informations avancées
+                </legend>
+                <div class="fr-alert fr-alert--info fr-mb-5w">
+                    <p>La sanctuarisation des champs vous permet de :
+                    <ul>
+                        <li>Empêcher la modification de ce champ dans les déclinaisons locales de vos aides.</li>
+                        <li>Lorsque vous modifiez un champ sanctuarisé, la modification se propage à toutes ses déclinaisons.</li>
+                    </ul>
+                </div>
+                {{ form_row(formAid.sanctuarizedFields) }}
+            </fieldset>
+            {% endif %}
+
             <div class="fr-background-main fr-pt-2w">
                 <div class="fr-hidden">
                 {{ form_row(formAid.status) }}

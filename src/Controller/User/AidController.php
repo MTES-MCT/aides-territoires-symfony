@@ -271,27 +271,29 @@ class AidController extends FrontController
         $formAid->handleRequest($requestStack->getCurrentRequest());
         if ($formAid->isSubmitted()) {
             if ($formAid->isValid()) {
-                // les financers
-                foreach ($aid->getAidFinancers() as $aidFinancer) {
-                    $aid->removeAidFinancer($aidFinancer);
-                }
-                $financers = $formAid->get('financers')->getData();
-                foreach ($financers as $financer) {
-                    $aidFinancer = new AidFinancer();
-                    $aidFinancer->setBacker($financer);
-                    $aid->addAidFinancer($aidFinancer);
-                }
-                // les instructors
-                foreach ($aid->getAidInstructors() as $aidInstructor) {
-                    $aid->removeAidInstructor($aidInstructor);
-                }
-                $instructors = $formAid->get('instructors')->getData();
-                foreach ($instructors as $instructor) {
-                    $aidInstructor = new AidInstructor();
-                    $aidInstructor->setBacker($instructor);
-                    $aid->addAidInstructor($aidInstructor);
-                }
-
+                // si ce n'est pas une déclinaison
+                // if ($aid->getGenericAid()) {
+                    // les financers
+                    foreach ($aid->getAidFinancers() as $aidFinancer) {
+                        $aid->removeAidFinancer($aidFinancer);
+                    }
+                    $financers = $formAid->get('financers')->getData();
+                    foreach ($financers as $financer) {
+                        $aidFinancer = new AidFinancer();
+                        $aidFinancer->setBacker($financer);
+                        $aid->addAidFinancer($aidFinancer);
+                    }
+                    // les instructors
+                    foreach ($aid->getAidInstructors() as $aidInstructor) {
+                        $aid->removeAidInstructor($aidInstructor);
+                    }
+                    $instructors = $formAid->get('instructors')->getData();
+                    foreach ($instructors as $instructor) {
+                        $aidInstructor = new AidInstructor();
+                        $aidInstructor->setBacker($instructor);
+                        $aid->addAidInstructor($aidInstructor);
+                    }
+                // }
                 // sauvegarde
                 $managerRegistry->getManager()->persist($aid);
                 $managerRegistry->getManager()->flush();

@@ -145,6 +145,14 @@
 
             $(base.checboxesWrapper).on({
                 change: function (e) {
+                    if ($(this).attr('readonly')) {
+                        if ($(this).is(':checked')) {
+                            $(this).prop('checked', false);
+                        } else {
+                            $(this).prop('checked', true);
+                        }
+                        return;
+                    }
                     base.setResumeText();
                     base.highlightLine($(this));
                 }

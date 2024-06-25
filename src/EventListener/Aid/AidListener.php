@@ -3,12 +3,15 @@
 namespace App\EventListener\Aid;
 
 use App\Entity\Aid\Aid;
+use App\Entity\Aid\AidFinancer;
+use App\Entity\Aid\AidInstructor;
 use App\Service\Aid\AidService;
 use App\Service\Email\EmailService;
 use App\Service\Various\ParamService;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Event\PostLoadEventArgs;
 use Doctrine\ORM\Event\PostUpdateEventArgs;
+use Doctrine\ORM\Event\PreUpdateEventArgs;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 
@@ -23,13 +26,58 @@ class AidListener
         
     }
 
-    public function onPostLoad(PostLoadEventArgs $args) : void {
+    public function onPostLoad(PostLoadEventArgs $args) : void
+    {
         if ($args->getObject() instanceof Aid) {
             $args->getObject()->setUrl($this->aidService->getUrl($args->getObject()));
         }
     }
 
-    public function onPostUpdate(PostUpdateEventArgs $args): void {
+    public function onPreUpdate(PreUpdateEventArgs $args): void
+    {
+        /** @var Aid $aid */
+        $aid = $args->getObject();
+
+        // si c'est une déclinaison locale
+        if ($aid->getGenericAid() instanceof Aid) {
+            foreach ($aid->getGenericAid()->getSanctuarizedFields() as $sanctuarizedField) {
+                if ($sanctuarizedField->getName() == 'aidFinancers') {
+                    foreach ($aid->getAidFinancers() as $aidFinancer) {
+                        $aid->removeAidFinancer($aidFinancer);
+                    }
+                    foreach ($aid->getGenericAid()->getAidFinancers() as $aidFinancer) {
+                        $newAidFinancer = new AidFinancer();
+                        $newAidFinancer->setBacker($aidFinancer->getBacker());
+                        $aid->addAidFinancer($newAidFinancer);
+                    }
+                } elseif ($sanctuarizedField->getName() == 'aidInstructors') {
+                    foreach ($aid->getAidInstructors() as $aidInstructor) {
+                        $aid->removeAidInstructor($aidInstructor);
+                    }
+                    foreach ($aid->getGenericAid()->getAidInstructors() as $aidInstructor) {
+                        $newAidInstructor = new AidInstructor();
+                        $newAidInstructor->setBacker($aidInstructor->getBacker());
+                        $aid->addAidInstructor($newAidInstructor);
+                    }
+                } else {
+                    if (
+                        method_exists($aid, 'set' . ucfirst($sanctuarizedField->getName()))
+                        && method_exists($aid->getGenericAid(), 'get' . ucfirst($sanctuarizedField->getName()))
+                    ) {
+                        $aid->{'set' . ucfirst($sanctuarizedField->getName())}($aid->getGenericAid()->{'get' . ucfirst($sanctuarizedField->getName())}());
+                    } elseif (
+                        method_exists($aid, 'set' . ucfirst($sanctuarizedField->getName()))
+                        && method_exists($aid->getGenericAid(), 'is' . ucfirst($sanctuarizedField->getName()))
+                    ) {
+                        $aid->{'set' . ucfirst($sanctuarizedField->getName())}($aid->getGenericAid()->{'is' . ucfirst($sanctuarizedField->getName())}());
+                    }
+                }
+            }
+        }
+    }
+
+    public function onPostUpdate(PostUpdateEventArgs $args): void
+    {
         /** @var Aid $aid */
         $aid = $args->getObject();
         // les champs qui ont été modifiés
@@ -64,5 +112,50 @@ class AidListener
                 }
             }
         }
+
+        // si c'est une aide générique avec des champs sanctuarisés, on va mettre à jour ses déclinaisons
+        if ($aid->isIsGeneric() && !$aid->getSanctuarizedFields()->isEmpty()) {
+            $this->propagateUpdate($aid, $manager);
+        }
+    }
+
+    private function propagateUpdate(Aid $aid, EntityManager $manager) {
+        foreach ($aid->getAidsFromGeneric() as $aidFromGeneric) {
+            foreach ($aid->getSanctuarizedFields() as $sanctuarizedField) {
+                if ($sanctuarizedField->getName() == 'aidFinancers') {
+                    foreach ($aidFromGeneric->getAidFinancers() as $aidFinancer) {
+                        $aidFromGeneric->removeAidFinancer($aidFinancer);
+                    }
+                    foreach ($aid->getAidFinancers() as $aidFinancer) {
+                        $newAidFinancer = new AidFinancer();
+                        $newAidFinancer->setBacker($aidFinancer->getBacker());
+                        $aidFromGeneric->addAidFinancer($newAidFinancer);
+                    }
+                } elseif ($sanctuarizedField->getName() == 'aidInstructors') {
+                    foreach ($aidFromGeneric->getAidInstructors() as $aidInstructor) {
+                        $aidFromGeneric->removeAidInstructor($aidInstructor);
+                    }
+                    foreach ($aid->getAidInstructors() as $aidInstructor) {
+                        $newAidInstructor = new AidInstructor();
+                        $newAidInstructor->setBacker($aidInstructor->getBacker());
+                        $aidFromGeneric->addAidInstructor($newAidInstructor);
+                    }
+                } else {
+                    if (
+                        method_exists($aidFromGeneric, 'set' . ucfirst($sanctuarizedField->getName()))
+                        && method_exists($aid, 'get' . ucfirst($sanctuarizedField->getName()))
+                    ) {
+                        $aidFromGeneric->{'set' . ucfirst($sanctuarizedField->getName())}($aid->{'get' . ucfirst($sanctuarizedField->getName())}());
+                    } elseif (
+                        method_exists($aidFromGeneric, 'set' . ucfirst($sanctuarizedField->getName()))
+                        && method_exists($aid, 'is' . ucfirst($sanctuarizedField->getName()))
+                    ) {
+                        $aidFromGeneric->{'set' . ucfirst($sanctuarizedField->getName())}($aid->{'is' . ucfirst($sanctuarizedField->getName())}());
+                    }
+                }
+            }
+            $manager->persist($aidFromGeneric);
+        }
+        $manager->flush();
     }
 }

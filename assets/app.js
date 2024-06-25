@@ -39,6 +39,30 @@ $(function(){
 
         return str;
     }
+
+    // tous les inputs types checkbox avec l'attribut readonly, on bloque le click
+    $('input[type="checkbox"][readonly]').on('click', function(e){
+        e.preventDefault();
+    });
+
+    
+    // tous les select avec l'attribut readonly, on bloque le click
+    $('select[readonly]').on('mousedown keydown click change', function(e) {
+        e.preventDefault();
+    });
+    
+    $('.tom-select-readonly').each(function() {
+        if ($(this).attr('id')) {
+            var selectElement = document.getElementById($(this).attr('id'));
+
+            // Récupérer l'instance Tom Select via l'élément DOM
+            var tomSelectInstance = selectElement.tomselect;
+            // Vérifier si l'instance Tom Select existe
+            if (tomSelectInstance) {
+                tomSelectInstance.lock();  // Empêche la modification de Tom Select
+            }
+        }
+    });
 })
 
 global.datatables_fr_strings = {
