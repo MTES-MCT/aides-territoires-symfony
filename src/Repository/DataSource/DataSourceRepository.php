@@ -4,6 +4,7 @@ namespace App\Repository\DataSource;
 
 use App\Entity\DataSource\DataSource;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -20,29 +21,30 @@ class DataSourceRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, DataSource::class);
     }
+    
+    public function countAids(?array $params = null): int
+    {
+        $qb = $this->getQueryBuilder($params);
 
-//    /**
-//     * @return DataSource[] Returns an array of DataSource objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('d')
-//            ->andWhere('d.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('d.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
+        return (int) $qb
+            ->select('COUNT(a.id)')
+            ->leftJoin('d.aids', 'a')
+            ->getQuery()
+            ->getSingleScalarResult()
+            ;
+    }
+    public function getQueryBuilder(?array $params = null): QueryBuilder
+    {
+        $id = $params['id'] ?? null;
+        $qb = $this->createQueryBuilder('d');
 
-//    public function findOneBySomeField($value): ?DataSource
-//    {
-//        return $this->createQueryBuilder('d')
-//            ->andWhere('d.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
+        if ($id !== null) {
+            $qb
+                ->andWhere('d.id = :id')
+                ->setParameter('id', $id)
+                ;
+        }
+        
+        return $qb;
+    }
 }
