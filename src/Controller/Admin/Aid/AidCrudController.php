@@ -627,10 +627,6 @@ class AidCrudController extends AtCrudController
         ->hideOnIndex()
         ->setColumns(12);
 
-        yield BooleanField::new('contactInfoUpdated', 'En attente de revue des données de contact mises à jour')
-        ->setHelp('Cette aide est en attente d’une revue des données de contact')
-        ->hideOnIndex()
-        ->setColumns(12);
 
         yield FormField::addFieldset('Uniquement pour les aides génériques');
         yield BooleanField::new('isGeneric', 'Aide générique')
@@ -724,6 +720,12 @@ class AidCrudController extends AtCrudController
         ->onlyOnIndex()
         ->setColumns(12);
 
+
+        yield BooleanField::new('contactInfoUpdated', 'En attente de revue des données de contact mises à jour')
+        ->setHelp('Cette aide est en attente d’une revue des données de contact')
+        ->hideOnIndex()
+        ->setColumns(12);
+        
         yield BooleanField::new('isImported', 'Importé')
         ->hideOnIndex()
         ->setColumns(12);

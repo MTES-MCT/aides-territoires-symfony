@@ -33,9 +33,9 @@ class ImportFluxCdmCommand extends ImportFluxCommand
 
     protected function getFieldsMapping(array $aidToImport, array $params = null): array
     {
-        $importRaws = $this->getImportRaws($aidToImport);
-        $importRawObjectCalendar = $importRaws['importRawObjectCalendar'];
-        $importRawObject = $importRaws['importRawObject'];
+        // $importRaws = $this->getImportRaws($aidToImport);
+        // $importRawObjectCalendar = $importRaws['importRawObjectCalendar'];
+        // $importRawObject = $importRaws['importRawObject'];
 
         $dateStart = $this->getDateTimeOrNull($aidToImport['start_date']);
         $dateSubmissionDeadline = $this->getDateTimeOrNull($aidToImport['submission_deadline']);
@@ -51,10 +51,24 @@ class ImportFluxCdmCommand extends ImportFluxCommand
             $contact = null;
         }
 
-        return [
+        // return [
+        //     'importDataMention' => 'Ces données sont mises à disposition par le Conseil départemental de la Manche.',
+        //     'importRawObjectCalendar' => $importRawObjectCalendar,
+        //     'importRawObject' => $importRawObject,
+        //     'name' => isset($aidToImport['name']) ? strip_tags($aidToImport['name']) : null,
+        //     'nameInitial' => isset($aidToImport['name']) ? strip_tags($aidToImport['name']) : null,
+        //     'description' => isset($aidToImport['description']) ? $this->getCleanHtml($aidToImport['description']) : null,
+        //     'originUrl' => isset($aidToImport['origin_url']) ? $aidToImport['origin_url'] : null,
+        //     'applicationUrl' => isset($aidToImport['application_url']) ? $aidToImport['application_url'] : null,
+        //     'isCallForProject' => isset($aidToImport['is_call_for_project']) ? $aidToImport['is_call_for_project'] : null,
+        //     'dateStart' => $dateStart,
+        //     'dateSubmissionDeadline' => $dateSubmissionDeadline,
+        //     'eligibility' => isset($aidToImport['eligibility']) ? $this->getCleanHtml($aidToImport['eligibility']) : null,
+        //     'contact' => $contact,
+        // ];
+
+        $return = [
             'importDataMention' => 'Ces données sont mises à disposition par le Conseil départemental de la Manche.',
-            'importRawObjectCalendar' => $importRawObjectCalendar,
-            'importRawObject' => $importRawObject,
             'name' => isset($aidToImport['name']) ? strip_tags($aidToImport['name']) : null,
             'nameInitial' => isset($aidToImport['name']) ? strip_tags($aidToImport['name']) : null,
             'description' => isset($aidToImport['description']) ? $this->getCleanHtml($aidToImport['description']) : null,
@@ -65,8 +79,10 @@ class ImportFluxCdmCommand extends ImportFluxCommand
             'dateSubmissionDeadline' => $dateSubmissionDeadline,
             'eligibility' => isset($aidToImport['eligibility']) ? $this->getCleanHtml($aidToImport['eligibility']) : null,
             'contact' => $contact,
-
         ];
+
+        // on ajoute les données brut d'import pour comparer avec les données actuelles
+        return $this->mergeImportDatas($return);
     }
 
     protected function setAidTypes(array $aidToImport, Aid $aid): Aid

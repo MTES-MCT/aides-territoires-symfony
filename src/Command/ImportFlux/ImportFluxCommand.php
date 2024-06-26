@@ -71,10 +71,10 @@ class ImportFluxCommand extends Command // NOSONAR too much methods
         $io = new SymfonyStyle($input, $output);
         $io->title($this->commandTextStart);
 
-        if ($this->kernelInterface->getEnvironment() != 'prod') {
-            $io->info('Uniquement en prod');
-            return Command::FAILURE;
-        }
+        // if ($this->kernelInterface->getEnvironment() != 'prod') {
+        //     $io->info('Uniquement en prod');
+        //     return Command::FAILURE;
+        // }
 
         try  {
             // set la dataSource
@@ -298,64 +298,48 @@ class ImportFluxCommand extends Command // NOSONAR too much methods
         try {
             // les nouvelles valeurs
             $newValues = $this->getFieldsMapping($aidToImport, ['context' => 'update', 'aid' => $aid]);
-            $keepValues = [];
-
-            if (
-                isset($newValues['importRawObject'])
-                && $newValues['importRawObject'] != $aid->getImportRawObject()
-            ) {
-                /*
-                If fields other than :
-                    - aid.submission_deadline,
-                    - aid.start_date,
-                    - aid.name_initial
-                have been modified.
-                We won't update automotically the aid.
-                Aid's status is "reviewable" and we simply update the fields calendar
-                and the fields:
-                    - import_raw_object_temp et
-                    - import_raw_object_temp_calendar
-                    - start_date
-                    - submission_deadline
-                    - name_initial
-                */
-                $keepValues = ['dateStart', 'dateSubmissionDeadline', 'nameInitial', 'importRawObject', 'importRawObjectCalendar'];
-                $aid->setImportUpdated(true);
-            } elseif (
-                isset($newValues['importRawObjectCalendar'])
-                && $newValues['importRawObjectCalendar'] != $aid->getImportRawObjectCalendar()
-                && $this->idDataSource !== 2
-            ) {
-                /*
-                If the changed fields are:
-                    - aid.submission_deadline,
-                    - aid.start_date,
-                    - aid.name_initial,
-                and if the import_data_source is not Pays de la Loire
-                we try an automatic update of these fields.
-                We also update the field import_raw_object_temp_calendar
-                */
-                $keepValues = ['dateStart', 'dateSubmissionDeadline', 'nameInitial', 'importRawObjectCalendar'];
-                $aid->setDateImportLastAccess(new \DateTime(date('Y-m-d H:i:s')));
-            }
+            // liste des champs qu'on met à jour automatiquement, les autres sont soumis à validation manuelle
+            $keepValues = ['dateStart', 'dateSubmissionDeadline', 'nameInitial'];
 
             // parcours les nouvelles valeurs
             $entityUpdated = false;
             foreach ($newValues as $field => $value) {
-                if (!in_array($field, $keepValues)) {
+                // on ne regarde pas le champ qui stocke l'update
+                if ($field == 'importDatas') {
                     continue;
                 }
-                if ($field == 'importRawObject') {
-                    $aid->setImportRawObjectTemp($value);
-                    unset($newValues[$field]);
-                } elseif ($field == 'importRawObjectCalendar') {
-                    $aid->setImportRawObjectTempCalendar($value);
-                    unset($newValues[$field]);
-                } else {
-                    $aid->{'set' . ucfirst($field)}($value);
+                // gestion des booleéns
+                $methodGet = 'get';
+                if (!method_exists($aid, 'get'.ucfirst($field))) {
+                    if (method_exists($aid, 'is'.ucfirst($field))) {
+                        $methodGet = 'is';
+                    } else {
+                        continue;
+                    }
                 }
-                $entityUpdated = true;
+
+                // les champs qu'on ne modifie pas automatiquement
+                if (!in_array($field, $keepValues)) {
+                    // on regarde si il y a une modification pour mettre un statut "à valider" à l'aide
+                    if ($aid->{$methodGet.ucfirst($field)}() != $value) {
+                        $entityUpdated = true;
+                    }
+                    continue;
+                }
+
+                // les champs qu'on modifie automatiquement
+                if ($aid->{$methodGet.ucfirst($field)}() != $value && method_exists($aid, 'set'.ucfirst($field))) {
+                    // assigne la nouvelle valeur
+                    $aid->{'set' . ucfirst($field)}($value);
+                    // on retire le champ des valeurs à validées manuellement
+                    unset($newValues[$field]);
+                    // on note que l'entité à été modifiée
+                    $entityUpdated = true;
+                }
             }
+
+            // on assigne les valeurs de l'api au champ importDatas
+            $aid->setImportDatas($newValues);
 
             // on regarde si modification des audiences
             $oldArray = $aid->getAidAudiences()->toArray();
@@ -383,6 +367,8 @@ class ImportFluxCommand extends Command // NOSONAR too much methods
             if ($entityUpdated) {
                 // notifie que l'aide à été modifié suite à l'import
                 $aid->setImportUpdated(true);
+                // si les infos de contact ont été modifié
+                $aid->setContactInfoUpdated($this->isContactUpdated($newValues, $aid));
                 // persiste
                 $this->managerRegistry->getManager()->persist($aid);
 
@@ -464,6 +450,28 @@ class ImportFluxCommand extends Command // NOSONAR too much methods
     protected function setIsCallForProject(array $aidToImport, Aid $aid): Aid // NOSONAR methode generique pour surcharge
     {
         return $aid;
+    }
+
+    protected function mergeImportDatas(array $return): array
+    {
+        return array_merge($return, [
+            'importDatas' => $return
+        ]);
+    }
+
+    protected function isContactUpdated(array $newValues, Aid $aid): bool
+    {
+        $checkFields = ['contact', 'originUrl', 'applicationUrl'];
+        foreach ($checkFields as $field) {
+            if (
+                isset($newValues[$field])
+                && method_exists($aid, 'get'.ucfirst($field))
+                && $aid->{'get'.ucfirst($field)}() != $newValues[$field]
+                ) {
+                return true;
+            }
+        }
+        return false;
     }
 
     protected function getImportRaws(
