@@ -4,12 +4,13 @@ namespace App\EventListener;
 
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Sentry\State\HubInterface;
+use Symfony\Component\HttpKernel\KernelInterface;
 
 class SentryListener
 {
     private $hub;
 
-    public function __construct(HubInterface $hub)
+    public function __construct(HubInterface $hub, private KernelInterface $kernelInterface)
     {
         $this->hub = $hub;
     }
@@ -17,7 +18,7 @@ class SentryListener
     public function onKernelRequest(RequestEvent $event): void
     {
         // Vérifier si l'environnement est 'prod'
-        if ($_ENV['APP_ENV'] !== 'prod') {
+        if ($this->kernelInterface->getEnvironment() !== 'prod') {
             return;
         }
 
