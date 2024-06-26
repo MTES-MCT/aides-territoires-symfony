@@ -118,22 +118,44 @@ class AidCrudController extends AtCrudController
         $responseParameters->setIfNotSet('formKeywordReferenceAssociation', $formKeywordReferenceAssociation);
 
         $aid = $this->getContext()->getEntity()->getInstance() ?? null;
-
-        if ($aid && is_array($aid->getImportRawObject()) && $aid->isImportUpdated()) {
+        
+        if ($aid && is_array($aid->getImportDatas()) && $aid->isImportUpdated()) {
             $pendingUpdates = [];
             $nbUpdates = 0;
-            foreach ($aid->getImportRawObject() as $key => $value) {
-                if (isset($aid->getImportRawObjectTemp()[$key])) {
-                    $pendingUpdates[] = [
-                        'key' => $key,
-                        'value' => $value,
-                        'newValue' => $aid->getImportRawObjectTemp()[$key] ?? null,
-                        'updated' => $aid->getImportRawObjectTemp()[$key] != $value  ? true : false
-                    ];
-                    if ($aid->getImportRawObjectTemp()[$key] != $value) {
-                        $nbUpdates++;
+
+            foreach ($aid->getImportDatas() as $field => $value) {
+                // gestion des booleéns
+                $methodGet = 'get';
+                if (!method_exists($aid, 'get'.ucfirst($field))) {
+                    if (method_exists($aid, 'is'.ucfirst($field))) {
+                        $methodGet = 'is';
+                    } else {
+                        continue;
                     }
                 }
+
+                if ($aid->{$methodGet.ucfirst($field)}() != $value) {
+                    dump($aid->{$methodGet.ucfirst($field)}(), $value);
+                    $pendingUpdates[] = [
+                        'key' => $field,
+                        'value' => $aid->{$methodGet.ucfirst($field)}(),
+                        'newValue' => $aid->getImportDatas()[$field] ?? null,
+                        'updated' => false
+                    ];
+                    $nbUpdates++;
+                }
+                
+                // if (isset($aid->getImportRawObjectTemp()[$key])) {
+                //     $pendingUpdates[] = [
+                //         'key' => $key,
+                //         'value' => $value,
+                //         'newValue' => $aid->getImportRawObjectTemp()[$key] ?? null,
+                //         'updated' => $aid->getImportRawObjectTemp()[$key] != $value  ? true : false
+                //     ];
+                //     if ($aid->getImportRawObjectTemp()[$key] != $value) {
+                //         $nbUpdates++;
+                //     }
+                // }
             }
 
             if ($nbUpdates > 0) {
@@ -725,7 +747,7 @@ class AidCrudController extends AtCrudController
         ->setHelp('Cette aide est en attente d’une revue des données de contact')
         ->hideOnIndex()
         ->setColumns(12);
-        
+
         yield BooleanField::new('isImported', 'Importé')
         ->hideOnIndex()
         ->setColumns(12);

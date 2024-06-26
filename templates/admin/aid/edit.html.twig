@@ -58,33 +58,33 @@
 						<div data-content>
 							<div class="card-body">
 								{% set updateLoopIndex = loop.index %}
-								<div>Valeur actuelle :</div>
+								<div>Valeur actuelle : <button class="btn-copy-clipboard" data-clipboard-target="#actual_value_{{ updateLoopIndex }}"><i class="fas fa-clipboard-check"></i></button></div>
 								{% if update.value is iterable %}
 									{% for subValue in update.value %}
 										{% set updateLoopIndex = updateLoopIndex~ '_' ~ loop.index %}
-										<pre><code id="actual_value_{{ updateLoopIndex }}" style="max-width: 100%;overflow: scroll;">
+										<code id="actual_value_{{ updateLoopIndex }}" style="max-width: 100%;overflow: scroll;">
 											{% if subValue is not iterable %}
-												{{ subValue }}
+												{{ subValue|raw }}
 											{% endif %}
-										</code><button class="btn-copy-clipboard" data-clipboard-target="#actual_value_{{ updateLoopIndex }}"><i class="fas fa-clipboard-check"></i></button></pre>
+										</code>
 									{% endfor %}
 								{% else %}
-								<pre><code id="actual_value_{{ updateLoopIndex }}" style="max-width: 100%;overflow: scroll;">{{ update.value }}</code><button class="btn-copy-clipboard" data-clipboard-target="#actual_value_{{ updateLoopIndex }}"><i class="fas fa-clipboard-check"></i></button></pre>
+								<code id="actual_value_{{ updateLoopIndex }}" style="max-width: 100%;overflow: scroll;">{{ update.value|raw }}</code>
 								{% endif %}
 								
 								{% set updateLoopIndex = loop.index %}
-								<p>Nouvelle valeur :</p>
+								<p>Nouvelle valeur : <button class="btn-copy-clipboard" data-clipboard-target="#new_value_{{ updateLoopIndex }}"><i class="fas fa-clipboard-check"></i></button></p>
 								{% if update.newValue is iterable %}
 									{% for subValue in update.newValue %}
 										{% set updateLoopIndex = updateLoopIndex~ '_' ~ loop.index %}
-										<pre><code id="new_value_{{ updateLoopIndex }}" style="max-width: 100%;overflow: scroll;">
+										<code id="new_value_{{ updateLoopIndex }}" style="max-width: 100%;overflow: scroll;">
 											{% if subValue is not iterable %}
-												{{ subValue }}
+												{{ subValue|raw }}
 											{% endif %}
-										</code><button class="btn-copy-clipboard" data-clipboard-target="#new_value_{{ updateLoopIndex }}"><i class="fas fa-clipboard-check"></i></button></pre>
+										</code>
 									{% endfor %}
 								{% else %}
-								<pre><code id="new_value_{{ updateLoopIndex }}" style="max-width: 100%;overflow: scroll;">{{ update.newValue }}</code><button class="btn-copy-clipboard" data-clipboard-target="#new_value_{{ updateLoopIndex }}"><i class="fas fa-clipboard-check"></i></button></pre>
+								<code id="new_value_{{ updateLoopIndex }}" style="max-width: 100%;overflow: scroll;">{{ update.newValue|raw }}</code>
 								{% endif %}
 							</div>
 						</div>
