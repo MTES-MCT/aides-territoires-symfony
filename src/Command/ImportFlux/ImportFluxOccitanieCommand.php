@@ -55,7 +55,7 @@ class ImportFluxOccitanieCommand extends ImportFluxCommand
             $description = null;
         }
 
-        return [
+        $return = [
             'name' => isset($aidToImport['fields']['titre']) ? strip_tags($aidToImport['fields']['titre']) : null,
             'nameInitial' => isset($aidToImport['fields']['titre']) ? strip_tags($aidToImport['fields']['titre']) : null,
             'timePublished' => $timePublished,
@@ -68,6 +68,9 @@ class ImportFluxOccitanieCommand extends ImportFluxCommand
             'contact' => "Pour contacter la Région Occitanie ou candidater à l'offre, veuillez cliquer sur le bouton 'Plus d'informations' ou sur le bouton 'Candidater à l'aide'.",
             'importDataMention' => 'Ces données sont mises à disposition par la Région Occitanie.',
         ];
+
+        // on ajoute les données brut d'import pour comparer avec les données actuelles
+        return $this->mergeImportDatas($return);
     }
 
     protected function setCategories(array $aidToImport, Aid $aid): Aid

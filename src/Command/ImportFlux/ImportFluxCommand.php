@@ -245,7 +245,7 @@ class ImportFluxCommand extends Command // NOSONAR too much methods
             $aid->setImportDataUrl($this->dataSource->getImportDataUrl());
             $importLicence = $this->dataSource->getImportLicence() ?? DataSource::SLUG_LICENCE_UNKNOWN;
             $aid->setImportShareLicence($importLicence);
-            $aid->setImportRawObject($aidToImport);
+            // $aid->setImportRawObject($aidToImport);
             $aid->setAuthor($this->dataSource->getAidAuthor());
             $aidFinancer = new AidFinancer();
             $aidFinancer->setBacker($this->dataSource->getBacker());
@@ -264,14 +264,7 @@ class ImportFluxCommand extends Command // NOSONAR too much methods
             foreach ($this->getFieldsMapping($aidToImport, ['context' => 'create']) as $field => $value) {
                 $aid->{'set' . ucfirst($field)}($value);
             }
-            // recup auto des champ import_..._temp si non renseigné
-            if (!$aid->getImportRawObjectTemp()) {
-                $aid->setImportRawObjectTemp($aid->getImportRawObject());
-            }
-            if (!$aid->getImportRawObjectTempCalendar()) {
-                $aid->setImportRawObjectTempCalendar($aid->getImportRawObjectCalendar());
-            }
-            
+
             // prépare pour sauvegarde
             $this->managerRegistry->getManager()->persist($aid);
 
@@ -298,11 +291,16 @@ class ImportFluxCommand extends Command // NOSONAR too much methods
         try {
             // les nouvelles valeurs
             $newValues = $this->getFieldsMapping($aidToImport, ['context' => 'update', 'aid' => $aid]);
+            // en update on ne touche pas au nom (modifié par les bizdev lors de la validation)
+            if (isset($newValues['importDatas']) && isset($newValues['importDatas']['name'])) {
+                unset($newValues['importDatas']['name']);
+            }
             // liste des champs qu'on met à jour automatiquement, les autres sont soumis à validation manuelle
-            $keepValues = ['dateStart', 'dateSubmissionDeadline', 'nameInitial'];
+            $keepValues = ['dateStart', 'dateSubmissionDeadline', 'nameInitial', 'originUrl', 'applicationUrl', 'importDataMention'];
 
             // parcours les nouvelles valeurs
             $entityUpdated = false;
+            $needManualValidation = false;
             foreach ($newValues as $field => $value) {
                 // on ne regarde pas le champ qui stocke l'update
                 if ($field == 'importDatas') {
@@ -323,6 +321,7 @@ class ImportFluxCommand extends Command // NOSONAR too much methods
                     // on regarde si il y a une modification pour mettre un statut "à valider" à l'aide
                     if ($aid->{$methodGet.ucfirst($field)}() != $value) {
                         $entityUpdated = true;
+                        $needManualValidation = true;
                     }
                     continue;
                 }
@@ -339,9 +338,9 @@ class ImportFluxCommand extends Command // NOSONAR too much methods
             }
 
             // on assigne les valeurs de l'api au champ importDatas
-            $aid->setImportDatas($newValues);
+            $aid->setImportDatas($newValues['importDatas'] ?? null);
 
-            // on regarde si modification des audiences
+            // on regarde si modification des audiences, update en auto
             $oldArray = $aid->getAidAudiences()->toArray();
             $aid = $this->setAidAudiences($aidToImport, $aid);
             $newArray = $aid->getAidAudiences()->toArray();
@@ -353,7 +352,7 @@ class ImportFluxCommand extends Command // NOSONAR too much methods
             //-----------------------------------------------------
 
 
-            // on regarde si modification des categories
+            // on regarde si modification des categories, update en auto
             $oldArray = $aid->getCategories()->toArray();
             $aid = $this->setCategories($aidToImport, $aid);
             $newArray = $aid->getCategories()->toArray();
@@ -365,10 +364,13 @@ class ImportFluxCommand extends Command // NOSONAR too much methods
             //-----------------------------------------------------
 
             if ($entityUpdated) {
-                // notifie que l'aide à été modifié suite à l'import
-                $aid->setImportUpdated(true);
-                // si les infos de contact ont été modifié
-                $aid->setContactInfoUpdated($this->isContactUpdated($newValues, $aid));
+                // on ne notifie que si l'aide est en ligne et a besoin d'une validation manuelle
+                if ($aid->isLive() && $needManualValidation) {
+                    // notifie que l'aide à été modifié suite à l'import
+                    $aid->setImportUpdated(true);
+                    // si les infos de contact ont été modifié
+                    $aid->setContactInfoUpdated($this->isContactUpdated($newValues, $aid));
+                }
                 // persiste
                 $this->managerRegistry->getManager()->persist($aid);
 
@@ -474,41 +476,17 @@ class ImportFluxCommand extends Command // NOSONAR too much methods
         return false;
     }
 
-    protected function getImportRaws(
-        array $aidToImport,
-        array $keys = ['start_date', 'predeposit_date', 'submission_deadline', 'recurrence']
-    ): array
-    {
-        $importRawObjectCalendar = [];
-        foreach ($keys as $key) {
-            if (isset($aidToImport[$key])) {
-                $importRawObjectCalendar[$key] = $aidToImport[$key];
-            }
-        }
-        if (empty($importRawObjectCalendar)) {
-            $importRawObjectCalendar = null;
-        }
-
-        $importRawObject = $aidToImport;
-        foreach ($keys as $key) {
-            if (isset($importRawObject[$key])) {
-                unset($importRawObject[$key]);
-            }
-        }
-
-        return [
-            'importRawObjectCalendar' => $importRawObjectCalendar,
-            'importRawObject' => $importRawObject
-        ];
-    }
-
     protected function getDateTimeOrNull(?string $date): ?\DateTime
     {
         if (!$date) {
             return null;
         }
         try {
-            $date = new \DateTime($date);
+            $dateTemp = new \DateTime($date);
+            // Force pour éviter les différence sur le fuseau horaire
+            $date = new \DateTime(date($dateTemp->format('Y-m-d')));
+            // Force les heures, minutes, et secondes à 00:00:00
+            $date->setTime(0, 0, 0);
         } catch (\Exception $e) {
             $date = null;
         }

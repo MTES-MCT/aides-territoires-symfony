@@ -118,7 +118,7 @@ class AidCrudController extends AtCrudController
         $responseParameters->setIfNotSet('formKeywordReferenceAssociation', $formKeywordReferenceAssociation);
 
         $aid = $this->getContext()->getEntity()->getInstance() ?? null;
-        
+
         if ($aid && is_array($aid->getImportDatas()) && $aid->isImportUpdated()) {
             $pendingUpdates = [];
             $nbUpdates = 0;
@@ -135,7 +135,10 @@ class AidCrudController extends AtCrudController
                 }
 
                 if ($aid->{$methodGet.ucfirst($field)}() != $value) {
-                    similar_text($aid->{$methodGet.ucfirst($field)}(), $value, $percent);
+                    $percent = 0;
+                    if (is_string($value) && is_string($aid->{$methodGet.ucfirst($field)}())) {
+                        similar_text($aid->{$methodGet.ucfirst($field)}(), $value, $percent);
+                    }
                     $pendingUpdates[] = [
                         'key' => $field,
                         'value' => $aid->{$methodGet.ucfirst($field)}(),

@@ -87,10 +87,6 @@ class ImportFluxIleDeFranceCommand extends ImportFluxCommand
     protected function getFieldsMapping(array $aidToImport, array $params = null): array
     {
         try {
-            $importRaws = $this->getImportRaws($aidToImport, ['dateFinCampagne', 'dateOuvertureCampagne', 'dateDebutFuturCampagne', 'datePublicationSouhaitee']);
-            $importRawObjectCalendar = $importRaws['importRawObjectCalendar'];
-            $importRawObject = $importRaws['importRawObject'];
-
             $aidName = isset($aidToImport['libelle']) ? strip_tags($aidToImport['libelle']) : null;
             if (!$aidName) {
                 $aidName = isset($aidToImport['title']) ? strip_tags($aidToImport['title']) : '';
@@ -98,8 +94,6 @@ class ImportFluxIleDeFranceCommand extends ImportFluxCommand
 
             $originUrl = 'https://www.iledefrance.fr/aides-et-appels-a-projets/' . $this->stringService->getSlug(str_replace(["'", "’", 'à'], [''], preg_replace('/(\d{2,4})[-.](\d{2})[-.](\d{2,4})/', '$1$2$3', $aidName)));
             $applicationUrl = $originUrl;
-    
-    
     
     
             $dateStart = null;
@@ -112,6 +106,11 @@ class ImportFluxIleDeFranceCommand extends ImportFluxCommand
             }
             if (!$dateStart instanceof \DateTime) {
                 $dateStart = null;
+            } else {
+                // Force pour éviter les différence sur le fuseau horaire
+                $dateStart = new \DateTime(date($dateStart->format('Y-m-d')));
+                // Force les heures, minutes, et secondes à 00:00:00
+                $dateStart->setTime(0, 0, 0);
             }
                 
             $dateSubmissionDeadline = null;
@@ -124,12 +123,15 @@ class ImportFluxIleDeFranceCommand extends ImportFluxCommand
             }
             if (!$dateSubmissionDeadline instanceof \DateTime) {
                 $dateSubmissionDeadline = null;
+            } else {
+                // Force pour éviter les différence sur le fuseau horaire
+                $dateSubmissionDeadline = new \DateTime(date($dateSubmissionDeadline->format('Y-m-d')));
+                // Force les heures, minutes, et secondes à 00:00:00
+                $dateSubmissionDeadline->setTime(0, 0, 0);
             }
 
-            return [
+            $return = [
                 'importDataMention' => 'Ces données sont mises à disposition par le Conseil Régional d\'Île-de-France.',
-                'importRawObjectCalendar' => $importRawObjectCalendar,
-                'importRawObject' => $importRawObject,
                 'name' => $aidName,
                 'nameInitial' => $aidName,
                 'description' => $this->concatHtmlFields($aidToImport, ['engagements', 'entete', 'notes'], '<br/>'),
@@ -141,6 +143,9 @@ class ImportFluxIleDeFranceCommand extends ImportFluxCommand
                 'dateSubmissionDeadline' => $dateSubmissionDeadline,
                 'isCallForProject' => isset($aidToImport['AAP']) && $aidToImport['AAP'] == '1' ? true : false,
             ];
+
+            // on ajoute les données brut d'import pour comparer avec les données actuelles
+            return $this->mergeImportDatas($return);
         } catch (\Exception $e) {
             return [];
         }
