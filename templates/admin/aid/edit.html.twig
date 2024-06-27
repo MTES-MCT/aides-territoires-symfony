@@ -62,29 +62,50 @@
 								{% if update.value is iterable %}
 									{% for subValue in update.value %}
 										{% set updateLoopIndex = updateLoopIndex~ '_' ~ loop.index %}
-										<code id="actual_value_{{ updateLoopIndex }}" style="max-width: 100%;overflow: scroll;">
+										<div id="actual_value_{{ updateLoopIndex }}" style="max-width: 100%;overflow: scroll;">
 											{% if subValue is not iterable %}
-												{{ subValue|raw }}
+												{% if isDateTime(subValue) %}
+													{{ subValue|date('Y-m-d H:i:s') }}
+												{% else %}
+													{{ subValue|raw }}
+												{% endif %}
 											{% endif %}
-										</code>
+										</div>
 									{% endfor %}
 								{% else %}
-								<code id="actual_value_{{ updateLoopIndex }}" style="max-width: 100%;overflow: scroll;">{{ update.value|raw }}</code>
+								<div id="actual_value_{{ updateLoopIndex }}" style="max-width: 100%;overflow: scroll;">
+								{% if isDateTime(update.value) %}
+									{{ update.value|date('Y-m-d H:i:s') }}
+								{% else %}
+									{{ update.value|raw }}
+								{% endif %}
+								</div>
 								{% endif %}
 								
+								<hr />
 								{% set updateLoopIndex = loop.index %}
-								<p>Nouvelle valeur : <button class="btn-copy-clipboard" data-clipboard-target="#new_value_{{ updateLoopIndex }}"><i class="fas fa-clipboard-check"></i></button></p>
+								<p>Nouvelle valeur (= à {{ update.similarPercent }}%) : <button class="btn-copy-clipboard" data-clipboard-target="#new_value_{{ updateLoopIndex }}"><i class="fas fa-clipboard-check"></i></button></p>
 								{% if update.newValue is iterable %}
 									{% for subValue in update.newValue %}
 										{% set updateLoopIndex = updateLoopIndex~ '_' ~ loop.index %}
-										<code id="new_value_{{ updateLoopIndex }}" style="max-width: 100%;overflow: scroll;">
+										<div id="new_value_{{ updateLoopIndex }}" style="max-width: 100%;overflow: scroll;">
 											{% if subValue is not iterable %}
-												{{ subValue|raw }}
+												{% if isDateTime(subValue) %}
+													{{ subValue|date('Y-m-d H:i:s') }}
+												{% else %}
+													{{ subValue|raw }}
+												{% endif %}
 											{% endif %}
-										</code>
+										</div>
 									{% endfor %}
 								{% else %}
-								<code id="new_value_{{ updateLoopIndex }}" style="max-width: 100%;overflow: scroll;">{{ update.newValue|raw }}</code>
+								<div id="new_value_{{ updateLoopIndex }}" style="max-width: 100%;overflow: scroll;">
+								{% if isDateTime(update.newValue) %}
+									{{ update.newValue|date('Y-m-d H:i:s') }}
+								{% else %}
+									{{ update.newValue|raw }}
+								{% endif %}
+								</div>
 								{% endif %}
 							</div>
 						</div>

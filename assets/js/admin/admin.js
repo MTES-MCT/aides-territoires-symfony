@@ -5,11 +5,9 @@ require('trumbowyg/dist/langs/fr.min.js');
 require('trumbowyg/dist/plugins/upload/trumbowyg.upload.min.js');
 require('trumbowyg/dist/plugins/cleanpaste/trumbowyg.cleanpaste.min.js');
 require('trumbowyg/dist/ui/trumbowyg.min.css');
-require('clipboard/dist/clipboard.min.js');
 require('../jQueryAccordion/jquery.accordion.js')
 
 // import le fichier router dans ce fichier
-import ClipboardJS from 'clipboard';
 import Routing from 'fos-router';
 
 // plugin chartJS
@@ -31,7 +29,16 @@ $(function(){
         "transitionSpeed": 400
     });
 
-    new ClipboardJS('.btn-copy-clipboard');
+    $(document).on('click', '.btn-copy-clipboard', function(e) {
+        // Récupère le sélecteur de l'élément cible depuis l'attribut data-clipboard-target
+        var targetSelector = $(this).attr('data-clipboard-target');
+        // Sélectionne l'élément cible et récupère son contenu HTML
+        var htmlContent = $(targetSelector).html().trim();
+        // Copie le contenu dans le presse-papiers
+        navigator.clipboard.writeText(htmlContent).then(function() {
+        }).catch(function(error) {
+        });
+    });
 
     /**
      * Champs avec un maxlength

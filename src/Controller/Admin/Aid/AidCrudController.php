@@ -135,27 +135,16 @@ class AidCrudController extends AtCrudController
                 }
 
                 if ($aid->{$methodGet.ucfirst($field)}() != $value) {
-                    dump($aid->{$methodGet.ucfirst($field)}(), $value);
+                    similar_text($aid->{$methodGet.ucfirst($field)}(), $value, $percent);
                     $pendingUpdates[] = [
                         'key' => $field,
                         'value' => $aid->{$methodGet.ucfirst($field)}(),
                         'newValue' => $aid->getImportDatas()[$field] ?? null,
-                        'updated' => false
+                        'updated' => false,
+                        'similarPercent' => round($percent, 2)
                     ];
                     $nbUpdates++;
                 }
-                
-                // if (isset($aid->getImportRawObjectTemp()[$key])) {
-                //     $pendingUpdates[] = [
-                //         'key' => $key,
-                //         'value' => $value,
-                //         'newValue' => $aid->getImportRawObjectTemp()[$key] ?? null,
-                //         'updated' => $aid->getImportRawObjectTemp()[$key] != $value  ? true : false
-                //     ];
-                //     if ($aid->getImportRawObjectTemp()[$key] != $value) {
-                //         $nbUpdates++;
-                //     }
-                // }
             }
 
             if ($nbUpdates > 0) {
