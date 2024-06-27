@@ -21,14 +21,28 @@ document.addEventListener('chartjs:init', function (event) {
 
 $(function(){
 
-    // register globally for all charts
-// register globally for all charts
-
-
     $('.accordion').accordion({
         "transitionSpeed": 400
     });
 
+    // pour ouvrir un tab
+    $(document).on({
+        click: function(e) {
+            e.preventDefault();
+            var target = $(this).attr('href');
+            if (typeof $(target) != 'undefined') {
+                var parent = $(target).parents('.tab-pane');
+                $('.tab-pane').removeClass('active').removeClass('show');
+                $(parent).addClass('active').addClass('show');
+
+                var idTab = $(parent).attr('id');
+                $('.nav-link').removeClass('active');
+                $('.nav-link[href="#'+idTab+'"]').addClass('active');
+            }
+        }
+    }, '.ea-tab-opener');
+
+    // fonction copie dans clipboard
     $(document).on('click', '.btn-copy-clipboard', function(e) {
         // Récupère le sélecteur de l'élément cible depuis l'attribut data-clipboard-target
         var targetSelector = $(this).attr('data-clipboard-target');
