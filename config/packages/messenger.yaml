@@ -25,6 +25,7 @@ framework:
             'App\Message\Aid\AidExtractKeyword': async
             'App\Message\Alert\AlertMessage': async
             'App\Message\Alert\AlertResume': async
+            'App\Message\Export\MsgSpreadsheetToExport': async
             'App\Message\Reference\ProjectReferenceCountAids': async
             'App\Message\Perimeter\CountyCountBacker': async
             'App\Message\Backer\BackerCountAid': async
