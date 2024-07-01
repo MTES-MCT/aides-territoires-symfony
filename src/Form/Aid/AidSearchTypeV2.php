@@ -277,7 +277,7 @@ class AidSearchTypeV2 extends AbstractType
                 ])
                 ->add('backerGroup', EntityType::class, [
                     'required' => false,
-                    'label' => 'Groupe Porteurs d\'aides',
+                    'label' => 'Groupe de porteurs d\'aides',
                     'class' => BackerGroup::class,
                     'choice_label' => 'name',
                     'attr' => [
