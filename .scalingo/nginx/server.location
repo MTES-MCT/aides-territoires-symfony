@@ -3,11 +3,6 @@ add_header X-Frame-Options "deny";
 # Limite de débit globale pour toutes les requêtes
 limit_req_zone $binary_remote_addr zone=one:10m rate=1r/s;
 
-location / {
-    # Appliquer la limitation de débit
-    limit_req zone=one burst=5 nodelay;
-}
-
 location ~* ^/_up/.*\.(jpg|jpeg|png)$ {
     try_files $uri /index.php$is_args$args;
 }
