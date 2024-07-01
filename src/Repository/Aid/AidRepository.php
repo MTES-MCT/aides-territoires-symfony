@@ -553,14 +553,20 @@ class AidRepository extends ServiceEntityRepository
             }
             
             $sqlObjects = '';
+            if (isset($sqlProjectReference)) {
+                $sqlObjects .= $sqlProjectReference;
+            }
             if ($objectsString) {
-                $sqlObjects = '
+                if (trim($sqlObjects) !== '') {
+                    $sqlObjects .= ' + ';
+                }
+                $sqlObjects .= '
                 CASE WHEN (MATCH_AGAINST(a.name) AGAINST(:objects_string IN BOOLEAN MODE) > 1) THEN 60 ELSE 0 END +
                 CASE WHEN (MATCH_AGAINST(a.nameInitial) AGAINST(:objects_string IN BOOLEAN MODE) > 1) THEN 60 ELSE 0 END +
                 CASE WHEN (MATCH_AGAINST(a.description, a.eligibility, a.projectExamples) AGAINST(:objects_string IN BOOLEAN MODE) > 1) THEN 10 ELSE 0 END 
                 ';
 
-                $objects = str_getcsv($objectsString, ' ', '"');       
+                $objects = str_getcsv($objectsString, ' ', '"');
                 if (!empty($objects)) {
                     $sqlObjects .= ' + ';
                 
@@ -583,12 +589,11 @@ class AidRepository extends ServiceEntityRepository
                     }
                 }
 
-                if (isset($sqlProjectReference) && $sqlProjectReference !== '') {
-                    $sqlObjects .= ' + '.$sqlProjectReference;
-                }
-
-                $qb->addSelect('('.$sqlObjects.') as score_objects');
                 $qb->setParameter('objects_string', $objectsString);
+            }
+
+            if (trim($sqlObjects) !== '') {
+                $qb->addSelect('('.$sqlObjects.') as score_objects');
                 $qb->andHaving('score_objects >= '.$scoreObjectsMin);
             }
 
