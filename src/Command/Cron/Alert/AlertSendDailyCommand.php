@@ -56,10 +56,10 @@ class AlertSendDailyCommand extends Command
         $io->title($this->commandTextStart);
 
         try  {
-            // if ($this->kernelInterface->getEnvironment() != 'prod') {
-            //     $io->info('Uniquement en prod');
-            //     return Command::FAILURE;
-            // }
+            if ($this->kernelInterface->getEnvironment() != 'prod') {
+                $io->info('Uniquement en prod');
+                return Command::FAILURE;
+            }
             // tache
             $this->cronTask($input, $output);
         } catch (\Exception $exception) {
@@ -78,6 +78,7 @@ class AlertSendDailyCommand extends Command
         
         /** @var AlertRepository $alertRepo */
         $alertRepo = $this->managerRegistry->getRepository(Alert::class);
+        
         // charge les alertes
         $alerts = $alertRepo->findToSendDaily();
 
