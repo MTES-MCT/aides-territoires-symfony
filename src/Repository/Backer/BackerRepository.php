@@ -7,6 +7,7 @@ use App\Entity\Aid\AidType;
 use App\Entity\Aid\AidTypeGroup;
 use App\Entity\Backer\Backer;
 use App\Entity\Backer\BackerCategory;
+use App\Entity\Backer\BackerGroup;
 use App\Entity\Organization\OrganizationType;
 use App\Entity\Perimeter\Perimeter;
 use App\Entity\User\User;
@@ -276,6 +277,7 @@ class BackerRepository extends ServiceEntityRepository
         $hasPublishedFinancedAids = $params['hasPublishedFinancedAids'] ?? null;
         $active = isset($params['active']) ? $params['active'] : null;
         $nbAidsLiveMin = $params['nbAidsLiveMin'] ?? null;
+        $backerGroup = $params['backerGroup'] ?? null;
         $orderBy = (isset($params['orderBy']) && isset($params['orderBy']['sort']) && isset($params['orderBy']['order'])) ? $params['orderBy'] : null;
         
         $qb = $this->createQueryBuilder('b');
@@ -343,6 +345,13 @@ class BackerRepository extends ServiceEntityRepository
                     ->andWhere('aidForHasPublishedFinancedAids.id IS NULL')
                     ;
             }
+        }
+
+        if ($backerGroup instanceof BackerGroup && $backerGroup->getId()) {
+            $qb
+                ->andWhere('b.backerGroup = :backerGroup')
+                ->setParameter('backerGroup', $backerGroup)
+            ;
         }
 
         if ($orderRand === true) {
