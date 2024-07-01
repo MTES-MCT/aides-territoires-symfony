@@ -57,8 +57,6 @@ class AlertRepository extends ServiceEntityRepository
 
     public function findToSendWeekly(array $params = null) : array {
         $today = new \DateTime(date('Y-m-d'));
-        // retire une semaine
-        $today->modify('-1 week');
         $weekNumber = $today->format('W');
         $year = $today->format('o');
         
