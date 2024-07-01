@@ -61,14 +61,22 @@ class LogAidViewRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult()[0]['nb'] ?? 0;
     }
 
-    public function countApiByHourByOrganization(?array $params = null): array
+    public function countApiByDay(?array $params = null) {
+        $params['source'] = 'api';
+        $qb = $this->getQueryBuilder($params);
+        $qb->select('COUNT(lav.id) as nb, DATE_FORMAT(lav.timeCreate, \'%Y-%m-%d\') as dateDay');
+        $qb->groupBy('dateDay');
+
+        return $qb->getQuery()->getResult();
+    }
+
+    public function countByOrganization(?array $params = null)
     {
         $params['source'] = 'api';
         $qb = $this->getQueryBuilder($params);
-        $qb->select('COUNT(lav.id) as nb, DATE_FORMAT(lav.timeCreate, \'%Y-%m-%d\') as dateDay, DATE_FORMAT(lav.timeCreate, \'%H\') as dateHour');
+        $qb->select('COUNT(lav.id) as nb, organization.id as organizationId, organization.name as organizationName');
         $qb->innerJoin('lav.organization', 'organization');
-        $qb->addSelect('organization.id as organizationId, organization.name as organizationName');
-        $qb->groupBy('dateDay, dateHour, organizationId');
+        $qb->groupBy('organizationId');
 
         return $qb->getQuery()->getResult();
     }
