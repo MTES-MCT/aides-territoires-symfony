@@ -678,6 +678,9 @@ class Aid // NOSONAR too much methods
     #[ORM\OneToMany(mappedBy: 'aid', targetEntity: KeywordReferenceSuggested::class, orphanRemoval: true)]
     private Collection $keywordReferenceSuggesteds;
 
+    #[Groups([self::API_GROUP_ITEM])]
+    private bool $live = false;
+    
     /**
      * <Non Database Fields
      */
@@ -2055,6 +2058,13 @@ class Aid // NOSONAR too much methods
         }
 
         return false;
+    }
+
+    public function setLive(bool $live): static
+    {
+        $this->live = $live;
+
+        return $this;
     }
 
     public function isOnGoing(): bool

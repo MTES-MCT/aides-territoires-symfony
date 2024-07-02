@@ -142,7 +142,6 @@ class AidController extends ApiController
     ): JsonResponse
     {
         $params = [];
-        $params['showInSearch'] = true;
         $params['id'] = (int) $id;
         $codeStatus = 200;
         $aid = $aidRepository->findOneCustom($params);
@@ -195,7 +194,6 @@ class AidController extends ApiController
     {
         $codeStatus = 200;
         $params = [];
-        $params['showInSearch'] = true;
         $params['slug'] = $slug;
         $aid = $aidRepository->findOneCustom($params);
         if ($aid instanceof Aid) {
@@ -366,7 +364,8 @@ class AidController extends ApiController
                 'date_created' => $result->getTimeCreate()->format(\DateTime::ATOM),
                 'date_updated' => $result->getTimeUpdate() ? $result->getTimeUpdate()->format(\DateTime::ATOM) : null,
                 'project_references' => $projectReferences,
-                'european_aid' => $result->getEuropeanAid()
+                'european_aid' => $result->getEuropeanAid(),
+                'is_live' => $result->isLive()
             ];
         }
 
