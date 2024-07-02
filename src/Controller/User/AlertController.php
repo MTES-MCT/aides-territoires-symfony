@@ -27,6 +27,7 @@ class AlertController extends FrontController
 
         // regarde le statut actuel de l'utilisateur
         $isMlConsent = $emailService->isUserMlConsent($user);
+
         if ($isMlConsent !== $user->isMlConsent()) {
             // on met à jour notre base
             $user->setMlConsent($isMlConsent);
