@@ -1,0 +1,38 @@
+http {
+    # Définir une zone de limitation de débit
+    limit_req_zone $binary_remote_addr zone=one:10m rate=1r/s;
+}
+
+server {
+    # headers securite
+    add_header X-Frame-Options "deny";
+    add_header Permissions-Policy "base-uri 'self'; geolocation 'self'; microphone 'self'; sync-xhr 'self'; fullscreen 'self'";
+
+    # ip bloques
+    deny 152.42.250.90;
+    deny 154.38.187.92;
+    deny 66.249.70.7;
+    deny 178.128.55.15;
+    deny 216.218.191.202;
+    deny 86.104.21.81;
+    deny 118.193.36.63;
+
+    # liimitation de débit
+    location / {
+        limit_req zone=one burst=5 nodelay;
+    }
+
+    location ~* ^/_up/.*\.(jpg|jpeg|png)$ {
+        try_files $uri /index.php$is_args$args;
+    }
+
+    # cache medias
+    location ~* ^(?!/media/cache/resolve/).*\.(css|js|jpg|jpeg|png|svg|webp|mp4|ico|woff2|woff|eot|ttf)$ {
+        add_header Cache-Control "public, max-age=31536000";
+    }
+
+    # bloquer les fichiers de configuration
+    location = /js/fos_js_routes.json {
+        return 403;
+    }
+}
