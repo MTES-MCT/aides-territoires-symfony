@@ -7,6 +7,7 @@ use App\Entity\Aid\AidRecurrence;
 use App\Entity\Aid\AidStep;
 use App\Entity\Aid\AidType;
 use App\Entity\Backer\Backer;
+use App\Entity\Backer\BackerGroup;
 use App\Entity\Category\Category;
 use App\Entity\Organization\OrganizationType;
 use App\Entity\Perimeter\Perimeter;
@@ -38,6 +39,8 @@ class AidSearchClass // NOSONAR too much methods
      * @var ?ArrayCollection|AidType[]
      */
     private $backerschoice;
+    private ?BackerGroup $backerGroup;
+
     private ?\DateTime $applyBefore;
     /**
      * @var ?ArrayCollection|Program[]
@@ -69,6 +72,7 @@ class AidSearchClass // NOSONAR too much methods
         $this->aidTypes = null;
         $this->orderBy = null;
         $this->backerschoice = null;
+        $this->backerGroup = null;
         $this->applyBefore = null;
         $this->programs = null;
         $this->aidSteps = null;
@@ -210,6 +214,16 @@ class AidSearchClass // NOSONAR too much methods
         }
     }
 
+    public function getBackerGroup(): ?BackerGroup
+    {
+        return $this->backerGroup;
+    }
+
+    public function setBackerGroup(?BackerGroup $backerGroup): void
+    {
+        $this->backerGroup = $backerGroup;
+    }
+    
     public function getApplyBefore(): ?\DateTime
     {
         return $this->applyBefore;

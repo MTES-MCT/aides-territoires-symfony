@@ -32,6 +32,7 @@ class AidController extends ApiController
     ): JsonResponse
     {
         $aidSearchClass = $aidSearchFormService->getAidSearchClass();
+
         // parametres pour requetes aides
         $aidParams = [
             'showInSearch' => true,

@@ -8,6 +8,7 @@ use App\Entity\Aid\AidStep;
 use App\Entity\Aid\AidType;
 use App\Entity\Aid\AidTypeGroup;
 use App\Entity\Backer\Backer;
+use App\Entity\Backer\BackerGroup;
 use App\Entity\Category\Category;
 use App\Entity\Category\CategoryTheme;
 use App\Entity\Organization\OrganizationType;
@@ -17,6 +18,7 @@ use App\Service\User\UserService;
 use App\Form\Type\EntityCheckboxAbsoluteType;
 use App\Form\Type\EntityCheckboxGroupAbsoluteType;
 use App\Form\Type\PerimeterAutocompleteType;
+use App\Repository\Backer\BackerGroupRepository;
 use App\Repository\Backer\BackerRepository;
 use App\Service\Aid\AidSearchClass;
 use Doctrine\ORM\EntityRepository;
@@ -272,6 +274,25 @@ class AidSearchTypeV2 extends AbstractType
                 ->add('isCallForProject', CheckboxType::class, [
                     'required' => false,
                     'label' => 'Appels à projets / Appels à manifestation d’intérêt uniquement'
+                ])
+                ->add('backerGroup', EntityType::class, [
+                    'required' => false,
+                    'label' => 'Groupe de porteurs d\'aides',
+                    'class' => BackerGroup::class,
+                    'choice_label' => 'name',
+                    'attr' => [
+                        'placeholder' => 'Tous les groupes de porteurs d\'aides',
+                    ],
+                    'autocomplete' => true,
+                    'multiple' => false,
+                    'query_builder' => function(BackerGroupRepository $backerGroupRepository) {
+                        return $backerGroupRepository->getQueryBuilder([
+                            'orderBy' => [
+                                'sort' => 'bg.name',
+                                'order' => 'ASC'
+                            ]
+                        ]);
+                    },
                 ])
                 ;
 

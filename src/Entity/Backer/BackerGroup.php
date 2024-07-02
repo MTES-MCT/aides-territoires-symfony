@@ -2,15 +2,40 @@
 
 namespace App\Entity\Backer;
 
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\OpenApi\Model;
+use App\Controller\Api\Backer\BackerGroupController;
 use App\Repository\Backer\BackerGroupRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-
+use Symfony\Component\Serializer\Attribute\Groups;
+#[ApiResource(
+    // shortName: 'Porteurs',
+    operations: [
+        new GetCollection(
+            uriTemplate: '/backer-groups/',
+            controller: BackerGroupController::class,
+            normalizationContext: ['groups' => self::API_GROUP_LIST],
+            openapi: new Model\Operation(
+                summary: self::API_DESCRIPTION,
+                description: self::API_DESCRIPTION,
+            ),
+            paginationEnabled: true,
+            paginationItemsPerPage: 50,
+            paginationClientItemsPerPage: true
+        ),
+    ]
+)]
 #[ORM\Entity(repositoryClass: BackerGroupRepository::class)]
 class BackerGroup
 {
+    const API_DESCRIPTION = 'Lister tous les groupes de porteurs d\'aides';
+    const API_GROUP_LIST = 'backer_group:list';
+
+    #[Groups([self::API_GROUP_LIST])]
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -19,12 +44,14 @@ class BackerGroup
     #[ORM\ManyToOne(inversedBy: 'backerGroups')]
     private ?BackerSubcategory $backerSubCategory = null;
 
+    #[Groups([self::API_GROUP_LIST])]
     #[ORM\Column(length: 255)]
     private ?string $name = null;
 
     #[ORM\Column(length: 255)]
     private ?string $slug = null;
 
+    #[Groups([self::API_GROUP_LIST])]
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $timeCreate = null;
 
