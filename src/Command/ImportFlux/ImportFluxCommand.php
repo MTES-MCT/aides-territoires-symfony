@@ -43,6 +43,9 @@ class ImportFluxCommand extends Command // NOSONAR too much methods
     protected int $error = 0;
     protected \DateTime $dateImportStart;
 
+    protected array $thematiquesOk = [];
+    protected array $thematiquesKo = [];
+
     public function __construct(
         protected KernelInterface $kernelInterface,
         protected ManagerRegistry $managerRegistry,
@@ -143,6 +146,7 @@ class ImportFluxCommand extends Command // NOSONAR too much methods
             );
             $content = $response->toArray();
             $nbItems = $content['count'] ?? 0;
+
             if (!$nbItems) {
                 throw new \Exception('Erreur sur la pagination, nbItems = 0');
             }
@@ -171,11 +175,7 @@ class ImportFluxCommand extends Command // NOSONAR too much methods
             }
 
             // on regarde si on trouve une aide avec cet importUniqueid
-            $aid = $this->managerRegistry->getRepository(Aid::class)->findOneBy(
-                [
-                    'importUniqueid' => trim($importUniqueid)
-                ]
-            );
+            $aid = $this->findAid($aidToImport);
 
             if (!$aid instanceof Aid) {
                 // on crée l'aide
@@ -187,7 +187,11 @@ class ImportFluxCommand extends Command // NOSONAR too much methods
 
             $io->progressAdvance();
         }
-
+        $this->thematiquesOk = array_unique($this->thematiquesOk);
+        $this->thematiquesKo = array_unique($this->thematiquesKo);
+        sort($this->thematiquesOk);
+        sort($this->thematiquesKo);
+dd($this->thematiquesOk, $this->thematiquesKo);
         $io->progressFinish();
 
         // sauvegarde en base
@@ -213,7 +217,7 @@ class ImportFluxCommand extends Command // NOSONAR too much methods
                 );
                 $content = $response->getContent();
                 $content = $response->toArray();
-    
+
                 foreach ($content as $key => $value) {
                     if (in_array($key, $this->aidsLabelSearch) && is_array($value)) {
                         $aidsFromImport = array_merge($aidsFromImport, $value);
@@ -232,6 +236,25 @@ class ImportFluxCommand extends Command // NOSONAR too much methods
         return $aidsFromImport;
     }
 
+    protected function findAid($aidToImport): ?Aid
+    {
+        try {
+            // on recherche par importUniqueid
+            $aid = $this->managerRegistry->getRepository(Aid::class)->findOneBy(
+                [
+                    'importUniqueid' => trim($this->getImportUniqueid($aidToImport))
+                ]
+            );
+            if ($aid instanceof Aid) {
+                return $aid;
+            }
+        } catch (\Exception $e) {
+            return null;
+        }
+
+        return null;
+    }
+
     // The aid is actually new, so we just create it.
     protected function createAid($aidToImport): bool
     {
@@ -245,7 +268,6 @@ class ImportFluxCommand extends Command // NOSONAR too much methods
             $aid->setImportDataUrl($this->dataSource->getImportDataUrl());
             $importLicence = $this->dataSource->getImportLicence() ?? DataSource::SLUG_LICENCE_UNKNOWN;
             $aid->setImportShareLicence($importLicence);
-            // $aid->setImportRawObject($aidToImport);
             $aid->setAuthor($this->dataSource->getAidAuthor());
             $aidFinancer = new AidFinancer();
             $aidFinancer->setBacker($this->dataSource->getBacker());
@@ -476,17 +498,22 @@ class ImportFluxCommand extends Command // NOSONAR too much methods
         return false;
     }
 
-    protected function getDateTimeOrNull(?string $date): ?\DateTime
+    protected function getDateTimeOrNull(?string $date, ?array $params = null): ?\DateTime
     {
         if (!$date) {
             return null;
         }
         try {
             $dateTemp = new \DateTime($date);
-            // Force pour éviter les différence sur le fuseau horaire
-            $date = new \DateTime(date($dateTemp->format('Y-m-d')));
-            // Force les heures, minutes, et secondes à 00:00:00
-            $date->setTime(0, 0, 0);
+
+            if (!isset($params['keepTime'])) {
+                // Force pour éviter les différence sur le fuseau horaire
+                $date = new \DateTime($dateTemp->format('Y-m-d'));
+                // Force les heures, minutes, et secondes à 00:00:00
+                $date->setTime(0, 0, 0);
+            } else {
+                $date = new \DateTime($date);
+            }
         } catch (\Exception $e) {
             $date = null;
         }
