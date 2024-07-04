@@ -167,6 +167,8 @@ class Aid // NOSONAR too much methods
     private ?int $id = null;
 
     #[Groups([self::API_GROUP_LIST, self::API_GROUP_ITEM])]
+    #[Assert\NotNull()]
+    #[Assert\NotBlank()]
     #[Assert\Length(max: 255)]
     #[ORM\Column(length: 255)]
     private ?string $name = null;

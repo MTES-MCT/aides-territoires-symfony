@@ -195,7 +195,7 @@ Encore
         to: 'docs/[path][name].[hash:8].[ext]',
 
         // only copy files matching this pattern
-        pattern: /\.(json)$/
+        pattern: /\.(json|xlsx|csv)$/
     })
 ;
 
