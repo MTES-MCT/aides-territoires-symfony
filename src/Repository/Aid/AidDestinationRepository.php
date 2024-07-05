@@ -22,6 +22,21 @@ class AidDestinationRepository extends ServiceEntityRepository
         parent::__construct($registry, AidDestination::class);
     }
 
+    public function getNames(?array $params = null): array
+    {
+        $params['orderBy'] = ['sort' => 'ad.name', 'order' => 'ASC'];
+        $qb = $this->getQueryBuilder($params);
+
+        $qb
+            ->select('ad.name')
+        ;
+
+        $results = $qb->getQuery()->getResult();
+
+        // on met directement le champ name dans le tableau
+        return array_column($results, 'name');
+    }
+
     public function countCustom(array $params = null): int
     {
         $qb = $this->getQueryBuilder($params);
@@ -40,7 +55,15 @@ class AidDestinationRepository extends ServiceEntityRepository
 
     public function getQueryBuilder(array $params = null): QueryBuilder
     {
+        $orderBy = (isset($params['orderBy']) && isset($params['orderBy']['sort']) && isset($params['orderBy']['order'])) ? $params['orderBy'] : null;
+
         $qb = $this->createQueryBuilder('ad');
+
+        if ($orderBy !== null) {
+            $qb
+                ->addOrderBy($orderBy['sort'], $orderBy['order'])
+            ;
+        }
 
         return $qb;
     }

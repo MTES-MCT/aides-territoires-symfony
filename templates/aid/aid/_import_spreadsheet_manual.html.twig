@@ -35,7 +35,12 @@
             <td>
                 <ul>
                     <li>Optionnel</li>
-                    <li>Doit être le nom exact du programme voir <a href="{{ path('app_program_program') }}" target="_blank">la liste</a></li>
+                    <li>
+                    Doit être le nom exact du programme
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#programsModal">
+                        Liste
+                    </button>
+                    </li>
                     <li>Plusieurs programmes peuvent être séparés par des virgules</li>
                 </ul>
             </td>
@@ -59,11 +64,16 @@
             <td>
                 <ul>
                     <li>Optionnel</li>
-                    <li>Doit être le nom exact du porteur.</li>
-                    <li>Plusieurs porteurs peuvent être séparés par des virgules</li>
+                    <li>
+                    Doit être l'identifiant du porteur.
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#backersModal">
+                        Trouver identifiant
+                    </button>
+                    </li>
+                    <li>Plusieurs identifiants porteurs peuvent être séparés par des virgules</li>
                 </ul>
             </td>
-            <td>ADEME, Ademe — Direction régionale — Provence-Alpes-Côte d'Azur</td>
+            <td>22 (ADEME), 347 (Ademe — Direction régionale — Provence-Alpes-Côte d'Azur)</td>
         </tr>
         <tr>
             <td>E</td>
@@ -72,11 +82,16 @@
             <td>
                 <ul>
                     <li>Optionnel</li>
-                    <li>Doit être le nom exact de l'instructeur.</li>
-                    <li>Plusieurs insctructeurs peuvent être séparés par des virgules</li>
+                    <li>
+                    Doit être l'identifiant de l'instructeur.
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#backersModal">
+                        Trouver identifiant
+                    </button>                    
+                    </li>
+                    <li>Plusieurs identifiants insctructeurs peuvent être séparés par des virgules</li>
                 </ul>
             </td>
-            <td>ADEME, Ademe — Direction régionale — Provence-Alpes-Côte d'Azur</td>
+            <td>22 (ADEME), 347 (Ademe — Direction régionale — Provence-Alpes-Côte d'Azur)</td>
         </tr>
         <tr>
             <td>F</td>
@@ -85,7 +100,12 @@
             <td>
                 <ul>
                     <li>Optionnel</li>
-                    <li>Doit être le nom exact de la cible.</li>
+                    <li>
+                    Doit être le nom exact de la cible.
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#organizationTypesModal">
+                        Liste
+                    </button>
+                    </li>
                     <li>Plusieurs bénéficiaires peuvent être séparés par des virgules</li>
                 </ul>
             </td>
@@ -98,7 +118,12 @@
             <td>
                 <ul>
                     <li>Optionnel</li>
-                    <li>Doit être le nom exact du type.</li>
+                    <li>
+                    Doit être le nom exact du type.
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#aidTypesModal">
+                        Liste
+                    </button>
+                    </li>
                     <li>Plusieurs types peuvent être séparés par des virgules</li>
                 </ul>
             </td>
@@ -170,7 +195,12 @@
             <td>
                 <ul>
                     <li>Optionnel</li>
-                    <li>Doit être le nom exact de la thématique.</li>
+                    <li>
+                    Doit être le nom exact de la thématique.
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#categoriesModal">
+                        Liste
+                    </button>
+                    </li>
                     <li>Plusieurs thématiques peuvent être séparés par des virgules</li>
                 </ul>
             </td>
@@ -183,7 +213,12 @@
             <td>
                 <ul>
                     <li>Optionnel</li>
-                    <li>Doit être le nom exact de la récurrence.</li>
+                    <li>
+                    Doit être le nom exact de la récurrence.
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#recurrencesModal">
+                        Liste
+                    </button>
+                    </li>
                 </ul>
             </td>
             <td>Permanente</td>
@@ -243,7 +278,12 @@
             <td>
                 <ul>
                     <li>Optionnel</li>
-                    <li>Doit être le nom exact de l'état d'avancement.</li>
+                    <li>
+                    Doit être le nom exact de l'état d'avancement.
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#stepsModal">
+                        Liste
+                    </button>
+                    </li>
                     <li>Plusieurs états peuvent être séparés par des virgules</li>
                 </ul>
             </td>
@@ -256,7 +296,12 @@
             <td>
                 <ul>
                     <li>Optionnel</li>
-                    <li>Doit être le nom exact du type / de l'action.</li>
+                    <li>
+                    Doit être le nom exact du type / de l'action.
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#destinationsModal">
+                        Liste
+                    </button>                    
+                    </li>
                     <li>Plusieurs types / actions peuvent être séparés par des virgules</li>
                 </ul>
             </td>
@@ -269,10 +314,15 @@
             <td>
                 <ul>
                     <li>Optionnel</li>
-                    <li>Doit être le nom exact du périmètre.</li>
+                    <li>
+                    Doit être l'identifiant du périmètre.
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#perimetersModal">
+                        Trouver l'identifiant
+                    </button>  
+                    </li>
                 </ul>
             </td>
-            <td>Landes</td>
+            <td>71016 (Landes)</td>
         </tr>
         <tr>
             <td>V</td>
@@ -341,7 +391,12 @@
             <td>
                 <ul>
                     <li>Requis</li>
-                    <li>Doit être un nombre</li>
+                    <li>
+                    Doit être un nombre
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#organizationIdsModal">
+                        Vos identifiants
+                    </button>   
+                    </li>
                 </ul>
             </td>
             <td></td>
@@ -353,7 +408,12 @@
             <td>
                 <ul>
                     <li>Optionnel</li>
-                    <li>Doit être le nom exact du projet référent.</li>
+                    <li>
+                    Doit être le nom exact du projet référent.
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#projectReferencesModal">
+                        Liste
+                    </button>                        
+                    </li>
                     <li>Plusieurs projets référents peuvent être séparés par des virgules</li>
                 </ul>
             </td>
@@ -361,3 +421,279 @@
         </tr>
     </tbody>
 </table>
+
+{% set manualData = getImportAidManualDatas() %}
+
+<!-- Modal Programs -->
+<div class="modal fade" id="programsModal" tabindex="-1" aria-labelledby="programsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="programsModalLabel">Liste des programmes</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="column-text">
+                    {% for program in manualData.programs %}
+                    <p>{{ program }}</p>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- /Modal Programs -->
+
+<!-- Modal Backers -->
+<div class="modal fade" id="backersModal" tabindex="-1" aria-labelledby="backersModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="backersModalLabel">Porteurs et insctructeurs</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p><input type="text" name="backer" id="backerSearch" class="form-control" placeholder="Rechercher un porteur ou instructeur"></p>
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Id</th>
+                            <th>Nom</th>
+                            <th>Périmètre</th>
+                        </tr>
+                    </thead>
+                    <tbody id="backerList">
+
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- /Modal Backers -->
+
+
+<!-- Modal OrganizationTypes -->
+<div class="modal fade" id="organizationTypesModal" tabindex="-1" aria-labelledby="organizationTypesModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="organizationTypesModalLabel">Liste des types de structure</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="column-text">
+                    {% for organizationType in manualData.organizationTypes %}
+                    <p>{{ organizationType }}</p>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- /Modal OrganizationTypes -->
+
+<!-- Modal AidTypes -->
+<div class="modal fade" id="aidTypesModal" tabindex="-1" aria-labelledby="aidTypesModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="aidTypesModalLabel">Liste des types d'aides</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="column-text">
+                    {% for aidType in manualData.aidTypes %}
+                    <p>{{ aidType }}</p>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- /Modal AidTypes -->
+
+<!-- Modal Categories -->
+<div class="modal fade" id="categoriesModal" tabindex="-1" aria-labelledby="categoriesModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="categoriesModalLabel">Liste des thématiques</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="column-text">
+                    {% for category in manualData.categories %}
+                    <p>{{ category }}</p>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- /Modal Categories -->
+
+<!-- Modal AidRecurrence -->
+<div class="modal fade" id="recurrencesModal" tabindex="-1" aria-labelledby="recurrencesModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="recurrencesModalLabel">Liste des récurrences</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="column-text">
+                    {% for aidRecurrence in manualData.aidRecurrences %}
+                    <p>{{ aidRecurrence }}</p>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- /Modal AidRecurrence -->
+
+<!-- Modal AidStep -->
+<div class="modal fade" id="stepsModal" tabindex="-1" aria-labelledby="stepsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="stepsModalLabel">Liste des étapes</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="column-text">
+                    {% for aidStep in manualData.aidSteps %}
+                    <p>{{ aidStep }}</p>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- /Modal AidStep -->
+
+<!-- Modal AidDestination -->
+<div class="modal fade" id="destinationsModal" tabindex="-1" aria-labelledby="destinationsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="destinationsModalLabel">Liste des types de dépenses / actions couvertes</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="column-text">
+                    {% for aidDestination in manualData.aidDestinations %}
+                    <p>{{ aidDestination }}</p>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- /Modal AidDestination -->
+
+<!-- Modal Perimeter -->
+<div class="modal fade" id="perimetersModal" tabindex="-1" aria-labelledby="perimetersModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="perimetersModalLabel">Liste des périmètres</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p><input type="text" name="perimeter" id="perimeterSearch" class="form-control" placeholder="Rechercher un périmètre"></p>
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Id</th>
+                            <th>Nom</th>
+                            <th>Echelle</th>
+                            <th>Code Postal</th>
+                        </tr>
+                    </thead>
+                    <tbody id="perimeterList">
+
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- /Modal Perimeter -->
+
+
+<!-- Modal OrganizationIds -->
+<div class="modal fade" id="organizationIdsModal" tabindex="-1" aria-labelledby="organizationIdsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="organizationIdsModalLabel">Identifiants de vos structures</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="column-text">
+                    {% if app.user %}
+                        {% for organization in app.user.organizations %}
+                        <p>{{ organization.name }} : <strong>{{ organization.id }}</strong></p>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- /Modal OrganizationIds -->
+
+<!-- Modal ProjectReference -->
+<div class="modal fade" id="projectReferencesModal" tabindex="-1" aria-labelledby="projectReferencesModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="projectReferencesModalLabel">Liste des projets référents</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="column-text">
+                    {% for projectReference in manualData.projectReferences %}
+                    <p>{{ projectReference }}</p>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- /Modal ProjectReference -->

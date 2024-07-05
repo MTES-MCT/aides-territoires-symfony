@@ -36,6 +36,8 @@ use App\Field\TrumbowygField;
 use App\Form\Admin\Aid\AidImportType;
 use App\Form\Admin\Aid\KeywordReferenceAssociationType;
 use App\Form\Admin\Aid\ProjectReferenceAssociationType;
+use App\Form\Perimeter\PerimeterSearchType;
+use App\Form\Type\PerimeterAutocompleteType;
 use App\Repository\Aid\AidDestinationRepository;
 use App\Repository\Aid\AidRecurrenceRepository;
 use App\Repository\Aid\AidRepository;
@@ -966,9 +968,9 @@ class AidCrudController extends AtCrudController
                                 }
                             }
 
-                            $perimeterName = trim($cells[20]->getValue());
-                            if ($perimeterName !== '') {
-                                $perimeter = $perimeterRepository->findOneBy(['name' => $perimeterName]);
+                            $perimeterId = (int) trim($cells[20]->getValue());
+                            if ($perimeterId) {
+                                $perimeter = $perimeterRepository->find($perimeterId);
                                 if ($perimeter instanceof Perimeter) {
                                     $aid->setPerimeter($perimeter);
                                 }

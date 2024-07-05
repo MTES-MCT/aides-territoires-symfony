@@ -6,10 +6,13 @@ use App\Controller\FrontController;
 use App\Entity\Backer\Backer;
 use App\Repository\Aid\AidRepository;
 use App\Repository\Backer\BackerRepository;
+use App\Service\Api\InternalApiService;
 use App\Service\Backer\BackerService;
 use App\Service\Log\LogService;
+use App\Service\Security\SecurityService;
 use App\Service\User\UserService;
 use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -20,9 +23,6 @@ class BackerController extends FrontController
     public function index(): Response
     {
         return $this->redirectToRoute('app_cartography_cartography');
-        return $this->render('backer/backer/index.html.twig', [
-
-        ]);
     }
 
     #[Route('/partenaires/{id}-{slug}/', name: 'app_backer_details', requirements: ['id' => '[0-9]+', 'slug' => '[a-zA-Z0-9\-_]+'])]
@@ -117,5 +117,49 @@ class BackerController extends FrontController
             'categories_by_theme' => $categories_by_theme,
             'programs_list' => $programs_list
         ]);
+    }
+
+    #[Route('partenaires/ajax-search', name: 'app_backer_ajax_search', options: ['expose' => true])]
+    public function ajaxSearch(
+        RequestStack $requestStack,
+        InternalApiService $internalApiService,
+        SecurityService $securityService
+    ): JsonResponse
+    {
+        try {
+            if ($securityService->validHostOrgin($requestStack) === false) {
+                // La requête n'est pas interne, retourner une erreur
+                // throw $this->createAccessDeniedException('This action can only be performed by the server itself.');
+            }
+
+            // recuperer id du perimetre
+            $search = $requestStack->getCurrentRequest()->get('search', null);
+            if (!$search) {
+                throw new \Exception('Paramètre search manquant');
+            }
+
+            // appel l'api pour avoir les datas
+            $backers = $internalApiService->callApi(
+                url: '/backers/',
+                params: ['q' => (string) $search]
+            );
+            $backers = json_decode($backers);
+            $results = $backers->results;
+            $return = [];
+            foreach ($results as $result) {
+                $return[] = $result;
+            }
+
+            return new JsonResponse([
+                'success' => 1,
+                'results' => $return
+            ]);
+
+        } catch (\Exception $e) {
+            return new JsonResponse([
+                'success' => 0,
+                'message' => $e->getMessage()
+            ]);
+        }
     }
 }
