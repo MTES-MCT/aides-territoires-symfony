@@ -34,11 +34,6 @@ class ImportFluxMinistereCultureCommand extends ImportFluxCommand
     protected function getFieldsMapping(array $aidToImport, array $params = null): array // NOSONAR too complex
     {
         try {
-            $importRaws = $this->getImportRaws($aidToImport, ['deadline']);
-            $importRawObjectCalendar = $importRaws['importRawObjectCalendar'];
-            $importRawObject = $importRaws['importRawObject'];
-
-    
             $description1 = isset($aidToImport['summary']) ? $this->htmlSanitizerInterface->sanitize($aidToImport['summary']) : '';
             $description2 = isset($aidToImport['body']) ? $this->htmlSanitizerInterface->sanitize($aidToImport['body']) : '';
             $type = isset($aidToImport['type']) ? $aidToImport['type'] : '';
@@ -75,21 +70,12 @@ class ImportFluxMinistereCultureCommand extends ImportFluxCommand
                 $eligility = $this->htmlSanitizerInterface->sanitize($eligility);
             }
     
-            $dateSubmissionDeadline = null;
-            try {
-                if (isset($aidToImport['deadline'])) {
-                    $dateSubmissionDeadline = new \DateTime($aidToImport['deadline']);
-                }
-            } catch (\Exception $e) {
-                $dateSubmissionDeadline = null;
-            }
+            $dateSubmissionDeadline = $this->getDateTimeOrNull($aidToImport['deadline'] ?? null);
     
             $isCallForProject = (isset($aidToImport['deadline']) && $aidToImport['deadline']) ? true : false;
     
             $return = [
-                'importDataMention' => 'Ces données sont mises à disposition par le Ministère de la Culture',
-                'importRawObjectCalendar' => $importRawObjectCalendar,
-                'importRawObject' => $importRawObject,
+                'importDataMention' => 'Ces données sont mises à disposition par le Ministère de la Culture.',
                 'name' => isset($aidToImport['title']) ? strip_tags($aidToImport['title']) : null,
                 'nameInitial' => isset($aidToImport['title']) ? strip_tags($aidToImport['title']) : null,
                 'description' => $description,
@@ -107,7 +93,8 @@ class ImportFluxMinistereCultureCommand extends ImportFluxCommand
                 }
             }
     
-            return $return;
+            // on ajoute les données brut d'import pour comparer avec les données actuelles
+            return $this->mergeImportDatas($return);
         } catch (\Exception $e) {
             return [];
         }

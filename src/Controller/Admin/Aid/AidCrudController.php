@@ -119,20 +119,34 @@ class AidCrudController extends AtCrudController
 
         $aid = $this->getContext()->getEntity()->getInstance() ?? null;
 
-        if ($aid && is_array($aid->getImportRawObject()) && $aid->isImportUpdated()) {
+        if ($aid && is_array($aid->getImportDatas()) && $aid->isImportUpdated()) {
             $pendingUpdates = [];
             $nbUpdates = 0;
-            foreach ($aid->getImportRawObject() as $key => $value) {
-                if (isset($aid->getImportRawObjectTemp()[$key])) {
-                    $pendingUpdates[] = [
-                        'key' => $key,
-                        'value' => $value,
-                        'newValue' => $aid->getImportRawObjectTemp()[$key] ?? null,
-                        'updated' => $aid->getImportRawObjectTemp()[$key] != $value  ? true : false
-                    ];
-                    if ($aid->getImportRawObjectTemp()[$key] != $value) {
-                        $nbUpdates++;
+
+            foreach ($aid->getImportDatas() as $field => $value) {
+                // gestion des booleéns
+                $methodGet = 'get';
+                if (!method_exists($aid, 'get'.ucfirst($field))) {
+                    if (method_exists($aid, 'is'.ucfirst($field))) {
+                        $methodGet = 'is';
+                    } else {
+                        continue;
                     }
+                }
+
+                if ($aid->{$methodGet.ucfirst($field)}() != $value) {
+                    $percent = 0;
+                    if (is_string($value) && is_string($aid->{$methodGet.ucfirst($field)}())) {
+                        similar_text($aid->{$methodGet.ucfirst($field)}(), $value, $percent);
+                    }
+                    $pendingUpdates[] = [
+                        'key' => $field,
+                        'value' => $aid->{$methodGet.ucfirst($field)}(),
+                        'newValue' => $aid->getImportDatas()[$field] ?? null,
+                        'updated' => false,
+                        'similarPercent' => round($percent, 2)
+                    ];
+                    $nbUpdates++;
                 }
             }
 
@@ -627,10 +641,6 @@ class AidCrudController extends AtCrudController
         ->hideOnIndex()
         ->setColumns(12);
 
-        yield BooleanField::new('contactInfoUpdated', 'En attente de revue des données de contact mises à jour')
-        ->setHelp('Cette aide est en attente d’une revue des données de contact')
-        ->hideOnIndex()
-        ->setColumns(12);
 
         yield FormField::addFieldset('Uniquement pour les aides génériques');
         yield BooleanField::new('isGeneric', 'Aide générique')
@@ -722,6 +732,12 @@ class AidCrudController extends AtCrudController
         yield BooleanField::new('importUpdated', 'Revue à faire')
         ->setHelp('Cette aide est en attente d’une revue des mises à jour proposées par l’outil d’import')
         ->onlyOnIndex()
+        ->setColumns(12);
+
+
+        yield BooleanField::new('contactInfoUpdated', 'En attente de revue des données de contact mises à jour')
+        ->setHelp('Cette aide est en attente d’une revue des données de contact')
+        ->hideOnIndex()
         ->setColumns(12);
 
         yield BooleanField::new('isImported', 'Importé')

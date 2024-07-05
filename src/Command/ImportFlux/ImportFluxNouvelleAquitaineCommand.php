@@ -76,26 +76,28 @@ class ImportFluxNouvelleAquitaineCommand extends ImportFluxCommand
 
     protected function getFieldsMapping(array $aidToImport, array $params = null): array
     {
-        $importRaws = $this->getImportRaws($aidToImport, ['pubDate']);
-        $importRawObjectCalendar = $importRaws['importRawObjectCalendar'];
-        $importRawObject = $importRaws['importRawObject'];
-
         $dateStart = (isset($aidToImport['pubDate']) && $aidToImport['pubDate'] !== '' && $aidToImport['pubDate'] !== null) ? \DateTime::createFromFormat('D, d M y H:i:s O', $aidToImport['pubDate']) : null;
-
+        if ($dateStart instanceof \DateTime) {
+            // Force pour éviter les différence sur le fuseau horaire
+            $dateStart = new \DateTime(date($dateStart->format('Y-m-d')));
+            // Force les heures, minutes, et secondes à 00:00:00
+            $dateStart->setTime(0, 0, 0);
+        }
         $description = $this->concatHtmlFields($aidToImport, ['description']);
         if (isset($aidToImport['source']) && $aidToImport['source'] !== '') {
             $description .= '<h2>Source :</h2><div>' . $aidToImport['source'] . '</div>';
         }
-        return [
+        $return = [
             'importDataMention' => 'Ces données sont mises à disposition par le Conseil régional de Nouvelle-Aquitaine .',
-            'importRawObjectCalendar' => $importRawObjectCalendar,
-            'importRawObject' => $importRawObject,
             'name' => isset($aidToImport['title']) ? strip_tags($aidToImport['title']) : null,
             'nameInitial' => isset($aidToImport['title']) ? strip_tags($aidToImport['title']) : null,
             'description' => $description,
             'originUrl' => isset($aidToImport['guid']) ? $aidToImport['guid'] : null,
             'dateStart' => $dateStart,
         ];
+
+        // on ajoute les données brut d'import pour comparer avec les données actuelles
+        return $this->mergeImportDatas($return);
     }
 
     protected function setCategories(array $aidToImport, Aid $aid): Aid

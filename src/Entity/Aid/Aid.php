@@ -682,6 +682,9 @@ class Aid // NOSONAR too much methods
     #[ORM\OneToMany(mappedBy: 'aid', targetEntity: KeywordReferenceSuggested::class, orphanRemoval: true)]
     private Collection $keywordReferenceSuggesteds;
 
+    #[ORM\Column(type: Types::ARRAY, nullable: true)]
+    private ?array $importDatas = null;
+
     #[Groups([self::API_GROUP_ITEM])]
     private bool $live = false;
     
@@ -2593,6 +2596,18 @@ class Aid // NOSONAR too much methods
             $this->projectReferencesSearched = new ArrayCollection();
         }
         $this->projectReferencesSearched->removeElement($projectReferenceSearched);
+        return $this;
+    }
+
+    public function getImportDatas(): ?array
+    {
+        return $this->importDatas;
+    }
+
+    public function setImportDatas(?array $importDatas): static
+    {
+        $this->importDatas = $importDatas;
+
         return $this;
     }
 }
