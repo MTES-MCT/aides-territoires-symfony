@@ -38,116 +38,82 @@ class ApiController extends AbstractController
             $formDateRange->get('dateMax')->setData($dateMax);
         }
 
-        // on fait un tableau de tous les jours de la période, chaque entrée contient chaque heure de la journée
+        // on fait un tableau de tous les jours de la période
         $days = [];
         $date = clone $dateMin;
         while ($date <= $dateMax) {
-            $days[$date->format('Y-m-d')] = [];
-            for ($hour = 0; $hour < 24; $hour++) {
-                $days[$date->format('Y-m-d')][str_pad($hour, 2, '0', STR_PAD_LEFT)] = [
-                    'total' => 0,
-                    'types' => [
-                        'logAidSearchs' => [
-                            'label' => 'Recherche d\'aides',
-                            'backgroundColor' => 'rgb(255, 255, 0)',
-                            'total' => 0,
-                            'organizations' => []
-                        ],
-                        'logAidViews' => [
-                            'label' => 'Détails d\'aides',
-                            'backgroundColor' => 'rgb(0, 255, 255)',
-                            'total' => 0,
-                            'organizations' => []
-                        ]
+            $days[$date->format('Y-m-d')] = [
+                'total' => 0,
+                'types' => [
+                    'logAidSearchs' => [
+                        'label' => 'Recherche d\'aides',
+                        'backgroundColor' => 'rgb(255, 255, 0)',
+                        'total' => 0,
+                    ],
+                    'logAidViews' => [
+                        'label' => 'Détails d\'aides',
+                        'backgroundColor' => 'rgb(0, 255, 255)',
+                        'total' => 0,
                     ]
-                ];
-            }
+                ]
+            ];
             $date->modify('+1 day');
         }
         
         // les logs de recherche d'aides
-        $logAidSearchs = $logAidSearchRepository->countApiByHourByOrganization([
+        $logAidSearchs = $logAidSearchRepository->countApiByDay([
             'dateCreateMin' => $dateMin,
             'dateCreateMax' => $dateMax,
         ]);
-        
+
         foreach ($logAidSearchs as $logAidSearch) {
-            $days[$logAidSearch['dateDay']][$logAidSearch['dateHour']]['total'] += $logAidSearch['nb'];
-            $days[$logAidSearch['dateDay']][$logAidSearch['dateHour']]['types']['logAidSearchs']['total'] += $logAidSearch['nb'];
-            if (isset($days[$logAidSearch['dateDay']][$logAidSearch['dateHour']]['types']['logAidSearchs']['organizations'][$logAidSearch['organizationId']])) {
-                $days[$logAidSearch['dateDay']][$logAidSearch['dateHour']]['types']['logAidSearchs']['organizations'][$logAidSearch['organizationId']]['total'] += $logAidSearch['nb'];
-            } else {
-                $days[$logAidSearch['dateDay']][$logAidSearch['dateHour']]['types']['logAidSearchs']['organizations'][$logAidSearch['organizationId']] = [
-                    'total' => $logAidSearch['nb'],
-                    'name' => $logAidSearch['organizationName'],
-                ];
-            }
+            $days[$logAidSearch['dateDay']]['total'] += $logAidSearch['nb'];
+            $days[$logAidSearch['dateDay']]['types']['logAidSearchs']['total'] += $logAidSearch['nb'];
         }
 
         // les logs de vues détails aide
-        $logAidViews = $logAidViewRepository->countApiByHourByOrganization([
+        $logAidViews = $logAidViewRepository->countApiByDay([
             'dateCreateMin' => $dateMin,
             'dateCreateMax' => $dateMax,
         ]);
         foreach ($logAidViews as $logAidView) {
-            $days[$logAidView['dateDay']][$logAidView['dateHour']]['total'] += $logAidView['nb'];
-            $days[$logAidView['dateDay']][$logAidView['dateHour']]['types']['logAidViews']['total'] += $logAidView['nb'];
-            if (isset($days[$logAidView['dateDay']][$logAidView['dateHour']]['types']['logAidViews']['organizations'][$logAidView['organizationId']])) {
-                $days[$logAidView['dateDay']][$logAidView['dateHour']]['types']['logAidViews']['organizations'][$logAidView['organizationId']]['total'] += $logAidView['nb'];
-            } else {
-                $days[$logAidView['dateDay']][$logAidView['dateHour']]['types']['logAidViews']['organizations'][$logAidView['organizationId']] = [
-                    'total' => $logAidView['nb'],
-                    'name' => $logAidView['organizationName'],
-                ];
-            }
+            $days[$logAidView['dateDay']]['total'] += $logAidView['nb'];
+            $days[$logAidView['dateDay']]['types']['logAidViews']['total'] += $logAidView['nb'];
         }
 
         
         // graphique utilisation totale, jour par jour, stacked sur type utilisation
         $labels = [];
-        foreach ($days as $day => $hours) {
-            $labels[] = $day;
-        }
-        $datasetsOfTypes = [];
-        // parcours les jours
-        foreach ($days as $day => $hours) {
-            $typesOfDay = [];
-            // parcours heure par heure
-            foreach ($hours as $hour) {
-                // recupère les différents types d'utilisation
-                foreach ($hour['types'] as $typeSlug => $type) {
-                    if (!isset($typesOfDay[$typeSlug])) {
-                        $typesOfDay[$typeSlug] = [
-                            'label' => $type['label'],
-                            'backgroundColor' => $type['backgroundColor'],
-                            'total' => 0,
-                        ];
-                    }
-                    $typesOfDay[$typeSlug]['total'] += $type['total'];
-                }
-            }
-
-            // les aujoutes au dataset des types
-            foreach ($typesOfDay as $typeSlug => $typeOfDay) {
-                if (!isset($datasetsOfTypes[$typeSlug])) {
-                    $datasetsOfTypes[$typeSlug] = [
-                        'label' => $typeOfDay['label'],
-                        'backgroundColor' => $typeOfDay['backgroundColor'],
-                        'data' => [],
-                    ];
-                }
-                $datasetsOfTypes[$typeSlug]['data'][] = $typeOfDay['total'];
-            }
-        }
-
-        // on construit les datasets du graphique à partir de ceux du site
         $datasets = [];
-        foreach ($datasetsOfTypes as $dataset) {
-            $datasets[] = $dataset;
+        $datasets['logAidSearchs'] = [
+            'label' => 'Recherche d\'aides',
+            'backgroundColor' => 'rgb(255, 255, 0)',
+            'data' => [],
+        ];
+        $datasets['logAidViews'] = [
+            'label' => 'Détails d\'aides',
+            'backgroundColor' => 'rgb(0, 255, 255)',
+            'data' => [],
+        ];
+        foreach ($days as $day => $dayData) {
+            $labels[] = $day;
+            if (isset($dayData['types']['logAidSearchs'])) {
+                $datasets['logAidSearchs']['data'][] = $dayData['types']['logAidSearchs']['total'];
+            } else {
+                $datasets['logAidSearchs']['data'][] = 0;
+            }
+            if (isset($dayData['types']['logAidViews'])) {
+                $datasets['logAidViews']['data'][] = $dayData['types']['logAidViews']['total'];
+            } else {
+                $datasets['logAidViews']['data'][] = 0;
+            }
         }
 
-        $chartTotal = $chartBuilderInterface->createChart(Chart::TYPE_BAR);
-        $chartTotal->setData([
+        // sort pour transformer les clés
+        sort($datasets);
+
+        $chartByType = $chartBuilderInterface->createChart(Chart::TYPE_BAR);
+        $chartByType->setData([
             'labels' => $labels,
             'datasets' => $datasets,
         ]);
@@ -162,58 +128,76 @@ class ApiController extends AbstractController
                 ]
             ]
         ];
-        $chartTotal->setOptions($options);
+        $chartByType->setOptions($options);
 
-        // utilisation de l'api heure par heure
-        $chartByHour = $chartBuilderInterface->createChart(Chart::TYPE_LINE);
+        // Par organization
+        $logAidSearchsByOrganization = $logAidSearchRepository->countByOrganization([
+            'dateCreateMin' => $dateMin,
+            'dateCreateMax' => $dateMax,
+        ]);
+        $logAidViewsByOrganization = $logAidViewRepository->countByOrganization([
+            'dateCreateMin' => $dateMin,
+            'dateCreateMax' => $dateMax,
+        ]);
+
+        // on regroupe tout dans un tableau par id d'organization
+        $dataByOrganization = [];
+        foreach ($logAidSearchsByOrganization as $logAidSearch) {
+            if (!isset($dataByOrganization[$logAidSearch['organizationId']])) {
+                $dataByOrganization[$logAidSearch['organizationId']] = [
+                    'organizationName' => $logAidSearch['organizationName'],
+                    'total' => 0,
+                ];
+            }
+            $dataByOrganization[$logAidSearch['organizationId']]['total'] += $logAidSearch['nb'];
+        }
+        foreach ($logAidViewsByOrganization as $logAidView) {
+            if (!isset($dataByOrganization[$logAidView['organizationId']])) {
+                $dataByOrganization[$logAidView['organizationId']] = [
+                    'organizationName' => $logAidView['organizationName'],
+                    'total' => 0,
+                ];
+            }
+            $dataByOrganization[$logAidView['organizationId']]['total'] += $logAidView['nb'];
+        }
+
+
+        // graphique utilisation par organization
         $labels = [];
-        foreach ($days as $day => $hours) {
-            foreach ($hours as $keyHour => $hour) {
-                $labels[] = ($keyHour == '00') ? $day.'-'.$keyHour : $keyHour;
-            }
+        $backgroundColors = [];
+        $datas = [];
+
+
+        foreach ($dataByOrganization as $dataOrganization) {
+            $labels[] = $dataOrganization['organizationName'];
+            $backgroundColors[] = 'rgb('.rand(0, 255).', '.rand(0, 255).', '.rand(0, 255).')';
+            $datas[] = $dataOrganization['total'];
         }
 
-        $datasetTypes = [];
-        foreach ($days as $day => $hours) {
-            // parcours heure par heure
-            foreach ($hours as $keyHour => $hour) {
-                // recupère les différents types d'utilisation
-                foreach ($hour['types'] as $typeSlug => $type) {
-                    if (!isset($datasetTypes[$typeSlug])) {
-                        $datasetTypes[$typeSlug] = [
-                            'label' => $type['label'],
-                            'backgroundColor' => $type['backgroundColor'],
-                            'data' => [],
-                        ];
-                    }
-                    if (!isset($datasetTypes[$typeSlug]['data'][$day.'-'.$keyHour])) {
-                        $datasetTypes[$typeSlug]['data'][$day.'-'.$keyHour] = [];
-                        for ($i = 0; $i < 24; $i++) {
-                            $datasetTypes[$typeSlug]['data'][$day.'-'.str_pad($i, 2, '0', STR_PAD_LEFT)] = 0;
-                        }
-                    }
-                    $datasetTypes[$typeSlug]['data'][$day.'-'.$keyHour] += $type['total'];
-                }
-            }
-        }
-        // on construit les datasets du graphique à partir de celui des types
-        $datasets = [];
-        foreach ($datasetTypes as $dataset) {
-            $datasets[] = $dataset;
-        }
+        $datasets = [
+            [
+                'label' => 'Utilisation',
+                'backgroundColor' => $backgroundColors,
+                'data' => $datas,
+            ]
+        ];
 
-        $chartByHour->setData([
+        // graphique pie
+        $chartByOrganization = $chartBuilderInterface->createChart(Chart::TYPE_PIE);
+        $chartByOrganization->setData([
             'labels' => $labels,
             'datasets' => $datasets,
         ]);
+
+
 
         // rendu template
         return $this->render('admin/statistics/api/api_use.html.twig', [
             'formDateRange' => $formDateRange->createView(),
             'dateMin' => $dateMin,
             'dateMax' => $dateMax,
-            'chartTotal' => $chartTotal,
-            'chartByHour' => $chartByHour
+            'chartByType' => $chartByType,
+            'chartByOrganization' => $chartByOrganization
         ]);
     }
 }

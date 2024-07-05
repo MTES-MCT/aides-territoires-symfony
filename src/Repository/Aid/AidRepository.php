@@ -10,6 +10,7 @@ use App\Entity\Aid\AidType;
 use App\Entity\Aid\AidTypeGroup;
 use App\Entity\Backer\Backer;
 use App\Entity\Backer\BackerCategory;
+use App\Entity\Backer\BackerGroup;
 use App\Entity\Category\Category;
 use App\Entity\Keyword\Keyword;
 use App\Entity\Organization\OrganizationType;
@@ -386,6 +387,8 @@ class AidRepository extends ServiceEntityRepository
         $limit = $params['limit'] ?? null;
         $backer = $params['backer'] ?? null;
         $backers = $params['backers'] ?? null;
+        $backerCategory = $params['backerCategory'] ?? null;
+        $backerGroup = $params['backerGroup'] ?? null;
         $isFinancial = $params['isFinancial'] ?? null;
         $isTechnical = $params['isTechnical'] ?? null;
         $aidTypeGroup = $params['aidTypeGroup'] ?? null;
@@ -395,7 +398,6 @@ class AidRepository extends ServiceEntityRepository
         $categoryIds = $params['categoryIds'] ?? null;
         $categories = $params['categories'] ?? null;
         $categorySlugs = $params['categorySlugs'] ?? null;
-        $backerCategory = $params['backerCategory'] ?? null;
         $keywords = $params['keywords'] ?? null;
 
         $keyword = $params['keyword'] ?? null;
@@ -553,14 +555,20 @@ class AidRepository extends ServiceEntityRepository
             }
             
             $sqlObjects = '';
+            if (isset($sqlProjectReference)) {
+                $sqlObjects .= $sqlProjectReference;
+            }
             if ($objectsString) {
-                $sqlObjects = '
+                if (trim($sqlObjects) !== '') {
+                    $sqlObjects .= ' + ';
+                }
+                $sqlObjects .= '
                 CASE WHEN (MATCH_AGAINST(a.name) AGAINST(:objects_string IN BOOLEAN MODE) > 1) THEN 60 ELSE 0 END +
                 CASE WHEN (MATCH_AGAINST(a.nameInitial) AGAINST(:objects_string IN BOOLEAN MODE) > 1) THEN 60 ELSE 0 END +
                 CASE WHEN (MATCH_AGAINST(a.description, a.eligibility, a.projectExamples) AGAINST(:objects_string IN BOOLEAN MODE) > 1) THEN 10 ELSE 0 END 
                 ';
 
-                $objects = str_getcsv($objectsString, ' ', '"');       
+                $objects = str_getcsv($objectsString, ' ', '"');
                 if (!empty($objects)) {
                     $sqlObjects .= ' + ';
                 
@@ -583,12 +591,11 @@ class AidRepository extends ServiceEntityRepository
                     }
                 }
 
-                if (isset($sqlProjectReference) && $sqlProjectReference !== '') {
-                    $sqlObjects .= ' + '.$sqlProjectReference;
-                }
-
-                $qb->addSelect('('.$sqlObjects.') as score_objects');
                 $qb->setParameter('objects_string', $objectsString);
+            }
+
+            if (trim($sqlObjects) !== '') {
+                $qb->addSelect('('.$sqlObjects.') as score_objects');
                 $qb->andHaving('score_objects >= '.$scoreObjectsMin);
             }
 
@@ -834,6 +841,16 @@ class AidRepository extends ServiceEntityRepository
                 ->innerJoin('aidFinancersB.backer', 'backerB')
                 ->andWhere('backerB IN (:backers)')
                 ->setParameter('backers', $backers)
+            ;
+        }
+
+        if ($backerGroup instanceof BackerGroup && $backerGroup->getId()) {
+            $qb
+                ->innerJoin('a.aidFinancers', 'aidFinancersG')
+                ->innerJoin('aidFinancersG.backer', 'backerG')
+                ->innerJoin('backerG.backerGroup', 'backerGroupG')
+                ->andWhere('backerGroupG = :backerGroup')
+                ->setParameter('backerGroup', $backerGroup)
             ;
         }
 

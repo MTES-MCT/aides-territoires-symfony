@@ -68,6 +68,15 @@
         </div>
     {% endif %}
 
+    {% if formAidSearch.backerGroup.vars.data %}
+        <div class="fr-tags-group">
+            <p title="Groupe de porteurs d’aides" class="fr-tag">
+                <span class="ri-hand-coin-line ri-xl fr-mr-1w at-icon-align--sub" aria-hidden="true"></span>
+                {{ formAidSearch.backerGroup.vars.data.name }}
+            </p>
+        </div>
+    {% endif %}
+
     {% if formAidSearch.programs is defined and formAidSearch.programs.vars.data and formAidSearch.programs.vars.data|length > 0 %}
     <div class="fr-tags-group">
         <p title="Programmes d’aides" class="fr-tag fr-icon-arrow-right-line fr-tag--icon-left">

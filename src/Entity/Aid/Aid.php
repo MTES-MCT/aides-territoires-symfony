@@ -53,6 +53,8 @@ use App\Filter\Aid\AidTargetedAudiencesFilter;
 use App\Filter\Aid\AidTechnicalAidFilter;
 use App\Filter\Aid\AidTextFilter;
 use App\Filter\Aid\AidTypeGroupFilter;
+use App\Filter\Backer\BackerFilter;
+use App\Filter\Backer\BackerGroupFilter;
 use App\Service\Doctrine\DoctrineConstants;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -120,6 +122,8 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ApiFilter(AidPerimeterFilter::class)]
 #[ApiFilter(AidProjectReferenceFilter::class)]
 #[ApiFilter(AidEuropeanFilter::class)]
+#[ApiFilter(BackerFilter::class)]
+#[ApiFilter(BackerGroupFilter::class)]
 class Aid // NOSONAR too much methods
 {
     const API_OPERATION_GET_BY_ID = 'api_aid_get_by_id';
@@ -681,6 +685,9 @@ class Aid // NOSONAR too much methods
     #[ORM\Column(type: Types::ARRAY, nullable: true)]
     private ?array $importDatas = null;
 
+    #[Groups([self::API_GROUP_ITEM])]
+    private bool $live = false;
+    
     /**
      * <Non Database Fields
      */
@@ -2058,6 +2065,13 @@ class Aid // NOSONAR too much methods
         }
 
         return false;
+    }
+
+    public function setLive(bool $live): static
+    {
+        $this->live = $live;
+
+        return $this;
     }
 
     public function isOnGoing(): bool

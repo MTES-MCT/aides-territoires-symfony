@@ -7,10 +7,12 @@ use App\Entity\Perimeter\Perimeter;
 use App\Entity\Perimeter\PerimeterImport;
 use App\Form\Admin\Perimeter\CombineType;
 use App\Form\Admin\Perimeter\ImportCsvInseeType;
+use App\Message\Perimeter\MsgPerimeterImport;
 use App\Service\User\UserService;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Routing\Attribute\Route;
 
 class PerimeterController extends DashboardController
@@ -75,7 +77,8 @@ class PerimeterController extends DashboardController
         $id,
         ManagerRegistry $managerRegistry,
         RequestStack $requestStack,
-        UserService $userService
+        UserService $userService,
+        MessageBusInterface $messageBusInterface
     ): Response
     {
         // le perimetre
@@ -111,6 +114,9 @@ class PerimeterController extends DashboardController
                 // sauvegarde
                 $this->managerRegistry->getManager()->persist($perimeterImport);
                 $this->managerRegistry->getManager()->flush();
+
+                // envoi au worker
+                $messageBusInterface->dispatch(new MsgPerimeterImport());
 
                 $this->addFlash('success', 'Import demandé. Vous recevrez un mail lorsque l\'import sera terminé.');
             } else {

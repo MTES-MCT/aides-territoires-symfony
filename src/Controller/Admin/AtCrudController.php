@@ -22,6 +22,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\KernelInterface;
+use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 enum Direction
@@ -46,7 +47,8 @@ class AtCrudController extends AbstractCrudController
         public AidSearchFormService $aidSearchFormService,
         public AidService $aidService,
         public UserService $userService,
-        public UserPasswordHasherInterface $userPasswordHasherInterface
+        public UserPasswordHasherInterface $userPasswordHasherInterface,
+        public MessageBusInterface $messageBusInterface
     ) {
     }
 
@@ -74,7 +76,7 @@ class AtCrudController extends AbstractCrudController
         ->addFormTheme('form/image_field_preview.html.twig')
         ->addFormTheme('form/add_new_type.html.twig')
         ->setDefaultSort(['id' => 'DESC']) // modifie le tri
-        ->showEntityActionsInlined() // met les actions affichées directement       
+        ->showEntityActionsInlined() // met les actions affichées directement
         ;
         $entityTest = new (static::getEntityFqcn());
 

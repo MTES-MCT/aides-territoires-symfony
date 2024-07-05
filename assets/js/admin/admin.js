@@ -130,6 +130,7 @@ $('textarea:not(.trumbowyg-textarea):not(.not-trumbowyg)').trumbowyg({
         ['image'],
         ['justifyLeft', 'justifyCenter', 'justifyRight'],
     ],
+    removeformatPasted: true,
     plugins: {
         // Image upload
         upload: {

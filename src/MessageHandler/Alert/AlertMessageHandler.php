@@ -40,8 +40,12 @@ class AlertMessageHandler
             $context->setHost($host);
             $context->setScheme('https');
 
-            // prépare les deux dates de publication à checker
-            $publishedAfter = new \DateTime(date('Y-m-d', strtotime('-1 day')));
+            // prépare la date de publication à checker selon l'alerte
+            if ($alert->getAlertFrequency() == Alert::FREQUENCY_DAILY_SLUG) {
+                $publishedAfter = new \DateTime(date('Y-m-d', strtotime('-1 day')));
+            } else {
+                $publishedAfter = new \DateTime(date('Y-m-d', strtotime('-7 day')));
+            }
 
             $aidSearchClass = $this->aidSearchFormService->getAidSearchClass(
                 params: [

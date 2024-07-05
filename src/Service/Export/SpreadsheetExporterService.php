@@ -7,6 +7,7 @@ use App\Entity\Backer\Backer;
 use App\Entity\Cron\CronExportSpreadsheet;
 use App\Entity\Project\Project;
 use App\Entity\User\User;
+use App\Message\Export\MsgSpreadsheetToExport;
 use App\Repository\Aid\AidRepository;
 use App\Service\File\FileService;
 use App\Service\User\UserService;
@@ -21,6 +22,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\HtmlSanitizer\HtmlSanitizerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
+use Symfony\Component\Messenger\MessageBusInterface;
 use Twig\Environment;
 
 class SpreadsheetExporterService
@@ -34,7 +36,8 @@ class SpreadsheetExporterService
         private ManagerRegistry $managerRegistry,
         private FileService $fileService,
         private HtmlSanitizerInterface $htmlSanitizerInterface,
-        private LoggerInterface $loggerInterface
+        private LoggerInterface $loggerInterface,
+        private MessageBusInterface $messageBusInterface
     )
     {
         
@@ -53,7 +56,7 @@ class SpreadsheetExporterService
         $queryBuilderCount = clone $queryBuilder;
         $count = $queryBuilderCount->select('COUNT(entity)')->getQuery()->getSingleScalarResult();
 
-        // si trop de résultats, on va traiter par cron
+        // si trop de résultats, on va traiter par le worker
         if ($count > 1000) {
             $params = $queryBuilder->getQuery()->getParameters() ?? null;
             $sqlParams = [];
@@ -82,6 +85,9 @@ class SpreadsheetExporterService
             $this->managerRegistry->getManager()->persist($cronExportSpreadsheet);
             $this->managerRegistry->getManager()->flush();
 
+            // envoi au worker
+            $this->messageBusInterface->dispatch(new MsgSpreadsheetToExport());
+            
             $content = $this->twig->render('admin/cron/cron-launched.html.twig', [
             ]);
 
