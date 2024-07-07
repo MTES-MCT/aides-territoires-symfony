@@ -191,7 +191,7 @@ class ImportFluxCommand extends Command // NOSONAR too much methods
         $this->thematiquesKo = array_unique($this->thematiquesKo);
         sort($this->thematiquesOk);
         sort($this->thematiquesKo);
-dd($this->thematiquesOk, $this->thematiquesKo);
+
         $io->progressFinish();
 
         // sauvegarde en base
