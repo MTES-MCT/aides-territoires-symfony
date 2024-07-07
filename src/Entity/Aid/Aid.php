@@ -682,6 +682,9 @@ class Aid // NOSONAR too much methods
     #[ORM\OneToMany(mappedBy: 'aid', targetEntity: KeywordReferenceSuggested::class, orphanRemoval: true)]
     private Collection $keywordReferenceSuggesteds;
 
+    #[ORM\ManyToMany(targetEntity: SanctuarizedField::class, mappedBy: 'aids')]
+    private Collection $sanctuarizedFields;
+      
     #[ORM\Column(type: Types::ARRAY, nullable: true)]
     private ?array $importDatas = null;
 
@@ -724,6 +727,7 @@ class Aid // NOSONAR too much methods
         $this->aidLocks = new ArrayCollection();
         $this->keywordReferenceSuggesteds = new ArrayCollection();
         $this->projectReferencesSearched = new ArrayCollection();
+        $this->sanctuarizedFields = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -803,6 +807,13 @@ class Aid // NOSONAR too much methods
         return $this;
     }
 
+    public function setAidAudiences(Collection $aidAudiences): static
+    {
+        $this->aidAudiences = $aidAudiences;
+
+        return $this;
+    }
+
     /**
      * @return Collection<int, AidType>
      */
@@ -827,6 +838,13 @@ class Aid // NOSONAR too much methods
         return $this;
     }
 
+    public function setAidTypes(Collection $aidTypes): static
+    {
+        $this->aidTypes = $aidTypes;
+
+        return $this;
+    }
+
     /**
      * @return Collection<int, AidDestination>
      */
@@ -847,6 +865,13 @@ class Aid // NOSONAR too much methods
     public function removeAidDestination(AidDestination $aidDestination): static
     {
         $this->aidDestinations->removeElement($aidDestination);
+
+        return $this;
+    }
+
+    public function setAidDestinations(Collection $aidDestinations): static
+    {
+        $this->aidDestinations = $aidDestinations;
 
         return $this;
     }
@@ -967,6 +992,13 @@ class Aid // NOSONAR too much methods
     public function removeAidStep(AidStep $aidStep): static
     {
         $this->aidSteps->removeElement($aidStep);
+
+        return $this;
+    }
+
+    public function setAidSteps(Collection $aidSteps): static
+    {
+        $this->aidSteps = $aidSteps;
 
         return $this;
     }
@@ -1678,6 +1710,13 @@ class Aid // NOSONAR too much methods
         return $this;
     }
 
+    public function setCategories(Collection $categories): static
+    {
+        $this->categories = $categories;
+
+        return $this;
+    }
+
     public function removeCategory(Category $category): static
     {
         $this->categories->removeElement($category);
@@ -1717,6 +1756,13 @@ class Aid // NOSONAR too much methods
         return $this->programs;
     }
 
+    public function setPrograms(Collection $programs): static
+    {
+        $this->programs = $programs;
+
+        return $this;
+    }
+
     public function addProgram(Program $program): static
     {
         if (!$this->programs->contains($program)) {
@@ -1748,6 +1794,7 @@ class Aid // NOSONAR too much methods
             $aidFinancer->setAid($this);
         }
 
+        $this->timeUpdate = new \DateTime(date('Y-m-d H:i:s'));
         return $this;
     }
 
@@ -1757,6 +1804,7 @@ class Aid // NOSONAR too much methods
             $aidFinancer->setAid(null);
         }
 
+        $this->timeUpdate = new \DateTime(date('Y-m-d H:i:s'));
         return $this;
     }
 
@@ -1775,6 +1823,7 @@ class Aid // NOSONAR too much methods
             $aidInstructor->setAid($this);
         }
 
+        $this->timeUpdate = new \DateTime(date('Y-m-d H:i:s'));
         return $this;
     }
 
@@ -1784,6 +1833,7 @@ class Aid // NOSONAR too much methods
             $aidInstructor->setAid(null);
         }
 
+        $this->timeUpdate = new \DateTime(date('Y-m-d H:i:s'));
         return $this;
     }
 
@@ -2460,6 +2510,13 @@ class Aid // NOSONAR too much methods
         return $this;
     }
 
+    public function setProjectReferences(Collection $projectReferences): static
+    {
+        $this->projectReferences = $projectReferences;
+
+        return $this;
+    }
+
     public function getScoreTotal(): ?float
     {
         return $this->scoreTotal;
@@ -2599,6 +2656,32 @@ class Aid // NOSONAR too much methods
         return $this;
     }
 
+    /**
+     * @return Collection<int, SanctuarizedField>
+     */
+    public function getSanctuarizedFields(): Collection
+    {
+        return $this->sanctuarizedFields;
+    }
+
+    public function addSanctuarizedField(SanctuarizedField $sanctuarizedField): static
+    {
+        if (!$this->sanctuarizedFields->contains($sanctuarizedField)) {
+            $this->sanctuarizedFields->add($sanctuarizedField);
+            $sanctuarizedField->addAid($this);
+        }
+
+        return $this;
+    }
+
+    public function removeSanctuarizedField(SanctuarizedField $sanctuarizedField): static
+    {
+        if ($this->sanctuarizedFields->removeElement($sanctuarizedField)) {
+            $sanctuarizedField->removeAid($this);
+        }
+        return $this;
+    }
+      
     public function getImportDatas(): ?array
     {
         return $this->importDatas;
@@ -2606,7 +2689,7 @@ class Aid // NOSONAR too much methods
 
     public function setImportDatas(?array $importDatas): static
     {
-        $this->importDatas = $importDatas;
+        $this->importDatas = $importDatas
 
         return $this;
     }
