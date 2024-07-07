@@ -26,6 +26,17 @@ class PerimeterRepository extends ServiceEntityRepository
         parent::__construct($registry, Perimeter::class);
     }
 
+    public function getDepartments(?array $params = null): array
+    {
+        $params['scale'] = Perimeter::SCALE_DEPARTEMENT;
+
+        $qb = $this->getQueryBuilder($params)
+            ->orderBy('p.code', 'ASC')
+        ;
+
+        return $qb->getQuery()->getResult();
+    }
+
     public function countNbByOrganization(array $params = []): array
     {
         $scalePerimeter = $params['scalePerimeter'] ?? null;
@@ -221,6 +232,7 @@ class PerimeterRepository extends ServiceEntityRepository
         $orderBy = (isset($params['orderBy']) && isset($params['orderBy']['sort']) && isset($params['orderBy']['order'])) ? $params['orderBy'] : null;
         $codes = $params['codes'] ?? null;
         $insees = $params['insees'] ?? null;
+        $zipcodes = $params['zipcodes'] ?? null;
         $firstResult = $params['firstResult'] ?? null;
         $maxResults = $params['maxResults'] ?? null;
         $nameMatchAgainst = $params['nameMatchAgainst'] ?? null;
@@ -244,7 +256,6 @@ class PerimeterRepository extends ServiceEntityRepository
         if ($regions && is_array($regions) && count($regions) > 0) {
             $qb
                 ->andWhere("JSON_CONTAINS(p.regions, :regions, '$') = 1 ")
-                // ->andWhere(':regions MEMBER OF p.regions')
                 ->setParameter('regions', json_encode($regions))
             ;
         }
@@ -271,6 +282,22 @@ class PerimeterRepository extends ServiceEntityRepository
             $qb
                 ->andWhere('p.insee IN (:insees)')
                 ->setParameter('insees', $insees)
+            ;
+        }
+
+        if (is_array($zipcodes)) {
+            $sqlZipcodes = '';
+            for ($i=0; $i<count($zipcodes); $i++) {
+                $zipcodes[$i] = (int) $zipcodes[$i];
+                $sqlZipcodes .= 'p.zipcodes LIKE :zipcode'.$i;
+                if ($i < count($zipcodes) - 1) {
+                    $sqlZipcodes .= ' OR ';
+                }
+                $qb
+                    ->setParameter('zipcode'.$i, '%'.$zipcodes[$i].'%');
+            }
+            $qb
+                ->andWhere($sqlZipcodes)
             ;
         }
 

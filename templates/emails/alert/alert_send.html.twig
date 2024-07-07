@@ -35,7 +35,7 @@ prennent connaissance de ces aides.
 
 <p>
     <span aria-hidden="true">🔕</span> Cette alerte ne correspond plus à vos besoins ? <br />
-    <a href="{{ absolute_url(url('app_user_alert')) }}">
+    <a href="{{ absolute_url(url('app_user_alert_delete_public', {'id': alert.id})) }}">
         Vous pouvez la supprimer.
     </a>
 </p>

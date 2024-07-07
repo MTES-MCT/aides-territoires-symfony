@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Exception\NotFoundException\UserRegisterConfirmationNotFoundException;
 use App\Form\Security\LoginType;
 use App\Repository\User\UserRegisterConfirmationRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -55,7 +56,7 @@ class SecurityController extends FrontController
             ]
         );
         if (!$userRegisterConfirmation) {
-            throw $this->createNotFoundException('Ce lien n\'existe pas');
+            throw new UserRegisterConfirmationNotFoundException('Ce lien n\'existe pas');
         }
 
         // le lien n'as pas été utilisé

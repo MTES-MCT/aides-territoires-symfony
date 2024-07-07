@@ -1,0 +1,36 @@
+{% extends 'admin/statistics/_stats_base.html.twig' %}
+
+{% block breadcrumb %}
+{% endblock %}
+
+{% block head_javascript %}
+    {{ parent() }}
+{% endblock head_javascript %}
+
+{% block stats_content %}
+<section class="container">
+    <h1>Utilisations API aides</h1>
+</section>
+
+<section class="container mt-5">
+    
+    <div class="mt-5">
+        {{ form_start(formDateRange) }}
+        <div class="d-flex">
+            <div class="d-flex me-3">
+            {{ form_row(formDateRange.dateMin) }}
+            </div>
+            <div class="d-flex me-3">
+            {{ form_row(formDateRange.dateMax) }}
+            </div>
+            <div class="d-flex me-3">
+            <button type="submit" class="btn btn-primary">Valider</button>
+            </div>
+        </div>
+        {{ form_end(formDateRange) }}
+    </div>
+
+    <div class="my-4 chart-max-size">{{ render_chart(chartByType) }}</div>
+    <div class="my-4 chart-max-size">{{ render_chart(chartByOrganization) }}</div>
+</section>
+{% endblock stats_content %}

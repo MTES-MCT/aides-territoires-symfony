@@ -32,6 +32,15 @@
 
         {% block javascripts %}
             {{ encore_entry_script_tags('app') }}
+            {% if app.environment == 'prod' %}
+                {% cspscript %}
+                <script>
+                    window.dsfr = {
+                        production: true,
+                    };
+                </script>
+                {% endcspscript %}
+            {% endif %}
         {% endblock %}
 
         {% block ld_json %}{% endblock %}

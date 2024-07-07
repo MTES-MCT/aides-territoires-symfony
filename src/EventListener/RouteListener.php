@@ -91,6 +91,17 @@ final class RouteListener
                     $event->setResponse($response);
                     return;
                 }
+            } elseif ($subdomain == 'biodiversite-occitanie') { // spe biodiversite occitanie
+                // pour s'assurer de rediriger vers la prod
+                $host = $this->paramService->get('prod_host');
+                $context = $this->routerInterface->getContext();
+                $context->setHost($host);
+                $context->setScheme('https');
+                
+                $url = $this->routerInterface->generate('app_home', [], UrlGeneratorInterface::ABSOLUTE_URL);
+                $response = new RedirectResponse($url);
+                $event->setResponse($response);
+                return;
             }
 
             // on regarde si cela corresponds à un portail
@@ -162,14 +173,25 @@ final class RouteListener
         $newFaviconSvg = 'build/images/favicon/favicon.svg';
         $known404 = [
             '/static/img/logo_AT_og.png' => $this->packages->getUrl('build/images/logo/logo_AT_og.png'),
+            '/app/public/static/img/logo_AT_og.png' => $this->packages->getUrl('build/images/logo/logo_AT_og.png'),
             '/static/favicons/favicon.93b88edf055e.svg' => $this->packages->getUrl($newFaviconSvg),
+            '/app/public/static/favicons/favicon.93b88edf055e.svg' => $this->packages->getUrl($newFaviconSvg),
             '/static/favicons/favicon-32x32.05f90bae01cd.png' => $this->packages->getUrl('build/images/favicon/favicon.svg'),
+            '/app/public/static/favicons/favicon-32x32.05f90bae01cd.png' => $this->packages->getUrl('build/images/favicon/favicon.svg'),
             '/static/favicons/favicon.12acb9fc12ee.ico' => $this->packages->getUrl('build/images/favicon/favicon.ico'),
+            '/app/public/static/favicons/favicon.12acb9fc12ee.ico' => $this->packages->getUrl('build/images/favicon/favicon.ico'),
+            '/static/favicons/favicon.12acb9fc12ee.ico' => $this->packages->getUrl('build/images/favicon/favicon.ico'),
+            '/app/public/static/favicons/favicon.12acb9fc12ee.ico' => $this->packages->getUrl('build/images/favicon/favicon.ico'),
             '/static/favicons/favicon.05f90bae01cd.png' => $this->packages->getUrl($newFaviconSvg),
+            '/app/public/static/favicons/favicon.05f90bae01cd.png' => $this->packages->getUrl($newFaviconSvg),
             '/favicon.ico' => $this->packages->getUrl('build/images/favicon/favicon.ico'),
             '/favicon.svg' => $this->packages->getUrl($newFaviconSvg),
             '/apple-touch-icon.png' => $this->packages->getUrl('build/images/favicon/apple-touch-icon.png'),
-            '/recherche/trouver-des-aides' => $this->routerInterface->generate('app_aid_aid')
+            '/recherche/trouver-des-aides' => $this->routerInterface->generate('app_aid_aid'),
+            '/recherche/trouver-des-aides/' => $this->routerInterface->generate('app_aid_aid'),
+            '/notifications/' => $this->routerInterface->generate('app_user_user_notification'),
+            '/api/schema' => '/api/docs.jsonld',
+            '/api/schema/' => '/api/docs.jsonld'
         ];
 
         if (isset($known404[$url])) {

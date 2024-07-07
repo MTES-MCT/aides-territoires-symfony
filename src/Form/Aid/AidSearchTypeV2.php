@@ -8,14 +8,17 @@ use App\Entity\Aid\AidStep;
 use App\Entity\Aid\AidType;
 use App\Entity\Aid\AidTypeGroup;
 use App\Entity\Backer\Backer;
+use App\Entity\Backer\BackerGroup;
 use App\Entity\Category\Category;
 use App\Entity\Category\CategoryTheme;
 use App\Entity\Organization\OrganizationType;
 use App\Entity\Program\Program;
+use App\Entity\Search\SearchPage;
 use App\Service\User\UserService;
 use App\Form\Type\EntityCheckboxAbsoluteType;
 use App\Form\Type\EntityCheckboxGroupAbsoluteType;
 use App\Form\Type\PerimeterAutocompleteType;
+use App\Repository\Backer\BackerGroupRepository;
 use App\Repository\Backer\BackerRepository;
 use App\Service\Aid\AidSearchClass;
 use Doctrine\ORM\EntityRepository;
@@ -71,6 +74,15 @@ class AidSearchTypeV2 extends AbstractType
                 'choice_value' => function (?OrganizationType $entity) {
                     return $entity ? $entity->getSlug() : '';
                 },
+                'query_builder' => function(EntityRepository $er) use ($options) {
+                    $qb = $er->createQueryBuilder('ot');
+
+                    if ($options['searchPage'] instanceof SearchPage && !$options['searchPage']->getOrganizationTypes()->isEmpty()) {
+                        $qb->andWhere('ot IN (:organizationTypes)')
+                            ->setParameter('organizationTypes', $options['searchPage']->getOrganizationTypes());
+                    }
+                    return $qb;
+                },
                 'placeholder' => 'Tous types de structures',
             ])
             ->add('searchPerimeter', PerimeterAutocompleteType::class, [
@@ -98,7 +110,8 @@ class AidSearchTypeV2 extends AbstractType
                     'closeAfterSelect' => true,
                     'sanitize_html' => true,
                     'delimiter' => '$%§'
-                ]
+                ],
+                'sanitize_html' => true,
 
             ])
             ->add('categorysearch', EntityCheckboxGroupAbsoluteType::class, [
@@ -111,12 +124,18 @@ class AidSearchTypeV2 extends AbstractType
                 'group_by' => function(Category $category) {
                     return $category->getCategoryTheme()->getName();
                 },
-                'query_builder' => function(EntityRepository $er) {
-                    return $er->createQueryBuilder('c')
+                'query_builder' => function(EntityRepository $er) use ($options) {
+                    $qb = $er->createQueryBuilder('c')
                         ->innerJoin('c.categoryTheme', 'categoryTheme')
                         ->orderBy('categoryTheme.name', 'ASC')
                         ->addOrderBy('c.name', 'ASC')
                     ;
+                    if ($options['searchPage'] instanceof SearchPage && !$options['searchPage']->getCategories()->isEmpty()) {
+                        $qb->andWhere('c IN (:categories)')
+                            ->setParameter('categories', $options['searchPage']->getCategories());
+                    }
+
+                    return $qb;
                 },
                 'multiple' => true,
                 'expanded' => true
@@ -189,6 +208,7 @@ class AidSearchTypeV2 extends AbstractType
                     'multiple' => true,
                     'query_builder' => function(BackerRepository $backerRepository) {
                         return $backerRepository->getQueryBuilder([
+                            'hasFinancedAids' => true,
                             'active' => true,
                             'orderBy' => [
                                 'sort' => 'b.name',
@@ -255,6 +275,25 @@ class AidSearchTypeV2 extends AbstractType
                     'required' => false,
                     'label' => 'Appels à projets / Appels à manifestation d’intérêt uniquement'
                 ])
+                ->add('backerGroup', EntityType::class, [
+                    'required' => false,
+                    'label' => 'Groupe de porteurs d\'aides',
+                    'class' => BackerGroup::class,
+                    'choice_label' => 'name',
+                    'attr' => [
+                        'placeholder' => 'Tous les groupes de porteurs d\'aides',
+                    ],
+                    'autocomplete' => true,
+                    'multiple' => false,
+                    'query_builder' => function(BackerGroupRepository $backerGroupRepository) {
+                        return $backerGroupRepository->getQueryBuilder([
+                            'orderBy' => [
+                                'sort' => 'bg.name',
+                                'order' => 'ASC'
+                            ]
+                        ]);
+                    },
+                ])
                 ;
 
 
@@ -276,6 +315,7 @@ class AidSearchTypeV2 extends AbstractType
             'allow_extra_fields' => true,
             'extended' => false,
             'removes' => [],
+            'searchPage' => null
 
         ]);
     }

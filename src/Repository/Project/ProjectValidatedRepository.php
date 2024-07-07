@@ -70,6 +70,7 @@ class ProjectValidatedRepository extends ServiceEntityRepository
         $radius = $params['radius'] ?? null;
         $search = $params['search'] ?? null;
         $scoreTotalMin = $params['scoreTotalMin'] ?? 30;
+        $maxResults = $params['maxResults'] ?? null;
 
         $queryBuilder = $this->createQueryBuilder('p');
 
@@ -170,54 +171,14 @@ class ProjectValidatedRepository extends ServiceEntityRepository
             ;
         }
 
-
-        // if ($keyword !== null) {
-        //     $queryBuilder
-        //         ->andWhere('p.projectName LIKE :keyword')
-        //         ->setParameter('keyword', '%'.$keyword.'%')
-        //         ;
-        // }
-
-        // if ($objects_string !== null && $objects_string !== '') {
-        //     $queryBuilder
-        //         ->andWhere('
-        //         MATCH_AGAINST(p.projectName) AGAINST (:objects_string IN BOOLEAN MODE) > 5
-        //         OR MATCH_AGAINST(p.description) AGAINST (:objects_string IN BOOLEAN MODE) > 5
-        //         ')
-        //         ->setParameter('objects_string', $objects_string)
-        //         ->addSelect(
-        //             '(
-        //             MATCH_AGAINST(p.projectName) AGAINST (:objects_string IN BOOLEAN MODE)
-        //             + MATCH_AGAINST(p.description) AGAINST (:objects_string IN BOOLEAN MODE)
-        //             ) AS score_match
-        //             '
-        //         )
-        //         ->addOrderBy('score_match', 'DESC')
-        //     ;
-        // }
-
-        // if ($simple_words_string !== null && $objects_string == '') {
-        //     $queryBuilder
-        //         ->andWhere('
-        //         MATCH_AGAINST(p.projectName) AGAINST (:simple_words_string IN BOOLEAN MODE) > 2
-        //         OR MATCH_AGAINST(p.description) AGAINST (:simple_words_string IN BOOLEAN MODE) > 2
-        //         ')
-        //         ->setParameter('simple_words_string', $simple_words_string)
-        //         ->addSelect(
-        //             '(
-        //             MATCH_AGAINST(p.projectName) AGAINST (:simple_words_string IN BOOLEAN MODE)
-        //             + MATCH_AGAINST(p.description) AGAINST (:simple_words_string IN BOOLEAN MODE)
-        //             ) AS score_match
-        //             '
-        //         )
-        //         ->addOrderBy('score_match', 'DESC')
-        //     ;
-        // }
-
         if (isset($scoreTotalAvailable)) {
             $queryBuilder->orderBy('score_total', 'DESC');
         }
 
+        if ($maxResults) {
+            $queryBuilder->setMaxResults($maxResults);
+        }
+        
         $results = $queryBuilder->getQuery()->getResult();
         $projects=[];
         foreach($results as $result){

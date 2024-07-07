@@ -21,7 +21,7 @@
     <div class="fr-tags-group">
         <p title="Mot-clé" class="fr-tag">
             <span class="ri-double-quotes-r ri-xl fr-mr-1w at-icon-align--sub" aria-hidden="true"></span>
-            {{ getKeywordReferenceAndSynonyms(formAidSearch.keyword.vars.data) }}
+            {{ getKeywordReferenceAndSynonyms(formAidSearch.keyword.vars.data|sanitize_html) }}
         </p>
     </div>
     {% endif %}
@@ -64,6 +64,15 @@
                 {% for backer in formAidSearch.backerschoice.vars.data %}
                 {{ backer.name }}{% if not loop.last %}, {% endif %}
                 {% endfor %}
+            </p>
+        </div>
+    {% endif %}
+
+    {% if formAidSearch.backerGroup.vars.data %}
+        <div class="fr-tags-group">
+            <p title="Groupe de porteurs d’aides" class="fr-tag">
+                <span class="ri-hand-coin-line ri-xl fr-mr-1w at-icon-align--sub" aria-hidden="true"></span>
+                {{ formAidSearch.backerGroup.vars.data.name }}
             </p>
         </div>
     {% endif %}

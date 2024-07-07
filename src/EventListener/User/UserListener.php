@@ -3,6 +3,7 @@
 namespace App\EventListener\User;
 
 use ApiPlatform\Api\UrlGeneratorInterface;
+use App\Entity\Alert\Alert;
 use App\Entity\User\User;
 use App\Entity\User\UserRegisterConfirmation;
 use App\Service\Email\EmailService;
@@ -109,7 +110,9 @@ class UserListener
                 $message .= 'Pour le user '.$entity->getEmail();
             }
             $admin = $this->managerRegistry->getRepository(User::class)->findOneBy(['email' => $this->paramService->get('email_super_admin')]);
-            $this->notificationService->addNotification($admin, 'Erreur postPersist User', $message);
+            if ($admin instanceof User) {
+                $this->notificationService->addNotification($admin, 'Erreur postPersist User', $message);
+            }
         }
     }
 
@@ -122,6 +125,21 @@ class UserListener
             if (count($organization->getBeneficiairies()) === 1) {
                 $this->managerRegistry->getManager()->remove($organization);
             }
+        }
+
+        // désinscris le user des listes de diffusion
+        $this->emailService->unsubscribeUser($user);
+
+        // supprime les alertes
+        $alertRepository = $this->managerRegistry->getRepository(Alert::class);
+
+        $alerts = $alertRepository->findBy(
+            [
+                'email' => $user->getEmail()
+            ]
+        );
+        foreach ($alerts as $alert) {
+            $this->managerRegistry->getManager()->remove($alert);
         }
     }
 }

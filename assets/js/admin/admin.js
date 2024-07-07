@@ -5,11 +5,9 @@ require('trumbowyg/dist/langs/fr.min.js');
 require('trumbowyg/dist/plugins/upload/trumbowyg.upload.min.js');
 require('trumbowyg/dist/plugins/cleanpaste/trumbowyg.cleanpaste.min.js');
 require('trumbowyg/dist/ui/trumbowyg.min.css');
-require('clipboard/dist/clipboard.min.js');
 require('../jQueryAccordion/jquery.accordion.js')
 
 // import le fichier router dans ce fichier
-import ClipboardJS from 'clipboard';
 import Routing from 'fos-router';
 
 // plugin chartJS
@@ -23,15 +21,38 @@ document.addEventListener('chartjs:init', function (event) {
 
 $(function(){
 
-    // register globally for all charts
-// register globally for all charts
-
-
     $('.accordion').accordion({
         "transitionSpeed": 400
     });
 
-    new ClipboardJS('.btn-copy-clipboard');
+    // pour ouvrir un tab
+    $(document).on({
+        click: function(e) {
+            e.preventDefault();
+            var target = $(this).attr('href');
+            if (typeof $(target) != 'undefined') {
+                var parent = $(target).parents('.tab-pane');
+                $('.tab-pane').removeClass('active').removeClass('show');
+                $(parent).addClass('active').addClass('show');
+
+                var idTab = $(parent).attr('id');
+                $('.nav-link').removeClass('active');
+                $('.nav-link[href="#'+idTab+'"]').addClass('active');
+            }
+        }
+    }, '.ea-tab-opener');
+
+    // fonction copie dans clipboard
+    $(document).on('click', '.btn-copy-clipboard', function(e) {
+        // Récupère le sélecteur de l'élément cible depuis l'attribut data-clipboard-target
+        var targetSelector = $(this).attr('data-clipboard-target');
+        // Sélectionne l'élément cible et récupère son contenu HTML
+        var htmlContent = $(targetSelector).html().trim();
+        // Copie le contenu dans le presse-papiers
+        navigator.clipboard.writeText(htmlContent).then(function() {
+        }).catch(function(error) {
+        });
+    });
 
     /**
      * Champs avec un maxlength
@@ -109,6 +130,7 @@ $('textarea:not(.trumbowyg-textarea):not(.not-trumbowyg)').trumbowyg({
         ['image'],
         ['justifyLeft', 'justifyCenter', 'justifyRight'],
     ],
+    removeformatPasted: true,
     plugins: {
         // Image upload
         upload: {

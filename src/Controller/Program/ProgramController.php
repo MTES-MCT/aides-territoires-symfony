@@ -20,7 +20,9 @@ use App\Service\Reference\ReferenceService;
 use App\Service\User\UserService;
 use Doctrine\Common\Collections\ArrayCollection;
 use Pagerfanta\Adapter\ArrayAdapter;
+use Pagerfanta\Exception\OutOfRangeCurrentPageException;
 use Pagerfanta\Pagerfanta;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -121,11 +123,19 @@ class ProgramController extends FrontController
         
         // le paginateur
         $aids = $aidService->searchAids($aidParams);
+        try {
         $adapter = new ArrayAdapter($aids);
         $pagerfanta = new Pagerfanta($adapter);
         $pagerfanta->setMaxPerPage(self::NB_AID_BY_PAGE);
         $pagerfanta->setCurrentPage($currentPage);
-
+        } catch (OutOfRangeCurrentPageException $e) {
+            $this->addFlash(
+                FrontController::FLASH_ERROR,
+                'Le numéro de page demandé n\'existe pas'
+            );
+            $newUrl = preg_replace('/(page=)[^\&]+/', 'page=' . $pagerfanta->getNbPages(), $requestStack->getCurrentRequest()->getRequestUri());
+            return new RedirectResponse($newUrl);
+        }
         $query = parse_url($requestStack->getCurrentRequest()->getRequestUri(), PHP_URL_QUERY) ?? null;
 
         // Log recherche
@@ -134,13 +144,14 @@ class ProgramController extends FrontController
             'querystring' => $query ?? null,
             'resultsCount' => $pagerfanta->getNbResults(),
             'host' => $requestStack->getCurrentRequest()->getHost(),
-            'perimeter' => $aidParams['perimeter'] ?? null,
+            'perimeter' => $aidParams['perimeterFrom'] ?? null,
             'search' => $aidParams['keyword'] ?? null,
             'organization' => ($user instanceof User && $user->getDefaultOrganization()) ? $user->getDefaultOrganization() : null,
             'backers' => $aidParams['backers'] ?? null,
             'categories' => $aidParams['categories'] ?? null,
             'programs' => $aidParams['programs'] ?? null,
-            'source' => $program->getSlug()
+            'source' => $program->getSlug(),
+            'user' => $user ?? null
         ];
         $themes = new ArrayCollection();
         if (isset($aidParams['categories']) && is_array($aidParams['categories'])) {

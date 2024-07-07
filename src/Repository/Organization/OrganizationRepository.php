@@ -81,20 +81,19 @@ class OrganizationRepository extends ServiceEntityRepository
         $qb->addSelect('beneficiairiesForCommune.email AS user__email');
         $qb->addSelect('organizationType.name AS organization_type');
 
-        return $qb->getQuery()->getResult();       
+        return $qb->getQuery()->getResult();
     }
 
     public function countInterco(?array $params = null) : int
     {
         $params['typeSlug'] = OrganizationType::SLUG_EPCI;
-        // $params['perimeterScale'] = Perimeter::SCALE_EPCI;
         $params['perimeterIsObsolete'] = false;
         $params['isImported'] = false;
         $qb = $this->getQueryBuilder($params);
 
         $qb->select('IFNULL(COUNT(DISTINCT(perimeterForObsolete.id)), 0) AS nb');
 
-        return $qb->getQuery()->getResult()[0]['nb'] ?? 0;         
+        return $qb->getQuery()->getResult()[0]['nb'] ?? 0;
     }
 
     public function countEpci(?array $params = null) : int
@@ -128,7 +127,7 @@ class OrganizationRepository extends ServiceEntityRepository
         $qb->addSelect('beneficiairiesForEpcis.email AS user__email');
         $qb->addSelect('organizationType.name AS organization_type');
 
-        return $qb->getQuery()->getResult();       
+        return $qb->getQuery()->getResult();
     }
 
     public function countByType(?array $params = null): array

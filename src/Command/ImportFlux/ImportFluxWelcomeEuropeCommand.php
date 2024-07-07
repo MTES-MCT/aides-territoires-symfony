@@ -33,6 +33,7 @@ class ImportFluxWelcomeEuropeCommand extends ImportFluxCommand
     protected function callApi()
     {
         $aidsFromImport = [];
+        $client = $this->getClient();
 
         for ($i=0; $i<$this->nbPages; $i++) {
             $this->currentPage = $i;
@@ -41,7 +42,7 @@ class ImportFluxWelcomeEuropeCommand extends ImportFluxCommand
                 $importUrl .= '?limit=' . $this->nbByPages . '&offset=' . ($this->currentPage * $this->nbByPages);
             }
             try {
-                $response = $this->httpClientInterface->request(
+                $response = $client->request(
                     'GET',
                     $importUrl,
                     $this->getApiOptions()
@@ -67,17 +68,6 @@ class ImportFluxWelcomeEuropeCommand extends ImportFluxCommand
 
     protected function getFieldsMapping(array $aidToImport, array $params = null): array // NOSONAR too complex
     {
-        $importRawObjectCalendar = [];
-        $importRawObject = [];
-
-        $keys = ['deadline1', 'dates_statut', 'dates_publication', 'dates_open-1', 'dates_open-2', 'dates_open-3', 'dates_open-4', 'dates_open-5', 'dates_deadline1', 'dates_deadline-2', 'dates_deadline-3', 'dates_deadline-4', 'dates'];
-        foreach ($keys as $key) {
-            if (isset($aidToImport[$key])) {
-                $importRawObjectCalendar[$key] = $aidToImport[$key];
-            }
-        }
-        $importRawObject = $aidToImport;
-
         $description = '';
         if (isset($aidToImport['relations_programmes'])) {
             $programs = '<p>' . '<br/>' . $aidToImport['relations_programmes'] . '</p>';
@@ -124,6 +114,11 @@ class ImportFluxWelcomeEuropeCommand extends ImportFluxCommand
         }
         if (!$dateStart instanceof \DateTime) {
             $dateStart = null;
+        } else {
+            // Force pour éviter les différence sur le fuseau horaire
+            $dateStart = new \DateTime(date($dateStart->format('Y-m-d')));
+            // Force les heures, minutes, et secondes à 00:00:00
+            $dateStart->setTime(0, 0, 0);
         }
 
         $dateSubmissionDeadline = null;
@@ -139,6 +134,11 @@ class ImportFluxWelcomeEuropeCommand extends ImportFluxCommand
         }
         if (!$dateSubmissionDeadline instanceof \DateTime) {
             $dateSubmissionDeadline = null;
+        } else {
+            // Force pour éviter les différence sur le fuseau horaire
+            $dateSubmissionDeadline = new \DateTime(date($dateSubmissionDeadline->format('Y-m-d')));
+            // Force les heures, minutes, et secondes à 00:00:00
+            $dateSubmissionDeadline->setTime(0, 0, 0);
         }
 
         $contact = null;
@@ -173,10 +173,8 @@ class ImportFluxWelcomeEuropeCommand extends ImportFluxCommand
             $contact .= '</div>';
         }
 
-        return [
+        $return = [
             'importDataMention' => 'Ces données sont mises à disposition par Welcomeurope à titre gracieux.',
-            'importRawObjectCalendar' => $importRawObjectCalendar,
-            'importRawObject' => $importRawObject,
             'europeanAid' => Aid::SLUG_EUROPEAN_SECTORIAL,
             'name' => isset($aidToImport['post_title']) ? $this->cleanName($aidToImport['post_title']) : null,
             'nameInitial' => isset($aidToImport['post_title']) ? $this->cleanName($aidToImport['post_title']) : null,
@@ -188,6 +186,9 @@ class ImportFluxWelcomeEuropeCommand extends ImportFluxCommand
             'dateSubmissionDeadline' => $dateSubmissionDeadline,
             'contact' => $contact,
         ];
+
+        // on ajoute les données brut d'import pour comparer avec les données actuelles
+        return $this->mergeImportDatas($return);
     }
 
     protected function setKeywords(array $aidToImport, Aid $aid): Aid

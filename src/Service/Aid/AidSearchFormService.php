@@ -8,6 +8,7 @@ use App\Entity\Aid\AidStep;
 use App\Entity\Aid\AidType;
 use App\Entity\Aid\AidTypeGroup;
 use App\Entity\Backer\Backer;
+use App\Entity\Backer\BackerGroup;
 use App\Entity\Category\Category;
 use App\Entity\Organization\OrganizationType;
 use App\Entity\Perimeter\Perimeter;
@@ -87,6 +88,9 @@ class AidSearchFormService
                 $backers[] = $backer->getId();
             }
             $params['backerschoice'] = $backers;
+        }
+        if ($aidSearchClass->getBackerGroup()) {
+            $params['backerGroup'] = $aidSearchClass->getBackerGroup()->getId();
         }
         if ($aidSearchClass->getApplyBefore()) {
             $params['applyBefore'] = $aidSearchClass->getApplyBefore()->format('Y-m-d');
@@ -173,6 +177,10 @@ class AidSearchFormService
             $aidParams['backers'] = $aidSearchClass->getBackerschoice();
         }
 
+        if ($aidSearchClass->getBackerGroup()) {
+            $aidParams['backerGroup'] = $aidSearchClass->getBackerGroup();
+        }
+
         if ($aidSearchClass->getApplyBefore()) {
             $aidParams['applyBefore'] = $aidSearchClass->getApplyBefore();
         }
@@ -230,12 +238,14 @@ class AidSearchFormService
         }
 
         $queryParams = [];
-        $queryItems = explode('&', $query);
+        $queryItems = explode('&', (string) $query);
 
         if (is_array($queryItems)) {
             foreach ($queryItems as $queyItem) {
                 $param = explode('=', urldecode($queyItem));
                 if (isset($param[0]) && isset($param[1])) {
+                    $param[0] = strip_tags($param[0]);
+                    $param[1] = strip_tags($param[1]);
                     if (isset($queryParams[$param[0]]) && is_array($queryParams[$param[0]])) {
                         $queryParams[$param[0]][] = $param[1];
                     } elseif (isset($queryParams[$param[0]]) && !is_array($queryParams[$param[0]])) {
@@ -506,8 +516,11 @@ class AidSearchFormService
         $backers = [];
         foreach ($queryParams as $key => $value) {
             if (strpos($key, 'backers') !== false) {
-                $backers[] = $value;
-                break;
+                if (is_array($value)) {
+                    $backers = array_merge($backers, $value);
+                } else {
+                    $backers[] = $value;
+                }
             }
         }
 
@@ -524,13 +537,24 @@ class AidSearchFormService
                     if ($backer instanceof Backer) {
                         $aidSearchClass->addBackerchoice($backer);
                     }
-                
                 }
             }
         }
-
         /**
          * > Backers
+        */
+
+        /**
+         * < BackerGroup
+        */
+        if (isset($queryParams['backerGroup'])) {
+            $backerGroup = $this->managerRegistry->getRepository(BackerGroup::class)->find((int) $queryParams['backerGroup']);
+            if ($backerGroup instanceof BackerGroup) {
+                $aidSearchClass->setBackerGroup($backerGroup);
+            }
+        }
+        /**
+         * < BackerGroup
         */
 
         /**
@@ -1089,7 +1113,7 @@ class AidSearchFormService
     public function setShowExtended(Form $formAidSearch): bool
     {
         $showExtended = false;
-        $fields = ['aidTypes', 'backers', 'applyBefore', 'programs', 'aidSteps', 'aidDestinations', 'isCharged', 'europeanAid', 'isCallForProject'];
+        $fields = ['aidTypes', 'backers', 'applyBefore', 'programs', 'aidSteps', 'aidDestinations', 'isCharged', 'europeanAid', 'isCallForProject', 'backerGroup'];
         foreach ($fields as $field) {
             if ($formAidSearch->has($field) && $formAidSearch->get($field)->getData()) {
                 if ($formAidSearch->get($field)->getData() instanceof ArrayCollection) {
@@ -1115,6 +1139,7 @@ class AidSearchFormService
             $aidSearchClass->getAidDestinations() ||
             $aidSearchClass->getIsCharged() !== null ||
             $aidSearchClass->getEuropeanAid() ||
-            $aidSearchClass->getIsCallForProject();
+            $aidSearchClass->getIsCallForProject() ||
+            $aidSearchClass->getBackerGroup();
     }
 }

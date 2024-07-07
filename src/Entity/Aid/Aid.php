@@ -39,7 +39,9 @@ use ApiPlatform\Metadata\ApiProperty;
 use App\Controller\Api\Aid\AidController as AidAidController;
 use App\Filter\Aid\AidApplyBeforeFilter;
 use App\Filter\Aid\AidCallForProjectOnlyFilter;
+use App\Filter\Aid\AidCategoriesFilter;
 use App\Filter\Aid\AidDestinationFilter;
+use App\Filter\Aid\AidEuropeanFilter;
 use App\Filter\Aid\AidFinancialAidFilter;
 use App\Filter\Aid\AidIsChargedFilter;
 use App\Filter\Aid\AidMobilizationStepFilter;
@@ -51,6 +53,8 @@ use App\Filter\Aid\AidTargetedAudiencesFilter;
 use App\Filter\Aid\AidTechnicalAidFilter;
 use App\Filter\Aid\AidTextFilter;
 use App\Filter\Aid\AidTypeGroupFilter;
+use App\Filter\Backer\BackerFilter;
+use App\Filter\Backer\BackerGroupFilter;
 use App\Service\Doctrine\DoctrineConstants;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -88,6 +92,12 @@ use Symfony\Component\Validator\Constraints as Assert;
             uriTemplate: '/aids/{slug}/',
             controller: AidAidController::class,
         ),
+        new Get(
+            name: self::API_OPERATION_GET_BY_ID,
+            normalizationContext: ['groups' => self::API_GROUP_ITEM],
+            uriTemplate: '/aids/by-id/{id}/',
+            controller: AidAidController::class,
+        ),
     ],
     order: ['dateStart' => 'DESC', 'id' => 'DESC'],
     paginationEnabled: true,
@@ -98,6 +108,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 #[ApiFilter(AidTextFilter::class)]
 #[ApiFilter(AidTargetedAudiencesFilter::class)]
+#[ApiFilter(AidCategoriesFilter::class)]
 #[ApiFilter(AidApplyBeforeFilter::class)]
 #[ApiFilter(AidPublishedAfterFilter::class)]
 #[ApiFilter(AidTypeGroupFilter::class)]
@@ -110,8 +121,12 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ApiFilter(AidIsChargedFilter::class)]
 #[ApiFilter(AidPerimeterFilter::class)]
 #[ApiFilter(AidProjectReferenceFilter::class)]
+#[ApiFilter(AidEuropeanFilter::class)]
+#[ApiFilter(BackerFilter::class)]
+#[ApiFilter(BackerGroupFilter::class)]
 class Aid // NOSONAR too much methods
 {
+    const API_OPERATION_GET_BY_ID = 'api_aid_get_by_id';
     const API_OPERATION_GET_BY_SLUG = 'api_aid_get_by_slug';
     const API_OPERATION_GET_COLLECTION_PUBLISHED = 'api_aids_published';
     const API_OPERATION_GET_COLLECTION_ALL = 'api_aids_all';
@@ -152,6 +167,7 @@ class Aid // NOSONAR too much methods
     private ?int $id = null;
 
     #[Groups([self::API_GROUP_LIST, self::API_GROUP_ITEM])]
+    #[Assert\Length(max: 255)]
     #[ORM\Column(length: 255)]
     private ?string $name = null;
 
@@ -159,6 +175,7 @@ class Aid // NOSONAR too much methods
     #[Groups([self::API_GROUP_LIST, self::API_GROUP_ITEM])]
     private ?string $description = null;
 
+    #[Assert\Length(max: 16)]
     #[ORM\Column(length: 16)]
     #[Groups([self::API_GROUP_LIST, self::API_GROUP_ITEM])]
     private ?string $status = null;
@@ -251,12 +268,15 @@ class Aid // NOSONAR too much methods
     #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $dateSubmissionDeadline = null;
 
+    #[Assert\Length(max: 255)]
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $contactEmail = null;
 
+    #[Assert\Length(max: 35)]
     #[ORM\Column(length: 35, nullable: true)]
     private ?string $contactPhone = null;
 
+    #[Assert\Length(max: 255)]
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $contactDetail = null;
 
@@ -315,6 +335,7 @@ class Aid // NOSONAR too much methods
 
     #[ApiProperty(identifier: true)]
     #[Groups([self::API_GROUP_LIST, self::API_GROUP_ITEM])]
+    #[Assert\Length(max: 255)]
     #[ORM\Column(length: 255)]
     #[Gedmo\Slug(fields: ['name'], updatable: false)]
     private ?string $slug = null;
@@ -322,13 +343,16 @@ class Aid // NOSONAR too much methods
     #[ORM\Column]
     private ?bool $isImported = false;
 
+    #[Assert\Length(max: 255)]
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $importUniqueid = null;
 
+    #[Assert\Length(max: 255)]
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $financerSuggestion = null;
 
     #[Groups([self::API_GROUP_LIST, self::API_GROUP_ITEM])]
+    #[Assert\Length(max: 255)]
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $importDataUrl = null;
 
@@ -336,6 +360,7 @@ class Aid // NOSONAR too much methods
     private ?\DateTimeInterface $dateImportLastAccess = null;
 
     #[Groups([self::API_GROUP_LIST, self::API_GROUP_ITEM])]
+    #[Assert\Length(max: 50)]
     #[ORM\Column(length: 50, nullable: true)]
     private ?string $importShareLicence = null;
 
@@ -359,15 +384,18 @@ class Aid // NOSONAR too much methods
     #[ORM\Column]
     private ?bool $isAmendment = false;
 
+    #[Assert\Length(max: 255)]
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $amendmentAuthorName = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $amendmentComment = null;
 
+    #[Assert\Length(max: 255)]
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $amendmentAuthorEmail = null;
 
+    #[Assert\Length(max: 255)]
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $amendmentAuthorOrg = null;
 
@@ -379,6 +407,8 @@ class Aid // NOSONAR too much methods
     #[ORM\Column(nullable: true)]
     private ?int $subventionRateMax = null;
 
+    #[Groups([self::API_GROUP_LIST, self::API_GROUP_ITEM])]
+    #[Assert\Length(max: 255)]
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $subventionComment = null;
 
@@ -386,6 +416,7 @@ class Aid // NOSONAR too much methods
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $contact = null;
 
+    #[Assert\Length(max: 255)]
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $instructorSuggestion = null;
 
@@ -393,10 +424,12 @@ class Aid // NOSONAR too much methods
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $projectExamples = null;
 
+    #[Assert\Length(max: 255)]
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $perimeterSuggestion = null;
 
     #[Groups([self::API_GROUP_LIST, self::API_GROUP_ITEM])]
+    #[Assert\Length(max: 64)]
     #[ORM\Column(length: 64, nullable: true)]
     private ?string $shortTitle = null;
 
@@ -444,6 +477,7 @@ class Aid // NOSONAR too much methods
     #[ORM\Column(nullable: true)]
     private ?int $loanAmount = null;
 
+    #[Assert\Length(max: 100)]
     #[ORM\Column(length: 100, nullable: true)]
     private ?string $otherFinancialAidComment = null;
 
@@ -452,6 +486,7 @@ class Aid // NOSONAR too much methods
     private ?int $recoverableAdvanceAmount = null;
 
     #[Groups([self::API_GROUP_LIST, self::API_GROUP_ITEM])]
+    #[Assert\Length(max: 255)]
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $nameInitial = null;
 
@@ -467,10 +502,12 @@ class Aid // NOSONAR too much methods
     #[ORM\Column(nullable: true)]
     private ?array $importRawObjectTempCalendar = null;
 
+    #[Groups([self::API_GROUP_LIST, self::API_GROUP_ITEM])]
     #[ORM\Column(length: 32, nullable: true)]
     private ?string $europeanAid = null;
 
     #[Groups([self::API_GROUP_LIST, self::API_GROUP_ITEM])]
+    #[Assert\Length(max: 255)]
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $importDataMention = null;
 
@@ -616,11 +653,14 @@ class Aid // NOSONAR too much methods
     private ArrayCollection $instructors;
 
     #[ORM\ManyToOne(inversedBy: 'aids')]
+    #[ORM\JoinColumn(onDelete: DoctrineConstants::SET_NULL)]
     private ?Organization $organization = null;
 
+    #[Assert\Length(max: 255)]
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $applicationUrlText = null;
 
+    #[Assert\Length(max: 255)]
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $originUrlText = null;
 
@@ -644,7 +684,13 @@ class Aid // NOSONAR too much methods
 
     #[ORM\ManyToMany(targetEntity: SanctuarizedField::class, mappedBy: 'aids')]
     private Collection $sanctuarizedFields;
+      
+    #[ORM\Column(type: Types::ARRAY, nullable: true)]
+    private ?array $importDatas = null;
 
+    #[Groups([self::API_GROUP_ITEM])]
+    private bool $live = false;
+    
     /**
      * <Non Database Fields
      */
@@ -2071,6 +2117,13 @@ class Aid // NOSONAR too much methods
         return false;
     }
 
+    public function setLive(bool $live): static
+    {
+        $this->live = $live;
+
+        return $this;
+    }
+
     public function isOnGoing(): bool
     {
         if ($this->getAidRecurrence() && $this->aidRecurrence->getSlug() == AidRecurrence::SLUG_ONGOING) {
@@ -2626,6 +2679,17 @@ class Aid // NOSONAR too much methods
         if ($this->sanctuarizedFields->removeElement($sanctuarizedField)) {
             $sanctuarizedField->removeAid($this);
         }
+        return $this;
+    }
+      
+    public function getImportDatas(): ?array
+    {
+        return $this->importDatas;
+    }
+
+    public function setImportDatas(?array $importDatas): static
+    {
+        $this->importDatas = $importDatas
 
         return $this;
     }

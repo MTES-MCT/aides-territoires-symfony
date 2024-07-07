@@ -64,7 +64,11 @@ class DataSourceCrudController extends AtCrudController
         ->autocomplete()
         ->setHelp('Mettre Admin AT (aides-territoires@beta.gouv.fr) par défaut');
         yield NumberField::new('nbAids', 'Nombre d\'aides')
-        ->onlyOnIndex();
+        ->onlyOnIndex()
+        ->formatValue(function ($value, $entity) {
+            $dataSourceRepository = $this->managerRegistry->getRepository(DataSource::class);
+            return $dataSourceRepository->countAids(['id' => $entity->getId()]);
+        });
         yield DateField::new('timeLastAccess', 'Date du dernier accès')
         ->onlyOnIndex();
         

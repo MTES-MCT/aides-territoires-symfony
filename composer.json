@@ -148,7 +148,6 @@
                 "rm -rf .docker"
             ],
             "php-config": [
-                "memory_limit=512M",
                 "opcache.memory_consumption=256",
                 "opcache.max_accelerated_files=20000",
                 "opcache.validate_timestamps=0",
@@ -157,8 +156,14 @@
                 "realpath_cache_size=4096K",
                 "realpath_cache_ttl=600"
             ],
+            "nginx-http-includes": [
+                ".scalingo/nginx/nginx-http.conf"
+            ],
             "nginx-includes": [
-                ".scalingo/nginx/server.location"
+                ".scalingo/nginx/nginx-app.conf",
+                ".scalingo/nginx/server.location",
+                ".scalingo/nginx/nginx-ips-filtering.conf",
+                ".scalingo/nginx/permission-policy.conf"
             ]
         }
     },
@@ -175,3 +180,4 @@
         "symfony/web-profiler-bundle": "6.4.*"
     }
 }
+

@@ -11,7 +11,6 @@ use App\Entity\User\User;
 use App\Form\Admin\Filter\DateRangeType;
 use App\Form\Aid\AidSearchTypeV2;
 use App\Form\Alert\AlertCreateType;
-use App\Repository\Aid\AidRepository;
 use App\Repository\Log\LogAidViewRepository;
 use App\Repository\Search\SearchPageRepository;
 use App\Service\Aid\AidSearchClass;
@@ -24,12 +23,13 @@ use App\Service\User\UserService;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Persistence\ManagerRegistry;
 use Pagerfanta\Adapter\ArrayAdapter;
+use Pagerfanta\Exception\OutOfRangeCurrentPageException;
 use Pagerfanta\Pagerfanta;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Routing\Generator\UrlGenerator;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\UX\Chartjs\Builder\ChartBuilderInterface;
 use Symfony\UX\Chartjs\Model\Chart;
@@ -85,14 +85,17 @@ class PortalController extends FrontController
         $aidParams = [
             'showInSearch' => true,
         ];
+        if (!$search_page->getOrganizationTypes()->isEmpty()) {
+            $aidParams['organizationTypes'] = $search_page->getOrganizationTypes();
+        }
+        if (!$search_page->getCategories()->isEmpty()) {
+            $aidParams['categories'] = $search_page->getCategories();
+        }
         $queryString = null;
         try {
             // certaines pages ont un querystring avec https://... d'autres directement les parametres
             $query = parse_url($search_page->getSearchQuerystring())['query'] ?? null;
             $queryString = $query ?? $search_page->getSearchQuerystring();
-
-            // $aidParams = array_merge($aidParams, $aidSearchFormService->convertQuerystringToParams($queryString));
-            
         } catch (\Exception $e) {
             $queryString = null;
         }
@@ -110,6 +113,7 @@ class PortalController extends FrontController
             'method' => 'GET',
             'action' => '#aid-list',
             'extended' => true,
+            'searchPage' => $search_page
         ];
 
         // formulaire recherche aides
@@ -120,8 +124,8 @@ class PortalController extends FrontController
         );
         $formAidSearch->handleRequest($requestStack->getCurrentRequest());
 
-        // check si on affiche ou pas le formulaire étendu
-        $showExtended = $aidSearchFormService->setShowExtendedV2($aidSearchClass);
+        // on force le formulaire étendu
+        $showExtended = true;
 
         // parametres pour requetes aides
         $aidParams = array_merge($aidParams, $aidSearchFormService->convertAidSearchClassToAidParams($aidSearchClass));
@@ -129,10 +133,19 @@ class PortalController extends FrontController
         // // le paginateur
         $aidParams['searchPage'] = $search_page;
         $aids = $aidService->searchAids($aidParams);
-        $adapter = new ArrayAdapter($aids);
-        $pagerfanta = new Pagerfanta($adapter);
-        $pagerfanta->setMaxPerPage(AidController::NB_AID_BY_PAGE);
-        $pagerfanta->setCurrentPage($currentPage);
+        try {
+            $adapter = new ArrayAdapter($aids);
+            $pagerfanta = new Pagerfanta($adapter);
+            $pagerfanta->setMaxPerPage(AidController::NB_AID_BY_PAGE);
+            $pagerfanta->setCurrentPage($currentPage);
+        } catch (OutOfRangeCurrentPageException $e) {
+            $this->addFlash(
+                FrontController::FLASH_ERROR,
+                'Le numéro de page demandé n\'existe pas'
+            );
+            $newUrl = preg_replace('/(page=)[^\&]+/', 'page=' . $pagerfanta->getNbPages(), $requestStack->getCurrentRequest()->getRequestUri());
+            return new RedirectResponse($newUrl);
+        }
 
         // Log recherche
         $logParams = [
@@ -140,13 +153,14 @@ class PortalController extends FrontController
             'querystring' => $querystring ?? null,
             'resultsCount' => $pagerfanta->getNbResults(),
             'host' => $requestStack->getCurrentRequest()->getHost(),
-            'perimeter' => $aidParams['perimeter'] ?? null,
+            'perimeter' => $aidParams['perimeterFrom'] ?? null,
             'search' => $aidParams['keyword'] ?? null,
             'organization' => ($user instanceof User && $user->getDefaultOrganization()) ? $user->getDefaultOrganization() : null,
             'backers' => $aidParams['backers'] ?? null,
             'categories' => $aidParams['categories'] ?? null,
             'programs' => $aidParams['programs'] ?? null,
-            'source' => $search_page->getSlug()
+            'source' => $search_page->getSlug(),
+            'user' => $user ?? null
         ];
         $themes = new ArrayCollection();
         if (isset($aidParams['categories']) && is_array($aidParams['categories'])) {
@@ -271,7 +285,14 @@ class PortalController extends FrontController
             'querystring' => $queryString,
             'perimeterName' => (isset($aidParams['perimeterFrom']) && $aidParams['perimeterFrom'] instanceof Perimeter) ? $aidParams['perimeterFrom']->getName() : '',
             'categoriesName' => $categoriesName,
-            'highlightedWords' => $highlightedWords
+            'highlightedWords' => $highlightedWords,
+            'showAudienceField' => $search_page->isShowAudienceField(),
+            'showPerimeterField' => $search_page->isShowPerimeterField(), 
+            'showTextField' => $search_page->isShowTextField(),
+            'showCategoriesField' => $search_page->isShowCategoriesField(),
+            'showAidTypeField' => $search_page->isShowAidTypeField(),
+            'showBackersField' => $search_page->isShowBackersField(),
+            'showMobilizationStepField' => $search_page->isShowMobilizationStepField(),
         ]);
     }
 

@@ -11,6 +11,7 @@ use App\Entity\Aid\AidType;
 use App\Entity\Category\Category;
 use App\Entity\Organization\OrganizationType;
 use App\Entity\Reference\KeywordReference;
+use Symfony\Component\HttpClient\CurlHttpClient;
 
 #[AsCommand(name: 'at:import_flux:ile_de_france', description: 'Import de flux ile de france')]
 class ImportFluxIleDeFranceCommand extends ImportFluxCommand
@@ -32,6 +33,7 @@ class ImportFluxIleDeFranceCommand extends ImportFluxCommand
     protected function callApi()
     {
         $aidsFromImport = [];
+        $client = $this->getClient();
 
         for ($i=0; $i<$this->nbPages; $i++) {
             $this->currentPage = $i;
@@ -40,7 +42,7 @@ class ImportFluxIleDeFranceCommand extends ImportFluxCommand
                 $importUrl .= '?limit=' . $this->nbByPages . '&offset=' . ($this->currentPage * $this->nbByPages);
             }
             try {
-                $response = $this->httpClientInterface->request(
+                $response = $client->request(
                     'GET',
                     $importUrl,
                     $this->getApiOptions()
@@ -62,19 +64,36 @@ class ImportFluxIleDeFranceCommand extends ImportFluxCommand
         return $aidsFromImport;
     }
 
+    protected function getClient(): CurlHttpClient
+    {
+        // place le certificat dans un fichier temporaire
+        $cerificate = $this->paramService->get('certificat_ile_de_france');
+        $certificatePath = $this->fileService->getUploadTmpDir() . '/certificat_ile_de_france.pem';
+        file_put_contents($certificatePath, $cerificate);
+
+        // combine les options avec le certificat
+        $apiOptions = array_merge(
+            [
+                'cafile' => $certificatePath,
+            ],
+            $this->getApiOptions()
+        );
+
+        // creer le client
+        return new CurlHttpClient($apiOptions);
+    }
 
 
     protected function getFieldsMapping(array $aidToImport, array $params = null): array
     {
         try {
-            $importRaws = $this->getImportRaws($aidToImport, ['dateFinCampagne', 'dateOuvertureCampagne', 'dateDebutFuturCampagne', 'datePublicationSouhaitee']);
-            $importRawObjectCalendar = $importRaws['importRawObjectCalendar'];
-            $importRawObject = $importRaws['importRawObject'];
-            $originUrl = 'https://www.iledefrance.fr/aides-appels-a-projets/'
-                        . (isset($aidToImport['reference'])) ? strip_tags($aidToImport['reference']) : '';
+            $aidName = isset($aidToImport['libelle']) ? strip_tags($aidToImport['libelle']) : null;
+            if (!$aidName) {
+                $aidName = isset($aidToImport['title']) ? strip_tags($aidToImport['title']) : '';
+            }
+
+            $originUrl = 'https://www.iledefrance.fr/aides-et-appels-a-projets/' . $this->stringService->getSlug(str_replace(["'", "’", 'à'], [''], preg_replace('/(\d{2,4})[-.](\d{2})[-.](\d{2,4})/', '$1$2$3', $aidName)));
             $applicationUrl = $originUrl;
-    
-    
     
     
             $dateStart = null;
@@ -87,6 +106,11 @@ class ImportFluxIleDeFranceCommand extends ImportFluxCommand
             }
             if (!$dateStart instanceof \DateTime) {
                 $dateStart = null;
+            } else {
+                // Force pour éviter les différence sur le fuseau horaire
+                $dateStart = new \DateTime(date($dateStart->format('Y-m-d')));
+                // Force les heures, minutes, et secondes à 00:00:00
+                $dateStart->setTime(0, 0, 0);
             }
                 
             $dateSubmissionDeadline = null;
@@ -99,14 +123,17 @@ class ImportFluxIleDeFranceCommand extends ImportFluxCommand
             }
             if (!$dateSubmissionDeadline instanceof \DateTime) {
                 $dateSubmissionDeadline = null;
+            } else {
+                // Force pour éviter les différence sur le fuseau horaire
+                $dateSubmissionDeadline = new \DateTime(date($dateSubmissionDeadline->format('Y-m-d')));
+                // Force les heures, minutes, et secondes à 00:00:00
+                $dateSubmissionDeadline->setTime(0, 0, 0);
             }
 
-            return [
+            $return = [
                 'importDataMention' => 'Ces données sont mises à disposition par le Conseil Régional d\'Île-de-France.',
-                'importRawObjectCalendar' => $importRawObjectCalendar,
-                'importRawObject' => $importRawObject,
-                'name' => isset($aidToImport['title']) ? strip_tags($aidToImport['title']) : null,
-                'nameInitial' => isset($aidToImport['title']) ? strip_tags($aidToImport['title']) : null,
+                'name' => $aidName,
+                'nameInitial' => $aidName,
                 'description' => $this->concatHtmlFields($aidToImport, ['engagements', 'entete', 'notes'], '<br/>'),
                 'originUrl' => $originUrl,
                 'applicationUrl' => $applicationUrl,
@@ -116,6 +143,9 @@ class ImportFluxIleDeFranceCommand extends ImportFluxCommand
                 'dateSubmissionDeadline' => $dateSubmissionDeadline,
                 'isCallForProject' => isset($aidToImport['AAP']) && $aidToImport['AAP'] == '1' ? true : false,
             ];
+
+            // on ajoute les données brut d'import pour comparer avec les données actuelles
+            return $this->mergeImportDatas($return);
         } catch (\Exception $e) {
             return [];
         }
@@ -148,11 +178,23 @@ class ImportFluxIleDeFranceCommand extends ImportFluxCommand
             'Associations' => [
                 OrganizationType::SLUG_ASSOCIATION,
             ],
+            'Association' => [
+                OrganizationType::SLUG_ASSOCIATION,
+            ],
             'Chercheurs' => [
                 OrganizationType::SLUG_RESEARCHER,
             ],
             'Collectivités - Institutions' => [
                 OrganizationType::SLUG_EPCI,
+            ],
+            'Commune' => [
+                OrganizationType::SLUG_COMMUNE
+            ],
+            'EPCI' => [
+                OrganizationType::SLUG_EPCI,
+            ],
+            'Département' => [
+                OrganizationType::SLUG_DEPARTMENT,
             ],
             'Entreprises' => [
                 OrganizationType::SLUG_PRIVATE_SECTOR,
@@ -166,10 +208,29 @@ class ImportFluxIleDeFranceCommand extends ImportFluxCommand
             'Particuliers' => [
                 OrganizationType::SLUG_PRIVATE_PERSON,
             ],
+            'Particulier' => [
+                OrganizationType::SLUG_PRIVATE_PERSON,
+            ],
             'Professionnels' => [
                 OrganizationType::SLUG_PRIVATE_SECTOR,
             ],
+            'Professionnel' => [
+                OrganizationType::SLUG_PRIVATE_SECTOR,
+            ],
+            'Établissement de recherche et laboratoire' => [
+                OrganizationType::SLUG_RESEARCHER
+            ]
         ];
+        
+        
+        // manquants
+        // 0 => "Collectivité ou institution - Autre (GIP, copropriété, EPA...)"
+        // 1 => "Collectivité ou institution - Bailleurs sociaux"
+        // 2 => "Collectivité ou institution - EPT / Métropole du Grand Paris"
+        // 3 => "Collectivité ou institution - Office de tourisme intercommunal"
+        // 4 => "Établissement d'enseignement secondaire"
+        // 5 => "Établissement d'enseignement supérieur"
+        // 6 => "Établissement ou organismes de formation (OF, OPCO, FSS, CFA...)"
 
         foreach ($aidToImport['publicsBeneficiaire'] as $publicsBeneficiaire) {
             if (!isset($publicsBeneficiaire['title'])) {

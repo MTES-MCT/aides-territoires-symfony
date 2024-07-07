@@ -555,7 +555,6 @@ class ProjectController extends FrontController
     public function similaires(
         $id,
         $slug,
-        ProjectRepository $ProjectRepository,
         UserService $userService,
         ProjectValidatedRepository $projectValidatedRepository,
         ProjectRepository $projectRepository,
@@ -566,7 +565,7 @@ class ProjectController extends FrontController
         // gestion pagination
         $currentPage = (int) $requestStack->getCurrentRequest()->get('page', 1);
         
-        $project = $ProjectRepository->findOneBy(
+        $project = $projectRepository->findOneBy(
             [
                 'id' => $id,
                 'slug' => $slug
@@ -592,7 +591,8 @@ class ProjectController extends FrontController
         if ($project_perimeter instanceof Perimeter) {
             $projectParams = [
                 'perimeter' => $project_perimeter,
-                'radius' => 30
+                'radius' => 30,
+                'maxResults' => 60
             ];
             if ($synonyms) {
                 $projectParams = array_merge($projectParams, $synonyms);
@@ -607,7 +607,7 @@ class ProjectController extends FrontController
         $pagerfanta->setCurrentPage($currentPage);
 
         
-        // Projets publics : 
+        // Projets publics :
         $projets_publics = [];
         if ($synonyms) {
             $projectParams = $synonyms;
@@ -625,11 +625,11 @@ class ProjectController extends FrontController
             $projets_publics = $projectRepository->findPublicProjects($projectParams);
 
             // Si rien à 30 km, on élargit à 300 km
-            if (count($projets_publics) == 0 && $project_perimeter instanceof Perimeter) {
+            if (empty($projets_publics) && $project_perimeter instanceof Perimeter) {
                 $projectParams['radius'] = 300;
                 $projets_publics = $projectRepository->findPublicProjects($projectParams);
             }
-        }   
+        }
         
         // fil d'arianne
         $this->breadcrumb->add("Mon compte",$this->generateUrl('app_user_dashboard'));

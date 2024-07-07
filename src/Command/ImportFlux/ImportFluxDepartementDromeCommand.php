@@ -31,25 +31,6 @@ class ImportFluxDepartementDromeCommand extends ImportFluxCommand
 
     protected function getFieldsMapping(array $aidToImport, array $params = null): array // NOSONAR too complex
     {
-        $keys = ['start_date', 'predeposit_date', 'submission_deadline', 'recurrence'];
-
-        $importRawObjectCalendar = [];
-        foreach ($keys as $key) {
-            if (isset($aidToImport[$key])) {
-                $importRawObjectCalendar[$key] = $aidToImport[$key];
-            }
-        }
-        if (empty($importRawObjectCalendar)) {
-            $importRawObjectCalendar = null;
-        }
-
-        $importRawObject = $aidToImport;
-        foreach ($keys as $key) {
-            if (isset($importRawObject[$key])) {
-                unset($importRawObject[$key]);
-            }
-        }
-
         $description = isset($aidToImport['description']) ? $aidToImport['description'] : null;
         if ($description) {
             if (strpos($description, 'Service Instructeur et Référent') !== false) {
@@ -71,19 +52,8 @@ class ImportFluxDepartementDromeCommand extends ImportFluxCommand
             }
         }
 
-        $dateStart = null;
-        try {
-            $dateStart = new \DateTime($aidToImport['start_date'] ?? null);
-        } catch (\Exception $e) {
-            $dateStart = null;
-        }
-
-        $dateSubmissionDeadline = null;
-        try {
-            $dateSubmissionDeadline = new \DateTime($aidToImport['submission_deadline'] ?? null);
-        } catch (\Exception $e) {
-            $dateSubmissionDeadline = null;
-        }
+        $dateStart = $this->getDateTimeOrNull($aidToImport['start_date'] ?? null);
+        $dateSubmissionDeadline = $this->getDateTimeOrNull($aidToImport['submission_deadline'] ?? null);
         
         $contact = isset($aidToImport['contact']) ? $this->htmlSanitizerInterface->sanitize($aidToImport['contact']) : null;
         if (!$contact) {
@@ -98,11 +68,8 @@ class ImportFluxDepartementDromeCommand extends ImportFluxCommand
             }
         }
 
-
-        return [
-            'importDataMention' => 'Ces données sont mises à disposition par le Conseil départemental de la Manche.',
-            'importRawObjectCalendar' => $importRawObjectCalendar,
-            'importRawObject' => $importRawObject,
+        $return = [
+            'importDataMention' => 'Ces données sont mises à disposition par le Conseil départemental de la Drôme.',
             'name' => isset($aidToImport['name']) ? strip_tags($aidToImport['name']) : null,
             'nameInitial' => isset($aidToImport['name']) ? strip_tags($aidToImport['name']) : null,
             'description' => $description,
@@ -114,6 +81,9 @@ class ImportFluxDepartementDromeCommand extends ImportFluxCommand
             'dateSubmissionDeadline' => $dateSubmissionDeadline,
             'contact' => $contact
         ];
+
+        // on ajoute les données brut d'import pour comparer avec les données actuelles
+        return $this->mergeImportDatas($return);
     }
 
     protected function setAidRecurrence(array $aidToImport, Aid $aid): Aid

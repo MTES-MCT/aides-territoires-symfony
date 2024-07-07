@@ -23,6 +23,7 @@ use App\Field\TextLengthCountField;
 use App\Field\TrumbowygField;
 use App\Form\Admin\Aid\KeywordReferenceAssociationType;
 use App\Form\Admin\Aid\ProjectReferenceAssociationType;
+use App\Repository\Aid\AidRepository;
 use App\Service\Export\SpreadsheetExporterService;
 use Doctrine\ORM\EntityRepository;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
@@ -102,10 +103,6 @@ class AidCrudController extends AtCrudController
             ->add(AidReferenceSearchFilter::new('referenceSearch', 'Recherche de référence'))
             ->add(AidReferenceSearchObjectFilter::new('referenceSearchObject', 'Recherche de référence (objets uniquement)'))
             ->add(AidNoReferenceFilter::new('noReference', 'Pas de projet référent associé'))
-            
-            // most of the times there is no need to define the
-            // filter type because EasyAdmin can guess it automatically
-            // ->add(BooleanFilter::new('published'))
         ;
     }
 
@@ -122,20 +119,34 @@ class AidCrudController extends AtCrudController
 
         $aid = $this->getContext()->getEntity()->getInstance() ?? null;
 
-        if ($aid && is_array($aid->getImportRawObject()) && $aid->isImportUpdated()) {
+        if ($aid && is_array($aid->getImportDatas()) && $aid->isImportUpdated()) {
             $pendingUpdates = [];
             $nbUpdates = 0;
-            foreach ($aid->getImportRawObject() as $key => $value) {
-                if (isset($aid->getImportRawObjectTemp()[$key])) {
-                    $pendingUpdates[] = [
-                        'key' => $key,
-                        'value' => $value,
-                        'newValue' => $aid->getImportRawObjectTemp()[$key] ?? null,
-                        'updated' => $aid->getImportRawObjectTemp()[$key] != $value  ? true : false
-                    ];
-                    if ($aid->getImportRawObjectTemp()[$key] != $value) {
-                        $nbUpdates++;
+
+            foreach ($aid->getImportDatas() as $field => $value) {
+                // gestion des booleéns
+                $methodGet = 'get';
+                if (!method_exists($aid, 'get'.ucfirst($field))) {
+                    if (method_exists($aid, 'is'.ucfirst($field))) {
+                        $methodGet = 'is';
+                    } else {
+                        continue;
                     }
+                }
+
+                if ($aid->{$methodGet.ucfirst($field)}() != $value) {
+                    $percent = 0;
+                    if (is_string($value) && is_string($aid->{$methodGet.ucfirst($field)}())) {
+                        similar_text($aid->{$methodGet.ucfirst($field)}(), $value, $percent);
+                    }
+                    $pendingUpdates[] = [
+                        'key' => $field,
+                        'value' => $aid->{$methodGet.ucfirst($field)}(),
+                        'newValue' => $aid->getImportDatas()[$field] ?? null,
+                        'updated' => false,
+                        'similarPercent' => round($percent, 2)
+                    ];
+                    $nbUpdates++;
                 }
             }
 
@@ -220,12 +231,35 @@ class AidCrudController extends AtCrudController
         ->setHelp('Le titre doit commencer par un verbe à l’infinitif pour que l’objectif de l’aide soit explicite vis-à-vis de ses bénéficiaires.')
         ->setFormTypeOption('attr', ['maxlength' => 180])
         ->setColumns(12);
+
+        $slugHelp = 'Laisser vide pour autoremplir.';
+        if ($entity instanceof Aid) {
+            $aidDuplicates = $this->aidService->getAidDuplicates($entity);
+            if (!empty($aidDuplicates)) {
+                $slugHelp .= '<div class="alert alert-danger">';
+                $slugHelp .= '<p>Attention ! Nous avons trouvé des aides qui ressemblent à des doublons.</p>';
+                $slugHelp .= '<ul>';
+                foreach ($aidDuplicates as $aidDuplicate) {
+                    $urlEditAid = $this->adminUrlGenerator
+                        ->setController(AidCrudController::class)
+                        ->setAction(Action::EDIT)
+                        ->setEntityId($aidDuplicate->getId())
+                        ->generateUrl();
+                    $slugHelp .= '<li><a href="'.$urlEditAid.'" target="_blank">'.$aidDuplicate->getName().'</a></li>';
+                }
+                $slugHelp .= '</ul>';
+                $slugHelp .= '</div>';
+            }
+        }
+
         yield TextField::new('slug', 'Slug')
             ->setFormTypeOption('attr', ['readonly' => true, 'autocomplete' => 'off'])
-            ->setHelp('Laisser vide pour autoremplir.')
+            ->setHelp($slugHelp)
             ->hideOnIndex()
             ->setColumns(12)
         ;
+
+
         yield TextField::new('nameInitial', 'Nom initial')
         ->setHelp('Comment cette aide s’intitule-t-elle au sein de votre structure ? Exemple : AAP Mob’Biodiv')
         ->hideOnIndex()
@@ -353,11 +387,11 @@ class AidCrudController extends AtCrudController
                 $name = $value->getName();
                 if ($value->getScale() == Perimeter::SCALE_COUNTY) {
                     $name .= ' (Département)';
-                } else if ($value->getScale() == Perimeter::SCALE_REGION) {
+                } elseif ($value->getScale() == Perimeter::SCALE_REGION) {
                     $name .= ' (Région)';
-                } else if ($value->getScale() == Perimeter::SCALE_COMMUNE) {
+                } elseif ($value->getScale() == Perimeter::SCALE_COMMUNE) {
                     $name .= ' (Commune)';
-                } else if ($value->getScale() == Perimeter::SCALE_ADHOC) {
+                } elseif ($value->getScale() == Perimeter::SCALE_ADHOC) {
                     $name .= ' (Adhoc)';
                 }
                 $display = strlen($name) < 20 ? $name : substr($name, 0, 20).'...';
@@ -464,7 +498,12 @@ class AidCrudController extends AtCrudController
         ->hideOnIndex();
         $nbAidsLive = 0;
         if ($entity && $entity->getAuthor()) {
-            $nbAidsLive = $entity->getAuthor()->getNbAidsLive();
+            /** @var AidRepository $aidRepository */
+            $aidRepository = $this->managerRegistry->getRepository(Aid::class);
+            $nbAidsLive = $aidRepository->countCustom([
+                'author' => $entity->getAuthor(),
+                'showInSearch' => true
+            ]);
         }
         yield IntegerField::new('nbAidsLive', 'Du même auteur')
         ->setHelp('Nb. d\'aides live créées par le même utilisateur')
@@ -602,10 +641,6 @@ class AidCrudController extends AtCrudController
         ->hideOnIndex()
         ->setColumns(12);
 
-        yield BooleanField::new('contactInfoUpdated', 'En attente de revue des données de contact mises à jour')
-        ->setHelp('Cette aide est en attente d’une revue des données de contact')
-        ->hideOnIndex()
-        ->setColumns(12);
 
         yield FormField::addFieldset('Uniquement pour les aides génériques');
         yield BooleanField::new('isGeneric', 'Aide générique')
@@ -699,6 +734,12 @@ class AidCrudController extends AtCrudController
         ->onlyOnIndex()
         ->setColumns(12);
 
+
+        yield BooleanField::new('contactInfoUpdated', 'En attente de revue des données de contact mises à jour')
+        ->setHelp('Cette aide est en attente d’une revue des données de contact')
+        ->hideOnIndex()
+        ->setColumns(12);
+
         yield BooleanField::new('isImported', 'Importé')
         ->hideOnIndex()
         ->setColumns(12);
@@ -720,25 +761,15 @@ class AidCrudController extends AtCrudController
         yield DateTimeField::new('dateImportLastAccess', 'Date du dernier accès')
         ->hideOnIndex()
         ->setColumns(12);
-        // yield ArrayField::new('importRawObject', 'Donnée brute importée')
-        // ->hideOnIndex();
-        // yield ArrayField::new('importRawObjectTemp', 'Donnée brute importée temporaire')
-        // ->hideOnIndex();
-        // yield ArrayField::new('importRawObjectCalendar', 'Donnée brute importée pour le calendrier')
-        // ->hideOnIndex();
-        // yield ArrayField::new('importRawObjectTempCalendar', 'Donnée brute importée temporaire pour le calendrie')
-        // ->hideOnIndex();
-
-
     }
 
 
     public function  configureCrud(Crud $crud): Crud
     {
         return parent::configureCrud($crud)
-        ->overrideTemplate('crud/edit', 'admin/aid/edit.html.twig')  
-        ->overrideTemplate('crud/index', 'admin/aid/index.html.twig')  
-        ->setPaginatorPageSize(50)
+            ->overrideTemplate('crud/edit', 'admin/aid/edit.html.twig')
+            ->overrideTemplate('crud/index', 'admin/aid/index.html.twig')
+            ->setPaginatorPageSize(50)
         ;
     }
 

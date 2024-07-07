@@ -3,9 +3,16 @@
 namespace App\Form\User\SearchPage;
 
 use App\Entity\Aid\Aid;
+use App\Entity\Category\Category;
+use App\Entity\Organization\OrganizationType;
 use App\Entity\Search\SearchPage;
 use App\Form\Type\AidAutocompleteType;
+use App\Form\Type\EntityCheckboxAbsoluteType;
+use App\Form\Type\EntityCheckboxGroupAbsoluteType;
+use Doctrine\ORM\EntityRepository;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -93,6 +100,97 @@ class SearchPageEditType extends AbstractType
                 'allow_delete' => true,
                 'label' => false,
                 'by_reference' => false
+            ])
+
+            ->add('showAudienceField', ChoiceType::class, [
+                'required' => true,
+                'label' => 'Afficher le champ "structures"',
+                'choices' => [
+                    'Oui' => true,
+                    'Non' => false
+                ],
+            ])
+            ->add('organizationTypes', EntityCheckboxAbsoluteType::class, [
+                'required' => false,
+                'label' => 'Restreindre à ces types de structures',
+                'class' => OrganizationType::class,
+                'choice_label' => 'name',
+                'multiple' => true,
+                'expanded' => true,
+                'autocomplete' => true
+            ])
+
+            ->add('showPerimeterField', ChoiceType::class, [
+                'required' => true,
+                'label' => 'Afficher le champ "territoire"',
+                'choices' => [
+                    'Oui' => true,
+                    'Non' => false
+                ],
+            ])
+
+            ->add('showTextField', ChoiceType::class, [
+                'required' => true,
+                'label' => 'Afficher le champ "mot clé"',
+                'choices' => [
+                    'Oui' => true,
+                    'Non' => false
+                ],
+            ])
+
+            ->add('showCategoriesField', ChoiceType::class, [
+                'required' => true,
+                'label' => 'Afficher le champ "thématiques"',
+                'choices' => [
+                    'Oui' => true,
+                    'Non' => false
+                ],
+            ])
+
+            ->add('categories', EntityCheckboxGroupAbsoluteType::class, [
+                'required' => false,
+                'label' => 'Restreindre à ces types de thématiques',
+                'class' => Category::class,
+                'choice_label' => 'name',
+                'group_by' => function(Category $category) {
+                    return $category->getCategoryTheme()->getName();
+                },
+                'query_builder' => function(EntityRepository $er) {
+                    return $er->createQueryBuilder('c')
+                        ->innerJoin('c.categoryTheme', 'categoryTheme')
+                        ->orderBy('categoryTheme.name', 'ASC')
+                        ->addOrderBy('c.name', 'ASC')
+                    ;
+                },
+                'multiple' => true,
+                'expanded' => true
+            ])
+
+            ->add('showAidTypeField', ChoiceType::class, [
+                'required' => true,
+                'label' => 'Afficher le champ "nature de l\'aide"',
+                'choices' => [
+                    'Oui' => true,
+                    'Non' => false
+                ],
+            ])
+            
+            ->add('showBackersField', ChoiceType::class, [
+                'required' => true,
+                'label' => 'Afficher le champ "porteurs"',
+                'choices' => [
+                    'Oui' => true,
+                    'Non' => false
+                ],
+            ])
+                        
+            ->add('showMobilizationStepField', ChoiceType::class, [
+                'required' => true,
+                'label' => 'Afficher le champ "avancement du projet"',
+                'choices' => [
+                    'Oui' => true,
+                    'Non' => false
+                ],
             ])
         ;
     }

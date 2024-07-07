@@ -376,19 +376,23 @@ class ProjectController extends FrontController
         if ($formCounties->isSubmitted()) {
             if ($formCounties->isValid()) {
                 $project_perimeter = $perimeterRepository->findOneBy(['code' => $formCounties->get('county')->getData()]);
-                $projects=$projectValidatedRepository->findProjectInCounty(
-                    ['id' => $project_perimeter->getId()]
-                );
-                $department_search=true;
+                if ($project_perimeter instanceof Perimeter) {
+                    $projects=$projectValidatedRepository->findProjectInCounty(
+                        ['id' => $project_perimeter->getId()]
+                    );
+                    $department_search=true;
+                }
             }
         }
 
         if ($idPerimeter && !isset($project_perimeter)) {
             $project_perimeter = $perimeterRepository->find($idPerimeter);
-            $projects=$projectValidatedRepository->findProjectInCounty(
-                ['id' => $project_perimeter->getId()]
-            );
-            $department_search=true;
+            if ($project_perimeter instanceof Perimeter) {
+                $projects=$projectValidatedRepository->findProjectInCounty(
+                    ['id' => $project_perimeter->getId()]
+                );
+                $department_search=true;
+            }
         }
 
         // Log recherche

@@ -9,6 +9,7 @@
 {% block javascripts %}
 	{{ parent() }}
 	{{ encore_entry_script_tags('front/user/searchpage/edit') }}
+    {{ encore_entry_script_tags('form/entity-checkbox-absolute-type') }}
 {% endblock %}
 
 {% block title %}Editer votre portail {{ searchPage.name }} {{ parent() }}{% endblock %}
@@ -92,7 +93,18 @@
                     </div>
                 </fieldset>
 
-
+                <fieldset class="optgroup fr-mb-2w">
+                    <legend>Personnaliser le formulaire de recherche</legend>
+                    {{ form_row(form.showAudienceField) }}
+                    {{ form_row(form.organizationTypes) }}
+                    {{ form_row(form.showPerimeterField) }}
+                    {{ form_row(form.showTextField) }}
+                    {{ form_row(form.showCategoriesField) }}
+                    {{ form_row(form.categories) }}
+                    {{ form_row(form.showAidTypeField) }}
+                    {{ form_row(form.showBackersField) }}
+                    {{ form_row(form.showMobilizationStepField) }}
+                </fieldset>
                                         
                 <footer class="fr-mt-5w">
                     <button type="submit" class="fr-btn">Modifier</button>

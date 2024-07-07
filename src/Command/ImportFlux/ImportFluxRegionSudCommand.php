@@ -12,6 +12,7 @@ use App\Entity\Category\Category;
 use App\Entity\Organization\OrganizationType;
 use App\Repository\Aid\AidStepRepository;
 use App\Repository\Aid\AidTypeRepository;
+use Symfony\Component\HttpClient\CurlHttpClient;
 
 #[AsCommand(name: 'at:import_flux:region_sud', description: 'Import de flux région sud')]
 class ImportFluxRegionSudCommand extends ImportFluxCommand
@@ -33,7 +34,7 @@ class ImportFluxRegionSudCommand extends ImportFluxCommand
     protected function callApi()
     {
         $aidsFromImport = [];
-
+        $client = $this->getClient();
         for ($i=0; $i<$this->nbPages; $i++) {
             $this->currentPage = $i;
             $importUrl = $this->dataSource->getImportApiUrl();
@@ -41,7 +42,7 @@ class ImportFluxRegionSudCommand extends ImportFluxCommand
                 $importUrl .= '?limit=' . $this->nbByPages . '&offset=' . ($this->currentPage * $this->nbByPages);
             }
             try {
-                $response = $this->httpClientInterface->request(
+                $response = $client->request(
                     'GET',
                     $importUrl,
                     $this->getApiOptions()
@@ -62,20 +63,46 @@ class ImportFluxRegionSudCommand extends ImportFluxCommand
         return $aidsFromImport;
     }
 
+    // visiblement le certificat à re changer. Je laisse en commentaire pour le moment
+    // protected function getClient(): CurlHttpClient
+    // {
+    //     // place le certificat dans un fichier temporaire
+    //     $cerificate = $this->paramService->get('certificat_region_sud');
+    //     $certificatePath = $this->fileService->getUploadTmpDir() . '/certificat_region_sud.pem';
+    //     file_put_contents($certificatePath, $cerificate);
+
+    //     // combine les options avec le certificat
+    //     $apiOptions = array_merge(
+    //         [
+    //             'cafile' => $certificatePath,
+    //         ],
+    //         $this->getApiOptions()
+    //     );
+
+    //     // creer le client
+    //     return new CurlHttpClient($apiOptions);
+    // }
+
 
     protected function getFieldsMapping(array $aidToImport, array $params = null): array
     {
-        $importRaws = $this->getImportRaws($aidToImport, ['Date d’ouverture', 'Date de clôture']);
-        $importRawObjectCalendar = $importRaws['importRawObjectCalendar'];
-        $importRawObject = $importRaws['importRawObject'];
-
         $dateStart = (isset($aidToImport['Date d’ouverture']) && $aidToImport['Date d’ouverture'] !== '' && $aidToImport['Date d’ouverture'] !== null) ? new \DateTime($aidToImport['Date d’ouverture']) : null;
+        if ($dateStart instanceof \DateTime) {
+            // Force pour éviter les différence sur le fuseau horaire
+            $dateStart = new \DateTime(date($dateStart->format('Y-m-d')));
+            // Force les heures, minutes, et secondes à 00:00:00
+            $dateStart->setTime(0, 0, 0);
+        }
         $dateSubmissionDeadline = (isset($aidToImport['Date de clôture']) && $aidToImport['Date de clôture'] !== '' && $aidToImport['Date de clôture'] !== null) ? new \DateTime($aidToImport['Date de clôture']) : null;
+        if ($dateSubmissionDeadline instanceof \DateTime) {
+            // Force pour éviter les différence sur le fuseau horaire
+            $dateSubmissionDeadline = new \DateTime(date($dateSubmissionDeadline->format('Y-m-d')));
+            // Force les heures, minutes, et secondes à 00:00:00
+            $dateSubmissionDeadline->setTime(0, 0, 0);
+        }
 
-        return [
+        $return = [
             'importDataMention' => 'Ces données sont mises à disposition par le Conseil Régional PACA.',
-            'importRawObjectCalendar' => $importRawObjectCalendar,
-            'importRawObject' => $importRawObject,
             'name' => isset($aidToImport['Nom de l’aide']) ? strip_tags($aidToImport['Nom de l’aide']) : null,
             'nameInitial' => isset($aidToImport['Nom de l’aide']) ? strip_tags($aidToImport['Nom de l’aide']) : null,
             'description' => $this->concatHtmlFields($aidToImport, ['Chapo', 'Pour qui', 'Pourquoi candidater', 'Quelle est la nature de l’aide (type d’aide)', 'Plus d’infos']),
@@ -87,6 +114,9 @@ class ImportFluxRegionSudCommand extends ImportFluxCommand
             'dateSubmissionDeadline' => $dateSubmissionDeadline,
             'isCallForProject' => isset($aidToImport['AAP']) && $aidToImport['AAP'] == '1' ? true : false,
         ];
+
+        // on ajoute les données brut d'import pour comparer avec les données actuelles
+        return $this->mergeImportDatas($return);
     }
 
     protected function setCategories(array $aidToImport, Aid $aid): Aid // NOSONAR too complex
@@ -178,6 +208,9 @@ class ImportFluxRegionSudCommand extends ImportFluxCommand
             ],
             'Association' => [
                 'association'
+            ],
+            'Particulier' => [
+                'private-person'
             ]
         ];
 

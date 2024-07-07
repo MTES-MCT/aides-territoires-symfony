@@ -67,7 +67,7 @@ class AlertRepository extends ServiceEntityRepository
         $params['dateLatestAlertMax'] = $startOfWeek;
         $params['hasQueryString'] = true;
         $params['alertFrequency'] = Alert::FREQUENCY_WEEKLY_SLUG;
-        
+
         $qb = $this->getQueryBuilder($params);
 
         return $qb->getQuery()->getResult();

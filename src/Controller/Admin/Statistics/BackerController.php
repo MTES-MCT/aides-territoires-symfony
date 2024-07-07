@@ -35,7 +35,7 @@ class BackerController extends DashboardController
         // pourcentage de backer avec des aides lives
         $percentBackerAidsLive = $nbBackersTotal == 0 ? 0 : number_format((count($backers) * 100 / $nbBackersTotal), 2);
 
-        // grapgique
+        // graphique
         $chartBackerAids = $chartBuilderInterface->createChart(Chart::TYPE_PIE);
 
         // pourcentage des 10 premiers backers

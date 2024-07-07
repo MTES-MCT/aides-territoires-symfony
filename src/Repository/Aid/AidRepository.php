@@ -10,6 +10,7 @@ use App\Entity\Aid\AidType;
 use App\Entity\Aid\AidTypeGroup;
 use App\Entity\Backer\Backer;
 use App\Entity\Backer\BackerCategory;
+use App\Entity\Backer\BackerGroup;
 use App\Entity\Category\Category;
 use App\Entity\Keyword\Keyword;
 use App\Entity\Organization\OrganizationType;
@@ -270,7 +271,23 @@ class AidRepository extends ServiceEntityRepository
 
         $qb = $this->getQueryBuilder($params);
 
-        return $qb->getQuery()->getResult();
+        $results = $qb->getQuery()->getResult();
+
+        $return = [];
+        foreach ($results as $result) {
+            if ($result instanceof Aid) {
+                $return[] = $result;
+            } elseif (is_array($result) && isset($result[0]) && $result[0] instanceof Aid) {
+                if (isset($result['score_total'])) {
+                    $result[0]->setScoreTotal($result['score_total']);
+                }
+                if (isset($result['score_objects'])) {
+                    $result[0]->setScoreObjects($result['score_objects']);
+                }
+                $return[] = $result[0];
+            }
+        }
+        return $return;
     }
 
     public function findOneCustom(array $params = null) : ?Aid
@@ -355,6 +372,7 @@ class AidRepository extends ServiceEntityRepository
 
     public function getQueryBuilder(array $params = null) : QueryBuilder
     {
+        $id = $params['id'] ?? null;
         $author = $params['author'] ?? null;
         $isLive = $params['isLive'] ?? null;
         $showInSearch = $params['showInSearch'] ?? null;
@@ -369,6 +387,8 @@ class AidRepository extends ServiceEntityRepository
         $limit = $params['limit'] ?? null;
         $backer = $params['backer'] ?? null;
         $backers = $params['backers'] ?? null;
+        $backerCategory = $params['backerCategory'] ?? null;
+        $backerGroup = $params['backerGroup'] ?? null;
         $isFinancial = $params['isFinancial'] ?? null;
         $isTechnical = $params['isTechnical'] ?? null;
         $aidTypeGroup = $params['aidTypeGroup'] ?? null;
@@ -378,11 +398,11 @@ class AidRepository extends ServiceEntityRepository
         $categoryIds = $params['categoryIds'] ?? null;
         $categories = $params['categories'] ?? null;
         $categorySlugs = $params['categorySlugs'] ?? null;
-        $backerCategory = $params['backerCategory'] ?? null;
         $keywords = $params['keywords'] ?? null;
 
         $keyword = $params['keyword'] ?? null;
         if ($keyword !== null) {
+            $keyword = strip_tags($keyword);
             $synonyms = $this->referenceService->getSynonymes($keyword);
         }
 
@@ -428,6 +448,12 @@ class AidRepository extends ServiceEntityRepository
 
         $qb = $this->createQueryBuilder('a');
 
+        if ($id !== null) {
+            $qb
+                ->andWhere('a.id = :id')
+                ->setParameter('id', $id);
+        }
+        
         if ($nameLike !== null) {
             $qb
                 ->andWhere('a.name LIKE :nameLike')
@@ -465,195 +491,8 @@ class AidRepository extends ServiceEntityRepository
         }
 
 
-/******************************************************************************************** */
-if (isset($synonyms)) {
-    $forbiddenChars = ['@'];
-    $originalName = (isset($synonyms['original_name']) && str_replace($forbiddenChars, [''], trim($synonyms['original_name'])) !== '')  ? str_replace($forbiddenChars, [''], trim($synonyms['original_name'])) : null;
-    $intentionsString = (isset($synonyms['intentions_string']) && str_replace($forbiddenChars, [''], trim($synonyms['intentions_string'])) !== '')  ? str_replace($forbiddenChars, [''], trim($synonyms['intentions_string'])) : null;
-    $objectsString = (isset($synonyms['objects_string']) && str_replace($forbiddenChars, [''], trim($synonyms['objects_string'])) !== '')  ? str_replace($forbiddenChars, [''], trim($synonyms['objects_string'])) : null;
-    $simpleWordsString = (isset($synonyms['simple_words_string']) && str_replace($forbiddenChars, [''], trim($synonyms['simple_words_string'])) !== '')  ? str_replace($forbiddenChars, [''], trim($synonyms['simple_words_string'])) : null;
-
-    if ($originalName) {
-        $sqlOriginalName = '
-        CASE WHEN (a.name = :originalName) THEN 4000 ELSE 0 END +
-        CASE WHEN (a.nameInitial = :originalName) THEN 4000 ELSE 0 END
-        ';
-        $qb->setParameter('originalName', $originalName);
-    }
-
-    // Projets référents
-    if ($projectReference instanceof ProjectReference) {
-        $sqlProjectReference = '
-        CASE
-            WHEN :projectReference MEMBER OF a.projectReferences THEN 2000
-            ELSE 0
-        END
-        ';
-
-        $qb
-        ->setParameter('projectReference', $projectReference)
-        ;
-
-        if (!$projectReference->getRequiredKeywordReferences()->isEmpty()) {
-            $requiredKeywordReferencesName = [];
-            foreach ($projectReference->getRequiredKeywordReferences() as $keywordReference) {
-                $requiredKeywordReferencesName[] = $keywordReference->getName();
-            }
-            $requiredKeywordReferencesName = array_unique($requiredKeywordReferencesName);
-            $requiredKeywordReferencesNameString = implode('|', $requiredKeywordReferencesName);
-
-            $qb->andWhere(
-                '
-                REGEXP(a.name, :requireKeywordReferencesString) = 1
-                OR REGEXP(a.nameInitial, :requireKeywordReferencesString) = 1
-                OR REGEXP(a.description, :requireKeywordReferencesString) = 1
-                OR REGEXP(a.eligibility, :requireKeywordReferencesString) = 1
-                OR REGEXP(a.projectExamples, :requireKeywordReferencesString) = 1
-                OR :projectReference MEMBER OF a.projectReferences
-                '
-            );
-            $qb->setParameter('requireKeywordReferencesString', '\\b'.$requiredKeywordReferencesNameString.'\\b');
-        }
-
-    }
-    
-    // les keywordReferences
-    $keywordReferencesSynonyms = $this->getEntityManager()->getRepository(KeywordReference::class)->findFromSynonyms($synonyms);
-    if (!empty($keywordReferencesSynonyms)) {
-        $sqlKeywordReferences = '
-        CASE
-            WHEN :keywordReferences MEMBER OF a.keywordReferences THEN 60
-            ELSE 0
-        END
-        ';
-        $qb->setParameter('keywordReferences', $keywordReferencesSynonyms);
-    }
-    
-    $sqlObjects = '';
-    if ($objectsString) {
-        // // gestion pluriels des objets
-        // $inflector = InflectorFactory::create()->build();
-        // $objects = str_getcsv($objectsString, ' ', '"');
-        // foreach ($objects as $object) {
-        //     $plural = $inflector->pluralize($object);
-        //     if ($plural !== $object) {
-        //     $objects[] = $plural;
-        //     }
-        // }
-        // $objectsString = '"' . implode('" "', $objects) . '"';
-
-        $sqlObjects = '
-        CASE WHEN (MATCH_AGAINST(a.name) AGAINST(:objects_string IN BOOLEAN MODE) > 1) THEN 60 ELSE 0 END +
-        CASE WHEN (MATCH_AGAINST(a.nameInitial) AGAINST(:objects_string IN BOOLEAN MODE) > 1) THEN 60 ELSE 0 END +
-        CASE WHEN (MATCH_AGAINST(a.description, a.eligibility, a.projectExamples) AGAINST(:objects_string IN BOOLEAN MODE) > 1) THEN 10 ELSE 0 END 
-        ';
-
-        $objects = str_getcsv($objectsString, ' ', '"');
-        if (!empty($objects)) {
-            $sqlObjects .= ' + ';
-        }
-        for ($i = 0; $i<count($objects); $i++) {
-            $sqlObjects .= '
-                CASE WHEN (REGEXP(a.name, :objects'.$i.') = 1) THEN 60 ELSE 0 END +
-                CASE WHEN (REGEXP(a.nameInitial, :objects'.$i.') = 1) THEN 60 ELSE 0 END +
-                CASE WHEN (REGEXP(a.description, :objects'.$i.') = 1) THEN 60 ELSE 0 END
-            ';
-
-            if ($i < count($objects) - 1) {
-                $sqlObjects .= ' + ';
-            }
-
-            $qb->setParameter('objects'.$i, '\\b'.$objects[$i].'\\b');
-        }
-
-        if (isset($sqlProjectReference) && $sqlProjectReference !== '') {
-            $sqlObjects .= ' + '.$sqlProjectReference;
-        }
-
-        $qb->addSelect('('.$sqlObjects.') as score_objects');
-        $qb->setParameter('objects_string', $objectsString);
-        $qb->andHaving('score_objects >= '.$scoreObjectsMin);
-    }
-
-    if ($intentionsString && $objectsString) {
-        $sqlIntentions = '
-        CASE WHEN (MATCH_AGAINST(a.name, a.nameInitial, a.description, a.eligibility, a.projectExamples) AGAINST(:intentions_string IN BOOLEAN MODE) > 1) THEN 1 ELSE 0 END 
-        ';
-        if (isset($sqlProjectReference) && $sqlProjectReference !== '') {
-            $sqlIntentions .= ' + '.$sqlProjectReference;
-        }
-        
-        $qb->addSelect('('.$sqlIntentions.') as score_intentions');
-        $qb->setParameter('intentions_string', $intentionsString);
-        $qb->andHaving('score_intentions >= '.$scoreIntentionMin);
-    }
-
-    if ($simpleWordsString && !$objectsString) {
-        $sqlSimpleWords = '
-        CASE WHEN (MATCH_AGAINST(a.name) AGAINST(:simple_words_string IN BOOLEAN MODE) > 1) THEN 120 ELSE 0 END +
-        CASE WHEN (MATCH_AGAINST(a.nameInitial) AGAINST(:simple_words_string IN BOOLEAN MODE) > 1) THEN 120 ELSE 0 END +
-        CASE WHEN (MATCH_AGAINST(a.description, a.eligibility, a.projectExamples) AGAINST(:simple_words_string IN BOOLEAN MODE) > 1) THEN 60 ELSE 0 END
-        ';
-        $qb->setParameter('simple_words_string', $simpleWordsString);
-    }
-
-    $sqlTotal = '';
-    if ($originalName) {
-        $sqlTotal .= $sqlOriginalName;
-    }
-    if ($objectsString) {
-        if ($originalName) {
-            $sqlTotal .= ' + ';
-        }
-        $sqlTotal .= $sqlObjects;
-    }
-    if ($intentionsString && $objectsString) {
-        if ($originalName || $objectsString) {
-            $sqlTotal .= ' + ';
-        }
-        $sqlTotal .= $sqlIntentions;
-    }
-    if (isset($sqlSimpleWords)) {
-        if ($originalName || $objectsString || $intentionsString) {
-            $sqlTotal .= ' + ';
-        }
-        $sqlTotal .= $sqlSimpleWords;
-    }
-
-    if (isset($sqlCategories)) {
-        if ($originalName || $objectsString || $intentionsString || isset($sqlSimpleWords)) {
-            $sqlTotal .= ' + ';
-        }
-        $sqlTotal .= $sqlCategories;
-    }
-
-    if (isset($sqlKeywordReferences)) {
-        if ($originalName || $objectsString || $intentionsString || isset($sqlSimpleWords) || isset($sqlCategories)) {
-            $sqlTotal .= ' + ';
-        }
-        $sqlTotal .= $sqlKeywordReferences;
-    }
-
-    if (isset($sqlProjectReference)) {
-        if ($originalName || $objectsString || $intentionsString || isset($sqlSimpleWords) || isset($sqlCategories) || isset($sqlKeywordReferences)) {
-            $sqlTotal .= ' + ';
-        }
-        $sqlTotal .= $sqlProjectReference;
-    }
-
-    if ($sqlTotal !== '') {
-        $scoreTotalAvailable = true;
-        $qb->addSelect('('.$sqlTotal.') as score_total');
-        $qb->andHaving('score_total >= '.$scoreTotalMin);
-    }
-}
-
-/******************************************************************************************** */
-
-        $toto = null;
-        
-        if ($toto && isset($synonyms)) {
-            $forbiddenChars = ['@'];
+        if (isset($synonyms)) {
+            $forbiddenChars = ['@', '+', '-'];
             $originalName = (isset($synonyms['original_name']) && str_replace($forbiddenChars, [''], trim($synonyms['original_name'])) !== '')  ? str_replace($forbiddenChars, [''], trim($synonyms['original_name'])) : null;
             $intentionsString = (isset($synonyms['intentions_string']) && str_replace($forbiddenChars, [''], trim($synonyms['intentions_string'])) !== '')  ? str_replace($forbiddenChars, [''], trim($synonyms['intentions_string'])) : null;
             $objectsString = (isset($synonyms['objects_string']) && str_replace($forbiddenChars, [''], trim($synonyms['objects_string'])) !== '')  ? str_replace($forbiddenChars, [''], trim($synonyms['objects_string'])) : null;
@@ -661,8 +500,8 @@ if (isset($synonyms)) {
 
             if ($originalName) {
                 $sqlOriginalName = '
-                CASE WHEN (a.name = :originalName) THEN 500 ELSE 0 END +
-                CASE WHEN (a.nameInitial = :originalName) THEN 400 ELSE 0 END
+                CASE WHEN (a.name = :originalName) THEN 4000 ELSE 0 END +
+                CASE WHEN (a.nameInitial = :originalName) THEN 4000 ELSE 0 END
                 ';
                 $qb->setParameter('originalName', $originalName);
             }
@@ -671,7 +510,7 @@ if (isset($synonyms)) {
             if ($projectReference instanceof ProjectReference) {
                 $sqlProjectReference = '
                 CASE
-                    WHEN :projectReference MEMBER OF a.projectReferences THEN 300
+                    WHEN :projectReference MEMBER OF a.projectReferences THEN 2000
                     ELSE 0
                 END
                 ';
@@ -679,23 +518,33 @@ if (isset($synonyms)) {
                 $qb
                 ->setParameter('projectReference', $projectReference)
                 ;
+
+                if (!$projectReference->getRequiredKeywordReferences()->isEmpty()) {
+                    $requiredKeywordReferencesName = [];
+                    foreach ($projectReference->getRequiredKeywordReferences() as $keywordReference) {
+                        $requiredKeywordReferencesName[] = $keywordReference->getName();
+                    }
+                    $requiredKeywordReferencesName = array_unique($requiredKeywordReferencesName);
+                    $requiredKeywordReferencesNameString = implode('|', $requiredKeywordReferencesName);
+
+                    $qb->andWhere(
+                        '
+                        REGEXP(a.name, :requireKeywordReferencesString) = 1
+                        OR REGEXP(a.nameInitial, :requireKeywordReferencesString) = 1
+                        OR REGEXP(a.description, :requireKeywordReferencesString) = 1
+                        OR REGEXP(a.eligibility, :requireKeywordReferencesString) = 1
+                        OR REGEXP(a.projectExamples, :requireKeywordReferencesString) = 1
+                        OR :projectReference MEMBER OF a.projectReferences
+                        '
+                    );
+                    $qb->setParameter('requireKeywordReferencesString', '\\b'.$requiredKeywordReferencesNameString.'\\b');
+                }
+
             }
             
-            // Les catégories
-            $categoriesSynonyms = $this->getEntityManager()->getRepository(Category::class)->findFromSynonyms($synonyms);
-            if (count($categoriesSynonyms) > 0) {
-                $sqlCategories = '
-                CASE
-                    WHEN :categoriesSynonyms MEMBER OF a.categories THEN 60
-                    ELSE 0
-                END
-                ';
-                $qb->setParameter('categoriesSynonyms', $categoriesSynonyms);
-            }
-
             // les keywordReferences
             $keywordReferencesSynonyms = $this->getEntityManager()->getRepository(KeywordReference::class)->findFromSynonyms($synonyms);
-            if (count($keywordReferencesSynonyms) > 0) {
+            if (!empty($keywordReferencesSynonyms)) {
                 $sqlKeywordReferences = '
                 CASE
                     WHEN :keywordReferences MEMBER OF a.keywordReferences THEN 60
@@ -706,20 +555,15 @@ if (isset($synonyms)) {
             }
             
             $sqlObjects = '';
+            if (isset($sqlProjectReference)) {
+                $sqlObjects .= $sqlProjectReference;
+            }
             if ($objectsString) {
-                // gestion pluriels des objets
-                $inflector = InflectorFactory::create()->build();
-                $objects = str_getcsv($objectsString, ' ', '"');
-                foreach ($objects as $object) {
-                    $plural = $inflector->pluralize($object);
-                    if ($plural !== $object) {
-                    $objects[] = $plural;
-                    }
+                if (trim($sqlObjects) !== '') {
+                    $sqlObjects .= ' + ';
                 }
-                $objectsString = '"' . implode('" "', $objects) . '"';
-
-                $sqlObjects = '
-                CASE WHEN (MATCH_AGAINST(a.name) AGAINST(:objects_string IN BOOLEAN MODE) > 1) THEN 90 ELSE 0 END +
+                $sqlObjects .= '
+                CASE WHEN (MATCH_AGAINST(a.name) AGAINST(:objects_string IN BOOLEAN MODE) > 1) THEN 60 ELSE 0 END +
                 CASE WHEN (MATCH_AGAINST(a.nameInitial) AGAINST(:objects_string IN BOOLEAN MODE) > 1) THEN 60 ELSE 0 END +
                 CASE WHEN (MATCH_AGAINST(a.description, a.eligibility, a.projectExamples) AGAINST(:objects_string IN BOOLEAN MODE) > 1) THEN 10 ELSE 0 END 
                 ';
@@ -727,44 +571,52 @@ if (isset($synonyms)) {
                 $objects = str_getcsv($objectsString, ' ', '"');
                 if (!empty($objects)) {
                     $sqlObjects .= ' + ';
-                }
-                for ($i = 0; $i<count($objects); $i++) {
-
-                    $sqlObjects .= '
-                        CASE WHEN (a.name LIKE :objects'.$i.') THEN 30 ELSE 0 END +
-                        CASE WHEN (a.nameInitial LIKE :objects'.$i.') THEN 20 ELSE 0 END
-                    ';
-
-                    if ($i < count($objects) - 1) {
-                        $sqlObjects .= ' + ';
+                
+                    // on limite le nombre d'objets car le serveur ne tiens pas le coup
+                    if (count($objects) > 40) {
+                        $objects = array_slice($objects, 0, 40);
                     }
-                    $qb->setParameter('objects'.$i, '%'.$objects[$i].'%');
+                    for ($i = 0; $i<count($objects); $i++) {
+                        $sqlObjects .= '
+                            CASE WHEN (REGEXP(a.name, :objects'.$i.') = 1) THEN 60 ELSE 0 END +
+                            CASE WHEN (REGEXP(a.nameInitial, :objects'.$i.') = 1) THEN 60 ELSE 0 END +
+                            CASE WHEN (REGEXP(a.description, :objects'.$i.') = 1) THEN 60 ELSE 0 END
+                        ';
+
+                        if ($i < count($objects) - 1) {
+                            $sqlObjects .= ' + ';
+                        }
+
+                        $qb->setParameter('objects'.$i, '\\b'.$objects[$i].'\\b');
+                    }
                 }
 
-                if (isset($sqlProjectReference) && $sqlProjectReference !== '') {
-                    $sqlObjects .= ' + '.$sqlProjectReference;
-                }
-
-                $qb->addSelect('('.$sqlObjects.') as score_objects');
                 $qb->setParameter('objects_string', $objectsString);
+            }
+
+            if (trim($sqlObjects) !== '') {
+                $qb->addSelect('('.$sqlObjects.') as score_objects');
                 $qb->andHaving('score_objects >= '.$scoreObjectsMin);
             }
 
-
             if ($intentionsString && $objectsString) {
                 $sqlIntentions = '
-                CASE WHEN (MATCH_AGAINST(a.name) AGAINST(:intentions_string IN BOOLEAN MODE) > 1) THEN 5 ELSE 0 END +
-                CASE WHEN (MATCH_AGAINST(a.nameInitial) AGAINST(:intentions_string IN BOOLEAN MODE) > 1) THEN 5 ELSE 0 END +
-                CASE WHEN (MATCH_AGAINST(a.description, a.eligibility, a.projectExamples) AGAINST(:intentions_string IN BOOLEAN MODE) > 1) THEN 1 ELSE 0 END 
+                CASE WHEN (MATCH_AGAINST(a.name, a.nameInitial, a.description, a.eligibility, a.projectExamples) AGAINST(:intentions_string IN BOOLEAN MODE) > 1) THEN 1 ELSE 0 END 
                 ';
+                if (isset($sqlProjectReference) && $sqlProjectReference !== '') {
+                    $sqlIntentions .= ' + '.$sqlProjectReference;
+                }
+                
+                $qb->addSelect('('.$sqlIntentions.') as score_intentions');
                 $qb->setParameter('intentions_string', $intentionsString);
+                $qb->andHaving('score_intentions >= '.$scoreIntentionMin);
             }
 
-            if ($simpleWordsString) {
+            if ($simpleWordsString && !$objectsString) {
                 $sqlSimpleWords = '
-                CASE WHEN (MATCH_AGAINST(a.name) AGAINST(:simple_words_string IN BOOLEAN MODE) > 1) THEN 30 ELSE 0 END +
-                CASE WHEN (MATCH_AGAINST(a.nameInitial) AGAINST(:simple_words_string IN BOOLEAN MODE) > 1) THEN 30 ELSE 0 END +
-                CASE WHEN (MATCH_AGAINST(a.description, a.eligibility, a.projectExamples) AGAINST(:simple_words_string IN BOOLEAN MODE) > 1) THEN 5 ELSE 0 END 
+                CASE WHEN (MATCH_AGAINST(a.name) AGAINST(:simple_words_string IN BOOLEAN MODE) > 1) THEN 120 ELSE 0 END +
+                CASE WHEN (MATCH_AGAINST(a.nameInitial) AGAINST(:simple_words_string IN BOOLEAN MODE) > 1) THEN 120 ELSE 0 END +
+                CASE WHEN (MATCH_AGAINST(a.description, a.eligibility, a.projectExamples) AGAINST(:simple_words_string IN BOOLEAN MODE) > 1) THEN 60 ELSE 0 END
                 ';
                 $qb->setParameter('simple_words_string', $simpleWordsString);
             }
@@ -989,6 +841,16 @@ if (isset($synonyms)) {
                 ->innerJoin('aidFinancersB.backer', 'backerB')
                 ->andWhere('backerB IN (:backers)')
                 ->setParameter('backers', $backers)
+            ;
+        }
+
+        if ($backerGroup instanceof BackerGroup && $backerGroup->getId()) {
+            $qb
+                ->innerJoin('a.aidFinancers', 'aidFinancersG')
+                ->innerJoin('aidFinancersG.backer', 'backerG')
+                ->innerJoin('backerG.backerGroup', 'backerGroupG')
+                ->andWhere('backerGroupG = :backerGroup')
+                ->setParameter('backerGroup', $backerGroup)
             ;
         }
 

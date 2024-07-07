@@ -49,8 +49,12 @@
 			<div class="col-md-6">
 				<h2 clas="title">Mises à jour en revue</h2>
 				<p class="alert alert-info">
-					Pour ne plus voir cette liste, dans "Import", décocher la case "<a href="#Aid_importUpdated">En attente de revue des données importées mises à jour</a>".<br>
+					Pour ne plus voir cette liste, dans "Import", décocher la case "<a href="#Aid_importUpdated" class="ea-tab-opener">En attente de revue des données importées mises à jour</a>".<br>
 				</p>
+				<div class="alert alert-info">
+					<p>Sur les champs de type 'wysiwyg' (description, contact, ...) il peu y avoir des différences mineures, non visible à l'oeil nu. Par exemple : {{ "<br> != <br />"|escape('html') }} même si le rendu est identique.</p>
+					<p>Le pourcentage peu donc être légèrement différent de 100% avec un contenu identique.</p>
+				</div>
 				<div data-accordion-group>
 					{% for update in pendingUpdates %}
 					<div class="accordion card {% if update.value == update.newValue %}bg-success-subtle{% else %}bg-secondary-subtle{% endif %}" data-accordion>
@@ -58,25 +62,54 @@
 						<div data-content>
 							<div class="card-body">
 								{% set updateLoopIndex = loop.index %}
-								<div>Valeur actuelle :</div>
+								<div>Valeur actuelle : <button class="btn-copy-clipboard" data-clipboard-target="#actual_value_{{ updateLoopIndex }}"><i class="fas fa-clipboard-check"></i></button></div>
 								{% if update.value is iterable %}
 									{% for subValue in update.value %}
 										{% set updateLoopIndex = updateLoopIndex~ '_' ~ loop.index %}
-										<pre><code id="actual_value_{{ updateLoopIndex }}" style="max-width: 100%;overflow: scroll;">{{ subValue }}</code><button class="btn-copy-clipboard" data-clipboard-target="#actual_value_{{ updateLoopIndex }}"><i class="fas fa-clipboard-check"></i></button></pre>
+										<div id="actual_value_{{ updateLoopIndex }}" style="max-width: 100%;overflow: scroll;">
+											{% if subValue is not iterable %}
+												{% if isDateTime(subValue) %}
+													{{ subValue|date('Y-m-d H:i:s') }}
+												{% else %}
+													{{ subValue|raw }}
+												{% endif %}
+											{% endif %}
+										</div>
 									{% endfor %}
 								{% else %}
-								<pre><code id="actual_value_{{ updateLoopIndex }}" style="max-width: 100%;overflow: scroll;">{{ update.value }}</code><button class="btn-copy-clipboard" data-clipboard-target="#actual_value_{{ updateLoopIndex }}"><i class="fas fa-clipboard-check"></i></button></pre>
+								<div id="actual_value_{{ updateLoopIndex }}" style="max-width: 100%;overflow: scroll;">
+								{% if isDateTime(update.value) %}
+									{{ update.value|date('Y-m-d H:i:s') }}
+								{% else %}
+									{{ update.value|raw }}
+								{% endif %}
+								</div>
 								{% endif %}
 								
+								<hr />
 								{% set updateLoopIndex = loop.index %}
-								<p>Nouvelle valeur :</p>
+								<p>Nouvelle valeur (= à {{ update.similarPercent }}%) : <button class="btn-copy-clipboard" data-clipboard-target="#new_value_{{ updateLoopIndex }}"><i class="fas fa-clipboard-check"></i></button></p>
 								{% if update.newValue is iterable %}
 									{% for subValue in update.newValue %}
 										{% set updateLoopIndex = updateLoopIndex~ '_' ~ loop.index %}
-										<pre><code id="new_value_{{ updateLoopIndex }}" style="max-width: 100%;overflow: scroll;">{{ subValue }}</code><button class="btn-copy-clipboard" data-clipboard-target="#new_value_{{ updateLoopIndex }}"><i class="fas fa-clipboard-check"></i></button></pre>
+										<div id="new_value_{{ updateLoopIndex }}" style="max-width: 100%;overflow: scroll;">
+											{% if subValue is not iterable %}
+												{% if isDateTime(subValue) %}
+													{{ subValue|date('Y-m-d H:i:s') }}
+												{% else %}
+													{{ subValue|raw }}
+												{% endif %}
+											{% endif %}
+										</div>
 									{% endfor %}
 								{% else %}
-								<pre><code id="new_value_{{ updateLoopIndex }}" style="max-width: 100%;overflow: scroll;">{{ update.newValue }}</code><button class="btn-copy-clipboard" data-clipboard-target="#new_value_{{ updateLoopIndex }}"><i class="fas fa-clipboard-check"></i></button></pre>
+								<div id="new_value_{{ updateLoopIndex }}" style="max-width: 100%;overflow: scroll;">
+								{% if isDateTime(update.newValue) %}
+									{{ update.newValue|date('Y-m-d H:i:s') }}
+								{% else %}
+									{{ update.newValue|raw }}
+								{% endif %}
+								</div>
 								{% endif %}
 							</div>
 						</div>

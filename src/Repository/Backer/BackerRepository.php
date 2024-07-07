@@ -7,6 +7,7 @@ use App\Entity\Aid\AidType;
 use App\Entity\Aid\AidTypeGroup;
 use App\Entity\Backer\Backer;
 use App\Entity\Backer\BackerCategory;
+use App\Entity\Backer\BackerGroup;
 use App\Entity\Organization\OrganizationType;
 use App\Entity\Perimeter\Perimeter;
 use App\Entity\User\User;
@@ -92,10 +93,10 @@ class BackerRepository extends ServiceEntityRepository
 
         $qb = $this->createQueryBuilder('b');
 
-        if ($active == true) {
+        if ($active === true) {
             $qb
                 ->addCriteria(self::activeCriteria());
-        } else if ($active == false) {
+        } elseif ($active === false) {
             $qb
                 ->addCriteria(self::unactiveCriteria());
         }
@@ -107,11 +108,13 @@ class BackerRepository extends ServiceEntityRepository
             ->addCriteria(AidRepository::liveCriteria('aid.'))
             ;
             if ($perimeterFrom instanceof Perimeter && $perimeterFrom->getId()) {
+                $ids = $this->getEntityManager()->getRepository(Perimeter::class)->getIdPerimetersContainedIn(array('perimeter' => $perimeterFrom));
+                $ids[] = $perimeterFrom->getId();
+    
                 $qb
-                    ->innerJoin('b.perimeter', 'perimeter')
-                    ->innerJoin('perimeter.perimetersFrom', 'perimetersFrom')
-                    ->andWhere('(perimetersFrom = :perimeter OR perimeter = :perimeter)')
-                    ->setParameter('perimeter', $perimeterFrom)
+                ->innerJoin('b.perimeter', 'perimeter')
+                ->andWhere('perimeter.id IN (:ids)')
+                ->setParameter('ids', $ids)
                 ;
             }
             
@@ -274,6 +277,7 @@ class BackerRepository extends ServiceEntityRepository
         $hasPublishedFinancedAids = $params['hasPublishedFinancedAids'] ?? null;
         $active = isset($params['active']) ? $params['active'] : null;
         $nbAidsLiveMin = $params['nbAidsLiveMin'] ?? null;
+        $backerGroup = $params['backerGroup'] ?? null;
         $orderBy = (isset($params['orderBy']) && isset($params['orderBy']['sort']) && isset($params['orderBy']['order'])) ? $params['orderBy'] : null;
         
         $qb = $this->createQueryBuilder('b');
@@ -341,6 +345,13 @@ class BackerRepository extends ServiceEntityRepository
                     ->andWhere('aidForHasPublishedFinancedAids.id IS NULL')
                     ;
             }
+        }
+
+        if ($backerGroup instanceof BackerGroup && $backerGroup->getId()) {
+            $qb
+                ->andWhere('b.backerGroup = :backerGroup')
+                ->setParameter('backerGroup', $backerGroup)
+            ;
         }
 
         if ($orderRand === true) {

@@ -4,6 +4,7 @@ namespace App\Controller\Admin\Perimeter;
 
 use App\Controller\Admin\AtCrudController;
 use App\Entity\Perimeter\PerimeterImport;
+use App\Message\Perimeter\MsgPerimeterImport;
 use App\Repository\User\UserRepository;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
@@ -168,6 +169,9 @@ class PerimeterImportCrudController extends AtCrudController
             'askProcessing' => true,
             'exclude' => $entity
         ]);
+
+        // envoi au worker
+        $this->messageBusInterface->dispatch(new MsgPerimeterImport());
 
         $this->addFlash('success', 'Import demandé. Vous recevrez un mail lorsque l\'import sera terminé. Il y en a actuellement '.$nbImport.' en attente.');
         $adminUrlGenerator = $this->container->get(AdminUrlGenerator::class);

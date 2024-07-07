@@ -289,11 +289,7 @@ class DataSource // NOSONAR too much methods
 
     public function getNbAids(): int
     {
-        try {
-            return count($this->getAids());
-        } catch (\Exception $e) {
-            return 0;
-        }
+        return $this->nbAids;
     }
 
     public function setNbAids(int $nb): static

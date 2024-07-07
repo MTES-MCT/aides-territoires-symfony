@@ -27,6 +27,7 @@ class AlertController extends FrontController
 
         // regarde le statut actuel de l'utilisateur
         $isMlConsent = $emailService->isUserMlConsent($user);
+
         if ($isMlConsent !== $user->isMlConsent()) {
             // on met à jour notre base
             $user->setMlConsent($isMlConsent);
@@ -47,6 +48,41 @@ class AlertController extends FrontController
         ]);
     }
 
+    #[Route('/alertes/vos-alertes/{id}/suppression', name: 'app_user_alert_delete_public')]
+    public function deletePublic(
+        $id,
+        AlertRepository $alertRepository,
+        ManagerRegistry $managerRegistry
+    )
+    {
+        // alerte a supprimer
+        $alert = $alertRepository->findOneBy(
+            [
+                'id' => $id,
+            ]
+        );
+        if (!$alert instanceof Alert) {
+            throw new NotFoundHttpException('Alerte introuvable');
+        }
+        
+        try {
+            $managerRegistry->getManager()->remove($alert);
+            $managerRegistry->getManager()->flush();
+
+            $this->tAddFlash(
+                FrontController::FLASH_SUCCESS,
+                'Votre alerte a bien été supprimée.'
+            );
+        } catch (\Exception $e) {
+            $this->tAddFlash(
+                FrontController::FLASH_ERROR,
+                'Une erreur s’est produite lors de la suppression de votre alerte'
+            );
+        }
+
+        return $this->redirectToRoute('app_home');
+    }
+
     #[Route('/comptes/alertes/vos-alertes/{id}/suppression', name: 'app_user_alert_delete')]
     public function delete(
         $id,
@@ -64,7 +100,7 @@ class AlertController extends FrontController
                 'id' => $id,
                 'email' => $user->getEmail()
             ]
-        );   
+        );
         if (!$alert instanceof Alert) {
             throw new NotFoundHttpException('Alerte introuvable');
         }

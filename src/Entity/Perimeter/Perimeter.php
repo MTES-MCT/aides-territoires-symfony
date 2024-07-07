@@ -25,9 +25,12 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\OpenApi\Model;
 use App\Controller\Api\Perimeter\PerimeterController;
+use App\Filter\Perimeter\PerimeterInseesFilter;
 use App\Filter\Perimeter\PerimeterScaleFilter;
 use App\Filter\Perimeter\PerimeterTextFilter;
+use App\Filter\Perimeter\PerimeterZipcodesFilter;
 use App\Service\Doctrine\DoctrineConstants;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ApiResource(
     shortName: 'Périmètres',
@@ -53,6 +56,8 @@ use App\Service\Doctrine\DoctrineConstants;
 )]
 #[ApiFilter(PerimeterTextFilter::class)]
 #[ApiFilter(PerimeterScaleFilter::class)]
+#[ApiFilter(PerimeterZipcodesFilter::class)]
+#[ApiFilter(PerimeterInseesFilter::class)]
 #[ORM\Entity(repositoryClass: PerimeterRepository::class)]
 #[ORM\Index(columns: ['date_create'], name: 'date_create_peri')]
 #[ORM\Index(columns: ['scale'], name: 'scale_peri')]
@@ -107,6 +112,7 @@ class Perimeter // NOSONAR too much methods
     const SCALE_COUNTY = 10;
     const SCALE_COMMUNE = 1;
     const SCALE_EPCI = 5;
+    const SCALE_DEPARTEMENT = 10;
     const SCALE_REGION = 15;
     const SCALE_ADHOC = 18;
     const SCALE_CONTINENT = 25;
@@ -142,13 +148,16 @@ class Perimeter // NOSONAR too much methods
     #[ORM\Column]
     private ?int $scale = null;
 
+    #[Assert\Length(max: 16)]
     #[ORM\Column(length: 16)]
     private ?string $code = null;
 
     #[Groups([Aid::API_GROUP_LIST, Aid::API_GROUP_ITEM, Backer::API_GROUP_LIST])]
+    #[Assert\Length(max: 255)]
     #[ORM\Column(length: 255)]
     private ?string $name = null;
 
+    #[Assert\Length(max: 32)]
     #[ORM\Column(length: 32, nullable: true)]
     private ?string $epci = null;
 
@@ -158,6 +167,7 @@ class Perimeter // NOSONAR too much methods
     #[ORM\Column(length: 2)]
     private ?string $continent = null;
 
+    #[Assert\Length(max: 3)]
     #[ORM\Column(length: 3)]
     private ?string $country = null;
 
@@ -179,6 +189,7 @@ class Perimeter // NOSONAR too much methods
     #[ORM\Column]
     private ?bool $isVisibleToUsers = false;
 
+    #[Assert\Length(max: 128)]
     #[ORM\Column(length: 128)]
     private ?string $unaccentedName = null;
 
@@ -224,15 +235,19 @@ class Perimeter // NOSONAR too much methods
     #[ORM\Column(nullable: true)]
     private ?int $projectsCount = null;
 
+    #[Assert\Length(max: 50)]
     #[ORM\Column(length: 50, nullable: true)]
     private ?string $densityTypology = null;
 
+    #[Assert\Length(max: 5)]
     #[ORM\Column(length: 5, nullable: true)]
     private ?string $insee = null;
 
+    #[Assert\Length(exactly: 9)]
     #[ORM\Column(length: 9, nullable: true)]
     private ?string $siren = null;
 
+    #[Assert\Length(exactly: 14)]
     #[ORM\Column(length: 14, nullable: true)]
     private ?string $siret = null;
 

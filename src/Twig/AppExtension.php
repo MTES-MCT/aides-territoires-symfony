@@ -143,6 +143,7 @@ class AppExtension extends AbstractExtension // NOSONAR too much methods
             new TwigFunction('getMatomoGoalId', [$this, 'getMatomoGoalId']),
             new TwigFunction('getKeywordReferenceAndSynonyms', [$this, 'getKeywordReferenceAndSynonyms']),
             new TwigFunction('getUserPublicProjectLatestView', [$this, 'getUserPublicProjectLatestView']),
+            new TwigFunction('isDateTime', [$this, 'isDateTime'])
         ];
     }
 
@@ -303,5 +304,9 @@ class AppExtension extends AbstractExtension // NOSONAR too much methods
             return null;
         }
         return $this->userService->getPublicProjectLatestView($user, $project);
+    }
+
+    public function isDateTime($date): bool {
+        return $date instanceof \DateTime;
     }
 }

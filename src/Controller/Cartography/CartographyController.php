@@ -102,6 +102,13 @@ class CartographyController extends FrontController
             'code' => $code,
             'scale' => Perimeter::SCALE_COUNTY
         ]);
+        if (!$current_dep instanceof Perimeter) {
+            $this->addFlash(
+                FrontController::FLASH_ERROR,
+                'Département non trouvé'
+            );
+            return $this->redirectToRoute('app_cartography_cartography');
+        }
 
         // formulaire de recherche de porteur d'aide
         $formBackerSearch = $this->createForm(
@@ -113,10 +120,6 @@ class CartographyController extends FrontController
                 'forceDepartement'=>$current_dep
             ]);
         $formBackerSearch->handleRequest($requestStack->getCurrentRequest());
-        if ($formBackerSearch->isSubmitted()) {
-            if ($formBackerSearch->isValid()) {                
-            }
-        }
 
         // les porteurs d'aides du département
         $backerParams = [

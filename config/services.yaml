@@ -41,6 +41,8 @@ parameters:
     ademe_agir_api_username: '%env(ADEME_AGIR_API_USERNAME)%'
     ademe_agir_api_password: '%env(ADEME_AGIR_API_PASSWORD)%'
     at_x_auth_token: '%env(AT_X_AUTH_TOKEN)%'
+    certificat_region_sud: '%env(CERTIFICAT_REGION_SUD)%'
+    certificat_ile_de_france: '%env(CERTIFICAT_ILE_DE_FRANCE)%'
 
 services:
     # default configuration for services in *this* file
@@ -102,3 +104,7 @@ services:
                 use_path_style_endpoint: true
 
     Nelmio\SecurityBundle\EventListener\ContentSecurityPolicyListener: '@nelmio_security.csp_listener'
+
+    App\EventListener\SentryListener:
+        tags:
+            - { name: kernel.event_listener, event: kernel.request, method: onKernelRequest }
