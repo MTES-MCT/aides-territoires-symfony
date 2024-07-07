@@ -2681,7 +2681,7 @@ class Aid // NOSONAR too much methods
         }
         return $this;
     }
-      
+    
     public function getImportDatas(): ?array
     {
         return $this->importDatas;
@@ -2689,8 +2689,7 @@ class Aid // NOSONAR too much methods
 
     public function setImportDatas(?array $importDatas): static
     {
-        $this->importDatas = $importDatas
-
+        $this->importDatas = $importDatas;
         return $this;
     }
 }
