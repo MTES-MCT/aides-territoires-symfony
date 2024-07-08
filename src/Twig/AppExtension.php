@@ -160,6 +160,7 @@ class AppExtension extends AbstractExtension // NOSONAR too much methods
             new TwigFunction('getKeywordReferenceAndSynonyms', [$this, 'getKeywordReferenceAndSynonyms']),
             new TwigFunction('getUserPublicProjectLatestView', [$this, 'getUserPublicProjectLatestView']),
             new TwigFunction('getImportAidManualDatas', [$this, 'getImportAidManualDatas']),
+            new TwigFunction('isDateTime', [$this, 'isDateTime'])
         ];
     }
 
@@ -367,5 +368,9 @@ class AppExtension extends AbstractExtension // NOSONAR too much methods
         $datas['projectReferences'] = $projectReferenceNames;
 
         return $datas;
+    }
+  
+    public function isDateTime($date): bool {
+        return $date instanceof \DateTime;
     }
 }

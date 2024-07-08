@@ -34,43 +34,14 @@ class ImportFluxAdemeAgirCommand extends ImportFluxCommand
 
     protected function getFieldsMapping(array $aidToImport, array $params = null): array // NOSONAR too complex
     {
-        $keys = ['date_debut', 'date_fin'];
-
-        $importRawObjectCalendar = [];
-        foreach ($keys as $key) {
-            if (isset($aidToImport[$key])) {
-                $importRawObjectCalendar[$key] = $aidToImport[$key];
-            }
-        }
-        if (empty($importRawObjectCalendar)) {
-            $importRawObjectCalendar = null;
-        }
-
-        $importRawObject = $aidToImport;
-        foreach ($keys as $key) {
-            if (isset($importRawObject[$key])) {
-                unset($importRawObject[$key]);
-            }
-        }
-
         $isCallForProject = false;
         if (isset($aidToImport['type']) && $aidToImport['type'] == 'AAP') {
             $isCallForProject = true;
         }
 
-        $dateStart = null;
-        try {
-            $dateStart = new \DateTime($aidToImport['date_debut'] ?? null);
-        } catch (\Exception $e) {
-            $dateStart = null;
-        }
 
-        $dateSubmissionDeadline = null;
-        try {
-            $dateSubmissionDeadline = new \DateTime($aidToImport['date_fin'] ?? null);
-        } catch (\Exception $e) {
-            $dateSubmissionDeadline = null;
-        }
+        $dateStart = $this->getDateTimeOrNull($aidToImport['date_debut'] ?? null);
+        $dateSubmissionDeadline = $this->getDateTimeOrNull($aidToImport['date_fin'] ?? null);
 
         $eligibility = null;
         if (isset($aidToImport['couverture_geo']) && (int) $aidToImport['couverture_geo'] == 4) {
@@ -88,10 +59,8 @@ class ImportFluxAdemeAgirCommand extends ImportFluxCommand
             $eligibility = 'Ce dispositif est applicable uniquement aux régions suivantes : '.trim($eligibility);
         }
 
-        return [
+        $return = [
             'importDataMention' => 'Ces données sont mises à disposition par l\'ADEME.',
-            'importRawObjectCalendar' => $importRawObjectCalendar,
-            'importRawObject' => $importRawObject,
             'name' => isset($aidToImport['titre']) ? strip_tags($aidToImport['titre']) : null,
             'nameInitial' => isset($aidToImport['titre']) ? strip_tags($aidToImport['titre']) : null,
             'description' => isset($aidToImport['description_longue']) ? $this->htmlSanitizerInterface->sanitize($aidToImport['description_longue']) : null,
@@ -103,6 +72,9 @@ class ImportFluxAdemeAgirCommand extends ImportFluxCommand
             'eligibility' => $eligibility,
             'contact' => 'Pour contacter l\'Ademe ou candidater à l\'offre, veuillez cliquer sur le lien vers le descriptif complet.'
         ];
+
+        // on ajoute les données brut d'import pour comparer avec les données actuelles
+        return $this->mergeImportDatas($return);
     }
 
     protected function getApiOptions(): array

@@ -43,6 +43,9 @@ class ImportFluxCommand extends Command // NOSONAR too much methods
     protected int $error = 0;
     protected \DateTime $dateImportStart;
 
+    protected array $thematiquesOk = [];
+    protected array $thematiquesKo = [];
+
     public function __construct(
         protected KernelInterface $kernelInterface,
         protected ManagerRegistry $managerRegistry,
@@ -71,10 +74,10 @@ class ImportFluxCommand extends Command // NOSONAR too much methods
         $io = new SymfonyStyle($input, $output);
         $io->title($this->commandTextStart);
 
-        if ($this->kernelInterface->getEnvironment() != 'prod') {
-            $io->info('Uniquement en prod');
-            return Command::FAILURE;
-        }
+        // if ($this->kernelInterface->getEnvironment() != 'prod') {
+        //     $io->info('Uniquement en prod');
+        //     return Command::FAILURE;
+        // }
 
         try  {
             // set la dataSource
@@ -143,6 +146,7 @@ class ImportFluxCommand extends Command // NOSONAR too much methods
             );
             $content = $response->toArray();
             $nbItems = $content['count'] ?? 0;
+
             if (!$nbItems) {
                 throw new \Exception('Erreur sur la pagination, nbItems = 0');
             }
@@ -171,11 +175,7 @@ class ImportFluxCommand extends Command // NOSONAR too much methods
             }
 
             // on regarde si on trouve une aide avec cet importUniqueid
-            $aid = $this->managerRegistry->getRepository(Aid::class)->findOneBy(
-                [
-                    'importUniqueid' => trim($importUniqueid)
-                ]
-            );
+            $aid = $this->findAid($aidToImport);
 
             if (!$aid instanceof Aid) {
                 // on crée l'aide
@@ -187,6 +187,10 @@ class ImportFluxCommand extends Command // NOSONAR too much methods
 
             $io->progressAdvance();
         }
+        $this->thematiquesOk = array_unique($this->thematiquesOk);
+        $this->thematiquesKo = array_unique($this->thematiquesKo);
+        sort($this->thematiquesOk);
+        sort($this->thematiquesKo);
 
         $io->progressFinish();
 
@@ -213,7 +217,7 @@ class ImportFluxCommand extends Command // NOSONAR too much methods
                 );
                 $content = $response->getContent();
                 $content = $response->toArray();
-    
+
                 foreach ($content as $key => $value) {
                     if (in_array($key, $this->aidsLabelSearch) && is_array($value)) {
                         $aidsFromImport = array_merge($aidsFromImport, $value);
@@ -232,6 +236,25 @@ class ImportFluxCommand extends Command // NOSONAR too much methods
         return $aidsFromImport;
     }
 
+    protected function findAid($aidToImport): ?Aid
+    {
+        try {
+            // on recherche par importUniqueid
+            $aid = $this->managerRegistry->getRepository(Aid::class)->findOneBy(
+                [
+                    'importUniqueid' => trim($this->getImportUniqueid($aidToImport))
+                ]
+            );
+            if ($aid instanceof Aid) {
+                return $aid;
+            }
+        } catch (\Exception $e) {
+            return null;
+        }
+
+        return null;
+    }
+
     // The aid is actually new, so we just create it.
     protected function createAid($aidToImport): bool
     {
@@ -245,7 +268,6 @@ class ImportFluxCommand extends Command // NOSONAR too much methods
             $aid->setImportDataUrl($this->dataSource->getImportDataUrl());
             $importLicence = $this->dataSource->getImportLicence() ?? DataSource::SLUG_LICENCE_UNKNOWN;
             $aid->setImportShareLicence($importLicence);
-            $aid->setImportRawObject($aidToImport);
             $aid->setAuthor($this->dataSource->getAidAuthor());
             $aidFinancer = new AidFinancer();
             $aidFinancer->setBacker($this->dataSource->getBacker());
@@ -264,14 +286,7 @@ class ImportFluxCommand extends Command // NOSONAR too much methods
             foreach ($this->getFieldsMapping($aidToImport, ['context' => 'create']) as $field => $value) {
                 $aid->{'set' . ucfirst($field)}($value);
             }
-            // recup auto des champ import_..._temp si non renseigné
-            if (!$aid->getImportRawObjectTemp()) {
-                $aid->setImportRawObjectTemp($aid->getImportRawObject());
-            }
-            if (!$aid->getImportRawObjectTempCalendar()) {
-                $aid->setImportRawObjectTempCalendar($aid->getImportRawObjectCalendar());
-            }
-            
+
             // prépare pour sauvegarde
             $this->managerRegistry->getManager()->persist($aid);
 
@@ -298,66 +313,56 @@ class ImportFluxCommand extends Command // NOSONAR too much methods
         try {
             // les nouvelles valeurs
             $newValues = $this->getFieldsMapping($aidToImport, ['context' => 'update', 'aid' => $aid]);
-            $keepValues = [];
-
-            if (
-                isset($newValues['importRawObject'])
-                && $newValues['importRawObject'] != $aid->getImportRawObject()
-            ) {
-                /*
-                If fields other than :
-                    - aid.submission_deadline,
-                    - aid.start_date,
-                    - aid.name_initial
-                have been modified.
-                We won't update automotically the aid.
-                Aid's status is "reviewable" and we simply update the fields calendar
-                and the fields:
-                    - import_raw_object_temp et
-                    - import_raw_object_temp_calendar
-                    - start_date
-                    - submission_deadline
-                    - name_initial
-                */
-                $keepValues = ['dateStart', 'dateSubmissionDeadline', 'nameInitial', 'importRawObject', 'importRawObjectCalendar'];
-                $aid->setImportUpdated(true);
-            } elseif (
-                isset($newValues['importRawObjectCalendar'])
-                && $newValues['importRawObjectCalendar'] != $aid->getImportRawObjectCalendar()
-                && $this->idDataSource !== 2
-            ) {
-                /*
-                If the changed fields are:
-                    - aid.submission_deadline,
-                    - aid.start_date,
-                    - aid.name_initial,
-                and if the import_data_source is not Pays de la Loire
-                we try an automatic update of these fields.
-                We also update the field import_raw_object_temp_calendar
-                */
-                $keepValues = ['dateStart', 'dateSubmissionDeadline', 'nameInitial', 'importRawObjectCalendar'];
-                $aid->setDateImportLastAccess(new \DateTime(date('Y-m-d H:i:s')));
+            // en update on ne touche pas au nom (modifié par les bizdev lors de la validation)
+            if (isset($newValues['importDatas']) && isset($newValues['importDatas']['name'])) {
+                unset($newValues['importDatas']['name']);
             }
+            // liste des champs qu'on met à jour automatiquement, les autres sont soumis à validation manuelle
+            $keepValues = ['dateStart', 'dateSubmissionDeadline', 'nameInitial', 'originUrl', 'applicationUrl', 'importDataMention'];
 
             // parcours les nouvelles valeurs
             $entityUpdated = false;
+            $needManualValidation = false;
             foreach ($newValues as $field => $value) {
-                if (!in_array($field, $keepValues)) {
+                // on ne regarde pas le champ qui stocke l'update
+                if ($field == 'importDatas') {
                     continue;
                 }
-                if ($field == 'importRawObject') {
-                    $aid->setImportRawObjectTemp($value);
-                    unset($newValues[$field]);
-                } elseif ($field == 'importRawObjectCalendar') {
-                    $aid->setImportRawObjectTempCalendar($value);
-                    unset($newValues[$field]);
-                } else {
-                    $aid->{'set' . ucfirst($field)}($value);
+                // gestion des booleéns
+                $methodGet = 'get';
+                if (!method_exists($aid, 'get'.ucfirst($field))) {
+                    if (method_exists($aid, 'is'.ucfirst($field))) {
+                        $methodGet = 'is';
+                    } else {
+                        continue;
+                    }
                 }
-                $entityUpdated = true;
+
+                // les champs qu'on ne modifie pas automatiquement
+                if (!in_array($field, $keepValues)) {
+                    // on regarde si il y a une modification pour mettre un statut "à valider" à l'aide
+                    if ($aid->{$methodGet.ucfirst($field)}() != $value) {
+                        $entityUpdated = true;
+                        $needManualValidation = true;
+                    }
+                    continue;
+                }
+
+                // les champs qu'on modifie automatiquement
+                if ($aid->{$methodGet.ucfirst($field)}() != $value && method_exists($aid, 'set'.ucfirst($field))) {
+                    // assigne la nouvelle valeur
+                    $aid->{'set' . ucfirst($field)}($value);
+                    // on retire le champ des valeurs à validées manuellement
+                    unset($newValues[$field]);
+                    // on note que l'entité à été modifiée
+                    $entityUpdated = true;
+                }
             }
 
-            // on regarde si modification des audiences
+            // on assigne les valeurs de l'api au champ importDatas
+            $aid->setImportDatas($newValues['importDatas'] ?? null);
+
+            // on regarde si modification des audiences, update en auto
             $oldArray = $aid->getAidAudiences()->toArray();
             $aid = $this->setAidAudiences($aidToImport, $aid);
             $newArray = $aid->getAidAudiences()->toArray();
@@ -369,7 +374,7 @@ class ImportFluxCommand extends Command // NOSONAR too much methods
             //-----------------------------------------------------
 
 
-            // on regarde si modification des categories
+            // on regarde si modification des categories, update en auto
             $oldArray = $aid->getCategories()->toArray();
             $aid = $this->setCategories($aidToImport, $aid);
             $newArray = $aid->getCategories()->toArray();
@@ -381,8 +386,13 @@ class ImportFluxCommand extends Command // NOSONAR too much methods
             //-----------------------------------------------------
 
             if ($entityUpdated) {
-                // notifie que l'aide à été modifié suite à l'import
-                $aid->setImportUpdated(true);
+                // on ne notifie que si l'aide est en ligne et a besoin d'une validation manuelle
+                if ($aid->isLive() && $needManualValidation) {
+                    // notifie que l'aide à été modifié suite à l'import
+                    $aid->setImportUpdated(true);
+                    // si les infos de contact ont été modifié
+                    $aid->setContactInfoUpdated($this->isContactUpdated($newValues, $aid));
+                }
                 // persiste
                 $this->managerRegistry->getManager()->persist($aid);
 
@@ -466,41 +476,44 @@ class ImportFluxCommand extends Command // NOSONAR too much methods
         return $aid;
     }
 
-    protected function getImportRaws(
-        array $aidToImport,
-        array $keys = ['start_date', 'predeposit_date', 'submission_deadline', 'recurrence']
-    ): array
+    protected function mergeImportDatas(array $return): array
     {
-        $importRawObjectCalendar = [];
-        foreach ($keys as $key) {
-            if (isset($aidToImport[$key])) {
-                $importRawObjectCalendar[$key] = $aidToImport[$key];
-            }
-        }
-        if (empty($importRawObjectCalendar)) {
-            $importRawObjectCalendar = null;
-        }
-
-        $importRawObject = $aidToImport;
-        foreach ($keys as $key) {
-            if (isset($importRawObject[$key])) {
-                unset($importRawObject[$key]);
-            }
-        }
-
-        return [
-            'importRawObjectCalendar' => $importRawObjectCalendar,
-            'importRawObject' => $importRawObject
-        ];
+        return array_merge($return, [
+            'importDatas' => $return
+        ]);
     }
 
-    protected function getDateTimeOrNull(?string $date): ?\DateTime
+    protected function isContactUpdated(array $newValues, Aid $aid): bool
+    {
+        $checkFields = ['contact', 'originUrl', 'applicationUrl'];
+        foreach ($checkFields as $field) {
+            if (
+                isset($newValues[$field])
+                && method_exists($aid, 'get'.ucfirst($field))
+                && $aid->{'get'.ucfirst($field)}() != $newValues[$field]
+                ) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    protected function getDateTimeOrNull(?string $date, ?array $params = null): ?\DateTime
     {
         if (!$date) {
             return null;
         }
         try {
-            $date = new \DateTime($date);
+            $dateTemp = new \DateTime($date);
+
+            if (!isset($params['keepTime'])) {
+                // Force pour éviter les différence sur le fuseau horaire
+                $date = new \DateTime($dateTemp->format('Y-m-d'));
+                // Force les heures, minutes, et secondes à 00:00:00
+                $date->setTime(0, 0, 0);
+            } else {
+                $date = new \DateTime($date);
+            }
         } catch (\Exception $e) {
             $date = null;
         }
