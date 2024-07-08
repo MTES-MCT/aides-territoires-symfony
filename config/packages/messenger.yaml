@@ -23,6 +23,7 @@ framework:
             # Route your messages to the transports
             'App\Message\SendNotification': async
             'App\Message\Aid\AidExtractKeyword': async
+            'App\Message\Aid\AidPropagateUpdate': async
             'App\Message\Alert\AlertMessage': async
             'App\Message\Alert\AlertResume': async
             'App\Message\Export\MsgSpreadsheetToExport': async
