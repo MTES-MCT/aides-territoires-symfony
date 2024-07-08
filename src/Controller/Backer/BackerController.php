@@ -129,7 +129,7 @@ class BackerController extends FrontController
         try {
             if ($securityService->validHostOrgin($requestStack) === false) {
                 // La requête n'est pas interne, retourner une erreur
-                // throw $this->createAccessDeniedException('This action can only be performed by the server itself.');
+                throw $this->createAccessDeniedException('This action can only be performed by the server itself.');
             }
 
             // recuperer id du perimetre

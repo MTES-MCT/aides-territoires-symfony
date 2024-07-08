@@ -5,6 +5,11 @@
 	{{ encore_entry_link_tags('import-scss/user/aid/import-manual') }}
 {% endblock %}
 
+{% block javascripts %}
+	{{ parent() }}
+	{{ encore_entry_script_tags('front/user/aid/import-manual') }}
+{% endblock %}
+
 {% block title %}Manuel d'importation | {{ parent() }}{% endblock %}
 
 {% block body %}

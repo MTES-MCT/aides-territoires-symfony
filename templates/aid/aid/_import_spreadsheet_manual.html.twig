@@ -70,7 +70,7 @@
                     <li>Optionnel</li>
                     <li>
                     Doit être l'identifiant du porteur.
-                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#backersModal">
+                    <button type="button" class="{{ classBtn }}" data-bs-toggle="modal" data-bs-target="#backersModal" data-fr-opened="false" aria-controls="backersModal">
                         Trouver identifiant
                     </button>
                     </li>
@@ -88,7 +88,7 @@
                     <li>Optionnel</li>
                     <li>
                     Doit être l'identifiant de l'instructeur.
-                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#backersModal">
+                    <button type="button" class="{{ classBtn }}" data-bs-toggle="modal" data-bs-target="#backersModal" data-fr-opened="false" aria-controls="backersModal">
                         Trouver identifiant
                     </button>                    
                     </li>
@@ -106,7 +106,7 @@
                     <li>Optionnel</li>
                     <li>
                     Doit être le nom exact de la cible.
-                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#organizationTypesModal">
+                    <button type="button" class="{{ classBtn }}" data-bs-toggle="modal" data-bs-target="#organizationTypesModal" data-fr-opened="false" aria-controls="organizationTypesModal">
                         Liste
                     </button>
                     </li>
@@ -124,7 +124,7 @@
                     <li>Optionnel</li>
                     <li>
                     Doit être le nom exact du type.
-                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#aidTypesModal">
+                    <button type="button" class="{{ classBtn }}" data-bs-toggle="modal" data-bs-target="#aidTypesModal" data-fr-opened="false" aria-controls="aidTypesModal">
                         Liste
                     </button>
                     </li>
@@ -201,7 +201,7 @@
                     <li>Optionnel</li>
                     <li>
                     Doit être le nom exact de la thématique.
-                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#categoriesModal">
+                    <button type="button" class="{{ classBtn }}" data-bs-toggle="modal" data-bs-target="#categoriesModal" data-fr-opened="false" aria-controls="categoriesModal">
                         Liste
                     </button>
                     </li>
@@ -219,7 +219,7 @@
                     <li>Optionnel</li>
                     <li>
                     Doit être le nom exact de la récurrence.
-                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#recurrencesModal">
+                    <button type="button" class="{{ classBtn }}" data-bs-toggle="modal" data-bs-target="#recurrencesModal" data-fr-opened="false" aria-controls="recurrencesModal">
                         Liste
                     </button>
                     </li>
@@ -284,7 +284,7 @@
                     <li>Optionnel</li>
                     <li>
                     Doit être le nom exact de l'état d'avancement.
-                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#stepsModal">
+                    <button type="button" class="{{ classBtn }}" data-bs-toggle="modal" data-bs-target="#stepsModal" data-fr-opened="false" aria-controls="stepsModal">
                         Liste
                     </button>
                     </li>
@@ -302,7 +302,7 @@
                     <li>Optionnel</li>
                     <li>
                     Doit être le nom exact du type / de l'action.
-                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#destinationsModal">
+                    <button type="button" class="{{ classBtn }}" data-bs-toggle="modal" data-bs-target="#destinationsModal" data-fr-opened="false" aria-controls="destinationsModal">
                         Liste
                     </button>                    
                     </li>
@@ -320,7 +320,7 @@
                     <li>Optionnel</li>
                     <li>
                     Doit être l'identifiant du périmètre.
-                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#perimetersModal">
+                    <button type="button" class="{{ classBtn }}" data-bs-toggle="modal" data-bs-target="#perimetersModal" data-fr-opened="false" aria-controls="perimetersModal">
                         Trouver l'identifiant
                     </button>  
                     </li>
@@ -397,7 +397,7 @@
                     <li>Requis</li>
                     <li>
                     Doit être un nombre
-                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#organizationIdsModal">
+                    <button type="button" class="{{ classBtn }}" data-bs-toggle="modal" data-bs-target="#organizationIdsModal" data-fr-opened="false" aria-controls="organizationIdsModal">
                         Vos identifiants
                     </button>   
                     </li>
@@ -414,7 +414,7 @@
                     <li>Optionnel</li>
                     <li>
                     Doit être le nom exact du projet référent.
-                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#projectReferencesModal">
+                    <button type="button" class="{{ classBtn }}" data-bs-toggle="modal" data-bs-target="#projectReferencesModal" data-fr-opened="false" aria-controls="projectReferencesModal">
                         Liste
                     </button>                        
                     </li>
@@ -429,7 +429,7 @@
 {% set manualData = getImportAidManualDatas() %}
 
 <!-- Modal Programs -->
-<dialog class="modal fr-modal fade" role="dialog" id="programsModal" tabindex="-1" aria-labelledby="programsModalLabel" aria-hidden="true">
+<dialog class="modal fr-modal fade" id="programsModal" tabindex="-1" aria-labelledby="programsModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl fr-container fr-container--fluid">
         <div class="modal-content fr-modal__body">
             {% if isFront is defined %}
@@ -437,7 +437,7 @@
                 <button class="fr-btn fr-btn--close" title="Fermer la fenêtre modale" aria-controls="programsModal">Fermer</button>
             </div>
             {% endif %}
-            <div class="modal-header fr-modal__content">
+            <div class="modal-header fr-modal__content fr-mb-1w">
                 <h5 class="modal-title" id="programsModalLabel">Liste des programmes</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
@@ -459,16 +459,21 @@
 <!-- /Modal Programs -->
 
 <!-- Modal Backers -->
-<div class="modal fade" id="backersModal" tabindex="-1" aria-labelledby="backersModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-xl">
-        <div class="modal-content">
-            <div class="modal-header">
+<dialog class="modal fr-modal fade" id="backersModal" tabindex="-1" aria-labelledby="backersModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl fr-container fr-container--fluid">
+        <div class="modal-content fr-modal__body">
+            {% if isFront is defined %}
+            <div class="fr-modal__header">
+                <button class="fr-btn fr-btn--close" title="Fermer la fenêtre modale" aria-controls="backersModal">Fermer</button>
+            </div>
+            {% endif %}
+            <div class="modal-header fr-modal__content fr-mb-1w">
                 <h5 class="modal-title" id="backersModalLabel">Porteurs et insctructeurs</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body">
-                <p><input type="text" name="backer" id="backerSearch" class="form-control" placeholder="Rechercher un porteur ou instructeur"></p>
-                <table class="table table-striped">
+            <div class="modal-body fr-modal__content">
+                <p><input type="text" name="backer" id="backerSearch" class="form-control fr-input" placeholder="Rechercher un porteur ou instructeur"></p>
+                <table class="fr-table table table-striped">
                     <thead>
                         <tr>
                             <th>Id</th>
@@ -481,164 +486,213 @@
                     </tbody>
                 </table>
             </div>
+            {% if isFront is not defined %}
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
             </div>
+            {% endif %}
         </div>
     </div>
-</div>
+</dialog>
 <!-- /Modal Backers -->
 
 
 <!-- Modal OrganizationTypes -->
-<div class="modal fade" id="organizationTypesModal" tabindex="-1" aria-labelledby="organizationTypesModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-xl">
-        <div class="modal-content">
-            <div class="modal-header">
+<dialog class="modal fr-modal fade" id="organizationTypesModal" tabindex="-1" aria-labelledby="organizationTypesModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl fr-container fr-container--fluid">
+        <div class="modal-content fr-modal__body">
+            {% if isFront is defined %}
+            <div class="fr-modal__header">
+                <button class="fr-btn fr-btn--close" title="Fermer la fenêtre modale" aria-controls="organizationTypesModal">Fermer</button>
+            </div>
+            {% endif %}
+            <div class="modal-header fr-modal__content fr-mb-1w">
                 <h5 class="modal-title" id="organizationTypesModalLabel">Liste des types de structure</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body">
+            <div class="modal-body fr-modal__content">
                 <div class="column-text">
                     {% for organizationType in manualData.organizationTypes %}
                     <p>{{ organizationType }}</p>
                     {% endfor %}
                 </div>
             </div>
+            {% if isFront is not defined %}
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
             </div>
+            {% endif %}
         </div>
     </div>
-</div>
+</dialog>
 <!-- /Modal OrganizationTypes -->
 
 <!-- Modal AidTypes -->
-<div class="modal fade" id="aidTypesModal" tabindex="-1" aria-labelledby="aidTypesModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-xl">
-        <div class="modal-content">
-            <div class="modal-header">
+<dialog class="modal fr-modal fade" id="aidTypesModal" tabindex="-1" aria-labelledby="aidTypesModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl fr-container fr-container--fluid">
+        <div class="modal-content fr-modal__body">
+            {% if isFront is defined %}
+            <div class="fr-modal__header">
+                <button class="fr-btn fr-btn--close" title="Fermer la fenêtre modale" aria-controls="aidTypesModal">Fermer</button>
+            </div>
+            {% endif %}
+            <div class="modal-header fr-modal__content fr-mb-1w">
                 <h5 class="modal-title" id="aidTypesModalLabel">Liste des types d'aides</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body">
+            <div class="modal-body fr-modal__content">
                 <div class="column-text">
                     {% for aidType in manualData.aidTypes %}
                     <p>{{ aidType }}</p>
                     {% endfor %}
                 </div>
             </div>
+            {% if isFront is not defined %}
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
             </div>
+            {% endif %}
         </div>
     </div>
-</div>
+</dialog>
 <!-- /Modal AidTypes -->
 
 <!-- Modal Categories -->
-<div class="modal fade" id="categoriesModal" tabindex="-1" aria-labelledby="categoriesModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-xl">
-        <div class="modal-content">
-            <div class="modal-header">
+<dialog class="modal fr-modal fade" id="categoriesModal" tabindex="-1" aria-labelledby="categoriesModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl fr-container fr-container--fluid">
+        <div class="modal-content fr-modal__body">
+            {% if isFront is defined %}
+            <div class="fr-modal__header">
+                <button class="fr-btn fr-btn--close" title="Fermer la fenêtre modale" aria-controls="categoriesModal">Fermer</button>
+            </div>
+            {% endif %}
+            <div class="modal-header fr-modal__content fr-mb-1w">
                 <h5 class="modal-title" id="categoriesModalLabel">Liste des thématiques</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body">
+            <div class="modal-body fr-modal__content">
                 <div class="column-text">
                     {% for category in manualData.categories %}
                     <p>{{ category }}</p>
                     {% endfor %}
                 </div>
             </div>
+            {% if isFront is not defined %}
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
             </div>
+            {% endif %}
         </div>
     </div>
-</div>
+</dialog>
 <!-- /Modal Categories -->
 
 <!-- Modal AidRecurrence -->
-<div class="modal fade" id="recurrencesModal" tabindex="-1" aria-labelledby="recurrencesModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-xl">
-        <div class="modal-content">
-            <div class="modal-header">
+<dialog class="modal fr-modal fade" id="recurrencesModal" tabindex="-1" aria-labelledby="recurrencesModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl fr-container fr-container--fluid">
+        <div class="modal-content fr-modal__body">
+            {% if isFront is defined %}
+            <div class="fr-modal__header">
+                <button class="fr-btn fr-btn--close" title="Fermer la fenêtre modale" aria-controls="recurrencesModal">Fermer</button>
+            </div>
+            {% endif %}
+            <div class="modal-header fr-modal__content fr-mb-1w">
                 <h5 class="modal-title" id="recurrencesModalLabel">Liste des récurrences</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body">
+            <div class="modal-body fr-modal__content">
                 <div class="column-text">
                     {% for aidRecurrence in manualData.aidRecurrences %}
                     <p>{{ aidRecurrence }}</p>
                     {% endfor %}
                 </div>
             </div>
+            {% if isFront is not defined %}
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
             </div>
+            {% endif %}
         </div>
     </div>
-</div>
+</dialog>
 <!-- /Modal AidRecurrence -->
 
 <!-- Modal AidStep -->
-<div class="modal fade" id="stepsModal" tabindex="-1" aria-labelledby="stepsModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-xl">
-        <div class="modal-content">
-            <div class="modal-header">
+<dialog class="modal fr-modal fade" id="stepsModal" tabindex="-1" aria-labelledby="stepsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl fr-container fr-container--fluid">
+        <div class="modal-content fr-modal__body">
+            {% if isFront is defined %}
+            <div class="fr-modal__header">
+                <button class="fr-btn fr-btn--close" title="Fermer la fenêtre modale" aria-controls="stepsModal">Fermer</button>
+            </div>
+            {% endif %}
+            <div class="modal-header fr-modal__content fr-mb-1w">
                 <h5 class="modal-title" id="stepsModalLabel">Liste des étapes</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body">
+            <div class="modal-body fr-modal__content">
                 <div class="column-text">
                     {% for aidStep in manualData.aidSteps %}
                     <p>{{ aidStep }}</p>
                     {% endfor %}
                 </div>
             </div>
+            {% if isFront is not defined %}
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
             </div>
+            {% endif %}
         </div>
     </div>
-</div>
+</dialog>
 <!-- /Modal AidStep -->
 
 <!-- Modal AidDestination -->
-<div class="modal fade" id="destinationsModal" tabindex="-1" aria-labelledby="destinationsModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-xl">
-        <div class="modal-content">
-            <div class="modal-header">
+<dialog class="modal fr-modal fade" id="destinationsModal" tabindex="-1" aria-labelledby="destinationsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl fr-container fr-container--fluid">
+        <div class="modal-content fr-modal__body">
+            {% if isFront is defined %}
+            <div class="fr-modal__header">
+                <button class="fr-btn fr-btn--close" title="Fermer la fenêtre modale" aria-controls="destinationsModal">Fermer</button>
+            </div>
+            {% endif %}
+            <div class="modal-header fr-modal__content fr-mb-1w">
                 <h5 class="modal-title" id="destinationsModalLabel">Liste des types de dépenses / actions couvertes</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body">
+            <div class="modal-body fr-modal__content">
                 <div class="column-text">
                     {% for aidDestination in manualData.aidDestinations %}
                     <p>{{ aidDestination }}</p>
                     {% endfor %}
                 </div>
             </div>
+            {% if isFront is not defined %}
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
             </div>
+            {% endif %}
         </div>
     </div>
-</div>
+</dialog>
 <!-- /Modal AidDestination -->
 
 <!-- Modal Perimeter -->
-<div class="modal fade" id="perimetersModal" tabindex="-1" aria-labelledby="perimetersModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-xl">
-        <div class="modal-content">
-            <div class="modal-header">
+<dialog class="modal fr-modal fade" id="perimetersModal" tabindex="-1" aria-labelledby="perimetersModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl fr-container fr-container--fluid">
+        <div class="modal-content fr-modal__body">
+            {% if isFront is defined %}
+            <div class="fr-modal__header">
+                <button class="fr-btn fr-btn--close" title="Fermer la fenêtre modale" aria-controls="perimetersModal">Fermer</button>
+            </div>
+            {% endif %}
+            <div class="modal-header fr-modal__content fr-mb-1w">
                 <h5 class="modal-title" id="perimetersModalLabel">Liste des périmètres</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body">
-                <p><input type="text" name="perimeter" id="perimeterSearch" class="form-control" placeholder="Rechercher un périmètre"></p>
-                <table class="table table-striped">
+            <div class="modal-body fr-modal__content">
+                <p><input type="text" name="perimeter" id="perimeterSearch" class="form-control fr-input" placeholder="Rechercher un périmètre"></p>
+                <table class="fr-table table table-striped">
                     <thead>
                         <tr>
                             <th>Id</th>
@@ -652,24 +706,31 @@
                     </tbody>
                 </table>
             </div>
+            {% if isFront is not defined %}
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
             </div>
+            {% endif %}
         </div>
     </div>
-</div>
+</dialog>
 <!-- /Modal Perimeter -->
 
 
 <!-- Modal OrganizationIds -->
-<div class="modal fade" id="organizationIdsModal" tabindex="-1" aria-labelledby="organizationIdsModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-xl">
-        <div class="modal-content">
-            <div class="modal-header">
+<dialog class="modal fr-modal fade" id="organizationIdsModal" tabindex="-1" aria-labelledby="organizationIdsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl fr-container fr-container--fluid">
+        <div class="modal-content fr-modal__body">
+            {% if isFront is defined %}
+            <div class="fr-modal__header">
+                <button class="fr-btn fr-btn--close" title="Fermer la fenêtre modale" aria-controls="organizationIdsModal">Fermer</button>
+            </div>
+            {% endif %}
+            <div class="modal-header fr-modal__content fr-mb-1w">
                 <h5 class="modal-title" id="organizationIdsModalLabel">Identifiants de vos structures</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body">
+            <div class="modal-body fr-modal__content">
                 <div class="column-text">
                     {% if app.user %}
                         {% for organization in app.user.organizations %}
@@ -678,33 +739,42 @@
                     {% endif %}
                 </div>
             </div>
+            {% if isFront is not defined %}
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
             </div>
+            {% endif %}
         </div>
     </div>
-</div>
+</dialog>
 <!-- /Modal OrganizationIds -->
 
 <!-- Modal ProjectReference -->
-<div class="modal fade" id="projectReferencesModal" tabindex="-1" aria-labelledby="projectReferencesModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-xl">
-        <div class="modal-content">
-            <div class="modal-header">
+<dialog class="modal fr-modal fade" id="projectReferencesModal" tabindex="-1" aria-labelledby="projectReferencesModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl fr-container fr-container--fluid">
+        <div class="modal-content fr-modal__body">
+            {% if isFront is defined %}
+            <div class="fr-modal__header">
+                <button class="fr-btn fr-btn--close" title="Fermer la fenêtre modale" aria-controls="projectReferencesModal">Fermer</button>
+            </div>
+            {% endif %}
+            <div class="modal-header fr-modal__content fr-mb-1w">
                 <h5 class="modal-title" id="projectReferencesModalLabel">Liste des projets référents</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body">
+            <div class="modal-body fr-modal__content">
                 <div class="column-text">
                     {% for projectReference in manualData.projectReferences %}
                     <p>{{ projectReference }}</p>
                     {% endfor %}
                 </div>
             </div>
+            {% if isFront is not defined %}
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
             </div>
+            {% endif %}
         </div>
     </div>
-</div>
+</dialog>
 <!-- /Modal ProjectReference -->

@@ -22,6 +22,27 @@ global.$ = global.jQuery = $;
 
 
 $(function(){
+    /***************************
+     * Pour ne pas trigger plusieurs fois un event
+     *
+     * exemple :
+    waitForFinalEvent(function () {
+
+    }, 500, 'id-unique');
+    */
+    global.waitForFinalEvent = (function () {
+        var timers = {};
+        return function (callback, ms, uniqueId) {
+            if (!uniqueId) {
+                uniqueId = "Don't call this twice without a uniqueId";
+            }
+            if (timers[uniqueId]) {
+                clearTimeout (timers[uniqueId]);
+            }
+            timers[uniqueId] = setTimeout(callback, ms);
+        };
+    })();
+
     global.convertToSlug = function(str) {
         str = str.replace(/^\s+|\s+$/g, ''); // trim
         str = str.toLowerCase();

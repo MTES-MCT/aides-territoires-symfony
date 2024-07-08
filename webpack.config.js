@@ -64,6 +64,7 @@ Encore
     .addEntry('front/aid/aid/detail', './assets/js/front/aid/aid/detail.js')
     .addEntry('front/user/register', './assets/js/front/user/register.js')
     .addEntry('front/user/aid/publications', './assets/js/front/user/aid/publications.js')
+    .addEntry('front/user/aid/import-manual', './assets/js/front/user/aid/import-manual.js')
     .addEntry('front/user/register-commune', './assets/js/front/user/register-commune.js')
     .addEntry('front/user/project/index', './assets/js/front/user/project/index.js')
     .addEntry('front/user/project/aides', './assets/js/front/user/project/aides.js')
