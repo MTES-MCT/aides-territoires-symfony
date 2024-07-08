@@ -150,8 +150,17 @@ class ImportFluxOccitanieCommand extends ImportFluxCommand
 
         // une partie du mapping à été fait sur les CategoryTheme et non sur les catégories
         $mappingThemes = [
+            'Aménagement du territoire' => [
+                'urbanisme-logement-amenagement'
+            ],
+            'Art de la scène' => [
+                'culture-patrimoine-sports-tourisme',
+            ],
             'Culture' => [
                 'culture-patrimoine-sports-tourisme',
+            ],
+            'Eau' => [
+                'eau'
             ],
             'Environnement - Climat' => [
                 'nature-environnement-risques'
@@ -159,37 +168,97 @@ class ImportFluxOccitanieCommand extends ImportFluxCommand
             'Solidarités - Santé - Égalités' => [
                 'solidarites-lien-social'
             ],
-            'Aménagement du territoire' => [
+            'Économie et vie des entreprises' => [
+                'developpement-economique'
+            ],
+            'Politique de la ville' => [
                 'urbanisme-logement-amenagement'
             ],
-            'Économie et vie des entreprises' => [
+            'Solidarités - Santé - Égalités' => [
+                'solidarites-lien-social'
+            ],
+            'Soutien et accompagnement des entreprises' => [
                 'developpement-economique'
             ],
             'Transport et mobilité' => [
                 'mobilite-transports'
-            ]
+            ],
+            'Villes / Aménagements urbains' => [
+                'urbanisme-logement-amenagement'
+            ],
+            'Économie sociale et solidaire' => [
+                'solidarites-lien-social'
+            ],
+            'Éducation à l’environnement et au développement durable' => [
+                'nature-environnement-risques'
+            ],
         ];
 
         // l'autre partie est bien sur les catégories
         $mapping = [
+            'Activités maritimes' => [
+                'mers'
+            ],
+            'Agriculture et alimentation' => [
+                'agriculture'
+            ],
+            'Agroalimentaire' => [
+                'agriculture'
+            ],
+            'Alimentation' => [
+                'agriculture'
+            ],
+            'Apprentissage' => [
+                'education'
+            ],
+            'Biodiversité' => [
+                'biodiversite'
+            ],
+            'Bois - Forêt' => [
+                'biodiversite'
+            ],
             'Citoyenneté et démocratie' => [
                 'citoyennete'
+            ],
+            'Coopération européenne' => [
+                'cooperation-transfrontaliere'
+            ],
+            'Coopération internationale' => [
+                'cooperation-transfrontaliere'
+            ],
+            'Déchets et économie circulaire' => [
+                'economie-circulaire'
             ],
             'Enseignement supérieur - Recherche' => [
                 'education',
                 'innovation-et-recherche'
             ],
+            'Emploi' => [
+                'emploi'
+            ],
+            'Enseignement supérieur' => [
+                'education'
+            ],
             'Europe et international' => [
                 'cooperation-transfrontaliere'
             ],
-            'Agriculture et alimentation' => [
-                'agriculture'
+            'Foncier' => [
+                'foncier'
+            ],
+            'Formation' => [
+                'education'
             ],
             'Formation - Orientation - Éducation' => [
                 'education'
             ],
-            'Sport' => [
-                'sport'
+            'Handicap' => [
+                'handicap'
+            ],
+            'Innovation' => [
+                'innovation-et-recherche'
+            ],
+            'Logement' => [
+                'logement-habitat'
             ],
             'Mer' => [
                 'mers'
@@ -197,12 +266,57 @@ class ImportFluxOccitanieCommand extends ImportFluxCommand
             'Montagne' => [
                 'montagne'
             ],
-            'Tourisme' => [
-                'tourisme'
+            'Orientation' => [
+                'education'
+            ],
+            'Plan littoral 21' => [
+                'mers'
+            ],
+            'Plantations - Arboriculture' => [
+                'agriculture'
+            ],
+            'Recherche' => [
+                'innovation-et-recherche'
+            ],
+            'Santé' => [
+                'sante'
+            ],
+            'Service civique' => [
+                'citoyennete'
+            ],
+            'Sport' => [
+                'sport'
             ],
             'Sûreté - Sécurité' => [
                 'securite'
-            ]
+            ],
+            'Tourisme' => [
+                'tourisme'
+            ],
+            'Transformation numérique' => [
+                'numerique'
+            ],
+            'Vie associative' => [
+                'education'
+            ],
+            'Viticulture' => [
+                'agriculture'
+            ],
+            'Économie touristique' => [
+                'tourisme'
+            ],
+            'Éducation' => [
+                'education'
+            ],
+            'Égalité femme-homme' => [
+                'egalite-des-chances'
+            ],
+            'Égalités' => [
+                'egalite-des-chances'
+            ],
+            'Élevage' => [
+                'consommation-et-production'
+            ],
             
         ];
         
