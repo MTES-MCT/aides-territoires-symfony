@@ -320,6 +320,9 @@ class ImportFluxOccitanieCommand extends ImportFluxCommand
             'Élevage' => [
                 'consommation-et-production'
             ],
+            'Énergie' => [
+                'economie-denergie'
+            ],
             
         ];
         
