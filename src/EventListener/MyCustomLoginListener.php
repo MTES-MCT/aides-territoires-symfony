@@ -61,7 +61,7 @@ class MyCustomLoginListener
 
             // si firewall admin on augmente la durée de session avec AdminSessionManager
             if ($this->authorizationChecker->isGranted(User::ROLE_ADMIN)) {
-                $this->adminSessionManager->extendSessionLifetime();
+                // $this->adminSessionManager->extendSessionLifetime();
             }
 
         }
