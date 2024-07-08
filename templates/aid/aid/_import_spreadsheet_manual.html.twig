@@ -1,12 +1,16 @@
 
+{% set classBtn = 'btn btn-primary' %}
+{% if isFront is defined %}
+    {% set classBtn = 'fr-btn fr-btn--sm fr-btn--secondary' %}
+{% endif %}
 <div>
     <p>Modèle de fichier à respecter pour l'import de données d'aides :</p>
     <ul>
         <li><p><a href="{{ asset('build/docs/aid_import_template.xlsx') }}" download="aid_import_template.xlsx" title="Format Xslx" class="btn btn-success"><i class="fa fa-download"></i> Format Xlsx</a></p></li>
-        <li><p><a href="{{ asset('build/docs/aid_import_template.csv') }}" download="aid_import_template.csv" title="Format CSV" class="btn btn-success"><i class="fa fa-download"></i> Format CSV</a></p></li>
+        <li><p><a href="{{ asset('build/docs/aid_import_template.csv') }}" download="aid_import_template.csv" title="Format CSV" class="btn btn-success"><i class="fa fa-download"></i> Format CSV</a> (séparateur <strong>;</strong> délimiteur de texte <strong>"</strong>)</p></li>
     </ul>
 </div>
-<table class="table table-striped">
+<table class="fr-table table table-striped">
     <thead>
         <tr>
             <th>Colonne</th>
@@ -37,7 +41,7 @@
                     <li>Optionnel</li>
                     <li>
                     Doit être le nom exact du programme
-                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#programsModal">
+                    <button type="button" class="{{ classBtn }}" data-bs-toggle="modal" data-bs-target="#programsModal" data-fr-opened="false" aria-controls="programsModal">
                         Liste
                     </button>
                     </li>
@@ -425,26 +429,33 @@
 {% set manualData = getImportAidManualDatas() %}
 
 <!-- Modal Programs -->
-<div class="modal fade" id="programsModal" tabindex="-1" aria-labelledby="programsModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-xl">
-        <div class="modal-content">
-            <div class="modal-header">
+<dialog class="modal fr-modal fade" role="dialog" id="programsModal" tabindex="-1" aria-labelledby="programsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl fr-container fr-container--fluid">
+        <div class="modal-content fr-modal__body">
+            {% if isFront is defined %}
+            <div class="fr-modal__header">
+                <button class="fr-btn fr-btn--close" title="Fermer la fenêtre modale" aria-controls="programsModal">Fermer</button>
+            </div>
+            {% endif %}
+            <div class="modal-header fr-modal__content">
                 <h5 class="modal-title" id="programsModalLabel">Liste des programmes</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body">
+            <div class="modal-body fr-modal__content">
                 <div class="column-text">
                     {% for program in manualData.programs %}
-                    <p>{{ program }}</p>
+                        <p>{{ program }}</p>
                     {% endfor %}
                 </div>
             </div>
+            {% if isFront is not defined %}
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
             </div>
+            {% endif %}
         </div>
     </div>
-</div>
+</dialog>
 <!-- /Modal Programs -->
 
 <!-- Modal Backers -->

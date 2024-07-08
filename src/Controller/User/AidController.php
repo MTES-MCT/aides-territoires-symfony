@@ -37,6 +37,22 @@ use Symfony\Component\Routing\RouterInterface;
 
 class AidController extends FrontController
 {
+    #[Route('/comptes/aides/manuel-import', name: 'app_user_aid_import_manual')]
+    public function importManual()
+    {
+        // fil arianne
+        $this->breadcrumb->add(
+            'Mon compte',
+            $this->generateUrl('app_user_dashboard')
+        );
+        $this->breadcrumb->add(
+            'Mon portefeuille d’aides'
+        );
+        
+        // rendu template
+        return $this->render('user/aid/import-manual.html.twig');
+    }
+
     #[Route('/comptes/aides/publier/', name: 'app_user_aid_detail_publish')]
     public function publish(
         RequestStack $requestStack,

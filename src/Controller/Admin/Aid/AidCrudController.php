@@ -36,8 +36,6 @@ use App\Field\TrumbowygField;
 use App\Form\Admin\Aid\AidImportType;
 use App\Form\Admin\Aid\KeywordReferenceAssociationType;
 use App\Form\Admin\Aid\ProjectReferenceAssociationType;
-use App\Form\Perimeter\PerimeterSearchType;
-use App\Form\Type\PerimeterAutocompleteType;
 use App\Repository\Aid\AidDestinationRepository;
 use App\Repository\Aid\AidRecurrenceRepository;
 use App\Repository\Aid\AidRepository;
@@ -51,7 +49,6 @@ use App\Repository\User\UserRepository;
 use App\Service\Export\SpreadsheetExporterService;
 use App\Service\File\FileService;
 use Doctrine\ORM\EntityRepository;
-use Doctrine\ORM\Exception\ORMException;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Assets;
@@ -811,7 +808,7 @@ class AidCrudController extends AtCrudController
 
                         $options = new OptionsCsv();
                         $options->FIELD_DELIMITER = ';';
-                        // $options->FIELD_ENCLOSURE = '@';
+                        $options->FIELD_ENCLOSURE = '"';
 
                         $reader = new ReaderCsv($options);
                         
