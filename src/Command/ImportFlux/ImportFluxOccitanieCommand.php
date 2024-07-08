@@ -174,6 +174,9 @@ class ImportFluxOccitanieCommand extends ImportFluxCommand
             'Politique de la ville' => [
                 'urbanisme-logement-amenagement'
             ],
+            'Solidarité' => [
+                'solidarites-lien-social'
+            ],
             'Solidarités - Santé - Égalités' => [
                 'solidarites-lien-social'
             ],
@@ -308,7 +311,7 @@ class ImportFluxOccitanieCommand extends ImportFluxCommand
             'Éducation' => [
                 'education'
             ],
-            'Égalité femme-homme' => [
+            'Égalité  femme-homme' => [
                 'egalite-des-chances'
             ],
             'Égalités' => [
@@ -348,6 +351,7 @@ class ImportFluxOccitanieCommand extends ImportFluxCommand
                     }
                 }
             }
+
             if ($found) {
                 $this->thematiquesOk[] = $categoryName;
             } else {
