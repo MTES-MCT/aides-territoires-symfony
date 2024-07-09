@@ -1,3 +1,7 @@
+{% if env != 'prod' %}
+User-agent: *
+Disallow: /
+{% else %}
 # Allowed
 User-agent: Googlebot
 Disallow:
@@ -26,3 +30,4 @@ User-agent: YandexBot
 Disallow: /
 
 Sitemap: {{ absolute_url(url('app_sitemap')) }}
+{% endif %}
