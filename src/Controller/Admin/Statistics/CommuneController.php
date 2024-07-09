@@ -7,6 +7,8 @@ use App\Entity\Aid\AidProject;
 use App\Entity\Organization\Organization;
 use App\Entity\Organization\OrganizationType;
 use App\Entity\Perimeter\Perimeter;
+use App\Repository\Organization\OrganizationRepository;
+use App\Repository\Perimeter\PerimeterRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractDashboardController;
 use OpenSpout\Common\Entity\Cell;
@@ -24,7 +26,20 @@ class CommuneController extends AbstractController
         protected ManagerRegistry $managerRegistry,
         protected ChartBuilderInterface $chartBuilderInterface,
     )
-    {   
+    {
+    }
+
+    #[Route('/admin/statistics/commune/population', name: 'admin_statistics_commune_population')]
+    public function mapPopulation(
+        OrganizationRepository $organizationRepository
+    ): Response
+    {
+        $cities = $organizationRepository->getCitiesForMap();
+
+        // rendu template
+        return $this->render('admin/statistics/commune/population.html.twig', [
+            'cities' => $cities,
+        ]);
     }
 
     #[Route('/admin/statistics/commune/dashboard', name: 'admin_statistics_commune_dashboard')]

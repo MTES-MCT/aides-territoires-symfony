@@ -1,0 +1,28 @@
+{% extends 'admin/statistics/_stats_base.html.twig' %}
+
+{% block head_stylesheets %}
+    {{ parent() }}
+    {{ encore_entry_link_tags('import-scss/admin/statistics/commune/population') }}
+{% endblock head_stylesheets %}
+
+{% block head_javascript %}
+    {{ parent() }}
+    {{ encore_entry_script_tags('admin/statistics/commune/population') }}
+{% endblock head_javascript %}
+
+{% block breadcrumb %}
+{% endblock %}
+
+{% block stats_content %}
+<section class="container">
+    <h1>Population couverte</h1>
+
+    <div id="map"></div>
+
+    {% cspscript %}
+    <script>
+    var cities = {{ cities|json_encode|raw }};
+    </script>
+    {% endcspscript %}
+</section>
+{% endblock %}
