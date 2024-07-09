@@ -960,12 +960,11 @@ class AidCrudController extends AtCrudController
                             }
 
                             $aid->setDateStart(trim($cells[14]->getValue() !== '') ? new \DateTime($cells[14]->getValue()) : null);
-                            $aid->setDatePredeposit(trim($cells[15]->getValue() !== '') ? new \DateTime($cells[15]->getValue()) : null);
-                            $aid->setDateSubmissionDeadline(trim($cells[16]->getValue() !== '') ? new \DateTime($cells[16]->getValue()) : null);
+                            $aid->setDateSubmissionDeadline(trim($cells[15]->getValue() !== '') ? new \DateTime($cells[15]->getValue()) : null);
 
-                            $aid->setEligibility(trim($cells[17]->getValue()) !== '' ? nl2br(trim($cells[17]->getValue())) : null);
+                            $aid->setEligibility(trim($cells[16]->getValue()) !== '' ? nl2br(trim($cells[16]->getValue())) : null);
 
-                            $aidStepNames = explode(',', $cells[18]->getValue());
+                            $aidStepNames = explode(',', $cells[17]->getValue());
                             foreach ($aidStepNames as $aidStepName) {
                                 $aidStep = $aidStepRepository->findOneBy(['name' => trim($aidStepName)]);
                                 if ($aidStep instanceof AidStep) {
@@ -973,7 +972,7 @@ class AidCrudController extends AtCrudController
                                 }
                             }
 
-                            $aidDestinationNames = explode(',', $cells[19]->getValue());
+                            $aidDestinationNames = explode(',', $cells[18]->getValue());
                             foreach ($aidDestinationNames as $aidDestinationName) {
                                 $aidDestination = $aidDestinationRepository->findOneBy(['name' => trim($aidDestinationName)]);
                                 if ($aidDestination instanceof AidDestination) {
@@ -981,7 +980,7 @@ class AidCrudController extends AtCrudController
                                 }
                             }
 
-                            $perimeterId = (int) trim($cells[20]->getValue());
+                            $perimeterId = (int) trim($cells[19]->getValue());
                             if ($perimeterId) {
                                 $perimeter = $perimeterRepository->find($perimeterId);
                                 if ($perimeter instanceof Perimeter) {
@@ -989,12 +988,12 @@ class AidCrudController extends AtCrudController
                                 }
                             }
 
-                            $aid->setOriginUrl(trim($cells[21]->getValue()) !== '' ? trim($cells[21]->getValue()) : null);
-                            $aid->setApplicationUrl(trim($cells[22]->getValue()) !== '' ? trim($cells[22]->getValue()) : null);
+                            $aid->setOriginUrl(trim($cells[20]->getValue()) !== '' ? trim($cells[20]->getValue()) : null);
+                            $aid->setApplicationUrl(trim($cells[21]->getValue()) !== '' ? trim($cells[21]->getValue()) : null);
 
-                            $aid->setContact(trim($cells[23]->getValue()) !== '' ? nl2br(trim($cells[23]->getValue())) : null);
+                            $aid->setContact(trim($cells[22]->getValue()) !== '' ? nl2br(trim($cells[22]->getValue())) : null);
 
-                            $userEmail = trim($cells[24]->getValue());
+                            $userEmail = trim($cells[23]->getValue());
                             if ($userEmail !== '') {
                                 $user = $userRepository->findOneBy(['email' => $userEmail]);
                                 if ($user instanceof User) {
@@ -1002,9 +1001,9 @@ class AidCrudController extends AtCrudController
                                 }
                             }
 
-                            $aid->setImportDataUrl(trim($cells[25]->getValue()) !== '' ? trim($cells[25]->getValue()) : null);
+                            $aid->setImportDataUrl(trim($cells[24]->getValue()) !== '' ? trim($cells[24]->getValue()) : null);
                             
-                            $organizationId = (int) trim($cells[26]->getValue());
+                            $organizationId = (int) trim($cells[25]->getValue());
                             if ($organizationId) {
                                 $organization = $organizationRepository->find($organizationId);
                                 if ($organization instanceof Organization) {
@@ -1012,7 +1011,7 @@ class AidCrudController extends AtCrudController
                                 }
                             }
 
-                            $projectReferenceNames = explode(',', $cells[27]->getValue());
+                            $projectReferenceNames = explode(',', $cells[26]->getValue());
                             foreach ($projectReferenceNames as $projectReferenceName) {
                                 $projectReference = $projectReferenceRepository->findOneBy(['name' => trim($projectReferenceName)]);
                                 if ($projectReference instanceof ProjectReference) {
