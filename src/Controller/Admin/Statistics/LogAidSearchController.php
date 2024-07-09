@@ -129,9 +129,9 @@ class LogAidSearchController extends AbstractController
         $departmentsByCode = [];
         $logAidSearchsByDept = [];
         foreach ($departments as $department) {
-            $departmentsByCode[$department->getCode()] = $department;
-            $logAidSearchsByDept[$department->getCode()] = [
-                'dept' => $department->getCode(),
+            $departmentsByCode[(string) $department->getCode()] = $department;
+            $logAidSearchsByDept[(string) $department->getCode()] = [
+                'dept' => (string) $department->getCode(),
                 'count' => 0,
                 'fullName' => $department->getName(),
                 'class' => 'none'
@@ -195,7 +195,7 @@ class LogAidSearchController extends AbstractController
                 }
             }
         }
-            
+
         // rendu template
         return $this->render('admin/statistics/log/aid-search-missing-perimeters.html.twig', [
             'formDateRange' => $formDateRange,
