@@ -33,7 +33,7 @@ function searchPerimeter(search)
         for (var i = 0; i < data.results.length; i++) {
             var trItem =    '<tr>' +
                                 '<td>'+parseInt(data.results[i].id)+'</td>' +
-                                '<td>'+data.results[i].name+'</td>' +
+                                '<td><span id="perimeter_'+i+'">'+data.results[i].name+'</span><button class="btn-copy-clipboard" data-clipboard-target="#perimeter_'+i+'"><i class="fas fa-clipboard"></i></button></td>' +
                                 '<td>'+data.results[i].scale+'</td>' +
                                 '<td>'+data.results[i].zipcodes.join(', ')+'</td>' + 
                             '</tr>';
@@ -53,7 +53,7 @@ function searchBacker(search)
         for (var i = 0; i < data.results.length; i++) {
             var trItem =    '<tr>' +
                                 '<td>'+parseInt(data.results[i].id)+'</td>' +
-                                '<td>'+data.results[i].text+'</td>' +
+                                '<td><span id="backer_'+i+'">'+data.results[i].text+'</span><button class="btn-copy-clipboard" data-clipboard-target="#backer_'+i+'"><i class="fas fa-clipboard"></i></button></td>' +
                                 '<td>'+data.results[i].perimeter+'</td>' +
                             '</tr>';
             $('#backerList').append(trItem);

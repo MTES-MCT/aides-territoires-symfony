@@ -432,7 +432,7 @@
             <div class="modal-body fr-modal__content">
                 <div class="column-text">
                     {% for program in manualData.programs %}
-                        <p>{{ program }}</p>
+                        <p><span id="program_{{ loop.index }}">{{ program }}</span><button class="btn-copy-clipboard" data-clipboard-target="#program_{{ loop.index }}"><i class="fas fa-clipboard"></i></button></p>
                     {% endfor %}
                 </div>
             </div>
@@ -501,7 +501,7 @@
             <div class="modal-body fr-modal__content">
                 <div class="column-text">
                     {% for organizationType in manualData.organizationTypes %}
-                    <p>{{ organizationType }}</p>
+                    <p><span id="organizationType_{{ loop.index }}">{{ organizationType }}</span><button class="btn-copy-clipboard" data-clipboard-target="#organizationType_{{ loop.index }}"><i class="fas fa-clipboard"></i></button></p>
                     {% endfor %}
                 </div>
             </div>
@@ -531,7 +531,7 @@
             <div class="modal-body fr-modal__content">
                 <div class="column-text">
                     {% for aidType in manualData.aidTypes %}
-                    <p>{{ aidType }}</p>
+                    <p><span id="aidType_{{ loop.index }}">{{ aidType }}</span><button class="btn-copy-clipboard" data-clipboard-target="#aidType_{{ loop.index }}"><i class="fas fa-clipboard"></i></button></p>
                     {% endfor %}
                 </div>
             </div>
@@ -561,7 +561,7 @@
             <div class="modal-body fr-modal__content">
                 <div class="column-text">
                     {% for category in manualData.categories %}
-                    <p>{{ category }}</p>
+                    <p><span id="category_{{ loop.index }}">{{ category }}</span><button class="btn-copy-clipboard" data-clipboard-target="#category_{{ loop.index }}"><i class="fas fa-clipboard"></i></button></p>
                     {% endfor %}
                 </div>
             </div>
@@ -591,7 +591,7 @@
             <div class="modal-body fr-modal__content">
                 <div class="column-text">
                     {% for aidRecurrence in manualData.aidRecurrences %}
-                    <p>{{ aidRecurrence }}</p>
+                    <p><span id="aidRecurrence_{{ loop.index }}">{{ aidRecurrence }}</span><button class="btn-copy-clipboard" data-clipboard-target="#aidRecurrence_{{ loop.index }}"><i class="fas fa-clipboard"></i></button></p>
                     {% endfor %}
                 </div>
             </div>
@@ -621,7 +621,7 @@
             <div class="modal-body fr-modal__content">
                 <div class="column-text">
                     {% for aidStep in manualData.aidSteps %}
-                    <p>{{ aidStep }}</p>
+                    <p><span id="aidStep_{{ loop.index }}">{{ aidStep }}</span><button class="btn-copy-clipboard" data-clipboard-target="#aidStep_{{ loop.index }}"><i class="fas fa-clipboard"></i></button></p>
                     {% endfor %}
                 </div>
             </div>
@@ -651,7 +651,7 @@
             <div class="modal-body fr-modal__content">
                 <div class="column-text">
                     {% for aidDestination in manualData.aidDestinations %}
-                    <p>{{ aidDestination }}</p>
+                    <p><span id="aidDestination_{{ loop.index }}">{{ aidDestination }}</span><button class="btn-copy-clipboard" data-clipboard-target="#aidDestination_{{ loop.index }}"><i class="fas fa-clipboard"></i></button></p>
                     {% endfor %}
                 </div>
             </div>
@@ -722,7 +722,7 @@
                 <div class="column-text">
                     {% if app.user %}
                         {% for organization in app.user.organizations %}
-                        <p>{{ organization.name }} : <strong>{{ organization.id }}</strong></p>
+                        <p>{{ organization.name }} : <span id="organization_{{ loop.index }}"><strong>{{ organization.id }}</span><button class="btn-copy-clipboard" data-clipboard-target="#organization_{{ loop.index }}"><i class="fas fa-clipboard"></i></button></p>
                         {% endfor %}
                     {% endif %}
                 </div>
@@ -753,7 +753,7 @@
             <div class="modal-body fr-modal__content">
                 <div class="column-text">
                     {% for projectReference in manualData.projectReferences %}
-                    <p>{{ projectReference }}</p>
+                    <p><span id="projectReference_{{ loop.index }}">{{ projectReference }}</span><button class="btn-copy-clipboard" data-clipboard-target="#projectReference_{{ loop.index }}"><i class="fas fa-clipboard"></i></button></p>
                     {% endfor %}
                 </div>
             </div>

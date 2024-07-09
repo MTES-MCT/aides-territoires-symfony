@@ -43,6 +43,40 @@ $(function(){
         };
     })();
 
+    // fonction copie dans clipboard
+    $(document).on('click', '.btn-copy-clipboard', function(e) {
+        // Recupère le bouton cliqué
+        var thisElt = $(this);
+        // Récupère le sélecteur de l'élément cible depuis l'attribut data-clipboard-target
+        var targetSelector = $(this).attr('data-clipboard-target');
+        var targetElement = $(targetSelector)[0]; // Obtient l'élément DOM natif
+
+        // Vérifie si la sélection est possible
+        if (document.body.createTextRange) { // Pour IE
+            const range = document.body.createTextRange();
+            range.moveToElementText(targetElement);
+            range.select();
+        } else if (window.getSelection) {
+            const selection = window.getSelection();
+            const range = document.createRange();
+            range.selectNodeContents(targetElement);
+            selection.removeAllRanges(); // Supprime toutes les sélections existantes
+            selection.addRange(range); // Ajoute la nouvelle sélection
+        }
+
+        // reset la classe des autres boutons
+        $('.fa-clipboard-check').removeClass('fa-clipboard-check').addClass('fa-clipboard');
+        // change la classe de l'icone bouton cliqué
+        thisElt.find('i').removeClass('fa-clipboard').addClass('fa-clipboard-check');
+
+        // Sélectionne l'élément cible et récupère son contenu HTML
+        var htmlContent = $(targetSelector).html().trim();
+        // Copie le contenu dans le presse-papiers
+        navigator.clipboard.writeText(htmlContent).then(function() {
+        }).catch(function(error) {
+        });
+    });
+
     global.convertToSlug = function(str) {
         str = str.replace(/^\s+|\s+$/g, ''); // trim
         str = str.toLowerCase();
