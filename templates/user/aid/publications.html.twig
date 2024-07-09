@@ -34,8 +34,11 @@
                 <p>Les aides arrivées à échéance sont automatiquement dépubliées de la plateforme, mais restent dans votre portefeuille d’aides en statut "brouillon" au cas où vous souhaiteriez les publier à nouveau.</p>        
             </div>
         
-            <p>Vous souhaitez importer un fichier contenant des aides ?  <a href="{{ path('app_user_aid_import_manual') }}" target="_blank" class="fr-btn">Consultez le manuel d’import</a>.</p>           
-
+            <div class="fr-alert fr-alert--info fr-alert--sm fr-mb-2w fr-mt-2w">
+                <p>Vous souhaitez importer un fichier contenant des aides ?  <a href="{{ path('app_user_aid_import_manual') }}" target="_blank" class="fr-btn">Consultez le manuel d’import</a>.</p>           
+                <p>Envoyez le modèle rempli à <a href="mailto:aides-territoires@beta.gouv.fr" title="Envoyer par email">aides-territoires@beta.gouv.fr</a></p>
+            </div>
+            
             <div class="fr-mt-5w">
                 Nombre d'aides publiées en cours : <span class="counter fr-tag">{{ nbAidsLive }}</span><br />
                 Nombre de vues total des aides depuis la première publication : <span class="counter fr-tag">{{ nbAidsViews }}</span><br />
