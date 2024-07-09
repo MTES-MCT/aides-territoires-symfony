@@ -122,7 +122,7 @@ class LogService
                         if (isset($params['source'])) {
                             $log->setSource($params['source']);
                         }
-                        $log->setSearch($params['search'] ?? null);
+                        $log->setSearch(isset($params['search']) ? substr($params['search'], 0, 255) : null);
                         $log->setPerimeter($params['perimeter'] ?? null);
                         $log->setOrganization($params['organization'] ?? null);
                         $log->setUser($params['user'] ?? null);
@@ -216,7 +216,7 @@ class LogService
 
                         case self::PROJECT_VALIDATED_SEARCH:
                             $log = new LogProjectValidatedSearch();
-                            $log->setSearch($params['search'] ?? null);
+                            $log->setSearch(isset($params['search']) ? substr($params['search'], 0, 255) : null);
                             $log->setQuerystring($params['querystring'] ?? null);
                             $log->setResultsCount($params['resultsCount'] ?? null);
                             $log->setOrganization($params['organization'] ?? null);
