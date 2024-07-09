@@ -254,7 +254,7 @@ class SitemapController extends AbstractController
         
         // ----------------------------------------------------------------------
         // Rendu template
-        $response = new Response(
+        return new Response(
             $this->renderView(
                 'sitemap.html.twig', array(
                 'urls'          => $urls
@@ -264,6 +264,5 @@ class SitemapController extends AbstractController
                 'Content-Type' => 'text/xml'
             )
         );
-        return $response;
     }
 }
