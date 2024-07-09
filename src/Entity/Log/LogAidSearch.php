@@ -17,6 +17,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: LogAidSearchRepository::class)]
 #[ORM\Index(columns: ['date_create'], name: 'date_create_las')]
@@ -37,6 +38,7 @@ class LogAidSearch // NOSONAR too much methods
     #[ORM\Column]
     private ?int $resultsCount = null;
 
+    #[Assert\Length(max: 255)]
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $source = null;
 
@@ -48,6 +50,7 @@ class LogAidSearch // NOSONAR too much methods
     #[Gedmo\Timestampable(on: 'create')]
     private ?\DateTimeInterface $dateCreate = null;
 
+    #[Assert\Length(max: 255)]
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $search = null;
 
