@@ -6,6 +6,7 @@
     .opener{
         @include fr-input;
         @include fr-background-opener;
+        max-width: 100%;
         cursor: pointer;
         min-height: 48px;
         overflow: hidden;

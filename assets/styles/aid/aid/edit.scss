@@ -8,6 +8,7 @@
 @import '../../form/input-length-counter';
 @import '../../form/label';
 @import '../../form/legend';
+@import '../../form/display-content-type';
 
 
 .at-field-label{
@@ -46,4 +47,10 @@ section#aid-edit #nav-form {
 
 .actions {
     border: solid 1px var(--border-action-high-blue-france);
+}
+
+.entity-checkbox-absolute-type-wrapper{
+    .opener{
+        white-space: normal!important;
+    }
 }

@@ -17,6 +17,7 @@ use App\Entity\Organization\OrganizationType;
 use App\Entity\Perimeter\Perimeter;
 use App\Entity\Program\Program;
 use App\Entity\Reference\ProjectReference;
+use App\Form\Type\DisplayContentType;
 use App\Form\Type\EntityCheckboxAbsoluteType;
 use App\Form\Type\EntityCheckboxGroupAbsoluteType;
 use App\Form\Type\EntityGroupedType;
@@ -193,7 +194,7 @@ class AidEditType extends AbstractType
                 'multiple' => true,
                 'expanded' => true,
                 'attr' => [
-                    'readonly' => in_array('programs', $sanctuarizedFields) ? true : false
+                    'readonly' => in_array('programs', $sanctuarizedFields) ? true : false,
                 ],
             ])
             ->add('financers', EntityType::class, [
@@ -403,39 +404,66 @@ class AidEditType extends AbstractType
                     'readonly' => in_array('isCallForProject', $sanctuarizedFields) ? true : false
                 ],
             ])
-            ->add('description', TextareaType::class, [
-                'required' => $isDraft ? false : true,
-                'label' => 'Description complète de l’aide et de ses objectif',
-                'help_html' => true,
-                'help' => (in_array('description', $sanctuarizedFields) ? $sanctuarizedFieldHelp : ''),
-                'attr' => [
-                    'placeholder' => 'Si vous avez un descriptif, n’hésitez pas à le copier ici.
-                    Essayez de compléter le descriptif avec le maximum d’informations.
-                    Si l’on vous contacte régulièrement pour vous demander les mêmes 
-                    informations, essayez de donner des éléments de réponses dans cet espace.',
-                    'class' => 'trumbowyg',
-                    'cols' => 40,
-                    'rows' => 10,
-                    'readonly' => in_array('description', $sanctuarizedFields) ? true : false,
-                    'autocomplete' => 'off'
-                ],
-                'sanitize_html' => true,
-            ])
-            ->add('projectExamples', TextareaType::class, [
-                'required' => false,
-                'label' => 'Exemples d’applications ou de projets réalisés grâce à cette aide',
-                'help_html' => true,
-                'help' => 'Afin d’aider les territoires à mieux comprendre votre aide, donnez ici quelques exemples concrets de projets réalisables ou réalisés.'
-                    . (in_array('projectExamples', $sanctuarizedFields) ? $sanctuarizedFieldHelp : ''),
-                'attr' => [
-                    'placeholder' => 'Médiathèque, skatepark, accompagner des enfants en classe de neige, financer une usine de traitement des déchets, etc.',
-                    'class' => 'trumbowyg',
-                    'cols' => 40,
-                    'rows' => 10,
-                    'readonly' => in_array('projectExamples', $sanctuarizedFields) ? true : false
-                ],
-                'sanitize_html' => true,
-            ])
+            ;
+
+            // champ description
+            if (in_array('description', $sanctuarizedFields)) {
+                $builder
+                ->add('description', DisplayContentType::class, [
+                    'required' => false,
+                    'label' => 'Description complète de l’aide et de ses objectif',
+                    'help_html' => true,
+                    'help' => $sanctuarizedFieldHelp,
+                ]);
+            } else {
+                $builder
+                ->add('description', TextareaType::class, [
+                    'required' => $isDraft ? false : true,
+                    'label' => 'Description complète de l’aide et de ses objectif',
+                    'help_html' => true,
+                    'help' => '',
+                    'attr' => [
+                        'placeholder' => 'Si vous avez un descriptif, n’hésitez pas à le copier ici.
+                        Essayez de compléter le descriptif avec le maximum d’informations.
+                        Si l’on vous contacte régulièrement pour vous demander les mêmes 
+                        informations, essayez de donner des éléments de réponses dans cet espace.',
+                        'class' => 'trumbowyg',
+                        'cols' => 40,
+                        'rows' => 10,
+                        'autocomplete' => 'off'
+                    ],
+                    'sanitize_html' => true,
+                ]);
+            }
+
+            // champ projectExamples
+            if (in_array('projectExamples', $sanctuarizedFields)) {
+                $builder
+                ->add('projectExamples', DisplayContentType::class, [
+                    'required' => false,
+                    'label' => 'Exemples d’applications ou de projets réalisés grâce à cette aide',
+                    'help_html' => true,
+                    'help' => 'Afin d’aider les territoires à mieux comprendre votre aide, donnez ici quelques exemples concrets de projets réalisables ou réalisés.'
+                        . $sanctuarizedFieldHelp,
+                ]);
+            } else {
+                $builder
+                ->add('projectExamples', TextareaType::class, [
+                    'required' => false,
+                    'label' => 'Exemples d’applications ou de projets réalisés grâce à cette aide',
+                    'help_html' => true,
+                    'help' => 'Afin d’aider les territoires à mieux comprendre votre aide, donnez ici quelques exemples concrets de projets réalisables ou réalisés.',
+                    'attr' => [
+                        'placeholder' => 'Médiathèque, skatepark, accompagner des enfants en classe de neige, financer une usine de traitement des déchets, etc.',
+                        'class' => 'trumbowyg',
+                        'cols' => 40,
+                        'rows' => 10,
+                    ],
+                    'sanitize_html' => true,
+                ]);
+            }
+
+            $builder
             ->add('categories', EntityCheckboxGroupAbsoluteType::class, [
                 'required' => $isDraft ? false : true,
                 'label' => 'Thématiques de l\'aide',
@@ -510,20 +538,35 @@ class AidEditType extends AbstractType
                     'autocomplete' => 'off',
                     'readonly' => in_array('dateSubmissionDeadline', $sanctuarizedFields) ? true : false
                 ]
-            ])
-            ->add('eligibility', TextareaType::class, [
-                'required' => false,
-                'label' => 'Conditions d’éligibilité',
-                'help_html' => true,
-                'help' => (in_array('eligibility', $sanctuarizedFields) ? $sanctuarizedFieldHelp : ''),
-                'attr' => [
-                    'class' => 'trumbowyg',
-                    'cols' => 40,
-                    'rows' => 10,
-                    'readonly' => in_array('eligibility', $sanctuarizedFields) ? true : false
-                ],
-                'sanitize_html' => true,
-            ])
+            ]);
+
+            // champ eligibility
+            if (in_array('eligibility', $sanctuarizedFields)) {
+            $builder
+                ->add('eligibility', DisplayContentType::class, [
+                    'required' => false,
+                    'label' => 'Conditions d’éligibilité',
+                    'help_html' => true,
+                    'help' => $sanctuarizedFieldHelp,
+                ]);
+            } else {
+                $builder
+                ->add('eligibility', TextareaType::class, [
+                    'required' => false,
+                    'label' => 'Conditions d’éligibilité',
+                    'help_html' => true,
+                    'help' => '',
+                    'attr' => [
+                        'class' => 'trumbowyg',
+                        'cols' => 40,
+                        'rows' => 10,
+                    ],
+                    'sanitize_html' => true,
+                ]);
+            }
+
+
+            $builder
             ->add('aidSteps', EntityType::class, [
                 'required' => $isDraft ? false : true,
                 'label' => 'État d’avancement du projet pour bénéficier du dispositif',
@@ -613,23 +656,35 @@ class AidEditType extends AbstractType
                 'attr' => [
                     'readonly' => in_array('applicationUrl', $sanctuarizedFields) ? true : false,
                 ],
-            ])
-            ->add('contact', TextareaType::class, [
-                'required' => $isDraft ? false : true,
-                'label' => 'Contact pour candidater',
-                'help_html' => true,
-                'help' => 'N’hésitez pas à ajouter plusieurs contacts'
-                    . (in_array('contact', $sanctuarizedFields) ? $sanctuarizedFieldHelp : ''),
-                'attr' => [
-                    'placeholder' => 'Nom, prénom, e-mail, téléphone, commentaires…',
-                    'class' => 'trumbowyg',
-                    'cols' => 40,
-                    'rows' => 10,
-                    'readonly' => in_array('contact', $sanctuarizedFields) ? true : false,
-                ],
-                'sanitize_html' => true,
-            ])
+            ]);
 
+            if (in_array('contact', $sanctuarizedFields)) {
+                $builder
+                ->add('contact', DisplayContentType::class, [
+                    'required' => $isDraft ? false : true,
+                    'label' => 'Contact pour candidater',
+                    'help_html' => true,
+                    'help' => 'N’hésitez pas à ajouter plusieurs contacts'
+                        . $sanctuarizedFieldHelp,
+                ]);
+            } else {
+                $builder
+                ->add('contact', TextareaType::class, [
+                    'required' => $isDraft ? false : true,
+                    'label' => 'Contact pour candidater',
+                    'help_html' => true,
+                    'help' => 'N’hésitez pas à ajouter plusieurs contacts',
+                    'attr' => [
+                        'placeholder' => 'Nom, prénom, e-mail, téléphone, commentaires…',
+                        'class' => 'trumbowyg',
+                        'cols' => 40,
+                        'rows' => 10,
+                    ],
+                    'sanitize_html' => true,
+                ]);
+            }
+
+            $builder
             ->addEventListener(
                 FormEvents::SUBMIT,
                 [$this, 'onSubmit']

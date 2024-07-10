@@ -3,6 +3,7 @@ twig:
     form_themes: 
         - 'form/dsfr-theme.html.twig'
         - 'form/custom_types.html.twig'
+        - 'form/display_content_type.html.twig'
         - 'form/entity_checkbox_absolute_type.html.twig'
         - 'form/entity_checkbox_group_absolute_type.html.twig'
         - 'form/entity_grouped_type.html.twig'
