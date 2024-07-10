@@ -47,6 +47,20 @@ class AidRepository extends ServiceEntityRepository
         parent::__construct($registry, Aid::class);
     }
 
+    public function getScaleCovered($scale, ?array $params = null): array
+    {
+        $qb = $this->getQueryBuilder($params)
+        ->innerJoin('a.perimeter', 'p')
+        ->select('DISTINCT(p.id) as id, p.name, p.latitude, p.longitude, p.population')
+        ->andWhere('p.scale = :scale')
+        ->andWhere('p.isObsolete = false')
+        ->setParameter('scale', $scale)
+        ->orderBy('p.name', 'ASC')
+        ;
+
+        return $qb->getQuery()->getResult();
+    }
+
     public function findAidsBySynonyms(array $params): array
     {
         $submission_deadline=date("Y-m-d");

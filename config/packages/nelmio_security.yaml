@@ -54,6 +54,10 @@ nelmio_security:
                 - 'https://a.forte.tiles.quaidorsay.fr'
                 - 'https://b.forte.tiles.quaidorsay.fr'
                 - 'https://c.forte.tiles.quaidorsay.fr'
+                - 'https://a.tile.openstreetmap.org'
+                - 'https://b.tile.openstreetmap.org'
+                - 'https://c.tile.openstreetmap.org'
+
             #définit les sources d’éléments multimédias autorisées (ex : <vidéo>, <audio>)
             media-src:
                 - 'self'
