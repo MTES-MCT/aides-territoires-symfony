@@ -17,12 +17,12 @@
 
 {% block body %}
 
-<div class="article fr-container fr-my-5w" id="base-edit">
+<div class="fr-container fr-my-5w" id="base-edit">
     {% block page_title %}{% endblock page_title %}
 
     {% block before_section %}{% endblock before_section %}
 
-    <section id="aid-edit" class="fr-container">
+    <section id="aid-edit">
         {% include 'user/aid/_aid_edit_stepper.html.twig' %}
 
         {% if organizationBackersNotComplete|length > 0 %}
@@ -80,7 +80,9 @@
 
                     {{ form_row(formAid.nameInitial) }}
                     {{ form_row(formAid.organization) }}
+
                     {{ form_row(formAid.programs) }}
+
                     {{ form_row(formAid.financers) }}
                     {{ form_row(formAid.financerSuggestion) }}
                     

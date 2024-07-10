@@ -194,7 +194,7 @@ class AidEditType extends AbstractType
                 'multiple' => true,
                 'expanded' => true,
                 'attr' => [
-                    'readonly' => in_array('programs', $sanctuarizedFields) ? true : false
+                    'readonly' => in_array('programs', $sanctuarizedFields) ? true : false,
                 ],
             ])
             ->add('financers', EntityType::class, [
