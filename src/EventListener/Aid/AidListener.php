@@ -9,6 +9,7 @@ use App\Message\Aid\AidPropagateUpdate;
 use App\Service\Aid\AidService;
 use App\Service\Email\EmailService;
 use App\Service\Various\ParamService;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Event\PostLoadEventArgs;
 use Doctrine\ORM\Event\PostUpdateEventArgs;
@@ -33,49 +34,6 @@ class AidListener
     {
         if ($args->getObject() instanceof Aid) {
             $args->getObject()->setUrl($this->aidService->getUrl($args->getObject()));
-        }
-    }
-
-    public function onPreUpdate(PreUpdateEventArgs $args): void
-    {
-        /** @var Aid $aid */
-        $aid = $args->getObject();
-
-        // si c'est une déclinaison locale
-        if ($aid->getGenericAid() instanceof Aid) {
-            foreach ($aid->getGenericAid()->getSanctuarizedFields() as $sanctuarizedField) {
-                if ($sanctuarizedField->getName() == 'aidFinancers') {
-                    foreach ($aid->getAidFinancers() as $aidFinancer) {
-                        $aid->removeAidFinancer($aidFinancer);
-                    }
-                    foreach ($aid->getGenericAid()->getAidFinancers() as $aidFinancer) {
-                        $newAidFinancer = new AidFinancer();
-                        $newAidFinancer->setBacker($aidFinancer->getBacker());
-                        $aid->addAidFinancer($newAidFinancer);
-                    }
-                } elseif ($sanctuarizedField->getName() == 'aidInstructors') {
-                    foreach ($aid->getAidInstructors() as $aidInstructor) {
-                        $aid->removeAidInstructor($aidInstructor);
-                    }
-                    foreach ($aid->getGenericAid()->getAidInstructors() as $aidInstructor) {
-                        $newAidInstructor = new AidInstructor();
-                        $newAidInstructor->setBacker($aidInstructor->getBacker());
-                        $aid->addAidInstructor($newAidInstructor);
-                    }
-                } else {
-                    if (
-                        method_exists($aid, 'set' . ucfirst($sanctuarizedField->getName()))
-                        && method_exists($aid->getGenericAid(), 'get' . ucfirst($sanctuarizedField->getName()))
-                    ) {
-                        $aid->{'set' . ucfirst($sanctuarizedField->getName())}($aid->getGenericAid()->{'get' . ucfirst($sanctuarizedField->getName())}());
-                    } elseif (
-                        method_exists($aid, 'set' . ucfirst($sanctuarizedField->getName()))
-                        && method_exists($aid->getGenericAid(), 'is' . ucfirst($sanctuarizedField->getName()))
-                    ) {
-                        $aid->{'set' . ucfirst($sanctuarizedField->getName())}($aid->getGenericAid()->{'is' . ucfirst($sanctuarizedField->getName())}());
-                    }
-                }
-            }
         }
     }
 
