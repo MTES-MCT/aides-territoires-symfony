@@ -7,7 +7,7 @@
                 {{ form.vars.value|raw }}
             </div>
         </div>
-        <input type="hidden" name="{{ form.vars.full_name }}" value="{{ form.vars.value|raw }}">
+        <textarea class="fr-hidden" name="{{ form.vars.full_name }}">{{ form.vars.value|raw }}</textarea>
         {{ form_errors(form) }}
     </div>
 </div>
