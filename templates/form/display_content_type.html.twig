@@ -1,0 +1,10 @@
+{% block display_content_type_row %}
+<div class="field-text">
+    {{ form_label(form) }}
+    <div class="wysiwyg-wrapper">
+        {{ form.vars.value|raw }}
+    </div>
+    <input type="hidden" name="{{ form.vars.full_name }}" value="{{ form.vars.value|raw }}">
+    {{ form_errors(form) }}
+</div>
+{% endblock %}

@@ -237,7 +237,11 @@ p {
   }
   
   // Form general rules
-  
+  form{
+    .fr-input-group{
+      max-width: 100%;
+    }
+  }
   form .fr-input-group>ul>li,
   form .fr-checkbox-group>ul>li,
   form .fr-radio-group>ul>li {

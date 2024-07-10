@@ -50,9 +50,9 @@ global.launchTrumbowyg = function(elt)
     });
 
     // si l'élément à readonly, on disable
-    $(elt).each(function() {
-        if ($(this).attr('readonly')) {
-            $(this).trumbowyg('disable');
-        }
-    });
+    // $(elt).each(function() {
+    //     if ($(this).attr('readonly')) {
+    //         $(this).trumbowyg('disable');
+    //     }
+    // });
 }
