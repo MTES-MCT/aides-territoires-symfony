@@ -42,6 +42,7 @@ Encore
     .addEntry('admin/statistics/dashboard', './assets/js/admin/statistics/dashboard.js')
     .addEntry('admin/statistics/map_controller', './assets/js/admin/statistics/map_controller.js')
     .addEntry('admin/statistics/carto', './assets/js/admin/statistics/carto.js')
+    .addEntry('admin/statistics/commune/population', './assets/js/admin/statistics/commune/population.js')
     .addEntry('admin/statistics/blog/dashboard', './assets/js/admin/statistics/blog/dashboard.js')
     .addEntry('admin/statistics/project_reference/dashboard', './assets/js/admin/statistics/project_reference/dashboard.js')
     .addEntry('admin/statistics/log/perimeter-missing', './assets/js/admin/statistics/log/perimeter-missing.js')
@@ -81,6 +82,7 @@ Encore
     .addEntry('import-scss/admin/admin', './assets/js/import-scss/admin/admin.js')
     .addEntry('import-scss/admin/perimeter/combine', './assets/js/import-scss/admin/perimeter/combine.js')
     .addEntry('import-scss/admin/statistics/carto', './assets/js/import-scss/admin/statistics/carto.js')
+    .addEntry('import-scss/admin/statistics/commune/population', './assets/js/import-scss/admin/statistics/commune/population.js')
     .addEntry('import-scss/admin/aid/associate', './assets/js/import-scss/admin/aid/associate.js')
     .addEntry('import-scss/admin/include/_order_items', './assets/js/import-scss/admin/include/_order_items.js')
 

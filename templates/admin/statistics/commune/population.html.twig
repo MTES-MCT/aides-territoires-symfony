@@ -1,0 +1,29 @@
+{% extends 'admin/statistics/_stats_base.html.twig' %}
+
+{% block head_stylesheets %}
+    {{ parent() }}
+    {{ encore_entry_link_tags('import-scss/admin/statistics/commune/population') }}
+{% endblock head_stylesheets %}
+
+{% block head_javascript %}
+    {{ parent() }}
+    {{ encore_entry_script_tags('admin/statistics/commune/population') }}
+{% endblock head_javascript %}
+
+{% block breadcrumb %}
+{% endblock %}
+
+{% block stats_content %}
+<section class="container">
+    <h1>Communes et Epcis couvertes par des aides</h1>
+    <p class="alert alert-info">Cette carte en prends en compte que les aides assignées à une commune ou à un EPCI.</p>
+    <div id="map"></div>
+
+    {% cspscript %}
+    <script>
+    var cities = {{ cities|json_encode|raw }};
+    var epcis = {{ epcis|json_encode|raw }};
+    </script>
+    {% endcspscript %}
+</section>
+{% endblock %}

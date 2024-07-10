@@ -26,6 +26,21 @@ class PerimeterRepository extends ServiceEntityRepository
         parent::__construct($registry, Perimeter::class);
     }
 
+    public function getBiggestCity($idPerimeter, ?array $params = null): ?Perimeter
+    {
+        $params['scale'] = Perimeter::SCALE_COMMUNE;
+        $params['orderBy'] = [
+            'sort' => 'p.population',
+            'order' => 'DESC'
+        ];
+        $params['idParent'] = $idPerimeter;
+        $params['maxResults'] = 1;
+
+        $qb = $this->getQueryBuilder($params);
+
+        return $qb->getQuery()->getOneOrNullResult();
+    }
+
     public function getDepartments(?array $params = null): array
     {
         $params['scale'] = Perimeter::SCALE_DEPARTEMENT;
