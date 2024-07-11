@@ -2,9 +2,7 @@
 
 namespace App\MessageHandler\Perimeter;
 
-use App\Entity\Backer\Backer;
 use App\Entity\Perimeter\Perimeter;
-use App\Message\Perimeter\CountyCountBacker;
 use App\Message\Perimeter\MsgPerimeterCombine;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Doctrine\Persistence\ManagerRegistry;
@@ -35,5 +33,9 @@ class MsgPerimeterCombineHandler
         foreach ($perimeterToAdd->getPerimetersTo() as $perimeterTo) {
             $perimeter->addPerimetersTo($perimeterTo);
         }
+
+        // sauvegarde
+        $this->managerRegistry->getManager()->persist($perimeter);
+        $this->managerRegistry->getManager()->flush();
     }
 }
