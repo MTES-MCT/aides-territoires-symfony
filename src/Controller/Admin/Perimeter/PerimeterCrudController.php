@@ -17,6 +17,9 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IntegerField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\NumberField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
+use OpenSpout\Common\Entity\Cell;
+use OpenSpout\Common\Entity\Row;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class PerimeterCrudController extends AtCrudController
 {
@@ -179,11 +182,68 @@ class PerimeterCrudController extends AtCrudController
             })
         ;
 
+        // action pour export csv de codes insee
+        $exportInsee = Action::new('exportInsee', 'Export CSV codes Insee')
+        ->setHtmlAttributes(['title' => 'Export CSV codes Insee'])
+        ->linkToCrudAction('exportInsee')
+    ;
+
         return parent::configureActions($actions)
             ->add(Crud::PAGE_INDEX, $combine)
             ->add(Crud::PAGE_INDEX, $importInsee)
+            ->add(Crud::PAGE_INDEX, $exportInsee)
             ->add(Crud::PAGE_EDIT, $combine)
             ->add(Crud::PAGE_EDIT, $importInsee)
         ;
+    }
+
+    public function exportInsee(): StreamedResponse
+    {
+        $response = new StreamedResponse();
+        $response->setCallback(function () {
+            // le périmètre
+            /** @var Perimeter $perimeter */
+            $perimeter = $this->getContext()->getEntity()->getInstance();
+            
+            // options CSV
+            $options = new \OpenSpout\Writer\CSV\Options();
+            $options->FIELD_DELIMITER = ';';
+            $options->FIELD_ENCLOSURE = '"';
+
+            // writer
+            $writer = new \OpenSpout\Writer\CSV\Writer($options);
+
+            // ouverture fichier
+            $now = new \DateTime(date('Y-m-d H:i:s'));
+            $writer->openToBrowser('export_'.$this->stringService->getSlug($perimeter->getName()).'_'.$now->format('Y-m-d_H-i-s').'.csv');
+
+            // entêtes
+            $cells = [
+                Cell::fromValue('Code Insee'),
+                Cell::fromValue('Nom du périmètre'),
+            ];
+            $singleRow = new Row($cells);
+            $writer->addRow($singleRow);
+
+            // les inscriptions
+            foreach ($perimeter->getPerimetersFrom() as $perimeterFrom) {
+                if (!$perimeterFrom->getInsee()) {
+                    continue;
+                }
+                // ajoute ligne par ligne
+                $cells = [
+                    Cell::fromValue($perimeterFrom->getInsee()),
+                    Cell::fromValue($perimeterFrom->getName())
+                ];
+
+                $singleRow = new Row($cells);
+                $writer->addRow($singleRow);
+            }
+
+            // fermeture fichier
+            $writer->close();
+        });
+
+        return $response;
     }
 }

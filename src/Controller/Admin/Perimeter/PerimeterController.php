@@ -40,13 +40,29 @@ class PerimeterController extends DashboardController
         if ($formCombine->isSubmitted()) {
             if ($formCombine->isValid()) {
                 $perimetersToAdd = $formCombine->get('perimetersToAdd')->getData();
+                /** @var Perimeter $perimeterToAdd */
                 foreach ($perimetersToAdd as $perimeterToAdd) {
                     $perimeter->addPerimetersFrom($perimeterToAdd);
+                    // ajoute les enfants
+                    foreach ($perimeterToAdd->getPerimetersFrom() as $perimeterFrom) {
+                        $perimeter->addPerimetersFrom($perimeterFrom);
+                    }
+                    // ajoute les parents
+                    foreach ($perimeterToAdd->getPerimetersTo() as $perimeterTo) {
+                        $perimeter->addPerimetersTo($perimeterTo);
+                    }
                 }
 
+                // retirer des enfants
+                $perimetersFromRemove = $formCombine->get('perimetersFromRemove')->getData();
+                foreach ($perimetersFromRemove as $perimeterFromRemove) {
+                    $perimeter->removePerimetersFrom($perimeterFromRemove);
+                }
+
+                // retirer des parents
                 $perimetersToRemove = $formCombine->get('perimetersToRemove')->getData();
                 foreach ($perimetersToRemove as $perimeterToRemove) {
-                    $perimeter->removePerimetersFrom($perimeterToRemove);
+                    $perimeter->removePerimetersTo($perimeterToRemove);
                 }
 
                 // sauvegarde
@@ -107,7 +123,7 @@ class PerimeterController extends DashboardController
                 $perimeterImport->setAuthor($userService->getUserLogged());
 
 
-                while (($line = fgetcsv($file)) !== false) {
+                while (($line = fgetcsv($file, null, ';', '"')) !== false) {
                     $perimeterImport->addCityCode(str_pad($line[0], 5, '0', STR_PAD_LEFT));
                 }
 
