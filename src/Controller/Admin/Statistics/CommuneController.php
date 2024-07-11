@@ -33,10 +33,12 @@ class CommuneController extends AbstractController
     #[Route('/admin/statistics/commune/population', name: 'admin_statistics_commune_population')]
     public function mapPopulation(
         AidRepository $aidRepository,
-        PerimeterRepository $perimeterRepository
+        PerimeterRepository $perimeterRepository,
+        OrganizationRepository $organizationRepository
     ): Response
     {
-        $cities = $aidRepository->getScaleCovered(scale: Perimeter::SCALE_COMMUNE);
+        $cities = $organizationRepository->getScaleCovered(scale: Perimeter::SCALE_COMMUNE);
+        dd($cities);
         $epcis = $aidRepository->getScaleCovered(scale: Perimeter::SCALE_EPCI);
         foreach ($epcis as $key => $epci) {
             if (!$epci['latitude'] || !$epci['longitude']) {

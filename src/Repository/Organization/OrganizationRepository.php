@@ -25,6 +25,21 @@ class OrganizationRepository extends ServiceEntityRepository
         parent::__construct($registry, Organization::class);
     }
 
+    public function getScaleCovered($scale, ?array $params = null): array
+    {
+        $qb = $this->getQueryBuilder($params)
+        ->innerJoin('o.perimeter', 'p')
+        ->select('DISTINCT(p.id) as id, p.name, p.latitude, p.longitude, p.population')
+        ->andWhere('p.scale = :scale')
+        ->andWhere('p.isObsolete = false')
+        ->setParameter('scale', $scale)
+        ->orderBy('p.name', 'ASC')
+        ;
+
+        return $qb->getQuery()->getResult();
+    }
+
+
     public function countWithUserBeneficiary(?array $params = null): int
     {
         $params['hasUserBeneficiary'] = true;
