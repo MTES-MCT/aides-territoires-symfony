@@ -7,6 +7,7 @@ use App\Entity\Perimeter\Perimeter;
 use App\Entity\Perimeter\PerimeterImport;
 use App\Form\Admin\Perimeter\CombineType;
 use App\Form\Admin\Perimeter\ImportCsvInseeType;
+use App\Message\Perimeter\MsgPerimeterCombine;
 use App\Message\Perimeter\MsgPerimeterImport;
 use App\Service\User\UserService;
 use Doctrine\Persistence\ManagerRegistry;
@@ -42,15 +43,7 @@ class PerimeterController extends DashboardController
                 $perimetersToAdd = $formCombine->get('perimetersToAdd')->getData();
                 /** @var Perimeter $perimeterToAdd */
                 foreach ($perimetersToAdd as $perimeterToAdd) {
-                    $perimeter->addPerimetersFrom($perimeterToAdd);
-                    // ajoute les enfants
-                    foreach ($perimeterToAdd->getPerimetersFrom() as $perimeterFrom) {
-                        $perimeter->addPerimetersFrom($perimeterFrom);
-                    }
-                    // ajoute les parents
-                    foreach ($perimeterToAdd->getPerimetersTo() as $perimeterTo) {
-                        $perimeter->addPerimetersTo($perimeterTo);
-                    }
+                    $this->messageBusInterface->dispatch(new MsgPerimeterCombine($perimeter->getId(), $perimeterToAdd->getId()));
                 }
 
                 // retirer des enfants
