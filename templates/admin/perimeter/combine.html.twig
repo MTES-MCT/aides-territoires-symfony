@@ -20,7 +20,9 @@
 
 <p>A partir du périmètre <strong>{{ perimeter.name }}</strong></p>
 <p>Utilisez ce formulaire pour configurer ce périmètre comme une combinaison d’autres périmètres. Attention, la configuration actuelle sera remise à zéro. </p>
-
+<p class="alert alert-info">
+    L'ajout se fait de manière aynschrone. Ils sont traités dans une file d'attente, le traitement peu prendre de quelques secondes à quelques minutes selon la taille et le nombre de périmètre ajoutés.</p>
+</p>
 {{ form_start(formCombine) }}
     {{ form_row(formCombine.perimetersToAdd) }}
     {{ form_row(formCombine.perimetersFromRemove) }}
