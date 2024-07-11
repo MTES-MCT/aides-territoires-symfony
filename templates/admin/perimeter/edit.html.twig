@@ -30,4 +30,33 @@
 			</div>
 		</fieldset>
 	</div>
+
+
+	<div class="form-fieldset  field-form_fieldset">
+		<fieldset>
+			<div class="form-fieldset-header collapsible ">
+				<div class="form-fieldset-title">
+
+					<a href="#content-ea_form_fieldset_01HF47A4QDW5B3P1C6AVD3TGBQ5" data-bs-toggle="collapse" class="form-fieldset-title-content form-fieldset-collapse collapsed" aria-expanded="false" aria-controls="content-ea_form_fieldset_01HF47A4QDW5B3P1C6AVD3TGBQ5">
+						<i class="fas fw fa-chevron-right form-fieldset-collapse-marker"></i>
+						Contenu dans les périmètres suivants ({{ entity.instance.perimetersTo|length }})
+					</a>
+				</div>
+			</div>
+
+			<div id="content-ea_form_fieldset_01HF47A4QDW5B3P1C6AVD3TGBQ5" class="form-fieldset-body  collapse ">
+				<div class="row">
+                    {% if entity.instance.perimetersTo|length == 0 %}
+						<p>Contenu dans aucun périmètre</p>
+					{% else %}
+						<ul>
+							{% for perimeter in entity.instance.perimetersTo %}
+								<li>{{ perimeter|getPerimeterSmartName }}</li>
+							{% endfor %}
+						</ul>
+					{% endif %}
+                </div>
+			</div>
+		</fieldset>
+	</div>
 {% endblock %}

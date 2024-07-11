@@ -18,16 +18,25 @@ class CombineType extends AbstractType
                 'attr' => [
                     'data-controller' => 'custom-autocomplete'
                 ],
-                'help' => 'Sélectionnez une liste de périmètres à combiner',
+                'help' => 'Sélectionnez une liste de périmètres à combiner. Pour chaque périmètre ses enfants et ses parents seront ajoutés. Ex: En ajout "CC Alpes d’Azur" à "Gal Alpes et Azur", on ajoute aussi les communes de "CC Alpes d’Azur" à "Gal Alpes et Azur" et on ajoute "Gal Alpes et Azur" aux parents de "CC Alpes d’Azur" (Région, Département, etc.)',
+                'multiple' => true
+            ])
+            ->add('perimetersFromRemove', PerimeterAutocompleteType::class, [
+                'required' => false,
+                'label' => 'Périmètres enfants à soustraire',
+                'attr' => [
+                    'data-controller' => 'custom-autocomplete'
+                ],
+                'help' => 'Ces périmètres seront enlevés des enfants du périmètre. Ex: Retiré "Alpes-Maritîmes" des parents de "Gal Alpes et Azur". Les enfants et parents de "Alpes-Maritîmes" ne seront pas traités.',
                 'multiple' => true
             ])
             ->add('perimetersToRemove', PerimeterAutocompleteType::class, [
                 'required' => false,
-                'label' => 'Périmètres à soustraire',
+                'label' => 'Périmètres parents à soustraire',
                 'attr' => [
                     'data-controller' => 'custom-autocomplete'
                 ],
-                'help' => 'Ces périmètres seront enlevés du périmètre combiné.',
+                'help' => 'Ces périmètres seront enlevés des parents du périmètre. Ex: Retirer "CC Alpes d’Azur" à "Gal Alpes et Azur". Les enfants et parents de "CC Alpes d’Azur" ne seront pas traités.',
                 'multiple' => true
             ])
         ;

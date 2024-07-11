@@ -9,6 +9,7 @@ use App\Service\File\FileService;
 use App\Service\Image\ImageService;
 use App\Service\User\UserService;
 use App\Service\Various\ParamService;
+use App\Service\Various\StringService;
 use Doctrine\Persistence\ManagerRegistry;
 use EasyCorp\Bundle\EasyAdminBundle\Collection\FieldCollection;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
@@ -33,7 +34,7 @@ enum Direction
     case Bottom;
 }
 class AtCrudController extends AbstractCrudController
-{      
+{
     const UPLOAD_TMP_FOLDER = '/public/uploads/_tmp/';
 
     public function __construct(
@@ -48,7 +49,8 @@ class AtCrudController extends AbstractCrudController
         public AidService $aidService,
         public UserService $userService,
         public UserPasswordHasherInterface $userPasswordHasherInterface,
-        public MessageBusInterface $messageBusInterface
+        public MessageBusInterface $messageBusInterface,
+        public StringService $stringService
     ) {
     }
 
