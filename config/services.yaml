@@ -134,3 +134,17 @@ when@prod:
                 # uncomment the following if your Redis server requires a user and a password (when user is not default)
                 # - auth:
                 #     - ['%env(REDIS_USER)%','%env(REDIS_PASSWORD)%']
+
+when@staging:
+    services:
+
+        Symfony\Component\HttpFoundation\Session\Storage\Handler\RedisSessionHandler:
+            arguments:
+                - '@Redis'
+                - { 'prefix': 'at_sess', 'ttl': 3600 }
+
+        Redis:
+            class: \Redis
+            calls:
+                - connect:
+                    - '%env(resolve:REDIS_URL)%'
