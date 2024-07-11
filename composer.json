@@ -40,6 +40,7 @@
         "scheb/2fa-bundle": "^6.9",
         "scheb/2fa-totp": "^6.9",
         "sentry/sentry-symfony": "^4.14",
+        "snc/redis-bundle": "^4.7",
         "stof/doctrine-extensions-bundle": "^1.8",
         "symfony/apache-pack": "^1.0",
         "symfony/asset": "6.4.*",

@@ -109,42 +109,5 @@ services:
         tags:
             - { name: kernel.event_listener, event: kernel.request, method: onKernelRequest }
 
-when@prod:
-    services:
-
-        Symfony\Component\HttpFoundation\Session\Storage\Handler\RedisSessionHandler:
-            arguments:
-                - '@Redis'
-                # you can optionally pass an array of options. The only options are 'prefix' and 'ttl',
-                # which define the prefix to use for the keys to avoid collision on the Redis server
-                # and the expiration time for any given entry (in seconds), defaults are 'sf_s' and null:
-                - { 'prefix': 'at_sess', 'ttl': 3600 }
-
-        Redis:
-            # you can also use \RedisArray, \RedisCluster, \Relay\Relay or \Predis\Client classes
-            class: \Redis
-            calls:
-                - connect:
-                    - '%env(resolve:REDIS_URL)%'
-
-                # uncomment the following if your Redis server requires a password
-                # - auth:
-                #     - '%env(REDIS_PASSWORD)%'
-
-                # uncomment the following if your Redis server requires a user and a password (when user is not default)
-                # - auth:
-                #     - ['%env(REDIS_USER)%','%env(REDIS_PASSWORD)%']
-
-when@staging:
-    services:
-
-        Symfony\Component\HttpFoundation\Session\Storage\Handler\RedisSessionHandler:
-            arguments:
-                - '@Redis'
-                - { 'prefix': 'at_sess', 'ttl': 3600 }
-
-        Redis:
-            class: \Redis
-            calls:
-                - connect:
-                    - '%env(resolve:REDIS_URL)%'
+    Symfony\Component\HttpFoundation\Session\Storage\Handler\RedisSessionHandler:
+        arguments: ['@snc_redis.session']
