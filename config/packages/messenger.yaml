@@ -29,6 +29,7 @@ framework:
             'App\Message\Export\MsgSpreadsheetToExport': async
             'App\Message\Reference\ProjectReferenceCountAids': async
             'App\Message\Perimeter\CountyCountBacker': async
+            'App\Message\Perimeter\MsgPerimeterCombine': async
             'App\Message\Perimeter\MsgPerimeterImport': async
             'App\Message\Backer\BackerCountAid': async
             'App\Message\SearchPage\SearchPageCountAid': async
