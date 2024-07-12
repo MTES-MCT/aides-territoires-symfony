@@ -46,6 +46,11 @@ class PerimeterController extends DashboardController
                     $this->messageBusInterface->dispatch(new MsgPerimeterCombine($perimeter->getId(), $perimeterToAdd->getId()));
                 }
 
+                $perimetersToAddStrict = $formCombine->get('perimetersToAddStrict')->getData();
+                foreach ($perimetersToAddStrict as $perimeterToAdd) {
+                    $perimeter->addPerimetersFrom($perimeterToAdd);
+                }
+
                 // retirer des enfants
                 $perimetersFromRemove = $formCombine->get('perimetersFromRemove')->getData();
                 foreach ($perimetersFromRemove as $perimeterFromRemove) {
