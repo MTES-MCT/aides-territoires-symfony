@@ -14,13 +14,23 @@ class CombineType extends AbstractType
         $builder
             ->add('perimetersToAdd', PerimeterAutocompleteType::class, [
                 'required' => false,
-                'label' => 'Périmètres à additionner',
+                'label' => 'Périmètres à additionner récursif',
                 'attr' => [
                     'data-controller' => 'custom-autocomplete'
                 ],
                 'help' => 'Sélectionnez une liste de périmètres à combiner. Pour chaque périmètre ses enfants et ses parents seront ajoutés. Ex: En ajout "CC Alpes d’Azur" à "Gal Alpes et Azur", on ajoute aussi les communes de "CC Alpes d’Azur" à "Gal Alpes et Azur" et on ajoute "Gal Alpes et Azur" aux parents de "CC Alpes d’Azur" (Région, Département, etc.)',
                 'multiple' => true
             ])
+            ->add('perimetersToAddStrict', PerimeterAutocompleteType::class, [
+                'required' => false,
+                'label' => 'Périmètres à additionner stricte',
+                'attr' => [
+                    'data-controller' => 'custom-autocomplete'
+                ],
+                'help' => 'Sélectionnez une liste de périmètres à combiner. Seul les périmètre sélectionner seront ajoutés (les enfants et parents seront ignorés). C\'est l\'ancien comportement.',
+                'multiple' => true
+            ])
+
             ->add('perimetersFromRemove', PerimeterAutocompleteType::class, [
                 'required' => false,
                 'label' => 'Périmètres enfants à soustraire',
