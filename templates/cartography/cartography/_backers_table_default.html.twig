@@ -36,14 +36,15 @@
                         {% endif %}
                     {% endfor %}
                 </td>
+
                 <td>
-                    <a href="{{ path('app_aid_aid', {'forceOrganizationType': 'null', 'perimeter': current_dept.id, 'backers[]': backer.id}) }}" title="Voir les aides du porteur {{ backer.name }}">{{ backer.nbAidsLive }}</a>
+                    <a href="{{ path('app_aid_aid', {'forceOrganizationType': 'null', 'perimeter': current_dept.id, 'backers[]': backer.id}) }}" title="Voir les aides du porteur {{ backer.name }}">{{ backer.aidsLive|length }}</a>
                 </td>
                 <td>
-                    <a href="{{ path('app_aid_aid', {'forceOrganizationType': 'null', 'perimeter': current_dept.id, 'backers[]': backer.id, 'aidTypeGroup': constant('App\\Entity\\Aid\\AidTypeGroup::SLUG_FINANCIAL')}) }}" title="Voir les aides financières du porteur {{ backer.name }}">{{ backer.nbAidsLiveFinancial }}</a>
+                    <a href="{{ path('app_aid_aid', {'forceOrganizationType': 'null', 'perimeter': current_dept.id, 'backers[]': backer.id, 'aidTypeGroup': constant('App\\Entity\\Aid\\AidTypeGroup::SLUG_FINANCIAL')}) }}" title="Voir les aides financières du porteur {{ backer.name }}">{{ backer.aidsFinancial|length }}</a>
                 </td>
                 <td>
-                    <a href="{{ path('app_aid_aid', {'forceOrganizationType': 'null', 'perimeter': current_dept.id, 'backers[]': backer.id, 'aidTypeGroup': constant('App\\Entity\\Aid\\AidTypeGroup::SLUG_TECHNICAL')}) }}" title="Voir les aides en ingénierie du porteur {{ backer.name }}">{{ backer.nbAidsLiveTechnical }}</a>
+                    <a href="{{ path('app_aid_aid', {'forceOrganizationType': 'null', 'perimeter': current_dept.id, 'backers[]': backer.id, 'aidTypeGroup': constant('App\\Entity\\Aid\\AidTypeGroup::SLUG_TECHNICAL')}) }}" title="Voir les aides en ingénierie du porteur {{ backer.name }}">{{ backer.aidsTechnical|length }}</a>
                 </td>
             </tr>
         {% endfor %}
