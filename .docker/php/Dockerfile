@@ -59,8 +59,12 @@ RUN docker-php-ext-install \
     && docker-php-ext-configure zip --with-zip \
     && docker-php-ext-install zip \
     && docker-php-ext-install sockets
-
 # end PDOSQL, IMAGICK, SOAP
+
+# Redis
+RUN pecl install redis \
+    && docker-php-ext-enable redis
+# end Redis
 
 # Excimer pour Sentry
 RUN pecl install excimer
