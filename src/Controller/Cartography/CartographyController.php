@@ -196,29 +196,6 @@ class CartographyController extends FrontController
             }
         }
 
-
-        $backerTest = $backerRepository->find(190);
-        $aidsParams =[
-            'backer' => $backerTest,
-            'showInSearch' => true
-        ];
-        $backerTest->setAidsLive($aidService->searchAids($aidsParams));
-        $backerTest->setNbAidsLive(count($backerTest->getAidsLive()));
-        $backerTest->setNbAidsLiveFinancial(count($backerTest->getAidsFinancial()));
-        $backerTest->setNbAidsLiveTechnical(count($backerTest->getAidsTechnical()));
-        dump($backerTest->getNbAidsLive(), $backerTest->getNbAidsLiveFinancial(), $backerTest->getNbAidsLiveTechnical());
-
-        // assigne les aides aux backers
-        // foreach ($backers as $key => $backer) {
-        //     $aidsParams['backer'] = $backer;
-        //     // défini les aides lives, à partir de quoi on pourra récupérer les financières, techniques, les thématiques
-        //     $backer->setAidsLive($aidService->searchAids($aidsParams));
-        //     // si pas d'aide live on retire la ligne
-        //     if (empty($backer->getAidsLive())) {
-        //         unset($backers[$key]);
-        //     }
-        // }
-
          // fil arianne
         $this->breadcrumb->add(
             'Cartographie',
