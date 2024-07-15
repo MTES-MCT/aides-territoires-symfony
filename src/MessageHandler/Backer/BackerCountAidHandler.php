@@ -5,6 +5,7 @@ namespace App\MessageHandler\Backer;
 use App\Entity\Aid\Aid;
 use App\Entity\Backer\Backer;
 use App\Message\Backer\BackerCountAid;
+use App\Service\Aid\AidService;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -13,6 +14,7 @@ class BackerCountAidHandler
 {
     public function __construct(
         private ManagerRegistry $managerRegistry,
+        private AidService $aidService
     ) {
     }
 
@@ -30,7 +32,14 @@ class BackerCountAidHandler
             $aidRepo = $this->managerRegistry->getRepository(Aid::class);
 
             $backer->setNbAids($aidRepo->countCustom(['backer' => $backer]));
-            $backer->setNbAidsLive($aidRepo->countCustom(['backer' => $backer, 'showInSearch' => true]));
+            $aidsParams =[
+                'backer' => $backer,
+                'showInSearch' => true
+            ];
+            $backer->setAidsLive($this->aidService->searchAids($aidsParams));
+            $backer->setNbAidsLive(count($backer->getAidsLive()));
+            $backer->setNbAidsLiveFinancial(count($backer->getAidsFinancial()));
+            $backer->setNbAidsLiveTechnical(count($backer->getAidsTechnical()));
             $this->managerRegistry->getManager()->persist($backer);
             $this->managerRegistry->getManager()->flush();
         }

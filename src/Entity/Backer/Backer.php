@@ -546,7 +546,7 @@ class Backer // NOSONAR too much methods
     private ?array $aidsFinancial = [];
     public function getAidsFinancial() : ?array
     {
-        if (count($this->aidsFinancial) > 0) {
+        if (!empty($this->aidsFinancial)) {
             return $this->aidsFinancial;
         }
 
@@ -576,6 +576,11 @@ class Backer // NOSONAR too much methods
     #[ORM\Column(nullable: true)]
     private ?int $nbAidsLive = null;
 
+    #[ORM\Column(nullable: true)]
+    private ?int $nbAidsLiveFinancial = null;
+    #[ORM\Column(nullable: true)]
+    private ?int $nbAidsLiveTechnical = null;
+
     #[ORM\OneToMany(mappedBy: 'backer', targetEntity: BackerLock::class, orphanRemoval: true)]
     private Collection $backerLocks;
 
@@ -588,7 +593,7 @@ class Backer // NOSONAR too much methods
 
     public function getAidsTechnical() : ?array
     {
-        if (count($this->aidsTechnical) > 0) {
+        if (!empty($this->aidsTechnical)) {
             return $this->aidsTechnical;
         }
         $aidsTechnical = new ArrayCollection();
@@ -908,6 +913,30 @@ class Backer // NOSONAR too much methods
     public function setNbAidsLive(?int $nbAidsLive): static
     {
         $this->nbAidsLive = $nbAidsLive;
+
+        return $this;
+    }
+
+    public function getNbAidsLiveFinancial(): ?int
+    {
+        return $this->nbAidsLiveFinancial;
+    }
+
+    public function setNbAidsLiveFinancial(?int $nbAidsLiveFinancial): static
+    {
+        $this->nbAidsLiveFinancial = $nbAidsLiveFinancial;
+
+        return $this;
+    }
+
+    public function getNbAidsLiveTechnical(): ?int
+    {
+        return $this->nbAidsLiveTechnical;
+    }
+
+    public function setNbAidsLiveTechnical(?int $nbAidsLiveTechnical): static
+    {
+        $this->nbAidsLiveTechnical = $nbAidsLiveTechnical;
 
         return $this;
     }

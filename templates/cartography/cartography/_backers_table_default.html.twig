@@ -37,32 +37,14 @@
                     {% endfor %}
                 </td>
                 <td>
-                    <a href="{{ path('app_aid_aid', {'forceOrganizationType': 'null', 'perimeter': current_dept.id, 'backers[]': backer.id}) }}" title="Voir les aides du porteur {{ backer.name }}">{{ backer.aidsLive|length }}</a>
+                    <a href="{{ path('app_aid_aid', {'forceOrganizationType': 'null', 'perimeter': current_dept.id, 'backers[]': backer.id}) }}" title="Voir les aides du porteur {{ backer.name }}">{{ backer.nbAidsLive }}</a>
                 </td>
                 <td>
-                    <a href="{{ path('app_aid_aid', {'forceOrganizationType': 'null', 'perimeter': current_dept.id, 'backers[]': backer.id, 'aidTypeGroup': constant('App\\Entity\\Aid\\AidTypeGroup::SLUG_FINANCIAL')}) }}" title="Voir les aides financières du porteur {{ backer.name }}">{{ backer.aidsFinancial|length }}</a>
+                    <a href="{{ path('app_aid_aid', {'forceOrganizationType': 'null', 'perimeter': current_dept.id, 'backers[]': backer.id, 'aidTypeGroup': constant('App\\Entity\\Aid\\AidTypeGroup::SLUG_FINANCIAL')}) }}" title="Voir les aides financières du porteur {{ backer.name }}">{{ backer.nbAidsLiveFinancial }}</a>
                 </td>
                 <td>
-                    <a href="{{ path('app_aid_aid', {'forceOrganizationType': 'null', 'perimeter': current_dept.id, 'backers[]': backer.id, 'aidTypeGroup': constant('App\\Entity\\Aid\\AidTypeGroup::SLUG_TECHNICAL')}) }}" title="Voir les aides en ingénierie du porteur {{ backer.name }}">{{ backer.aidsTechnical|length }}</a>
+                    <a href="{{ path('app_aid_aid', {'forceOrganizationType': 'null', 'perimeter': current_dept.id, 'backers[]': backer.id, 'aidTypeGroup': constant('App\\Entity\\Aid\\AidTypeGroup::SLUG_TECHNICAL')}) }}" title="Voir les aides en ingénierie du porteur {{ backer.name }}">{{ backer.nbAidsLiveTechnical }}</a>
                 </td>
-                {#<td>
-                    {% for aid_category in entry.aids_categories %}
-                        <p class="fr-mb-1w">{{ aid_category }};</p>
-                    {% endfor %}
-                </td>
-                <td>
-                    <a href="{% url 'search_view' %}?perimeter={{ current_dept.id }}&backers={{ entry.id }}&targeted_audiences={{ target_audience }}{% if aid_categories_url_fragment %}&{{ aid_categories_url_fragment }}{% endif %}">{{ entry.total_aids }}</a>
-                </td>
-                <td>
-                    <a href="{% url 'search_view' %}?perimeter={{ current_dept.id }}&backers={{ entry.id }}&aid_type=grant&aid_type=loan&aid_type=recoverable_advance&aid_type=cee&aid_type=other&targeted_audiences={{ target_audience }}{% if aid_categories_url_fragment %}&{{ aid_categories_url_fragment }}{% endif %}">
-                        {{ entry.financial_aids }}
-                    </a>
-                </td>
-                <td>
-                    <a href="{% url 'search_view' %}?perimeter={{ current_dept.id }}&backers={{ entry.id }}&aid_type=technical_engineering&aid_type=financial_engineering&aid_type=legal_engineering&targeted_audiences={{ target_audience }}{% if aid_categories_url_fragment %}&{{ aid_categories_url_fragment }}{% endif %}">
-                        {{ entry.technical_aids }}
-                    </a>
-                </td>   #}
             </tr>
         {% endfor %}
     </tbody>
