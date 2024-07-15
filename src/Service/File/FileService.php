@@ -47,4 +47,9 @@ class FileService
     {
         return $this->kernelInterface->getProjectDir();
     }
+
+    public function getExtension(string $filename): string
+    {
+        return pathinfo($filename, PATHINFO_EXTENSION);
+    }
 }

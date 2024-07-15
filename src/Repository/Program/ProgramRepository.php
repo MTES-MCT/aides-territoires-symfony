@@ -30,6 +30,21 @@ class ProgramRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult()[0]['nb'] ?? 0;
     }
 
+    public function getNames(?array $params = null): array
+    {
+        $params['orderBy'] = ['sort' => 'p.name', 'order' => 'ASC'];
+        $qb = $this->getQueryBuilder($params);
+
+        $qb
+            ->select('p.name')
+        ;
+
+        $results = $qb->getQuery()->getResult();
+
+        // on met directement le champ name dans le tableau
+        return array_column($results, 'name');
+    }
+
     public function findCustom(array $params = null): array
     {
         $qb = $this->getQueryBuilder($params);

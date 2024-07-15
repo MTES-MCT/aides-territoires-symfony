@@ -15,16 +15,39 @@ use App\Controller\Admin\Filter\Aid\AidReferenceSearchFilter;
 use App\Controller\Admin\Filter\Aid\AidReferenceSearchObjectFilter;
 use App\Controller\Admin\Filter\Aid\AidStateFilter;
 use App\Entity\Aid\Aid;
+use App\Entity\Aid\AidDestination;
+use App\Entity\Aid\AidFinancer;
+use App\Entity\Aid\AidInstructor;
+use App\Entity\Aid\AidRecurrence;
+use App\Entity\Aid\AidStep;
+use App\Entity\Aid\AidType;
+use App\Entity\Backer\Backer;
+use App\Entity\Category\Category;
+use App\Entity\Organization\Organization;
+use App\Entity\Organization\OrganizationType;
 use App\Entity\Perimeter\Perimeter;
+use App\Entity\Program\Program;
 use App\Entity\Reference\ProjectReference;
+use App\Entity\User\User;
 use App\Field\AddNewField;
 use App\Field\JsonField;
 use App\Field\TextLengthCountField;
 use App\Field\TrumbowygField;
+use App\Form\Admin\Aid\AidImportType;
 use App\Form\Admin\Aid\KeywordReferenceAssociationType;
 use App\Form\Admin\Aid\ProjectReferenceAssociationType;
+use App\Repository\Aid\AidDestinationRepository;
+use App\Repository\Aid\AidRecurrenceRepository;
 use App\Repository\Aid\AidRepository;
+use App\Repository\Aid\AidTypeRepository;
+use App\Repository\Backer\BackerRepository;
+use App\Repository\Category\CategoryRepository;
+use App\Repository\Organization\OrganizationRepository;
+use App\Repository\Program\ProgramRepository;
+use App\Repository\Reference\ProjectReferenceRepository;
+use App\Repository\User\UserRepository;
 use App\Service\Export\SpreadsheetExporterService;
+use App\Service\File\FileService;
 use Doctrine\ORM\EntityRepository;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
@@ -47,8 +70,13 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\IntegerField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\UrlField;
 use EasyCorp\Bundle\EasyAdminBundle\Filter\ChoiceFilter;
+use OpenSpout\Reader\CSV\Options as OptionsCsv;
+use OpenSpout\Reader\CSV\Reader as ReaderCsv;
+use OpenSpout\Reader\XLSX\Reader as ReaderXlsx;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use TypeError;
 
 class AidCrudController extends AtCrudController
 {
@@ -174,8 +202,17 @@ class AidCrudController extends AtCrudController
             ->setHtmlAttributes(['title' => 'Statistiques', 'target' => '_blank']) // titre
             ->linkToUrl(function($entity) {
                 return $this->generateUrl('app_user_aid_stats', ['slug' => $entity->getSlug()]);
-            });
+            })
         ;
+
+        // import
+        $importSpreadsheetAction = Action::new('importSpreadsheet', 'Importer des aides', 'fas fa-file-import')
+            ->setHtmlAttributes(['title' => 'Importer des aides'])
+            ->linkToCrudAction('importSpreadsheet')
+            ->addCssClass('btn btn-success')
+            ->setIcon('fa fa-download')
+            ->createAsGlobalAction()
+            ;
 
         // exports
         $exportCsvAction = $this->getExportCsvAction();
@@ -192,6 +229,7 @@ class AidCrudController extends AtCrudController
             ->add(Crud::PAGE_INDEX, $displayOnFront)
             ->add(Crud::PAGE_INDEX, $displayStats)
             ->add(Crud::PAGE_EDIT, $displayOnFront)
+            ->add(Crud::PAGE_INDEX, $importSpreadsheetAction)
             ->add(Crud::PAGE_INDEX, $exportCsvAction)
             ->add(Crud::PAGE_INDEX, $exportXlsxAction)
             ->addBatchAction($batchAssociate)
@@ -771,6 +809,269 @@ class AidCrudController extends AtCrudController
             ->overrideTemplate('crud/index', 'admin/aid/index.html.twig')
             ->setPaginatorPageSize(50)
         ;
+    }
+
+    public function importSpreadsheet(AdminContext $context, FileService $fileService): Response
+    {
+        $form = $this->createForm(AidImportType::class);
+        $form->handleRequest($context->getRequest());
+        if ($form->isSubmitted()) {
+            if ($form->isValid()) {
+                // détermine l'extension
+                $extension = $fileService->getExtension($form->get('file')->getData()->getClientOriginalName());
+                switch ($extension) {
+                    case 'csv':
+
+                        $options = new OptionsCsv();
+                        $options->FIELD_DELIMITER = ';';
+                        $options->FIELD_ENCLOSURE = '"';
+
+                        $reader = new ReaderCsv($options);
+                        
+                        break;
+                    case 'xlsx':
+                        $reader = new ReaderXlsx();
+                        break;
+                    default:
+                        $this->addFlash('danger', 'Le format de fichier n\'est pas supporté.');
+                        return $this->render('admin/aid/import.html.twig', [
+                            'form' => $form->createView(),
+                        ]);
+                }
+
+                $reader->open($form->get('file')->getData()->getPathname());
+
+                /** @var ProgramRepository $programRepository */
+                $programRepository = $this->managerRegistry->getRepository(Program::class);
+
+                /** @var BackerRepository $backerRepository */
+                $backerRepository = $this->managerRegistry->getRepository(Backer::class);
+                
+                /** @var OrganizationTypeRepository $organizationTypeRepository */
+                $organizationTypeRepository = $this->managerRegistry->getRepository(OrganizationType::class);
+
+                /** @var AidTypeRepository $aidTypeRepository */
+                $aidTypeRepository = $this->managerRegistry->getRepository(AidType::class);
+
+                /** @var CategoryRepository $categoryRepository */
+                $categoryRepository = $this->managerRegistry->getRepository(Category::class);
+
+                /** @var AidRecurrenceRepository $aidRecurrenceRepository */
+                $aidRecurrenceRepository = $this->managerRegistry->getRepository(AidRecurrence::class);
+
+                /** @var AidStepRepository $aidStepRepository */
+                $aidStepRepository = $this->managerRegistry->getRepository(AidStep::class);
+
+                /** @var AidDestinationRepository $aidDestinationRepository */
+                $aidDestinationRepository = $this->managerRegistry->getRepository(AidDestination::class);
+
+                /** @var PerimeterRepository $perimeterRepository */
+                $perimeterRepository = $this->managerRegistry->getRepository(Perimeter::class);
+
+                /** @var UserRepository $userRepository */
+                $userRepository = $this->managerRegistry->getRepository(User::class);
+
+                /** @var OrganizationRepository $organizationRepository */
+                $organizationRepository = $this->managerRegistry->getRepository(Organization::class);
+
+                /** @var ProjectReferenceRepository $projectReferenceRepository */
+                $projectReferenceRepository = $this->managerRegistry->getRepository(ProjectReference::class);
+
+                $importReturns = [];
+                $lineNumber = 1;
+                foreach ($reader->getSheetIterator() as $sheet) {
+                    foreach ($sheet->getRowIterator() as $row) {
+                        // on passe la permière ligne (entêtes)
+                        if ($lineNumber == 1) {
+                            $lineNumber++;
+                            continue;
+                        }
+                        // do stuff with the row
+                        $cells = $row->getCells();
+
+                        try {
+                            $aid = new Aid();
+                            $aid->setName(trim($cells[0]->getValue()) !== '' ? trim($cells[0]->getValue()) : null);
+
+                            $programNames = explode(',', $cells[1]->getValue());
+                            foreach ($programNames as $programName) {
+                                $program = $programRepository->findOneBy(['name' => trim($programName)]);
+                                if ($program instanceof Program) {
+                                    $aid->addProgram($program);
+                                }
+                            }
+                            $aid->setNameInitial($cells[2]->getValue());
+                            $backerNames = explode(',', $cells[3]->getValue());
+                            foreach ($backerNames as $backerName) {
+                                $backer = $backerRepository->findOneBy(['name' => trim($backerName)]);
+                                if ($backer instanceof Backer) {
+                                    $aidFinancer = new AidFinancer();
+                                    $aidFinancer->setBacker($backer);
+                                    $aid->addAidFinancer($aidFinancer);
+                                }
+                            }
+
+                            $instructorNames = explode(',', $cells[4]->getValue());
+                            foreach ($instructorNames as $instructorName) {
+                                $backer = $backerRepository->findOneBy(['name' => trim($instructorName)]);
+                                if ($backer instanceof Backer) {
+                                    $aidInstructor = new AidInstructor();
+                                    $aidInstructor->setBacker($backer);
+                                    $aid->addAidInstructor($aidInstructor);
+                                }
+                            }
+                            $audienceNames = explode(',', $cells[5]->getValue());
+                            foreach ($audienceNames as $audienceName) {
+                                $organizationType = $organizationTypeRepository->findOneBy(['name' => trim($audienceName)]);
+                                if ($organizationType instanceof OrganizationType) {
+                                    $aid->addAidAudience($organizationType);
+                                }
+                            }
+                            $aidTypeNames = explode(',', $cells[6]->getValue());
+                            foreach ($aidTypeNames as $aidTypeName) {
+                                $aidType = $aidTypeRepository->findOneBy(['name' => trim($aidTypeName)]);
+                                if ($aidType instanceof AidType) {
+                                    $aid->addAidType($aidType);
+                                }
+                            }
+                            $subventionsRates = explode(',', $cells[7]->getValue());
+                            $aid->setSubventionRateMin(isset($subventionsRates[0]) ? (int) $subventionsRates[0] : null);
+                            $aid->setSubventionRateMax(isset($subventionsRates[1]) ? (int) $subventionsRates[1] : null);
+                            $aid->setSubventionComment(trim($cells[8]->getValue()) !== '' ? trim($cells[8]->getValue()) : null);
+
+                            $aid->setIsCallForProject(trim(strtolower($cells[9]->getValue())) == 'oui' ? true : false);
+                            $aid->setDescription(trim($cells[10]->getValue()) !== '' ? nl2br(trim($cells[10]->getValue())) : null);
+                            $aid->setProjectExamples(trim($cells[11]->getValue()) !== '' ? nl2br(trim($cells[11]->getValue())) : null);
+
+                            $categoryNames = explode(',', $cells[12]->getValue());
+                            foreach ($categoryNames as $categoryName) {
+                                $category = $categoryRepository->findOneBy(['name' => trim($categoryName)]);
+                                if ($category instanceof Category) {
+                                    $aid->addCategory($category);
+                                }
+                            }
+
+                            $recurrenceName = (trim($cells[13]->getValue()) !== '' ? trim($cells[13]->getValue()) : null);
+                            if ($recurrenceName) {
+                                $recurrence = $aidRecurrenceRepository->findOneBy(['name' => $recurrenceName]);
+                                if ($recurrence instanceof AidRecurrence) {
+                                    $aid->setAidRecurrence($recurrence);
+                                }
+                            }
+
+                            $aid->setDateStart(trim($cells[14]->getValue() !== '') ? new \DateTime($cells[14]->getValue()) : null);
+                            $aid->setDateSubmissionDeadline(trim($cells[15]->getValue() !== '') ? new \DateTime($cells[15]->getValue()) : null);
+
+                            $aid->setEligibility(trim($cells[16]->getValue()) !== '' ? nl2br(trim($cells[16]->getValue())) : null);
+
+                            $aidStepNames = explode(',', $cells[17]->getValue());
+                            foreach ($aidStepNames as $aidStepName) {
+                                $aidStep = $aidStepRepository->findOneBy(['name' => trim($aidStepName)]);
+                                if ($aidStep instanceof AidStep) {
+                                    $aid->addAidStep($aidStep);
+                                }
+                            }
+
+                            $aidDestinationNames = explode(',', $cells[18]->getValue());
+                            foreach ($aidDestinationNames as $aidDestinationName) {
+                                $aidDestination = $aidDestinationRepository->findOneBy(['name' => trim($aidDestinationName)]);
+                                if ($aidDestination instanceof AidDestination) {
+                                    $aid->addAidDestination($aidDestination);
+                                }
+                            }
+
+                            $perimeterId = (int) trim($cells[19]->getValue());
+                            if ($perimeterId) {
+                                $perimeter = $perimeterRepository->find($perimeterId);
+                                if ($perimeter instanceof Perimeter) {
+                                    $aid->setPerimeter($perimeter);
+                                }
+                            }
+
+                            $aid->setOriginUrl(trim($cells[20]->getValue()) !== '' ? trim($cells[20]->getValue()) : null);
+                            $aid->setApplicationUrl(trim($cells[21]->getValue()) !== '' ? trim($cells[21]->getValue()) : null);
+
+                            $aid->setContact(trim($cells[22]->getValue()) !== '' ? nl2br(trim($cells[22]->getValue())) : null);
+
+                            $userEmail = trim($cells[23]->getValue());
+                            if ($userEmail !== '') {
+                                $user = $userRepository->findOneBy(['email' => $userEmail]);
+                                if ($user instanceof User) {
+                                    $aid->setAuthor($user);
+                                }
+                            }
+
+                            $aid->setImportDataUrl(trim($cells[24]->getValue()) !== '' ? trim($cells[24]->getValue()) : null);
+                            
+                            $organizationId = (int) trim($cells[25]->getValue());
+                            if ($organizationId) {
+                                $organization = $organizationRepository->find($organizationId);
+                                if ($organization instanceof Organization) {
+                                    $aid->setOrganization($organization);
+                                }
+                            }
+
+                            $projectReferenceNames = explode(',', $cells[26]->getValue());
+                            foreach ($projectReferenceNames as $projectReferenceName) {
+                                $projectReference = $projectReferenceRepository->findOneBy(['name' => trim($projectReferenceName)]);
+                                if ($projectReference instanceof ProjectReference) {
+                                    $aid->addProjectReference($projectReference);
+                                }
+                            }
+                            
+                            // status forcé
+                            $aid->setStatus(Aid::STATUS_REVIEWABLE);
+
+                            // sauvegarde
+                            $this->managerRegistry->getManager()->persist($aid);
+                            $this->managerRegistry->getManager()->flush();
+
+                            $importReturns[] = [
+                                'row' => $lineNumber,
+                                'aidName' => $cells[0]->getValue(),
+                                'aidId' => $aid->getId(),
+                                'urlEdit' => $this->adminUrlGenerator
+                                    ->setController(AidCrudController::class)
+                                    ->setAction(Action::EDIT)
+                                    ->setEntityId($aid->getId())
+                                    ->generateUrl(),
+                                'status' => 'success',
+                            ];
+
+                            $lineNumber++;
+                        } catch (TypeError $e) {
+                            $importReturns[] = [
+                                'row' => $lineNumber,
+                                'aidName' => $cells[0]->getValue(),
+                                'status' => 'error',
+                                'message' => 'Erreur de type : '.$e->getMessage(),
+                            ];
+
+                            $lineNumber++;
+                        } catch (\Exception $e) {
+                            $importReturns[] = [
+                                'row' => $lineNumber,
+                                'aidName' => $cells[0]->getValue(),
+                                'status' => 'error',
+                                'message' => $e->getMessage(),
+                            ];
+
+                            $lineNumber++;
+                        }
+                    }
+                }
+
+                $reader->close();
+                // traitement des données
+                // $reader = new Reader($form->get('file')->getData()->getPathname());
+            } else {
+                $this->addFlash('danger', 'Le formulaire contient des erreurs.');
+            }
+        }
+        return $this->render('admin/aid/import.html.twig', [
+            'form' => $form->createView(),
+            'importReturns' => $importReturns ?? null
+        ]);
     }
 
     public function exportXlsx(AdminContext $context, SpreadsheetExporterService $spreadsheetExporterService, string $filename = 'aides')

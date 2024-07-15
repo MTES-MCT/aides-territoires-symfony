@@ -23,6 +23,22 @@ class ProjectReferenceRepository extends ServiceEntityRepository
         parent::__construct($registry, ProjectReference::class);
     }
 
+    public function getNames(?array $params = null): array
+    {
+        $params['orderBy'] = ['sort' => 'pr.name', 'order' => 'ASC'];
+        $qb = $this->getQueryBuilder($params);
+
+        $qb
+            ->select('pr.name')
+        ;
+
+        $results = $qb->getQuery()->getResult();
+
+        // on met directement le champ name dans le tableau
+        return array_column($results, 'name');
+    }
+
+
     public function countCustom(?array $params = null): int
     {
         $qb = $this->getQueryBuilder($params);

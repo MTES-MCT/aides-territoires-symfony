@@ -3,11 +3,27 @@
 namespace App\Twig;
 
 use App\Entity\Aid\Aid;
+use App\Entity\Aid\AidDestination;
+use App\Entity\Aid\AidRecurrence;
+use App\Entity\Aid\AidStep;
+use App\Entity\Aid\AidType;
 use App\Entity\Alert\Alert;
+use App\Entity\Category\Category;
 use App\Entity\Log\LogPublicProjectView;
+use App\Entity\Organization\OrganizationType;
 use App\Entity\Perimeter\Perimeter;
+use App\Entity\Program\Program;
 use App\Entity\Project\Project;
+use App\Entity\Reference\ProjectReference;
 use App\Entity\User\User;
+use App\Repository\Aid\AidDestinationRepository;
+use App\Repository\Aid\AidRecurrenceRepository;
+use App\Repository\Aid\AidStepRepository;
+use App\Repository\Aid\AidTypeRepository;
+use App\Repository\Category\CategoryRepository;
+use App\Repository\Organization\OrganizationTypeRepository;
+use App\Repository\Program\ProgramRepository;
+use App\Repository\Reference\ProjectReferenceRepository;
 use App\Service\Category\CategoryService;
 use App\Service\Matomo\MatomoService;
 use App\Service\Perimeter\PerimeterService;
@@ -143,6 +159,7 @@ class AppExtension extends AbstractExtension // NOSONAR too much methods
             new TwigFunction('getMatomoGoalId', [$this, 'getMatomoGoalId']),
             new TwigFunction('getKeywordReferenceAndSynonyms', [$this, 'getKeywordReferenceAndSynonyms']),
             new TwigFunction('getUserPublicProjectLatestView', [$this, 'getUserPublicProjectLatestView']),
+            new TwigFunction('getImportAidManualDatas', [$this, 'getImportAidManualDatas']),
             new TwigFunction('isDateTime', [$this, 'isDateTime'])
         ];
     }
@@ -306,6 +323,53 @@ class AppExtension extends AbstractExtension // NOSONAR too much methods
         return $this->userService->getPublicProjectLatestView($user, $project);
     }
 
+    public function getImportAidManualDatas() : array
+    {
+        $datas = [];
+
+        /** @var ProgramRepository $programRepository */
+        $programRepository = $this->managerRegistry->getRepository(Program::class);
+        $programNames = $programRepository->getNames();
+        $datas['programs'] = $programNames;
+
+        /** @var OrganizationTypeRepository $organizationTypeRepository */
+        $organizationTypeRepository = $this->managerRegistry->getRepository(OrganizationType::class);
+        $organizationTypeNames = $organizationTypeRepository->getNames();
+        $datas['organizationTypes'] = $organizationTypeNames;
+
+        /** @var AidTypeRepository $aidTypeRepository */
+        $aidTypeRepository = $this->managerRegistry->getRepository(AidType::class);
+        $aidTypeNames = $aidTypeRepository->getNames();
+        $datas['aidTypes'] = $aidTypeNames;
+
+        /** @var CategoryRepository $categoryRepository */
+        $categoryRepositoy = $this->managerRegistry->getRepository(Category::class);
+        $categoryNames = $categoryRepositoy->getNames();
+        $datas['categories'] = $categoryNames;
+
+        /** @var AidRecurrenceRepository $aidRecurrenceRepository */
+        $aidRecurrenceRepository = $this->managerRegistry->getRepository(AidRecurrence::class);
+        $aidRecurrenceNames = $aidRecurrenceRepository->getNames();
+        $datas['aidRecurrences'] = $aidRecurrenceNames;
+
+        /** @var AidStepRepository $aidStepRepository */
+        $aidStepRepository = $this->managerRegistry->getRepository(AidStep::class);
+        $aidStepNames = $aidStepRepository->getNames();
+        $datas['aidSteps'] = $aidStepNames;
+
+        /** @var AidDestinationRepository $aidDestinationRepository */
+        $aidDestinationRepository = $this->managerRegistry->getRepository(AidDestination::class);
+        $aidDestinationNames = $aidDestinationRepository->getNames();
+        $datas['aidDestinations'] = $aidDestinationNames;
+
+        /** @var ProjectReferenceRepository $projectReferenceRepository */
+        $projectReferenceRepository = $this->managerRegistry->getRepository(ProjectReference::class);
+        $projectReferenceNames = $projectReferenceRepository->getNames();
+        $datas['projectReferences'] = $projectReferenceNames;
+
+        return $datas;
+    }
+  
     public function isDateTime($date): bool {
         return $date instanceof \DateTime;
     }

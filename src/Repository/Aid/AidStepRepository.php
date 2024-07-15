@@ -22,6 +22,21 @@ class AidStepRepository extends ServiceEntityRepository
         parent::__construct($registry, AidStep::class);
     }
 
+    public function getNames(?array $params = null): array
+    {
+        $params['orderBy'] = ['sort' => 'ast.name', 'order' => 'ASC'];
+        $qb = $this->getQueryBuilder($params);
+
+        $qb
+            ->select('ast.name')
+        ;
+
+        $results = $qb->getQuery()->getResult();
+
+        // on met directement le champ name dans le tableau
+        return array_column($results, 'name');
+    }
+
     public function countCustom(array $params = null): int
     {
         $qb = $this->getQueryBuilder($params);
@@ -41,12 +56,19 @@ class AidStepRepository extends ServiceEntityRepository
     public function getQueryBuilder(array $params = null): QueryBuilder
     {
         $slugs = $params['slugs'] ?? null;
+        $orderBy = (isset($params['orderBy']) && isset($params['orderBy']['sort']) && isset($params['orderBy']['order'])) ? $params['orderBy'] : null;
 
         $qb = $this->createQueryBuilder('ast');
 
         if (is_array($slugs) && count($slugs) > 0) {
             $qb->andWhere('ast.slug IN (:slugs)')
                 ->setParameter('slugs', $slugs);
+        }
+
+        if ($orderBy !== null) {
+            $qb
+                ->addOrderBy($orderBy['sort'], $orderBy['order'])
+            ;
         }
         
         return $qb;

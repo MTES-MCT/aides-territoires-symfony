@@ -21,6 +21,21 @@ class CategoryRepository extends ServiceEntityRepository
         parent::__construct($registry, Category::class);
     }
 
+    public function getNames(?array $params = null): array
+    {
+        $params['orderBy'] = ['sort' => 'c.name', 'order' => 'ASC'];
+        $qb = $this->getQueryBuilder($params);
+
+        $qb
+            ->select('c.name')
+        ;
+
+        $results = $qb->getQuery()->getResult();
+
+        // on met directement le champ name dans le tableau
+        return array_column($results, 'name');
+    }
+
     public function findFromSynonyms(array $synonyms): array
     {
         $originalName = (isset($synonyms['original_name']) && trim($synonyms['original_name']) !== '')  ? $synonyms['original_name'] : null;
@@ -57,6 +72,7 @@ class CategoryRepository extends ServiceEntityRepository
         $groupBy = $params['groupBy'] ?? null;
         $ids = $params['ids'] ?? null;
         $words = $params['words'] ?? null;
+        $orderBy = (isset($params['orderBy']) && isset($params['orderBy']['sort']) && isset($params['orderBy']['order'])) ? $params['orderBy'] : null;
 
         $qb = $this->createQueryBuilder('c');
 
@@ -71,6 +87,11 @@ class CategoryRepository extends ServiceEntityRepository
                 ;
         }
 
+        if ($orderBy !== null) {
+            $qb
+                ->addOrderBy($orderBy['sort'], $orderBy['order'])
+            ;
+        }
 
         if ($groupBy !== null) {
             $qb->addGroupBy($groupBy);

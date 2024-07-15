@@ -4,12 +4,57 @@ namespace App\Controller\Perimeter;
 
 use App\Controller\FrontController;
 use App\Service\Api\InternalApiService;
+use App\Service\Security\SecurityService;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Attribute\Route;
 
 class PerimeterController extends FrontController
 {
+    #[Route('perimeter/ajax-search', name: 'app_perimeter_ajax_search', options: ['expose' => true])]
+    public function ajaxSearch(
+        RequestStack $requestStack,
+        InternalApiService $internalApiService,
+        SecurityService $securityService
+    ): JsonResponse
+    {
+        try {
+            if ($securityService->validHostOrgin($requestStack) === false) {
+                // La requête n'est pas interne, retourner une erreur
+                throw $this->createAccessDeniedException('This action can only be performed by the server itself.');
+            }
+
+            // recuperer id du perimetre
+            $search = $requestStack->getCurrentRequest()->get('search', null);
+            if (!$search) {
+                throw new \Exception('Paramètre search manquant');
+            }
+
+            // appel l'api pour avoir les datas
+            $perimeters = $internalApiService->callApi(
+                url: '/perimeters/',
+                params: ['searchLike' => (string) $search]
+            );
+            $perimeters = json_decode($perimeters);
+            $results = $perimeters->results;
+            $return = [];
+            foreach ($results as $result) {
+                $return[] = $result;
+            }
+
+            return new JsonResponse([
+                'success' => 1,
+                'results' => $return
+            ]);
+
+        } catch (\Exception $e) {
+            return new JsonResponse([
+                'success' => 0,
+                'message' => $e->getMessage()
+            ]);
+        }
+    }
+
     #[Route('perimeter/ajax-datas', name: 'app_perimeter_ajax_datas', options: ['expose' => true])]
     public function ajaxDatas(
         RequestStack $requestStack,

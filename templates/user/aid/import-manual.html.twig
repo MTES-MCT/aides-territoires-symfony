@@ -1,0 +1,20 @@
+{% extends 'base.html.twig' %}
+
+{% block stylesheets %}
+	{{ parent() }}
+	{{ encore_entry_link_tags('import-scss/user/aid/import-manual') }}
+{% endblock %}
+
+{% block javascripts %}
+	{{ parent() }}
+	{{ encore_entry_script_tags('front/user/aid/import-manual') }}
+{% endblock %}
+
+{% block title %}Manuel d'importation | {{ parent() }}{% endblock %}
+
+{% block body %}
+<div class="fr-container">
+    <h1 class="fr-h3">Manuel d'importation</h1>
+    {% include 'aid/aid/_import_spreadsheet_manual.html.twig' with {isFront: true} %}
+</div>
+{% endblock %}

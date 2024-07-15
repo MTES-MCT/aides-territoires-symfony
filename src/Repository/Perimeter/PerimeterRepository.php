@@ -257,6 +257,7 @@ class PerimeterRepository extends ServiceEntityRepository
         $ids = $params['ids'] ?? null;
         $regions = $params['regions'] ?? null;
         $idParent = $params['idParent'] ?? null;
+        $searchLike = $params['searchLike'] ?? null;
 
         $qb = $this->createQueryBuilder('p');
 
@@ -290,7 +291,38 @@ class PerimeterRepository extends ServiceEntityRepository
             $qb
             ->andWhere('MATCH_AGAINST(p.name) AGAINST (:nameMatchAgainst) > 1')
             ->setParameter('nameMatchAgainst', $nameMatchAgainst);
-            
+        }
+
+        if ($searchLike !== null) {
+            // c'est un code postal
+            if (preg_match('/^[0-9]{5}$/', $searchLike)) {
+                $qb
+                ->andWhere('
+                    p.zipcodes LIKE :zipcodes
+                ')
+                ->setParameter('zipcodes', '%'.$searchLike.'%');
+                ;
+            } else { // c'est une string
+                $strings = [$searchLike];
+                if (strpos($searchLike, ' ') !== false) {
+                    $strings[] = str_replace(' ', '-', $searchLike);
+                }
+                if (strpos($searchLike, '-') !== false) {
+                    $strings[] = str_replace('-', ' ', $searchLike);
+                }
+
+                $sqlWhere = '';
+                for ($i=0; $i < count($strings); $i++) {
+                    $sqlWhere .= ' p.name LIKE :nameLike'.$i;
+                    if ($i < count($strings) - 1) {
+                        $sqlWhere .= ' OR ';
+                    }
+                    $qb->setParameter('nameLike'.$i, '%'.$strings[$i].'%');
+                }
+                $qb
+                ->andWhere($sqlWhere)
+                ;
+            }
         }
         
         if (is_array($insees)) {

@@ -50,6 +50,10 @@ class PerimeterController extends ApiController
             $params['nameMatchAgainst'] = $q;
         }
 
+        if (isset($queryParams['searchLike'])) {
+            $params['searchLike'] = trim(strip_tags($queryParams['searchLike']));
+        }
+
         if (isset($queryParams['scale'])) {
             if (is_array($queryParams['scale'])) {
                 $scale = implode(' ', $queryParams['scale']);

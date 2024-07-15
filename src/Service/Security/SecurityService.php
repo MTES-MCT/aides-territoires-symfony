@@ -8,13 +8,20 @@ class SecurityService
 {
     public function validHostOrgin(RequestStack $requestStack): bool
     {
-            // verification requete interne
-            $request = $requestStack->getCurrentRequest();
-            $origin = $request->headers->get('origin');
+        // vérification requête interne
+        $request = $requestStack->getCurrentRequest();
+        $origin = $request->headers->get('origin');
+        if ($origin) {
             $infosOrigin = parse_url($origin);
             $hostOrigin = $infosOrigin['host'] ?? null;
-            $serverName = $request->getHost();
+        } else {
+            // Utiliser l'en-tête Host si Origin n'est pas défini
+            $hostOrigin = $request->headers->get('host');
+            // Supprimer le port si présent
+            $hostOrigin = explode(':', $hostOrigin)[0];
+        }
+        $serverName = $request->getHost();
 
-            return $hostOrigin === $serverName;
+        return $hostOrigin === $serverName;
     }
 }

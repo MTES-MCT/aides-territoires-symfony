@@ -1,0 +1,49 @@
+{% extends "@EasyAdmin/page/content.html.twig" %}
+
+
+{% block main %}
+<main>
+    <h1 class="title">Importer un fichier contenant des aides</h1>
+
+    {{ form_start(form) }}
+        {{ form_row(form.file) }}
+        <p><button type="submit" class="btn btn-primary">Importer</button></p>
+    {{ form_end(form) }}
+
+    {% if importReturns %}
+    <h2>Résultats import</h2>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Ligne</th>
+                <th>Nom aide</th>
+                <th>Id Aide</th>
+                <th>Statut import</th>
+                <th>Message</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for importReturn in importReturns %}
+            <tr>
+                <td>{{ importReturn.row }}</td>
+                <td>{{ importReturn.aidName }}</td>
+                <td>
+                    {% if importReturn.aidId is defined %}
+                        <a href="{{ importReturn.urlEdit }}" title="Editer" target="_blank">{{ importReturn.aidId }}</a>
+                    {% else %}
+                        N/A
+                    {% endif %}
+                </td>
+                <td>{% if importReturn.status == 'success' %}<span class="text-success">Succès</span>{% else %}<span class="text-danger">Erreur</span>{% endif %}</td>
+                <td>{% if importReturn.message is defined %}{{ importReturn.message }}{% endif %}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% endif %}
+
+    <h2>Format du fichier</h2>
+    {% include "aid/aid/_import_spreadsheet_manual.html.twig" %}
+</main>
+
+{% endblock %}

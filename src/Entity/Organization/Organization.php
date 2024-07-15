@@ -1354,7 +1354,14 @@ class Organization // NOSONAR too much methods
 
     public function __toString(): string
     {
-        return $this->name ?? null;
+        $return = '';
+        if ($this->name) {
+            $return .= $this->name;
+        }
+        if ($this->id) {
+            $return .= ' (' . $this->id . ')';
+        }
+        return $return;
     }
 
     /**

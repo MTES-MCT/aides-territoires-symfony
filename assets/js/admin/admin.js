@@ -5,6 +5,7 @@ require('trumbowyg/dist/langs/fr.min.js');
 require('trumbowyg/dist/plugins/upload/trumbowyg.upload.min.js');
 require('trumbowyg/dist/plugins/cleanpaste/trumbowyg.cleanpaste.min.js');
 require('trumbowyg/dist/ui/trumbowyg.min.css');
+require('../front/user/aid/_import_manual_core.js');
 require('../jQueryAccordion/jquery.accordion.js')
 
 // import le fichier router dans ce fichier
@@ -20,6 +21,26 @@ document.addEventListener('chartjs:init', function (event) {
 });
 
 $(function(){
+    /***************************
+     * Pour ne pas trigger plusieurs fois un event
+     *
+     * exemple :
+    waitForFinalEvent(function () {
+
+    }, 500, 'id-unique');
+    */
+    global.waitForFinalEvent = (function () {
+        var timers = {};
+        return function (callback, ms, uniqueId) {
+            if (!uniqueId) {
+                uniqueId = "Don't call this twice without a uniqueId";
+            }
+            if (timers[uniqueId]) {
+                clearTimeout (timers[uniqueId]);
+            }
+            timers[uniqueId] = setTimeout(callback, ms);
+        };
+    })();
 
     $('.accordion').accordion({
         "transitionSpeed": 400
@@ -45,7 +66,27 @@ $(function(){
     // fonction copie dans clipboard
     $(document).on('click', '.btn-copy-clipboard', function(e) {
         // Récupère le sélecteur de l'élément cible depuis l'attribut data-clipboard-target
-        var targetSelector = $(this).attr('data-clipboard-target');
+        var targetSelector = $(this).data('clipboard-target');
+        var targetElement = $(targetSelector)[0]; // Obtient l'élément DOM natif
+
+        // Vérifie si la sélection est possible
+        if (document.body.createTextRange) { // Pour IE
+            const range = document.body.createTextRange();
+            range.moveToElementText(targetElement);
+            range.select();
+        } else if (window.getSelection) {
+            const selection = window.getSelection();
+            const range = document.createRange();
+            range.selectNodeContents(targetElement);
+            selection.removeAllRanges(); // Supprime toutes les sélections existantes
+            selection.addRange(range); // Ajoute la nouvelle sélection
+        }
+
+        // reset la classe des autres boutons
+        $('.fa-clipboard-check').removeClass('fa-clipboard-check').addClass('fa-clipboard');
+        // change la classe de l'icone bouton cliqué
+        thisElt.find('i').removeClass('fa-clipboard').addClass('fa-clipboard-check');
+        
         // Sélectionne l'élément cible et récupère son contenu HTML
         var htmlContent = $(targetSelector).html().trim();
         // Copie le contenu dans le presse-papiers
@@ -146,3 +187,4 @@ $('textarea:not(.trumbowyg-textarea):not(.not-trumbowyg)').trumbowyg({
     }
 });
 }
+

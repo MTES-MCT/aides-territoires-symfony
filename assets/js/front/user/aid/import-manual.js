@@ -1,0 +1,1 @@
+require('./_import_manual_core.js');
