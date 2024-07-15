@@ -38,22 +38,22 @@ class CommuneController extends AbstractController
     ): Response
     {
         $cities = $organizationRepository->getScaleCovered(scale: Perimeter::SCALE_COMMUNE);
-        dd($cities);
-        $epcis = $aidRepository->getScaleCovered(scale: Perimeter::SCALE_EPCI);
-        foreach ($epcis as $key => $epci) {
-            if (!$epci['latitude'] || !$epci['longitude']) {
-                $biggestCity = $perimeterRepository->getBiggestCity($epci['id']);
-                if ($biggestCity instanceof Perimeter) {
-                    $epcis[$key]['latitude'] = $biggestCity->getLatitude();
-                    $epcis[$key]['longitude'] = $biggestCity->getLongitude();
-                }
-            }
-        }
+        // dd($cities);
+        // $epcis = $aidRepository->getScaleCovered(scale: Perimeter::SCALE_EPCI);
+        // foreach ($epcis as $key => $epci) {
+        //     if (!$epci['latitude'] || !$epci['longitude']) {
+        //         $biggestCity = $perimeterRepository->getBiggestCity($epci['id']);
+        //         if ($biggestCity instanceof Perimeter) {
+        //             $epcis[$key]['latitude'] = $biggestCity->getLatitude();
+        //             $epcis[$key]['longitude'] = $biggestCity->getLongitude();
+        //         }
+        //     }
+        // }
 
         // rendu template
         return $this->render('admin/statistics/commune/population.html.twig', [
             'cities' => $cities,
-            'epcis' => $epcis,
+            // 'epcis' => $epcis,
         ]);
     }
 
