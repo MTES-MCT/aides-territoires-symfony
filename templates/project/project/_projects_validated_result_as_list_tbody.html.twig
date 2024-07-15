@@ -24,7 +24,7 @@
     </td>
     <td>
         {% if project.aid  %}
-            <a href="#">
+            <a href="{{ path('app_aid_aid_details', {'slug': project.aid.slug}) }}">
                 {{ project.aid.name}}
             </a>
         {% else %}
