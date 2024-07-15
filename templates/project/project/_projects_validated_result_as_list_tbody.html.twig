@@ -8,9 +8,9 @@
     <td>{{ project.timeObtained|date("Y")}}</td>
     <td>
         {% if project.organization %}
-        <a href="#">
+        {% if project.organization.perimeter %}<a href="{{ path('app_project_project_subsidized_detail', {'project_perimeter': project.organization.perimeter.id})}}">{% endif %}
             {{ project.organization.name }}
-        </a>
+        {% if project.organization.perimeter %}</a>{% endif %}
         {% endif %}
     </td>
     <td>
@@ -24,7 +24,7 @@
     </td>
     <td>
         {% if project.aid  %}
-            <a href="#">
+            <a href="{{ path('app_aid_aid_details', {'slug': project.aid.slug}) }}">
                 {{ project.aid.name}}
             </a>
         {% else %}

@@ -342,7 +342,8 @@ class ProjectController extends FrontController
 
         // formulaire recherche
         $formProjectSearch = $this->createForm(ProjectValidatedSearchType::class,null,[
-            'method'=>'GET'
+            'method'=>'GET',
+            'dontUseUserPerimeter' => true
             ]
         );
         $formProjectSearch->handleRequest($requestStack->getCurrentRequest());
@@ -388,10 +389,21 @@ class ProjectController extends FrontController
         if ($idPerimeter && !isset($project_perimeter)) {
             $project_perimeter = $perimeterRepository->find($idPerimeter);
             if ($project_perimeter instanceof Perimeter) {
-                $projects=$projectValidatedRepository->findProjectInCounty(
-                    ['id' => $project_perimeter->getId()]
-                );
-                $department_search=true;
+                if ($project_perimeter->getScale() == Perimeter::SCALE_COMMUNE) {
+                    $projects = $projectValidatedRepository->findProjectInRadius(
+                        [
+                        'perimeter' => $project_perimeter,
+                        'search' => $keyword,
+                        'radius' => 30
+                        ]
+                    );
+                    $commune_search=true;
+                } else {
+                    $projects=$projectValidatedRepository->findProjectInCounty(
+                        ['id' => $project_perimeter->getId()]
+                    );
+                    $department_search=true;
+                }
             }
         }
 
@@ -418,7 +430,6 @@ class ProjectController extends FrontController
             'Résutats de votre recherche de projets subventionnés',
             null
         );
-
 
         return $this->render('project/project/subsidized-detail.html.twig', [
             'commune_search' => $commune_search,
