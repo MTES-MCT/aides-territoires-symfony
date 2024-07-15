@@ -329,21 +329,12 @@ class AidService // NOSONAR too complex
             }
 
             if ($searchSmaller) {
-                // si c'est une aide generic avec des declinaisons, on la retire si un des aides locales est dans la liste
-                if (!$aid->getAidsFromGeneric()->isEmpty()) {
-                    $localInList = false;
-                    foreach ($aid->getAidsFromGeneric() as $aidFromGeneric) {
-                        if ($aids->contains($aidFromGeneric)) {
-                            $localInList = true;
-                            break;
-                        }
-                    }
-                    if ($localInList) {
-                        $aids->removeElement($aid);
-                    }
+                // Si c'est une aide locale, on retire l'aide générique si présente dans la liste
+                if ($aid->getGenericAid() && $aids->contains($aid->getGenericAid())) {
+                    $aids->removeElement($aid->getGenericAid());
                 }
             } elseif ($searchWider) {
-                // Si c'est une aide locale et que la liste contiens l'aide générique, on la retire de la liste
+                // Si c'est une aide locale et que la liste contiens l'aide générique, on retire l'aide locale de la liste
                 if ($aid->getGenericAid() && $aids->contains($aid->getGenericAid())) {
                     $aids->removeElement($aid);
                 }
