@@ -33,25 +33,27 @@ class CommuneController extends AbstractController
     #[Route('/admin/statistics/commune/population', name: 'admin_statistics_commune_population')]
     public function mapPopulation(
         AidRepository $aidRepository,
-        PerimeterRepository $perimeterRepository
+        PerimeterRepository $perimeterRepository,
+        OrganizationRepository $organizationRepository
     ): Response
     {
-        $cities = $aidRepository->getScaleCovered(scale: Perimeter::SCALE_COMMUNE);
-        $epcis = $aidRepository->getScaleCovered(scale: Perimeter::SCALE_EPCI);
-        foreach ($epcis as $key => $epci) {
-            if (!$epci['latitude'] || !$epci['longitude']) {
-                $biggestCity = $perimeterRepository->getBiggestCity($epci['id']);
-                if ($biggestCity instanceof Perimeter) {
-                    $epcis[$key]['latitude'] = $biggestCity->getLatitude();
-                    $epcis[$key]['longitude'] = $biggestCity->getLongitude();
-                }
-            }
-        }
+        $cities = $organizationRepository->getScaleCovered(scale: Perimeter::SCALE_COMMUNE);
+        // dd($cities);
+        // $epcis = $aidRepository->getScaleCovered(scale: Perimeter::SCALE_EPCI);
+        // foreach ($epcis as $key => $epci) {
+        //     if (!$epci['latitude'] || !$epci['longitude']) {
+        //         $biggestCity = $perimeterRepository->getBiggestCity($epci['id']);
+        //         if ($biggestCity instanceof Perimeter) {
+        //             $epcis[$key]['latitude'] = $biggestCity->getLatitude();
+        //             $epcis[$key]['longitude'] = $biggestCity->getLongitude();
+        //         }
+        //     }
+        // }
 
         // rendu template
         return $this->render('admin/statistics/commune/population.html.twig', [
             'cities' => $cities,
-            'epcis' => $epcis,
+            // 'epcis' => $epcis,
         ]);
     }
 

@@ -299,8 +299,8 @@ class DashboardController extends AbstractDashboardController
         yield MenuItem::subMenu('Statistiques', 'fas fa-chart-line')->setSubItems([
             MenuItem::linkToRoute('Globale', 'fas fa-list', 'admin_statistics_dashboard', []),
             MenuItem::linkToRoute('Aides', 'fas fa-list', 'admin_log_aids_logs', []),
-            MenuItem::linkToRoute('Communes', 'fas fa-list', 'admin_statistics_commune_dashboard', []),
-            MenuItem::linkToRoute('Population couverte', 'fas fa-list', 'admin_statistics_commune_population', []),
+            MenuItem::linkToRoute('Communes - Inscriptions', 'fas fa-list', 'admin_statistics_commune_dashboard', []),
+            MenuItem::linkToRoute('Commnunes - Carte', 'fas fa-list', 'admin_statistics_commune_population', []),
             MenuItem::linkToRoute('Blog', 'fas fa-list', 'admin_statistics_blog_dashboard', []),
             MenuItem::linkToRoute('Périmètres manquants', 'fas fa-list', 'admin_statistics_log_aid_search_missing_perimeters', []),
             MenuItem::linkToRoute('Projets référents', 'fas fa-list', 'admin_statistics_project_reference_dashboard', []),
