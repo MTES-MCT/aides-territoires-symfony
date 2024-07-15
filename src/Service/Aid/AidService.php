@@ -321,7 +321,7 @@ class AidService // NOSONAR too complex
         $perimeterScale = ($perimeter instanceof Perimeter) ? $perimeter->getScale() : 0;
         // Parcours la liste des aides actuelles
         /** @var Aid $aid */
-        foreach ($aids as $keyAid => $aid) {
+        foreach ($aids as $aid) {
             // Si on a un périmètre de recherche
             if ($perimeterSearch) {
                 $searchSmaller = $perimeterScale <= $aid->getPerimeter()->getScale();
@@ -330,21 +330,22 @@ class AidService // NOSONAR too complex
 
             if ($searchSmaller) {
                 // si c'est une aide generic avec des declinaisons, on la retire si un des aides locales est dans la liste
-                if ($aid->getAidsFromGeneric()) {
+                if (!$aid->getAidsFromGeneric()->isEmpty()) {
                     $localInList = false;
                     foreach ($aid->getAidsFromGeneric() as $aidFromGeneric) {
                         if ($aids->contains($aidFromGeneric)) {
                             $localInList = true;
+                            break;
                         }
                     }
                     if ($localInList) {
-                        $aids->remove($aid);
+                        $aids->removeElement($aid);
                     }
                 }
             } elseif ($searchWider) {
-                // Si c'est une aide locale et que la liste contiens l'aide générique, on la retire de la listes
+                // Si c'est une aide locale et que la liste contiens l'aide générique, on la retire de la liste
                 if ($aid->getGenericAid() && $aids->contains($aid->getGenericAid())) {
-                    $aids->remove($keyAid);
+                    $aids->removeElement($aid);
                 }
             }
         }
