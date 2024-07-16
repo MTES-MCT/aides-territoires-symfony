@@ -104,7 +104,11 @@ class SitemapController extends AbstractController
         // PORTEURS D'AIDES
 
         // détails de chaque porteurs d'aides
-        $backers = $managerRegistry->getRepository(Backer::class)->findAll();
+        $backers = $managerRegistry->getRepository(Backer::class)->findBy(
+            [
+                'active' => true
+            ]
+        );
         foreach ($backers as $backer) {
             $urls[] = [
                 'loc' => $this->generateUrl('app_backer_details', [
