@@ -1,1 +1,1 @@
-worker: php bin/console messenger:consume async --memory-limit=400M
+worker: php bin/console messenger:consume async --time-limit=2700
