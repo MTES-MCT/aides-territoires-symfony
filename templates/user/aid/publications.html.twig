@@ -57,64 +57,70 @@
                 </div>
             {{ form_end(formAidFilter)}}
 
-            <div class="fr-table">
-                <table class="sortable-table data-table" id="table-aids">
-                    <caption class="fr-sr-only">
-                        La liste de vos aides publiées
-                        <br />
-                        <span class="fr-text fr-icon-information-line"> Cliquer sur le nom d’une colonne pour trier</span>
-                    </caption>
-                    <thead>
-                        <tr>
-                            <th scope="col" class="aid-name-column" title="Trier par Nom de l’aide">Nom de l’aide</th>
-                            <th scope="col" title="Trier par structure">Structure</th>
-                            <th scope="col" title="Trier par Périmètre">Périmètre</th>
-                            <th scope="col" title="Trier par Créée le">Créée le</th>
-                            <th scope="col" title="Trier par Modifiée le">Modifiée le</th>
-                            <th scope="col" title="Trier par Echéance">Échéance</th>
-                            <th scope="col">Visibilité sur le site</th>
-                            <th scope="col">Statistiques</th>
-                            <th scope="col">Export PDF</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for aid in aids %}
-                        <tr>
-                            <td>
-                                <a href="{{ path('app_user_aid_edit', {'slug': aid.slug}) }}">
-                                    {{ aid.name }}
-                                </a>
-                                {% if aid.isLive %}
-                                    <p class="fr-badge fr-badge--success fr-badge--sm">Affichée</p>
-                                {% endif %}
-                            </td>
-                            <td>
-                                {% if aid.organization %}{{ aid.organization.name }}{% endif %}
-                            </td>
-                            <td>{% if aid.perimeter %}{{ aid.perimeter.name }}{% endif %}</td>
-                            <td data-sort="{{ aid.dateCreate|date('Ymd') }}">{{ aid.dateCreate|date('d/m/Y') }}</td>
-                            <td data-sort="{{ aid.timeUpdate|date('Ymd') }}">{{ aid.timeUpdate|date('d/m/Y') }}</td>
-                            <td class="nowrap-cell" data-sort="{{ aid.dateSubmissionDeadline|date('Ymd') }}">
-                                {% if aid.dateSubmissionDeadline %}<span>{{ aid.dateSubmissionDeadline|date('d/m/Y') }}</span>{% endif %}
-                                {% if aid.isOngoing %}
-                                    <p class="fr-badge fr-badge--info fr-badge--sm">Permanente</p>
-                                {% elseif aid.isApproachingDeadline %}
-                                    <p class="fr-badge fr-badge--new fr-badge--sm">Échéance proche</p>                       
-                                {% elseif aid.hasExpired %}
-                                    <p class="fr-badge fr-badge--warning fr-badge--sm">Expirée</p>
-                                {% endif %}
-                            </td>
-                            <td class="nowrap-cell">
-                                <a href="{{ absolute_url(path('app_aid_aid_details', {'slug': aid.slug})) }}">{% if aid.hasExpired %}Archivée{% else %}{{ aid.status|aidStatusDisplay }}{% endif %}</a>
-                            </td>
-                            <td><a href="{{ path('app_user_aid_stats', {'slug': aid.slug, 'dateMin': aid.dateCreate|date('Y-m-d'), 'dateMax': "now"|date('Y-m-d')}) }}">{{ aid.nbViews }}</a></td>
-                            <td>
-                                <a href="{{ path('app_user_aid_export_pdf', {'slug': aid.slug}) }}" target="_blank" title="Télécharger la fiche détail de l’aide en PDF - Ouvre une nouvelle fenêtre" class="fr-btn fr-icon-download-line fr-btn--tertiary fr-btn--tertiary-no-outline at-box-shadow--none"><span class="fr-sr-only">Télécharger la fiche détail de l’aide en PDF</span></a>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+            <div class="fr-table fr-table--no-scroll">
+                <div class="fr-table__wrapper">
+                    <div class="fr-table__container">
+                        <div class="fr-table__content">
+                            <table class="sortable-table data-table" id="table-aids">
+                                <caption class="fr-sr-only">
+                                    La liste de vos aides publiées
+                                    <br />
+                                    <span class="fr-text fr-icon-information-line"> Cliquer sur le nom d’une colonne pour trier</span>
+                                </caption>
+                                <thead>
+                                    <tr>
+                                        <th scope="col" class="aid-name-column" title="Trier par Nom de l’aide">Nom de l’aide</th>
+                                        <th scope="col" title="Trier par structure">Structure</th>
+                                        <th scope="col" title="Trier par Périmètre">Périmètre</th>
+                                        <th scope="col" title="Trier par Créée le">Créée le</th>
+                                        <th scope="col" title="Trier par Modifiée le">Modifiée le</th>
+                                        <th scope="col" title="Trier par Echéance">Échéance</th>
+                                        <th scope="col">Visibilité sur le site</th>
+                                        <th scope="col">Statistiques</th>
+                                        <th scope="col">Export PDF</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for aid in aids %}
+                                    <tr>
+                                        <td>
+                                            <a href="{{ path('app_user_aid_edit', {'slug': aid.slug}) }}">
+                                                {{ aid.name }}
+                                            </a>
+                                            {% if aid.isLive %}
+                                                <p class="fr-badge fr-badge--success fr-badge--sm">Affichée</p>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if aid.organization %}{{ aid.organization.name }}{% endif %}
+                                        </td>
+                                        <td>{% if aid.perimeter %}{{ aid.perimeter.name }}{% endif %}</td>
+                                        <td data-sort="{{ aid.dateCreate|date('Ymd') }}">{{ aid.dateCreate|date('d/m/Y') }}</td>
+                                        <td data-sort="{{ aid.timeUpdate|date('Ymd') }}">{{ aid.timeUpdate|date('d/m/Y') }}</td>
+                                        <td class="nowrap-cell" data-sort="{{ aid.dateSubmissionDeadline|date('Ymd') }}">
+                                            {% if aid.dateSubmissionDeadline %}<span>{{ aid.dateSubmissionDeadline|date('d/m/Y') }}</span>{% endif %}
+                                            {% if aid.isOngoing %}
+                                                <p class="fr-badge fr-badge--info fr-badge--sm">Permanente</p>
+                                            {% elseif aid.isApproachingDeadline %}
+                                                <p class="fr-badge fr-badge--new fr-badge--sm">Échéance proche</p>                       
+                                            {% elseif aid.hasExpired %}
+                                                <p class="fr-badge fr-badge--warning fr-badge--sm">Expirée</p>
+                                            {% endif %}
+                                        </td>
+                                        <td class="nowrap-cell">
+                                            <a href="{{ absolute_url(path('app_aid_aid_details', {'slug': aid.slug})) }}">{% if aid.hasExpired %}Archivée{% else %}{{ aid.status|aidStatusDisplay }}{% endif %}</a>
+                                        </td>
+                                        <td><a href="{{ path('app_user_aid_stats', {'slug': aid.slug, 'dateMin': aid.dateCreate|date('Y-m-d'), 'dateMax': "now"|date('Y-m-d')}) }}">{{ aid.nbViews }}</a></td>
+                                        <td>
+                                            <a href="{{ path('app_user_aid_export_pdf', {'slug': aid.slug}) }}" target="_blank" title="Télécharger la fiche détail de l’aide en PDF - Ouvre une nouvelle fenêtre" class="fr-btn fr-icon-download-line fr-btn--tertiary fr-btn--tertiary-no-outline at-box-shadow--none"><span class="fr-sr-only">Télécharger la fiche détail de l’aide en PDF</span></a>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <button

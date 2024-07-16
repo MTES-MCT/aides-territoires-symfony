@@ -62,6 +62,8 @@
                     {% include 'aid/aid/_search_meta.html.twig' %}
                     {% include "aid/aid/_search_form.html.twig" %}
 
+                    {% include 'aid/aid/_aid_result_as_list.html.twig' with {'aids': myPager.currentPageResults} %}
+
                     <div class="fr-grid-row" id="aids-as-card">
                     {% for aid in myPager.currentPageResults %}
                         <div class="fr-col-xs-12 fr-col-md-4 fr-p-3w">

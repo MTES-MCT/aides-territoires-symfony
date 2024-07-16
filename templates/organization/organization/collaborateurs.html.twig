@@ -43,66 +43,72 @@
                         Ajouter un collaborateur
                     </button>
 
-                    <div class="fr-table">
-                        <table class="data-table">
-                            <caption>
-                                Liste des personnes inscrites ou en attente de validation
-                            </caption>
-                            <thead>
-                                <tr>
-                                    <th scope="col">Nom</th>
-                                    <th scope="col">Email</th>
-                                    <th scope="col">Fonction</th>
-                                    <th scope="col">Invitée le</th>
-                                    <th scope="col">Statut</th>
-                                </tr>
-                            </thead>
-                            {% if collaborators|length > 0 %}
-                            <tbody>
-                                {% for collaborator in collaborators %}
-                                <tr>
-                                    <td>
-                                        {% if collaborator.email == app.user.email %}
-                                            Vous
+                    <div class="fr-table fr-table--no-scroll">
+                        <div class="fr-table__wrapper">
+                            <div class="fr-table__container">
+                                <div class="fr-table__content">
+                                    <table class="data-table">
+                                        <caption>
+                                            Liste des personnes inscrites ou en attente de validation
+                                        </caption>
+                                        <thead>
+                                            <tr>
+                                                <th scope="col">Nom</th>
+                                                <th scope="col">Email</th>
+                                                <th scope="col">Fonction</th>
+                                                <th scope="col">Invitée le</th>
+                                                <th scope="col">Statut</th>
+                                            </tr>
+                                        </thead>
+                                        {% if collaborators|length > 0 %}
+                                        <tbody>
+                                            {% for collaborator in collaborators %}
+                                            <tr>
+                                                <td>
+                                                    {% if collaborator.email == app.user.email %}
+                                                        Vous
+                                                    {% else %}
+                                                        {{ collaborator.name }}
+                                                    {% endif %}
+                                                </td>
+                                                <td>
+                                                    {{ collaborator.email }}
+                                                </td>
+                                                <td>
+                                                {% if collaborator.role != '' %}
+                                                    {{ collaborator.role }}
+                                                {% else %}
+                                                    Ce collaborateur n’a pas encore renseigné sa fonction
+                                                {% endif %}
+                                                </td>
+                                                <td>
+                                                    {{ collaborator.dateInvite }}
+                                                </td>
+                                                <td>
+                                                    {{ collaborator.status}}
+                                                    {% if collaborator.excludable %}
+                                                        <br />
+                                                        <button data-url="{{ path('app_organization_invitations_exclude', {'id': collaborator.invitationId})}}" class="fr-m-1w fr-tag _fr-tag--md fr-text--sd fr-icon-delete-line _fr-tag--icon-left exclude-collaborators-modal-btn" id="exclude-collaborators-modal-btn-{{ collaborator.invitationId }}" data-fr-opened="false" aria-controls="exclude-collaborators-modal">
+                                                            Exclure le membre
+                                                        </button>
+                                                    {% endif %}
+                                                </td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
                                         {% else %}
-                                            {{ collaborator.name }}
+                                        <tbody>
+                                            <tr>
+                                                <td colspan="5" class="at-centered-important">
+                                                    Vous n’avez aucun collaborateur pour le moment
+                                                </td>
+                                            </tr>
+                                        </tbody>
                                         {% endif %}
-                                    </td>
-                                    <td>
-                                        {{ collaborator.email }}
-                                    </td>
-                                    <td>
-                                    {% if collaborator.role != '' %}
-                                        {{ collaborator.role }}
-                                    {% else %}
-                                        Ce collaborateur n’a pas encore renseigné sa fonction
-                                    {% endif %}
-                                    </td>
-                                    <td>
-                                        {{ collaborator.dateInvite }}
-                                    </td>
-                                    <td>
-                                        {{ collaborator.status}}
-                                        {% if collaborator.excludable %}
-                                            <br />
-                                            <button data-url="{{ path('app_organization_invitations_exclude', {'id': collaborator.invitationId})}}" class="fr-m-1w fr-tag _fr-tag--md fr-text--sd fr-icon-delete-line _fr-tag--icon-left exclude-collaborators-modal-btn" id="exclude-collaborators-modal-btn-{{ collaborator.invitationId }}" data-fr-opened="false" aria-controls="exclude-collaborators-modal">
-                                                Exclure le membre
-                                            </button>
-                                        {% endif %}
-                                    </td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                            {% else %}
-                            <tbody>
-                                <tr>
-                                    <td colspan="5" class="at-centered-important">
-                                        Vous n’avez aucun collaborateur pour le moment
-                                    </td>
-                                </tr>
-                            </tbody>
-                            {% endif %}
-                        </table>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
