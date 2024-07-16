@@ -5,7 +5,7 @@
 	{{ encore_entry_script_tags('front/user/project/index') }}
 {% endblock %}
 
-{% block title %}Mon journal de connexion | {{ parent() }}{% endblock %}
+{% block title %}Mes projets | {{ parent() }}{% endblock %}
 
 {% block body %}
 
@@ -23,106 +23,113 @@
 
             <a href="{{ path('app_user_project_creation_projet') }}" class="fr-btn fr-icon-add-circle-line fr-btn--icon-left fr-mb-5w fr-mt-4w" id="create-project-btn">Ajouter un projet</a>
 
-            <div class="fr-table">
-                <table class="data-table at-table--xl">
-                    <caption>
-                        Liste de vos projets en cours
-                    </caption>
-                    <thead>
-                        <tr>
-                            <th scope="col" class="fr-text">Nom</th>
-                            <th scope="col" class="fr-text">Structure</th>
-                            <th scope="col" class="fr-text">Nombre d’aides ajoutées</th>
-                            <th scope="col" class="fr-text">Date création</th>
-                            <th scope="col" class="fr-text">État d’avancement</th>
-                            <th scope="col" class="fr-text">Créé par</th>
-                            <th scope="col" class="fr-text">Projet public</th>
-                            <th scope="col" class="fr-text">Action</th>
-                        </tr>
-                    </thead>
-                    {% if projects %}
-                    <tbody>
-                        {% for project in projects %}
-                        <tr>
-                            <td class="fr-text">
-                                <a  href="{{ path('app_user_project_details_fiche_projet', {'id': project.id, 'slug': project.slug}) }}" id="project-{{ project.id }}">
-                                    {{ project.name }}
-                                </a>
-                            </td>
-                            <td class="fr-text">
-                                {% if project.organization %}
-                                    {{ project.organization.name }}
+            <div class="fr-table fr-table--bordered">
+                <div class="fr-table__wrapper">
+                    <div class="fr-table__container">
+                        <div class="fr-table__content">
+
+                            <table>
+                                <caption>
+                                    Liste de vos projets en cours
+                                </caption>
+                                <thead>
+                                    <tr>
+                                        <th scope="col" class="fr-text">Nom</th>
+                                        <th scope="col" class="fr-text">Structure</th>
+                                        <th scope="col" class="fr-text">Nombre d’aides ajoutées</th>
+                                        <th scope="col" class="fr-text">Date création</th>
+                                        <th scope="col" class="fr-text">État d’avancement</th>
+                                        <th scope="col" class="fr-text">Créé par</th>
+                                        <th scope="col" class="fr-text">Projet public</th>
+                                        <th scope="col" class="fr-text">Action</th>
+                                    </tr>
+                                </thead>
+                                {% if projects %}
+                                <tbody>
+                                    {% for project in projects %}
+                                    <tr>
+                                        <td class="fr-text">
+                                            <a  href="{{ path('app_user_project_details_fiche_projet', {'id': project.id, 'slug': project.slug}) }}" id="project-{{ project.id }}">
+                                                {{ project.name }}
+                                            </a>
+                                        </td>
+                                        <td class="fr-text">
+                                            {% if project.organization %}
+                                                {{ project.organization.name }}
+                                            {% else %}
+                                                Non renseigné
+                                            {% endif %}
+                                        </td>
+                                        <td class="fr-text">
+                                            {% if project.aidProjects.count %}
+                                                {{ project.aidProjects.count }}
+                                            {% else %}
+                                            <span>Vous n’avez pas encore associé d’aides à ce projet.</span>
+                                            {% endif %}
+                                        </td>
+                                        <td class="fr-text">{{ project.dateCreate|date('d/m/y') }}</td>
+                                        <td class="fr-text">
+                                            {% if project.step %}
+                                            {% if project.step == "finished" %}
+                                            <p class="fr-mb-0 fr-badge fr-badge--success">{{  constant('App\\Entity\\Project\\Project::PROJECT_STEPS_BY_SLUG')[project.step] }}</p>
+                                            {% else %}
+                                            <p class="fr-mb-0 fr-badge fr-badge--new">{{  constant('App\\Entity\\Project\\Project::PROJECT_STEPS_BY_SLUG')[project.step] }}</p>
+                                            {% endif %}
+                                            {% else %}
+                                            aucun
+                                            {% endif %}
+                                        </td>
+                                        <td class="fr-text">
+                                        {% if project.author and project.author == app.user %}
+                                            Vous
+                                        {% else %}
+                                            {% if project.author %}
+                                            {{ project.author.firstname }} {{ project.author.lastname }}
+                                            {% endif %}
+                                        {% endif %}
+                                        </td>
+                                        <td class="fr-text">
+                                            {% if project.isPublic %}
+                                                <p class="fr-mb-0 fr-badge fr-badge--success">Oui</p>
+                                            {% else %}
+                                                {% if project.isPublic %}
+                                                    <p class="fr-mb-0 fr-badge fr-badge--new">En cours</p>
+                                                {% else %}
+                                                    <p class="fr-mb-0 fr-badge fr-badge--error">Non</p>              
+                                                {% endif %}
+                                            {% endif %}
+                                        </td>
+                                        <td class="fr-text">
+                                            {% if project.author and project.author == app.user %}
+                                                <button type="button"
+                                                        class="fr-btn fr-icon-delete-line fr-btn--tertiary fr-btn--tertiary-no-outline at-box-shadow--none"
+                                                        id="delete-project-btn-{{ project.id }}"
+                                                        data-fr-opened="false"
+                                                        title="Supprimer ce projet"
+                                                        aria-controls="delete-project-modal"
+                                                        aria-describedby="project-{{ project.id }}"
+                                                        data-project-id="{{ project.id }}"
+                                                >
+                                                    Supprimer ce projet
+                                                </button>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
                                 {% else %}
-                                    Non renseigné
+                                <tbody>
+                                    <tr>
+                                        <td colspan="7" class="at-centered-important">
+                                            Vous n’avez aucun projet pour l’instant
+                                        </td>
+                                    </tr>
+                                </tbody>
                                 {% endif %}
-                            </td>
-                            <td class="fr-text">
-                                {% if project.aidProjects.count %}
-                                    {{ project.aidProjects.count }}
-                                {% else %}
-                                <span>Vous n’avez pas encore associé d’aides à ce projet.</span>
-                                {% endif %}
-                            </td>
-                            <td class="fr-text">{{ project.dateCreate|date('d/m/y') }}</td>
-                            <td class="fr-text">
-                                {% if project.step %}
-                                {% if project.step == "finished" %}
-                                <p class="fr-mb-0 fr-badge fr-badge--success">{{  constant('App\\Entity\\Project\\Project::PROJECT_STEPS_BY_SLUG')[project.step] }}</p>
-                                {% else %}
-                                <p class="fr-mb-0 fr-badge fr-badge--new">{{  constant('App\\Entity\\Project\\Project::PROJECT_STEPS_BY_SLUG')[project.step] }}</p>
-                                {% endif %}
-                                {% else %}
-                                aucun
-                                {% endif %}
-                            </td>
-                            <td class="fr-text">
-                            {% if project.author and project.author == app.user %}
-                                Vous
-                            {% else %}
-                                {% if project.author %}
-                                {{ project.author.firstname }} {{ project.author.lastname }}
-                                {% endif %}
-                            {% endif %}
-                            </td>
-                            <td class="fr-text">
-                                {% if project.isPublic %}
-                                    <p class="fr-mb-0 fr-badge fr-badge--success">Oui</p>
-                                {% else %}
-                                    {% if project.isPublic %}
-                                        <p class="fr-mb-0 fr-badge fr-badge--new">En cours</p>
-                                    {% else %}
-                                        <p class="fr-mb-0 fr-badge fr-badge--error">Non</p>              
-                                    {% endif %}
-                                {% endif %}
-                            </td>
-                            <td class="fr-text">
-                                {% if project.author and project.author == app.user %}
-                                    <button type="button"
-                                            class="fr-btn fr-icon-delete-line fr-btn--tertiary fr-btn--tertiary-no-outline at-box-shadow--none"
-                                            id="delete-project-btn-{{ project.id }}"
-                                            data-fr-opened="false"
-                                            title="Supprimer ce projet"
-                                            aria-controls="delete-project-modal"
-                                            aria-describedby="project-{{ project.id }}"
-                                            data-project-id="{{ project.id }}"
-                                    >
-                                        Supprimer ce projet
-                                    </button>
-                                {% endif %}
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                    {% else %}
-                    <tbody>
-                        <tr>
-                            <td colspan="7" class="at-centered-important">
-                                Vous n’avez aucun projet pour l’instant
-                            </td>
-                        </tr>
-                    </tbody>
-                    {% endif %}
-                </table>
+                            </table>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
