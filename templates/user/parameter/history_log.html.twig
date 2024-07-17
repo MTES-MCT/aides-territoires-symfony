@@ -16,35 +16,41 @@
             </h1>
 
             <div class="fr-table fr-mt-5w">
-                <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th scope="col">Date de la connexion</th>
-                        </tr>
-                    </thead>
-                    {% if my_pager.getNbResults() > 0 %}
-                    <tbody>
-                        {% for connexion in my_pager.currentPageResults %}
-                        
-                            {% if connexion.action=='login' %}
-                            <tr>
-                                <td>
-                                    {{ connexion.timeCreate|date('d/m/y à H\\hi') }}
-                                </td>
-                            </tr>
-                            {% endif %}
-                        {% endfor %}
-                    </tbody>
-                    {% else %}
-                    <tbody>
-                        <tr>
-                            <td colspan="5" class="at-centered-important">
-                                Aucun historique de connexion
-                            </td>
-                        </tr>
-                    </tbody>
-                    {% endif %}
-                </table>
+                <div class="fr-table__wrapper">
+                    <div class="fr-table__container">
+                        <div class="fr-table__content">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Date de la connexion</th>
+                                    </tr>
+                                </thead>
+                                {% if my_pager.getNbResults() > 0 %}
+                                <tbody>
+                                    {% for connexion in my_pager.currentPageResults %}
+                                    
+                                        {% if connexion.action=='login' %}
+                                        <tr>
+                                            <td>
+                                                {{ connexion.timeCreate|date('d/m/y à H\\hi') }}
+                                            </td>
+                                        </tr>
+                                        {% endif %}
+                                    {% endfor %}
+                                </tbody>
+                                {% else %}
+                                <tbody>
+                                    <tr>
+                                        <td colspan="5" class="at-centered-important">
+                                            Aucun historique de connexion
+                                        </td>
+                                    </tr>
+                                </tbody>
+                                {% endif %}
+                            </table>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <div class="pagerfanta fr-container fr-grid-row fr-grid-row--center fr-my-5w">

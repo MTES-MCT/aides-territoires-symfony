@@ -26,125 +26,131 @@
                 {% include "user/project/_menu_project.html.twig" with { aides: true, project_id: project.id, project_slug: project.slug } %}
                 <div id="tabpanel_liste_des_aides" class="fr-tabs__panel" role="tabpanel" aria-labelledby="tabpanel_liste_des_aides" tabindex="0">
                     {# <h2 class="fr-h6 _fr-mt-1w">Liste des aides que vous avez sélectionnées</h2> #}
-                    <div class="fr-table">
-                        <table class="data-table at-table--xl">
-                            <caption>
-                                Liste des aides que vous avez sélectionnées :
-                            </caption>
-                            <thead>
-                                <tr>
-                                    <th scope="col" class="fr-text">Nom</th>
-                                    <th scope="col" class="fr-text">Echéance</th>
-                                    <th scope="col" class="fr-text">Type d’aide</th>
-                                    <th scope="col" class="fr-text">Porteur d’aides</th>
-                                    <th scope="col" class="fr-text">Ajoutée le</th>
-                                    <th scope="col" class="fr-text">Par</th>
-                                    <th scope="col" class="fr-text">Statut</th>
-                                    <th scope="col" class="fr-text">Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% if project.aidProjects|length > 0 %}
-                                    {% for aidProject in project.aidProjects %}
-                                        <tr id="aidProject-{{ aidProject.id }}"> 
-                                            <td class="fr-text">
-                                                <a href="{{ path('app_aid_aid_details', {'slug': aidProject.aid.slug}) }}" target="_blank" rel="noopener" id="aid-{{ aidProject.aid.id }}">
-                                                    {{ aidProject.aid.name }}
-                                                    <span class="fr-sr-only">Ouvre une nouvelle fenêtre</span>
-                                                </a>
-                                            </td>
-                                            <td class="fr-text">
-                                                <span>{{ aidProject.aid.dateSubmissionDeadline|date('d/m/Y') }}</span>
-                                                {% if aidProject.aid.isOnGoing() %}
-                                                    <p class="fr-badge fr-badge--info fr-badge--sm">Permanente</p>
-                                                {% elseif  aidProject.aid.isRecurring() %}
-                                                    <p class="fr-badge fr-badge--info fr-badge--sm">Récurrente</p>
-                                                {% elseif  aidProject.aid.isApproachingDeadline() %}
-                                                    <p class="fr-badge fr-badge--new fr-badge--sm">Échéance proche</p>                       
-                                                {% elseif  aidProject.aid.hasExpired() %}
-                                                    <p class="fr-badge fr-badge--warning fr-badge--sm">Expirée</p>
-                                                {% endif %}
-                                            </td>
-                                            <td class="fr-text">
-                                                {% for aidType in aidProject.aid.aidTypes %}
-                                                    {{ aidType.name }}
-                                                {% endfor %} 
-                                            </td>
-                                            <td class="fr-text">
-                                                <ul>
-                                                    {% for financer in aidProject.aid.aidFinancers %}
-                                                        <li>
-                                                            <a href="{{ path('app_backer_details', {'id': financer.backer.id, 'slug': financer.backer.slug}) }}" target="_blank" rel="noopener">
-                                                                {{ financer.backer.name }}
+                    <div class="fr-table fr-table--no-scroll">
+                        <div class="fr-table__wrapper">
+                            <div class="fr-table__container">
+                                <div class="fr-table__content">
+                                    <table class="data-table at-table--xl">
+                                        <caption>
+                                            Liste des aides que vous avez sélectionnées :
+                                        </caption>
+                                        <thead>
+                                            <tr>
+                                                <th scope="col" class="fr-text">Nom</th>
+                                                <th scope="col" class="fr-text">Echéance</th>
+                                                <th scope="col" class="fr-text">Type d’aide</th>
+                                                <th scope="col" class="fr-text">Porteur d’aides</th>
+                                                <th scope="col" class="fr-text">Ajoutée le</th>
+                                                <th scope="col" class="fr-text">Par</th>
+                                                <th scope="col" class="fr-text">Statut</th>
+                                                <th scope="col" class="fr-text">Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% if project.aidProjects|length > 0 %}
+                                                {% for aidProject in project.aidProjects %}
+                                                    <tr id="aidProject-{{ aidProject.id }}"> 
+                                                        <td class="fr-text">
+                                                            <a href="{{ path('app_aid_aid_details', {'slug': aidProject.aid.slug}) }}" target="_blank" rel="noopener" id="aid-{{ aidProject.aid.id }}">
+                                                                {{ aidProject.aid.name }}
                                                                 <span class="fr-sr-only">Ouvre une nouvelle fenêtre</span>
                                                             </a>
-                                                        </li>
-                                                    {% endfor %} 
-                                                </ul>
-                                            </td>      
+                                                        </td>
+                                                        <td class="fr-text">
+                                                            <span>{{ aidProject.aid.dateSubmissionDeadline|date('d/m/Y') }}</span>
+                                                            {% if aidProject.aid.isOnGoing() %}
+                                                                <p class="fr-badge fr-badge--info fr-badge--sm">Permanente</p>
+                                                            {% elseif  aidProject.aid.isRecurring() %}
+                                                                <p class="fr-badge fr-badge--info fr-badge--sm">Récurrente</p>
+                                                            {% elseif  aidProject.aid.isApproachingDeadline() %}
+                                                                <p class="fr-badge fr-badge--new fr-badge--sm">Échéance proche</p>                       
+                                                            {% elseif  aidProject.aid.hasExpired() %}
+                                                                <p class="fr-badge fr-badge--warning fr-badge--sm">Expirée</p>
+                                                            {% endif %}
+                                                        </td>
+                                                        <td class="fr-text">
+                                                            {% for aidType in aidProject.aid.aidTypes %}
+                                                                {{ aidType.name }}
+                                                            {% endfor %} 
+                                                        </td>
+                                                        <td class="fr-text">
+                                                            <ul>
+                                                                {% for financer in aidProject.aid.aidFinancers %}
+                                                                    <li>
+                                                                        <a href="{{ path('app_backer_details', {'id': financer.backer.id, 'slug': financer.backer.slug}) }}" target="_blank" rel="noopener">
+                                                                            {{ financer.backer.name }}
+                                                                            <span class="fr-sr-only">Ouvre une nouvelle fenêtre</span>
+                                                                        </a>
+                                                                    </li>
+                                                                {% endfor %} 
+                                                            </ul>
+                                                        </td>      
+                                                        <td class="fr-text">
+                                                            {{ aidProject.dateCreate|date('d/m/Y') }}
+                                                        </td>
+                                                        <td class="fr-text">
+                                                            {% if aidProject.creator %}
+                                                                {% if aidProject.creator.id == app.user.id %}
+                                                                    Vous
+                                                                {% else %}
+                                                                    {{ aidProject.creator.firstName }} {{ aidProject.creator.lastName }}
+                                                                {% endif %}
+                                                            {% endif %}
+                                                        </td>
+                                                        <td>
+                                                            {% if aidProject.aidPaid %}
+                                                            <span class="fr-mb-1w fr-badge fr-badge--success">Reçue</span>
+                                                            {% elseif aidProject.aidObtained %}
+                                                            <span class="fr-mb-1w fr-badge fr-badge--success">Obtenue</span>
+                                                            {% elseif aidProject.aidDenied %}
+                                                            <span class="fr-mb-1w fr-badge fr-badge--error">Refusée</span>
+                                                            {% elseif aidProject.aidRequested %}
+                                                            <span class="fr-mb-1w fr-badge fr-badge--info">Demandée</span>
+                                                            {% endif %}
+                                                            <button
+                                                                class="fr-btn edit-aid-project"
+                                                                {# id="aidproject-status-modal-btn" #}
+                                                                title="Editer"
+                                                                {% if formAidProjectEditHasError == aidProject.id %}
+                                                                data-fr-opened="true"
+                                                                {% else %}
+                                                                data-fr-opened="false"
+                                                                {% endif %}
+                                                                aria-controls="aidproject-status-modal-{{ aidProject.id }}"
+                                                                aria-describedby="aidproject-status-{{ aidProject.id }}"
+                                                            >
+                                                                Editer
+                                                            </button>
+                                                        </td>
                                             <td class="fr-text">
-                                                {{ aidProject.dateCreate|date('d/m/Y') }}
-                                            </td>
-                                            <td class="fr-text">
-                                                {% if aidProject.creator %}
-                                                    {% if aidProject.creator.id == app.user.id %}
-                                                        Vous
-                                                    {% else %}
-                                                        {{ aidProject.creator.firstName }} {{ aidProject.creator.lastName }}
-                                                    {% endif %}
-                                                {% endif %}
-                                            </td>
-                                            <td>
-                                                {% if aidProject.aidPaid %}
-                                                <span class="fr-mb-1w fr-badge fr-badge--success">Reçue</span>
-                                                {% elseif aidProject.aidObtained %}
-                                                <span class="fr-mb-1w fr-badge fr-badge--success">Obtenue</span>
-                                                {% elseif aidProject.aidDenied %}
-                                                <span class="fr-mb-1w fr-badge fr-badge--error">Refusée</span>
-                                                {% elseif aidProject.aidRequested %}
-                                                <span class="fr-mb-1w fr-badge fr-badge--info">Demandée</span>
-                                                {% endif %}
                                                 <button
-                                                    class="fr-btn edit-aid-project"
-                                                    {# id="aidproject-status-modal-btn" #}
-                                                    title="Editer"
-                                                    {% if formAidProjectEditHasError == aidProject.id %}
-                                                    data-fr-opened="true"
-                                                    {% else %}
+                                                    class="fr-btn fr-icon-delete-line fr-btn--tertiary fr-btn--tertiary-no-outline at-box-shadow--none"
+                                                    {# id="delete-aid-modal-btn" #}
+                                                    title="Supprimer cette aide"
                                                     data-fr-opened="false"
-                                                    {% endif %}
-                                                    aria-controls="aidproject-status-modal-{{ aidProject.id }}"
-                                                    aria-describedby="aidproject-status-{{ aidProject.id }}"
+                                                    aria-controls="delete-aid-modal"
+                                                    aria-describedby="aidProject-{{ aidProject.id }}"
+                                                    data-id_aid_project = "{{ aidProject.id }}"
                                                 >
-                                                    Editer
+                                                    Supprimer cette aide
                                                 </button>
                                             </td>
-                                <td class="fr-text">
-                                    <button
-                                        class="fr-btn fr-icon-delete-line fr-btn--tertiary fr-btn--tertiary-no-outline at-box-shadow--none"
-                                        {# id="delete-aid-modal-btn" #}
-                                        title="Supprimer cette aide"
-                                        data-fr-opened="false"
-                                        aria-controls="delete-aid-modal"
-                                        aria-describedby="aidProject-{{ aidProject.id }}"
-                                        data-id_aid_project = "{{ aidProject.id }}"
-                                    >
-                                        Supprimer cette aide
-                                    </button>
-                                </td>
-                                        </tr>
-                                    {% endfor %}
-                                {% else %}
-                                    <tbody>
-                                        <tr>
-                                            <td colspan="8" class="fr-text at-centered-important">
-                                                Aucune aide n’a été ajouté à ce projet pour l’instant
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                {% endif %}
-                            </tbody>
-                        </table>
+                                                    </tr>
+                                                {% endfor %}
+                                            {% else %}
+                                                <tbody>
+                                                    <tr>
+                                                        <td colspan="8" class="fr-text at-centered-important">
+                                                            Aucune aide n’a été ajouté à ce projet pour l’instant
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            {% endif %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     {% if project.id %}

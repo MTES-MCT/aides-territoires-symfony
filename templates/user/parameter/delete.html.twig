@@ -57,33 +57,39 @@
 
                     {% endif %}
 
-                    <div class="fr-table at-table--fullwidth">
-                        <table class="data-table" aria-describedby="projects">
-                            <thead>
-                                <tr>
-                                    <th scope="col" class="fr-text">Nom</th>
-                                    <th scope="col" class="fr-text">Nombre d’aides ajoutées</th>
-                                    <th scope="col" class="fr-text">Date création</th>
-                                    <th scope="col" class="fr-text">Date d’échéance</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for project in organization.projectsOfUser(user) %}
-                                    <tr>
-                                        <td class="fr-text">
-                                            <a href="{{ path('app_user_project_details_fiche_projet', {'id': project.id, 'slug': project.slug}) }}">
-                                                {{ project.name }}
-                                            </a>
-                                        </td>
-                                        <td class="fr-text">
-                                            {{ project.aidProjects|length }}
-                                        </td>
-                                        <td class="fr-text">{% if project.dateCreate %}{{ project.dateCreate|date('d/m/y') }}{% endif %}</td>
-                                        <td class="fr-text">{% if project.dueDate %}{{ project.dueDate|date('d/m/y') }}{% endif %}</td>
-                                    </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
+                    <div class="fr-table at-table--fullwidth fr-table--no-scroll">
+                        <div class="fr-table__wrapper">
+                            <div class="fr-table__container">
+                                <div class="fr-table__content">
+                                    <table class="data-table" aria-describedby="projects">
+                                        <thead>
+                                            <tr>
+                                                <th scope="col" class="fr-text">Nom</th>
+                                                <th scope="col" class="fr-text">Nombre d’aides ajoutées</th>
+                                                <th scope="col" class="fr-text">Date création</th>
+                                                <th scope="col" class="fr-text">Date d’échéance</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for project in organization.projectsOfUser(user) %}
+                                                <tr>
+                                                    <td class="fr-text">
+                                                        <a href="{{ path('app_user_project_details_fiche_projet', {'id': project.id, 'slug': project.slug}) }}">
+                                                            {{ project.name }}
+                                                        </a>
+                                                    </td>
+                                                    <td class="fr-text">
+                                                        {{ project.aidProjects|length }}
+                                                    </td>
+                                                    <td class="fr-text">{% if project.dateCreate %}{{ project.dateCreate|date('d/m/y') }}{% endif %}</td>
+                                                    <td class="fr-text">{% if project.dueDate %}{{ project.dueDate|date('d/m/y') }}{% endif %}</td>
+                                                </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     {% if organization.beneficiairies|length > 1 %}                     

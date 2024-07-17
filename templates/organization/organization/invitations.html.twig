@@ -13,54 +13,60 @@
             </h1>
 
 
-            <div class="fr-table">
-                <table class="data-table">
-                    <caption>
-                        Liste de vos invitations reçues
-                    </caption>
-                    <thead>
-                        <tr>
-                            <th scope="col">Structure</th>
-                            <th scope="col">Invitée par</th>
-                            <th scope="col">Etat</th>
-                        </tr>
-                    </thead>
-                    {% if organizationInvitations %}
-                    <tbody>
-                        {% for organizationInvitation in organizationInvitations %}
-                        <tr>
-                            <td>
-                                {% if organizationInvitation.organization %}{{ organizationInvitation.organization.name }}{% endif %}
-                            </td>
-                            <td>
-                                {% if organizationInvitation.author %}
-                                    {{ organizationInvitation.author.email }}
-                                {% endif %}
-                            </td>
-                            <td>
-                                {% if organizationInvitation.timeExclude %}
-                                    Exclu le {{ organizationInvitation.timeExclude|date('d/m/y') }}
-                                {% elseif organizationInvitation.timeAccept %}
-                                    Accepté le {{ organizationInvitation.timeAccept|date('d/m/y') }}
-                                {% elseif organizationInvitation.timeRefuse %}
-                                    Refusé le {{ organizationInvitation.timeRefuse|date('d/m/y') }}
+            <div class="fr-table fr-table--no-scroll">
+                <div class="fr-table__wrapper">
+                    <div class="fr-table__container">
+                        <div class="fr-table__content">
+                            <table class="data-table">
+                                <caption>
+                                    Liste de vos invitations reçues
+                                </caption>
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Structure</th>
+                                        <th scope="col">Invitée par</th>
+                                        <th scope="col">Etat</th>
+                                    </tr>
+                                </thead>
+                                {% if organizationInvitations %}
+                                <tbody>
+                                    {% for organizationInvitation in organizationInvitations %}
+                                    <tr>
+                                        <td>
+                                            {% if organizationInvitation.organization %}{{ organizationInvitation.organization.name }}{% endif %}
+                                        </td>
+                                        <td>
+                                            {% if organizationInvitation.author %}
+                                                {{ organizationInvitation.author.email }}
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if organizationInvitation.timeExclude %}
+                                                Exclu le {{ organizationInvitation.timeExclude|date('d/m/y') }}
+                                            {% elseif organizationInvitation.timeAccept %}
+                                                Accepté le {{ organizationInvitation.timeAccept|date('d/m/y') }}
+                                            {% elseif organizationInvitation.timeRefuse %}
+                                                Refusé le {{ organizationInvitation.timeRefuse|date('d/m/y') }}
+                                            {% else %}
+                                                <a href="{{ path('app_organization_invitations_accept', {'id': organizationInvitation.id}) }}" title="Accepter">Accepter</a> | <a href="{{ path('app_organization_invitations_refuse', {'id': organizationInvitation.id}) }}" title="Refuser">Refuser</a>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
                                 {% else %}
-                                    <a href="{{ path('app_organization_invitations_accept', {'id': organizationInvitation.id}) }}" title="Accepter">Accepter</a> | <a href="{{ path('app_organization_invitations_refuse', {'id': organizationInvitation.id}) }}" title="Refuser">Refuser</a>
+                                <tbody>
+                                    <tr>
+                                        <td colspan="3" class="at-centered-important">
+                                            Vous n’avez aucune invitation pour le moment
+                                        </td>
+                                    </tr>
+                                </tbody>
                                 {% endif %}
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                    {% else %}
-                    <tbody>
-                        <tr>
-                            <td colspan="3" class="at-centered-important">
-                                Vous n’avez aucune invitation pour le moment
-                            </td>
-                        </tr>
-                    </tbody>
-                    {% endif %}
-                </table>
+                            </table>
+                        </div>
+                    </div>
+                </div>
             </div>
 
         </div>

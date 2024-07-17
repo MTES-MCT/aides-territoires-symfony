@@ -20,55 +20,61 @@
             <a class="fr-btn fr-col-12 fr-col-md-3 fr-grid-row--center" href="{{ path('app_user_user_notification_settings') }}">Préférences</a>
         </div>
         
-        <div class="fr-table fr-table--bordered at-table--fullwidth">
-            <table class="data-table">
-                <caption>
-                    <h2 class="fr-h4">Mes notifications</h2>
-                </caption>
-                <thead>
-                    <tr>
-                        <th scope="col">Texte</th>
-                        <th scope="col">Date</th>
-                        <th scope="col">Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% if myPager.getNbResults() %}
-                        {% for notification in myPager.currentPageResults %}
-                            <tr>
-                                <td>
-                                    <div id="notification-{{ notification.id }}">
-                                        <h3 class="fr-h6 at-title--nomargin">{{ notification.name }}</h3>
-                                        <div{% if notification.timeRead is null %} class="at-text--bold"{% endif %}>
-                                            {{ notification.description|raw }}
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>{{ notification.timeCreate|format_datetime('long', 'short', locale='fr') }}</td>
-                                <td class="fr-text">
-                                    <button type="button"
-                                            class="fr-btn fr-icon-delete-line fr-btn--tertiary fr-btn--tertiary-no-outline at-box-shadow--none"
-                                            id="delete-notification-btn"
-                                            data-fr-opened="false"
-                                            title="Supprimer cette notification"
-                                            aria-controls="delete-notification-modal"
-                                            aria-describedby="notification-{{ notification.id }}"
-                                            data-id-notification="{{ notification.id }}"
-                                    >
-                                        Supprimer cette notification
-                                    </button>
-                                </td>
-                            </tr>
-                        {% endfor %}
-                    {% else %}
-                        <tr>
-                            <td colspan="3" class="at-centered-important">
-                                Vous n’avez aucune notification pour l’instant
-                            </td>
-                        </tr>
-                    {% endif %}
-                </tbody>
-            </table>
+        <div class="fr-table fr-table--bordered at-table--fullwidth fr-table--no-scroll">
+            <div class="fr-table__wrapper">
+                <div class="fr-table__container">
+                    <div class="fr-table__content">
+                        <table class="data-table">
+                            <caption>
+                                <h2 class="fr-h4">Mes notifications</h2>
+                            </caption>
+                            <thead>
+                                <tr>
+                                    <th scope="col">Texte</th>
+                                    <th scope="col">Date</th>
+                                    <th scope="col">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if myPager.getNbResults() %}
+                                    {% for notification in myPager.currentPageResults %}
+                                        <tr>
+                                            <td>
+                                                <div id="notification-{{ notification.id }}">
+                                                    <h3 class="fr-h6 at-title--nomargin">{{ notification.name }}</h3>
+                                                    <div{% if notification.timeRead is null %} class="at-text--bold"{% endif %}>
+                                                        {{ notification.description|raw }}
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>{{ notification.timeCreate|format_datetime('long', 'short', locale='fr') }}</td>
+                                            <td class="fr-text">
+                                                <button type="button"
+                                                        class="fr-btn fr-icon-delete-line fr-btn--tertiary fr-btn--tertiary-no-outline at-box-shadow--none"
+                                                        id="delete-notification-btn"
+                                                        data-fr-opened="false"
+                                                        title="Supprimer cette notification"
+                                                        aria-controls="delete-notification-modal"
+                                                        aria-describedby="notification-{{ notification.id }}"
+                                                        data-id-notification="{{ notification.id }}"
+                                                >
+                                                    Supprimer cette notification
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                {% else %}
+                                    <tr>
+                                        <td colspan="3" class="at-centered-important">
+                                            Vous n’avez aucune notification pour l’instant
+                                        </td>
+                                    </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <div class="fr-container fr-grid-row fr-grid-row--center fr-my-5w">
