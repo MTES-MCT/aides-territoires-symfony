@@ -41,70 +41,76 @@
                     <h2 class="fr-h6">Projets subventionnés :</h2>
                 {% if myPager.getNbResults %}
                     <p>Découvrez ci-dessous une sélection de projets qui ont bénéficié de subventions dans l'entourage de votre collectivité. Nous vous encourageons à prendre contact avec les mairies locales afin d'obtenir de plus amples informations.</p>
-                    <div class="fr-table" id="project_in_list">
-                        <table title="Liste des projets subventionnés" id="validated_projects_table">
-                            <caption class="fr-sr-only">
-                                Liste des projets subventionnés
-                            </caption>
-                            <thead>
-                                <tr>
-                                    <th scope="col">Distance</th>
-                                    <th scope="col">Année</th>
-                                    <th scope="col">Mairie</th>
-                                    <th scope="col">Projet</th>
-                                    <th scope="col">Aide</th>
-                                    <th scope="col">Porteur de l’aide</th>
-                                    <th scope="col">Coût total</th>
-                                    <th scope="col">Subvention accordée</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                            {% for project in myPager.currentPageResults %}
-                                <tr>
-                                    <td data-order="{{ project.distance|round(2) }}">
-                                        {% if project.distance > 0 %}{{ project.distance|round(2) }} km{% endif %}
-                                    </td> 
+                    <div class="fr-table fr-table--no-scroll" id="project_in_list">
+                        <div class="fr-table__wrapper">
+                            <div class="fr-table__container">
+                                <div class="fr-table__content">
+                                    <table title="Liste des projets subventionnés" id="validated_projects_table">
+                                        <caption class="fr-sr-only">
+                                            Liste des projets subventionnés
+                                        </caption>
+                                        <thead>
+                                            <tr>
+                                                <th scope="col">Distance</th>
+                                                <th scope="col">Année</th>
+                                                <th scope="col">Mairie</th>
+                                                <th scope="col">Projet</th>
+                                                <th scope="col">Aide</th>
+                                                <th scope="col">Porteur de l’aide</th>
+                                                <th scope="col">Coût total</th>
+                                                <th scope="col">Subvention accordée</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                        {% for project in myPager.currentPageResults %}
+                                            <tr>
+                                                <td data-order="{{ project.distance|round(2) }}">
+                                                    {% if project.distance > 0 %}{{ project.distance|round(2) }} km{% endif %}
+                                                </td> 
 
-                                <td>{% if project.timeObtained %}{{ project.timeObtained|date("Y")}}{% endif %}</td>
-                                <td>
-                                    {% if project.organization %}{{ project.organization.name }}{% endif %}
-                                </td>
-                                <td>
-                                    {{ project.projectName }}
-                                </td>
-                                <td>
-                                    {% if project.aid  %}
-                                        {{ project.aid.name}}
-                                    {% else %}
-                                        {{ project.aidName }}
-                                    {% endif %}
-                                </td>
-                                <td>
-                                    {% if project.financer %}
-                                        <a href="{{ path('app_backer_details', {'id':project.financer.id, 'slug': project.financer.slug}) }}"  >
-                                            {{ project.financer.name}}
-                                        </a>
-                                    {% else %}
-                                        {{ project.financerName }}
-                                    {% endif %}
-                                </td>
-                                <td class="number_one_line" data-order="{{ project.budget }}">{{ project.budget|number_format(0, ',', '&nbsp;')|raw }} €</td>
-                                <td class="number_one_line" data-order="{{ project.amountObtained }}">
-                                    {% if project.amountObtained %}
-                                        {{ project.amountObtained|number_format(0, ',', '&nbsp;')|raw }} €
-                                        ({{ (project.amountObtained/project.budget*100)|round }}%)
-                                    {% else %}
-                                        inconnue
-                                    {% endif %}
-                                </td>
-                            </tr>
-                            {% endfor %}
-                            </tbody>
-                        </table>
-
-                        <div class="fr-container fr-grid-row fr-grid-row--center fr-my-5w">
-                            {{ pagerfanta(myPager) }}
+                                            <td>{% if project.timeObtained %}{{ project.timeObtained|date("Y")}}{% endif %}</td>
+                                            <td>
+                                                {% if project.organization %}{{ project.organization.name }}{% endif %}
+                                            </td>
+                                            <td>
+                                                {{ project.projectName }}
+                                            </td>
+                                            <td>
+                                                {% if project.aid  %}
+                                                    {{ project.aid.name}}
+                                                {% else %}
+                                                    {{ project.aidName }}
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                {% if project.financer %}
+                                                    <a href="{{ path('app_backer_details', {'id':project.financer.id, 'slug': project.financer.slug}) }}"  >
+                                                        {{ project.financer.name}}
+                                                    </a>
+                                                {% else %}
+                                                    {{ project.financerName }}
+                                                {% endif %}
+                                            </td>
+                                            <td class="number_one_line" data-order="{{ project.budget }}">{{ project.budget|number_format(0, ',', '&nbsp;')|raw }} €</td>
+                                            <td class="number_one_line" data-order="{{ project.amountObtained }}">
+                                                {% if project.amountObtained %}
+                                                    {{ project.amountObtained|number_format(0, ',', '&nbsp;')|raw }} €
+                                                    ({{ (project.amountObtained/project.budget*100)|round }}%)
+                                                {% else %}
+                                                    inconnue
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
                         </div>
+                    </div>
+
+                    <div class="fr-container fr-grid-row fr-grid-row--center fr-my-5w">
+                        {{ pagerfanta(myPager) }}
                     </div>
                 {% else %}
                     <p>Désolé, mais nous n'avons pas trouvé de projets subventionnés qui correspondent à votre projet.</p>

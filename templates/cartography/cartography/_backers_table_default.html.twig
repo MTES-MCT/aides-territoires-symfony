@@ -1,52 +1,60 @@
 <div class="fr-mb-5w">
 <h2>{{ current_dept.name }} : {{ backers|length }} porteur{% if backers|length > 1 %}s{% endif %} d‘aides présent{% if backers|length > 1 %}s{% endif %}</h2>
 </div>
-<table class="sortable-table at-table--xl">
-    <thead>
-        <tr>
-            <th scope="col">Catégorie</th>
-            <th scope="col">Porteur</th>
-            <th scope="col">Périmètre du porteur</th>
-            <th scope="col">Thématiques des aides</th>
-            <th scope="col">Total des aides</th>
-            <th scope="col">Aides financières</th>
-            <th scope="col">Aides en ingénierie</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for backer in backers %}
-            <tr>
-                <td>
-                    {% if backer.backerGroup and backer.backerGroup.backerSubCategory and backer.backerGroup.backerSubCategory.backerCategory %}
-                    {{ backer.backerGroup.backerSubCategory.backerCategory.name }}
-                    {% endif %}
-                </td>
-                <td>
-                    <a href="{{ path('app_backer_details', {'id': backer.id, 'slug': backer.slug}) }}" title="Voir les détails du porteur d'aide {{ backer.name }}">{{ backer.name }}</a>
-                </td>
-                <td data-sort="{{ backer.perimeter.scale }}">{{ backer.perimeter.name }}</td>
-                <td>
-                    {% for thematic in backer.aidsThematics %}
-                        {% if 
-                        (categoryThemesSelected is defined and thematic in categoryThemesSelected)
-                        or categoryThemesSelected is not defined
-                        or (categoryThemesSelected is defined and categoryThemesSelected is empty)
-                        %}
-                        <p class="fr-mb-1w">{{ thematic.name }}</p>
-                        {% endif %}
-                    {% endfor %}
-                </td>
+<div class="fr-table fr-table--no-scroll">
+    <div class="fr-table__wrapper">
+        <div class="fr-table__container">
+            <div class="fr-table__content">
+                <table class="sortable-table at-table--xl">
+                    <thead>
+                        <tr>
+                            <th scope="col">Catégorie</th>
+                            <th scope="col">Porteur</th>
+                            <th scope="col">Périmètre du porteur</th>
+                            <th scope="col">Thématiques des aides</th>
+                            <th scope="col">Total des aides</th>
+                            <th scope="col">Aides financières</th>
+                            <th scope="col">Aides en ingénierie</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for backer in backers %}
+                            <tr>
+                                <td>
+                                    {% if backer.backerGroup and backer.backerGroup.backerSubCategory and backer.backerGroup.backerSubCategory.backerCategory %}
+                                    {{ backer.backerGroup.backerSubCategory.backerCategory.name }}
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <a href="{{ path('app_backer_details', {'id': backer.id, 'slug': backer.slug}) }}" title="Voir les détails du porteur d'aide {{ backer.name }}">{{ backer.name }}</a>
+                                </td>
+                                <td data-sort="{{ backer.perimeter.scale }}">{{ backer.perimeter.name }}</td>
+                                <td>
+                                    {% for thematic in backer.aidsThematics %}
+                                        {% if 
+                                        (categoryThemesSelected is defined and thematic in categoryThemesSelected)
+                                        or categoryThemesSelected is not defined
+                                        or (categoryThemesSelected is defined and categoryThemesSelected is empty)
+                                        %}
+                                        <p class="fr-mb-1w">{{ thematic.name }}</p>
+                                        {% endif %}
+                                    {% endfor %}
+                                </td>
 
-                <td>
-                    <a href="{{ path('app_aid_aid', {'forceOrganizationType': 'null', 'perimeter': current_dept.id, 'backers[]': backer.id}) }}" title="Voir les aides du porteur {{ backer.name }}">{{ backer.aidsLive|length }}</a>
-                </td>
-                <td>
-                    <a href="{{ path('app_aid_aid', {'forceOrganizationType': 'null', 'perimeter': current_dept.id, 'backers[]': backer.id, 'aidTypeGroup': constant('App\\Entity\\Aid\\AidTypeGroup::SLUG_FINANCIAL')}) }}" title="Voir les aides financières du porteur {{ backer.name }}">{{ backer.aidsFinancial|length }}</a>
-                </td>
-                <td>
-                    <a href="{{ path('app_aid_aid', {'forceOrganizationType': 'null', 'perimeter': current_dept.id, 'backers[]': backer.id, 'aidTypeGroup': constant('App\\Entity\\Aid\\AidTypeGroup::SLUG_TECHNICAL')}) }}" title="Voir les aides en ingénierie du porteur {{ backer.name }}">{{ backer.aidsTechnical|length }}</a>
-                </td>
-            </tr>
-        {% endfor %}
-    </tbody>
-</table>
+                                <td>
+                                    <a href="{{ path('app_aid_aid', {'forceOrganizationType': 'null', 'perimeter': current_dept.id, 'backers[]': backer.id}) }}" title="Voir les aides du porteur {{ backer.name }}">{{ backer.aidsLive|length }}</a>
+                                </td>
+                                <td>
+                                    <a href="{{ path('app_aid_aid', {'forceOrganizationType': 'null', 'perimeter': current_dept.id, 'backers[]': backer.id, 'aidTypeGroup': constant('App\\Entity\\Aid\\AidTypeGroup::SLUG_FINANCIAL')}) }}" title="Voir les aides financières du porteur {{ backer.name }}">{{ backer.aidsFinancial|length }}</a>
+                                </td>
+                                <td>
+                                    <a href="{{ path('app_aid_aid', {'forceOrganizationType': 'null', 'perimeter': current_dept.id, 'backers[]': backer.id, 'aidTypeGroup': constant('App\\Entity\\Aid\\AidTypeGroup::SLUG_TECHNICAL')}) }}" title="Voir les aides en ingénierie du porteur {{ backer.name }}">{{ backer.aidsTechnical|length }}</a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

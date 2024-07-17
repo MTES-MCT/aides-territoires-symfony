@@ -44,51 +44,57 @@
             <h2 class="fr-h4">Mes alertes</h2>
             <p>Retrouvez ici toutes les alertes auxquelles vous vous êtes abonné.</p>
             {% if alerts|length > 0 %}
-                <div class="fr-table fr-table--bordered">
-                    <table class="data-table">
-                        <thead>
-                            <tr>
-                                <th scope="col">Nom</th>
-                                <th scope="col">Fréquence</th>
-                                <th scope="col">Date création</th>
-                                <th scope="col">Dernière réception</th>
-                                <th scope="col">Action</th>
-                            </tr>
-                        </thead>
-                        {% for alert in alerts %}
-                        <tbody>
-                            <tr>
-                                <td>
-                                    <a href="{{ path('app_aid_aid') }}?{{ alert.querystring }}" target="_blank" rel="noopener" id="alert-{{ alert.id }}">
-                                        {{ alert.title }} 
-                                        <span class="fr-sr-only">Ouvre une nouvelle fenêtre</span>
-                                    </a>
-                                </td>
-                                <td>{{ alert.alertFrequency|alertFrequencyDisplay }}</td>
-                                <td>{{ alert.timeCreate|date('d/m/y') }}</td>
-                                <td>
-                                    {% if alert.timeLatestAlert %}
-                                    {{ alert.timeLatestAlert|date('d/m/y') }}
-                                    {% else %}
-                                    Non envoyée
-                                    {% endif %}
-                                </td>
-                                <td class="fr-text">
-                                    <button type="button"
-                                            class="fr-btn fr-icon-delete-line fr-btn--tertiary fr-btn--tertiary-no-outline at-box-shadow--none"
-                                            id="delete-alert-btn-{{ alert.id }}"
-                                            data-fr-opened="false"
-                                            title="Supprimer cette alerte"
-                                            aria-controls="delete-alert-modal-{{ alert.id }}"
-                                            aria-describedby="alert-{{ alert.id }}"
-                                    >
-                                        Supprimer cette alerte
-                                    </button>
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
+                <div class="fr-table fr-table--bordered fr-table--no-scroll">
+                    <div class="fr-table__wrapper">
+                        <div class="fr-table__container">
+                            <div class="fr-table__content">
+                                <table class="data-table">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">Nom</th>
+                                            <th scope="col">Fréquence</th>
+                                            <th scope="col">Date création</th>
+                                            <th scope="col">Dernière réception</th>
+                                            <th scope="col">Action</th>
+                                        </tr>
+                                    </thead>
+                                    {% for alert in alerts %}
+                                    <tbody>
+                                        <tr>
+                                            <td>
+                                                <a href="{{ path('app_aid_aid') }}?{{ alert.querystring }}" target="_blank" rel="noopener" id="alert-{{ alert.id }}">
+                                                    {{ alert.title }} 
+                                                    <span class="fr-sr-only">Ouvre une nouvelle fenêtre</span>
+                                                </a>
+                                            </td>
+                                            <td>{{ alert.alertFrequency|alertFrequencyDisplay }}</td>
+                                            <td>{{ alert.timeCreate|date('d/m/y') }}</td>
+                                            <td>
+                                                {% if alert.timeLatestAlert %}
+                                                {{ alert.timeLatestAlert|date('d/m/y') }}
+                                                {% else %}
+                                                Non envoyée
+                                                {% endif %}
+                                            </td>
+                                            <td class="fr-text">
+                                                <button type="button"
+                                                        class="fr-btn fr-icon-delete-line fr-btn--tertiary fr-btn--tertiary-no-outline at-box-shadow--none"
+                                                        id="delete-alert-btn-{{ alert.id }}"
+                                                        data-fr-opened="false"
+                                                        title="Supprimer cette alerte"
+                                                        aria-controls="delete-alert-modal-{{ alert.id }}"
+                                                        aria-describedby="alert-{{ alert.id }}"
+                                                >
+                                                    Supprimer cette alerte
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             {% else %}
                 <p>Vous n’avez aucune alerte pour l’instant.</p>

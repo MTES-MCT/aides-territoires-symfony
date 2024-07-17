@@ -21,46 +21,58 @@
                     <div id="tabpanel_similar"  class="fr-tabs__panel" role="tabpanel" aria-labelledby="tabpanel_similar" tabindex="3">
 
                     {% if closes|length > 0 %}
-                        <div class="fr-table fr-table--layout-fixed">
-                            <table>
-                                <caption>Nos projets référents proches :</caption>
-                                <thead>
-                                    <tr>
-                                        <th scope="col">Nom</th>
-                                        <th scope="col">Catégorie</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {% for projectReference in closes %}
-                                        <tr>
-                                            <td><a href="{{ path('app_project_reference', {'prSlug': projectReference.slug}) }}" title="Rechercher avec ce projet">{{ projectReference.name }}</a></td>
-                                            <td>{% if projectReference.projectReferenceCategory %}{{ projectReference.projectReferenceCategory.name }}{% endif %}</td>
-                                        </tr>
-                                    {% endfor %}
-                                </tbody>
-                            </table>
+                        <div class="fr-table">
+                            <div class="fr-table__wrapper">
+                                <div class="fr-table__container">
+                                    <div class="fr-table__content">
+                                        <table>
+                                            <caption>Nos projets référents proches :</caption>
+                                            <thead>
+                                                <tr>
+                                                    <th scope="col">Nom</th>
+                                                    <th scope="col">Catégorie</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for projectReference in closes %}
+                                                    <tr>
+                                                        <td><a href="{{ path('app_project_reference', {'prSlug': projectReference.slug}) }}" title="Rechercher avec ce projet">{{ projectReference.name }}</a></td>
+                                                        <td>{% if projectReference.projectReferenceCategory %}{{ projectReference.projectReferenceCategory.name }}{% endif %}</td>
+                                                    </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     {% endif %}
                     
                     {% if others|length > 0 %}
-                        <div class="fr-table fr-table--layout-fixed">
-                            <table>
-                                <caption>Nos autres projets référents :</caption>
-                                <thead>
-                                    <tr>
-                                        <th scope="col">Nom</th>
-                                        <th scope="col">Catégorie</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {% for projectReference in others %}
-                                        <tr>
-                                            <td><a href="{{ path('app_project_reference', {'prSlug': projectReference.slug}) }}" title="Rechercher avec ce projet">{{ projectReference.name }}</a></td>
-                                            <td>{% if projectReference.projectReferenceCategory %}{{ projectReference.projectReferenceCategory.name }}{% endif %}</td>
-                                        </tr>
-                                    {% endfor %}
-                                </tbody>
-                            </table>
+                        <div class="fr-table">
+                            <div class="fr-table__wrapper">
+                                <div class="fr-table__container">
+                                    <div class="fr-table__content">
+                                        <table>
+                                            <caption>Nos autres projets référents :</caption>
+                                            <thead>
+                                                <tr>
+                                                    <th scope="col">Nom</th>
+                                                    <th scope="col">Catégorie</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for projectReference in others %}
+                                                    <tr>
+                                                        <td><a href="{{ path('app_project_reference', {'prSlug': projectReference.slug}) }}" title="Rechercher avec ce projet">{{ projectReference.name }}</a></td>
+                                                        <td>{% if projectReference.projectReferenceCategory %}{{ projectReference.projectReferenceCategory.name }}{% endif %}</td>
+                                                    </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     {% endif %}
                 </div>
