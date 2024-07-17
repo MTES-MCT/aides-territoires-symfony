@@ -45,6 +45,7 @@ use Symfony\Component\Validator\Constraints as Assert;
             ),
             paginationEnabled: true,
             paginationItemsPerPage: 50,
+            paginationMaximumItemsPerPage: 100,
             paginationClientItemsPerPage: true
         ),
         new Get(

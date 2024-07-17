@@ -25,6 +25,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
             ),
             paginationEnabled: true,
             paginationItemsPerPage: 50,
+            paginationMaximumItemsPerPage: 100,
             paginationClientItemsPerPage: true
         ),
     ]

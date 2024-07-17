@@ -102,6 +102,7 @@ use Symfony\Component\Validator\Constraints as Assert;
     order: ['dateStart' => 'DESC', 'id' => 'DESC'],
     paginationEnabled: true,
     paginationItemsPerPage: 30,
+    paginationMaximumItemsPerPage: 100,
     paginationClientItemsPerPage: true
     
 )]

@@ -46,6 +46,7 @@ use App\Filter\Backer\HasPublishedFinancedAidsFilter;
             ),
             paginationEnabled: true,
             paginationItemsPerPage: 50,
+            paginationMaximumItemsPerPage: 100,
             paginationClientItemsPerPage: true
         ),
     ]
