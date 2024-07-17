@@ -73,6 +73,10 @@ class ReferenceService
       // rend le tableau unique
       $keywords = array_unique($keywords);
 
+      // genere les combinaisons possibles avec les termes restants et les ajoutes au tableau
+      $keywords = $this->enleverArticlesFromArray($keywords);
+      $keywords = array_merge($keywords, $this->genererToutesCombinaisons($keywords));
+
       // on regarde si c'est un mot clé de la base de données
       $keywordReferences = $this->keywordReferenceRepository->findCustom([
           'names' => $keywords
@@ -81,36 +85,9 @@ class ReferenceService
 
     
       foreach ($keywordReferences as $keywordReference) {
-        // retire de keywords les mots clés trouvés
-        $key = array_search($keywordReference->getName(), $keywords);
-        if ($key !== false) {
-          unset($keywords[$key]);
-        }
         // stock dans un tableau
         $keywordReferencesByName[$keywordReference->getName()] = $keywordReference;
       }
-
-        // genere les combinaisons possibles avec les termes restants
-        $keywords = $this->enleverArticlesFromArray($keywords);
-        $projetKeywordsCombinaisons = $this->genererToutesCombinaisons($keywords);
-  
-        // regarde si on trouve d'autre mots clés référents
-        $keywordReferencesBis = $this->keywordReferenceRepository->findCustom([
-          'names' => $projetKeywordsCombinaisons
-        ]);
-        foreach ($keywordReferencesBis as $keywordReference) {
-          // retire des combinaisons les mots clés trouvés
-          $key = array_search($keywordReference->getName(), $projetKeywordsCombinaisons);
-          if ($key !== false) {
-            unset($projetKeywordsCombinaisons[$key]);
-          }
-          // ajoute au tableau
-          if (!isset($keywordReferencesByName[$keywordReference->getName()])) {
-            $keywordReferencesByName[$keywordReference->getName()] = $keywordReference;
-            $keywordReferences[] = $keywordReference;
-          }
-        }
-      
 
       // Prépare deux tableaux pour les intentions et les objets
       $intentions = [];
@@ -129,15 +106,8 @@ class ReferenceService
         }
       }
 
-      // on enlève les mots exclus du projet rérérent le cas échéant
-      foreach ($projetKeywordsCombinaisons as $key => $synonym) {
-        if (in_array($synonym, $excludedKeywordReferences)) {
-          unset($projetKeywordsCombinaisons[$key]);
-        }
-      }
-
-      // parcours les mots clés
-      foreach ($keywordReferences as $result) {
+      // parcours les mots clés restant
+      foreach ($keywordReferencesByName as $result) {
           // ajoute le mot
           if ($result->isIntention()) {
             $intentions[] = $result->getName();
