@@ -178,56 +178,6 @@ class ReferenceService
           }
       }
 
-      
-
-      // Parcours les combinaisons de mots
-      foreach ($projetKeywordsCombinaisons as $synonym) {
-        $results = $this->keywordReferenceRepository->findCustom([
-          'name' => $synonym
-        ]);
-        /** @var KeywordReference $result */
-        foreach ($results as $result) {
-          // ajoute le mot
-          if ($result->isIntention()) {
-            $intentions[] = $result->getName();
-          } else {
-            $objects[] = $result->getName();
-          }
-
-          // si il a des enfants
-          foreach ($result->getKeywordReferences() as $keywordReference) {
-            if ($keywordReference->isIntention()) {
-              $intentions[] = $keywordReference->getName();
-            } else {
-              $objects[] = $keywordReference->getName();
-            }
-            foreach ($keywordReference->getKeywordReferences() as $subKeyword) {
-              if ($subKeyword->isIntention()) {
-                $intentions[] = $subKeyword->getName();
-              } else {
-                $objects[] = $subKeyword->getName();
-              }
-            }
-          }
-
-          // si il a un parent
-          if ($result->getParent()) {
-            if ($result->getParent()->isIntention()) {
-              $intentions[] = $result->getParent()->getName();
-            } else {
-              $objects[] = $result->getParent()->getName();
-            }
-            foreach ($result->getParent()->getKeywordReferences() as $subKeyword) {
-              if ($subKeyword->isIntention()) {
-                $intentions[] = $subKeyword->getName();
-              } else {
-                $objects[] = $subKeyword->getName();
-              }
-            }
-          }
-        }
-      }
-
       // rends les tableaux unique
       $intentions = array_unique($intentions);
       $objects = array_unique($objects);
