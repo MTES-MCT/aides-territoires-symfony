@@ -44,6 +44,8 @@ class ReferenceService
     public function getSynonymes(string $project_name): ?array
     {
       $original_name = $project_name;
+      // nettoie la string
+      $project_name = str_replace(array("/","(",")",",",":","–","-"), " ",strtolower($project_name));
 
       // regarde si c'est un projet référent
       $projectReference = $this->projectReferenceRepository->findOneBy([
@@ -58,6 +60,18 @@ class ReferenceService
           unset($keywords[$key]);
         }
       }
+
+      // sépare sur les espaces
+      $keywords = explode(' ', $project_name);
+      foreach ($keywords as $key => $keyword) {
+        $keywords[$key] = trim($keyword);
+        if (empty($keywords[$key])) {
+          unset($keywords[$key]);
+        }
+      }
+
+      // rend le tableau unique
+      $keywords = array_unique($keywords);
 
       // on regarde si c'est un mot clé de la base de données
       $keywordReferences = $this->keywordReferenceRepository->findCustom([
@@ -76,15 +90,27 @@ class ReferenceService
         $keywordReferencesByName[$keywordReference->getName()] = $keywordReference;
       }
 
-      // genere les combinaisons sur les mots non trouvés
-      $projetKeywordsCombinaisons = [];
-      foreach ($keywords as $keyword) {
-        $keyword = str_replace(array("/","(",")",",",":","–","-"), " ",strtolower($keyword));
-        $projetKeywordsCombinaisons = array_merge($projetKeywordsCombinaisons, $this->genererCombinaisons($keyword, $this->articles));
-      }
-    
-      // Tri du tableau pour d'abord chercher des expressions complètes "terrain de football" aura la priorité sur "terrain"
-      usort($projetKeywordsCombinaisons, array($this,"compareLength"));
+        // genere les combinaisons possibles avec les termes restants
+        $keywords = $this->enleverArticlesFromArray($keywords);
+        $projetKeywordsCombinaisons = $this->genererToutesCombinaisons($keywords);
+  
+        // regarde si on trouve d'autre mots clés référents
+        $keywordReferencesBis = $this->keywordReferenceRepository->findCustom([
+          'names' => $projetKeywordsCombinaisons
+        ]);
+        foreach ($keywordReferencesBis as $keywordReference) {
+          // retire des combinaisons les mots clés trouvés
+          $key = array_search($keywordReference->getName(), $projetKeywordsCombinaisons);
+          if ($key !== false) {
+            unset($projetKeywordsCombinaisons[$key]);
+          }
+          // ajoute au tableau
+          if (!isset($keywordReferencesByName[$keywordReference->getName()])) {
+            $keywordReferencesByName[$keywordReference->getName()] = $keywordReference;
+            $keywordReferences[] = $keywordReference;
+          }
+        }
+      
 
       // Prépare deux tableaux pour les intentions et les objets
       $intentions = [];
@@ -151,6 +177,8 @@ class ReferenceService
             }
           }
       }
+
+      
 
       // Parcours les combinaisons de mots
       foreach ($projetKeywordsCombinaisons as $synonym) {
@@ -235,6 +263,20 @@ class ReferenceService
         return $highlightedWords;
     }
 
+    private function enleverArticlesFromArray(array $array): array
+    {
+      foreach($array as $key => $value) {
+        $value = str_replace(array("/","(",")",",",":","–"), " ",strtolower($value));
+        if (in_array($value, $this->articles)) {
+          unset($array[$key]);
+        } else {
+          $array[$key] = $value;
+        }
+      }
+
+      return $array;
+    }
+
     private function enleverArticles($content, $articles) {
         $content = str_replace(array("/","(",")",",",":","–"), " ",strtolower($content));
         foreach ($articles as $article) {
@@ -261,6 +303,27 @@ class ReferenceService
       return implode(" ", $words);
   }
   
+  private function genererToutesCombinaisons($keywords) {
+    if (empty($keywords)) {
+        return [''];
+    }
+
+    $premierMot = array_shift($keywords);
+    $combinaisonsSansPremier = $this->genererToutesCombinaisons($keywords);
+    $combinaisonsAvecPremier = [];
+
+    foreach ($combinaisonsSansPremier as $combinaison) {
+        $combinaisonsAvecPremier[] = $combinaison;
+        if (!empty($combinaison)) {
+            $combinaisonsAvecPremier[] = $premierMot . ' ' . $combinaison;
+        } else {
+            $combinaisonsAvecPremier[] = $premierMot;
+        }
+    }
+
+    return $combinaisonsAvecPremier;
+}
+
   
   private function genererCombinaisons($texte,$articles) {
     // Séparer le texte en mots
