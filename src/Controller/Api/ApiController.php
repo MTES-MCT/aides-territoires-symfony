@@ -14,6 +14,7 @@ use Symfony\Component\Serializer\SerializerInterface;
 class ApiController extends AbstractController
 {
     const SERIALIZE_FORMAT = 'json';
+    const MAX_ITEMS_PER_PAGE = 100;
 
     public function __construct(
         protected RequestStack $requestStack,
@@ -36,12 +37,12 @@ class ApiController extends AbstractController
         // old way
         $size = $this->requestStack->getCurrentRequest()->get('size', null);
         if ($size) {
-            return (int) $size;
+            return (int) $size > self::MAX_ITEMS_PER_PAGE ? self::MAX_ITEMS_PER_PAGE : (int) $size;
         }
 
         // new way
         $itemsPerPage = $this->requestStack->getCurrentRequest()->get('itemsPerPage', 50);
-        return (int) $itemsPerPage;
+        return (int) $itemsPerPage > self::MAX_ITEMS_PER_PAGE ? self::MAX_ITEMS_PER_PAGE : (int) $itemsPerPage;
     }
 
     protected function getNbPages($nbItems = 0): int
