@@ -44,22 +44,14 @@ class ReferenceService
     public function getSynonymes(string $project_name): ?array
     {
       $original_name = $project_name;
-      // nettoie la string
-      $project_name = str_replace(array("/","(",")",",",":","–","-"), " ",strtolower($project_name));
 
       // regarde si c'est un projet référent
       $projectReference = $this->projectReferenceRepository->findOneBy([
-          'name' => $project_name
+        'name' => $project_name
       ]);
-
-      // sépare sur les virgules
-      $keywords = explode(',', $project_name);
-      foreach ($keywords as $key => $keyword) {
-        $keywords[$key] = trim($keyword);
-        if (empty($keywords[$key])) {
-          unset($keywords[$key]);
-        }
-      }
+      
+      // nettoie la string
+      $project_name = str_replace(["/","(",")",",",":","–","-"], " ",strtolower($project_name));
 
       // sépare sur les espaces
       $keywords = explode(' ', $project_name);
@@ -72,10 +64,13 @@ class ReferenceService
 
       // rend le tableau unique
       $keywords = array_unique($keywords);
-
+      
       // genere les combinaisons possibles avec les termes restants et les ajoutes au tableau
       $keywords = $this->enleverArticlesFromArray($keywords);
       $keywords = array_merge($keywords, $this->genererToutesCombinaisons($keywords));
+      // retire tous les élements vides
+      $keywords = array_filter($keywords);
+      $keywords = array_unique($keywords);
 
       // on regarde si c'est un mot clé de la base de données
       $keywordReferences = $this->keywordReferenceRepository->findCustom([
@@ -98,16 +93,17 @@ class ReferenceService
       if ($projectReference instanceof ProjectReference) {
         foreach ($projectReference->getExcludedKeywordReferences() as $excludedKeywordReference) {
           $excludedKeywordReferences[] = $excludedKeywordReference->getName();
-
-          // on retire du tableau des mots clés trouvés
-          if (isset($keywordReferencesByName[$excludedKeywordReference->getName()])) {
-            unset($keywordReferencesByName[$excludedKeywordReference->getName()]);
-          }
         }
       }
 
       // parcours les mots clés restant
-      foreach ($keywordReferencesByName as $result) {
+      foreach ($keywordReferences as $key => $result) {
+          // si dans la liste d'exclusion
+          if (in_array($result->getName(), $excludedKeywordReferences)) {
+            unset($keywordReferences[$key]);
+            continue;
+          }
+
           // ajoute le mot
           if ($result->isIntention()) {
             $intentions[] = $result->getName();
