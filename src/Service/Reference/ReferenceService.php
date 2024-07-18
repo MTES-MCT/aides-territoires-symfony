@@ -72,34 +72,27 @@ class ReferenceService
       $keywords = array_filter($keywords);
       $keywords = array_unique($keywords);
 
-      // on regarde si c'est un mot clé de la base de données
+      // on regarde si ça corresponds à des mots clés de la base de données
       $keywordReferences = $this->keywordReferenceRepository->findCustom([
           'names' => $keywords
       ]);
-      $keywordReferencesByName = [];
-
-    
-      foreach ($keywordReferences as $keywordReference) {
-        // stock dans un tableau
-        $keywordReferencesByName[$keywordReference->getName()] = $keywordReference;
-      }
 
       // Prépare deux tableaux pour les intentions et les objets
       $intentions = [];
       $objects = [];
 
       // on fait un tableau avec les mots clés exlus
-      $excludedKeywordReferences = [];
+      $excludedKeywordReferenceNames = [];
       if ($projectReference instanceof ProjectReference) {
         foreach ($projectReference->getExcludedKeywordReferences() as $excludedKeywordReference) {
-          $excludedKeywordReferences[] = $excludedKeywordReference->getName();
+          $excludedKeywordReferenceNames[] = $excludedKeywordReference->getName();
         }
       }
 
       // parcours les mots clés restant
       foreach ($keywordReferences as $key => $result) {
           // si dans la liste d'exclusion
-          if (in_array($result->getName(), $excludedKeywordReferences)) {
+          if (in_array($result->getName(), $excludedKeywordReferenceNames)) {
             unset($keywordReferences[$key]);
             continue;
           }
@@ -127,8 +120,8 @@ class ReferenceService
             }
           }
 
-          // si il a un parent
-          if ($result->getParent()) {
+          // si il a un parent qui n'est pas lui même
+          if ($result->getParent() && $result->getParent()->getId() !== $result->getId()) {
             if ($result->getParent()->isIntention()) {
               $intentions[] = $result->getParent()->getName();
             } else {
