@@ -47,11 +47,14 @@ class ReferenceService
 
       // regarde si c'est un projet référent
       $projectReference = $this->projectReferenceRepository->findOneBy([
-          'name' => $project_name
+        'name' => $project_name
       ]);
+      
+      // nettoie la string
+      $project_name = str_replace(["/","(",")",",",":","–","-"], " ",strtolower($project_name));
 
-      // sépare sur les virgules
-      $keywords = explode(',', $project_name);
+      // sépare sur les espaces
+      $keywords = explode(' ', $project_name);
       foreach ($keywords as $key => $keyword) {
         $keywords[$key] = trim($keyword);
         if (empty($keywords[$key])) {
@@ -59,59 +62,41 @@ class ReferenceService
         }
       }
 
-      // on regarde si c'est un mot clé de la base de données
+      // rend le tableau unique
+      $keywords = array_unique($keywords);
+      
+      // genere les combinaisons possibles avec les termes restants et les ajoutes au tableau
+      $keywords = $this->enleverArticlesFromArray($keywords);
+      $keywords = array_merge($keywords, $this->genererToutesCombinaisons($keywords));
+      // retire tous les élements vides
+      $keywords = array_filter($keywords);
+      $keywords = array_unique($keywords);
+
+      // on regarde si ça corresponds à des mots clés de la base de données
       $keywordReferences = $this->keywordReferenceRepository->findCustom([
           'names' => $keywords
       ]);
-      $keywordReferencesByName = [];
-
-    
-      foreach ($keywordReferences as $keywordReference) {
-        // retire de keywords les mots clés trouvés
-        $key = array_search($keywordReference->getName(), $keywords);
-        if ($key !== false) {
-          unset($keywords[$key]);
-        }
-        // stock dans un tableau
-        $keywordReferencesByName[$keywordReference->getName()] = $keywordReference;
-      }
-
-      // genere les combinaisons sur les mots non trouvés
-      $projetKeywordsCombinaisons = [];
-      foreach ($keywords as $keyword) {
-        $keyword = str_replace(array("/","(",")",",",":","–","-"), " ",strtolower($keyword));
-        $projetKeywordsCombinaisons = array_merge($projetKeywordsCombinaisons, $this->genererCombinaisons($keyword, $this->articles));
-      }
-    
-      // Tri du tableau pour d'abord chercher des expressions complètes "terrain de football" aura la priorité sur "terrain"
-      usort($projetKeywordsCombinaisons, array($this,"compareLength"));
 
       // Prépare deux tableaux pour les intentions et les objets
       $intentions = [];
       $objects = [];
 
       // on fait un tableau avec les mots clés exlus
-      $excludedKeywordReferences = [];
+      $excludedKeywordReferenceNames = [];
       if ($projectReference instanceof ProjectReference) {
         foreach ($projectReference->getExcludedKeywordReferences() as $excludedKeywordReference) {
-          $excludedKeywordReferences[] = $excludedKeywordReference->getName();
+          $excludedKeywordReferenceNames[] = $excludedKeywordReference->getName();
+        }
+      }
 
-          // on retire du tableau des mots clés trouvés
-          if (isset($keywordReferencesByName[$excludedKeywordReference->getName()])) {
-            unset($keywordReferencesByName[$excludedKeywordReference->getName()]);
+      // parcours les mots clés restant
+      foreach ($keywordReferences as $key => $result) {
+          // si dans la liste d'exclusion
+          if (in_array($result->getName(), $excludedKeywordReferenceNames)) {
+            unset($keywordReferences[$key]);
+            continue;
           }
-        }
-      }
 
-      // on enlève les mots exclus du projet rérérent le cas échéant
-      foreach ($projetKeywordsCombinaisons as $key => $synonym) {
-        if (in_array($synonym, $excludedKeywordReferences)) {
-          unset($projetKeywordsCombinaisons[$key]);
-        }
-      }
-
-      // parcours les mots clés
-      foreach ($keywordReferences as $result) {
           // ajoute le mot
           if ($result->isIntention()) {
             $intentions[] = $result->getName();
@@ -135,8 +120,8 @@ class ReferenceService
             }
           }
 
-          // si il a un parent
-          if ($result->getParent()) {
+          // si il a un parent qui n'est pas lui même
+          if ($result->getParent() && $result->getParent()->getId() !== $result->getId()) {
             if ($result->getParent()->isIntention()) {
               $intentions[] = $result->getParent()->getName();
             } else {
@@ -150,54 +135,6 @@ class ReferenceService
               }
             }
           }
-      }
-
-      // Parcours les combinaisons de mots
-      foreach ($projetKeywordsCombinaisons as $synonym) {
-        $results = $this->keywordReferenceRepository->findCustom([
-          'name' => $synonym
-        ]);
-        /** @var KeywordReference $result */
-        foreach ($results as $result) {
-          // ajoute le mot
-          if ($result->isIntention()) {
-            $intentions[] = $result->getName();
-          } else {
-            $objects[] = $result->getName();
-          }
-
-          // si il a des enfants
-          foreach ($result->getKeywordReferences() as $keywordReference) {
-            if ($keywordReference->isIntention()) {
-              $intentions[] = $keywordReference->getName();
-            } else {
-              $objects[] = $keywordReference->getName();
-            }
-            foreach ($keywordReference->getKeywordReferences() as $subKeyword) {
-              if ($subKeyword->isIntention()) {
-                $intentions[] = $subKeyword->getName();
-              } else {
-                $objects[] = $subKeyword->getName();
-              }
-            }
-          }
-
-          // si il a un parent
-          if ($result->getParent()) {
-            if ($result->getParent()->isIntention()) {
-              $intentions[] = $result->getParent()->getName();
-            } else {
-              $objects[] = $result->getParent()->getName();
-            }
-            foreach ($result->getParent()->getKeywordReferences() as $subKeyword) {
-              if ($subKeyword->isIntention()) {
-                $intentions[] = $subKeyword->getName();
-              } else {
-                $objects[] = $subKeyword->getName();
-              }
-            }
-          }
-        }
       }
 
       // rends les tableaux unique
@@ -235,6 +172,20 @@ class ReferenceService
         return $highlightedWords;
     }
 
+    private function enleverArticlesFromArray(array $array): array
+    {
+      foreach($array as $key => $value) {
+        $value = str_replace(array("/","(",")",",",":","–"), " ",strtolower($value));
+        if (in_array($value, $this->articles)) {
+          unset($array[$key]);
+        } else {
+          $array[$key] = $value;
+        }
+      }
+
+      return $array;
+    }
+
     private function enleverArticles($content, $articles) {
         $content = str_replace(array("/","(",")",",",":","–"), " ",strtolower($content));
         foreach ($articles as $article) {
@@ -261,6 +212,27 @@ class ReferenceService
       return implode(" ", $words);
   }
   
+  private function genererToutesCombinaisons($keywords) {
+    if (empty($keywords)) {
+        return [''];
+    }
+
+    $premierMot = array_shift($keywords);
+    $combinaisonsSansPremier = $this->genererToutesCombinaisons($keywords);
+    $combinaisonsAvecPremier = [];
+
+    foreach ($combinaisonsSansPremier as $combinaison) {
+        $combinaisonsAvecPremier[] = $combinaison;
+        if (!empty($combinaison)) {
+            $combinaisonsAvecPremier[] = $premierMot . ' ' . $combinaison;
+        } else {
+            $combinaisonsAvecPremier[] = $premierMot;
+        }
+    }
+
+    return $combinaisonsAvecPremier;
+}
+
   
   private function genererCombinaisons($texte,$articles) {
     // Séparer le texte en mots

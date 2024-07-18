@@ -615,7 +615,7 @@ class AidRepository extends ServiceEntityRepository
 
             if ($intentionsString && $objectsString) {
                 $sqlIntentions = '
-                CASE WHEN (MATCH_AGAINST(a.name, a.nameInitial, a.description, a.eligibility, a.projectExamples) AGAINST(:intentions_string IN BOOLEAN MODE) > 1) THEN 1 ELSE 0 END 
+                CASE WHEN (MATCH_AGAINST(a.name, a.nameInitial, a.description, a.eligibility, a.projectExamples) AGAINST(:intentions_string IN BOOLEAN MODE) > 0.8) THEN 1 ELSE 0 END
                 ';
                 if (isset($sqlProjectReference) && $sqlProjectReference !== '') {
                     $sqlIntentions .= ' + '.$sqlProjectReference;
