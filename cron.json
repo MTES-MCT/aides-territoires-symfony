@@ -41,6 +41,9 @@
     },
     {
       "command": "30 8 * * SUN php bin/console at:import_flux:ademe_agir"
+    },
+    {
+      "command": "*/45 * * * * php bin/console at:cron:site:restart_worker"
     }
   ]
 }
