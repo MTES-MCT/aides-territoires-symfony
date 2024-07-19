@@ -691,6 +691,7 @@ class AidCrudController extends AtCrudController
             'by_reference' => false,
             'multiple' => true,
         ])
+        ->hideOnIndex()
         ;
 
         yield FormField::addFieldset('Uniquement pour les aides locales');
