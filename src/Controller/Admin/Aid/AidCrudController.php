@@ -48,6 +48,7 @@ use App\Repository\Reference\ProjectReferenceRepository;
 use App\Repository\User\UserRepository;
 use App\Service\Export\SpreadsheetExporterService;
 use App\Service\File\FileService;
+use DateTimeImmutable;
 use Doctrine\ORM\EntityRepository;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
@@ -959,8 +960,16 @@ class AidCrudController extends AtCrudController
                                 }
                             }
 
-                            $aid->setDateStart(trim($cells[14]->getValue() !== '') ? new \DateTime($cells[14]->getValue()) : null);
-                            $aid->setDateSubmissionDeadline(trim($cells[15]->getValue() !== '') ? new \DateTime($cells[15]->getValue()) : null);
+                            $dateStartFromCell = $cells[14]->getValue();
+                            if (!$dateStartFromCell instanceof DateTimeImmutable) {
+                                $dateStartFromCell = trim($cells[14]->getValue() !== '') ? new \DateTime($cells[14]->getValue()) : null;
+                            }
+                            $aid->setDateStart($dateStartFromCell);
+                            $dateSubmissionDeadlineFromCell = $cells[15]->getValue();
+                            if (!$dateSubmissionDeadlineFromCell instanceof DateTimeImmutable) {
+                                $dateSubmissionDeadlineFromCell = trim($cells[15]->getValue() !== '') ? new \DateTime($cells[15]->getValue()) : null;
+                            }
+                            $aid->setDateSubmissionDeadline($dateSubmissionDeadlineFromCell);
 
                             $aid->setEligibility(trim($cells[16]->getValue()) !== '' ? nl2br(trim($cells[16]->getValue())) : null);
 
