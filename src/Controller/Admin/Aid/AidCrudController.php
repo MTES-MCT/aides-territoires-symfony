@@ -686,6 +686,12 @@ class AidCrudController extends AtCrudController
         ->setHelp('Cette aide est-elle générique ?')
         ->hideOnIndex()
         ->setColumns(12);
+        yield AssociationField::new('sanctuarizedFields', 'Champs sacntuarisés')
+        ->setFormTypeOptions([
+            'by_reference' => false,
+            'multiple' => true,
+        ])
+        ;
 
         yield FormField::addFieldset('Uniquement pour les aides locales');
         yield AssociationField::new('genericAid', 'Aide générique')
