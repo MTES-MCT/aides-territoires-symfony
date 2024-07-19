@@ -212,25 +212,27 @@ class ReferenceService
       return implode(" ", $words);
   }
   
+  // combinaisons de 2 mots
   private function genererToutesCombinaisons($keywords) {
-    if (empty($keywords)) {
-        return [''];
+    sort($keywords);
+    $combinaisons = [];
+    $nombreDeMots = count($keywords);
+
+    // Si aucun mot ou un seul mot est fourni, retourne les mots tels quels.
+    if ($nombreDeMots <= 1) {
+        return $keywords;
     }
 
-    $premierMot = array_shift($keywords);
-    $combinaisonsSansPremier = $this->genererToutesCombinaisons($keywords);
-    $combinaisonsAvecPremier = [];
-
-    foreach ($combinaisonsSansPremier as $combinaison) {
-        $combinaisonsAvecPremier[] = $combinaison;
-        if (!empty($combinaison)) {
-            $combinaisonsAvecPremier[] = $premierMot . ' ' . $combinaison;
-        } else {
-            $combinaisonsAvecPremier[] = $premierMot;
+    for ($i = 0; $i < $nombreDeMots; $i++) {
+        for ($j = 0; $j < $nombreDeMots; $j++) {
+            if ($i != $j) {
+                // Ajoute la combinaison du mot actuel avec chaque autre mot.
+                $combinaisons[] = $keywords[$i] . ' ' . $keywords[$j];
+            }
         }
     }
 
-    return $combinaisonsAvecPremier;
+    return $combinaisons;
 }
 
   
