@@ -686,7 +686,7 @@ class AidCrudController extends AtCrudController
         ->setHelp('Cette aide est-elle générique ?')
         ->hideOnIndex()
         ->setColumns(12);
-        yield AssociationField::new('sanctuarizedFields', 'Champs sacntuarisés')
+        yield AssociationField::new('sanctuarizedFields', 'Champs sanctuarisés')
         ->setFormTypeOptions([
             'by_reference' => false,
             'multiple' => true,
