@@ -104,7 +104,6 @@ class ProjectReferenceController extends FrontController
         }
         $aids = [];
         if ($name) {
-            // $aids = $aidRepository->findAidsBySynonyms(array_merge($aidParams, $referenceService->getSynonymes($name)));
             $aids = $aidRepository->findCustom(array_merge($aidParams, ['keyword' => $name]));
             $aids = $aidService->postPopulateAids($aids, $aidParams);
         }
