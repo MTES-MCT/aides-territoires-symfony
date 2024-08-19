@@ -50,6 +50,7 @@ use Doctrine\ORM\Mapping\OrderBy;
 use Scheb\TwoFactorBundle\Model\Totp\TotpConfiguration;
 use Scheb\TwoFactorBundle\Model\Totp\TotpConfigurationInterface;
 use Scheb\TwoFactorBundle\Model\Totp\TwoFactorInterface;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: '`user`')]
@@ -96,12 +97,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
     private ?int $id = null;
 
     #[ORM\Column(length: 180, unique: true)]
+    #[Assert\NotNull()]
+    #[Assert\NotBlank()]
+    #[Assert\Length(max: 180)]
     private ?string $email = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\Length(max: 255)]
     private ?string $firstname = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\Length(max: 255)]
     private ?string $lastname = null;
 
     #[ORM\Column]
@@ -126,6 +132,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
     private ?bool $mlConsent = false;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Assert\Length(max: 255)]
     private ?string $image = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
@@ -153,36 +160,46 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
     private ?\DateTimeInterface $timeJoinOrganization = null;
 
     #[ORM\Column(length: 32, nullable: true)]
+    #[Assert\Length(max: 32)]
     private ?string $acquisitionChannel = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Assert\Length(max: 255)]
     private ?string $acquisitionChannelComment = null;
 
     #[ORM\Column]
     private ?int $notificationCounter = 0;
 
     #[ORM\Column(length: 32)]
+    #[Assert\Length(max: 32)]
     private ?string $notificationEmailFrequency = self::NOTIFICATION_DAILY;
 
     #[ORM\Column(length: 35, nullable: true)]
+    #[Assert\Length(max: 32)]
     private ?string $contributorContactPhone = null;
 
     #[ORM\Column(length: 128, nullable: true)]
+    #[Assert\Length(max: 128)]
     private ?string $contributorOrganization = null;
 
     #[ORM\Column(length: 128, nullable: true)]
+    #[Assert\Length(max: 128)]
     private ?string $contributorRole = null;
 
     #[ORM\Column(length: 32, nullable: true)]
+    #[Assert\Length(max: 32)]
     private ?string $beneficiaryFunction = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Assert\Length(max: 255)]
     private ?string $totpSecret;
 
     #[ORM\Column(length: 128, nullable: true)]
+    #[Assert\Length(max: 128)]
     private ?string $beneficiaryRole = null;
 
     #[ORM\Column(length: 255, nullable: true, unique: true)]
+    #[Assert\Length(max: 255)]
     private ?string $apiToken = null;
 
     // Relations
