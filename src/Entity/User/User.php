@@ -1379,19 +1379,15 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
 
         if ($this->getDefaultOrganization()) {
             if ($this->getDefaultOrganization()->getOrganizationType()) {
-                $preferences['targeted_audiences'] = $this->getDefaultOrganization()->getOrganizationType()->getSlug();
+                $preferences['organizationType'] = $this->getDefaultOrganization()->getOrganizationType()->getSlug();
             }
 
             if ($this->getDefaultOrganization()->getPerimeter()) {
-                $preferences['perimeter'] = $this->getDefaultOrganization()->getPerimeter()->getId();
+                $preferences['searchPerimeter'] = $this->getDefaultOrganization()->getPerimeter()->getId();
             }
         }
 
         return $preferences;
-    }
-
-    public function getSearchPreferencesString() : string {
-        return join('&', $this->getSearchPreferences());
     }
 
     /**
