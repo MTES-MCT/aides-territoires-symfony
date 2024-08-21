@@ -12,6 +12,8 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Attribute\Groups;
+use Gedmo\Mapping\Annotation as Gedmo;
+
 #[ApiResource(
     // shortName: 'Porteurs',
     operations: [
@@ -49,9 +51,11 @@ class BackerGroup
     #[ORM\Column(length: 255)]
     private ?string $name = null;
 
+    #[Gedmo\Slug(fields: ['name'])]
     #[ORM\Column(length: 255)]
     private ?string $slug = null;
 
+    #[Gedmo\Timestampable(on: 'create')]
     #[Groups([self::API_GROUP_LIST])]
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $timeCreate = null;
