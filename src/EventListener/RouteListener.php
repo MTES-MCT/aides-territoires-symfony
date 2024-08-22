@@ -3,9 +3,11 @@
 namespace App\EventListener;
 
 use App\Controller\Page\PageController;
+use App\Entity\Log\LogUrlRedirect;
 use App\Entity\Page\Page;
 use App\Entity\Program\Program;
 use App\Entity\Search\SearchPage;
+use App\Entity\Site\UrlRedirect;
 use App\Entity\User\User;
 use App\Repository\Page\PageRepository;
 use App\Repository\Search\SearchPageRepository;
@@ -65,6 +67,9 @@ final class RouteListener
         // Le sous-domaine est le premier composant
         $subdomain = $hostParts[0] ?? null;
         $this->handleSubdomain($event, $subdomain);
+
+        // url de redirections
+        $this->handleRedirect($event);
 
         // regarde si une page corresponds à l'url demandée
         $this->handlePage($event);
@@ -135,6 +140,44 @@ final class RouteListener
                     $event->setResponse($response);
                     return;
                 }
+            }
+        }
+    }
+
+    private function handleRedirect(RequestEvent $event): void
+    {
+        // url demandée
+        $url = urldecode($event->getRequest()->getRequestUri()) ?? null;
+
+        $urlRedirectRepository = $this->entityManagerInterface->getRepository(UrlRedirect::class);
+
+        // regarde si une url de redirection corresponds à l'url demandée
+        $urlRedirect = $urlRedirectRepository->findOneBy(
+            [
+                'oldUrl' => $url,
+            ]
+        );
+
+        // si url de redirection trouvée
+        if ($urlRedirect instanceof UrlRedirect) {
+            try {
+                // log du redirect
+                $logUrlRedirect = new LogUrlRedirect();
+                $logUrlRedirect->setUrlRedirect($urlRedirect);
+                $logUrlRedirect->setIp($event->getRequest()->getClientIp() ?? null);
+                $logUrlRedirect->setReferer($event->getRequest()->headers->get('referer') ?? null);
+                $logUrlRedirect->setUserAgent($event->getRequest()->headers->get('user-agent') ?? null);
+                $logUrlRedirect->setRequestUri($event->getRequest()->getRequestUri() ?? null);
+                $this->entityManagerInterface->persist($logUrlRedirect);
+                $this->entityManagerInterface->flush();
+
+                // redirige vers la nouvelle url
+                $response = new RedirectResponse($urlRedirect->getNewUrl());
+                $event->setResponse($response);
+                return;
+            } catch (\Exception $e) {
+                $admin = $this->entityManagerInterface->getRepository(User::class)->findOneBy(['email' => $this->paramService->get('email_super_admin')]);
+                $this->notificationService->addNotification($admin, 'Erreur redirection url', 'Url : '.$url);
             }
         }
     }

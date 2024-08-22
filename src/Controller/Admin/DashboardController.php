@@ -52,6 +52,7 @@ use App\Entity\Reference\KeywordReferenceSuggested;
 use App\Entity\Reference\ProjectReference;
 use App\Entity\Reference\ProjectReferenceCategory;
 use App\Entity\Search\SearchPage;
+use App\Entity\Site\UrlRedirect;
 use App\Entity\User\ApiTokenAsk;
 use App\Entity\User\User;
 use App\Repository\Backer\BackerAskAssociateRepository;
@@ -291,6 +292,7 @@ class DashboardController extends AbstractDashboardController
         ]);
 
         yield MenuItem::subMenu('Configuration système', 'fas fa-cogs')->setSubItems([
+            MenuItem::linkToCrud('Urls de redirections', 'fas fa-list', UrlRedirect::class),
             MenuItem::linkToCrud('Exports de données', 'fas fa-list', DataExport::class),
             MenuItem::linkToCrud('Sources de données', 'fas fa-list', DataSource::class),
             MenuItem::linkToRoute('Logs Symfony', 'fas fa-list', 'admin_log_symfony_download', [])
@@ -306,6 +308,7 @@ class DashboardController extends AbstractDashboardController
             MenuItem::linkToRoute('Projets référents', 'fas fa-list', 'admin_statistics_project_reference_dashboard', []),
             MenuItem::linkToRoute('Porteurs d\'aides', 'fas fa-list', 'admin_statistics_backer_dashboard', []),
             MenuItem::linkToRoute('Recherche', 'fas fa-list', 'admin_statistics_log_aid_search', []),
+            MenuItem::linkToRoute('Redirections', 'fas fa-list', 'admin_statistics_log_url_redirect', []),
             MenuItem::linkToRoute('Utilisateurs', 'fas fa-list', 'admin_statistics_user_dashboard', []),
             MenuItem::linkToRoute('Api - Utilisation', 'fas fa-list', 'admin_statistics_api_use', []),
             
