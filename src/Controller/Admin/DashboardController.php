@@ -308,6 +308,7 @@ class DashboardController extends AbstractDashboardController
             MenuItem::linkToRoute('Projets référents', 'fas fa-list', 'admin_statistics_project_reference_dashboard', []),
             MenuItem::linkToRoute('Porteurs d\'aides', 'fas fa-list', 'admin_statistics_backer_dashboard', []),
             MenuItem::linkToRoute('Recherche', 'fas fa-list', 'admin_statistics_log_aid_search', []),
+            MenuItem::linkToRoute('Redirections', 'fas fa-list', 'admin_statistics_log_url_redirect', []),
             MenuItem::linkToRoute('Utilisateurs', 'fas fa-list', 'admin_statistics_user_dashboard', []),
             MenuItem::linkToRoute('Api - Utilisation', 'fas fa-list', 'admin_statistics_api_use', []),
             

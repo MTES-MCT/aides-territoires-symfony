@@ -4,6 +4,7 @@ namespace App\Repository\Log;
 
 use App\Entity\Log\LogUrlRedirect;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -16,28 +17,39 @@ class LogUrlRedirectRepository extends ServiceEntityRepository
         parent::__construct($registry, LogUrlRedirect::class);
     }
 
-    //    /**
-    //     * @return LogUrlRedirect[] Returns an array of LogUrlRedirect objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('l')
-    //            ->andWhere('l.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('l.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
+    public function findGroupByUrl(?array $params = null) : array
+    {
+        $qb = $this->getQueryBuilder($params);
+        $qb->innerJoin('l.urlRedirect', 'urlRedirect');
+        $qb->select('urlRedirect.oldUrl, urlRedirect.newUrl, COUNT(l.id) as nb');
+        $qb->groupBy('urlRedirect.oldUrl, urlRedirect.newUrl');
+        $qb->orderBy('nb', 'DESC');
 
-    //    public function findOneBySomeField($value): ?LogUrlRedirect
-    //    {
-    //        return $this->createQueryBuilder('l')
-    //            ->andWhere('l.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+        return $qb->getQuery()->getResult();
+    }
+
+
+    public function getQueryBuilder(?array $params = null): QueryBuilder
+    {
+        $dateCreateMin = $params['dateCreateMin'] ?? null;
+        $dateCreateMax = $params['dateCreateMax'] ?? null;
+
+        $qb = $this->createQueryBuilder('l');
+        
+        if ($dateCreateMin instanceof \DateTime) {
+            $qb
+                ->andWhere('l.timeCreate >= :dateCreateMin')
+                ->setParameter('dateCreateMin', $dateCreateMin)
+            ;
+        }
+
+        if ($dateCreateMax instanceof \DateTime) {
+            $qb
+                ->andWhere('l.timeCreate <= :dateCreateMax')
+                ->setParameter('dateCreateMax', $dateCreateMax)
+            ;
+        }
+
+        return $qb;
+    }
 }
