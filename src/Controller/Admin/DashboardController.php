@@ -52,6 +52,7 @@ use App\Entity\Reference\KeywordReferenceSuggested;
 use App\Entity\Reference\ProjectReference;
 use App\Entity\Reference\ProjectReferenceCategory;
 use App\Entity\Search\SearchPage;
+use App\Entity\Site\UrlRedirect;
 use App\Entity\User\ApiTokenAsk;
 use App\Entity\User\User;
 use App\Repository\Backer\BackerAskAssociateRepository;
@@ -291,6 +292,7 @@ class DashboardController extends AbstractDashboardController
         ]);
 
         yield MenuItem::subMenu('Configuration système', 'fas fa-cogs')->setSubItems([
+            MenuItem::linkToCrud('Urls de redirections', 'fas fa-list', UrlRedirect::class),
             MenuItem::linkToCrud('Exports de données', 'fas fa-list', DataExport::class),
             MenuItem::linkToCrud('Sources de données', 'fas fa-list', DataSource::class),
             MenuItem::linkToRoute('Logs Symfony', 'fas fa-list', 'admin_log_symfony_download', [])
