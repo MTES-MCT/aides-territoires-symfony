@@ -12,6 +12,8 @@ use Symfony\Component\Validator\Constraints as Assert;
 use Gedmo\Mapping\Annotation as Gedmo;
 
 #[ORM\Entity(repositoryClass: UrlRedirectRepository::class)]
+#[ORM\Index(columns: ['old_url'], name: 'old_url_url_redirect')]
+#[ORM\Index(columns: ['date_create'], name: 'date_create_url_redirect')]
 class UrlRedirect
 {
     #[ORM\Id]

@@ -11,6 +11,10 @@ use Symfony\Component\Validator\Constraints as Assert;
 use Gedmo\Mapping\Annotation as Gedmo;
 
 #[ORM\Entity(repositoryClass: LogUrlRedirectRepository::class)]
+#[ORM\Index(columns: ['date_create'], name: 'date_create_lurlred')]
+#[ORM\Index(columns: ['ip'], name: 'ip_lurlred')]
+#[ORM\Index(columns: ['referer'], name: 'referer_lurlred')]
+#[ORM\Index(columns: ['request_uri'], name: 'request_uri_lurlred')]
 class LogUrlRedirect
 {
     #[ORM\Id]
@@ -29,6 +33,10 @@ class LogUrlRedirect
     #[Assert\Length(max: 700)]
     #[ORM\Column(length: 700, nullable: true)]
     private ?string $referer = null;
+
+    #[Assert\Length(max: 700)]
+    #[ORM\Column(length: 700, nullable: true)]
+    private ?string $requestUri = null;
 
     #[Assert\Length(max: 255)]
     #[ORM\Column(length: 255, nullable: true)]
@@ -115,6 +123,18 @@ class LogUrlRedirect
     public function setDateCreate(\DateTimeInterface $dateCreate): static
     {
         $this->dateCreate = $dateCreate;
+
+        return $this;
+    }
+
+    public function getRequestUri(): ?string
+    {
+        return $this->requestUri;
+    }
+
+    public function setRequestUri(?string $requestUri): static
+    {
+        $this->requestUri = $requestUri;
 
         return $this;
     }
