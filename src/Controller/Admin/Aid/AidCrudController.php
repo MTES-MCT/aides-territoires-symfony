@@ -243,6 +243,10 @@ class AidCrudController extends AtCrudController
         $entity = $this->getContext()->getEntity()->getInstance() ?? null;
         $badgeNoBackerAssociate = '<span class="badge badge-warning">(pas de porteur associé)</span>';
         $badgeNoBackerValid = '<span class="badge badge-warning">(porteur associé non validé)</span>';
+        $projectReferencesSuggestions = [];
+        if ($entity instanceof Aid) {
+            $projectReferencesSuggestions = $this->aidService->getSuggestedProjectReferences($entity);
+        }
         //-------------------------------------------------------
         yield FormField::addTab('Informations générales');
 
@@ -336,6 +340,22 @@ class AidCrudController extends AtCrudController
         }, $value->toArray()));
         })
         ->onlyOnIndex();
+
+        if (!empty($projectReferencesSuggestions)) {
+            $entity->setProjectReferencesSuggestions($projectReferencesSuggestions);
+            yield ArrayField::new('projectReferencesSuggestions', 'Projets référents suggérés')
+                ->setHelp('Ces résultats sont proposés en fonction de ce que donne la recherche.')
+                ->formatValue(function ($value) {
+                return implode('', array_map(function ($projectReference) {
+                    return '- '.$projectReference->getName().'<br>';
+                }, $value->toArray()));
+                })
+                ->setFormTypeOption('allow_add', false)
+                ->setFormTypeOption('allow_delete', false)
+                ;
+        }
+
+
         yield ArrayField::new('keywordReferences', 'Mots clés référents')
         ->formatValue(function ($value, $entity) {
         return implode('', array_map(function ($keywordReference) {
