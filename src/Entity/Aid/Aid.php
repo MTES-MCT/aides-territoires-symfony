@@ -655,6 +655,8 @@ class Aid // NOSONAR too much methods
 
     private ArrayCollection $instructors;
 
+    private array $projectReferencesSuggestions = [];
+
     #[ORM\ManyToOne(inversedBy: 'aids')]
     #[ORM\JoinColumn(onDelete: DoctrineConstants::SET_NULL)]
     private ?Organization $organization = null;
@@ -672,6 +674,7 @@ class Aid // NOSONAR too much methods
 
     #[Groups([self::API_GROUP_LIST, self::API_GROUP_ITEM])]
     #[ORM\ManyToMany(targetEntity: ProjectReference::class, inversedBy: 'aids')]
+    #[ORM\OrderBy(['name' => 'ASC'])]
     private Collection $projectReferences;
 
     #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
@@ -2693,6 +2696,17 @@ class Aid // NOSONAR too much methods
     public function setImportDatas(?array $importDatas): static
     {
         $this->importDatas = $importDatas;
+        return $this;
+    }
+
+    public function getProjectReferencesSuggestions(): array
+    {
+        return $this->projectReferencesSuggestions;
+    }
+
+    public function setProjectReferencesSuggestions(array $projectReferenceSuggestions): static
+    {
+        $this->projectReferencesSuggestions = $projectReferenceSuggestions;
         return $this;
     }
 }

@@ -72,11 +72,6 @@ class ReferenceService
       $keywords = array_filter($keywords);
       $keywords = array_unique($keywords);
 
-      // on regarde si ça corresponds à des mots clés de la base de données
-      $keywordReferences = $this->keywordReferenceRepository->findCustom([
-          'names' => $keywords
-      ]);
-
       // Prépare deux tableaux pour les intentions et les objets
       $intentions = [];
       $objects = [];
@@ -89,6 +84,10 @@ class ReferenceService
         }
       }
 
+      // on regarde si ça corresponds à des mots clés de la base de données
+      $keywordReferences = $this->keywordReferenceRepository->findCustom([
+          'names' => $keywords
+      ]);
       // parcours les mots clés restant
       foreach ($keywordReferences as $key => $result) {
           // si dans la liste d'exclusion
@@ -137,6 +136,26 @@ class ReferenceService
           }
       }
 
+      // // optimisation a valider
+      // $keywordReferences = $this->keywordReferenceRepository->findArrayOfAllSynonyms([
+      //   'names' => $keywords,
+      //   'excludeds' => $excludedKeywordReferenceNames
+      // ]);
+      // foreach ($keywordReferences as $key => $result) {
+      //   // si dans la liste d'exclusion
+      //   if (in_array($result['name'], $excludedKeywordReferenceNames)) {
+      //     unset($keywordReferences[$key]);
+      //     continue;
+      //   }
+
+      //   // ajoute le mot
+      //   if ($result['intention']) {
+      //     $intentions[] = $result['name'];
+      //   } else {
+      //     $objects[] = $result['name'];
+      //   }
+      // }
+      
       // rends les tableaux unique
       $intentions = array_unique($intentions);
       $objects = array_unique($objects);

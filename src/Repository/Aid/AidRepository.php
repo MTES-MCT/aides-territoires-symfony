@@ -246,7 +246,7 @@ class AidRepository extends ServiceEntityRepository
         foreach ($results as $result) {
             if ($result instanceof Aid) {
                 $return[] = $result;
-            } else if (is_array($result) && isset($result[0]) && $result[0] instanceof Aid) {
+            } elseif (is_array($result) && isset($result[0]) && $result[0] instanceof Aid) {
                 if (isset($result['score_total'])) {
                     $result[0]->setScoreTotal($result['score_total']);
                 }

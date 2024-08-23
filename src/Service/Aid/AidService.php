@@ -38,6 +38,30 @@ class AidService // NOSONAR too complex
         
     }
 
+    public function getSuggestedProjectReferences(Aid $aid): array
+    {
+        $projectReferencesSuggestions = [];
+        $projectReferenceRepository = $this->managerRegistry->getRepository(ProjectReference::class);
+        $projectReferences = $projectReferenceRepository->findBy(
+            [],
+            ['name' => 'ASC']
+        );
+
+        // Pour chaque projet référent on faire une recherche pour voir si l'aide sort
+        foreach ($projectReferences as $projectReference) {
+            $aids = $this->searchAids(
+                [
+                    'id' => $aid->getId(),
+                    'keyword' => $projectReference->getName()
+                ]
+            );
+            if (!empty($aids)) {
+                $projectReferencesSuggestions[] = $projectReference;
+            }
+        }
+        return $projectReferencesSuggestions;
+    }
+
     public function getAidDuplicates(Aid $aid): array
     {
         if (!$aid->getOriginUrl()) {

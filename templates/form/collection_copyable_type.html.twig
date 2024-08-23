@@ -1,0 +1,18 @@
+{% block collection_copyable_type_row %}
+    {% set randNumForm = random()|replace({'.': ''}) %}
+    <div class="form-group">
+        {{ form_label(form) }}
+        {{ form_errors(form) }}
+        
+        <ul>
+        {% for item in form.vars.value %}
+            <li>
+                {% if item.name is defined %}
+                    <span id="item_{{ randNumForm }}_{{ loop.index }}">{{ item.name }}</span> <button class="btn-copy-clipboard" data-clipboard-target="#item_{{ randNumForm }}_{{ loop.index }}"><i class="fas fa-clipboard"></i></button>
+                {% endif %}
+            </li>
+        {% endfor %}
+        </ul>
+        {{ form_help(form) }}
+    </div>
+{% endblock %}
