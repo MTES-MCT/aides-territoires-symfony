@@ -83,7 +83,7 @@ class AidExportPdfHandler
                 mkdir($tmpFolder, 0777, true);
             }
 
-            $fileTarget = $tmpFolder.$filename.'.pdf';
+            $fileTarget = $tmpFolder.'/'.$filename.'.pdf';
             // Enregistre le fichier PDF dans le dossier temporaire
             file_put_contents($fileTarget, $dompdf->output());
 
