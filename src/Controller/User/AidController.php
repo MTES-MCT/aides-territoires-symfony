@@ -13,6 +13,7 @@ use App\Form\Aid\AidEditType;
 use App\Form\User\Aid\AidExportType;
 use App\Form\User\Aid\AidFilterType;
 use App\Form\User\Aid\AidStatsPeriodType;
+use App\Message\User\AidsExportPdf;
 use App\Repository\Aid\AidProjectRepository;
 use App\Repository\Aid\AidRepository;
 use App\Repository\Log\LogAidApplicationUrlClickRepository;
@@ -23,7 +24,6 @@ use App\Service\Security\SecurityService;
 use App\Service\User\UserService;
 use App\Service\Various\StringService;
 use Doctrine\Persistence\ManagerRegistry;
-use Liip\ImagineBundle\Exception\Config\Filter\NotFoundException;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -32,6 +32,7 @@ use Dompdf\Options;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 
@@ -362,11 +363,10 @@ class AidController extends FrontController
         RequestStack $requestStack,
         AidRepository $aidRepository,
         StringService $stringService,
-        RouterInterface $routerInterface
+        RouterInterface $routerInterface,
+        MessageBusInterface $messageBus
     )
     {
-        ini_set('max_execution_time', 300);
-        
         // le user
         $user = $userService->getUserLogged();
 
@@ -383,6 +383,16 @@ class AidController extends FrontController
                     ]
                 );
 
+                // si pdf
+                if ($formExport->get('format')->getData() == 'pdf') {
+                    $messageBus->dispatch(new AidsExportPdf($user->getId(), $user->getDefaultOrganization() ? $user->getDefaultOrganization()->getId() : 0));
+                    $this->addFlash(
+                        FrontController::FLASH_SUCCESS,
+                        'Votre export PDF est en cours de génération. Vous recevrez un email avec le fichier.'
+                    );
+                    return $this->redirectToRoute('app_user_aid_publications');
+                } else {
+                // si tableur
                 // alimente la réponse
                 $response = $this->getExportStreamedResponse(
                     $formExport->get('format')->getData(),
@@ -391,6 +401,7 @@ class AidController extends FrontController
                     $stringService,
                     $routerInterface
                 );
+                }
             }
         }
 
