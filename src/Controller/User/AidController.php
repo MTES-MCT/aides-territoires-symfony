@@ -365,6 +365,8 @@ class AidController extends FrontController
         RouterInterface $routerInterface
     )
     {
+        ini_set('max_execution_time', 300);
+        
         // le user
         $user = $userService->getUserLogged();
 
