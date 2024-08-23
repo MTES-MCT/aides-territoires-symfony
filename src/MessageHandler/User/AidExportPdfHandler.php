@@ -34,75 +34,84 @@ class AidExportPdfHandler
 
     public function __invoke(AidsExportPdf $message): void
     {
-        /** @var UserRepository $userRepository */
-        $userRepository = $this->managerRegistry->getRepository(User::class);
-        $user = $userRepository->find($message->getIdUser());
-        if (!$user instanceof User) {
-            return;
-        }
+        try {
+            /** @var UserRepository $userRepository */
+            $userRepository = $this->managerRegistry->getRepository(User::class);
+            $user = $userRepository->find($message->getIdUser());
+            if (!$user instanceof User) {
+                return;
+            }
 
-        /** @var AidRepository $aidRepository */
-        $aidRepository = $this->managerRegistry->getRepository(Aid::class);
+            /** @var AidRepository $aidRepository */
+            $aidRepository = $this->managerRegistry->getRepository(Aid::class);
 
-        // les aides
-        $aids = $aidRepository->findCustom(
-            [
-                'author' => $user,
-                'showInSearch' => true
-            ]
-        );
-
-        // nom de fichier
-        $today = new \DateTime(date('Y-m-d H:i:s'));
-        $organizationName = $user->getDefaultOrganization() ? $this->stringService->getSLug($user->getDefaultOrganization()->getName()) : '';
-        $filename = 'Aides-territoires-'.$today->format('d_m_Y').'-'.$organizationName;
-
-        // créer le PDF
-        $pdfOptions = new Options();
-        $pdfOptions->setIsRemoteEnabled(true);
-
-        // instantiate and use the dompdf class
-        $dompdf = new Dompdf($pdfOptions);
-
-        $dompdf->loadHtml(
-            $this->twig->render('user/aid/aids_export_pdf.html.twig', [
-                'aids' => $aids,
-                'organization' => $user->getDefaultOrganization() ?? null
-            ])
-        );
-
-        // (Optional) Setup the paper size and orientation
-        $dompdf->setPaper('A4', 'portrait');
-
-        // Render the HTML as PDF
-        $dompdf->render();
-
-        $tmpFolder = $this->fileService->getUploadTmpDir();
-        if (!is_dir($tmpFolder)) {
-            mkdir($tmpFolder, 0777, true);
-        }
-
-        $fileTarget = $tmpFolder.$filename.'.pdf';
-        // Enregistre le fichier PDF dans le dossier temporaire
-        file_put_contents($fileTarget, $dompdf->output());
-
-        // Envoi l'email
-        $this->emailService->sendEmail(
-            $user->getEmail(),
-            'Export des aides',
-            'emails/base.html.twig',
-            [
-                'subject' => 'Export des aides',
-                'body' => 'Votre export en pièce jointe',
-            ],
-            [
-                'attachments' => [
-                    $fileTarget
+            // les aides
+            $aids = $aidRepository->findCustom(
+                [
+                    'author' => $user,
+                    'showInSearch' => true
                 ]
-            ]
-        );
+            );
 
-        // Supprime le fichier
-        @unlink($fileTarget);
+            // nom de fichier
+            $today = new \DateTime(date('Y-m-d H:i:s'));
+            $organizationName = $user->getDefaultOrganization() ? $this->stringService->getSLug($user->getDefaultOrganization()->getName()) : '';
+            $filename = 'Aides-territoires-'.$today->format('d_m_Y').'-'.$organizationName;
+
+            // créer le PDF
+            $pdfOptions = new Options();
+            $pdfOptions->setIsRemoteEnabled(true);
+
+            // instantiate and use the dompdf class
+            $dompdf = new Dompdf($pdfOptions);
+
+            $dompdf->loadHtml(
+                $this->twig->render('user/aid/aids_export_pdf.html.twig', [
+                    'aids' => $aids,
+                    'organization' => $user->getDefaultOrganization() ?? null
+                ])
+            );
+
+            // (Optional) Setup the paper size and orientation
+            $dompdf->setPaper('A4', 'portrait');
+
+            // Render the HTML as PDF
+            $dompdf->render();
+
+            $tmpFolder = $this->fileService->getUploadTmpDir();
+            if (!is_dir($tmpFolder)) {
+                mkdir($tmpFolder, 0777, true);
+            }
+
+            $fileTarget = $tmpFolder.$filename.'.pdf';
+            // Enregistre le fichier PDF dans le dossier temporaire
+            file_put_contents($fileTarget, $dompdf->output());
+
+            // Envoi l'email
+            $this->emailService->sendEmail(
+                $user->getEmail(),
+                'Export des aides',
+                'emails/base.html.twig',
+                [
+                    'subject' => 'Export des aides',
+                    'body' => 'Votre export en pièce jointe',
+                ],
+                [
+                    'attachments' => [
+                        $fileTarget
+                    ]
+                ]
+            );
+
+            // Supprime le fichier
+            @unlink($fileTarget);
+        } catch (\Exception $e) {
+            $admin = $this->managerRegistry->getRepository(User::class)->findOneBy(['email' => $this->paramService->get('email_super_admin')]);
+            $this->notificationService->addNotification(
+                $admin,
+                'Erreur lors de l\'export PDF des aides',
+                $e->getMessage()
+            );
+        }
     }
 }
