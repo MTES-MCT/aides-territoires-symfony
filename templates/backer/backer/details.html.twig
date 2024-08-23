@@ -45,94 +45,114 @@
             {% endif %}
         </div> 
 
-        <div class="fr-grid-row fr-grid-row--gutters at--space-between">
-            {% if backer.perimeter %}
-            <div class="fr-col-12 at-background-alt-grey fr-mb-5w fr-p-5w">
-                <h2 class="fr-mt-1w">Zone géographique couverte</h2>
-                <p class="fr-mb-0">{{ backer.perimeter.name }}</p>
+        <div class="fr-tabs">
+            <ul class="fr-tabs__list" role="tablist" aria-label="[A modifier | nom du système d'onglet]">
+                {% if backer.perimeter or backer.backerType or backer.description or backer.projectsExamples or backer.internalOperation or backer.contact or backer.usefulLinks %}
+                <li role="presentation">
+                    <button id="tabpanel-about" class="fr-tabs__tab fr-icon-checkbox-line fr-tabs__tab--icon-left" tabindex="0" role="tab" aria-selected="true" aria-controls="tabpanel-about-panel">A propos</button>
+                </li>
+                {% endif %}
+                {% if aids %}
+                <li role="presentation">
+                    <button id="tabpanel-aids" class="fr-tabs__tab fr-icon-checkbox-line fr-tabs__tab--icon-left" tabindex="-1" role="tab" aria-selected="false" aria-controls="tabpanel-aids-panel">Aides</button>
+                </li>
+                {% endif %}
+                {% if categories_by_theme|length > 0 %}
+                <li role="presentation">
+                    <button id="tabpanel-categories" class="fr-tabs__tab fr-icon-checkbox-line fr-tabs__tab--icon-left" tabindex="-1" role="tab" aria-selected="false" aria-controls="tabpanel-categories-panel">Thématiques</button>
+                </li>
+                {% endif %}
+                {% if programs_list|length > 0 %}
+                <li role="presentation">
+                    <button id="tabpanel-programs" class="fr-tabs__tab fr-icon-checkbox-line fr-tabs__tab--icon-left" tabindex="-1" role="tab" aria-selected="false" aria-controls="tabpanel-programs-panel">Programmes</button>
+                </li>
+                {% endif %}
+            </ul>
+
+            {% if backer.perimeter or backer.backerType or backer.description or backer.projectsExamples or backer.internalOperation or backer.contact or backer.usefulLinks %}
+            <div id="tabpanel-about-panel" class="fr-tabs__panel fr-tabs__panel--selected" role="tabpanel" aria-labelledby="tabpanel-about" tabindex="0">
+                {% if backer.perimeter %}
+                <div class="fr-col-12 at-background-alt-grey fr-mb-5w fr-p-5w">
+                    <h2 class="fr-mt-1w">Zone géographique couverte</h2>
+                    <p class="fr-mb-0">{{ backer.perimeter.name }}</p>
+                </div>
+                {% endif %}
+                {% if backer.backerType %}
+                    <div class="fr-col-12 at-background-alt-grey fr-mb-5w fr-p-5w">
+                        <h2 class="fr-mt-1w">Type de porteur</h2>
+                        {{ backer.backerType|sanitize_html|raw }}
+                    </div>
+                {% endif %}
+
+                {% if backer.description %}
+                    <div class="fr-col-12 at-background-alt-grey fr-mb-5w fr-p-5w">
+                        <h2 class="fr-mt-1w">Présentation générale</h2>
+                        {{ backer.description|sanitize_html|raw }}
+                    </div>
+                {% endif %}
+
+                {% if backer.projectsExamples %}
+                    <div class="fr-col-12 at-background-alt-grey fr-mb-5w fr-p-5w">
+                        <h2 class="fr-mt-1w">Exemples de projets accompagnés par le porteur</h2>
+                        {{ backer.projectsExamples|sanitize_html|raw }}
+                    </div>
+                {% endif %}
+
+                {% if backer.internalOperation %}
+                    <div class="fr-col-12 at-background-alt-grey fr-mb-5w fr-p-5w">
+                        <h2 class="fr-mt-1w">Mode de fonctionnement interne pour obtenir une aide </h2>
+                        {{ backer.internalOperation|sanitize_html|raw }}
+                    </div>
+                {% endif %}
+
+                {% if backer.contact %}
+                    <div class="fr-col-12 at-background-alt-grey fr-mb-5w fr-p-5w">
+                        <h2 class="fr-mt-1w">Contact</h2>
+                        {{ backer.contact|sanitize_html|raw }}
+                    </div>
+                {% endif %}
+
+                {% if backer.usefulLinks %}
+                    <div class="fr-col-12 at-background-alt-grey fr-mb-5w fr-p-5w">
+                        <h2 class="fr-mt-1w">Liens utiles</h2>
+                        {{ backer.usefulLinks|sanitize_html|raw }}
+                    </div>
+                {% endif %}
             </div>
             {% endif %}
-            {% if backer.backerType %}
-                <div class="fr-col-12 at-background-alt-grey fr-mb-5w fr-p-5w">
-                    <h2 class="fr-mt-1w">Type de porteur</h2>
-                    {{ backer.backerType|sanitize_html|raw }}
-                </div>
-            {% endif %}
-
-            {% if backer.description %}
-                <div class="fr-col-12 at-background-alt-grey fr-mb-5w fr-p-5w">
-                    <h2 class="fr-mt-1w">Présentation générale</h2>
-                    {{ backer.description|sanitize_html|raw }}
-                </div>
-            {% endif %}
-
-            {% if backer.projectsExamples %}
-                <div class="fr-col-12 at-background-alt-grey fr-mb-5w fr-p-5w">
-                    <h2 class="fr-mt-1w">Exemples de projets accompagnés par le porteur</h2>
-                    {{ backer.projectsExamples|sanitize_html|raw }}
-                </div>
-            {% endif %}
-
-            {% if backer.internalOperation %}
-                <div class="fr-col-12 at-background-alt-grey fr-mb-5w fr-p-5w">
-                    <h2 class="fr-mt-1w">Mode de fonctionnement interne pour obtenir une aide </h2>
-                    {{ backer.internalOperation|sanitize_html|raw }}
-                </div>
-            {% endif %}
-
-            {% if backer.contact %}
-                <div class="fr-col-12 at-background-alt-grey fr-mb-5w fr-p-5w">
-                    <h2 class="fr-mt-1w">Contact</h2>
-                    {{ backer.contact|sanitize_html|raw }}
-                </div>
-            {% endif %}
-
-            {% if backer.usefulLinks %}
-                <div class="fr-col-12 at-background-alt-grey fr-mb-5w fr-p-5w">
-                    <h2 class="fr-mt-1w">Liens utiles</h2>
-                    {{ backer.usefulLinks|sanitize_html|raw }}
-                </div>
-            {% endif %}
-        </div>
-
-        <div class="fr-grid-row fr-grid-row--gutters at--space-between">
             {% if aids %}
-                <div class="fr-col-12 fr-col-md-8 at-background-alt-grey">
-                    <h2 class="fr-mt-1w">Aides</h2>
-                    <div>
-                        {% include "aid/aid/_aid_result_as_list.html.twig" %}
-                    </div>
+            <div id="tabpanel-aids-panel" class="fr-tabs__panel" role="tabpanel" aria-labelledby="tabpanel-aids" tabindex="0">
+                <div>
+                    {% include "aid/aid/_aid_result_as_list.html.twig" %}
                 </div>
-
-                 <div class="fr-col-12 fr-col-md-3 at-background-alt-grey fr-px-5w">
-                    <div>
-                        <h2 class="fr-mt-1w">Thématiques</h2>
-                        <div class="backer-categories">
-                            {% for category_theme in categories_by_theme %}
-                                <div class="theme fr-mt-1w">
-                                    <p>
-                                        <strong>{{ category_theme.categoryTheme.name }}</strong>
-                                    </p>
-                                    <div class="fr-tags-group">
-                                    {% for category in category_theme.categories %}
-                                        <p class="fr-tag">{{ category.name }}</p>
-                                    {% endfor %}
-                                    </div>
-                                </div>
-                            {% endfor %}
-                        </div>
-                    </div>
-                     {% if programs_list %}
-                        <div>
-                            <h2>Programmes</h2>
+            </div>
+            {% endif %}
+            {% if categories_by_theme|length > 0 %}
+            <div id="tabpanel-categories-panel" class="fr-tabs__panel" role="tabpanel" aria-labelledby="tabpanel-categories" tabindex="0">
+                <div class="backer-categories">
+                    {% for category_theme in categories_by_theme %}
+                        <div class="theme fr-mt-1w">
+                            <p>
+                                <strong>{{ category_theme.categoryTheme.name }}</strong>
+                            </p>
                             <div class="fr-tags-group">
-                                {% for programList in programs_list %}
-                                    <p class="fr-tag">{{ programList.program.name|raw }}</p>
-                                {% endfor %}
+                            {% for category in category_theme.categories %}
+                                <p class="fr-tag">{{ category.name }}</p>
+                            {% endfor %}
                             </div>
                         </div>
-                    {% endif %} 
-                </div> 
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+            {% if programs_list|length > 0 %}
+            <div id="tabpanel-programs-panel" class="fr-tabs__panel" role="tabpanel" aria-labelledby="tabpanel-programs" tabindex="0">
+                <div class="fr-tags-group">
+                    {% for programList in programs_list %}
+                        <p class="fr-tag">{{ programList.program.name|raw }}</p>
+                    {% endfor %}
+                </div>
+            </div>
             {% endif %}
         </div>
     </section>    
