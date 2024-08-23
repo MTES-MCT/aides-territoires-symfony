@@ -341,19 +341,20 @@ class AidCrudController extends AtCrudController
         })
         ->onlyOnIndex();
 
-        if (!empty($projectReferencesSuggestions)) {
-            $entity->setProjectReferencesSuggestions($projectReferencesSuggestions);
-            yield ArrayField::new('projectReferencesSuggestions', 'Projets référents suggérés')
-                ->setHelp('Ces résultats sont proposés en fonction de ce que donne la recherche.')
-                ->formatValue(function ($value) {
-                return implode('', array_map(function ($projectReference) {
-                    return '- '.$projectReference->getName().'<br>';
-                }, $value->toArray()));
-                })
-                ->setFormTypeOption('allow_add', false)
-                ->setFormTypeOption('allow_delete', false)
-                ;
-        }
+
+        $entity->setProjectReferencesSuggestions($projectReferencesSuggestions);
+        $help = !empty($projectReferencesSuggestions) ? 'Ces résultats sont proposés en fonction de ce que donne la recherche.' : 'Aucun projet référent suggéré pour cette aide.';
+        yield ArrayField::new('projectReferencesSuggestions', 'Projets référents suggérés')
+            ->setHelp($help)
+            ->formatValue(function ($value) {
+            return implode('', array_map(function ($projectReference) {
+                return '- '.$projectReference->getName().'<br>';
+            }, $value->toArray()));
+            })
+            ->setFormTypeOption('allow_add', false)
+            ->setFormTypeOption('allow_delete', false)
+            ;
+
 
 
         yield ArrayField::new('keywordReferences', 'Mots clés référents')
