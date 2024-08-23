@@ -105,6 +105,14 @@ class AidExportPdfHandler
 
             // Supprime le fichier
             @unlink($fileTarget);
+
+            $admin = $this->managerRegistry->getRepository(User::class)->findOneBy(['email' => $this->paramService->get('email_super_admin')]);
+            $this->notificationService->addNotification(
+                $admin,
+                'Export PDF des aides',
+                'fini ok'
+            );
+
         } catch (\Exception $e) {
             $admin = $this->managerRegistry->getRepository(User::class)->findOneBy(['email' => $this->paramService->get('email_super_admin')]);
             $this->notificationService->addNotification(
