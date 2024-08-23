@@ -1,10 +1,10 @@
 <?php
+
 namespace App\Field;
 
 use App\Form\Type\JsonCodeEditorType;
 use EasyCorp\Bundle\EasyAdminBundle\Contracts\Field\FieldInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Field\FieldTrait;
-use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 
 final class JsonField implements FieldInterface
 {

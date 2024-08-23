@@ -65,6 +65,9 @@ $(function(){
 
     // fonction copie dans clipboard
     $(document).on('click', '.btn-copy-clipboard', function(e) {
+        e.preventDefault();
+        // Recupère le bouton cliqué
+        var thisElt = $(this);
         // Récupère le sélecteur de l'élément cible depuis l'attribut data-clipboard-target
         var targetSelector = $(this).data('clipboard-target');
         var targetElement = $(targetSelector)[0]; // Obtient l'élément DOM natif
