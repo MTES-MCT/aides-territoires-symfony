@@ -111,18 +111,20 @@ class AidExportPdfHandler
             // Supprime le fichier
             @unlink($fileTarget);
 
+            // notif admin ok
             $admin = $this->managerRegistry->getRepository(User::class)->findOneBy(['email' => $this->paramService->get('email_super_admin')]);
             $this->notificationService->addNotification(
                 $admin,
-                'Export PDF des aides',
-                'fini ok'
+                'Export PDF des aides par '.$user->getEmail(). ' de '.$organizationName,
+                'Export ok'
             );
 
         } catch (\Exception $e) {
+            // notif admin erreur
             $admin = $this->managerRegistry->getRepository(User::class)->findOneBy(['email' => $this->paramService->get('email_super_admin')]);
             $this->notificationService->addNotification(
                 $admin,
-                'Erreur lors de l\'export PDF des aides',
+                'Erreur lors de l\'export PDF des aides par '.$user->getEmail(). ' de '.$organizationName,
                 $e->getMessage()
             );
         }

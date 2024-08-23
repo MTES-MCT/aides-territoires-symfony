@@ -170,9 +170,6 @@ class AidController extends FrontController
         // formulaire export aide
         $formExport = $this->createForm(AidExportType::class, null, [
             'action' => $this->generateUrl('app_user_aids_export'),
-            'attr' => [
-                'target' => '_blank'
-            ]
         ]);
 
         // les aides du user
