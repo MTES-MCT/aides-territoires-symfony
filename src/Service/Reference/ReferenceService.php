@@ -72,11 +72,6 @@ class ReferenceService
       $keywords = array_filter($keywords);
       $keywords = array_unique($keywords);
 
-      // on regarde si ça corresponds à des mots clés de la base de données
-      $keywordReferences = $this->keywordReferenceRepository->findCustom([
-          'names' => $keywords
-      ]);
-
       // Prépare deux tableaux pour les intentions et les objets
       $intentions = [];
       $objects = [];
@@ -89,52 +84,76 @@ class ReferenceService
         }
       }
 
-      // parcours les mots clés restant
+      // on regarde si ça corresponds à des mots clés de la base de données
+      // $keywordReferences = $this->keywordReferenceRepository->findCustom([
+      //     'names' => $keywords
+      // ]);
+      // // parcours les mots clés restant
+      // foreach ($keywordReferences as $key => $result) {
+      //     // si dans la liste d'exclusion
+      //     if (in_array($result->getName(), $excludedKeywordReferenceNames)) {
+      //       unset($keywordReferences[$key]);
+      //       continue;
+      //     }
+
+      //     // ajoute le mot
+      //     if ($result->isIntention()) {
+      //       $intentions[] = $result->getName();
+      //     } else {
+      //       $objects[] = $result->getName();
+      //     }
+
+      //     // si il a des enfants
+      //     foreach ($result->getKeywordReferences() as $keywordReference) {
+      //       if ($keywordReference->isIntention()) {
+      //         $intentions[] = $keywordReference->getName();
+      //       } else {
+      //         $objects[] = $keywordReference->getName();
+      //       }
+      //       foreach ($keywordReference->getKeywordReferences() as $subKeyword) {
+      //         if ($subKeyword->isIntention()) {
+      //           $intentions[] = $subKeyword->getName();
+      //         } else {
+      //           $objects[] = $subKeyword->getName();
+      //         }
+      //       }
+      //     }
+
+      //     // si il a un parent qui n'est pas lui même
+      //     if ($result->getParent() && $result->getParent()->getId() !== $result->getId()) {
+      //       if ($result->getParent()->isIntention()) {
+      //         $intentions[] = $result->getParent()->getName();
+      //       } else {
+      //         $objects[] = $result->getParent()->getName();
+      //       }
+      //       foreach ($result->getParent()->getKeywordReferences() as $subKeyword) {
+      //         if ($subKeyword->isIntention()) {
+      //           $intentions[] = $subKeyword->getName();
+      //         } else {
+      //           $objects[] = $subKeyword->getName();
+      //         }
+      //       }
+      //     }
+      // }
+
+      // new
+      $keywordReferences = $this->keywordReferenceRepository->findArrayOfAllSynonyms([
+        'names' => $keywords,
+        'excludeds' => $excludedKeywordReferenceNames
+      ]);
       foreach ($keywordReferences as $key => $result) {
-          // si dans la liste d'exclusion
-          if (in_array($result->getName(), $excludedKeywordReferenceNames)) {
-            unset($keywordReferences[$key]);
-            continue;
-          }
+        // si dans la liste d'exclusion
+        if (in_array($result['name'], $excludedKeywordReferenceNames)) {
+          unset($keywordReferences[$key]);
+          continue;
+        }
 
-          // ajoute le mot
-          if ($result->isIntention()) {
-            $intentions[] = $result->getName();
-          } else {
-            $objects[] = $result->getName();
-          }
-
-          // si il a des enfants
-          foreach ($result->getKeywordReferences() as $keywordReference) {
-            if ($keywordReference->isIntention()) {
-              $intentions[] = $keywordReference->getName();
-            } else {
-              $objects[] = $keywordReference->getName();
-            }
-            foreach ($keywordReference->getKeywordReferences() as $subKeyword) {
-              if ($subKeyword->isIntention()) {
-                $intentions[] = $subKeyword->getName();
-              } else {
-                $objects[] = $subKeyword->getName();
-              }
-            }
-          }
-
-          // si il a un parent qui n'est pas lui même
-          if ($result->getParent() && $result->getParent()->getId() !== $result->getId()) {
-            if ($result->getParent()->isIntention()) {
-              $intentions[] = $result->getParent()->getName();
-            } else {
-              $objects[] = $result->getParent()->getName();
-            }
-            foreach ($result->getParent()->getKeywordReferences() as $subKeyword) {
-              if ($subKeyword->isIntention()) {
-                $intentions[] = $subKeyword->getName();
-              } else {
-                $objects[] = $subKeyword->getName();
-              }
-            }
-          }
+        // ajoute le mot
+        if ($result['intention']) {
+          $intentions[] = $result['name'];
+        } else {
+          $objects[] = $result['name'];
+        }
       }
 
       // rends les tableaux unique

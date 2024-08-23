@@ -42,7 +42,10 @@ class AidService // NOSONAR too complex
     {
         $projectReferencesSuggestions = [];
         $projectReferenceRepository = $this->managerRegistry->getRepository(ProjectReference::class);
-        $projectReferences = $projectReferenceRepository->findAll();
+        $projectReferences = $projectReferenceRepository->findBy(
+            [],
+            ['name' => 'ASC']
+        );
 
         // Pour chaque projet référent on faire une recherche pour voir si l'aide sort
         foreach ($projectReferences as $projectReference) {

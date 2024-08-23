@@ -22,6 +22,15 @@ class KeywordReferenceRepository extends ServiceEntityRepository
         parent::__construct($registry, KeywordReference::class);
     }
 
+    public function findArrayOfAllSynonyms(?array $params): array
+    {
+        $qb = $this->getQueryBuilder($params);
+        $qb->select('DISTINCT (kr2.id), kr2.name,  kr2.intention');
+        $qb->innerJoin(KeywordReference::class, 'kr2', 'WITH', 'kr2 = kr.parent OR kr.parent = kr2.parent');
+        
+        return $qb->getQuery()->getResult();
+    }
+
     public function findFromSynonyms(array $synonyms): array
     {
         $originalName = (isset($synonyms['original_name']) && trim($synonyms['original_name']) !== '')  ? $synonyms['original_name'] : null;
@@ -38,7 +47,7 @@ class KeywordReferenceRepository extends ServiceEntityRepository
             if ($intentionsString) {
                 $words = array_merge($words, str_getcsv($intentionsString, ' ', '"'));
             }
-        } else if ($simpleWordsString) {
+        } elseif ($simpleWordsString) {
             $words = array_merge($words, str_getcsv($simpleWordsString, ' ', '"'));
         }
 
@@ -64,6 +73,7 @@ class KeywordReferenceRepository extends ServiceEntityRepository
         $string = $params['string'] ?? null;
         $name = $params['name'] ?? null;
         $names = $params['names'] ?? null;
+        $excludeds = $params['excludeds'] ?? null;
         $words = $params['words'] ?? null;
         $nameLike = $params['nameLike'] ?? null;
         $onlyParent = $params['onlyParent'] ?? false;
@@ -77,13 +87,13 @@ class KeywordReferenceRepository extends ServiceEntityRepository
                 ->andWhere('kr.intention = 0')
                 ;
         }
-      
+
         if ($name !== null) {
             $qb->andWhere('kr.name = :name')
             ->setParameter('name', $name)
             ;
         }
-      
+
         if ($nameLike !== null) {
             $qb->andWhere('kr.name LIKE :nameLike')
                 ->setParameter('nameLike', '%'.$nameLike.'%')
@@ -97,6 +107,12 @@ class KeywordReferenceRepository extends ServiceEntityRepository
         if (is_array($names) && !empty($names)) {
             $qb->andWhere('kr.name IN (:names)')
                 ->setParameter('names', $names)
+                ;
+        }
+
+        if (is_array($excludeds) && !empty($excludeds)) {
+            $qb->andWhere('kr.name NOT IN (:excludeds)')
+                ->setParameter('excludeds', $excludeds)
                 ;
         }
 

@@ -333,6 +333,11 @@ class AidCrudController extends AtCrudController
         ->setColumns(12);
 
         yield AssociationField::new('projectReferences', 'Projets référents')
+        ->setFormTypeOption('query_builder', function ($repository) {
+            return $repository->createQueryBuilder('pr')
+                ->orderBy('pr.name', 'ASC');
+        })
+        ->setColumns(12)
         ->hideOnIndex();
         yield ArrayField::new('projectReferences', 'Projets référents')
         ->formatValue(function ($value, $entity) {
@@ -345,16 +350,6 @@ class AidCrudController extends AtCrudController
         if ($entity instanceof Aid) {
             $entity->setProjectReferencesSuggestions($projectReferencesSuggestions);
             $help = !empty($projectReferencesSuggestions) ? 'Ces résultats sont proposés en fonction de ce que donne la recherche.' : 'Aucun projet référent suggéré pour cette aide.';
-            // yield ArrayField::new('projectReferencesSuggestions', 'Projets référents suggérés')
-            //     ->setHelp($help)
-            //     ->formatValue(function ($value) {
-            //     return implode('', array_map(function ($projectReference) {
-            //         return '- '.$projectReference->getName().'<br>';
-            //     }, $value->toArray()));
-            //     })
-            //     ->setFormTypeOption('allow_add', false)
-            //     ->setFormTypeOption('allow_delete', false)
-            //     ;
     
             yield CollectionCopyableField::new('projectReferencesSuggestions', 'Projets référents suggérés')
                 ->setHelp($help)
@@ -365,7 +360,8 @@ class AidCrudController extends AtCrudController
                 })
                 ->setFormTypeOption('allow_add', false)
                 ->setFormTypeOption('allow_delete', false)
-                ;
+                ->setColumns(12)
+            ;
         }
 
 

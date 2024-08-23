@@ -674,6 +674,7 @@ class Aid // NOSONAR too much methods
 
     #[Groups([self::API_GROUP_LIST, self::API_GROUP_ITEM])]
     #[ORM\ManyToMany(targetEntity: ProjectReference::class, inversedBy: 'aids')]
+    #[ORM\OrderBy(['name' => 'ASC'])]
     private Collection $projectReferences;
 
     #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
