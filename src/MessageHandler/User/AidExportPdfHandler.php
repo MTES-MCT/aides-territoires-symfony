@@ -85,10 +85,12 @@ class AidExportPdfHandler
 
             $fileTarget = $tmpFolder.'/'.$filename.'.pdf';
             // Enregistre le fichier PDF dans le dossier temporaire
-            file_put_contents($fileTarget, $dompdf->output());
+            if (!file_put_contents($fileTarget, $dompdf->output())) {
+                throw new \Exception('Erreur lors de la création du fichier PDF');
+            }
 
             // Envoi l'email
-            $this->emailService->sendEmail(
+            $send = $this->emailService->sendEmail(
                 $user->getEmail(),
                 'Export des aides',
                 'emails/base.html.twig',
@@ -103,6 +105,9 @@ class AidExportPdfHandler
                 ]
             );
 
+            if (!$send) {
+                throw new \Exception('Erreur lors de l\'envoi de l\'email');
+            }
             // Supprime le fichier
             @unlink($fileTarget);
 
