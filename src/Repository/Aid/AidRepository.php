@@ -509,9 +509,11 @@ class AidRepository extends ServiceEntityRepository
                     }
                     for ($i = 0; $i<count($objects); $i++) {
                         $sqlObjects .= '
-                            CASE WHEN (REGEXP(a.name, :objects'.$i.') = 1) THEN 60 ELSE 0 END +
-                            CASE WHEN (REGEXP(a.nameInitial, :objects'.$i.') = 1) THEN 60 ELSE 0 END +
-                            CASE WHEN (REGEXP(a.description, :objects'.$i.') = 1) THEN 60 ELSE 0 END
+                        CASE WHEN (
+                            REGEXP(a.name, :objects'.$i.') = 1
+                            OR REGEXP(a.nameInitial, :objects'.$i.') = 1
+                            OR REGEXP(a.description, :objects'.$i.') = 1
+                        ) THEN 60 ELSE 0 END
                         ';
 
                         if ($i < count($objects) - 1) {
