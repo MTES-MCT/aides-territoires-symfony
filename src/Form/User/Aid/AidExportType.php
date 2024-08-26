@@ -16,6 +16,7 @@ class AidExportType extends AbstractType
             ->add('format', ChoiceType::class, [
                 'required' => true,
                 'label' => 'Veuillez sélectionner le format d’export : ',
+                'help' => 'L\'export PDF est envoyé par email.',
                 'choices' => [
                     'Fichier CSV' => 'csv',
                     'Tableur Excel' => 'xlsx',
