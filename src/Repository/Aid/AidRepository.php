@@ -631,10 +631,12 @@ class AidRepository extends ServiceEntityRepository
 
             if ($sqlTotal !== '') {
                 $scoreTotalAvailable = true;
-                $qb->addSelect('('.$sqlTotal.') as score_total');
+                
                 if ($sqlObjects !== '') {
+                    $qb->addSelect('('.$sqlTotal.') as score_total');
                     $qb->andHaving('(score_total + score_objects) >= '.$scoreTotalMin);
                 } else {
+                    $qb->addSelect('('.$sqlTotal.') as score_total');
                     $qb->andHaving('score_total >= '.$scoreTotalMin);
                 }
             }
@@ -934,6 +936,9 @@ class AidRepository extends ServiceEntityRepository
             if ($orderBy['sort'] == 'score_total') {
                 if (isset($scoreTotalAvailable) && $scoreTotalAvailable === true) {
                     $qb->addOrderBy($orderBy['sort'], $orderBy['order']);
+                    if ($sqlObjects !== '') {
+                        $qb->addOrderBy('score_objects', 'DESC');
+                    }
                 }
             } else {
                 $qb->addOrderBy($orderBy['sort'], $orderBy['order']);
@@ -954,6 +959,9 @@ class AidRepository extends ServiceEntityRepository
             $qb
                 ->addOrderBy('score_total', 'DESC')
             ;
+            if ($sqlObjects !== '') {
+                $qb->addOrderBy('score_objects', 'DESC');
+            }
         }
 
         if (is_array($aidStepIds) && count($aidStepIds) > 0) {
