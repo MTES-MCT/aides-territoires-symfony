@@ -548,11 +548,11 @@ class AidRepository extends ServiceEntityRepository
                         $qb->setParameter('objects'.$i, '\\b'.$objects[$i].'\\b');
                     }
 
-                    $sqlObjects .= 'CASE WHEN (
-                        '.$sqlRegexpName.'
-                        OR '.$sqlRegexpNameInitial.'
-                        OR '.$sqlRegexpDescription.'
-                    ) THEN 60 ELSE 0 END ';
+                    $sqlObjects .=
+                    'CASE WHEN ( '.$sqlRegexpName.' ) THEN 60 ELSE 0 END +'
+                    .'CASE WHEN ( '.$sqlRegexpNameInitial.' ) THEN 60 ELSE 0 END +'
+                    .'CASE WHEN ( '.$sqlRegexpDescription.' ) THEN 60 ELSE 0 END '
+                    ;
                 }
 
                 $qb->setParameter('objects_string', $objectsString);
