@@ -21,7 +21,7 @@
     <div class="fr-tags-group">
         <p title="Mot-clé" class="fr-tag">
             <span class="ri-double-quotes-r ri-xl fr-mr-1w at-icon-align--sub" aria-hidden="true"></span>
-            {{ getKeywordReferenceAndSynonyms(formAidSearch.keyword.vars.data|sanitize_html) }}
+            {{ getKeywordReferenceAndSynonyms(formAidSearch.keyword.vars.data|sanitize_html)|raw }}
         </p>
     </div>
     {% endif %}
