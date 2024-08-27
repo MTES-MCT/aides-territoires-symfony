@@ -500,26 +500,59 @@ class AidRepository extends ServiceEntityRepository
                 ';
 
                 $objects = str_getcsv($objectsString, ' ', '"');
+                // if (!empty($objects)) {
+                //     $sqlObjects .= ' + ';
+                
+                //     // on limite le nombre d'objets car le serveur ne tiens pas le coup
+                //     if (count($objects) > 40) {
+                //         $objects = array_slice($objects, 0, 40);
+                //     }
+                //     for ($i = 0; $i<count($objects); $i++) {
+                //         $sqlObjects .= '
+                //         CASE WHEN (
+                //             REGEXP(a.name, :objects'.$i.') = 1
+                //             OR REGEXP(a.nameInitial, :objects'.$i.') = 1
+                //             OR REGEXP(a.description, :objects'.$i.') = 1
+                //         ) THEN 60 ELSE 0 END
+                //         ';
+
+                //         if ($i < count($objects) - 1) {
+                //             $sqlObjects .= ' + ';
+                //         }
+
+                //         $qb->setParameter('objects'.$i, '\\b'.$objects[$i].'\\b');
+                //     }
+                // }
+
                 if (!empty($objects)) {
                     $sqlObjects .= ' + ';
-                
+                    $sqlRegexpName = '';
+                    $sqlRegexpNameInitial = '';
+                    $sqlRegexpDescription = '';
+
                     // on limite le nombre d'objets car le serveur ne tiens pas le coup
                     if (count($objects) > 40) {
                         $objects = array_slice($objects, 0, 40);
                     }
                     for ($i = 0; $i<count($objects); $i++) {
-                        $sqlObjects .= '
-                            CASE WHEN (REGEXP(a.name, :objects'.$i.') = 1) THEN 60 ELSE 0 END +
-                            CASE WHEN (REGEXP(a.nameInitial, :objects'.$i.') = 1) THEN 60 ELSE 0 END +
-                            CASE WHEN (REGEXP(a.description, :objects'.$i.') = 1) THEN 60 ELSE 0 END
-                        ';
+                        $sqlRegexpName .= 'REGEXP(a.name, :objects'.$i.') = 1';
+                        $sqlRegexpNameInitial .= 'REGEXP(a.nameInitial, :objects'.$i.') = 1';
+                        $sqlRegexpDescription .= 'REGEXP(a.description, :objects'.$i.') = 1';
 
                         if ($i < count($objects) - 1) {
-                            $sqlObjects .= ' + ';
+                            $sqlRegexpName .= ' OR ';
+                            $sqlRegexpNameInitial .= ' OR ';
+                            $sqlRegexpDescription .= ' OR ';
                         }
 
                         $qb->setParameter('objects'.$i, '\\b'.$objects[$i].'\\b');
                     }
+
+                    $sqlObjects .=
+                    'CASE WHEN ( '.$sqlRegexpName.' ) THEN 60 ELSE 0 END +'
+                    .'CASE WHEN ( '.$sqlRegexpNameInitial.' ) THEN 60 ELSE 0 END +'
+                    .'CASE WHEN ( '.$sqlRegexpDescription.' ) THEN 60 ELSE 0 END '
+                    ;
                 }
 
                 $qb->setParameter('objects_string', $objectsString);
@@ -560,7 +593,7 @@ class AidRepository extends ServiceEntityRepository
                 if ($originalName) {
                     $sqlTotal .= ' + ';
                 }
-                $sqlTotal .= $sqlObjects;
+                // $sqlTotal .= $sqlObjects;
             }
             if ($intentionsString && $objectsString) {
                 if ($originalName || $objectsString) {
@@ -598,9 +631,16 @@ class AidRepository extends ServiceEntityRepository
 
             if ($sqlTotal !== '') {
                 $scoreTotalAvailable = true;
-                $qb->addSelect('('.$sqlTotal.') as score_total');
-                $qb->andHaving('score_total >= '.$scoreTotalMin);
+                
+                if ($sqlObjects !== '') {
+                    $qb->addSelect('('.$sqlTotal.') as score_total');
+                    $qb->andHaving('(score_total + score_objects) >= '.$scoreTotalMin);
+                } else {
+                    $qb->addSelect('('.$sqlTotal.') as score_total');
+                    $qb->andHaving('score_total >= '.$scoreTotalMin);
+                }
             }
+            
         }
 
         // recherche sur projet référent strict
@@ -896,6 +936,9 @@ class AidRepository extends ServiceEntityRepository
             if ($orderBy['sort'] == 'score_total') {
                 if (isset($scoreTotalAvailable) && $scoreTotalAvailable === true) {
                     $qb->addOrderBy($orderBy['sort'], $orderBy['order']);
+                    if ($sqlObjects !== '') {
+                        $qb->addOrderBy('score_objects', 'DESC');
+                    }
                 }
             } else {
                 $qb->addOrderBy($orderBy['sort'], $orderBy['order']);
@@ -916,6 +959,9 @@ class AidRepository extends ServiceEntityRepository
             $qb
                 ->addOrderBy('score_total', 'DESC')
             ;
+            if ($sqlObjects !== '') {
+                $qb->addOrderBy('score_objects', 'DESC');
+            }
         }
 
         if (is_array($aidStepIds) && count($aidStepIds) > 0) {

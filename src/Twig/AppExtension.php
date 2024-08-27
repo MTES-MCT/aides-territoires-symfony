@@ -62,6 +62,7 @@ class AppExtension extends AbstractExtension // NOSONAR too much methods
     public function getFilters(): array
     {
         return [
+            new TwigFilter('htmlDecode', [$this, 'htmlDecode']),
             new TwigFilter('myTruncate', [$this, 'myTruncate']),
             new TwigFilter('mySlug', [$this, 'mySlug']),
             new TwigFilter('perimeterSmartRegionNames', [$this, 'perimeterSmartRegionNames']),
@@ -70,6 +71,11 @@ class AppExtension extends AbstractExtension // NOSONAR too much methods
             new TwigFilter('alertFrequencyDisplay', [$this, 'alertFrequencyDisplay']),
             new TwigFilter('projectStepDisplay', [$this, 'projectStepDisplay']),
         ];
+    }
+
+    public function htmlDecode($string)
+    {
+        return html_entity_decode($string, ENT_QUOTES, 'UTF-8');
     }
 
     public function myTruncate(string $string, int $length = 200): string

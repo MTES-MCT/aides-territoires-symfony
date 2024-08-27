@@ -230,6 +230,13 @@ class AidService // NOSONAR too complex
         $aidRepo = $this->managerRegistry->getRepository(Aid::class);
         $aids = $aidRepo->findCustom($aidParams);
 
+        // Si on a le score total et le score objects on tri par le cumul des deux (pas possible directement dans la requête sans trop l'alourdir)
+        if (isset($aids[0]) && $aids[0]->getScoreTotal() && $aids[0]->getScoreObjects()) {
+            usort($aids, function($a, $b) {
+            return ($b->getScoreTotal() + $b->getScoreObjects()) <=> ($a->getScoreTotal() + $a->getScoreObjects());
+            });
+        }
+
         if (isset($aidParams['projectReference']) && $aidParams['projectReference'] instanceof ProjectReference) {
             /** @var Aid $aid */
             foreach ($aids as $aid) {

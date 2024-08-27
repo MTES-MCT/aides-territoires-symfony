@@ -67,6 +67,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Index(columns: ['european_aid'], name: 'european_aid_aid')]
 #[ORM\Index(columns: ['origin_url'], name: 'origin_url_aid')]
 #[ORM\Index(columns: ['import_uniqueid'], name: 'import_uniqueid_aid')]
+#[ORM\Index(columns: ['is_generic'], name: 'is_generic_aid')]
 #[ORM\Index(columns: ['name'], name: 'name_aid_fulltext', flags: ['fulltext'])]
 #[ORM\Index(columns: ['name_initial'], name: 'name_initial_aid_fulltext', flags: ['fulltext'])]
 #[ORM\Index(columns: ['description'], name: 'description_aid_fulltext', flags: ['fulltext'])]

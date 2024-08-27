@@ -18,7 +18,7 @@
                                 </div>
                                 
                                 <div class="fr-col-12 fr-col-md-3 {% if showTextField is defined and not showTextField %}fr-hidden{% endif %}">
-                                    {{ form_row(formAidSearch.keyword)}}
+                                    {{ form_row(formAidSearch.keyword, {'value': formAidSearch.keyword.vars.value|htmlDecode}) }}
                                 </div>
                                 
                                 <div
