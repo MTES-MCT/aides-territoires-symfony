@@ -7,31 +7,37 @@ use App\Entity\Aid\Aid;
 use App\Entity\Aid\AidFinancer;
 use App\Entity\Aid\AidInstructor;
 use App\Entity\User\User;
+use App\Exception\InvalidFileFormatException;
 use App\Exception\NotFoundException\AidNotFoundException;
 use App\Form\Aid\AidDeleteType;
 use App\Form\Aid\AidEditType;
 use App\Form\User\Aid\AidExportType;
 use App\Form\User\Aid\AidFilterType;
 use App\Form\User\Aid\AidStatsPeriodType;
+use App\Message\User\AidsExportPdf;
 use App\Repository\Aid\AidProjectRepository;
 use App\Repository\Aid\AidRepository;
 use App\Repository\Log\LogAidApplicationUrlClickRepository;
 use App\Repository\Log\LogAidOriginUrlClickRepository;
 use App\Repository\Log\LogAidViewRepository;
 use App\Service\Aid\AidService;
+use App\Service\File\FileService;
 use App\Service\Security\SecurityService;
 use App\Service\User\UserService;
 use App\Service\Various\StringService;
 use Doctrine\Persistence\ManagerRegistry;
-use Liip\ImagineBundle\Exception\Config\Filter\NotFoundException;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Dompdf\Dompdf;
 use Dompdf\Options;
+use OpenSpout\Common\Entity\Cell;
+use OpenSpout\Common\Entity\Row;
+use OpenSpout\Writer\XLSX\Entity\SheetView;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 
@@ -166,16 +172,21 @@ class AidController extends FrontController
             }
         }
 
-        // formulaire export aide
-        $formExport = $this->createForm(AidExportType::class, null, [
-            'action' => $this->generateUrl('app_user_aids_export'),
-            'attr' => [
-                'target' => '_blank'
-            ]
-        ]);
+
 
         // les aides du user
         $aids = $aidRepository->findCustom($aidsParams);
+
+        $formExportParams = [
+            'action' => $this->generateUrl('app_user_aids_export')
+        ];
+        if (count($aids) <= Aid::MAX_NB_EXPORT_PDF) {
+            $formExportParams['attr'] = [
+                'target' => '_blank'
+            ];
+        }
+        // formulaire export aide
+        $formExport = $this->createForm(AidExportType::class, null, $formExportParams);
 
         // nb aides publiées
         $nbAidsLive = $aidRepository->countByUser(
@@ -362,7 +373,8 @@ class AidController extends FrontController
         RequestStack $requestStack,
         AidRepository $aidRepository,
         StringService $stringService,
-        RouterInterface $routerInterface
+        RouterInterface $routerInterface,
+        MessageBusInterface $messageBus
     )
     {
         // le user
@@ -381,14 +393,25 @@ class AidController extends FrontController
                     ]
                 );
 
-                // alimente la réponse
-                $response = $this->getExportStreamedResponse(
-                    $formExport->get('format')->getData(),
-                    $aids,
-                    $user,
-                    $stringService,
-                    $routerInterface
-                );
+                // si pdf et plus de Aid::MAX_NB_EXPORT_PDF aides
+                if ($formExport->get('format')->getData() == 'pdf' && count($aids) > Aid::MAX_NB_EXPORT_PDF) {
+                    $messageBus->dispatch(new AidsExportPdf($user->getId(), $user->getDefaultOrganization() ? $user->getDefaultOrganization()->getId() : 0));
+                    $this->addFlash(
+                        FrontController::FLASH_SUCCESS,
+                        'Votre export PDF est en cours de génération. Vous recevrez un email avec le fichier.'
+                    );
+                    return $this->redirectToRoute('app_user_aid_publications');
+                } else {
+                    // si tableur ou pdf et moins de Aid::MAX_NB_EXPORT_PDF aides
+                    // alimente la réponse
+                    $response = $this->getExportStreamedResponse(
+                        $formExport->get('format')->getData(),
+                        $aids,
+                        $user,
+                        $stringService,
+                        $routerInterface
+                    );
+                }
             }
         }
 
@@ -408,7 +431,6 @@ class AidController extends FrontController
         $organizationName = $user->getDefaultOrganization() ? $stringService->getSLug($user->getDefaultOrganization()->getName()) : '';
         $filename = 'Aides-territoires-'.$today->format('d_m_Y').'-'.$organizationName;
 
-        
         // alimente la réponse
         if ($format == 'pdf') {
             $pdfOptions = new Options();
@@ -436,10 +458,26 @@ class AidController extends FrontController
             ]);
             // exit pour eviter les erreur sur le retour null
             exit;
-        } elseif (in_array($format, ['csv', 'xlsx'])) {
-            $response = new StreamedResponse(function () use ($aids, $routerInterface) {
-                $csv = fopen('php://output', 'w+');
-                fputcsv($csv, [
+        } elseif (in_array($format, [FileService::FORMAT_CSV, FileService::FORMAT_XLSX])) {
+            return new StreamedResponse(function () use ($aids, $routerInterface, $format, $filename) {
+                if ($format == FileService::FORMAT_CSV) {
+                    $options = new \OpenSpout\Writer\CSV\Options();
+                    $options->FIELD_DELIMITER = ';';
+                    $options->FIELD_ENCLOSURE = '"';
+        
+                    $writer = new \OpenSpout\Writer\CSV\Writer($options);
+                } elseif ($format == FileService::FORMAT_XLSX) {
+                    $sheetView = new SheetView();
+                    $writer = new \OpenSpout\Writer\XLSX\Writer();
+                }
+
+                $writer->openToBrowser('export_'.$filename.'.'.$format);
+
+                if ($format == FileService::FORMAT_XLSX) {
+                    $writer->getCurrentSheet()->setSheetView($sheetView);
+                }
+
+                $headers = [
                     'Adresse de la fiche aide',
                     'Nom',
                     'Description complète de l’aide et de ses objectifs',
@@ -461,7 +499,16 @@ class AidController extends FrontController
                     'Porteurs d’aides',
                     'Instructeurs',
                     'Programmes',
-                ]);
+                ];
+                $cells = [];
+                foreach ($headers as $headerItem) {
+                    $cells[] = Cell::fromValue($headerItem);
+                }
+
+                /** add a row at a time */
+                $singleRow = new Row($cells);
+                $writer->addRow($singleRow);
+
                 /** @var Aid $aid */
                 foreach ($aids as $aid) {
                     $aidStepsString = '';
@@ -556,7 +603,7 @@ class AidController extends FrontController
                         }
                     }
 
-                    fputcsv($csv, [
+                    $datas = [
                         $routerInterface->generate('app_aid_aid_details', ['slug' => $aid->getSlug()], UrlGeneratorInterface::ABSOLUTE_URL),
                         $aid->getName(),
                         $aid->getDescription(),
@@ -578,33 +625,25 @@ class AidController extends FrontController
                         $aidFinancersString,
                         $aidInstructorsString,
                         $programsString
-                    ]);
+                    ];
+
+                    $cells = [];
+                    foreach ($datas as $data) {
+                        $cells[] = Cell::fromValue($data);
+                    }
+
+                    /** add a row at a time */
+                    $singleRow = new Row($cells);
+                    $writer->addRow($singleRow);
                 }
-                fclose($csv);
+
+                $writer->close();
             });
         } else {
             return new StreamedResponse(function() {
-                echo 'Format invalide';
+                echo FileService::EXCEPTION_FORMAT_NOT_SUPPORTED_MESSAGE;
             });
         }
-
-        // header selon format demandé
-        switch ($format) {
-            case 'csv':
-                $response->headers->set('Content-Type', 'text/csv; charset=utf-8');
-                $response->headers->set('Content-Disposition', 'attachment; filename="'.$filename.'.csv"');
-                break;
-
-            case 'xlsx':
-                $response->headers->set('Content-Type', 'application/vnd.ms-excel; charset=utf-8');
-                $response->headers->set('Content-Disposition', 'attachment; filename="'.$filename.'.xlsx"');
-                break;
-
-            case 'pdf':
-                break;
-        }
-
-        return $response;
     }
 
     #[Route('/comptes/aides/exporter-aide-en-pdf/{slug}/', name: 'app_user_aid_export_pdf', requirements: ['slug' => '[a-zA-Z0-9\-_]+'])]
