@@ -84,10 +84,12 @@ class Backer // NOSONAR too much methods
     #[ORM\Column]
     private ?int $id = null;
 
+    #[Assert\Length(max: 255)]
     #[Groups([Aid::API_GROUP_LIST, Aid::API_GROUP_ITEM, self::API_GROUP_LIST])]
     #[ORM\Column(length: 255)]
     private ?string $name = null;
 
+    #[Assert\Length(max: 255)]
     #[Groups([Aid::API_GROUP_LIST, Aid::API_GROUP_ITEM, self::API_GROUP_LIST])]
     #[ORM\Column(length: 255)]
     #[Gedmo\Slug(fields: ['name'])]
@@ -96,12 +98,14 @@ class Backer // NOSONAR too much methods
     #[ORM\Column]
     private ?bool $isCorporate = null;
 
+    #[Assert\Length(max: 255)]
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $externalLink = null;
 
     #[ORM\Column]
     private ?bool $isSpotlighted = false;
 
+    #[Assert\Length(max: 255)]
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $logo = null;
 
@@ -116,10 +120,11 @@ class Backer // NOSONAR too much methods
     #[Gedmo\Timestampable(on: 'create')]
     private ?\DateTimeInterface $timeCreate = null;
 
-    #[Assert\Length(null, null, 255)]
+    #[Assert\Length(max: 255)]
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $metaDescription = null;
 
+    #[Assert\Length(max: 255)]
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $metaTitle = null;
 
