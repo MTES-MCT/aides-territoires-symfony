@@ -29,21 +29,10 @@ class FaqCrudController extends AtCrudController
         yield TextField::new('name', 'Nom')
         ->setHelp('Utilisé uniquement pour l\'association dans l\'administration.');
         yield AssociationField::new('pageTab', 'Onglet lié');
-        // yield CollectionField::new('faqCategories', 'Catégories des questions')
-        // ->setEntryIsComplex(true)
-        // ->useEntryCrudForm(FaqCategoryCollectionCrudController::class)
-        // ->setColumns(12)
-        // ;
         yield CollectionField::new('faqCategories', 'Catégories des questions')
         ->setEntryType(FaqCategoryCollectionType::class)
         ->setColumns(12)
         ;
-        // yield DateTimeField::new('timeCreate', 'Date de création')
-        // ->setFormTypeOption('attr', ['readonly' => true])
-        // ->onlyWhenUpdating();
-        // yield DateTimeField::new('timeUpdate', 'Date de mise à jour')
-        // ->setFormTypeOption('attr', ['readonly' => true])
-        // ->onlyWhenUpdating();
     }
 
     public function configureActions(Actions $actions): Actions
@@ -66,19 +55,25 @@ class FaqCrudController extends AtCrudController
         // la faq choisie
         $faq = $adminContext->getEntity()->getInstance();
 
+        // les repository
+        $faqRepository = $this->managerRegistry->getRepository(Faq::class);
+        $faqCategoryRepository = $this->managerRegistry->getRepository(FaqCategory::class);
+        $faqQuestionAnswserRepository = $this->managerRegistry->getRepository(FaqQuestionAnswser::class);
+
         $orderToSave = $adminContext->getRequest()->get('orderToSave', null);
         if ($orderToSave) {
             $orderToSave = json_decode($orderToSave);
+
             if (is_array($orderToSave)) {
                 foreach ($orderToSave as $key => $value) {
-                    $faqItem = $this->managerRegistry->getRepository(Faq::class)->find($value->id);
+                    $faqItem = $faqRepository->find($value->id);
                     if (!$faqItem instanceof Faq) {
                         continue;
                     }
                     if (isset($value->children) && is_array($value->children)) {
                         $positionCategory = 0;
                         foreach ($value->children as $faqCategoryItem) {
-                            $faqCategory = $this->managerRegistry->getRepository(FaqCategory::class)->find($faqCategoryItem->id);
+                            $faqCategory = $faqCategoryRepository->find($faqCategoryItem->id);
                             if ($faqCategory instanceof FaqCategory) {
                                 $faqCategory->setPosition($positionCategory);
                                 $positionCategory++;
@@ -87,21 +82,22 @@ class FaqCrudController extends AtCrudController
                                 if (isset($faqCategoryItem->children) && is_array($faqCategoryItem->children)) {
                                     $positionQuestion = 0;
                                     foreach ($faqCategoryItem->children as $faqQuestionAnswserItem) {
-                                        $faqQuestionAnswser = $this->managerRegistry->getRepository(FaqQuestionAnswser::class)->find($faqQuestionAnswserItem->id);
+                                        $faqQuestionAnswser = $faqQuestionAnswserRepository->find($faqQuestionAnswserItem->id);
                                         if ($faqQuestionAnswser instanceof FaqQuestionAnswser) {
                                             $faqQuestionAnswser->setPosition($positionQuestion);
                                             $positionQuestion++;
                                             $this->managerRegistry->getManager()->persist($faqQuestionAnswser);
                                         }
                                     }
-                                
                                 }
                             }
+
+                            $this->managerRegistry->getManager()->flush();
                         }
                     }
 
                 }
-                $this->managerRegistry->getManager()->flush();
+                
                 $this->addFlash('success', 'L\'ordre des catégories de questions a été enregistré.');
 
                 return $this->redirect(
@@ -111,14 +107,6 @@ class FaqCrudController extends AtCrudController
                         ->setEntityId($faq->getId())
                         ->generateUrl()
                 );
-
-                return $this->redirectToRoute('admin', [
-                    'menuIndex' => 1,
-                    'submenuIndex' => 1,
-                    'entity' => Faq::class
-                ]);
-            
-            
             }
         }
         return $this->render('admin/program/faq-order.html.twig', [
