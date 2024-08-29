@@ -11,7 +11,8 @@ class FileService
     const FORMAT_PDF = 'pdf';
     
     const UPLOAD_TMP_FOLDER = '/public/uploads/_tmp';
-
+    const EXCEPTION_FORMAT_NOT_SUPPORTED_MESSAGE = 'Format non supporté';
+    
     public function __construct(
         private KernelInterface $kernelInterface
     )
