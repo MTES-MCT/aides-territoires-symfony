@@ -32,17 +32,17 @@
         "@fancyapps/ui": "^5.0.20",
         "@fortawesome/fontawesome-free": "^6.4.0",
         "@gouvfr/dsfr": "^1.12.1",
+        "axios": "^0.28.0",
         "browser-sync": "^2.29.3",
         "chartjs-plugin-annotation": "2.2.1",
         "datatables": "^1.10.18",
         "jquery": "^3.7.0",
         "jquery-highlight": "^3.5.0",
         "leaflet": "^1.9.4",
+        "localtunnel": "^2.0.2",
         "remixicon": "^3.5.0",
         "sortablejs": "^1.15.2",
-        "trumbowyg": "^2.27.3",
-        "axios": "^0.28.0",
-        "localtunnel": "^2.0.2"
+        "trumbowyg": "^2.27.3"
     },
     "resolutions": {
         "axios": "^0.28.0"
