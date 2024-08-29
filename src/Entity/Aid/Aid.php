@@ -60,6 +60,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: AidRepository::class)]
 #[ORM\Index(columns: ['status'], name: 'status_aid')]
+#[ORM\Index(columns: ['slug'], name: 'slug_aid')]
 #[ORM\Index(columns: ['date_start'], name: 'date_start_aid')]
 #[ORM\Index(columns: ['date_submission_deadline'], name: 'date_submission_deadline_aid')]
 #[ORM\Index(columns: ['date_published'], name: 'date_published_aid')]

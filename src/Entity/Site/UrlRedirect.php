@@ -13,6 +13,7 @@ use Gedmo\Mapping\Annotation as Gedmo;
 
 #[ORM\Entity(repositoryClass: UrlRedirectRepository::class)]
 #[ORM\Index(columns: ['old_url'], name: 'old_url_url_redirect')]
+#[ORM\Index(columns: ['new_url'], name: 'new_url_url_redirect')]
 #[ORM\Index(columns: ['date_create'], name: 'date_create_url_redirect')]
 class UrlRedirect
 {
