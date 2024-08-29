@@ -2,6 +2,7 @@
 
 namespace App\EventListener\Aid;
 
+use App\Controller\FrontController;
 use App\Entity\Aid\Aid;
 use App\Entity\Site\UrlRedirect;
 use App\Message\Aid\AidPropagateUpdate;
@@ -11,6 +12,7 @@ use App\Service\Various\ParamService;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Event\PostLoadEventArgs;
 use Doctrine\ORM\Event\PostUpdateEventArgs;
+use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
@@ -104,6 +106,23 @@ class AidListener
 
             $oldSlug = $changeSet['slug'][0];
             $newSlug = $changeSet['slug'][1];
+
+            // vérifie si pas déjà une redirection sur la nouvelle url (pour ne pas tourner en boucle)
+            $urlRedirectCheck = $manager->getRepository(UrlRedirect::class)->findOneBy(
+                ['oldUrl' => '/'.$this->aidService->getUrl($aid, UrlGeneratorInterface::RELATIVE_PATH)]
+            );
+            if ($urlRedirectCheck) {
+                // on supprime cette redirection
+                $manager->remove($urlRedirectCheck);
+                $manager->flush();
+                // message flash pour indiquer que la redirection a été supprimée
+                $session =  new Session();
+                $session->getFlashBag()->add(
+                    'alert alert-info alert-dismissible fade show',
+                    'La nouvelle url était dans les redirection, la redirection à été supprimée pour éviter les redirections en boucle.'
+                );
+            }
+
             $urlRedirect = new UrlRedirect();
             $aid->setSlug($oldSlug);
             $urlRedirect->setOldUrl('/'.$this->aidService->getUrl($aid, UrlGeneratorInterface::RELATIVE_PATH));
