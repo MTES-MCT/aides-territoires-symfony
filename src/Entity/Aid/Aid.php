@@ -160,7 +160,8 @@ class Aid // NOSONAR too much methods
         self::SLUG_EUROPEAN_ORGANIZATIONAL => 'Aides européennes structurelles',
     ];
 
-
+    const MAX_NB_EXPORT_PDF = 20;
+    
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]

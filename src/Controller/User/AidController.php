@@ -167,13 +167,21 @@ class AidController extends FrontController
             }
         }
 
-        // formulaire export aide
-        $formExport = $this->createForm(AidExportType::class, null, [
-            'action' => $this->generateUrl('app_user_aids_export'),
-        ]);
+
 
         // les aides du user
         $aids = $aidRepository->findCustom($aidsParams);
+
+        $formExportParams = [
+            'action' => $this->generateUrl('app_user_aids_export')
+        ];
+        if (count($aids) <= Aid::MAX_NB_EXPORT_PDF) {
+            $formExportParams['attr'] = [
+                'target' => '_blank'
+            ];
+        }
+        // formulaire export aide
+        $formExport = $this->createForm(AidExportType::class, null, $formExportParams);
 
         // nb aides publiées
         $nbAidsLive = $aidRepository->countByUser(
@@ -380,8 +388,8 @@ class AidController extends FrontController
                     ]
                 );
 
-                // si pdf
-                if ($formExport->get('format')->getData() == 'pdf') {
+                // si pdf et plus de Aid::MAX_NB_EXPORT_PDF aides
+                if ($formExport->get('format')->getData() == 'pdf' && count($aids) > Aid::MAX_NB_EXPORT_PDF) {
                     $messageBus->dispatch(new AidsExportPdf($user->getId(), $user->getDefaultOrganization() ? $user->getDefaultOrganization()->getId() : 0));
                     $this->addFlash(
                         FrontController::FLASH_SUCCESS,
@@ -389,15 +397,15 @@ class AidController extends FrontController
                     );
                     return $this->redirectToRoute('app_user_aid_publications');
                 } else {
-                // si tableur
-                // alimente la réponse
-                $response = $this->getExportStreamedResponse(
-                    $formExport->get('format')->getData(),
-                    $aids,
-                    $user,
-                    $stringService,
-                    $routerInterface
-                );
+                    // si tableur ou pdf et moins de Aid::MAX_NB_EXPORT_PDF aides
+                    // alimente la réponse
+                    $response = $this->getExportStreamedResponse(
+                        $formExport->get('format')->getData(),
+                        $aids,
+                        $user,
+                        $stringService,
+                        $routerInterface
+                    );
                 }
             }
         }
