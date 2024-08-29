@@ -28,6 +28,7 @@ use App\Entity\Organization\OrganizationType;
 use App\Entity\Perimeter\Perimeter;
 use App\Entity\Program\Program;
 use App\Entity\Reference\ProjectReference;
+use App\Entity\Site\UrlRedirect;
 use App\Entity\User\User;
 use App\Field\AddNewField;
 use App\Field\CollectionCopyableField;
@@ -294,10 +295,24 @@ class AidCrudController extends AtCrudController
                 $slugHelp .= '</ul>';
                 $slugHelp .= '</div>';
             }
+
+            $urlRedirects = $this->managerRegistry->getRepository(UrlRedirect::class)->findBy([
+                'newUrl' => '/'.$this->aidService->getUrl($entity, UrlGeneratorInterface::RELATIVE_PATH)
+            ]);
+            if (!empty($urlRedirects)) {
+                $slugHelp .= '<div class="alert alert-danger">';
+                $slugHelp .= '<p>Attention ! Nous avons trouvé des redirections qui pointent vers cette aide.</p>';
+                $slugHelp .= '<ul>';
+                foreach ($urlRedirects as $urlRedirect) {
+                    $slugHelp .= '<li>'.$urlRedirect->getOldUrl().'</li>';
+                }
+                $slugHelp .= '</ul>';
+                $slugHelp .= '</div>';
+            }
         }
 
         yield TextField::new('slug', 'Slug')
-            ->setFormTypeOption('attr', ['readonly' => true, 'autocomplete' => 'off'])
+            ->setFormTypeOption('attr', ['autocomplete' => 'off'])
             ->setHelp($slugHelp)
             ->hideOnIndex()
             ->setColumns(12)
