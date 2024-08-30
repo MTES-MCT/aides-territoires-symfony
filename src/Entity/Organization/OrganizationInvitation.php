@@ -7,6 +7,7 @@ use App\Repository\Organization\OrganizationInvitationRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Index(columns: ['date_create'], name: 'date_create_oi')]
 #[ORM\Index(columns: ['date_accept'], name: 'date_accept_oi')]
@@ -38,12 +39,15 @@ class OrganizationInvitation // NOSONAR too much methods
     #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $dateRefuse = null;
     
+    #[Assert\Length(max: 255)]
     #[ORM\Column(length: 255)]
     private ?string $firstname = null;
 
+    #[Assert\Length(max: 255)]
     #[ORM\Column(length: 255)]
     private ?string $lastname = null;
 
+    #[Assert\Length(max: 255)]
     #[ORM\Column(length: 255)]
     private ?string $email = null;
 
