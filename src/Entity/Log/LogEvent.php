@@ -6,6 +6,7 @@ use App\Repository\Log\LogEventRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: LogEventRepository::class)]
 #[ORM\Index(columns: ['category'], name: 'category_event')]
@@ -22,15 +23,19 @@ class LogEvent
     #[ORM\Column]
     private ?int $value = 0;
 
+    #[Assert\Length(max: 128)]
     #[ORM\Column(length: 128)]
     private ?string $category = null;
 
+    #[Assert\Length(max: 128)]
     #[ORM\Column(length: 128)]
     private ?string $event = null;
 
+    #[Assert\Length(max: 255)]
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $meta = null;
 
+    #[Assert\Length(max: 255)]
     #[ORM\Column(length: 255)]
     private ?string $source = null;
 

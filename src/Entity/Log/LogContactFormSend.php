@@ -6,6 +6,7 @@ use App\Repository\Log\LogContactFormSendRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: LogContactFormSendRepository::class)]
 #[ORM\Index(columns: ['subject'], name: 'subject_lcfs')]
@@ -17,6 +18,7 @@ class LogContactFormSend
     #[ORM\Column]
     private ?int $id = null;
 
+    #[Assert\Length(max: 255)]
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $subject = null;
 

@@ -7,6 +7,7 @@ use App\Repository\Log\LogAidContactClickRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: LogAidContactClickRepository::class)]
 #[ORM\Index(columns: ['date_create'], name: 'date_create_lacc')]
@@ -21,6 +22,7 @@ class LogAidContactClick
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $querystring = null;
 
+    #[Assert\Length(max: 255)]
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $source = null;
 
