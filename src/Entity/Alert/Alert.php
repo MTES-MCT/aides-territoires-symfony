@@ -8,6 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Types\UuidType;
 use Symfony\Component\Uid\Uuid;
 use Gedmo\Mapping\Annotation as Gedmo;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Index(columns: ['email'], name: 'email_alert')]
 #[ORM\Index(columns: ['date_latest_alert'], name: 'date_latest_alert_alert')]
@@ -29,15 +30,20 @@ class Alert // NOSONAR too much methods
     #[ORM\CustomIdGenerator(class: 'doctrine.uuid_generator')]
     private ?Uuid $id = null;
 
+    #[Assert\NotNull()]
+    #[Assert\NotBlank()]
+    #[Assert\Length(max: 255)]
     #[ORM\Column(length: 255)]
     private ?string $email = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $querystring = null;
 
+    #[Assert\Length(max: 255)]
     #[ORM\Column(length: 255)]
     private ?string $title = null;
 
+    #[Assert\Length(max: 32)]
     #[ORM\Column(length: 32)]
     private ?string $alertFrequency = null;
 
