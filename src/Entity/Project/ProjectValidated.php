@@ -77,6 +77,11 @@ class ProjectValidated // NOSONAR too much methods
 
     private ?float $distance = null;
 
+    public function __toString()
+    {
+        return 'Projet : '.$this->projectName.' / Aide : '.$this->aidName;
+    }
+
     public function getId(): ?int
     {
         return $this->id;
