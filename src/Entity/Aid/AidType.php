@@ -13,6 +13,7 @@ use Gedmo\Mapping\Annotation as Gedmo;
 use Symfony\Component\Serializer\Annotation\Groups;
 use ApiPlatform\OpenApi\Model;
 use App\Controller\Api\Aid\AidTypeController;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ApiResource(
     shortName: 'Aid',
@@ -53,16 +54,19 @@ class AidType
     #[ORM\Column]
     private ?int $id = null;
 
+    #[Assert\NotNull()]
+    #[Assert\NotBlank()]
+    #[Assert\Length(max: 255)]
     #[Groups([Aid::API_GROUP_LIST, Aid::API_GROUP_ITEM, self::API_GROUP_LIST])]
     #[ORM\Column(length: 255)]
     private ?string $name = null;
 
+    #[Assert\Length(max: 255)]
     #[ORM\Column(length: 255)]
     #[Gedmo\Slug(fields: ['name'], updatable: false)]
     private ?string $slug = null;
 
     #[ORM\Column]
-    // #[Gedmo\SortablePosition]
     private ?int $position = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]

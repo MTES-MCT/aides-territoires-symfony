@@ -9,6 +9,8 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
+
 #[ORM\Entity(repositoryClass: AidTypeGroupRepository::class)]
 #[ORM\Index(columns: ['slug'], name: 'slug_aid_type_group')]
 class AidTypeGroup
@@ -24,17 +26,20 @@ class AidTypeGroup
     #[ORM\Column]
     private ?int $id = null;
 
+    #[Assert\NotNull()]
+    #[Assert\NotBlank()]
+    #[Assert\Length(max: 255)]
     #[Groups([Aid::API_GROUP_LIST, Aid::API_GROUP_ITEM, self::API_GROUP_LIST])]
     #[ORM\Column(length: 255)]
     private ?string $name = null;
 
+    #[Assert\Length(max: 255)]
     #[Groups([Aid::API_GROUP_LIST, Aid::API_GROUP_ITEM, self::API_GROUP_LIST])]
     #[ORM\Column(length: 255)]
     #[Gedmo\Slug(fields: ['name'], updatable: false)]
     private ?string $slug = null;
 
     #[ORM\Column]
-    // #[Gedmo\SortablePosition]
     private ?int $position = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
