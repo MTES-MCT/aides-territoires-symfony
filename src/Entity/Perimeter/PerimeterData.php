@@ -12,6 +12,7 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\OpenApi\Model;
 use App\Controller\Api\Perimeter\PerimeterDataController;
 use App\Filter\PerimeterData\PerimeterDataPerimeterIdFilter;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ApiResource(
     shortName: 'Périmètres',
@@ -39,9 +40,15 @@ class PerimeterData
     #[ORM\Column]
     private ?int $id = null;
 
+    #[Assert\NotNull()]
+    #[Assert\NotBlank()]
+    #[Assert\Length(max: 100)]
     #[ORM\Column(length: 100)]
     private ?string $prop = null;
 
+    #[Assert\NotNull()]
+    #[Assert\NotBlank()]
+    #[Assert\Length(max: 255)]
     #[ORM\Column(length: 255)]
     private ?string $value = null;
 
