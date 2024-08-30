@@ -4,7 +4,6 @@ namespace App\Entity\Eligibility;
 
 use App\Repository\Eligibility\EligibilityTestQuestionRepository;
 use Doctrine\ORM\Mapping as ORM;
-use Gedmo\Mapping\Annotation as Gedmo;
 
 #[ORM\Entity(repositoryClass: EligibilityTestQuestionRepository::class)]
 class EligibilityTestQuestion
