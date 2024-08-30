@@ -17,6 +17,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Symfony\Component\Serializer\Attribute\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ApiResource(
     shortName: 'Projets référents',
@@ -53,10 +54,14 @@ class ProjectReference
     #[ORM\Column]
     private ?int $id = null;
 
+    #[Assert\NotNull()]
+    #[Assert\NotBlank()]
+    #[Assert\Length(max: 150)]
     #[Groups([self::API_GROUP_LIST, self::API_GROUP_ITEM, Aid::API_GROUP_LIST, Aid::API_GROUP_ITEM])]
     #[ORM\Column(length: 150)]
     private ?string $name = null;
 
+    #[Assert\Length(max: 255)]
     #[Groups([self::API_GROUP_LIST, self::API_GROUP_ITEM, Aid::API_GROUP_LIST, Aid::API_GROUP_ITEM])]
     #[Gedmo\Slug(fields: ['name'])]
     #[ORM\Column(length: 255)]

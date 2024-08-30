@@ -6,6 +6,7 @@ use App\Repository\User\UserRegisterConfirmationRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: UserRegisterConfirmationRepository::class)]
 class UserRegisterConfirmation
@@ -19,6 +20,9 @@ class UserRegisterConfirmation
     #[ORM\JoinColumn(nullable: false)]
     private ?User $user = null;
 
+    #[Assert\NotNull()]
+    #[Assert\NotBlank()]
+    #[Assert\Length(max: 255)]
     #[ORM\Column(length: 255)]
     private ?string $token = null;
 

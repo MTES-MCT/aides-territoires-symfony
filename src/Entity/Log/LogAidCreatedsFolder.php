@@ -10,6 +10,7 @@ use App\Service\Doctrine\DoctrineConstants;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
+use Symfony\Component\Validator\Constraints as Assert;
 
 
 #[ORM\Entity(repositoryClass: LogAidCreatedsFolderRepository::class)]
@@ -21,9 +22,11 @@ class LogAidCreatedsFolder
     #[ORM\Column]
     private ?int $id = null;
 
+    #[Assert\Length(max: 255)]
     #[ORM\Column(length: 255)]
     private ?string $dsFolderUrl = null;
 
+    #[Assert\Length(max: 255)]
     #[ORM\Column(length: 255)]
     private ?string $dsFolderId = null;
 

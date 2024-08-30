@@ -20,7 +20,9 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\OpenApi\Model;
 use App\Controller\Api\Program\ProgramController;
+use Symfony\Component\Validator\Constraints as Assert;
 
+#[ORM\Index(columns: ['slug'], name: 'slug_program')]
 #[ORM\Index(columns: ['is_spotlighted'], name: 'is_spotlighted_program')]
 #[ApiResource(
     operations: [
@@ -46,10 +48,14 @@ class Program // NOSONAR too much methods
     #[ORM\Column]
     private ?int $id = null;
 
+    #[Assert\NotNull()]
+    #[Assert\NotBlank()]
+    #[Assert\Length(max: 255)]
     #[Groups([Aid::API_GROUP_LIST, Aid::API_GROUP_ITEM, self::API_GROUP_LIST])]
     #[ORM\Column(length: 255)]
     private ?string $name = null;
 
+    #[Assert\Length(max: 255)]
     #[Groups([Aid::API_GROUP_LIST, Aid::API_GROUP_ITEM, self::API_GROUP_LIST])]
     #[ORM\Column(length: 255)]
     #[Gedmo\Slug(fields: ['name'])]
@@ -61,6 +67,7 @@ class Program // NOSONAR too much methods
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $shortDescription = null;
 
+    #[Assert\Length(max: 100)]
     #[ORM\Column(length: 100, nullable: true)]
     private ?string $logo = null;
 
@@ -72,9 +79,11 @@ class Program // NOSONAR too much methods
     #[Gedmo\Timestampable(on: 'create')]
     private ?\DateTimeInterface $timeCreate = null;
 
+    #[Assert\Length(max: 255)]
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $metaDescription = null;
 
+    #[Assert\Length(max: 255)]
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $metaTitle = null;
 

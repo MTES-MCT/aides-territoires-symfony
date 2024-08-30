@@ -7,6 +7,7 @@ use App\Repository\Log\LogAdminActionRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: LogAdminActionRepository::class)]
 class LogAdminAction
@@ -25,12 +26,14 @@ class LogAdminAction
     #[ORM\Column]
     private ?int $id = null;
 
+    #[Assert\Length(max: 255)]
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $objectClass = null;
 
     #[ORM\Column(nullable: true)]
     private ?int $objectId = null;
 
+    #[Assert\Length(max: 255)]
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $objectRepr = null;
 

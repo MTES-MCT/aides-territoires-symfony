@@ -10,6 +10,7 @@ use App\Service\Doctrine\DoctrineConstants;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: LogProgramViewRepository::class)]
 #[ORM\Index(columns: ['date_create'], name: 'date_create_lpv')]
@@ -20,6 +21,7 @@ class LogProgramView
     #[ORM\Column]
     private ?int $id = null;
 
+    #[Assert\Length(max: 255)]
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $source = null;
 

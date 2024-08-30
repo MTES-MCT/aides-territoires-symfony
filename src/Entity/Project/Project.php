@@ -79,6 +79,7 @@ class Project // NOSONAR too much methods
 
     #[Assert\Length(max: 255)]
     #[Assert\NotBlank()]
+    #[Assert\NotNull()]
     #[ORM\Column(length: 255)]
     private ?string $name = null;
 

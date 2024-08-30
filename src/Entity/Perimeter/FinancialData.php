@@ -5,6 +5,7 @@ namespace App\Entity\Perimeter;
 use App\Repository\Perimeter\FinancialDataRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: FinancialDataRepository::class)]
 class FinancialData
@@ -14,15 +15,25 @@ class FinancialData
     #[ORM\Column]
     private ?int $id = null;
 
+    #[Assert\NotNull()]
+    #[Assert\NotBlank()]
+    #[Assert\Length(max: 5)]
     #[ORM\Column(length: 5)]
     private ?string $inseeCode = null;
 
+    #[Assert\NotNull()]
+    #[Assert\NotBlank()]
     #[ORM\Column]
     private ?int $year = null;
 
+    #[Assert\NotNull()]
+    #[Assert\NotBlank()]
     #[ORM\Column]
     private ?int $populationStrata = null;
 
+    #[Assert\NotNull()]
+    #[Assert\NotBlank()]
+    #[Assert\Length(max: 255)]
     #[ORM\Column(length: 255)]
     private ?string $aggregate = null;
 

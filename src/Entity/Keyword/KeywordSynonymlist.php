@@ -13,6 +13,7 @@ use Gedmo\Mapping\Annotation as Gedmo;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
 use App\Controller\Api\Keyword\KeywordSynonymlistController;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ApiResource(
     shortName: 'synonymlists',
@@ -35,9 +36,13 @@ class KeywordSynonymlist
     #[ORM\Column]
     private ?int $id = null;
 
+    #[Assert\NotNull()]
+    #[Assert\NotBlank()]
+    #[Assert\Length(max: 70)]
     #[ORM\Column(length: 70)]
     private ?string $name = null;
 
+    #[Assert\Length(max: 70)]
     #[ORM\Column(length: 70)]
     #[Gedmo\Slug(fields: ['name'])]
     private ?string $slug = null;

@@ -7,6 +7,7 @@ use App\Entity\User\User;
 use App\Repository\Directory\DirectoryRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: DirectoryRepository::class)]
 class Directory
@@ -16,21 +17,27 @@ class Directory
     #[ORM\Column]
     private ?int $id = null;
 
+    #[Assert\Length(max: 15)]
     #[ORM\Column(length: 15, nullable: true)]
     private ?string $gender = null;
 
+    #[Assert\Length(max: 150)]
     #[ORM\Column(length: 150)]
     private ?string $firstname = null;
 
+    #[Assert\Length(max: 150)]
     #[ORM\Column(length: 150)]
     private ?string $lastname = null;
 
+    #[Assert\Length(max: 150)]
     #[ORM\Column(length: 150, nullable: true)]
     private ?string $email = null;
 
+    #[Assert\Length(max: 15)]
     #[ORM\Column(length: 15, nullable: true)]
     private ?string $telephone = null;
 
+    #[Assert\Length(max: 15)]
     #[ORM\Column(length: 15, nullable: true)]
     private ?string $mobile = null;
 
@@ -43,7 +50,7 @@ class Directory
     #[ORM\ManyToOne(inversedBy: 'directories')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Organization $organization = null;
-   
+
     public function getId(): ?int
     {
         return $this->id;
@@ -156,6 +163,4 @@ class Directory
 
         return $this;
     }
-
-   
 }

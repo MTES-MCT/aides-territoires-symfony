@@ -13,6 +13,8 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
+use Symfony\Component\Validator\Constraints as Assert;
+
 #[ORM\Entity(repositoryClass: LogAidViewRepository::class)]
 #[ORM\Index(columns: ['date_create'], name: 'date_create_lav')]
 #[ORM\Index(columns: ['source'], name: 'source_lav')]
@@ -26,6 +28,7 @@ class LogAidView
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $querystring = null;
 
+    #[Assert\Length(max: 255)]
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $source = null;
 

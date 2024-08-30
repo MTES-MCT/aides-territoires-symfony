@@ -8,6 +8,7 @@ use App\Entity\Organization\Organization;
 use App\Repository\Project\ProjectValidatedRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Index(columns: ['project_name'], name: 'project_name_project_validated_fulltext', flags: ['fulltext'])]
 #[ORM\Index(columns: ['description'], name: 'description_project_validated_fulltext', flags: ['fulltext'])]
@@ -20,15 +21,24 @@ class ProjectValidated // NOSONAR too much methods
     #[ORM\Column]
     private ?int $id = null;
 
+    #[Assert\NotNull()]
+    #[Assert\NotBlank()]
+    #[Assert\Length(max: 255)]
     #[ORM\Column(length: 255)]
     private ?string $projectName = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $description = null;
 
+    #[Assert\NotNull()]
+    #[Assert\NotBlank()]
+    #[Assert\Length(max: 255)]
     #[ORM\Column(length: 255)]
     private ?string $aidName = null;
 
+    #[Assert\NotNull()]
+    #[Assert\NotBlank()]
+    #[Assert\Length(max: 255)]
     #[ORM\Column(length: 255)]
     private ?string $financerName = null;
 
@@ -47,6 +57,7 @@ class ProjectValidated // NOSONAR too much methods
     #[ORM\Column(type: Types::DATE_MUTABLE)]
     private ?\DateTimeInterface $dateCreate = null;
 
+    #[Assert\Length(max: 64)]
     #[ORM\Column(length: 64, nullable: true)]
     private ?string $importUniqueid = null;
 
@@ -65,6 +76,11 @@ class ProjectValidated // NOSONAR too much methods
     private ?Project $project = null;
 
     private ?float $distance = null;
+
+    public function __toString()
+    {
+        return 'Projet : '.$this->projectName.' / Aide : '.$this->aidName;
+    }
 
     public function getId(): ?int
     {

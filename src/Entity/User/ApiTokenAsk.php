@@ -7,6 +7,7 @@ use App\Service\Doctrine\DoctrineConstants;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: ApiTokenAskRepository::class)]
 class ApiTokenAsk
@@ -31,6 +32,7 @@ class ApiTokenAsk
     #[ORM\JoinColumn(onDelete:DoctrineConstants::SET_NULL)]
     private ?User $user = null;
 
+    #[Assert\Length(max: 255)]
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $urlService = null;
 

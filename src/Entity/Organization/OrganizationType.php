@@ -19,6 +19,7 @@ use ApiPlatform\OpenApi\Model;
 use App\Controller\Api\Aid\AidAudienceController;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Serializer\Attribute\MaxDepth;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: OrganizationTypeRepository::class)]
 #[ORM\Index(columns: ['date_create'], name: 'date_create_orgt')]
@@ -60,10 +61,14 @@ class OrganizationType // NOSONAR too much methods
     #[ORM\Column]
     private ?int $id = null;
 
+    #[Assert\NotNull()]
+    #[Assert\NotBlank()]
+    #[Assert\Length(max: 255)]
     #[Groups([Aid::API_GROUP_LIST, Aid::API_GROUP_ITEM, self::API_GROUP_LIST])]
     #[ORM\Column(length: 255)]
     private ?string $name = null;
 
+    #[Assert\Length(max: 255)]
     #[Groups([self::API_GROUP_LIST])]
     #[ORM\Column(length: 255)]
     private ?string $slug = null;

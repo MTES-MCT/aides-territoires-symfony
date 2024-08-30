@@ -6,6 +6,7 @@ use App\Entity\User\User;
 use App\Repository\Cron\CronExportSpreadsheetRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: CronExportSpreadsheetRepository::class)]
 class CronExportSpreadsheet
@@ -21,9 +22,11 @@ class CronExportSpreadsheet
     #[ORM\Column(nullable: true)]
     private ?array $sqlParams = null;
 
+    #[Assert\Length(max: 255)]
     #[ORM\Column(length: 255)]
     private ?string $filename = null;
 
+    #[Assert\Length(max: 255)]
     #[ORM\Column(length: 255)]
     private ?string $format = null;
 
@@ -37,6 +40,7 @@ class CronExportSpreadsheet
     #[ORM\Column]
     private ?bool $processing = false;
 
+    #[Assert\Length(max: 255)]
     #[ORM\Column(length: 255)]
     private ?string $entityFqcn = null;
 
