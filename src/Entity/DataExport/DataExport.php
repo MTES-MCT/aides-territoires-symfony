@@ -6,6 +6,7 @@ use App\Entity\User\User;
 use App\Repository\DataExport\DataExportRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: DataExportRepository::class)]
 class DataExport
@@ -17,6 +18,7 @@ class DataExport
     #[ORM\Column]
     private ?int $id = null;
 
+    #[Assert\Length(max: 100)]
     #[ORM\Column(length: 100)]
     private ?string $exportedFile = null;
 
