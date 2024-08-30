@@ -8,6 +8,7 @@ use App\Repository\Bundle\BundleRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: BundleRepository::class)]
 class Bundle
@@ -17,9 +18,13 @@ class Bundle
     #[ORM\Column]
     private ?int $id = null;
 
+    #[Assert\NotNull()]
+    #[Assert\NotBlank()]
+    #[Assert\Length(max: 64)]
     #[ORM\Column(length: 64)]
     private ?string $name = null;
 
+    #[Assert\Length(max: 64)]
     #[ORM\Column(length: 64)]
     private ?string $slug = null;
 
