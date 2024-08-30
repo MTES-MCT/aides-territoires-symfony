@@ -61,6 +61,8 @@ class OrganizationType // NOSONAR too much methods
     #[ORM\Column]
     private ?int $id = null;
 
+    #[Assert\NotNull()]
+    #[Assert\NotBlank()]
     #[Assert\Length(max: 255)]
     #[Groups([Aid::API_GROUP_LIST, Aid::API_GROUP_ITEM, self::API_GROUP_LIST])]
     #[ORM\Column(length: 255)]

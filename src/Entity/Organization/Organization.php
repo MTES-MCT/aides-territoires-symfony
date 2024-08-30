@@ -62,7 +62,8 @@ class Organization // NOSONAR too much methods
     #[ORM\Column]
     private ?int $id = null;
 
-    #[Assert\Length(max: 255)]
+    #[Assert\NotNull()]
+    #[Assert\NotBlank()]
     #[ORM\Column(length: 255)]
     private ?string $name = null;
 

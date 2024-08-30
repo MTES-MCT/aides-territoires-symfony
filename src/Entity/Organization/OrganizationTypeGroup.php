@@ -20,6 +20,8 @@ class OrganizationTypeGroup
     #[ORM\Column]
     private ?int $id = null;
 
+    #[Assert\NotNull()]
+    #[Assert\NotBlank()]
     #[Assert\Length(max: 255)]
     #[ORM\Column(length: 255)]
     private ?string $name = null;
