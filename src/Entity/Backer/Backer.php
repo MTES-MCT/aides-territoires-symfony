@@ -33,6 +33,9 @@ use App\Filter\Backer\HasFinancedAidsFilter;
 use App\Filter\Backer\HasPublishedFinancedAidsFilter;
 
 #[ORM\Index(columns: ['is_spotlighted'], name: 'is_spotlighted_backer')]
+#[ORM\Index(columns: ['active'], name: 'active_backer')]
+#[ORM\Index(columns: ['slug'], name: 'slug_backer')]
+#[ORM\Index(columns: ['is_corporate'], name: 'is_corporate_backer')]
 #[ApiResource(
     // shortName: 'Porteurs',
     operations: [
