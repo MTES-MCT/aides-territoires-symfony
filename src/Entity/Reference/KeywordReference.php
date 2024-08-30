@@ -8,6 +8,7 @@ use App\Repository\Reference\KeywordReferenceRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: KeywordReferenceRepository::class)]
 #[ORM\Index(columns: ['name'], name: 'name_kr')]
@@ -20,6 +21,9 @@ class KeywordReference
     #[ORM\Column]
     private ?int $id = null;
 
+    #[Assert\NotNull()]
+    #[Assert\NotBlank()]
+    #[Assert\Length(max: 150)]
     #[ORM\Column(length: 150)]
     private ?string $name = null;
 

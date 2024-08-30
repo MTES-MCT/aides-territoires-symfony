@@ -5,6 +5,7 @@ namespace App\Entity\Upload;
 use App\Repository\Upload\UploadImageRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: UploadImageRepository::class)]
 class UploadImage
@@ -14,9 +15,13 @@ class UploadImage
     #[ORM\Column]
     private ?int $id = null;
 
+    #[Assert\NotNull()]
+    #[Assert\NotBlank()]
+    #[Assert\Length(max: 255)]
     #[ORM\Column(length: 255)]
     private ?string $image = null;
 
+    #[Assert\Length(max: 255)]
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $description = null;
 

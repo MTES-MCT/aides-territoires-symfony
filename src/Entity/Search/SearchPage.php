@@ -26,15 +26,21 @@ class SearchPage // NOSONAR too much methods
     #[ORM\Column]
     private ?int $id = null;
 
+    #[Assert\NotNull()]
+    #[Assert\NotBlank()]
+    #[Assert\Length(max: 255)]
     #[ORM\Column(length: 255)]
     private ?string $name = null;
 
+    #[Assert\Length(max: 255)]
     #[ORM\Column(length: 255)]
     private ?string $slug = null;
 
+    #[Assert\Length(max: 255)]
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $metaTitle = null;
 
+    #[Assert\Length(max: 255)]
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $metaDescription = null;
 
@@ -44,15 +50,19 @@ class SearchPage // NOSONAR too much methods
     #[ORM\Column(type: Types::TEXT)]
     private ?string $searchQuerystring = null;
 
+    #[Assert\Length(max: 10)]
     #[ORM\Column(length: 10, nullable: true)]
     private ?string $color1 = null;
 
+    #[Assert\Length(max: 10)]
     #[ORM\Column(length: 10, nullable: true)]
     private ?string $color2 = null;
 
+    #[Assert\Length(max: 10)]
     #[ORM\Column(length: 10, nullable: true)]
     private ?string $color3 = null;
 
+    #[Assert\Length(max: 255)]
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $logo = null;
 
@@ -60,18 +70,22 @@ class SearchPage // NOSONAR too much methods
 
     private bool $deleteLogo = false;
 
+    #[Assert\Length(max: 10)]
     #[ORM\Column(length: 10)]
     private ?string $color4 = null;
 
+    #[Assert\Length(max: 255)]
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $logoLink = null;
 
+    #[Assert\Length(max: 10)]
     #[ORM\Column(length: 10, nullable: true)]
     private ?string $color5 = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $moreContent = null;
 
+    #[Assert\Length(max: 255)]
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $metaImage = null;
 
@@ -94,6 +108,7 @@ class SearchPage // NOSONAR too much methods
     #[ORM\ManyToMany(targetEntity: OrganizationType::class, inversedBy: 'searchPages')]
     private Collection $organizationTypes;
 
+    #[Assert\Length(max: 255)]
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $shortTitle = null;
 
@@ -125,6 +140,7 @@ class SearchPage // NOSONAR too much methods
     #[ORM\Column]
     private ?bool $showTextField = null;
 
+    #[Assert\Length(max: 255)]
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $contactLink = null;
 
