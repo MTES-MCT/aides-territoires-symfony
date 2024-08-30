@@ -399,3 +399,12 @@ p {
     margin-bottom: 0;
   }
 }
+
+.fr-accordion {
+  .fr-collapse{
+    &.no-padding{
+      padding-left: 0;
+      padding-right: 0;
+    }
+  }
+}

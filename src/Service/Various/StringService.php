@@ -100,4 +100,29 @@ class StringService
         $string = strtr($string, array_combine($a, $b));
         return $string;
     }
+
+    /**
+     * Normalize a string for comparison
+     *
+     * @param string $string
+     * @return string
+     */
+    public function normalizeString(string $string): string
+    {
+        $string = strtolower($string);
+
+        // Remplace les caractères accentués par leurs équivalents non accentués
+        $unwanted_array = [
+            'à' => 'a', 'á' => 'a', 'â' => 'a', 'ã' => 'a', 'ä' => 'a', 'ç' => 'c', 'è' => 'e', 'é' => 'e',
+            'ê' => 'e', 'ë' => 'e', 'ì' => 'i', 'í' => 'i', 'î' => 'i', 'ï' => 'i', 'ñ' => 'n', 'ò' => 'o',
+            'ó' => 'o', 'ô' => 'o', 'õ' => 'o', 'ö' => 'o', 'ù' => 'u', 'ú' => 'u', 'û' => 'u', 'ü' => 'u',
+            'ý' => 'y', 'ÿ' => 'y', 'œ' => 'oe'
+        ];
+        $string = strtr($string, $unwanted_array);
+    
+        // Retire les espaces, tirets, et autres caractères non alphabétiques
+        $string = preg_replace('/[^a-z0-9]/', '', $string);
+    
+        return $string;
+    }
 }
