@@ -34,9 +34,22 @@ class InternalRequestVoter extends Voter
     protected function voteOnAttribute(string $attribute, $subject, TokenInterface $token): bool
     {
         $request = $this->requestStack->getCurrentRequest();
-
-        // Vérification de l'adresse IP de l'appelant
+        if (!$request) {
+            return false;
+        }
+        
+        // Vérification de l'adresse IP du client
         $clientIp = $request->getClientIp();
-        return in_array($clientIp, $this->allowedIps, true);
+        if (in_array($clientIp, $this->allowedIps, true)) {
+            return true;
+        }
+
+        // Vérification de l'en-tête X-Internal-Request
+        $internalRequestHeader = $request->headers->get('X-Internal-Request');
+        if ($internalRequestHeader === 'true') {
+            return true;
+        }
+
+        return false;
     }
 }

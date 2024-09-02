@@ -5,9 +5,9 @@ framework:
     http_method_override: false
     handle_all_throwables: true
     
-    trusted_proxies: '127.0.0.1,REMOTE_ADDR'
+    trusted_proxies: '127.0.0.1,::1,172.27.0.1,172.27.0.4'
     trusted_headers: ['x-forwarded-for', 'x-forwarded-host', 'x-forwarded-proto', 'x-forwarded-port', 'x-forwarded-prefix']
-    
+
     uid:
         default_uuid_version: 4
     # Enables session support. Note that the session will ONLY be started if you read or write from it.
