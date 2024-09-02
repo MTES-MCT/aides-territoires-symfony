@@ -62,33 +62,14 @@ class ContactController extends FrontController
                 // email admin
                 $email_subject = "[aides-territoires] [Contact]";
 
-                $content_email="<p>Message reçu via le formulaire de contact.</p>";
-                $content_email.="<p>De :</p><ul>";
-                $content_email.="<li>Email : ".$formContact->get('email')->getData()."</li>";
-                if($formContact->get('firstname')->getData()){
-                    $content_email.="<li>Prénom : ".$formContact->get('firstname')->getData()."</li>";
-                }
-                if($formContact->get('lastname')->getData()){
-                    $content_email.="<li>Nom : ".$formContact->get('lastname')->getData()."</li>";
-                }
-                if($formContact->get('phoneNumber')->getData()){
-                    $content_email.="<li>Téléphone : ".$formContact->get('phoneNumber')->getData()."</li>";
-                }
-                if($formContact->get('structureAndFunction')->getData()){
-                    $content_email.="<li>Structure et fonction : ".$formContact->get('structureAndFunction')->getData()."</li>";
-                }
-                $content_email.="</ul>";
-                $content_email.="<p>Sujet : ".ContactType::SUBJECTS[$formContact->get('subject')->getData()]."</p>";
-                $content_email.="<p>Message :<br />".$formContact->get('message')->getData()."</p>";
-
                 // envoi email
                 $emailService->sendEmail(
                     $paramService->get('email_to'),
                     $email_subject,
-                    'emails/base.html.twig',
+                    'emails/contact/contact.html.twig',
                     [
                         'subject' => $email_subject,
-                        'body' => $content_email,
+                        'contact' => $contact,
                     ]
                 );
 
