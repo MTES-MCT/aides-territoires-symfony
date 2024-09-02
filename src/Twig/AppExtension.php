@@ -33,6 +33,7 @@ use App\Service\Various\Breadcrumb;
 use App\Service\Various\ParamService;
 use App\Service\Various\StringService;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\Persistence\ManagerRegistry;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;
@@ -166,7 +167,9 @@ class AppExtension extends AbstractExtension // NOSONAR too much methods
             new TwigFunction('getKeywordReferenceAndSynonyms', [$this, 'getKeywordReferenceAndSynonyms']),
             new TwigFunction('getUserPublicProjectLatestView', [$this, 'getUserPublicProjectLatestView']),
             new TwigFunction('getImportAidManualDatas', [$this, 'getImportAidManualDatas']),
-            new TwigFunction('isDateTime', [$this, 'isDateTime'])
+            new TwigFunction('isDateTime', [$this, 'isDateTime']),
+            new TwigFunction('orderAidFinancerByBackerName', [$this, 'orderAidFinancerByBackerName']),
+            new TwigFunction('orderAidInstructorByBackerName', [$this, 'orderAidInstructorByBackerName']),
         ];
     }
 
@@ -375,8 +378,24 @@ class AppExtension extends AbstractExtension // NOSONAR too much methods
 
         return $datas;
     }
-  
+
     public function isDateTime($date): bool {
         return $date instanceof \DateTime;
+    }
+
+    public function orderAidFinancerByBackerName(Collection $aidFinancers) : Collection {
+        $aidFinancers = $aidFinancers->toArray();
+
+        usort($aidFinancers, function ($a, $b) {
+            $nameA = $this->stringService->normalizeString($a->getBacker()->getName());
+            $nameB = $this->stringService->normalizeString($b->getBacker()->getName());
+            return strcmp($nameA, $nameB);
+        });
+
+        return new ArrayCollection($aidFinancers);
+    }
+
+    public function orderAidInstructorByBackerName(Collection $aidInstructors) : Collection {
+        return $this->orderAidFinancerByBackerName($aidInstructors);
     }
 }
