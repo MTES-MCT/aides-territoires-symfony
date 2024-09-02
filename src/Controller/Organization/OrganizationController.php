@@ -22,12 +22,12 @@ use App\Repository\Organization\OrganizationInvitationRepository;
 use App\Repository\Organization\OrganizationRepository;
 use App\Repository\Perimeter\PerimeterDataRepository;
 use App\Repository\Perimeter\PerimeterRepository;
+use App\Security\Voter\InternalRequestVoter;
 use App\Service\Backer\BackerService;
 use App\Service\Email\EmailService;
 use App\Service\Image\ImageService;
 use App\Service\Notification\NotificationService;
 use App\Service\Organization\OrganizationService;
-use App\Service\Security\SecurityService;
 use App\Service\User\UserService;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -739,15 +739,13 @@ class OrganizationController extends FrontController
         RequestStack $requestStack,
         BackerRepository $backerRepository,
         BackerService $backerService,
-        UserService $userService,
-        SecurityService $securityService
+        UserService $userService
     ) : JsonResponse
     {
         try {
-            // verification requete interne
-            if (!$securityService->validHostOrgin($requestStack)) {
-                // La requête n'est pas interne, retourner une erreur
-                throw $this->createAccessDeniedException('This action can only be performed by the server itself.');
+            // verification requête interne
+            if (!$this->isGranted(InternalRequestVoter::IDENTIFIER)) {
+                throw $this->createAccessDeniedException(InternalRequestVoter::MESSAGE_ERROR);
             }
             
             // recupere id
@@ -852,15 +850,13 @@ class OrganizationController extends FrontController
         RequestStack $requestStack,
         BackerRepository $backerRepository,
         BackerService $backerService,
-        UserService $userService,
-        SecurityService $securityService
+        UserService $userService
     ) : JsonResponse
     {
         try {
-            // verification requete interne
-            if (!$securityService->validHostOrgin($requestStack)) {
-                // La requête n'est pas interne, retourner une erreur
-                throw $this->createAccessDeniedException('This action can only be performed by the server itself.');
+            // verification requête interne
+            if (!$this->isGranted(InternalRequestVoter::IDENTIFIER)) {
+                throw $this->createAccessDeniedException(InternalRequestVoter::MESSAGE_ERROR);
             }
 
             // recupere id

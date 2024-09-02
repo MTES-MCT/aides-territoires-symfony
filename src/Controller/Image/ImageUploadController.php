@@ -3,6 +3,7 @@
 namespace App\Controller\Image;
 
 use App\Controller\FrontController;
+use App\Security\Voter\InternalRequestVoter;
 use App\Service\File\FileService;
 use App\Service\Image\ImageService;
 use App\Service\Various\ParamService;
@@ -18,7 +19,6 @@ class ImageUploadController extends FrontController {
     #[Route('/upload-image', name: 'app_upload_image', options: ['expose' => true])]
     public function index
     (
-        Request $request,
         SluggerInterface $slugger,
         FileService $fileService,
         ImageService $imageService,
@@ -30,14 +30,10 @@ class ImageUploadController extends FrontController {
         try {
             // verification requete interne
             $request = $requestStack->getCurrentRequest();
-            $origin = $request->headers->get('origin');
-            $infosOrigin = parse_url($origin);
-            $hostOrigin = $infosOrigin['host'] ?? null;
-            $serverName = $request->getHost();
-    
-            if ($hostOrigin !== $serverName) {
-                // La requête n'est pas interne, retourner une erreur
-                throw $this->createAccessDeniedException('This action can only be performed by the server itself.');
+
+            // verification requête interne
+            if (!$this->isGranted(InternalRequestVoter::IDENTIFIER)) {
+                throw $this->createAccessDeniedException(InternalRequestVoter::MESSAGE_ERROR);
             }
 
             // gestion de l'image

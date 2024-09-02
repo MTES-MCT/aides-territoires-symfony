@@ -3,6 +3,7 @@
 namespace App\Controller\Log;
 
 use App\Controller\FrontController;
+use App\Security\Voter\InternalRequestVoter;
 use App\Service\Log\LogService;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -17,14 +18,10 @@ class LogController extends FrontController
     ): JsonResponse
     {
         $request = $requestStack->getCurrentRequest();
-        $origin = $request->headers->get('origin');
-        $infosOrigin = parse_url($origin);
-        $hostOrigin = $infosOrigin['host'] ?? null;
-        $serverName = $request->getHost();
-
-        if ($hostOrigin !== $serverName) {
-            // La requête n'est pas interne, retourner une erreur
-            throw $this->createAccessDeniedException('This action can only be performed by the server itself.');
+        
+        // verification requête interne
+        if (!$this->isGranted(InternalRequestVoter::IDENTIFIER)) {
+            throw $this->createAccessDeniedException(InternalRequestVoter::MESSAGE_ERROR);
         }
 
         // log

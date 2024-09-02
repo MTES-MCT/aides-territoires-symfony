@@ -6,10 +6,10 @@ use App\Controller\FrontController;
 use App\Entity\Backer\Backer;
 use App\Repository\Aid\AidRepository;
 use App\Repository\Backer\BackerRepository;
+use App\Security\Voter\InternalRequestVoter;
 use App\Service\Api\InternalApiService;
 use App\Service\Backer\BackerService;
 use App\Service\Log\LogService;
-use App\Service\Security\SecurityService;
 use App\Service\User\UserService;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -122,14 +122,13 @@ class BackerController extends FrontController
     #[Route('partenaires/ajax-search', name: 'app_backer_ajax_search', options: ['expose' => true])]
     public function ajaxSearch(
         RequestStack $requestStack,
-        InternalApiService $internalApiService,
-        SecurityService $securityService
+        InternalApiService $internalApiService
     ): JsonResponse
     {
         try {
-            if ($securityService->validHostOrgin($requestStack) === false) {
-                // La requête n'est pas interne, retourner une erreur
-                throw $this->createAccessDeniedException('This action can only be performed by the server itself.');
+            // verification requête interne
+            if (!$this->isGranted(InternalRequestVoter::IDENTIFIER)) {
+                throw $this->createAccessDeniedException(InternalRequestVoter::MESSAGE_ERROR);
             }
 
             // recuperer id du perimetre

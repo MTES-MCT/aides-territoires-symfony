@@ -14,10 +14,10 @@ use App\Form\User\Project\AidProjectStatusType;
 use App\Form\User\Project\ProjectDeleteType;
 use App\Form\User\Project\ProjectExportType;
 use App\Repository\Aid\AidProjectRepository;
-use App\Repository\Aid\AidRepository;
 use App\Repository\Project\ProjectRepository;
 use App\Repository\Project\ProjectValidatedRepository;
 use App\Repository\Reference\ProjectReferenceRepository;
+use App\Security\Voter\InternalRequestVoter;
 use App\Service\Aid\AidService;
 use App\Service\Export\SpreadsheetExporterService;
 use App\Service\File\FileService;
@@ -25,7 +25,6 @@ use App\Service\Image\ImageService;
 use App\Service\Notification\NotificationService;
 use App\Service\Project\ProjectService;
 use App\Service\Reference\ReferenceService;
-use App\Service\Security\SecurityService;
 use App\Service\User\UserService;
 use Doctrine\Persistence\ManagerRegistry;
 use Dompdf\Dompdf;
@@ -649,15 +648,13 @@ class ProjectController extends FrontController
         RequestStack $requestStack,
         ProjectRepository $projectRepository,
         ProjectService $projectService,
-        UserService $userService,
-        SecurityService $securityService
+        UserService $userService
     ) : JsonResponse
     {
         try {
-            // verification requete interne
-            if (!$securityService->validHostOrgin($requestStack)) {
-                // La requête n'est pas interne, retourner une erreur
-                throw $this->createAccessDeniedException('This action can only be performed by the server itself.');
+            // verification requête interne
+            if (!$this->isGranted(InternalRequestVoter::IDENTIFIER)) {
+                throw $this->createAccessDeniedException(InternalRequestVoter::MESSAGE_ERROR);
             }
             
             // recupere id
@@ -754,15 +751,13 @@ class ProjectController extends FrontController
         RequestStack $requestStack,
         ProjectRepository $projectRepository,
         ProjectService $projectService,
-        UserService $userService,
-        SecurityService $securityService
+        UserService $userService
     ) : JsonResponse
     {
         try {
-            // verification requete interne
-            if (!$securityService->validHostOrgin($requestStack)) {
-                // La requête n'est pas interne, retourner une erreur
-                throw $this->createAccessDeniedException('This action can only be performed by the server itself.');
+            // verification requête interne
+            if (!$this->isGranted(InternalRequestVoter::IDENTIFIER)) {
+                throw $this->createAccessDeniedException(InternalRequestVoter::MESSAGE_ERROR);
             }
             
             // recupere id

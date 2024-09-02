@@ -8,10 +8,10 @@ use App\Entity\Search\SearchPage;
 use App\Entity\User\User;
 use App\Form\User\SearchPage\SearchPageEditType;
 use App\Repository\Search\SearchPageRepository;
+use App\Security\Voter\InternalRequestVoter;
 use App\Service\Aid\AidSearchFormService;
 use App\Service\Aid\AidService;
 use App\Service\SearchPage\SearchPageService;
-use App\Service\Security\SecurityService;
 use App\Service\User\UserService;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -106,15 +106,13 @@ class PortalController extends FrontController
         RequestStack $requestStack,
         SearchPageRepository $searchPageRepository,
         SearchPageService $searchPageService,
-        UserService $userService,
-        SecurityService $securityService
+        UserService $userService
     ) : JsonResponse
     {
         try {
-            // verification requete interne
-            if (!$securityService->validHostOrgin($requestStack)) {
-                // La requête n'est pas interne, retourner une erreur
-                throw $this->createAccessDeniedException('This action can only be performed by the server itself.');
+            // verification requête interne
+            if (!$this->isGranted(InternalRequestVoter::IDENTIFIER)) {
+                throw $this->createAccessDeniedException(InternalRequestVoter::MESSAGE_ERROR);
             }
             
             // recupere id
@@ -211,15 +209,13 @@ class PortalController extends FrontController
         RequestStack $requestStack,
         SearchPageRepository $searchPageRepository,
         SearchPageService $searchPageService,
-        UserService $userService,
-        SecurityService $securityService
+        UserService $userService
     ) : JsonResponse
     {
         try {
-            // verification requete interne
-            if (!$securityService->validHostOrgin($requestStack)) {
-                // La requête n'est pas interne, retourner une erreur
-                throw $this->createAccessDeniedException('This action can only be performed by the server itself.');
+            // verification requête interne
+            if (!$this->isGranted(InternalRequestVoter::IDENTIFIER)) {
+                throw $this->createAccessDeniedException(InternalRequestVoter::MESSAGE_ERROR);
             }
             
             // recupere id

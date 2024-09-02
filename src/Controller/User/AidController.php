@@ -20,9 +20,9 @@ use App\Repository\Aid\AidRepository;
 use App\Repository\Log\LogAidApplicationUrlClickRepository;
 use App\Repository\Log\LogAidOriginUrlClickRepository;
 use App\Repository\Log\LogAidViewRepository;
+use App\Security\Voter\InternalRequestVoter;
 use App\Service\Aid\AidService;
 use App\Service\File\FileService;
-use App\Service\Security\SecurityService;
 use App\Service\User\UserService;
 use App\Service\Various\StringService;
 use Doctrine\Persistence\ManagerRegistry;
@@ -993,15 +993,13 @@ class AidController extends FrontController
         RequestStack $requestStack,
         AidRepository $aidRepository,
         AidService $aidService,
-        UserService $userService,
-        SecurityService $securityService
+        UserService $userService
     ) : JsonResponse
     {
         try {
-            // verification requete interne
-            if (!$securityService->validHostOrgin($requestStack)) {
-                // La requête n'est pas interne, retourner une erreur
-                throw $this->createAccessDeniedException('This action can only be performed by the server itself.');
+            // verification requête interne
+            if (!$this->isGranted(InternalRequestVoter::IDENTIFIER)) {
+                throw $this->createAccessDeniedException(InternalRequestVoter::MESSAGE_ERROR);
             }
             
             // recupere id
@@ -1098,15 +1096,13 @@ class AidController extends FrontController
         RequestStack $requestStack,
         AidRepository $aidRepository,
         AidService $aidService,
-        UserService $userService,
-        SecurityService $securityService
+        UserService $userService
     ) : JsonResponse
     {
         try {
-            // verification requete interne
-            if (!$securityService->validHostOrgin($requestStack)) {
-                // La requête n'est pas interne, retourner une erreur
-                throw $this->createAccessDeniedException('This action can only be performed by the server itself.');
+            // verification requête interne
+            if (!$this->isGranted(InternalRequestVoter::IDENTIFIER)) {
+                throw $this->createAccessDeniedException(InternalRequestVoter::MESSAGE_ERROR);
             }
             
             // recupere id
