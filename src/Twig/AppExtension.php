@@ -169,6 +169,7 @@ class AppExtension extends AbstractExtension // NOSONAR too much methods
             new TwigFunction('getImportAidManualDatas', [$this, 'getImportAidManualDatas']),
             new TwigFunction('isDateTime', [$this, 'isDateTime']),
             new TwigFunction('orderAidFinancerByBackerName', [$this, 'orderAidFinancerByBackerName']),
+            new TwigFunction('orderAidInstructorByBackerName', [$this, 'orderAidInstructorByBackerName']),
         ];
     }
 
@@ -392,5 +393,9 @@ class AppExtension extends AbstractExtension // NOSONAR too much methods
         });
 
         return new ArrayCollection($aidFinancers);
+    }
+
+    public function orderAidInstructorByBackerName(Collection $aidInstructors) : Collection {
+        return $this->orderAidFinancerByBackerName($aidInstructors);
     }
 }

@@ -146,6 +146,9 @@
             {% endif %}
 
             {% if aid.aidInstructors|length > 0 %}
+            {% set maxAidInstructorDisplay = 3 %}
+            {% set aidInstructorByBackerName = orderAidInstructorByBackerName(aid.aidInstructors) %}
+            {% set aidInstructorLeftDisplay = aid.aidInstructors|length - maxAidInstructorDisplay %}
             <div class="fr-mb-4w fr-grid-row">
                 <div class="fr-col-1">
                     <span class="ri-open-arm-line ri-xl"></span>
@@ -154,7 +157,7 @@
                     <h2 class="fr-text--md fr-text--normal fr-mb-0 fr-ml-1w">
                         <strong>Instructeur(s) de l’aide :</strong>
                     </h2>
-                    {% for aidInstructor in aid.aidInstructors %}
+                    {% for aidInstructor in aidInstructorByBackerName|slice(0, maxAidInstructorDisplay) %}
                     <p class="fr-mb-0 fr-ml-1w">
                         <a href="{{ path('app_backer_details', {'id': aidInstructor.backer.id, 'slug': aidInstructor.backer.slug}) }}"
                         title="{{ aidInstructor.backer.name }} - Ouvrir dans une nouvelle fenêtre"
@@ -164,8 +167,28 @@
                         </a>
                     </p>
                     {% endfor %}
+                    {% if aid.instructors|length > maxAidInstructorDisplay %}
+                    <section class="fr-accordion fr-mt-2w">
+                        <h3 class="fr-accordion__title">
+                            <button class="fr-accordion__btn" aria-expanded="false" aria-controls="accordion-more-aidInstructor">+{{ aidFinancerLeftDisplay }} autre{% if aidFinancerLeftDisplay > 1 %}s{% endif %}</button>
+                        </h3>
+                        <div class="fr-collapse no-padding" id="accordion-more-aidInstructor">
+                            {% for aidInstructor in aidInstructorByBackerName|slice(maxAidInstructorDisplay) %}
+                            <p class="fr-mb-0 fr-ml-1w">
+                                <a href="{{ path('app_backer_details', {'id': aidInstructor.backer.id, 'slug': aidInstructor.backer.slug}) }}"
+                                title="{{ aidInstructor.backer.name }} - Ouvrir dans une nouvelle fenêtre"
+                                target="_blank" rel="noopener"
+                                >
+                                    {{ aidInstructor.backer.name }}
+                                </a>
+                            </p>
+                            {% endfor %}
+                        </div>
+                    </section>
+                    {% endif %}
+
                     <div id="logos-instructors" class="fr-mt-2w">
-                    {% for aidInstructor in aid.aidInstructors %}
+                    {% for aidInstructor in aidInstructorByBackerName|slice(0, maxAidInstructorDisplay) %}
                         {% if aidInstructor.backer.logo %}
                             <p class="fr-mb-0 fr-ml-1w">
                                 <a class="fr-col-10 at-link__nodecorator at-link-blank__none" href="{{ path('app_backer_details', {'id': aidInstructor.backer.id, 'slug': aidInstructor.backer.slug}) }}"
@@ -177,6 +200,28 @@
                             </p>
                         {% endif %}
                     {% endfor %}
+
+                    {% if aid.aidInstructors|length > maxAidInstructorDisplay %}
+                    <section class="fr-accordion fr-mt-2w">
+                        <h3 class="fr-accordion__title">
+                            <button class="fr-accordion__btn" aria-expanded="false" aria-controls="accordion-more-aidFinancer-logo">+{{ aidFinancerLeftDisplay }} autre{% if aidFinancerLeftDisplay > 1 %}s{% endif %}</button>
+                        </h3>
+                        <div class="fr-collapse no-padding" id="accordion-more-aidFinancer-logo">
+                            {% for aidInstructor in aidInstructorByBackerName|slice(maxAidInstructorDisplay) %}
+                                {% if aidInstructor.backer.logo %}
+                                    <p class="fr-mb-0 fr-ml-1w">
+                                        <a class="fr-col-10 at-link__nodecorator at-link-blank__none" href="{{ path('app_backer_details', {'id': aidInstructor.backer.id, 'slug': aidInstructor.backer.slug}) }}"
+                                        title="{{ aidInstructor.backer.name }} - Ouvrir dans une nouvelle fenêtre"
+                                        target="_blank" rel="noopener"
+                                        >
+                                            <img src="{{ getParameter('cloud_image_url') }}{{ aidInstructor.backer.logo }}" alt="logo {{ aidInstructor.backer.name }}">
+                                        </a>
+                                    </p>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    </section>
+                    {% endif %}
                     </div>
                 </div>
             </div>
