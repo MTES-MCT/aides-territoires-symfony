@@ -34,6 +34,7 @@ use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType as TypeIntegerType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\UrlType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormEvent;
@@ -639,7 +640,7 @@ class AidEditType extends AbstractType
                     'readonly' => in_array('perimeterSuggestion', $sanctuarizedFields) ? true : false,
                 ],
             ])
-            ->add('originUrl', TextType::class, [
+            ->add('originUrl', UrlType::class, [
                 'required' => $isDraft ? false : true,
                 'label' => 'Lien vers plus d’information (url d’origine, site du porteur d’aides)',
                 'help_html' => true,
