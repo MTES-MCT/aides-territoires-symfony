@@ -28,6 +28,7 @@ use App\Entity\Organization\OrganizationType;
 use App\Entity\Perimeter\Perimeter;
 use App\Entity\Program\Program;
 use App\Entity\Reference\ProjectReference;
+use App\Entity\Reference\ProjectReferenceMissing;
 use App\Entity\Site\UrlRedirect;
 use App\Entity\User\User;
 use App\Field\AddNewField;
@@ -38,6 +39,7 @@ use App\Field\TrumbowygField;
 use App\Form\Admin\Aid\AidImportType;
 use App\Form\Admin\Aid\KeywordReferenceAssociationType;
 use App\Form\Admin\Aid\ProjectReferenceAssociationType;
+use App\Form\Admin\Reference\ProjectReferenceMissingCreateType;
 use App\Repository\Aid\AidDestinationRepository;
 use App\Repository\Aid\AidRecurrenceRepository;
 use App\Repository\Aid\AidRepository;
@@ -60,6 +62,8 @@ use EasyCorp\Bundle\EasyAdminBundle\Config\Filters;
 use EasyCorp\Bundle\EasyAdminBundle\Config\KeyValueStore;
 use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\BatchActionDto;
+use EasyCorp\Bundle\EasyAdminBundle\Event\BeforeEntityPersistedEvent;
+use EasyCorp\Bundle\EasyAdminBundle\Event\BeforeEntityUpdatedEvent;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ArrayField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
@@ -76,12 +80,13 @@ use EasyCorp\Bundle\EasyAdminBundle\Filter\ChoiceFilter;
 use OpenSpout\Reader\CSV\Options as OptionsCsv;
 use OpenSpout\Reader\CSV\Reader as ReaderCsv;
 use OpenSpout\Reader\XLSX\Reader as ReaderXlsx;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use TypeError;
 
-class AidCrudController extends AtCrudController
+class AidCrudController extends AtCrudController implements EventSubscriberInterface
 {
     private $symbolWarning = '&#9888;';
     public static function getEntityFqcn(): string
@@ -378,6 +383,14 @@ class AidCrudController extends AtCrudController
                 ->setColumns(12)
             ;
         }
+
+        yield CollectionField::new('projectReferenceMissings', 'Projets référents manquants')
+        ->setEntryType(ProjectReferenceMissingCreateType::class)
+        ->allowAdd() // Permet d'ajouter de nouveaux éléments
+        ->allowDelete() // Permet de supprimer des éléments
+        ->setFormTypeOption('by_reference', false)
+        ->setColumns(12)
+        ->hideOnIndex();
 
 
         yield ArrayField::new('keywordReferences', 'Mots clés référents')
@@ -1190,5 +1203,43 @@ class AidCrudController extends AtCrudController
         }
 
         return $this->redirect($batchActionDto->getReferrerUrl());
+    }
+
+    public static function getSubscribedEvents()
+    {
+        return [
+            BeforeEntityPersistedEvent::class => ['handleProjectReferenceMissingPersistEvent'],
+            BeforeEntityUpdatedEvent::class => ['handleProjectReferenceMissingUpdateEvent'],
+        ];
+    }
+
+    public function handleProjectReferenceMissingPersistEvent(BeforeEntityPersistedEvent $event)
+    {
+        $this->handleProjectReferenceMissingDuplicates($event->getEntityInstance());
+    }
+
+    public function handleProjectReferenceMissingUpdateEvent(BeforeEntityUpdatedEvent $event)
+    {
+        $this->handleProjectReferenceMissingDuplicates($event->getEntityInstance());
+    }
+
+    private function handleProjectReferenceMissingDuplicates(Aid $entity): void
+    {
+        // on parcours les projets référents manquants donnés
+        foreach ($entity->getProjectReferenceMissings() as $projectReferenceMissing) {
+            // si l'id est null
+            if (!$projectReferenceMissing->getId()) {
+                // on vérifie que ce projet n'existe pas déjà par le nom
+                $projectReferenceMissingTest = $this->managerRegistry->getRepository(ProjectReferenceMissing::class)->findOneBy(['name' => $projectReferenceMissing->getName()]);
+                // si il existe déjà
+                if ($projectReferenceMissingTest instanceof ProjectReferenceMissing) {
+                    // on ajoute à l'entité
+                    $entity->addProjectReferenceMissing($projectReferenceMissingTest);
+                    // on retire l'ajout sans id pour éviter les doublons
+                    $entity->removeProjectReferenceMissing($projectReferenceMissing);
+                }
+                $this->managerRegistry->getManager()->remove($projectReferenceMissing);
+            }
+        }
     }
 }
