@@ -21,6 +21,7 @@ use App\Entity\Project\ProjectValidated;
 use App\Entity\Reference\KeywordReference;
 use App\Entity\Reference\KeywordReferenceSuggested;
 use App\Entity\Reference\ProjectReference;
+use App\Entity\Reference\ProjectReferenceMissing;
 use App\Entity\Search\SearchPage;
 use App\Entity\User\User;
 use App\Repository\Aid\AidRepository;
@@ -699,6 +700,12 @@ class Aid // NOSONAR too much methods
 
     #[Groups([self::API_GROUP_ITEM])]
     private bool $live = false;
+
+    /**
+     * @var Collection<int, ProjectReferenceMissing>
+     */
+    #[ORM\ManyToMany(targetEntity: ProjectReferenceMissing::class, mappedBy: 'aids', cascade:['persist'])]
+    private Collection $projectReferenceMissings;
     
     /**
      * <Non Database Fields
@@ -737,6 +744,7 @@ class Aid // NOSONAR too much methods
         $this->keywordReferenceSuggesteds = new ArrayCollection();
         $this->projectReferencesSearched = new ArrayCollection();
         $this->sanctuarizedFields = new ArrayCollection();
+        $this->projectReferenceMissings = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -2710,6 +2718,33 @@ class Aid // NOSONAR too much methods
     public function setProjectReferencesSuggestions(array $projectReferenceSuggestions): static
     {
         $this->projectReferencesSuggestions = $projectReferenceSuggestions;
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, ProjectReferenceMissing>
+     */
+    public function getProjectReferenceMissings(): Collection
+    {
+        return $this->projectReferenceMissings;
+    }
+
+    public function addProjectReferenceMissing(ProjectReferenceMissing $projectReferenceMissing): static
+    {
+        if (!$this->projectReferenceMissings->contains($projectReferenceMissing)) {
+            $this->projectReferenceMissings->add($projectReferenceMissing);
+            $projectReferenceMissing->addAid($this);
+        }
+
+        return $this;
+    }
+
+    public function removeProjectReferenceMissing(ProjectReferenceMissing $projectReferenceMissing): static
+    {
+        if ($this->projectReferenceMissings->removeElement($projectReferenceMissing)) {
+            $projectReferenceMissing->removeAid($this);
+        }
+
         return $this;
     }
 }

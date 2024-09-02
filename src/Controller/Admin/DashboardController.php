@@ -51,6 +51,7 @@ use App\Entity\Reference\KeywordReference;
 use App\Entity\Reference\KeywordReferenceSuggested;
 use App\Entity\Reference\ProjectReference;
 use App\Entity\Reference\ProjectReferenceCategory;
+use App\Entity\Reference\ProjectReferenceMissing;
 use App\Entity\Search\SearchPage;
 use App\Entity\Site\UrlRedirect;
 use App\Entity\User\ApiTokenAsk;
@@ -261,6 +262,7 @@ class DashboardController extends AbstractDashboardController
             MenuItem::linkToCrud('Mots clé référents', 'fas fa-list', KeywordReference::class),
             MenuItem::linkToCrud('Projets', 'fas fa-list', ProjectReference::class),
             MenuItem::linkToCrud('Catégories de projet', 'fas fa-list', ProjectReferenceCategory::class),
+            MenuItem::linkToCrud('Projets manquants', 'fas fa-list', ProjectReferenceMissing::class),
             MenuItem::linkToCrud('Suggestion mots clés / aides', 'fas fa-list', KeywordReferenceSuggested::class),
         ]);
 
