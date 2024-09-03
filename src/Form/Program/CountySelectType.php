@@ -11,9 +11,10 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class CountySelectType extends AbstractType
 {
-    public function  __construct(
+    public function __construct(
         protected ManagerRegistry $managerRegistry,
-    ) {}
+    ) {
+    }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {

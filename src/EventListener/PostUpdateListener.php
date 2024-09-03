@@ -28,7 +28,8 @@ class PostUpdateListener
         private AidListener $aidListener,
         private BackerListener $backerListener,
         private BackerAskAssociateListener $backerAskAssociateListener
-    ) {}
+    ) {
+    }
 
     public function postUpdate(PostUpdateEventArgs $args): void
     {

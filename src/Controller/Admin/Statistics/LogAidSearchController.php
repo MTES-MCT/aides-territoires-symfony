@@ -28,7 +28,8 @@ class LogAidSearchController extends AbstractController
     public function __construct(
         private LogAidSearchRepository $logAidSearchRepository,
         private RequestStack $requestStack
-    ) {}
+    ) {
+    }
 
     #[Route('/admin/statistics/log/aid-search', name: 'admin_statistics_log_aid_search')]
     public function blogDashboard(

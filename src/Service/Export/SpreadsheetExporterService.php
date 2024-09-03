@@ -38,8 +38,9 @@ class SpreadsheetExporterService
         private HtmlSanitizerInterface $htmlSanitizerInterface,
         private LoggerInterface $loggerInterface,
         private MessageBusInterface $messageBusInterface
-    ) {}
-    public function  createResponseFromQueryBuilder( // NOSONAR too complex
+    ) {
+    }
+    public function createResponseFromQueryBuilder(// NOSONAR too complex
         QueryBuilder $queryBuilder,
         mixed $entityFcqn,
         string $filename,

@@ -19,7 +19,8 @@ class DeleteType extends AbstractType
     public function __construct(
         protected UserService $userService,
         protected UserPasswordHasherInterface $userPasswordHasherInterface
-    ) {}
+    ) {
+    }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {

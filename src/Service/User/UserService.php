@@ -24,7 +24,8 @@ class UserService
         private AuthorizationCheckerInterface $authorizationCheckerInterface,
         private TokenStorageInterface $tokenStorageInterface,
         private Security $security
-    ) {}
+    ) {
+    }
 
     public function isMemberOfOrganization(?Organization $organization, User $user): bool
     {

@@ -51,7 +51,8 @@ class AtCrudController extends AbstractCrudController
         public UserPasswordHasherInterface $userPasswordHasherInterface,
         public MessageBusInterface $messageBusInterface,
         public StringService $stringService
-    ) {}
+    ) {
+    }
 
     public static function getEntityFqcn(): string
     {
@@ -105,22 +106,22 @@ class AtCrudController extends AbstractCrudController
             $moveTop = Action::new('moveTop', false, 'fa fa-arrow-up')
                 ->setHtmlAttributes(['title' => 'Move to top']) // titre
                 ->linkToCrudAction('moveTop') // l'action appellée
-                ->displayIf(fn($entity) => $entity->getPosition() > 0); // condition d'affichage
+                ->displayIf(fn ($entity) => $entity->getPosition() > 0); // condition d'affichage
 
             $moveUp = Action::new('moveUp', false, 'fa fa-sort-up')
                 ->setHtmlAttributes(['title' => 'Move up'])
                 ->linkToCrudAction('moveUp')
-                ->displayIf(fn($entity) => $entity->getPosition() > 0);
+                ->displayIf(fn ($entity) => $entity->getPosition() > 0);
 
             $moveDown = Action::new('moveDown', false, 'fa fa-sort-down')
                 ->setHtmlAttributes(['title' => 'Move down'])
                 ->linkToCrudAction('moveDown')
-                ->displayIf(fn($entity) => $entity->getPosition() < $entityCount - 1);
+                ->displayIf(fn ($entity) => $entity->getPosition() < $entityCount - 1);
 
             $moveBottom = Action::new('moveBottom', false, 'fa fa-arrow-down')
                 ->setHtmlAttributes(['title' => 'Move to bottom'])
                 ->linkToCrudAction('moveBottom')
-                ->displayIf(fn($entity) => $entity->getPosition() < $entityCount - 1);
+                ->displayIf(fn ($entity) => $entity->getPosition() < $entityCount - 1);
 
             return $actions
                 ->add(Crud::PAGE_INDEX, $moveBottom)
@@ -207,7 +208,8 @@ class AtCrudController extends AbstractCrudController
                     ->andWhere('pt.position <= :oldPosition')
                     ->setParameter('oldPosition', $oldPosition)
                     ->setParameter('newPosition', $newPosition)
-                ;;
+                ;
+                ;
             } else {
                 $qb
                     ->andWhere('pt.position <= :newPosition')

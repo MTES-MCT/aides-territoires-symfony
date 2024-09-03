@@ -22,7 +22,8 @@ class PostPersistListener
         protected FirewallMapInterface $firewallMapInterface,
         protected ManagerRegistry $managerRegistry,
         protected UserListener $userListener
-    ) {}
+    ) {
+    }
 
     public function postPersist(PostPersistEventArgs $args): void
     {

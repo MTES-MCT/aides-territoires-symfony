@@ -13,7 +13,8 @@ class CountyCountBackerHandler
 {
     public function __construct(
         private ManagerRegistry $managerRegistry,
-    ) {}
+    ) {
+    }
 
     public function __invoke(CountyCountBacker $message): void
     {

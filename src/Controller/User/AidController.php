@@ -722,7 +722,7 @@ class AidController extends FrontController
             throw new NotFoundHttpException('Cette aide n\'exite pas');
         }
 
-        // duplique l'aide 
+        // duplique l'aide
         $newAid = $aidService->duplicateAid($aid, $user);
 
         // sauvegarde

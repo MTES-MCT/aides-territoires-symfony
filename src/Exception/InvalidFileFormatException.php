@@ -2,4 +2,6 @@
 
 namespace App\Exception;
 
-class InvalidFileFormatException extends \Exception {}
+class InvalidFileFormatException extends \Exception
+{
+}

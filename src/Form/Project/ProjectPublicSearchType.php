@@ -15,10 +15,11 @@ use Symfony\Component\Routing\RouterInterface;
 
 class ProjectPublicSearchType extends AbstractType
 {
-    public function  __construct(
+    public function __construct(
         protected ManagerRegistry $managerRegistry,
         protected RouterInterface $routerInterface
-    ) {}
+    ) {
+    }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {

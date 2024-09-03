@@ -12,7 +12,6 @@ use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Symfony\Component\Validator\Constraints as Assert;
 
-
 #[ORM\Entity(repositoryClass: LogAidCreatedsFolderRepository::class)]
 #[ORM\Index(columns: ['date_create'], name: 'date_create_laccf')]
 class LogAidCreatedsFolder

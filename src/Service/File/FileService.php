@@ -16,7 +16,8 @@ class FileService
 
     public function __construct(
         private KernelInterface $kernelInterface
-    ) {}
+    ) {
+    }
 
     public function getUploadTmpDirRelative(): string
     {

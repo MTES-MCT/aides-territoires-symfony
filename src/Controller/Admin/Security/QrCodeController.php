@@ -17,7 +17,6 @@ use Endroid\QrCode\Writer\PngWriter;
 use Scheb\TwoFactorBundle\Security\TwoFactor\Provider\Totp\TotpAuthenticatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
-
 class QrCodeController extends AbstractController
 {
     #[Route(

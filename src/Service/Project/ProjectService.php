@@ -13,7 +13,8 @@ class ProjectService
     public function __construct(
         private ProjectRepository $projectRepository,
         private ManagerRegistry $managerRegistry
-    ) {}
+    ) {
+    }
 
     public function searchProjects(?array $projectParams = null)
     {

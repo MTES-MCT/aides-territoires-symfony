@@ -163,7 +163,7 @@ class AidController extends FrontController
             foreach ($formAidSearch->getData() as $key => $data) {
                 if (in_array($key, ['organizationType', 'searchPerimeter'])) {
                     continue;
-                } else if (in_array($key, ['aidTypes', 'categorysearch', 'backers', 'programs', 'aidSteps'])) {
+                } elseif (in_array($key, ['aidTypes', 'categorysearch', 'backers', 'programs', 'aidSteps'])) {
                     if (count($formAidSearch->get($key)->getData()) > 0) {
                         $nbCriteria++;
                     }
@@ -338,7 +338,7 @@ class AidController extends FrontController
             return $this->redirect($aid->getUrl());
         }
 
-        // duplique l'aide 
+        // duplique l'aide
         $newAid = $aidService->duplicateAid($aid, $user);
 
         // on met les infos de l'aide generic

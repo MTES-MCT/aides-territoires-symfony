@@ -107,7 +107,6 @@ use Symfony\Component\Validator\Constraints as Assert;
     paginationItemsPerPage: 30,
     paginationMaximumItemsPerPage: 100,
     paginationClientItemsPerPage: true
-
 )]
 
 #[ApiFilter(AidTextFilter::class)]
@@ -2188,7 +2187,7 @@ class Aid // NOSONAR too much methods
         return false;
     }
 
-    public function  hasCalendar(): bool
+    public function hasCalendar(): bool
     {
         if ($this->isOnGoing()) {
             return false;

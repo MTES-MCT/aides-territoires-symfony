@@ -21,7 +21,8 @@ class AidPropagateUpdateHandler
 {
     public function __construct(
         private ManagerRegistry $managerRegistry,
-    ) {}
+    ) {
+    }
 
     public function __invoke(AidPropagateUpdate $message): void
     {

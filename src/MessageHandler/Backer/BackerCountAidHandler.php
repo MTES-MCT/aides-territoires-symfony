@@ -15,7 +15,8 @@ class BackerCountAidHandler
     public function __construct(
         private ManagerRegistry $managerRegistry,
         private AidService $aidService
-    ) {}
+    ) {
+    }
 
     public function __invoke(BackerCountAid $message): void
     {

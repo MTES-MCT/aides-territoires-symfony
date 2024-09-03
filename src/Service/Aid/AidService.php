@@ -33,7 +33,8 @@ class AidService // NOSONAR too complex
         private ReferenceService $referenceService,
         private ManagerRegistry $managerRegistry,
         private LoggerInterface $loggerInterface
-    ) {}
+    ) {
+    }
 
     public function getSuggestedProjectReferences(Aid $aid): array
     {

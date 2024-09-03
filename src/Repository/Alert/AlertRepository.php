@@ -76,7 +76,7 @@ class AlertRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult();
     }
 
-    public function  getQueryBuilder(array $params = null): QueryBuilder
+    public function getQueryBuilder(array $params = null): QueryBuilder
     {
         $dailyMinDate = $params['dailyMinDate'] ?? null;
         $weeklyMinDate = $params['weeklyMinDate'] ?? null;

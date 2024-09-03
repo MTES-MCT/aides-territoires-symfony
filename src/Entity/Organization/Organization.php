@@ -1420,7 +1420,7 @@ class Organization // NOSONAR too much methods
     }
 
 
-    public function  getProjectsOfUser(User $user): array
+    public function getProjectsOfUser(User $user): array
     {
         $projects = [];
         foreach ($this->getProjects() as $project) {
@@ -1431,7 +1431,7 @@ class Organization // NOSONAR too much methods
         return $projects;
     }
 
-    public function  getAidsOfUser(User $user): array
+    public function getAidsOfUser(User $user): array
     {
         $aids = [];
         foreach ($this->getAids() as $aid) {

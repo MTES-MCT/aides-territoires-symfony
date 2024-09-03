@@ -150,7 +150,7 @@ class PerimeterCrudController extends AtCrudController
             ->useEntryCrudForm(PerimeterDataCrudController::class);
     }
 
-    public function  configureCrud(Crud $crud): Crud
+    public function configureCrud(Crud $crud): Crud
     {
         return parent::configureCrud($crud)
             ->overrideTemplate('crud/edit', 'admin/perimeter/edit.html.twig')

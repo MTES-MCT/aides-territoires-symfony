@@ -23,7 +23,7 @@ class ApiTokenAskCrudController extends AtCrudController
     }
 
     public function configureFields(string $pageName): iterable
-        {
+    {
         yield IdField::new('id')->onlyOnIndex();
         yield TextareaField::new('description', 'Description')
         ->hideOnIndex();
@@ -45,7 +45,7 @@ class ApiTokenAskCrudController extends AtCrudController
             ->setHtmlAttributes(['title' => 'Accepter', 'target' => '_self']) // titre
             ->linkToCrudAction('accept') // l'action appellée
             ->displayIf(fn ($entity) => !$entity->getUser()->getApiToken()); // condition d'affichage
-            ;
+        ;
         
         return $actions
             ->add(Crud::PAGE_INDEX, $accept)
@@ -64,7 +64,7 @@ class ApiTokenAskCrudController extends AtCrudController
         $object->setTimeAccept(new \DateTime(date('Y-m-d H:i:s')));
         $this->managerRegistry->getManager()->persist($object);
 
-        $this->managerRegistry->getManager()->flush();    
+        $this->managerRegistry->getManager()->flush();
 
         $this->addFlash('success', 'Token ajouté à l\'utilisateur.');
 

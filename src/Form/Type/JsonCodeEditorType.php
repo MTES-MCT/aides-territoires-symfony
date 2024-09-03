@@ -15,8 +15,8 @@ class JsonCodeEditorType extends AbstractType
 
         $builder
             ->addModelTransformer(new CallbackTransformer(
-                static fn($object) => json_encode($object, \JSON_THROW_ON_ERROR | \JSON_PRETTY_PRINT),
-                static fn($json) => json_decode($json, true, 512, \JSON_THROW_ON_ERROR)
+                static fn ($object) => json_encode($object, \JSON_THROW_ON_ERROR | \JSON_PRETTY_PRINT),
+                static fn ($json) => json_decode($json, true, 512, \JSON_THROW_ON_ERROR)
             ));
     }
 

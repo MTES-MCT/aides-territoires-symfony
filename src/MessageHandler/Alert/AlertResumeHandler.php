@@ -18,7 +18,8 @@ class AlertResumeHandler
         private ManagerRegistry $managerRegistry,
         private ParamService $paramService,
         private NotificationService $notificationService
-    ) {}
+    ) {
+    }
 
     public function __invoke(AlertResume $resume): void
     {

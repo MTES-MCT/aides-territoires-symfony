@@ -32,7 +32,8 @@ final class RouteListener
         private ParamService $paramService,
         private Packages $packages,
         private NotificationService $notificationService
-    ) {}
+    ) {
+    }
     public function onKernelRequest(
         RequestEvent $event
     ): void {

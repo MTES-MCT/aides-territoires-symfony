@@ -36,11 +36,12 @@ use Symfony\Component\Routing\RouterInterface;
 
 class AidSearchTypeV2 extends AbstractType
 {
-    public function  __construct(
+    public function __construct(
         private UserService $userService,
         protected ManagerRegistry $managerRegistry,
         protected RouterInterface $routerInterface
-    ) {}
+    ) {
+    }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {

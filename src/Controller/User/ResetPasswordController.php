@@ -29,7 +29,8 @@ class ResetPasswordController extends AbstractController
         private ResetPasswordHelperInterface $resetPasswordHelper,
         private EntityManagerInterface $entityManager,
         private ParamService $paramService
-    ) {}
+    ) {
+    }
 
     /**
      * Display & process form to request a password reset.

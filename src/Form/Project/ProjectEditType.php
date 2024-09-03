@@ -28,7 +28,8 @@ class ProjectEditType extends AbstractType
     public function __construct(
         protected ImageService $imageService,
         protected UserService $userService
-    ) {}
+    ) {
+    }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {

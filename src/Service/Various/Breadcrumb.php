@@ -4,11 +4,11 @@ namespace App\Service\Various;
 
 class Breadcrumb
 {
-    protected $items = array();
+    protected $items = [];
 
     public function add(string $text, ?string $url = null): self
     {
-        array_push($this->items, array('text' => $text, 'url' => $url));
+        array_push($this->items, ['text' => $text, 'url' => $url]);
         return $this;
     }
 

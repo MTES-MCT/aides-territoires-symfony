@@ -16,7 +16,8 @@ class SendNotificationHandler
         private NotificationService $notificationService,
         private ManagerRegistry $managerRegistry,
         private ParamService $paramService
-    ) {}
+    ) {
+    }
 
     public function __invoke(SendNotification $message)
     {

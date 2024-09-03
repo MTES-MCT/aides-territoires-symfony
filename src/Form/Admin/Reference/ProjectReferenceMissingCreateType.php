@@ -13,7 +13,8 @@ class ProjectReferenceMissingCreateType extends AbstractType
 {
     public function __construct(
         private RouterInterface $routerInterface
-    ) {}
+    ) {
+    }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {

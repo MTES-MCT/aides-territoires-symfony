@@ -17,7 +17,8 @@ class MatomoService
         protected RequestStack $requestStack,
         protected ParamService $paramService,
         protected HttpClientInterface $httpClientInterface
-    ) {}
+    ) {
+    }
 
     /**
      * Set an analytics goal to be tracked.

@@ -17,10 +17,11 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 class ProjectReferenceSearchType extends AbstractType
 {
-    public function  __construct(
+    public function __construct(
         private UserService $userService,
         private RouterInterface $routerInterface
-    ) {}
+    ) {
+    }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {

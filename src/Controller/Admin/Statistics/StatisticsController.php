@@ -39,13 +39,14 @@ class StatisticsController extends DashboardController
     const NB_ORGANIZATION_BY_PAGE = 50;
     const NB_PROJECT_BY_PAGE = 50;
 
-    public function  __construct(
+    public function __construct(
         protected UserService $userService,
         protected ManagerRegistry $managerRegistry,
         protected AdminUrlGenerator $adminUrlGenerator,
         protected ChartBuilderInterface $chartBuilderInterface,
         protected Breadcrumb $breadcrumb
-    ) {}
+    ) {
+    }
 
     private function getChartObjectif(int $nbCurrent, int $nbTotal, ?int $nbObjectif): Chart
     {
@@ -478,7 +479,8 @@ class StatisticsController extends DashboardController
             $registersWithProject[] = $this->managerRegistry->getRepository(User::class)->countRegistersWithProject([
                 'dateCreateMin' => $dateStart,
                 'dateCreateMax' => $dateMax,
-            ]);;
+            ]);
+            ;
         }
 
         $chartRegisters = $this->chartBuilderInterface->createChart(Chart::TYPE_BAR);
@@ -1325,7 +1327,7 @@ class StatisticsController extends DashboardController
         return isset($nbCommunes[$departmentCode]) ? $nbCommunes[$departmentCode] : 0;
     }
 
-    function getAge(\DateTime $date): int
+    public function getAge(\DateTime $date): int
     {
         $now = new \DateTime();
         $interval = $now->diff($date);

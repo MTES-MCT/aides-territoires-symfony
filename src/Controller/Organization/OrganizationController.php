@@ -49,7 +49,7 @@ class OrganizationController extends FrontController
         PerimeterDataRepository $perimeterDataRepository,
         ?int $id = null
     ): Response {
-        // le user        
+        // le user
         $user = $userService->getUserLogged();
 
         // l'organization

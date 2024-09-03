@@ -43,7 +43,7 @@ class OrganizationCrudController extends AtCrudController
             ->addWebpackEncoreEntry('admin/organization/associate');
     }
 
-    public function  configureCrud(Crud $crud): Crud
+    public function configureCrud(Crud $crud): Crud
     {
         return parent::configureCrud($crud)
             ->overrideTemplate('crud/index', 'admin/organization/index.html.twig')

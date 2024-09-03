@@ -46,7 +46,9 @@ class SimpleSearchFilter extends AbstractFilter
 
         $words = explode(' ', $value);
         foreach ($words as $word) {
-            if (empty($word)) continue;
+            if (empty($word)) {
+                continue;
+            }
 
             $this->addWhere($queryBuilder, $word, $queryNameGenerator->generateParameterName($property), $queryNameGenerator, $resourceClass);
         }

@@ -154,7 +154,7 @@ class ParameterController extends FrontController
             return $this->redirectToRoute('app_user_parameter_history_log');
         }
 
-        $logsParams = array();
+        $logsParams = [];
         $logsParams['user'] = $user;
         $logsParams['action'] = 'login';
         $logsParams['limit'] = $params['limit'] ?? 3;

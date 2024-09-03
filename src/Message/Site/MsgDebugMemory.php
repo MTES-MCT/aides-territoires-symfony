@@ -2,4 +2,6 @@
 
 namespace App\Message\Site;
 
-class MsgDebugMemory {}
+class MsgDebugMemory
+{
+}

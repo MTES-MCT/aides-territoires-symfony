@@ -35,7 +35,8 @@ class AidPerimeterFilter implements FilterInterface
         $queryBuilder
             ->innerJoin(sprintf('%s.perimeter', $filterDataDto->getEntityAlias()), 'perimeterFilter')
             ->andWhere('perimeterFilter.id IN (:ids)')
-            ->setParameter('ids', $ids);;
+            ->setParameter('ids', $ids);
+        ;
 
         return;
     }

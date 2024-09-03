@@ -9,7 +9,8 @@ class DataExportListener
 {
     public function __construct(
         protected DataExportService $dataExportService
-    ) {}
+    ) {
+    }
 
     public function onPostLoad(PostLoadEventArgs $args): void
     {

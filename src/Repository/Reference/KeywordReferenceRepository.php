@@ -133,7 +133,8 @@ class KeywordReferenceRepository extends ServiceEntityRepository
             if ($orderBy['sort'] == 'projectReferenceCategory.name') {
                 $qb->leftJoin('pr.projectReferenceCategory', 'projectReferenceCategory');
             }
-            $qb->addOrderBy($orderBy['sort'], $orderBy['order']);;
+            $qb->addOrderBy($orderBy['sort'], $orderBy['order']);
+            ;
         }
 
         return $qb;

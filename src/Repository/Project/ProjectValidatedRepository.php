@@ -165,7 +165,8 @@ class ProjectValidatedRepository extends ServiceEntityRepository
                 ->setParameter('lng', $perimeter->getLongitude())
                 ->andHaving('dist <= :distanceKm')
                 ->setParameter('distanceKm', $radius)
-                ->orderBy('dist', 'ASC');;
+                ->orderBy('dist', 'ASC');
+            ;
         }
 
         if (isset($scoreTotalAvailable)) {

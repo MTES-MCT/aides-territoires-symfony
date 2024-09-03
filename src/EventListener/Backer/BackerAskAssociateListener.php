@@ -13,7 +13,8 @@ class BackerAskAssociateListener
     public function __construct(
         private NotificationService $notificationService,
         private RouterInterface $routerInterface
-    ) {}
+    ) {
+    }
 
     public function onPostUpdate(PostUpdateEventArgs $args): void
     {

@@ -2,4 +2,6 @@
 
 namespace App\Message\Perimeter;
 
-class MsgPerimeterImport {}
+class MsgPerimeterImport
+{
+}

@@ -854,7 +854,7 @@ class AidCrudController extends AtCrudController implements EventSubscriberInter
     }
 
 
-    public function  configureCrud(Crud $crud): Crud
+    public function configureCrud(Crud $crud): Crud
     {
         return parent::configureCrud($crud)
             ->overrideTemplate('crud/edit', 'admin/aid/edit.html.twig')

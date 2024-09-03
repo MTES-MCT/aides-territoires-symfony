@@ -20,7 +20,8 @@ class MsgSpreadsheetToExportHandler
         private KernelInterface $kernelInterface,
         private NotificationService $notificationService,
         private ParamService $paramService
-    ) {}
+    ) {
+    }
 
     public function __invoke(MsgSpreadsheetToExport $message): void
     {

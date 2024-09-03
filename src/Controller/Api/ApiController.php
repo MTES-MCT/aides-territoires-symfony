@@ -23,7 +23,8 @@ class ApiController extends AbstractController
         protected ManagerRegistry $managerRegistry,
         protected StringService $stringService,
         protected ParamService $paramService
-    ) {}
+    ) {
+    }
 
     protected function getPage(): int
     {

@@ -146,7 +146,7 @@ final class AtSearchFilter extends AbstractFilter implements SearchFilterInterfa
         }, $values);
 
         $expected = \count($values);
-        $values = array_filter($values, static fn($value) => null !== $value);
+        $values = array_filter($values, static fn ($value) => null !== $value);
         if ($expected > \count($values)) {
             /*
              * Shouldn't this actually fail harder?

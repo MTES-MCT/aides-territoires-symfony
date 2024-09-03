@@ -220,7 +220,7 @@ class AidRepository extends ServiceEntityRepository
 
     public function findOneCustom(array $params = null): ?Aid
     {
-        $params = array_merge($params, array('limit' => 1));
+        $params = array_merge($params, ['limit' => 1]);
 
         $qb = $this->getQueryBuilder($params);
 
@@ -743,7 +743,7 @@ class AidRepository extends ServiceEntityRepository
         }
 
         if ($perimeterFrom instanceof Perimeter && $perimeterFrom->getId()) {
-            $ids = $this->getEntityManager()->getRepository(Perimeter::class)->getIdPerimetersContainedIn(array('perimeter' => $perimeterFrom));
+            $ids = $this->getEntityManager()->getRepository(Perimeter::class)->getIdPerimetersContainedIn(['perimeter' => $perimeterFrom]);
             $ids[] = $perimeterFrom->getId();
 
             $qb

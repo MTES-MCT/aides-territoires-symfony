@@ -19,7 +19,8 @@ class FrontController extends AbstractController
     public function __construct(
         public Breadcrumb $breadcrumb,
         public TranslatorInterface $translatorInterface
-    ) {}
+    ) {
+    }
 
     /**
      * Pour les addFlash traduits

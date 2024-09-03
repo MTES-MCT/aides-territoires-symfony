@@ -516,7 +516,8 @@ class PortalController extends FrontController
             $labels = [];
             $datas = [];
             foreach ($organizationTypes as $organizationType) {
-                $labels[] = $organizationType['name'] . ' (' . $organizationType['percentage'] . '%)';;
+                $labels[] = $organizationType['name'] . ' (' . $organizationType['percentage'] . '%)';
+                ;
                 $datas[] = $organizationType['nb'];
             }
             $colors = $this->getPieColors($organizationTypes);

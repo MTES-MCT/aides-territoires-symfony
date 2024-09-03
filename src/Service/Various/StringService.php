@@ -76,7 +76,7 @@ class StringService
      */
     public function getNoAccent(string $string): string
     {
-        $a = array(
+        $a = [
             'À',
             'Á',
             'Â',
@@ -288,8 +288,8 @@ class StringService
             'ǽ',
             'Ǿ',
             'ǿ'
-        );
-        $b = array(
+        ];
+        $b = [
             'A',
             'A',
             'A',
@@ -501,7 +501,7 @@ class StringService
             'ae',
             'O',
             'o'
-        );
+        ];
         $string = strtr($string, array_combine($a, $b));
         return $string;
     }

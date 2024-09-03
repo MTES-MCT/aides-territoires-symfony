@@ -23,7 +23,8 @@ class TokenAuthenticator extends AbstractAuthenticator
         private UserRepository $userRepository,
         private ?AuthenticationSuccessHandler $successHandler,
         private ?AuthenticationFailureEvent $failureHandler
-    ) {}
+    ) {
+    }
 
     /**
      * Called on every request to decide if this authenticator should be

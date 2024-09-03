@@ -66,7 +66,7 @@ class CustomPasswordHasher implements PasswordHasherInterface
             // login ok.
             return true;
         } else {
-            //login fail       
+            //login fail
             return false;
         }
     }

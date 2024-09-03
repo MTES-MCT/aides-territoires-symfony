@@ -12,7 +12,8 @@ class NotificationService
     public function __construct(
         private ManagerRegistry $managerRegistry,
         private LoggerInterface $loggerInterface
-    ) {}
+    ) {
+    }
 
     public function addNotification(User $user, string $name, string $description): void
     {

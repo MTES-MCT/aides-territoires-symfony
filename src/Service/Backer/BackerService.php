@@ -11,7 +11,8 @@ class BackerService
 {
     public function __construct(
         private ManagerRegistry $managerRegistry
-    ) {}
+    ) {
+    }
 
     public function userCanPreview(?User $user, ?Backer $backer): bool
     {

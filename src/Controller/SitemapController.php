@@ -256,14 +256,14 @@ class SitemapController extends AbstractController
         return new Response(
             $this->renderView(
                 'sitemap.html.twig',
-                array(
+                [
                     'urls'          => $urls
-                )
+                ]
             ),
             200,
-            array(
+            [
                 'Content-Type' => 'text/xml'
-            )
+            ]
         );
     }
 }

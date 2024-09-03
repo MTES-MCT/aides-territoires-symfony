@@ -10,7 +10,8 @@ class CategoryService
 {
     public function __construct(
         protected CategoryRepository $categoryRepository
-    ) {}
+    ) {
+    }
 
     public function groupCategoriesByTheme(ArrayCollection $categories): array
     {

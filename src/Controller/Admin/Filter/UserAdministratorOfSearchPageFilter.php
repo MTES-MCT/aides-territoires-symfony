@@ -32,13 +32,13 @@ class UserAdministratorOfSearchPageFilter implements FilterInterface
         if ($filterDataDto->getValue() === 1) {
             $queryBuilder
                 ->innerJoin(
-                    sprintf('%s.searchPages',  $filterDataDto->getEntityAlias()),
+                    sprintf('%s.searchPages', $filterDataDto->getEntityAlias()),
                     'searchPages'
                 );
             return;
-        } else if ($filterDataDto->getValue() === 0) {
+        } elseif ($filterDataDto->getValue() === 0) {
             $queryBuilder
-                ->leftJoin(sprintf('%s.searchPages', 'searchPages'),  $filterDataDto->getEntityAlias())
+                ->leftJoin(sprintf('%s.searchPages', 'searchPages'), $filterDataDto->getEntityAlias())
                 ->andWhere('searchPages.id IS NULL')
             ;
             return;

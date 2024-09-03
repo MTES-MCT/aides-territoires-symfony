@@ -12,7 +12,8 @@ class MsgPerimeterCombineHandler
 {
     public function __construct(
         private ManagerRegistry $managerRegistry,
-    ) {}
+    ) {
+    }
 
     public function __invoke(MsgPerimeterCombine $message): void
     {

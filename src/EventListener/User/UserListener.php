@@ -27,7 +27,8 @@ class UserListener
         private MatomoService $matomoService,
         private NotificationService $notificationService,
         private LoggerInterface $loggerInterface
-    ) {}
+    ) {
+    }
 
     public function onPostPersist(PostPersistEventArgs $args): void
     {
@@ -115,7 +116,7 @@ class UserListener
         }
     }
 
-    public function  onPreRemove(PreRemoveEventArgs $args): void
+    public function onPreRemove(PreRemoveEventArgs $args): void
     {
         /** @var User $user */
         $user = $args->getObject();

@@ -23,7 +23,8 @@ class AlertMessageHandler
         private AidSearchFormService $aidSearchFormService,
         private ParamService $paramService,
         private EmailService $emailService
-    ) {}
+    ) {
+    }
 
     public function __invoke(AlertMessage $message): void
     {

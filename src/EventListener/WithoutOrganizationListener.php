@@ -19,7 +19,8 @@ final class WithoutOrganizationListener
         private PageRepository $pageRepository,
         private UserService $userService,
         private RouterInterface $routerInterface,
-    ) {}
+    ) {
+    }
 
     public function onKernelRequest(
         RequestEvent $event

@@ -249,7 +249,7 @@ class EligibilityTest // NOSONAR too much methods
     }
 
 
-    public function  __toString(): string
+    public function __toString(): string
     {
         return $this->name ?? 'EligibilityTest';
     }

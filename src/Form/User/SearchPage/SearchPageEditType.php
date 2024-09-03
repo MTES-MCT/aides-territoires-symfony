@@ -25,7 +25,8 @@ class SearchPageEditType extends AbstractType
 {
     public function __construct(
         private RouterInterface $routerInterface
-    ) {}
+    ) {
+    }
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
@@ -91,9 +92,9 @@ class SearchPageEditType extends AbstractType
             ->add('pages', CollectionType::class, [
                 'required' => true,
                 'entry_type' => SearchPageOngletType::class,
-                'entry_options' => array(
+                'entry_options' => [
                     'label' => false
-                ),
+                ],
                 'allow_add' => true,
                 'allow_delete' => true,
                 'label' => false,

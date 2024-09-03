@@ -166,7 +166,7 @@ class ProjectReference
         return $this;
     }
 
-    public function  __toString(): string
+    public function __toString(): string
     {
         return $this->getName() ?? '';
     }
@@ -200,7 +200,7 @@ class ProjectReference
 
     public function getAidsLive(): Collection
     {
-        $this->aidsLive = $this->aids->filter(fn(Aid $aid) => $aid->isLive());
+        $this->aidsLive = $this->aids->filter(fn (Aid $aid) => $aid->isLive());
         return $this->aidsLive;
     }
 

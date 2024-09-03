@@ -18,7 +18,8 @@ class ImageService
         protected KernelInterface $kernelInterface,
         protected StringService $stringService,
         protected FileService $fileService
-    ) {}
+    ) {
+    }
 
     /**
      * Envoi une image (deja uploadee / traitee sur le serveur) sur le cloud

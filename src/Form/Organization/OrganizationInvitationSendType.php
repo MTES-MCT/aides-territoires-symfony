@@ -18,7 +18,8 @@ class OrganizationInvitationSendType extends AbstractType
 {
     public function __construct(
         private UserService $userService
-    ) {}
+    ) {
+    }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {

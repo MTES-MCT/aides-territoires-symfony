@@ -20,7 +20,8 @@ class SearchPageCountAidHandler
         private ManagerRegistry $managerRegistry,
         private AidSearchFormService $aidSearchFormService,
         private AidService $aidService
-    ) {}
+    ) {
+    }
 
     public function __invoke(SearchPageCountAid $message): void
     {

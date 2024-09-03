@@ -55,7 +55,8 @@ class DataSourceCrudController extends AtCrudController
         yield AssociationField::new('contactTeam', 'Contact (Team AT)')
             ->setFormTypeOption('query_builder', function (UserRepository $entityRepository) {
                 return $entityRepository->getQueryBuilder(['onlyAdmin' => true]);
-            });;
+            });
+        ;
         yield TextareaField::new('contactBacker', 'Contact(s) coté porteur')
             ->onlyOnForms();
         yield AssociationField::new('aidAuthor', 'L\'auteur par défaut des aides importées')

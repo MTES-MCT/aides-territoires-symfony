@@ -26,7 +26,8 @@ class UserController extends AbstractController
     public function __construct(
         protected ManagerRegistry $managerRegistry,
         protected ChartBuilderInterface $chartBuilderInterface,
-    ) {}
+    ) {
+    }
 
     #[Route('/admin/statistics/user/dashboard', name: 'admin_statistics_user_dashboard')]
     public function communeDashboard(): Response

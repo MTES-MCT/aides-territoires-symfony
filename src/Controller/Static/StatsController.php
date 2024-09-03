@@ -37,7 +37,7 @@ class StatsController extends FrontController
             'Statistiques publiques'
         );
 
-        // rendu template  
+        // rendu template
         return $this->render('static/stats/index.html.twig', [
             'nbAids' => $nbAids,
             'nbAlerts' => $nbAlerts,

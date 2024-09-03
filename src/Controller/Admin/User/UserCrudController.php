@@ -159,10 +159,10 @@ class UserCrudController extends AtCrudController
         ->hideOnIndex();
     }
 
-    public function  configureCrud(Crud $crud): Crud
+    public function configureCrud(Crud $crud): Crud
     {
         return parent::configureCrud($crud)
-        ->overrideTemplate('crud/edit', 'admin/user/edit.html.twig')  
+        ->overrideTemplate('crud/edit', 'admin/user/edit.html.twig')
         ;
     }
 
@@ -173,7 +173,7 @@ class UserCrudController extends AtCrudController
             ->setHtmlAttributes(['title' => 'Afficher le QrCode', 'target' => '_blank']) // titre
             ->linkToCrudAction('showQrCode') // l'action appellée
             ->displayIf(fn ($entity) => $this->userService->isUserGranted($entity, User::ROLE_ADMIN)) // condition d'affichage
-            ;
+        ;
 
         $exportCsvAction = $this->getExportCsvAction();
         $exportXlsxAction = $this->getExportXlsxAction();

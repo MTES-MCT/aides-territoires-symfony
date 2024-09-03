@@ -20,7 +20,8 @@ class MsgPerimeterImportHandler
         private KernelInterface $kernelInterface,
         private NotificationService $notificationService,
         private ParamService $paramService
-    ) {}
+    ) {
+    }
 
     public function __invoke(MsgPerimeterImport $message): void
     {

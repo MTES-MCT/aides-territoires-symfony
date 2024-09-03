@@ -62,7 +62,7 @@ class OrganizationRepository extends ServiceEntityRepository
         $qb->select('IFNULL(COUNT(DISTINCT(perimeterForScale.id)), 0) AS nb');
 
         return $qb->getQuery()->getResult()[0]['nb'] ?? 0;
-        // return $this->countCustom($params);        
+        // return $this->countCustom($params);
     }
 
     public function countRegistrationsByMonth(array $params = []): array
@@ -180,7 +180,9 @@ class OrganizationRepository extends ServiceEntityRepository
         return $result[0]['nb'] ?? 0;
     }
 
-    public function findCounties(Organization $organization) {}
+    public function findCounties(Organization $organization)
+    {
+    }
 
     public function getQueryBuilder(?array $params = null): QueryBuilder
     {

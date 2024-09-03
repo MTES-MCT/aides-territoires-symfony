@@ -9,7 +9,8 @@ class DataExportService
 {
     public function __construct(
         protected ParameterBagInterface $parameterBagInterface
-    ) {}
+    ) {
+    }
 
     public function getUrlExportedFile(DataExport $dataExport): ?string
     {

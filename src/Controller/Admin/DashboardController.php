@@ -79,7 +79,8 @@ class DashboardController extends AbstractDashboardController
         protected AdminUrlGenerator $adminUrlGenerator,
         protected ChartBuilderInterface $chartBuilderInterface,
         protected MessageBusInterface $messageBusInterface
-    ) {}
+    ) {
+    }
 
     #[Route('/admin', name: 'admin')]
     public function index(): Response

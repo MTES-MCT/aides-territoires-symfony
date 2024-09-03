@@ -74,7 +74,7 @@ class ProjectReferenceController extends FrontController
         $formProjectReferenceSearch->handleRequest($requestStack->getCurrentRequest());
         if ($formProjectReferenceSearch->isSubmitted()) {
             if ($formProjectReferenceSearch->isValid()) {
-                // créer la session avec les valeurs du formulaire     
+                // créer la session avec les valeurs du formulaire
                 if ($formProjectReferenceSearch->has('organizationType')) {
                     $requestStack->getCurrentRequest()->getSession()->set('reference_organizationType', $formProjectReferenceSearch->get('organizationType')->getData());
                     $organizationType = $formProjectReferenceSearch->get('organizationType')->getData();
@@ -161,7 +161,7 @@ class ProjectReferenceController extends FrontController
         $formProjectReferenceSearch->handleRequest($requestStack->getCurrentRequest());
         if ($formProjectReferenceSearch->isSubmitted()) {
             if ($formProjectReferenceSearch->isValid()) {
-                // créer la session avec les valeurs du formulaire     
+                // créer la session avec les valeurs du formulaire
                 if ($formProjectReferenceSearch->has('organizationType')) {
                     $requestStack->getCurrentRequest()->getSession()->set('reference_organizationType', $formProjectReferenceSearch->get('organizationType')->getData());
                     $organizationType = $formProjectReferenceSearch->get('organizationType')->getData();
@@ -235,7 +235,7 @@ class ProjectReferenceController extends FrontController
         $formProjectReferenceSearch->handleRequest($requestStack->getCurrentRequest());
         if ($formProjectReferenceSearch->isSubmitted()) {
             if ($formProjectReferenceSearch->isValid()) {
-                // créer la session avec les valeurs du formulaire     
+                // créer la session avec les valeurs du formulaire
                 if ($formProjectReferenceSearch->has('organizationType')) {
                     $requestStack->getCurrentRequest()->getSession()->set('reference_organizationType', $formProjectReferenceSearch->get('organizationType')->getData());
                     $organizationType = $formProjectReferenceSearch->get('organizationType')->getData();
@@ -312,7 +312,7 @@ class ProjectReferenceController extends FrontController
         $formProjectReferenceSearch->handleRequest($requestStack->getCurrentRequest());
         if ($formProjectReferenceSearch->isSubmitted()) {
             if ($formProjectReferenceSearch->isValid()) {
-                // créer la session avec les valeurs du formulaire     
+                // créer la session avec les valeurs du formulaire
                 if ($formProjectReferenceSearch->has('organizationType')) {
                     $requestStack->getCurrentRequest()->getSession()->set('reference_organizationType', $formProjectReferenceSearch->get('organizationType')->getData());
                     $organizationType = $formProjectReferenceSearch->get('organizationType')->getData();

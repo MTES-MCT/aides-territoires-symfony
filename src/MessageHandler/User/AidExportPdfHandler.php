@@ -29,7 +29,8 @@ class AidExportPdfHandler
         private Environment $twig,
         private EmailService $emailService,
         private FileService $fileService
-    ) {}
+    ) {
+    }
 
     public function __invoke(AidsExportPdf $message): void
     {

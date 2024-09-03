@@ -11,10 +11,11 @@ class InternalApiService
     const API_FOLDER = 'api';
     private string $bearerToken = '';
 
-    public function  __construct(
+    public function __construct(
         private RequestStack $requestStack,
         private ParamService $paramService
-    ) {}
+    ) {
+    }
 
     private function getAPiBaseUrl(): string
     {

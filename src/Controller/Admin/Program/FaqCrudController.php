@@ -38,7 +38,7 @@ class FaqCrudController extends AtCrudController
     {
         $order = Action::new('order', 'Ordre', 'fa fa-sort')
             ->linkToCrudAction('order')
-            ->displayIf(fn($entity) => $entity instanceof Faq);
+            ->displayIf(fn ($entity) => $entity instanceof Faq);
 
         return $actions
             ->add(Crud::PAGE_INDEX, $order)

@@ -25,7 +25,8 @@ class AidListener
         private ParamService $paramService,
         private RouterInterface $routerInterface,
         private MessageBusInterface $messageBusInterface
-    ) {}
+    ) {
+    }
 
     public function onPostLoad(PostLoadEventArgs $args): void
     {

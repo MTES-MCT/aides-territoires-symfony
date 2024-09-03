@@ -21,12 +21,12 @@ use App\Entity\Aid\Aid;
             )
         ),
     ],
-
     order: ['id' => 'DESC'],
     paginationEnabled: true,
     paginationItemsPerPage: 30,
     paginationMaximumItemsPerPage: 100,
     paginationClientItemsPerPage: true
-
 )]
-class AidAllResource {}
+class AidAllResource
+{
+}

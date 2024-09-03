@@ -39,9 +39,10 @@ class LogService
     public function __construct(
         private ManagerRegistry $managerRegistry,
         private LoggerInterface $loggerInterface
-    ) {}
+    ) {
+    }
 
-    public function log( // NOSONAR too complex
+    public function log(// NOSONAR too complex
         ?string $type,
         ?array $params,
     ): void {

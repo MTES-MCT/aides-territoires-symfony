@@ -15,7 +15,8 @@ class SearchPageService
         private UserService $userService,
         private OrganizationService $organizationService,
         private ManagerRegistry $managerRegistry
-    ) {}
+    ) {
+    }
 
     public function userCanViewEdit(SearchPage $searchPage, User $user)
     {

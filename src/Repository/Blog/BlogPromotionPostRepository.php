@@ -34,7 +34,7 @@ class BlogPromotionPostRepository extends ServiceEntityRepository
         return $this->getQueryBuilder($params)->getQuery()->getResult();
     }
 
-    public function  getQueryBuilder(array $params = null): QueryBuilder
+    public function getQueryBuilder(array $params = null): QueryBuilder
     {
         $organizationType = $params['organizationType'] ?? null;
         $backers = $params['backers'] ?? null;
@@ -82,7 +82,7 @@ class BlogPromotionPostRepository extends ServiceEntityRepository
         }
 
         if ($perimeterFrom instanceof Perimeter && $perimeterFrom->getId()) {
-            $ids = $this->getEntityManager()->getRepository(Perimeter::class)->getIdPerimetersContainedIn(array('perimeter' => $perimeterFrom));
+            $ids = $this->getEntityManager()->getRepository(Perimeter::class)->getIdPerimetersContainedIn(['perimeter' => $perimeterFrom]);
             $ids[] = $perimeterFrom->getId();
             $qb
                 ->leftJoin('bpp.perimeter', 'perimeter')

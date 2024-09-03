@@ -146,7 +146,7 @@ class ProjectCrudController extends AtCrudController
         // action pour afficher le qrCode
         $displayOnFront = Action::new('displayOnFront', 'Afficher sur le site', 'far fa-eye')
             ->setHtmlAttributes(['title' => 'Afficher sur le site', 'target' => '_blank']) // titre
-            ->displayIf(fn($entity) => $entity->isIsPublic() ?? false); // condition d'affichage
+            ->displayIf(fn ($entity) => $entity->isIsPublic() ?? false); // condition d'affichage
         ;
 
         //set the link using a string or a callable (function like its being used here)

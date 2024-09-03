@@ -45,7 +45,8 @@ class AidSearchFormService
         protected ManagerRegistry $managerRegistry,
         protected StringService $stringService,
         protected UserService $userService
-    ) {}
+    ) {
+    }
 
     public function convertAidSearchClassToQueryString(AidSearchClass $aidSearchClass): string
     { // NOSONAR too complex

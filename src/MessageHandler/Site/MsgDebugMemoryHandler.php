@@ -16,7 +16,8 @@ class MsgDebugMemoryHandler
         private ManagerRegistry $managerRegistry,
         private ParamService $paramService,
         private NotificationService $notificationService
-    ) {}
+    ) {
+    }
 
     public function __invoke(MsgDebugMemory $message): void
     {

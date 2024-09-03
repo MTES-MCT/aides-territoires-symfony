@@ -2,7 +2,6 @@
 
 namespace App\Filter\Aid;
 
-
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Doctrine\Orm\Filter\AbstractFilter;
 use ApiPlatform\Metadata\Operation;

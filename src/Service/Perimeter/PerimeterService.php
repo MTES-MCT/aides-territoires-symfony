@@ -9,7 +9,8 @@ class PerimeterService
 {
     public function __construct(
         protected PerimeterRepository $perimeterRepository
-    ) {}
+    ) {
+    }
 
     public function getAdhocNameFromInseeCodes($inseeCodes): string
     {

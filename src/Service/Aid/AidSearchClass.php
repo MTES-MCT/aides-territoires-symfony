@@ -61,7 +61,7 @@ class AidSearchClass // NOSONAR too much methods
     private ?ProjectReference $projectReference;
     private ?AidRecurrence $aidRecurrence;
 
-    public function  __construct()
+    public function __construct()
     {
         $this->organizationType = null;
         $this->audiences = null;

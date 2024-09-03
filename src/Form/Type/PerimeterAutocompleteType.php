@@ -16,7 +16,8 @@ class PerimeterAutocompleteType extends AbstractType
 {
     public function __construct(
         protected PerimeterService $perimeterService
-    ) {}
+    ) {
+    }
 
     public function configureOptions(OptionsResolver $resolver): void
     {
@@ -45,7 +46,8 @@ class PerimeterAutocompleteType extends AbstractType
                         ->andWhere('
                         p.zipcodes LIKE :zipcodes
                     ')
-                        ->setParameter('zipcodes', '%' . $query . '%');;
+                        ->setParameter('zipcodes', '%' . $query . '%');
+                    ;
                 } else { // c'est une string
                     $strings = [$query];
                     if (strpos($query, ' ') !== false) {

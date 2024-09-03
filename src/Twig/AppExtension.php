@@ -53,7 +53,8 @@ class AppExtension extends AbstractExtension // NOSONAR too much methods
         private MatomoService $matomoService,
         private ContentSecurityPolicyListener $contentSecurityPolicyListener,
         private KeywordReferenceService $keywordReferenceService
-    ) {}
+    ) {
+    }
 
     /**
      * @return TwigFilter[]

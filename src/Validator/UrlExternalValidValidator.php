@@ -21,7 +21,8 @@ class UrlExternalValidValidator extends ConstraintValidator
         private ManagerRegistry $managerRegistry,
         private RequestStack $requestStack,
         private ParamService $paramService
-    ) {}
+    ) {
+    }
 
     public function validate($value, Constraint $constraint): void
     {

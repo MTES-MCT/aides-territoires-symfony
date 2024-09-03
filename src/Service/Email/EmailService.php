@@ -24,7 +24,8 @@ class EmailService
         protected MailerInterface $mailerInterface,
         protected ParamService $paramService,
         protected RouterInterface $routerInterface
-    ) {}
+    ) {
+    }
 
     /**
      * Envoi un email

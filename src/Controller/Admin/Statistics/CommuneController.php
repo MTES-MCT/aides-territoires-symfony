@@ -26,7 +26,8 @@ class CommuneController extends AbstractController
     public function __construct(
         protected ManagerRegistry $managerRegistry,
         protected ChartBuilderInterface $chartBuilderInterface,
-    ) {}
+    ) {
+    }
 
     #[Route('/admin/statistics/commune/population', name: 'admin_statistics_commune_population')]
     public function mapPopulation(

@@ -108,7 +108,7 @@ class BackerRepository extends ServiceEntityRepository
             ->addCriteria(AidRepository::liveCriteria('aid.'))
         ;
         if ($perimeterFrom instanceof Perimeter && $perimeterFrom->getId()) {
-            $ids = $this->getEntityManager()->getRepository(Perimeter::class)->getIdPerimetersContainedIn(array('perimeter' => $perimeterFrom));
+            $ids = $this->getEntityManager()->getRepository(Perimeter::class)->getIdPerimetersContainedIn(['perimeter' => $perimeterFrom]);
             $ids[] = $perimeterFrom->getId();
 
             $qb
@@ -370,7 +370,11 @@ class BackerRepository extends ServiceEntityRepository
         return $qb;
     }
 
-    public function getPrograms(int $backer_id) {}
+    public function getPrograms(int $backer_id)
+    {
+    }
 
-    public function getCategories(int $backer_id) {}
+    public function getCategories(int $backer_id)
+    {
+    }
 }

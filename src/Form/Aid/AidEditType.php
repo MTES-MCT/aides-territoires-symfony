@@ -52,7 +52,8 @@ class AidEditType extends AbstractType
         protected ManagerRegistry $managerRegistry,
         protected UserService $userService,
         protected RouterInterface $routerInterface
-    ) {}
+    ) {
+    }
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         // regarde si l'utilisateur à rempli toutes ses fiches porteur d'aides

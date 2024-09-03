@@ -26,7 +26,8 @@ class ProjectReferenceCountAidsHandler
         private AidSearchFormService $aidSearchFormService,
         private ParamService $paramService,
         private EmailService $emailService
-    ) {}
+    ) {
+    }
 
     public function __invoke(ProjectReferenceCountAids $message): void
     {

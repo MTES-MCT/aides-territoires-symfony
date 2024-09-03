@@ -117,7 +117,7 @@ class PageTab
         return $this;
     }
 
-    public function  __toString(): string
+    public function __toString(): string
     {
         $name = $this->getName();
         if ($this->getProgram() instanceof Program) {

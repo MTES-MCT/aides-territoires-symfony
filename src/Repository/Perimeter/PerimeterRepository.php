@@ -299,7 +299,8 @@ class PerimeterRepository extends ServiceEntityRepository
                     ->andWhere('
                     p.zipcodes LIKE :zipcodes
                 ')
-                    ->setParameter('zipcodes', '%' . $searchLike . '%');;
+                    ->setParameter('zipcodes', '%' . $searchLike . '%');
+                ;
             } else { // c'est une string
                 $strings = [$searchLike];
                 if (strpos($searchLike, ' ') !== false) {

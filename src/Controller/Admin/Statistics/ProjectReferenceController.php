@@ -14,14 +14,14 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-
 class ProjectReferenceController extends AbstractController
 {
     public function __construct(
         private ManagerRegistry $managerRegistry,
         private AdminUrlGenerator $adminUrlGenerator,
         private AidService $aidService
-    ) {}
+    ) {
+    }
 
     #[Route('/admin/statistics/projets-references/dashboard', name: 'admin_statistics_project_reference_dashboard')]
     public function prDashboard(): Response
