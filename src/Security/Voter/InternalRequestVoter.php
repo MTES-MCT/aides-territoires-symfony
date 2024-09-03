@@ -2,6 +2,7 @@
 
 namespace App\Security\Voter;
 
+use App\Service\Various\ParamService;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
@@ -13,16 +14,12 @@ class InternalRequestVoter extends Voter
 
     private array $allowedIps;
     public function __construct(
-        private RequestStack $requestStack
+        private RequestStack $requestStack,
+        private ParamService $paramService
     )
     {
         $this->requestStack = $requestStack;
-        $this->allowedIps = [
-            '127.0.0.1',
-            '::1',
-            '172.27.0.1',
-            '172.27.0.4'
-        ];
+        $this->allowedIps = explode(',', $this->paramService->get('allowed_internal_ips'));
     }
 
     protected function supports(string $attribute, $subject): bool
@@ -40,16 +37,6 @@ class InternalRequestVoter extends Voter
         
         // Vérification de l'adresse IP du client
         $clientIp = $request->getClientIp();
-        if (in_array($clientIp, $this->allowedIps, true)) {
-            return true;
-        }
-
-        // Vérification de l'en-tête X-Internal-Request
-        $internalRequestHeader = $request->headers->get('X-Internal-Request');
-        if ($internalRequestHeader === 'true') {
-            return true;
-        }
-
-        return false;
+        return in_array($clientIp, $this->allowedIps, true);
     }
 }
