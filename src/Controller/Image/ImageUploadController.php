@@ -38,6 +38,16 @@ class ImageUploadController extends FrontController {
 
             // gestion de l'image
             $image = $request->files->get('image', null);
+
+            // verification image
+            if (!$fileService->uploadedFileIsImage($image)) {
+                return new JsonResponse([
+                    'url' => null,
+                    'exception' => 'Le fichier n\'est pas une image'
+                ]);
+            }
+
+            // nommage de l'image
             if ($image) {
                 $originalFilename = pathinfo($image->getClientOriginalName(), PATHINFO_FILENAME);
                 // this is needed to safely include the file name as part of the URL

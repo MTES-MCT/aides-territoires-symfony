@@ -2,6 +2,7 @@
 
 namespace App\Service\File;
 
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpKernel\KernelInterface;
 
 class FileService
@@ -10,7 +11,7 @@ class FileService
     const FORMAT_XLSX = 'xlsx';
     const FORMAT_PDF = 'pdf';
     
-    const UPLOAD_TMP_FOLDER = '/public/uploads/_tmp';
+    const UPLOAD_TMP_FOLDER = '/uploads_tmp';
     const EXCEPTION_FORMAT_NOT_SUPPORTED_MESSAGE = 'Format non supporté';
     
     public function __construct(
@@ -52,5 +53,19 @@ class FileService
     public function getExtension(string $filename): string
     {
         return pathinfo($filename, PATHINFO_EXTENSION);
+    }
+
+    public function uploadedFileIsImage(UploadedFile $file): bool
+    {
+        $allowedMimeTypes = [
+            'image/jpeg',
+            'image/png',
+            'image/gif',
+            'image/svg+xml',
+            'image/webp',
+            'image/avif'
+        ];
+
+        return in_array($file->getMimeType(), $allowedMimeTypes);
     }
 }

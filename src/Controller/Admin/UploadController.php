@@ -3,6 +3,7 @@
 namespace App\Controller\Admin;
 
 use App\Controller\FrontController;
+use App\Security\Voter\InternalRequestVoter;
 use App\Service\File\FileService;
 use App\Service\Image\ImageService;
 use App\Service\Various\ParamService;
@@ -24,10 +25,24 @@ class UploadController extends FrontController {
         ParamService $paramService
     ): Response
     {
+        // verification requête interne
+        if (!$this->isGranted(InternalRequestVoter::IDENTIFIER)) {
+            throw $this->createAccessDeniedException(InternalRequestVoter::MESSAGE_ERROR);
+        }
+        
         $image = $request->files->get('image', null);
+
+        // verification image
+        if (!$fileService->uploadedFileIsImage($image)) {
+            return new JsonResponse([
+                'url' => null,
+                'exception' => 'Le fichier n\'est pas une image'
+            ]);
+        }
+        
+        // nommage de l'image
         if ($image) {
             $originalFilename = pathinfo($image->getClientOriginalName(), PATHINFO_FILENAME);
-            // this is needed to safely include the file name as part of the URL
             $safeFilename = $slugger->slug($originalFilename);
             $newFilename = $safeFilename.'-'.uniqid().'.'.$image->guessExtension();
         }
