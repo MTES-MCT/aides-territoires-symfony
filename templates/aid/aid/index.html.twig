@@ -20,11 +20,7 @@
 
 {% block body %}
 	<div class="fr-container">
-		<h1>{{ myPager.getNbResults() }}
-			résultat
-			{% if myPager.getNbResults() > 1 %}s
-			{% endif %}
-		</h1>
+		<h1>{{ myPager.getNbResults() }} résultat{% if myPager.getNbResults() > 1 %}s{% endif %}</h1>
 
 		{% include 'aid/aid/_search_meta.html.twig' %}
 

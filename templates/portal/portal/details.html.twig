@@ -68,11 +68,7 @@
 						</section>
 					{% endif %}
 					<section id="aid-list">
-						<h2>{{ myPager.getNbResults }}
-							résultat
-							{% if myPager.nbResults > 1 %}s
-							{% endif %}
-						</h2>
+						<h2>{{ myPager.getNbResults }} résultat{% if myPager.nbResults > 1 %}s{% endif %}</h2>
 						{% include 'aid/aid/_search_meta.html.twig' %}
 						{% include "aid/aid/_search_form.html.twig" %}
 

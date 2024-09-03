@@ -63,15 +63,7 @@
 					<h2 class="fr-mt-0 fr-mb-2w">Présentation générale</h2>
 					{{ program.description | raw }}
 					<section id="aid-list">
-						<h2>{{ myPager.getNbResults }}
-							aide
-							{% if myPager.nbResults > 1 %}s
-							{% endif %}
-							liée
-							{% if myPager.nbResults > 1 %}s
-							{% endif %}
-							au programme
-							{{ program.name }}</h2>
+						<h2>{{ myPager.getNbResults }} aide{% if myPager.nbResults > 1 %}s{% endif %} liée{% if myPager.nbResults > 1 %}s{% endif %}  au programme {{ program.name }}</h2>
 						{% include 'aid/aid/_search_meta.html.twig' %}
 						{% include "aid/aid/_search_form.html.twig" %}
 
