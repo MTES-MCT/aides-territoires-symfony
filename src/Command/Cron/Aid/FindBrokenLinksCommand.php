@@ -15,6 +15,8 @@ use App\Service\Aid\AidSearchFormService;
 use App\Service\Aid\AidService;
 use App\Service\Email\EmailService;
 use App\Service\Various\ParamService;
+use App\Validator\UrlExternalValid;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 #[AsCommand(name: 'at:cron:aid:find_broken_links', description: 'Recherche si des aides publiées ont des liens casssés')]
 class FindBrokenLinksCommand extends Command
@@ -25,12 +27,13 @@ class FindBrokenLinksCommand extends Command
     protected string $commandTextEnd = '>Cron';
 
     public function __construct(
-        protected KernelInterface $kernelInterface,
-        protected ManagerRegistry $managerRegistry,
-        protected AidService $aidService,
-        protected AidSearchFormService $aidSearchFormService,
-        protected EmailService $emailService,
-        protected ParamService $paramService
+        private KernelInterface $kernelInterface,
+        private ManagerRegistry $managerRegistry,
+        private AidService $aidService,
+        private AidSearchFormService $aidSearchFormService,
+        private EmailService $emailService,
+        private ParamService $paramService,
+        private ValidatorInterface $validator
     )
     {
         ini_set('max_execution_time', 60*60);
@@ -152,6 +155,14 @@ class FindBrokenLinksCommand extends Command
 
     private function checkUrl($url): bool
     {
+        // on vérifie d'abord que l'url est valide
+        $constraint = new UrlExternalValid();
+        $violations = $this->validator->validate($url, $constraint);
+        if (!empty($violations)) {
+            return false;
+        }
+
+        // Si url valide, on test son code retour
         $ch = curl_init($url);
 
         // Définir l'option pour retourner le transfert en tant que chaîne

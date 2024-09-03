@@ -24,6 +24,7 @@ use App\Form\Type\EntityGroupedType;
 use App\Form\Type\PerimeterAutocompleteType;
 use App\Repository\Backer\BackerRepository;
 use App\Service\User\UserService;
+use App\Validator\UrlExternalValid;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
@@ -648,6 +649,9 @@ class AidEditType extends AbstractType
                 'attr' => [
                     'readonly' => in_array('originUrl', $sanctuarizedFields) ? true : false,
                 ],
+                'constraints' => [
+                    new UrlExternalValid()
+                ]
             ])
             ->add('applicationUrl', TextType::class, [
                 'required' => false,
@@ -657,6 +661,9 @@ class AidEditType extends AbstractType
                 'attr' => [
                     'readonly' => in_array('applicationUrl', $sanctuarizedFields) ? true : false,
                 ],
+                'constraints' => [
+                    new UrlExternalValid()
+                ]
             ]);
 
             if (in_array('contact', $sanctuarizedFields)) {

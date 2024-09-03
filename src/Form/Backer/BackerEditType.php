@@ -5,6 +5,7 @@ namespace App\Form\Backer;
 use App\Entity\Backer\Backer;
 use App\Entity\Perimeter\Perimeter;
 use App\Form\Type\PerimeterAutocompleteType;
+use App\Validator\UrlExternalValid;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
@@ -49,7 +50,7 @@ class BackerEditType extends AbstractType
                 'label' => 'Lien externe',
                 'help' => 'L’URL externe vers laquelle renvoie un clic sur le logo du porteur',
                 'constraints' => [
-                    new Url()
+                    new UrlExternalValid()
                 ],
             ])
             ->add('logoFile', FileType::class, [
