@@ -18,8 +18,7 @@ class AidValidUrlValidator extends ConstraintValidator
         protected TranslatorInterface $translator,
         protected ManagerRegistry $managerRegistry,
         protected RequestStack $requestStack
-    ) {
-    }
+    ) {}
 
     public function validate($value, Constraint $constraint): void
     {

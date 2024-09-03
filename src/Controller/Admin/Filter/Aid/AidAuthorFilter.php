@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Controller\Admin\Filter\Aid;
 
 use App\Form\Admin\Filter\Aid\AidAuthorFilterType;
@@ -32,7 +33,7 @@ class AidAuthorFilter implements FilterInterface
             ->innerJoin(sprintf('%s.author', $filterDataDto->getEntityAlias()), 'authorFilter')
             ->andWhere('(authorFilter.email = :email OR authorFilter.firstname LIKE :nameLike OR authorFilter.lastname LIKE :nameLike)')
             ->setParameter('email', $filterDataDto->getValue())
-            ->setParameter('nameLike', '%'.$filterDataDto->getValue().'%')
+            ->setParameter('nameLike', '%' . $filterDataDto->getValue() . '%')
         ;
 
         return;

@@ -21,8 +21,7 @@ class AidExtractKeywordHandler
         private ManagerRegistry $managerRegistry,
         private ParamService $paramService,
         private AidService $aidService
-    ) {
-    }
+    ) {}
 
     public function __invoke(AidExtractKeyword $message): void
     {

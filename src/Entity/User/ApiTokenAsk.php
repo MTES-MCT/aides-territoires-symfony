@@ -29,7 +29,7 @@ class ApiTokenAsk
     private ?\DateTimeInterface $dateCreate = null;
 
     #[ORM\ManyToOne(inversedBy: 'apiTokenAsks')]
-    #[ORM\JoinColumn(onDelete:DoctrineConstants::SET_NULL)]
+    #[ORM\JoinColumn(onDelete: DoctrineConstants::SET_NULL)]
     private ?User $user = null;
 
     #[Assert\Length(max: 255)]

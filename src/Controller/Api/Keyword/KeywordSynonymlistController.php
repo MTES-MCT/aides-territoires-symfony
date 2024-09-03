@@ -19,8 +19,7 @@ class KeywordSynonymlistController extends ApiController
     public function index(
         KeywordSynonymlistRepository $keywordSynonymlistRepository,
         KeywordSynonymlistService $keywordSynonymlistService
-    ): JsonResponse
-    {
+    ): JsonResponse {
         // les filtres
         $params = [];
 
@@ -39,7 +38,7 @@ class KeywordSynonymlistController extends ApiController
         /** @var KeywordSynonymlist $result */
         foreach ($results as $result) {
             $resultsSpe[] = [
-                'id' => $result->getId().'-synonyms-'.$result->getName(),
+                'id' => $result->getId() . '-synonyms-' . $result->getName(),
                 'text' => $keywordSynonymlistService->getSmartName($result),
                 'name' => $result->getName(),
             ];
@@ -63,14 +62,13 @@ class KeywordSynonymlistController extends ApiController
     #[Route('/api/synonymlists/classic-list/', name: 'api_keyword_synonymlist_list_classic', priority: 5)]
     public function classic(
         KeywordSynonymlistRepository $keywordSynonymlistRepository
-    ): JsonResponse
-    {
+    ): JsonResponse {
         // les filtres
         $params = [];
 
         // requete pour les résultats avec la pagination
         $params['orderBy'] = ['sort' => 'ks.name', 'order' => 'ASC'];
-        
+
         $results = $keywordSynonymlistRepository->findCustom($params);
 
         // spécifique

@@ -31,47 +31,44 @@ class DataSourceCrudController extends AtCrudController
         yield TextField::new('name', 'Nom');
         yield BooleanField::new('active', 'Actif');
         yield TextareaField::new('description', 'Description complète de la source de données')
-        ->onlyOnForms();
+            ->onlyOnForms();
         yield TextareaField::new('importDetails', 'Détails additionels concernant l\'import')
-        ->onlyOnForms();
+            ->onlyOnForms();
         yield AssociationField::new('backer', 'Porteur d\'aides')
-        ->onlyOnForms()
-        ->setFormTypeOption('choice_label', 'name');
+            ->onlyOnForms()
+            ->setFormTypeOption('choice_label', 'name');
         yield AssociationField::new('perimeter', 'Périmètre')
-        ->onlyOnForms()
-        ->autocomplete()
-        ;
+            ->onlyOnForms()
+            ->autocomplete();
         yield UrlField::new('importApiUrl', 'URL de l\'API')
-        ->onlyOnForms()
-        ->setHelp('L\'URL utilisée par le script d\'import');
+            ->onlyOnForms()
+            ->setHelp('L\'URL utilisée par le script d\'import');
         yield UrlField::new('importDataUrl', 'URL d\'origine de la donnée importée')
-        ->onlyOnForms();
+            ->onlyOnForms();
         $choices = [];
         foreach (DataSource::LICENCES as $licence) {
             $choices[$licence['name']] = $licence['slug'];
         }
         yield ChoiceField::new('importLicence', 'Licence de la donnée importée')
-        ->onlyOnForms()
-        ->setChoices($choices);
+            ->onlyOnForms()
+            ->setChoices($choices);
         yield AssociationField::new('contactTeam', 'Contact (Team AT)')
-        ->setFormTypeOption('query_builder', function (UserRepository $entityRepository) {
-            return $entityRepository->getQueryBuilder(['onlyAdmin' => true]);
-        });
-        ;
+            ->setFormTypeOption('query_builder', function (UserRepository $entityRepository) {
+                return $entityRepository->getQueryBuilder(['onlyAdmin' => true]);
+            });;
         yield TextareaField::new('contactBacker', 'Contact(s) coté porteur')
-        ->onlyOnForms();
+            ->onlyOnForms();
         yield AssociationField::new('aidAuthor', 'L\'auteur par défaut des aides importées')
-        ->autocomplete()
-        ->setHelp('Mettre Admin AT (aides-territoires@beta.gouv.fr) par défaut');
+            ->autocomplete()
+            ->setHelp('Mettre Admin AT (aides-territoires@beta.gouv.fr) par défaut');
         yield NumberField::new('nbAids', 'Nombre d\'aides')
-        ->onlyOnIndex()
-        ->formatValue(function ($value, $entity) {
-            $dataSourceRepository = $this->managerRegistry->getRepository(DataSource::class);
-            return $dataSourceRepository->countAids(['id' => $entity->getId()]);
-        });
+            ->onlyOnIndex()
+            ->formatValue(function ($value, $entity) {
+                $dataSourceRepository = $this->managerRegistry->getRepository(DataSource::class);
+                return $dataSourceRepository->countAids(['id' => $entity->getId()]);
+            });
         yield DateField::new('timeLastAccess', 'Date du dernier accès')
-        ->onlyOnIndex();
-        
+            ->onlyOnIndex();
     }
 
     public function configureActions(Actions $actions): Actions

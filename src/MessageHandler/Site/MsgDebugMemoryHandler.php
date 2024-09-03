@@ -16,15 +16,15 @@ class MsgDebugMemoryHandler
         private ManagerRegistry $managerRegistry,
         private ParamService $paramService,
         private NotificationService $notificationService
-    ) {
-    }
+    ) {}
+
     public function __invoke(MsgDebugMemory $message): void
     {
         $admin = $this->managerRegistry->getRepository(User::class)->findOneBy(['email' => $this->paramService->get('email_super_admin')]);
         $this->notificationService->addNotification(
             $admin,
             'Memoire disponible dans worker',
-            'config : '.ini_get('memory_limit'). ' currentUsage : '.round(memory_get_usage() / 1024 / 1024) . ' MB'. ' peakUsage : '.round(memory_get_peak_usage() / 1024 / 1024) . ' MB',
+            'config : ' . ini_get('memory_limit') . ' currentUsage : ' . round(memory_get_usage() / 1024 / 1024) . ' MB' . ' peakUsage : ' . round(memory_get_peak_usage() / 1024 / 1024) . ' MB',
         );
     }
 }

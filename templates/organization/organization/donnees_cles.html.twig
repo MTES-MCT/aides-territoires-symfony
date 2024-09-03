@@ -1,29 +1,30 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Les données-clés de la collectivité | {{ parent() }}{% endblock %}
+{% block title %}Les données-clés de la collectivité |
+	{{ parent() }}
+{% endblock %}
 
 {% block body %}
-<div class="fr-container fr-mb-5w fr-mt-0">
-    <div class="fr-grid-row">
+	<div class="fr-container fr-mb-5w fr-mt-0">
+		<div class="fr-grid-row">
 
-    {% include "user/_menu_user.html.twig" with { structure:true, data_info:true } %}
+			{% include "user/_menu_user.html.twig" with { structure:true, data_info:true } %}
 
-    <div class="fr-col-12 fr-col-md-9">
-        <h1 class="fr-h3">Les données-clés de la collectivité</h1>
+			<div class="fr-col-12 fr-col-md-9">
+				<h1 class="fr-h3">Les données-clés de la collectivité</h1>
 
-        <div class="fr-mb-5w">
-        {{ form_start(formOrganizationChoice) }}
-            {{ form_row(formOrganizationChoice.organization) }}
-            <button type="submit" class="fr-btn">Afficher</button>
-        {{ form_end(formOrganizationChoice) }}
-        </div>
-        
-        <div class="fr-alert fr-alert--info">
-            <p>Veuillez choisir la structure dont vous souhaitez renseigner les données.</p>
-        </div>
-    </div>
-</div>
+				<div class="fr-mb-5w">
+					{{ form_start(formOrganizationChoice) }}
+					{{ form_row(formOrganizationChoice.organization) }}
+					<button type="submit" class="fr-btn">Afficher</button>
+					{{ form_end(formOrganizationChoice) }}
+				</div>
+
+				<div class="fr-alert fr-alert--info">
+					<p>Veuillez choisir la structure dont vous souhaitez renseigner les données.</p>
+				</div>
+			</div>
+		</div>
 
 
-
-{% endblock %}
+	{% endblock %}

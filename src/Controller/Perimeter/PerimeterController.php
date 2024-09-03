@@ -15,8 +15,7 @@ class PerimeterController extends FrontController
     public function ajaxSearch(
         RequestStack $requestStack,
         InternalApiService $internalApiService
-    ): JsonResponse
-    {
+    ): JsonResponse {
         try {
             // verification requête interne
             if (!$this->isGranted(InternalRequestVoter::IDENTIFIER)) {
@@ -45,7 +44,6 @@ class PerimeterController extends FrontController
                 'success' => 1,
                 'results' => $return
             ]);
-
         } catch (\Exception $e) {
             return new JsonResponse([
                 'success' => 0,
@@ -58,8 +56,7 @@ class PerimeterController extends FrontController
     public function ajaxDatas(
         RequestStack $requestStack,
         InternalApiService $internalApiService
-    ): JsonResponse
-    {
+    ): JsonResponse {
         try {
             // verification requête interne
             if (!$this->isGranted(InternalRequestVoter::IDENTIFIER)) {
@@ -91,7 +88,6 @@ class PerimeterController extends FrontController
                 'success' => 1,
                 'results' => $return
             ]);
-
         } catch (\Exception $e) {
             return new JsonResponse([
                 'success' => 0,

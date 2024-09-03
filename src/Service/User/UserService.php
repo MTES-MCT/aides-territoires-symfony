@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Service\User;
 
 use App\Entity\Log\LogPublicProjectView;
@@ -23,19 +24,16 @@ class UserService
         private AuthorizationCheckerInterface $authorizationCheckerInterface,
         private TokenStorageInterface $tokenStorageInterface,
         private Security $security
-    )
-    {
-        
-    }
+    ) {}
 
-    public function isMemberOfOrganization(?Organization $organization, User $user) : bool
+    public function isMemberOfOrganization(?Organization $organization, User $user): bool
     {
         $isMember = false;
 
         if (!$organization) {
             return true;
         }
-        
+
         foreach ($user->getOrganizations() as $userOrganization) {
             if ($userOrganization->getId() === $organization->getId()) {
                 $isMember = true;
@@ -44,7 +42,8 @@ class UserService
         return $isMember;
     }
 
-    public function generateApiToken() : string {
+    public function generateApiToken(): string
+    {
         return sha1(uniqid(rand(), true));
     }
 
@@ -143,7 +142,7 @@ class UserService
      * @param ?User $user
      * @return string
      */
-    public function getSibEmailId(?User $user) : string
+    public function getSibEmailId(?User $user): string
     {
         $targetOrganizationTypeSlugs = [
             OrganizationType::SLUG_COMMUNE,
@@ -152,18 +151,18 @@ class UserService
             OrganizationType::SLUG_PUBLIC_ORG,
             OrganizationType::SLUG_REGION,
         ];
-    
+
         $result = "";
-    
+
         if (
             $user
             && $user->getDefaultOrganization()
             && $user->getDefaultOrganization()->getOrganizationType()
             && in_array($user->getDefaultOrganization()->getOrganizationType()->getSlug(), $targetOrganizationTypeSlugs)
-            ) {
+        ) {
             $result = $user->getEmail();
         }
-    
+
         return $result;
     }
 

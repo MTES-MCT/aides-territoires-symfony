@@ -15,10 +15,9 @@ class LogController extends FrontController
     public function ajaxLog(
         RequestStack $requestStack,
         LogService $logService
-    ): JsonResponse
-    {
+    ): JsonResponse {
         $request = $requestStack->getCurrentRequest();
-        
+
         // verification requête interne
         if (!$this->isGranted(InternalRequestVoter::IDENTIFIER)) {
             throw $this->createAccessDeniedException(InternalRequestVoter::MESSAGE_ERROR);

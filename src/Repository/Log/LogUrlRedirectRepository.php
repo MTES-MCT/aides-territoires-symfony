@@ -17,7 +17,7 @@ class LogUrlRedirectRepository extends ServiceEntityRepository
         parent::__construct($registry, LogUrlRedirect::class);
     }
 
-    public function findGroupByUrl(?array $params = null) : array
+    public function findGroupByUrl(?array $params = null): array
     {
         $qb = $this->getQueryBuilder($params);
         $qb->innerJoin('l.urlRedirect', 'urlRedirect');
@@ -35,7 +35,7 @@ class LogUrlRedirectRepository extends ServiceEntityRepository
         $dateCreateMax = $params['dateCreateMax'] ?? null;
 
         $qb = $this->createQueryBuilder('l');
-        
+
         if ($dateCreateMin instanceof \DateTime) {
             $qb
                 ->andWhere('l.timeCreate >= :dateCreateMin')

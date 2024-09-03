@@ -54,7 +54,7 @@ class AidController extends FrontController
         $this->breadcrumb->add(
             'Mon portefeuille d’aides'
         );
-        
+
         // rendu template
         return $this->render('user/aid/import-manual.html.twig');
     }
@@ -64,7 +64,7 @@ class AidController extends FrontController
         RequestStack $requestStack,
         UserService $userService,
         ManagerRegistry $managerRegistry
-    ) : Response {
+    ): Response {
         // le user
         $user = $userService->getUserLogged();
 
@@ -97,7 +97,7 @@ class AidController extends FrontController
                 // message
                 $this->tAddFlash(
                     FrontController::FLASH_SUCCESS,
-                    'Votre aide a été créée. Vous pouvez poursuivre l’édition ou <a href="'.$this->generateUrl('app_aid_aid_details', ['slug' => $aid->getSlug()]).'" target="_blank">la prévisualiser <span class="fr-sr-only">Ouvre une nouvelle fenêtre</span></a>.'
+                    'Votre aide a été créée. Vous pouvez poursuivre l’édition ou <a href="' . $this->generateUrl('app_aid_aid_details', ['slug' => $aid->getSlug()]) . '" target="_blank">la prévisualiser <span class="fr-sr-only">Ouvre une nouvelle fenêtre</span></a>.'
                 );
 
                 // redirection
@@ -113,7 +113,8 @@ class AidController extends FrontController
         // regarde si des fiches porteurs ne sont pas complètes
         $organizationBackersNotComplete = [];
         foreach ($user->getOrganizations() as $organization) {
-            if ($organization->getBacker()
+            if (
+                $organization->getBacker()
                 && (
                     !$organization->getBacker()->getName()
                     || $organization->getBacker()->isIsCorporate() === null
@@ -140,7 +141,7 @@ class AidController extends FrontController
         AidRepository $aidRepository,
         LogAidViewRepository $logAidViewRepository,
         RequestStack $requestStack
-    ) : Response {
+    ): Response {
         // le user
         $user = $userService->getUserLogged();
 
@@ -195,7 +196,7 @@ class AidController extends FrontController
                 'showInSearch' => true
             ]
         );
-        
+
         // nb vues des aides du user
         $nbAidsViews = $logAidViewRepository->countCustom(
             [
@@ -251,7 +252,7 @@ class AidController extends FrontController
         RequestStack $requestStack,
         ManagerRegistry $managerRegistry,
         AidRepository $aidRepository
-    ) : Response {
+    ): Response {
         // user
         $user = $userService->getUserLogged();
 
@@ -308,7 +309,7 @@ class AidController extends FrontController
                     $aidFinancer->setBacker($financer);
                     $aid->addAidFinancer($aidFinancer);
                 }
-                
+
                 // les instructors
                 foreach ($aid->getAidInstructors() as $aidInstructor) {
                     $aid->removeAidInstructor($aidInstructor);
@@ -345,7 +346,8 @@ class AidController extends FrontController
         // regarde si des fiches porteurs ne sont pas complètes
         $organizationBackersNotComplete = [];
         foreach ($user->getOrganizations() as $organization) {
-            if ($organization->getBacker()
+            if (
+                $organization->getBacker()
                 && (
                     !$organization->getBacker()->getName()
                     || $organization->getBacker()->isIsCorporate() === null
@@ -355,7 +357,7 @@ class AidController extends FrontController
                 $organizationBackersNotComplete[] = $organization;
             }
         }
-        
+
         // rendu template
         return $this->render('user/aid/edit.html.twig', [
             'no_breadcrumb' => true,
@@ -375,8 +377,7 @@ class AidController extends FrontController
         StringService $stringService,
         RouterInterface $routerInterface,
         MessageBusInterface $messageBus
-    )
-    {
+    ) {
         // le user
         $user = $userService->getUserLogged();
 
@@ -424,36 +425,35 @@ class AidController extends FrontController
         User $user,
         StringService $stringService,
         RouterInterface $routerInterface
-    ): StreamedResponse
-    {
+    ): StreamedResponse {
         // nom de fichier
         $today = new \DateTime(date('Y-m-d'));
         $organizationName = $user->getDefaultOrganization() ? $stringService->getSLug($user->getDefaultOrganization()->getName()) : '';
-        $filename = 'Aides-territoires-'.$today->format('d_m_Y').'-'.$organizationName;
+        $filename = 'Aides-territoires-' . $today->format('d_m_Y') . '-' . $organizationName;
 
         // alimente la réponse
         if ($format == 'pdf') {
             $pdfOptions = new Options();
             $pdfOptions->setIsRemoteEnabled(true);
-    
+
             // instantiate and use the dompdf class
             $dompdf = new Dompdf($pdfOptions);
-    
+
             $dompdf->loadHtml(
                 $this->renderView('user/aid/aids_export_pdf.html.twig', [
                     'aids' => $aids,
                     'organization' => $user->getDefaultOrganization() ?? null
                 ])
             );
-    
+
             // (Optional) Setup the paper size and orientation
             $dompdf->setPaper('A4', 'portrait');
-    
+
             // Render the HTML as PDF
             $dompdf->render();
-    
+
             // Output the generated PDF to Browser (inline view)
-            $dompdf->stream($filename.'.pdf', [
+            $dompdf->stream($filename . '.pdf', [
                 "Attachment" => false
             ]);
             // exit pour eviter les erreur sur le retour null
@@ -464,14 +464,14 @@ class AidController extends FrontController
                     $options = new \OpenSpout\Writer\CSV\Options();
                     $options->FIELD_DELIMITER = ';';
                     $options->FIELD_ENCLOSURE = '"';
-        
+
                     $writer = new \OpenSpout\Writer\CSV\Writer($options);
                 } elseif ($format == FileService::FORMAT_XLSX) {
                     $sheetView = new SheetView();
                     $writer = new \OpenSpout\Writer\XLSX\Writer();
                 }
 
-                $writer->openToBrowser('export_'.$filename.'.'.$format);
+                $writer->openToBrowser('export_' . $filename . '.' . $format);
 
                 if ($format == FileService::FORMAT_XLSX) {
                     $writer->getCurrentSheet()->setSheetView($sheetView);
@@ -513,10 +513,10 @@ class AidController extends FrontController
                 foreach ($aids as $aid) {
                     $aidStepsString = '';
                     if ($aid->getAidSteps()) {
-                        $i=0;
+                        $i = 0;
                         foreach ($aid->getAidSteps() as $aidStep) {
                             $aidStepsString = $aidStep->getName();
-                            if ($i < count($aid->getAidSteps()) -1) {
+                            if ($i < count($aid->getAidSteps()) - 1) {
                                 $aidStepsString .= ', ';
                             }
                             $i++;
@@ -525,10 +525,10 @@ class AidController extends FrontController
 
                     $aidTypesString = '';
                     if ($aid->getAidTypes()) {
-                        $i=0;
+                        $i = 0;
                         foreach ($aid->getAidTypes() as $aidType) {
                             $aidTypesString .= $aidType->getName();
-                            if ($i < count($aid->getAidTypes()) -1) {
+                            if ($i < count($aid->getAidTypes()) - 1) {
                                 $aidTypesString .= ', ';
                             }
                             $i++;
@@ -537,10 +537,10 @@ class AidController extends FrontController
 
                     $aidDestinationsString = '';
                     if ($aid->getAidDestinations()) {
-                        $i=0;
+                        $i = 0;
                         foreach ($aid->getAidDestinations() as $aidDestination) {
                             $aidDestinationsString .= $aidDestination->getName();
-                            if ($i < count($aid->getAidDestinations()) -1) {
+                            if ($i < count($aid->getAidDestinations()) - 1) {
                                 $aidDestinationsString .= ', ';
                             }
                             $i++;
@@ -549,18 +549,18 @@ class AidController extends FrontController
 
                     $subventionRatesString = '';
                     if ($aid->getSubventionRateMin()) {
-                        $subventionRatesString .= 'Min : '.$aid->getSubventionRateMin().' ';
+                        $subventionRatesString .= 'Min : ' . $aid->getSubventionRateMin() . ' ';
                     }
                     if ($aid->getSubventionRateMax()) {
-                        $subventionRatesString .= 'Max : '.$aid->getSubventionRateMax();
+                        $subventionRatesString .= 'Max : ' . $aid->getSubventionRateMax();
                     }
 
                     $categoriesString = '';
                     if ($aid->getCategories()) {
-                        $i=0;
+                        $i = 0;
                         foreach ($aid->getCategories() as $category) {
                             $categoriesString .= $category->getName();
-                            if ($i < count($aid->getCategories()) -1) {
+                            if ($i < count($aid->getCategories()) - 1) {
                                 $categoriesString .= ', ';
                             }
                             $i++;
@@ -569,10 +569,10 @@ class AidController extends FrontController
 
                     $aidFinancersString = '';
                     if ($aid->getAidFinancers()) {
-                        $i=0;
+                        $i = 0;
                         foreach ($aid->getAidFinancers() as $aidFinancer) {
                             $aidFinancersString .= $aidFinancer->getBacker() ? $aidFinancer->getBacker()->getName() : '';
-                            if ($i < count($aid->getAidFinancers()) -1) {
+                            if ($i < count($aid->getAidFinancers()) - 1) {
                                 $aidFinancersString .= ', ';
                             }
                             $i++;
@@ -581,10 +581,10 @@ class AidController extends FrontController
 
                     $aidInstructorsString = '';
                     if ($aid->getAidInstructors()) {
-                        $i=0;
+                        $i = 0;
                         foreach ($aid->getAidInstructors() as $aidInstructor) {
                             $aidInstructorsString .= $aidInstructor->getBacker() ? $aidInstructor->getBacker()->getName() : '';
-                            if ($i < count($aid->getAidInstructors()) -1) {
+                            if ($i < count($aid->getAidInstructors()) - 1) {
                                 $aidInstructorsString .= ', ';
                             }
                             $i++;
@@ -593,10 +593,10 @@ class AidController extends FrontController
 
                     $programsString = '';
                     if ($aid->getPrograms()) {
-                        $i=0;
+                        $i = 0;
                         foreach ($aid->getPrograms() as $program) {
                             $programsString .= $program->getName();
-                            if ($i < count($aid->getPrograms()) -1) {
+                            if ($i < count($aid->getPrograms()) - 1) {
                                 $programsString .= ', ';
                             }
                             $i++;
@@ -640,7 +640,7 @@ class AidController extends FrontController
                 $writer->close();
             });
         } else {
-            return new StreamedResponse(function() {
+            return new StreamedResponse(function () {
                 echo FileService::EXCEPTION_FORMAT_NOT_SUPPORTED_MESSAGE;
             });
         }
@@ -652,8 +652,7 @@ class AidController extends FrontController
         UserService $userService,
         AidRepository $aidRepository,
         AidService $aidService
-    )
-    {
+    ) {
         // le user
         $user = $userService->getUserLogged();
 
@@ -661,7 +660,7 @@ class AidController extends FrontController
             [
                 'slug' => $slug
             ]
-            );
+        );
         if (!$aid instanceof Aid) {
             throw new AidNotFoundException('Cette aide n\'existe pas');
         }
@@ -694,7 +693,7 @@ class AidController extends FrontController
 
         // Définissez le type de contenu et le nom du fichier dans les en-têtes HTTP
         $response->headers->set('Content-Type', 'application/pdf');
-        $response->headers->set('Content-Disposition', 'inline; filename="'.$aid->getSlug().'.pdf"');
+        $response->headers->set('Content-Disposition', 'inline; filename="' . $aid->getSlug() . '.pdf"');
 
         return $response;
     }
@@ -733,7 +732,7 @@ class AidController extends FrontController
         // message
         $this->tAddFlash(
             FrontController::FLASH_SUCCESS,
-            'La nouvelle aide a été créée. Vous pouvez poursuivre l’édition. Et retrouvez l’aide dupliquée sur <a href="'.$this->generateUrl('app_user_aid_publications').'">votre portefeuille d’aides</a>.'
+            'La nouvelle aide a été créée. Vous pouvez poursuivre l’édition. Et retrouvez l’aide dupliquée sur <a href="' . $this->generateUrl('app_user_aid_publications') . '">votre portefeuille d’aides</a>.'
         );
 
         // redirecition
@@ -849,7 +848,7 @@ class AidController extends FrontController
             $this->generateUrl('app_user_aid_publications')
         );
         $this->breadcrumb->add(
-            'Statistiques de l’aide « '.$aid->getName().' »',
+            'Statistiques de l’aide « ' . $aid->getName() . ' »',
             $this->generateUrl('app_user_aid_publications')
         );
 
@@ -878,8 +877,7 @@ class AidController extends FrontController
         LogAidOriginUrlClickRepository $logAidOriginUrlClickRepository,
         AidProjectRepository $aidProjectRepository,
         AidService $aidService
-    )
-    {
+    ) {
         // le user
         $user = $userService->getUserLogged();
 
@@ -983,7 +981,7 @@ class AidController extends FrontController
         });
 
         $response->headers->set('Content-Type', 'application/vnd.ms-excel; charset=utf-8');
-        $response->headers->set('Content-Disposition', 'attachment; filename="'.$filename.'.xlsx"');
+        $response->headers->set('Content-Disposition', 'attachment; filename="' . $filename . '.xlsx"');
 
         return $response;
     }
@@ -994,14 +992,13 @@ class AidController extends FrontController
         AidRepository $aidRepository,
         AidService $aidService,
         UserService $userService
-    ) : JsonResponse
-    {
+    ): JsonResponse {
         try {
             // verification requête interne
             if (!$this->isGranted(InternalRequestVoter::IDENTIFIER)) {
                 throw $this->createAccessDeniedException(InternalRequestVoter::MESSAGE_ERROR);
             }
-            
+
             // recupere id
             $id = (int) $requestStack->getCurrentRequest()->get('id', 0);
             if (!$id) {
@@ -1031,7 +1028,7 @@ class AidController extends FrontController
             if ($isLockedByAnother) {
                 throw new \Exception('Aide déjà bloquée');
             }
-            
+
             // le bloque
             $aidService->lock($aid, $user);
 
@@ -1052,8 +1049,7 @@ class AidController extends FrontController
         AidRepository $aidRepository,
         UserService $userService,
         AidService $aidService
-    ): Response
-    {
+    ): Response {
         try {
             // le user
             $user = $userService->getUserLogged();
@@ -1088,7 +1084,6 @@ class AidController extends FrontController
             // retour
             return $this->redirectToRoute('app_user_aid_edit', ['slug' => $aid->getSlug()]);
         }
-
     }
 
     #[Route('/comptes/aides/ajax-unlock/', name: 'app_user_aid_ajax_unlock', options: ['expose' => true])]
@@ -1097,14 +1092,13 @@ class AidController extends FrontController
         AidRepository $aidRepository,
         AidService $aidService,
         UserService $userService
-    ) : JsonResponse
-    {
+    ): JsonResponse {
         try {
             // verification requête interne
             if (!$this->isGranted(InternalRequestVoter::IDENTIFIER)) {
                 throw $this->createAccessDeniedException(InternalRequestVoter::MESSAGE_ERROR);
             }
-            
+
             // recupere id
             $id = (int) $requestStack->getCurrentRequest()->get('id', 0);
             if (!$id) {

@@ -26,14 +26,15 @@ class BlogPromotionPostRepository extends ServiceEntityRepository
         parent::__construct($registry, BlogPromotionPost::class);
     }
 
-    public function findPublished(array $params = null) : array {
+    public function findPublished(array $params = null): array
+    {
         $params['status'] = BlogPromotionPost::STATUS_PUBLISHED;
         $params['orderBy'] = ['sort' => 'bpp.timeCreate', 'order' => 'Desc'];
 
         return $this->getQueryBuilder($params)->getQuery()->getResult();
     }
 
-    public function  getQueryBuilder(array $params = null) : QueryBuilder
+    public function  getQueryBuilder(array $params = null): QueryBuilder
     {
         $organizationType = $params['organizationType'] ?? null;
         $backers = $params['backers'] ?? null;
@@ -54,7 +55,7 @@ class BlogPromotionPostRepository extends ServiceEntityRepository
                 ->leftJoin('bpp.keywordReferences', 'keywordReferences')
                 ->andWhere('keywordReferences.name IN (:objetcs) OR keywordReferences IS NULL')
                 ->setParameter('objetcs', $objetcs)
-                ;
+            ;
         }
         if ($organizationType instanceof OrganizationType && $organizationType->getId()) {
             $qb
@@ -100,8 +101,8 @@ class BlogPromotionPostRepository extends ServiceEntityRepository
 
         if ($status !== null) {
             $qb
-            ->andWhere('bpp.status = :status')
-            ->setParameter('status', $status)
+                ->andWhere('bpp.status = :status')
+                ->setParameter('status', $status)
             ;
         }
 
@@ -124,7 +125,7 @@ class BlogPromotionPostRepository extends ServiceEntityRepository
         // on update les ids actuels pour avoir les futurs id de libre
         $qb = $this->createQueryBuilder('u');
         $qb->update(BlogPromotionPost::class, 'uu');
-        $qb->set('uu.id', 'uu.id + '.$maxOldId)
+        $qb->set('uu.id', 'uu.id + ' . $maxOldId)
             ->andWhere('uu.oldId IS NOT NULL');
         $qb->getQuery()->execute();
 
@@ -132,7 +133,7 @@ class BlogPromotionPostRepository extends ServiceEntityRepository
         $qb = $this->createQueryBuilder('u');
         $qb->update(BlogPromotionPost::class, 'uu');
         $qb->set('uu.id', 'uu.oldId')
-        ->andWhere('uu.oldId IS NOT NULL');
+            ->andWhere('uu.oldId IS NOT NULL');
         $qb->getQuery()->execute();
 
         // met à jour l'auto increment
@@ -142,7 +143,7 @@ class BlogPromotionPostRepository extends ServiceEntityRepository
         $maxId = $resultMax[0]['maxId'] ?? 1;
 
         $table = $this->getEntityManager()->getClassMetadata(BlogPromotionPost::class)->getTableName();
-        $sql = 'ALTER TABLE '.$table.' AUTO_INCREMENT = '.$maxId;
+        $sql = 'ALTER TABLE ' . $table . ' AUTO_INCREMENT = ' . $maxId;
 
         $conn = $this->getEntityManager()->getConnection();
         $stmt = $conn->prepare($sql);

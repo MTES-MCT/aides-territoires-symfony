@@ -8,9 +8,7 @@ class ParamService
 {
     public function __construct(
         protected ParameterBagInterface $parameterBagInterface
-    )
-    {
-    }
+    ) {}
 
     /**
      * Retourne un parametre

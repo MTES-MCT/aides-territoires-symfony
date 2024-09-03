@@ -1,41 +1,43 @@
 {% block entity_grouped_type_row %}
-    <div class="fr-fieldset fr-input-group {% if form_errors(form) %}fr-fieldset--error{% endif %}">
-        {% if form.vars.label %}
-        <legend class="fr-fieldset__legend fr-text--regular">
-            <label class="fr-label {% if form.vars.required is defined and form.vars.required %}required{% endif %}"><span class="at-field-label">{{ form.vars.label }}</span></label>
-            {% if form.vars.help is defined and form.vars.help %}
-            <span class="fr-hint-text">{{ form.vars.help|raw }}</span>
-            {% endif %}
-        </legend>
-        {% endif %}
+	<div class="fr-fieldset fr-input-group {% if form_errors(form) %}fr-fieldset--error{% endif %}">
+		{% if form.vars.label %}
+			<legend class="fr-fieldset__legend fr-text--regular">
+				<label class="fr-label {% if form.vars.required is defined and form.vars.required %}required{% endif %}">
+					<span class="at-field-label">{{ form.vars.label }}</span>
+				</label>
+				{% if form.vars.help is defined and form.vars.help %}
+					<span class="fr-hint-text">{{ form.vars.help|raw }}</span>
+				{% endif %}
+			</legend>
+		{% endif %}
 
-        
-        <div class="checkboxes-wrapper">
-            {% for key, choices in form.vars.choices %}
-                
-                <div class="fr-fieldset__element optgroup">
-                    <legend>{{ key }}</legend>
-                </div>
-                
-                {% for keyChoice, choice in choices %}
-                {% set field = form.children[keyChoice] %}
-                {%- set widget_attr = {} -%}
-                {%- if help is not empty -%}
-                    {%- set widget_attr = {attr: {'aria-describedby': id ~"_help"}} -%}
-                {%- endif -%}
-                {% set widget_attr = widget_attr|merge({'attr': {'autocomplete': 'off'}}) %}
-                {% set row_attr = row_attr|merge({'class': (row_attr.class|default('') ~ ' fr-input-group')|trim}) %}
-                <div class="fr-fieldset__element" aria-selected="false">
-                    <div class="fr-checkbox-group">
-                    {{- form_errors(field) -}}
-                    {{- form_widget(field, widget_attr) -}}
-                    {{- form_label(field) -}}
-                    </div>
-                </div>
-                {% endfor %}
 
-            {% endfor %}
-            {{ form_errors(form)}}
-        </div>
-    </div>
+		<div class="checkboxes-wrapper">
+			{% for key, choices in form.vars.choices %}
+
+				<div class="fr-fieldset__element optgroup">
+					<legend>{{ key }}</legend>
+				</div>
+
+				{% for keyChoice, choice in choices %}
+					{% set field = form.children[keyChoice] %}
+					{%- set widget_attr = {} -%}
+					{%- if help is not empty -%}
+						{%- set widget_attr = {attr: {'aria-describedby': id ~"_help"}} -%}
+					{%- endif -%}
+					{% set widget_attr = widget_attr|merge({'attr': {'autocomplete': 'off'}}) %}
+					{% set row_attr = row_attr|merge({'class': (row_attr.class|default('') ~ ' fr-input-group')|trim}) %}
+					<div class="fr-fieldset__element" aria-selected="false">
+						<div class="fr-checkbox-group">
+							{{- form_errors(field) -}}
+							{{- form_widget(field, widget_attr) -}}
+							{{- form_label(field) -}}
+						</div>
+					</div>
+				{% endfor %}
+
+			{% endfor %}
+			{{ form_errors(form)}}
+		</div>
+	</div>
 {% endblock %}

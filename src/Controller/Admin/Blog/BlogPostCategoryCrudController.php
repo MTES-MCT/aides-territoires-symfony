@@ -21,8 +21,7 @@ class BlogPostCategoryCrudController extends AtCrudController
         yield TextField::new('name', 'Nom de la catégorie');
         yield TextField::new('slug', 'Fragment d’URL')
             ->setFormTypeOption('attr', ['readonly' => true, 'autocomplete' => 'off'])
-            ->setHelp('Laisser vide pour autoremplir.')
-        ;
+            ->setHelp('Laisser vide pour autoremplir.');
         yield TextEditorField::new('description', 'Description');
     }
 }

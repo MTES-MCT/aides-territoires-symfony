@@ -18,9 +18,7 @@ class ProjectPublicSearchType extends AbstractType
     public function  __construct(
         protected ManagerRegistry $managerRegistry,
         protected RouterInterface $routerInterface
-    )
-    {
-    }
+    ) {}
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
@@ -36,7 +34,7 @@ class ProjectPublicSearchType extends AbstractType
 
         $keywordSynonymlists = $this->managerRegistry->getRepository(KeywordSynonymlist::class)->findBy(
             [],
-            ['name'=>'ASC']
+            ['name' => 'ASC']
         );
         $choicesKeywordSynonymList = [];
         foreach ($keywordSynonymlists as $keywordSynonymlist) {

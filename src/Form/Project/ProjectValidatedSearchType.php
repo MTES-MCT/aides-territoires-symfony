@@ -19,9 +19,7 @@ class ProjectValidatedSearchType extends AbstractType
         protected ManagerRegistry $managerRegistry,
         protected UserService $userService,
         protected RouterInterface $routerInterface
-    )
-    {
-    }
+    ) {}
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {

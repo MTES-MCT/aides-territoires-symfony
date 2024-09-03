@@ -13,8 +13,7 @@ class CountyCountBackerHandler
 {
     public function __construct(
         private ManagerRegistry $managerRegistry,
-    ) {
-    }
+    ) {}
 
     public function __invoke(CountyCountBacker $message): void
     {
@@ -23,7 +22,7 @@ class CountyCountBackerHandler
 
         /** @var BackerRepository $backerRepo */
         $backerRepo = $this->managerRegistry->getRepository(Backer::class);
-        
+
         // charge le département
         $county = $perimeterRepo->find($message->getIdPerimeter());
 

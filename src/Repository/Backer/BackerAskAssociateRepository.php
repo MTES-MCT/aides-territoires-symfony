@@ -30,14 +30,12 @@ class BackerAskAssociateRepository extends ServiceEntityRepository
             'refused' => false,
         ]);
         $qb
-            ->select('COUNT(baa.id)')
-        ;
+            ->select('COUNT(baa.id)');
         return (int) $qb
             ->getQuery()
-            ->getSingleScalarResult()
-        ;
+            ->getSingleScalarResult();
     }
-    
+
     public function findOrganizationRefused(Organization $organization): array
     {
         $params = [

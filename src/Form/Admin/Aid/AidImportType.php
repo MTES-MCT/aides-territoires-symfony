@@ -31,13 +31,11 @@ class AidImportType extends AbstractType
                         'mimeTypesMessage' => 'Veuillez télécharger un fichier au bon format'
                     ])
                 ]
-            ])
-        ;
+            ]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver->setDefaults([
-        ]);
+        $resolver->setDefaults([]);
     }
 }

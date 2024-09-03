@@ -20,8 +20,8 @@ class MsgSpreadsheetToExportHandler
         private KernelInterface $kernelInterface,
         private NotificationService $notificationService,
         private ParamService $paramService
-    ) {
-    }
+    ) {}
+
     public function __invoke(MsgSpreadsheetToExport $message): void
     {
         $command = ['php', 'bin/console', 'at:cron:export:spreadsheet_export'];

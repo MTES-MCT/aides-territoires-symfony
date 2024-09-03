@@ -30,7 +30,7 @@ class ImportFluxNouvelleAquitaineCommand extends ImportFluxCommand
         $aidsFromImport = [];
         $client = $this->getClient();
 
-        for ($i=0; $i<$this->nbPages; $i++) {
+        for ($i = 0; $i < $this->nbPages; $i++) {
             $this->currentPage = $i;
             $importUrl = $this->dataSource->getImportApiUrl();
 
@@ -40,7 +40,7 @@ class ImportFluxNouvelleAquitaineCommand extends ImportFluxCommand
                     $importUrl,
                     $this->getApiOptions()
                 );
-                
+
                 $content = $response->getContent();
 
                 // Convertit le contenu XML en un objet SimpleXMLElement
@@ -117,7 +117,7 @@ class ImportFluxNouvelleAquitaineCommand extends ImportFluxCommand
             'Égalité' => [
                 'egalite-des-chances'
             ]
-            
+
         ];
 
         $categories = explode(',', $aidToImport['Les thématiques']);
@@ -144,7 +144,7 @@ class ImportFluxNouvelleAquitaineCommand extends ImportFluxCommand
         if (!isset($aidToImport['Pour qui'])) {
             return $aid;
         }
-        
+
         $mapping = [
             'Collectivité' => [
                 'commune',
@@ -171,7 +171,7 @@ class ImportFluxNouvelleAquitaineCommand extends ImportFluxCommand
         ];
 
         foreach ($mapping as $key => $values) {
-            if (preg_match('/.*'.$key.'.*/i', $aidToImport['Pour qui'])) {
+            if (preg_match('/.*' . $key . '.*/i', $aidToImport['Pour qui'])) {
                 foreach ($values as $value) {
                     $organizationType = $this->managerRegistry->getRepository(OrganizationType::class)->findOneBy([
                         'slug' => $value

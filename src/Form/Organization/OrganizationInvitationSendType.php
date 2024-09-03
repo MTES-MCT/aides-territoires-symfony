@@ -18,10 +18,8 @@ class OrganizationInvitationSendType extends AbstractType
 {
     public function __construct(
         private UserService $userService
-    )
-    {
-        
-    }
+    ) {}
+
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $user = $this->userService->getUserLogged();
@@ -78,9 +76,7 @@ class OrganizationInvitationSendType extends AbstractType
                             'message' => 'Veuillez choisir une structure.',
                         ]),
                     ],
-                ])
-            ;
-        
+                ]);
         }
     }
 

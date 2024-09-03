@@ -66,7 +66,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
     const ROLE_ADMIN = 'ROLE_ADMIN';
     const ROLE_USER = 'ROLE_USER';
     const ROLE_BANNED = 'ROLE_BANNED';
-    
+
     const NOTIFICATION_DAILY = 'daily';
     const NOTIFICATION_WEEKLY = 'weekly';
     const NOTIFICATION_NEVER = 'never';
@@ -260,7 +260,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
     #[ORM\OneToMany(mappedBy: 'author', targetEntity: DataExport::class)]
     private Collection $dataExports;
 
-    #[ORM\ManyToMany(targetEntity: Organization::class, mappedBy: 'beneficiairies', cascade:['persist'])]
+    #[ORM\ManyToMany(targetEntity: Organization::class, mappedBy: 'beneficiairies', cascade: ['persist'])]
     private Collection $organizations;
 
     #[ORM\OneToMany(mappedBy: 'administrator', targetEntity: SearchPage::class)]
@@ -463,7 +463,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
 
         return $this;
     }
-    
+
     /**
      * @see UserInterface
      */
@@ -1247,7 +1247,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
 
     public function getTotpAuthenticationConfiguration(): ?TotpConfigurationInterface
     {
-    // You could persist the other configuration options in the user entity to make it individual per user.
+        // You could persist the other configuration options in the user entity to make it individual per user.
         return new TotpConfiguration($this->totpSecret, TotpConfiguration::ALGORITHM_SHA1, 30, 6);
     }
 
@@ -1272,7 +1272,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
     public function removeSearchPage(SearchPage $searchPage): static
     {
         if ($this->searchPages->removeElement($searchPage) && $searchPage->getAdministrator() === $this) {
-                $searchPage->setAdministrator(null);
+            $searchPage->setAdministrator(null);
         }
 
         return $this;
@@ -1374,7 +1374,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
     }
 
 
-    public function getSearchPreferences() : array {
+    public function getSearchPreferences(): array
+    {
         $preferences = [];
 
         if ($this->getDefaultOrganization()) {
@@ -1660,7 +1661,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
         return $this;
     }
 
-    public function getNbAids() : int {
+    public function getNbAids(): int
+    {
         try {
             return count($this->getAids());
         } catch (\Exception $e) {
@@ -1673,7 +1675,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
         return $this;
     }
 
-    public function getNbAidsLive() : int {
+    public function getNbAidsLive(): int
+    {
         $live = 0;
         try {
             foreach ($this->getAids() as $aid) {
@@ -1724,7 +1727,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
         return $this;
     }
 
-    public function getFullName() : string {
+    public function getFullName(): string
+    {
         return $this->getFirstname() . ' ' . $this->getLastname();
     }
 

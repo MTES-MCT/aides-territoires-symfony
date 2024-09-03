@@ -24,10 +24,7 @@ class EmailService
         protected MailerInterface $mailerInterface,
         protected ParamService $paramService,
         protected RouterInterface $routerInterface
-    )
-    {
-        
-    }
+    ) {}
 
     /**
      * Envoi un email
@@ -45,19 +42,18 @@ class EmailService
         string $template = 'emails/base.html.twig',
         ?array $datas = null,
         ?array $options = null
-    ): bool
-    {
+    ): bool {
         $form = $options['forceFrom'] ?? $this->paramService->get('email_from');
         $datas['subject'] = $datas['subject'] ?? $subject;
 
         try {
             $email = (new TemplatedEmail())
-            ->from($form )
-            ->to($email)
-            ->subject($subject)
-            ->htmlTemplate($template)
-            ->context($datas);
-    
+                ->from($form)
+                ->to($email)
+                ->subject($subject)
+                ->htmlTemplate($template)
+                ->context($datas);
+
             if ($options['attachments'] ?? false) {
                 foreach ($options['attachments'] as $attachment) {
                     $email->addPart(new DataPart(new File($attachment)));
@@ -79,8 +75,7 @@ class EmailService
         ?array $params = null,
         ?array $headers = null,
         ?array $tags = null
-    ) : bool
-    {
+    ): bool {
         // Configure API key authorization: api-key
         $config = Configuration::getDefaultConfiguration()->setApiKey('api-key', $this->paramService->get('sib_api_key'));
 
@@ -143,8 +138,7 @@ class EmailService
      */
     public function unsubscribeUser(
         User $user
-    ): bool
-    {
+    ): bool {
         // Configure API key authorization: api-key
         $config = Configuration::getDefaultConfiguration()->setApiKey('api-key', $this->paramService->get('sib_api_key'));
 
@@ -162,7 +156,7 @@ class EmailService
             $newsletterListIds[$key] = (int) $value;
         }
         $updateContact['unlinkListIds'] = $newsletterListIds;
-        
+
 
         try {
             $apiInstance->updateContact($user->getEmail(), $updateContact);
@@ -184,7 +178,7 @@ class EmailService
             new Client(),
             $config
         );
-        
+
         $newsletterListIds = explode(',', $this->paramService->get('sib_newsletter_list_ids'));
         foreach ($newsletterListIds as $key => $value) {
             $newsletterListIds[$key] = (int) $value;
@@ -219,7 +213,7 @@ class EmailService
             new Client(),
             $config
         );
-        
+
         $newsletterListIds = explode(',', $this->paramService->get('sib_newsletter_list_ids'));
         foreach ($newsletterListIds as $key => $value) {
             $newsletterListIds[$key] = (int) $value;
@@ -242,7 +236,8 @@ class EmailService
         }
     }
 
-    public function isUserMlConsent($user) : bool {
+    public function isUserMlConsent($user): bool
+    {
         // Configure API key authorization: api-key
         $config = Configuration::getDefaultConfiguration()->setApiKey('api-key', $this->paramService->get('sib_api_key'));
 

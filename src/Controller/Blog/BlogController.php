@@ -22,15 +22,14 @@ class BlogController extends FrontController
     public function index(
         BlogPostRepository $blogPostRepository,
         RequestStack $requestStack
-    ): Response
-    {
+    ): Response {
         // gestion pagination
         $currentPage = (int) $requestStack->getCurrentRequest()->get('page', 1);
         if (!$currentPage) {
             $currentPage = 1;
         }
         $nextPage = $currentPage + 1;
-        $previousPage = $currentPage -1;
+        $previousPage = $currentPage - 1;
 
         // formulaire filtre catégories
         $formCategories = $this->createForm(BlogPostCategoryFilterType::class);
@@ -86,16 +85,15 @@ class BlogController extends FrontController
         BlogPostCategoryRepository $blogPostCategoryRepository,
         BlogPostRepository $blogPostRepository,
         RequestStack $requestStack
-    ): Response
-    {
+    ): Response {
         // gestion pagination
         $currentPage = (int) $requestStack->getCurrentRequest()->get('page', 1);
         if (!$currentPage) {
             $currentPage = 1;
         }
         $nextPage = $currentPage + 1;
-        $previousPage = $currentPage -1;
-        
+        $previousPage = $currentPage - 1;
+
         // charge categorie
         $blogPostCategory = $blogPostCategoryRepository->findOneBy(
             [
@@ -129,7 +127,7 @@ class BlogController extends FrontController
 
         // le nombre de page
         $nbPages = ceil($nbBlogPosts / self::NB_POST_BY_PAGE);
-        
+
         // fil arianne
         $this->breadcrumb->add(
             'Blog',
@@ -157,8 +155,7 @@ class BlogController extends FrontController
         BlogPostRepository $blogPostRepository,
         UserService $userService,
         LogService $logService
-    ): Response
-    {
+    ): Response {
         // le user
         $user = $userService->getUserLogged();
 
@@ -167,7 +164,7 @@ class BlogController extends FrontController
             [
                 'slug' => $slug
             ]
-            );
+        );
         if (!$blogPost instanceof BlogPost) {
             return $this->redirectToRoute('app_blog_blog');
         }
@@ -191,7 +188,7 @@ class BlogController extends FrontController
             $blogPost->getName(),
             null
         );
-        
+
         // rendu template
         return $this->render('blog/blogpost/details.html.twig', [
             'blogPost' => $blogPost

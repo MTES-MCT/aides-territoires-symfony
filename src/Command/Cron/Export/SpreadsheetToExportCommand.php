@@ -33,9 +33,8 @@ class SpreadsheetToExportCommand extends Command
         protected ParamService $paramService,
         protected SpreadsheetExporterService $spreadsheetExporterService,
         protected RouterInterface $routerInterface
-    )
-    {
-        ini_set('max_execution_time', 60*60);
+    ) {
+        ini_set('max_execution_time', 60 * 60);
         ini_set('memory_limit', '1G');
         parent::__construct();
     }
@@ -48,7 +47,7 @@ class SpreadsheetToExportCommand extends Command
         $io = new SymfonyStyle($input, $output);
         $io->title($this->commandTextStart);
 
-        try  {
+        try {
             // generate menu
             $this->cronTask($input, $output);
         } catch (\Exception $exception) {
@@ -106,9 +105,8 @@ class SpreadsheetToExportCommand extends Command
             }
 
             $query = $this->entityManager
-                    ->createQuery($cronExportSpreadsheet->getSqlRequest())
-                    ->setParameters($sqlParams)
-                    ;
+                ->createQuery($cronExportSpreadsheet->getSqlRequest())
+                ->setParameters($sqlParams);
 
             // le fichier d'export
             $fileTarget = $this->spreadsheetExporterService->exportToFile(
@@ -157,5 +155,4 @@ class SpreadsheetToExportCommand extends Command
             $io->error($e->getMessage());
         }
     }
-
 }

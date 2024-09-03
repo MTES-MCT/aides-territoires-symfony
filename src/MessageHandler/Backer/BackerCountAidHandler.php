@@ -15,14 +15,13 @@ class BackerCountAidHandler
     public function __construct(
         private ManagerRegistry $managerRegistry,
         private AidService $aidService
-    ) {
-    }
+    ) {}
 
     public function __invoke(BackerCountAid $message): void
     {
         /** @var BackerRepository $backerRepo */
         $backerRepo = $this->managerRegistry->getRepository(Backer::class);
-        
+
         // charge le porteur
         $backer = $backerRepo->find($message->getIdBacker());
 
@@ -32,7 +31,7 @@ class BackerCountAidHandler
             $aidRepo = $this->managerRegistry->getRepository(Aid::class);
 
             $backer->setNbAids($aidRepo->countCustom(['backer' => $backer]));
-            $aidsParams =[
+            $aidsParams = [
                 'backer' => $backer,
                 'showInSearch' => true
             ];

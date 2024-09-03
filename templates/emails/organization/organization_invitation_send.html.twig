@@ -1,25 +1,35 @@
 {% extends 'emails/base.html.twig' %}
 
 {% block body %}
-<p>Bonjour {{ organizationInvitation.firstname }} {{ organizationInvitation.lastname }},</p>
+	<p>Bonjour
+		{{ organizationInvitation.firstname }}
+		{{ organizationInvitation.lastname }},</p>
 
-<p>{{ organizationInvitation.author.firstname }} {{ organizationInvitation.author.lastname }} vous invite à rejoindre la structure "{{ organizationInvitation.organization.name }}" sur Aides-territoires, plateforme publique qui permet aux collectivités et à leurs partenaires de trouver les aides financières et d'ingénierie pour donner vie à leurs projets.</p>
+	<p>{{ organizationInvitation.author.firstname }}
+		{{ organizationInvitation.author.lastname }}
+		vous invite à rejoindre la structure "{{ organizationInvitation.organization.name }}" sur Aides-territoires, plateforme publique qui permet aux collectivités et à leurs partenaires de trouver les aides financières et d'ingénierie pour donner vie à leurs projets.</p>
 
-<p>En rejoignant sa structure, vous pourrez gérer en commun des projets et des collaborateurs avec {{ organizationInvitation.author.firstname }} {{ organizationInvitation.author.lastname }}.</p>
+	<p>En rejoignant sa structure, vous pourrez gérer en commun des projets et des collaborateurs avec
+		{{ organizationInvitation.author.firstname }}
+		{{ organizationInvitation.author.lastname }}.</p>
 
-{% if not organizationInvitation.guest %}
-    <p>Pour ce faire, il vous suffit de vous inscrire puis d'accepter son invitation dans Mon Compte > Ma Structure > Mes invitations :</p>
-    <p><a href="{{ absolute_url(url('app_user_user_register')) }}" title="S'inscrire">{{ absolute_url(url('app_user_user_register')) }}</a></p>
-{% else %}
-    <p>Pour ce faire, il vous suffit d'accepter son invitation dans Mon Compte > Ma Structure > Mes invitations :</p>
-    <p><a href="{{ absolute_url(url('app_organization_invitations')) }}" title="Gérer l'invitation">{{ absolute_url(url('app_organization_invitations')) }}</a></p>
-{% endif %}
+	{% if not organizationInvitation.guest %}
+		<p>Pour ce faire, il vous suffit de vous inscrire puis d'accepter son invitation dans Mon Compte > Ma Structure > Mes invitations :</p>
+		<p>
+			<a href="{{ absolute_url(url('app_user_user_register')) }}" title="S'inscrire">{{ absolute_url(url('app_user_user_register')) }}</a>
+		</p>
+	{% else %}
+		<p>Pour ce faire, il vous suffit d'accepter son invitation dans Mon Compte > Ma Structure > Mes invitations :</p>
+		<p>
+			<a href="{{ absolute_url(url('app_organization_invitations')) }}" title="Gérer l'invitation">{{ absolute_url(url('app_organization_invitations')) }}</a>
+		</p>
+	{% endif %}
 
-<p>Si vous voulez en savoir plus sur Aides-territoires découvrez le service en quelques minutes: https://www.youtube.com/channel/UCLmm-foIU4gG2IWBXFn3IKQ</p>
+	<p>Si vous voulez en savoir plus sur Aides-territoires découvrez le service en quelques minutes: https://www.youtube.com/channel/UCLmm-foIU4gG2IWBXFn3IKQ</p>
 
-<p>
-Cordialement,
-<br />
-L’équipe d’Aides-territoires.
-</p>
+	<p>
+		Cordialement,
+		<br/>
+		L’équipe d’Aides-territoires.
+	</p>
 {% endblock %}

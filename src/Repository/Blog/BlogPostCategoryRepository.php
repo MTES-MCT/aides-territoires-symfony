@@ -32,7 +32,7 @@ class BlogPostCategoryRepository extends ServiceEntityRepository
         // on update les ids actuels pour avoir les futurs id de libre
         $qb = $this->createQueryBuilder('u');
         $qb->update(BlogPostCategory::class, 'uu');
-        $qb->set('uu.id', 'uu.id + '.$maxOldId)
+        $qb->set('uu.id', 'uu.id + ' . $maxOldId)
             ->andWhere('uu.oldId IS NOT NULL');
         $qb->getQuery()->execute();
 
@@ -40,7 +40,7 @@ class BlogPostCategoryRepository extends ServiceEntityRepository
         $qb = $this->createQueryBuilder('u');
         $qb->update(BlogPostCategory::class, 'uu');
         $qb->set('uu.id', 'uu.oldId')
-        ->andWhere('uu.oldId IS NOT NULL');
+            ->andWhere('uu.oldId IS NOT NULL');
         $qb->getQuery()->execute();
 
         // met à jour l'auto increment
@@ -50,7 +50,7 @@ class BlogPostCategoryRepository extends ServiceEntityRepository
         $maxId = $resultMax[0]['maxId'] ?? 1;
 
         $table = $this->getEntityManager()->getClassMetadata(BlogPostCategory::class)->getTableName();
-        $sql = 'ALTER TABLE '.$table.' AUTO_INCREMENT = '.$maxId;
+        $sql = 'ALTER TABLE ' . $table . ' AUTO_INCREMENT = ' . $maxId;
 
         $conn = $this->getEntityManager()->getConnection();
         $stmt = $conn->prepare($sql);

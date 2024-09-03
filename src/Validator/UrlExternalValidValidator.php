@@ -21,8 +21,7 @@ class UrlExternalValidValidator extends ConstraintValidator
         private ManagerRegistry $managerRegistry,
         private RequestStack $requestStack,
         private ParamService $paramService
-    ) {
-    }
+    ) {}
 
     public function validate($value, Constraint $constraint): void
     {
@@ -30,11 +29,11 @@ class UrlExternalValidValidator extends ConstraintValidator
             if (null === $value || '' === $value) {
                 return;
             }
-    
+
             if (!$constraint instanceof UrlExternalValid) {
                 throw new UnexpectedTypeException($constraint, UrlExternalValid::class);
             }
-    
+
             if (!is_string($value)) {
                 throw new UnexpectedValueException($value, 'string');
             }

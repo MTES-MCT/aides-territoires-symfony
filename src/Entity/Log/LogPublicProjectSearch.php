@@ -38,15 +38,15 @@ class LogPublicProjectSearch
     private ?\DateTimeInterface $dateCreate = null;
 
     #[ORM\ManyToOne(inversedBy: 'logPublicProjectSearches')]
-    #[ORM\JoinColumn(onDelete:DoctrineConstants::SET_NULL)]
+    #[ORM\JoinColumn(onDelete: DoctrineConstants::SET_NULL)]
     private ?Organization $organization = null;
 
     #[ORM\ManyToOne(inversedBy: 'logPublicProjectSearches')]
-    #[ORM\JoinColumn(onDelete:DoctrineConstants::SET_NULL)]
+    #[ORM\JoinColumn(onDelete: DoctrineConstants::SET_NULL)]
     private ?Perimeter $perimeter = null;
 
     #[ORM\ManyToOne(inversedBy: 'logPublicProjectSearches')]
-    #[ORM\JoinColumn(onDelete:DoctrineConstants::SET_NULL)]
+    #[ORM\JoinColumn(onDelete: DoctrineConstants::SET_NULL)]
     private ?User $user = null;
 
     #[ORM\ManyToMany(targetEntity: KeywordSynonymlist::class, inversedBy: 'logPublicProjectSearches')]

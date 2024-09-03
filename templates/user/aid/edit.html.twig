@@ -1,68 +1,75 @@
 {% extends 'user/aid/_base_edit.html.twig' %}
 
-{% block page_title %}<h1>Modifiez une aide</h1>{% endblock page_title %}
+{% block page_title %}
+	<h1>Modifiez une aide</h1>
+{% endblock page_title %}
 
 {% block before_section %}
-    <div class="fr-container">
-        <div class="actions fr-grid-row fr-grid-row--center fr-mb-5w fr-grid-row--gutters">
-            <div class="sidebar-actions fr-col-12 fr-col-md-4">
-                <p class="fr-h3 fr-mt-1w">{{ aid.status|aidStatusDisplay }}</p>
-                
-                <div>
-                    {% if aid.status == constant('App\\Entity\\Aid\\Aid::STATUS_DRAFT') %}
-                        <p>Cette aide <strong>n’est actuellement pas affichée sur le site</strong>. Vous pouvez l’envoyer pour publication en demandant une revue par un administrateur.</p>
-                        <p class="help">Vous pourrez continuer à modifier votre aide.</p>
-                        <button type="button" data-status="{{ constant('App\\Entity\\Aid\\Aid::STATUS_REVIEWABLE') }}" class="fr-btn btn-change-status">Demander la publication</button>
-                    {% elseif aid.status == constant('App\\Entity\\Aid\\Aid::STATUS_REVIEWABLE') %}
-                        <p>Sous réserve de validation par un administrateur, <strong>cette aide sera publiée sous peu</strong>.</p>
-                        <p class="help">Vous pourrez à nouveau demander une revue pour publication plus tard.</p>
-                        <button type="button" data-status="{{ constant('App\\Entity\\Aid\\Aid::STATUS_DRAFT') }}" class="fr-btn btn-change-status">Annuler la revue</button>
-                    {% elseif aid.status == constant('App\\Entity\\Aid\\Aid::STATUS_PUBLISHED') %}
-                        <p>Vous éditez actuellement une aide publiée à <a href="{{ absolute_url(path('app_aid_aid_details', {'slug': aid.slug})) }}"><strong>cette adresse</strong></a>. Merci de procéder avec prudence.</p>
-                        <p class="help">Vous devrez demander une revue par un administrateur pour re-publier votre aide.</p>
-                        <button type="button" data-status="{{ constant('App\\Entity\\Aid\\Aid::STATUS_DRAFT') }}"  class="fr-btn btn-change-status">Dépublier maintenant</button>
-                    {% endif %}
-                </div>
-            </div>
+	<div class="fr-container">
+		<div class="actions fr-grid-row fr-grid-row--center fr-mb-5w fr-grid-row--gutters">
+			<div class="sidebar-actions fr-col-12 fr-col-md-4">
+				<p class="fr-h3 fr-mt-1w">{{ aid.status|aidStatusDisplay }}</p>
 
-            <div class="sidebar-actions fr-col-12 fr-col-md-4">
-                <p class="fr-h3 fr-mt-1w">Prévisualisation</p>
-                <div>
-                    <p>Vérifiez le rendu de votre aide pour notre public.</p>
-                    <a class="fr-btn" href="{{ absolute_url(path('app_aid_aid_details', {'slug': aid.slug})) }}" target="_blank" rel="noopener" title="Prévisualiser cette aide - Ouvre une nouvelle fenêtre">
-                        Prévisualiser cette aide
-                    </a>
-                </div>
-            </div>
+				<div>
+					{% if aid.status == constant('App\\Entity\\Aid\\Aid::STATUS_DRAFT') %}
+						<p>Cette aide
+							<strong>n’est actuellement pas affichée sur le site</strong>. Vous pouvez l’envoyer pour publication en demandant une revue par un administrateur.</p>
+						<p class="help">Vous pourrez continuer à modifier votre aide.</p>
+						<button type="button" data-status="{{ constant('App\\Entity\\Aid\\Aid::STATUS_REVIEWABLE') }}" class="fr-btn btn-change-status">Demander la publication</button>
+					{% elseif aid.status == constant('App\\Entity\\Aid\\Aid::STATUS_REVIEWABLE') %}
+						<p>Sous réserve de validation par un administrateur,
+							<strong>cette aide sera publiée sous peu</strong>.</p>
+						<p class="help">Vous pourrez à nouveau demander une revue pour publication plus tard.</p>
+						<button type="button" data-status="{{ constant('App\\Entity\\Aid\\Aid::STATUS_DRAFT') }}" class="fr-btn btn-change-status">Annuler la revue</button>
+					{% elseif aid.status == constant('App\\Entity\\Aid\\Aid::STATUS_PUBLISHED') %}
+						<p>Vous éditez actuellement une aide publiée à
+							<a href="{{ absolute_url(path('app_aid_aid_details', {'slug': aid.slug})) }}">
+								<strong>cette adresse</strong>
+							</a>. Merci de procéder avec prudence.</p>
+						<p class="help">Vous devrez demander une revue par un administrateur pour re-publier votre aide.</p>
+						<button type="button" data-status="{{ constant('App\\Entity\\Aid\\Aid::STATUS_DRAFT') }}" class="fr-btn btn-change-status">Dépublier maintenant</button>
+					{% endif %}
+				</div>
+			</div>
 
-            <div class="sidebar-actions action-danger fr-col-12 fr-col-md-4">
-                <p class="fr-h3 fr-mt-1w">Suppression de l’aide</p>
-                <div>
-                    <p>En cliquant sur le bouton ci-dessous, vous supprimerez définitivement votre aide. Il n'y a pas d'annulation possible.</p>
-                    {{ form_start(formDelete)}}
-                        {{ form_row(formDelete.confirm)}}
-                        <div class="fr-input-group">
-                            <button type="submit" class="fr-btn">Supprimer cette aide</button>
-                        </div>
-                    {{ form_end(formDelete)}}
-                </div>
-            </div>
-        </div>
-    </div>
+			<div class="sidebar-actions fr-col-12 fr-col-md-4">
+				<p class="fr-h3 fr-mt-1w">Prévisualisation</p>
+				<div>
+					<p>Vérifiez le rendu de votre aide pour notre public.</p>
+					<a class="fr-btn" href="{{ absolute_url(path('app_aid_aid_details', {'slug': aid.slug})) }}" target="_blank" rel="noopener" title="Prévisualiser cette aide - Ouvre une nouvelle fenêtre">
+						Prévisualiser cette aide
+					</a>
+				</div>
+			</div>
+
+			<div class="sidebar-actions action-danger fr-col-12 fr-col-md-4">
+				<p class="fr-h3 fr-mt-1w">Suppression de l’aide</p>
+				<div>
+					<p>En cliquant sur le bouton ci-dessous, vous supprimerez définitivement votre aide. Il n'y a pas d'annulation possible.</p>
+					{{ form_start(formDelete)}}
+					{{ form_row(formDelete.confirm)}}
+					<div class="fr-input-group">
+						<button type="submit" class="fr-btn">Supprimer cette aide</button>
+					</div>
+					{{ form_end(formDelete)}}
+				</div>
+			</div>
+		</div>
+	</div>
 {% endblock before_section %}
 
 {% block form_actions %}
-<div class="form-actions fr-grid-row fr-grid-row--gutters fr-mt-2w fr-mb-6w fr-background-main">
-    <div class="submit-buttons fr-col-md-8">
-        <button type="submit" class="fr-btn">Enregistrer vos modifications</button>
-        <a href="{{ path('app_user_aid_duplicate', {'slug': aid.slug}) }}" class="fr-btn">Dupliquer cette aide</a>
-    </div>
-    <div class="fr-col-md-4 fr-grid-row fr-grid-row--right">
-        <a href="{{ path('app_user_aid_publications') }}" class="fr-btn fr-btn--tertiary">Retour à votre portefeuille d’aides</a>
-    </div>
-</div>
+	<div class="form-actions fr-grid-row fr-grid-row--gutters fr-mt-2w fr-mb-6w fr-background-main">
+		<div class="submit-buttons fr-col-md-8">
+			<button type="submit" class="fr-btn">Enregistrer vos modifications</button>
+			<a href="{{ path('app_user_aid_duplicate', {'slug': aid.slug}) }}" class="fr-btn">Dupliquer cette aide</a>
+		</div>
+		<div class="fr-col-md-4 fr-grid-row fr-grid-row--right">
+			<a href="{{ path('app_user_aid_publications') }}" class="fr-btn fr-btn--tertiary">Retour à votre portefeuille d’aides</a>
+		</div>
+	</div>
 {% endblock form_actions %}
 
 {% block modal %}
-    {% include 'user/dashboard/_modal_organization_not_complete.html.twig' %}
+	{% include 'user/dashboard/_modal_organization_not_complete.html.twig' %}
 {% endblock %}

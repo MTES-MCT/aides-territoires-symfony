@@ -28,13 +28,12 @@ class OrganizationRepository extends ServiceEntityRepository
     public function getScaleCovered($scale, ?array $params = null): array
     {
         $qb = $this->getQueryBuilder($params)
-        ->innerJoin('o.perimeter', 'p')
-        ->select('DISTINCT(p.id) as id, p.name, p.latitude, p.longitude, p.population')
-        ->andWhere('p.scale = :scale')
-        ->andWhere('p.isObsolete = false')
-        ->setParameter('scale', $scale)
-        ->orderBy('p.name', 'ASC')
-        ;
+            ->innerJoin('o.perimeter', 'p')
+            ->select('DISTINCT(p.id) as id, p.name, p.latitude, p.longitude, p.population')
+            ->andWhere('p.scale = :scale')
+            ->andWhere('p.isObsolete = false')
+            ->setParameter('scale', $scale)
+            ->orderBy('p.name', 'ASC');
 
         return $qb->getQuery()->getResult();
     }
@@ -52,7 +51,7 @@ class OrganizationRepository extends ServiceEntityRepository
         return $this->countCustom($params);
     }
 
-    public function countCommune(?array $params = null) : int
+    public function countCommune(?array $params = null): int
     {
         $params['typeSlug'] = OrganizationType::SLUG_COMMUNE;
         $params['perimeterScale'] = Perimeter::SCALE_COMMUNE;
@@ -66,20 +65,20 @@ class OrganizationRepository extends ServiceEntityRepository
         // return $this->countCustom($params);        
     }
 
-    public function countRegistrationsByMonth(array $params = []) : array
+    public function countRegistrationsByMonth(array $params = []): array
     {
         $params['perimeterIsObsolete'] = false;
         $params['isImported'] = false;
         $qb = $this->getQueryBuilder($params);
         $qb
-        ->select('IFNULL(COUNT(DISTINCT(o.id)), 0) AS nb, DATE_FORMAT(o.dateCreate, \'%Y-%m\') AS month')
-        ->addGroupBy('month')
-        ->orderBy('month', 'ASC')
+            ->select('IFNULL(COUNT(DISTINCT(o.id)), 0) AS nb, DATE_FORMAT(o.dateCreate, \'%Y-%m\') AS month')
+            ->addGroupBy('month')
+            ->orderBy('month', 'ASC')
         ;
         return $qb->getQuery()->getResult();
     }
 
-    public function findCommunes(?array $params = null) : array
+    public function findCommunes(?array $params = null): array
     {
         $params['typeSlug'] = OrganizationType::SLUG_COMMUNE;
         $params['perimeterScale'] = Perimeter::SCALE_COMMUNE;
@@ -87,7 +86,8 @@ class OrganizationRepository extends ServiceEntityRepository
         $params['isImported'] = false;
         $qb = $this->getQueryBuilder($params);
         $qb->select('o.name, o.dateCreate');
-        $qb->addSelect('
+        $qb->addSelect(
+            '
         (SELECT COUNT(DISTINCT(projects.id)) FROM App\Entity\Project\Project projects WHERE projects.organization = o) as projects_count'
         );
         $qb->innerJoin('o.perimeter', 'perimeter');
@@ -99,7 +99,7 @@ class OrganizationRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult();
     }
 
-    public function countInterco(?array $params = null) : int
+    public function countInterco(?array $params = null): int
     {
         $params['typeSlug'] = OrganizationType::SLUG_EPCI;
         $params['perimeterIsObsolete'] = false;
@@ -111,7 +111,7 @@ class OrganizationRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult()[0]['nb'] ?? 0;
     }
 
-    public function countEpci(?array $params = null) : int
+    public function countEpci(?array $params = null): int
     {
         $params['typeSlug'] = OrganizationType::SLUG_EPCI;
         $params['perimeterScale'] = Perimeter::SCALE_EPCI;
@@ -122,10 +122,10 @@ class OrganizationRepository extends ServiceEntityRepository
 
         $qb->select('IFNULL(COUNT(DISTINCT(perimeterForScale.id)), 0) AS nb');
 
-        return $qb->getQuery()->getResult()[0]['nb'] ?? 0;      
+        return $qb->getQuery()->getResult()[0]['nb'] ?? 0;
     }
 
-    public function findEpcis(?array $params = null) : array
+    public function findEpcis(?array $params = null): array
     {
         $params['typeSlug'] = OrganizationType::SLUG_EPCI;
         $params['perimeterScale'] = Perimeter::SCALE_EPCI;
@@ -133,7 +133,8 @@ class OrganizationRepository extends ServiceEntityRepository
         $params['isImported'] = false;
         $qb = $this->getQueryBuilder($params);
         $qb->select('o.name, o.dateCreate');
-        $qb->addSelect('
+        $qb->addSelect(
+            '
         (SELECT COUNT(DISTINCT(projects.id)) FROM App\Entity\Project\Project projects WHERE projects.organization = o) as projects_count'
         );
         $qb->innerJoin('o.perimeter', 'perimeter');
@@ -156,7 +157,8 @@ class OrganizationRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult();
     }
 
-    public function countCustom(array $params = null) : int {
+    public function countCustom(array $params = null): int
+    {
         $qb = $this->getQueryBuilder($params);
 
         $qb->select('IFNULL(COUNT(DISTINCT(o.id)), 0) AS nb');
@@ -167,23 +169,18 @@ class OrganizationRepository extends ServiceEntityRepository
     public function countCollaborators(User $user): int
     {
         $result = $this->createQueryBuilder('o')
-        ->select('COUNT(o.id) AS nb')
-        ->innerJoin('o.beneficiairies','beneficiairiesForCollaborators')
-        ->andWhere('o = :userOrganization')
-        ->setParameter('userOrganization', $user->getDefaultOrganization())
-        ->andWhere('beneficiairiesForCollaborators != :user')
-        ->setParameter('user', $user)
-        ->getQuery()
-        ->getResult()
-        ;
+            ->select('COUNT(o.id) AS nb')
+            ->innerJoin('o.beneficiairies', 'beneficiairiesForCollaborators')
+            ->andWhere('o = :userOrganization')
+            ->setParameter('userOrganization', $user->getDefaultOrganization())
+            ->andWhere('beneficiairiesForCollaborators != :user')
+            ->setParameter('user', $user)
+            ->getQuery()
+            ->getResult();
         return $result[0]['nb'] ?? 0;
-
     }
 
-    public function findCounties(Organization $organization)
-    {
-
-    }
+    public function findCounties(Organization $organization) {}
 
     public function getQueryBuilder(?array $params = null): QueryBuilder
     {
@@ -199,18 +196,18 @@ class OrganizationRepository extends ServiceEntityRepository
         $hasUserContributor = $params['hasUserContributor'] ?? null;
         $hasPerimeter = $params['hasPerimeter'] ?? null;
         $perimeterRegion = $params['perimeterRegion'] ?? null;
-        $perimeterDepartment= $params['perimeterDepartment'] ?? null;
+        $perimeterDepartment = $params['perimeterDepartment'] ?? null;
 
         $qb = $this->createQueryBuilder('o');
 
         if ($perimeterDepartment instanceof Perimeter && $perimeterDepartment->getId()) {
             $qb->andWhere('o.perimeterDepartment = :perimeterDepartment')
-            ->setParameter('perimeterDepartment', $perimeterDepartment);
+                ->setParameter('perimeterDepartment', $perimeterDepartment);
         }
 
         if ($perimeterRegion instanceof Perimeter && $perimeterRegion->getId()) {
             $qb->andWhere('o.perimeterRegion = :perimeterRegion')
-            ->setParameter('perimeterRegion', $perimeterRegion);
+                ->setParameter('perimeterRegion', $perimeterRegion);
         }
         if ($hasPerimeter) {
             $qb->innerJoin('o.perimeter', 'perimeterForPerimeter');
@@ -220,7 +217,7 @@ class OrganizationRepository extends ServiceEntityRepository
                 ->innerJoin('o.beneficiairies', 'beneficiairiesForContributor')
                 ->andWhere('beneficiairiesForContributor.isContributor = :isContributorTrue')
                 ->setParameter('isContributorTrue', true)
-                ;
+            ;
         }
 
         if ($hasUserBeneficiary) {
@@ -228,52 +225,51 @@ class OrganizationRepository extends ServiceEntityRepository
                 ->innerJoin('o.beneficiairies', 'beneficiairiesForBeneficiary')
                 ->andWhere('beneficiairiesForBeneficiary.isBeneficiary = :isBeneficiaryTrue')
                 ->setParameter('isBeneficiaryTrue', true)
-                ;
+            ;
         }
 
         if ($dateCreateMin instanceof \DateTime) {
             $qb->andWhere('o.dateCreate >= :dateCreateMin')
-            ->setParameter('dateCreateMin', $dateCreateMin);
+                ->setParameter('dateCreateMin', $dateCreateMin);
         }
 
         if ($dateCreateMax instanceof \DateTime) {
             $qb->andWhere('o.dateCreate <= :dateCreateMax')
-            ->setParameter('dateCreateMax', $dateCreateMax);
+                ->setParameter('dateCreateMax', $dateCreateMax);
         }
 
         if ($intercommunalityType !== null) {
             $qb
                 ->andWhere('o.intercommunalityType = :intercommunalityType')
                 ->setParameter('intercommunalityType', $intercommunalityType)
-                ;
+            ;
         }
         if (is_array($intercommunalityTypes)) {
             $qb
                 ->andWhere('o.intercommunalityType IN (:intercommunalityTypes)')
                 ->setParameter('intercommunalityTypes', $intercommunalityTypes)
-                ;
+            ;
         }
         if ($isImported !== null) {
             $qb->andWhere('o.isImported = :isImported')
-            ->setParameter('isImported', $isImported);
+                ->setParameter('isImported', $isImported);
         }
-        if ($typeSlug !== null)
-        {
+        if ($typeSlug !== null) {
             $qb->innerJoin('o.organizationType', 'organizationType')
-            ->andWhere('organizationType.slug = :typeSlug')
-            ->setParameter('typeSlug', $typeSlug);
+                ->andWhere('organizationType.slug = :typeSlug')
+                ->setParameter('typeSlug', $typeSlug);
         }
 
         if ($perimeterScale !== null) {
             $qb->innerJoin('o.perimeter', 'perimeterForScale')
-            ->andWhere('perimeterForScale.scale = :perimeterScale')
-            ->setParameter('perimeterScale', $perimeterScale);
+                ->andWhere('perimeterForScale.scale = :perimeterScale')
+                ->setParameter('perimeterScale', $perimeterScale);
         }
 
         if ($perimeterIsObsolete !== null) {
             $qb->innerJoin('o.perimeter', 'perimeterForObsolete')
-            ->andWhere('perimeterForObsolete.isObsolete = :perimeterIsObsolete')
-            ->setParameter('perimeterIsObsolete', $perimeterIsObsolete);
+                ->andWhere('perimeterForObsolete.isObsolete = :perimeterIsObsolete')
+                ->setParameter('perimeterIsObsolete', $perimeterIsObsolete);
         }
 
         return $qb;

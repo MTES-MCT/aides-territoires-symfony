@@ -28,8 +28,7 @@ class AidStepRepository extends ServiceEntityRepository
         $qb = $this->getQueryBuilder($params);
 
         $qb
-            ->select('ast.name')
-        ;
+            ->select('ast.name');
 
         $results = $qb->getQuery()->getResult();
 
@@ -67,10 +66,9 @@ class AidStepRepository extends ServiceEntityRepository
 
         if ($orderBy !== null) {
             $qb
-                ->addOrderBy($orderBy['sort'], $orderBy['order'])
-            ;
+                ->addOrderBy($orderBy['sort'], $orderBy['order']);
         }
-        
+
         return $qb;
     }
 }

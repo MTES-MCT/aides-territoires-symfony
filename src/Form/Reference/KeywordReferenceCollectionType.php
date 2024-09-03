@@ -25,9 +25,8 @@ class KeywordReferenceCollectionType extends AbstractType
                 'attr' => [
                     'class' => 'collection',
                 ],
-            
-            ])
-        ;
+
+            ]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void

@@ -45,7 +45,7 @@ class Organization // NOSONAR too much methods
         ['slug' => 'PETR', 'name' => 'Pays et pôles d’équilibre territorial et rural (PETR)'],
         ['slug' => 'SM', 'name' => 'Syndicat mixte et syndicat de commune'],
     ];
-    
+
     const TOTAL_BY_INTERCOMMUNALITY_TYPE = [
         "CC" => 1019,
         "CA" => 219,
@@ -56,7 +56,7 @@ class Organization // NOSONAR too much methods
         "PETR" => 368,
         "SM" => 9970,
     ];
-    
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -260,43 +260,43 @@ class Organization // NOSONAR too much methods
     private Collection $organizationInvitations;
 
     #[ORM\OneToMany(mappedBy: 'organization', targetEntity: Aid::class)]
-    #[ORM\JoinColumn(onDelete:DoctrineConstants::SET_NULL)]
+    #[ORM\JoinColumn(onDelete: DoctrineConstants::SET_NULL)]
     private Collection $aids;
 
     #[ORM\OneToMany(mappedBy: 'organization', targetEntity: LogAidView::class)]
-    #[ORM\JoinColumn(onDelete:DoctrineConstants::SET_NULL)]
+    #[ORM\JoinColumn(onDelete: DoctrineConstants::SET_NULL)]
     private Collection $logAidViews;
 
     #[ORM\OneToMany(mappedBy: 'organization', targetEntity: LogAidCreatedsFolder::class)]
-    #[ORM\JoinColumn(onDelete:DoctrineConstants::SET_NULL)]
+    #[ORM\JoinColumn(onDelete: DoctrineConstants::SET_NULL)]
     private Collection $logAidCreatedsFolders;
 
     #[ORM\OneToMany(mappedBy: 'organization', targetEntity: LogAidSearch::class)]
-    #[ORM\JoinColumn(onDelete:DoctrineConstants::SET_NULL)]
+    #[ORM\JoinColumn(onDelete: DoctrineConstants::SET_NULL)]
     private Collection $logAidSearches;
 
     #[ORM\OneToMany(mappedBy: 'organization', targetEntity: LogBackerView::class)]
-    #[ORM\JoinColumn(onDelete:DoctrineConstants::SET_NULL)]
+    #[ORM\JoinColumn(onDelete: DoctrineConstants::SET_NULL)]
     private Collection $logBackerViews;
 
     #[ORM\OneToMany(mappedBy: 'organization', targetEntity: LogBlogPostView::class)]
-    #[ORM\JoinColumn(onDelete:DoctrineConstants::SET_NULL)]
+    #[ORM\JoinColumn(onDelete: DoctrineConstants::SET_NULL)]
     private Collection $logBlogPostViews;
 
     #[ORM\OneToMany(mappedBy: 'organization', targetEntity: LogProgramView::class)]
-    #[ORM\JoinColumn(onDelete:DoctrineConstants::SET_NULL)]
+    #[ORM\JoinColumn(onDelete: DoctrineConstants::SET_NULL)]
     private Collection $logProgramViews;
 
     #[ORM\OneToMany(mappedBy: 'organization', targetEntity: LogPublicProjectSearch::class)]
-    #[ORM\JoinColumn(onDelete:DoctrineConstants::SET_NULL)]
+    #[ORM\JoinColumn(onDelete: DoctrineConstants::SET_NULL)]
     private Collection $logPublicProjectSearches;
 
     #[ORM\OneToMany(mappedBy: 'organization', targetEntity: LogPublicProjectView::class)]
-    #[ORM\JoinColumn(onDelete:DoctrineConstants::SET_NULL)]
+    #[ORM\JoinColumn(onDelete: DoctrineConstants::SET_NULL)]
     private Collection $logPublicProjectViews;
 
     #[ORM\OneToMany(mappedBy: 'organization', targetEntity: LogProjectValidatedSearch::class)]
-    #[ORM\JoinColumn(onDelete:DoctrineConstants::SET_NULL)]
+    #[ORM\JoinColumn(onDelete: DoctrineConstants::SET_NULL)]
     private Collection $logProjectValidatedSearches;
 
     #[ORM\OneToMany(mappedBy: 'organization', targetEntity: BackerAskAssociate::class, orphanRemoval: true)]
@@ -1420,7 +1420,8 @@ class Organization // NOSONAR too much methods
     }
 
 
-    public function  getProjectsOfUser(User $user) : array {
+    public function  getProjectsOfUser(User $user): array
+    {
         $projects = [];
         foreach ($this->getProjects() as $project) {
             if ($project->getAuthor() && $project->getAuthor()->getId() == $user->getId()) {
@@ -1430,7 +1431,8 @@ class Organization // NOSONAR too much methods
         return $projects;
     }
 
-    public function  getAidsOfUser(User $user) : array {
+    public function  getAidsOfUser(User $user): array
+    {
         $aids = [];
         foreach ($this->getAids() as $aid) {
             if ($aid->getAuthor() && $aid->getAuthor()->getId() == $user->getId()) {
@@ -1441,7 +1443,7 @@ class Organization // NOSONAR too much methods
     }
 
 
-    public function getFirstBeneficary() : ?User
+    public function getFirstBeneficary(): ?User
     {
         if (!$this->beneficiairies) {
             return null;

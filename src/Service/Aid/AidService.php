@@ -33,10 +33,7 @@ class AidService // NOSONAR too complex
         private ReferenceService $referenceService,
         private ManagerRegistry $managerRegistry,
         private LoggerInterface $loggerInterface
-    )
-    {
-        
-    }
+    ) {}
 
     public function getSuggestedProjectReferences(Aid $aid): array
     {
@@ -205,14 +202,14 @@ class AidService // NOSONAR too complex
         return $newAid;
     }
 
-    public function canUserAccessStatsPage(?User $user, Aid $aid) : bool
+    public function canUserAccessStatsPage(?User $user, Aid $aid): bool
     {
         if (!$user instanceof User || !$aid instanceof Aid) {
             return false;
         }
 
         $access = false;
-        if(
+        if (
             $aid->getAuthor() == $user
             || $this->userService->isUserGranted($user, User::ROLE_ADMIN)
             || ($aid->getOrganization() && $aid->getOrganization()->getBeneficiairies()->contains($user))
@@ -221,7 +218,6 @@ class AidService // NOSONAR too complex
         }
 
         return $access;
-        
     }
 
     public function searchAids(array $aidParams): array
@@ -232,8 +228,8 @@ class AidService // NOSONAR too complex
 
         // Si on a le score total et le score objects on tri par le cumul des deux (pas possible directement dans la requête sans trop l'alourdir)
         if (isset($aids[0]) && $aids[0]->getScoreTotal() && $aids[0]->getScoreObjects()) {
-            usort($aids, function($a, $b) {
-            return ($b->getScoreTotal() + $b->getScoreObjects()) <=> ($a->getScoreTotal() + $a->getScoreObjects());
+            usort($aids, function ($a, $b) {
+                return ($b->getScoreTotal() + $b->getScoreObjects()) <=> ($a->getScoreTotal() + $a->getScoreObjects());
             });
         }
 
@@ -283,14 +279,14 @@ class AidService // NOSONAR too complex
 
 
 
-    public function postPopulateAids(array $aids, ?array $params) : array
+    public function postPopulateAids(array $aids, ?array $params): array
     {
         // on déduplique les génériques
         $aids = $this->unDuplicateGenerics($aids, $params['perimeterFrom'] ?? null);
 
         // pour les portails il y a des aides mises en avant et des aides à exclures
         $aids = $this->handleSearchPageRules($aids, $params);
-        
+
         return $aids;
     }
 
@@ -337,7 +333,7 @@ class AidService // NOSONAR too complex
         Lorsque la recherche porte sur une zone plus petite que le périmètre de l'aide locale,
             nous affichons la version locale.
     */
-    public function unDuplicateGenerics(array $aids, ?Perimeter $perimeter) : array // NOSONAR too complex
+    public function unDuplicateGenerics(array $aids, ?Perimeter $perimeter): array // NOSONAR too complex
     {
         // Si on n'a pas de périmètre de recherche
         if (!$perimeter instanceof Perimeter) {
@@ -375,15 +371,17 @@ class AidService // NOSONAR too complex
         return $aids->toArray();
     }
 
-    public function getUrl(Aid $aid, $interface = UrlGeneratorInterface::ABSOLUTE_URL) : ?string {
+    public function getUrl(Aid $aid, $interface = UrlGeneratorInterface::ABSOLUTE_URL): ?string
+    {
         try {
             return $this->routerInterface->generate('app_aid_aid_details', ['slug' => $aid->getSlug()], $interface);
         } catch (\Exception $e) {
             return null;
         }
     }
-    
-    public function userCanExportPdf(Aid $aid, ?User $user) : bool {
+
+    public function userCanExportPdf(Aid $aid, ?User $user): bool
+    {
         if (!$user) {
             return false;
         }
@@ -393,7 +391,8 @@ class AidService // NOSONAR too complex
         return false;
     }
 
-    public function userCanSee(Aid $aid, ?User $user) : bool {
+    public function userCanSee(Aid $aid, ?User $user): bool
+    {
         if (!$aid->isPublished()) {
             if ($user && $aid->getAuthor() && ($user->getId() == $aid->getAuthor()->getId())) { // c'est l'auteur
                 return true;
@@ -409,7 +408,7 @@ class AidService // NOSONAR too complex
         }
     }
 
-    public function userCanEdit(Aid $aid, ?User $user) : bool
+    public function userCanEdit(Aid $aid, ?User $user): bool
     {
         if (!$user instanceof User) {
             return false;
@@ -423,7 +422,7 @@ class AidService // NOSONAR too complex
         return false;
     }
 
-    public function userCanDuplicate(Aid $aid, ?User $user) : bool
+    public function userCanDuplicate(Aid $aid, ?User $user): bool
     {
         return $this->userCanEdit($aid, $user);
     }
@@ -449,7 +448,7 @@ class AidService // NOSONAR too complex
         if (!$aid->getDsMapping()) {
             return $datas;
         }
-        
+
         // utilisateur non connecté
         if (!$user) {
             $datas['ds_application_url'] = true;
@@ -465,7 +464,6 @@ class AidService // NOSONAR too complex
                 $datas['prepopulate_application_url'] = $content->dossier_url ?? null;
                 $datas['ds_folder_id'] = $content->dossier_id ?? null;
                 $datas['ds_folder_number'] = $content->dossier_number ?? null;
-
             } catch (\Exception $e) {
                 $this->loggerInterface->error('Erreur getDatasFromDs', [
                     'exception' => $e,
@@ -475,7 +473,7 @@ class AidService // NOSONAR too complex
                 ]);
             }
         }
-        
+
         return $datas;
     }
 
@@ -493,7 +491,7 @@ class AidService // NOSONAR too complex
 
         return $this->httpClientInterface->request(
             'POST',
-            'https://www.demarches-simplifiees.fr/api/public/v1/demarches/'.$dsId.'/dossiers',
+            'https://www.demarches-simplifiees.fr/api/public/v1/demarches/' . $dsId . '/dossiers',
             [
                 'headers' => [
                     'Content-Type' => 'application/json',
@@ -533,7 +531,7 @@ class AidService // NOSONAR too complex
                             break;
 
                         default:
-                        break;
+                            break;
                     }
                     if ($value) {
                         $datas[$field['ds_field_id']] = $value;
@@ -565,18 +563,18 @@ class AidService // NOSONAR too complex
             switch ($oldField) {
                 case 'last_name':
                     return $entity->getLastname();
-                break;
+                    break;
 
                 case 'first_name':
                     return $entity->getFirstname();
-                break;
+                    break;
 
                 case 'email':
                     return $entity->getEmail();
-                break;
+                    break;
 
                 default:
-                break;
+                    break;
             }
         } elseif ($entity instanceof Organization) {
             if ($oldField == 'organizationType') {
@@ -599,7 +597,7 @@ class AidService // NOSONAR too complex
 
         return false;
     }
-    
+
     public function getLock(Aid $aid): ?AidLock
     {
         foreach ($aid->getAidLocks() as $aidLock) {
@@ -614,7 +612,7 @@ class AidService // NOSONAR too complex
         $minutesMax = 5;
         foreach ($aid->getAidLocks() as $aidLock) {
             // si le lock a plus de 5 min, on le supprime
-            if ($aidLock->getTimeStart() < $now->sub(new \DateInterval('PT'.$minutesMax.'M'))) {
+            if ($aidLock->getTimeStart() < $now->sub(new \DateInterval('PT' . $minutesMax . 'M'))) {
                 $this->managerRegistry->getManager()->remove($aidLock);
                 $this->managerRegistry->getManager()->flush();
                 continue;
@@ -631,7 +629,7 @@ class AidService // NOSONAR too complex
     {
         return !$aid->getAidLocks()->isEmpty();
     }
-    
+
     public function lock(Aid $aid, User $user): void
     {
         // vérifie que l'aide n'est pas déjà lock
@@ -643,8 +641,8 @@ class AidService // NOSONAR too complex
             $this->managerRegistry->getManager()->flush();
         } else {
             $aidLock = (isset($aid->getAidLocks()[0]) && $aid->getAidLocks()[0] instanceof AidLock)
-                        ? $aid->getAidLocks()[0]
-                        : null;
+                ? $aid->getAidLocks()[0]
+                : null;
             // on met à jour le lock si le user et l'aide sont bien les mêmes
             if ($aidLock && $aidLock->getUser() == $user && $aidLock->getAid() == $aid) {
                 $aidLock->setTimeStart(new \DateTime(date('Y-m-d H:i:s')));
@@ -667,22 +665,103 @@ class AidService // NOSONAR too complex
     public function extractKeywords(Aid $aid): array
     {
         // concatene les textes bruts
-        $text = $aid->getName(). ' '
-                . strip_tags($aid->getDescription()). ' '
-                . strip_tags($aid->getEligibility()). ' '
-                . strip_tags($aid->getContact())
-                ;
-        
+        $text = $aid->getName() . ' '
+            . strip_tags($aid->getDescription()) . ' '
+            . strip_tags($aid->getEligibility()) . ' '
+            . strip_tags($aid->getContact());
+
         $commonWords = [
-            'pour', 'des', 'ces', 'que', 'qui', 'nous', 'vous', 'mais', 'avec', 'cette', 'dans', 'sur', 'fait', 'elle', 'tout', 'son', 'sont', 'aux', 'par', 'comme', 'peut', 'plus', 'sans', 'ses', 'donc', 'quand', 'depuis', 'leur', 'sous', 'tous', 'très', 'fait', 'était', 'aussi', 'cela', 'entre', 'avant', 'après', 'tous', 'autre', 'trop', 'encore', 'alors', 'ainsi', 'chez', 'leurs', 'dont', 'cette', 'faire', 'part', 'quel', 'elle', 'même', 'moins', 'peu', 'car', 'aucun', 'chaque', 'toute', 'fois', 'quelque', 'manière', 'chose', 'autres', 'beaucoup', 'toutes', 'ceux', 'celles', 'devant', 'depuis', 'derrière', 'dessous', 'dessus', 'contre', 'pendant', 'malgré', 'hors', 'parmi', 'sans', 'sauf', 'selon', 'sous', 'vers'
+            'pour',
+            'des',
+            'ces',
+            'que',
+            'qui',
+            'nous',
+            'vous',
+            'mais',
+            'avec',
+            'cette',
+            'dans',
+            'sur',
+            'fait',
+            'elle',
+            'tout',
+            'son',
+            'sont',
+            'aux',
+            'par',
+            'comme',
+            'peut',
+            'plus',
+            'sans',
+            'ses',
+            'donc',
+            'quand',
+            'depuis',
+            'leur',
+            'sous',
+            'tous',
+            'très',
+            'fait',
+            'était',
+            'aussi',
+            'cela',
+            'entre',
+            'avant',
+            'après',
+            'tous',
+            'autre',
+            'trop',
+            'encore',
+            'alors',
+            'ainsi',
+            'chez',
+            'leurs',
+            'dont',
+            'cette',
+            'faire',
+            'part',
+            'quel',
+            'elle',
+            'même',
+            'moins',
+            'peu',
+            'car',
+            'aucun',
+            'chaque',
+            'toute',
+            'fois',
+            'quelque',
+            'manière',
+            'chose',
+            'autres',
+            'beaucoup',
+            'toutes',
+            'ceux',
+            'celles',
+            'devant',
+            'depuis',
+            'derrière',
+            'dessous',
+            'dessus',
+            'contre',
+            'pendant',
+            'malgré',
+            'hors',
+            'parmi',
+            'sans',
+            'sauf',
+            'selon',
+            'sous',
+            'vers'
         ];
-        
+
         // Retirer les caractères spéciaux sauf les caractères accentués
         $text = preg_replace('/[^a-z0-9\sàâäéèêëïîôöùûüÿç]/ui', '', $text);
-        
+
         // Retirer les mots de moins de 3 lettres
         $text = preg_replace('/\b\w{1,2}\b/u', '', $text);
-        
+
         // Retirer les mots communs
         $commonWordsPattern = '/\b(' . implode('|', $commonWords) . ')\b/ui';
         $text = preg_replace($commonWordsPattern, '', $text);

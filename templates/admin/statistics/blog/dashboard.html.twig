@@ -2,92 +2,95 @@
 
 
 {% block head_javascript %}
-    {{ parent() }}
-    {{ encore_entry_script_tags('admin/statistics/blog/dashboard') }}
+	{{ parent() }}
+	{{ encore_entry_script_tags('admin/statistics/blog/dashboard') }}
 {% endblock head_javascript %}
 
-{% block breadcrumb %}
-{% endblock %}
+{% block breadcrumb %}{% endblock %}
 
 {% block stats_content %}
-<section class="container">
-    <h1>Blog statistiques</h1>
-</section>
+	<section class="container">
+		<h1>Blog statistiques</h1>
+	</section>
 
-<section id="blog-dahboard-stats" class="container mt-5">
-    
+	<section id="blog-dahboard-stats" class="container mt-5">
 
-    <h2>Top articles et catégories sur la période</h2>
 
-    <div class="mt-5">
-        {{ form_start(formDateRange) }}
-        <div class="d-flex">
-            <div class="d-flex me-3">
-            {{ form_row(formDateRange.dateMin) }}
-            </div>
-            <div class="d-flex me-3">
-            {{ form_row(formDateRange.dateMax) }}
-            </div>
-            <div class="d-flex me-3">
-            <button type="submit" class="btn btn-primary">Valider</button>
-            </div>
-        </div>
-        {{ form_end(formDateRange) }}
-    </div>
+		<h2>Top articles et catégories sur la période</h2>
 
-    <div class="row mt-5">
-        <div class="col-md-6">
-            <table class="table table-striped">
-                <thead>
-                    <tr>
-                        <th>Nom</th>
-                        <th>Date de publication</th>
-                        <th>Nombre de vues</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for topBlogPost in topBlogPosts %}
-                        {% if topBlogPost.blogPost %}
-                        <tr>
-                            <td>{{ topBlogPost.blogPost.name }}</td>
-                            <td>{% if topBlogPost.blogPost.datePublished %}{{ topBlogPost.blogPost.datePublished|date('d/m/Y') }}{% endif %}</td>
-                            <td>{{ topBlogPost.nb }}</td>
-                        </tr>
-                        {% endif %}
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-        <div class="col-md-6">
-            <div class="charts">
-                {{ render_chart(chartTopCategories) }}
-            </div>
-        </div>
-    </div>
-</section>
+		<div class="mt-5">
+			{{ form_start(formDateRange) }}
+			<div class="d-flex">
+				<div class="d-flex me-3">
+					{{ form_row(formDateRange.dateMin) }}
+				</div>
+				<div class="d-flex me-3">
+					{{ form_row(formDateRange.dateMax) }}
+				</div>
+				<div class="d-flex me-3">
+					<button type="submit" class="btn btn-primary">Valider</button>
+				</div>
+			</div>
+			{{ form_end(formDateRange) }}
+		</div>
 
-<section id="evolution" class="container mt-5 mb-5">
-    <h2>Evolution d'un article</h2>
-    <div class="mt-5">
-        {{ form_start(formDateRangeEvolution) }}
-        <div class="d-flex">
-            <div class="d-flex me-3">
-            {{ form_row(formDateRangeEvolution.dateMin) }}
-            </div>
-            <div class="d-flex me-3">
-            {{ form_row(formDateRangeEvolution.dateMax) }}
-            </div>
-            <div class="d-flex me-3">
-            <button type="submit" class="btn btn-primary">Valider</button>
-            </div>
-        </div>
-        {{ form_end(formDateRangeEvolution) }}
-    </div>
+		<div class="row mt-5">
+			<div class="col-md-6">
+				<table class="table table-striped">
+					<thead>
+						<tr>
+							<th>Nom</th>
+							<th>Date de publication</th>
+							<th>Nombre de vues</th>
+						</tr>
+					</thead>
+					<tbody>
+						{% for topBlogPost in topBlogPosts %}
+							{% if topBlogPost.blogPost %}
+								<tr>
+									<td>{{ topBlogPost.blogPost.name }}</td>
+									<td>
+										{% if topBlogPost.blogPost.datePublished %}
+											{{ topBlogPost.blogPost.datePublished|date('d/m/Y') }}
+										{% endif %}
+									</td>
+									<td>{{ topBlogPost.nb }}</td>
+								</tr>
+							{% endif %}
+						{% endfor %}
+					</tbody>
+				</table>
+			</div>
+			<div class="col-md-6">
+				<div class="charts">
+					{{ render_chart(chartTopCategories) }}
+				</div>
+			</div>
+		</div>
+	</section>
 
-    {% if chartEvolution %}
-    <div class="charts">
-        {{ render_chart(chartEvolution) }}
-    </div>
-    {% endif %}
-</section>
+	<section id="evolution" class="container mt-5 mb-5">
+		<h2>Evolution d'un article</h2>
+		<div class="mt-5">
+			{{ form_start(formDateRangeEvolution) }}
+			<div class="d-flex">
+				<div class="d-flex me-3">
+					{{ form_row(formDateRangeEvolution.dateMin) }}
+				</div>
+				<div class="d-flex me-3">
+					{{ form_row(formDateRangeEvolution.dateMax) }}
+				</div>
+				<div class="d-flex me-3">
+					<button type="submit" class="btn btn-primary">Valider</button>
+				</div>
+			</div>
+			{{ form_end(formDateRangeEvolution) }}
+		</div>
+
+		{% if chartEvolution %}
+			<div class="charts">
+				{{ render_chart(chartEvolution) }}
+			</div>
+		{% endif %}
+	</section>
 {% endblock stats_content %}

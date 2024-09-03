@@ -1,25 +1,29 @@
 <div class="fr-card fr-enlarge-link fr-card--horizontal fr-card--horizontal-third fr-my-5w">
-    <div class="fr-card__body">
-        <div class="fr-card__content">
-            <h2 class="fr-card__title">
-                <a href="{{ path('app_blog_post_details', {'slug': blogPost.slug}) }}" title="Lire l'article {{ blogPost.name }}">{{ blogPost.name|myTruncate(80) }}</a>
-            </h2>
-            {% if blogPost.hat %}
-            <div class="fr-card__desc">{{ blogPost.hat|replace({'&nbsp;': ' '})|striptags|myTruncate(190) }}</div>
-            {% endif %}
-            <div class="fr-card__start">
-                <ul class="fr-tags-group">
-                    <li>
-                        <p class="fr-tag">{% if blogPost.blogPostCategory %}{{ blogPost.blogPostCategory.name }}{% endif %}</p>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </div>
+	<div class="fr-card__body">
+		<div class="fr-card__content">
+			<h2 class="fr-card__title">
+				<a href="{{ path('app_blog_post_details', {'slug': blogPost.slug}) }}" title="Lire l'article {{ blogPost.name }}">{{ blogPost.name|myTruncate(80) }}</a>
+			</h2>
+			{% if blogPost.hat %}
+				<div class="fr-card__desc">{{ blogPost.hat|replace({'&nbsp;': ' '})|striptags|myTruncate(190) }}</div>
+			{% endif %}
+			<div class="fr-card__start">
+				<ul class="fr-tags-group">
+					<li>
+						<p class="fr-tag">
+							{% if blogPost.blogPostCategory %}
+								{{ blogPost.blogPostCategory.name }}
+							{% endif %}
+						</p>
+					</li>
+				</ul>
+			</div>
+		</div>
+	</div>
 
-    <div class="fr-card__header">
-        <div class="fr-card__img">
-            <img src="{{ blogPost.logo|imagine_filter('blog_preview') }}" class="fr-responsive-img" alt="Illustration article {{ blogPost.name }}" loading="lazy" data-fr-js-ratio="true">
-        </div>
-    </div>
+	<div class="fr-card__header">
+		<div class="fr-card__img">
+			<img src="{{ blogPost.logo|imagine_filter('blog_preview') }}" class="fr-responsive-img" alt="Illustration article {{ blogPost.name }}" loading="lazy" data-fr-js-ratio="true">
+		</div>
+	</div>
 </div>

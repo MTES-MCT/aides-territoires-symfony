@@ -1,86 +1,124 @@
 {% extends 'admin/statistics/dashboard.html.twig' %}
 
 {% block date_range_form %}
-    {% include 'admin/statistics/_form_date_range.html.twig' %}
+	{% include 'admin/statistics/_form_date_range.html.twig' %}
 {% endblock date_range_form %}
-    
+
 
 {% block stats_content %}
-<div id="consultation-panel" class="fr-tabs__panel fr-tabs__panel--selected" role="tabpanel" aria-labelledby="consultation" tabindex="0">
-    <div class="d-flex">
-            <div class="card col">
-                <div class="card-body d-flex flex-column justify-content-between">
-                    <h5 class="card-title">
-                        <a class="card-link" href="#">
-                            Nombre de visiteurs
-                        </a>
-                    </h5>
-                    <p class="card-text fs-2"><strong>{% if statsMatomo.nb_visits is defined %}{{ statsMatomo.nb_visits|number_format(0, ',', ' ') }}{% endif %}</strong></p>
-                </div>
-            </div>
+	<div id="consultation-panel" class="fr-tabs__panel fr-tabs__panel--selected" role="tabpanel" aria-labelledby="consultation" tabindex="0">
+		<div class="d-flex">
+			<div class="card col">
+				<div class="card-body d-flex flex-column justify-content-between">
+					<h5 class="card-title">
+						<a class="card-link" href="#">
+							Nombre de visiteurs
+						</a>
+					</h5>
+					<p class="card-text fs-2">
+						<strong>
+							{% if statsMatomo.nb_visits is defined %}
+								{{ statsMatomo.nb_visits|number_format(0, ',', ' ') }}
+							{% endif %}
+						</strong>
+					</p>
+				</div>
+			</div>
 
-            <div class="card col">
-                <div class="card-body d-flex flex-column justify-content-between">
-                    <h5 class="card-title">
-                        <a class="card-link" href="#">Taux de rebond</a>
-                    </h5>
-                    <p class="card-text fs-2"><strong>{% if statsMatomo.bounce_rate is defined %}{{ statsMatomo.bounce_rate }}{% endif %}</strong></p>
-                </div>
-            </div>
+			<div class="card col">
+				<div class="card-body d-flex flex-column justify-content-between">
+					<h5 class="card-title">
+						<a class="card-link" href="#">Taux de rebond</a>
+					</h5>
+					<p class="card-text fs-2">
+						<strong>
+							{% if statsMatomo.bounce_rate is defined %}
+								{{ statsMatomo.bounce_rate }}
+							{% endif %}
+						</strong>
+					</p>
+				</div>
+			</div>
 
-            <div class="card col">
-                <div class="card-body d-flex flex-column justify-content-between">
-                    <h5 class="card-title">
-                        <a class="card-link" href="#">
-                            Durée moyenne d’une visite
-                        </a>
-                    </h5>
-                    <p class="card-text fs-2"><strong>{% if statsMatomo.avg_time_on_site is defined %}{{ statsMatomo.avg_time_on_site|number_format(0, ',', ' ') }}{% endif %}</strong></p>
-                </div>
-            </div>
+			<div class="card col">
+				<div class="card-body d-flex flex-column justify-content-between">
+					<h5 class="card-title">
+						<a class="card-link" href="#">
+							Durée moyenne d’une visite
+						</a>
+					</h5>
+					<p class="card-text fs-2">
+						<strong>
+							{% if statsMatomo.avg_time_on_site is defined %}
+								{{ statsMatomo.avg_time_on_site|number_format(0, ',', ' ') }}
+							{% endif %}
+						</strong>
+					</p>
+				</div>
+			</div>
 
-            <div class="card col">
-                <div class="card-body d-flex flex-column justify-content-between">
-                    <h5 class="card-title">
-                        <a class="card-link" href="#">
-                            Nombre de pages vues
-                        </a>
-                    </h5>
-                    <p class="card-text fs-2"><strong>{% if statsMatomoActions.nb_pageviews is defined %}{{ statsMatomoActions.nb_pageviews|number_format(0, ',', ' ') }}{% endif %}</strong></p>
-                </div>
-            </div>
+			<div class="card col">
+				<div class="card-body d-flex flex-column justify-content-between">
+					<h5 class="card-title">
+						<a class="card-link" href="#">
+							Nombre de pages vues
+						</a>
+					</h5>
+					<p class="card-text fs-2">
+						<strong>
+							{% if statsMatomoActions.nb_pageviews is defined %}
+								{{ statsMatomoActions.nb_pageviews|number_format(0, ',', ' ') }}
+							{% endif %}
+						</strong>
+					</p>
+				</div>
+			</div>
 
-            <div class="card col">
-                <div class="card-body d-flex flex-column justify-content-between">
-                    <h5 class="card-title">
-                        <a class="card-link" href="">
-                            Nombre d’aides vues (sans l’API)
-                        </a>
-                    </h5>
-                    <p class="card-text fs-2"><strong>{% if nbAidViews is defined %}{{ nbAidViews|number_format(0, ',', ' ') }}{% endif %}</strong></p>
-                </div>
-            </div>
+			<div class="card col">
+				<div class="card-body d-flex flex-column justify-content-between">
+					<h5 class="card-title">
+						<a class="card-link" href="">
+							Nombre d’aides vues (sans l’API)
+						</a>
+					</h5>
+					<p class="card-text fs-2">
+						<strong>
+							{% if nbAidViews is defined %}
+								{{ nbAidViews|number_format(0, ',', ' ') }}
+							{% endif %}
+						</strong>
+					</p>
+				</div>
+			</div>
 
-            <div class="card col">
-                <div class="card-body d-flex flex-column justify-content-between">
-                    <h5 class="card-title">
-                        <a class="card-link" href="">
-                            Nombre d’aides vues différentes (sans l’API)
-                        </a>
-                    </h5>
-                    <p class="card-text fs-2"><strong>{% if nbAidViewsDistinct is defined %}{{ nbAidViewsDistinct|number_format(0, ',', ' ') }}{% endif %}</strong></p>
-                </div>
-            </div>
+			<div class="card col">
+				<div class="card-body d-flex flex-column justify-content-between">
+					<h5 class="card-title">
+						<a class="card-link" href="">
+							Nombre d’aides vues différentes (sans l’API)
+						</a>
+					</h5>
+					<p class="card-text fs-2">
+						<strong>
+							{% if nbAidViewsDistinct is defined %}
+								{{ nbAidViewsDistinct|number_format(0, ',', ' ') }}
+							{% endif %}
+						</strong>
+					</p>
+				</div>
+			</div>
 
-    </div>
+		</div>
 
-    <h3 class="mt-5"><span aria-hidden="true">🚀 </span>Visites uniques ces 10 dernières semaines :</h3>
-    <div class="alert alert-info">
-        <p>Les inscriptions et alertes créées sont multipliées par 20 afin qu’elles soient visibles et comparables avec les visites uniques.</p>
-        <p>Cela permet de visualiser une conversion hebdomadaire en fonction des actions engagées par l’équipe.</p>
-    </div>
-    <div class="mt-5">
-        <div>{{ render_chart(chartLast10Weeks) }}</div>
-    </div>
-</div>
+		<h3 class="mt-5">
+			<span aria-hidden="true">🚀
+			</span>Visites uniques ces 10 dernières semaines :</h3>
+		<div class="alert alert-info">
+			<p>Les inscriptions et alertes créées sont multipliées par 20 afin qu’elles soient visibles et comparables avec les visites uniques.</p>
+			<p>Cela permet de visualiser une conversion hebdomadaire en fonction des actions engagées par l’équipe.</p>
+		</div>
+		<div class="mt-5">
+			<div>{{ render_chart(chartLast10Weeks) }}</div>
+		</div>
+	</div>
 {% endblock stats_content %}

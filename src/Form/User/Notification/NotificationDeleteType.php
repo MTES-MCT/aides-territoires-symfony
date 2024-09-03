@@ -18,22 +18,20 @@ class NotificationDeleteType extends AbstractType
     public function __construct(
         protected UserService $userService,
         protected ManagerRegistry $managerRegistry
-    )
-    {
-    }
+    ) {}
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-        ->add('idNotification', HiddenType::class, [
-            'required' => true,
-            'label' => false,
-        ])
+            ->add('idNotification', HiddenType::class, [
+                'required' => true,
+                'label' => false,
+            ])
 
-        ->addEventListener(
-            FormEvents::SUBMIT,
-            [$this, 'onSubmit']
-        )
+            ->addEventListener(
+                FormEvents::SUBMIT,
+                [$this, 'onSubmit']
+            )
         ;
     }
 

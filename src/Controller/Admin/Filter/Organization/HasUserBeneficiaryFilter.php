@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Controller\Admin\Filter\Organization;
 
 use App\Form\Admin\Filter\Organization\HasUserBeneficiaryFilterType;
@@ -26,17 +27,15 @@ class HasUserBeneficiaryFilter implements FilterInterface
     {
         if ($filterDataDto->getValue() !== null) {
             $queryBuilder
-                ->innerJoin($filterDataDto->getEntityAlias().'.beneficiairies', 'beneficiairies')
+                ->innerJoin($filterDataDto->getEntityAlias() . '.beneficiairies', 'beneficiairies')
                 ->andWhere('beneficiairies.isBeneficiary = :isBeneficiary')
             ;
             if ($filterDataDto->getValue() === true) {
                 $queryBuilder
-                    ->setParameter('isBeneficiary', true)
-                ;
+                    ->setParameter('isBeneficiary', true);
             } else {
                 $queryBuilder
-                    ->setParameter('isBeneficiary', false)
-                ;
+                    ->setParameter('isBeneficiary', false);
             }
         }
     }

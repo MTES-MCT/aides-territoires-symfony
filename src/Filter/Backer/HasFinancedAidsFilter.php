@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Filter\Backer;
 
 
@@ -44,4 +45,3 @@ final class HasFinancedAidsFilter extends AbstractFilter
         ];
     }
 }
-?>

@@ -29,8 +29,7 @@ class ProjectReferenceRepository extends ServiceEntityRepository
         $qb = $this->getQueryBuilder($params);
 
         $qb
-            ->select('pr.name')
-        ;
+            ->select('pr.name');
 
         $results = $qb->getQuery()->getResult();
 
@@ -68,28 +67,26 @@ class ProjectReferenceRepository extends ServiceEntityRepository
 
         if ($projectReferenceCategory instanceof ProjectReferenceCategory && $projectReferenceCategory->getId()) {
             $qb
-            ->andWhere('pr.projectReferenceCategory = :projectReferenceCategory')
-            ->setParameter('projectReferenceCategory', $projectReferenceCategory);
+                ->andWhere('pr.projectReferenceCategory = :projectReferenceCategory')
+                ->setParameter('projectReferenceCategory', $projectReferenceCategory);
         }
 
-        if ($nameMatchAgainst !== null)
-        {
+        if ($nameMatchAgainst !== null) {
             $qb
-            ->andWhere('MATCH_AGAINST(pr.name) AGAINST (:nameMatchAgainst IN BOOLEAN MODE) > 5')
-            ->setParameter('nameMatchAgainst', $nameMatchAgainst);
-            
+                ->andWhere('MATCH_AGAINST(pr.name) AGAINST (:nameMatchAgainst IN BOOLEAN MODE) > 5')
+                ->setParameter('nameMatchAgainst', $nameMatchAgainst);
         }
 
         if ($nameLike !== null) {
             $qb
-            ->andWhere('pr.name LIKE :nameLike')
-            ->setParameter('nameLike', '%' . $nameLike . '%');
+                ->andWhere('pr.name LIKE :nameLike')
+                ->setParameter('nameLike', '%' . $nameLike . '%');
         }
 
         if ($excludes !== null) {
             $qb
-            ->andWhere('pr NOT IN (:excludes)')
-            ->setParameter('excludes', $excludes);
+                ->andWhere('pr NOT IN (:excludes)')
+                ->setParameter('excludes', $excludes);
         }
 
         if ($orderBy !== null) {

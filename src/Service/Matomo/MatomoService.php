@@ -17,9 +17,7 @@ class MatomoService
         protected RequestStack $requestStack,
         protected ParamService $paramService,
         protected HttpClientInterface $httpClientInterface
-    )
-    {
-    }
+    ) {}
 
     /**
      * Set an analytics goal to be tracked.
@@ -45,7 +43,7 @@ class MatomoService
         try {
             $value = $this->requestStack->getSession()->get(self::GOAL_KEY);
             $this->requestStack->getSession()->set(self::GOAL_KEY, null);
-    
+
             return $value;
         } catch (\Exception $e) {
             return null;
@@ -77,19 +75,18 @@ class MatomoService
      */
     public function getMatomoStats(
         $apiMethod,
-        ?string $customSegment="",
-        string $fromDateString="2023-01-01",
-        string $toDateString=null,
-        ?string $period= 'range',
+        ?string $customSegment = "",
+        string $fromDateString = "2023-01-01",
+        string $toDateString = null,
+        ?string $period = 'range',
         ?array $options = null
-    ): mixed
-    {
+    ): mixed {
         try {
             $date = $fromDateString;
             if ($toDateString) {
-                $date .= ','.$toDateString;
+                $date .= ',' . $toDateString;
             }
-        
+
             $params = [
                 "idSite" => $this->paramService->get('matomo_site_id'),
                 "module" => "API",

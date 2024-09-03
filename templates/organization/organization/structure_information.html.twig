@@ -1,72 +1,77 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Ma structure | {{ parent() }}{% endblock %}
+{% block title %}Ma structure |
+	{{ parent() }}
+{% endblock %}
 
 {% block stylesheets %}
-    {{ parent() }}
-    {{ encore_entry_link_tags('import-scss/user/register') }}
+	{{ parent() }}
+	{{ encore_entry_link_tags('import-scss/user/register') }}
 {% endblock %}
 
 {% block javascripts %}
-    {{ parent() }}
-    {{ encore_entry_script_tags('front/user/register') }}
+	{{ parent() }}
+	{{ encore_entry_script_tags('front/user/register') }}
 {% endblock %}
 
 {% block body %}
-<div class="fr-container fr-mb-5w fr-mt-0">
-    <div class="fr-grid-row">
+	<div class="fr-container fr-mb-5w fr-mt-0">
+		<div class="fr-grid-row">
 
-        {% include "user/_menu_user.html.twig" with { structure:true, structure_info:true } %}
+			{% include "user/_menu_user.html.twig" with { structure:true, structure_info:true } %}
 
-        <div class="fr-col-12 fr-col-md-9">
-            <h1 class="fr-h3">Informations sur {% if organization.name %}la structure {{ organization.name }}{% else %}ma structure{% endif %}</h1>
+			<div class="fr-col-12 fr-col-md-9">
+				<h1 class="fr-h3">Informations sur
+					{% if organization.name %}la structure
+						{{ organization.name }}{% else %}ma structure
+					{% endif %}
+				</h1>
 
-            {% if not organization.id and app.user.organizations|length == 0 %}
-            <div class="fr-alert fr-alert--error fr-alert--sm fr-mb-5w">
-                <p>Vous devez renseigner votre structure avant de pouvoir créer des aides ou des projets.</p>
-            </div>
-            {% endif %}
+				{% if not organization.id and app.user.organizations|length == 0 %}
+					<div class="fr-alert fr-alert--error fr-alert--sm fr-mb-5w">
+						<p>Vous devez renseigner votre structure avant de pouvoir créer des aides ou des projets.</p>
+					</div>
+				{% endif %}
 
-            <div class="fr-tabs fr-mt-0w fr-mb-5w">
-                {% include 'organization/organization/_menu_organization.html.twig' with { organization_information: true} %}
+				<div class="fr-tabs fr-mt-0w fr-mb-5w">
+					{% include 'organization/organization/_menu_organization.html.twig' with { organization_information: true} %}
 
-                <div id="tabpanel_informations" class="fr-tabs__panel" role="tabpanel" aria-labelledby="tabpanel_informations" tabindex="0">
-                    {{ form_start(form) }}
-                        <p>Les champs marqués d’un astérisque (*) sont obligatoires.</p>
-                        <fieldset class="fr-my-5w"> 
-                            <legend class="fr-h4">Généralités</legend>
-                            {{ form_row(form.organizationType )}}
-                            <div id="intercommunality-type-field-collapse" class="fr-collapse">
-                                <div class="fr-mb-3w">
-                                    {{ form_row(form.intercommunalityType)}}
-                                </div>
-                            </div>    
-                            {{ form_row(form.perimeter )}}
-                            {{ form_row(form.name )}}
-                        </fieldset>
-                        <fieldset class="fr-my-5w">
-                            <legend class="fr-h4">Coordonnées</legend>
-                            {{ form_row(form.address )}}
-                            {{ form_row(form.cityName )}}
-                            {{ form_row(form.zipCode )}}
-                        </fieldset>
-                        <fieldset id="organization-administrative-data" class="fr-my-5w">
-                            <legend class="fr-h4">Données administratives</legend>
-                            {{ form_row(form.sirenCode )}}
-                            {{ form_row(form.siretCode )}}
-                            {{ form_row(form.apeCode )}}
-                            {{ form_row(form.inseeCode )}}
-                        </fieldset>
-                        <footer>
-                            <button type="submit" class="fr-btn">Mettre à jour</button>
-                        </footer>
-                    {{ form_end(form) }}
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
+					<div id="tabpanel_informations" class="fr-tabs__panel" role="tabpanel" aria-labelledby="tabpanel_informations" tabindex="0">
+						{{ form_start(form) }}
+						<p>Les champs marqués d’un astérisque (*) sont obligatoires.</p>
+						<fieldset class="fr-my-5w">
+							<legend class="fr-h4">Généralités</legend>
+							{{ form_row(form.organizationType )}}
+							<div id="intercommunality-type-field-collapse" class="fr-collapse">
+								<div class="fr-mb-3w">
+									{{ form_row(form.intercommunalityType)}}
+								</div>
+							</div>
+							{{ form_row(form.perimeter )}}
+							{{ form_row(form.name )}}
+						</fieldset>
+						<fieldset class="fr-my-5w">
+							<legend class="fr-h4">Coordonnées</legend>
+							{{ form_row(form.address )}}
+							{{ form_row(form.cityName )}}
+							{{ form_row(form.zipCode )}}
+						</fieldset>
+						<fieldset id="organization-administrative-data" class="fr-my-5w">
+							<legend class="fr-h4">Données administratives</legend>
+							{{ form_row(form.sirenCode )}}
+							{{ form_row(form.siretCode )}}
+							{{ form_row(form.apeCode )}}
+							{{ form_row(form.inseeCode )}}
+						</fieldset>
+						<footer>
+							<button type="submit" class="fr-btn">Mettre à jour</button>
+						</footer>
+						{{ form_end(form) }}
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
 
 
 {% endblock %}

@@ -196,6 +196,6 @@ class Page // NOSONAR too much methods
      */
     public function __toString()
     {
-        return $this->url .' - '.$this->name;
+        return $this->url . ' - ' . $this->name;
     }
 }

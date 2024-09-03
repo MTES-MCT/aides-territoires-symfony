@@ -58,7 +58,7 @@ class BackerGroupRepository extends ServiceEntityRepository
             $qb->setMaxResults($maxResults);
         }
 
-        
+
         return $qb;
     }
 }

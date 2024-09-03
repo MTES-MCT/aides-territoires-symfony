@@ -26,13 +26,10 @@ class UserController extends AbstractController
     public function __construct(
         protected ManagerRegistry $managerRegistry,
         protected ChartBuilderInterface $chartBuilderInterface,
-    )
-    {   
-    }
+    ) {}
 
     #[Route('/admin/statistics/user/dashboard', name: 'admin_statistics_user_dashboard')]
-    public function communeDashboard(
-    ): Response
+    public function communeDashboard(): Response
     {
         // les repository
         $userRepository = $this->managerRegistry->getRepository(User::class);
@@ -81,7 +78,7 @@ class UserController extends AbstractController
             $datas[] = $uniqueLoginsByWeekItem['unique_users'];
         }
         $chartLoginsByWeek = $this->getLineChart($labels, $datas, 'Evolution des connexions par semaine');
-        
+
         // retour template
         return $this->render('admin/statistics/user/dashboard.html.twig', [
             'nbUsers' => $nbUsers,
@@ -132,5 +129,4 @@ class UserController extends AbstractController
 
         return $chart;
     }
-
 }

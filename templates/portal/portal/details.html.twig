@@ -1,9 +1,13 @@
 {% extends 'base.html.twig' %}
 
 
-{% block title %}{{ search_page.metaTitle|default(search_page.name) }}{% endblock %}
+{% block title %}
+	{{ search_page.metaTitle|default(search_page.name) }}
+{% endblock %}
 
-{% block meta_description %}Les aides du programme {{search_page.metaDescription}}{% endblock %}
+{% block meta_description %}Les aides du programme
+	{{search_page.metaDescription}}
+{% endblock %}
 
 {% block stylesheets %}
 	{{ parent() }}
@@ -12,120 +16,118 @@
 
 {% block javascripts %}
 	{{ parent() }}
-    {{ encore_entry_script_tags('form/entity-checkbox-absolute-type') }}
-    {{ encore_entry_script_tags('front/aid/aid/index') }}
+	{{ encore_entry_script_tags('form/entity-checkbox-absolute-type') }}
+	{{ encore_entry_script_tags('front/aid/aid/index') }}
 {% endblock %}
 
 {% block body %}
-<article class="fr-container fr-mb-5w fr-background-main fr-pb-5w fr-grid-row fr-grid-row--center">
-    <div class="fr-col-12 fr-col-md-12">
+	<article class="fr-container fr-mb-5w fr-background-main fr-pb-5w fr-grid-row fr-grid-row--center">
+		<div class="fr-col-12 fr-col-md-12">
 
-        <div id="searchpage-title">
-            <div class="fr-grid-row fr-grid-row--middle fr-mb-5w">
-                <div class="fr-col-12 fr-col-md-9">
-                    <h1>{{ search_page.name }}</h1>
-                </div>
-                {% if search_page.logo %}
-                <div class="fr-col-12 fr-col-md-3">
-                    <img src="{{ getParameter('cloud_image_url') }}{{ search_page.logo }}" class="fr-responsive-img" alt="{{ search_page.name }}">
-                </div>
-                {% endif %}
-            </div>
-        </div>
+			<div id="searchpage-title">
+				<div class="fr-grid-row fr-grid-row--middle fr-mb-5w">
+					<div class="fr-col-12 fr-col-md-9">
+						<h1>{{ search_page.name }}</h1>
+					</div>
+					{% if search_page.logo %}
+						<div class="fr-col-12 fr-col-md-3">
+							<img src="{{ getParameter('cloud_image_url') }}{{ search_page.logo }}" class="fr-responsive-img" alt="{{ search_page.name }}">
+						</div>
+					{% endif %}
+				</div>
+			</div>
 
-        <div class="fr-tabs">
-            <ul class="fr-tabs__list" role="tablist" aria-label="Onglets du portail">
-                <li role="presentation">
-                    <button id="tabpanel-home" class="fr-tabs__tab" tabindex="0" role="tab" aria-selected="true" aria-controls="tabpanel-home-panel">Présentation</button>
-                </li>
-                {% for page in search_page.pages %}
-                    <li role="presentation">
-                        <button id="tabpanel-{{ page.url }}" class="fr-tabs__tab" tabindex="-1" role="tab" aria-selected="false" aria-controls="tabpanel-{{ page.url }}-panel">{{ page.name }}</button>
-                    </li>
-                {% endfor %}
-            </ul>
-            <div id="tabpanel-home-panel" class="fr-tabs__panel fr-tabs__panel--selected" role="tabpanel" aria-labelledby="tabpanel-home" tabindex="0">
-                {% if search_page.description %}
-                    <div class="wysiwyg-wrapper">
-                        {{ optimizeHtmlFromWysiwyg(search_page.description)|sanitize_html|raw }}
-                    </div>
-                {% endif %}
+			<div class="fr-tabs">
+				<ul class="fr-tabs__list" role="tablist" aria-label="Onglets du portail">
+					<li role="presentation">
+						<button id="tabpanel-home" class="fr-tabs__tab" tabindex="0" role="tab" aria-selected="true" aria-controls="tabpanel-home-panel">Présentation</button>
+					</li>
+					{% for page in search_page.pages %}
+						<li role="presentation">
+							<button id="tabpanel-{{ page.url }}" class="fr-tabs__tab" tabindex="-1" role="tab" aria-selected="false" aria-controls="tabpanel-{{ page.url }}-panel">{{ page.name }}</button>
+						</li>
+					{% endfor %}
+				</ul>
+				<div id="tabpanel-home-panel" class="fr-tabs__panel fr-tabs__panel--selected" role="tabpanel" aria-labelledby="tabpanel-home" tabindex="0">
+					{% if search_page.description %}
+						<div class="wysiwyg-wrapper">
+							{{ optimizeHtmlFromWysiwyg(search_page.description)|sanitize_html|raw }}
+						</div>
+					{% endif %}
 
-                {% if search_page.moreContent %}
-                <section class="fr-accordion fr-mb-5w">
-                    <h3 class="fr-accordion__title">
-                        <button id="more-content-reveal-button" class="fr-accordion__btn" aria-expanded="false" aria-controls="more-content">Voir plus de détails</button>
-                    </h3>
-                    <div id="more-content" class="fr-collapse">
-                        <div class="wysiwyg-wrapper">
-                            {{ optimizeHtmlFromWysiwyg(search_page.moreContent)|sanitize_html|raw }}
-                        </div>
-                    </div>
-                </section>
-                {% endif %}
-                <section id="aid-list">
-                    <h2>{{ myPager.getNbResults }} résultat{% if myPager.nbResults > 1 %}s{% endif %}</h2>
-                    {% include 'aid/aid/_search_meta.html.twig' %}
-                    {% include "aid/aid/_search_form.html.twig" %}
+					{% if search_page.moreContent %}
+						<section class="fr-accordion fr-mb-5w">
+							<h3 class="fr-accordion__title">
+								<button id="more-content-reveal-button" class="fr-accordion__btn" aria-expanded="false" aria-controls="more-content">Voir plus de détails</button>
+							</h3>
+							<div id="more-content" class="fr-collapse">
+								<div class="wysiwyg-wrapper">
+									{{ optimizeHtmlFromWysiwyg(search_page.moreContent)|sanitize_html|raw }}
+								</div>
+							</div>
+						</section>
+					{% endif %}
+					<section id="aid-list">
+						<h2>{{ myPager.getNbResults }}
+							résultat
+							{% if myPager.nbResults > 1 %}s
+							{% endif %}
+						</h2>
+						{% include 'aid/aid/_search_meta.html.twig' %}
+						{% include "aid/aid/_search_form.html.twig" %}
 
-                    {% include 'aid/aid/_aid_result_as_list.html.twig' with {'aids': myPager.currentPageResults} %}
+						{% include 'aid/aid/_aid_result_as_list.html.twig' with {'aids': myPager.currentPageResults} %}
 
-                    <div class="fr-grid-row" id="aids-as-card">
-                    {% for aid in myPager.currentPageResults %}
-                        <div class="fr-col-xs-12 fr-col-md-4 fr-p-3w">
-                            {% include 'aid/aid/_aid_result.html.twig' %}
-                        </div>
-                    {% endfor %}
-                    </div>
+						<div class="fr-grid-row" id="aids-as-card">
+							{% for aid in myPager.currentPageResults %}
+								<div class="fr-col-xs-12 fr-col-md-4 fr-p-3w">
+									{% include 'aid/aid/_aid_result.html.twig' %}
+								</div>
+							{% endfor %}
+						</div>
 
-                    {% if myPager.nbPages > 1 %}
-                    <div class="fr-container fr-grid-row fr-grid-row--center fr-my-5w">
-                        {{ pagerfanta(myPager) }}
-                    </div>
-                    {% endif %}
-                </section>
-            </div>
-            {% for page in search_page.pages %}
-                <div id="tabpanel-{{ page.url }}-panel" class="fr-tabs__panel" role="tabpanel" aria-labelledby="tabpanel-{{ page.url }}" tabindex="0">
-                    {% if page.description %}
-                    <div class="wysiwyg-wrapper">
-                        {{ addMailtoToEmailLinks(optimizeHtmlFromWysiwyg(page.description))|sanitize_html|raw }}
-                    </div>
-                    {% endif %}
-                </div>
-            {% endfor %}
-        </div>
-    </div>
-</article>
+						{% if myPager.nbPages > 1 %}
+							<div class="fr-container fr-grid-row fr-grid-row--center fr-my-5w">
+								{{ pagerfanta(myPager) }}
+							</div>
+						{% endif %}
+					</section>
+				</div>
+				{% for page in search_page.pages %}
+					<div id="tabpanel-{{ page.url }}-panel" class="fr-tabs__panel" role="tabpanel" aria-labelledby="tabpanel-{{ page.url }}" tabindex="0">
+						{% if page.description %}
+							<div class="wysiwyg-wrapper">
+								{{ addMailtoToEmailLinks(optimizeHtmlFromWysiwyg(page.description))|sanitize_html|raw }}
+							</div>
+						{% endif %}
+					</div>
+				{% endfor %}
+			</div>
+		</div>
+	</article>
 {% endblock %}
 
 {% block javascriptsBottom %}
-    {{ parent() }}
-    {% cspscript %}
-        <script>
-            var CURRENT_SEARCH = '{{ querystring }}';
-            var PERIMETER_NAME = '{{ perimeterName }}';
-            var CATEGORIES_NAME = [];
-            {% for categoryName in categoriesName %}
-                CATEGORIES_NAME.push('{{ categoryName }}');
-            {% endfor %}
-            var NB_RESULTS = {{ myPager.getNbResults() }};
-        </script>
-    {% endcspscript %}
+	{{ parent() }}
+	{% cspscript %}
+	<script>
+		var CURRENT_SEARCH = '{{ querystring }}';
+var PERIMETER_NAME = '{{ perimeterName }}';
+var CATEGORIES_NAME = [];{% for categoryName in categoriesName %}CATEGORIES_NAME.push('{{ categoryName }}');{% endfor %}
+var NB_RESULTS = {{ myPager.getNbResults() }};
+	</script>
+	{% endcspscript %}
 
-    {% if highlightedWords is defined and highlightedWords|length > 0 %}
-        {% cspscript %}
-        <script>
-            const highlightedWords = [];
-            {% for word in highlightedWords %}
-                highlightedWords.push('{{ word }}');
-            {% endfor %}
-        </script>
-        {% endcspscript %}
-    {% endif %}
+	{% if highlightedWords is defined and highlightedWords|length > 0 %}
+		{% cspscript %}
+		<script>
+			const highlightedWords = [];{% for word in highlightedWords %}highlightedWords.push('{{ word }}');{% endfor %}
+		</script>
+		{% endcspscript %}
+	{% endif %}
 {% endblock %}
 
 
 {% block modal %}
-    {% include 'aid/aid/_alert_modal.html.twig' with {'form': formAlertCreate} %}
+	{% include 'aid/aid/_alert_modal.html.twig' with {'form': formAlertCreate} %}
 {% endblock %}

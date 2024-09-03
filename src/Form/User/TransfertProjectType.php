@@ -16,9 +16,7 @@ class TransfertProjectType extends AbstractType
 {
     public function __construct(
         protected UserService $userService
-    )
-    {
-    }
+    ) {}
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {

@@ -19,9 +19,7 @@ class AidProjectStatusType extends AbstractType
     public function __construct(
         protected UserService $userService,
         protected ManagerRegistry $managerRegistry
-    )
-    {
-    }
+    ) {}
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
@@ -46,7 +44,7 @@ class AidProjectStatusType extends AbstractType
                 'label' => 'Aide refusée',
                 'help' => 'Vous avez été notifié par le porteur/instructeur que votre dossier/demande n’avait pas été accepté. (L’aide ne peut être à la fois « obtenue » ou « reçue » et « refusée »)'
             ])
-            
+
             ->addEventListener(
                 FormEvents::SUBMIT,
                 [$this, 'onSubmit']
@@ -56,7 +54,7 @@ class AidProjectStatusType extends AbstractType
 
     public function onSubmit(FormEvent $event): void
     {
-        
+
         try {
             $aidProject = $event->getData();
 

@@ -38,7 +38,7 @@ class OrganizationInvitation // NOSONAR too much methods
 
     #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $dateRefuse = null;
-    
+
     #[Assert\NotNull()]
     #[Assert\NotBlank()]
     #[Assert\Length(max: 255)]

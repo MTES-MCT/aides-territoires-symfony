@@ -10,12 +10,10 @@ class CategoryService
 {
     public function __construct(
         protected CategoryRepository $categoryRepository
-    )
-    {
-        
-    }
+    ) {}
 
-    public function groupCategoriesByTheme(ArrayCollection $categories) : array {
+    public function groupCategoriesByTheme(ArrayCollection $categories): array
+    {
         $categoryThemesById = [];
         foreach ($categories as $category) {
             if (!isset($categoryThemesById[$category->getCategoryTheme()->getId()])) {
@@ -31,7 +29,8 @@ class CategoryService
         return $categoryThemesById;
     }
 
-    public function categoriesToMetas(ArrayCollection|array $categories) : array {
+    public function categoriesToMetas(ArrayCollection|array $categories): array
+    {
         $categoryThemesById = [];
         foreach ($categories as $category) {
             if ($category instanceof Category) {

@@ -34,7 +34,8 @@ class LogAidContactClickRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult();
     }
 
-    public function countCustom(array $params = null) : int {
+    public function countCustom(array $params = null): int
+    {
         $qb = $this->getQueryBuilder($params);
 
         $qb->select('IFNULL(COUNT(lacc.id), 0) AS nb');
@@ -56,16 +57,16 @@ class LogAidContactClickRepository extends ServiceEntityRepository
                 ->innerJoin('lacc.aid', 'aid')
                 ->andWhere('lacc.author = :author')
                 ->setParameter('author', $author)
-                ;
+            ;
         }
-        
+
         if ($aid instanceof Aid && $aid->getId()) {
             $qb
                 ->andWhere('lacc.aid = :aid')
                 ->setParameter('aid', $aid)
             ;
         }
-        
+
         if ($dateMin instanceof \DateTime) {
             $qb
                 ->andWhere('lacc.dateCreate >= :dateMin')

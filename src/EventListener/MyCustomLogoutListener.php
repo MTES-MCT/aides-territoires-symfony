@@ -1,4 +1,5 @@
 <?php
+
 namespace App\EventListener;
 
 use App\Entity\Log\LogUserLogin;
@@ -13,8 +14,7 @@ class MyCustomLogoutListener
 
     public function __construct(
         private UserService $userService
-    ) {
-    }
+    ) {}
     public function onSymfonyComponentSecurityHttpEventLogoutEvent(LogoutEvent $logoutEvent): void
     {
         if ($logoutEvent->getToken() && $logoutEvent->getToken()->getUser() instanceof User) {

@@ -21,13 +21,10 @@ class ProjectReferenceController extends AbstractController
         private ManagerRegistry $managerRegistry,
         private AdminUrlGenerator $adminUrlGenerator,
         private AidService $aidService
-    )
-    {
-    }
+    ) {}
 
     #[Route('/admin/statistics/projets-references/dashboard', name: 'admin_statistics_project_reference_dashboard')]
-    public function prDashboard(
-    ): Response
+    public function prDashboard(): Response
     {
         // recupere tous les projets référents
         $projectReferences = $this->managerRegistry->getRepository(ProjectReference::class)->findAll();
@@ -36,11 +33,11 @@ class ProjectReferenceController extends AbstractController
         $aidsUrlByProjectReferenceId = [];
         foreach ($projectReferences as $projectReference) {
             $aidsUrlByProjectReferenceId[$projectReference->getId()] = $this->adminUrlGenerator
-            ->setController(AidCrudController::class)
-            ->setAction(Action::INDEX)
-            ->set('filters[projectReferences][value][]', $projectReference->getId())
-            ->set('filters[projectReferences][comparison]', '=')
-            ->generateUrl();
+                ->setController(AidCrudController::class)
+                ->setAction(Action::INDEX)
+                ->set('filters[projectReferences][value][]', $projectReference->getId())
+                ->set('filters[projectReferences][comparison]', '=')
+                ->generateUrl();
         }
 
         // retour template

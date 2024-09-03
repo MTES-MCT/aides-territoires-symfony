@@ -29,7 +29,7 @@ class RegisterCommuneType extends AbstractType
         $builder
             ->add('beneficiaryFunction', ChoiceType::class, [
                 'required' => false,
-                'label' => 'Votre fonction', 
+                'label' => 'Votre fonction',
                 'placeholder' => 'Sélectionnez votre fonction',
                 'choices' => $choicesBeneficiaryFunction,
                 'attr' => [

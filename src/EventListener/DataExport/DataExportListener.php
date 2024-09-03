@@ -9,10 +9,10 @@ class DataExportListener
 {
     public function __construct(
         protected DataExportService $dataExportService
-    ) {
-    }
+    ) {}
 
-    public function onPostLoad(PostLoadEventArgs $args) : void {
+    public function onPostLoad(PostLoadEventArgs $args): void
+    {
         $args->getObject()->setUrlExportedFile($this->dataExportService->getUrlExportedFile($args->getObject()));
     }
 }

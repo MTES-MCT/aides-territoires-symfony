@@ -14,7 +14,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 class OrganizationTypeGroup
 {
     const ID_COLLECTIVITES = 1;
-    
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]

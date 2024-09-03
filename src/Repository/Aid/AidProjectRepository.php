@@ -23,7 +23,8 @@ class AidProjectRepository extends ServiceEntityRepository
         parent::__construct($registry, AidProject::class);
     }
 
-    public function countDistinctAids(?array $params = null) : int {
+    public function countDistinctAids(?array $params = null): int
+    {
         $qb = $this->getQueryBuilder($params);
 
         $qb
@@ -32,8 +33,9 @@ class AidProjectRepository extends ServiceEntityRepository
 
         return $qb->getQuery()->getResult()[0]['nb'] ?? 0;
     }
-    
-    public function countProjectByAid(Aid $aid, array $params = null) : int {
+
+    public function countProjectByAid(Aid $aid, array $params = null): int
+    {
         $params['aid'] = $aid;
         $qb = $this->getQueryBuilder($params);
 
@@ -42,7 +44,8 @@ class AidProjectRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult()[0]['nb'] ?? 0;
     }
 
-    public function countCustom(array $params = null) : int {
+    public function countCustom(array $params = null): int
+    {
         $qb = $this->getQueryBuilder($params);
 
         $qb->select('IFNULL(COUNT(ap.id), 0) AS nb');
@@ -56,20 +59,20 @@ class AidProjectRepository extends ServiceEntityRepository
 
         $qb = $this->getQueryBuilder($params);
         $qb
-        ->select('COUNT(DISTINCT(ap.id)) as nb, DATE_FORMAT(ap.dateCreate, \'%Y-%m\') as mois')
-        ->innerJoin('ap.project', 'project')
-        ->innerJoin('project.organization', 'organization')
+            ->select('COUNT(DISTINCT(ap.id)) as nb, DATE_FORMAT(ap.dateCreate, \'%Y-%m\') as mois')
+            ->innerJoin('ap.project', 'project')
+            ->innerJoin('project.organization', 'organization')
         ;
         if ($organizationTypeSlug) {
             $qb
-            ->innerJoin('organization.organizationType', 'organizationType')
-            ->andWhere('organizationType.slug = :organizationTypeSlug')
-            ->setParameter('organizationTypeSlug', $organizationTypeSlug)
+                ->innerJoin('organization.organizationType', 'organizationType')
+                ->andWhere('organizationType.slug = :organizationTypeSlug')
+                ->setParameter('organizationTypeSlug', $organizationTypeSlug)
             ;
         }
         $qb
-        ->groupBy('mois')
-        ->orderBy('mois', 'ASC')
+            ->groupBy('mois')
+            ->orderBy('mois', 'ASC')
         ;
         return $qb->getQuery()->getResult();
     }

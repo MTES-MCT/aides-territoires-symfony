@@ -18,13 +18,12 @@ class AlertResumeHandler
         private ManagerRegistry $managerRegistry,
         private ParamService $paramService,
         private NotificationService $notificationService
-    ) {
-    }
+    ) {}
 
     public function __invoke(AlertResume $resume): void
     {
         $today = new \DateTime(date('Y-m-d'));
-        
+
         // compte les alertes de cette fréquences enovyée aujourd'hui
         /** @var AlertRepository $alertRepository */
         $alertRepository = $this->managerRegistry->getRepository(Alert::class);
@@ -39,9 +38,8 @@ class AlertResumeHandler
         $admin = $this->managerRegistry->getRepository(User::class)->findOneBy(['email' => $this->paramService->get('email_super_admin')]);
         $this->notificationService->addNotification(
             $admin,
-            'Résume alertes '.$resume->getAlertFrequency(),
-            $nbAlerts . ' alertes '.$resume->getAlertFrequency().' envoyées le '.$today->format('d/m/Y'),
+            'Résume alertes ' . $resume->getAlertFrequency(),
+            $nbAlerts . ' alertes ' . $resume->getAlertFrequency() . ' envoyées le ' . $today->format('d/m/Y'),
         );
-        
     }
 }

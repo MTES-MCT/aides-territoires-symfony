@@ -29,15 +29,15 @@ class LogPublicProjectView
     private ?\DateTimeInterface $dateCreate = null;
 
     #[ORM\ManyToOne(inversedBy: 'logPublicProjectViews')]
-    #[ORM\JoinColumn(onDelete:DoctrineConstants::SET_NULL)]
+    #[ORM\JoinColumn(onDelete: DoctrineConstants::SET_NULL)]
     private ?Organization $organization = null;
 
     #[ORM\ManyToOne(inversedBy: 'logPublicProjectViews')]
-    #[ORM\JoinColumn(onDelete:DoctrineConstants::SET_NULL)]
+    #[ORM\JoinColumn(onDelete: DoctrineConstants::SET_NULL)]
     private ?Project $project = null;
 
     #[ORM\ManyToOne(inversedBy: 'logPublicProjectViews')]
-    #[ORM\JoinColumn(onDelete:DoctrineConstants::SET_NULL)]
+    #[ORM\JoinColumn(onDelete: DoctrineConstants::SET_NULL)]
     private ?User $user = null;
 
     public function getId(): ?int

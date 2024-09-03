@@ -79,10 +79,8 @@ class DashboardController extends AbstractDashboardController
         protected AdminUrlGenerator $adminUrlGenerator,
         protected ChartBuilderInterface $chartBuilderInterface,
         protected MessageBusInterface $messageBusInterface
-    )
-    {
-    }
-        
+    ) {}
+
     #[Route('/admin', name: 'admin')]
     public function index(): Response
     {
@@ -189,10 +187,8 @@ class DashboardController extends AbstractDashboardController
     public function configureAssets(): Assets
     {
         return parent::configureAssets()
-            // ->addWebpackEncoreEntry('app')
             ->addWebpackEncoreEntry('admin/admin')
-            ;
-
+        ;
     }
 
     public function configureDashboard(): Dashboard
@@ -281,7 +277,7 @@ class DashboardController extends AbstractDashboardController
             MenuItem::linkToCrud('Articles de blog', 'fas fa-list', BlogPost::class),
             MenuItem::linkToCrud('Catégories des articles de blog', 'fas fa-list', BlogPostCategory::class),
             MenuItem::linkToCrud('Pages', 'fas fa-list', Page::class)
-            ->setController(PageCrudController::class),
+                ->setController(PageCrudController::class),
             MenuItem::linkToCrud('Communication promotionnelle', 'fas fa-list', BlogPromotionPost::class)
         ]);
 
@@ -313,13 +309,12 @@ class DashboardController extends AbstractDashboardController
             MenuItem::linkToRoute('Redirections', 'fas fa-list', 'admin_statistics_log_url_redirect', []),
             MenuItem::linkToRoute('Utilisateurs', 'fas fa-list', 'admin_statistics_user_dashboard', []),
             MenuItem::linkToRoute('Api - Utilisation', 'fas fa-list', 'admin_statistics_api_use', []),
-            
+
         ]);
 
         yield MenuItem::subMenu('Obsolète - Mots clés', 'fas fa-table')->setSubItems([
             MenuItem::linkToCrud('Mots clés', 'fas fa-list', Keyword::class),
             MenuItem::linkToCrud('Listes de synonymes', 'fas fa-list', KeywordSynonymlist::class),
         ]);
-
     }
 }

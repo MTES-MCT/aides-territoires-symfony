@@ -1,101 +1,105 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Mon journal de connexion | {{ parent() }}{% endblock %}
+{% block title %}Mon journal de connexion |
+	{{ parent() }}
+{% endblock %}
 
 {% block body %}
 
 
-<div class="fr-container fr-mb-5w fr-mt-0">
-    <div class="fr-grid-row">
+	<div class="fr-container fr-mb-5w fr-mt-0">
+		<div class="fr-grid-row">
 
-        {% include "user/_menu_user.html.twig" with { user_parameter:true, history_login:true } %}
+			{% include "user/_menu_user.html.twig" with { user_parameter:true, history_login:true } %}
 
-        <div class="fr-col-12 fr-col-md-9">
-            <h1 class="fr-h3 fr-col">
-                Mon journal de connexion
-            </h1>
+			<div class="fr-col-12 fr-col-md-9">
+				<h1 class="fr-h3 fr-col">
+					Mon journal de connexion
+				</h1>
 
-            <div class="fr-table fr-mt-5w">
-                <div class="fr-table__wrapper">
-                    <div class="fr-table__container">
-                        <div class="fr-table__content">
-                            <table class="data-table">
-                                <thead>
-                                    <tr>
-                                        <th scope="col">Date de la connexion</th>
-                                    </tr>
-                                </thead>
-                                {% if my_pager.getNbResults() > 0 %}
-                                <tbody>
-                                    {% for connexion in my_pager.currentPageResults %}
-                                    
-                                        {% if connexion.action=='login' %}
-                                        <tr>
-                                            <td>
-                                                {{ connexion.timeCreate|date('d/m/y à H\\hi') }}
-                                            </td>
-                                        </tr>
-                                        {% endif %}
-                                    {% endfor %}
-                                </tbody>
-                                {% else %}
-                                <tbody>
-                                    <tr>
-                                        <td colspan="5" class="at-centered-important">
-                                            Aucun historique de connexion
-                                        </td>
-                                    </tr>
-                                </tbody>
-                                {% endif %}
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
+				<div class="fr-table fr-mt-5w">
+					<div class="fr-table__wrapper">
+						<div class="fr-table__container">
+							<div class="fr-table__content">
+								<table class="data-table">
+									<thead>
+										<tr>
+											<th scope="col">Date de la connexion</th>
+										</tr>
+									</thead>
+									{% if my_pager.getNbResults() > 0 %}
+										<tbody>
+											{% for connexion in my_pager.currentPageResults %}
 
-            <div class="pagerfanta fr-container fr-grid-row fr-grid-row--center fr-my-5w">
-                {{ pagerfanta(my_pager) }}
-            </div>
-            
-            <button class="fr-btn" data-fr-opened='false' aria-controls="delete-history-login-modal">
-                <span class="ri-delete-bin-7-line ri-xl fr-mr-1w"></span>Réinitialiser mon journal
-            </button>
+												{% if connexion.action=='login' %}
+													<tr>
+														<td>
+															{{ connexion.timeCreate|date('d/m/y à H\\hi') }}
+														</td>
+													</tr>
+												{% endif %}
+											{% endfor %}
+										</tbody>
+									{% else %}
+										<tbody>
+											<tr>
+												<td colspan="5" class="at-centered-important">
+													Aucun historique de connexion
+												</td>
+											</tr>
+										</tbody>
+									{% endif %}
+								</table>
+							</div>
+						</div>
+					</div>
+				</div>
 
-        </div>
-    </div>
-</div>
+				<div class="pagerfanta fr-container fr-grid-row fr-grid-row--center fr-my-5w">
+					{{ pagerfanta(my_pager) }}
+				</div>
 
-<dialog aria-labelledby="fr-modal-title-modal-1" role="dialog" id="delete-history-login-modal" class="fr-modal">
-    <div class="fr-container fr-container--fluid fr-container-md">
-        <div class="fr-grid-row fr-grid-row--center">
-            <div class="fr-col-12 fr-col-md-8 fr-col-lg-6">
-                {{ form_start(form) }}
-                <div class="fr-modal__body">
-                    <div class="fr-modal__header">
-                        <button class="fr-btn fr-btn--close" title="Fermer la fenêtre modale" aria-controls="delete-history-login-modal">Fermer</button>
-                    </div>
-                    <div class="fr-modal__content">
-                        <h2 id="fr-modal-title-modal-1" class="fr-modal__title"><span class="fr-icon-arrow-right-line fr-icon--lg"></span>Réinitialiser mon journal</h2>
-                        <p>Ce journal permet de savoir quand vous vous êtes connecté⋅e à votre compte, et permet au service Aides-territoires de suivre l'impact qu'il a auprès de ses utilisateurs.</p>
-                        <p>Souhaitez-vous tout de même réinitialiser votre journal de connexion ?</p>
-                        <footer>
-                            <ul class="fr-btns-group fr-btns-group--inline fr-btns-group--right">
-                                <li>
-                                    <button class="btn-block fr-btn fr-btn--secondary" type="button" title="Fermer la fenêtre modale" aria-controls="delete-history-login-modal">Annuler</button>
-                                </li>
-                                <li>
-                                    {{ form_row(form.save,{'attr':{'class':'fr-btn'}} )}}
-                                </li>
-                            </ul>
-                        </footer>
-                    </div>
-                </div>
-                {{ form_end(form) }}
-                
-            </div>
-        </div>
-    </div>
-</dialog>
+				<button class="fr-btn" data-fr-opened='false' aria-controls="delete-history-login-modal">
+					<span class="ri-delete-bin-7-line ri-xl fr-mr-1w"></span>Réinitialiser mon journal
+				</button>
+
+			</div>
+		</div>
+	</div>
+
+	<dialog aria-labelledby="fr-modal-title-modal-1" role="dialog" id="delete-history-login-modal" class="fr-modal">
+		<div class="fr-container fr-container--fluid fr-container-md">
+			<div class="fr-grid-row fr-grid-row--center">
+				<div class="fr-col-12 fr-col-md-8 fr-col-lg-6">
+					{{ form_start(form) }}
+					<div class="fr-modal__body">
+						<div class="fr-modal__header">
+							<button class="fr-btn fr-btn--close" title="Fermer la fenêtre modale" aria-controls="delete-history-login-modal">Fermer</button>
+						</div>
+						<div class="fr-modal__content">
+							<h2 id="fr-modal-title-modal-1" class="fr-modal__title">
+								<span class="fr-icon-arrow-right-line fr-icon--lg"></span>Réinitialiser mon journal</h2>
+							<p>Ce journal permet de savoir quand vous vous êtes connecté⋅e à votre compte, et permet au service Aides-territoires de suivre l'impact qu'il a auprès de ses utilisateurs.</p>
+							<p>Souhaitez-vous tout de même réinitialiser votre journal de connexion ?</p>
+							<footer>
+								<ul class="fr-btns-group fr-btns-group--inline fr-btns-group--right">
+									<li>
+										<button class="btn-block fr-btn fr-btn--secondary" type="button" title="Fermer la fenêtre modale" aria-controls="delete-history-login-modal">Annuler</button>
+									</li>
+									<li>
+										{{ form_row(form.save,{'attr':{'class':'fr-btn'}}
+										)}}
+									</li>
+								</ul>
+							</footer>
+						</div>
+					</div>
+					{{ form_end(form) }}
+
+				</div>
+			</div>
+		</div>
+	</dialog>
 
 
 {% endblock %}

@@ -37,7 +37,7 @@ class AidRecurrence
     const SLUG_ONEOFF = 'oneoff';
     const SLUG_ONGOING = 'ongoing';
     const SLUG_RECURRING = 'recurring';
-    
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]

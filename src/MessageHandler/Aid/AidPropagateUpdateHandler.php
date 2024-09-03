@@ -21,8 +21,7 @@ class AidPropagateUpdateHandler
 {
     public function __construct(
         private ManagerRegistry $managerRegistry,
-    ) {
-    }
+    ) {}
 
     public function __invoke(AidPropagateUpdate $message): void
     {
@@ -32,7 +31,7 @@ class AidPropagateUpdateHandler
         $aidGeneric = $aidRepository->find($message->getIdAidGeneric());
         $aidLocal = $aidRepository->find($message->getIdAidLocal());
 
-        
+
         foreach ($aidGeneric->getSanctuarizedFields() as $sanctuarizedField) {
             if ($sanctuarizedField->getName() == 'aidFinancers') {
                 foreach ($aidLocal->getAidFinancers() as $aidFinancer) {

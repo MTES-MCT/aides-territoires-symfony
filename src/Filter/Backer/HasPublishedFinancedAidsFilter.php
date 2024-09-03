@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Filter\Backer;
 
 
@@ -18,8 +19,7 @@ final class HasPublishedFinancedAidsFilter extends AbstractFilter
         }
 
         $queryBuilder
-            ->innerJoin('o.aidFinancers', 'aidFinancers')
-        ;
+            ->innerJoin('o.aidFinancers', 'aidFinancers');
     }
 
     public function getDescription(string $resourceClass): array
@@ -40,4 +40,3 @@ final class HasPublishedFinancedAidsFilter extends AbstractFilter
         ];
     }
 }
-?>

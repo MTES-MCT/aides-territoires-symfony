@@ -28,9 +28,7 @@ class BlogPostCategoryFilterType extends AbstractType
                         'message' => 'Veuillez choisir une catégorie.',
                     ]),
                 ],
-            ])
-
-        ;
+            ]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void

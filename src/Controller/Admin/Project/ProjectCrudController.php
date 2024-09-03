@@ -56,95 +56,89 @@ class ProjectCrudController extends AtCrudController
         yield IdField::new('id')->onlyOnIndex();
         yield TextField::new('name', 'Nom');
         yield TextField::new('slug', 'Slug')
-        ->setFormTypeOption('attr', ['readonly' => true, 'autocomplete' => 'off'])
-        ->setHelp('Laisser vide pour autoremplir.')
-        ->hideOnIndex()
-        ;
-        yield AssociationField::new('projectReference', 'Projet référent')
-        ;
+            ->setFormTypeOption('attr', ['readonly' => true, 'autocomplete' => 'off'])
+            ->setHelp('Laisser vide pour autoremplir.')
+            ->hideOnIndex();
+        yield AssociationField::new('projectReference', 'Projet référent');
         yield BooleanField::new('referentNotFound', 'Référent non trouvé')
-        ->hideOnIndex();
+            ->hideOnIndex();
 
         yield TrumbowygField::new('description', 'Description')
-        ->hideOnIndex();
+            ->hideOnIndex();
         yield TrumbowygField::new('privateDescription', 'Notes internes du projet')
-        ->hideOnIndex();
+            ->hideOnIndex();
 
         yield ImageField::new('imageFile', 'Image')
-        ->setHelp('Évitez les fichiers trop lourds. Préférez les fichiers SVG.')
-        ->setUploadDir($this->fileService->getUploadTmpDirRelative())
-        ->setBasePath($this->paramService->get('cloud_image_url'))
-        ->setUploadedFileNamePattern(Project::FOLDER.'/[slug]-[timestamp].[extension]')
-        ->setFormTypeOption('upload_new', function(UploadedFile $file, string $uploadDir, string $fileName) {
-            $this->imageService->sendUploadedImageToCloud($file, Project::FOLDER, $fileName);
-            $this->getContext()->getEntity()->getInstance()->setImage($fileName);
-        })
-        ->onlyOnForms()
-        ;
+            ->setHelp('Évitez les fichiers trop lourds. Préférez les fichiers SVG.')
+            ->setUploadDir($this->fileService->getUploadTmpDirRelative())
+            ->setBasePath($this->paramService->get('cloud_image_url'))
+            ->setUploadedFileNamePattern(Project::FOLDER . '/[slug]-[timestamp].[extension]')
+            ->setFormTypeOption('upload_new', function (UploadedFile $file, string $uploadDir, string $fileName) {
+                $this->imageService->sendUploadedImageToCloud($file, Project::FOLDER, $fileName);
+                $this->getContext()->getEntity()->getInstance()->setImage($fileName);
+            })
+            ->onlyOnForms();
         yield BooleanField::new('deleteImage', 'Supprimer le fichier actuel')
-        ->onlyWhenUpdating();
+            ->onlyWhenUpdating();
 
         yield DateField::new('dueDate', 'Date d’échéance')
-        ->hideOnIndex();
+            ->hideOnIndex();
         yield ChoiceField::new('step', 'Avancement du projet')
-        ->setChoices($stepChoices)
-        ->hideOnIndex();
+            ->setChoices($stepChoices)
+            ->hideOnIndex();
         yield IntegerField::new('budget', 'Budget prévisionnel')
-        ->hideOnIndex();
+            ->hideOnIndex();
         yield TextareaField::new('keyWords', 'Mots-clés')
-        ->setHelp('mots-clés associés au projet')
-        ->hideOnIndex();
+            ->setHelp('mots-clés associés au projet')
+            ->hideOnIndex();
         yield AssociationField::new('author', 'Auteur')
-        ->autocomplete()
-        ->hideOnIndex();
+            ->autocomplete()
+            ->hideOnIndex();
         yield AssociationField::new('organization', 'Structure')
-        ->autocomplete()
-        ->hideOnIndex();
+            ->autocomplete()
+            ->hideOnIndex();
         yield TextField::new('otherProjectOwner', 'Autre maître d’ouvrage')
-        ->hideOnIndex();
+            ->hideOnIndex();
         yield IntegerField::new('nbAids', 'Nombre d\'aides')
-        ->setFormTypeOption('attr', ['readonly' => true])
-        ->hideOnIndex();
+            ->setFormTypeOption('attr', ['readonly' => true])
+            ->hideOnIndex();
         yield CollectionField::new('aidProjects', 'Aides associées')
-        ->setEntryIsComplex()
-        ->useEntryCrudForm(AidProjectDisplayCrudController::class)
-        ->hideOnIndex()
-        ;
+            ->setEntryIsComplex()
+            ->useEntryCrudForm(AidProjectDisplayCrudController::class)
+            ->hideOnIndex();
         yield BooleanField::new('isPublic', 'Projet public');
-        
+
         $contractLinksChoices = [];
         foreach (Project::CONTRACT_LINK as $contractLink) {
             $contractLinksChoices[$contractLink['name']] = $contractLink['slug'];
         }
         yield ChoiceField::new('contractLink', 'Appartenance à un plan/programme/contrat')
-        ->setChoices($contractLinksChoices)
-        ->hideOnIndex();
+            ->setChoices($contractLinksChoices)
+            ->hideOnIndex();
         yield AssociationField::new('keywordSynonymlists', 'Types de projet')
-        ->setFormTypeOptions([
-            'query_builder' => function (KeywordSynonymlistRepository $er) {
-                return $er->getQueryBuilder([
-                    'orderBy' => [
-                        'sort' => 'ks.name',
-                        'order' => 'ASC'
-                    ]
-                ]);
-            },
-        ])
-        ->hideOnIndex();
+            ->setFormTypeOptions([
+                'query_builder' => function (KeywordSynonymlistRepository $er) {
+                    return $er->getQueryBuilder([
+                        'orderBy' => [
+                            'sort' => 'ks.name',
+                            'order' => 'ASC'
+                        ]
+                    ]);
+                },
+            ])
+            ->hideOnIndex();
         yield TextField::new('projectTypesSuggestion', 'Type de projet suggéré')
-        ->hideOnIndex();
+            ->hideOnIndex();
 
         $statusChoices = [];
         foreach (Project::STATUS as $status) {
             $statusChoices[$status['name']] = $status['slug'];
         }
         yield ChoiceField::new('status', 'Statut')
-        ->setChoices($statusChoices)
-        ;
+            ->setChoices($statusChoices);
         yield DateTimeField::new('timeCreate', 'Date de création')
-        ->setFormTypeOption('attr', ['readonly' => true])
-        ->hideWhenCreating();
-
+            ->setFormTypeOption('attr', ['readonly' => true])
+            ->hideWhenCreating();
     }
 
     public function configureActions(Actions $actions): Actions
@@ -152,14 +146,14 @@ class ProjectCrudController extends AtCrudController
         // action pour afficher le qrCode
         $displayOnFront = Action::new('displayOnFront', 'Afficher sur le site', 'far fa-eye')
             ->setHtmlAttributes(['title' => 'Afficher sur le site', 'target' => '_blank']) // titre
-            ->displayIf(fn ($entity) => $entity->isIsPublic() ?? false); // condition d'affichage
-            ;
+            ->displayIf(fn($entity) => $entity->isIsPublic() ?? false); // condition d'affichage
+        ;
 
         //set the link using a string or a callable (function like its being used here)
-        $displayOnFront->linkToUrl(function($entity) {
+        $displayOnFront->linkToUrl(function ($entity) {
             return $this->generateUrl('app_project_project_public_details', ['id' => $entity->getId(), 'slug' => $entity->getSlug(), UrlGeneratorInterface::ABSOLUTE_URL]);
         });
-        
+
         $exportCsvAction = $this->getExportCsvAction();
         $exportXlsxAction = $this->getExportXlsxAction();
 

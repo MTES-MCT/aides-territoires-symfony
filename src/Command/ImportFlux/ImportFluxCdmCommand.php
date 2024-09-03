@@ -166,7 +166,7 @@ class ImportFluxCdmCommand extends ImportFluxCommand
         if (!isset($aidToImport['destinations']) || !is_array($aidToImport['destinations'])) {
             return $aid;
         }
-        foreach($aidToImport['destinations'] as $destinationName) {
+        foreach ($aidToImport['destinations'] as $destinationName) {
             // on a un problème avec les apostrophes
             $destinationName = str_replace("'", "’", $destinationName);
             $destination = $this->managerRegistry->getRepository(OrganizationType::class)->findOneBy(['name' => $destinationName]);

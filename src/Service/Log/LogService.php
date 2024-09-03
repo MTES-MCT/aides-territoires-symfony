@@ -39,15 +39,12 @@ class LogService
     public function __construct(
         private ManagerRegistry $managerRegistry,
         private LoggerInterface $loggerInterface
-    )
-    {
-    }
+    ) {}
 
     public function log( // NOSONAR too complex
         ?string $type,
         ?array $params,
-    ): void
-    {
+    ): void {
         try {
             switch ($type) {
                 case 'register-from-next-page-warning':
@@ -57,7 +54,7 @@ class LogService
                             if ($key == '_token') { // pas besoin de stocker le tocken
                                 continue;
                             }
-                            $querystring .= $key.'='.$param . '&';
+                            $querystring .= $key . '=' . $param . '&';
                         }
                         $querystring = substr($querystring, 0, -1); // on enlève le dernier & (qui est en trop)
                     }
@@ -66,9 +63,9 @@ class LogService
                     }
                     $log = new LogAccountRegisterFromNextPageWarningClickEvent();
                     $log->setQuerystring($querystring);
-                    
+
                     break;
-    
+
                 case 'originUrl':
                     $log = new LogAidOriginUrlClick();
                     $log->setQuerystring($params['querystring']);
@@ -79,177 +76,177 @@ class LogService
                     }
                     $log->setAid($aid);
                     break;
-    
-                    case 'applicationUrl':
-                        $log = new LogAidApplicationUrlClick();
-                        $log->setQuerystring($params['querystring']);
-                        $log->setSource($this->getSiteFromHost($params['host']));
-                        $aid = null;
-                        if (isset($params['aidSlug'])) {
-                            $aid = $this->managerRegistry->getRepository(Aid::class)->findOneBy(['slug' => $params['aidSlug']]);
-                        }
-                        $log->setAid($aid);
-                        break;
-    
-                    case 'createDsFolder':
-                        $log = new LogAidCreatedsFolder();
-                        $log->setDsFolderUrl($params['dsFolderUrl'] ?? null);
-                        $log->setDsFolderId($params['dsFolderId'] ?? null);
-                        $log->setDsFolderNumber($params['dsFolderNumber'] ?? null);
-                        $aid = null;
-                        if (isset($params['aidSlug'])) {
-                            $aid = $this->managerRegistry->getRepository(Aid::class)->findOneBy(['slug' => (string) $params['aidSlug']]);
-                        }
-                        $log->setAid($aid);
-                        $origanization = null;
-                        if (isset($params['organization'])) {
-                            $origanization = $this->managerRegistry->getRepository(Organization::class)->find((int) $params['organization']);
-                        }
-                        $log->setOrganization($origanization);
 
-                        $user = null;
-                        if (isset($params['user'])) {
-                            $user = $this->managerRegistry->getRepository(User::class)->find((int) $params['user']);
-                        }
-                        $log->setUser($user);
-                        break;
-    
-                    case self::AID_SEARCH:
-                        $log = new LogAidSearch();
-                        $log->setQuerystring($params['querystring'] ?? null);
-                        $log->setResultsCount($params['resultsCount'] ?? null);
-                        $log->setSource($this->getSiteFromHost($params['host'] ?? null));
-                        if (isset($params['source'])) {
-                            $log->setSource($params['source']);
-                        }
-                        $log->setSearch(isset($params['search']) ? substr($params['search'], 0, 255) : null);
-                        $log->setPerimeter($params['perimeter'] ?? null);
-                        $log->setOrganization($params['organization'] ?? null);
-                        $log->setUser($params['user'] ?? null);
-                        if (isset($params['organizationTypes'])) {
-                            foreach ($params['organizationTypes'] as $organizationType) {
-                                $log->addOrganizationType($organizationType);
-                            }
-                        }
-                        if (isset($params['backers'])) {
-                            foreach ($params['backers'] as $backer) {
-                                $log->addBacker($backer);
-                            }
-                        }
-                        if (isset($params['categories'])) {
-                            foreach ($params['categories'] as $category) {
-                                $log->addCategory($category);
-                            }
-                        }
-                        if (isset($params['programs'])) {
-                            foreach ($params['programs'] as $program) {
-                                $log->addProgram($program);
-                            }
-                        }
-                        if (isset($params['themes'])) {
-                            foreach ($params['themes'] as $theme) {
-                                $log->addTheme($theme);
-                            }
-                        }
-                        break;
+                case 'applicationUrl':
+                    $log = new LogAidApplicationUrlClick();
+                    $log->setQuerystring($params['querystring']);
+                    $log->setSource($this->getSiteFromHost($params['host']));
+                    $aid = null;
+                    if (isset($params['aidSlug'])) {
+                        $aid = $this->managerRegistry->getRepository(Aid::class)->findOneBy(['slug' => $params['aidSlug']]);
+                    }
+                    $log->setAid($aid);
+                    break;
 
-                    case self::AID_VIEW:
-                        $log = new LogAidView();
-                        $log->setQuerystring($params['querystring'] ?? null);
-                        $log->setSource($this->getSiteFromHost($params['host'] ?? null));
-                        if (isset($params['source'])) {
-                            $log->setSource($params['source']);
+                case 'createDsFolder':
+                    $log = new LogAidCreatedsFolder();
+                    $log->setDsFolderUrl($params['dsFolderUrl'] ?? null);
+                    $log->setDsFolderId($params['dsFolderId'] ?? null);
+                    $log->setDsFolderNumber($params['dsFolderNumber'] ?? null);
+                    $aid = null;
+                    if (isset($params['aidSlug'])) {
+                        $aid = $this->managerRegistry->getRepository(Aid::class)->findOneBy(['slug' => (string) $params['aidSlug']]);
+                    }
+                    $log->setAid($aid);
+                    $origanization = null;
+                    if (isset($params['organization'])) {
+                        $origanization = $this->managerRegistry->getRepository(Organization::class)->find((int) $params['organization']);
+                    }
+                    $log->setOrganization($origanization);
+
+                    $user = null;
+                    if (isset($params['user'])) {
+                        $user = $this->managerRegistry->getRepository(User::class)->find((int) $params['user']);
+                    }
+                    $log->setUser($user);
+                    break;
+
+                case self::AID_SEARCH:
+                    $log = new LogAidSearch();
+                    $log->setQuerystring($params['querystring'] ?? null);
+                    $log->setResultsCount($params['resultsCount'] ?? null);
+                    $log->setSource($this->getSiteFromHost($params['host'] ?? null));
+                    if (isset($params['source'])) {
+                        $log->setSource($params['source']);
+                    }
+                    $log->setSearch(isset($params['search']) ? substr($params['search'], 0, 255) : null);
+                    $log->setPerimeter($params['perimeter'] ?? null);
+                    $log->setOrganization($params['organization'] ?? null);
+                    $log->setUser($params['user'] ?? null);
+                    if (isset($params['organizationTypes'])) {
+                        foreach ($params['organizationTypes'] as $organizationType) {
+                            $log->addOrganizationType($organizationType);
                         }
-                        $log->setAid($params['aid'] ?? null);
-                        $log->setOrganization($params['organization'] ?? null);
-                        $log->setUser($params['user'] ?? null);
-                        if (isset($params['organizationTypes'])) {
-                            foreach ($params['organizationTypes'] as $organizationType) {
-                                $log->addOrganizationType($organizationType);
-                            }
+                    }
+                    if (isset($params['backers'])) {
+                        foreach ($params['backers'] as $backer) {
+                            $log->addBacker($backer);
                         }
-                        break;
-                    case self::BACKER_VIEW:
-                        $log = new LogBackerView();
-                        $log->setSource($this->getSiteFromHost($params['host'] ?? null));
-                        $log->setBacker($params['backer'] ?? null);
-                        $log->setOrganization($params['organization'] ?? null);
-                        $log->setUser($params['user'] ?? null);
-                        break;
-
-                    case self::BLOG_POST_VIEW:
-                        $log = new LogBlogPostView();
-                        $log->setOrganization($params['organization'] ?? null);
-                        $log->setUser($params['user'] ?? null);
-                        $log->setBlogPost($params['blogPost'] ?? null);
-                        break;
-
-                    case self::BLOG_PROMOTION_POST_CLICK:
-                        $log = new LogBlogPromotionPostClick();
-                        $log->setQuerystring($params['querystring'] ?? null);
-                        $log->setSource($this->getSiteFromHost($params['host'] ?? null));
-                        $blogPromotionPost = null;
-                        if (isset($params['blogPromotionPostId'])) {
-                            $blogPromotionPost = $this->managerRegistry->getRepository(BlogPromotionPost::class)->find((int) $params['blogPromotionPostId']);
+                    }
+                    if (isset($params['categories'])) {
+                        foreach ($params['categories'] as $category) {
+                            $log->addCategory($category);
                         }
-                        $log->setBlogPromotionPost($blogPromotionPost);
-                        break;
+                    }
+                    if (isset($params['programs'])) {
+                        foreach ($params['programs'] as $program) {
+                            $log->addProgram($program);
+                        }
+                    }
+                    if (isset($params['themes'])) {
+                        foreach ($params['themes'] as $theme) {
+                            $log->addTheme($theme);
+                        }
+                    }
+                    break;
 
-                        case self::BLOG_PROMOTION_POST_DISPLAY:
-                            $log = new LogBlogPromotionPostDisplay();
-                            $log->setQuerystring($params['querystring'] ?? null);
-                            $log->setSource($this->getSiteFromHost($params['host'] ?? null));
-                            $blogPromotionPost = null;
-                            if (isset($params['blogPromotionPostId'])) {
-                                $blogPromotionPost = $this->managerRegistry->getRepository(BlogPromotionPost::class)->find((int) $params['blogPromotionPostId']);
-                            }
-                            $log->setBlogPromotionPost($blogPromotionPost);
-                            break;
+                case self::AID_VIEW:
+                    $log = new LogAidView();
+                    $log->setQuerystring($params['querystring'] ?? null);
+                    $log->setSource($this->getSiteFromHost($params['host'] ?? null));
+                    if (isset($params['source'])) {
+                        $log->setSource($params['source']);
+                    }
+                    $log->setAid($params['aid'] ?? null);
+                    $log->setOrganization($params['organization'] ?? null);
+                    $log->setUser($params['user'] ?? null);
+                    if (isset($params['organizationTypes'])) {
+                        foreach ($params['organizationTypes'] as $organizationType) {
+                            $log->addOrganizationType($organizationType);
+                        }
+                    }
+                    break;
+                case self::BACKER_VIEW:
+                    $log = new LogBackerView();
+                    $log->setSource($this->getSiteFromHost($params['host'] ?? null));
+                    $log->setBacker($params['backer'] ?? null);
+                    $log->setOrganization($params['organization'] ?? null);
+                    $log->setUser($params['user'] ?? null);
+                    break;
 
-                        case self::PROGRAM_VIEW:
-                            $log = new LogProgramView();
-                            $log->setSource($this->getSiteFromHost($params['host'] ?? null));
-                            $log->setProgram($params['program'] ?? null);
-                            $log->setOrganization($params['organization'] ?? null);
-                            $log->setUser($params['user'] ?? null);
-                            break;
+                case self::BLOG_POST_VIEW:
+                    $log = new LogBlogPostView();
+                    $log->setOrganization($params['organization'] ?? null);
+                    $log->setUser($params['user'] ?? null);
+                    $log->setBlogPost($params['blogPost'] ?? null);
+                    break;
 
-                        case self::PROJECT_VALIDATED_SEARCH:
-                            $log = new LogProjectValidatedSearch();
-                            $log->setSearch(isset($params['search']) ? substr($params['search'], 0, 255) : null);
-                            $log->setQuerystring($params['querystring'] ?? null);
-                            $log->setResultsCount($params['resultsCount'] ?? null);
-                            $log->setOrganization($params['organization'] ?? null);
-                            $log->setPerimeter($params['perimeter'] ?? null);
-                            $log->setUser($params['user'] ?? null);
-                            break;
+                case self::BLOG_PROMOTION_POST_CLICK:
+                    $log = new LogBlogPromotionPostClick();
+                    $log->setQuerystring($params['querystring'] ?? null);
+                    $log->setSource($this->getSiteFromHost($params['host'] ?? null));
+                    $blogPromotionPost = null;
+                    if (isset($params['blogPromotionPostId'])) {
+                        $blogPromotionPost = $this->managerRegistry->getRepository(BlogPromotionPost::class)->find((int) $params['blogPromotionPostId']);
+                    }
+                    $log->setBlogPromotionPost($blogPromotionPost);
+                    break;
 
-                        case self::PROJECT_PUBLIC_SEARCH:
-                            $log = new LogPublicProjectSearch();
-                            $log->setQuerystring($params['querystring'] ?? null);
-                            $log->setResultsCount($params['resultsCount'] ?? null);
-                            $log->setOrganization($params['organization'] ?? null);
-                            $log->setPerimeter($params['perimeter'] ?? null);
-                            $log->setUser($params['user'] ?? null);
-                            if (isset($params['keywordSynonymlists']) && is_array($params['keywordSynonymlists'])) {
-                                foreach ($params['keywordSynonymlists'] as $keywordSynonymlist) {
-                                    $log->addKeywordSynonymlist($keywordSynonymlist);
-                                }
-                            }
-                            break;
+                case self::BLOG_PROMOTION_POST_DISPLAY:
+                    $log = new LogBlogPromotionPostDisplay();
+                    $log->setQuerystring($params['querystring'] ?? null);
+                    $log->setSource($this->getSiteFromHost($params['host'] ?? null));
+                    $blogPromotionPost = null;
+                    if (isset($params['blogPromotionPostId'])) {
+                        $blogPromotionPost = $this->managerRegistry->getRepository(BlogPromotionPost::class)->find((int) $params['blogPromotionPostId']);
+                    }
+                    $log->setBlogPromotionPost($blogPromotionPost);
+                    break;
 
-                        case self::PROJECT_PUBLIC_VIEW:
-                            $log = new LogPublicProjectView();
-                            $log->setProject($params['project'] ?? null);
-                            $log->setOrganization($params['organization'] ?? null);
-                            $log->setUser($params['user'] ?? null);
-                            break;
+                case self::PROGRAM_VIEW:
+                    $log = new LogProgramView();
+                    $log->setSource($this->getSiteFromHost($params['host'] ?? null));
+                    $log->setProgram($params['program'] ?? null);
+                    $log->setOrganization($params['organization'] ?? null);
+                    $log->setUser($params['user'] ?? null);
+                    break;
+
+                case self::PROJECT_VALIDATED_SEARCH:
+                    $log = new LogProjectValidatedSearch();
+                    $log->setSearch(isset($params['search']) ? substr($params['search'], 0, 255) : null);
+                    $log->setQuerystring($params['querystring'] ?? null);
+                    $log->setResultsCount($params['resultsCount'] ?? null);
+                    $log->setOrganization($params['organization'] ?? null);
+                    $log->setPerimeter($params['perimeter'] ?? null);
+                    $log->setUser($params['user'] ?? null);
+                    break;
+
+                case self::PROJECT_PUBLIC_SEARCH:
+                    $log = new LogPublicProjectSearch();
+                    $log->setQuerystring($params['querystring'] ?? null);
+                    $log->setResultsCount($params['resultsCount'] ?? null);
+                    $log->setOrganization($params['organization'] ?? null);
+                    $log->setPerimeter($params['perimeter'] ?? null);
+                    $log->setUser($params['user'] ?? null);
+                    if (isset($params['keywordSynonymlists']) && is_array($params['keywordSynonymlists'])) {
+                        foreach ($params['keywordSynonymlists'] as $keywordSynonymlist) {
+                            $log->addKeywordSynonymlist($keywordSynonymlist);
+                        }
+                    }
+                    break;
+
+                case self::PROJECT_PUBLIC_VIEW:
+                    $log = new LogPublicProjectView();
+                    $log->setProject($params['project'] ?? null);
+                    $log->setOrganization($params['organization'] ?? null);
+                    $log->setUser($params['user'] ?? null);
+                    break;
 
                 default:
                     // Code à exécuter si aucune des conditions précédentes n'est remplie
                     break;
             }
-    
+
             $this->managerRegistry->getManager()->persist($log);
             $this->managerRegistry->getManager()->flush();
         } catch (\Exception $exception) {

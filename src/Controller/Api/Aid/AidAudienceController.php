@@ -14,8 +14,7 @@ class AidAudienceController extends ApiController
     #[Route('/api/aids/audiences/', name: 'api_aid_audiences', priority: 5)]
     public function index(
         OrganizationTypeRepository $organizationTypeRepository,
-    ): JsonResponse
-    {
+    ): JsonResponse {
         $params = [];
         // requete pour compter sans la pagination
         $count = $organizationTypeRepository->countCustom($params);
@@ -23,7 +22,7 @@ class AidAudienceController extends ApiController
         // requete pour les résultats avec la pagination
         $params['firstResult'] = ($this->getPage() - 1) * $this->getItemsPerPage();
         $params['maxResults'] = $this->getItemsPerPage();
-    
+
         $results = $organizationTypeRepository->findCustom($params);
 
         // spécifique
@@ -35,7 +34,7 @@ class AidAudienceController extends ApiController
                 'type' => $result->getOrganizationTypeGroup() ? $result->getOrganizationTypeGroup()->getName() : null
             ];
         }
-        
+
         // le retour
         $data = [
             'count' => $count,

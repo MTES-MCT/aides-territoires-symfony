@@ -1,6 +1,7 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Blog{{ getParameter('meta_title_end') }}{% endblock %}
+{% block title %}Blog{{ getParameter('meta_title_end') }}
+{% endblock %}
 
 {% block javascripts %}
 	{{ parent() }}
@@ -21,17 +22,17 @@
 							<p>Retrouvez dans cette rubrique nos actualités ainsi que des ressources complémentaires pour vous aider à réaliser vos projets</p>
 
 							<div id="search-posts">
-                                {{ form_start(formCategories) }}
-                                    {{ form_row(formCategories.blogPostCategory) }}
-                                {{ form_end(formCategories) }}
+								{{ form_start(formCategories) }}
+								{{ form_row(formCategories.blogPostCategory) }}
+								{{ form_end(formCategories) }}
 							</div>
 						</div>
 
 
 						<div class="posts">
-                            {% for blogPost in blogPosts %}
+							{% for blogPost in blogPosts %}
 								{% include 'blog/blogpost/_blogpost.html.twig' %}
-                            {% endfor %}
+							{% endfor %}
 						</div>
 
 					</div>

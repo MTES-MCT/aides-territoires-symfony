@@ -16,10 +16,9 @@ class AidProjectDisplayCrudController extends AtCrudController
     public function configureFields(string $pageName): iterable
     {
         yield AssociationField::new('aid', 'Aide')
-        ->setFormTypeOption('attr', ['readonly' => true])
-        ->autocomplete(true)
-        ;
+            ->setFormTypeOption('attr', ['readonly' => true])
+            ->autocomplete(true);
         yield AssociationField::new('creator', 'Auteur association')
-        ->autocomplete(true);
+            ->autocomplete(true);
     }
 }

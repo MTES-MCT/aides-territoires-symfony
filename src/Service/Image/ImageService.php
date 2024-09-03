@@ -18,11 +18,9 @@ class ImageService
         protected KernelInterface $kernelInterface,
         protected StringService $stringService,
         protected FileService $fileService
-    )
-    {
-    }
+    ) {}
 
-        /**
+    /**
      * Envoi une image (deja uploadee / traitee sur le serveur) sur le cloud
      *
      * @param string $file
@@ -34,8 +32,7 @@ class ImageService
         string $file,
         string $uploadDir,
         string $fileName
-    ): bool
-    {
+    ): bool {
         if (!$file) {
             return false;
         }
@@ -77,7 +74,7 @@ class ImageService
 
             // Créer un objet Credentials en utilisant les clés d'accès AWS
             $credentials = new Credentials($this->paramService->get('aws_access_key_id'), $this->paramService->get('aws_secret_access_key'));
-            
+
             // Créer un client S3
             $s3 = new S3Client([
                 'version' => 'latest',
@@ -105,16 +102,15 @@ class ImageService
 
     public function deleteImageFromCloud(
         string $fileName
-    )
-    {
+    ) {
         if (!$fileName || trim($fileName) == '') {
             return false;
         }
-        
+
         // Créer un objet Credentials en utilisant les clés d'accès AWS
         $credentials = new Credentials($this->paramService->get('aws_access_key_id'), $this->paramService->get('aws_secret_access_key'));
 
-        
+
         // Créer un client S3
         $s3 = new S3Client([
             'version' => 'latest',
@@ -143,8 +139,7 @@ class ImageService
         UploadedFile $file,
         string $uploadDir,
         string $fileName
-    ): bool
-    {
+    ): bool {
         if (!$file) {
             return false;
         }
@@ -162,7 +157,7 @@ class ImageService
                 preg_replace('/' . preg_quote($uploadDir, '/') . '/', '', $fileName)
             );
             $tmpFile = rtrim($tmpFolder, '/') . '/' . ltrim(preg_replace('/' . preg_quote($uploadDir, '/') . '/', '', $fileName), '/');
-            
+
             // resize image avec \Imagick
             $imagick = new \Imagick($tmpFile);
             if ($imagick->getImageMimeType() == 'image/svg+xml') {
@@ -198,7 +193,7 @@ class ImageService
 
             // Créer un objet Credentials en utilisant les clés d'accès AWS
             $credentials = new Credentials($this->paramService->get('aws_access_key_id'), $this->paramService->get('aws_secret_access_key'));
-            
+
             // Créer un client S3
             $s3 = new S3Client([
                 'version' => 'latest',
@@ -215,7 +210,7 @@ class ImageService
                 'SourceFile' => $tmpFile,
                 'ACL'    => 'public-read',
             ]);
-            
+
             // suppression fichier temporaire
             unlink($tmpFile);
             return true;
@@ -230,9 +225,10 @@ class ImageService
      * @param string $filename
      * @return string
      */
-    public function getSafeFileName(string $filename) : string {
+    public function getSafeFileName(string $filename): string
+    {
         $extension = pathinfo($filename, PATHINFO_EXTENSION);
-        return uniqid().'-'.$this->stringService->getSlug($filename).'.'.$extension;
+        return uniqid() . '-' . $this->stringService->getSlug($filename) . '.' . $extension;
     }
 
     /**

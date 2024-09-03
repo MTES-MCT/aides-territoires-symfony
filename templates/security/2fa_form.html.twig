@@ -1,6 +1,7 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Connectez-vous | Aides-territoires{% endblock %}
+{% block title %}Connectez-vous | Aides-territoires
+{% endblock %}
 
 {% block body %}
 	<main role="main" class="fr-container-fluid" id="at-main">
@@ -12,40 +13,37 @@
 
 						<p>Les champs marqués d’un astérisque (*) sont obligatoires.</p>
 
-                        {% if authenticationError %}
-                            <div class="fr-alert fr-alert--error fr-alert--sm fr-mt-2w fr-background-main">{{ authenticationError|trans(authenticationErrorData, 'SchebTwoFactorBundle') }}</div>
-                        {% endif %}
+						{% if authenticationError %}
+							<div class="fr-alert fr-alert--error fr-alert--sm fr-mt-2w fr-background-main">{{ authenticationError|trans(authenticationErrorData, 'SchebTwoFactorBundle') }}</div>
+						{% endif %}
 
-                        <form class="fr-mt-5w" action="{{ checkPathUrl ? checkPathUrl: path(checkPathRoute) }}" method="post">
-                            <div class="fr-input-group">
+						<form class="fr-mt-5w" action="{{ checkPathUrl ? checkPathUrl: path(checkPathRoute) }}" method="post">
+							<div class="fr-input-group">
 
-                                <label class="fr-label required" for="_auth_code">Votre code d'identification<div id="_auth_code_help" class="help-text fr-hint-text">En utilisant par ex Google Authenticate</div></label>
-                                <input
-                                    id="_auth_code"
-                                    type="text"
-                                    name="{{ authCodeParameterName }}"
-                                    autocomplete="one-time-code"
-                                    autofocus
-                                    class="fr-input"
-                                    inputmode="numeric"
-                                    pattern="[0-9]*"
-                                />
-                            </div>
+								<label class="fr-label required" for="_auth_code">Votre code d'identification<div id="_auth_code_help" class="help-text fr-hint-text">En utilisant par ex Google Authenticate</div>
+								</label>
+								<input id="_auth_code" type="text" name="{{ authCodeParameterName }}" autocomplete="one-time-code" autofocus class="fr-input" inputmode="numeric" pattern="[0-9]*"/>
+							</div>
 
-                            {% if displayTrustedOption %}
-                                <p class="fr-mt-5w"><label for="_trusted"><input id="_trusted" type="checkbox" name="{{ trustedParameterName }}" /> {{ "trusted"|trans({}, 'SchebTwoFactorBundle') }}</label></p>
-                            {% endif %}
-                            {% if isCsrfProtectionEnabled %}
-                                <input type="hidden" name="{{ csrfParameterName }}" value="{{ csrf_token(csrfTokenId) }}">
-                            {% endif %}
-                            <div class="validation-wrapper">
-                                <div class="form-group">
-                                    <button type="submit" class="fr-btn">{{ "login"|trans({}, 'SchebTwoFactorBundle') }}</button>
-                                </div>
+							{% if displayTrustedOption %}
+								<p class="fr-mt-5w">
+									<label for="_trusted"><input id="_trusted" type="checkbox" name="{{ trustedParameterName }}"/>
+										{{ "trusted"|trans({}, 'SchebTwoFactorBundle') }}</label>
+								</p>
+							{% endif %}
+							{% if isCsrfProtectionEnabled %}
+								<input type="hidden" name="{{ csrfParameterName }}" value="{{ csrf_token(csrfTokenId) }}">
+							{% endif %}
+							<div class="validation-wrapper">
+								<div class="form-group">
+									<button type="submit" class="fr-btn">{{ "login"|trans({}, 'SchebTwoFactorBundle') }}</button>
+								</div>
 
-                                <p class="fr-mt-5w"><a href="{{ logoutPath }}">{{ "cancel"|trans({}, 'SchebTwoFactorBundle') }}</a></p>
-                            </div>
-                        </form>
+								<p class="fr-mt-5w">
+									<a href="{{ logoutPath }}">{{ "cancel"|trans({}, 'SchebTwoFactorBundle') }}</a>
+								</p>
+							</div>
+						</form>
 					</div>
 				</div>
 			</div>

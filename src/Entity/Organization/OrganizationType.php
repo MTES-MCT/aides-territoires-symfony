@@ -54,7 +54,7 @@ class OrganizationType // NOSONAR too much methods
     const SLUG_PRIVATE_PERSON = 'private-person';
     const SLUG_FARMER = 'farmer';
     const SLUG_RESEARCHER = 'researcher';
-    
+
 
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -103,7 +103,7 @@ class OrganizationType // NOSONAR too much methods
     private Collection $searchPages;
 
     #[ORM\ManyToMany(targetEntity: LogAidView::class, mappedBy: 'organizationTypes')]
-    #[ORM\JoinColumn(onDelete:'SET NULL')]
+    #[ORM\JoinColumn(onDelete: 'SET NULL')]
     private Collection $logAidViews;
 
     #[ORM\ManyToMany(targetEntity: LogAidSearch::class, mappedBy: 'organizationTypes')]

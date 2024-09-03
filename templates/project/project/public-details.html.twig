@@ -6,105 +6,144 @@
 	{{ encore_entry_link_tags('import-scss/project/public-details') }}
 {% endblock %}
 
-{% block title %}Projet public {{ project.name }} | Aides-territoires{% endblock %}
+{% block title %}Projet public
+	{{ project.name }}
+	| Aides-territoires
+{% endblock %}
 
-{% block meta_description %}Trouvez des aides pour financer et accompagner les projets de votre collectivité en France métropolitaine et en Outre-mer{% endblock %}
+{% block meta_description %}Trouvez des aides pour financer et accompagner les projets de votre collectivité en France métropolitaine et en Outre-mer
+{% endblock %}
 
 {% block body %}
-<div class="fr-container fr-mb-5w fr-mt-0">
+	<div class="fr-container fr-mb-5w fr-mt-0">
 
-    {% if project.status == 'reviewable' and isUserGranted(app.user, constant('App\\Entity\\User\\User::ROLE_ADMIN'))  %}
-    <div class="fr-alert fr-alert--warning at-clear fr-my-2w">
-        <p class="fr-alert__title">Attention ! Ce projet n’est actuellement pas affiché sur le site.</p>
-        <p>Vous pouvez le prévisualiser parce que vous en êtes le modérateur.</p>
-    </div>
-    {% endif %}
+		{% if project.status == 'reviewable' and isUserGranted(app.user, constant('App\\Entity\\User\\User::ROLE_ADMIN'))  %}
+			<div class="fr-alert fr-alert--warning at-clear fr-my-2w">
+				<p class="fr-alert__title">Attention ! Ce projet n’est actuellement pas affiché sur le site.</p>
+				<p>Vous pouvez le prévisualiser parce que vous en êtes le modérateur.</p>
+			</div>
+		{% endif %}
 
-    <div class="fr-grid-row">
+		<div class="fr-grid-row">
 
-        <div class="fr-col-12">
-            <h1 class="fr-h3 fr-mb-5w">
-            Projet : « {{ project.name|sanitize_html }} »
-            {% if app.user and app.user.defaultOrganization and project in app.user.defaultOrganization.favoriteProjects %}
-            <span class="ri-star-fill at-color--blue fr-mb-1w at-align-end" title="Ce projet est un de vos favoris"></span>
-            {% endif %}
-            </h1>
+			<div class="fr-col-12">
+				<h1 class="fr-h3 fr-mb-5w">
+					Projet : «
+					{{ project.name|sanitize_html }}
+					»
+					{% if app.user and app.user.defaultOrganization and project in app.user.defaultOrganization.favoriteProjects %}
+						<span class="ri-star-fill at-color--blue fr-mb-1w at-align-end" title="Ce projet est un de vos favoris"></span>
+					{% endif %}
+				</h1>
 
-            {% if app.user %}
-            <div class="fr-grid-row fr-grid-row--gutters fr-background-alt">
-                {% if project.image %}
-                <img class="fr-col-12 fr-col-md-7" src="{{ getParameter('cloud_image_url') }}{{ project.image }}" alt="Logo {{ project.name }}" />    
-                {% else %}
-                <div class="fr-col-12 fr-col-md-7">
-                    <picture>
-                        <source srcset="{{ asset('build/images/project/project_illustration.webp') }}">
-                        <img class="fr-responsive-img" src="{{ asset('build/images/project/project_illustration.png') }}" alt="Logo par défaut" />
-                    </picture>
-                </div>
-                {% endif %}
-                <div class="fr-col-12 fr-col-md-5">
-                    {% if project.organization %}<h2 class="fr-text--md fr-text--normal fr-mb-0 fr-mt-5w"><strong>Structure porteuse :</strong> {{ project.organization.name }}</h2>{% endif %}
-                    {% if project.otherProjectOwner%}<h2 class="fr-text--md fr-text--normal fr-mb-0 fr-mt-2w"><strong>Autre maître d’ouvrage :</strong> {{ project.otherProjectOwner }}</h2>{% endif %}
-                    {% if project.organization %}<h2 class="fr-text--md fr-text--normal fr-mb-0 fr-mt-2w"><strong>Territoire du projet :</strong> {{ project.organization.perimeter.name }} ({{ project.organization.zipCode }})</h2>{% endif %}
-                    <h2 class="fr-text--md fr-text--normal fr-mb-0 fr-mt-2w"><strong>État d’avancement du projet :</strong>  {% if project.step %}{{  constant('App\\Entity\\Project\\Project::PROJECT_STEPS_BY_SLUG')[project.step] }}{% else %}aucun{% endif %}</h2>
-                    <h2 class="fr-text--md fr-text--normal fr-mb-5w fr-mt-2w"><strong>Budget prévisionnel :</strong>  {% if project.budget %}{{ project.budget|format_number }} €{% else %}non renseigné{% endif %}</h2>
-                </div>
-            </div>
+				{% if app.user %}
+					<div class="fr-grid-row fr-grid-row--gutters fr-background-alt">
+						{% if project.image %}
+							<img class="fr-col-12 fr-col-md-7" src="{{ getParameter('cloud_image_url') }}{{ project.image }}" alt="Logo {{ project.name }}"/>
+						{% else %}
+							<div class="fr-col-12 fr-col-md-7">
+								<picture>
+									<source srcset="{{ asset('build/images/project/project_illustration.webp') }}">
+									<img class="fr-responsive-img" src="{{ asset('build/images/project/project_illustration.png') }}" alt="Logo par défaut"/>
+								</picture>
+							</div>
+						{% endif %}
+						<div class="fr-col-12 fr-col-md-5">
+							{% if project.organization %}
+								<h2 class="fr-text--md fr-text--normal fr-mb-0 fr-mt-5w">
+									<strong>Structure porteuse :</strong>
+									{{ project.organization.name }}</h2>
+							{% endif %}
+							{% if project.otherProjectOwner%}
+								<h2 class="fr-text--md fr-text--normal fr-mb-0 fr-mt-2w">
+									<strong>Autre maître d’ouvrage :</strong>
+									{{ project.otherProjectOwner }}</h2>
+							{% endif %}
+							{% if project.organization %}
+								<h2 class="fr-text--md fr-text--normal fr-mb-0 fr-mt-2w">
+									<strong>Territoire du projet :</strong>
+									{{ project.organization.perimeter.name }}
+									({{ project.organization.zipCode }})</h2>
+							{% endif %}
+							<h2 class="fr-text--md fr-text--normal fr-mb-0 fr-mt-2w">
+								<strong>État d’avancement du projet :</strong>
+								{% if project.step %}
+									{{  constant('App\\Entity\\Project\\Project::PROJECT_STEPS_BY_SLUG')[project.step] }}{% else %}aucun
+								{% endif %}
+							</h2>
+							<h2 class="fr-text--md fr-text--normal fr-mb-5w fr-mt-2w">
+								<strong>Budget prévisionnel :</strong>
+								{% if project.budget %}
+									{{ project.budget|format_number }}
+									€{% else %}non renseigné
+								{% endif %}
+							</h2>
+						</div>
+					</div>
 
-            <div class="fr-grid-row fr-grid-row--gutters fr-my-5w">
-                <div class="fr-col-12 fr-col-md-7">
-                    <h2 class="fr-h4">Description du projet</h2>
-                    {% if project.description %}
-                        <div class="wysiwyg-wrapper">
-                            {{ project.description|sanitize_html|raw }}
-                        </div>
-                    {% endif %}
-                </div>
-                <div class="fr-col-12 fr-col-md-5">
-                {% if project.keywordSynonymlists|length > 0 %}
-                <h2 class="fr-text--md fr-text--normal fr-mb-0 fr-mt-2w"><strong>Types de projet :</strong>
-                    {% for project_type in project.keywordSynonymlists %}
-                    <span class="fr-tag fr-mb-1w">{{ project_type.name }}</span>
-                    {% endfor %}
-                </h2>
-                {% endif %}
-                {% if project.contractLink %}
-                <h2 class="fr-text--md fr-text--normal fr-mb-0 fr-mt-2w"><strong>Appartenance à un plan/programme/contrat :</strong> {{ constant('App\\Entity\\Project\\Project::CONTRACT_LINK_BY_SLUG')[project.contractLink] }}</h2>
-                {% endif %}
-                </div> 
-            </div>
+					<div class="fr-grid-row fr-grid-row--gutters fr-my-5w">
+						<div class="fr-col-12 fr-col-md-7">
+							<h2 class="fr-h4">Description du projet</h2>
+							{% if project.description %}
+								<div class="wysiwyg-wrapper">
+									{{ project.description|sanitize_html|raw }}
+								</div>
+							{% endif %}
+						</div>
+						<div class="fr-col-12 fr-col-md-5">
+							{% if project.keywordSynonymlists|length > 0 %}
+								<h2 class="fr-text--md fr-text--normal fr-mb-0 fr-mt-2w">
+									<strong>Types de projet :</strong>
+									{% for project_type in project.keywordSynonymlists %}
+										<span class="fr-tag fr-mb-1w">{{ project_type.name }}</span>
+									{% endfor %}
+								</h2>
+							{% endif %}
+							{% if project.contractLink %}
+								<h2 class="fr-text--md fr-text--normal fr-mb-0 fr-mt-2w">
+									<strong>Appartenance à un plan/programme/contrat :</strong>
+									{{ constant('App\\Entity\\Project\\Project::CONTRACT_LINK_BY_SLUG')[project.contractLink] }}</h2>
+							{% endif %}
+						</div>
+					</div>
 
-            {% include "project/project/_public_project_aids_list.html.twig" %}
-
-
-            <div class="fr-container at-centered">
-                {% if app.user and app.user.defaultOrganization and project in app.user.defaultOrganization.favoriteProjects %}
-                <button class="fr-btn" data-fr-opened="false" aria-controls="remove-from-favorite-modal--{{ project.id }}">
-                    Retirer ce projet de mes favoris
-                </button>
-                {% else %}
-                <button class="fr-btn" data-fr-opened="false" aria-controls="add-to-favorite-modal--{{ project.id }}">
-                    Ajouter ce projet à mes favoris
-                </button>
-                {% endif %}
-                <button class="fr-btn" data-fr-opened="false" aria-controls="suggest-aid-modal">
-                    Suggérer une aide pour ce projet
-                </button>
-            </div>
+					{% include "project/project/_public_project_aids_list.html.twig" %}
 
 
-            {% else %}
-            <div class="fr-alert fr-alert--info fr-alert--sm fr-mb-5w">
-                <p><strong>L’affichage complet de cette page est réservé aux utilisateurs connectés.</strong></p>
-                <p><a href="{{ path('app_login') }}">Connectez-vous</a> ou <a href="#">créez un compte</a> afin d'afficher les informations relatives à ce projet !</p>
-            </div>
-            {% endif %}
-        </div>
-    </div>
-</div>
+					<div class="fr-container at-centered">
+						{% if app.user and app.user.defaultOrganization and project in app.user.defaultOrganization.favoriteProjects %}
+							<button class="fr-btn" data-fr-opened="false" aria-controls="remove-from-favorite-modal--{{ project.id }}">
+								Retirer ce projet de mes favoris
+							</button>
+						{% else %}
+							<button class="fr-btn" data-fr-opened="false" aria-controls="add-to-favorite-modal--{{ project.id }}">
+								Ajouter ce projet à mes favoris
+							</button>
+						{% endif %}
+						<button class="fr-btn" data-fr-opened="false" aria-controls="suggest-aid-modal">
+							Suggérer une aide pour ce projet
+						</button>
+					</div>
 
-{% include 'project/project/_add_to_favorite_modal.html.twig' %}
-{% include 'project/project/_remove_from_favorite_modal.html.twig' %}
-{% include 'project/project/_suggest_aid_modal.html.twig' %}
+
+				{% else %}
+					<div class="fr-alert fr-alert--info fr-alert--sm fr-mb-5w">
+						<p>
+							<strong>L’affichage complet de cette page est réservé aux utilisateurs connectés.</strong>
+						</p>
+						<p>
+							<a href="{{ path('app_login') }}">Connectez-vous</a>
+							ou
+							<a href="#">créez un compte</a>
+							afin d'afficher les informations relatives à ce projet !</p>
+					</div>
+				{% endif %}
+			</div>
+		</div>
+	</div>
+
+	{% include 'project/project/_add_to_favorite_modal.html.twig' %}
+	{% include 'project/project/_remove_from_favorite_modal.html.twig' %}
+	{% include 'project/project/_suggest_aid_modal.html.twig' %}
 
 {% endblock %}

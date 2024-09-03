@@ -37,8 +37,7 @@ class OrganizationTypeRepository extends ServiceEntityRepository
         $qb = $this->getQueryBuilder($params);
 
         $qb
-            ->select('ot.name')
-        ;
+            ->select('ot.name');
 
         $results = $qb->getQuery()->getResult();
 
@@ -56,13 +55,12 @@ class OrganizationTypeRepository extends ServiceEntityRepository
     public function getQueryBuilder(array $params = null): QueryBuilder
     {
         $orderBy = (isset($params['orderBy']) && isset($params['orderBy']['sort']) && isset($params['orderBy']['order'])) ? $params['orderBy'] : null;
-        
+
         $qb = $this->createQueryBuilder('ot');
 
         if ($orderBy !== null) {
             $qb
-                ->addOrderBy($orderBy['sort'], $orderBy['order'])
-            ;
+                ->addOrderBy($orderBy['sort'], $orderBy['order']);
         }
 
         return $qb;

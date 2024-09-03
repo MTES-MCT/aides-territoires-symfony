@@ -117,7 +117,7 @@ class Perimeter // NOSONAR too much methods
     const SCALE_REGION = 15;
     const SCALE_ADHOC = 18;
     const SCALE_CONTINENT = 25;
-    
+
     const SLUG_LOCAL_GROUP = 'local_group';
     const SCALES_LOCAL_GROUP = [
         ['scale' => 1, 'slug' => 'commune', 'name' => self::SCALE_COMMUNE_NAME],
@@ -270,10 +270,10 @@ class Perimeter // NOSONAR too much methods
     #[ORM\OneToMany(mappedBy: 'perimeter', targetEntity: Backer::class)]
     private Collection $backers;
 
-    #[ORM\OneToMany(mappedBy: 'perimeter', targetEntity: PerimeterData::class, orphanRemoval: true, cascade:['persist'])]
+    #[ORM\OneToMany(mappedBy: 'perimeter', targetEntity: PerimeterData::class, orphanRemoval: true, cascade: ['persist'])]
     private Collection $perimeterDatas;
 
-    #[ORM\OneToMany(mappedBy: 'adhocPerimeter', targetEntity: PerimeterImport::class, orphanRemoval: true, cascade:['persist'])]
+    #[ORM\OneToMany(mappedBy: 'adhocPerimeter', targetEntity: PerimeterImport::class, orphanRemoval: true, cascade: ['persist'])]
     private Collection $perimeterImports;
 
     /*
@@ -1108,7 +1108,8 @@ class Perimeter // NOSONAR too much methods
         return $this;
     }
 
-    public function getPerimetersToIds() : array {
+    public function getPerimetersToIds(): array
+    {
         $ids = [];
         foreach ($this->getPerimetersTo() as $perimetersTo) {
             $ids[] = $perimetersTo->getId();
@@ -1116,7 +1117,8 @@ class Perimeter // NOSONAR too much methods
         return $ids;
     }
 
-    public function getPerimetersFromIds() : array {
+    public function getPerimetersFromIds(): array
+    {
         $ids = [];
         foreach ($this->getPerimetersFrom() as $perimetersFrom) {
             $ids[] = $perimetersFrom->getId();

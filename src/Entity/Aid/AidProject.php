@@ -226,10 +226,10 @@ class AidProject // NOSONAR too much methods
     {
         $name = '';
         if ($this->getAid() instanceof Aid) {
-            $name .= '(aide) '.$this->getAid()->__toString();
+            $name .= '(aide) ' . $this->getAid()->__toString();
         }
         if ($this->getProject()) {
-            $name .= ' | (projet) '.$this->getProject()->__toString();
+            $name .= ' | (projet) ' . $this->getProject()->__toString();
         }
         if ($name == '') {
             $name = 'Aide projet';

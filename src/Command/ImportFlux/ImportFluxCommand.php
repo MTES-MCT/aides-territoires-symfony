@@ -56,9 +56,8 @@ class ImportFluxCommand extends Command // NOSONAR too much methods
         protected PerimeterService $perimeterService,
         protected StringService $stringService,
         protected FileService $fileService
-    )
-    {
-        ini_set('max_execution_time', 60*60);
+    ) {
+        ini_set('max_execution_time', 60 * 60);
         ini_set('memory_limit', '1G');
         parent::__construct();
         $this->dateImportStart = new \DateTime(date('Y-m-d H:i:s'));
@@ -79,7 +78,7 @@ class ImportFluxCommand extends Command // NOSONAR too much methods
         //     return Command::FAILURE;
         // }
 
-        try  {
+        try {
             // set la dataSource
             $this->dataSource = $this->managerRegistry->getRepository(DataSource::class)->find($this->idDataSource);
             if (!$this->dataSource instanceof DataSource) {
@@ -97,7 +96,7 @@ class ImportFluxCommand extends Command // NOSONAR too much methods
                     'dataSource' => $this->dataSource,
                     'error' => $exception->getMessage(),
                 ]
-                );
+            );
             $io->error($exception->getMessage());
             return Command::FAILURE;
         }
@@ -110,11 +109,11 @@ class ImportFluxCommand extends Command // NOSONAR too much methods
         $this->dataSource->setTimeLastAccess(new \DateTime(date('Y-m-d H:i:s')));
         $this->managerRegistry->getManager()->persist($this->dataSource);
         $this->managerRegistry->getManager()->flush();
-        
+
         $timeEnd = microtime(true);
         $time = $timeEnd - $timeStart;
 
-        $io->success('Import flux terminé : '.gmdate("H:i:s", $timeEnd).' ('.gmdate("H:i:s", intval($time)).')');
+        $io->success('Import flux terminé : ' . gmdate("H:i:s", $timeEnd) . ' (' . gmdate("H:i:s", intval($time)) . ')');
         $io->success('Mémoire maximale utilisée : ' . intval(round(memory_get_peak_usage() / 1024 / 1024)) . ' MB');
 
         $io->title($this->commandTextEnd);
@@ -155,7 +154,7 @@ class ImportFluxCommand extends Command // NOSONAR too much methods
             }
             $this->nbPages = ceil($nbItems / $this->nbByPages);
         }
-        
+
         // ouvre le flux pour recuperer les aides
         $aidsFormImport = $this->callApi();
 
@@ -203,7 +202,7 @@ class ImportFluxCommand extends Command // NOSONAR too much methods
         $aidsFromImport = [];
         $client = $this->getClient();
 
-        for ($i=0; $i<$this->nbPages; $i++) {
+        for ($i = 0; $i < $this->nbPages; $i++) {
             $this->currentPage = $i;
             $importUrl = $this->dataSource->getImportApiUrl();
             if ($this->paginationEnabled) {
@@ -299,8 +298,7 @@ class ImportFluxCommand extends Command // NOSONAR too much methods
 
             // retour
             return true;
-            }
-        catch (\Exception $e) {
+        } catch (\Exception $e) {
             throw new \Exception('Impossible de créer l\'aide : ' . $e->getMessage());
         }
     }
@@ -330,8 +328,8 @@ class ImportFluxCommand extends Command // NOSONAR too much methods
                 }
                 // gestion des booleéns
                 $methodGet = 'get';
-                if (!method_exists($aid, 'get'.ucfirst($field))) {
-                    if (method_exists($aid, 'is'.ucfirst($field))) {
+                if (!method_exists($aid, 'get' . ucfirst($field))) {
+                    if (method_exists($aid, 'is' . ucfirst($field))) {
                         $methodGet = 'is';
                     } else {
                         continue;
@@ -341,7 +339,7 @@ class ImportFluxCommand extends Command // NOSONAR too much methods
                 // les champs qu'on ne modifie pas automatiquement
                 if (!in_array($field, $keepValues)) {
                     // on regarde si il y a une modification pour mettre un statut "à valider" à l'aide
-                    if ($aid->{$methodGet.ucfirst($field)}() != $value) {
+                    if ($aid->{$methodGet . ucfirst($field)}() != $value) {
                         $entityUpdated = true;
                         $needManualValidation = true;
                     }
@@ -349,7 +347,7 @@ class ImportFluxCommand extends Command // NOSONAR too much methods
                 }
 
                 // les champs qu'on modifie automatiquement
-                if ($aid->{$methodGet.ucfirst($field)}() != $value && method_exists($aid, 'set'.ucfirst($field))) {
+                if ($aid->{$methodGet . ucfirst($field)}() != $value && method_exists($aid, 'set' . ucfirst($field))) {
                     // assigne la nouvelle valeur
                     $aid->{'set' . ucfirst($field)}($value);
                     // on retire le champ des valeurs à validées manuellement
@@ -410,7 +408,7 @@ class ImportFluxCommand extends Command // NOSONAR too much methods
     {
         return $this->httpClientInterface;
     }
-    
+
     protected function getApiOptions(): array
     {
         return [
@@ -489,9 +487,9 @@ class ImportFluxCommand extends Command // NOSONAR too much methods
         foreach ($checkFields as $field) {
             if (
                 isset($newValues[$field])
-                && method_exists($aid, 'get'.ucfirst($field))
-                && $aid->{'get'.ucfirst($field)}() != $newValues[$field]
-                ) {
+                && method_exists($aid, 'get' . ucfirst($field))
+                && $aid->{'get' . ucfirst($field)}() != $newValues[$field]
+            ) {
                 return true;
             }
         }

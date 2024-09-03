@@ -35,7 +35,7 @@ class ImportFluxWelcomeEuropeCommand extends ImportFluxCommand
         $aidsFromImport = [];
         $client = $this->getClient();
 
-        for ($i=0; $i<$this->nbPages; $i++) {
+        for ($i = 0; $i < $this->nbPages; $i++) {
             $this->currentPage = $i;
             $importUrl = $this->dataSource->getImportApiUrl();
             if ($this->paginationEnabled) {
@@ -49,7 +49,7 @@ class ImportFluxWelcomeEuropeCommand extends ImportFluxCommand
                 );
                 $content = $response->getContent();
                 $content = $response->toArray();
-    
+
                 // retourne directement un tableau d'aides
                 $aidsFromImport = $content;
             } catch (\Exception $e) {
@@ -79,8 +79,7 @@ class ImportFluxWelcomeEuropeCommand extends ImportFluxCommand
 
             $description =
                 '<div>'
-                . $programs
-                ;
+                . $programs;
             if ($banner_chapeau) {
                 $description .= '<p>-----</p>' . $banner_chapeau;
             }
@@ -148,9 +147,8 @@ class ImportFluxWelcomeEuropeCommand extends ImportFluxCommand
             $info_utile = '';
             foreach ($info_utile_list as $key => $value) {
                 if (trim($value) != '') {
-                    $info_utile .= '<p>'.trim($value).'</p>';
+                    $info_utile .= '<p>' . trim($value) . '</p>';
                 }
-                
             }
         }
         if (isset($aidToImport['info_contact']) && trim($aidToImport['info_contact']) != '') {

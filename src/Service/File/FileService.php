@@ -10,15 +10,13 @@ class FileService
     const FORMAT_CSV = 'csv';
     const FORMAT_XLSX = 'xlsx';
     const FORMAT_PDF = 'pdf';
-    
+
     const UPLOAD_TMP_FOLDER = '/uploads_tmp';
     const EXCEPTION_FORMAT_NOT_SUPPORTED_MESSAGE = 'Format non supporté';
-    
+
     public function __construct(
         private KernelInterface $kernelInterface
-    )
-    {
-    }
+    ) {}
 
     public function getUploadTmpDirRelative(): string
     {
@@ -36,7 +34,7 @@ class FileService
         if ($this->getEnvironment() == 'prod' || $this->getEnvironment() == 'staging') {
             return $this->kernelInterface->getProjectDir();
         } else {
-            return $this->kernelInterface->getProjectDir().self::UPLOAD_TMP_FOLDER;
+            return $this->kernelInterface->getProjectDir() . self::UPLOAD_TMP_FOLDER;
         }
     }
 

@@ -6,7 +6,7 @@ use App\Controller\FrontController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-#[Route(priority:1)]
+#[Route(priority: 1)]
 class AccessibilityController extends FrontController
 {
     #[Route('/accessibilité/', name: 'app_static_accessibility')]
@@ -18,7 +18,6 @@ class AccessibilityController extends FrontController
         );
 
         // rendu template
-        return $this->render('static/accessibility/index.html.twig', [
-        ]);
+        return $this->render('static/accessibility/index.html.twig', []);
     }
 }

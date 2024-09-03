@@ -40,14 +40,13 @@ class OrganizationCrudController extends AtCrudController
     {
         $assets = parent::configureAssets($assets);
         return $assets
-            ->addWebpackEncoreEntry('admin/organization/associate')
-        ;
+            ->addWebpackEncoreEntry('admin/organization/associate');
     }
 
     public function  configureCrud(Crud $crud): Crud
     {
         return parent::configureCrud($crud)
-        ->overrideTemplate('crud/index', 'admin/organization/index.html.twig')
+            ->overrideTemplate('crud/index', 'admin/organization/index.html.twig')
         ;
     }
 
@@ -67,7 +66,7 @@ class OrganizationCrudController extends AtCrudController
     public function configureActions(Actions $actions): Actions
     {
         $batchOrganizationAssociateBacker = Action::new('batchOrganizationAssociateBacker', 'Associé Porteur')
-        ->linkToCrudAction('batchOrganizationAssociateBacker');
+            ->linkToCrudAction('batchOrganizationAssociateBacker');
 
         return parent::configureActions($actions)
             ->addBatchAction($batchOrganizationAssociateBacker)
@@ -90,156 +89,156 @@ class OrganizationCrudController extends AtCrudController
         yield TextField::new('name', 'Nom');
         yield TextField::new('slug', 'Slug')
             ->setFormTypeOption('attr', ['readonly' => true, 'autocomplete' => 'off'])
-            ->setHelp('Laisser vide pour autoremplir.')
-        ;
+            ->setHelp('Laisser vide pour autoremplir.');
         yield AssociationField::new('organizationType', 'Type')
-        ->setFormTypeOption('choice_label', 'name');
+            ->setFormTypeOption('choice_label', 'name');
         yield AssociationField::new('beneficiairies', 'Membres')
-        ->autocomplete()
-        ->onlyOnForms();
+            ->autocomplete()
+            ->onlyOnForms();
         yield AssociationField::new('backer', 'Porteur d\'aide')
-        ->autocomplete()
-        ;
+            ->autocomplete();
         yield TextField::new('intercommunalityType', 'Type d\'inter-communalité')
-        ->onlyOnForms();
+            ->onlyOnForms();
         yield TextField::new('densityTypology', 'Typologie de densité')
-        ->onlyOnForms();
+            ->onlyOnForms();
         yield TextField::new('populationStrata', 'Strates de population')
-        ->onlyOnForms();
+            ->onlyOnForms();
 
         yield FormField::addFieldset('Projets');
         yield AssociationField::new('favoriteProjects', 'Projets Favoris')
-        ->autocomplete()
-        ->onlyOnForms();
+            ->autocomplete()
+            ->onlyOnForms();
         yield AssociationField::new('projects', 'Projets')
-        ->autocomplete()
-        ->onlyOnForms();
+            ->autocomplete()
+            ->onlyOnForms();
         yield AssociationField::new('projectValidateds', 'Projets subventionnés')
-        ->autocomplete()
-        ->onlyOnForms();
+            ->autocomplete()
+            ->onlyOnForms();
 
         yield FormField::addFieldset('Emplacement');
         yield TextField::new('address', 'Adresse')
-        ->onlyOnForms();
+            ->onlyOnForms();
         yield TextField::new('cityName', 'Ville')
-        ->onlyOnForms();
+            ->onlyOnForms();
         yield TextField::new('zipCode', 'Code postal')
-        ->onlyOnForms();
+            ->onlyOnForms();
         yield AssociationField::new('perimeter', 'Périmètre')
-        ->autocomplete()
-        ->onlyOnForms();
+            ->autocomplete()
+            ->onlyOnForms();
         yield AssociationField::new('perimeterDepartment', 'Département')
-        ->setFormTypeOptions([
-            'query_builder' => function (PerimeterRepository $er) {
-                return $er->getQueryBuilder([
-                    'scale' => Perimeter::SCALE_COUNTY,
-                    'orderBy' => [
-                        'sort' => 'p.code',
-                        'order' => 'ASC'
-                    ]
-                ]);
-            },
-        ])
-        ->onlyOnForms();
+            ->setFormTypeOptions([
+                'query_builder' => function (PerimeterRepository $er) {
+                    return $er->getQueryBuilder([
+                        'scale' => Perimeter::SCALE_COUNTY,
+                        'orderBy' => [
+                            'sort' => 'p.code',
+                            'order' => 'ASC'
+                        ]
+                    ]);
+                },
+            ])
+            ->onlyOnForms();
         yield AssociationField::new('perimeterRegion', 'Région')
-        ->setFormTypeOptions([
-            'query_builder' => function (PerimeterRepository $er) {
-                return $er->getQueryBuilder([
-                    'scale' => Perimeter::SCALE_REGION,
-                    'orderBy' => [
-                        'sort' => 'p.code',
-                        'order' => 'ASC'
-                    ]
-                ]);
-            },
-        ])
-        ->onlyOnForms();
+            ->setFormTypeOptions([
+                'query_builder' => function (PerimeterRepository $er) {
+                    return $er->getQueryBuilder([
+                        'scale' => Perimeter::SCALE_REGION,
+                        'orderBy' => [
+                            'sort' => 'p.code',
+                            'order' => 'ASC'
+                        ]
+                    ]);
+                },
+            ])
+            ->onlyOnForms();
 
         yield FormField::addFieldset('Informations légales');
         yield TextField::new('sirenCode', 'Code SIREN')
-        ->onlyOnForms();
+            ->onlyOnForms();
         yield TextField::new('siretCode', 'Code SIRET')
-        ->onlyOnForms();
+            ->onlyOnForms();
         yield TextField::new('apeCode', 'Code APE')
-        ->onlyOnForms();
+            ->onlyOnForms();
         yield TextField::new('inseeCode', 'Code INSEE')
-        ->onlyOnForms();
+            ->onlyOnForms();
 
 
         yield FormField::addFieldset('Composition du périmètre');
         yield IntegerField::new('inhabitantsNumber', 'Nombre d\'habitants')
-        ->onlyOnForms();
+            ->onlyOnForms();
         yield IntegerField::new('votersNumber', 'Nombre de votants')
-        ->onlyOnForms();
+            ->onlyOnForms();
         yield IntegerField::new('corporatesNumber', 'Nombre de sociétés')
-        ->onlyOnForms();
+            ->onlyOnForms();
         yield IntegerField::new('associationsNumber', 'Nombre d\'associations')
-        ->onlyOnForms();
+            ->onlyOnForms();
         yield IntegerField::new('municipalRoads', 'Nombre de routes municipales')
-        ->onlyOnForms();
+            ->onlyOnForms();
         yield IntegerField::new('departmentalRoads', 'Nombre de routes départementales')
-        ->onlyOnForms();
+            ->onlyOnForms();
         yield IntegerField::new('theaterNumber', 'Nombre de théatres')
-        ->onlyOnForms();
+            ->onlyOnForms();
         yield IntegerField::new('museumNumber', 'Nombre de musées')
-        ->onlyOnForms();
+            ->onlyOnForms();
         yield IntegerField::new('kindergartenNumber', 'Nombre de jardins d\'enfants')
-        ->onlyOnForms();
+            ->onlyOnForms();
         yield IntegerField::new('primarySchoolNumber', 'Nombre d\'écoles primaoires')
-        ->onlyOnForms();
+            ->onlyOnForms();
         yield IntegerField::new('middleSchoolNumber', 'Nombre de collèges')
-        ->onlyOnForms();
+            ->onlyOnForms();
         yield IntegerField::new('highSchoolNumber', 'Nombre de lycées')
-        ->onlyOnForms();
+            ->onlyOnForms();
         yield IntegerField::new('universityNumber', 'Nombre d\'universitées')
-        ->onlyOnForms();
+            ->onlyOnForms();
         yield IntegerField::new('swimmingPoolNumber', 'Nombre de piscines')
-        ->onlyOnForms();
+            ->onlyOnForms();
         yield IntegerField::new('placeOfWorshipNumber', 'Nombre de lieux de cultes')
-        ->onlyOnForms();
+            ->onlyOnForms();
         yield IntegerField::new('cemeteryNumber', 'Nombre de cimetières')
-        ->onlyOnForms();
+            ->onlyOnForms();
         yield IntegerField::new('bridgeNumber', 'Nombre de ponts')
-        ->onlyOnForms();
+            ->onlyOnForms();
         yield IntegerField::new('cinemaNumber', 'Nombre de cinéma')
-        ->onlyOnForms();
+            ->onlyOnForms();
         yield IntegerField::new('coveredSportingComplexNumber', 'Nombre de complexes sportifs couverts')
-        ->onlyOnForms();
+            ->onlyOnForms();
         yield IntegerField::new('footballFieldNumber', 'Nombre de terrains de footbal')
-        ->onlyOnForms();
+            ->onlyOnForms();
         yield IntegerField::new('forestNumber', 'Nombre de forêts')
-        ->onlyOnForms();
+            ->onlyOnForms();
         yield IntegerField::new('nurseryNumber', 'Nombre de garderies')
-        ->onlyOnForms();
+            ->onlyOnForms();
         yield IntegerField::new('otherOutsideStructureNumber', 'Nombre de structures extérieures autres')
-        ->onlyOnForms();
+            ->onlyOnForms();
         yield IntegerField::new('protectedMonumentNumber', 'Nombre de monuments protégés')
-        ->onlyOnForms();
+            ->onlyOnForms();
         yield IntegerField::new('recCenterNumber', 'Nombre de centres de loisirs')
-        ->onlyOnForms();
+            ->onlyOnForms();
         yield IntegerField::new('runningTrackNumber', 'Nombre de pistes de courses')
-        ->onlyOnForms();
+            ->onlyOnForms();
         yield IntegerField::new('shopsNumber', 'Nombre de commerces')
-        ->onlyOnForms();
+            ->onlyOnForms();
         yield IntegerField::new('tennisCourtNumber', 'Nombre de courts de tennis')
-        ->onlyOnForms();
+            ->onlyOnForms();
 
 
         yield FormField::addFieldset('Import');
         yield DateTimeField::new('importedTime', 'Date d\'import')
-        ->setFormTypeOption(
-            'attr', [
-                'readonly' => true
-            ]
-        )
-        ->onlyOnForms();
+            ->setFormTypeOption(
+                'attr',
+                [
+                    'readonly' => true
+                ]
+            )
+            ->onlyOnForms();
         yield BooleanField::new('isImported', 'Est importé')
-        ->setFormTypeOption(
-            'attr', [
-                'readonly' => true
-            ]
-        )
-        ->onlyOnForms();
+            ->setFormTypeOption(
+                'attr',
+                [
+                    'readonly' => true
+                ]
+            )
+            ->onlyOnForms();
     }
 
 

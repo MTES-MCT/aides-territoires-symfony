@@ -23,9 +23,7 @@ class ApiController extends AbstractController
         protected ManagerRegistry $managerRegistry,
         protected StringService $stringService,
         protected ParamService $paramService
-    )
-    {
-    }
+    ) {}
 
     protected function getPage(): int
     {
@@ -57,9 +55,9 @@ class ApiController extends AbstractController
     {
         return $this->getPage() <= 1
             ? null
-            : preg_replace_callback('/page='.$this->getPage().'/', function($matches) {
-                return 'page='.($this->getPage() - 1);
-            }, substr($this->routerInterface->generate('app_home', [], UrlGeneratorInterface::ABSOLUTE_URL), 0, -1).$this->requestStack->getCurrentRequest()->getRequestUri());
+            : preg_replace_callback('/page=' . $this->getPage() . '/', function ($matches) {
+                return 'page=' . ($this->getPage() - 1);
+            }, substr($this->routerInterface->generate('app_home', [], UrlGeneratorInterface::ABSOLUTE_URL), 0, -1) . $this->requestStack->getCurrentRequest()->getRequestUri());
     }
 
     protected function getNext($nbItems = 0): ?string
@@ -74,7 +72,7 @@ class ApiController extends AbstractController
         $filters = $this->requestStack->getCurrentRequest()->query->all();
         $filters['page'] = isset($filters['page']) ? $filters['page'] + 1 : 2;
         $query = http_build_query($filters);
-        return substr($urlBase, 0, -1).$pathInfo.'?'.$query;
+        return substr($urlBase, 0, -1) . $pathInfo . '?' . $query;
     }
 
     protected function stringToBool(?string $str): bool

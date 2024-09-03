@@ -14,23 +14,18 @@ use Symfony\Bundle\SecurityBundle\Security;
 final class AidExtension implements QueryCollectionExtensionInterface, QueryItemExtensionInterface
 {
 
-    public function __construct(private readonly Security $security)
-    {
-    }
+    public function __construct(private readonly Security $security) {}
 
     public function applyToCollection(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, Operation $operation = null, array $context = []): void
     {
-        if ($operation->getName() == Aid::API_OPERATION_GET_COLLECTION_PUBLISHED)
-        {
+        if ($operation->getName() == Aid::API_OPERATION_GET_COLLECTION_PUBLISHED) {
             $this->addWhere($queryBuilder, $resourceClass);
         }
-        
     }
 
     public function applyToItem(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, array $identifiers, Operation $operation = null, array $context = []): void
     {
-        if ($operation->getName() == Aid::API_OPERATION_GET_BY_SLUG) 
-        {
+        if ($operation->getName() == Aid::API_OPERATION_GET_BY_SLUG) {
             $this->addWhere($queryBuilder, $resourceClass);
         }
     }
@@ -43,7 +38,6 @@ final class AidExtension implements QueryCollectionExtensionInterface, QueryItem
 
         $rootAlias = $queryBuilder->getRootAliases()[0];
         $queryBuilder
-            ->addCriteria(AidRepository::liveCriteria($rootAlias.'.'))
-        ;
+            ->addCriteria(AidRepository::liveCriteria($rootAlias . '.'));
     }
 }

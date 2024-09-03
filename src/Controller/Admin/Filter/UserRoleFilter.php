@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Controller\Admin\Filter;
 
 use App\Form\Admin\Filter\UserRoleFilterType;
@@ -30,8 +31,7 @@ class UserRoleFilter implements FilterInterface
 
         $queryBuilder
             ->andWhere(sprintf('%s.%s LIKE :valueLikeChoice', $filterDataDto->getEntityAlias(), $filterDataDto->getProperty()))
-            ->setParameter('valueLikeChoice', '%' . $filterDataDto->getValue() . '%');
-            ;
+            ->setParameter('valueLikeChoice', '%' . $filterDataDto->getValue() . '%');;
 
         return;
     }

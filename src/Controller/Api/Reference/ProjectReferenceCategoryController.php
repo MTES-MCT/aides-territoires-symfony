@@ -15,20 +15,19 @@ class ProjectReferenceCategoryController extends ApiController
     #[Route('/api/project-reference-categories/', name: 'api_project_reference_categories', priority: 5)]
     public function index(
         ProjectReferenceCategoryRepository $projectReferenceCategoryRepository,
-    ): JsonResponse
-    {
-       // requete pour compter sans la pagination
+    ): JsonResponse {
+        // requete pour compter sans la pagination
         $count = $projectReferenceCategoryRepository->countCustom();
 
         // requete pour les résultats avec la pagination
         $params['firstResult'] = ($this->getPage() - 1) * $this->getItemsPerPage();
         $params['maxResults'] = $this->getItemsPerPage();
-    
+
         $results = $projectReferenceCategoryRepository->findCustom();
 
         // on serialize pour ne garder que les champs voulus
         $results = $this->serializerInterface->serialize($results, static::SERIALIZE_FORMAT, ['groups' => ProjectReferenceCategory::API_GROUP_LIST]);
-        
+
         // le retour
         $data = [
             'count' => $count,

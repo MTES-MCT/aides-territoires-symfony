@@ -2,6 +2,4 @@
 
 namespace App\Message\Export;
 
-class MsgSpreadsheetToExport
-{
-}
+class MsgSpreadsheetToExport {}

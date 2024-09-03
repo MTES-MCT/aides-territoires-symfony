@@ -13,7 +13,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
-#[Route(priority:1)]
+#[Route(priority: 1)]
 class SecurityController extends FrontController
 {
     #[Route(path: '/comptes/connexion/', name: 'app_login')]
@@ -47,8 +47,7 @@ class SecurityController extends FrontController
         UserRegisterConfirmationRepository $userRegisterConfirmationRepository,
         ManagerRegistry $managerRegistry,
         Security $security
-    ): Response
-    {
+    ): Response {
         // check token
         $userRegisterConfirmation = $userRegisterConfirmationRepository->findOneBy(
             [
@@ -69,9 +68,8 @@ class SecurityController extends FrontController
             // log le user
             if ($userRegisterConfirmation->getUser()) {
                 $flashMessage = $userRegisterConfirmation->getUser()->getTimeLastLogin()
-                                ? 'Vous êtes maintenant connecté. Bienvenue ! Pourriez-vous prendre quelques secondes pour mettre à jour votre profil ?'
-                                : 'Vous êtes maintenant connecté. Bienvenue !'
-                                ;
+                    ? 'Vous êtes maintenant connecté. Bienvenue ! Pourriez-vous prendre quelques secondes pour mettre à jour votre profil ?'
+                    : 'Vous êtes maintenant connecté. Bienvenue !';
                 $security->login($userRegisterConfirmation->getUser(), 'form_login', 'main');
                 // message success
                 $this->tAddFlash(
@@ -83,11 +81,9 @@ class SecurityController extends FrontController
                 return $this->redirectToRoute('app_user_dashboard');
             }
         }
-        
-        // le lien a déjà été utilisé, on affiche une erreur
-        return $this->render('security/register-confirmation.html.twig', [
 
-        ]);
+        // le lien a déjà été utilisé, on affiche une erreur
+        return $this->render('security/register-confirmation.html.twig', []);
     }
 
     #[Route(path: '/admin/connexion/', name: 'app_login_admin')]

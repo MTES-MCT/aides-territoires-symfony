@@ -63,7 +63,6 @@ class MyCustomLoginListener
             if ($this->authorizationChecker->isGranted(User::ROLE_ADMIN)) {
                 // $this->adminSessionManager->extendSessionLifetime();
             }
-
         }
     }
 }

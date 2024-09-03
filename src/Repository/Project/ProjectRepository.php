@@ -27,22 +27,21 @@ class ProjectRepository extends ServiceEntityRepository
     public function __construct(
         ManagerRegistry $registry,
         protected ReferenceService $referenceService
-    )
-    {
+    ) {
         parent::__construct($registry, Project::class);
     }
 
-    public static function publicCriteria($alias = 'p.') : Criteria
+    public static function publicCriteria($alias = 'p.'): Criteria
     {
         return Criteria::create()
-            ->andWhere(Criteria::expr()->eq($alias.'isPublic', true))
+            ->andWhere(Criteria::expr()->eq($alias . 'isPublic', true))
         ;
     }
 
-    public static function privateCriteria($alias = 'p.') : Criteria
+    public static function privateCriteria($alias = 'p.'): Criteria
     {
         return Criteria::create()
-            ->andWhere(Criteria::expr()->eq($alias.'isPublic', false))
+            ->andWhere(Criteria::expr()->eq($alias . 'isPublic', false))
         ;
     }
 
@@ -53,8 +52,7 @@ class ProjectRepository extends ServiceEntityRepository
             ->andWhere('p.organization = :organization')
             ->setParameter('organization', $organization)
             ->getQuery()
-            ->getResult()
-        ;
+            ->getResult();
         return $result[0]['nb'] ?? 0;
     }
 
@@ -65,18 +63,16 @@ class ProjectRepository extends ServiceEntityRepository
             ->andWhere('p.author = :user')
             ->setParameter('user', $user)
             ->getQuery()
-            ->getResult()
-        ;
+            ->getResult();
         return $result[0]['nb'] ?? 0;
     }
 
     public function findImageToFix(array $params = []): array
     {
         $qb = $this->createQueryBuilder('p')
-        ->andWhere('(p.image LIKE :jpg OR p.image LIKE :png)')
-        ->setParameter('jpg', '%-jpg')
-        ->setParameter('png', '%-png')
-        ;
+            ->andWhere('(p.image LIKE :jpg OR p.image LIKE :png)')
+            ->setParameter('jpg', '%-jpg')
+            ->setParameter('png', '%-png');
         return $qb->getQuery()->getResult();
     }
 
@@ -100,7 +96,7 @@ class ProjectRepository extends ServiceEntityRepository
 
         return $qb->getQuery()->getResult()[0]['nb'] ?? 0;
     }
-    
+
     public function findPublicProjects(array $params = null): array
     {
         $params['isPublic'] = true;
@@ -193,15 +189,15 @@ class ProjectRepository extends ServiceEntityRepository
                 if (!empty($objects)) {
                     $sqlObjects .= ' + ';
                 }
-                for ($i = 0; $i<count($objects); $i++) {
+                for ($i = 0; $i < count($objects); $i++) {
 
                     $sqlObjects .= '
-                        CASE WHEN (p.name LIKE :objects'.$i.') THEN 30 ELSE 0 END
+                        CASE WHEN (p.name LIKE :objects' . $i . ') THEN 30 ELSE 0 END
                     ';
                     if ($i < count($objects) - 1) {
                         $sqlObjects .= ' + ';
                     }
-                    $qb->setParameter('objects'.$i, '%'.$objects[$i].'%');
+                    $qb->setParameter('objects' . $i, '%' . $objects[$i] . '%');
                 }
 
                 $qb->setParameter('objects_string', $objectsString);
@@ -231,8 +227,7 @@ class ProjectRepository extends ServiceEntityRepository
                 ';
 
                 $qb
-                ->setParameter('projectReference', $projectReference)
-                ;
+                    ->setParameter('projectReference', $projectReference);
             }
 
             $sqlTotal = '';
@@ -267,41 +262,41 @@ class ProjectRepository extends ServiceEntityRepository
 
             if ($sqlTotal !== '') {
                 $scoreTotalAvailable = true;
-                $qb->addSelect('('.$sqlTotal.') as score_total');
-                $qb->andHaving('score_total >= '.$scoreTotalMin);
+                $qb->addSelect('(' . $sqlTotal . ') as score_total');
+                $qb->andHaving('score_total >= ' . $scoreTotalMin);
             }
         }
-        
+
         if ($organizationType instanceof OrganizationType && $organizationType->getId()) {
             $qb
                 ->innerJoin('p.organization', 'organizationForType')
                 ->andWhere('organizationForType.organizationType = :organizationType')
                 ->setParameter('organizationType', $organizationType)
-                ;
+            ;
         }
 
         if ($organizations !== null) {
             $qb
                 ->andWhere('p.organization IN (:organizations)')
                 ->setParameter('organizations', $organizations)
-                ;
+            ;
         }
 
         if ($dateCreateMin instanceof \DateTime) {
             $qb->andWhere('p.dateCreate >= :dateCreateMin')
-            ->setParameter('dateCreateMin', $dateCreateMin);
+                ->setParameter('dateCreateMin', $dateCreateMin);
         }
 
         if ($dateCreateMax instanceof \DateTime) {
             $qb->andWhere('p.dateCreate <= :dateCreateMax')
-            ->setParameter('dateCreateMax', $dateCreateMax);
+                ->setParameter('dateCreateMax', $dateCreateMax);
         }
-        
+
         if ($exclude instanceof Project && $exclude->getId()) {
             $qb
                 ->andWhere('p != :perimeterExclude')
                 ->setParameter('perimeterExclude', $exclude)
-                ;
+            ;
         }
         if ($perimeterRadius instanceof Perimeter && $perimeterRadius->getLatitude() && $perimeterRadius->getLongitude() && $radius !== null) {
             $qb
@@ -321,50 +316,50 @@ class ProjectRepository extends ServiceEntityRepository
             $qb
                 ->andWhere('p.isPublic = :isPublic')
                 ->setParameter('isPublic', $isPublic)
-                ;
+            ;
         }
 
         if ($isTypesSuggested !== null) {
             $qb
                 ->andWhere('p.projectTypesSuggestion = :isTypesSuggested')
                 ->setParameter('isTypesSuggested', $isTypesSuggested)
-                ;
+            ;
         }
 
-        if($perimeter instanceof Perimeter && $perimeter->getId()){
+        if ($perimeter instanceof Perimeter && $perimeter->getId()) {
             $qb
                 ->innerJoin('p.organization', 'organization')
-                ->innerJoin('organization.perimeter','perimeter')
-                ->innerJoin('perimeter.perimetersTo','perimetersTo')
+                ->innerJoin('organization.perimeter', 'perimeter')
+                ->innerJoin('perimeter.perimetersTo', 'perimetersTo')
                 ->andWhere('(perimetersTo = :perimeter OR perimeter = :perimeter)')
                 ->setParameter('perimeter', $perimeter)
-                ;
+            ;
         }
-        if (is_array($keywordSynonymlistSearch) &&  count($keywordSynonymlistSearch)>0 ) {
+        if (is_array($keywordSynonymlistSearch) &&  count($keywordSynonymlistSearch) > 0) {
             $qb
                 ->innerJoin('p.keywordSynonymlists', 'keywordSynonymlists')
                 ->andWhere('keywordSynonymlists.id IN (:keywordSynonymlistSearch)')
                 ->setParameter('keywordSynonymlistSearch', $keywordSynonymlistSearch)
-                ;
+            ;
         }
 
         if ($status !== null) {
             $qb
                 ->andWhere('p.status = :status')
                 ->setParameter('status', $status)
-                ;
+            ;
         }
         if ($contractLink !== null) {
             $qb
                 ->andWhere('p.contractLink = :contractLink')
                 ->setParameter('contractLink', $contractLink)
-                ;
+            ;
         }
         if ($step !== null) {
             $qb
                 ->andWhere('p.step = :step')
                 ->setParameter('step', $step)
-                ;
+            ;
         }
 
         if (isset($scoreTotalAvailable)) {
@@ -373,7 +368,7 @@ class ProjectRepository extends ServiceEntityRepository
         if ($orderBy !== null) {
             $qb->addOrderBy($orderBy['sort'], $orderBy['order']);
         }
-        
+
         if ($limit !== null) {
             $qb->setMaxResults($limit);
         }

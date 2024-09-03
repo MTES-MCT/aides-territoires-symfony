@@ -1,66 +1,66 @@
 {% block checkbox_multiple_search_row %}
-<div class="widget-autocomplete-multiple-wrapper fr-input-group">
-    <div class="form-group">
-        {{ form_label(form.displayer) }}
-        {{ form_widget(form.displayer) }}
-        {{ form_errors(form.displayer) }}
-    </div>
-    <div class="autocomplete-list-wrapper">
-        {% if form.autocomplete is defined %}
-        <div class="autocomplete-input">
-            <div class="form-group">
-                {{ form_label(form.autocomplete) }}
-                {{ form_widget(form.autocomplete) }}
-                {{ form_help(form.autocomplete) }}
-                {{ form_errors(form.autocomplete) }}
-            </div>
-        </div>
-        {% endif %}
+	<div class="widget-autocomplete-multiple-wrapper fr-input-group">
+		<div class="form-group">
+			{{ form_label(form.displayer) }}
+			{{ form_widget(form.displayer) }}
+			{{ form_errors(form.displayer) }}
+		</div>
+		<div class="autocomplete-list-wrapper">
+			{% if form.autocomplete is defined %}
+				<div class="autocomplete-input">
+					<div class="form-group">
+						{{ form_label(form.autocomplete) }}
+						{{ form_widget(form.autocomplete) }}
+						{{ form_help(form.autocomplete) }}
+						{{ form_errors(form.autocomplete) }}
+					</div>
+				</div>
+			{% endif %}
 
-        <div class="autocomplete-choices">
-            <div class="form-group">
-                {% set choiceByValue = [] %}
-                {% for customChoice in form.customChoices %}
-                    {% set choiceKey = customChoice.vars.value %}
-                    {% set choiceByValue = {(choiceKey): customChoice} + choiceByValue %}
-                {% endfor %}
+			<div class="autocomplete-choices">
+				<div class="form-group">
+					{% set choiceByValue = [] %}
+					{% for customChoice in form.customChoices %}
+						{% set choiceKey = customChoice.vars.value %}
+						{% set choiceByValue = {(choiceKey): customChoice} + choiceByValue %}
+					{% endfor %}
 
-                {% for key, customChoiceItem in form.customChoices.vars.choices %}
-                    <div class="choices-optgroup">
-                        {% if key is not empty and key matches '/[a-z]+/i' %}
-                        <div class="fr-fieldset__element optgroup">
-                            <strong class="select2-results__group">{{ key }}</strong>
-                        </div>
-                        {% endif %}
+					{% for key, customChoiceItem in form.customChoices.vars.choices %}
+						<div class="choices-optgroup">
+							{% if key is not empty and key matches '/[a-z]+/i' %}
+								<div class="fr-fieldset__element optgroup">
+									<strong class="select2-results__group">{{ key }}</strong>
+								</div>
+							{% endif %}
 
-                        {% if customChoiceItem.choices is defined %}
-                            {% for choice in customChoiceItem.choices %}
-                                {% for choiceItem in choice.choices %}
-                                    <div class="fr-fieldset__element" aria-selected="{% if choiceByValue[choiceItem.value].vars.checked %}true{% else %}false{% endif %}">
-                                        <div class="fr-checkbox-group">
-                                            {{ form_widget(choiceByValue[choiceItem.value], {'attr': {'autocomplete': 'off'}})}}
-                                            {{ form_label(choiceByValue[choiceItem.value])}}
-                                            {{ form_help(choiceByValue[choiceItem.value]) }}
-                                            {{ form_errors(choiceByValue[choiceItem.value]) }}
-                                        </div>
-                                    </div>
-                                {% endfor %}
-                            {% endfor %}
-                        {% else %}
-                            <div class="fr-fieldset__element" aria-selected="{% if choiceByValue[customChoiceItem.value].vars.checked %}true{% else %}false{% endif %}">
-                                <div class="fr-checkbox-group">
-                                    {{ form_widget(choiceByValue[customChoiceItem.value], {'attr': {'autocomplete': 'off'}})}}
-                                    {{ form_label(choiceByValue[customChoiceItem.value])}}
-                                    {{ form_help(choiceByValue[customChoiceItem.value]) }}
-                                    {{ form_errors(choiceByValue[customChoiceItem.value]) }}
-                                </div>
-                            </div>
-                        {% endif %}
-                    </div>
-                {% endfor %}
-                
-            </div>
-        </div>
-    </div>
-</div>
+							{% if customChoiceItem.choices is defined %}
+								{% for choice in customChoiceItem.choices %}
+									{% for choiceItem in choice.choices %}
+										<div class="fr-fieldset__element" aria-selected="{% if choiceByValue[choiceItem.value].vars.checked %}true{% else %}false{% endif %}">
+											<div class="fr-checkbox-group">
+												{{ form_widget(choiceByValue[choiceItem.value], {'attr': {'autocomplete': 'off'}})}}
+												{{ form_label(choiceByValue[choiceItem.value])}}
+												{{ form_help(choiceByValue[choiceItem.value]) }}
+												{{ form_errors(choiceByValue[choiceItem.value]) }}
+											</div>
+										</div>
+									{% endfor %}
+								{% endfor %}
+							{% else %}
+								<div class="fr-fieldset__element" aria-selected="{% if choiceByValue[customChoiceItem.value].vars.checked %}true{% else %}false{% endif %}">
+									<div class="fr-checkbox-group">
+										{{ form_widget(choiceByValue[customChoiceItem.value], {'attr': {'autocomplete': 'off'}})}}
+										{{ form_label(choiceByValue[customChoiceItem.value])}}
+										{{ form_help(choiceByValue[customChoiceItem.value]) }}
+										{{ form_errors(choiceByValue[customChoiceItem.value]) }}
+									</div>
+								</div>
+							{% endif %}
+						</div>
+					{% endfor %}
+
+				</div>
+			</div>
+		</div>
+	</div>
 {% endblock %}

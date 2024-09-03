@@ -23,17 +23,16 @@ class FaqQuestionAnswserCrudController extends AtCrudController
     public function configureFilters(Filters $filters): Filters
     {
         return $filters
-            ->add('faqCategory')
-        ;
+            ->add('faqCategory');
     }
 
     public function configureFields(string $pageName): iterable
     {
         yield IdField::new('id')->onlyOnIndex();
         yield TextField::new('question', 'Question')
-        ->setColumns(12);
+            ->setColumns(12);
         yield TextEditorField::new('answer', 'Réponse')
-        ->setColumns(12);
+            ->setColumns(12);
         yield AssociationField::new('faqCategory', 'Catégorie FAQ');
         yield IntegerField::new('position', 'Position')->onlyOnIndex();
         // yield DateTimeField::new('timeCreate', 'Date de création')

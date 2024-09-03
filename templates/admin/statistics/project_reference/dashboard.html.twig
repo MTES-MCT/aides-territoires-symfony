@@ -1,61 +1,62 @@
 {% extends 'admin/statistics/_stats_base.html.twig' %}
 
-{% block breadcrumb %}
-{% endblock %}
+{% block breadcrumb %}{% endblock %}
 
 {% block head_javascript %}
-    {{ parent() }}
-    {{ encore_entry_script_tags('admin/admin') }}
-    {{ encore_entry_script_tags('admin/statistics/project_reference/dashboard') }}
+	{{ parent() }}
+	{{ encore_entry_script_tags('admin/admin') }}
+	{{ encore_entry_script_tags('admin/statistics/project_reference/dashboard') }}
 {% endblock head_javascript %}
 
 {% block stats_content %}
-<section class="container">
-    <h1>Statistiques Projets référents</h1>
+	<section class="container">
+		<h1>Statistiques Projets référents</h1>
 
-    <div class="alert alert-info my-5">
-        <ul>
-            <li>La recherche est faite sans structure, sans périmètre.</li>
-            <li>La recherche étant trop lourde pour scalingo, elle est pré-calculée chaque nuit.</li>
-            <li>Si le delta est négatif c'est probablement du au dédoublonnage des aides génériques / locales. A vérifier au cas par cas.</li>
-            <li>Si le delta est trop grand, il est possible que le projet référent ne soit pas associé à toutes les aides OU qu'il y a des mots clés à exclure.</li>
-        </ul>
-    </div>
-    <table class="table table-striped dataTable">
-        <thead>
-            <tr>
-                <th>Projet référent</th>
-                <th>Nombre d'aides associées (live)</th>
-                <th>Nombre de résultas de recherche</th>
-                <th>Delta</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for projectReference in projectReferences %}
-                <tr>
-                    <td>{{ projectReference.name }}</td>
-                    <td>
-                    {% if aidsUrlByProjectReferenceId[projectReference.id] is defined %}
-                        <a href="{{ aidsUrlByProjectReferenceId[projectReference.id] }}">{{ projectReference.aids|length }} ({{ projectReference.aidsLive|length }})</a>
-                    {% else %}
-                    {{ projectReference.aids|length }}  ({{ projectReference.aidsLive|length }})
-                    {% endif %}
-                    </td>
-                    <td>
-                        {% if projectReference.nbSearchResult %}
-                            <a href="{{ path('app_aid_aid', {'keyword': projectReference.name})}}" target="_blank">{{ projectReference.nbSearchResult }}</a>
-                        {% endif %}
-                    </td>
-                    <td>
-                        {% if projectReference.nbSearchResult %}
-                        {{ projectReference.nbSearchResult - projectReference.aidsLive|length }}
-                        {% else %}
-                        N/a
-                        {% endif %}
-                    </td>
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-</section>
+		<div class="alert alert-info my-5">
+			<ul>
+				<li>La recherche est faite sans structure, sans périmètre.</li>
+				<li>La recherche étant trop lourde pour scalingo, elle est pré-calculée chaque nuit.</li>
+				<li>Si le delta est négatif c'est probablement du au dédoublonnage des aides génériques / locales. A vérifier au cas par cas.</li>
+				<li>Si le delta est trop grand, il est possible que le projet référent ne soit pas associé à toutes les aides OU qu'il y a des mots clés à exclure.</li>
+			</ul>
+		</div>
+		<table class="table table-striped dataTable">
+			<thead>
+				<tr>
+					<th>Projet référent</th>
+					<th>Nombre d'aides associées (live)</th>
+					<th>Nombre de résultas de recherche</th>
+					<th>Delta</th>
+				</tr>
+			</thead>
+			<tbody>
+				{% for projectReference in projectReferences %}
+					<tr>
+						<td>{{ projectReference.name }}</td>
+						<td>
+							{% if aidsUrlByProjectReferenceId[projectReference.id] is defined %}
+								<a href="{{ aidsUrlByProjectReferenceId[projectReference.id] }}">{{ projectReference.aids|length }}
+									({{ projectReference.aidsLive|length }})</a>
+							{% else %}
+								{{ projectReference.aids|length }}
+								({{ projectReference.aidsLive|length }})
+							{% endif %}
+						</td>
+						<td>
+							{% if projectReference.nbSearchResult %}
+								<a href="{{ path('app_aid_aid', {'keyword': projectReference.name})}}" target="_blank">{{ projectReference.nbSearchResult }}</a>
+							{% endif %}
+						</td>
+						<td>
+							{% if projectReference.nbSearchResult %}
+								{{ projectReference.nbSearchResult - projectReference.aidsLive|length }}
+							{% else %}
+								N/a
+							{% endif %}
+						</td>
+					</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+	</section>
 {% endblock %}

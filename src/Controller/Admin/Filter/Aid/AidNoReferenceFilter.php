@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Controller\Admin\Filter\Aid;
 
 use App\Form\Admin\Filter\Aid\AidNoReferenceFilterType;
@@ -28,9 +29,9 @@ class AidNoReferenceFilter implements FilterInterface
             return;
         }
         $queryBuilder
-            ->leftJoin($filterDataDto->getEntityAlias().'.projectReferences', 'projectReferences')
+            ->leftJoin($filterDataDto->getEntityAlias() . '.projectReferences', 'projectReferences')
             ->andWhere('projectReferences.id IS NULL')
-            ;
+        ;
 
         return;
     }

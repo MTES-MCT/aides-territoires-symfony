@@ -1,52 +1,61 @@
 <tr>
-    {% if commune_search and project_perimeter and project_perimeter.latitude and project_perimeter.longitude %}
-        <td data-order="{{ project.distance|round(2) }}">
-            {% if project.distance > 0 %}{{ project.distance|round(2) }} km{% endif %}
-        </td> 
-    {% endif %}
+	{% if commune_search and project_perimeter and project_perimeter.latitude and project_perimeter.longitude %}
+		<td data-order="{{ project.distance|round(2) }}">
+			{% if project.distance > 0 %}
+				{{ project.distance|round(2) }}
+				km
+			{% endif %}
+		</td>
+	{% endif %}
 
-    <td>{{ project.timeObtained|date("Y")}}</td>
-    <td>
-        {% if project.organization %}
-        {% if project.organization.perimeter %}<a href="{{ path('app_project_project_subsidized_detail', {'project_perimeter': project.organization.perimeter.id})}}">{% endif %}
-            {{ project.organization.name }}
-        {% if project.organization.perimeter %}</a>{% endif %}
-        {% endif %}
-    </td>
-    <td>
-        {% if project.project %}
-            <a href="#">
-            {{ project.project.name }}
-            </a>
-        {% else %}
-            {{ project.projectName }}
-        {% endif %}
-    </td>
-    <td>
-        {% if project.aid  %}
-            <a href="{{ path('app_aid_aid_details', {'slug': project.aid.slug}) }}">
-                {{ project.aid.name}}
-            </a>
-        {% else %}
-            {{ project.aidName }}
-        {% endif %}
-    </td>
-    <td>
-        {% if project.financer %}
-            <a href="{{ path('app_backer_details', {'id':project.financer.id, 'slug': project.financer.slug}) }}"  >
-                {{ project.financer.name}}
-            </a>
-        {% else %}
-            {{ project.financerName }}
-        {% endif %}
-    </td>
-    <td class="number_one_line" data-order="{{ project.budget }}">{{ project.budget|number_format(0, ',', ' ') }} €</td>
-    <td class="number_one_line" data-order="{{ project.amountObtained }}">
-        {% if project.amountObtained %}
-            {{ project.amountObtained|number_format(0, ',', ' ') }} €
-            ({{ (project.amountObtained/project.budget*100)|round }}%)
-        {% else %}
-            inconnue
-        {% endif %}
-    </td>
+	<td>{{ project.timeObtained|date("Y")}}</td>
+	<td>
+		{% if project.organization %}
+			{% if project.organization.perimeter %}
+				<a href="{{ path('app_project_project_subsidized_detail', {'project_perimeter': project.organization.perimeter.id})}}">
+				{% endif %}
+				{{ project.organization.name }}
+				{% if project.organization.perimeter %}
+				</a>
+			{% endif %}
+		{% endif %}
+	</td>
+	<td>
+		{% if project.project %}
+			<a href="#">
+				{{ project.project.name }}
+			</a>
+		{% else %}
+			{{ project.projectName }}
+		{% endif %}
+	</td>
+	<td>
+		{% if project.aid  %}
+			<a href="{{ path('app_aid_aid_details', {'slug': project.aid.slug}) }}">
+				{{ project.aid.name}}
+			</a>
+		{% else %}
+			{{ project.aidName }}
+		{% endif %}
+	</td>
+	<td>
+		{% if project.financer %}
+			<a href="{{ path('app_backer_details', {'id':project.financer.id, 'slug': project.financer.slug}) }}">
+				{{ project.financer.name}}
+			</a>
+		{% else %}
+			{{ project.financerName }}
+		{% endif %}
+	</td>
+	<td class="number_one_line" data-order="{{ project.budget }}">{{ project.budget|number_format(0, ',', ' ') }}
+		€</td>
+	<td class="number_one_line" data-order="{{ project.amountObtained }}">
+		{% if project.amountObtained %}
+			{{ project.amountObtained|number_format(0, ',', ' ') }}
+			€
+			            ({{ (project.amountObtained/project.budget*100)|round }}%)
+		{% else %}
+			inconnue
+		{% endif %}
+	</td>
 </tr>

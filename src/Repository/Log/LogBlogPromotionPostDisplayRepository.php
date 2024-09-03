@@ -20,29 +20,4 @@ class LogBlogPromotionPostDisplayRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, LogBlogPromotionPostDisplay::class);
     }
-
-//    /**
-//     * @return LogBlogPromotionPostDisplay[] Returns an array of LogBlogPromotionPostDisplay objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('l')
-//            ->andWhere('l.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('l.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
-
-//    public function findOneBySomeField($value): ?LogBlogPromotionPostDisplay
-//    {
-//        return $this->createQueryBuilder('l')
-//            ->andWhere('l.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
 }

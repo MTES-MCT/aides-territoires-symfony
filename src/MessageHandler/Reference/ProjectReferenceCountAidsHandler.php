@@ -26,8 +26,7 @@ class ProjectReferenceCountAidsHandler
         private AidSearchFormService $aidSearchFormService,
         private ParamService $paramService,
         private EmailService $emailService
-    ) {
-    }
+    ) {}
 
     public function __invoke(ProjectReferenceCountAids $message): void
     {
@@ -38,7 +37,7 @@ class ProjectReferenceCountAidsHandler
 
         if ($projectReference instanceof ProjectReference) {
             // parametres pour requetes aides
-            $aidParams =[
+            $aidParams = [
                 'showInSearch' => true,
                 'keyword' => $projectReference->getName(),
                 'projectReference' => $projectReference,

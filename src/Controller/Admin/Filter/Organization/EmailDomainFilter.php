@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Controller\Admin\Filter\Organization;
 
 use App\Form\Admin\Filter\Organization\EmailDomainFilterType;
@@ -28,9 +29,9 @@ class EmailDomainFilter implements FilterInterface
             return;
         }
         $queryBuilder
-            ->innerJoin($filterDataDto->getEntityAlias().'.beneficiairies', 'beneficiairies')
+            ->innerJoin($filterDataDto->getEntityAlias() . '.beneficiairies', 'beneficiairies')
             ->andWhere('beneficiairies.email LIKE :email')
-            ->setParameter('email', '%'.$filterDataDto->getValue() )
-            ;
+            ->setParameter('email', '%' . $filterDataDto->getValue())
+        ;
     }
 }

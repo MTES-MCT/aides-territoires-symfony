@@ -6,6 +6,7 @@ use App\Entity\Backer\Backer;
 use App\Repository\Aid\AidInstructorRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
+
 #[ORM\Entity(repositoryClass: AidInstructorRepository::class)]
 class AidInstructor
 {
@@ -77,7 +78,7 @@ class AidInstructor
         if ($name == '') {
             $name = 'AidInstructor';
         }
-        
+
         return $name;
     }
 }

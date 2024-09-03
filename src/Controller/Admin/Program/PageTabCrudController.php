@@ -24,18 +24,18 @@ class PageTabCrudController extends AtCrudController
         yield IdField::new('id')->onlyOnIndex();
         yield TextField::new('name', 'Nom');
         yield AssociationField::new('program', 'Program')
-        ->autocomplete()
-        ->setHelp('Programme lié à cette page.');
+            ->autocomplete()
+            ->setHelp('Programme lié à cette page.');
         yield TrumbowygField::new('description', 'Contenu')
-        ->hideOnIndex();
+            ->hideOnIndex();
         yield BooleanField::new('active', 'Actif');
-        
+
         yield FormField::addFieldset('A propos de cet onglet');
         yield DateTimeField::new('timeCreate', 'Date de création')
-        ->setFormTypeOption('attr', ['readonly' => true])
-        ->onlyWhenUpdating();
+            ->setFormTypeOption('attr', ['readonly' => true])
+            ->onlyWhenUpdating();
         yield DateTimeField::new('timeUpdate', 'Date de mise à jour')
-        ->setFormTypeOption('attr', ['readonly' => true])
-        ->onlyWhenUpdating();
+            ->setFormTypeOption('attr', ['readonly' => true])
+            ->onlyWhenUpdating();
     }
 }

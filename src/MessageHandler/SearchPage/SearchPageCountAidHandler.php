@@ -20,14 +20,13 @@ class SearchPageCountAidHandler
         private ManagerRegistry $managerRegistry,
         private AidSearchFormService $aidSearchFormService,
         private AidService $aidService
-    ) {
-    }
+    ) {}
 
     public function __invoke(SearchPageCountAid $message): void
     {
         /** @var BackerRepository $backerRepo */
         $searchPageRepo = $this->managerRegistry->getRepository(SearchPage::class);
-        
+
         // charge le portail
         $searchPage = $searchPageRepo->find($message->getIdSearchPage());
 
@@ -42,7 +41,7 @@ class SearchPageCountAidHandler
                     'querystring' => $searchPage->getSearchQuerystring() ?? null,
                     'forceOrganizationType' => null,
                     'dontUseUserPerimeter' => true
-                    ]
+                ]
             );
 
             $aidParams = array_merge($aidParams, $this->aidSearchFormService->convertAidSearchClassToAidParams($aidSearchClass));

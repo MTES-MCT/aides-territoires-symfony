@@ -53,9 +53,7 @@ class AppExtension extends AbstractExtension // NOSONAR too much methods
         private MatomoService $matomoService,
         private ContentSecurityPolicyListener $contentSecurityPolicyListener,
         private KeywordReferenceService $keywordReferenceService
-    ) {
-        
-    }
+    ) {}
 
     /**
      * @return TwigFilter[]
@@ -84,25 +82,29 @@ class AppExtension extends AbstractExtension // NOSONAR too much methods
         return $this->stringService->truncate($string, $length);
     }
 
-    public function mySlug(string $string) : string {
+    public function mySlug(string $string): string
+    {
         return $this->stringService->getSlug($string);
     }
 
-    public function getPerimeterSmartName(?Perimeter $perimeter) : string {
+    public function getPerimeterSmartName(?Perimeter $perimeter): string
+    {
         if (!$perimeter instanceof Perimeter) {
             return '';
         }
         return $this->perimeterService->getSmartName($perimeter);
     }
-    
-    public function perimeterSmartRegionNames(?Perimeter $perimeter) : string {
+
+    public function perimeterSmartRegionNames(?Perimeter $perimeter): string
+    {
         if (!$perimeter instanceof Perimeter) {
             return '';
         }
         return $this->perimeterService->getSmartRegionNames($perimeter);
     }
 
-    public function aidStatusDisplay(string $slug) : string {
+    public function aidStatusDisplay(string $slug): string
+    {
         switch ($slug) {
             case Aid::STATUS_DRAFT:
                 return 'Brouillon';
@@ -115,7 +117,7 @@ class AppExtension extends AbstractExtension // NOSONAR too much methods
             case Aid::STATUS_PUBLISHED:
                 return 'Publiée';
                 break;
-                
+
             case Aid::STATUS_DELETED:
                 return 'Supprimée';
                 break;
@@ -129,7 +131,8 @@ class AppExtension extends AbstractExtension // NOSONAR too much methods
         }
     }
 
-    public function alertFrequencyDisplay(string $slug) : string {
+    public function alertFrequencyDisplay(string $slug): string
+    {
         foreach (Alert::FREQUENCIES as $frequency) {
             if ($frequency['slug'] == $slug) {
                 return $frequency['name'] ?? '';
@@ -138,7 +141,8 @@ class AppExtension extends AbstractExtension // NOSONAR too much methods
         return '';
     }
 
-    public function projectStepDisplay(string $string) : string {
+    public function projectStepDisplay(string $string): string
+    {
         foreach (Project::PROJECT_STEPS as $step) {
             if ($step['slug'] == $string) {
                 return $step['name'];
@@ -178,7 +182,8 @@ class AppExtension extends AbstractExtension // NOSONAR too much methods
         return $this->breadcrumb->getItems();
     }
 
-    public function getParameter(string $parameterName) : ?string {
+    public function getParameter(string $parameterName): ?string
+    {
         try {
             return $this->paramService->get($parameterName);
         } catch (\Exception $e) {
@@ -210,8 +215,7 @@ class AppExtension extends AbstractExtension // NOSONAR too much methods
         $dom->loadHTML(mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8'), LIBXML_HTML_NODEFDTD);
         $x = new \DOMXPath($dom);
 
-        foreach($x->query("//a") as $node)
-        {
+        foreach ($x->query("//a") as $node) {
             $href = $node->getAttribute('href');
             // Vérifie si le href est une adresse e-mail
             if (preg_match('/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/', $href)) {
@@ -236,9 +240,8 @@ class AppExtension extends AbstractExtension // NOSONAR too much methods
         // pour garder le utf-8
         $dom->loadHTML(mb_encode_numericentity($html, [0x80, 0x10FFFF, 0, ~0], 'UTF-8'), LIBXML_HTML_NODEFDTD);
         $x = new \DOMXPath($dom);
-        
-        foreach($x->query("//*[@style]") as $node)
-        {
+
+        foreach ($x->query("//*[@style]") as $node) {
             $styles = explode(';', $node->getAttribute('style'));
 
             $classesToAdd = [];
@@ -266,7 +269,7 @@ class AppExtension extends AbstractExtension // NOSONAR too much methods
             // Mettre à jour l'attribut de classe du nœud
             $node->setAttribute('class', $newClass);
         }
-        
+
         // Sélectionner uniquement le contenu intérieur de la balise <body>
         $body = $x->query('//body')->item(0);
         $newHtml = '';
@@ -284,31 +287,34 @@ class AppExtension extends AbstractExtension // NOSONAR too much methods
         // pour garder le utf-8
         $dom->loadHTML(mb_encode_numericentity($html, [0x80, 0x10FFFF, 0, ~0], 'UTF-8'), LIBXML_HTML_NODEFDTD);
         $x = new \DOMXPath($dom);
-        
-        foreach($x->query("//img") as $node)
-        {
-            $node->setAttribute("loading","lazy");
+
+        foreach ($x->query("//img") as $node) {
+            $node->setAttribute("loading", "lazy");
         }
         return substr($dom->saveHTML(), 12, -15);
     }
 
-    public function getPerimeterScale($scale) : ?array {
+    public function getPerimeterScale($scale): ?array
+    {
         return $this->perimeterService->getScale($scale);
     }
 
-    public function categoriesToMetas(ArrayCollection|array $categories) : array {
+    public function categoriesToMetas(ArrayCollection|array $categories): array
+    {
         return $this->categoryService->categoriesToMetas($categories);
     }
 
-    public function getEntityById(string $entityName, int $id) : mixed {
+    public function getEntityById(string $entityName, int $id): mixed
+    {
         try {
-            return $this->managerRegistry->getRepository('App\Entity\\'.$entityName)->find($id);
+            return $this->managerRegistry->getRepository('App\Entity\\' . $entityName)->find($id);
         } catch (\Exception $e) {
             return null;
         }
     }
 
-    public function getUserSibEmailId(?User $user) : string {
+    public function getUserSibEmailId(?User $user): string
+    {
         return $this->userService->getSibEmailId($user);
     }
 
@@ -317,7 +323,8 @@ class AppExtension extends AbstractExtension // NOSONAR too much methods
         return $this->matomoService->getGoal();
     }
 
-    public function getKeywordReferenceAndSynonyms(?string $keyword): string{
+    public function getKeywordReferenceAndSynonyms(?string $keyword): string
+    {
         if (!$keyword) {
             return '';
         }
@@ -325,14 +332,15 @@ class AppExtension extends AbstractExtension // NOSONAR too much methods
         return $this->keywordReferenceService->getKeywordReferenceAndSynonyms($keyword);
     }
 
-    public function getUserPublicProjectLatestView(?User $user, ?Project $project): ?LogPublicProjectView {
+    public function getUserPublicProjectLatestView(?User $user, ?Project $project): ?LogPublicProjectView
+    {
         if (!$user || !$project) {
             return null;
         }
         return $this->userService->getPublicProjectLatestView($user, $project);
     }
 
-    public function getImportAidManualDatas() : array
+    public function getImportAidManualDatas(): array
     {
         $datas = [];
 
@@ -379,11 +387,13 @@ class AppExtension extends AbstractExtension // NOSONAR too much methods
         return $datas;
     }
 
-    public function isDateTime($date): bool {
+    public function isDateTime($date): bool
+    {
         return $date instanceof \DateTime;
     }
 
-    public function orderAidFinancerByBackerName(Collection $aidFinancers) : Collection {
+    public function orderAidFinancerByBackerName(Collection $aidFinancers): Collection
+    {
         $aidFinancers = $aidFinancers->toArray();
 
         usort($aidFinancers, function ($a, $b) {
@@ -395,7 +405,8 @@ class AppExtension extends AbstractExtension // NOSONAR too much methods
         return new ArrayCollection($aidFinancers);
     }
 
-    public function orderAidInstructorByBackerName(Collection $aidInstructors) : Collection {
+    public function orderAidInstructorByBackerName(Collection $aidInstructors): Collection
+    {
         return $this->orderAidFinancerByBackerName($aidInstructors);
     }
 }

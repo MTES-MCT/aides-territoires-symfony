@@ -6,7 +6,7 @@ use App\Controller\FrontController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-#[Route(priority:1)]
+#[Route(priority: 1)]
 class DataController extends FrontController
 {
     #[Route('/data/', name: 'app_static_data')]

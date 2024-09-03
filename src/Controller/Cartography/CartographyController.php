@@ -29,9 +29,8 @@ class CartographyController extends FrontController
         ProgramRepository $programRepository,
         RequestStack $requestStack,
         StringService $stringService
-    ): Response
-    {
-         // les infos départements pour la carte
+    ): Response {
+        // les infos départements pour la carte
         $counties = $perimeterRepository->findCounties();
         $departmentsData = [];
         foreach ($counties as $county) {
@@ -43,7 +42,7 @@ class CartographyController extends FrontController
             ];
         }
 
-         // formulaire choix département
+        // formulaire choix département
         $formCounties = $this->createForm(CountySelectType::class);
         $formCounties->handleRequest($requestStack->getCurrentRequest());
         if ($formCounties->isSubmitted()) {
@@ -63,7 +62,7 @@ class CartographyController extends FrontController
 
         // nb porteur
         $nbBackers = $backerRepository->countWithAids();
-        
+
         // nb programs
         $nbPrograms = $programRepository->countCustom();
 
@@ -83,7 +82,7 @@ class CartographyController extends FrontController
         ]);
     }
 
-    #[Route('/cartographie/{code}-{slug}/porteurs/', name: 'app_cartography_detail', requirements: ['code' => '[0-9A-Za-z]+','slug' => '[a-zA-Z0-9\-_]+'])]
+    #[Route('/cartographie/{code}-{slug}/porteurs/', name: 'app_cartography_detail', requirements: ['code' => '[0-9A-Za-z]+', 'slug' => '[a-zA-Z0-9\-_]+'])]
     public function detail(
         $code,
         $slug,
@@ -95,8 +94,7 @@ class CartographyController extends FrontController
         PerimeterService $perimeterService,
         CategoryRepository $categoryRepository,
         AidService $aidService
-    ): Response
-    {
+    ): Response {
         // departement courant
         $current_dep = $perimeterRepository->findOneBy([
             'code' => $code,
@@ -117,8 +115,9 @@ class CartographyController extends FrontController
             [
                 'action' => $this->generateUrl('app_cartography_detail', ['code' => $current_dep->getCode(), 'slug' => $stringService->getSlug($current_dep->getName())]),
                 'method' => 'GET',
-                'forceDepartement'=>$current_dep
-            ]);
+                'forceDepartement' => $current_dep
+            ]
+        );
         $formBackerSearch->handleRequest($requestStack->getCurrentRequest());
 
         // les porteurs d'aides du département
@@ -206,14 +205,14 @@ class CartographyController extends FrontController
                 unset($backers[$key]);
             }
         }
-        
-         // fil arianne
+
+        // fil arianne
         $this->breadcrumb->add(
             'Cartographie',
             $this->generateUrl('app_cartography_cartography')
         );
         $this->breadcrumb->add(
-            $current_dep->getCode()." ".$current_dep->getName(),
+            $current_dep->getCode() . " " . $current_dep->getName(),
             null
         );
 

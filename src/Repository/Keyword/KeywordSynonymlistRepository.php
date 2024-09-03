@@ -22,7 +22,8 @@ class KeywordSynonymlistRepository extends ServiceEntityRepository
         parent::__construct($registry, KeywordSynonymlist::class);
     }
 
-    public function countCustom(array $params = null) : int {
+    public function countCustom(array $params = null): int
+    {
         $qb = $this->getQueryBuilder($params);
 
         $qb->select('IFNULL(COUNT(ks.id), 0) AS nb');
@@ -48,8 +49,8 @@ class KeywordSynonymlistRepository extends ServiceEntityRepository
         if ($nameLike !== null) {
             $qb
                 ->andWhere('(ks.name LIKE :nameLike OR ks.keywordsList LIKE :nameLike)')
-                ->setParameter('nameLike', '%'.$nameLike.'%')
-                ;
+                ->setParameter('nameLike', '%' . $nameLike . '%')
+            ;
         }
 
         if ($orderBy !== null) {
@@ -59,8 +60,7 @@ class KeywordSynonymlistRepository extends ServiceEntityRepository
 
         if ($limit !== null) {
             $qb
-                ->setMaxResults($limit)
-            ;
+                ->setMaxResults($limit);
         }
 
         return $qb;
@@ -78,7 +78,7 @@ class KeywordSynonymlistRepository extends ServiceEntityRepository
         // on update les ids actuels pour avoir les futurs id de libre
         $qb = $this->createQueryBuilder('u');
         $qb->update(KeywordSynonymlist::class, 'uu');
-        $qb->set('uu.id', 'uu.id + '.$maxOldId)
+        $qb->set('uu.id', 'uu.id + ' . $maxOldId)
             ->andWhere('uu.oldId IS NOT NULL');
         $qb->getQuery()->execute();
 
@@ -86,7 +86,7 @@ class KeywordSynonymlistRepository extends ServiceEntityRepository
         $qb = $this->createQueryBuilder('u');
         $qb->update(KeywordSynonymlist::class, 'uu');
         $qb->set('uu.id', 'uu.oldId')
-        ->andWhere('uu.oldId IS NOT NULL');
+            ->andWhere('uu.oldId IS NOT NULL');
         $qb->getQuery()->execute();
 
         // met à jour l'auto increment
@@ -96,7 +96,7 @@ class KeywordSynonymlistRepository extends ServiceEntityRepository
         $maxId = $resultMax[0]['maxId'] ?? 1;
 
         $table = $this->getEntityManager()->getClassMetadata(KeywordSynonymlist::class)->getTableName();
-        $sql = 'ALTER TABLE '.$table.' AUTO_INCREMENT = '.$maxId;
+        $sql = 'ALTER TABLE ' . $table . ' AUTO_INCREMENT = ' . $maxId;
 
         $conn = $this->getEntityManager()->getConnection();
         $stmt = $conn->prepare($sql);

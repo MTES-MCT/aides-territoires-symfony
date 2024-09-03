@@ -1,27 +1,39 @@
 {% extends 'base.html.twig' %}
 
 {% block stylesheets %}
-    {{ parent() }}
-    {# {{ encore_entry_link_tags('import-scss/page/page-details') }} #}
+	{{ parent() }}
 {% endblock %}
 
-{% block title %}{% if page.metaTitle %}{{ page.metaTitle }}{% else %}{{ page.name }}{% endif %} {{ getParameter('meta_title_end') }}{% endblock %}
+{% block title %}
+	{% if page.metaTitle %}
+		{{ page.metaTitle }}
+	{% else %}
+		{{ page.name }}
+	{% endif %}
+	{{ getParameter('meta_title_end') }}
+{% endblock %}
 
 
-{% block metaDescription %}{% if page.metaDescription %}{{ page.metaDescription }}{% else %}{{ parent() }}{% endif %}{% endblock %}
+{% block metaDescription %}
+	{% if page.metaDescription %}
+		{{ page.metaDescription }}
+	{% else %}
+		{{ parent() }}
+	{% endif %}
+{% endblock %}
 
 
 {% block body %}
-<main role="main" class="fr-container-fluid" id="at-main">
-    <article class="fr-container fr-mb-5w">
-        <div class="fr-grid-row fr-grid-row--center">
-            <div id="page-content" class="fr-col-md-10">
-                <h1>{{ page.name }}</h1>
-                {% if page.description %}
-                {{ optimizeHtmlFromWysiwyg(page.description)|sanitize_html|raw }}
-                {% endif %}
-            </div>
-        </div>
-    </article>
-</main>
+	<main role="main" class="fr-container-fluid" id="at-main">
+		<article class="fr-container fr-mb-5w">
+			<div class="fr-grid-row fr-grid-row--center">
+				<div id="page-content" class="fr-col-md-10">
+					<h1>{{ page.name }}</h1>
+					{% if page.description %}
+						{{ optimizeHtmlFromWysiwyg(page.description)|sanitize_html|raw }}
+					{% endif %}
+				</div>
+			</div>
+		</article>
+	</main>
 {% endblock %}

@@ -16,8 +16,7 @@ class InternalRequestVoter extends Voter
     public function __construct(
         private RequestStack $requestStack,
         private ParamService $paramService
-    )
-    {
+    ) {
         $this->requestStack = $requestStack;
         $this->allowedIps = explode(',', $this->paramService->get('allowed_internal_ips'));
     }
@@ -34,7 +33,7 @@ class InternalRequestVoter extends Voter
         if (!$request) {
             return false;
         }
-        
+
         // Vérification de l'adresse IP du client
         $clientIp = $request->getClientIp();
         return in_array($clientIp, $this->allowedIps, true);

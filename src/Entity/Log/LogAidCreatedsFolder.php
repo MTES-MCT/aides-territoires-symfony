@@ -42,15 +42,15 @@ class LogAidCreatedsFolder
     private ?\DateTimeInterface $dateCreate = null;
 
     #[ORM\ManyToOne(inversedBy: 'logAidCreatedsFolders')]
-    #[ORM\JoinColumn(onDelete:DoctrineConstants::SET_NULL)]
+    #[ORM\JoinColumn(onDelete: DoctrineConstants::SET_NULL)]
     private ?Aid $aid = null;
 
     #[ORM\ManyToOne(inversedBy: 'logAidCreatedsFolders')]
-    #[ORM\JoinColumn(onDelete:DoctrineConstants::SET_NULL)]
+    #[ORM\JoinColumn(onDelete: DoctrineConstants::SET_NULL)]
     private ?Organization $organization = null;
 
     #[ORM\ManyToOne(inversedBy: 'logAidCreatedsFolders')]
-    #[ORM\JoinColumn(onDelete:DoctrineConstants::SET_NULL)]
+    #[ORM\JoinColumn(onDelete: DoctrineConstants::SET_NULL)]
     private ?User $user = null;
 
     public function getId(): ?int

@@ -71,7 +71,7 @@ class ContactType extends AbstractType
             ])
             ->add('structureAndFunction', TextType::class, [
                 'label' => 'Votre structure et fonction :',
-                'required' => true, 
+                'required' => true,
                 'attr' => [
                     'placeholder' => 'Exemple: Mairie de Château-Thierry / Chargé de mission habitat'
                 ],

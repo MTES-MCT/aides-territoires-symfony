@@ -31,8 +31,7 @@ class QrCodeController extends AbstractController
         ManagerRegistry $managerRegistry,
         UserRepository $userRepository,
         UserService $userService
-        ): Response
-    {
+    ): Response {
         /** @var User $user */
         $user = $userRepository->find($idUser);
         if (!$userService->isUserGranted($user, User::ROLE_ADMIN)) {

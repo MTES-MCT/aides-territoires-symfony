@@ -23,15 +23,14 @@ class AidSearchKeywordCommand extends Command
     protected string $commandTextStart = '<Recherche des mots clés référents dans les aides';
     protected string $commandTextEnd = '>Recherche des mots clés référents dans les aides';
 
-    
+
 
     public function __construct(
         private ManagerRegistry $managerRegistry,
         private ReferenceService $referenceService,
         private MessageBusInterface $bus,
-    )
-    {
-        ini_set('max_execution_time', 60*60);
+    ) {
+        ini_set('max_execution_time', 60 * 60);
         ini_set('memory_limit', '1G');
         parent::__construct();
     }
@@ -44,7 +43,7 @@ class AidSearchKeywordCommand extends Command
         $io = new SymfonyStyle($input, $output);
         $io->title($this->commandTextStart);
 
-        try  {
+        try {
             // import des keywords
             $this->sendToQueue($input, $output);
         } catch (\Exception $exception) {
@@ -72,7 +71,7 @@ class AidSearchKeywordCommand extends Command
             ]
         );
         $nbAids = count($aids);
-        
+
         $batchSize = 100;
         $aidsChunks = array_chunk($aids, $batchSize);
 
@@ -87,8 +86,8 @@ class AidSearchKeywordCommand extends Command
         $timeEnd = microtime(true);
         $time = $timeEnd - $timeStart;
 
-        $io->success($nbAids. ' aides envoyées pour analyses');
-        $io->success('Fin : '.gmdate("H:i:s", $timeEnd).' ('.gmdate("H:i:s", intval($time)).')');
+        $io->success($nbAids . ' aides envoyées pour analyses');
+        $io->success('Fin : ' . gmdate("H:i:s", $timeEnd) . ' (' . gmdate("H:i:s", intval($time)) . ')');
         $io->success('Mémoire maximale utilisée : ' . intval(round(memory_get_peak_usage() / 1024 / 1024)) . ' MB');
     }
 }

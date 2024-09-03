@@ -20,8 +20,7 @@ class PerimeterDataController extends ApiController
     public function index(
         PerimeterDataRepository $perimeterDataRepository,
         PerimeterService $perimeterService
-    ): JsonResponse
-    {
+    ): JsonResponse {
         // les filtres
         $params = [];
 

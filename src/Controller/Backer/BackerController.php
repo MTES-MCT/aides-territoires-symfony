@@ -35,8 +35,7 @@ class BackerController extends FrontController
         UserService $userService,
         RequestStack $requestStack,
         BackerService $backerService
-    ): Response
-    {
+    ): Response {
         $user = $userService->getUserLogged();
 
         // charge backer
@@ -45,7 +44,7 @@ class BackerController extends FrontController
                 'id' => $id,
                 'slug' => $slug,
             ]
-            );
+        );
         if (!$backer instanceof Backer) {
             return $this->redirectToRoute('app_home');
         }
@@ -75,26 +74,27 @@ class BackerController extends FrontController
         );
 
         //foreach $backer->getAidsLive()
-        $categories_by_theme=[];$programs_list=[];
-        foreach($backer->getAidsLive() as $aid) {
+        $categories_by_theme = [];
+        $programs_list = [];
+        foreach ($backer->getAidsLive() as $aid) {
 
 
-            foreach($aid->getCategories() as $category){
+            foreach ($aid->getCategories() as $category) {
 
-                if(!isset($categories_by_theme[$category->getCategoryTheme()->getId()])){
+                if (!isset($categories_by_theme[$category->getCategoryTheme()->getId()])) {
                     $categories_by_theme[$category->getCategoryTheme()->getId()] = [
                         'categoryTheme' => $category->getCategoryTheme(),
                         'categories' => new ArrayCollection()
                     ];
                 }
-                if(!$categories_by_theme[$category->getCategoryTheme()->getId()]['categories']->contains($category)) {
+                if (!$categories_by_theme[$category->getCategoryTheme()->getId()]['categories']->contains($category)) {
                     $categories_by_theme[$category->getCategoryTheme()->getId()]['categories']->add($category);
                 }
             }
-            
-            foreach($aid->getPrograms() as $program){
 
-                if(!isset($programs_list[$program->getId()])){
+            foreach ($aid->getPrograms() as $program) {
+
+                if (!isset($programs_list[$program->getId()])) {
                     $programs_list[$program->getId()] = [
                         'program' => $program,
                     ];
@@ -108,7 +108,7 @@ class BackerController extends FrontController
             $backer->getName(),
             null
         );
-        
+
         // rendu template
         return $this->render('backer/backer/details.html.twig', [
             'backer' => $backer,
@@ -123,8 +123,7 @@ class BackerController extends FrontController
     public function ajaxSearch(
         RequestStack $requestStack,
         InternalApiService $internalApiService
-    ): JsonResponse
-    {
+    ): JsonResponse {
         try {
             // verification requête interne
             if (!$this->isGranted(InternalRequestVoter::IDENTIFIER)) {
@@ -153,7 +152,6 @@ class BackerController extends FrontController
                 'success' => 1,
                 'results' => $return
             ]);
-
         } catch (\Exception $e) {
             return new JsonResponse([
                 'success' => 0,

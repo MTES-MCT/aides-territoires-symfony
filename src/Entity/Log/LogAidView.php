@@ -41,18 +41,18 @@ class LogAidView
     private ?\DateTimeInterface $dateCreate = null;
 
     #[ORM\ManyToOne(inversedBy: 'logAidViews')]
-    #[ORM\JoinColumn(onDelete:DoctrineConstants::SET_NULL)]
+    #[ORM\JoinColumn(onDelete: DoctrineConstants::SET_NULL)]
     private ?Aid $aid = null;
 
     #[ORM\ManyToMany(targetEntity: OrganizationType::class, inversedBy: 'logAidViews')]
     private Collection $organizationTypes;
 
     #[ORM\ManyToOne(inversedBy: 'logAidViews')]
-    #[ORM\JoinColumn(onDelete:DoctrineConstants::SET_NULL)]
+    #[ORM\JoinColumn(onDelete: DoctrineConstants::SET_NULL)]
     private ?Organization $organization = null;
 
     #[ORM\ManyToOne(inversedBy: 'logAidViews')]
-    #[ORM\JoinColumn(onDelete:DoctrineConstants::SET_NULL)]
+    #[ORM\JoinColumn(onDelete: DoctrineConstants::SET_NULL)]
     private ?User $user = null;
 
     public function __construct()

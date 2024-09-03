@@ -16,11 +16,10 @@ class BackerController extends DashboardController
     public function backerDashboard(
         BackerRepository $backerRepository,
         ChartBuilderInterface $chartBuilderInterface
-    )
-    {
+    ) {
         // nombre total de porteurs
         $nbBackersTotal = $backerRepository->count([]);
-        
+
         // Les porteurs avec des aides lives
         $backers = $backerRepository->findCustom(
             [
@@ -64,9 +63,9 @@ class BackerController extends DashboardController
         $colors = [];
         foreach ($backers as $key => $backer) {
             $percentage = $total == 0 ? 0 : number_format(($backer->getNbAidsLive() * 100 / $total), 2);
-            $labels[] = $backer->getName() . ' ('.$percentage.'%)';
+            $labels[] = $backer->getName() . ' (' . $percentage . '%)';
             $datas[] = $backer->getNbAidsLive();
-            $colors[] = 'rgb('.rand(0, 255).', '.rand(0, 255).', '.rand(0, 255).')';
+            $colors[] = 'rgb(' . rand(0, 255) . ', ' . rand(0, 255) . ', ' . rand(0, 255) . ')';
         }
 
         $chartBackerAids->setData([
@@ -92,9 +91,9 @@ class BackerController extends DashboardController
                 ],
             ],
         ]);
-        
 
-        
+
+
         return $this->render('admin/statistics/backer/dashboard.html.twig', [
             'chartBackerAids' => $chartBackerAids,
             'percentBackerAidsLive' => $percentBackerAidsLive,

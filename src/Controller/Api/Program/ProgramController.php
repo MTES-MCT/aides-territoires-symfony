@@ -15,8 +15,7 @@ class ProgramController extends ApiController
     #[Route('/api/programs/', name: 'api_programs', priority: 5)]
     public function index(
         ProgramRepository $programRepository
-    ): JsonResponse
-    {
+    ): JsonResponse {
         // les filtres
         $params = [];
 

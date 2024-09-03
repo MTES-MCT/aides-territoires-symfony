@@ -1,30 +1,28 @@
 {% extends "@EasyAdmin/page/content.html.twig" %}
 
 {% block head_stylesheets %}
-    {{ parent() }}
-    {{ encore_entry_link_tags('import-scss/admin/admin') }}
+	{{ parent() }}
+	{{ encore_entry_link_tags('import-scss/admin/admin') }}
 {% endblock head_stylesheets %}
 
 {% block head_javascript %}
-    {{ parent() }}
-    {{ encore_entry_script_tags('admin/admin') }}
-    {{ encore_entry_script_tags('admin/statistics/dashboard') }}
+	{{ parent() }}
+	{{ encore_entry_script_tags('admin/admin') }}
+	{{ encore_entry_script_tags('admin/statistics/dashboard') }}
 {% endblock head_javascript %}
 
 {% block main %}
-<main>
-    <h1 class="title">Statistiques globales</h1>
+	<main>
+		<h1 class="title">Statistiques globales</h1>
 
-    {% include 'admin/statistics/_dashboard_top.html.twig' %}
+		{% include 'admin/statistics/_dashboard_top.html.twig' %}
 
-    {% block date_range_form %}
-    {% endblock date_range_form %}
-    
-    <div class="container mb-5">
-        {% include 'admin/statistics/_dashboard_nav_tabs.html.twig' %}
-        
-        {% block stats_content %}
-        {% endblock stats_content %}
-    </div>
-</main>
+		{% block date_range_form %}{% endblock date_range_form %}
+
+		<div class="container mb-5">
+			{% include 'admin/statistics/_dashboard_nav_tabs.html.twig' %}
+
+			{% block stats_content %}{% endblock stats_content %}
+		</div>
+	</main>
 {% endblock %}

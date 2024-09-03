@@ -31,33 +31,33 @@ class KeywordReferenceSuggestedCrudController extends AtCrudController
         ;
     }
 
-    
+
     public function configureFields(string $pageName): iterable
     {
         yield IdField::new('id')
-        ->onlyOnIndex();
+            ->onlyOnIndex();
 
         yield AssociationField::new('keywordReference')
-        ->formatValue(function ($value) {
-            $keywords = [$value->getName()];
-            foreach ($value->getKeywordReferences() as $keywordReference) {
-                $keywords[] = $keywordReference->getName();
-            }
-            return implode(', ', $keywords);
-        });
-        
+            ->formatValue(function ($value) {
+                $keywords = [$value->getName()];
+                foreach ($value->getKeywordReferences() as $keywordReference) {
+                    $keywords[] = $keywordReference->getName();
+                }
+                return implode(', ', $keywords);
+            });
+
         yield AssociationField::new('aid')
-        ->formatValue(function ($value, $entity) {
-            return sprintf('<a href="%s">%s</a>',
-                $this->adminUrlGenerator
-                    ->setController(AidCrudController::class)
-                    ->setAction('edit')
-                    ->setEntityId($entity->getAid()->getId())
-                    ->generateUrl(),
-                $value
-            );
-        })
-        ;
+            ->formatValue(function ($value, $entity) {
+                return sprintf(
+                    '<a href="%s">%s</a>',
+                    $this->adminUrlGenerator
+                        ->setController(AidCrudController::class)
+                        ->setAction('edit')
+                        ->setEntityId($entity->getAid()->getId())
+                        ->generateUrl(),
+                    $value
+                );
+            });
         yield NumberField::new('occurence');
     }
 
@@ -65,18 +65,18 @@ class KeywordReferenceSuggestedCrudController extends AtCrudController
     {
         // accepter
         $accept = Action::new('accept', 'Accepter', 'far fa-valid')
-        ->linkToCrudAction('accept');
+            ->linkToCrudAction('accept');
 
         return parent::configureActions($actions)
             ->add(Crud::PAGE_INDEX, $accept)
         ;
     }
-    
+
     public function accept(AdminContext $context): RedirectResponse
     {
         /** @var KeywordReferenceSuggested $entity */
         $entity = $context->getEntity()->getInstance();
-        
+
         $entity->getAid()->addKeywordReference($entity->getKeywordReference());
 
         // associe mot clé / aide

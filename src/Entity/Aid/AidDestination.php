@@ -36,7 +36,7 @@ class AidDestination
 
     const SLUG_SUPPLY = 'supply';
     const SLUG_INVESTMENT = 'investment';
-    
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]

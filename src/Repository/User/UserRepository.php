@@ -31,8 +31,7 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
     public function countCustom(?array $params = null)
     {
         $qb = $this->getQueryBuilder($params);
-        $qb->select('COUNT(DISTINCT(u.id))')
-        ;
+        $qb->select('COUNT(DISTINCT(u.id))');
 
         return (int) $qb->getQuery()->getSingleScalarResult();
     }
@@ -43,8 +42,7 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         $params['isContributor'] = false;
 
         $qb = $this->getQueryBuilder($params);
-        $qb->select('COUNT(DISTINCT(u.id))')
-        ;
+        $qb->select('COUNT(DISTINCT(u.id))');
 
         return (int) $qb->getQuery()->getSingleScalarResult();
     }
@@ -55,8 +53,7 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         $params['isContributor'] = true;
 
         $qb = $this->getQueryBuilder($params);
-        $qb->select('COUNT(DISTINCT(u.id))')
-        ;
+        $qb->select('COUNT(DISTINCT(u.id))');
 
         return (int) $qb->getQuery()->getSingleScalarResult();
     }
@@ -65,7 +62,7 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
     {
         $qb = $this->getQueryBuilder($params);
         $qb->select('COUNT(DISTINCT(u.id))')
-        ->innerJoin('u.aids', 'aids');
+            ->innerJoin('u.aids', 'aids');
 
         return (int) $qb->getQuery()->getSingleScalarResult();
     }
@@ -74,7 +71,7 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
     {
         $qb = $this->getQueryBuilder($params);
         $qb->select('COUNT(DISTINCT(u.id))')
-        ->innerJoin('u.projects', 'projects');
+            ->innerJoin('u.projects', 'projects');
 
         return (int) $qb->getQuery()->getSingleScalarResult();
     }
@@ -101,8 +98,8 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
             'dateCreateMin' => $dateMin,
             'dateCreateMax' => $dateMax
         ])
-        ->select('DATE_FORMAT(u.dateCreate, \'%Y-%u\') AS week, IFNULL(COUNT(DISTINCT(u.id)), 0) AS nb')
-        ->groupBy('week');
+            ->select('DATE_FORMAT(u.dateCreate, \'%Y-%u\') AS week, IFNULL(COUNT(DISTINCT(u.id)), 0) AS nb')
+            ->groupBy('week');
 
         return $qb->getQuery()->getResult();
     }
@@ -173,20 +170,20 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
             $qb
                 ->andWhere('u.email = :email')
                 ->setParameter('email', $email)
-                ;
+            ;
         }
-        
+
         if ($organizationHasProject) {
             $qb
                 ->innerJoin('u.organizations', 'organizationForProject')
                 ->innerJoin('organizationForProject.projects', 'project')
-                ;
+            ;
         }
         if ($organizationHasAid) {
             $qb
                 ->innerJoin('u.organizations', 'organizationForAid')
                 ->innerJoin('organizationForAid.aids', 'aid')
-                ;
+            ;
         }
         if ($organizationIsCommune) {
             $qb
@@ -222,30 +219,30 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
 
         if ($onlyAdmin === true) {
             $qb
-            ->andWhere('u.roles LIKE :roleAdmin')
-            ->setParameter('roleAdmin', '%'.User::ROLE_ADMIN.'%')
+                ->andWhere('u.roles LIKE :roleAdmin')
+                ->setParameter('roleAdmin', '%' . User::ROLE_ADMIN . '%')
             ;
         }
 
         if ($dateCreateMin instanceof \DateTime) {
             $qb
-            ->andWhere('u.dateCreate >= :dateCreateMin')
-            ->setParameter('dateCreateMin', $dateCreateMin)
+                ->andWhere('u.dateCreate >= :dateCreateMin')
+                ->setParameter('dateCreateMin', $dateCreateMin)
             ;
         }
 
 
         if ($dateCreateMax instanceof \DateTime) {
             $qb
-            ->andWhere('u.dateCreate <= :dateCreateMax')
-            ->setParameter('dateCreateMax', $dateCreateMax)
+                ->andWhere('u.dateCreate <= :dateCreateMax')
+                ->setParameter('dateCreateMax', $dateCreateMax)
             ;
         }
 
         if ($connectedSinceYesterday == true) {
             $date = new \DateTime();
             $date->sub(new \DateInterval('P1D')); // Subtract 1 day from the current date
-        
+
             $qb
                 ->andWhere('u.dateLastLogin IS NOT NULL')
                 ->andWhere('u.dateLastLogin >= :yesterday')
@@ -270,10 +267,9 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
 
         if ($orderBy !== null) {
             $qb
-                ->addOrderBy($orderBy['sort'], $orderBy['order'])
-            ;
+                ->addOrderBy($orderBy['sort'], $orderBy['order']);
         }
-        
+
         return $qb;
     }
 

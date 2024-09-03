@@ -1,14 +1,14 @@
 <div id="statistiques" class="mt-5 mb-5 d-flex flex-row justify-content-center align-items-center">
-    <h2 class="me-3">Statistiques sur une période :</h2>
-    {{ form_start(formDateRange, {'attr': {'class': 'd-flex'}}) }}
-    <div class="d-flex me-3">
-    {{ form_row(formDateRange.dateMin) }}
-    </div>
-    <div class="d-flex me-3">
-    {{ form_row(formDateRange.dateMax) }}
-    </div>
-    <div class="d-flex me-3">
-    <button type="submit" class="btn btn-primary">Valider</button>
-    </div>
-    {{ form_end(formDateRange) }}
+	<h2 class="me-3">Statistiques sur une période :</h2>
+	{{ form_start(formDateRange, {'attr': {'class': 'd-flex'}}) }}
+	<div class="d-flex me-3">
+		{{ form_row(formDateRange.dateMin) }}
+	</div>
+	<div class="d-flex me-3">
+		{{ form_row(formDateRange.dateMax) }}
+	</div>
+	<div class="d-flex me-3">
+		<button type="submit" class="btn btn-primary">Valider</button>
+	</div>
+	{{ form_end(formDateRange) }}
 </div>

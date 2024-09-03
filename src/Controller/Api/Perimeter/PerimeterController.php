@@ -17,8 +17,7 @@ class PerimeterController extends ApiController
     public function index(
         PerimeterRepository $perimeterRepository,
         PerimeterService $perimeterService
-    ): JsonResponse
-    {
+    ): JsonResponse {
         $query = parse_url($this->requestStack->getCurrentRequest()->getRequestUri(), PHP_URL_QUERY) ?? null;
         $queryItems = explode('&', $query);
         $queryParams = [];
@@ -96,7 +95,7 @@ class PerimeterController extends ApiController
         /** @var Perimeter $result */
         foreach ($results as $result) {
             $resultsSpe[] = [
-                'id' => $result->getId().'-'.$this->stringService->getSlug($result->getName()),
+                'id' => $result->getId() . '-' . $this->stringService->getSlug($result->getName()),
                 'text' => $perimeterService->getSmartName($result),
                 'name' => $result->getName(),
                 'scale' => $perimeterService->getScale($result->getScale())['name'] ?? null,
@@ -121,9 +120,7 @@ class PerimeterController extends ApiController
     }
 
     #[Route('/api/perimeters/scales/', name: 'api_perimeters_scales', priority: 5)]
-    public function scales(
-
-    ): JsonResponse
+    public function scales(): JsonResponse
     {
         // tableau des échelles
         $scales = [];
@@ -159,8 +156,7 @@ class PerimeterController extends ApiController
         string $id,
         PerimeterRepository $perimeterRepository,
         PerimeterService $perimeterService
-    ): JsonResponse
-    {
+    ): JsonResponse {
         $perimeter = $perimeterRepository->find((int) $id);
         if (!$perimeter instanceof Perimeter) {
             return new JsonResponse([
@@ -173,7 +169,7 @@ class PerimeterController extends ApiController
 
         // spécifique
         $data = [
-            'id' => $perimeter->getId().'-'.$this->stringService->getSlug($perimeter->getName()),
+            'id' => $perimeter->getId() . '-' . $this->stringService->getSlug($perimeter->getName()),
             'text' => $perimeterService->getSmartName($perimeter),
             'name' => $perimeter->getName(),
             'scale' => $perimeterService->getScale($perimeter->getScale())['name'] ?? null,

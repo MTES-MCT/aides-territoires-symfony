@@ -32,14 +32,10 @@ final class RouteListener
         private ParamService $paramService,
         private Packages $packages,
         private NotificationService $notificationService
-    )
-    {
-        
-    }
+    ) {}
     public function onKernelRequest(
         RequestEvent $event
-    ): void
-    {
+    ): void {
         // Si ce n'est pas la requête principale, ne fait rien
         if (!$event->isMainRequest()) {
             return;
@@ -90,7 +86,7 @@ final class RouteListener
                     $context = $this->routerInterface->getContext();
                     $context->setHost($host);
                     $context->setScheme('https');
-                    
+
                     $url = $this->routerInterface->generate('app_program_details', ['slug' => $program->getSlug()], UrlGeneratorInterface::ABSOLUTE_URL);
                     $response = new RedirectResponse($url);
                     $event->setResponse($response);
@@ -102,7 +98,7 @@ final class RouteListener
                 $context = $this->routerInterface->getContext();
                 $context->setHost($host);
                 $context->setScheme('https');
-                
+
                 $url = $this->routerInterface->generate('app_home', [], UrlGeneratorInterface::ABSOLUTE_URL);
                 $response = new RedirectResponse($url);
                 $event->setResponse($response);
@@ -130,7 +126,7 @@ final class RouteListener
                     return;
                 } catch (\Exception $e) {
                     $admin = $this->entityManagerInterface->getRepository(User::class)->findOneBy(['email' => $this->paramService->get('email_super_admin')]);
-                    $this->notificationService->addNotification($admin, 'Erreur redirection portail', 'Portail : '.$searchPage->getName());
+                    $this->notificationService->addNotification($admin, 'Erreur redirection portail', 'Portail : ' . $searchPage->getName());
                 }
             } else {
                 if ($host != $this->paramService->get('prod_host')) {
@@ -177,7 +173,7 @@ final class RouteListener
                 return;
             } catch (\Exception $e) {
                 $admin = $this->entityManagerInterface->getRepository(User::class)->findOneBy(['email' => $this->paramService->get('email_super_admin')]);
-                $this->notificationService->addNotification($admin, 'Erreur redirection url', 'Url : '.$url);
+                $this->notificationService->addNotification($admin, 'Erreur redirection url', 'Url : ' . $url);
             }
         }
     }
@@ -186,7 +182,7 @@ final class RouteListener
     {
         // url demandée
         $url = urldecode($event->getRequest()->getRequestUri()) ?? null;
-        
+
         $page = $this->pageRepository->findOneBy(
             [
                 'url' => $url,
@@ -204,7 +200,7 @@ final class RouteListener
                 );
             } catch (\Exception $e) {
                 $admin = $this->entityManagerInterface->getRepository(User::class)->findOneBy(['email' => $this->paramService->get('email_super_admin')]);
-                $this->notificationService->addNotification($admin, 'Erreur redirection page', 'Page : '.$url);
+                $this->notificationService->addNotification($admin, 'Erreur redirection page', 'Page : ' . $url);
             }
         }
     }
@@ -244,7 +240,7 @@ final class RouteListener
                 return;
             } catch (\Exception $e) {
                 $admin = $this->entityManagerInterface->getRepository(User::class)->findOneBy(['email' => $this->paramService->get('email_super_admin')]);
-                $this->notificationService->addNotification($admin, 'Erreur redirection static django', 'Url : '.$url);
+                $this->notificationService->addNotification($admin, 'Erreur redirection static django', 'Url : ' . $url);
             }
         }
     }

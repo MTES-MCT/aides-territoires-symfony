@@ -22,10 +22,10 @@ class LogUserLoginCrudController extends AtCrudController
     {
         yield IdField::new('id')->onlyOnIndex();
         yield TextField::new('user', 'Utilisateur')
-        ->setFormTypeOption('choice_label', 'email')
-        ->setFormTypeOption('attr', ['readonly' => true]);
+            ->setFormTypeOption('choice_label', 'email')
+            ->setFormTypeOption('attr', ['readonly' => true]);
         yield DateTimeField::new('timeCreate', 'Date création')
-        ->setFormTypeOption('attr', ['readonly' => true]);
+            ->setFormTypeOption('attr', ['readonly' => true]);
     }
 
     public function configureActions(Actions $actions): Actions

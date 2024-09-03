@@ -48,7 +48,7 @@ class OrganizationController extends FrontController
         PerimeterRepository $perimeterRepository,
         PerimeterDataRepository $perimeterDataRepository,
         ?int $id = null
-    ) : Response {
+    ): Response {
         // le user        
         $user = $userService->getUserLogged();
 
@@ -82,7 +82,7 @@ class OrganizationController extends FrontController
             if ($form->isValid()) {
                 // essaye de déterminer le departement
                 if ($organization->getPerimeter() && $organization->getPerimeter()->getDepartments()) {
-                    $departementsCode = $organization->getPerimeter()->getDepartments() ;
+                    $departementsCode = $organization->getPerimeter()->getDepartments();
                     $departementCode = $departementsCode[0] ?? null;
                     if ($departementCode) {
                         $departement = $perimeterRepository->findOneBy([
@@ -116,15 +116,15 @@ class OrganizationController extends FrontController
                 }
 
                 // sauvegarde
-                $managerRegistry->getManager()->persist($organization); 
+                $managerRegistry->getManager()->persist($organization);
                 $managerRegistry->getManager()->flush();
-    
+
                 // message retour
                 $this->addFlash(
                     FrontController::FLASH_SUCCESS,
                     'Vos modifications ont été enregistrées avec succès.'
                 );
-    
+
                 // redirection
                 return $this->redirectToRoute('app_organization_structure_information', ['id' => $organization->getId()]);
             } else {
@@ -136,7 +136,7 @@ class OrganizationController extends FrontController
         }
 
         // fil arianne
-        $this->breadcrumb->add('Mon compte',$this->generateUrl('app_user_dashboard'));
+        $this->breadcrumb->add('Mon compte', $this->generateUrl('app_user_dashboard'));
         $this->breadcrumb->add($organization->getId() ? $organization->getName() : 'Nouvelle structure');
 
         // rendu template
@@ -149,13 +149,12 @@ class OrganizationController extends FrontController
     #[Route('/comptes/structure/donnees-cles/', name: 'app_organization_donnees_cles')]
     public function donneesCles(
         RequestStack $requestStack
-    ): Response
-    {
+    ): Response {
         // page obsolète
         return $this->redirectToRoute('app_user_dashboard');
 
-        $this->breadcrumb->add('Mon compte',$this->generateUrl('app_user_dashboard'));
-        $this->breadcrumb->add('Ma structure',$this->generateUrl('app_organization_structure_information'));
+        $this->breadcrumb->add('Mon compte', $this->generateUrl('app_user_dashboard'));
+        $this->breadcrumb->add('Ma structure', $this->generateUrl('app_organization_structure_information'));
         $this->breadcrumb->add('Données clés');
 
         $formOrganizationChoice = $this->createForm(OrganizationChoiceType::class);
@@ -179,8 +178,7 @@ class OrganizationController extends FrontController
         ManagerRegistry $managerRegistry,
         RequestStack $requestStack,
         OrganizationService $organizationService
-    ): Response
-    {
+    ): Response {
         // le user
         $user = $userService->getUserLogged();
         // la structure
@@ -198,7 +196,7 @@ class OrganizationController extends FrontController
         $formOrganizationDatas->handleRequest($requestStack->getCurrentRequest());
         if ($formOrganizationDatas->isSubmitted()) {
             if ($formOrganizationDatas->isValid()) {
-                $managerRegistry->getManager()->persist($organization); 
+                $managerRegistry->getManager()->persist($organization);
                 $managerRegistry->getManager()->flush();
                 $this->addFlash(FrontController::FLASH_SUCCESS, 'Vos modifications ont été enregistrées avec succès.');
                 return $this->redirectToRoute('app_organization_donnees_cles_details', ['id' => $organization->getId()]);
@@ -208,8 +206,8 @@ class OrganizationController extends FrontController
         }
 
         // fil d'arianne
-        $this->breadcrumb->add('Mon compte',$this->generateUrl('app_user_dashboard'));
-        $this->breadcrumb->add('Ma structure',$this->generateUrl('app_organization_structure_information'));
+        $this->breadcrumb->add('Mon compte', $this->generateUrl('app_user_dashboard'));
+        $this->breadcrumb->add('Ma structure', $this->generateUrl('app_organization_structure_information'));
         $this->breadcrumb->add('Données clés');
 
         // rendu template
@@ -222,15 +220,14 @@ class OrganizationController extends FrontController
     #[Route('/comptes/structure/collaborateurs/{id}', name: 'app_organization_collaborateurs', requirements: ['id' => '[0-9]+'])]
     public function collaborateurs(
         $id,
-        UserService $userService, 
-        ManagerRegistry $managerRegistry, 
+        UserService $userService,
+        ManagerRegistry $managerRegistry,
         RequestStack $requestStack,
         EmailService $emailService,
         OrganizationInvitationRepository $organizationInvitationRepository,
         OrganizationRepository $organizationRepository,
         OrganizationService $organizationService
-        ): Response
-    {
+    ): Response {
         $user = $userService->getUserLogged();
         $organization = $organizationRepository->find($id);
 
@@ -268,7 +265,7 @@ class OrganizationController extends FrontController
                 }
 
                 // verifie que la personne ne fait pas déjà partie de l'organization
-                if ($organization->getBeneficiairies()->filter(function($beneficiary) use ($organizationInvitation) {
+                if ($organization->getBeneficiairies()->filter(function ($beneficiary) use ($organizationInvitation) {
                     return $beneficiary->getEmail() === $organizationInvitation->getEmail();
                 })->count()) {
                     $this->addFlash(
@@ -326,17 +323,17 @@ class OrganizationController extends FrontController
                 $excludable = false;
                 $status = '';
                 if ($userInvitation && $userInvitation->getTimeExclude()) {
-                    $status = 'Exclu le '.$userInvitation->getTimeExclude()->format('d/m/Y');
+                    $status = 'Exclu le ' . $userInvitation->getTimeExclude()->format('d/m/Y');
                 } elseif ($userInvitation && $userInvitation->getTimeAccept()) {
-                    $status = 'Accepté le '.$userInvitation->getTimeAccept()->format('d/m/Y');
+                    $status = 'Accepté le ' . $userInvitation->getTimeAccept()->format('d/m/Y');
                     if ($userInvitation->getGuest() !== $user) {
                         $excludable = true;
                     }
                 } elseif ($userInvitation && $userInvitation->getTimeRefuse()) {
-                    $status = 'Refusé le '.$userInvitation->getTimeRefuse()->format('d/m/Y');
+                    $status = 'Refusé le ' . $userInvitation->getTimeRefuse()->format('d/m/Y');
                 }
                 $collaborators[] = [
-                    'name' => $beneficiary->getFirstname().' '.$beneficiary->getLastname(),
+                    'name' => $beneficiary->getFirstname() . ' ' . $beneficiary->getLastname(),
                     'email' => $beneficiary->getEmail(),
                     'role' => $beneficiary->getBeneficiaryRole() ?? '',
                     'dateInvite' => ($userInvitation && $userInvitation->getDateCreate()) ? $userInvitation->getDateCreate()->format('d/m/Y') : '',
@@ -362,18 +359,18 @@ class OrganizationController extends FrontController
             $status = '';
             if ($organizationInvitation->getGuest()) {
                 if ($organizationInvitation && $organizationInvitation->getTimeExclude()) {
-                    $status = 'Exclu le '.$organizationInvitation->getTimeExclude()->format('d/m/Y');
+                    $status = 'Exclu le ' . $organizationInvitation->getTimeExclude()->format('d/m/Y');
                 } elseif ($organizationInvitation && $organizationInvitation->getTimeAccept()) {
-                    $status = 'Accepté le '.$organizationInvitation->getTimeAccept()->format('d/m/Y');
+                    $status = 'Accepté le ' . $organizationInvitation->getTimeAccept()->format('d/m/Y');
                     $excludable = true;
                 } elseif ($organizationInvitation && $organizationInvitation->getTimeRefuse()) {
-                    $status = 'Refusé le '.$organizationInvitation->getTimeRefuse()->format('d/m/Y');
+                    $status = 'Refusé le ' . $organizationInvitation->getTimeRefuse()->format('d/m/Y');
                 }
             } else {
                 $status = 'En attente';
             }
             $collaborators[] = [
-                'name' => $organizationInvitation->getFirstname().' '.$organizationInvitation->getLastname(),
+                'name' => $organizationInvitation->getFirstname() . ' ' . $organizationInvitation->getLastname(),
                 'email' => $organizationInvitation->getEmail(),
                 'role' => '',
                 'dateInvite' => ($organizationInvitation->getDateCreate()) ? $organizationInvitation->getDateCreate()->format('d/m/Y') : '',
@@ -384,10 +381,10 @@ class OrganizationController extends FrontController
         }
 
         // fil arianne
-        $this->breadcrumb->add('Mon compte',$this->generateUrl('app_user_dashboard'));
-        $this->breadcrumb->add('Ma structure',$this->generateUrl('app_organization_structure_information'));
+        $this->breadcrumb->add('Mon compte', $this->generateUrl('app_user_dashboard'));
+        $this->breadcrumb->add('Ma structure', $this->generateUrl('app_organization_structure_information'));
         $this->breadcrumb->add('Collaborateurs');
-        
+
         // rendu template
         return $this->render('organization/organization/collaborateurs.html.twig', [
             'formInvitation' => $formInvitation,
@@ -401,8 +398,7 @@ class OrganizationController extends FrontController
     public function invitations(
         UserService $userService,
         OrganizationInvitationRepository $organizationInvitationRepository
-    ): Response
-    {
+    ): Response {
         $user = $userService->getUserLogged();
 
         $organizationInvitations = $organizationInvitationRepository->findBy([
@@ -413,7 +409,7 @@ class OrganizationController extends FrontController
             'organizationInvitations' => $organizationInvitations
         ]);
     }
-    
+
     #[Route('/comptes/structure/invitations/{id}/accepter/', name: 'app_organization_invitations_accept')]
     public function acceptInvitation(
         $id,
@@ -421,8 +417,7 @@ class OrganizationController extends FrontController
         OrganizationInvitationRepository $organizationInvitationRepository,
         ManagerRegistry $managerRegistry,
         NotificationService $notificationService
-    ): Response
-    {
+    ): Response {
         $user = $userService->getUserLogged();
 
         $organizationInvitation = $organizationInvitationRepository->find($id);
@@ -434,7 +429,7 @@ class OrganizationController extends FrontController
         $organization = $organizationInvitation->getOrganization();
         $organization->addBeneficiairy($user);
         $managerRegistry->getManager()->persist($organization);
-        
+
         // met à jour l'invitation
         $organizationInvitation->setGuest($user);
         $organizationInvitation->setDateAccept(new \DateTime());
@@ -445,8 +440,8 @@ class OrganizationController extends FrontController
         // ajout notification au créateur de l'invitation
         $message = '
         <p>
-            '.$user->getFirstname().' '.$user->getLastname().' a accepté votre invitation et vient de
-            rejoindre votre structure '.$organization->getName().'.
+            ' . $user->getFirstname() . ' ' . $user->getLastname() . ' a accepté votre invitation et vient de
+            rejoindre votre structure ' . $organization->getName() . '.
         </p>
         ';
         $notificationService->addNotification($organizationInvitation->getAuthor(), 'Votre invitation a été acceptée', $message);
@@ -460,8 +455,8 @@ class OrganizationController extends FrontController
 
             $message = '
             <p>
-            '.$user->getFirstname().' '.$user->getLastname().' a accepté l’invitation de '.$organizationInvitation->getAuthor()->getFirstname().' '.$organizationInvitation->getAuthor()->getLastname().'
-            et vient de rejoindre votre structure '.$organization->getName().'.
+            ' . $user->getFirstname() . ' ' . $user->getLastname() . ' a accepté l’invitation de ' . $organizationInvitation->getAuthor()->getFirstname() . ' ' . $organizationInvitation->getAuthor()->getLastname() . '
+            et vient de rejoindre votre structure ' . $organization->getName() . '.
             </p>
             ';
             $notificationService->addNotification($beneficiary, 'Une invitation a été acceptée', $message);
@@ -482,8 +477,7 @@ class OrganizationController extends FrontController
         OrganizationInvitationRepository $organizationInvitationRepository,
         ManagerRegistry $managerRegistry,
         NotificationService $notificationService
-    ): Response
-    {
+    ): Response {
         $user = $userService->getUserLogged();
 
         $organizationInvitation = $organizationInvitationRepository->find($id);
@@ -500,7 +494,7 @@ class OrganizationController extends FrontController
         // ajout notification au créateur de l'invitation
         $message = '
         <p>
-            '.$user->getFirstname().' '.$user->getLastname().' a refusé votre invitation.
+            ' . $user->getFirstname() . ' ' . $user->getLastname() . ' a refusé votre invitation.
         </p>
         ';
         $notificationService->addNotification($organizationInvitation->getAuthor(), 'Votre invitation a été refusée', $message);
@@ -522,8 +516,7 @@ class OrganizationController extends FrontController
         OrganizationInvitationRepository $organizationInvitationRepository,
         ManagerRegistry $managerRegistry,
         NotificationService $notificationService
-    ): Response
-    {
+    ): Response {
         $user = $userService->getUserLogged();
 
         // on vérifie que c'est bien l'auteur
@@ -536,18 +529,18 @@ class OrganizationController extends FrontController
         $organizationName = $organizationInvitation->getOrganization() ? $organizationInvitation->getOrganization()->getName() : 'une structure';
         $message = '
         <p>
-            '.$user->getFirstname().' '.$user->getLastname().' vous à exclu de l\'organization '.$organizationName.'.
+            ' . $user->getFirstname() . ' ' . $user->getLastname() . ' vous à exclu de l\'organization ' . $organizationName . '.
         </p>
         ';
 
         if ($organizationInvitation->getGuest()) {
-            $notificationService->addNotification($organizationInvitation->getGuest(), 'Vous avez été exclu de '.$organizationName, $message);
+            $notificationService->addNotification($organizationInvitation->getGuest(), 'Vous avez été exclu de ' . $organizationName, $message);
         }
-        
+
         // message
         $this->addFlash(
             FrontController::FLASH_SUCCESS,
-            'Vous avez exclu '.$organizationInvitation->getFirstname().' '.$organizationInvitation->getLastname().' de l\'organization.'
+            'Vous avez exclu ' . $organizationInvitation->getFirstname() . ' ' . $organizationInvitation->getLastname() . ' de l\'organization.'
         );
 
         // retire l'organization à l'utilisateur
@@ -558,7 +551,7 @@ class OrganizationController extends FrontController
         $organizationInvitation->setTimeExclude(new \DateTime());
         $organizationInvitation->setGuest(null);
         $managerRegistry->getManager()->persist($organizationInvitation);
-        
+
         // sauvegarde
         $managerRegistry->getManager()->flush();
 
@@ -579,14 +572,13 @@ class OrganizationController extends FrontController
         OrganizationService $organizationService,
         NotificationService $notificationService,
         BackerService $backerService
-    )
-    {
+    ) {
         // le user
         $user = $userService->getUserLogged();
 
         // l'organization
         $organization = $organizationRepository->find($id);
-        
+
         if (!$organizationService->canEdit($user, $organization)) {
             $this->addFlash(FrontController::FLASH_ERROR, 'Vous n\'avez pas les droits pour éditer cette fiche porteur d\'aide.');
             return $this->redirectToRoute('app_user_dashboard');
@@ -638,7 +630,7 @@ class OrganizationController extends FrontController
             }
         }
 
-    
+
         // formulaire edition porteur
         $form = $this->createForm(BackerEditType::class, $backer);
         if (!$backer->getId() && $organization) {
@@ -653,7 +645,7 @@ class OrganizationController extends FrontController
                 // traitement image
                 $logoFile = $form->get('logoFile')->getData();
                 if ($logoFile instanceof UploadedFile) {
-                    $backer->setLogo(Backer::FOLDER.'/'.$imageService->getSafeFileName($logoFile->getClientOriginalName()));
+                    $backer->setLogo(Backer::FOLDER . '/' . $imageService->getSafeFileName($logoFile->getClientOriginalName()));
                     $backer->setLogoFile(null);
                     $imageService->sendUploadedImageToCloud($logoFile, Backer::FOLDER, $backer->getLogo());
                 }
@@ -664,7 +656,7 @@ class OrganizationController extends FrontController
                 $organization->setBacker($backer);
                 $managerRegistry->getManager()->persist($organization);
 
-                 // sauvegarde
+                // sauvegarde
                 $managerRegistry->getManager()->flush();
 
                 // on envoi une notification à tous les membres de l'organization pour les prévenir de l'update
@@ -673,17 +665,17 @@ class OrganizationController extends FrontController
                         if (isset($create)) {
                             $notificationService->addNotification(
                                 $beneficiary,
-                                'La fiche du porteur d\'aide '.$backer->getName().' à été créee',
+                                'La fiche du porteur d\'aide ' . $backer->getName() . ' à été créee',
                                 '<p>
-                                '.$user->getFirstname().' '.$user->getLastname().' de la structure '.$organization->getName(). ' a créé la fiche du porteur d\'aide '.$backer->getName().'.
+                                ' . $user->getFirstname() . ' ' . $user->getLastname() . ' de la structure ' . $organization->getName() . ' a créé la fiche du porteur d\'aide ' . $backer->getName() . '.
                                 </p>'
                             );
                         } else {
                             $notificationService->addNotification(
                                 $beneficiary,
-                                'La fiche du porteur d\'aide '.$backer->getName().' à été modifiée',
+                                'La fiche du porteur d\'aide ' . $backer->getName() . ' à été modifiée',
                                 '<p>
-                                '.$user->getFirstname().' '.$user->getLastname().' de la structure '.$organization->getName(). ' a mis à jour la fiche du porteur d\'aide '.$backer->getName().'.
+                                ' . $user->getFirstname() . ' ' . $user->getLastname() . ' de la structure ' . $organization->getName() . ' a mis à jour la fiche du porteur d\'aide ' . $backer->getName() . '.
                                 </p>'
                             );
                         }
@@ -704,7 +696,7 @@ class OrganizationController extends FrontController
                 } else {
                     $this->addFlash(FrontController::FLASH_SUCCESS, 'La fiche porteur d\'aide a bien été modifiée.');
                 }
-                
+
 
                 // redirection
                 return $this->redirectToRoute('app_organization_backer_edit', ['id' => $organization->getId(), 'idBacker' => $backer->getId()]);
@@ -740,14 +732,13 @@ class OrganizationController extends FrontController
         BackerRepository $backerRepository,
         BackerService $backerService,
         UserService $userService
-    ) : JsonResponse
-    {
+    ): JsonResponse {
         try {
             // verification requête interne
             if (!$this->isGranted(InternalRequestVoter::IDENTIFIER)) {
                 throw $this->createAccessDeniedException(InternalRequestVoter::MESSAGE_ERROR);
             }
-            
+
             // recupere id
             $id = (int) $requestStack->getCurrentRequest()->get('id', 0);
             if (!$id) {
@@ -777,7 +768,7 @@ class OrganizationController extends FrontController
             if ($isLockedByAnother) {
                 throw new \Exception('Fiche déjà bloquée');
             }
-            
+
             // la débloque
             $backerService->lock($backer, $user);
 
@@ -801,8 +792,7 @@ class OrganizationController extends FrontController
         OrganizationService $organizationService,
         UserService $userService,
         BackerService $backerService
-    ): Response
-    {
+    ): Response {
         try {
             // le user
             $user = $userService->getUserLogged();
@@ -851,8 +841,7 @@ class OrganizationController extends FrontController
         BackerRepository $backerRepository,
         BackerService $backerService,
         UserService $userService
-    ) : JsonResponse
-    {
+    ): JsonResponse {
         try {
             // verification requête interne
             if (!$this->isGranted(InternalRequestVoter::IDENTIFIER)) {

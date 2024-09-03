@@ -30,21 +30,21 @@ class BackerAskAssociateCrudController extends AtCrudController
     {
         yield IdField::new('id')->onlyOnIndex();
         yield TextareaField::new('description', 'Description')
-        ->formatValue(function ($value) {
-            return html_entity_decode($value);
-        });
+            ->formatValue(function ($value) {
+                return html_entity_decode($value);
+            });
         yield AssociationField::new('organization', 'Structure')
-        ->autocomplete(true);
+            ->autocomplete(true);
         yield AssociationField::new('backer', 'Porteur d\'aide')
-        ->autocomplete(true);
+            ->autocomplete(true);
         yield AssociationField::new('user', 'Utilisateur')
-        ->autocomplete(true);
+            ->autocomplete(true);
         yield DateTimeField::new('timeCreate', 'Date de création');
         yield BooleanField::new('accepted', 'Est accepté');
         yield BooleanField::new('refused', 'Est refusé');
         yield TextareaField::new('refusedDescription', 'Motif du refus')
-        ->formatValue(function ($value) {
-            return html_entity_decode($value);
-        });
+            ->formatValue(function ($value) {
+                return html_entity_decode($value);
+            });
     }
 }

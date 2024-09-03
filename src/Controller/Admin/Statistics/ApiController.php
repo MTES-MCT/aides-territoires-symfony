@@ -20,7 +20,7 @@ class ApiController extends AbstractController
         LogAidSearchRepository $logAidSearchRepository,
         LogAidViewRepository $logAidViewRepository,
         ChartBuilderInterface $chartBuilderInterface
-    ) : Response {
+    ): Response {
         // dates par défaut
         $dateMin = new \DateTime('-1 week');
         $dateMax = new \DateTime();
@@ -59,7 +59,7 @@ class ApiController extends AbstractController
             ];
             $date->modify('+1 day');
         }
-        
+
         // les logs de recherche d'aides
         $logAidSearchs = $logAidSearchRepository->countApiByDay([
             'dateCreateMin' => $dateMin,
@@ -81,7 +81,7 @@ class ApiController extends AbstractController
             $days[$logAidView['dateDay']]['types']['logAidViews']['total'] += $logAidView['nb'];
         }
 
-        
+
         // graphique utilisation totale, jour par jour, stacked sur type utilisation
         $labels = [];
         $datasets = [];
@@ -170,7 +170,7 @@ class ApiController extends AbstractController
 
         foreach ($dataByOrganization as $dataOrganization) {
             $labels[] = $dataOrganization['organizationName'];
-            $backgroundColors[] = 'rgb('.rand(0, 255).', '.rand(0, 255).', '.rand(0, 255).')';
+            $backgroundColors[] = 'rgb(' . rand(0, 255) . ', ' . rand(0, 255) . ', ' . rand(0, 255) . ')';
             $datas[] = $dataOrganization['total'];
         }
 

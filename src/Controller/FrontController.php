@@ -10,18 +10,16 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
-#[Route(priority:1)]
+#[Route(priority: 1)]
 class FrontController extends AbstractController
 {
     const FLASH_SUCCESS = 'success';
     const FLASH_ERROR = 'error';
-    
+
     public function __construct(
         public Breadcrumb $breadcrumb,
         public TranslatorInterface $translatorInterface
-    ) {
-        
-    }
+    ) {}
 
     /**
      * Pour les addFlash traduits

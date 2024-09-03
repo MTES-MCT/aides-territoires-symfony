@@ -15,18 +15,17 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\String\Slugger\SluggerInterface;
 
-class ImageUploadController extends FrontController {
+class ImageUploadController extends FrontController
+{
     #[Route('/upload-image', name: 'app_upload_image', options: ['expose' => true])]
-    public function index
-    (
+    public function index(
         SluggerInterface $slugger,
         FileService $fileService,
         ImageService $imageService,
         ParamService $paramService,
         RequestStack $requestStack
-    ): Response
-    {
-        
+    ): Response {
+
         try {
             // verification requete interne
             $request = $requestStack->getCurrentRequest();
@@ -52,7 +51,7 @@ class ImageUploadController extends FrontController {
                 $originalFilename = pathinfo($image->getClientOriginalName(), PATHINFO_FILENAME);
                 // this is needed to safely include the file name as part of the URL
                 $safeFilename = $slugger->slug($originalFilename);
-                $newFilename = $safeFilename.'-'.uniqid().'.'.$image->guessExtension();
+                $newFilename = $safeFilename . '-' . uniqid() . '.' . $image->guessExtension();
             }
 
             // si file, on la met dans le dossier temporaire
@@ -66,9 +65,9 @@ class ImageUploadController extends FrontController {
 
             // envoi au cloud
             $imageService->sendImageToCloud(
-                $fileService->getUploadTmpDir().'/'.$newFilename,
+                $fileService->getUploadTmpDir() . '/' . $newFilename,
                 'upload',
-                'upload/'.$newFilename
+                'upload/' . $newFilename
             );
         } catch (FileException $e) {
             return new JsonResponse([
@@ -76,10 +75,10 @@ class ImageUploadController extends FrontController {
                 'exception' => $e->getMessage()
             ]);
         }
-        
+
         return new JsonResponse([
             'data' => [
-                'link' => $paramService->get('cloud_image_url').'upload/'.$newFilename,
+                'link' => $paramService->get('cloud_image_url') . 'upload/' . $newFilename,
             ],
             'success' => true,
             'code' => 200
@@ -87,7 +86,7 @@ class ImageUploadController extends FrontController {
     }
 
 
-    public function imagickAutorotate(\Imagick $image) :\Imagick
+    public function imagickAutorotate(\Imagick $image): \Imagick
     {
         switch ($image->getImageOrientation()) {
             case \Imagick::ORIENTATION_TOPLEFT:
@@ -122,5 +121,4 @@ class ImageUploadController extends FrontController {
         $image->setImageOrientation(\Imagick::ORIENTATION_TOPLEFT);
         return $image;
     }
-
 }

@@ -1,11 +1,11 @@
- <ul class="fr-tabs__list" role="tablist" aria-label="">
-    <li role="presentation">
-        <a href="{{ path('app_user_project_details_fiche_projet', {'id': project_id, 'slug': project_slug}) }}" id="tabpanel-10" class="fr-tabs__tab _fr-icon-checkbox-line fr-tabs__tab--icon-left" tabindex="-1" role="tab" aria-selected="{% if fiche_projet is defined %}true{% else %}false{% endif %}" aria-controls="tabpanel_fiche_projet">Fiche projet</a>
-    </li>
-    <li role="presentation">
-        <a href="{{ path('app_user_project_aides', {'id': project_id, 'slug': project_slug}) }}" id="tabpanel-20" class="fr-tabs__tab _fr-icon-checkbox-line fr-tabs__tab--icon-left" tabindex="-1" role="tab" aria-selected="{% if aides is defined %}true{% else %}false{% endif %}" aria-controls="tabpanel_liste_des_aides">Aides</a>
-    </li>
-    <li role="presentation">
-        <a href="{{ path('app_user_project_similaires', {'id': project_id, 'slug': project_slug}) }}"  id="tabpanel-30" class="fr-tabs__tab _fr-icon-checkbox-line fr-tabs__tab--icon-left" tabindex="-1" role="tab" aria-selected="{% if similaires is defined %}true{% else %}false{% endif %}" aria-controls="tabpanel_projets_similaires">Projets similaires</a>
-    </li>
+<ul class="fr-tabs__list" role="tablist" aria-label="">
+	<li role="presentation">
+		<a href="{{ path('app_user_project_details_fiche_projet', {'id': project_id, 'slug': project_slug}) }}" id="tabpanel-10" class="fr-tabs__tab _fr-icon-checkbox-line fr-tabs__tab--icon-left" tabindex="-1" role="tab" aria-selected="{% if fiche_projet is defined %}true{% else %}false{% endif %}" aria-controls="tabpanel_fiche_projet">Fiche projet</a>
+	</li>
+	<li role="presentation">
+		<a href="{{ path('app_user_project_aides', {'id': project_id, 'slug': project_slug}) }}" id="tabpanel-20" class="fr-tabs__tab _fr-icon-checkbox-line fr-tabs__tab--icon-left" tabindex="-1" role="tab" aria-selected="{% if aides is defined %}true{% else %}false{% endif %}" aria-controls="tabpanel_liste_des_aides">Aides</a>
+	</li>
+	<li role="presentation">
+		<a href="{{ path('app_user_project_similaires', {'id': project_id, 'slug': project_slug}) }}" id="tabpanel-30" class="fr-tabs__tab _fr-icon-checkbox-line fr-tabs__tab--icon-left" tabindex="-1" role="tab" aria-selected="{% if similaires is defined %}true{% else %}false{% endif %}" aria-controls="tabpanel_projets_similaires">Projets similaires</a>
+	</li>
 </ul>

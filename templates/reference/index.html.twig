@@ -1,41 +1,43 @@
 {% extends 'base.html.twig' %}
 
 {% block stylesheets %}
-    {{ parent() }}
-    {{ encore_entry_link_tags('import-scss/reference/index') }}
+	{{ parent() }}
+	{{ encore_entry_link_tags('import-scss/reference/index') }}
 {% endblock %}
 
-{% block title %}Projets | Aides-territoires{% endblock %}
+{% block title %}Projets | Aides-territoires
+{% endblock %}
 
-{% block meta_description %}Trouvez des aides pour financer et accompagner les projets de votre collectivité en France métropolitaine et en Outre-mer{% endblock %}
+{% block meta_description %}Trouvez des aides pour financer et accompagner les projets de votre collectivité en France métropolitaine et en Outre-mer
+{% endblock %}
 
 {% block body %}
-    {% include 'reference/_form_project_reference.html.twig' %}
+	{% include 'reference/_form_project_reference.html.twig' %}
 
-    <div class="fr-container fr-mb-5w fr-mt-0">
-        <div class="fr-grid-row">
+	<div class="fr-container fr-mb-5w fr-mt-0">
+		<div class="fr-grid-row">
 
-            <div class="fr-col-12 fr-col-md-12">
-                <div class="fr-tabs fr-mt-0w fr-mb-5w">
-                    {% include "reference/_menu_project.html.twig" with { aides: true, nbAids: myPager.getNbResults } %}
+			<div class="fr-col-12 fr-col-md-12">
+				<div class="fr-tabs fr-mt-0w fr-mb-5w">
+					{% include "reference/_menu_project.html.twig" with { aides: true, nbAids: myPager.getNbResults } %}
 
-                    <div id="tabpanel_aides" class="fr-tabs__panel" role="tabpanel" aria-labelledby="tabpanel_aides" tabindex="0">
+					<div id="tabpanel_aides" class="fr-tabs__panel" role="tabpanel" aria-labelledby="tabpanel_aides" tabindex="0">
 
-                        {% if myPager.getNbResults > 0 %}
-                            {% include 'aid/aid/_aid_result_as_list.html.twig' with {'aids': myPager.currentPageResults} %}
-                            <div class="fr-container fr-grid-row fr-grid-row--center fr-my-5w">
-                                {{ pagerfanta(myPager) }}
-                            </div>
-                        {% else %}
-                            <div class="fr-alert fr-alert--info fr-mb-3w">
-                                <p>
-                                Aucune aide ne correspond à votre recherche.
-                                </p>
-                            </div>
-                        {% endif %}
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+						{% if myPager.getNbResults > 0 %}
+							{% include 'aid/aid/_aid_result_as_list.html.twig' with {'aids': myPager.currentPageResults} %}
+							<div class="fr-container fr-grid-row fr-grid-row--center fr-my-5w">
+								{{ pagerfanta(myPager) }}
+							</div>
+						{% else %}
+							<div class="fr-alert fr-alert--info fr-mb-3w">
+								<p>
+									Aucune aide ne correspond à votre recherche.
+								</p>
+							</div>
+						{% endif %}
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
 {% endblock %}

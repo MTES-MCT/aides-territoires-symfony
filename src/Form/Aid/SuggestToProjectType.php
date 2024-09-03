@@ -12,13 +12,13 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\Count as ConstraintsCount;
 use Symfony\Component\Validator\Constraints as Assert;
+
 class SuggestToProjectType extends AbstractType
 {
     public function __construct(
         protected UserService $userService
-    )
-    {
-    }
+    ) {}
+
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $user = $this->userService->getUserLogged();
@@ -62,7 +62,6 @@ class SuggestToProjectType extends AbstractType
 
     public function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver->setDefaults([
-        ]);
+        $resolver->setDefaults([]);
     }
 }

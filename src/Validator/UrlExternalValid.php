@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Validator;
 
 use Symfony\Component\Validator\Constraint;
@@ -8,6 +9,6 @@ class UrlExternalValid extends Constraint
 {
     public function validatedBy(): string
     {
-        return static::class.'Validator';
+        return static::class . 'Validator';
     }
 }

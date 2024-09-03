@@ -6,7 +6,7 @@ use App\Controller\FrontController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-#[Route(priority:1)]
+#[Route(priority: 1)]
 class SitemapController extends FrontController
 {
     #[Route('/plan-du-site/', name: 'app_static_sitemap')]
@@ -17,8 +17,7 @@ class SitemapController extends FrontController
             'Plan du site'
         );
 
-        // rendu template  
-        return $this->render('static/sitemap/index.html.twig', [
-        ]);
+        // rendu template
+        return $this->render('static/sitemap/index.html.twig', []);
     }
 }

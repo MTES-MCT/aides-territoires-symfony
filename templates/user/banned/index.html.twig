@@ -1,21 +1,24 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Compte bloqué | {{ parent() }}{% endblock %}
+{% block title %}Compte bloqué |
+	{{ parent() }}
+{% endblock %}
 
 
 {% block body %}
-<main role="main" class="fr-container-fluid">
-    <div class="fr-container">
-        <div class="fr-grid-row">
-            <div class="fr-col-12">
-                <h1 class="fr-text-h1">Compte bloqué</h1>
-                <p>Votre compte a été bloqué, il ne respectait pas nos <a href="{{ path('app_static_terms') }}" title="Voir les conditions générales d'utilisation">conditions générales d'utilisation</a>.</p>
+	<main role="main" class="fr-container-fluid">
+		<div class="fr-container">
+			<div class="fr-grid-row">
+				<div class="fr-col-12">
+					<h1 class="fr-text-h1">Compte bloqué</h1>
+					<p>Votre compte a été bloqué, il ne respectait pas nos
+						<a href="{{ path('app_static_terms') }}" title="Voir les conditions générales d'utilisation">conditions générales d'utilisation</a>.</p>
 
-                <p class="fr-alert fr-alert--warning" role="alert">
-                    Toute information transmise par le responsable de structure Porteuse d’aides ou Porteuse de projets locaux est de leur seule responsabilité. Il est rappelé que toute personne procédant à une fausse déclaration pour elle-même ou pour autrui s’expose, notamment, aux sanctions prévues à l’article 441-1 du code pénal, prévoyant des peines pouvant aller jusqu’à trois ans d’emprisonnement et 45 000 euros d’amende.
-                </p>
-            </div>
-        </div>
-    </div>
-</main>
+					<p class="fr-alert fr-alert--warning" role="alert">
+						Toute information transmise par le responsable de structure Porteuse d’aides ou Porteuse de projets locaux est de leur seule responsabilité. Il est rappelé que toute personne procédant à une fausse déclaration pour elle-même ou pour autrui s’expose, notamment, aux sanctions prévues à l’article 441-1 du code pénal, prévoyant des peines pouvant aller jusqu’à trois ans d’emprisonnement et 45 000 euros d’amende.
+					</p>
+				</div>
+			</div>
+		</div>
+	</main>
 {% endblock %}

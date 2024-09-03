@@ -24,7 +24,7 @@ final class TextLengthCountField implements FieldInterface
             ->setFormType(TextLengthCountType::class)
             // ->setFormTypeOption('attr', ['class' => 'trumbowyg'])
             ->setDefaultColumns('col-md-6 col-xxl-5')
-            
+
         ;
     }
 }

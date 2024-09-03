@@ -9,13 +9,12 @@ class DataExportService
 {
     public function __construct(
         protected ParameterBagInterface $parameterBagInterface
-    )
-    {
-    }
+    ) {}
 
-    public function getUrlExportedFile(DataExport $dataExport) : ?string {
+    public function getUrlExportedFile(DataExport $dataExport): ?string
+    {
         try {
-            return $this->parameterBagInterface->get('cloud_image_url').$dataExport->getExportedFile();
+            return $this->parameterBagInterface->get('cloud_image_url') . $dataExport->getExportedFile();
         } catch (\Exception $e) {
             return null;
         }

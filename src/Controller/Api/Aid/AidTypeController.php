@@ -14,8 +14,7 @@ class AidTypeController extends ApiController
     #[Route('/api/aids/types/', name: 'api_aid_types', priority: 5)]
     public function index(
         AidTypeRepository $aidTypeRepository,
-    ): JsonResponse
-    {
+    ): JsonResponse {
         $params = [];
         // requete pour compter sans la pagination
         $count = $aidTypeRepository->countCustom($params);
@@ -23,7 +22,7 @@ class AidTypeController extends ApiController
         // requete pour les résultats avec la pagination
         $params['firstResult'] = ($this->getPage() - 1) * $this->getItemsPerPage();
         $params['maxResults'] = $this->getItemsPerPage();
-    
+
         $results = $aidTypeRepository->findCustom($params);
 
         // spécifique
@@ -35,7 +34,7 @@ class AidTypeController extends ApiController
                 'type' => $result->getAidTypeGroup() ? $result->getAidTypeGroup()->getName() : null
             ];
         }
-        
+
         // le retour
         $data = [
             'count' => $count,

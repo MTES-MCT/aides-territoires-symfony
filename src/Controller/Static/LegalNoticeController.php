@@ -6,7 +6,7 @@ use App\Controller\FrontController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-#[Route(priority:1)]
+#[Route(priority: 1)]
 class LegalNoticeController extends FrontController
 {
     #[Route('/mentions-légales/', name: 'app_static_legal_notice')]
@@ -17,8 +17,7 @@ class LegalNoticeController extends FrontController
             'Mentions légales'
         );
 
-        // rendu template        
-        return $this->render('static/legal_notice/index.html.twig', [
-        ]);
+        // rendu template
+        return $this->render('static/legal_notice/index.html.twig', []);
     }
 }

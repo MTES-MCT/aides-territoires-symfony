@@ -21,8 +21,7 @@ class ContactController extends FrontController
         ManagerRegistry $managerRegistry,
         ParamService $paramService,
         EmailService $emailService
-    ): Response
-    {
+    ): Response {
 
         // fil arianne
         $this->breadcrumb->add(
@@ -37,18 +36,18 @@ class ContactController extends FrontController
 
         // vérification supplémentaire
         // des bots retire le required sur le sujet ce qui provoque une erreur dans le handleRequest
-        if ($requestStack->getCurrentRequest()->request->has('contact') ) {
+        if ($requestStack->getCurrentRequest()->request->has('contact')) {
             $contactRequest = $requestStack->getCurrentRequest()->get('contact');
             $subject = $contactRequest['subject'] ?? null;
             if (!$subject || trim($subject) == '') {
                 $this->addFlash(FrontController::FLASH_ERROR, 'Une erreur est survenue lors de l\'envoi du message.');
-                return $this->redirectToRoute('app_contact_contact', ['success'=>0]);
+                return $this->redirectToRoute('app_contact_contact', ['success' => 0]);
             }
         }
-        
+
         $formContact->handleRequest($requestStack->getCurrentRequest());
 
-        if ($formContact->isSubmitted()){ 
+        if ($formContact->isSubmitted()) {
             if ($formContact->isValid()) {
                 // log
                 $logContactFormSend = new LogContactFormSend();
@@ -75,7 +74,7 @@ class ContactController extends FrontController
 
                 $this->addFlash(FrontController::FLASH_SUCCESS, 'Votre message a bien été envoyé.');
 
-                return $this->redirectToRoute('app_contact_contact', ['success'=>1]);
+                return $this->redirectToRoute('app_contact_contact', ['success' => 1]);
             } else {
                 $this->addFlash(FrontController::FLASH_ERROR, 'Une erreur est survenue lors de l\'envoi du message.');
             }

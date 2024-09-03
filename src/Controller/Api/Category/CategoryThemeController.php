@@ -15,8 +15,7 @@ class CategoryThemeController extends ApiController
     #[Route('/api/themes/', name: 'api_category_theme', priority: 5)]
     public function index(
         CategoryThemeRepository $categoryThemeRepository
-    ): JsonResponse
-    {
+    ): JsonResponse {
         // les filtres
         $params = [];
 

@@ -24,15 +24,14 @@ class MimeTypeProgramCommand extends Command
     protected string $commandTextStart = '<Fix des mimes types sur s3';
     protected string $commandTextEnd = '>Fix des mimes types sur s3';
 
-    
+
 
     public function __construct(
         protected ManagerRegistry $managerRegistry,
         protected ParamService $paramService,
         protected FileService $fileService
-    )
-    {
-        ini_set('max_execution_time', 60*60);
+    ) {
+        ini_set('max_execution_time', 60 * 60);
         ini_set('memory_limit', '1G');
         parent::__construct();
     }
@@ -45,7 +44,7 @@ class MimeTypeProgramCommand extends Command
         $io = new SymfonyStyle($input, $output);
         $io->title($this->commandTextStart);
 
-        try  {
+        try {
             // import des keywords
             $this->fixMimesTypes($input, $output);
         } catch (\Exception $exception) {
@@ -72,7 +71,7 @@ class MimeTypeProgramCommand extends Command
             'credentials' => $credentials,
             'use_path_style_endpoint' => true
         ]);
-        
+
         // recupere tous les programs
         $programs = $this->managerRegistry->getRepository(Program::class)->findBy(
             [],
@@ -87,10 +86,10 @@ class MimeTypeProgramCommand extends Command
                     'Bucket' => $this->paramService->get('aws_storage_bucket_name'),
                     'Key'    => $program->getLogo(),
                 ]);
-        
+
                 // le mimeType actuel
                 $mimeType = $result['ContentType'];
-                
+
                 if (!in_array($mimeType, ['image/jpeg', 'image/png', 'image/gif', 'image/svg+xml'])) {
                     // Vérifiez si l'objet est une image, un PDF, un CSV ou un JSON en fonction de son extension
                     $extension = pathinfo($program->getLogo(), PATHINFO_EXTENSION);
@@ -104,9 +103,9 @@ class MimeTypeProgramCommand extends Command
                         } elseif ($extension == 'svg') {
                             $mimeType = 'image/svg+xml';
                         }
-            
+
                         // Chemin vers le fichier temporaire
-                        $url = $this->paramService->get('cloud_image_url').$program->getLogo();
+                        $url = $this->paramService->get('cloud_image_url') . $program->getLogo();
 
                         // Télécharge le fichier à un emplacement temporaire
                         $tempPath = tempnam($this->fileService->getUploadTmpDir(), '');
@@ -140,8 +139,6 @@ class MimeTypeProgramCommand extends Command
                 } else {
                     $io->success("{$program->getLogo()} à déjà {$mimeType}");
                 }
-
-
             } catch (\Exception $e) {
                 $io->error($program->getLogo());
                 continue;

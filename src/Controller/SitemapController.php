@@ -18,15 +18,14 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-#[Route(priority:1)]
+#[Route(priority: 1)]
 class SitemapController extends AbstractController
 {
     #[Route('/sitemap.xml', name: 'app_sitemap')]
     public function index(
         ManagerRegistry $managerRegistry,
         StringService $stringService
-    ): Response
-    {
+    ): Response {
         /* fréquences possible :
          * always
          * hourly
@@ -161,8 +160,7 @@ class SitemapController extends AbstractController
 
         // index
         $urls[] = [
-            'loc' => $this->generateUrl('app_cartography_cartography', [
-            ], UrlGeneratorInterface::ABSOLUTE_URL),
+            'loc' => $this->generateUrl('app_cartography_cartography', [], UrlGeneratorInterface::ABSOLUTE_URL),
         ];
 
         // pages par départements
@@ -179,7 +177,7 @@ class SitemapController extends AbstractController
 
         // ----------------------------------------------------------------------
         // CONTACT
-        
+
         // page contact
         $urls[] = [
             'loc' => $this->generateUrl('app_contact_contact', [], UrlGeneratorInterface::ABSOLUTE_URL),
@@ -192,17 +190,14 @@ class SitemapController extends AbstractController
         $pages = $managerRegistry->getRepository(Page::class)->findAll();
         foreach ($pages as $page) {
             $urls[] = [
-                'loc' => $this->generateUrl('app_home', [
-                ], UrlGeneratorInterface::ABSOLUTE_URL). trim($page->getUrl(), '/'). '/',
+                'loc' => $this->generateUrl('app_home', [], UrlGeneratorInterface::ABSOLUTE_URL) . trim($page->getUrl(), '/') . '/',
             ];
         }
         unset($pages);
         // ----------------------------------------------------------------------
         // PORTAILS
 
-        $searchPages = $managerRegistry->getRepository(SearchPage::class)->findBy([
-
-        ]);
+        $searchPages = $managerRegistry->getRepository(SearchPage::class)->findBy([]);
         foreach ($searchPages as $searchPage) {
             $urls[] = [
                 'loc' => $this->generateUrl('app_portal_portal_details', [
@@ -255,14 +250,16 @@ class SitemapController extends AbstractController
             ];
         }
         unset($publicProjects);
-        
+
         // ----------------------------------------------------------------------
         // Rendu template
         return new Response(
             $this->renderView(
-                'sitemap.html.twig', array(
-                'urls'          => $urls
-            )),
+                'sitemap.html.twig',
+                array(
+                    'urls'          => $urls
+                )
+            ),
             200,
             array(
                 'Content-Type' => 'text/xml'

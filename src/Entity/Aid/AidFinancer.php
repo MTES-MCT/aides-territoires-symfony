@@ -78,7 +78,7 @@ class AidFinancer
         if ($name == '') {
             $name = 'AidFinancer';
         }
-        
+
         return $name;
     }
 }

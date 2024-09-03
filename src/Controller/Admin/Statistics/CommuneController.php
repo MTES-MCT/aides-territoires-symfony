@@ -26,17 +26,14 @@ class CommuneController extends AbstractController
     public function __construct(
         protected ManagerRegistry $managerRegistry,
         protected ChartBuilderInterface $chartBuilderInterface,
-    )
-    {
-    }
+    ) {}
 
     #[Route('/admin/statistics/commune/population', name: 'admin_statistics_commune_population')]
     public function mapPopulation(
         AidRepository $aidRepository,
         PerimeterRepository $perimeterRepository,
         OrganizationRepository $organizationRepository
-    ): Response
-    {
+    ): Response {
         $cities = $organizationRepository->getScaleCovered(scale: Perimeter::SCALE_COMMUNE);
         // dd($cities);
         // $epcis = $aidRepository->getScaleCovered(scale: Perimeter::SCALE_EPCI);
@@ -58,8 +55,7 @@ class CommuneController extends AbstractController
     }
 
     #[Route('/admin/statistics/commune/dashboard', name: 'admin_statistics_commune_dashboard')]
-    public function communeDashboard(
-    ): Response
+    public function communeDashboard(): Response
     {
         // compte les inscriptions de commune mois par mois
         $communeRegistrationsByMonth = $this->managerRegistry->getRepository(Organization::class)->countRegistrationsByMonth([
@@ -129,7 +125,7 @@ class CommuneController extends AbstractController
 
         // Ajoute l'élément à la fin du tableau
         $reducedArray['10+'] = $tenPlus;
-        
+
         // première boucle pour faire les pourcentages
         $total = 0;
         foreach ($reducedArray as $key => $nbPerimeter) {
@@ -141,9 +137,9 @@ class CommuneController extends AbstractController
         $nbPerimeterTotal = 0;
         foreach ($reducedArray as $nbPerimeter) {
             $percentage = $total == 0 ? 0 : number_format(($nbPerimeter['nb_perimeter'] * 100 / $total), 2);
-            $labels[] = $nbPerimeter['nb_perimeter'] . ' commune(s) ont '.$nbPerimeter['nb_organization']. ' structure(s) (de tous type) : ('.$percentage.'%)';
+            $labels[] = $nbPerimeter['nb_perimeter'] . ' commune(s) ont ' . $nbPerimeter['nb_organization'] . ' structure(s) (de tous type) : (' . $percentage . '%)';
             $datas[] = $nbPerimeter['nb_perimeter'];
-            $colors[] = 'rgb('.rand(0, 255).', '.rand(0, 255).', '.rand(0, 255).')';
+            $colors[] = 'rgb(' . rand(0, 255) . ', ' . rand(0, 255) . ', ' . rand(0, 255) . ')';
             $nbPerimeterTotal += $nbPerimeter['nb_perimeter'];
         }
 
@@ -169,7 +165,7 @@ class CommuneController extends AbstractController
                 ],
                 'title' => [
                     'display' => true,
-                    'text' => 'Répartition des '.$nbPerimeterTotal.' communes par nombre de structures liées',
+                    'text' => 'Répartition des ' . $nbPerimeterTotal . ' communes par nombre de structures liées',
                     'font' => [
                         'size' => 24,
                     ],
@@ -230,105 +226,103 @@ class CommuneController extends AbstractController
     }
 
     #[Route('/admin/statistics/commune/export/registration-by-month', name: 'admin_statistics_commune_export_registration_by_month')]
-    public function exportRegistrationByMonth(
-    ): StreamedResponse
+    public function exportRegistrationByMonth(): StreamedResponse
     {
-        ini_set('max_execution_time', 60*60);
+        ini_set('max_execution_time', 60 * 60);
         ini_set('memory_limit', '1G');
 
         $response = new StreamedResponse();
         $response->setCallback(function () {
-                    // options CSV
-        $options = new \OpenSpout\Writer\CSV\Options();
-        $options->FIELD_DELIMITER = ';';
-        $options->FIELD_ENCLOSURE = '"';
+            // options CSV
+            $options = new \OpenSpout\Writer\CSV\Options();
+            $options->FIELD_DELIMITER = ';';
+            $options->FIELD_ENCLOSURE = '"';
 
-        // writer
-        $writer = new \OpenSpout\Writer\CSV\Writer($options);
+            // writer
+            $writer = new \OpenSpout\Writer\CSV\Writer($options);
 
-        // ouverture fichier
-        $now = new \DateTime(date('Y-m-d H:i:s'));
-        $writer->openToBrowser('export_inscriptions_communes_at_'.$now->format('d_m_Y').'.csv');
+            // ouverture fichier
+            $now = new \DateTime(date('Y-m-d H:i:s'));
+            $writer->openToBrowser('export_inscriptions_communes_at_' . $now->format('d_m_Y') . '.csv');
 
-        // entêtes
-        $cells = [
-            Cell::fromValue('Mois'),
-            Cell::fromValue('Nombre inscription commune'),
-        ];
-        $singleRow = new Row($cells);
-        $writer->addRow($singleRow);
-
-        // les inscriptions
-        $communeRegistrationsByMonth = $this->managerRegistry->getRepository(Organization::class)->countRegistrationsByMonth([
-            'typeSlug' =>  OrganizationType::SLUG_COMMUNE,
-            'perimeterScale' => Perimeter::SCALE_COMMUNE,
-        ]);
-        foreach ($communeRegistrationsByMonth as $registration) {
-            // ajoute ligne par ligne
+            // entêtes
             $cells = [
-                Cell::fromValue($registration['month']),
-                Cell::fromValue($registration['nb'])
+                Cell::fromValue('Mois'),
+                Cell::fromValue('Nombre inscription commune'),
             ];
-
             $singleRow = new Row($cells);
             $writer->addRow($singleRow);
-        }
 
-        // fermeture fichier
-        $writer->close();
+            // les inscriptions
+            $communeRegistrationsByMonth = $this->managerRegistry->getRepository(Organization::class)->countRegistrationsByMonth([
+                'typeSlug' =>  OrganizationType::SLUG_COMMUNE,
+                'perimeterScale' => Perimeter::SCALE_COMMUNE,
+            ]);
+            foreach ($communeRegistrationsByMonth as $registration) {
+                // ajoute ligne par ligne
+                $cells = [
+                    Cell::fromValue($registration['month']),
+                    Cell::fromValue($registration['nb'])
+                ];
+
+                $singleRow = new Row($cells);
+                $writer->addRow($singleRow);
+            }
+
+            // fermeture fichier
+            $writer->close();
         });
 
         return $response;
     }
 
     #[Route('/admin/statistics/commune/export/nb-ap-by-month', name: 'admin_statistics_commune_export_nb_ap_by_month')]
-    public function exportNbApByMonth(
-    ): StreamedResponse
+    public function exportNbApByMonth(): StreamedResponse
     {
-        ini_set('max_execution_time', 60*60);
+        ini_set('max_execution_time', 60 * 60);
         ini_set('memory_limit', '1G');
 
         $response = new StreamedResponse();
         $response->setCallback(function () {
-                    // options CSV
-        $options = new \OpenSpout\Writer\CSV\Options();
-        $options->FIELD_DELIMITER = ';';
-        $options->FIELD_ENCLOSURE = '"';
+            // options CSV
+            $options = new \OpenSpout\Writer\CSV\Options();
+            $options->FIELD_DELIMITER = ';';
+            $options->FIELD_ENCLOSURE = '"';
 
-        // writer
-        $writer = new \OpenSpout\Writer\CSV\Writer($options);
+            // writer
+            $writer = new \OpenSpout\Writer\CSV\Writer($options);
 
-        // ouverture fichier
-        $now = new \DateTime(date('Y-m-d H:i:s'));
-        $writer->openToBrowser('export_aide_ajoute_projet_communes_at_'.$now->format('d_m_Y').'.csv');
+            // ouverture fichier
+            $now = new \DateTime(date('Y-m-d H:i:s'));
+            $writer->openToBrowser('export_aide_ajoute_projet_communes_at_' . $now->format('d_m_Y') . '.csv');
 
-        // entêtes
-        $cells = [
-            Cell::fromValue('Mois'),
-            Cell::fromValue('Nombre d\'aides ajoutées à des projets'),
-        ];
-        $singleRow = new Row($cells);
-        $writer->addRow($singleRow);
-
-        // les inscriptions
-        $nbApCreatedByMonth = $this->managerRegistry->getRepository(AidProject::class)->countCreatedByMonth(
-            [
-                'organizationTypeSlug' => OrganizationType::SLUG_COMMUNE
-            ]
-        );
-        foreach ($nbApCreatedByMonth as $nbCreation) {
-            // ajoute ligne par ligne
+            // entêtes
             $cells = [
-                Cell::fromValue($nbCreation['mois']),
-                Cell::fromValue($nbCreation['nb'])
+                Cell::fromValue('Mois'),
+                Cell::fromValue('Nombre d\'aides ajoutées à des projets'),
             ];
-
             $singleRow = new Row($cells);
             $writer->addRow($singleRow);
-        }
 
-        // fermeture fichier
-        $writer->close();
+            // les inscriptions
+            $nbApCreatedByMonth = $this->managerRegistry->getRepository(AidProject::class)->countCreatedByMonth(
+                [
+                    'organizationTypeSlug' => OrganizationType::SLUG_COMMUNE
+                ]
+            );
+            foreach ($nbApCreatedByMonth as $nbCreation) {
+                // ajoute ligne par ligne
+                $cells = [
+                    Cell::fromValue($nbCreation['mois']),
+                    Cell::fromValue($nbCreation['nb'])
+                ];
+
+                $singleRow = new Row($cells);
+                $writer->addRow($singleRow);
+            }
+
+            // fermeture fichier
+            $writer->close();
         });
 
         return $response;

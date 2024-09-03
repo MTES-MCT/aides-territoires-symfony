@@ -35,7 +35,7 @@ class ImportFluxIleDeFranceCommand extends ImportFluxCommand
         $aidsFromImport = [];
         $client = $this->getClient();
 
-        for ($i=0; $i<$this->nbPages; $i++) {
+        for ($i = 0; $i < $this->nbPages; $i++) {
             $this->currentPage = $i;
             $importUrl = $this->dataSource->getImportApiUrl();
             if ($this->paginationEnabled) {
@@ -49,7 +49,7 @@ class ImportFluxIleDeFranceCommand extends ImportFluxCommand
                 );
                 $content = $response->getContent();
                 $content = $response->toArray();
-    
+
                 // retourne directement un tableau d'aides
                 $aidsFromImport = $content;
             } catch (\Exception $e) {
@@ -94,8 +94,8 @@ class ImportFluxIleDeFranceCommand extends ImportFluxCommand
 
             $originUrl = 'https://www.iledefrance.fr/aides-et-appels-a-projets/' . $this->stringService->getSlug(str_replace(["'", "’", 'à'], [''], preg_replace('/(\d{2,4})[-.](\d{2})[-.](\d{2,4})/', '$1$2$3', $aidName)));
             $applicationUrl = $originUrl;
-    
-    
+
+
             $dateStart = null;
             if (isset($aidToImport["dateOuvertureCampagne"])) {
                 try {
@@ -112,7 +112,7 @@ class ImportFluxIleDeFranceCommand extends ImportFluxCommand
                 // Force les heures, minutes, et secondes à 00:00:00
                 $dateStart->setTime(0, 0, 0);
             }
-                
+
             $dateSubmissionDeadline = null;
             if (isset($aidToImport["dateFinCampagne"])) {
                 try {
@@ -221,8 +221,8 @@ class ImportFluxIleDeFranceCommand extends ImportFluxCommand
                 OrganizationType::SLUG_RESEARCHER
             ]
         ];
-        
-        
+
+
         // manquants
         // 0 => "Collectivité ou institution - Autre (GIP, copropriété, EPA...)"
         // 1 => "Collectivité ou institution - Bailleurs sociaux"
@@ -237,7 +237,7 @@ class ImportFluxIleDeFranceCommand extends ImportFluxCommand
                 continue;
             }
             foreach ($mapping as $key => $values) {
-                if (preg_match('/.*'.str_replace(['/'], ['\/'], $key).'.*/i', $publicsBeneficiaire['title'])) {
+                if (preg_match('/.*' . str_replace(['/'], ['\/'], $key) . '.*/i', $publicsBeneficiaire['title'])) {
                     foreach ($values as $value) {
                         $organizationType = $this->managerRegistry->getRepository(OrganizationType::class)->findOneBy([
                             'slug' => $value
@@ -339,7 +339,7 @@ class ImportFluxIleDeFranceCommand extends ImportFluxCommand
                 continue;
             }
             foreach ($mapping as $key => $values) {
-                if (preg_match('/.*'.str_replace(['/'], ['\/'], $key).'.*/i', $competence['title'])) {
+                if (preg_match('/.*' . str_replace(['/'], ['\/'], $key) . '.*/i', $competence['title'])) {
                     foreach ($values as $value) {
                         $category = $this->managerRegistry->getRepository(Category::class)->findOneBy([
                             'slug' => $value

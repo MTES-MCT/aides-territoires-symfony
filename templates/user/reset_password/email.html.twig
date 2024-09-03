@@ -4,14 +4,17 @@
 
 <p>Retrouvez les accès à votre compte en cliquant sur le lien suivant :</p>
 
-<p><a href="{{ absolute_url(url('app_reset_password', {token: resetToken.token})) }}">{{ absolute_url(url('app_reset_password', {token: resetToken.token})) }}</a></p>
+<p>
+	<a href="{{ absolute_url(url('app_reset_password', {token: resetToken.token})) }}">{{ absolute_url(url('app_reset_password', {token: resetToken.token})) }}</a>
+</p>
 
-<p>Ce lien expirera dans {{ resetToken.expirationMessageKey|trans(resetToken.expirationMessageData, 'ResetPasswordBundle') }}.</p>
+<p>Ce lien expirera dans
+	{{ resetToken.expirationMessageKey|trans(resetToken.expirationMessageData, 'ResetPasswordBundle') }}.</p>
 
 <p>Si vous n’êtes pas à l’initiative de cette demande, vous n’avez rien à faire.</p>
 
 <p>
-À bientôt,
-<br />
-L’équipe d’Aides-territoires.
+	À bientôt,
+	<br/>
+	L’équipe d’Aides-territoires.
 </p>

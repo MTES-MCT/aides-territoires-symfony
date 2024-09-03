@@ -27,9 +27,7 @@ class EasyAdminSubscriber implements EventSubscriberInterface
         protected PerimeterService $perimeterService,
         protected EntityManagerInterface $entityManagerInterface,
         protected ImageService $imageService
-    )
-    {
-    }
+    ) {}
 
     public static function getSubscribedEvents(): array
     {

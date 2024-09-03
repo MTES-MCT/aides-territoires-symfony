@@ -22,11 +22,13 @@ class ApiTokenAskRepository extends ServiceEntityRepository
         parent::__construct($registry, ApiTokenAsk::class);
     }
 
-    public function countPendingAccept(array $params = null) : int {
+    public function countPendingAccept(array $params = null): int
+    {
         return $this->countCustom(['pendingAccept' => true]);
     }
 
-    public function countCustom(array $params = null) : int {
+    public function countCustom(array $params = null): int
+    {
         $qb = $this->getQueryBuilder($params);
 
         $qb->select('IFNULL(COUNT(DISTINCT(ata.id)), 0) AS nb');
@@ -34,7 +36,7 @@ class ApiTokenAskRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult()[0]['nb'] ?? 0;
     }
 
-    public function getQueryBuilder(array $params = null) : QueryBuilder
+    public function getQueryBuilder(array $params = null): QueryBuilder
     {
         $pendingAccept = $params['pendingAccept'] ?? false;
 
@@ -43,7 +45,7 @@ class ApiTokenAskRepository extends ServiceEntityRepository
         if ($pendingAccept == true) {
             $qb->andWhere('ata.timeAccept IS NULL');
         }
-        
+
         return $qb;
     }
 }

@@ -63,20 +63,20 @@ class SimpleSearchFilter extends AbstractFilter
                 [$alias, $prop] = $this->addJoinsForNestedProperty($prop, $alias, $queryBuilder, $queryNameGenerator, $resourceClass, Join::INNER_JOIN);
             }
 
-            $orExp->add($queryBuilder->expr()->like('LOWER('. $alias. '.' . $prop. ')', ':' . $parameterName));
+            $orExp->add($queryBuilder->expr()->like('LOWER(' . $alias . '.' . $prop . ')', ':' . $parameterName));
         }
 
         // Add it
         $queryBuilder
             ->andWhere('(' . $orExp . ')')
-            ->setParameter($parameterName, '%' . strtolower($word). '%');
+            ->setParameter($parameterName, '%' . strtolower($word) . '%');
     }
 
     /** {@inheritdoc} */
     public function getDescription(string $resourceClass): array
     {
         $props = $this->getProperties();
-        if (null===$props) {
+        if (null === $props) {
             throw new InvalidArgumentException('Properties must be specified');
         }
 
@@ -96,5 +96,4 @@ class SimpleSearchFilter extends AbstractFilter
             ]
         ];
     }
-
 }

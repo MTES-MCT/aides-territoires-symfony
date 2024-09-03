@@ -25,11 +25,10 @@ class NotificationController extends FrontController
         NotificationRepository $notificationRepository,
         ManagerRegistry $managerRegistry,
         RequestStack $requestStack
-    ): Response
-    {
+    ): Response {
         // gestion pagination
         $currentPage = (int) $requestStack->getCurrentRequest()->get('page', 1);
-        
+
         // user
         $user = $userService->getUserLogged();
 
@@ -139,8 +138,7 @@ class NotificationController extends FrontController
         UserService $userService,
         ManagerRegistry $managerRegistry,
         RequestStack $requestStack
-    ): Response
-    {
+    ): Response {
         // le user
         $user = $userService->getUserLogged();
 
@@ -193,8 +191,7 @@ class NotificationController extends FrontController
         UserService $userService,
         NotificationRepository $notificationRepository,
         ManagerRegistry $managerRegistry,
-    ): Response
-    {
+    ): Response {
         // user
         $user = $userService->getUserLogged();
 

@@ -35,13 +35,12 @@ class PerimeterImportCrudController extends AtCrudController
         yield IdField::new('id')->onlyOnIndex();
 
         yield AssociationField::new('adhocPerimeter', 'Périmètre adhoc')
-        ->autocomplete()
-        ->setHelp('Périmètre à définir.')
-        ->hideWhenCreating();
+            ->autocomplete()
+            ->setHelp('Périmètre à définir.')
+            ->hideWhenCreating();
         yield TextField::new('adhocPerimeterName', 'Périmètre adhoc')
-        ->onlyWhenCreating()
-        ->setHelp('Le nom du périmètre à créer avec cet import. Laissez vide pour auto-remplir avec les données, ex: regions_01_05_06_75_68')
-        ;
+            ->onlyWhenCreating()
+            ->setHelp('Le nom du périmètre à créer avec cet import. Laissez vide pour auto-remplir avec les données, ex: regions_01_05_06_75_68');
 
         yield AssociationField::new('author', 'Auteur')
             ->setFormTypeOption('attr', ['readonly' => true, 'autocomplete' => 'off'])
@@ -54,105 +53,102 @@ class PerimeterImportCrudController extends AtCrudController
                     ]);
                 },
                 'data' => $this->getUser()
-            ])
-            ;
+            ]);
 
         yield FormField::addFieldset('Périmètres à attacher')
-        ->onlyOnForms();
+            ->onlyOnForms();
         yield IntegerField::new('nbCities', 'Nombre de villes')
-        ->setFormTypeOption('attr', ['readonly' => true])
-        ->hideWhenCreating()
-        ;
+            ->setFormTypeOption('attr', ['readonly' => true])
+            ->hideWhenCreating();
 
         $entity = $this->getContext()->getEntity()->getInstance();
         yield ImageField::new('file', 'Fichier csv des codes INSEE')
-        ->setHelp('Permière ligne ignorée')
-        ->setUploadDir($this->fileService->getUploadTmpDirRelative())
-        ->setUploadedFileNamePattern('/[slug]-[timestamp].[extension]')
-        ->onlyWhenCreating()
-        ->setFormTypeOption('mapped', false)
-        ->setFormTypeOption('upload_new',function(UploadedFile $file, string $uploadDir, string $fileName) use ($entity) {
-            // créer dossier temporaire si besoin
-            $tmpFolder = $this->fileService->getUploadTmpDir();
-            if (!is_dir($tmpFolder)) {
-                mkdir($tmpFolder, 0777, true);
-            }
-
-            // déplace le fichier dans le dossier temporaire
-            $file->move(
-                $tmpFolder,
-                $fileName
-            );
-
-            $rowNumber = 1;
-            if (($handle = fopen($tmpFolder.$fileName, "r")) !== false) {
-                while (($data = fgetcsv($handle, 4096, ';')) !== false) {
-                    if ($rowNumber == 1) {
-                        $rowNumber++;
-                        continue;
-                    }
-                    ;
-                    $entity->addCityCode(str_pad($data[0], 5, '0', STR_PAD_LEFT));
+            ->setHelp('Permière ligne ignorée')
+            ->setUploadDir($this->fileService->getUploadTmpDirRelative())
+            ->setUploadedFileNamePattern('/[slug]-[timestamp].[extension]')
+            ->onlyWhenCreating()
+            ->setFormTypeOption('mapped', false)
+            ->setFormTypeOption('upload_new', function (UploadedFile $file, string $uploadDir, string $fileName) use ($entity) {
+                // créer dossier temporaire si besoin
+                $tmpFolder = $this->fileService->getUploadTmpDir();
+                if (!is_dir($tmpFolder)) {
+                    mkdir($tmpFolder, 0777, true);
                 }
-            }
 
-            // suppression fichier temporaire
-            unlink($tmpFolder.$fileName);
+                // déplace le fichier dans le dossier temporaire
+                $file->move(
+                    $tmpFolder,
+                    $fileName
+                );
 
-            // retour vide
-            return;
-        })
-        ;
+                $rowNumber = 1;
+                if (($handle = fopen($tmpFolder . $fileName, "r")) !== false) {
+                    while (($data = fgetcsv($handle, 4096, ';')) !== false) {
+                        if ($rowNumber == 1) {
+                            $rowNumber++;
+                            continue;
+                        };
+                        $entity->addCityCode(str_pad($data[0], 5, '0', STR_PAD_LEFT));
+                    }
+                }
+
+                // suppression fichier temporaire
+                unlink($tmpFolder . $fileName);
+
+                // retour vide
+                return;
+            });
 
         yield FormField::addFieldset('Import')->hideWhenCreating();
         yield BooleanField::new('isImported', 'Import effectué')
-        ->hideWhenCreating();
+            ->hideWhenCreating();
         yield DateTimeField::new('timeImported', 'Date importation')
-        ->onlyOnForms()
-        ->hideWhenCreating();
+            ->onlyOnForms()
+            ->hideWhenCreating();
         yield BooleanField::new('askProcessing', 'Demande effectuéee')
-        ->setHelp('Vous n\'avez normalement pas à modifier ce champ, il est là pour indiquer si l\'import a été demandé.')
-        ->hideOnIndex()
-        ->hideWhenCreating();
+            ->setHelp('Vous n\'avez normalement pas à modifier ce champ, il est là pour indiquer si l\'import a été demandé.')
+            ->hideOnIndex()
+            ->hideWhenCreating();
         yield BooleanField::new('importProcessing', 'Importation en cours de traitement')
-        ->hideOnIndex()
-        ->setHelp('Vous n\'avez normalement pas à modifier ce champ, il est là pour indiquer si l\'import est en cours.')
-        ->hideWhenCreating();
+            ->hideOnIndex()
+            ->setHelp('Vous n\'avez normalement pas à modifier ce champ, il est là pour indiquer si l\'import est en cours.')
+            ->hideWhenCreating();
 
         yield FormField::addFieldset('Métadonnées')->hideWhenCreating();
         yield DateTimeField::new('timeCreate', 'Date création')
-        ->setFormTypeOption('attr', ['readonly' => true])
-        ->onlyOnForms()
-        ->hideWhenCreating();
+            ->setFormTypeOption('attr', ['readonly' => true])
+            ->onlyOnForms()
+            ->hideWhenCreating();
         yield DateTimeField::new('timeUpdate', 'Date de mise à jour')
-        ->setFormTypeOption('attr', ['readonly' => true])
-        ->onlyOnForms()
-        ->hideWhenCreating();
+            ->setFormTypeOption('attr', ['readonly' => true])
+            ->onlyOnForms()
+            ->hideWhenCreating();
     }
 
-    
+
     public function configureActions(Actions $actions): Actions
     {
         $askImport = Action::new('askImport', 'Demander import')
             ->setHtmlAttributes(['title' => 'Demander import']) // titre
             ->linkToCrudAction('askImport') // l'action appellée
-            ;
+        ;
 
         $export = Action::new('export', 'Exporter')
             ->setHtmlAttributes(['title' => 'Exporter']) // titre
             ->linkToCrudAction('export') // l'action appellée
-            ;
+        ;
 
 
         return
             $actions
-                ->add(Crud::PAGE_INDEX, $export)
-                ->add(Crud::PAGE_EDIT, $export)
-                ->add(Crud::PAGE_INDEX, $askImport)
-            ;
+            ->add(Crud::PAGE_INDEX, $export)
+            ->add(Crud::PAGE_EDIT, $export)
+            ->add(Crud::PAGE_INDEX, $askImport)
+        ;
     }
 
-    public function askImport(AdminContext $context) : Response {
+    public function askImport(AdminContext $context): Response
+    {
         $entity = $context->getEntity()->getInstance();
         if (!$entity instanceof PerimeterImport) {
             throw new \Exception('Erreur : périmètre introuvable');
@@ -173,7 +169,7 @@ class PerimeterImportCrudController extends AtCrudController
         // envoi au worker
         $this->messageBusInterface->dispatch(new MsgPerimeterImport());
 
-        $this->addFlash('success', 'Import demandé. Vous recevrez un mail lorsque l\'import sera terminé. Il y en a actuellement '.$nbImport.' en attente.');
+        $this->addFlash('success', 'Import demandé. Vous recevrez un mail lorsque l\'import sera terminé. Il y en a actuellement ' . $nbImport . ' en attente.');
         $adminUrlGenerator = $this->container->get(AdminUrlGenerator::class);
         return $this->redirect(
             $adminUrlGenerator
@@ -195,7 +191,7 @@ class PerimeterImportCrudController extends AtCrudController
         } else {
             $filename = 'export-import-perimetre';
         }
-        $filename .= '-'.$now->format('Y_m_d_H_i_s');
+        $filename .= '-' . $now->format('Y_m_d_H_i_s');
 
         // Stream response
         $response = new StreamedResponse(function () use ($entity) {
@@ -213,7 +209,7 @@ class PerimeterImportCrudController extends AtCrudController
 
         // réponse avec header csv
         $response->headers->set('Content-Type', 'text/csv; charset=utf-8');
-        $response->headers->set('Content-Disposition', 'attachment; filename="'.$filename.'.csv"');
+        $response->headers->set('Content-Disposition', 'attachment; filename="' . $filename . '.csv"');
         return $response;
     }
 }

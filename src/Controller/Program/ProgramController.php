@@ -27,7 +27,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-#[Route(priority:1)]
+#[Route(priority: 1)]
 class ProgramController extends FrontController
 {
     const NB_AID_BY_PAGE = 18;
@@ -35,10 +35,9 @@ class ProgramController extends FrontController
     #[Route('/programmes/', name: 'app_program_program')]
     public function index(
         ProgramRepository $programRepository
-    ): Response
-    {
+    ): Response {
         // les programmes
-        $programs = $programRepository->findBy([],['slug'=> 'ASC']);
+        $programs = $programRepository->findBy([], ['slug' => 'ASC']);
 
         // fil arianne
         $this->breadcrumb->add(
@@ -64,18 +63,17 @@ class ProgramController extends FrontController
         LogService $logService,
         ReferenceService $referenceService,
         FaqService $faqService
-    ): Response
-    {
+    ): Response {
         // si onglet selectionne
         $tabSelected = $requestStack->getCurrentRequest()->get('tab', null);
 
         // gestion pagination
         $currentPage = (int) $requestStack->getCurrentRequest()->get('page', 1);
-        
+
         $user = $userService->getUserLogged();
 
         // le programe
-        $program = $programRepository->findOneBy(['slug'=> $slug]);
+        $program = $programRepository->findOneBy(['slug' => $slug]);
         if (!$program instanceof Program) {
             return $this->redirectToRoute('app_program_program');
         }
@@ -102,7 +100,7 @@ class ProgramController extends FrontController
                 'forceOrganizationType' => null,
                 'dontUseUserPerimeter' => true,
                 'forcePrograms' => [$program]
-                ]
+            ]
         );
 
         // formulaire recherche aides
@@ -112,7 +110,7 @@ class ProgramController extends FrontController
             $formAidSearchParams
         );
         $formAidSearch->handleRequest($requestStack->getCurrentRequest());
-        
+
         // parametres pour requetes aides
         $aidParams = [
             'showInSearch' => true,
@@ -120,14 +118,14 @@ class ProgramController extends FrontController
         ];
         $aidParams = array_merge($aidParams, $aidSearchFormService->convertAidSearchClassToAidParams($aidSearchClass));
         $showExtended = $aidSearchFormService->setShowExtendedV2($aidSearchClass);
-        
+
         // le paginateur
         $aids = $aidService->searchAids($aidParams);
         try {
-        $adapter = new ArrayAdapter($aids);
-        $pagerfanta = new Pagerfanta($adapter);
-        $pagerfanta->setMaxPerPage(self::NB_AID_BY_PAGE);
-        $pagerfanta->setCurrentPage($currentPage);
+            $adapter = new ArrayAdapter($aids);
+            $pagerfanta = new Pagerfanta($adapter);
+            $pagerfanta->setMaxPerPage(self::NB_AID_BY_PAGE);
+            $pagerfanta->setCurrentPage($currentPage);
         } catch (OutOfRangeCurrentPageException $e) {
             $this->addFlash(
                 FrontController::FLASH_ERROR,
@@ -166,7 +164,7 @@ class ProgramController extends FrontController
             type: LogService::AID_SEARCH,
             params: $logParams,
         );
-        
+
         // log vue programme
         $logService->log(
             type: LogService::PROGRAM_VIEW,
@@ -177,7 +175,7 @@ class ProgramController extends FrontController
                 'user' => $userService->getUserLogged(),
             ]
         );
-        
+
         // fil arianne
         $this->breadcrumb->add(
             'Tous les programmes d’aides',
@@ -188,7 +186,7 @@ class ProgramController extends FrontController
         $this->breadcrumb->add(
             $program->getName()
         );
-        
+
         // pour les stats
         $categoriesName = [];
         if (isset($aidParams['categories']) && is_array($aidParams['categories'])) {
@@ -212,7 +210,7 @@ class ProgramController extends FrontController
                             $highlightedWords[] = $keyword;
                         }
                     }
-                } 
+                }
                 if (isset($synonyms['objects_string'])) {
                     $keywords = str_getcsv($synonyms['objects_string'], ' ', '"');
                     foreach ($keywords as $keyword) {
@@ -220,7 +218,7 @@ class ProgramController extends FrontController
                             $highlightedWords[] = $keyword;
                         }
                     }
-                } 
+                }
                 if (isset($synonyms['simple_words_string'])) {
                     $keywords = str_getcsv($synonyms['simple_words_string'], ' ', '"');
                     foreach ($keywords as $keyword) {
@@ -269,7 +267,8 @@ class ProgramController extends FrontController
         ]);
     }
 
-    private function compareByPosition($a, $b) {
+    private function compareByPosition($a, $b)
+    {
         if ($a['position'] == $b['position']) {
             return 0;
         }

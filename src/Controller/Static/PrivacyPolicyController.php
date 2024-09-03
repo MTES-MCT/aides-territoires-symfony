@@ -5,7 +5,8 @@ namespace App\Controller\Static;
 use App\Controller\FrontController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-#[Route(priority:1)]
+
+#[Route(priority: 1)]
 class PrivacyPolicyController extends FrontController
 {
     #[Route('/politique-de-confidentialité/', name: 'app_static_privacy_policy')]
@@ -16,8 +17,7 @@ class PrivacyPolicyController extends FrontController
             'Politique de confidentialité'
         );
 
-        // rendu template  
-        return $this->render('static/privacy_policy/index.html.twig', [
-        ]);
+        // rendu template
+        return $this->render('static/privacy_policy/index.html.twig', []);
     }
 }

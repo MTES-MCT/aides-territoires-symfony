@@ -1,31 +1,33 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Récupération du mot de passe | {{ parent() }}{% endblock %}
+{% block title %}Récupération du mot de passe |
+	{{ parent() }}
+{% endblock %}
 
 {% block body %}
-<div class="fr-container fr-my-5w">
-    <div class="fr-grid-row fr-grid-row--center">
-        <div class="fr-col-md-8">
-            <h1>Mot de passe oublié ?<br />
-                <span class="fr-h4">En demander un nouveau</span>
-            </h1>
+	<div class="fr-container fr-my-5w">
+		<div class="fr-grid-row fr-grid-row--center">
+			<div class="fr-col-md-8">
+				<h1>Mot de passe oublié ?<br/>
+					<span class="fr-h4">En demander un nouveau</span>
+				</h1>
 
-            <p>Les champs marqués d’un astérisque (*) sont obligatoires.</p>
+				<p>Les champs marqués d’un astérisque (*) sont obligatoires.</p>
 
-            {{ form_start(requestForm, {'attr': {'class': 'fr-mt-5w'}}) }}
-                {{ form_row(requestForm.email) }}
-                <button type="submit" class="fr-btn">Demander un nouveau mot de passe</button>
-            {{ form_end(requestForm) }}
+				{{ form_start(requestForm, {'attr': {'class': 'fr-mt-5w'}}) }}
+				{{ form_row(requestForm.email) }}
+				<button type="submit" class="fr-btn">Demander un nouveau mot de passe</button>
+				{{ form_end(requestForm) }}
 
-            <div class="fr-col-12 fr-mt-3w">
-                <div class="fr-alert fr-alert--info fr-alert--sm">
-                    <p>
-                        Vous n’avez pas encore de compte ? <a href="{{ path('app_user_user_register') }}">Rendez-vous
-                        au formulaire d'inscription.</a>
-                    </p>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+				<div class="fr-col-12 fr-mt-3w">
+					<div class="fr-alert fr-alert--info fr-alert--sm">
+						<p>
+							Vous n’avez pas encore de compte ?
+							<a href="{{ path('app_user_user_register') }}">Rendez-vous au formulaire d'inscription.</a>
+						</p>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
 {% endblock %}

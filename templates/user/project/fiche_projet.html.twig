@@ -11,150 +11,154 @@
 {% endblock %}
 
 
-{% block title %}Editer votre projet | {{ parent() }}{% endblock %}
+{% block title %}Editer votre projet |
+	{{ parent() }}
+{% endblock %}
 
 {% block body %}
 
-<div class="fr-container fr-mb-5w fr-mt-0">
-    <div class="fr-grid-row">
-        {% include "user/_menu_user.html.twig" with { user_project:true, user_project_structure:true } %}
-        
-        <div class="fr-col-12 fr-col-md-9">
-            <div class="fr-grid-row">
-              <div class="fr-col-12 fr-col-md-9">
-                  <h1 class="fr-h3">Mon projet « {{ project.name }} »</h1>
-              </div>
-              <div class="fr-col-12 fr-col-md-3">
-                <a href="{{ path('app_user_project_structure') }}" class="fr-m-1w fr-tag _fr-tag--md fr-text--md fr-icon-arrow-left-line fr-tag--icon-left">Retour aux projets</a>
-              </div>
-            </div>
+	<div class="fr-container fr-mb-5w fr-mt-0">
+		<div class="fr-grid-row">
+			{% include "user/_menu_user.html.twig" with { user_project:true, user_project_structure:true } %}
+
+			<div class="fr-col-12 fr-col-md-9">
+				<div class="fr-grid-row">
+					<div class="fr-col-12 fr-col-md-9">
+						<h1 class="fr-h3">Mon projet «
+							{{ project.name }}
+							»</h1>
+					</div>
+					<div class="fr-col-12 fr-col-md-3">
+						<a href="{{ path('app_user_project_structure') }}" class="fr-m-1w fr-tag _fr-tag--md fr-text--md fr-icon-arrow-left-line fr-tag--icon-left">Retour aux projets</a>
+					</div>
+				</div>
 
 
-            {% if formErrors %}
-                {% include 'include/_form_has_errors.html.twig' %}
-            {% endif %}
+				{% if formErrors %}
+					{% include 'include/_form_has_errors.html.twig' %}
+				{% endif %}
 
-            <div class="fr-tabs fr-mt-0w fr-mb-5w">
-              {% include "user/project/_menu_project.html.twig" with { fiche_projet: true, project_id: project.id, project_slug: project.slug } %}
-              <div id="tabpanel_fiche_projet" class="fr-tabs__panel" role="tabpanel" aria-labelledby="tabpanel_fiche_projet" tabindex="0">
+				<div class="fr-tabs fr-mt-0w fr-mb-5w">
+					{% include "user/project/_menu_project.html.twig" with { fiche_projet: true, project_id: project.id, project_slug: project.slug } %}
+					<div id="tabpanel_fiche_projet" class="fr-tabs__panel" role="tabpanel" aria-labelledby="tabpanel_fiche_projet" tabindex="0">
 
-              {{ form_start(form) }}
-              {{ form_row(form.name )}}
-              {{ form_row(form.organization )}}
-              <div class="fr-grid-row fr-grid-row--gutters fr-grid-row--middle fr-mb-3w">
-                <div class="fr-col-12 fr-col-md-12">
-                  <label for="id_project_types">
-                    <span class="at-field-label at-required--label">Projet référent :*</span>
-                    <span class="fr-hint-text">
-                      Cette information nous aide à vous faire gagner du temps en vous proposant les meilleures aides pour votre projet.
-                      Si vous ne trouvez pas le type de projet qui vous correspond, cochez la case "Je n'ai pas trouvé de projet référent".</span>
-                    </label>
-                </div>
-                <div class="fr-col-12 fr-col-md-6">
-                  {{ form_row(form.projectReference )}}
-                </div>
-                <div class="fr-col-12 fr-col-md-6">
-                  {{ form_row(form.referentNotFound )}}
-                </div>
-                <div class="fr-col-12 fr-col-md-6">
-                  {{ form_row(form.step )}}
-                </div>
-                <div class="fr-col-12 fr-col-md-6">
-                  {{ form_row(form.contract_link )}}
-                </div>
-                
-              </div>
-              
-              {{ form_row(form.description )}}
-              
-              <div class="fr-grid-row fr-grid-row--gutters fr-grid-row--middle fr-mb-3w">
-                  <div class="fr-col-md-7"> 
-                      {{ form_row(form.isPublic, {'render_rest': false}) }}
-                  </div>
-                  <div class="fr-col-md-5" style="display: flex; align-items: center;"> 
-                      <button type="button" class="fr-tag fr-fi-information-line fr-tag--icon-left" data-fr-opened="false" aria-controls="public-project-modal">&nbsp;information</button>
-                  </div>
-              </div>
+						{{ form_start(form) }}
+						{{ form_row(form.name )}}
+						{{ form_row(form.organization )}}
+						<div class="fr-grid-row fr-grid-row--gutters fr-grid-row--middle fr-mb-3w">
+							<div class="fr-col-12 fr-col-md-12">
+								<label for="id_project_types">
+									<span class="at-field-label at-required--label">Projet référent :*</span>
+									<span class="fr-hint-text">
+										Cette information nous aide à vous faire gagner du temps en vous proposant les meilleures aides pour votre projet.
+										                      Si vous ne trouvez pas le type de projet qui vous correspond, cochez la case "Je n'ai pas trouvé de projet référent".</span>
+								</label>
+							</div>
+							<div class="fr-col-12 fr-col-md-6">
+								{{ form_row(form.projectReference )}}
+							</div>
+							<div class="fr-col-12 fr-col-md-6">
+								{{ form_row(form.referentNotFound )}}
+							</div>
+							<div class="fr-col-12 fr-col-md-6">
+								{{ form_row(form.step )}}
+							</div>
+							<div class="fr-col-12 fr-col-md-6">
+								{{ form_row(form.contract_link )}}
+							</div>
 
-              {{ form_row(form.private_description )}}
+						</div>
 
-              {% if project and project.image %}
-              <p><img src="{{ getParameter('cloud_image_url') }}{{ project.image }}" class="fr-responsive-img" alt="Image de votre projet" /></p>
-              {% endif %}
-              {{ form_row(form.imageUploadedFile )}}
-                                    
-              <footer class="fr-mt-2w">
-                  <button type="submit" class="fr-btn">Modifier</button>
-              </footer>
+						{{ form_row(form.description )}}
 
-              <p class="fr-hint-text fr-mt-2w">Les champs marqués d’un astérisque (*) sont obligatoires.</p>
+						<div class="fr-grid-row fr-grid-row--gutters fr-grid-row--middle fr-mb-3w">
+							<div class="fr-col-md-7">
+								{{ form_row(form.isPublic, {'render_rest': false}) }}
+							</div>
+							<div class="fr-col-md-5" style="display: flex; align-items: center;">
+								<button type="button" class="fr-tag fr-fi-information-line fr-tag--icon-left" data-fr-opened="false" aria-controls="public-project-modal">&nbsp;information</button>
+							</div>
+						</div>
 
-              {{ form_end(form) }}
-              </div> <!-- fin tabpanel-->
-            </div>
-        </div>
-    </div>
-</div>
+						{{ form_row(form.private_description )}}
 
-<dialog aria-labelledby="fr-modal-title-public-project" role="dialog" id="public-project-modal" class="fr-modal">
-    <div class="fr-container fr-container--fluid fr-container-md">
-        <div class="fr-grid-row fr-grid-row--center">
-            <div class="fr-col-12 fr-col-md-8 fr-col-lg-6">
-                <div class="fr-modal__body">
-                    <div class="fr-modal__header">
-                        <button class="fr-btn fr-btn--close" title="Fermer la fenêtre modale" aria-controls="public-project-modal">Fermer</button>
-                    </div>
-                    <div class="fr-modal__content">
-                        <h2 id="fr-modal-title-public-project" class="fr-modal__title fr-mb-5w"><span class="fr-icon-arrow-right-line fr-icon--lg"></span>Rendre votre projet public</h2>
-                        <div class="content">
-                          <p>Les projets que vous rendez publics sont visibles et consultables par tout utilisateur connecté.</p>
-                          <p>Pourquoi ? Rendre vos projets publics permettra à d’autres collectivités de s’inspirer, de vous aider en vous partageant des aides, mais également à des porteurs d’aides ou des accompagnateurs (dont les services déconcentrés) d’identifier vos projets et de mieux vous accompagner !</p>
-                          <p>Vous pourrez également suivre les projets qui vous intéressent, et partager votre expérience avec vos pairs.</p>
-                        </div>
-                    </div>
-                    <footer>
-                        <ul class="fr-btns-group fr-btns-group--right fr-btns-group--inline-reverse fr-btns-group--inline-lg fr-btns-group--icon-left">
-                            <li>
-                                <button class="fr-btn fr-mb-5w fr-mr-5w" title="Fermer la fenêtre modale" aria-controls="public-project-modal">Fermer</button>
-                            </li>
-                        </ul>
-                    </footer>
-                </div>
-            </div>
-        </div>
-    </div>
-</dialog>
+						{% if project and project.image %}
+							<p><img src="{{ getParameter('cloud_image_url') }}{{ project.image }}" class="fr-responsive-img" alt="Image de votre projet"/></p>
+						{% endif %}
+						{{ form_row(form.imageUploadedFile )}}
 
-<button id="btn_modal_waiting" data-fr-opened="false" aria-controls="fr-modal-waiting" style="visibility:hidden"></button>
-<dialog aria-labelledby="fr-modal-2-title" id="fr-modal-waiting" class="fr-modal" role="dialog" >
-  <div class="fr-container fr-container--fluid fr-container-md">
-    <div class="fr-grid-row fr-grid-row--center">
-      <div class="fr-col-12 fr-col-md-8 fr-col-lg-6">
-        <div class="fr-modal__body">
-          <div class="fr-modal__header">
-          </div>
-          <div class="fr-modal__content">
-            <h2 id="fr-modal-2-title fr-mb-2w" class="fr-modal__title">
-              <span class="fr-fi-arrow-right-line fr-fi--lg"></span>Modification en cours
-            </h2>
-            <p class="fr-text fr-mt-1w">
-              <b>Merci de patienter quelques instants...</b>
-            </p>
-          </div>
-          <div class="fr-modal__footer">
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</dialog>
+						<footer class="fr-mt-2w">
+							<button type="submit" class="fr-btn">Modifier</button>
+						</footer>
+
+						<p class="fr-hint-text fr-mt-2w">Les champs marqués d’un astérisque (*) sont obligatoires.</p>
+
+						{{ form_end(form) }}
+					</div>
+					<!-- fin tabpanel-->
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<dialog aria-labelledby="fr-modal-title-public-project" role="dialog" id="public-project-modal" class="fr-modal">
+		<div class="fr-container fr-container--fluid fr-container-md">
+			<div class="fr-grid-row fr-grid-row--center">
+				<div class="fr-col-12 fr-col-md-8 fr-col-lg-6">
+					<div class="fr-modal__body">
+						<div class="fr-modal__header">
+							<button class="fr-btn fr-btn--close" title="Fermer la fenêtre modale" aria-controls="public-project-modal">Fermer</button>
+						</div>
+						<div class="fr-modal__content">
+							<h2 id="fr-modal-title-public-project" class="fr-modal__title fr-mb-5w">
+								<span class="fr-icon-arrow-right-line fr-icon--lg"></span>Rendre votre projet public</h2>
+							<div class="content">
+								<p>Les projets que vous rendez publics sont visibles et consultables par tout utilisateur connecté.</p>
+								<p>Pourquoi ? Rendre vos projets publics permettra à d’autres collectivités de s’inspirer, de vous aider en vous partageant des aides, mais également à des porteurs d’aides ou des accompagnateurs (dont les services déconcentrés) d’identifier vos projets et de mieux vous accompagner !</p>
+								<p>Vous pourrez également suivre les projets qui vous intéressent, et partager votre expérience avec vos pairs.</p>
+							</div>
+						</div>
+						<footer>
+							<ul class="fr-btns-group fr-btns-group--right fr-btns-group--inline-reverse fr-btns-group--inline-lg fr-btns-group--icon-left">
+								<li>
+									<button class="fr-btn fr-mb-5w fr-mr-5w" title="Fermer la fenêtre modale" aria-controls="public-project-modal">Fermer</button>
+								</li>
+							</ul>
+						</footer>
+					</div>
+				</div>
+			</div>
+		</div>
+	</dialog>
+
+	<button id="btn_modal_waiting" data-fr-opened="false" aria-controls="fr-modal-waiting" style="visibility:hidden"></button>
+	<dialog aria-labelledby="fr-modal-2-title" id="fr-modal-waiting" class="fr-modal" role="dialog">
+		<div class="fr-container fr-container--fluid fr-container-md">
+			<div class="fr-grid-row fr-grid-row--center">
+				<div class="fr-col-12 fr-col-md-8 fr-col-lg-6">
+					<div class="fr-modal__body">
+						<div class="fr-modal__header"></div>
+						<div class="fr-modal__content">
+							<h2 id="fr-modal-2-title fr-mb-2w" class="fr-modal__title">
+								<span class="fr-fi-arrow-right-line fr-fi--lg"></span>Modification en cours
+							</h2>
+							<p class="fr-text fr-mt-1w">
+								<b>Merci de patienter quelques instants...</b>
+							</p>
+						</div>
+						<div class="fr-modal__footer"></div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</dialog>
 {% endblock %}
 
 {% block javascriptsBottom %}
-    {{ parent() }}
-    {% cspscript %}
-        <script type="text/javascript">
-            let idProject = {{ project.id }};
-        </script>
-    {% endcspscript %}
+	{{ parent() }}
+	{% cspscript %}
+	<script type="text/javascript">
+		let idProject = {{ project.id }};
+	</script>
+	{% endcspscript %}
 {% endblock %}

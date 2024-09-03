@@ -1,105 +1,72 @@
 {% extends "admin/statistics/_stats_base.html.twig" %}
 
 {% block head_stylesheets %}
-    {{ parent() }}
-    {{ encore_entry_link_tags('import-scss/admin/statistics/carto') }}
+	{{ parent() }}
+	{{ encore_entry_link_tags('import-scss/admin/statistics/carto') }}
 {% endblock head_stylesheets %}
 
 {% block head_javascript %}
-    {{ parent() }}
-    {{ encore_entry_script_tags('admin/statistics/carto') }}
+	{{ parent() }}
+	{{ encore_entry_script_tags('admin/statistics/carto') }}
 {% endblock head_javascript %}
 
 {% block stats_content %}
-<section class="fr-container">
-    <div data-controller="map"
-      data-action="map:moveend->map#switchShapes"
-      data-map-regions-org-communes-max-value="{{ regions_org_communes_max }}"
-      data-map-departments-org-communes-max-value="{{ departments_org_communes_max }}"
-      >
-      <div>
-        <ul class="flyto info legend">
-          <li>
-            <a href="#metropole"
-              data-action="map#flyTo"
-              data-latlon="[46.227, 2.213]"
-              data-zoom="5.5"
-              >Métropole</a>
-          </li>
-          <li>
-            <a href="#martinique"
-              data-action="map#flyTo"
-              data-latlon="[14.64733448410248, -60.9863181099044]"
-              data-zoom="10.5"
-              >Martinique</a>
-          </li>
-          <li>
-            <a href="#guadeloupe"
-              data-action="map#flyTo"
-              data-latlon="[16.22198290921609, -61.49184374055841]"
-              data-zoom="10.5"
-              >Guadeloupe</a>
-          </li>
-          <li>
-            <a href="reunion"
-              data-action="map#flyTo"
-              data-latlon="[-21.0981335232285, 55.519057070196396]"
-              data-zoom="10.5"
-              >La Réunion</a>
-          </li>
-          <li>
-            <a href="mayotte"
-              data-action="map#flyTo"
-              data-latlon="[-12.8205731179995, 45.163326586369074]"
-              data-zoom="10.5"
-              >Mayotte</a>
-          </li>
-          <li>
-            <a href="guyane"
-              data-action="map#flyTo"
-              data-latlon="[4.0093516128835835, -53.124561798899116]"
-              data-zoom="9"
-              >Guyane</a>
-          </li>
-        </ul>
-      </div>
-      {% cspscript %}
-      <script data-map-target="regions" type="application/json">
-        {{ regions_geojson|raw }}
-      </script>
-      {% endcspscript %}
-      {% cspscript %}
-      <script data-map-target="regionsOrgCounts" type="application/json">
-        {{ regions_org_counts|raw }}
-      </script>
-      {% endcspscript %}
-      {% cspscript %}
-      <script data-map-target="departmentsOrgCounts" type="application/json">
-        {{ departments_org_counts|raw }}
-      </script>
-    {% endcspscript %}
-      {% cspscript %}
-      <script data-map-target="communesWithOrg" type="application/json">
-        {{ communes_with_org|raw }}
-      </script>
-      {% endcspscript %}
-      {% cspscript %}
-      <script data-map-target="epcisWithOrg" type="application/json">
-        {{ epcis_with_org|raw }}
-      </script>
-      {% endcspscript %}
-      {% cspscript %}
-      <script data-map-target="departments" data-src="{{ asset('build/datas/geojson/departements-1000m.geojson') }}"></script>
-      {% endcspscript %}
-      {% cspscript %}
-      <script data-map-target="communes"
-        {% for code in departments_codes %}
-          data-src-{{ code }}="{{ asset('build/datas/geojson/communes-1000m-' ~ code ~ '.geojson') }}"
-        {% endfor %}
-     
-      ></script>
-      {% endcspscript %}
-      <div data-map-target="tables"></div>
-    </div>
-</section>
+	<section class="fr-container">
+		<div data-controller="map" data-action="map:moveend->map#switchShapes" data-map-regions-org-communes-max-value="{{ regions_org_communes_max }}" data-map-departments-org-communes-max-value="{{ departments_org_communes_max }}">
+			<div>
+				<ul class="flyto info legend">
+					<li>
+						<a href="#metropole" data-action="map#flyTo" data-latlon="[46.227, 2.213]" data-zoom="5.5">Métropole</a>
+					</li>
+					<li>
+						<a href="#martinique" data-action="map#flyTo" data-latlon="[14.64733448410248, -60.9863181099044]" data-zoom="10.5">Martinique</a>
+					</li>
+					<li>
+						<a href="#guadeloupe" data-action="map#flyTo" data-latlon="[16.22198290921609, -61.49184374055841]" data-zoom="10.5">Guadeloupe</a>
+					</li>
+					<li>
+						<a href="reunion" data-action="map#flyTo" data-latlon="[-21.0981335232285, 55.519057070196396]" data-zoom="10.5">La Réunion</a>
+					</li>
+					<li>
+						<a href="mayotte" data-action="map#flyTo" data-latlon="[-12.8205731179995, 45.163326586369074]" data-zoom="10.5">Mayotte</a>
+					</li>
+					<li>
+						<a href="guyane" data-action="map#flyTo" data-latlon="[4.0093516128835835, -53.124561798899116]" data-zoom="9">Guyane</a>
+					</li>
+				</ul>
+			</div>
+			{% cspscript %}
+			<script data-map-target="regions" type="application/json">
+				{{ regions_geojson|raw }}
+			</script>
+			{% endcspscript %}
+			{% cspscript %}
+			<script data-map-target="regionsOrgCounts" type="application/json">
+				{{ regions_org_counts|raw }}
+			</script>
+			{% endcspscript %}
+			{% cspscript %}
+			<script data-map-target="departmentsOrgCounts" type="application/json">
+				{{ departments_org_counts|raw }}
+			</script>
+			{% endcspscript %}
+			{% cspscript %}
+			<script data-map-target="communesWithOrg" type="application/json">
+				{{ communes_with_org|raw }}
+			</script>
+			{% endcspscript %}
+			{% cspscript %}
+			<script data-map-target="epcisWithOrg" type="application/json">
+				{{ epcis_with_org|raw }}
+			</script>
+			{% endcspscript %}
+			{% cspscript %}
+			<script data-map-target="departments" data-src="{{ asset('build/datas/geojson/departements-1000m.geojson') }}"></script>
+			{% endcspscript %}
+			{% cspscript %}
+			<script data-map-target="communes" {% for code in departments_codes %} data-src- {{ code }}="{{ asset('build/datas/geojson/communes-1000m-' ~ code ~ '.geojson') }}" {% endfor %}></script>
+			{% endcspscript %}
+			<div data-map-target="tables"></div>
+		</div>
+	</section>
 {% endblock stats_content %}

@@ -46,9 +46,9 @@ class ProjectController extends FrontController
     #[Route('/projets/vos-projets/', name: 'old_app_user_project_structure')]
     public function oldIndex(): RedirectResponse
     {
-        return $this->redirectToRoute('app_user_project_structure');   
+        return $this->redirectToRoute('app_user_project_structure');
     }
-    
+
     #[Route('/comptes/projets/', name: 'app_user_project_structure')]
     public function index(
         UserService $userService,
@@ -56,8 +56,7 @@ class ProjectController extends FrontController
         RequestStack $requestStack,
         ManagerRegistry $managerRegistry,
         NotificationService $notificationService
-    ): Response
-    {
+    ): Response {
         $user = $userService->getUserLogged();
 
         // formulaire suppression projet
@@ -76,7 +75,7 @@ class ProjectController extends FrontController
                                 $beneficiary,
                                 'Un projet a été supprimé',
                                 '<p>
-                                '.$user->getFirstname().' '.$user->getLastname().' a supprimé le projet '.$project->getName().'.
+                                ' . $user->getFirstname() . ' ' . $user->getLastname() . ' a supprimé le projet ' . $project->getName() . '.
                                 </p>'
                             );
                         }
@@ -115,9 +114,9 @@ class ProjectController extends FrontController
         );
 
         // fil arianne
-        $this->breadcrumb->add("Mon compte",$this->generateUrl('app_user_dashboard'));
+        $this->breadcrumb->add("Mon compte", $this->generateUrl('app_user_dashboard'));
         $this->breadcrumb->add("Mes projets de ma structure");
-        
+
         // rendu template
         return $this->render('user/project/index.html.twig', [
             'projects' => $projects,
@@ -129,14 +128,14 @@ class ProjectController extends FrontController
     public function projetFavoris(UserService $userService): Response
     {
         $user = $userService->getUserLogged();
-        $this->breadcrumb->add("Mon compte",$this->generateUrl('app_user_dashboard'));
+        $this->breadcrumb->add("Mon compte", $this->generateUrl('app_user_dashboard'));
         $this->breadcrumb->add("Mes projets favoris");
         return $this->render('user/project/favoris.html.twig', [
             'user' => $user
         ]);
     }
 
-    
+
     #[Route('/comptes/projets/details/{id}-{slug}/', name: 'app_user_project_details_fiche_projet', requirements: ['id' => '[0-9]+', 'slug' => '[a-zA-Z0-9\-_]+'])]
     public function details(
         $id,
@@ -147,8 +146,7 @@ class ProjectController extends FrontController
         ManagerRegistry $managerRegistry,
         ImageService $imageService,
         NotificationService $notificationService
-    ): Response
-    {
+    ): Response {
         $project = $ProjectRepository->findOneBy(
             [
                 'id' => $id,
@@ -156,11 +154,11 @@ class ProjectController extends FrontController
             ]
         );
         $user = $userService->getUserLogged();
-        
+
         if (!$project instanceof Project || !$userService->isMemberOfOrganization($project->getOrganization(), $user)) {
             return $this->redirectToRoute('app_user_project_structure');
         }
-        
+
         $form = $this->createForm(ProjectEditType::class, $project);
 
         $form->handleRequest($requestStack->getCurrentRequest());
@@ -169,7 +167,7 @@ class ProjectController extends FrontController
                 // traitement image
                 $imageFile = $form->get('imageUploadedFile')->getData();
                 if ($imageFile instanceof UploadedFile) {
-                    $project->setImage(Project::FOLDER.'/'.$imageService->getSafeFileName($imageFile->getClientOriginalName()));
+                    $project->setImage(Project::FOLDER . '/' . $imageService->getSafeFileName($imageFile->getClientOriginalName()));
                     $imageService->sendUploadedImageToCloud($imageFile, Project::FOLDER, $project->getImage());
                 }
 
@@ -184,7 +182,7 @@ class ProjectController extends FrontController
                 }
 
                 // sauvegarde
-                $managerRegistry->getManager()->persist($project); 
+                $managerRegistry->getManager()->persist($project);
                 $managerRegistry->getManager()->flush();
 
                 // notification aux autres membres de l'organization
@@ -195,8 +193,8 @@ class ProjectController extends FrontController
                                 $beneficiary,
                                 'Un projet a été mis à jour',
                                 '<p>
-                                '.$user->getFirstname().' '.$user->getLastname().' a modifié les informations du projet
-                                <a href="'.$this->generateUrl('app_user_project_details_fiche_projet', ['id' => $project->getId(), 'slug' => $project->getSlug()], UrlGeneratorInterface::ABSOLUTE_URL).'">'.$project->getName().'</a>.
+                                ' . $user->getFirstname() . ' ' . $user->getLastname() . ' a modifié les informations du projet
+                                <a href="' . $this->generateUrl('app_user_project_details_fiche_projet', ['id' => $project->getId(), 'slug' => $project->getSlug()], UrlGeneratorInterface::ABSOLUTE_URL) . '">' . $project->getName() . '</a>.
                                 </p>'
                             );
                         }
@@ -220,9 +218,9 @@ class ProjectController extends FrontController
         }
 
         // fil arianne
-        $this->breadcrumb->add("Mon compte",$this->generateUrl('app_user_dashboard'));
+        $this->breadcrumb->add("Mon compte", $this->generateUrl('app_user_dashboard'));
         $this->breadcrumb->add("Mes projets");
-        $this->breadcrumb->add("Projet ".$project->getName(),null);
+        $this->breadcrumb->add("Projet " . $project->getName(), null);
 
         // rendu template
         return $this->render('user/project/fiche_projet.html.twig', [
@@ -239,11 +237,10 @@ class ProjectController extends FrontController
         ManagerRegistry $managerRegistry,
         ImageService $imageService,
         NotificationService $notificationService
-    ): Response
-    {
+    ): Response {
         $project = new Project();
         $user = $userService->getUserLogged();
-        
+
         // formulaire
         $form = $this->createForm(ProjectEditType::class, $project);
         $form->handleRequest($requestStack->getCurrentRequest());
@@ -252,7 +249,7 @@ class ProjectController extends FrontController
                 // traitement image
                 $imageFile = $form->get('imageUploadedFile')->getData();
                 if ($imageFile instanceof UploadedFile) {
-                    $project->setImage(Project::FOLDER.'/'.$imageService->getSafeFileName($imageFile->getClientOriginalName()));
+                    $project->setImage(Project::FOLDER . '/' . $imageService->getSafeFileName($imageFile->getClientOriginalName()));
                     $imageService->sendUploadedImageToCloud($imageFile, Project::FOLDER, $project->getImage());
                 }
 
@@ -262,14 +259,14 @@ class ProjectController extends FrontController
                     $project->setOrganization($user->getDefaultOrganization());
                 }
                 $project->setAuthor($user);
-                
+
                 // si demande de projet public
                 if ($project->getStatus() == Project::STATUS_DRAFT && $project->isIsPublic()) {
                     $project->setStatus(Project::STATUS_REVIEWABLE);
                 }
 
                 // sauvegarde
-                $managerRegistry->getManager()->persist($project); 
+                $managerRegistry->getManager()->persist($project);
                 $managerRegistry->getManager()->flush();
 
                 // notification aux autres membres de l'organization
@@ -279,8 +276,8 @@ class ProjectController extends FrontController
                             $beneficiary,
                             'Un projet a été créé',
                             '<p>
-                            '.$user->getFirstname().' '.$user->getLastname().' a créé le projet
-                            <a href="'.$this->generateUrl('app_user_project_details_fiche_projet', ['id' => $project->getId(), 'slug' => $project->getSlug()], UrlGeneratorInterface::ABSOLUTE_URL).'">'.$project->getName().'</a>.
+                            ' . $user->getFirstname() . ' ' . $user->getLastname() . ' a créé le projet
+                            <a href="' . $this->generateUrl('app_user_project_details_fiche_projet', ['id' => $project->getId(), 'slug' => $project->getSlug()], UrlGeneratorInterface::ABSOLUTE_URL) . '">' . $project->getName() . '</a>.
                             </p>'
                         );
                     }
@@ -304,9 +301,9 @@ class ProjectController extends FrontController
         }
 
         // fil arianne
-        $this->breadcrumb->add("Mon compte",$this->generateUrl('app_user_dashboard'));
+        $this->breadcrumb->add("Mon compte", $this->generateUrl('app_user_dashboard'));
         $this->breadcrumb->add("Mes projets");
-        $this->breadcrumb->add("Nouveau projet",null);
+        $this->breadcrumb->add("Nouveau projet", null);
 
         // rendu termplate
         return $this->render('user/project/creation_projet.html.twig', [
@@ -330,8 +327,7 @@ class ProjectController extends FrontController
         ReferenceService $referenceService,
         SpreadsheetExporterService $spreadsheetExporterService,
         AidService $aidService
-    ): Response
-    {
+    ): Response {
         $projectCreated = $requestStack->getCurrentRequest()->get('projectCreated', 0);
 
         $project = $ProjectRepository->findOneBy(
@@ -340,7 +336,7 @@ class ProjectController extends FrontController
             ]
         );
         $user = $userService->getUserLogged();
-        
+
         if (!$project instanceof Project || !$userService->isMemberOfOrganization($project->getOrganization(), $user)) {
             return $this->redirectToRoute('app_user_project_structure');
         }
@@ -369,9 +365,9 @@ class ProjectController extends FrontController
 
             // regarde si le projet à un projet référent associé pour écraser la recherche
             if ($project->getProjectReference() instanceof ProjectReference && $project->getProjectReference()->getName()) {
-                    $aidParams['keyword'] = $project->getProjectReference()->getName();
-                    $aidParams['projectReference'] = $project->getProjectReference();
-                    $searchParams['keyword'] = $aidParams['keyword'];
+                $aidParams['keyword'] = $project->getProjectReference()->getName();
+                $aidParams['projectReference'] = $project->getProjectReference();
+                $searchParams['keyword'] = $aidParams['keyword'];
             }
 
             $aidsSuggested = $aidService->searchAids($aidParams);
@@ -399,8 +395,8 @@ class ProjectController extends FrontController
                                 $beneficiary,
                                 'Une aide a été supprimée d’un projet',
                                 '<p>
-                                '.$user->getFirstname().' '.$user->getLastname().' a supprimé une aide du projet
-                                <a href="'.$this->generateUrl('app_user_project_details_fiche_projet', ['id' => $project->getId(), 'slug' => $project->getSlug()], UrlGeneratorInterface::ABSOLUTE_URL).'">'.$project->getName().'</a>.
+                                ' . $user->getFirstname() . ' ' . $user->getLastname() . ' a supprimé une aide du projet
+                                <a href="' . $this->generateUrl('app_user_project_details_fiche_projet', ['id' => $project->getId(), 'slug' => $project->getSlug()], UrlGeneratorInterface::ABSOLUTE_URL) . '">' . $project->getName() . '</a>.
                                 </p>'
                             );
                         }
@@ -442,7 +438,7 @@ class ProjectController extends FrontController
                         FrontController::FLASH_SUCCESS,
                         'Le statut de l\'aide a bien été modifié.'
                     );
-    
+
                     // redirection
                     return $this->redirectToRoute('app_user_project_aides', [
                         'id' => $project->getId(),
@@ -471,12 +467,12 @@ class ProjectController extends FrontController
                         return $spreadsheetExporterService->exportProjectAids($project, FileService::FORMAT_CSV);
                         break;
                     case FileService::FORMAT_XLSX:
-                            return $spreadsheetExporterService->exportProjectAids($project, FileService::FORMAT_XLSX);
+                        return $spreadsheetExporterService->exportProjectAids($project, FileService::FORMAT_XLSX);
                         break;
                     case FileService::FORMAT_PDF:
                         return $this->exportAidsToPdf($project);
                         break;
-                    default: 
+                    default:
                         $this->addFlash(FrontController::FLASH_ERROR, 'Format non supporté');
                 }
             } else {
@@ -489,9 +485,9 @@ class ProjectController extends FrontController
         }
 
         // fil arianne
-        $this->breadcrumb->add("Mon compte",$this->generateUrl('app_user_dashboard'));
+        $this->breadcrumb->add("Mon compte", $this->generateUrl('app_user_dashboard'));
         $this->breadcrumb->add("Mes projets");
-        $this->breadcrumb->add("Projet ".$project->getName(),null);
+        $this->breadcrumb->add("Projet " . $project->getName(), null);
 
         // rendu template
         return $this->render('user/project/aides.html.twig', [
@@ -509,7 +505,7 @@ class ProjectController extends FrontController
     private function exportAidsToPdf(Project $project)
     {
         $now = new \DateTime(date('Y-m-d H:i:s'));
-        $filename = 'Aides-territoires_-_'.$now->format('Y-m-d').'_-_'.$project->getSlug().'.pdf';
+        $filename = 'Aides-territoires_-_' . $now->format('Y-m-d') . '_-_' . $project->getSlug() . '.pdf';
         $pdfOptions = new Options();
         $pdfOptions->setIsRemoteEnabled(true);
 
@@ -537,7 +533,7 @@ class ProjectController extends FrontController
 
         // Définissez le type de contenu et le nom du fichier dans les en-têtes HTTP
         $response->headers->set('Content-Type', 'application/pdf');
-        $response->headers->set('Content-Disposition', 'inline; filename="'.$filename.'.pdf"');
+        $response->headers->set('Content-Disposition', 'inline; filename="' . $filename . '.pdf"');
 
         return $response;
 
@@ -559,11 +555,10 @@ class ProjectController extends FrontController
         ProjectRepository $projectRepository,
         RequestStack $requestStack,
         ReferenceService $referenceService
-    ): Response
-    {
+    ): Response {
         // gestion pagination
         $currentPage = (int) $requestStack->getCurrentRequest()->get('page', 1);
-        
+
         $project = $projectRepository->findOneBy(
             [
                 'id' => $id,
@@ -571,7 +566,7 @@ class ProjectController extends FrontController
             ]
         );
         $user = $userService->getUserLogged();
-        
+
         if (!$project instanceof Project || !$userService->isMemberOfOrganization($project->getOrganization(), $user)) {
             return $this->redirectToRoute('app_user_project_structure');
         }
@@ -579,13 +574,11 @@ class ProjectController extends FrontController
         // Projets subventionnés
         $synonyms = ($project->getProjectReference())
             ? $referenceService->getSynonymes($project->getProjectReference()->getName())
-            : null
-        ;
+            : null;
 
         $project_perimeter = ($user->getDefaultOrganization() && $user->getDefaultOrganization()->getPerimeter())
             ? $user->getDefaultOrganization()->getPerimeter()
-            : null
-        ;
+            : null;
         $projects = [];
         if ($project_perimeter instanceof Perimeter) {
             $projectParams = [
@@ -605,7 +598,7 @@ class ProjectController extends FrontController
         $pagerfanta->setMaxPerPage(self::NB_PROJECT_BY_PAGE);
         $pagerfanta->setCurrentPage($currentPage);
 
-        
+
         // Projets publics :
         $projets_publics = [];
         if ($synonyms) {
@@ -629,11 +622,11 @@ class ProjectController extends FrontController
                 $projets_publics = $projectRepository->findPublicProjects($projectParams);
             }
         }
-        
+
         // fil d'arianne
-        $this->breadcrumb->add("Mon compte",$this->generateUrl('app_user_dashboard'));
+        $this->breadcrumb->add("Mon compte", $this->generateUrl('app_user_dashboard'));
         $this->breadcrumb->add("Mes projets");
-        $this->breadcrumb->add("Projet ".$project->getName(),null);
+        $this->breadcrumb->add("Projet " . $project->getName(), null);
 
         // rendu template
         return $this->render('user/project/similaires.html.twig', [
@@ -649,14 +642,13 @@ class ProjectController extends FrontController
         ProjectRepository $projectRepository,
         ProjectService $projectService,
         UserService $userService
-    ) : JsonResponse
-    {
+    ): JsonResponse {
         try {
             // verification requête interne
             if (!$this->isGranted(InternalRequestVoter::IDENTIFIER)) {
                 throw $this->createAccessDeniedException(InternalRequestVoter::MESSAGE_ERROR);
             }
-            
+
             // recupere id
             $id = (int) $requestStack->getCurrentRequest()->get('id', 0);
             if (!$id) {
@@ -686,7 +678,7 @@ class ProjectController extends FrontController
             if ($isLockedByAnother) {
                 throw new \Exception('Projet déjà bloqué');
             }
-            
+
             // la débloque
             $projectService->lock($project, $user);
 
@@ -707,8 +699,7 @@ class ProjectController extends FrontController
         ProjectRepository $projectRepository,
         UserService $userService,
         ProjectService $projectService
-    ): Response
-    {
+    ): Response {
         try {
             // le user
             $user = $userService->getUserLogged();
@@ -743,7 +734,6 @@ class ProjectController extends FrontController
             // retour
             return $this->redirectToRoute('app_user_project_details_fiche_projet', ['id' => $project->getId(), 'slug' => $project->getSlug()]);
         }
-
     }
 
     #[Route('/comptes/projets/ajax-unlock/', name: 'app_user_project_ajax_unlock', options: ['expose' => true])]
@@ -752,14 +742,13 @@ class ProjectController extends FrontController
         ProjectRepository $projectRepository,
         ProjectService $projectService,
         UserService $userService
-    ) : JsonResponse
-    {
+    ): JsonResponse {
         try {
             // verification requête interne
             if (!$this->isGranted(InternalRequestVoter::IDENTIFIER)) {
                 throw $this->createAccessDeniedException(InternalRequestVoter::MESSAGE_ERROR);
             }
-            
+
             // recupere id
             $id = (int) $requestStack->getCurrentRequest()->get('id', 0);
             if (!$id) {

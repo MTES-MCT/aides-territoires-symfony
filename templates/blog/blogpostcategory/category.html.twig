@@ -1,6 +1,7 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Blog{{ getParameter('meta_title_end') }}{% endblock %}
+{% block title %}Blog{{ getParameter('meta_title_end') }}
+{% endblock %}
 
 {% block body %}
 	<main role="main" class="fr-container-fluid" id="at-main">
@@ -13,24 +14,24 @@
 					<div class="fr-col-md-10">
 						<div id="blog-content">
 							<h1>{{ blogPostCategory.name }}</h1>
-                            {% if blogPostCategory.description %}
-                            {{ blogPostCategory.description|sanitize_html|raw }}
-                            {% endif %}
+							{% if blogPostCategory.description %}
+								{{ blogPostCategory.description|sanitize_html|raw }}
+							{% endif %}
 						</div>
 
 						<div class="posts">
-                            {% for blogPost in blogPosts %}
+							{% for blogPost in blogPosts %}
 								{% include 'blog/blogpost/_blogpost.html.twig' %}
-                            {% endfor %}
+							{% endfor %}
 						</div>
 					</div>
 				</div>
 			</section>
 
 			<div class="fr-container fr-grid-row fr-grid-row--center fr-my-5w">
-                <div class="fr-container fr-grid-row fr-grid-row--center fr-my-5w">
-                    {% include 'blog/_blog-pagination.html.twig' %}
-                </div>
+				<div class="fr-container fr-grid-row fr-grid-row--center fr-my-5w">
+					{% include 'blog/_blog-pagination.html.twig' %}
+				</div>
 			</div>
 
 		</div>

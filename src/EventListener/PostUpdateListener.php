@@ -46,7 +46,7 @@ class PostUpdateListener
         if ($args->getObject() instanceof BackerAskAssociate) {
             $this->backerAskAssociateListener->onPostUpdate($args);
         }
-        
+
         // LOG ADMIN
         $this->logAdmin($args);
     }
@@ -58,7 +58,7 @@ class PostUpdateListener
             if ($firewallConfig->getName() == LogAdminAction::FIREWALL_ADMIN_NAME && !$args->getObject() instanceof LogAdminAction) {
                 // l'action d'amin a loguer
                 $logAdminAction = $this->getLogAdminAction($args);
-                
+
                 $changeMessage = [
                     'changed' => [
                         'fields' => []
@@ -73,8 +73,8 @@ class PostUpdateListener
                     }
                 }
                 $logAdminAction->setChangeMessage($changeMessage);
-    
-    
+
+
                 // sauvegarde
                 $args->getObjectManager()->persist($logAdminAction);
                 $args->getObjectManager()->flush();
@@ -95,7 +95,7 @@ class PostUpdateListener
         if (method_exists($args->getObject(), '__toString')) {
             $objectRepr = $args->getObject()->__toString();
         } else {
-            $objectRepr = get_class($args->getObject()). ' : ' . $args->getObject()->getId();
+            $objectRepr = get_class($args->getObject()) . ' : ' . $args->getObject()->getId();
         }
         $logAdminAction->setObjectRepr($objectRepr);
         $logAdminAction->setActionFlag(LogAdminAction::ACTION_FLAG_UPDATE);

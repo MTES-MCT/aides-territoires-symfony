@@ -45,23 +45,23 @@ class ImportFluxMinistereCultureCommand extends ImportFluxCommand
             if (trim($description) == '') {
                 $description = null;
             }
-    
+
             $eligility = '';
             if (isset($aidToImport['amount'])) {
                 $eligility .= $aidToImport['amount'] . ' ';
             }
             if (isset($aidToImport['public'])) {
-                $eligility .= '<br/> bénéficiaires de l\'aide:'. (string) $aidToImport['public'];
+                $eligility .= '<br/> bénéficiaires de l\'aide:' . (string) $aidToImport['public'];
             }
             if (isset($aidToImport['eztag_region'])) {
                 $eztagRegion = $aidToImport['eztag_region'];
-                if (is_array($eztagRegion )) {
+                if (is_array($eztagRegion)) {
                     $eztagRegion  = implode(', ', $eztagRegion);
                 }
-                $eligility .= '<br/> périmètre de l\'aide:'. (string) $eztagRegion;
+                $eligility .= '<br/> périmètre de l\'aide:' . (string) $eztagRegion;
             }
             if (isset($aidToImport['deadline'])) {
-                $eligility .= '<br/> date de clôture de l\'aide :'. (string) $aidToImport['deadline'];
+                $eligility .= '<br/> date de clôture de l\'aide :' . (string) $aidToImport['deadline'];
             }
             $eligility = html_entity_decode($eligility);
             if (trim($eligility) == '') {
@@ -69,11 +69,11 @@ class ImportFluxMinistereCultureCommand extends ImportFluxCommand
             } else {
                 $eligility = $this->htmlSanitizerInterface->sanitize($eligility);
             }
-    
+
             $dateSubmissionDeadline = $this->getDateTimeOrNull($aidToImport['deadline'] ?? null);
-    
+
             $isCallForProject = (isset($aidToImport['deadline']) && $aidToImport['deadline']) ? true : false;
-    
+
             $return = [
                 'importDataMention' => 'Ces données sont mises à disposition par le Ministère de la Culture.',
                 'name' => isset($aidToImport['title']) ? strip_tags($aidToImport['title']) : null,
@@ -92,13 +92,12 @@ class ImportFluxMinistereCultureCommand extends ImportFluxCommand
                     $return['dateSubmissionDeadline'] = $dateSubmissionDeadline;
                 }
             }
-    
+
             // on ajoute les données brut d'import pour comparer avec les données actuelles
             return $this->mergeImportDatas($return);
         } catch (\Exception $e) {
             return [];
         }
-
     }
 
     protected function setAidSteps(array $aidToImport, Aid $aid): Aid
@@ -243,7 +242,7 @@ class ImportFluxMinistereCultureCommand extends ImportFluxCommand
             return $aid;
         }
         $mapping = $this->getMappingCategories();
-        
+
         foreach ($aidToImport['eztag_theme'] as $thematique) {
             if (isset($mapping[$thematique]) && is_array($mapping[$thematique])) {
                 foreach ($mapping[$thematique] as $category) {
@@ -284,15 +283,9 @@ class ImportFluxMinistereCultureCommand extends ImportFluxCommand
     private function getMappingCategories(): array // NOSONAR too complex
     {
         return [
-            'Démocratisation' => [
-
-            ],
-            'Développement culturel' => [
-
-            ],
-            'Développement durable' => [
-
-            ],
+            'Démocratisation' => [],
+            'Développement culturel' => [],
+            'Développement durable' => [],
             'Education aux médias et à l\'information (EMI)' => [
                 'medias',
                 'education'
@@ -307,9 +300,7 @@ class ImportFluxMinistereCultureCommand extends ImportFluxCommand
             'Handicap, accessibilité' => [
                 'handicap'
             ],
-            'Pratiques culturelles' => [
-
-            ],
+            'Pratiques culturelles' => [],
             'Éducation artistique et culturelle' => [
                 'education'
             ],
@@ -341,10 +332,8 @@ class ImportFluxMinistereCultureCommand extends ImportFluxCommand
             'Droit de la culture et de la communication' => [
                 'medias'
             ],
-            'Europe et international' => [
-            ],
-            'Histoire des politiques culturelles' => [
-            ],
+            'Europe et international' => [],
+            'Histoire des politiques culturelles' => [],
             'Bande dessinée' => [
                 'livres'
             ],
@@ -380,8 +369,7 @@ class ImportFluxMinistereCultureCommand extends ImportFluxCommand
             'Multilinguisme' => [
                 'culture'
             ],
-            'Mécénat' => [
-            ],
+            'Mécénat' => [],
             'Audiovisuel' => [
                 'medias'
             ],
@@ -429,14 +417,10 @@ class ImportFluxMinistereCultureCommand extends ImportFluxCommand
             'Sécurité, sûreté' => [
                 'patrimoine'
             ],
-            '1% artistique' => [
-            ],
-            'Pass Culture' => [
-            ],
-            'Villes et pays d\'art et d\'histoire' => [
-            ],
-            'Pratiques, consommations et usages culturels' => [
-            ],
+            '1% artistique' => [],
+            'Pass Culture' => [],
+            'Villes et pays d\'art et d\'histoire' => [],
+            'Pratiques, consommations et usages culturels' => [],
             'Sorties, expositions' => [
                 'musee'
             ],
@@ -458,8 +442,7 @@ class ImportFluxMinistereCultureCommand extends ImportFluxCommand
             'Théâtre' => [
                 'spectaclevivant'
             ],
-            'Études et statistiques' => [
-            ],
+            'Études et statistiques' => [],
             'Spectacle vivant' => [
                 'spectaclevivant'
             ],
@@ -469,20 +452,16 @@ class ImportFluxMinistereCultureCommand extends ImportFluxCommand
             'Patrimoines' => [
                 'patrimoine'
             ],
-            'Accès à la culture' => [
-            ],
-            'Politiques culturelles' => [
-            ],
+            'Accès à la culture' => [],
+            'Politiques culturelles' => [],
             'Arts visuels' => [
                 'spectaclevivant'
             ],
             'Égalité et diversité' => [
                 'egalite-des-chances'
             ],
-            'Evénements nationaux' => [
-            ],
-            'Eté culturel' => [
-            ],
+            'Evénements nationaux' => [],
+            'Eté culturel' => [],
             'Festival de l\'Histoire de l\'Art' => [
                 'arts',
                 'musee'
@@ -508,10 +487,8 @@ class ImportFluxMinistereCultureCommand extends ImportFluxCommand
             'Sciences du patrimoine' => [
                 'patrimoine'
             ],
-            'Création artistique' => [
-            ],
-            'Industries culturelles et créatives' => [
-            ],
+            'Création artistique' => [],
+            'Industries culturelles et créatives' => [],
         ];
     }
 
@@ -522,7 +499,7 @@ class ImportFluxMinistereCultureCommand extends ImportFluxCommand
         } else {
             $aidRecurrence = $this->managerRegistry->getRepository(AidRecurrence::class)->findOneBy(['slug' => AidRecurrence::SLUG_ONEOFF]);
         }
-        
+
         if ($aidRecurrence instanceof AidRecurrence) {
             $aid->setAidRecurrence($aidRecurrence);
         }

@@ -10,9 +10,7 @@ class NotificationDeleteAllType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $builder
-
-        ;
+        $builder;
     }
 
     public function configureOptions(OptionsResolver $resolver): void

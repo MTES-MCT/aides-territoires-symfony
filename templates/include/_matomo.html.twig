@@ -1,24 +1,29 @@
 {% if app.environment == 'prod' %}
-<!-- Matomo -->
-    {% cspscript %}
-    <script>
-        var _paq = window._paq = window._paq || [];
-        /* tracker methods like "setCustomDimension" should be called before "trackPageView" */
-        _paq.push(['trackPageView']);
-        _paq.push(['enableLinkTracking']);
-        {% set analyticsGoalId = getMatomoGoalId() %}
-        {% if analyticsGoalId %}
-            _paq.push(['trackGoal', {{ analyticsGoalId }}]);
-        {% endif %}
+	<!-- Matomo -->
+	{% cspscript %}
+	<script>
+		var _paq = window._paq = window._paq || [];
+/* tracker methods like "setCustomDimension" should be called before "trackPageView" */
+_paq.push(['trackPageView']);
+_paq.push(['enableLinkTracking']);
+{% set analyticsGoalId = getMatomoGoalId() %}
+{% if analyticsGoalId %}_paq.push(['trackGoal', {{ analyticsGoalId }}]);{% endif %}
 
-        (function() {
-            var u="https://stats.beta.gouv.fr/";
-            _paq.push(['setTrackerUrl', u+'matomo.php']);
-            _paq.push(['setSiteId', '{{ getParameter('matomo_site_id') }}']);
-            var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
-            g.async=true; g.src=u+'matomo.js'; s.parentNode.insertBefore(g,s);
-        })();
-    </script>
-    {% endcspscript %}
-    <!-- End Matomo Code -->
+(function () {
+var u = "https://stats.beta.gouv.fr/";
+_paq.push([
+'setTrackerUrl',
+u + 'matomo.php'
+]);
+_paq.push(['setSiteId', '{{ getParameter('matomo_site_id') }}']);
+var d = document,
+g = d.createElement('script'),
+s = d.getElementsByTagName('script')[0];
+g.async = true;
+g.src = u + 'matomo.js';
+s.parentNode.insertBefore(g, s);
+})();
+	</script>
+	{% endcspscript %}
+	<!-- End Matomo Code -->
 {% endif %}

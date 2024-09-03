@@ -58,14 +58,12 @@ class NotificationRepository extends ServiceEntityRepository
 
         if ($notRead) {
             $qb
-                ->andWhere('n.timeRead IS NULL')
-            ;
+                ->andWhere('n.timeRead IS NULL');
         }
 
         if ($notSend) {
             $qb
-                ->andWhere('n.timeEmail IS NULL')
-            ;
+                ->andWhere('n.timeEmail IS NULL');
         }
 
         if ($orderBy !== null) {

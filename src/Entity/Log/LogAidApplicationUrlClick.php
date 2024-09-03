@@ -35,7 +35,7 @@ class LogAidApplicationUrlClick
     private ?\DateTimeInterface $dateCreate = null;
 
     #[ORM\ManyToOne(inversedBy: 'logAidApplicationUrlClicks')]
-    #[ORM\JoinColumn(onDelete:'SET NULL')]
+    #[ORM\JoinColumn(onDelete: 'SET NULL')]
     private ?Aid $aid = null;
 
     public function getId(): ?int

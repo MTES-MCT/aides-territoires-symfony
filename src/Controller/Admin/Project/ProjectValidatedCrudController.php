@@ -23,27 +23,27 @@ class ProjectValidatedCrudController extends AtCrudController
         yield IdField::new('id')->onlyOnIndex();
         yield TextField::new('projectName', 'Nom');
         yield AssociationField::new('project', 'Projet lié')
-        ->autocomplete()
-        ->hideOnIndex();
+            ->autocomplete()
+            ->hideOnIndex();
         yield TrumbowygField::new('description', 'Description')
-        ->hideOnIndex();
+            ->hideOnIndex();
         yield TextField::new('aidName', 'Nom de l\'aide');
         yield AssociationField::new('aid', 'Aide liée')
-        ->autocomplete()
-        ->hideOnIndex();
+            ->autocomplete()
+            ->hideOnIndex();
         yield AssociationField::new('organization', 'Organisation porteuse')
-        ->autocomplete();
+            ->autocomplete();
         yield TextField::new('financerName', 'Nom du porteur de l’aide obtenue');
         yield AssociationField::new('financer', 'Porteur d’aides lié')
-        ->autocomplete()
-        ->hideOnIndex();
+            ->autocomplete()
+            ->hideOnIndex();
         yield IntegerField::new('budget', 'Budget définitif')
-        ->hideOnIndex();
+            ->hideOnIndex();
         yield IntegerField::new('amountObtained', 'Montant obtenu');
         yield DateTimeField::new('timeObtained', 'Date à laquelle l’aide a été obtenue par le porteur du projet')
-        ->setHelp('Date à laquelle l’aide a été obtenue par le porteur du projet');
+            ->setHelp('Date à laquelle l’aide a été obtenue par le porteur du projet');
         yield DateTimeField::new('timeCreate', 'Date de création')
-        ->setFormTypeOption('attr', ['readonly' => true])
-        ->hideOnIndex();
+            ->setFormTypeOption('attr', ['readonly' => true])
+            ->hideOnIndex();
     }
 }

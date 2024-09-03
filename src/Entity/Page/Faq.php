@@ -41,7 +41,7 @@ class Faq
     #[ORM\ManyToOne(inversedBy: 'faqs')]
     private ?PageTab $pageTab = null;
 
-    
+
     private ?\DateTime $latestUpdateTime = null;
 
     public function __construct()

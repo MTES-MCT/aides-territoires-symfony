@@ -25,15 +25,14 @@ class ImageNameProjectCommand extends Command
     protected string $commandTextStart = '<Fix des mimes types sur s3';
     protected string $commandTextEnd = '>Fix des mimes types sur s3';
 
-    
+
 
     public function __construct(
         protected ManagerRegistry $managerRegistry,
         protected ParamService $paramService,
         protected FileService $fileService
-    )
-    {
-        ini_set('max_execution_time', 60*60);
+    ) {
+        ini_set('max_execution_time', 60 * 60);
         ini_set('memory_limit', '1G');
         parent::__construct();
     }
@@ -46,7 +45,7 @@ class ImageNameProjectCommand extends Command
         $io = new SymfonyStyle($input, $output);
         $io->title($this->commandTextStart);
 
-        try  {
+        try {
             // import des keywords
             $this->fixMimesTypes($input, $output);
         } catch (\Exception $exception) {
@@ -73,7 +72,7 @@ class ImageNameProjectCommand extends Command
             'credentials' => $credentials,
             'use_path_style_endpoint' => true
         ]);
-        
+
         /** @var ProjectRepository $projectRepo */
         $projectRepo = $this->managerRegistry->getRepository(Project::class);
 
@@ -86,7 +85,7 @@ class ImageNameProjectCommand extends Command
             try {
                 $fixedImage = str_replace(['-jpg', '-png'], ['.jpg', '.png'], $project->getImage());
 
-        
+
                 $extension = pathinfo($fixedImage, PATHINFO_EXTENSION);
 
                 // Déterminez le type MIME en fonction de l'extension
@@ -98,9 +97,9 @@ class ImageNameProjectCommand extends Command
                 } elseif ($extension == 'svg') {
                     $mimeType = 'image/svg+xml';
                 }
-                
+
                 // Chemin vers le fichier temporaire
-                $url = $this->paramService->get('cloud_image_url').$project->getImage();
+                $url = $this->paramService->get('cloud_image_url') . $project->getImage();
 
                 // Télécharge le fichier à un emplacement temporaire
                 $tempPath = tempnam($this->fileService->getUploadTmpDir(), '');

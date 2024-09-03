@@ -29,7 +29,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 class Project // NOSONAR too much methods
 {
     const FOLDER = 'projects';
-    
+
     const STATUS = [
         ['slug' => 'draft', 'name' => 'Brouillon'],
         ['slug' => 'reviewable', 'name' => 'En revue'],
@@ -53,7 +53,7 @@ class Project // NOSONAR too much methods
 
     const CONTRACT_LINK_BY_SLUG = [
         'ACV1' => 'Action Coeur de Ville 1',
-        'ACV2'=> 'Action Coeur de Ville 2',
+        'ACV2' => 'Action Coeur de Ville 2',
         'AMI' => 'Expérimentations et bonnes pratiques locales des collectivités en faveur de l\'emploi des femmes en zone rurale',
         'CRTE' => 'CRTE',
         'PCAET' => 'PCAET',
@@ -152,7 +152,7 @@ class Project // NOSONAR too much methods
     private ?User $author = null;
 
     #[ORM\ManyToOne(inversedBy: 'projects')]
-    #[ORM\JoinColumn(onDelete:'SET NULL')]
+    #[ORM\JoinColumn(onDelete: 'SET NULL')]
     private ?Organization $organization = null;
 
     #[ORM\ManyToMany(targetEntity: KeywordSynonymlist::class, inversedBy: 'projects')]
@@ -161,7 +161,7 @@ class Project // NOSONAR too much methods
     #[ORM\OneToMany(mappedBy: 'project', targetEntity: ProjectValidated::class)]
     private Collection $projectValidateds;
 
-    #[ORM\OneToMany(mappedBy: 'project', targetEntity: AidProject::class, cascade:['persist'], orphanRemoval: true)]
+    #[ORM\OneToMany(mappedBy: 'project', targetEntity: AidProject::class, cascade: ['persist'], orphanRemoval: true)]
     private Collection $aidProjects;
 
     #[ORM\OneToMany(mappedBy: 'project', targetEntity: AidSuggestedAidProject::class, orphanRemoval: true)]
@@ -600,7 +600,7 @@ class Project // NOSONAR too much methods
         }
     }
 
-    
+
 
     public function getNbAids(): ?int
     {
@@ -700,5 +700,4 @@ class Project // NOSONAR too much methods
 
         return $this;
     }
-    
 }

@@ -15,9 +15,7 @@ class SearchPageService
         private UserService $userService,
         private OrganizationService $organizationService,
         private ManagerRegistry $managerRegistry
-    )
-    {
-    }
+    ) {}
 
     public function userCanViewEdit(SearchPage $searchPage, User $user)
     {
@@ -33,7 +31,7 @@ class SearchPageService
     {
         return $this->userCanViewEdit($searchPage, $user);
     }
-    
+
     public function getLock(SearchPage $searchPage): ?SearchPageLock
     {
         foreach ($searchPage->getSearchPageLocks() as $searchPageLock) {
@@ -42,14 +40,14 @@ class SearchPageService
 
         return null;
     }
-    
+
     public function isLockedByAnother(SearchPage $searchPage, User $user): bool
     {
         $now = new \DateTime(date('Y-m-d H:i:s'));
         $minutesMax = 5;
         foreach ($searchPage->getSearchPageLocks() as $searchPageLock) {
             // si le lock a plus de 5 min, on le supprime
-            if ($searchPageLock->getTimeStart() < $now->sub(new \DateInterval('PT'.$minutesMax.'M'))) {
+            if ($searchPageLock->getTimeStart() < $now->sub(new \DateInterval('PT' . $minutesMax . 'M'))) {
                 $this->managerRegistry->getManager()->remove($searchPageLock);
                 $this->managerRegistry->getManager()->flush();
                 continue;
@@ -66,7 +64,7 @@ class SearchPageService
     {
         return !$searchPage->getSearchPageLocks()->isEmpty();
     }
-    
+
     public function lock(SearchPage $searchPage, User $user): void
     {
         // vérifie que l'aide n'est pas déjà lock
@@ -78,8 +76,8 @@ class SearchPageService
             $this->managerRegistry->getManager()->flush();
         } else {
             $searchPageLock = (isset($searchPage->getSearchPageLocks()[0]) && $searchPage->getSearchPageLocks()[0] instanceof SearchPageLock)
-                        ? $searchPage->getSearchPageLocks()[0]
-                        : null;
+                ? $searchPage->getSearchPageLocks()[0]
+                : null;
             // on met à jour le lock si le user et l'aide sont bien les mêmes
             if ($searchPageLock && $searchPageLock->getUser() == $user && $searchPageLock->getSearchPage() == $searchPage) {
                 $searchPageLock->setTimeStart(new \DateTime(date('Y-m-d H:i:s')));

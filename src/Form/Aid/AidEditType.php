@@ -52,10 +52,7 @@ class AidEditType extends AbstractType
         protected ManagerRegistry $managerRegistry,
         protected UserService $userService,
         protected RouterInterface $routerInterface
-    )
-    {
-        
-    }
+    ) {}
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         // regarde si l'utilisateur à rempli toutes ses fiches porteur d'aides
@@ -68,7 +65,7 @@ class AidEditType extends AbstractType
             }
         }
 
-        
+
         // l'aide
         $aid = $options['data'] ?? null;
         // est en brouillon ?
@@ -98,7 +95,7 @@ class AidEditType extends AbstractType
                 $categoriesByTheme[$categoryTheme->getName()][] = [$category->getName() => $category->getId()];
             }
         }
-        
+
         // les financers et instructeurs
         $aid = $options['data'] ?? null;
         $financers = [];
@@ -117,19 +114,19 @@ class AidEditType extends AbstractType
             'required' => true,
             'label' => 'La structure pour laquelle vous publiez cette aide',
             'class' => Organization::class,
-            'choice_label' => function(Organization $organization) {
+            'choice_label' => function (Organization $organization) {
                 $return = $organization->getName();
                 if (!$organization->getBacker()) {
                     $return .= ' (fiche porteur d\'aides à renseigner)';
                 }
                 return $return;
             },
-            'query_builder' => function(EntityRepository $entityRepository) {
+            'query_builder' => function (EntityRepository $entityRepository) {
                 return $entityRepository->createQueryBuilder('o')
-                ->innerJoin('o.beneficiairies', 'beneficiairies')
-                ->andWhere('beneficiairies = :user')
-                ->setParameter('user', $this->userService->getUserLogged())
-                ->orderBy('o.name', 'ASC')
+                    ->innerJoin('o.beneficiairies', 'beneficiairies')
+                    ->andWhere('beneficiairies = :user')
+                    ->setParameter('user', $this->userService->getUserLogged())
+                    ->orderBy('o.name', 'ASC')
                 ;
             },
             'placeholder' => 'Choisissez une structure',
@@ -137,10 +134,9 @@ class AidEditType extends AbstractType
 
         if ($nbBackerNeedUpdate > 0) {
             $message = ($nbBackerNeedUpdate > 1)
-                        ? 'Les fiches porteurs des structures suivantes ne sont pas renseignées :'
-                        : 'La fiche porteur de la structure suivante n\'est pas renseignée :'
-                        ;
-            $help = '<div class="fr-alert fr-alert--warning">'.$message;
+                ? 'Les fiches porteurs des structures suivantes ne sont pas renseignées :'
+                : 'La fiche porteur de la structure suivante n\'est pas renseignée :';
+            $help = '<div class="fr-alert fr-alert--warning">' . $message;
             foreach ($user->getOrganizations() as $organization) {
                 if (!$organization->getBacker()) {
                     $help .= '<br />- <a href="' . $this->routerInterface->generate('app_organization_backer_edit', ['id' => $organization->getId(), 'idBacker' => 0]) . '">' . $organization->getName() . '</a>';
@@ -176,7 +172,7 @@ class AidEditType extends AbstractType
                 'label' => 'Nom initial',
                 'help_html' => true,
                 'help' => 'Comment cette aide s’intitule-t-elle au sein de votre structure ? Exemple : AAP Mob’Biodiv'
-                . (in_array('nameInitial', $sanctuarizedFields) ? $sanctuarizedFieldHelp : ''),
+                    . (in_array('nameInitial', $sanctuarizedFields) ? $sanctuarizedFieldHelp : ''),
                 'attr' => [
                     'readonly' => in_array('nameInitial', $sanctuarizedFields) ? true : false
                 ],
@@ -215,7 +211,7 @@ class AidEditType extends AbstractType
                 ],
                 'autocomplete' => true,
                 'multiple' => true,
-                'query_builder' => function(BackerRepository $backerRepository) {
+                'query_builder' => function (BackerRepository $backerRepository) {
                     return $backerRepository->getQueryBuilder([
                         'orderBy' => [
                             'sort' => 'b.name',
@@ -243,7 +239,7 @@ class AidEditType extends AbstractType
                 'mapped' => false,
                 'label' => 'Instructeurs',
                 'help_html' => true,
-                'help' => 'Saisissez quelques caractères et sélectionnez une valeur parmi les suggestions.' 
+                'help' => 'Saisissez quelques caractères et sélectionnez une valeur parmi les suggestions.'
                     . (in_array('instructors', $sanctuarizedFields) ? $sanctuarizedFieldHelp : ''),
                 'class' => Backer::class,
                 'choice_label' => 'name',
@@ -254,7 +250,7 @@ class AidEditType extends AbstractType
                 ],
                 'autocomplete' => true,
                 'multiple' => true,
-                'query_builder' => function(BackerRepository $backerRepository) {
+                'query_builder' => function (BackerRepository $backerRepository) {
                     return $backerRepository->getQueryBuilder([
                         'orderBy' => [
                             'sort' => 'b.name',
@@ -282,7 +278,7 @@ class AidEditType extends AbstractType
                 'label' => 'Bénéficiaires de l’aide',
                 'class' => OrganizationType::class,
                 'choice_label' => 'name',
-                'group_by' => function(OrganizationType $organizationType) {
+                'group_by' => function (OrganizationType $organizationType) {
                     return $organizationType->getOrganizationTypeGroup()->getName();
                 },
                 'expanded' => true,
@@ -301,7 +297,7 @@ class AidEditType extends AbstractType
                     . (in_array('aidTypes', $sanctuarizedFields) ? $sanctuarizedFieldHelp : ''),
                 'class' => AidType::class,
                 'choice_label' => 'name',
-                'group_by' => function(AidType $aidType) {
+                'group_by' => function (AidType $aidType) {
                     return $aidType->getAidTypeGroup()->getName();
                 },
                 'expanded' => true,
@@ -406,19 +402,19 @@ class AidEditType extends AbstractType
                     'readonly' => in_array('isCallForProject', $sanctuarizedFields) ? true : false
                 ],
             ])
-            ;
+        ;
 
-            // champ description
-            if (in_array('description', $sanctuarizedFields)) {
-                $builder
+        // champ description
+        if (in_array('description', $sanctuarizedFields)) {
+            $builder
                 ->add('description', DisplayContentType::class, [
                     'required' => false,
                     'label' => 'Description complète de l’aide et de ses objectif',
                     'help_html' => true,
                     'help' => $sanctuarizedFieldHelp,
                 ]);
-            } else {
-                $builder
+        } else {
+            $builder
                 ->add('description', TextareaType::class, [
                     'required' => $isDraft ? false : true,
                     'label' => 'Description complète de l’aide et de ses objectif',
@@ -436,11 +432,11 @@ class AidEditType extends AbstractType
                     ],
                     'sanitize_html' => true,
                 ]);
-            }
+        }
 
-            // champ projectExamples
-            if (in_array('projectExamples', $sanctuarizedFields)) {
-                $builder
+        // champ projectExamples
+        if (in_array('projectExamples', $sanctuarizedFields)) {
+            $builder
                 ->add('projectExamples', DisplayContentType::class, [
                     'required' => false,
                     'label' => 'Exemples d’applications ou de projets réalisés grâce à cette aide',
@@ -448,8 +444,8 @@ class AidEditType extends AbstractType
                     'help' => 'Afin d’aider les territoires à mieux comprendre votre aide, donnez ici quelques exemples concrets de projets réalisables ou réalisés.'
                         . $sanctuarizedFieldHelp,
                 ]);
-            } else {
-                $builder
+        } else {
+            $builder
                 ->add('projectExamples', TextareaType::class, [
                     'required' => false,
                     'label' => 'Exemples d’applications ou de projets réalisés grâce à cette aide',
@@ -463,9 +459,9 @@ class AidEditType extends AbstractType
                     ],
                     'sanitize_html' => true,
                 ]);
-            }
+        }
 
-            $builder
+        $builder
             ->add('categories', EntityCheckboxGroupAbsoluteType::class, [
                 'required' => $isDraft ? false : true,
                 'label' => 'Thématiques de l\'aide',
@@ -475,7 +471,7 @@ class AidEditType extends AbstractType
                     . (in_array('categories', $sanctuarizedFields) ? $sanctuarizedFieldHelp : ''),
                 'class' => Category::class,
                 'choice_label' => 'name',
-                'group_by' => function(Category $category) {
+                'group_by' => function (Category $category) {
                     return $category->getCategoryTheme()->getName();
                 },
                 'multiple' => true,
@@ -493,7 +489,7 @@ class AidEditType extends AbstractType
                     . (in_array('projectReferences', $sanctuarizedFields) ? $sanctuarizedFieldHelp : ''),
                 'class' => ProjectReference::class,
                 'choice_label' => 'name',
-                'query_builder' => function(EntityRepository $entityRepository) {
+                'query_builder' => function (EntityRepository $entityRepository) {
                     return $entityRepository->createQueryBuilder('pr')->orderBy('pr.name', 'ASC');
                 },
                 'multiple' => true,
@@ -542,8 +538,8 @@ class AidEditType extends AbstractType
                 ]
             ]);
 
-            // champ eligibility
-            if (in_array('eligibility', $sanctuarizedFields)) {
+        // champ eligibility
+        if (in_array('eligibility', $sanctuarizedFields)) {
             $builder
                 ->add('eligibility', DisplayContentType::class, [
                     'required' => false,
@@ -551,8 +547,8 @@ class AidEditType extends AbstractType
                     'help_html' => true,
                     'help' => $sanctuarizedFieldHelp,
                 ]);
-            } else {
-                $builder
+        } else {
+            $builder
                 ->add('eligibility', TextareaType::class, [
                     'required' => false,
                     'label' => 'Conditions d’éligibilité',
@@ -565,10 +561,10 @@ class AidEditType extends AbstractType
                     ],
                     'sanitize_html' => true,
                 ]);
-            }
+        }
 
 
-            $builder
+        $builder
             ->add('aidSteps', EntityType::class, [
                 'required' => $isDraft ? false : true,
                 'label' => 'État d’avancement du projet pour bénéficier du dispositif',
@@ -666,8 +662,8 @@ class AidEditType extends AbstractType
                 ]
             ]);
 
-            if (in_array('contact', $sanctuarizedFields)) {
-                $builder
+        if (in_array('contact', $sanctuarizedFields)) {
+            $builder
                 ->add('contact', DisplayContentType::class, [
                     'required' => $isDraft ? false : true,
                     'label' => 'Contact pour candidater',
@@ -675,8 +671,8 @@ class AidEditType extends AbstractType
                     'help' => 'N’hésitez pas à ajouter plusieurs contacts'
                         . $sanctuarizedFieldHelp,
                 ]);
-            } else {
-                $builder
+        } else {
+            $builder
                 ->add('contact', TextareaType::class, [
                     'required' => $isDraft ? false : true,
                     'label' => 'Contact pour candidater',
@@ -690,14 +686,13 @@ class AidEditType extends AbstractType
                     ],
                     'sanitize_html' => true,
                 ]);
-            }
+        }
 
-            $builder
+        $builder
             ->addEventListener(
                 FormEvents::SUBMIT,
                 [$this, 'onSubmit']
-            )
-        ;
+            );
 
         // gestion du statut
         $statusParams = [
@@ -715,24 +710,23 @@ class AidEditType extends AbstractType
             $statusParams['choices']['Publiée'] = Aid::STATUS_PUBLISHED;
         }
         $builder
-            ->add('status', ChoiceType::class, $statusParams)
-        ;
+            ->add('status', ChoiceType::class, $statusParams);
 
         if ($options['data'] instanceof Aid) {
             if ($options['data']->isLocal()) {
                 $builder
-                ->add('localCharacteristics', TextareaType::class, [
-                    'required' => false,
-                    'label' => 'Spécificités locales',
-                    'help_html' => true,
-                    'help' => 'Décrivez les spécificités de cette aide locale.'
-                        . (in_array('localCharacteristics', $sanctuarizedFields) ? $sanctuarizedFieldHelp : ''),
-                    'attr' => [
-                        'class' => 'trumbowyg',
-                        'readonly' => in_array('localCharacteristics', $sanctuarizedFields) ? true : false
-                    ],
-                    'sanitize_html' => true,
-                ]);
+                    ->add('localCharacteristics', TextareaType::class, [
+                        'required' => false,
+                        'label' => 'Spécificités locales',
+                        'help_html' => true,
+                        'help' => 'Décrivez les spécificités de cette aide locale.'
+                            . (in_array('localCharacteristics', $sanctuarizedFields) ? $sanctuarizedFieldHelp : ''),
+                        'attr' => [
+                            'class' => 'trumbowyg',
+                            'readonly' => in_array('localCharacteristics', $sanctuarizedFields) ? true : false
+                        ],
+                        'sanitize_html' => true,
+                    ]);
             }
             if ($options['data']->isIsGeneric()) {
                 $builder
@@ -750,14 +744,13 @@ class AidEditType extends AbstractType
                         'query_builder' => function (EntityRepository $er) {
                             return $er->createQueryBuilder('sf')
                                 ->orderBy('sf.position', 'ASC')
-                                ;
+                            ;
                         }
-                    ])
-                    ;
+                    ]);
             }
         }
     }
-    
+
     public function onSubmit(FormEvent $event): void
     {
         // si aide permanente, on force date ouverture et cloture à null
@@ -765,7 +758,7 @@ class AidEditType extends AbstractType
             $event->getData()->setDateStart(null);
             $event->getData()->setDateSubmissionDeadline(null);
         }
-        
+
         // vérifications subventions
         $subventionRateMin = $event->getForm()->has('subventionRateMin') ? $event->getForm()->get('subventionRateMin')->getData() : null;
         $subventionRateMax = $event->getForm()->has('subventionRateMax') ? $event->getForm()->get('subventionRateMax')->getData() : null;

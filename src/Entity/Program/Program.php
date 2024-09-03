@@ -40,7 +40,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 class Program // NOSONAR too much methods
 {
     const FOLDER = 'programs';
-    
+
     const API_GROUP_LIST = 'program:list';
 
     #[ORM\Id]
@@ -100,7 +100,7 @@ class Program // NOSONAR too much methods
     private Collection $blogPromotionPosts;
 
     #[ORM\OneToMany(mappedBy: 'program', targetEntity: FaqQuestionAnswser::class)]
-    #[ORM\OrderBy(["id"=>"ASC"])]
+    #[ORM\OrderBy(["id" => "ASC"])]
     private Collection $faqQuestionAnswsers;
 
     #[ORM\OneToMany(mappedBy: 'program', targetEntity: PageTab::class)]
@@ -110,7 +110,7 @@ class Program // NOSONAR too much methods
     private Collection $logAidSearches;
 
     #[ORM\OneToMany(mappedBy: 'program', targetEntity: LogProgramView::class)]
-    #[ORM\JoinColumn(onDelete:'SET NULL')]
+    #[ORM\JoinColumn(onDelete: 'SET NULL')]
     private Collection $logProgramViews;
 
 
@@ -436,7 +436,8 @@ class Program // NOSONAR too much methods
         return $this->name ?? null;
     }
 
-    public function getNbAids() : ?int {
+    public function getNbAids(): ?int
+    {
         try {
             return count($this->aids);
         } catch (\Exception $e) {

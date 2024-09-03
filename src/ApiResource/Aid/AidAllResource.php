@@ -27,9 +27,6 @@ use App\Entity\Aid\Aid;
     paginationItemsPerPage: 30,
     paginationMaximumItemsPerPage: 100,
     paginationClientItemsPerPage: true
-    
-)]
-class AidAllResource
-{
 
-}
+)]
+class AidAllResource {}

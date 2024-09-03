@@ -21,8 +21,7 @@ class AidDeleteType extends AbstractType
                         'message' => 'Vous devez cocher cette case pour confirmer.',
                     ]),
                 ],
-            ])
-        ;
+            ]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void

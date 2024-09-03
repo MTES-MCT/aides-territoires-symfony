@@ -40,9 +40,8 @@ class AlertSendDailyCommand extends Command
         private RouterInterface $routerInterface,
         private NotificationService $notificationService,
         private MessageBusInterface $bus
-    )
-    {
-        ini_set('max_execution_time', 60*60);
+    ) {
+        ini_set('max_execution_time', 60 * 60);
         ini_set('memory_limit', '1G');
         parent::__construct();
     }
@@ -55,7 +54,7 @@ class AlertSendDailyCommand extends Command
         $io = new SymfonyStyle($input, $output);
         $io->title($this->commandTextStart);
 
-        try  {
+        try {
             if ($this->kernelInterface->getEnvironment() != 'prod') {
                 $io->info('Uniquement en prod');
                 return Command::FAILURE;
@@ -75,10 +74,10 @@ class AlertSendDailyCommand extends Command
         $timeStart = microtime(true);
 
         $io = new SymfonyStyle($input, $output);
-        
+
         /** @var AlertRepository $alertRepo */
         $alertRepo = $this->managerRegistry->getRepository(Alert::class);
-        
+
         // charge les alertes
         $alerts = $alertRepo->findToSendDaily();
 
@@ -87,7 +86,7 @@ class AlertSendDailyCommand extends Command
 
         // date de publication des aides
         $publishedAfter = new \DateTime(date('Y-m-d', strtotime('-1 day')));
-        
+
         // envoi les alertes dans la file d'attente
         /**@var Alert $alert */
         foreach ($alerts as $alert) {
@@ -96,8 +95,8 @@ class AlertSendDailyCommand extends Command
 
         // notif admin
         $admin = $this->managerRegistry->getRepository(User::class)->findOneBy(['email' => $this->paramService->get('email_super_admin')]);
-        $this->notificationService->addNotification($admin, 'Envoi des alertes quotidiennes', $nbAlertTotal. ' alertes envoyées pour vérification des aides publiées après le ' . $publishedAfter->format('d/m/Y') . ' inclus');
-        
+        $this->notificationService->addNotification($admin, 'Envoi des alertes quotidiennes', $nbAlertTotal . ' alertes envoyées pour vérification des aides publiées après le ' . $publishedAfter->format('d/m/Y') . ' inclus');
+
         // on ajoute le resume à la file d'attente
         $this->bus->dispatch(new AlertResume(Alert::FREQUENCY_DAILY_SLUG));
 
@@ -106,7 +105,7 @@ class AlertSendDailyCommand extends Command
         $time = $timeEnd - $timeStart;
 
         // success
-        $io->success('Temps écoulé : '.gmdate("H:i:s", $timeEnd).' ('.gmdate("H:i:s", intval($time)).')');
+        $io->success('Temps écoulé : ' . gmdate("H:i:s", $timeEnd) . ' (' . gmdate("H:i:s", intval($time)) . ')');
         $io->success('Mémoire maximale utilisée : ' . round(memory_get_peak_usage() / 1024 / 1024) . ' MB');
     }
 }

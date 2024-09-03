@@ -52,7 +52,8 @@ class LogEventRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult()[0]['nb'] ?? 0;
     }
 
-    public function countCustom(array $params = null) : int {
+    public function countCustom(array $params = null): int
+    {
         $qb = $this->getQueryBuilder($params);
 
         $qb->select('IFNULL(COUNT(le.id), 0) AS nb');
@@ -71,19 +72,19 @@ class LogEventRepository extends ServiceEntityRepository
         $qb = $this->createQueryBuilder('le');
 
         if ($category !== null) {
-            $qb ->andWhere('le.category = :category')
+            $qb->andWhere('le.category = :category')
                 ->setParameter('category', $category)
             ;
         }
 
         if ($event !== null) {
-            $qb ->andWhere('le.event = :event')
+            $qb->andWhere('le.event = :event')
                 ->setParameter('event', $event)
             ;
         }
 
         if ($source !== null) {
-            $qb ->andWhere('le.source = :source')
+            $qb->andWhere('le.source = :source')
                 ->setParameter('source', $source)
             ;
         }

@@ -131,6 +131,6 @@ class PerimeterData
 
     public function __toString(): string
     {
-        return $this->prop.' : '.$this->value;
+        return $this->prop . ' : ' . $this->value;
     }
 }

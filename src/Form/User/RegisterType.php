@@ -110,7 +110,7 @@ class RegisterType extends AbstractType
                 'label' => 'Type de votre structure',
                 'placeholder' => 'Sélectionnez une valeur',
                 'class' => OrganizationType::class,
-                'group_by' => function(OrganizationType $organizationType) {
+                'group_by' => function (OrganizationType $organizationType) {
                     return $organizationType->getOrganizationTypeGroup()->getName();
                 },
                 'choice_label' => 'name'
@@ -118,7 +118,7 @@ class RegisterType extends AbstractType
             ->add('intercommunalityType', ChoiceType::class, [
                 'required' => false,
                 'mapped' => false,
-                'label' => 'Type d’intercommunalité', 
+                'label' => 'Type d’intercommunalité',
                 'placeholder' => 'Sélectionnez une valeur',
                 'choices' => $choicesIntercommunalityType
             ])
@@ -143,7 +143,7 @@ class RegisterType extends AbstractType
             ])
             ->add('beneficiaryFunction', ChoiceType::class, [
                 'required' => false,
-                'label' => 'Votre fonction', 
+                'label' => 'Votre fonction',
                 'placeholder' => 'Sélectionnez votre fonction',
                 'choices' => $choicesBeneficiaryFunction
             ])
@@ -161,7 +161,7 @@ class RegisterType extends AbstractType
             ])
             ->add('acquisitionChannel', ChoiceType::class, [
                 'required' => false,
-                'label' => 'Comment avez-vous connu Aides-territoires ?', 
+                'label' => 'Comment avez-vous connu Aides-territoires ?',
                 'placeholder' => 'Sélectionnez une option',
                 'choices' => $choicesAcquisitionChannel
             ])

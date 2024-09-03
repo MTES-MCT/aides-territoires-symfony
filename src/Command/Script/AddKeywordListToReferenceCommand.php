@@ -21,14 +21,13 @@ class AddKeywordListToReferenceCommand extends Command
     protected string $commandTextStart = '<Import des anciens mots-clés';
     protected string $commandTextEnd = '>Import des anciens mots-clés';
 
-    
+
 
     public function __construct(
         protected ManagerRegistry $managerRegistry,
         protected ReferenceService $referenceService
-    )
-    {
-        ini_set('max_execution_time', 60*60);
+    ) {
+        ini_set('max_execution_time', 60 * 60);
         ini_set('memory_limit', '1G');
         parent::__construct();
     }
@@ -41,7 +40,7 @@ class AddKeywordListToReferenceCommand extends Command
         $io = new SymfonyStyle($input, $output);
         $io->title($this->commandTextStart);
 
-        try  {
+        try {
             // import des keywords
             $this->importKeyword($input, $output);
         } catch (\Exception $exception) {
@@ -75,7 +74,7 @@ class AddKeywordListToReferenceCommand extends Command
             if (in_array($keywordSynonym->getName(), $intentions)) {
                 $intention = true;
             }
-            
+
             // déjà présent, on va voir pour lui ajouter les synonymes
             if ($keywodReference instanceof KeywordReference) {
                 foreach ($synonyms as $synonym) {

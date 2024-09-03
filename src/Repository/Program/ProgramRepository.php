@@ -22,7 +22,8 @@ class ProgramRepository extends ServiceEntityRepository
         parent::__construct($registry, Program::class);
     }
 
-    public function countCustom(array $params = null) : int {
+    public function countCustom(array $params = null): int
+    {
         $qb = $this->getQueryBuilder($params);
 
         $qb->select('IFNULL(COUNT(p.id), 0) AS nb');
@@ -36,8 +37,7 @@ class ProgramRepository extends ServiceEntityRepository
         $qb = $this->getQueryBuilder($params);
 
         $qb
-            ->select('p.name')
-        ;
+            ->select('p.name');
 
         $results = $qb->getQuery()->getResult();
 
@@ -52,7 +52,7 @@ class ProgramRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult();
     }
 
-    public function finddSelecteForHome() : array
+    public function finddSelecteForHome(): array
     {
         $params['hasLogo'] = true;
         $params['isSpotlighted'] = true;
@@ -78,27 +78,24 @@ class ProgramRepository extends ServiceEntityRepository
 
         if ($hasLogo === true) {
             $qb
-                ->andWhere('p.logo IS NOT NULL')
-            ;
+                ->andWhere('p.logo IS NOT NULL');
         }
 
         if ($isSpotlighted !== null) {
-            $qb 
+            $qb
                 ->andWhere('p.isSpotlighted = :isSpotlighted')
                 ->setParameter('isSpotlighted', $isSpotlighted)
-                ;
+            ;
         }
 
         if ($orderBy !== null) {
             $qb
-                ->addOrderBy($orderBy['sort'], $orderBy['order'])
-            ;
+                ->addOrderBy($orderBy['sort'], $orderBy['order']);
         }
 
         if ($limit !== null) {
             $qb
-                ->setMaxResults($limit)
-            ;
+                ->setMaxResults($limit);
         }
         return $qb;
     }

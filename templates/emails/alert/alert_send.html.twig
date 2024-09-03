@@ -1,47 +1,52 @@
 {% extends 'emails/base.html.twig' %}
 
 {% block body %}
-<p>Bonjour,</p>
+	<p>Bonjour,</p>
 
-<p>Nous avons détecté au moins une nouvelle aide sur votre recherche
-<strong>{{ alert.title }}</strong>.</p>
+	<p>Nous avons détecté au moins une nouvelle aide sur votre recherche
+		<strong>{{ alert.title }}</strong>.</p>
 
-<ul>
-{% for aid in aidsDisplay %}
-    <li>
-        <strong>Titre :</strong>
-        <a href="{{ aid.url }}">
-            {{ aid.name }}
-        </a>
-        {% if aid.dateSubmissionDeadline %}<br /><strong>Clôture :</strong> {{ aid.dateSubmissionDeadline|date('d/m/Y') }}{% endif %}
-    </li>
-{% endfor %}
-</ul>
+	<ul>
+		{% for aid in aidsDisplay %}
+			<li>
+				<strong>Titre :</strong>
+				<a href="{{ aid.url }}">
+					{{ aid.name }}
+				</a>
+				{% if aid.dateSubmissionDeadline %}<br/><strong>Clôture :</strong>
+					{{ aid.dateSubmissionDeadline|date('d/m/Y') }}
+				{% endif %}
+			</li>
+		{% endfor %}
+	</ul>
 
-{% if aids|length > 3 %}
-    <p>
-        Attention, il semble qu’il y ait encore d’autres aides disponibles ! <br />
-        <a href="{{ absolute_url(url('app_aid_aid')) }}?{% if querystringOrdered is defined %}{{ querystringOrdered }}{% else %}{{ alert.querystring }}{% endif %}">
-            Rendez-vous sur Aides-territoires pour les découvrir.
-        </a>
-    </p>
-{% endif %}
+	{% if aids|length > 3 %}
+		<p>
+			Attention, il semble qu’il y ait encore d’autres aides disponibles !
+			<br/>
+			<a href="{{ absolute_url(url('app_aid_aid')) }}?{% if querystringOrdered is defined %}{{ querystringOrdered }}{% else %}{{ alert.querystring }}{% endif %}">
+				Rendez-vous sur Aides-territoires pour les découvrir.
+			</a>
+		</p>
+	{% endif %}
 
-<p>
-<strong>N’hésitez pas à créer d’autres alertes pour être toujours bien informé.</strong><br/>
-Vous pouvez également transférer cet email à vos partenaires afin qu’ils
-prennent connaissance de ces aides.
-</p>
+	<p>
+		<strong>N’hésitez pas à créer d’autres alertes pour être toujours bien informé.</strong><br/>
+		Vous pouvez également transférer cet email à vos partenaires afin qu’ils
+		prennent connaissance de ces aides.
+	</p>
 
-<p>
-    <span aria-hidden="true">🔕</span> Cette alerte ne correspond plus à vos besoins ? <br />
-    <a href="{{ absolute_url(url('app_user_alert_delete_public', {'id': alert.id})) }}">
-        Vous pouvez la supprimer.
-    </a>
-</p>
+	<p>
+		<span aria-hidden="true">🔕</span>
+		Cette alerte ne correspond plus à vos besoins ?
+		<br/>
+		<a href="{{ absolute_url(url('app_user_alert_delete_public', {'id': alert.id})) }}">
+			Vous pouvez la supprimer.
+		</a>
+	</p>
 
-<p>
-    À très vite !<br />
-    L’équipe d’Aides-territoires.
-</p>
+	<p>
+		À très vite !<br/>
+		L’équipe d’Aides-territoires.
+	</p>
 {% endblock %}

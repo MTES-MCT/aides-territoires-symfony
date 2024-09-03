@@ -25,11 +25,9 @@ class AidListener
         private ParamService $paramService,
         private RouterInterface $routerInterface,
         private MessageBusInterface $messageBusInterface
-    ) {
-        
-    }
+    ) {}
 
-    public function onPostLoad(PostLoadEventArgs $args) : void
+    public function onPostLoad(PostLoadEventArgs $args): void
     {
         if ($args->getObject() instanceof Aid) {
             $args->getObject()->setUrl($this->aidService->getUrl($args->getObject()));
@@ -59,7 +57,7 @@ class AidListener
                 if ($aid->isAuthorNotification()) {
                     $this->emailService->sendEmailViaApi(
                         $aid->getAuthor()->getEmail(),
-                        $aid->getAuthor()->getFirstname().' '.$aid->getAuthor()->getLastname(),
+                        $aid->getAuthor()->getFirstname() . ' ' . $aid->getAuthor()->getLastname(),
                         $this->paramService->get('sib_publication_email_template_id'),
                         [
                             'PRENOM' => $aid->getAuthor()->getFirstname(),
@@ -109,7 +107,7 @@ class AidListener
 
             // vérifie si pas déjà une redirection sur la nouvelle url (pour ne pas tourner en boucle)
             $urlRedirectCheck = $manager->getRepository(UrlRedirect::class)->findOneBy(
-                ['oldUrl' => '/'.$this->aidService->getUrl($aid, UrlGeneratorInterface::RELATIVE_PATH)]
+                ['oldUrl' => '/' . $this->aidService->getUrl($aid, UrlGeneratorInterface::RELATIVE_PATH)]
             );
             if ($urlRedirectCheck) {
                 // on supprime cette redirection
@@ -125,9 +123,9 @@ class AidListener
 
             $urlRedirect = new UrlRedirect();
             $aid->setSlug($oldSlug);
-            $urlRedirect->setOldUrl('/'.$this->aidService->getUrl($aid, UrlGeneratorInterface::RELATIVE_PATH));
+            $urlRedirect->setOldUrl('/' . $this->aidService->getUrl($aid, UrlGeneratorInterface::RELATIVE_PATH));
             $aid->setSlug($newSlug);
-            $urlRedirect->setNewUrl('/'.$this->aidService->getUrl($aid, UrlGeneratorInterface::RELATIVE_PATH));
+            $urlRedirect->setNewUrl('/' . $this->aidService->getUrl($aid, UrlGeneratorInterface::RELATIVE_PATH));
             $manager->persist($urlRedirect);
             $manager->flush();
         }

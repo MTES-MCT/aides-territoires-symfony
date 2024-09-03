@@ -21,13 +21,12 @@ class AidsAddKeywordReferencesCommand extends Command
     protected string $commandTextStart = '<Transfert des mots-clés référents';
     protected string $commandTextEnd = '>Transfert des mots-clés référents';
 
-    
+
 
     public function __construct(
         protected ManagerRegistry $managerRegistry,
-    )
-    {
-        ini_set('max_execution_time', 60*60);
+    ) {
+        ini_set('max_execution_time', 60 * 60);
         ini_set('memory_limit', '1G');
         parent::__construct();
     }
@@ -40,7 +39,7 @@ class AidsAddKeywordReferencesCommand extends Command
         $io = new SymfonyStyle($input, $output);
         $io->title($this->commandTextStart);
 
-        try  {
+        try {
             // import des keywords
             $this->importKeyword($input, $output);
         } catch (\Exception $exception) {

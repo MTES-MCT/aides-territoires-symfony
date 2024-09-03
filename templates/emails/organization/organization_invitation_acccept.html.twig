@@ -1,15 +1,23 @@
 {% extends 'emails/base.html.twig' %}
 
 {% block body %}
-<p>Bonjour {{ organizationInvitation.author.firstname }} {{ organizationInvitation.author.lastname }},</p>
+	<p>Bonjour
+		{{ organizationInvitation.author.firstname }}
+		{{ organizationInvitation.author.lastname }},</p>
 
-<p>{{ organizationInvitation.firstname }} {{ organizationInvitation.lastname }} a accepté votre invitation et rejoint donc votre structure.</p>
+	<p>{{ organizationInvitation.firstname }}
+		{{ organizationInvitation.lastname }}
+		a accepté votre invitation et rejoint donc votre structure.</p>
 
-<p>Cela signifie que vous pourrez désormais accéder aux projets que vous avez tous deux créés (si {{ organizationInvitation.firstname }} {{ organizationInvitation.lastname }}  accepte bien de les dupliquer dans {{ organizationInvitationorganization.name }}) et aux aides qui leur sont associées.</p>
+	<p>Cela signifie que vous pourrez désormais accéder aux projets que vous avez tous deux créés (si
+		{{ organizationInvitation.firstname }}
+		{{ organizationInvitation.lastname }}
+		accepte bien de les dupliquer dans
+		{{ organizationInvitationorganization.name }}) et aux aides qui leur sont associées.</p>
 
-<p>
-Cordialement,
-<br />
-L’équipe d’Aides-territoires.
-</p>
+	<p>
+		Cordialement,
+		<br/>
+		L’équipe d’Aides-territoires.
+	</p>
 {% endblock %}

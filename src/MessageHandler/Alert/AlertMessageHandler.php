@@ -23,8 +23,7 @@ class AlertMessageHandler
         private AidSearchFormService $aidSearchFormService,
         private ParamService $paramService,
         private EmailService $emailService
-    ) {
-    }
+    ) {}
 
     public function __invoke(AlertMessage $message): void
     {
@@ -50,18 +49,18 @@ class AlertMessageHandler
             $aidSearchClass = $this->aidSearchFormService->getAidSearchClass(
                 params: [
                     'querystring' => $alert->getQuerystring(),
-                    ]
+                ]
             );
 
             // parametres pour requetes aides
-            $aidParams =[
+            $aidParams = [
                 'showInSearch' => true,
                 'publishedAfter' => $publishedAfter,
                 'noRelaunch' => true,
                 'noPostPopulate' => true
             ];
             $aidParams = array_merge($aidParams, $this->aidSearchFormService->convertAidSearchClassToAidParams($aidSearchClass));
-            
+
             // recupere les nouvelles aides qui correspondent à l'alerte
             $aids = $this->aidService->searchAids($aidParams);
             if (!empty($aids)) {
@@ -72,8 +71,8 @@ class AlertMessageHandler
                     $emailSubjectPrefix = $this->paramService->get('email_subject_prefix');
                 }
                 $today = new \DateTime(date('Y-m-d H:i:s'));
-                $emailSubject = $emailSubjectPrefix . ' '. $today->format('d/m/Y') . ' — De nouvelles aides correspondent à vos recherches';
-                $subject = count($aids).' résultat'.(count($aids) > 1 ? 's' : '').' pour votre alerte';
+                $emailSubject = $emailSubjectPrefix . ' ' . $today->format('d/m/Y') . ' — De nouvelles aides correspondent à vos recherches';
+                $subject = count($aids) . ' résultat' . (count($aids) > 1 ? 's' : '') . ' pour votre alerte';
 
                 // Force le tri par date de publication DESC
                 parse_str($alert->getQuerystring(), $params);

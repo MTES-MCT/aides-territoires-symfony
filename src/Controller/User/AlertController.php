@@ -11,7 +11,7 @@ use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Annotation\Route;
 
-#[Route(priority:5)]
+#[Route(priority: 5)]
 class AlertController extends FrontController
 {
     #[Route('/comptes/alertes/vos-alertes/', name: 'app_user_alert')]
@@ -20,8 +20,7 @@ class AlertController extends FrontController
         AlertRepository $alertRepository,
         EmailService $emailService,
         ManagerRegistry $managerRegistry
-    )
-    {
+    ) {
         // user actuel
         $user = $userService->getUserLogged();
 
@@ -34,13 +33,13 @@ class AlertController extends FrontController
             $managerRegistry->getManager()->persist($user);
             $managerRegistry->getManager()->flush();
         }
-        
+
         // les alertes
         $alerts = $alertRepository->findBy(
             [
                 'email' => $user->getEmail()
             ]
-            );
+        );
         // rendu template
         return $this->render('user/alert/index.html.twig', [
             'alertList' => true,
@@ -53,8 +52,7 @@ class AlertController extends FrontController
         $id,
         AlertRepository $alertRepository,
         ManagerRegistry $managerRegistry
-    )
-    {
+    ) {
         // alerte a supprimer
         $alert = $alertRepository->findOneBy(
             [
@@ -64,7 +62,7 @@ class AlertController extends FrontController
         if (!$alert instanceof Alert) {
             throw new NotFoundHttpException('Alerte introuvable');
         }
-        
+
         try {
             $managerRegistry->getManager()->remove($alert);
             $managerRegistry->getManager()->flush();
@@ -89,8 +87,7 @@ class AlertController extends FrontController
         UserService $userService,
         AlertRepository $alertRepository,
         ManagerRegistry $managerRegistry
-    )
-    {
+    ) {
         // user actuel
         $user = $userService->getUserLogged();
 
@@ -104,7 +101,7 @@ class AlertController extends FrontController
         if (!$alert instanceof Alert) {
             throw new NotFoundHttpException('Alerte introuvable');
         }
-        
+
         try {
             $managerRegistry->getManager()->remove($alert);
             $managerRegistry->getManager()->flush();
@@ -127,8 +124,7 @@ class AlertController extends FrontController
     public function newsletterSubscribe(
         UserService $userService,
         EmailService $emailService
-    )
-    {
+    ) {
         // user actuel
         $user = $userService->getUserLogged();
 
@@ -148,7 +144,7 @@ class AlertController extends FrontController
             );
         }
 
-        
+
         return $this->redirectToRoute('app_user_alert');
     }
 
@@ -158,8 +154,7 @@ class AlertController extends FrontController
         UserService $userService,
         EmailService $emailService,
         ManagerRegistry $managerRegistry
-    )
-    {
+    ) {
         // user actuel
         $user = $userService->getUserLogged();
 

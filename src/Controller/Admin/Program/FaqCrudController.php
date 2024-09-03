@@ -27,31 +27,28 @@ class FaqCrudController extends AtCrudController
     {
         yield IdField::new('id')->onlyOnIndex();
         yield TextField::new('name', 'Nom')
-        ->setHelp('Utilisé uniquement pour l\'association dans l\'administration.');
+            ->setHelp('Utilisé uniquement pour l\'association dans l\'administration.');
         yield AssociationField::new('pageTab', 'Onglet lié');
         yield CollectionField::new('faqCategories', 'Catégories des questions')
-        ->setEntryType(FaqCategoryCollectionType::class)
-        ->setColumns(12)
-        ;
+            ->setEntryType(FaqCategoryCollectionType::class)
+            ->setColumns(12);
     }
 
     public function configureActions(Actions $actions): Actions
     {
         $order = Action::new('order', 'Ordre', 'fa fa-sort')
             ->linkToCrudAction('order')
-            ->displayIf(fn ($entity) => $entity instanceof Faq)
-            ;
+            ->displayIf(fn($entity) => $entity instanceof Faq);
 
         return $actions
             ->add(Crud::PAGE_INDEX, $order)
             ->add(Crud::PAGE_DETAIL, $order)
             ->add(Crud::PAGE_EDIT, $order)
-            ;
+        ;
     }
     public function order(
         AdminContext $adminContext
-    )
-    {
+    ) {
         // la faq choisie
         $faq = $adminContext->getEntity()->getInstance();
 
@@ -95,9 +92,8 @@ class FaqCrudController extends AtCrudController
                             $this->managerRegistry->getManager()->flush();
                         }
                     }
-
                 }
-                
+
                 $this->addFlash('success', 'L\'ordre des catégories de questions a été enregistré.');
 
                 return $this->redirect(

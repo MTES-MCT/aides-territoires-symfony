@@ -9,15 +9,14 @@ use App\Repository\Page\PageRepository;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-#[Route(priority:0)]
+#[Route(priority: 0)]
 class PageController extends FrontController
 {
     #[Route('/{url}/', name: 'app_page_custom')]
     public function index(
         $url,
         PageRepository $pageRepository
-        ): Response
-    {
+    ): Response {
 
         $page = $pageRepository->findOneBy(
             [
@@ -37,14 +36,13 @@ class PageController extends FrontController
                     throw new PageNotFoundException('Cette page n\'existe pas.');
                 }
             }
-            
         }
 
         // fil arianne
         $this->breadcrumb->add(
             $page->getMetaTitle() ?? $page->getName(),
         );
-        
+
         return $this->render('page/page/index.html.twig', [
             'page' => $page
         ]);

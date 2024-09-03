@@ -1,41 +1,46 @@
 <div class="fr-header__tools">
-    <div class="fr-header__tools-links" data-fr-js-header-links="true">
-        <ul class="fr-btns-group">
-            {% if app.user %}
-            <li>
-                <a class="fr-btn fr-icon-account-line" href="{{ path('app_user_dashboard') }}" title="Mon compte">
-                    <span class="at-username">{% if app.user.firstname and app.user.lastname %}{{ app.user.firstname }} {{ app.user.lastname }}{% else %}{{ app.user.email }}{% endif %}</span>
-                </a>
-            </li>
-            {% if isUserGranted(app.user, constant('App\\Entity\\User\\User::ROLE_ADMIN')) %}
-            <li>
-                <a href="{{ path('admin') }}" title="Administration" class="fr-btn fr-icon-lock-line">Administration</a>
-            </li>
-            {% endif %}
-            <li>
-                <a 
-                href="{{ path('app_user_user_notification') }}"
-                class="at-notification-icon fr-tag fr-icon-notification-3-line fr-tag--icon-left {% if app.user and  app.user.notificationCounter %}at-notification-icon-unread{% else %}at-notification-icon-no-unread{% endif %}"
-                target="_self"
-                title="{% if app.user and  app.user.notificationCounter %}{% if app.user.notificationCounter == 0 %}Voir la page des notifications{% elseif app.user.notificationCounter == 1 %}Voir la notification non lue{% else %}Voir les {{ app.user.notificationCounter }} notifications non lues{% endif %}{% else %}Voir la page des notifications{% endif %}">
-                {% if app.user and  app.user.notificationCounter %}{{ app.user.notificationCounter }}{% endif %}
-                </a>
-            </li>        
-            {% else %}
-                <li>
-                    <a class="fr-btn fr-icon-lock-line" href="{{ path('app_login') }}" title="Se connecter">Se connecter</a>
-                </li>
-                <li>
-                    <a class="fr-btn fr-icon-account-line" href="{{ path('app_user_user_register') }}" title="S'inscrire">S’inscrire</a>
-                </li>
-            {% endif %}
-            
-            <li>
-                <a class="fr-btn fr-btn--secondary fr-icon-edit-box-line" href="{{ path('app_user_aid_publications') }}" title="Diffuser une aide">Diffuser une aide</a>
-            </li>
-            <li>
-                <a class="fr-btn at-btn--primary fr-icon-search-line" href="{{ path('app_aid_aid') }}" title="Trouver des aides">Trouver des aides</a>
-            </li>
-        </ul>
-    </div>
+	<div class="fr-header__tools-links" data-fr-js-header-links="true">
+		<ul class="fr-btns-group">
+			{% if app.user %}
+				<li>
+					<a class="fr-btn fr-icon-account-line" href="{{ path('app_user_dashboard') }}" title="Mon compte">
+						<span class="at-username">
+							{% if app.user.firstname and app.user.lastname %}
+								{{ app.user.firstname }}
+								{{ app.user.lastname }}
+							{% else %}
+								{{ app.user.email }}
+							{% endif %}
+						</span>
+					</a>
+				</li>
+				{% if isUserGranted(app.user, constant('App\\Entity\\User\\User::ROLE_ADMIN')) %}
+					<li>
+						<a href="{{ path('admin') }}" title="Administration" class="fr-btn fr-icon-lock-line">Administration</a>
+					</li>
+				{% endif %}
+				<li>
+					<a href="{{ path('app_user_user_notification') }}" class="at-notification-icon fr-tag fr-icon-notification-3-line fr-tag--icon-left {% if app.user and  app.user.notificationCounter %}at-notification-icon-unread{% else %}at-notification-icon-no-unread{% endif %}" target="_self" title="{% if app.user and app.user.notificationCounter %}{% if app.user.notificationCounter == 0 %}Voir la page des notifications{% elseif app.user.notificationCounter == 1 %}Voir la notification non lue{% else %}Voir les {{ app.user.notificationCounter }} notifications non lues{% endif %}{% else %}Voir la page des notifications{% endif %}">
+						{% if app.user and  app.user.notificationCounter %}
+							{{ app.user.notificationCounter }}
+						{% endif %}
+					</a>
+				</li>
+			{% else %}
+				<li>
+					<a class="fr-btn fr-icon-lock-line" href="{{ path('app_login') }}" title="Se connecter">Se connecter</a>
+				</li>
+				<li>
+					<a class="fr-btn fr-icon-account-line" href="{{ path('app_user_user_register') }}" title="S'inscrire">S’inscrire</a>
+				</li>
+			{% endif %}
+
+			<li>
+				<a class="fr-btn fr-btn--secondary fr-icon-edit-box-line" href="{{ path('app_user_aid_publications') }}" title="Diffuser une aide">Diffuser une aide</a>
+			</li>
+			<li>
+				<a class="fr-btn at-btn--primary fr-icon-search-line" href="{{ path('app_aid_aid') }}" title="Trouver des aides">Trouver des aides</a>
+			</li>
+		</ul>
+	</div>
 </div>

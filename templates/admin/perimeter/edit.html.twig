@@ -17,7 +17,7 @@
 
 			<div id="content-ea_form_fieldset_01HF47A4QDW5B3P1C6AVD3TGBQ" class="form-fieldset-body  collapse ">
 				<div class="row">
-                    {% if entity.instance.perimetersFrom|length == 0 %}
+					{% if entity.instance.perimetersFrom|length == 0 %}
 						<p>Ne contient pas d'autres périmètres</p>
 					{% else %}
 						<ul>
@@ -26,7 +26,7 @@
 							{% endfor %}
 						</ul>
 					{% endif %}
-                </div>
+				</div>
 			</div>
 		</fieldset>
 	</div>
@@ -46,7 +46,7 @@
 
 			<div id="content-ea_form_fieldset_01HF47A4QDW5B3P1C6AVD3TGBQ5" class="form-fieldset-body  collapse ">
 				<div class="row">
-                    {% if entity.instance.perimetersTo|length == 0 %}
+					{% if entity.instance.perimetersTo|length == 0 %}
 						<p>Contenu dans aucun périmètre</p>
 					{% else %}
 						<ul>
@@ -55,7 +55,7 @@
 							{% endfor %}
 						</ul>
 					{% endif %}
-                </div>
+				</div>
 			</div>
 		</fieldset>
 	</div>

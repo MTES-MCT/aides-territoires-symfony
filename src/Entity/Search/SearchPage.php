@@ -20,7 +20,7 @@ use Gedmo\Mapping\Annotation as Gedmo;
 class SearchPage // NOSONAR too much methods
 {
     const FOLDER = 'minisites';
-    
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -703,8 +703,9 @@ class SearchPage // NOSONAR too much methods
     {
         return $this->nbAids;
     }
-    
-    public function setNbAids(int $nbAids) : static {
+
+    public function setNbAids(int $nbAids): static
+    {
         $this->nbAids = $nbAids;
         return $this;
     }
@@ -713,7 +714,8 @@ class SearchPage // NOSONAR too much methods
     {
         return $this->nbAidsLive;
     }
-    public function setNbAidsLive(int $nbAidsLive) : static {
+    public function setNbAidsLive(int $nbAidsLive): static
+    {
         $this->nbAidsLive = $nbAidsLive;
         return $this;
     }

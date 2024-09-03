@@ -21,7 +21,7 @@ class DataSourceRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, DataSource::class);
     }
-    
+
     public function countAids(?array $params = null): int
     {
         $qb = $this->getQueryBuilder($params);
@@ -30,8 +30,7 @@ class DataSourceRepository extends ServiceEntityRepository
             ->select('COUNT(a.id)')
             ->leftJoin('d.aids', 'a')
             ->getQuery()
-            ->getSingleScalarResult()
-            ;
+            ->getSingleScalarResult();
     }
     public function getQueryBuilder(?array $params = null): QueryBuilder
     {
@@ -42,9 +41,9 @@ class DataSourceRepository extends ServiceEntityRepository
             $qb
                 ->andWhere('d.id = :id')
                 ->setParameter('id', $id)
-                ;
+            ;
         }
-        
+
         return $qb;
     }
 }
