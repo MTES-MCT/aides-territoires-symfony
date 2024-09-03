@@ -149,7 +149,9 @@
             <div id="tabpanel-programs-panel" class="fr-tabs__panel" role="tabpanel" aria-labelledby="tabpanel-programs" tabindex="0">
                 <div class="fr-tags-group">
                     {% for programList in programs_list %}
-                        <p class="fr-tag">{{ programList.program.name|raw }}</p>
+                        {% if programList.program and programList.program.name %}
+                        <p class="fr-tag">{{ programList.program.name|sanitize_html|raw }}</p>
+                        {% endif %}
                     {% endfor %}
                 </div>
             </div>

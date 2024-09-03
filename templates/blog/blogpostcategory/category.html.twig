@@ -14,7 +14,7 @@
 						<div id="blog-content">
 							<h1>{{ blogPostCategory.name }}</h1>
                             {% if blogPostCategory.description %}
-                            {{ blogPostCategory.description|raw }}
+                            {{ blogPostCategory.description|sanitize_html|raw }}
                             {% endif %}
 						</div>
 

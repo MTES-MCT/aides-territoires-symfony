@@ -92,7 +92,7 @@
                 {% for label, messages in flashes %}
                     {% for message in messages %}
                         <div class="fr-alert fr-alert--{{ label|default('info') }} fr-alert--sm">
-                            <p>{{ message|raw }}</p>
+                            <p>{{ message|sanitize_html|raw }}</p>
                         </div>
                     {% endfor %}
                 {% endfor %}

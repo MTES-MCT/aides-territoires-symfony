@@ -85,7 +85,9 @@
             {% if tab.active %}
             <div id="tabpanel-{{ tab.name }}-panel" class="fr-tabs__panel at-tabs__panel--opaque {% if tabSelected == tab.name %}fr-tabs__panel--selected{% endif %}" role="tabpanel" aria-labelledby="tabpanel-{{ tab.name }}" tabindex="0">
                 <h2 class="fr-mt-0 fr-mb-2w">{{ tab.name }}</h2>
-                {{ tab.description|raw }}
+                {% if tab.description %}
+                    {{ tab.description|sanitize_html|raw }}
+                {% endif %}
                 {% for faq in tab.faqs %}
                 {% if faq.latestUpdateTime %}
                 <p>Mis à jour le {{ faq.latestUpdateTime|format_datetime('long', 'none', locale='fr') }}</p>
@@ -109,9 +111,11 @@
                                         </button>
                                     </h4>
                                     <div id="{{ faq.id }}" class="fr-collapse">
-                                        <div>
-                                            {{ faq.answer|raw }}
-                                        </div>
+                                        {% if faq.answer %}
+                                            <div>
+                                                {{ faq.answer|sanitize_html|raw }}
+                                            </div>
+                                        {% endif %}
                                     </div>
                                 </div>
                                 {% endfor %}

@@ -623,7 +623,7 @@
                 <h2 class="fr-h3 fr-mb-2w">Description</h2>
                 {% if aid.description %}
                 <div class="wysiwyg-wrapper">
-                {{ aid.description|raw }}
+                {{ aid.description|sanitize_html|raw }}
                 </div>
                 {% else %}
                 <p>Aucune description détaillée n’a été renseignée.</p>
@@ -655,7 +655,7 @@
                     {% if aid.eligibility %}
                     <p class="fr-mb-2w">
                         <strong>Autres critères d’éligibilité :</strong>
-                        {{ aid.eligibility|raw }}
+                        {{ aid.eligibility|sanitize_html|raw }}
                     </p>
                     {% endif %}
 
@@ -672,7 +672,7 @@
                     {% if aid.projectExamples %}
                     <p class="fr-mb-2w">
                         <strong>Exemples de projets réalisables :</strong>
-                        {{ aid.projectExamples|raw }}
+                        {{ aid.projectExamples|sanitize_html|raw }}
                     </p>
                     {% endif %}
                     
@@ -699,7 +699,7 @@
 
                     {% if aid.isLocal and aid.localCharacteristics %}
                     <h3 class="fr-h4 fr-mb-2w">Spécificités locales</h3>
-                    {{ aid.localCharacteristics|raw }}
+                    {{ aid.localCharacteristics|sanitize_html|raw }}
                     {% endif %} 
                 </div>
             </div>

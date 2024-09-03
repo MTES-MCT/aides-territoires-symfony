@@ -54,9 +54,11 @@
             <div class="fr-grid-row fr-grid-row--gutters fr-my-5w">
                 <div class="fr-col-12 fr-col-md-7">
                     <h2 class="fr-h4">Description du projet</h2>
-                    <div class="wysiwyg-wrapper">
-                        {{ project.description|sanitize_html|raw }}
-                    </div>
+                    {% if project.description %}
+                        <div class="wysiwyg-wrapper">
+                            {{ project.description|sanitize_html|raw }}
+                        </div>
+                    {% endif %}
                 </div>
                 <div class="fr-col-12 fr-col-md-5">
                 {% if project.keywordSynonymlists|length > 0 %}

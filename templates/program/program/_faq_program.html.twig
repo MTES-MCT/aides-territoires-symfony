@@ -7,7 +7,7 @@
 {% endif %}
 <p class="fr-mb-5 fr-text--sm">Cette FAQ a été mise à jour le {{ faq_questions_answers_date_updated|date('d/m/Y')}}.</p>
 
- {% if faqsCategoriesById|length > 0 %}
+{% if faqsCategoriesById|length > 0 %}
 
 <div class="fr-accordions-group">
     {% for faq_category in faqsCategoriesById %}
@@ -28,7 +28,9 @@
                     </h4>
                     <div id="{{ faq.id }}" class="fr-collapse">
                         <div>
-                            {{ faq.answer|raw }}
+                            {% if faq.answer %}
+                                {{ faq.answer|sanitize_html|raw }}
+                            {% endif %}
                         </div>
                     </div>
                 </div>

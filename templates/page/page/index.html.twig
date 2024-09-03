@@ -17,7 +17,9 @@
         <div class="fr-grid-row fr-grid-row--center">
             <div id="page-content" class="fr-col-md-10">
                 <h1>{{ page.name }}</h1>
-                {{ optimizeHtmlFromWysiwyg(page.description)|raw }}
+                {% if page.description %}
+                {{ optimizeHtmlFromWysiwyg(page.description)|sanitize_html|raw }}
+                {% endif %}
             </div>
         </div>
     </article>

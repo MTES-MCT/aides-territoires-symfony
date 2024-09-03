@@ -55,7 +55,7 @@
 
 
 							<div class="wysiwyg-wrapper">
-								{{ optimizeHtmlFromWysiwyg(blogPost.description)|raw }}
+								{{ optimizeHtmlFromWysiwyg(blogPost.description)|sanitize_html|raw }}
 							</div>
 
 
