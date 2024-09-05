@@ -41,21 +41,16 @@ class InternalRequestVoter extends Voter
         // Récupérer la session via la requête
         $session = $request->getSession();
         if (!$session) {
-            dd('pas session');
             return false;
         }
 
         $csrfTokenSession = $session->get(self::CSRF_TOKEN_SESSION_NAME);
         if (!$csrfTokenSession) {
-            dd('pas token');
             return false;
         }
 
         // Valider le token CSRF
         $csrfToken = new CsrfToken(self::CSRF_TOKEN_NAME, $csrfTokenSession);
-        if (!$this->csrfTokenManager->isTokenValid($csrfToken)) {
-            dd('token invalide');
-        }
         return $this->csrfTokenManager->isTokenValid($csrfToken);
     }
 }
