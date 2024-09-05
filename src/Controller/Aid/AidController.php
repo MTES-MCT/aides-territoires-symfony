@@ -478,6 +478,11 @@ class AidController extends FrontController
 
                 // redirection page mes projets
                 return $this->redirect($requestStack->getCurrentRequest()->getUri());
+            } else {
+                $this->addFlash(
+                    FrontController::FLASH_ERROR,
+                    'Une erreur est survenue lors de l\'association de l\'aide au projet'
+                );
             }
         }
 
