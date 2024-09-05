@@ -48,6 +48,38 @@ class AidSearchFormService
     ) {
     }
 
+    public function countNbCriteriaFromAidSearchClass(AidSearchClass $aidSearchClass, $ignoreProperties = ['organizationType', 'searchPerimeter', 'orderBy']): int
+    {
+        $nbCriteria = 0;
+
+        // Utilisez la réflexion pour obtenir toutes les propriétés de AidSearchClass
+        $reflectionClass = new \ReflectionClass($aidSearchClass);
+        $properties = $reflectionClass->getProperties();
+
+        foreach ($properties as $property) {
+            $propertyName = $property->getName();
+
+            // Ignorer les propriétés spécifiées
+            if (in_array($propertyName, $ignoreProperties)) {
+                continue;
+            }
+            
+            $getter = 'get' . ucfirst($propertyName);
+            if (method_exists($aidSearchClass, $getter)) {
+                $value = $aidSearchClass->$getter();
+                if ($value instanceof ArrayCollection) {
+                    if (!$value->isEmpty()) {
+                        $nbCriteria++;
+                    }
+                } elseif ($value) {
+                    $nbCriteria++;
+                }
+            }
+        }
+
+        return $nbCriteria;
+    }
+
     public function convertAidSearchClassToQueryString(AidSearchClass $aidSearchClass): string
     { // NOSONAR too complex
         $params = [];

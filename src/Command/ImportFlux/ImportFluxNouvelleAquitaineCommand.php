@@ -22,6 +22,7 @@ class ImportFluxNouvelleAquitaineCommand extends ImportFluxCommand
         if (!isset($aidToImport['guid'])) {
             return null;
         }
+        // Utilisation de md5 pour des raisons historiques. Les données ne sont pas sensibles.
         return $this->importUniqueidPrefix . md5($aidToImport['guid']);
     }
 

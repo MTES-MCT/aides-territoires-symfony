@@ -158,22 +158,10 @@ class AidController extends FrontController
         if ($formAidSearch->get('searchPerimeter')->getData()) {
             $pageTitle .= ' - Périmètre : ' . $formAidSearch->get('searchPerimeter')->getData()->getName() . ' ';
         }
-        $nbCriteria = 0;
-        if (is_array($formAidSearch->getData())) {
-            foreach ($formAidSearch->getData() as $key => $data) {
-                if (in_array($key, ['organizationType', 'searchPerimeter'])) {
-                    continue;
-                } elseif (in_array($key, ['aidTypes', 'categorysearch', 'backers', 'programs', 'aidSteps'])) {
-                    if (count($formAidSearch->get($key)->getData()) > 0) {
-                        $nbCriteria++;
-                    }
-                } else {
-                    if ($data) {
-                        $nbCriteria++;
-                    }
-                }
-            }
-        }
+
+        /** @var AidSearchClass $data */
+        $data = $formAidSearch->getData();
+        $nbCriteria = $aidSearchFormService->countNbCriteriaFromAidSearchClass($data);
 
         if ($nbCriteria > 0) {
             $pageTitle .= ' - ' . $nbCriteria . ' autre';
