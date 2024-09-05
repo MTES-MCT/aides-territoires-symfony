@@ -36,9 +36,14 @@ class InternalRequestVoter extends Voter
 
         // Vérification de l'adresse IP du client
         $clientIp = $request->getClientIp();
-        if (!in_array($clientIp, $this->allowedIps, true)) {
-            dump($clientIp, $this->allowedIps);
+        $serverIp = $_SERVER['SERVER_ADDR'];
+
+        // Vérifie si l'IP du client est l'IP du serveur
+        if ($clientIp !== $serverIp) {
+            dd('pas ok', $clientIp, $serverIp);
+            return false;
         }
-        return in_array($clientIp, $this->allowedIps, true);
+
+        return true;
     }
 }
