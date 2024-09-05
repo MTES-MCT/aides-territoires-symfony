@@ -28,8 +28,8 @@ final class CsrfTokenSessionListener
         $request = $this->requestStack->getCurrentRequest();
         $session = $request->getSession();
 
-        // Si pas de session active, ne rien faire
-        if (!$session) {
+        // Si aucune session active ou session non initialisée, ne rien faire
+        if (!$session || !$session->isStarted()) {
             return;
         }
 
