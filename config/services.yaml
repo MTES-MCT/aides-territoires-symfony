@@ -88,6 +88,10 @@ services:
             # Priority 33 so it runs before routing
             - {name: kernel.event_listener, event: kernel.request, priority: 33}
 
+    App\EventListener\CsrfTokenSessionListener:
+        tags:
+            - { name: kernel.event_listener, event: kernel.request, method: onKernelRequest }
+
     App\EventListener\WithoutOrganizationListener:
         tags:
             - {name: kernel.event_listener, event: kernel.request}
