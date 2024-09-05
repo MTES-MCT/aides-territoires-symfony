@@ -78,6 +78,6 @@ class ApiController extends AbstractController
 
     protected function stringToBool(?string $str): bool
     {
-        return $str === 'true' ? true : false;
+        return $str === 'true';
     }
 }

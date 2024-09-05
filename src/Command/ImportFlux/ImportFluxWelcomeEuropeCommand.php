@@ -191,7 +191,7 @@ class ImportFluxWelcomeEuropeCommand extends ImportFluxCommand
 
     protected function setKeywords(array $aidToImport, Aid $aid): Aid
     {
-        if (!isset($aidToImport['filtres_sectors']) || !is_array($aidToImport['filtres_sectors'])) {
+        if (!isset($aidToImport['filtres_sectors'])) {
             return $aid;
         }
 
