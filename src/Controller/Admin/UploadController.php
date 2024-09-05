@@ -16,7 +16,7 @@ use Symfony\Component\String\Slugger\SluggerInterface;
 
 class UploadController extends FrontController
 {
-    #[Route('/admin/upload-image', name: 'app_admin_upload_image', options: ['expose' => true])]
+    #[Route('/admin/upload-image', name: 'app_admin_upload_image', options: ['expose' => true], methods: ['POST'])]
     public function index(
         Request $request,
         SluggerInterface $slugger,

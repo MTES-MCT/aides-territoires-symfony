@@ -11,7 +11,7 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class LogController extends FrontController
 {
-    #[Route(name: 'app_log_ajax', path: '/log/ajax', options: ['expose' => true])]
+    #[Route(name: 'app_log_ajax', path: '/log/ajax', options: ['expose' => true], methods: ['POST'])]
     public function ajaxLog(
         RequestStack $requestStack,
         LogService $logService

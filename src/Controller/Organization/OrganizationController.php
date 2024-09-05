@@ -726,7 +726,7 @@ class OrganizationController extends FrontController
         ]);
     }
 
-    #[Route('/comptes/structure/porteur/ajax-lock/', name: 'app_organization_backer_ajax_lock', options: ['expose' => true])]
+    #[Route('/comptes/structure/porteur/ajax-lock/', name: 'app_organization_backer_ajax_lock', options: ['expose' => true], methods: ['POST'])]
     public function ajaxLock(
         RequestStack $requestStack,
         BackerRepository $backerRepository,

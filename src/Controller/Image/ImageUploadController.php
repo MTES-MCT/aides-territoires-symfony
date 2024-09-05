@@ -29,7 +29,7 @@ public function options(): Response
 
     return $response;
 }
-    #[Route('/upload-image', name: 'app_upload_image', options: ['expose' => true])]
+    #[Route('/upload-image', name: 'app_upload_image', options: ['expose' => true], methods: ['POST'])]
     public function index(
         SluggerInterface $slugger,
         FileService $fileService,
