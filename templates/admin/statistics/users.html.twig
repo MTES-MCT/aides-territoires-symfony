@@ -1,98 +1,102 @@
 {% extends "admin/statistics/_stats_base.html.twig" %}
 
 {% block stats_content %}
-<section id="users-stats" class="container">
+	<section id="users-stats" class="container">
 
-    <div class="table-responsive mt-5">
-        <table class="table table-bordered">
-            <thead>
-                <tr>
-                    <th scope="col">Type</th>
-                    <th scope="col">Nombre d’inscrits</th>
-                    <th scope="col">%</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <th scope="row">Porteurs de projets uniquement</th>
-                    <td>{{ nbBeneficiaries }}</td>
-                    <td>{{ nbBeneficiariesPercent }} %</td>
-                </tr>
-                <tr>
-                    <th scope="row">Porteurs d’aides uniquement</th>
-                    <td>{{ nbContributors }}</td>
-                    <td>{{ nbContributorsPercent }} %</td>
-                </tr>
-                <tr>
-                    <th scope="row">Porteurs de projets et d’aides</th>
-                    <td>{{ nbBeneficiariesAndContributors }}</td>
-                    <td>{{ nbBeneficiariesAndContributorsPercent }} %</td>
-                </tr>
-                <tr>
-                    <th scope="row">TOTAL</th>
-                    <td>{{ nbUsers }}</td>
-                    <td>100 %</td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
+		<div class="table-responsive mt-5">
+			<table class="table table-bordered">
+				<thead>
+					<tr>
+						<th scope="col">Type</th>
+						<th scope="col">Nombre d’inscrits</th>
+						<th scope="col">%</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<th scope="row">Porteurs de projets uniquement</th>
+						<td>{{ nbBeneficiaries }}</td>
+						<td>{{ nbBeneficiariesPercent }}
+							%</td>
+					</tr>
+					<tr>
+						<th scope="row">Porteurs d’aides uniquement</th>
+						<td>{{ nbContributors }}</td>
+						<td>{{ nbContributorsPercent }}
+							%</td>
+					</tr>
+					<tr>
+						<th scope="row">Porteurs de projets et d’aides</th>
+						<td>{{ nbBeneficiariesAndContributors }}</td>
+						<td>{{ nbBeneficiariesAndContributorsPercent }}
+							%</td>
+					</tr>
+					<tr>
+						<th scope="row">TOTAL</th>
+						<td>{{ nbUsers }}</td>
+						<td>100 %</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
 
-    <h4 class="mt-0">Comptes utilisateurs ({{myPager.getNbResults()}}) :</h4>
+		<h4 class="mt-0">Comptes utilisateurs ({{myPager.getNbResults()}}) :</h4>
 
-    <div class="mt-5">
-        {{ form_start(formDateRange) }}
-        <div class="d-flex">
-            <div class="d-flex me-3">
-            {{ form_row(formDateRange.dateMin) }}
-            </div>
-            <div class="d-flex me-3">
-            {{ form_row(formDateRange.dateMax) }}
-            </div>
-            <div class="d-flex me-3">
-            <button type="submit" class="btn btn-primary">Valider</button>
-            </div>
-        </div>
-        {{ form_end(formDateRange) }}
-    </div>
+		<div class="mt-5">
+			{{ form_start(formDateRange) }}
+			<div class="d-flex">
+				<div class="d-flex me-3">
+					{{ form_row(formDateRange.dateMin) }}
+				</div>
+				<div class="d-flex me-3">
+					{{ form_row(formDateRange.dateMax) }}
+				</div>
+				<div class="d-flex me-3">
+					<button type="submit" class="btn btn-primary">Valider</button>
+				</div>
+			</div>
+			{{ form_end(formDateRange) }}
+		</div>
 
-    <div class="table-responsive mt-5">
-        <table class="table table-bordered">
-            <thead>
-                <tr>
-                    <th scope="col">Nom</th>
-                    <th scope="col">Structure</th>
-                    <th scope="col">Fonction</th>
-                    <th scope="col">Rôle</th>
-                    <th scope="col">Date de création</th>
-                    <th scope="col">Dernière connexion</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for user in myPager.currentPageResults %}
-                <tr>
-                    <td>{{ user.firstname }} {{ user.lastname }}</td>
-                    <td>
-                        {% if user.defaultOrganization %}
-                        {{ user.defaultOrganization.name }}
-                        {% endif %}
-                    </td>
-                    <td>
-                        {{ user.beneficiaryFunctionDisplay }}
-                    </td>
-                    <td>
-                        {{ user.beneficiaryRole }}
-                    </td>
-                    <td>{{ user.dateCreate|date('d/m/Y') }}</td>
-                    <td>{{ user.timeLastLogin|date('d/m/Y H:i') }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div> 
+		<div class="table-responsive mt-5">
+			<table class="table table-bordered">
+				<thead>
+					<tr>
+						<th scope="col">Nom</th>
+						<th scope="col">Structure</th>
+						<th scope="col">Fonction</th>
+						<th scope="col">Rôle</th>
+						<th scope="col">Date de création</th>
+						<th scope="col">Dernière connexion</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for user in myPager.currentPageResults %}
+						<tr>
+							<td>{{ user.firstname }}
+								{{ user.lastname }}</td>
+							<td>
+								{% if user.defaultOrganization %}
+									{{ user.defaultOrganization.name }}
+								{% endif %}
+							</td>
+							<td>
+								{{ user.beneficiaryFunctionDisplay }}
+							</td>
+							<td>
+								{{ user.beneficiaryRole }}
+							</td>
+							<td>{{ user.dateCreate|date('d/m/Y') }}</td>
+							<td>{{ user.timeLastLogin|date('d/m/Y H:i') }}</td>
+						</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+		</div>
 
-    <div class="">
-        {{ pagerfanta(myPager) }}
-    </div>
-    
-</section>
+		<div class="">
+			{{ pagerfanta(myPager) }}
+		</div>
+
+	</section>
 {% endblock stats_content %}

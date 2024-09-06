@@ -23,21 +23,20 @@ class ContactMessageCrudController extends AtCrudController
 
         yield IdField::new('id')->onlyOnIndex();
         yield TextField::new('firstname', 'Prénom')
-        ->hideOnIndex();
+            ->hideOnIndex();
         yield TextField::new('lastname', 'Nom')
-        ->hideOnIndex();
+            ->hideOnIndex();
         yield EmailField::new('email', 'Email');
         yield TextField::new('phoneNumber', 'Téléphone')
-        ->hideOnIndex();
+            ->hideOnIndex();
         yield TextField::new('structureAndFunction', 'Structure et fonction')
-        ->hideOnIndex();
+            ->hideOnIndex();
         yield TextField::new('subject', 'Sujet');
         yield TextareaField::new('message', 'Message')
-        ->hideOnIndex();
+            ->hideOnIndex();
         if ($entity && $entity->getTimeCreate()) {
             yield DateTimeField::new('timeCreate', 'Date de création')
-            ->setFormTypeOption('attr', ['readonly' => true]);
+                ->setFormTypeOption('attr', ['readonly' => true]);
         }
-
     }
 }

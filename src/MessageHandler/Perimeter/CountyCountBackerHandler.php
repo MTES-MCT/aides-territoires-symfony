@@ -23,7 +23,7 @@ class CountyCountBackerHandler
 
         /** @var BackerRepository $backerRepo */
         $backerRepo = $this->managerRegistry->getRepository(Backer::class);
-        
+
         // charge le département
         $county = $perimeterRepo->find($message->getIdPerimeter());
 

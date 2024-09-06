@@ -2,76 +2,100 @@
 
 {% block stats_content %}
 
-    <h1>Intercommunalités par type</h1>
-    <h2>EPCI</h2>
+	<h1>Intercommunalités par type</h1>
+	<h2>EPCI</h2>
 
-    <div class="row justify-content-center mt-5">
-        <div class="col-md-4">
-            <div>{{ render_chart(charts['CC']) }}</div>
-            <div class="text-center fs-5">
-                {{ interco_types['CC'].current }} / {{ interco_types['CC'].total }} ({{ interco_types['CC'].percentage }}%)<br />
-                <strong>{{ interco_types['CC'].label }}</strong>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div>{{ render_chart(charts['CA']) }}</div>
-            <div class="text-center fs-5">
-                {{ interco_types['CA'].current }} / {{ interco_types['CA'].total }} ({{ interco_types['CA'].percentage }}%)<br />
-                <strong>{{ interco_types['CA'].label }}</strong>
-            </div>
-        </div>
-    </div>
+	<div class="row justify-content-center mt-5">
+		<div class="col-md-4">
+			<div>{{ render_chart(charts['CC']) }}</div>
+			<div class="text-center fs-5">
+				{{ interco_types['CC'].current }}
+				/
+				{{ interco_types['CC'].total }}
+				({{ interco_types['CC'].percentage }}%)<br/>
+				<strong>{{ interco_types['CC'].label }}</strong>
+			</div>
+		</div>
+		<div class="col-md-4">
+			<div>{{ render_chart(charts['CA']) }}</div>
+			<div class="text-center fs-5">
+				{{ interco_types['CA'].current }}
+				/
+				{{ interco_types['CA'].total }}
+				({{ interco_types['CA'].percentage }}%)<br/>
+				<strong>{{ interco_types['CA'].label }}</strong>
+			</div>
+		</div>
+	</div>
 
-    <div class="row justify-content-center mt-5">
-        <div class="col-md-4">
-            <div>{{ render_chart(charts['CU']) }}</div>
-            <div class="text-center fs-5">
-                {{ interco_types['CU'].current }} / {{ interco_types['CU'].total }} ({{ interco_types['CU'].percentage }}%)<br />
-                <strong>{{ interco_types['CU'].label }}</strong>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div>{{ render_chart(charts['METRO']) }}</div>
-            <div class="text-center fs-5">
-                {{ interco_types['METRO'].current }} / {{ interco_types['METRO'].total }} ({{ interco_types['METRO'].percentage }}%)<br />
-                <strong>{{ interco_types['METRO'].label }}</strong>
-            </div>
-        </div>
-    </div>
+	<div class="row justify-content-center mt-5">
+		<div class="col-md-4">
+			<div>{{ render_chart(charts['CU']) }}</div>
+			<div class="text-center fs-5">
+				{{ interco_types['CU'].current }}
+				/
+				{{ interco_types['CU'].total }}
+				({{ interco_types['CU'].percentage }}%)<br/>
+				<strong>{{ interco_types['CU'].label }}</strong>
+			</div>
+		</div>
+		<div class="col-md-4">
+			<div>{{ render_chart(charts['METRO']) }}</div>
+			<div class="text-center fs-5">
+				{{ interco_types['METRO'].current }}
+				/
+				{{ interco_types['METRO'].total }}
+				({{ interco_types['METRO'].percentage }}%)<br/>
+				<strong>{{ interco_types['METRO'].label }}</strong>
+			</div>
+		</div>
+	</div>
 
-    <h2>Autres</h2>
+	<h2>Autres</h2>
 
-    <div class="row justify-content-center mt-5">
-        <div class="col-md-4">
-            <div>{{ render_chart(charts['GAL']) }}</div>
-            <div class="text-center fs-5">
-                {{ interco_types['GAL'].current }} / {{ interco_types['GAL'].total }} ({{ interco_types['GAL'].percentage }}%)<br />
-                <strong>{{ interco_types['GAL'].label }}</strong>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div>{{ render_chart(charts['PNR']) }}</div>
-            <div class="text-center fs-5">
-                {{ interco_types['PNR'].current }} / {{ interco_types['PNR'].total }} ({{ interco_types['PNR'].percentage }}%)<br />
-                <strong>{{ interco_types['PNR'].label }}</strong>
-            </div>
-        </div>
-    </div>
+	<div class="row justify-content-center mt-5">
+		<div class="col-md-4">
+			<div>{{ render_chart(charts['GAL']) }}</div>
+			<div class="text-center fs-5">
+				{{ interco_types['GAL'].current }}
+				/
+				{{ interco_types['GAL'].total }}
+				({{ interco_types['GAL'].percentage }}%)<br/>
+				<strong>{{ interco_types['GAL'].label }}</strong>
+			</div>
+		</div>
+		<div class="col-md-4">
+			<div>{{ render_chart(charts['PNR']) }}</div>
+			<div class="text-center fs-5">
+				{{ interco_types['PNR'].current }}
+				/
+				{{ interco_types['PNR'].total }}
+				({{ interco_types['PNR'].percentage }}%)<br/>
+				<strong>{{ interco_types['PNR'].label }}</strong>
+			</div>
+		</div>
+	</div>
 
-    <div class="row justify-content-center mt-5">
-        <div class="col-md-4">
-            <div>{{ render_chart(charts['PETR']) }}</div>
-            <div class="text-center fs-5">
-                {{ interco_types['PETR'].current }} / {{ interco_types['PETR'].total }} ({{ interco_types['PETR'].percentage }}%)<br />
-                <strong>{{ interco_types['PETR'].label }}</strong>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div>{{ render_chart(charts['SM']) }}</div>
-            <div class="text-center fs-5">
-                {{ interco_types['SM'].current }} / {{ interco_types['SM'].total }} ({{ interco_types['SM'].percentage }}%)<br />
-                <strong>{{ interco_types['SM'].label }}</strong>
-            </div>
-        </div>
-    </div>
+	<div class="row justify-content-center mt-5">
+		<div class="col-md-4">
+			<div>{{ render_chart(charts['PETR']) }}</div>
+			<div class="text-center fs-5">
+				{{ interco_types['PETR'].current }}
+				/
+				{{ interco_types['PETR'].total }}
+				({{ interco_types['PETR'].percentage }}%)<br/>
+				<strong>{{ interco_types['PETR'].label }}</strong>
+			</div>
+		</div>
+		<div class="col-md-4">
+			<div>{{ render_chart(charts['SM']) }}</div>
+			<div class="text-center fs-5">
+				{{ interco_types['SM'].current }}
+				/
+				{{ interco_types['SM'].total }}
+				({{ interco_types['SM'].percentage }}%)<br/>
+				<strong>{{ interco_types['SM'].label }}</strong>
+			</div>
+		</div>
+	</div>
 {% endblock stats_content %}

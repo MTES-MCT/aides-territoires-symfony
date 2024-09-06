@@ -15,101 +15,103 @@
 
 			<div class="form-fieldset-body show">
 				<div class="row">
-                <table class="table table-striped table-hover">
-                    <tbody>
-                        <tr scope="row">
-                            <td>Editions</td>
-                            <td>
-                            <ul>
-                            {% if entity.instance.logBackerEdits|length > 0 %}
-                            {% for logBackerEdit in entity.instance.logBackerEdits %}
-                                {% if logBackerEdit.user %}
-                                    <li>{{ logBackerEdit.user.email }} le {{ logBackerEdit.timecreate|date('d/m/Y H:i') }}</li>
-                                {% endif %}
-                            {% endfor %}
-                            </ul>
-                            {% else %}
-                            Aucune édition
-                            {% endif %}
-                            </td>
-                        </tr>
+					<table class="table table-striped table-hover">
+						<tbody>
+							<tr scope="row">
+								<td>Editions</td>
+								<td>
+									<ul>
+										{% if entity.instance.logBackerEdits|length > 0 %}
+											{% for logBackerEdit in entity.instance.logBackerEdits %}
+												{% if logBackerEdit.user %}
+													<li>{{ logBackerEdit.user.email }}
+														le
+														{{ logBackerEdit.timecreate|date('d/m/Y H:i') }}</li>
+												{% endif %}
+											{% endfor %}
+										</ul>
+									{% else %}
+										Aucune édition
+									{% endif %}
+								</td>
+							</tr>
 
-                        <tr scope="row">
-                            <td>Aides financées</td>
-                            <td>{{ entity.instance.aidFinancers|length }}</td>
-                        </tr>
-                        <tr scope="row">
-                            <td>Aides instruites</td>
-                            <td>{{ entity.instance.aidInstructors|length }}</td>
-                        </tr>
-                        <tr scope="row">
-                            <td>Aides associées</td>
-                            <td>
-                            <table class="table table-striped table-hover">
-                                <thead>
-                                    <tr scope="row">
-                                        <th scope="col">Auteur</th>
-                                        <th scope="col">Aide</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {% for aidFinancer in entity.instance.aidFinancers %}
-                                        {% if aidFinancer.aid %}
-                                            <tr scope="row">
-                                                <td>{% if aidFinancer.aid.author %}{{ aidFinancer.aid.author.email }}{% endif %}</td>
-                                                <td>
-                                                <a href="{{ ea_url()
-                                                    .setController('App\\Controller\\Admin\\Aid\\AidCrudController')
-                                                    .setAction('edit')
-                                                    .setEntityId(aidFinancer.aid.id)
-                                                }}">{{ aidFinancer.aid.name }}</a>
-                                                </td>
-                                            </tr>
-                                        {% endif %}
-                                    {% endfor %}
-                                </tbody>
-                            </table>
-                            </td>
-                        </tr>
+							<tr scope="row">
+								<td>Aides financées</td>
+								<td>{{ entity.instance.aidFinancers|length }}</td>
+							</tr>
+							<tr scope="row">
+								<td>Aides instruites</td>
+								<td>{{ entity.instance.aidInstructors|length }}</td>
+							</tr>
+							<tr scope="row">
+								<td>Aides associées</td>
+								<td>
+									<table class="table table-striped table-hover">
+										<thead>
+											<tr scope="row">
+												<th scope="col">Auteur</th>
+												<th scope="col">Aide</th>
+											</tr>
+										</thead>
+										<tbody>
+											{% for aidFinancer in entity.instance.aidFinancers %}
+												{% if aidFinancer.aid %}
+													<tr scope="row">
+														<td>
+															{% if aidFinancer.aid.author %}
+																{{ aidFinancer.aid.author.email }}
+															{% endif %}
+														</td>
+														<td>
+															<a href="{{ ea_url() .setController('App\\Controller\\Admin\\Aid\\AidCrudController') .setAction('edit') .setEntityId(aidFinancer.aid.id) }}">{{ aidFinancer.aid.name }}</a>
+														</td>
+													</tr>
+												{% endif %}
+											{% endfor %}
+										</tbody>
+									</table>
+								</td>
+							</tr>
 
-                        <tr scope="row">
-                            <td>Thématiques associées</td>
-                            <td>
-                            <ul>
-                            {% for category in entity.instance.categories %}
-                                <li>
-                                {{ category.name }}
-                                {% if category.categoryTheme %}
-                                    [{{ category.categoryTheme.name }}]
-                                {% endif %}
-                                </li>
-                            {% endfor %}
-                            </ul>
-                            </td>
-                        </tr>
+							<tr scope="row">
+								<td>Thématiques associées</td>
+								<td>
+									<ul>
+										{% for category in entity.instance.categories %}
+											<li>
+												{{ category.name }}
+												{% if category.categoryTheme %}
+													[{{ category.categoryTheme.name }}]
+												{% endif %}
+											</li>
+										{% endfor %}
+									</ul>
+								</td>
+							</tr>
 
-                        <tr scope="row">
-                            <td>Programmes associés</td>
-                            <td>
-                            <ul>
-                            {% for program in entity.instance.programs %}
-                                <li>
-                                {{ program.name }}
-                                </li>
-                            {% endfor %}
-                            </ul>
-                            </td>
-                        </tr>
+							<tr scope="row">
+								<td>Programmes associés</td>
+								<td>
+									<ul>
+										{% for program in entity.instance.programs %}
+											<li>
+												{{ program.name }}
+											</li>
+										{% endfor %}
+									</ul>
+								</td>
+							</tr>
 
-                        <tr scope="row">
-                            <td>Date de création</td>
-                            <td>{{ entity.instance.timeCreate|date('d/m/Y H:i') }}</td>
-                        </td>
+							<tr scope="row">
+								<td>Date de création</td>
+								<td>{{ entity.instance.timeCreate|date('d/m/Y H:i') }}</td>
+							</tr>
+						</tbody>
+					</td>
 
-                    </tbody>
-                </table>
-                </div>
-			</div>
-		</fieldset>
+				</tbody>
+			</table>
+		</div>
 	</div>
-{% endblock %}
+</fieldset></div>{% endblock %}

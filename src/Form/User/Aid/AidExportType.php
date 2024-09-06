@@ -17,7 +17,7 @@ class AidExportType extends AbstractType
             ->add('format', ChoiceType::class, [
                 'required' => true,
                 'label' => 'Veuillez sélectionner le format d’export : ',
-                'help' => 'L\'export PDF est envoyé par email au delà de '.Aid::MAX_NB_EXPORT_PDF.' aides.',
+                'help' => 'L\'export PDF est envoyé par email au delà de ' . Aid::MAX_NB_EXPORT_PDF . ' aides.',
                 'choices' => [
                     'Fichier CSV' => 'csv',
                     'Tableur Excel' => 'xlsx',
@@ -29,8 +29,7 @@ class AidExportType extends AbstractType
                         'message' => 'Veuillez choisir un format.',
                     ]),
                 ]
-            ])
-        ;
+            ]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void

@@ -79,11 +79,14 @@ $(window).on('pagehide', function() {
 function lock()
 {
     if (typeof idSearchPage !== 'undefined') {
+        var csrfToken = typeof csrfTokenInternal !== 'undefined' ? csrfTokenInternal : '';
+
         $.ajax({
             url: Routing.generate('app_user_portal_ajax_lock'),
             type: 'POST',
             data: {
-                'id': idSearchPage
+                'id': idSearchPage,
+                '_token': csrfToken
             }
         });
     }
@@ -91,13 +94,15 @@ function lock()
 
 function unlock()
 {
-    alert('unlock '+idSearchPage);
     if (typeof idSearchPage !== 'undefined') {
+        var csrfToken = typeof csrfTokenInternal !== 'undefined' ? csrfTokenInternal : '';
+
         $.ajax({
             url: Routing.generate('app_user_portal_ajax_unlock'),
             type: 'POST',
             data: {
-                'id': idSearchPage
+                'id': idSearchPage,
+                '_token': csrfToken
             }
         });
     }

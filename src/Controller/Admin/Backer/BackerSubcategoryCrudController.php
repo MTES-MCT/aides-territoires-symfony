@@ -21,9 +21,8 @@ class BackerSubcategoryCrudController extends AtCrudController
         yield TextField::new('name', 'Nom');
         yield TextField::new('slug', 'Slug')
             ->setFormTypeOption('attr', ['readonly' => true, 'autocomplete' => 'off'])
-            ->setHelp('Laisser vide pour autoremplir.')
-        ;
+            ->setHelp('Laisser vide pour autoremplir.');
         yield AssociationField::new('backerCategory', 'Catégorie')
-        ->setFormTypeOption('choice_label', 'name');
+            ->setFormTypeOption('choice_label', 'name');
     }
 }

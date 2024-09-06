@@ -19,9 +19,9 @@ class UserCountyFilterType extends AbstractType
             'choice_label' => 'name',
             'query_builder' => function (EntityRepository $er) {
                 return $er->createQueryBuilder('p')
-                ->andWhere('p.scale = :scaleCounty')
-                ->setParameter('scaleCounty', Perimeter::SCALE_COUNTY)
-                ->orderBy('p.name', 'ASC');
+                    ->andWhere('p.scale = :scaleCounty')
+                    ->setParameter('scaleCounty', Perimeter::SCALE_COUNTY)
+                    ->orderBy('p.name', 'ASC');
             },
         ]);
     }

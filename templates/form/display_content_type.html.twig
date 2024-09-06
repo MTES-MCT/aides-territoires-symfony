@@ -1,14 +1,14 @@
 {% block display_content_type_row %}
-<div class="fr-input-group">
-    <div class="field-text">
-        {{ form_label(form) }}
-        <div class="display-content-type-wrapper">
-            <div class="wysiwyg-wrapper">
-                {{ form.vars.value|raw }}
-            </div>
-        </div>
-        <textarea class="fr-hidden" name="{{ form.vars.full_name }}">{{ form.vars.value|raw }}</textarea>
-        {{ form_errors(form) }}
-    </div>
-</div>
+	<div class="fr-input-group">
+		<div class="field-text">
+			{{ form_label(form) }}
+			<div class="display-content-type-wrapper">
+				<div class="wysiwyg-wrapper">
+					{{ form.vars.value|raw }}
+				</div>
+			</div>
+			<textarea class="fr-hidden" name="{{ form.vars.full_name }}">{{ form.vars.value|raw }}</textarea>
+			{{ form_errors(form) }}
+		</div>
+	</div>
 {% endblock %}

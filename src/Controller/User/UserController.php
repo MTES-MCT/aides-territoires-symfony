@@ -22,6 +22,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
+
 #[Route(priority: 5)]
 class UserController extends FrontController
 {
@@ -35,8 +36,7 @@ class UserController extends FrontController
         MatomoService $matomoService,
         ParamService $paramService,
         EmailService $emailService
-    ): Response
-    {
+    ): Response {
         // nouveau user
         $user = new User();
 
@@ -67,7 +67,7 @@ class UserController extends FrontController
                         );
                     }
                 }
-                
+
                 // si infos organization
                 if ($formRegister->get('organizationName')->getData() && $formRegister->get('organizationType')->getData()) {
                     $organization = new Organization();
@@ -156,8 +156,7 @@ class UserController extends FrontController
         Security $security,
         MatomoService $matomoService,
         ParamService $paramService
-    ): Response
-    {
+    ): Response {
         // le user
         $user = $userService->getUserLogged();
 
@@ -188,10 +187,10 @@ class UserController extends FrontController
 
                 // assigne le perimetre à l'organisation
                 $organization->setPerimeter($user->getPerimeter());
-                
+
                 // le nom de l'organization en fonction du perimetre
-                $organization->setName('Mairie de '.$organization->getPerimeter()->getName());
-                
+                $organization->setName('Mairie de ' . $organization->getPerimeter()->getName());
+
                 // defini le departement de l'organisation
                 $departementsCode = ($organization->getPerimeter()) ? $organization->getPerimeter()->getDepartments() : null;
                 $departementCode = $departementsCode[0] ?? null;
@@ -224,7 +223,7 @@ class UserController extends FrontController
 
                 // authentifie le user
                 $security->login($user, 'form_login', 'main');
-                
+
                 // message success
                 $this->tAddFlash(
                     FrontController::FLASH_SUCCESS,
@@ -233,7 +232,7 @@ class UserController extends FrontController
 
                 // track goal
                 $matomoService->trackGoal($paramService->get('goal_register_id'));
-                            
+
                 // redirection
                 return $this->redirectToRoute('app_user_dashboard');
             } else {

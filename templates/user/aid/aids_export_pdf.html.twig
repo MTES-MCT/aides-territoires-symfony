@@ -1,207 +1,239 @@
 {% extends "_base_pdf.html.twig" %}
 
 {% block title_style %}
-h1 {
-    text-align: center;
-}
-.aid-title {
-    background-color: #000091;
-    color: #ffffff;
-}
+	h1 {
+	text-align: center;
+	}
+	.aid-title {
+	background-color: #000091;
+	color: #ffffff;
+	}
 {% endblock title_style%}
 
-{% block extratitle %}{{ organization.name }}{% endblock extratitle %}
+{% block extratitle %}
+	{{ organization.name }}
+{% endblock extratitle %}
 
 {% block logo_partner %}
-<img src="{{ absolute_url(asset('build/images/logo/logo_AT_courbes.png')) }}" style="height:60pt" alt="Aides-territoires" />
-{% if organization.backer and organization.backer.logo %}
-<img src="{{ getParameter('cloud_image_url') }}{{ organization.backer.logo }}" style="height:60pt" alt="logo de la structure {{organization.name}}" />
-{% endif %}
+	<img src="{{ absolute_url(asset('build/images/logo/logo_AT_courbes.png')) }}" style="height:60pt" alt="Aides-territoires"/>
+	{% if organization.backer and organization.backer.logo %}
+		<img src="{{ getParameter('cloud_image_url') }}{{ organization.backer.logo }}" style="height:60pt" alt="logo de la structure {{organization.name}}"/>
+	{% endif %}
 {% endblock logo_partner %}
 
 {% block intro %}{% endblock intro %}
 
 
 {% block content %}
-<div class="fr-container fr-mb-5w fr-mt-0">
-    <div class="fr-grid-row">
+	<div class="fr-container fr-mb-5w fr-mt-0">
+		<div class="fr-grid-row">
 
-        <div class="fr-col-12 fr-col-md-9">
-            <div class="fr-grid-row">
-              <div class="fr-col-12 fr-col-md-9">
-                  <h1>Les aides portées par la structure « {{ organization.name }} »</h1>
-              </div>
-            </div>
+			<div class="fr-col-12 fr-col-md-9">
+				<div class="fr-grid-row">
+					<div class="fr-col-12 fr-col-md-9">
+						<h1>Les aides portées par la structure «
+							{{ organization.name }}
+							»</h1>
+					</div>
+				</div>
 
-            {# Aids table #}
-            <h3 id="aids-table">Sommaire</h3>
-            <table aria-describedby="aids-table" repeat="1">
-                <thead>
-                    <tr>
-                        <th>Titre de l’aide</th>
-                        <th>Nature</th>
-                        <th>Récurrence et date d’échéance</th>    
-                        <th>Lien Aides-territoires</th>    
-                    </tr>
-                </thead>
+				{# Aids table #}
+				<h3 id="aids-table">Sommaire</h3>
+				<table aria-describedby="aids-table" repeat="1">
+					<thead>
+						<tr>
+							<th>Titre de l’aide</th>
+							<th>Nature</th>
+							<th>Récurrence et date d’échéance</th>
+							<th>Lien Aides-territoires</th>
+						</tr>
+					</thead>
 
-                {% for aid in aids %}
-                    <tbody>
-                        <tr>
-                            <td>
-                                <a href="#anchor-aid-{{ aid.id }}">{{ aid.name }}</a>
-                            </td>
-                            <td style="width:150px">
-                            {% if aid.aidTypes %}
-                                {% for aidType in aid.aidTypes %}
-                                {{ aidType.name }}{% if not loop.last %}, {% endif %}
-                                {% endfor %}
-                            {% endif %}
-                            </td>
-                            <td>
-                                {% if aid.aidRecurrence %}{{ aid.aidRecurrence.name }}{% endif %}
-                                {% if aid.dateSubmissionDeadline %}
-                                    <br />Échéance : {{ aid.dateSubmissionDeadline|date('d/m/Y') }}
-                                {% endif %}
-                            </td>
-                            <td><a href="{{ aid.url }}">Lien</a></td>
-                        </tr>
-                    </tbody>
-                {% endfor %}
-            </table>
+					{% for aid in aids %}
+						<tbody>
+							<tr>
+								<td>
+									<a href="#anchor-aid-{{ aid.id }}">{{ aid.name }}</a>
+								</td>
+								<td style="width:150px">
+									{% if aid.aidTypes %}
+										{% for aidType in aid.aidTypes %}
+											{{ aidType.name }}
+											{% if not loop.last %},
+											{% endif %}
+										{% endfor %}
+									{% endif %}
+								</td>
+								<td>
+									{% if aid.aidRecurrence %}
+										{{ aid.aidRecurrence.name }}
+									{% endif %}
+									{% if aid.dateSubmissionDeadline %}
+										<br/>Échéance :
+										{{ aid.dateSubmissionDeadline|date('d/m/Y') }}
+									{% endif %}
+								</td>
+								<td>
+									<a href="{{ aid.url }}">Lien</a>
+								</td>
+							</tr>
+						</tbody>
+					{% endfor %}
+				</table>
 
-            <pdf:nextpage />
+				<pdf:nextpage/>
 
-            {# Aid detail #}
-            <h2 id="aids-table">Détail des fiches aides sélectionnées</h2>
-            {% for aid in aids %}
-                {# name is an obsolete attribute for web but it is the correct one for PDFs #}
-                <h3 class="aid-title"><a name="anchor-aid-{{ aid.id }}" style="text-decoration:none;">{{ aid.name }}</a></h3>
-                <p>{{ aid.description|raw }}</p>
+				{# Aid detail #}
+				<h2 id="aids-table">Détail des fiches aides sélectionnées</h2>
+				{% for aid in aids %}
+					{# name is an obsolete attribute for web but it is the correct one for PDFs #}
+					<h3 class="aid-title">
+						<a name="anchor-aid-{{ aid.id }}" style="text-decoration:none;">{{ aid.name }}</a>
+					</h3>
+					<p>{{ aid.description|raw }}</p>
 
-                {% if aid.isLocal and aid.localCharacteristics %}
-                    <h4>Spécificités locales</h4>
+					{% if aid.isLocal and aid.localCharacteristics %}
+						<h4>Spécificités locales</h4>
 
-                    {{ aid.localCharacteristics|raw }}
+						{{ aid.localCharacteristics|raw }}
 
-                {% endif %}
-
-
-                {% if aid.aidAudiences %}
-                    <h4>Bénéficiaires de l’aide</h4>
-                    <p>
-                    {% for audience in aid.aidAudiences %}
-                    {{ audience.name }}{% if not loop.last %}, {% endif %}
-                    {% endfor %}
-                    </p>
-                {% endif %}
+					{% endif %}
 
 
-                {% if aid.aidTypes %}
-                    <h4>Types d’aide</h4>
-                    <p>
-                        {% for aidType in aid.aidTypes %}
-                        <strong>{{ aidType.name }}</strong><br />
-                        {% endfor %}
-                    </p>
-                {% endif %}
+					{% if aid.aidAudiences %}
+						<h4>Bénéficiaires de l’aide</h4>
+						<p>
+							{% for audience in aid.aidAudiences %}
+								{{ audience.name }}
+								{% if not loop.last %},
+								{% endif %}
+							{% endfor %}
+						</p>
+					{% endif %}
 
-                {% if aid.perimeter %}
-                <h4>Zone géographique couverte par l’aide</h4>
-                <p>{{ aid.perimeter.name }}</p>
-                {% endif %}
-                
-                <h4>Critères d’éligibilité</h4>
 
-                {% if aid.aidSteps %}
-                    <h5>État d’avancement du projet pour bénéficier du dispositif</h5>
-                    <p>
-                    {% for aidStep in aid.aidSteps %}
-                    {{ aidStep.name }}{% if not loop.last %}, {% endif %}
-                    {% endfor %}
-                    </p>
-                {% endif %}
+					{% if aid.aidTypes %}
+						<h4>Types d’aide</h4>
+						<p>
+							{% for aidType in aid.aidTypes %}
+								<strong>{{ aidType.name }}</strong><br/>
+							{% endfor %}
+						</p>
+					{% endif %}
 
-                {% if aid.aidDestinations %}
-                    <h5>Types de dépenses / actions couvertes</h5>
-                    <p>
-                    {% for aidDestination in aid.aidDestinations %}
-                    {{ aidDestination.name }}{% if not loop.last %}, {% endif %}
-                    {% endfor %}
-                    </p>
-                {% endif %}
+					{% if aid.perimeter %}
+						<h4>Zone géographique couverte par l’aide</h4>
+						<p>{{ aid.perimeter.name }}</p>
+					{% endif %}
 
-                {% if aid.projectExamples %}
-                    <h5>Exemples de projets réalisables</h5>
-                    {{ aid.projectExamples|raw }}
-                {% endif %}
+					<h4>Critères d’éligibilité</h4>
 
-                {% if aid.eligibility %}
-                    <h5>Autres critères d’éligibilité</h5>
-                    {{ aid.eligibility|raw }}
-                {% endif %}
+					{% if aid.aidSteps %}
+						<h5>État d’avancement du projet pour bénéficier du dispositif</h5>
+						<p>
+							{% for aidStep in aid.aidSteps %}
+								{{ aidStep.name }}
+								{% if not loop.last %},
+								{% endif %}
+							{% endfor %}
+						</p>
+					{% endif %}
 
-                <h4>Porteurs d’aides</h4>
-                <ul>
-                {% for aidFinancer in aid.aidFinancers %}
-                    {% if aidFinancer.backer %}
-                    <li>{{ aidFinancer.backer.name }}</li>
-                    {% endif %}
-                {% endfor %}
-                </ul>
+					{% if aid.aidDestinations %}
+						<h5>Types de dépenses / actions couvertes</h5>
+						<p>
+							{% for aidDestination in aid.aidDestinations %}
+								{{ aidDestination.name }}
+								{% if not loop.last %},
+								{% endif %}
+							{% endfor %}
+						</p>
+					{% endif %}
 
-                <h4>Calendrier</h4>
-                <ul>
-                    {% if aid.aidRecurrence %}<li><strong>Récurrence:</strong> {{ aid.aidRecurrence.name }}</li>{% endif %}
-                    {% if aid.dateStart %}
-                        <li><strong>Ouverture:</strong> {{ aid.dateStart|date('d/m/Y') }}</li>
-                    {% endif %}
-                    {% if aid.dateSubmissionDeadline %}
-                        <li><strong>Clôture:</strong> {{ aid.dateSubmissionDeadline|date('d/m/Y') }}</li>
-                    {% endif %}
-                </ul>
+					{% if aid.projectExamples %}
+						<h5>Exemples de projets réalisables</h5>
+						{{ aid.projectExamples|raw }}
+					{% endif %}
 
-                {% if aid.originUrl or aid.applicationUrl %}
-                    <h4>Liens :</h4>
-                    <ul>
-                        {% if aid.originUrl %}
-                            <li>Plus d’informations : <a href="{{ aid.originUrl }}">{{ aid.originUrl }}</a></li>
-                        {% endif %}
-                        {% if aid.applicationUrl %}
-                            <li>Candidater à l’aide : <a href="{{ aid.applicationUrl }}">{{ aid.applicationUrl }}</a></li>
-                        {% endif %}
-                    </ul>
-                {% endif %}
+					{% if aid.eligibility %}
+						<h5>Autres critères d’éligibilité</h5>
+						{{ aid.eligibility|raw }}
+					{% endif %}
 
-                {% if aid.contact %}
-                    <h4>Contact</h4>
-                    <p>{{ aid.contact|raw }}</p>
-                {% endif %}
+					<h4>Porteurs d’aides</h4>
+					<ul>
+						{% for aidFinancer in aid.aidFinancers %}
+							{% if aidFinancer.backer %}
+								<li>{{ aidFinancer.backer.name }}</li>
+							{% endif %}
+						{% endfor %}
+					</ul>
 
-                <p>
-                    <strong>Voir le descriptif complet sur Aides-territoires :</strong>
-                </p>
-                <p>
-                    <a href="{{ absolute_url(url('app_aid_aid_details', {'slug': aid.slug})) }}" class="at-pdf-link">
-                        {{ absolute_url(url('app_aid_aid_details', {'slug': aid.slug})) }}
-                    </a>
-                </p>
-                <pdf:nextpage />
-            {% endfor %}
+					<h4>Calendrier</h4>
+					<ul>
+						{% if aid.aidRecurrence %}
+							<li>
+								<strong>Récurrence:</strong>
+								{{ aid.aidRecurrence.name }}</li>
+						{% endif %}
+						{% if aid.dateStart %}
+							<li>
+								<strong>Ouverture:</strong>
+								{{ aid.dateStart|date('d/m/Y') }}</li>
+						{% endif %}
+						{% if aid.dateSubmissionDeadline %}
+							<li>
+								<strong>Clôture:</strong>
+								{{ aid.dateSubmissionDeadline|date('d/m/Y') }}</li>
+						{% endif %}
+					</ul>
 
-            <p>
-                Export valable en date du <strong>{{ "now"|date('d/m/Y') }}</strong>.
-            </p>
-            <p>Pensez à télécharger régulièrement ce document afin de disposer de la dernière mise à jour.</p>
+					{% if aid.originUrl or aid.applicationUrl %}
+						<h4>Liens :</h4>
+						<ul>
+							{% if aid.originUrl %}
+								<li>Plus d’informations :
+									<a href="{{ aid.originUrl }}">{{ aid.originUrl }}</a>
+								</li>
+							{% endif %}
+							{% if aid.applicationUrl %}
+								<li>Candidater à l’aide :
+									<a href="{{ aid.applicationUrl }}">{{ aid.applicationUrl }}</a>
+								</li>
+							{% endif %}
+						</ul>
+					{% endif %}
 
-        </div>
-    </div>
-</div>
+					{% if aid.contact %}
+						<h4>Contact</h4>
+						<p>{{ aid.contact|raw }}</p>
+					{% endif %}
+
+					<p>
+						<strong>Voir le descriptif complet sur Aides-territoires :</strong>
+					</p>
+					<p>
+						<a href="{{ absolute_url(url('app_aid_aid_details', {'slug': aid.slug})) }}" class="at-pdf-link">
+							{{ absolute_url(url('app_aid_aid_details', {'slug': aid.slug})) }}
+						</a>
+					</p>
+					<pdf:nextpage/>
+				{% endfor %}
+
+				<p>
+					Export valable en date du
+					<strong>{{ "now"|date('d/m/Y') }}</strong>.
+				</p>
+				<p>Pensez à télécharger régulièrement ce document afin de disposer de la dernière mise à jour.</p>
+
+			</div>
+		</div>
+	</div>
 {% endblock content %}
 
 {% block footer_sup %}
-<span><br />
-    L’ensemble des aides citées a été publié sur la plateforme Aides-territoires
-    depuis laquelle ce fichier a été édité.
-</span>
+	<span><br/>
+		L’ensemble des aides citées a été publié sur la plateforme Aides-territoires
+				    depuis laquelle ce fichier a été édité.
+	</span>
 {% endblock footer_sup %}

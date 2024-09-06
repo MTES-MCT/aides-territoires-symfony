@@ -24,29 +24,28 @@ class AidKeywordReferenceSearchFilterType extends AbstractType
             'choice_label' => function ($keyword) {
                 $return = '';
                 if ($keyword->getParent() && $keyword->getParent()->getName() != $keyword->getName()) {
-                    $return .= $keyword->getParent()->getName().', ';
+                    $return .= $keyword->getParent()->getName() . ', ';
                 }
-                $return .= $keyword->getName().' et synonymes';
+                $return .= $keyword->getName() . ' et synonymes';
                 return $return;
             },
             'query_builder' => function (EntityRepository $er) {
-                $qb = 
+                $qb =
                     $er->createQueryBuilder('kr')
-                        ->andWhere('kr.intention = 0')
-                        ->orderBy('kr.name')
-                    ;
+                    ->andWhere('kr.intention = 0')
+                    ->orderBy('kr.name');
                 return $qb;
             },
             'data_class' => null,
             'preload' => false,
-            'filter_query' => function(QueryBuilder $qb, string $query, KeywordReferenceRepository $repository) {
+            'filter_query' => function (QueryBuilder $qb, string $query, KeywordReferenceRepository $repository) {
                 if (!$query) {
                     return;
                 }
 
                 $qb
-                ->andWhere('kr.name = :name')
-                ->setParameter('name', $query)
+                    ->andWhere('kr.name = :name')
+                    ->setParameter('name', $query)
                 ;
             },
         ]);

@@ -24,15 +24,14 @@ class MimeTypeBlogPostCommand extends Command
     protected string $commandTextStart = '<Fix des mimes types sur s3';
     protected string $commandTextEnd = '>Fix des mimes types sur s3';
 
-    
+
 
     public function __construct(
         protected ManagerRegistry $managerRegistry,
         protected ParamService $paramService,
         protected FileService $fileService
-    )
-    {
-        ini_set('max_execution_time', 60*60);
+    ) {
+        ini_set('max_execution_time', 60 * 60);
         ini_set('memory_limit', '1G');
         parent::__construct();
     }
@@ -45,7 +44,7 @@ class MimeTypeBlogPostCommand extends Command
         $io = new SymfonyStyle($input, $output);
         $io->title($this->commandTextStart);
 
-        try  {
+        try {
             // import des keywords
             $this->fixMimesTypes($input, $output);
         } catch (\Exception $exception) {
@@ -72,7 +71,7 @@ class MimeTypeBlogPostCommand extends Command
             'credentials' => $credentials,
             'use_path_style_endpoint' => true
         ]);
-        
+
         // recupere tous les blogPost
         $blogPosts = $this->managerRegistry->getRepository(BlogPost::class)->findBy(
             [],
@@ -87,10 +86,10 @@ class MimeTypeBlogPostCommand extends Command
                     'Bucket' => $this->paramService->get('aws_storage_bucket_name'),
                     'Key'    => $blogPost->getLogo(),
                 ]);
-        
+
                 // le mimeType actuel
                 $mimeType = $result['ContentType'];
-                
+
                 if (!in_array($mimeType, ['image/jpeg', 'image/png', 'image/gif', 'image/svg+xml', 'application/pdf', 'text/csv', 'application/json'])) {
                     // Vérifiez si l'objet est une image, un PDF, un CSV ou un JSON en fonction de son extension
                     $extension = pathinfo($blogPost->getLogo(), PATHINFO_EXTENSION);
@@ -110,9 +109,9 @@ class MimeTypeBlogPostCommand extends Command
                         } elseif ($extension == 'json') {
                             $mimeType = 'application/json';
                         }
-            
+
                         // Chemin vers le fichier temporaire
-                        $url = $this->paramService->get('cloud_image_url').$blogPost->getLogo();
+                        $url = $this->paramService->get('cloud_image_url') . $blogPost->getLogo();
 
                         // Télécharge le fichier à un emplacement temporaire
                         $tempPath = tempnam($this->fileService->getUploadTmpDir(), '');
@@ -146,8 +145,6 @@ class MimeTypeBlogPostCommand extends Command
                 } else {
                     $io->success("{$blogPost->getLogo()} à déjà {$mimeType}");
                 }
-
-
             } catch (\Exception $e) {
                 $io->error($blogPost->getLogo());
                 continue;

@@ -22,8 +22,7 @@ class BlogController extends DashboardController
         LogBlogPostViewRepository $logBlogPostViewRepository,
         FormFactoryInterface $formFactoryInterface,
         ChartBuilderInterface $chartBuilderInterface
-    )
-    {
+    ) {
         // dates par défaut
         $dateMin = new \DateTime('-1 month');
         $dateMax = new \DateTime();
@@ -68,7 +67,7 @@ class BlogController extends DashboardController
         $datas = [];
         $categories = [];
         foreach ($topBlogPostsCategories as $category) {
-            $labels[] = $category['blogPostCategory']->getName(). ' ('.$category['percentage'].'%)';
+            $labels[] = $category['blogPostCategory']->getName() . ' (' . $category['percentage'] . '%)';
             $datas[] = $category['nb'];
             $categories[] = $category['blogPostCategory'];
         }
@@ -84,16 +83,16 @@ class BlogController extends DashboardController
                 ],
             ],
         ]);
-        
+
 
         // formulaire de filtre evolution
         // dates par défaut
         $dateMinEvolution = new \DateTime('-1 month');
         $dateMaxEvolution = new \DateTime();
-        
+
 
         $formDateRangeEvolution = $formFactoryInterface->createNamed('date_range_evolution', DateRangeType::class, null, [
-            'action' => $this->adminUrlGenerator->generateUrl('admin_statistics_blog_dashboard').'#evolution',
+            'action' => $this->adminUrlGenerator->generateUrl('admin_statistics_blog_dashboard') . '#evolution',
         ]);
         $formDateRangeEvolution->add('blogPost', EntityType::class, [
             'required' => true,
@@ -117,9 +116,9 @@ class BlogController extends DashboardController
                 $views = $logBlogPostViewRepository->countByDate([
                     'dateMin' => $dateMinEvolution,
                     'dateMax' => $dateMaxEvolution,
-                    'blogPost' => $formDateRangeEvolution->get('blogPost')->getData(), 
+                    'blogPost' => $formDateRangeEvolution->get('blogPost')->getData(),
                 ]);
-                
+
                 // on transforme en tableau par dates
                 $viewByDate = [];
                 foreach ($views as $view) {
@@ -128,7 +127,7 @@ class BlogController extends DashboardController
                         'nb' => $view['nb']
                     ];
                 }
-                
+
                 // on refait le tableau en prenant toutes les dates
                 $viewsByDateFinal = [];
                 $dateStart = clone $dateMinEvolution;
@@ -140,7 +139,7 @@ class BlogController extends DashboardController
                     ];
                     $dateStart->modify('+1 day');
                 }
-                
+
                 $chartEvolution = $chartBuilderInterface->createChart(Chart::TYPE_LINE);
 
                 $labels = [];
@@ -160,7 +159,7 @@ class BlogController extends DashboardController
                         ],
                     ],
                 ]);
-        
+
                 $chartEvolution->setOptions([
                     'scales' => [
                         'y' => [
@@ -168,14 +167,13 @@ class BlogController extends DashboardController
                         ],
                     ],
                 ]);
-
             }
         } else {
             $formDateRangeEvolution->get('dateMin')->setData($dateMinEvolution);
             $formDateRangeEvolution->get('dateMax')->setData($dateMaxEvolution);
         }
-        
-        
+
+
         return $this->render('admin/statistics/blog/dashboard.html.twig', [
             'formDateRange' => $formDateRange,
             'dateMin' => $dateMin,
@@ -189,7 +187,8 @@ class BlogController extends DashboardController
         ]);
     }
 
-    private function getCategoriesBackgroundColor(array $array) {
+    private function getCategoriesBackgroundColor(array $array)
+    {
         $colorsBySlug = [
             'webinaires' => 'rgb(255, 99, 132)',
             'article' => 'rgb(54, 162, 235)',

@@ -32,15 +32,15 @@ class ParameterController extends FrontController
     #[Route('/comptes/monprofil/', name: 'app_user_parameter_profil')]
     public function profil(UserPasswordHasherInterface $userPasswordHasher, UserService $userService, ManagerRegistry $managerRegistry, RequestStack $requestStack): Response
     {
-        $this->breadcrumb->add("Mon compte",$this->generateUrl('app_user_dashboard'));
+        $this->breadcrumb->add("Mon compte", $this->generateUrl('app_user_dashboard'));
         $this->breadcrumb->add("Mon profil");
         $user = $userService->getUserLogged();
 
         $form = $this->createForm(UserProfilType::class, $user);
         $form->handleRequest($requestStack->getCurrentRequest());
-        if($form->isSubmitted()){
+        if ($form->isSubmitted()) {
 
-            if ($form->isValid()){
+            if ($form->isValid()) {
                 // sauvegarder le user
                 $newPassword = $form->get('newPassword')->getData();
 
@@ -48,11 +48,11 @@ class ParameterController extends FrontController
                     $hashedPassword = $userPasswordHasher->hashPassword($user, $newPassword);
                     $user->setPassword($hashedPassword);
                 }
-                    
+
                 // sauvegarde
                 $managerRegistry->getManager()->persist($user);
                 $managerRegistry->getManager()->flush();
-                
+
                 // message
                 $this->tAddFlash(
                     FrontController::FLASH_SUCCESS,
@@ -75,20 +75,19 @@ class ParameterController extends FrontController
         ]);
     }
 
-    
+
     #[Route('/comptes/api-token/', name: 'app_user_parameter_api_token')]
     public function apiToken(
         UserService $userService,
         ManagerRegistry $managerRegistry,
         RequestStack $requestStack,
         ApiTokenAskRepository $apiTokenAskRepository
-    ): Response
-    {
+    ): Response {
         // recupere le user
         $user = $userService->getUserLogged();
 
         // formulaire demande api token
-        $apiTokenAsk = $apiTokenAskRepository->findOneBy(['user'=>$user]);
+        $apiTokenAsk = $apiTokenAskRepository->findOneBy(['user' => $user]);
         if (!$apiTokenAsk) {
             $apiTokenAsk = new ApiTokenAsk();
             $apiTokenAsk->setUser($user);
@@ -109,7 +108,7 @@ class ParameterController extends FrontController
 
                 // redirection
                 return $this->redirectToRoute('app_user_parameter_api_token');
-            } else  {
+            } else {
                 // message
                 $this->addFlash(
                     FrontController::FLASH_ERROR,
@@ -119,22 +118,22 @@ class ParameterController extends FrontController
         }
 
         // fil arianne
-        $this->breadcrumb->add('Mon compte',$this->generateUrl('app_user_dashboard'));
+        $this->breadcrumb->add('Mon compte', $this->generateUrl('app_user_dashboard'));
         $this->breadcrumb->add('Clé API');
-        
+
         // rendu template
         return $this->render('user/parameter/api_token.html.twig', [
             'form' => $form,
             'apiTokenAsk' => $apiTokenAsk
         ]);
     }
-    
+
     #[Route('/comptes/journal-de-connexion/', name: 'app_user_parameter_history_log')]
     public function historyLog(UserService $userService, ManagerRegistry $managerRegistry, RequestStack $requestStack, LogUserLoginRepository $logUserLoginRepository): Response
     {
-        $this->breadcrumb->add('Mon compte',$this->generateUrl('app_user_dashboard'));
+        $this->breadcrumb->add('Mon compte', $this->generateUrl('app_user_dashboard'));
         $this->breadcrumb->add('Mon journal de connexion');
-        
+
         // gestion pagination
         $currentPage = (int) $requestStack->getCurrentRequest()->get('page', 1);
 
@@ -142,7 +141,7 @@ class ParameterController extends FrontController
         $logins = $user->getLogUserLogins();
 
         $form = $this->createFormBuilder($user)
-            ->add('save',SubmitType::class,['label'=>'Oui'])
+            ->add('save', SubmitType::class, ['label' => 'Oui'])
             ->getForm();
         $form->handleRequest($requestStack->getCurrentRequest());
         if ($form->isSubmitted() && $form->isValid()) {
@@ -155,11 +154,11 @@ class ParameterController extends FrontController
             return $this->redirectToRoute('app_user_parameter_history_log');
         }
 
-        $logsParams = array();
+        $logsParams = [];
         $logsParams['user'] = $user;
         $logsParams['action'] = 'login';
         $logsParams['limit'] = $params['limit'] ?? 3;
-        
+
         // le paginateur
         $adapter = new QueryAdapter($logUserLoginRepository->getQuerybuilder($logsParams));
         $pagerfanta = new Pagerfanta($adapter);
@@ -181,24 +180,23 @@ class ParameterController extends FrontController
         TokenStorageInterface $tokenStorageInterface,
         Session $session,
         EmailService $emailService
-    ): Response
-    {
+    ): Response {
         // le user
         $user = $userService->getUserLogged();
 
         $formTransfertProjects = [];
         $formTransfertAids = [];
         foreach ($user->getOrganizations() as $organization) {
-            $formTransfertProjects['project-'.$organization->getId()] = $this->createForm(TransfertProjectType::class, null, [
+            $formTransfertProjects['project-' . $organization->getId()] = $this->createForm(TransfertProjectType::class, null, [
                 'attr' => [
-                    'id' => 'formTransfertProject-'.$organization->getSlug(),
+                    'id' => 'formTransfertProject-' . $organization->getSlug(),
                 ],
                 'organization' => $organization
             ]);
 
-            $formTransfertAids['aid-'.$organization->getId()] = $this->createForm(TransfertAidType::class, null, [
+            $formTransfertAids['aid-' . $organization->getId()] = $this->createForm(TransfertAidType::class, null, [
                 'attr' => [
-                    'id' => 'formTransfertAid-'.$organization->getSlug(),
+                    'id' => 'formTransfertAid-' . $organization->getSlug(),
                 ],
                 'organization' => $organization
             ]);
@@ -221,16 +219,16 @@ class ParameterController extends FrontController
                     // message
                     $this->addFlash(
                         FrontController::FLASH_SUCCESS,
-                        'Votre / Vos projet(s) de l\'organization '.$organization->getName().' ont été transférés avec succès.'
+                        'Votre / Vos projet(s) de l\'organization ' . $organization->getName() . ' ont été transférés avec succès.'
                     );
-    
+
                     // redirection
                     return $this->redirectToRoute('app_user_parameter_delete');
                 } else {
                     // message
                     $this->addFlash(
                         FrontController::FLASH_ERROR,
-                        'Impossible de transférer votre / vos projet(s) de l\'organization '.$organization->getName().' à cet utilisateur'
+                        'Impossible de transférer votre / vos projet(s) de l\'organization ' . $organization->getName() . ' à cet utilisateur'
                     );
                 }
             }
@@ -253,16 +251,16 @@ class ParameterController extends FrontController
                     // message
                     $this->addFlash(
                         FrontController::FLASH_SUCCESS,
-                        'Votre / Vos aide(s) de l\'organization '.$organization->getName().' ont été transférés avec succès.'
+                        'Votre / Vos aide(s) de l\'organization ' . $organization->getName() . ' ont été transférés avec succès.'
                     );
-    
+
                     // redirection
                     return $this->redirectToRoute('app_user_parameter_delete');
                 } else {
                     // message
                     $this->addFlash(
                         FrontController::FLASH_ERROR,
-                        'Impossible de transférer votre / vos aide(s) de l\'organization '.$organization->getName().' à cet utilisateur'
+                        'Impossible de transférer votre / vos aide(s) de l\'organization ' . $organization->getName() . ' à cet utilisateur'
                     );
                 }
             }
@@ -318,6 +316,4 @@ class ParameterController extends FrontController
             'user' => $user,
         ]);
     }
-    
-
 }

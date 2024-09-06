@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Controller\Admin\Filter\Aid;
 
 use App\Form\Admin\Filter\Aid\AidStateFilterType;
@@ -32,18 +33,17 @@ class AidStateFilter implements FilterInterface
         switch ($state) {
             case 'live':
             case 'showInSearch':
-                $queryBuilder->addCriteria(AidRepository::showInSearchCriteria($filterDataDto->getEntityAlias().'.'));
+                $queryBuilder->addCriteria(AidRepository::showInSearchCriteria($filterDataDto->getEntityAlias() . '.'));
                 break;
             case 'hidden':
-                $queryBuilder->addCriteria(AidRepository::hiddenCriteria($filterDataDto->getEntityAlias().'.'));
+                $queryBuilder->addCriteria(AidRepository::hiddenCriteria($filterDataDto->getEntityAlias() . '.'));
                 break;
             case 'deadline':
                 $queryBuilder
-                    ->addCriteria(AidRepository::deadlineCriteria($filterDataDto->getEntityAlias().'.'))
-                ;
+                    ->addCriteria(AidRepository::deadlineCriteria($filterDataDto->getEntityAlias() . '.'));
                 break;
             case 'expired':
-                $queryBuilder->addCriteria(AidRepository::expiredCriteria($filterDataDto->getEntityAlias().'.'));
+                $queryBuilder->addCriteria(AidRepository::expiredCriteria($filterDataDto->getEntityAlias() . '.'));
                 break;
         }
 

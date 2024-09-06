@@ -24,15 +24,14 @@ class CronExportSpreadsheetRepository extends ServiceEntityRepository
 
     public function findOneToExport(?array $params = null): ?CronExportSpreadsheet
     {
-        try  {
+        try {
             $params['notEmailed'] = true;
             $params['error'] = false;
             $params['orderBy'] = ['sort' => 'ces.id', 'order' => 'DESC'];
             $qb = $this->getQueryBuilder($params);
             $qb
-                ->setMaxResults(1)
-            ;
-    
+                ->setMaxResults(1);
+
             return $qb->getQuery()->getOneOrNullResult();
         } catch (\Exception $e) {
             return null;
@@ -61,18 +60,16 @@ class CronExportSpreadsheetRepository extends ServiceEntityRepository
                 ->setParameter('error', $error)
             ;
         }
-        
+
         if ($notEmailed !== null) {
             $qb
-                ->andWhere('ces.timeEmail IS NULL')
-            ;
+                ->andWhere('ces.timeEmail IS NULL');
         }
-        
+
         if ($orderBy !== null) {
             $qb
-                ->orderBy($orderBy['sort'], $orderBy['order'])
-            ;
-        }   
+                ->orderBy($orderBy['sort'], $orderBy['order']);
+        }
 
         return $qb;
     }

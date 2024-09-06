@@ -3,6 +3,7 @@
 namespace App\Controller\Image;
 
 use App\Controller\FrontController;
+use App\Security\Voter\InternalRequestVoter;
 use App\Service\File\FileService;
 use App\Service\Image\ImageService;
 use App\Service\Various\ParamService;
@@ -14,39 +15,43 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\String\Slugger\SluggerInterface;
 
-class ImageUploadController extends FrontController {
-    #[Route('/upload-image', name: 'app_upload_image', options: ['expose' => true])]
-    public function index
-    (
-        Request $request,
+class ImageUploadController extends FrontController
+{
+    #[Route('/upload-image', name: 'app_upload_image', options: ['expose' => true], methods: ['POST'])]
+    public function index(
         SluggerInterface $slugger,
         FileService $fileService,
         ImageService $imageService,
         ParamService $paramService,
         RequestStack $requestStack
-    ): Response
-    {
-        
+    ): Response {
+
         try {
             // verification requete interne
             $request = $requestStack->getCurrentRequest();
-            $origin = $request->headers->get('origin');
-            $infosOrigin = parse_url($origin);
-            $hostOrigin = $infosOrigin['host'] ?? null;
-            $serverName = $request->getHost();
-    
-            if ($hostOrigin !== $serverName) {
-                // La requête n'est pas interne, retourner une erreur
-                throw $this->createAccessDeniedException('This action can only be performed by the server itself.');
+
+            // verification requête interne
+            if (!$this->isGranted(InternalRequestVoter::IDENTIFIER)) {
+                throw $this->createAccessDeniedException(InternalRequestVoter::MESSAGE_ERROR);
             }
 
             // gestion de l'image
             $image = $request->files->get('image', null);
+
+            // verification image
+            if (!$fileService->uploadedFileIsImage($image)) {
+                return new JsonResponse([
+                    'url' => null,
+                    'exception' => 'Le fichier n\'est pas une image'
+                ]);
+            }
+
+            // nommage de l'image
             if ($image) {
                 $originalFilename = pathinfo($image->getClientOriginalName(), PATHINFO_FILENAME);
                 // this is needed to safely include the file name as part of the URL
                 $safeFilename = $slugger->slug($originalFilename);
-                $newFilename = $safeFilename.'-'.uniqid().'.'.$image->guessExtension();
+                $newFilename = $safeFilename . '-' . uniqid() . '.' . $image->guessExtension();
             }
 
             // si file, on la met dans le dossier temporaire
@@ -60,9 +65,9 @@ class ImageUploadController extends FrontController {
 
             // envoi au cloud
             $imageService->sendImageToCloud(
-                $fileService->getUploadTmpDir().'/'.$newFilename,
+                $fileService->getUploadTmpDir() . '/' . $newFilename,
                 'upload',
-                'upload/'.$newFilename
+                'upload/' . $newFilename
             );
         } catch (FileException $e) {
             return new JsonResponse([
@@ -70,10 +75,10 @@ class ImageUploadController extends FrontController {
                 'exception' => $e->getMessage()
             ]);
         }
-        
+
         return new JsonResponse([
             'data' => [
-                'link' => $paramService->get('cloud_image_url').'upload/'.$newFilename,
+                'link' => $paramService->get('cloud_image_url') . 'upload/' . $newFilename,
             ],
             'success' => true,
             'code' => 200
@@ -81,7 +86,7 @@ class ImageUploadController extends FrontController {
     }
 
 
-    public function imagickAutorotate(\Imagick $image) :\Imagick
+    public function imagickAutorotate(\Imagick $image): \Imagick
     {
         switch ($image->getImageOrientation()) {
             case \Imagick::ORIENTATION_TOPLEFT:
@@ -116,5 +121,4 @@ class ImageUploadController extends FrontController {
         $image->setImageOrientation(\Imagick::ORIENTATION_TOPLEFT);
         return $image;
     }
-
 }

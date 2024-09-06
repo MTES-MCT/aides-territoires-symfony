@@ -164,5 +164,4 @@ class BlogPostCategory
     {
         return $this->name ?? 'Catégorie';
     }
-
 }

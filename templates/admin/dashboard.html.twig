@@ -1,35 +1,53 @@
 {% extends "@EasyAdmin/page/content.html.twig" %}
 
 {% block main %}
-<main>
-<div class="container">
-    <div class="row">
-        <div class="col">
-            <div class="card {% if nbAidsInReview == 0 %}bg-success-subtle{% else %}bg-info-subtle{% endif %}">
-                <div class="card-body">
-                    <h5 class="card-title">Aides</h5>
-                    <p class="card-text"><a href="{{ urlAidsInReview }}" title="Passer les aides en revues">{{ nbAidsInReview }} en attente de revue</a></p>
-                    <p class="card-text"><a href="{{ urlAidsPublishedLastWeek }}" title="Passer les aides en revues">{{ nbAidsPublishedLastWeek }} aides publiées depuis 7 jours</a></p>
-                    <h5 class="card-title">Projets</h5>
-                    <p class="card-text"><a href="{{ urlProjectsInReview }}" title="Passer les aides en revues">{{ nbProjectsInReview }} en attente de revue</a></p>
-                    <h5 class="card-title">Porteur d'aides</h5>
-                    <p class="card-text"><a href="{{ urlBackersInReview }}" title="Passer les porteurs d'aides en revues">{{ nbBackersInReview }} en attente de validation</a></p>
-                    <p class="card-text"><a href="{{ urlBackerAskAssociatePending }}" title="Passer les demandes d'associations en revues">{{ nbBackerAskAssociatePending }} associations en attente de validation</a></p>
-                </div>
-            </div>
-        </div>
-        <div class="col">
-            <div class="card {% if nbApiTokenAsks == 0 %}bg-success-subtle{% else %}bg-info-subtle{% endif %}">
-                <div class="card-body">
-                    <h5 class="card-title">Utilisateurs</h5>
-                    <p class="card-text"><a href="{{ urlApiTokenAsk }}" title="Voir les demandes">{{ nbApiTokenAsks }} demandes de token API en attente</a></p>
-                    <div>
-{{ render_chart(chart) }}
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-</main>
+	<main>
+		<div class="container">
+			<div class="row">
+				<div class="col">
+					<div class="card {% if nbAidsInReview == 0 %}bg-success-subtle{% else %}bg-info-subtle{% endif %}">
+						<div class="card-body">
+							<h5 class="card-title">Aides</h5>
+							<p class="card-text">
+								<a href="{{ urlAidsInReview }}" title="Passer les aides en revues">{{ nbAidsInReview }}
+									en attente de revue</a>
+							</p>
+							<p class="card-text">
+								<a href="{{ urlAidsPublishedLastWeek }}" title="Passer les aides en revues">{{ nbAidsPublishedLastWeek }}
+									aides publiées depuis 7 jours</a>
+							</p>
+							<h5 class="card-title">Projets</h5>
+							<p class="card-text">
+								<a href="{{ urlProjectsInReview }}" title="Passer les aides en revues">{{ nbProjectsInReview }}
+									en attente de revue</a>
+							</p>
+							<h5 class="card-title">Porteur d'aides</h5>
+							<p class="card-text">
+								<a href="{{ urlBackersInReview }}" title="Passer les porteurs d'aides en revues">{{ nbBackersInReview }}
+									en attente de validation</a>
+							</p>
+							<p class="card-text">
+								<a href="{{ urlBackerAskAssociatePending }}" title="Passer les demandes d'associations en revues">{{ nbBackerAskAssociatePending }}
+									associations en attente de validation</a>
+							</p>
+						</div>
+					</div>
+				</div>
+				<div class="col">
+					<div class="card {% if nbApiTokenAsks == 0 %}bg-success-subtle{% else %}bg-info-subtle{% endif %}">
+						<div class="card-body">
+							<h5 class="card-title">Utilisateurs</h5>
+							<p class="card-text">
+								<a href="{{ urlApiTokenAsk }}" title="Voir les demandes">{{ nbApiTokenAsks }}
+									demandes de token API en attente</a>
+							</p>
+							<div>
+								{{ render_chart(chart) }}
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</main>
 {% endblock %}

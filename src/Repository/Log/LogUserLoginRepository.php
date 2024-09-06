@@ -98,10 +98,10 @@ class LogUserLoginRepository extends ServiceEntityRepository
     public function countUsersLoggedAtLeastOnce(): int
     {
         return
-        $this->createQueryBuilder('l')
-        ->select('COUNT(DISTINCT l.user)')
-        ->getQuery()
-        ->getSingleScalarResult()
+            $this->createQueryBuilder('l')
+            ->select('COUNT(DISTINCT l.user)')
+            ->getQuery()
+            ->getSingleScalarResult()
         ;
     }
     public function countUsersLoggedOnce(): int
@@ -137,7 +137,7 @@ class LogUserLoginRepository extends ServiceEntityRepository
         }
         return (int) $qb->getQuery()->getSingleScalarResult();
     }
-    
+
     public function getQueryBuilder(array $params = null): QueryBuilder
     {
         $user = $params['user'] ?? null;
@@ -154,9 +154,9 @@ class LogUserLoginRepository extends ServiceEntityRepository
 
         if ($excludeAdmins === true) {
             $qb
-            ->innerJoin('l.user', 'userForRole')
-            ->andWhere('userForRole.roles NOT LIKE :roleAdmin')
-            ->setParameter('roleAdmin', '%'.User::ROLE_ADMIN.'%')
+                ->innerJoin('l.user', 'userForRole')
+                ->andWhere('userForRole.roles NOT LIKE :roleAdmin')
+                ->setParameter('roleAdmin', '%' . User::ROLE_ADMIN . '%')
             ;
         }
 
@@ -167,7 +167,7 @@ class LogUserLoginRepository extends ServiceEntityRepository
                 ->innerJoin('organizations.organizationType', 'organizationType')
                 ->andWhere('organizationType.slug = :slugCommune')
                 ->setParameter('slugCommune', OrganizationType::SLUG_COMMUNE)
-                ;
+            ;
         }
 
         if ($isEpci) {
@@ -177,40 +177,40 @@ class LogUserLoginRepository extends ServiceEntityRepository
                 ->innerJoin('organizations.organizationType', 'organizationType')
                 ->andWhere('organizationType.slug = :slugCommune')
                 ->setParameter('slugCommune', OrganizationType::SLUG_EPCI)
-                ;
+            ;
         }
 
         if ($month instanceof \DateTime) {
             $qb->andWhere('DATE_FORMAT(l.dateCreate, \'%Y-%m\') = :month')
                 ->setParameter('month', $month->format('Y-m'))
-                ;
+            ;
         }
         if ($dateCreateMin instanceof \DateTime) {
             $qb
                 ->andWhere('l.dateCreate >= :dateCreateMin')
                 ->setParameter('dateCreateMin', $dateCreateMin)
-                ;
+            ;
         }
 
         if ($dateCreateMax instanceof \DateTime) {
             $qb
                 ->andWhere('l.dateCreate <= :dateCreateMax')
                 ->setParameter('dateCreateMax', $dateCreateMax)
-                ;
+            ;
         }
 
         if ($user !== null) {
             $qb
                 ->andWhere('l.user = :user')
                 ->setParameter('user', $user)
-                ;
+            ;
         }
-    
+
         if ($action !== null) {
             $qb
                 ->andWhere('l.action = :action')
                 ->setParameter('action', $action)
-                ;
+            ;
         }
 
         if ($limit !== null) {

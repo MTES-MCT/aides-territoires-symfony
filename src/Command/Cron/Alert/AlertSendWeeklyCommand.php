@@ -40,9 +40,8 @@ class AlertSendWeeklyCommand extends Command
         private RouterInterface $routerInterface,
         private NotificationService $notificationService,
         private MessageBusInterface $bus
-    )
-    {
-        ini_set('max_execution_time', 60*60);
+    ) {
+        ini_set('max_execution_time', 60 * 60);
         ini_set('memory_limit', '1G');
         parent::__construct();
     }
@@ -55,7 +54,7 @@ class AlertSendWeeklyCommand extends Command
         $io = new SymfonyStyle($input, $output);
         $io->title($this->commandTextStart);
 
-        try  {
+        try {
             if ($this->kernelInterface->getEnvironment() != 'prod') {
                 $io->info('Uniquement en prod');
                 return Command::FAILURE;
@@ -78,7 +77,7 @@ class AlertSendWeeklyCommand extends Command
 
         /** @var AlertRepository $alertRepo */
         $alertRepo = $this->managerRegistry->getRepository(Alert::class);
-        
+
         // charge les alertes
         $alerts = $alertRepo->findToSendWeekly();
 
@@ -89,7 +88,7 @@ class AlertSendWeeklyCommand extends Command
         $today = new \DateTime(date('Y-m-d'));
         $weekNumber = $today->format('W');
         $year = $today->format('o');
-        
+
         $startOfWeek = new \DateTime();
         $startOfWeek->setISODate($year, $weekNumber, 1);
 
@@ -104,17 +103,17 @@ class AlertSendWeeklyCommand extends Command
 
         // notif admin
         $admin = $this->managerRegistry->getRepository(User::class)->findOneBy(['email' => $this->paramService->get('email_super_admin')]);
-        $this->notificationService->addNotification($admin, 'Envoi des alertes hebdomadaires', $nbAlertTotal. ' alertes envoyées pour vérification des aides publiées après le ' . $publishedAfter->format('d/m/Y') . ' inclus');
-        
+        $this->notificationService->addNotification($admin, 'Envoi des alertes hebdomadaires', $nbAlertTotal . ' alertes envoyées pour vérification des aides publiées après le ' . $publishedAfter->format('d/m/Y') . ' inclus');
+
         // on ajoute le resume à la file d'attente
         $this->bus->dispatch(new AlertResume(Alert::FREQUENCY_WEEKLY_SLUG));
-        
+
         // le temps passé
         $timeEnd = microtime(true);
         $time = $timeEnd - $timeStart;
-        
+
         // success
-        $io->success('Temps écoulé : '.gmdate("H:i:s", $timeEnd).' ('.gmdate("H:i:s", intval($time)).')');
+        $io->success('Temps écoulé : ' . gmdate("H:i:s", $timeEnd) . ' (' . gmdate("H:i:s", intval($time)) . ')');
         $io->success('Mémoire maximale utilisée : ' . round(memory_get_peak_usage() / 1024 / 1024) . ' MB');
     }
 }

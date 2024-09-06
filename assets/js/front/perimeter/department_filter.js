@@ -19,8 +19,6 @@ function department_filter(return_page) {
                 new_url = window.location.origin + "/cartographie/" + department + "/porteurs" + return_page;
             }
             window.location.href = new_url + window.location.search;
-        } else {
-            console.log("Invalid department id");
         }
     });
 
@@ -30,8 +28,6 @@ function department_filter(return_page) {
             let audience = $(this).val();
             if (audience.match(SANE_ID_REGEX)) {
                 set_param_value("target_audience", audience);
-            } else {
-                console.log("Invalid target audience id");
             }
         });
 
@@ -40,8 +36,6 @@ function department_filter(return_page) {
             let aid_type = $(this).val();
             if (aid_type.match(SANE_ID_REGEX)) {
                 set_param_value("aid_type", aid_type);
-            } else {
-                console.log("Invalid aid type id");
             }
         });
 
@@ -50,8 +44,6 @@ function department_filter(return_page) {
             let perimeter_scale = $(this).val();
             if (perimeter_scale.match(SANE_ID_REGEX)) {
                 set_param_value("perimeter_scale", perimeter_scale);
-            } else {
-                console.log("Invalid perimeter scale");
             }
         });
 
@@ -60,8 +52,6 @@ function department_filter(return_page) {
             let backer_category = $(this).val();
             if (backer_category.match(SANE_ID_REGEX)) {
                 set_param_value("backer_category", backer_category);
-            } else {
-                console.log("Invalid backer category");
             }
         });
 

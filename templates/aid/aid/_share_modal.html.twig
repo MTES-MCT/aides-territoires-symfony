@@ -1,41 +1,42 @@
 <dialog aria-labelledby="fr-modal-title-share" role="dialog" id="share-modal" class="fr-modal">
-    <div class="fr-container fr-container--fluid fr-container-md">
-        <div class="fr-grid-row fr-grid-row--center">
-            <div class="fr-col-12 fr-col-md-8 fr-col-lg-6">
-                <div class="fr-modal__body">
-                    <div class="fr-modal__header">
-                        <button class="fr-btn fr-btn--close" title="Fermer la fenêtre modale" aria-controls="share-modal">Fermer</button>
-                    </div>
-                    <div class="fr-modal__content">
-                        <div class="fr-share">
-                            <h2 id="fr-modal-title-share" class="fr-modal__title fr-mb-5w"><span class="fr-icon-arrow-right-line fr-icon--lg"></span>Partager cette aide</h2>
-                            <ul class="fr-btns-group fr-grid-row fr-grid-row--gutters fr-grid-row--center">
-                                <li>
-                                    <a class="fr-btn fr-btn--facebook" id="fr-btn--facebook" title="Partager sur Facebook - ouvre une nouvelle fenêtre" href="https://www.facebook.com/sharer/sharer.php?u={{ absolute_url(path('app_aid_aid_details', {'slug': aid.slug})) }}&amp;src=sdkpreparse" target="_blank" rel="noopener">Partager sur Facebook</a>
-                                </li>
-                                <li>
-                                    <a class="fr-btn fr-icon-twitter-x-line" id="fr-btn--twitter" title="Partager sur Twitter - ouvre une nouvelle fenêtre" href="https://twitter.com/intent/tweet?via=AidesTerr&text={{ aid.name }}&url={{ absolute_url(path('app_aid_aid_details', {'slug': aid.slug})) }}" target="_blank" rel="noopener">Partager sur Twitter</a>
-                                </li>
-                                <li>
-                                    <a class="fr-btn fr-btn--linkedin" id="fr-btn--linkedin" title="Partager sur LinkedIn - ouvre une nouvelle fenêtre" href="https://www.linkedin.com/sharing/share-offsite/?url={{ absolute_url(path('app_aid_aid_details', {'slug': aid.slug})) }}" target="_blank" rel="noopener">Partager sur LinkedIn</a>
-                                </li>
-                                <li>
-                                    <a class="fr-btn fr-btn--mail" href="mailto:?subject=Votre%20recherche%20sur%20Aides%20territoires&body={{ absolute_url(path('app_aid_aid_details', {'slug': aid.slug})) }}" title="Partager par email - Ouvre une nouvelle fenêtre" target="_blank">Partager par email</a>
-                                </li>
-                            </ul>
-                        </div>
-                              
-                        <form id="copy-to-clipboard-form" class="fr-grid-row fr-grid-row--center">
-                            <div class="form-group fr-my-2w fr-col-12">
-                                <input type="text" id="currentUrl" name="current-url" value="{{ absolute_url(path('app_aid_aid_details', {'slug': aid.slug})) }}" class="fr-input" />
-                            </div>
-                            <button type="button" id="clipboard-btn" class="fr-btn">
-                                Copier l’url dans le presse-papier
-                            </button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+	<div class="fr-container fr-container--fluid fr-container-md">
+		<div class="fr-grid-row fr-grid-row--center">
+			<div class="fr-col-12 fr-col-md-8 fr-col-lg-6">
+				<div class="fr-modal__body">
+					<div class="fr-modal__header">
+						<button class="fr-btn fr-btn--close" title="Fermer la fenêtre modale" aria-controls="share-modal">Fermer</button>
+					</div>
+					<div class="fr-modal__content">
+						<div class="fr-share">
+							<h2 id="fr-modal-title-share" class="fr-modal__title fr-mb-5w">
+								<span class="fr-icon-arrow-right-line fr-icon--lg"></span>Partager cette aide</h2>
+							<ul class="fr-btns-group fr-grid-row fr-grid-row--gutters fr-grid-row--center">
+								<li>
+									<a class="fr-btn fr-btn--facebook" id="fr-btn--facebook" title="Partager sur Facebook - ouvre une nouvelle fenêtre" href="https://www.facebook.com/sharer/sharer.php?u={{ absolute_url(path('app_aid_aid_details', {'slug': aid.slug})) }}&amp;src=sdkpreparse" target="_blank" rel="noopener">Partager sur Facebook</a>
+								</li>
+								<li>
+									<a class="fr-btn fr-icon-twitter-x-line" id="fr-btn--twitter" title="Partager sur Twitter - ouvre une nouvelle fenêtre" href="https://twitter.com/intent/tweet?via=AidesTerr&text={{ aid.name }}&url={{ absolute_url(path('app_aid_aid_details', {'slug': aid.slug})) }}" target="_blank" rel="noopener">Partager sur Twitter</a>
+								</li>
+								<li>
+									<a class="fr-btn fr-btn--linkedin" id="fr-btn--linkedin" title="Partager sur LinkedIn - ouvre une nouvelle fenêtre" href="https://www.linkedin.com/sharing/share-offsite/?url={{ absolute_url(path('app_aid_aid_details', {'slug': aid.slug})) }}" target="_blank" rel="noopener">Partager sur LinkedIn</a>
+								</li>
+								<li>
+									<a class="fr-btn fr-btn--mail" href="mailto:?subject=Votre%20recherche%20sur%20Aides%20territoires&body={{ absolute_url(path('app_aid_aid_details', {'slug': aid.slug})) }}" title="Partager par email - Ouvre une nouvelle fenêtre" target="_blank">Partager par email</a>
+								</li>
+							</ul>
+						</div>
+
+						<form id="copy-to-clipboard-form" class="fr-grid-row fr-grid-row--center">
+							<div class="form-group fr-my-2w fr-col-12">
+								<input type="text" id="currentUrl" name="current-url" value="{{ absolute_url(path('app_aid_aid_details', {'slug': aid.slug})) }}" class="fr-input"/>
+							</div>
+							<button type="button" id="clipboard-btn" class="fr-btn">
+								Copier l’url dans le presse-papier
+							</button>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
 </dialog>

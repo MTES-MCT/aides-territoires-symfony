@@ -23,12 +23,10 @@ class DataExportCrudController extends AtCrudController
     {
         yield IdField::new('id')->onlyOnIndex();
         yield UrlClickField::new('urlExportedFile', 'Fichier exporté')
-        ->setFormTypeOption('attr', ['readonly' => true]);
+            ->setFormTypeOption('attr', ['readonly' => true]);
         yield TextField::new('author', 'Auteur')
-            ->setFormTypeOption('attr', ['readonly' => true, 'autocomplete' => 'off'])
-        ;
-        yield DateTimeField::new('timeCreate', 'Date création')
-        ;
+            ->setFormTypeOption('attr', ['readonly' => true, 'autocomplete' => 'off']);
+        yield DateTimeField::new('timeCreate', 'Date création');
     }
 
     public function configureActions(Actions $actions): Actions
@@ -36,13 +34,13 @@ class DataExportCrudController extends AtCrudController
         // action pour afficher le qrCode
         $displayOnFront = Action::new('downloadFile', 'Télécharger', 'fas fa-download')
             ->setHtmlAttributes(['title' => 'Télécharger', 'target' => '_blank']) // titre
-            ;
+        ;
 
         //set the link using a string or a callable (function like its being used here)
-        $displayOnFront->linkToUrl(function($entity) {
+        $displayOnFront->linkToUrl(function ($entity) {
             return $entity->getUrlExportedFile();
         });
-        
+
         return parent::configureActions($actions)
             ->add(Crud::PAGE_INDEX, $displayOnFront)
             ->remove(Crud::PAGE_INDEX, Action::NEW)

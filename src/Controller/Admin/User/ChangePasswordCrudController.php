@@ -25,8 +25,7 @@ class ChangePasswordCrudController extends AbstractCrudController implements Eve
         public UserPasswordHasherInterface $userPasswordHasherInterface,
         public RequestStack $requestStack,
         public AdminUrlGenerator $adminUrlGenerator
-    )
-    {
+    ) {
     }
 
     public function configureFields(string $pageName): iterable
@@ -78,7 +77,8 @@ class ChangePasswordCrudController extends AbstractCrudController implements Eve
         );
     }
 
-    public function hashPassword($entity, $newPassword) {
+    public function hashPassword($entity, $newPassword)
+    {
         if (!$entity instanceof User || !$newPassword) {
             return;
         }

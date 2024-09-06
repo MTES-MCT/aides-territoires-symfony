@@ -41,7 +41,7 @@ class Faq
     #[ORM\ManyToOne(inversedBy: 'faqs')]
     private ?PageTab $pageTab = null;
 
-    
+
     private ?\DateTime $latestUpdateTime = null;
 
     public function __construct()
@@ -117,7 +117,7 @@ class Faq
         return $this;
     }
 
-    public function  __toString(): string
+    public function __toString(): string
     {
         return $this->name ?? 'Faq';
     }

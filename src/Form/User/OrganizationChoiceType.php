@@ -15,8 +15,7 @@ class OrganizationChoiceType extends AbstractType
 {
     public function __construct(
         private UserService $userService
-    )
-    {
+    ) {
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -27,12 +26,12 @@ class OrganizationChoiceType extends AbstractType
                 'label' => 'Choix de la structure',
                 'class' => Organization::class,
                 'choice_label' => 'name',
-                'query_builder' => function(EntityRepository $entityRepository) {
+                'query_builder' => function (EntityRepository $entityRepository) {
                     return $entityRepository->createQueryBuilder('o')
-                    ->innerJoin('o.beneficiairies', 'beneficiairies')
-                    ->andWhere('beneficiairies = :user')
-                    ->setParameter('user', $this->userService->getUserLogged())
-                    ->orderBy('o.name', 'ASC')
+                        ->innerJoin('o.beneficiairies', 'beneficiairies')
+                        ->andWhere('beneficiairies = :user')
+                        ->setParameter('user', $this->userService->getUserLogged())
+                        ->orderBy('o.name', 'ASC')
                     ;
                 },
                 'constraints' => [
@@ -40,8 +39,7 @@ class OrganizationChoiceType extends AbstractType
                         'message' => 'Veuillez coisir la structure.',
                     ]),
                 ]
-            ])
-        ;
+            ]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void

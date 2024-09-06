@@ -17,12 +17,10 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 class ProjectReferenceSearchType extends AbstractType
 {
-    public function  __construct(
+    public function __construct(
         private UserService $userService,
         private RouterInterface $routerInterface
-    )
-    {
-
+    ) {
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -55,7 +53,7 @@ class ProjectReferenceSearchType extends AbstractType
         } else {
             $organizationTypeParams['data'] = ($user && $user->getDefaultOrganization() && $user->getDefaultOrganization()->getOrganizationType()) ? $user->getDefaultOrganization()->getOrganizationType() : null;
         }
-        
+
         // Perimeter params
         $perimeterParams = [
             'required' => false,
@@ -64,15 +62,15 @@ class ProjectReferenceSearchType extends AbstractType
         if ($options['forcePerimeter'] !== false) {
             $perimeterParams['data'] = $options['forcePerimeter'];
         } else {
-            $perimeterParams['data'] = 
+            $perimeterParams['data'] =
                 (
                     $user
                     && $user->getDefaultOrganization()
                     && $user->getDefaultOrganization()->getPerimeter()
                     && $user->getDefaultOrganization()->getPerimeter()->getScale() == Perimeter::SCALE_COMMUNE
                 )
-                    ? $user->getDefaultOrganization()->getPerimeter()
-                    : null;
+                ? $user->getDefaultOrganization()->getPerimeter()
+                : null;
         }
 
         $nameParams = [
@@ -100,7 +98,7 @@ class ProjectReferenceSearchType extends AbstractType
             ->add('organizationType', EntityType::class, $organizationTypeParams)
             ->add('perimeter', PerimeterCityAutocompleteType::class, $perimeterParams)
             ->add('name', TextType::class, $nameParams)
-            ;
+        ;
     }
 
     public function configureOptions(OptionsResolver $resolver): void

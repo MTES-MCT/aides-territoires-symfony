@@ -34,8 +34,7 @@ class KeywordReferenceCrudController extends AtCrudController
         yield TextField::new('name', 'Nom');
         yield AssociationField::new('parent', 'Parent');
         yield CollectionField::new('keywordReferences', 'Synonymes')
-        ->setEntryType(KeywordReferenceEditType::class)
-        ;
+            ->setEntryType(KeywordReferenceEditType::class);
         yield BooleanField::new('intention', 'Intention');
     }
 }

@@ -2,78 +2,84 @@
 
 {% block javascripts %}
 	{{ parent() }}
-    {{ encore_entry_script_tags('front/portal/stats') }}
+	{{ encore_entry_script_tags('front/portal/stats') }}
 {% endblock %}
 
 
-
 {% block body %}
-<div class="fr-container">
-    <h1>Statistiques du portail {{ search_page.slug }}</h1>
+	<div class="fr-container">
+		<h1>Statistiques du portail
+			{{ search_page.slug }}</h1>
 
-    <div class="fr-card fr-mb-5w">
-        <div class="fr-card__body">
-            <div class="fr-card__content fr-p-2w">
-                <h3 class="fr-card__title fr-mb-2w">
-                    Nombre d'aides affichées actuellement
-                </h3>
-                <p class="fr-card__desc"><span class="fr-display--md">{{ aids|length }}</span></p>
-            </div>
-        </div>
-    </div>
+		<div class="fr-card fr-mb-5w">
+			<div class="fr-card__body">
+				<div class="fr-card__content fr-p-2w">
+					<h3 class="fr-card__title fr-mb-2w">
+						Nombre d'aides affichées actuellement
+					</h3>
+					<p class="fr-card__desc">
+						<span class="fr-display--md">{{ aids|length }}</span>
+					</p>
+				</div>
+			</div>
+		</div>
 
-        <h2>Pour la période du {{ dateMin|date('d/m/Y') }} au {{ dateMax|date('d/m/Y') }}</h2>
+		<h2>Pour la période du
+			{{ dateMin|date('d/m/Y') }}
+			au
+			{{ dateMax|date('d/m/Y') }}</h2>
 
-    <div class="fr-card fr-mb-5w">
-        <div class="fr-card__body">
-            <div class="fr-card__content fr-p-2w">
-                {{ form_start(formDateRange) }}
-                    <div class="fr-grid-row fr-grid-row--gutters fr-grid-row--bottom">
-                        <div class="fr-col-md-3">
-                            {{ form_row(formDateRange.dateMin) }}
-                        </div>
-                        <div class="fr-col-md-3">
-                            {{ form_row(formDateRange.dateMax) }}
-                        </div>
-                        <div class="fr-col-md-3">
-                            <button type="submit" class="fr-btn">Afficher</button>
-                        </div>
-                    </div>
-                {{ form_end(formDateRange) }}
-            </div>
-        </div>
-    </div>
+		<div class="fr-card fr-mb-5w">
+			<div class="fr-card__body">
+				<div class="fr-card__content fr-p-2w">
+					{{ form_start(formDateRange) }}
+					<div class="fr-grid-row fr-grid-row--gutters fr-grid-row--bottom">
+						<div class="fr-col-md-3">
+							{{ form_row(formDateRange.dateMin) }}
+						</div>
+						<div class="fr-col-md-3">
+							{{ form_row(formDateRange.dateMax) }}
+						</div>
+						<div class="fr-col-md-3">
+							<button type="submit" class="fr-btn">Afficher</button>
+						</div>
+					</div>
+					{{ form_end(formDateRange) }}
+				</div>
+			</div>
+		</div>
 
-    <div class="fr-mb-5w">
-        <div class="fr-grid-row fr-grid-row--middle">
-            <div class="fr-col-md-6">
-                <div class="fr-mb-3w">
-                    <h3>Top 10 des aides les plus vues</h3>
-                    <div id="top-aids-container">Calcul en cours...</div>
-                </div>
-            </div>
-            <div class="fr-col-md-6">
-                <div class="fr-mb-3w">
-                    <div id="chart-views-by-organization-container">Calcul en cours...</div>
-                </div>
-            </div>
-        </div>
-    </div>
+		<div class="fr-mb-5w">
+			<div class="fr-grid-row fr-grid-row--middle">
+				<div class="fr-col-md-6">
+					<div class="fr-mb-3w">
+						<h3>Top 10 des aides les plus vues</h3>
+						<div id="top-aids-container">Calcul en cours...</div>
+					</div>
+				</div>
+				<div class="fr-col-md-6">
+					<div class="fr-mb-3w">
+						<div id="chart-views-by-organization-container">Calcul en cours...</div>
+					</div>
+				</div>
+			</div>
+		</div>
 
-    <h2>Depuis sa création</h2>
-    <div class="fr-grid-row fr-grid-row--gutters fr-grid-row--bottom">
-        <div class="fr-col-md-6">
-            <div class="fr-mb-3w">
-                <div id="chart-views-by-month-container">Calcul en cours...</div>
-                <hr />
-            </div>
-        </div>
-        <div class="fr-col-md-6">
-            <div class="fr-mb-3w">
-                <p class="fr-alert fr-alert--info">Ces statistiques ne sont disponibles qu'à partir du {{ dateStartMatomoto|date('d/m/Y') }}</p>
-                <div id="chart-visits-by-month-container">Calcul en cours...</div>
-            </div>
-        </div>
-    </div>
-</div>
+		<h2>Depuis sa création</h2>
+		<div class="fr-grid-row fr-grid-row--gutters fr-grid-row--bottom">
+			<div class="fr-col-md-6">
+				<div class="fr-mb-3w">
+					<div id="chart-views-by-month-container">Calcul en cours...</div>
+					<hr/>
+				</div>
+			</div>
+			<div class="fr-col-md-6">
+				<div class="fr-mb-3w">
+					<p class="fr-alert fr-alert--info">Ces statistiques ne sont disponibles qu'à partir du
+						{{ dateStartMatomoto|date('d/m/Y') }}</p>
+					<div id="chart-visits-by-month-container">Calcul en cours...</div>
+				</div>
+			</div>
+		</div>
+	</div>
 {% endblock %}

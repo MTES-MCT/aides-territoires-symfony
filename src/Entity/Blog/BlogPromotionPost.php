@@ -34,7 +34,7 @@ class BlogPromotionPost // NOSONAR too much methods
         ['slug' => self::STATUS_PUBLISHED, 'name' => 'Publié'],
         ['slug' => self::STATUS_DELETED, 'name' => 'Supprimé']
     ];
-    
+
 
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -106,11 +106,11 @@ class BlogPromotionPost // NOSONAR too much methods
     private Collection $programs;
 
     #[ORM\OneToMany(mappedBy: 'blogPromotionPost', targetEntity: LogBlogPromotionPostClick::class)]
-    #[ORM\JoinColumn(onDelete:'SET NULL')]
+    #[ORM\JoinColumn(onDelete: 'SET NULL')]
     private Collection $logBlogPromotionPostClicks;
 
     #[ORM\OneToMany(mappedBy: 'blogPromotionPost', targetEntity: LogBlogPromotionPostDisplay::class)]
-    #[ORM\JoinColumn(onDelete:'SET NULL')]
+    #[ORM\JoinColumn(onDelete: 'SET NULL')]
     private Collection $logBlogPromotionPostDisplays;
 
     #[ORM\ManyToMany(targetEntity: KeywordReference::class, inversedBy: 'blogPromotionPosts')]

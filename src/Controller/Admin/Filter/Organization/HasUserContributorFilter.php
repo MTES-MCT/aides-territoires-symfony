@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Controller\Admin\Filter\Organization;
 
 use App\Form\Admin\Filter\Organization\HasUserContributorFilterType;
@@ -26,17 +27,15 @@ class HasUserContributorFilter implements FilterInterface
     {
         if ($filterDataDto->getValue() !== null) {
             $queryBuilder
-                ->innerJoin($filterDataDto->getEntityAlias().'.beneficiairies', 'beneficiairies')
+                ->innerJoin($filterDataDto->getEntityAlias() . '.beneficiairies', 'beneficiairies')
                 ->andWhere('beneficiairies.isContributor = :isContributor')
             ;
             if ($filterDataDto->getValue() === true) {
                 $queryBuilder
-                    ->setParameter('isContributor', true)
-                ;
+                    ->setParameter('isContributor', true);
             } else {
                 $queryBuilder
-                    ->setParameter('isContributor', false)
-                ;
+                    ->setParameter('isContributor', false);
             }
         }
     }

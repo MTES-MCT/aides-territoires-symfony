@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Controller\Admin\Filter;
 
 use App\Form\Admin\Filter\UserCountyFilterType;
@@ -33,7 +34,7 @@ class UserCountyFilter implements FilterInterface
             ->innerJoin('organizations.perimeterDepartment', 'perimeterDepartment')
             ->andWhere('perimeterDepartment.id = :id')
             ->setParameter('id', $filterDataDto->getValue());
-            ;
+        ;
 
         return;
     }

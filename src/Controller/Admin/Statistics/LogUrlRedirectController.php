@@ -14,8 +14,7 @@ class LogUrlRedirectController extends AbstractController
     public function index(
         AdminContext $adminContext,
         LogUrlRedirectRepository $logUrlRedirectRepository
-    )
-    {
+    ) {
         // dates par défaut
         $dateMin = new \DateTime('-1 week');
         $dateMax = new \DateTime();

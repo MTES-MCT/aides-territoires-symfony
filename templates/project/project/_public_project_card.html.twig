@@ -1,67 +1,74 @@
 {% set userPublicProjectLatestView = getUserPublicProjectLatestView(app.user, project) %}
 <div class="fr-col-xs-12 fr-col-md-4 fr-p-3w project-public-card {% if userPublicProjectLatestView %}already-seen{% endif %}">
-    <div class="fr-card fr-enlarge-link">
-        <div class="fr-card__body">
-            <div class="fr-card__content">
-                {% if app.user and app.user.defaultOrganization %}
-                    {% if project in app.user.defaultOrganization.favoriteProjects %}
-                        <span class="ri-star-fill at-color--blue fr-mb-1w at-align-end" title="Ce projet est un de vos favoris"></span>
-                    {% endif %}
-                {% endif %}
-                <h2 class="fr-card__title fr-h5 fr-mb-1w">
-                    <a class="fr-card__link at-color--blue" href="{{ path('app_project_project_public_details', {'id': project.id, 'slug': project.slug}) }}" title="Voir le projet {{ project.name }} {% if userPublicProjectLatestView %}- vu le {{ userPublicProjectLatestView.dateCreate|date('d/m/Y') }}{% endif %}">
-                        {{ project.name }}
-                    </a>
-                </h2>
-                <div class="fr-card__desc">
-                    <p class="fr-mb-1w fr-mt-0 fr-text--sm at-color--blue">
-                    {% if project.organization %}
-                        {{ project.organization.name }} 
-                        {% if project.organization.zipCode or (project.organization.perimeter and project.organization.perimeter.zipCodes) %}
-                        (
-                            {% if project.organization.zipCode %}
-                                {{ project.organization.zipCode }}
-                            {% else %}
-                                {% if project.organization.perimeter %}
-                                    {% if project.organization.perimeter.zipCodes is iterable %}
-                                        {{ project.organization.perimeter.zipCodes|join(', ') }}
-                                    {% else %}
-                                        {{ project.organization.perimeter.zipCodes }}
-                                    {% endif %}
-                                {% endif %}
-                            {% endif %}
-                        )
-                        {% endif %}
-                    {% endif %}
-                    </p>
-                    {% if project.step and constant('App\\Entity\\Project\\Project::PROJECT_STEPS[project.step]') is defined %}
-                    <p class="fr-mb-1w fr-mt-0 fr-text--sm at-color--blue">
-                        État d'avancement : {{ constant('App\\Entity\\Project\\Project::PROJECT_STEPS[project.step]') }}
-                    </p>
-                    {% endif %}
-                    {% if project.aidProjects and project.aidProjects|length > 0 %}
-                    <p class="fr-mb-1w fr-mt-0 fr-text--sm at-color--blue">
-                        {{ project.aidProjects|length }} aide{% if project.aidProjects|length > 1 %}s{% endif %} sélectionnée{% if project.aidProjects|length > 1 %}s{% endif %}
-                    </p>
-                    {% endif %}
+	<div class="fr-card fr-enlarge-link">
+		<div class="fr-card__body">
+			<div class="fr-card__content">
+				{% if app.user and app.user.defaultOrganization %}
+					{% if project in app.user.defaultOrganization.favoriteProjects %}
+						<span class="ri-star-fill at-color--blue fr-mb-1w at-align-end" title="Ce projet est un de vos favoris"></span>
+					{% endif %}
+				{% endif %}
+				<h2 class="fr-card__title fr-h5 fr-mb-1w">
+					<a class="fr-card__link at-color--blue" href="{{ path('app_project_project_public_details', {'id': project.id, 'slug': project.slug}) }}" title="Voir le projet {{ project.name }} {% if userPublicProjectLatestView %}- vu le {{ userPublicProjectLatestView.dateCreate|date('d/m/Y') }}{% endif %}">
+						{{ project.name }}
+					</a>
+				</h2>
+				<div class="fr-card__desc">
+					<p class="fr-mb-1w fr-mt-0 fr-text--sm at-color--blue">
+						{% if project.organization %}
+							{{ project.organization.name }}
+							{% if project.organization.zipCode or (project.organization.perimeter and project.organization.perimeter.zipCodes) %}
+								(
+								{% if project.organization.zipCode %}
+									{{ project.organization.zipCode }}
+								{% else %}
+									{% if project.organization.perimeter %}
+										{% if project.organization.perimeter.zipCodes is iterable %}
+											{{ project.organization.perimeter.zipCodes|join(', ') }}
+										{% else %}
+											{{ project.organization.perimeter.zipCodes }}
+										{% endif %}
+									{% endif %}
+								{% endif %}
+								)
+							{% endif %}
+						{% endif %}
+					</p>
+					{% if project.step and constant('App\\Entity\\Project\\Project::PROJECT_STEPS[project.step]') is defined %}
+						<p class="fr-mb-1w fr-mt-0 fr-text--sm at-color--blue">
+							État d'avancement :
+							{{ constant('App\\Entity\\Project\\Project::PROJECT_STEPS[project.step]') }}
+						</p>
+					{% endif %}
+					{% if project.aidProjects and project.aidProjects|length > 0 %}
+						<p class="fr-mb-1w fr-mt-0 fr-text--sm at-color--blue">
+							{{ project.aidProjects|length }}
+							aide
+							{% if project.aidProjects|length > 1 %}s
+							{% endif %}
+							sélectionnée
+							{% if project.aidProjects|length > 1 %}s
+							{% endif %}
+						</p>
+					{% endif %}
 
-                    {% for keywordSynonym in project.keywordSynonymlists %}
-                    <p class="fr-tag fr-mb-1w at-color--blue">{{ keywordSynonym.name }}</p>
-                    {% endfor %}
-                </div>
-            </div>
-        </div>
-        <div class="fr-card__header">
-            <div class="fr-card__img">
-                {% if project.image %}
-                <img class="fr-responsive-img" src="{{ getParameter('cloud_image_url') }}{{ project.image }}" alt="Logo {{ project.name }}" loading="lazy" />    
-                {% else %}
-                <picture>
-                    <source srcset="{{ asset('build/images/project/project_illustration.webp') }}">
-                    <img src="{{ asset('build/images/project/project_illustration.png') }}" class="fr-responsive-img" alt="Logo par défaut" loading="lazy" />
-                </picture>
-                {% endif %}
-            </div>
-        </div>
-    </div>
+					{% for keywordSynonym in project.keywordSynonymlists %}
+						<p class="fr-tag fr-mb-1w at-color--blue">{{ keywordSynonym.name }}</p>
+					{% endfor %}
+				</div>
+			</div>
+		</div>
+		<div class="fr-card__header">
+			<div class="fr-card__img">
+				{% if project.image %}
+					<img class="fr-responsive-img" src="{{ getParameter('cloud_image_url') }}{{ project.image }}" alt="Logo {{ project.name }}" loading="lazy"/>
+				{% else %}
+					<picture>
+						<source srcset="{{ asset('build/images/project/project_illustration.webp') }}">
+						<img src="{{ asset('build/images/project/project_illustration.png') }}" class="fr-responsive-img" alt="Logo par défaut" loading="lazy"/>
+					</picture>
+				{% endif %}
+			</div>
+		</div>
+	</div>
 </div>

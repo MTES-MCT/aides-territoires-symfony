@@ -54,7 +54,7 @@ class ImportFluxDepartementDromeCommand extends ImportFluxCommand
 
         $dateStart = $this->getDateTimeOrNull($aidToImport['start_date'] ?? null);
         $dateSubmissionDeadline = $this->getDateTimeOrNull($aidToImport['submission_deadline'] ?? null);
-        
+
         $contact = isset($aidToImport['contact']) ? $this->htmlSanitizerInterface->sanitize($aidToImport['contact']) : null;
         if (!$contact) {
             $contact = isset($aidToImport['description']) ? $aidToImport['description'] : null;

@@ -1,33 +1,36 @@
 <nav role="navigation" class="fr-pagination" aria-label="Pagination">
-    <ul class="fr-pagination__list">
-        {% if previousPage > 0 %}
-        <li>
-            <a class="fr-pagination__link fr-pagination__link--first" href="?page=1" title="Première page">
-                Première page
-            </a>
-        </li>
-        <li>
-            <a class="fr-pagination__link fr-pagination__link--prev fr-pagination__link--lg-label" href="?page={{ previousPage }}" title="Page précédente">
-                Page précédente
-            </a>
-        </li>
-        {% endif %}
-        <li>
-            <span class="fr-pagination__link" aria-current="page">
-                Page {{ currentPage }} sur {{ nbPages }}
-            </span>
-        </li>
-        {% if currentPage < nbPages %}
-        <li>
-            <a class="fr-pagination__link fr-pagination__link--next fr-pagination__link--lg-label" href="?page={{ nextPage }}" title="Page suivante">
-                Page suivante
-            </a>
-        </li>
-        <li>
-            <a class="fr-pagination__link fr-pagination__link--last fr-unhidden-lg" href="?page={{ nbPages }}" title="Dernière page">
-                Dernière page
-            </a>
-        </li>
-        {% endif %}
-    </ul>
+	<ul class="fr-pagination__list">
+		{% if previousPage > 0 %}
+			<li>
+				<a class="fr-pagination__link fr-pagination__link--first" href="?page=1" title="Première page">
+					Première page
+				</a>
+			</li>
+			<li>
+				<a class="fr-pagination__link fr-pagination__link--prev fr-pagination__link--lg-label" href="?page={{ previousPage }}" title="Page précédente">
+					Page précédente
+				</a>
+			</li>
+		{% endif %}
+		<li>
+			<span class="fr-pagination__link" aria-current="page">
+				Page
+				{{ currentPage }}
+				sur
+				{{ nbPages }}
+			</span>
+		</li>
+		{% if currentPage < nbPages %}
+			<li>
+				<a class="fr-pagination__link fr-pagination__link--next fr-pagination__link--lg-label" href="?page={{ nextPage }}" title="Page suivante">
+					Page suivante
+				</a>
+			</li>
+			<li>
+				<a class="fr-pagination__link fr-pagination__link--last fr-unhidden-lg" href="?page={{ nbPages }}" title="Dernière page">
+					Dernière page
+				</a>
+			</li>
+		{% endif %}
+	</ul>
 </nav>

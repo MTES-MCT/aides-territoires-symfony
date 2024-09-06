@@ -28,6 +28,5 @@ function trackSearchEvent(perimeter, categories, nb_results, step) {
             _paq.push(['trackEvent', 'Recherche', step, eventName, nb_results]);
         }
     } catch (e) {
-        console.log(e);
     }
 }

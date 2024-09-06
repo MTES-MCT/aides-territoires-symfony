@@ -16,10 +16,9 @@ class PerimeterImportController extends DashboardController
     public function importPerimeters(
         $id,
         ManagerRegistry $managerRegistry
-    )
-    {
+    ) {
         $perimeterImport = $managerRegistry->getRepository(PerimeterImport::class)->find($id);
-        
+
         return $this->render('admin/perimeter/import.html.twig', [
             'perimeterImport' => $perimeterImport,
         ]);
@@ -29,9 +28,8 @@ class PerimeterImportController extends DashboardController
     public function ajaxImportPerimeterItem(
         RequestStack $requestStack,
         ManagerRegistry $managerRegistry
-    )
-    {
-        ini_set('max_execution_time', 60*60);
+    ) {
+        ini_set('max_execution_time', 60 * 60);
         ini_set('memory_limit', '8G');
         $nbToDo = 1;
 
@@ -49,7 +47,7 @@ class PerimeterImportController extends DashboardController
                 'message' => 'Périmètre introuvable'
             ]);
         }
-        
+
         $notFound = [];
         for ($i = $current; $i < $current + $nbToDo; $i++) {
             try {
@@ -71,7 +69,6 @@ class PerimeterImportController extends DashboardController
                 foreach ($perimeterToAdd->getPerimetersTo() as $parentToAdd) {
                     $perimeterImport->getAdhocPerimeter()->addPerimetersTo($parentToAdd);
                 }
-
             } catch (\Exception $e) {
                 return new JsonResponse([
                     'status' => 'error',

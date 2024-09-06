@@ -1,7 +1,15 @@
 {% block add_new_type_row %}
-<div class="field-text">
-    {% if form.vars.attr and form.vars.attr.new_url is defined %}
-    <p><a href="{{ form.vars.attr.new_url }}" target="_blank" class="btn btn-primary"><i class="fas fa-plus"></i> {% if form.vars.attr.new_text is defined %}{{ form.vars.attr.new_text }}{% endif %} <i class="fas fa-external-link-alt"></i></a></p>
-    {% endif %}
-</div>
+	<div class="field-text">
+		{% if form.vars.attr and form.vars.attr.new_url is defined %}
+			<p>
+				<a href="{{ form.vars.attr.new_url }}" target="_blank" class="btn btn-primary">
+					<i class="fas fa-plus"></i>
+					{% if form.vars.attr.new_text is defined %}
+						{{ form.vars.attr.new_text }}
+					{% endif %}
+					<i class="fas fa-external-link-alt"></i>
+				</a>
+			</p>
+		{% endif %}
+	</div>
 {% endblock %}

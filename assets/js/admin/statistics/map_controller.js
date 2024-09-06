@@ -492,7 +492,6 @@ export default class extends Controller {
         return departments
       })
       .catch((ex) => {
-        console.log('No available shapes for departments?', ex)
       })
   }
 
@@ -571,10 +570,6 @@ export default class extends Controller {
         return { communes, data }
       })
       .catch((ex) => {
-        console.log(
-          `No available communes shapes for that department code ${code}?`,
-          ex
-        )
       })
   }
 

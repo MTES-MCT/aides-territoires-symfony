@@ -19,7 +19,8 @@ class PasswordProfilValidator extends ConstraintValidator
 
     protected $translator;
 
-    public function __construct(TranslatorInterface $translator) {
+    public function __construct(TranslatorInterface $translator)
+    {
         $this->translator = $translator;
     }
 
@@ -49,7 +50,7 @@ class PasswordProfilValidator extends ConstraintValidator
                 }
             } catch (CustomValidatorException $exception) {
                 $this->context->buildViolation($this->translator->trans($exception->getMessage()))
-                ->addViolation();
+                    ->addViolation();
             }
         }
     }

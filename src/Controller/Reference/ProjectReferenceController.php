@@ -29,7 +29,7 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 #[Route(priority: 5)]
 class ProjectReferenceController extends FrontController
 {
-    
+
     const NB_PAID_BY_PAGE = 30;
     const NB_PROJECT_BY_PAGE = 18;
 
@@ -41,8 +41,7 @@ class ProjectReferenceController extends FrontController
         ManagerRegistry $managerRegistry,
         ProjectReferenceRepository $projectReferenceRepository,
         AidService $aidService
-    ): Response
-    {
+    ): Response {
         // gestion pagination
         $currentPage = (int) $requestStack->getCurrentRequest()->get('page', 1);
 
@@ -74,8 +73,8 @@ class ProjectReferenceController extends FrontController
         ]);
         $formProjectReferenceSearch->handleRequest($requestStack->getCurrentRequest());
         if ($formProjectReferenceSearch->isSubmitted()) {
-            if ($formProjectReferenceSearch->isValid()) {          
-                // créer la session avec les valeurs du formulaire     
+            if ($formProjectReferenceSearch->isValid()) {
+                // créer la session avec les valeurs du formulaire
                 if ($formProjectReferenceSearch->has('organizationType')) {
                     $requestStack->getCurrentRequest()->getSession()->set('reference_organizationType', $formProjectReferenceSearch->get('organizationType')->getData());
                     $organizationType = $formProjectReferenceSearch->get('organizationType')->getData();
@@ -108,12 +107,12 @@ class ProjectReferenceController extends FrontController
             $aids = $aidService->postPopulateAids($aids, $aidParams);
         }
 
-         // le paginateur
+        // le paginateur
         try {
-        $adapter = new ArrayAdapter($aids);
-        $pagerfanta = new Pagerfanta($adapter);
-        $pagerfanta->setMaxPerPage(self::NB_PAID_BY_PAGE);
-        $pagerfanta->setCurrentPage($currentPage);
+            $adapter = new ArrayAdapter($aids);
+            $pagerfanta = new Pagerfanta($adapter);
+            $pagerfanta->setMaxPerPage(self::NB_PAID_BY_PAGE);
+            $pagerfanta->setCurrentPage($currentPage);
         } catch (OutOfRangeCurrentPageException $e) {
             $this->addFlash(
                 FrontController::FLASH_ERROR,
@@ -142,8 +141,7 @@ class ProjectReferenceController extends FrontController
         ReferenceService $referenceService,
         ManagerRegistry $managerRegistry,
         ProjectValidatedRepository $projectValidatedRepository
-    ): Response
-    {
+    ): Response {
         // paramètres en session
         $organizationType = $requestStack->getCurrentRequest()->getSession()->get('reference_organizationType', $managerRegistry->getRepository(OrganizationType::class)->findOneBy(['slug' => OrganizationType::SLUG_COMMUNE]));
         $name = $requestStack->getCurrentRequest()->getSession()->get('reference_name', null);
@@ -162,8 +160,8 @@ class ProjectReferenceController extends FrontController
         ]);
         $formProjectReferenceSearch->handleRequest($requestStack->getCurrentRequest());
         if ($formProjectReferenceSearch->isSubmitted()) {
-            if ($formProjectReferenceSearch->isValid()) {          
-                // créer la session avec les valeurs du formulaire     
+            if ($formProjectReferenceSearch->isValid()) {
+                // créer la session avec les valeurs du formulaire
                 if ($formProjectReferenceSearch->has('organizationType')) {
                     $requestStack->getCurrentRequest()->getSession()->set('reference_organizationType', $formProjectReferenceSearch->get('organizationType')->getData());
                     $organizationType = $formProjectReferenceSearch->get('organizationType')->getData();
@@ -195,7 +193,7 @@ class ProjectReferenceController extends FrontController
         } else {
             $projectValidateds = [];
         }
-        
+
 
         // fil arianne
         $this->breadcrumb->add(
@@ -218,8 +216,7 @@ class ProjectReferenceController extends FrontController
         ReferenceService $referenceService,
         ManagerRegistry $managerRegistry,
         ProjectRepository $projectRepository
-    ): Response
-    {
+    ): Response {
         // paramètres en session
         $organizationType = $requestStack->getCurrentRequest()->getSession()->get('reference_organizationType', null);
         $name = $requestStack->getCurrentRequest()->getSession()->get('reference_name', null);
@@ -237,8 +234,8 @@ class ProjectReferenceController extends FrontController
         ]);
         $formProjectReferenceSearch->handleRequest($requestStack->getCurrentRequest());
         if ($formProjectReferenceSearch->isSubmitted()) {
-            if ($formProjectReferenceSearch->isValid()) {          
-                // créer la session avec les valeurs du formulaire     
+            if ($formProjectReferenceSearch->isValid()) {
+                // créer la session avec les valeurs du formulaire
                 if ($formProjectReferenceSearch->has('organizationType')) {
                     $requestStack->getCurrentRequest()->getSession()->set('reference_organizationType', $formProjectReferenceSearch->get('organizationType')->getData());
                     $organizationType = $formProjectReferenceSearch->get('organizationType')->getData();
@@ -272,7 +269,7 @@ class ProjectReferenceController extends FrontController
                 'order' => 'DESC'
             ]
         ]);
-        
+
         $projectsPublics = $projectRepository->findPublicProjects($projectsParams);
 
         // fil arianne
@@ -296,8 +293,7 @@ class ProjectReferenceController extends FrontController
         RequestStack $requestStack,
         ManagerRegistry $managerRegistry,
         StringService $stringService
-    ) : Response
-    {
+    ): Response {
         // paramètres en session
         $organizationType = $requestStack->getCurrentRequest()->getSession()->get('reference_organizationType', null);
         $name = $requestStack->getCurrentRequest()->getSession()->get('reference_name', null);
@@ -315,8 +311,8 @@ class ProjectReferenceController extends FrontController
         ]);
         $formProjectReferenceSearch->handleRequest($requestStack->getCurrentRequest());
         if ($formProjectReferenceSearch->isSubmitted()) {
-            if ($formProjectReferenceSearch->isValid()) {          
-                // créer la session avec les valeurs du formulaire     
+            if ($formProjectReferenceSearch->isValid()) {
+                // créer la session avec les valeurs du formulaire
                 if ($formProjectReferenceSearch->has('organizationType')) {
                     $requestStack->getCurrentRequest()->getSession()->set('reference_organizationType', $formProjectReferenceSearch->get('organizationType')->getData());
                     $organizationType = $formProjectReferenceSearch->get('organizationType')->getData();
@@ -354,7 +350,7 @@ class ProjectReferenceController extends FrontController
             $params['excludes'] = [$projectReference];
         }
         $projectReferences = $projectReferenceRepository->findCustom($params);
-                
+
         $closes = [];
         $others = [];
         foreach ($projectReferences as $projectReferenceCurrent) {
@@ -387,8 +383,7 @@ class ProjectReferenceController extends FrontController
         ProjectReferenceRepository $projectReferenceRepository,
         KeywordReferenceRepository $keywordReferenceRepository,
         RequestStack $requestStack
-    ): JsonResponse
-    {
+    ): JsonResponse {
         $query = $requestStack->getCurrentRequest()->get('query', null);
 
         // recherche les projets référents correspondants
@@ -426,9 +421,9 @@ class ProjectReferenceController extends FrontController
         foreach ($parents as $parent) {
             if ($parent) {
                 if ($parent->getName() != $query) {
-                    $text = $parent->getName(). ', '.$query.' et synonymes';
+                    $text = $parent->getName() . ', ' . $query . ' et synonymes';
                 } else {
-                    $text = $parent->getName(). ' et synonymes';
+                    $text = $parent->getName() . ' et synonymes';
                 }
                 $results[] = [
                     'value' => $parent->getName(),

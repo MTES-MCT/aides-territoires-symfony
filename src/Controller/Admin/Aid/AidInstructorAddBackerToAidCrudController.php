@@ -16,6 +16,6 @@ class AidInstructorAddBackerToAidCrudController extends AtCrudController
     public function configureFields(string $pageName): iterable
     {
         yield AssociationField::new('backer', 'Porteur d\'aide')
-        ->autocomplete();
+            ->autocomplete();
     }
 }

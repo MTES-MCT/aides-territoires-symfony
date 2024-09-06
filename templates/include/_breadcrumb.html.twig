@@ -1,43 +1,60 @@
 {% if no_breadcrumb is not defined %}
-    <div class="fr-container">
-        <nav role="navigation" class="fr-breadcrumb" aria-label="vous êtes ici :" data-fr-js-breadcrumb="true">
-            <button class="fr-breadcrumb__button" aria-expanded="false" aria-controls="breadcrumb-1" data-fr-js-collapse-button="true" title="Voir le fil d’Ariane">Voir le fil d’Ariane</button>
-            <div class="fr-collapse" id="breadcrumb-1" data-fr-js-collapse="true">
-                <ol class="fr-breadcrumb__list">
-                    <li>
-                        <a class="fr-breadcrumb__link" href="{{ path('app_home') }}">Accueil</a>
-                    </li>
-                    {% for item in getBreadcrumbItems() %}
-                    <li>
-                        {% if item.url %}<a class="fr-breadcrumb__link" href="{{ item.url }}" {% if loop.last %}aria-current="page"{% endif %} title="{{ item.text }}">{% else %}<span class="fr-breadcrumb__link" {% if loop.last %}aria-current="page"{% endif %}>{% endif %}{{ item.text }}{% if item.url %}</a>{% else %}</span>{% endif %}
-                    </li>
-                    {% endfor %}
-                </ol>
-            </div>
-        </nav>
-    </div>
+	<div class="fr-container">
+		<nav role="navigation" class="fr-breadcrumb" aria-label="vous êtes ici :" data-fr-js-breadcrumb="true">
+			<button class="fr-breadcrumb__button" aria-expanded="false" aria-controls="breadcrumb-1" data-fr-js-collapse-button="true" title="Voir le fil d’Ariane">Voir le fil d’Ariane</button>
+			<div class="fr-collapse" id="breadcrumb-1" data-fr-js-collapse="true">
+				<ol class="fr-breadcrumb__list">
+					<li>
+						<a class="fr-breadcrumb__link" href="{{ path('app_home') }}">Accueil</a>
+					</li>
+					{% for item in getBreadcrumbItems() %}
+						<li>
+							{% if item.url %}
+								<a class="fr-breadcrumb__link" href="{{ item.url }}" {% if loop.last %} aria-current="page" {% endif %} title="{{ item.text }}">
+								{% else %}
+									<span class="fr-breadcrumb__link" {% if loop.last %} aria-current="page" {% endif %}>
+									{% endif %}
+									{{ item.text }}
+									{% if item.url %}
+									</a>
+							{% else %}
+								</span>
+							{% endif %}
+						</li>
+					{% endfor %}
+				</ol>
+			</div>
+		</nav>
+	</div>
 
-    <script type="application/ld+json">
-        {
-            "@context": "https://schema.org",
-            "@type": "BreadcrumbList",
-            "itemListElement": [
-                {
-                "@type": "ListItem",
-                "position": 1,
-                "name": "Accueil",
-                "item": "{{ absolute_url(path('app_home')) }}"
-            }{% if getBreadcrumbItems()|length > 0 %},{% endif %}
-            {% for item in getBreadcrumbItems() %}
-                {
-                "@type": "ListItem",
-                "position": "{{ loop.index + 1 }}",
-                "name": "{{ item.text|trans }}",
-                "item": "{% if item.url %}{{ absolute_url(item.url) }}{% endif %}"
-            }{% if not loop.last %},{% endif %}
-        {% endfor %}
-            ]
-        }
-    </script>
+	<script type="application/ld+json">
+		{
+		"@context": "https://schema.org",
+		"@type": "BreadcrumbList",
+		"itemListElement": [
+		{
+		"@type": "ListItem",
+		"position": 1,
+		"name": "Accueil",
+		"item": "{{ absolute_url(path('app_home')) }}"
+		}
+		{% if getBreadcrumbItems()|length > 0 %},
+		{% endif %}
+		{% for item in getBreadcrumbItems() %}
+			{
+			"@type": "ListItem",
+			"position": "{{ loop.index + 1 }}",
+			"name": "{{ item.text|trans }}",
+			"item": "
+			{% if item.url %}
+				{{ absolute_url(item.url) }}
+			{% endif %}"
+			}
+			{% if not loop.last %},
+			{% endif %}
+		{% endfor %}
+		]
+		}
+	</script>
 
 {% endif %}

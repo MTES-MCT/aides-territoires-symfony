@@ -20,29 +20,4 @@ class LogPublicProjectViewRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, LogPublicProjectView::class);
     }
-
-//    /**
-//     * @return LogPublicProjectView[] Returns an array of LogPublicProjectView objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('l')
-//            ->andWhere('l.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('l.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
-
-//    public function findOneBySomeField($value): ?LogPublicProjectView
-//    {
-//        return $this->createQueryBuilder('l')
-//            ->andWhere('l.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
 }

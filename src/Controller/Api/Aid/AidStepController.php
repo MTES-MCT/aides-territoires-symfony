@@ -14,8 +14,7 @@ class AidStepController extends ApiController
     #[Route('/api/aids/steps/', name: 'api_aid_steps', priority: 5)]
     public function index(
         AidStepRepository $aidStepRepository,
-    ): JsonResponse
-    {
+    ): JsonResponse {
         $params = [];
         // requete pour compter sans la pagination
         $count = $aidStepRepository->countCustom($params);
@@ -23,7 +22,7 @@ class AidStepController extends ApiController
         // requete pour les résultats avec la pagination
         $params['firstResult'] = ($this->getPage() - 1) * $this->getItemsPerPage();
         $params['maxResults'] = $this->getItemsPerPage();
-    
+
         $results = $aidStepRepository->findCustom($params);
 
         // spécifique
@@ -34,7 +33,7 @@ class AidStepController extends ApiController
                 'name' => $result->getName()
             ];
         }
-        
+
         // le retour
         $data = [
             'count' => $count,

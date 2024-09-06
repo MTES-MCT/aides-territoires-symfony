@@ -1,14 +1,23 @@
- <ul class="fr-tabs__list" role="tablist" aria-label="">
-    <li role="presentation">
-        <a href="{{ path('app_project_reference') }}" id="tabpanel-10" class="fr-tabs__tab _fr-icon-checkbox-line fr-tabs__tab--icon-left" tabindex="-1" role="tab" aria-selected="{% if aides is defined %}true{% else %}false{% endif %}" aria-controls="tabpanel_aides">Aides {% if nbAids is defined %}({{ nbAids }}){% endif %}</a>
-    </li>
-    <li role="presentation">
-        <a href="{{ path('app_project_reference_projet_subventionnes') }}" id="tabpanel-11" class="fr-tabs__tab _fr-icon-checkbox-line fr-tabs__tab--icon-left" tabindex="-1" role="tab" aria-selected="{% if projets_subventionnes is defined %}true{% else %}false{% endif %}" aria-controls="tabpanel_projets_subventionnes">Projets subventionnés {% if projectValidateds is defined %}({{ projectValidateds|length }}){% endif %}</a>
-    </li>
-    <li role="presentation">
-        <a href="{{ path('app_project_reference_projects_publics') }}" id="tabpanel-12" class="fr-tabs__tab _fr-icon-checkbox-line fr-tabs__tab--icon-left" tabindex="-1" role="tab" aria-selected="{% if projectsPublics is defined %}true{% else %}false{% endif %}" aria-controls="tabpanel_projects_publics">Projets publics {% if projectsPublics is defined %}({{ projectsPublics|length}}){% endif %}</a>
-    </li>
-    <li role="presentation">
-        <a href="{{ path('app_project_reference_similar')}}" id="tabpanel-13" class="fr-tabs__tab _fr-icon-checkbox-line fr-tabs__tab--icon-left" tabindex="-1" role="tab" aria-selected="{% if similar is defined %}true{% else %}false{% endif %}" aria-controls="tabpanel_similar">Similaires</a>
-    </li>
+<ul class="fr-tabs__list" role="tablist" aria-label="">
+	<li role="presentation">
+		<a href="{{ path('app_project_reference') }}" id="tabpanel-10" class="fr-tabs__tab _fr-icon-checkbox-line fr-tabs__tab--icon-left" tabindex="-1" role="tab" aria-selected="{% if aides is defined %}true{% else %}false{% endif %}" aria-controls="tabpanel_aides">Aides
+			{% if nbAids is defined %}({{ nbAids }})
+			{% endif %}
+		</a>
+	</li>
+	<li role="presentation">
+		<a href="{{ path('app_project_reference_projet_subventionnes') }}" id="tabpanel-11" class="fr-tabs__tab _fr-icon-checkbox-line fr-tabs__tab--icon-left" tabindex="-1" role="tab" aria-selected="{% if projets_subventionnes is defined %}true{% else %}false{% endif %}" aria-controls="tabpanel_projets_subventionnes">Projets subventionnés
+			{% if projectValidateds is defined %}({{ projectValidateds|length }})
+			{% endif %}
+		</a>
+	</li>
+	<li role="presentation">
+		<a href="{{ path('app_project_reference_projects_publics') }}" id="tabpanel-12" class="fr-tabs__tab _fr-icon-checkbox-line fr-tabs__tab--icon-left" tabindex="-1" role="tab" aria-selected="{% if projectsPublics is defined %}true{% else %}false{% endif %}" aria-controls="tabpanel_projects_publics">Projets publics
+			{% if projectsPublics is defined %}({{ projectsPublics|length}})
+			{% endif %}
+		</a>
+	</li>
+	<li role="presentation">
+		<a href="{{ path('app_project_reference_similar')}}" id="tabpanel-13" class="fr-tabs__tab _fr-icon-checkbox-line fr-tabs__tab--icon-left" tabindex="-1" role="tab" aria-selected="{% if similar is defined %}true{% else %}false{% endif %}" aria-controls="tabpanel_similar">Similaires</a>
+	</li>
 </ul>

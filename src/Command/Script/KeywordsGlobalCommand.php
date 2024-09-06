@@ -20,14 +20,13 @@ class KeywordsGlobalCommand extends Command
     protected string $commandTextStart = '<Import des mots-clés';
     protected string $commandTextEnd = '>Import des mots-clés';
 
-    
+
 
     public function __construct(
         protected ManagerRegistry $managerRegistry,
         protected ReferenceService $referenceService
-    )
-    {
-        ini_set('max_execution_time', 60*60);
+    ) {
+        ini_set('max_execution_time', 60 * 60);
         ini_set('memory_limit', '1G');
         parent::__construct();
     }
@@ -65,7 +64,7 @@ class KeywordsGlobalCommand extends Command
                 $timeOperation = $timeEnd - $timeStartOperation;
                 $timeGlobal = $timeEnd - $timeStart;
 
-                $io->success('Fin '.$command->getName().' : '.gmdate("H:i:s", $timeEnd).' | ope : '.gmdate("H:i:s", $timeOperation).' | global : '.gmdate("H:i:s", $timeGlobal));
+                $io->success('Fin ' . $command->getName() . ' : ' . gmdate("H:i:s", $timeEnd) . ' | ope : ' . gmdate("H:i:s", $timeOperation) . ' | global : ' . gmdate("H:i:s", $timeGlobal));
 
                 // nettoyage memoire
                 gc_collect_cycles();
@@ -79,7 +78,7 @@ class KeywordsGlobalCommand extends Command
         $timeEnd = microtime(true);
         $time = $timeEnd - $timeStart;
 
-        $io->success('Fin des opérations : '.gmdate("H:i:s", $timeEnd).' ('.gmdate("H:i:s", $time).')');
+        $io->success('Fin des opérations : ' . gmdate("H:i:s", $timeEnd) . ' (' . gmdate("H:i:s", $time) . ')');
 
         $io->title($this->commandTextEnd);
         return Command::SUCCESS;

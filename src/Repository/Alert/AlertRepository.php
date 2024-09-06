@@ -30,7 +30,8 @@ class AlertRepository extends ServiceEntityRepository
         return (int) $qb->getQuery()->getSingleScalarResult();
     }
 
-    public function findToSend(array $params = null) : array {
+    public function findToSend(array $params = null): array
+    {
         $yesterday = new \DateTime(date('Y-m-d', strtotime('-1 day')));
         $lastWeek = new \DateTime(date('Y-m-d', strtotime('-7 day')));
 
@@ -43,7 +44,8 @@ class AlertRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult();
     }
 
-    public function findToSendDaily(array $params = null) : array {
+    public function findToSendDaily(array $params = null): array
+    {
         $today = new \DateTime(date('Y-m-d'));
         $today->setTime(0, 0, 0);
 
@@ -55,11 +57,12 @@ class AlertRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult();
     }
 
-    public function findToSendWeekly(array $params = null) : array {
+    public function findToSendWeekly(array $params = null): array
+    {
         $today = new \DateTime(date('Y-m-d'));
         $weekNumber = $today->format('W');
         $year = $today->format('o');
-        
+
         $startOfWeek = new \DateTime();
         $startOfWeek->setISODate($year, $weekNumber, 1);
         $startOfWeek->setTime(0, 0, 0);
@@ -73,7 +76,7 @@ class AlertRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult();
     }
 
-    public function  getQueryBuilder(array $params = null) : QueryBuilder
+    public function getQueryBuilder(array $params = null): QueryBuilder
     {
         $dailyMinDate = $params['dailyMinDate'] ?? null;
         $weeklyMinDate = $params['weeklyMinDate'] ?? null;
@@ -87,59 +90,57 @@ class AlertRepository extends ServiceEntityRepository
         $email = $params['email'] ?? null;
 
         $qb = $this->createQueryBuilder('a');
-        
+
         if ($alertFrequency !== null) {
             $qb
                 ->andWhere('a.alertFrequency = :alertFrequency')
                 ->setParameter('alertFrequency', $alertFrequency)
-                ;
+            ;
         }
 
         if ($hasQueryString) {
             $qb
-                ->andWhere('a.querystring IS NOT NULL AND a.querystring <> \'\'')
-                ;
+                ->andWhere('a.querystring IS NOT NULL AND a.querystring <> \'\'');
         }
-        if ($email !== null)
-        {
+        if ($email !== null) {
             $qb
                 ->andWhere('a.email = :email')
                 ->setParameter('email', $email)
-                ;
+            ;
         }
         if ($dateCreateMin instanceof \DateTime) {
             $qb
-            ->andWhere('a.timeCreate >= :dateCreateMin')
-            ->setParameter('dateCreateMin', $dateCreateMin)
+                ->andWhere('a.timeCreate >= :dateCreateMin')
+                ->setParameter('dateCreateMin', $dateCreateMin)
             ;
         }
 
 
         if ($dateCreateMax instanceof \DateTime) {
             $qb
-            ->andWhere('a.timeCreate <= :dateCreateMax')
-            ->setParameter('dateCreateMax', $dateCreateMax)
+                ->andWhere('a.timeCreate <= :dateCreateMax')
+                ->setParameter('dateCreateMax', $dateCreateMax)
             ;
         }
 
         if ($dateLatestAlertMin instanceof \DateTime) {
             $qb
-            ->andWhere('a.dateLatestAlert >= :dateLatestAlertMin OR a.dateLatestAlert IS NULL')
-            ->setParameter('dateLatestAlertMin', $dateLatestAlertMin)
+                ->andWhere('a.dateLatestAlert >= :dateLatestAlertMin OR a.dateLatestAlert IS NULL')
+                ->setParameter('dateLatestAlertMin', $dateLatestAlertMin)
             ;
         }
 
         if ($dateLatestAlertMax instanceof \DateTime) {
             $qb
-            ->andWhere('a.dateLatestAlert < :dateLatestAlertMax OR a.dateLatestAlert IS NULL')
-            ->setParameter('dateLatestAlertMax', $dateLatestAlertMax)
+                ->andWhere('a.dateLatestAlert < :dateLatestAlertMax OR a.dateLatestAlert IS NULL')
+                ->setParameter('dateLatestAlertMax', $dateLatestAlertMax)
             ;
         }
 
         if ($dateLatestAlert instanceof \DateTime) {
             $qb
-            ->andWhere('a.dateLatestAlert = :dateLatestAlert')
-            ->setParameter('dateLatestAlert', $dateLatestAlert)
+                ->andWhere('a.dateLatestAlert = :dateLatestAlert')
+                ->setParameter('dateLatestAlert', $dateLatestAlert)
             ;
         }
 

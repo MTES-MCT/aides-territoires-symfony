@@ -19,14 +19,12 @@ final class WithoutOrganizationListener
         private PageRepository $pageRepository,
         private UserService $userService,
         private RouterInterface $routerInterface,
-    )
-    {
-        
+    ) {
     }
+
     public function onKernelRequest(
         RequestEvent $event
-    ): void
-    {
+    ): void {
         // url demandée
         $url = urldecode($event->getRequest()->getRequestUri()) ?? null;
         $urlsAuthorized = [
@@ -36,7 +34,7 @@ final class WithoutOrganizationListener
         // on est dans la partie mon compte
         if (preg_match('/comptes/', $url)) {
             foreach ($urlsAuthorized as $urlAuthorized) {
-                if (preg_match('$'.$urlAuthorized.'$', $url)) {
+                if (preg_match('$' . $urlAuthorized . '$', $url)) {
                     return;
                 }
             }

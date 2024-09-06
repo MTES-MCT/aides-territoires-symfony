@@ -14,8 +14,7 @@ class AidDestinationController extends ApiController
     #[Route('/api/aids/destinations/', name: 'api_aid_destinations', priority: 5)]
     public function index(
         AidDestinationRepository $aidDestinationRepository,
-    ): JsonResponse
-    {
+    ): JsonResponse {
         $params = [];
         // requete pour compter sans la pagination
         $count = $aidDestinationRepository->countCustom($params);
@@ -23,7 +22,7 @@ class AidDestinationController extends ApiController
         // requete pour les résultats avec la pagination
         $params['firstResult'] = ($this->getPage() - 1) * $this->getItemsPerPage();
         $params['maxResults'] = $this->getItemsPerPage();
-    
+
         $results = $aidDestinationRepository->findCustom($params);
 
         // spécifique
@@ -34,7 +33,7 @@ class AidDestinationController extends ApiController
                 'name' => $result->getName()
             ];
         }
-        
+
         // le retour
         $data = [
             'count' => $count,

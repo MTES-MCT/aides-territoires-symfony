@@ -36,13 +36,11 @@ use Symfony\Component\Routing\RouterInterface;
 
 class AidSearchTypeV2 extends AbstractType
 {
-    public function  __construct(
+    public function __construct(
         private UserService $userService,
         protected ManagerRegistry $managerRegistry,
         protected RouterInterface $routerInterface
-    )
-    {
-
+    ) {
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -74,7 +72,7 @@ class AidSearchTypeV2 extends AbstractType
                 'choice_value' => function (?OrganizationType $entity) {
                     return $entity ? $entity->getSlug() : '';
                 },
-                'query_builder' => function(EntityRepository $er) use ($options) {
+                'query_builder' => function (EntityRepository $er) use ($options) {
                     $qb = $er->createQueryBuilder('ot');
 
                     if ($options['searchPage'] instanceof SearchPage && !$options['searchPage']->getOrganizationTypes()->isEmpty()) {
@@ -121,15 +119,14 @@ class AidSearchTypeV2 extends AbstractType
                 // 'help' => 'Sélectionnez la ou les thématiques associées à votre aide. N’hésitez pas à en choisir plusieurs.',
                 'class' => Category::class,
                 'choice_label' => 'name',
-                'group_by' => function(Category $category) {
+                'group_by' => function (Category $category) {
                     return $category->getCategoryTheme()->getName();
                 },
-                'query_builder' => function(EntityRepository $er) use ($options) {
+                'query_builder' => function (EntityRepository $er) use ($options) {
                     $qb = $er->createQueryBuilder('c')
                         ->innerJoin('c.categoryTheme', 'categoryTheme')
                         ->orderBy('categoryTheme.name', 'ASC')
-                        ->addOrderBy('c.name', 'ASC')
-                    ;
+                        ->addOrderBy('c.name', 'ASC');
                     if ($options['searchPage'] instanceof SearchPage && !$options['searchPage']->getCategories()->isEmpty()) {
                         $qb->andWhere('c IN (:categories)')
                             ->setParameter('categories', $options['searchPage']->getCategories());
@@ -161,7 +158,7 @@ class AidSearchTypeV2 extends AbstractType
                     $aidTypesByGroup[$aidTypeGroup->getName()][] = [$aidType->getName() => $aidType->getId()];
                 }
             }
-        
+
             // le builder
             $builder
                 ->add('orderBy', ChoiceType::class, [
@@ -182,15 +179,15 @@ class AidSearchTypeV2 extends AbstractType
                     'placeholder' => 'Toutes les natures d\'aide',
                     'class' => AidType::class,
                     'choice_label' => 'name',
-                    'group_by' => function(AidType $aidType) {
+                    'group_by' => function (AidType $aidType) {
                         return $aidType->getAidTypeGroup()->getName();
                     },
-                    'query_builder' => function(EntityRepository $entityRepository) {
-                        return $entityRepository   
-                        ->createQueryBuilder('at')
-                        ->innerJoin('at.aidTypeGroup', 'aidTypeGroup')
-                        ->orderBy('aidTypeGroup.name', 'ASC')
-                        ->addorderBy('at.name', 'ASC')
+                    'query_builder' => function (EntityRepository $entityRepository) {
+                        return $entityRepository
+                            ->createQueryBuilder('at')
+                            ->innerJoin('at.aidTypeGroup', 'aidTypeGroup')
+                            ->orderBy('aidTypeGroup.name', 'ASC')
+                            ->addorderBy('at.name', 'ASC')
                         ;
                     },
                     'multiple' => true,
@@ -206,7 +203,7 @@ class AidSearchTypeV2 extends AbstractType
                     ],
                     'autocomplete' => true,
                     'multiple' => true,
-                    'query_builder' => function(BackerRepository $backerRepository) {
+                    'query_builder' => function (BackerRepository $backerRepository) {
                         return $backerRepository->getQueryBuilder([
                             'hasFinancedAids' => true,
                             'active' => true,
@@ -230,7 +227,7 @@ class AidSearchTypeV2 extends AbstractType
                     'choice_label' => 'name',
                     'multiple' => true,
                     'expanded' => true,
-                    'query_builder' => function(EntityRepository $entityRepository) {
+                    'query_builder' => function (EntityRepository $entityRepository) {
                         return $entityRepository->createQueryBuilder('b')->orderBy('b.name', 'ASC');
                     }
                 ])
@@ -285,7 +282,7 @@ class AidSearchTypeV2 extends AbstractType
                     ],
                     'autocomplete' => true,
                     'multiple' => false,
-                    'query_builder' => function(BackerGroupRepository $backerGroupRepository) {
+                    'query_builder' => function (BackerGroupRepository $backerGroupRepository) {
                         return $backerGroupRepository->getQueryBuilder([
                             'orderBy' => [
                                 'sort' => 'bg.name',
@@ -294,7 +291,7 @@ class AidSearchTypeV2 extends AbstractType
                         ]);
                     },
                 ])
-                ;
+            ;
 
 
             foreach ($options['removes'] as $remove) {

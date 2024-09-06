@@ -18,8 +18,7 @@ class AddAidToProjectType extends AbstractType
     public function __construct(
         protected UserService $userService,
         protected ManagerRegistry $managerRegistry
-    )
-    {
+    ) {
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -33,36 +32,34 @@ class AddAidToProjectType extends AbstractType
 
         if (count($organizationProjects) > 0) {
             $builder
-            ->add('projects', EntityType::class, [
-                'required' => false,
-                'label' => false,
-                'class' => Project::class,
-                'choice_label' => 'name',
-                'query_builder' => function (EntityRepository $er) use ($user) {
-                    return $er->createQueryBuilder('p')
-                    ->andWhere('p.organization = :organization')
-                    ->setParameter('organization', $user->getDefaultOrganization())
-                    ;
-                },
-                'choice_attr' => function($project) use ($currentAid) {
-                    foreach ($project->getAidProjects() as $aidProject) {
-                        if ($aidProject->getAid()->getId() == $currentAid->getId()) {
-                            return ['disabled' => true, 'checked' => 'checked'];
+                ->add('projects', EntityType::class, [
+                    'required' => false,
+                    'label' => false,
+                    'class' => Project::class,
+                    'choice_label' => 'name',
+                    'query_builder' => function (EntityRepository $er) use ($user) {
+                        return $er->createQueryBuilder('p')
+                            ->andWhere('p.organization = :organization')
+                            ->setParameter('organization', $user->getDefaultOrganization())
+                        ;
+                    },
+                    'choice_attr' => function ($project) use ($currentAid) {
+                        foreach ($project->getAidProjects() as $aidProject) {
+                            if ($aidProject->getAid()->getId() == $currentAid->getId()) {
+                                return ['disabled' => true, 'checked' => 'checked'];
+                            }
                         }
-                    }
-                    return [];
-                },
-                'multiple' => true,
-                'expanded' => true,
-            ])
-        ;
+                        return [];
+                    },
+                    'multiple' => true,
+                    'expanded' => true,
+                ]);
         }
         $builder->add('newProject', TextType::class, [
             'required' => false,
             'label' => false,
             'sanitize_html' => true,
         ]);
-        
     }
 
     public function configureOptions(OptionsResolver $resolver): void

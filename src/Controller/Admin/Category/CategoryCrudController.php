@@ -25,13 +25,11 @@ class CategoryCrudController extends AtCrudController
         yield TextField::new('name', 'Nom');
         yield TextField::new('slug', 'Slug')
             ->setFormTypeOption('attr', ['readonly' => true, 'autocomplete' => 'off'])
-            ->setHelp('Laisser vide pour autoremplir.')
-        ;
+            ->setHelp('Laisser vide pour autoremplir.');
         yield TrumbowygField::new('shortDescription', 'Description courte')
-        ->onlyOnForms();
+            ->onlyOnForms();
         yield AssociationField::new('categoryTheme', 'Thème de la catégorie')
-        ->setFormTypeOption('choice_label', 'name')
-        ;
+            ->setFormTypeOption('choice_label', 'name');
     }
 
     public function configureCrud(Crud $crud): Crud
@@ -49,7 +47,6 @@ class CategoryCrudController extends AtCrudController
         return $actions
             ->update(Crud::PAGE_INDEX, Action::NEW, function (Action $action) {
                 return $action->setLabel('Créer sous-catégorie');
-            })
-        ;
+            });
     }
 }

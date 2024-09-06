@@ -1,10 +1,10 @@
 {% if app.user %}
-<div>
-    <form name="generic_to_local" action="{{ path('app_aid_generic_to_local', {'slug': aid.slug }) }}" method="post">
-        <button type="submit" class="fr-btn">
-            <span class="ri-file-copy-line ri-xl at-icon-align--sub at-color--text-inverted-blue-france fr-mr-1w"></span>
-            Créer une variante locale de cette aide
-        </button>
-    </form>
-</div>
+	<div>
+		<form name="generic_to_local" action="{{ path('app_aid_generic_to_local', {'slug': aid.slug }) }}" method="post">
+			<button type="submit" class="fr-btn">
+				<span class="ri-file-copy-line ri-xl at-icon-align--sub at-color--text-inverted-blue-france fr-mr-1w"></span>
+				Créer une variante locale de cette aide
+			</button>
+		</form>
+	</div>
 {% endif %}

@@ -56,7 +56,7 @@ class AidExportPdfHandler
             // nom de fichier
             $today = new \DateTime(date('Y-m-d H:i:s'));
             $organizationName = $user->getDefaultOrganization() ? $this->stringService->getSLug($user->getDefaultOrganization()->getName()) : '';
-            $filename = 'Aides-territoires-'.$today->format('d_m_Y').'-'.$organizationName;
+            $filename = 'Aides-territoires-' . $today->format('d_m_Y') . '-' . $organizationName;
 
             // créer le PDF
             $pdfOptions = new Options();
@@ -83,7 +83,7 @@ class AidExportPdfHandler
                 mkdir($tmpFolder, 0777, true);
             }
 
-            $fileTarget = $tmpFolder.'/'.$filename.'.pdf';
+            $fileTarget = $tmpFolder . '/' . $filename . '.pdf';
             // Enregistre le fichier PDF dans le dossier temporaire
             if (!file_put_contents($fileTarget, $dompdf->output())) {
                 throw new \Exception('Erreur lors de la création du fichier PDF');
@@ -115,16 +115,15 @@ class AidExportPdfHandler
             $admin = $this->managerRegistry->getRepository(User::class)->findOneBy(['email' => $this->paramService->get('email_super_admin')]);
             $this->notificationService->addNotification(
                 $admin,
-                'Export PDF des aides par '.$user->getEmail(). ' de '.$organizationName,
+                'Export PDF des aides par ' . $user->getEmail() . ' de ' . $organizationName,
                 'Export ok'
             );
-
         } catch (\Exception $e) {
             // notif admin erreur
             $admin = $this->managerRegistry->getRepository(User::class)->findOneBy(['email' => $this->paramService->get('email_super_admin')]);
             $this->notificationService->addNotification(
                 $admin,
-                'Erreur lors de l\'export PDF des aides par '.$user->getEmail(). ' de '.$organizationName,
+                'Erreur lors de l\'export PDF des aides par ' . $user->getEmail() . ' de ' . $organizationName,
                 $e->getMessage()
             );
         }

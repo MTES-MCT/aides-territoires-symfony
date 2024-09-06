@@ -8,52 +8,55 @@
 {% block javascripts %}
 	{{ parent() }}
 	{{ encore_entry_script_tags('form/checkbox-multiple-search') }}
-    {{ encore_entry_script_tags('front/cartography/details') }}
+	{{ encore_entry_script_tags('front/cartography/details') }}
 {% endblock %}
 
 
-
-
-{% block title %}Liste des porteurs d’aides dans le département {{ current_dept.name }} ({{ current_dept.code }}) | Aides-territoires{% endblock %}
+{% block title %}Liste des porteurs d’aides dans le département
+	{{ current_dept.name }}
+	({{ current_dept.code }}) | Aides-territoires
+{% endblock %}
 
 {% block body %}
-    <div class="fr-container fr-mb-5w">
-        <h1>
-            Liste des porteurs d’aides dans le département {{ current_dept.name }} ({{ current_dept.code }})
-        </h1>
-    </div>
-    <div class="fr-container">
-        {{ form_start(formBackerSearch) }}
-        <div class="fr-grid-row fr-grid-row--gutters">
-            <div class="fr-col-12 fr-col-md-3">
-                {{form_row(formBackerSearch.departement)}}
-            </div>
-            <div class="fr-col-12 fr-col-md-3">
-                {{form_row(formBackerSearch.organizationType)}}
-            </div>
-            <div class="fr-col-12 fr-col-md-3">
-                {{form_row(formBackerSearch.aidTypeGroup)}}
-            </div>
-            <div class="fr-col-12 fr-col-md-3">
-                {{form_row(formBackerSearch.categorysearch)}}
-            </div>
-            <div class="fr-col-12 fr-col-md-3">
-                {{form_row(formBackerSearch.scaleGroup)}}
-            </div>
-            <div class="fr-col-12 fr-col-md-3">
-                {{form_row(formBackerSearch.backerCategory)}}
-            </div>
-        </div>
-        {{ form_end(formBackerSearch) }}
-    </div>
+	<div class="fr-container fr-mb-5w">
+		<h1>
+			Liste des porteurs d’aides dans le département
+			{{ current_dept.name }}
+			({{ current_dept.code }})
+		</h1>
+	</div>
+	<div class="fr-container">
+		{{ form_start(formBackerSearch) }}
+		<div class="fr-grid-row fr-grid-row--gutters">
+			<div class="fr-col-12 fr-col-md-3">
+				{{form_row(formBackerSearch.departement)}}
+			</div>
+			<div class="fr-col-12 fr-col-md-3">
+				{{form_row(formBackerSearch.organizationType)}}
+			</div>
+			<div class="fr-col-12 fr-col-md-3">
+				{{form_row(formBackerSearch.aidTypeGroup)}}
+			</div>
+			<div class="fr-col-12 fr-col-md-3">
+				{{form_row(formBackerSearch.categorysearch)}}
+			</div>
+			<div class="fr-col-12 fr-col-md-3">
+				{{form_row(formBackerSearch.scaleGroup)}}
+			</div>
+			<div class="fr-col-12 fr-col-md-3">
+				{{form_row(formBackerSearch.backerCategory)}}
+			</div>
+		</div>
+		{{ form_end(formBackerSearch) }}
+	</div>
 
-    <article id="backers-by-departement" class="fr-container fr-mb-5w fr-pb-5w fr-mt-5w">
-        <div class="fr-table at-table--fullwidth">
-            {% include tableTemplate %}
-        </div>
-        <div class="at-centered">
-            <a class="fr-tag" href="{{ path('app_cartography_cartography') }}">Retour</a>
-        </div>
-    </article> 
+	<article id="backers-by-departement" class="fr-container fr-mb-5w fr-pb-5w fr-mt-5w">
+		<div class="fr-table at-table--fullwidth">
+			{% include tableTemplate %}
+		</div>
+		<div class="at-centered">
+			<a class="fr-tag" href="{{ path('app_cartography_cartography') }}">Retour</a>
+		</div>
+	</article>
 
 {% endblock %}

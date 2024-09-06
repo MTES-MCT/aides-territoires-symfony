@@ -18,7 +18,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 class BlogPost // NOSONAR too much methods
 {
     const FOLDER = 'blog';
-    
+
     const STATUS_DRAFT = 'draft';
     const STATUS_REVIEWABLE = 'reviewable';
     const STATUS_PUBLISHED = 'published';
@@ -92,7 +92,7 @@ class BlogPost // NOSONAR too much methods
     private ?int $oldId = null;
 
     #[ORM\OneToMany(mappedBy: 'blogPost', targetEntity: LogBlogPostView::class)]
-    #[ORM\JoinColumn(onDelete:'SET NULL')]
+    #[ORM\JoinColumn(onDelete: 'SET NULL')]
     private Collection $logBlogPostViews;
 
     public function __construct()
@@ -116,7 +116,7 @@ class BlogPost // NOSONAR too much methods
 
         return $this;
     }
-    
+
     public function getSlug(): ?string
     {
         return $this->slug;

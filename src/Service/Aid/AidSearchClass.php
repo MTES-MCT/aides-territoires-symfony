@@ -34,7 +34,7 @@ class AidSearchClass // NOSONAR too much methods
      * @var ?ArrayCollection|AidType[]
      */
     private $aidTypes;
-    
+
     /**
      * @var ?ArrayCollection|AidType[]
      */
@@ -50,7 +50,7 @@ class AidSearchClass // NOSONAR too much methods
      * @var ?ArrayCollection|AidStep[]
      */
     private $aidSteps;
-        /**
+    /**
      * @var ?ArrayCollection|AidDestination[]
      */
     private $aidDestinations;
@@ -61,7 +61,7 @@ class AidSearchClass // NOSONAR too much methods
     private ?ProjectReference $projectReference;
     private ?AidRecurrence $aidRecurrence;
 
-    public function  __construct()
+    public function __construct()
     {
         $this->organizationType = null;
         $this->audiences = null;
@@ -223,7 +223,7 @@ class AidSearchClass // NOSONAR too much methods
     {
         $this->backerGroup = $backerGroup;
     }
-    
+
     public function getApplyBefore(): ?\DateTime
     {
         return $this->applyBefore;
@@ -313,7 +313,7 @@ class AidSearchClass // NOSONAR too much methods
     {
         $this->europeanAid = $europeanAid;
     }
-    
+
     public function getIsCallForProject(): ?bool
     {
         return $this->isCallForProject;
@@ -343,5 +343,4 @@ class AidSearchClass // NOSONAR too much methods
     {
         $this->aidRecurrence = $aidRecurrence;
     }
-    
 }

@@ -18,18 +18,17 @@ class DashboardController extends FrontController
         ProjectRepository $projectRepository,
         OrganizationRepository $organizationRepository,
         AidRepository $aidRepository
-        ): Response
-    {   
+    ): Response {
         /* @var User $user */
         $user = $userService->getUserLogged();
         $aidsNumber = 0;
-        if ($user->isIsContributor()){
+        if ($user->isIsContributor()) {
             $aidsNumber = $aidRepository->countByUser($userService->getUserLogged());
         }
         $projectsNumber = $projectRepository->countByOrganization($user->getDefaultOrganization());
         $collaboratorsNumber = $organizationRepository->countCollaborators($userService->getUserLogged());
-        
-        $this->breadcrumb->add("Mon compte",null);
+
+        $this->breadcrumb->add("Mon compte", null);
         return $this->render('user/dashboard/index.html.twig', [
             'aidsNumber' => $aidsNumber,
             'projectsNumber' => $projectsNumber,

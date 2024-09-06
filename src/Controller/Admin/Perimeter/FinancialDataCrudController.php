@@ -21,18 +21,17 @@ class FinancialDataCrudController extends AbstractCrudController
     {
         yield IdField::new('id')->onlyOnIndex();
         yield AssociationField::new('perimeter', 'Périmètre')
-        ->autocomplete();
+            ->autocomplete();
         yield TextField::new('inseeCode', 'Code INSEE')
-        ->onlyOnForms();
+            ->onlyOnForms();
         yield IntegerField::new('Year', 'Exercice');
         yield IntegerField::new('populationStrata', 'Strate population')
-        ->onlyOnForms();
+            ->onlyOnForms();
         yield TextField::new('aggregate', 'Agrégat');
         yield NumberField::new('mainBudgetAmount', 'Montant budget principal')
-        ->setHelp('Valeur de l’agrégat pour le budget principal');
+            ->setHelp('Valeur de l’agrégat pour le budget principal');
         yield IntegerField::new('displayOrder', 'Ordre d’affichage')
-        ->onlyOnForms()
-        ->setHelp('Variable interne OFGL pour data visualisation');
-
+            ->onlyOnForms()
+            ->setHelp('Variable interne OFGL pour data visualisation');
     }
 }

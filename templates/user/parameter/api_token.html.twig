@@ -1,75 +1,89 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Mon compte | {{ parent() }}{% endblock %}
+{% block title %}Mon compte |
+	{{ parent() }}
+{% endblock %}
 
 {% block body %}
-<div class="fr-container fr-mb-5w fr-mt-0">
-    <div class="fr-grid-row">
+	<div class="fr-container fr-mb-5w fr-mt-0">
+		<div class="fr-grid-row">
 
-        {% include "user/_menu_user.html.twig" with { user_parameter:true, api_token:true } %}
+			{% include "user/_menu_user.html.twig" with { user_parameter:true, api_token:true } %}
 
-        <div class="fr-col-12 fr-col-md-9">
-            <h1 class="fr-h3">Ma clé API (pour les développeurs)</h1>
-            <p>
-                La clé API, ou Token API, est une combinaison vous permettant d’associer votre
-                login et votre mot de passe de façon sécurisée lors de vos intégrations.
-            </p>
-            <p>
-                Cet identifiant vous permet de connecter notre API à votre logiciel/service en
-                ligne avec une sécurité maximale.
-            </p>
-            <p>
+			<div class="fr-col-12 fr-col-md-9">
+				<h1 class="fr-h3">Ma clé API (pour les développeurs)</h1>
+				<p>
+					La clé API, ou Token API, est une combinaison vous permettant d’associer votre
+					login et votre mot de passe de façon sécurisée lors de vos intégrations.
+				</p>
+				<p>
+					Cet identifiant vous permet de connecter notre API à votre logiciel/service en
+					ligne avec une sécurité maximale.
+				</p>
+				<p>
 
-                <strong>
-                    Il sera obligatoire pour utiliser la nouvelle version de notre API prévue en
-                    novembre 2023.
-                </strong>
-            </p>
+					<strong>
+						Il sera obligatoire pour utiliser la nouvelle version de notre API prévue en
+						novembre 2023.
+					</strong>
+				</p>
 
-            {% if app.user.apiToken %}
-                <div class="fr-alert fr-alert--success fr-mb-3w">
-                    <p>Votre Token API :</p>
-                    <p><strong>{{ app.user.apiToken }}</strong></p>
-                </div>
+				{% if app.user.apiToken %}
+					<div class="fr-alert fr-alert--success fr-mb-3w">
+						<p>Votre Token API :</p>
+						<p>
+							<strong>{{ app.user.apiToken }}</strong>
+						</p>
+					</div>
 
-                <p>Ce token vous permettra de vous identifier sur l'api en appellant l'url : https://aides-territoires.beta.gouv.fr/api/connexion/</p>
-                <p>L'appel se fait en POST avec dans les <strong>HEADERS</strong> le paramètre <strong>X-AUTH-TOKEN</strong> = votre token</p>
-                <p>Ceci vous donnera un <strong>"Bearer Token"</strong>, valable <strong>24h</strong> à inclure dans tous vos appels de l'API.</p>
-                <p class="fr-alert fr-alert--info">
-                    Dans le Swagger de l'api (https://aides-territoires.beta.gouv.fr/api) pour utiliser le bouton "Authorize" vous devrez mettre en valeur : Bearer VotreTokenBearer</p>
-                </p>
-                <p>Voici un fichier contenant des examples pour le client <a href="https://github.com/ArchGPT/insomnium" target="_blank" title="Le client Insomnium - Ouvre une nouvelle fenêtre">Insomnium</a></p>
-                <p><a href="{{ asset('build/docs/Insomnium_2024-03-08.json') }}" download="{{ asset('build/docs/Insomnium_2024-03-08.json') }}" title="Fichier d'exemple Insomnium">Fichier d'exemple Insomnium</a></p>
-            {% endif %}
+					<p>Ce token vous permettra de vous identifier sur l'api en appellant l'url : https://aides-territoires.beta.gouv.fr/api/connexion/</p>
+					<p>L'appel se fait en POST avec dans les
+						<strong>HEADERS</strong>
+						le paramètre
+						<strong>X-AUTH-TOKEN</strong>
+						= votre token</p>
+					<p>Ceci vous donnera un
+						<strong>"Bearer Token"</strong>, valable
+						<strong>24h</strong>
+						à inclure dans tous vos appels de l'API.</p>
+					<p class="fr-alert fr-alert--info">
+						Dans le Swagger de l'api (https://aides-territoires.beta.gouv.fr/api) pour utiliser le bouton "Authorize" vous devrez mettre en valeur : Bearer VotreTokenBearer</p>
+				</p>
+				<p>Voici un fichier contenant des examples pour le client
+					<a href="https://github.com/ArchGPT/insomnium" target="_blank" title="Le client Insomnium - Ouvre une nouvelle fenêtre">Insomnium</a>
+				</p>
+				<p>
+					<a href="{{ asset('build/docs/Insomnium_2024-03-08.json') }}" download="{{ asset('build/docs/Insomnium_2024-03-08.json') }}" title="Fichier d'exemple Insomnium">Fichier d'exemple Insomnium</a>
+				</p>
+			{% endif %}
 
-            <div class="fr-alert fr-alert--info">
-                <p>
-                <a href="{{ path('app_home') }}api" target="_blank" rel="noopener">
-                    Consulter la documentation de l’API
-                    <span class="fr-sr-only">Ouvre une nouvelle fenêtre</span>
-                </a>
-                </p>
-            </div>
+			<div class="fr-alert fr-alert--info">
+				<p>
+					<a href="{{ path('app_home') }}api" target="_blank" rel="noopener">
+						Consulter la documentation de l’API
+						<span class="fr-sr-only">Ouvre une nouvelle fenêtre</span>
+					</a>
+				</p>
+			</div>
 
-            {% if not app.user.apiToken %}
-                <h2>Pour obtenir votre clé, merci de remplir le formulaire :</h2>
-                
-                {% if apiTokenAsk.id %}
-                    <div class="fr-alert fr-alert--success fr-alert--sm">
-                        <p>Votre demande de clé API a été enregistrée, elle sera examinée par nos équipes.</p>
-                    </div>
-                {% else %}
-                    {{ form_start(form) }}
-                        {{ form_row(form.description )}}
-                        {{ form_row(form.urlService )}}
-                        <footer>
-                            <button type="submit" class="fr-btn fr-mt-3w">Envoyer</button>
-                        </footer>
-                    {{ form_end(form) }}
-                {% endif %}
-            {% endif %}
+			{% if not app.user.apiToken %}
+				<h2>Pour obtenir votre clé, merci de remplir le formulaire :</h2>
 
-        </div>
-    </div>
-</div>
-{% endblock %}
+				{% if apiTokenAsk.id %}
+					<div class="fr-alert fr-alert--success fr-alert--sm">
+						<p>Votre demande de clé API a été enregistrée, elle sera examinée par nos équipes.</p>
+					</div>
+				{% else %}
+					{{ form_start(form) }}
+					{{ form_row(form.description )}}
+					{{ form_row(form.urlService )}}
+					<footer>
+						<button type="submit" class="fr-btn fr-mt-3w">Envoyer</button>
+					</footer>
+					{{ form_end(form) }}
+				{% endif %}
+			{% endif %}
+
+		</div>
+	</div>
+</div>{% endblock %}

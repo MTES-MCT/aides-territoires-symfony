@@ -23,7 +23,7 @@ final class JsonField implements FieldInterface
             ->setFormType(JsonCodeEditorType::class)
             // ->setFormTypeOption('attr', ['class' => 'trumbowyg'])
             ->setDefaultColumns('col-md-6 col-xxl-5')
-            
+
         ;
     }
 }

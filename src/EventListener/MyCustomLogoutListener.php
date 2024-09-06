@@ -1,4 +1,5 @@
 <?php
+
 namespace App\EventListener;
 
 use App\Entity\Log\LogUserLogin;
@@ -19,10 +20,10 @@ class MyCustomLogoutListener
     {
         if ($logoutEvent->getToken() && $logoutEvent->getToken()->getUser() instanceof User) {
             $this->userService->setLogUser(
-                array(
+                [
                     'user'          => $logoutEvent->getToken()->getUser(),
                     'action'        => LogUserLogin::ACTION_LOGOUT,
-                )
+                ]
             );
         }
     }

@@ -1,6 +1,6 @@
 <?php
-namespace App\Filter\PerimeterData;
 
+namespace App\Filter\PerimeterData;
 
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Doctrine\Orm\Filter\AbstractFilter;
@@ -34,4 +34,3 @@ final class PerimeterDataPerimeterIdFilter extends AbstractFilter
         ];
     }
 }
-?>

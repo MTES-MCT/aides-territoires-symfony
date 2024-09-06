@@ -1,6 +1,6 @@
 <?php
-namespace App\Filter\Perimeter;
 
+namespace App\Filter\Perimeter;
 
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Doctrine\Orm\Filter\AbstractFilter;

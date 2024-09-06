@@ -1,21 +1,23 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Tentative de connextion | {{ parent() }}{% endblock %}
+{% block title %}Tentative de connextion |
+	{{ parent() }}
+{% endblock %}
 
 {% block body %}
-<div class="fr-container fr-my-5w">
-    <div class="fr-grid-row fr-grid-row--center">
-        <div class="fr-col-md-8">
-            <h1>Ce lien à déjà été utilisé</h1>
+	<div class="fr-container fr-my-5w">
+		<div class="fr-grid-row fr-grid-row--center">
+			<div class="fr-col-md-8">
+				<h1>Ce lien à déjà été utilisé</h1>
 
-            <div class="fr-col-12 fr-mt-3w">
-                <div class="fr-alert fr-alert--error fr-alert--sm">
-                    <p>
-                        Ce lien de connexion à déjà été utilisé
-                    </p>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+				<div class="fr-col-12 fr-mt-3w">
+					<div class="fr-alert fr-alert--error fr-alert--sm">
+						<p>
+							Ce lien de connexion à déjà été utilisé
+						</p>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
 {% endblock %}

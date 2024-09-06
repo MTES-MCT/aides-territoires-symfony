@@ -11,7 +11,6 @@ use ApiPlatform\Metadata\Operation;
 use ApiPlatform\OpenApi\Model\Example;
 use Doctrine\ORM\QueryBuilder;
 use Symfony\Component\PropertyInfo\Type;
-
 use ApiPlatform\Api\IdentifiersExtractorInterface as LegacyIdentifiersExtractorInterface;
 use ApiPlatform\Api\IriConverterInterface as LegacyIriConverterInterface;
 use ApiPlatform\Doctrine\Common\Filter\SearchFilterInterface;
@@ -181,7 +180,7 @@ final class AtSearchFilter extends AbstractFilter implements SearchFilterInterfa
         }
 
         $wrapCase = $this->createWrapCase($caseSensitive);
-        $valueParameter = ':'.$queryNameGenerator->generateParameterName($field);
+        $valueParameter = ':' . $queryNameGenerator->generateParameterName($field);
         $aliasedField = sprintf('%s.%s', $alias, $field);
 
         if (!$strategy || self::STRATEGY_EXACT === $strategy) {
@@ -282,32 +281,31 @@ final class AtSearchFilter extends AbstractFilter implements SearchFilterInterfa
                 'property' => $property,
                 'description' => $this->swaggerDescription['description'],
                 'type' => $this->swaggerDescription['type'] ?? Type::BUILTIN_TYPE_STRING,
-                'required' => $this->swaggerDescription['required'] ?? false,  
+                'required' => $this->swaggerDescription['required'] ?? false,
             ];
             if (isset($this->swaggerDescription['openapi'])) {
                 if (
                     isset($this->swaggerDescription['openapi']['examples'])
                     && is_array($this->swaggerDescription['openapi']['examples'])
                     && count($this->swaggerDescription['openapi']['examples']) > 0
-                    ) {
-                        $examples = [];
-                        foreach ($this->swaggerDescription['openapi']['examples'] as $example) {
-                            $examples[] = new Example(
-                                $example['summary'] ?? null,
-                                $example['description'] ?? null,
-                                $example['value'] ?? null
-                            );
-                        }
-                        if (count($examples) > 0) {
-                            $description[$this->swaggerDescription['name']]['openapi']['examples'] = $examples;
-                        }
+                ) {
+                    $examples = [];
+                    foreach ($this->swaggerDescription['openapi']['examples'] as $example) {
+                        $examples[] = new Example(
+                            $example['summary'] ?? null,
+                            $example['description'] ?? null,
+                            $example['value'] ?? null
+                        );
                     }
+                    if (count($examples) > 0) {
+                        $description[$this->swaggerDescription['name']]['openapi']['examples'] = $examples;
+                    }
+                }
 
-                    if (isset($this->swaggerDescription['openapi']['example'])) {
-                        $description[$this->swaggerDescription['name']]['openapi']['example'] = $this->swaggerDescription['openapi']['example'];
-                    }
+                if (isset($this->swaggerDescription['openapi']['example'])) {
+                    $description[$this->swaggerDescription['name']]['openapi']['example'] = $this->swaggerDescription['openapi']['example'];
+                }
             }
-
         }
 
         return $description;

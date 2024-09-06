@@ -27,8 +27,7 @@ class NotificationSettingType extends AbstractType
                         'message' => 'Veuillez choisir la fréquence d\'envoi.',
                     ]),
                 ]
-            ])
-        ;
+            ]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void

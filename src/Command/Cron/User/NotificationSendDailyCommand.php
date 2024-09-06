@@ -35,9 +35,8 @@ class NotificationSendDailyCommand extends Command
         protected EmailService $emailService,
         protected ParamService $paramService,
         protected RouterInterface $routerInterface
-    )
-    {
-        ini_set('max_execution_time', 60*60);
+    ) {
+        ini_set('max_execution_time', 60 * 60);
         ini_set('memory_limit', '1G');
         parent::__construct();
     }
@@ -50,7 +49,7 @@ class NotificationSendDailyCommand extends Command
         $io = new SymfonyStyle($input, $output);
         $io->title($this->commandTextStart);
 
-        try  {
+        try {
             if ($this->kernelInterface->getEnvironment() != 'prod') {
                 $io->info('Uniquement en prod');
                 return Command::FAILURE;
@@ -84,7 +83,7 @@ class NotificationSendDailyCommand extends Command
         $context = $this->routerInterface->getContext();
         $context->setHost($host);
         $context->setScheme('https');
-        
+
         /** @var NotificationRepository $notificationRepo */
         $notificationRepo = $this->managerRegistry->getRepository(Notification::class);
 
@@ -120,9 +119,9 @@ class NotificationSendDailyCommand extends Command
             }
         }
 
-        
+
         // success
-        $io->success(count($users). ' utilisateurs, ' . $nbOk . ' notifications envoyées, ' . $nbError . ' erreurs');
+        $io->success(count($users) . ' utilisateurs, ' . $nbOk . ' notifications envoyées, ' . $nbError . ' erreurs');
         $io->success('Mémoire maximale utilisée : ' . round(memory_get_peak_usage() / 1024 / 1024) . ' MB');
     }
 }

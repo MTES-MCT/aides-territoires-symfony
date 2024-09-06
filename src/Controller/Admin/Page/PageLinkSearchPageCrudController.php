@@ -16,11 +16,8 @@ class PageLinkSearchPageCrudController extends AtCrudController
 
     public function configureFields(string $pageName): iterable
     {
-        yield TextField::new('url', 'Url')
-        ;
+        yield TextField::new('url', 'Url');
         yield TextField::new('name', 'Titre');
-        yield TrumbowygField::new('description', 'Contenu')
-        ;
-
+        yield TrumbowygField::new('description', 'Contenu');
     }
 }

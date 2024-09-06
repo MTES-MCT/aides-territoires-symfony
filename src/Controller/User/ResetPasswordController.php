@@ -139,8 +139,7 @@ class ResetPasswordController extends AbstractController
         EmailService $emailService,
         TranslatorInterface $translator,
         RouterInterface $routerInterface
-        ): RedirectResponse
-    {
+    ): RedirectResponse {
         $user = $this->entityManager->getRepository(User::class)->findOneBy([
             'email' => $emailFormData,
         ]);
@@ -171,7 +170,7 @@ class ResetPasswordController extends AbstractController
         $context = $routerInterface->getContext();
         $context->setHost($host);
         $context->setScheme('https');
-        
+
         $emailService->sendEmail(
             $user->getEmail(),
             'Renouvellement de votre mot de passe',

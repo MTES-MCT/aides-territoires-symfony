@@ -23,17 +23,16 @@ class PerimeterController extends DashboardController
         $id,
         ManagerRegistry $managerRegistry,
         RequestStack $requestStack
-    ): Response
-    {
+    ): Response {
         // le perimetre
         /** @var Perimeter $perimeter */
         $perimeter = $managerRegistry->getRepository(Perimeter::class)->find($id);
 
         $backUrl = $this->adminUrlGenerator
-        ->setController(PerimeterCrudController::class)
-        ->setAction('edit')
-        ->setEntityId($perimeter->getId())
-        ->generateUrl();
+            ->setController(PerimeterCrudController::class)
+            ->setAction('edit')
+            ->setEntityId($perimeter->getId())
+            ->generateUrl();
 
         // formulaire combiner
         $formCombine = $this->createForm(CombineType::class);
@@ -93,17 +92,16 @@ class PerimeterController extends DashboardController
         RequestStack $requestStack,
         UserService $userService,
         MessageBusInterface $messageBusInterface
-    ): Response
-    {
+    ): Response {
         // le perimetre
         /** @var Perimeter $perimeter */
         $perimeter = $managerRegistry->getRepository(Perimeter::class)->find($id);
 
         $backUrl = $this->adminUrlGenerator
-        ->setController(PerimeterCrudController::class)
-        ->setAction('edit')
-        ->setEntityId($perimeter->getId())
-        ->generateUrl();
+            ->setController(PerimeterCrudController::class)
+            ->setAction('edit')
+            ->setEntityId($perimeter->getId())
+            ->generateUrl();
 
         // formulaire import code insee
         $codesInseeNotFound = [];
@@ -114,7 +112,7 @@ class PerimeterController extends DashboardController
                 $fileCsv = $form->get('fileCsv')->getData();
                 // lecture du fichier csv
                 $file = fopen($fileCsv->getPathname(), 'r');
-                
+
                 $perimeterImport = new PerimeterImport();
                 $perimeterImport->setAdhocPerimeter($perimeter);
                 $perimeterImport->setAskProcessing(true);

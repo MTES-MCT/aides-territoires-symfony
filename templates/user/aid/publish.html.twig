@@ -1,16 +1,24 @@
 {% extends 'user/aid/_base_edit.html.twig' %}
 
-{% block page_title %}<h1>Publier une aide</h1>{% endblock page_title %}
+{% block page_title %}
+	<h1>Publier une aide</h1>
+{% endblock page_title %}
 
 {% block before_section %}
-<div class="fr-alert fr-alert--info fr-alert--sm fr-mb-1w">
-    <p class="fr-mb-0">Votre aide devra être <strong>revue par un administrateur</strong> avant publication.</p>
-</div>
-<div class="fr-alert fr-alert--info fr-alert--sm fr-mb-5w">
-    <p class="fr-mb-0">Vous pouvez créer votre aide et <strong>demander la publication immédiatement,</strong> ou <strong>l’enregistrer en tant que brouillon.</strong></p>
-</div>
+	<div class="fr-alert fr-alert--info fr-alert--sm fr-mb-1w">
+		<p class="fr-mb-0">Votre aide devra être
+			<strong>revue par un administrateur</strong>
+			avant publication.</p>
+	</div>
+	<div class="fr-alert fr-alert--info fr-alert--sm fr-mb-5w">
+		<p class="fr-mb-0">Vous pouvez créer votre aide et
+			<strong>demander la publication immédiatement,</strong>
+			ou
+			<strong>l’enregistrer en tant que brouillon.</strong>
+		</p>
+	</div>
 {% endblock before_section %}
 
 {% block modal %}
-    {% include 'user/dashboard/_modal_organization_not_complete.html.twig' %}
+	{% include 'user/dashboard/_modal_organization_not_complete.html.twig' %}
 {% endblock %}

@@ -2,88 +2,88 @@
 
 
 {% block main %}
-<main>
-    <h1 class="title">Statistiques aides</h1>
+	<main>
+		<h1 class="title">Statistiques aides</h1>
 
-    <div class="mb-5">
-        {{ form_start(formDateRange) }}
-            <div class="container">
-                <div class="row justify-content-md-center">
-                    <div class="col-md-auto">
-                        {{ form_row(formDateRange.dateMin) }}
-                    </div>
-                    <div class="col-md-auto">
-                        {{ form_row(formDateRange.dateMax) }}
-                    </div>
-                    <div class="col-md-auto">
-                        <button type="submit" class="btn btn-primary">Valider</button>
-                    </div>
-                </div>
-            </div>
-        {{ form_end(formDateRange) }}
-    </div>
+		<div class="mb-5">
+			{{ form_start(formDateRange) }}
+			<div class="container">
+				<div class="row justify-content-md-center">
+					<div class="col-md-auto">
+						{{ form_row(formDateRange.dateMin) }}
+					</div>
+					<div class="col-md-auto">
+						{{ form_row(formDateRange.dateMax) }}
+					</div>
+					<div class="col-md-auto">
+						<button type="submit" class="btn btn-primary">Valider</button>
+					</div>
+				</div>
+			</div>
+			{{ form_end(formDateRange) }}
+		</div>
 
-    <div class="container mb-5">
-        <div class="row">
-            <div class="col-md-6">
-                <div class="chart-wrapper">
-                    {{ render_chart(chartApplication) }}
-                </div>
-            </div>
-            <div class="col-md-6">
-                <div class="chart-wrapper">
-                    {{ render_chart(chartOrigin) }}
-                </div>
-            </div>
-        </div>
-    </div>
+		<div class="container mb-5">
+			<div class="row">
+				<div class="col-md-6">
+					<div class="chart-wrapper">
+						{{ render_chart(chartApplication) }}
+					</div>
+				</div>
+				<div class="col-md-6">
+					<div class="chart-wrapper">
+						{{ render_chart(chartOrigin) }}
+					</div>
+				</div>
+			</div>
+		</div>
 
-    <div class="container mb-5">
-        <div class="row">
-            <div class="col-md-6">
-                <h2>Top 10 des aides les plus candidater</h2>
-                <table class="table table-striped">
-                    <thead>
-                        <tr>
-                            <th></th>
-                            <th>Aide</th>
-                            <th>Nombre de clicks</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for topAidApplicationsUrlClick in topAidApplicationsUrlClicks %}
-                        <tr>
-                            <td>{{ loop.index }}</td>
-                            <td>{{ topAidApplicationsUrlClick.name }}</td>
-                            <td>{{ topAidApplicationsUrlClick.nb }}</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-            <div class="col-md-6">
-                <h2>Top 10 des aides en savoir plus</h2>
-                <table class="table table-striped">
-                    <thead>
-                        <tr>
-                            <th></th>
-                            <th>Aide</th>
-                            <th>Nombre de clicks</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for topAidOriginUrlClick in topAidOriginUrlClicks %}
-                        <tr>
-                            <td>{{ loop.index }}</td>
-                            <td>{{ topAidOriginUrlClick.name }}</td>
-                            <td>{{ topAidOriginUrlClick.nb }}</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
+		<div class="container mb-5">
+			<div class="row">
+				<div class="col-md-6">
+					<h2>Top 10 des aides les plus candidater</h2>
+					<table class="table table-striped">
+						<thead>
+							<tr>
+								<th></th>
+								<th>Aide</th>
+								<th>Nombre de clicks</th>
+							</tr>
+						</thead>
+						<tbody>
+							{% for topAidApplicationsUrlClick in topAidApplicationsUrlClicks %}
+								<tr>
+									<td>{{ loop.index }}</td>
+									<td>{{ topAidApplicationsUrlClick.name }}</td>
+									<td>{{ topAidApplicationsUrlClick.nb }}</td>
+								</tr>
+							{% endfor %}
+						</tbody>
+					</table>
+				</div>
+				<div class="col-md-6">
+					<h2>Top 10 des aides en savoir plus</h2>
+					<table class="table table-striped">
+						<thead>
+							<tr>
+								<th></th>
+								<th>Aide</th>
+								<th>Nombre de clicks</th>
+							</tr>
+						</thead>
+						<tbody>
+							{% for topAidOriginUrlClick in topAidOriginUrlClicks %}
+								<tr>
+									<td>{{ loop.index }}</td>
+									<td>{{ topAidOriginUrlClick.name }}</td>
+									<td>{{ topAidOriginUrlClick.nb }}</td>
+								</tr>
+							{% endfor %}
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
 
-</main>
+	</main>
 {% endblock %}

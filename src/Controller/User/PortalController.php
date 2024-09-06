@@ -8,10 +8,10 @@ use App\Entity\Search\SearchPage;
 use App\Entity\User\User;
 use App\Form\User\SearchPage\SearchPageEditType;
 use App\Repository\Search\SearchPageRepository;
+use App\Security\Voter\InternalRequestVoter;
 use App\Service\Aid\AidSearchFormService;
 use App\Service\Aid\AidService;
 use App\Service\SearchPage\SearchPageService;
-use App\Service\Security\SecurityService;
 use App\Service\User\UserService;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -30,8 +30,7 @@ class PortalController extends FrontController
         ManagerRegistry $managerRegistry,
         AidSearchFormService $aidSearchFormService,
         AidService $aidService
-    ): Response
-    {
+    ): Response {
         // verification user
         $user = $userService->getUserLogged();
         if (!$user instanceof User) {
@@ -53,7 +52,7 @@ class PortalController extends FrontController
                 'querystring' => $queryString,
                 'forceOrganizationType' => null,
                 'dontUseUserPerimeter' => true
-                ]
+            ]
         );
         $aidParams = [
             'showInSearch' => true,
@@ -90,7 +89,7 @@ class PortalController extends FrontController
 
         // fil arianne
         $this->breadcrumb->add('Comptes', $this->generateUrl('app_user_dashboard'));
-        $this->breadcrumb->add('Portail '.$searchPage->getName(), $this->generateUrl('app_user_portal_edit', ['id' => $id]));
+        $this->breadcrumb->add('Portail ' . $searchPage->getName(), $this->generateUrl('app_user_portal_edit', ['id' => $id]));
 
         // rendu template
         return $this->render('user/searchpage/edit.html.twig', [
@@ -106,17 +105,14 @@ class PortalController extends FrontController
         RequestStack $requestStack,
         SearchPageRepository $searchPageRepository,
         SearchPageService $searchPageService,
-        UserService $userService,
-        SecurityService $securityService
-    ) : JsonResponse
-    {
+        UserService $userService
+    ): JsonResponse {
         try {
-            // verification requete interne
-            if (!$securityService->validHostOrgin($requestStack)) {
-                // La requête n'est pas interne, retourner une erreur
-                throw $this->createAccessDeniedException('This action can only be performed by the server itself.');
+            // verification requête interne
+            if (!$this->isGranted(InternalRequestVoter::IDENTIFIER)) {
+                throw $this->createAccessDeniedException(InternalRequestVoter::MESSAGE_ERROR);
             }
-            
+
             // recupere id
             $id = (int) $requestStack->getCurrentRequest()->get('id', 0);
             if (!$id) {
@@ -146,7 +142,7 @@ class PortalController extends FrontController
             if ($isLockedByAnother) {
                 throw new \Exception('Portail déjà bloqué');
             }
-            
+
             // le bloque
             $searchPageService->lock($searchPage, $user);
 
@@ -167,8 +163,7 @@ class PortalController extends FrontController
         SearchPageRepository $searchPageRepository,
         UserService $userService,
         SearchPageService $searchPageService
-    ): Response
-    {
+    ): Response {
         try {
             // le user
             $user = $userService->getUserLogged();
@@ -203,7 +198,6 @@ class PortalController extends FrontController
             // retour
             return $this->redirectToRoute('app_user_portal_edit', ['id' => $searchPage->getId()]);
         }
-
     }
 
     #[Route('/comptes/portails/ajax-unlock/', name: 'app_user_portal_ajax_unlock', options: ['expose' => true])]
@@ -211,17 +205,14 @@ class PortalController extends FrontController
         RequestStack $requestStack,
         SearchPageRepository $searchPageRepository,
         SearchPageService $searchPageService,
-        UserService $userService,
-        SecurityService $securityService
-    ) : JsonResponse
-    {
+        UserService $userService
+    ): JsonResponse {
         try {
-            // verification requete interne
-            if (!$securityService->validHostOrgin($requestStack)) {
-                // La requête n'est pas interne, retourner une erreur
-                throw $this->createAccessDeniedException('This action can only be performed by the server itself.');
+            // verification requête interne
+            if (!$this->isGranted(InternalRequestVoter::IDENTIFIER)) {
+                throw $this->createAccessDeniedException(InternalRequestVoter::MESSAGE_ERROR);
             }
-            
+
             // recupere id
             $id = (int) $requestStack->getCurrentRequest()->get('id', 0);
             if (!$id) {

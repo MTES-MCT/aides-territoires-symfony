@@ -24,9 +24,8 @@ use Symfony\Component\Validator\Constraints as Assert;
 class SearchPageEditType extends AbstractType
 {
     public function __construct(
-        private RouterInterface $routerInterface)
-    {
-        
+        private RouterInterface $routerInterface
+    ) {
     }
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
@@ -93,9 +92,9 @@ class SearchPageEditType extends AbstractType
             ->add('pages', CollectionType::class, [
                 'required' => true,
                 'entry_type' => SearchPageOngletType::class,
-                'entry_options' => array(
+                'entry_options' => [
                     'label' => false
-                ),
+                ],
                 'allow_add' => true,
                 'allow_delete' => true,
                 'label' => false,
@@ -152,10 +151,10 @@ class SearchPageEditType extends AbstractType
                 'label' => 'Restreindre à ces types de thématiques',
                 'class' => Category::class,
                 'choice_label' => 'name',
-                'group_by' => function(Category $category) {
+                'group_by' => function (Category $category) {
                     return $category->getCategoryTheme()->getName();
                 },
-                'query_builder' => function(EntityRepository $er) {
+                'query_builder' => function (EntityRepository $er) {
                     return $er->createQueryBuilder('c')
                         ->innerJoin('c.categoryTheme', 'categoryTheme')
                         ->orderBy('categoryTheme.name', 'ASC')
@@ -174,7 +173,7 @@ class SearchPageEditType extends AbstractType
                     'Non' => false
                 ],
             ])
-            
+
             ->add('showBackersField', ChoiceType::class, [
                 'required' => true,
                 'label' => 'Afficher le champ "porteurs"',
@@ -183,7 +182,7 @@ class SearchPageEditType extends AbstractType
                     'Non' => false
                 ],
             ])
-                        
+
             ->add('showMobilizationStepField', ChoiceType::class, [
                 'required' => true,
                 'label' => 'Afficher le champ "avancement du projet"',

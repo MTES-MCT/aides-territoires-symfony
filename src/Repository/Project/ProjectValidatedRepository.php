@@ -24,8 +24,7 @@ class ProjectValidatedRepository extends ServiceEntityRepository
     public function __construct(
         ManagerRegistry $registry,
         protected ReferenceService $referenceService
-    )
-    {
+    ) {
         parent::__construct($registry, ProjectValidated::class);
     }
 
@@ -39,8 +38,8 @@ class ProjectValidatedRepository extends ServiceEntityRepository
             ->innerJoin('organization.perimeterDepartment', 'perimeterDepartment')
             ->andWhere('perimeterDepartment.id = :id')
             ->setParameter('id', $params['id'])
-            ;
-            
+        ;
+
 
         return $queryBuilder->getQuery()->getResult()[0]['nb'] ?? 0;
     }
@@ -54,8 +53,8 @@ class ProjectValidatedRepository extends ServiceEntityRepository
             ->innerJoin('organization.perimeterDepartment', 'perimeterDepartment')
             ->andWhere('perimeterDepartment.id = :id')
             ->setParameter('id', $params['id'])
-            ;
-            
+        ;
+
 
         return $queryBuilder->getQuery()->getResult();
     }
@@ -98,15 +97,15 @@ class ProjectValidatedRepository extends ServiceEntityRepository
                 if (count($objects) > 0) {
                     $sqlObjects .= ' + ';
                 }
-                for ($i = 0; $i<count($objects); $i++) {
+                for ($i = 0; $i < count($objects); $i++) {
 
                     $sqlObjects .= '
-                        CASE WHEN (p.projectName LIKE :objects'.$i.') THEN 30 ELSE 0 END
+                        CASE WHEN (p.projectName LIKE :objects' . $i . ') THEN 30 ELSE 0 END
                     ';
                     if ($i < count($objects) - 1) {
                         $sqlObjects .= ' + ';
                     }
-                    $queryBuilder->setParameter('objects'.$i, '%'.$objects[$i].'%');
+                    $queryBuilder->setParameter('objects' . $i, '%' . $objects[$i] . '%');
                 }
 
                 $queryBuilder->setParameter('objects_string', $objectsString);
@@ -152,22 +151,21 @@ class ProjectValidatedRepository extends ServiceEntityRepository
 
             if ($sqlTotal !== '') {
                 $scoreTotalAvailable = true;
-                $queryBuilder->addSelect('('.$sqlTotal.') as score_total');
-                $queryBuilder->andHaving('score_total >= '.$scoreTotalMin);
+                $queryBuilder->addSelect('(' . $sqlTotal . ') as score_total');
+                $queryBuilder->andHaving('score_total >= ' . $scoreTotalMin);
             }
-
         }
         if ($perimeter instanceof Perimeter && $perimeter->getLatitude() && $perimeter->getLongitude() && $radius !== null) {
             $queryBuilder
-            ->addSelect('(((ACOS(SIN(:lat * PI() / 180) * SIN(perimeter.latitude * PI() / 180) + COS(:lat * PI() / 180) *
+                ->addSelect('(((ACOS(SIN(:lat * PI() / 180) * SIN(perimeter.latitude * PI() / 180) + COS(:lat * PI() / 180) *
                  COS(perimeter.latitude * PI() / 180) * COS((:lng - perimeter.longitude) * PI() / 180)) * 180 / PI()) * 60 * 1.1515) * 1.6093) AS dist')
-            ->innerJoin('p.organization', 'organization')
-            ->innerJoin('organization.perimeter', 'perimeter')
-            ->setParameter('lat', $perimeter->getLatitude())
-            ->setParameter('lng', $perimeter->getLongitude())
-            ->andHaving('dist <= :distanceKm')
-            ->setParameter('distanceKm', $radius)
-            ->orderBy('dist', 'ASC');
+                ->innerJoin('p.organization', 'organization')
+                ->innerJoin('organization.perimeter', 'perimeter')
+                ->setParameter('lat', $perimeter->getLatitude())
+                ->setParameter('lng', $perimeter->getLongitude())
+                ->andHaving('dist <= :distanceKm')
+                ->setParameter('distanceKm', $radius)
+                ->orderBy('dist', 'ASC');
             ;
         }
 
@@ -178,10 +176,10 @@ class ProjectValidatedRepository extends ServiceEntityRepository
         if ($maxResults) {
             $queryBuilder->setMaxResults($maxResults);
         }
-        
+
         $results = $queryBuilder->getQuery()->getResult();
-        $projects=[];
-        foreach($results as $result){
+        $projects = [];
+        foreach ($results as $result) {
             if ($result instanceof ProjectValidated) {
                 $projects[] = $result;
                 continue;
@@ -205,7 +203,7 @@ class ProjectValidatedRepository extends ServiceEntityRepository
 
         $results = $qb->getQuery()->getResult();
         $projects = [];
-        foreach($results as $result) {
+        foreach ($results as $result) {
             if ($result instanceof ProjectValidated) {
                 $projects[] = $result;
             } else {
@@ -231,22 +229,24 @@ class ProjectValidatedRepository extends ServiceEntityRepository
 
         $qb = $this->createQueryBuilder('p');
 
-        if ($perimeter instanceof Perimeter
-        && $perimeter->getLatitude()
-        && $perimeter->getLongitude()) {
+        if (
+            $perimeter instanceof Perimeter
+            && $perimeter->getLatitude()
+            && $perimeter->getLongitude()
+        ) {
             $qb
-            ->addSelect('(((ACOS(SIN(:lat * PI() / 180) * SIN(perimeter.latitude * PI() / 180) + COS(:lat * PI() / 180) *
+                ->addSelect('(((ACOS(SIN(:lat * PI() / 180) * SIN(perimeter.latitude * PI() / 180) + COS(:lat * PI() / 180) *
             COS(perimeter.latitude * PI() / 180) * COS((:lng - perimeter.longitude) * PI() / 180)) * 180 / PI()) * 60 * 1.1515) * 1.6093) AS dist')
-            ->innerJoin('p.organization', 'organization')
-            ->innerJoin('organization.perimeter', 'perimeter')
-            ->setParameter('lat', $perimeter->getLatitude())
-            ->setParameter('lng', $perimeter->getLongitude())
-            ->orderBy('dist', 'ASC')
+                ->innerJoin('p.organization', 'organization')
+                ->innerJoin('organization.perimeter', 'perimeter')
+                ->setParameter('lat', $perimeter->getLatitude())
+                ->setParameter('lng', $perimeter->getLongitude())
+                ->orderBy('dist', 'ASC')
             ;
             if ($radius) {
                 $qb
-                ->having('dist <= :distanceKm')
-                ->setParameter('distanceKm', $radius)
+                    ->having('dist <= :distanceKm')
+                    ->setParameter('distanceKm', $radius)
                 ;
             }
         }
@@ -256,14 +256,14 @@ class ProjectValidatedRepository extends ServiceEntityRepository
                 ->innerJoin('p.organization', 'organizationForType')
                 ->andWhere('organizationForType.organizationType = :organizationType')
                 ->setParameter('organizationType', $organizationType)
-                ;
+            ;
         }
 
         if ($keyword !== null) {
             $qb
                 ->andWhere('p.projectName LIKE :keyword')
-                ->setParameter('keyword', '%'.$keyword.'%')
-                ;
+                ->setParameter('keyword', '%' . $keyword . '%')
+            ;
         }
 
         if ($objects_string !== null) {

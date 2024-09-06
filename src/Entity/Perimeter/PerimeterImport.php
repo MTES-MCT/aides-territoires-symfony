@@ -70,7 +70,8 @@ class PerimeterImport // NOSONAR too much methods
         return $this;
     }
 
-    public function addCityCode(string $cityCode) : static {
+    public function addCityCode(string $cityCode): static
+    {
         $this->cityCodes[] = $cityCode;
 
         return $this;

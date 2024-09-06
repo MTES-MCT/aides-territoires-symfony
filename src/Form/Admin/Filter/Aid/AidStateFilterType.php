@@ -16,7 +16,7 @@ class AidStateFilterType extends AbstractType
                 'Expirent bientôt' => 'deadline',
                 'Aides expirées' => 'expired',
                 'Actuellement non affichées' => 'hidden',
-                
+
             ],
         ]);
     }

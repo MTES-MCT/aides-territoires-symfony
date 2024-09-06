@@ -27,8 +27,7 @@ class PerimeterImportType extends AbstractType
                         'mimeTypesMessage' => 'Veuillez sélectionner un fichier .csv valide',
                     ])
                 ]
-            ])
-        ;
+            ]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void

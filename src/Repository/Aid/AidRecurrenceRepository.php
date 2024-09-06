@@ -37,8 +37,7 @@ class AidRecurrenceRepository extends ServiceEntityRepository
         $qb = $this->getQueryBuilder($params);
 
         $qb
-            ->select('ar.name')
-        ;
+            ->select('ar.name');
 
         $results = $qb->getQuery()->getResult();
 
@@ -61,8 +60,7 @@ class AidRecurrenceRepository extends ServiceEntityRepository
 
         if ($orderBy !== null) {
             $qb
-                ->addOrderBy($orderBy['sort'], $orderBy['order'])
-            ;
+                ->addOrderBy($orderBy['sort'], $orderBy['order']);
         }
 
         return $qb;

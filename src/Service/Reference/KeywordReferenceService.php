@@ -9,7 +9,6 @@ class KeywordReferenceService
     public function __construct(
         private KeywordReferenceRepository $keywordReferenceRepository
     ) {
-        
     }
 
     public function getKeywordReferenceAndSynonyms(?string $keyword): string

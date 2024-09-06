@@ -39,15 +39,13 @@ class StatisticsController extends DashboardController
     const NB_ORGANIZATION_BY_PAGE = 50;
     const NB_PROJECT_BY_PAGE = 50;
 
-    public function  __construct(
+    public function __construct(
         protected UserService $userService,
         protected ManagerRegistry $managerRegistry,
         protected AdminUrlGenerator $adminUrlGenerator,
         protected ChartBuilderInterface $chartBuilderInterface,
         protected Breadcrumb $breadcrumb
-        )
-    {
-        
+    ) {
     }
 
     private function getChartObjectif(int $nbCurrent, int $nbTotal, ?int $nbObjectif): Chart
@@ -73,7 +71,7 @@ class StatisticsController extends DashboardController
                 ],
             ],
         ]);
-        
+
         $options = [
             'scales' => [
                 'y' => [
@@ -86,27 +84,26 @@ class StatisticsController extends DashboardController
             ]
         ];
         if ($nbObjectif) {
-            $options['plugins'] =[
-                    'annotation' => [
-                        'annotations' => [
-                            'line1' => [
-                                'type' => 'line',
-                                'yMin' => $nbObjectif,
-                                'yMax' => $nbObjectif,
-                                'borderColor' => 'rgb(255, 99, 132)',
-                                'borderWidth' => 4,
-                                'clip' => false, // add this line
-                                'label' => [
-                                    'enabled' => true,
-                                    'content' => 'Objectif '.$nbObjectif,
-                                    'position' => 'center',
-                                    'display' => true
-                                ],
+            $options['plugins'] = [
+                'annotation' => [
+                    'annotations' => [
+                        'line1' => [
+                            'type' => 'line',
+                            'yMin' => $nbObjectif,
+                            'yMax' => $nbObjectif,
+                            'borderColor' => 'rgb(255, 99, 132)',
+                            'borderWidth' => 4,
+                            'clip' => false, // add this line
+                            'label' => [
+                                'enabled' => true,
+                                'content' => 'Objectif ' . $nbObjectif,
+                                'position' => 'center',
+                                'display' => true
                             ],
                         ],
                     ],
-                ]
-        ;
+                ],
+            ];
         }
 
         $chart->setOptions($options);
@@ -133,7 +130,7 @@ class StatisticsController extends DashboardController
             'nbEpciTotal' => 1256,
             'nbEpciObjectif' => (int) 1256 * 0.75,
             'nbEpciObjectifPercentage' => round((1256 * 0.75 / 1256) * 100, 1),
-            
+
         ];
         $stats['nbEpciPercentage'] = round(($stats['nbEpci'] / $stats['nbEpciTotal']) * 100, 1);
         return $stats;
@@ -143,8 +140,7 @@ class StatisticsController extends DashboardController
     public function dashboard(
         AdminContext $adminContext,
         MatomoService $matomoService
-    ): Response
-    {
+    ): Response {
         $statsGlobal = $this->getStatsGlobal();
         $chartCommune = $this->getChartObjectif($statsGlobal['nbCommune'], $statsGlobal['nbCommuneTotal'], $statsGlobal['nbCommuneObjectif']);
         $chartEpci = $this->getChartObjectif($statsGlobal['nbEpci'], $statsGlobal['nbEpciTotal'], $statsGlobal['nbEpciObjectif']);
@@ -180,7 +176,7 @@ class StatisticsController extends DashboardController
             toDateString: $dateMax->format('Y-m-d')
         );
         $statsMatomoLast10Weeks = $matomoService->getMatomoStats(
-            apiMethod:'VisitsSummary.get',
+            apiMethod: 'VisitsSummary.get',
             period: 'week',
             fromDateString: 'last10',
             toDateString: null
@@ -210,7 +206,7 @@ class StatisticsController extends DashboardController
             $dateStart = new \DateTime($dates[0]);
             $dateEnd = new \DateTime($dates[1]);
             // dd($registersByWeek, $dateStart->format('Y-W'));
-            $labels[] = $dateStart->format('d/m/Y').' au '.$dateEnd->format('d/m/Y');
+            $labels[] = $dateStart->format('d/m/Y') . ' au ' . $dateEnd->format('d/m/Y');
             $visitsUnique[] = $stats[0]->nb_uniq_visitors ?? 0;
             $registers[] = $this->managerRegistry->getRepository(User::class)->countRegisters(['dateCreateMin' => $dateStart, 'dateCreateMax' => $dateMax]);
             $alerts[] = $this->managerRegistry->getRepository(Alert::class)->countCustom(['dateCreateMin' => $dateStart, 'dateCreateMax' => $dateMax]);
@@ -269,8 +265,7 @@ class StatisticsController extends DashboardController
     public function acquisition(
         AdminContext $adminContext,
         MatomoService $matomoService
-    ): Response
-    {
+    ): Response {
         $statsGlobal = $this->getStatsGlobal();
         $chartCommune = $this->getChartObjectif($statsGlobal['nbCommune'], $statsGlobal['nbCommuneTotal'], $statsGlobal['nbCommuneObjectif']);
         $chartEpci = $this->getChartObjectif($statsGlobal['nbEpci'], $statsGlobal['nbEpciTotal'], $statsGlobal['nbEpciObjectif']);
@@ -292,7 +287,7 @@ class StatisticsController extends DashboardController
             $formDateRange->get('dateMax')->setData($dateMax);
         }
 
-        
+
         // stats matomo
         $statsMatomoReferer = $matomoService->getMatomoStats(
             apiMethod: 'Referrers.get',
@@ -364,7 +359,7 @@ class StatisticsController extends DashboardController
 
         $labels = [];
         $datas = [];
-        foreach($userRegistersByDate as $date => $nbRegister) {
+        foreach ($userRegistersByDate as $date => $nbRegister) {
             $labels[] = $date;
             $datas[] = $nbRegister;
         }
@@ -405,8 +400,7 @@ class StatisticsController extends DashboardController
     public function engagement(
         AdminContext $adminContext,
         MatomoService $matomoService
-    ): Response
-    {
+    ): Response {
         $statsGlobal = $this->getStatsGlobal();
         $chartCommune = $this->getChartObjectif($statsGlobal['nbCommune'], $statsGlobal['nbCommuneTotal'], $statsGlobal['nbCommuneObjectif']);
         $chartEpci = $this->getChartObjectif($statsGlobal['nbEpci'], $statsGlobal['nbEpciTotal'], $statsGlobal['nbEpciObjectif']);
@@ -454,9 +448,9 @@ class StatisticsController extends DashboardController
             'dateMin' => $dateMin,
             'dateMax' => $dateMax,
         ]);
-        
+
         $statsMatomoLast10Weeks = $matomoService->getMatomoStats(
-            apiMethod:'VisitsSummary.get',
+            apiMethod: 'VisitsSummary.get',
             period: 'week',
             fromDateString: 'last10',
             toDateString: null
@@ -470,22 +464,23 @@ class StatisticsController extends DashboardController
             $dates = explode(',', $key);
             $dateStart = new \DateTime($dates[0]);
             $dateEnd = new \DateTime($dates[1]);
-            
-            $labels[] = $dateStart->format('d/m/Y').' au '.$dateEnd->format('d/m/Y');
+
+            $labels[] = $dateStart->format('d/m/Y') . ' au ' . $dateEnd->format('d/m/Y');
             $registers[] = $this->managerRegistry->getRepository(User::class)->countRegisters([
                 'dateCreateMin' => $dateStart,
                 'dateCreateMax' => $dateMax,
-            
+
             ]);
             $registersWithAid[] = $this->managerRegistry->getRepository(User::class)->countRegistersWithAid([
                 'dateCreateMin' => $dateStart,
                 'dateCreateMax' => $dateMax,
-            
+
             ]);
             $registersWithProject[] = $this->managerRegistry->getRepository(User::class)->countRegistersWithProject([
                 'dateCreateMin' => $dateStart,
                 'dateCreateMax' => $dateMax,
-            ]);;
+            ]);
+            ;
         }
 
         $chartRegisters = $this->chartBuilderInterface->createChart(Chart::TYPE_BAR);
@@ -518,7 +513,7 @@ class StatisticsController extends DashboardController
 
         // top aides
         $statsMatomoTopAids = $matomoService->getMatomoStats(
-            apiMethod:'Actions.getPageUrls',
+            apiMethod: 'Actions.getPageUrls',
             fromDateString: $dateMin->format('Y-m-d'),
             toDateString: $dateMax->format('Y-m-d'),
             options: [
@@ -558,7 +553,7 @@ class StatisticsController extends DashboardController
                 ]);
                 $allClicks = $nbContactClicks + $nbInformations + $nbApplications;
             }
-            
+
             $nbUniqVisitors = $stats->nb_uniq_visitors ?? $stats->sum_daily_nb_uniq_visitors ?? 0;
             $conversionvalue = $nbUniqVisitors == 0 ? 0 : 100 * $allClicks / $nbUniqVisitors;
             $topAids[] = [
@@ -575,7 +570,7 @@ class StatisticsController extends DashboardController
         $dateStart = new \DateTime('last month');
         $dateEnd = clone $dateStart;
         $dateEnd->sub(new \DateInterval('P5M'));
-        
+
         $currentDate = clone $dateStart;
         $labels = [];
         $usersConnected = [];
@@ -667,8 +662,7 @@ class StatisticsController extends DashboardController
     #[Route('/admin/statistics/porteurs/', name: 'admin_statistics_porteurs')]
     public function porteurs(
         AdminContext $adminContext
-    ): Response
-    {
+    ): Response {
         $statsGlobal = $this->getStatsGlobal();
         $chartCommune = $this->getChartObjectif($statsGlobal['nbCommune'], $statsGlobal['nbCommuneTotal'], $statsGlobal['nbCommuneObjectif']);
         $chartEpci = $this->getChartObjectif($statsGlobal['nbEpci'], $statsGlobal['nbEpciTotal'], $statsGlobal['nbEpciObjectif']);
@@ -707,7 +701,7 @@ class StatisticsController extends DashboardController
             'dateMin' => $dateMin,
             'dateMax' => $dateMax,
         ]);
-        
+
         $nbContributors = $this->managerRegistry->getRepository(User::class)->countContributors([
             'dateCreateMin' => $dateMin,
             'dateCreateMax' => $dateMax,
@@ -731,7 +725,7 @@ class StatisticsController extends DashboardController
         $dateStart = new \DateTime('-10 weeks');
         $dateEnd = new \DateTime();
         $currentDate = clone $dateStart;
-        
+
         $labels = [];
         $communes = [];
         $communesWithAid = [];
@@ -743,7 +737,7 @@ class StatisticsController extends DashboardController
         while ($currentDate < $dateEnd) {
             $startOfWeek = (clone $currentDate)->setISODate($currentDate->format('Y'), $currentDate->format('W'), 1);
             $endOfWeek = (clone $currentDate)->setISODate($currentDate->format('Y'), $currentDate->format('W'), 7);
-        
+
             // inscriptions communes
             $nbCommunes = $this->managerRegistry->getRepository(User::class)->countRegisters([
                 'dateCreateMin' => $startOfWeek,
@@ -791,7 +785,7 @@ class StatisticsController extends DashboardController
             ]);
 
 
-            $labels[] = $startOfWeek->format('d/m/Y').' au '.$endOfWeek->format('d/m/Y');
+            $labels[] = $startOfWeek->format('d/m/Y') . ' au ' . $endOfWeek->format('d/m/Y');
             $communes[] = $nbCommunes;
             $communesWithAid[] = $nbCommunesWithAid;
             $communesWithProject[] = $nbCommunesWithProject;
@@ -885,8 +879,7 @@ class StatisticsController extends DashboardController
     #[Route('/admin/statistics/stats-utilisateurs/', name: 'admin_statistics_users')]
     public function statsUsers(
         AdminContext $adminContext
-    ): Response
-    {
+    ): Response {
         $nbUsers = $this->managerRegistry->getRepository(User::class)->countCustom();
         $nbBeneficiaries = $this->managerRegistry->getRepository(User::class)->countBeneficiaries();
         $nbContributors = $this->managerRegistry->getRepository(User::class)->countContributors();
@@ -917,7 +910,7 @@ class StatisticsController extends DashboardController
 
         // gestion pagination
         $currentPage = (int) $adminContext->getRequest()->get('page', 1);
-        
+
         // le paginateur
         $users = $this->managerRegistry->getRepository(User::class)->getQueryBuilder([
             'dateCreateMin' => $dateMin,
@@ -931,7 +924,7 @@ class StatisticsController extends DashboardController
         $pagerfanta = new Pagerfanta($adapter);
         $pagerfanta->setMaxPerPage(self::NB_USER_BY_PAGE);
         $pagerfanta->setCurrentPage($currentPage);
-        
+
         // fil arianne
         $this->breadcrumb->add(
             'Dashboard',
@@ -958,8 +951,7 @@ class StatisticsController extends DashboardController
     #[Route('/admin/statistics/stats-structures/', name: 'admin_statistics_organizations')]
     public function statsOrganizations(
         AdminContext $adminContext
-    ): Response
-    {
+    ): Response {
         $nbOrganizations = $this->managerRegistry->getRepository(Organization::class)->countCustom([
             'isImported' => false,
             'hasPerimeter' => true
@@ -971,7 +963,7 @@ class StatisticsController extends DashboardController
         foreach ($nbOrganizationsByType as $key => $organizationType) {
             $nbOrganizationsByType[$key]['percent'] = $nbOrganizations == 0 ? 0 : round($organizationType['nb'] / $nbOrganizations * 100, 2);
         }
-        
+
         // dates par défaut
         $dateMin = new \DateTime('-1 month');
         $dateMax = new \DateTime();
@@ -991,7 +983,7 @@ class StatisticsController extends DashboardController
 
         // gestion pagination
         $currentPage = (int) $adminContext->getRequest()->get('page', 1);
-        
+
         // le paginateur
         $organizations = $this->managerRegistry->getRepository(Organization::class)->getQueryBuilder([
             'dateCreateMin' => $dateMin,
@@ -1028,10 +1020,9 @@ class StatisticsController extends DashboardController
     public function statsCarto(
         AdminContext $adminContext,
         KernelInterface $kernelInterface
-    ): Response
-    {
+    ): Response {
         // fichier geojson des régions pour la carte
-        $regionsGeojson = file_get_contents($kernelInterface->getProjectDir().'/datas/geojson/regions-1000m.geojson');
+        $regionsGeojson = file_get_contents($kernelInterface->getProjectDir() . '/datas/geojson/regions-1000m.geojson');
 
         // on recupère toutes les régions
         $regions = $this->managerRegistry->getRepository(Perimeter::class)->findCustom([
@@ -1071,7 +1062,7 @@ class StatisticsController extends DashboardController
         }
         // libere memoire
         unset($regions);
-        
+
 
         # Les départements
         $counties = $this->managerRegistry->getRepository(Perimeter::class)->findCustom([
@@ -1108,7 +1099,7 @@ class StatisticsController extends DashboardController
             // calcul le pourcentage de communes inscrites
             $nbCommuneTotalOffical = $this->getNbCommuneByDepartmentOffical($county->getCode());
             $percentCommunes = $nbCommuneTotalOffical == 0 ? 0 : round($nbCommune / $nbCommuneTotalOffical * 100, 2);
-            
+
             // on alimente le tableau
             $countiesOrgCounts[$county->getCode()] = [
                 'name' => $county->getName(),
@@ -1123,7 +1114,7 @@ class StatisticsController extends DashboardController
 
         // recuperes toutes les organizations de type communes
         $organizationCommunes = $this->managerRegistry->getRepository(Organization::class)->findCommunes([]);
-        
+
         $communes_with_org = [];
         /** @var Organization $organization */
         foreach ($organizationCommunes as $organization) {
@@ -1336,11 +1327,11 @@ class StatisticsController extends DashboardController
         return isset($nbCommunes[$departmentCode]) ? $nbCommunes[$departmentCode] : 0;
     }
 
-    function getAge(\DateTime $date): int
+    public function getAge(\DateTime $date): int
     {
         $now = new \DateTime();
         $interval = $now->diff($date);
-        
+
         if ($interval->days < 30) {
             return 3;
         } elseif ($interval->days < 90) {
@@ -1352,11 +1343,10 @@ class StatisticsController extends DashboardController
 
 
     #[Route('/admin/statistics/stats-intercommunalites/', name: 'admin_statistics_interco')]
-    public function statsInterco(
-    ): Response
+    public function statsInterco(): Response
     {
         $interco_types = [];
-        
+
         foreach (Organization::INTERCOMMUNALITY_TYPES as $intercoType) {
             $key = $intercoType['slug'];
             $label = $intercoType['name'];
@@ -1392,7 +1382,7 @@ class StatisticsController extends DashboardController
         }
 
         $charts = [];
-        
+
         foreach ($interco_types as $interco_type) {
 
             $chart = $this->getChartObjectif($interco_type['current_chart'], $interco_type['total'], null);
@@ -1405,7 +1395,7 @@ class StatisticsController extends DashboardController
         foreach ($interco_types as $interco_type) {
             $interco_types_final[$interco_type['code']] = $interco_type;
         }
-        
+
         // fil arianne
         $this->breadcrumb->add(
             'Dashboard',
@@ -1425,9 +1415,8 @@ class StatisticsController extends DashboardController
     #[Route('/admin/statistics/stats-projets/', name: 'admin_statistics_projects')]
     public function statsProjects(
         AdminContext $adminContext
-    ): Response
-    {
-        
+    ): Response {
+
         // dates par défaut
         $dateMin = new \DateTime('-1 month');
         $dateMax = new \DateTime();
@@ -1445,9 +1434,9 @@ class StatisticsController extends DashboardController
             $formDateRange->get('dateMax')->setData($dateMax);
         }
 
-                // gestion pagination
-                $currentPage = (int) $adminContext->getRequest()->get('page', 1);
-        
+        // gestion pagination
+        $currentPage = (int) $adminContext->getRequest()->get('page', 1);
+
 
         // les projets
         $projects = $this->managerRegistry->getRepository(Project::class)->getQueryBuilder([

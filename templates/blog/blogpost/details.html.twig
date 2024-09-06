@@ -9,23 +9,32 @@
 {% endblock %}
 
 {% block ld_json %}
-<script type="application/ld+json">
-{
-	"@context": "https://schema.org",
-	"@type": "NewsArticle",
-	"headline": "{{ blogPost.name }}",
-	"image": [
-		"{{ getParameter('cloud_image_url') }}{{ blogPost.logo }}"
-	],
-	"datePublished": "{{ blogPost.datePublished|date('Y-m-d H:i:s') }}",
-	"dateModified": "{% if blogPost.timeUpdate %}{{ blogPost.timeUpdate|date('Y-m-d H:i:s') }}{% else %}{{ blogPost.timeCreate|date('Y-m-d H:i:s') }}{% endif %}",
-	"author": [{
-		"@type": "Person",
-		"name": "{% if blogPost.user %}{{ blogPost.user.firstname }} {{ blogPost.user.lastname }}{% endif %}",
-		"url": "{{ getParameter('site_url') }}"
-	}]
-}
-</script>
+	<script type="application/ld+json">
+		{
+			"@context": "https://schema.org",
+			"@type": "NewsArticle",
+			"headline": "{{ blogPost.name }}",
+			"image": [
+				"{{ getParameter('cloud_image_url') }}{{ blogPost.logo }}"
+			],
+			"datePublished": "{{ blogPost.datePublished|date('Y-m-d H:i:s') }}",
+			"dateModified": "
+		{% if blogPost.timeUpdate %}
+			{{ blogPost.timeUpdate|date('Y-m-d H:i:s') }}
+		{% else %}
+			{{ blogPost.timeCreate|date('Y-m-d H:i:s') }}
+		{% endif %}",
+			"author": [{
+				"@type": "Person",
+				"name": "
+		{% if blogPost.user %}
+			{{ blogPost.user.firstname }}
+			{{ blogPost.user.lastname }}
+		{% endif %}",
+				"url": "{{ getParameter('site_url') }}"
+			}]
+		}
+	</script>
 {% endblock %}
 
 {% block body %}
@@ -55,7 +64,7 @@
 
 
 							<div class="wysiwyg-wrapper">
-								{{ optimizeHtmlFromWysiwyg(blogPost.description)|raw }}
+								{{ optimizeHtmlFromWysiwyg(blogPost.description)|sanitize_html|raw }}
 							</div>
 
 
@@ -64,19 +73,20 @@
 									{% if blogPost.user.image %}
 										<img id="post-author-img" src="{{ getParameter('cloud_image_url') }}{{ blogPost.user.image }}" alt="Avatar {{ blogPost.user.firstname }} {{ blogPost.user.lastname }}" class="fr-col-12">
 									{% endif %}
-								<div class="fr-mt-2w">
-									<p class="fr-ml-1w fr-mb-0">
-										<strong>{{ blogPost.user.firstname }} {{ blogPost.user.lastname }}</strong>
-									</p>
+									<div class="fr-mt-2w">
+										<p class="fr-ml-1w fr-mb-0">
+											<strong>{{ blogPost.user.firstname }}
+												{{ blogPost.user.lastname }}</strong>
+										</p>
 
-									<p class="fr-ml-1w fr-mb-2w">{{ blogPost.user.email }}</p>
+										<p class="fr-ml-1w fr-mb-2w">{{ blogPost.user.email }}</p>
 
 
-									<p class="fr-ml-1w fr-mb-1w fr-text--sm">
-										<a href="{{ path('app_contact_contact') }}" title="nous contacter">Nous contacter</a>
-									</p>
+										<p class="fr-ml-1w fr-mb-1w fr-text--sm">
+											<a href="{{ path('app_contact_contact') }}" title="nous contacter">Nous contacter</a>
+										</p>
 
-								</div>
+									</div>
 								{% endif %}
 							</div>
 

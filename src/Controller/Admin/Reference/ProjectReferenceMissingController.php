@@ -14,8 +14,7 @@ class ProjectReferenceMissingController extends AbstractController
     public function ajaxUxAutocomplete(
         ProjectReferenceMissingRepository $projectReferenceMissingRepository,
         RequestStack $requestStack
-    ): JsonResponse
-    {
+    ): JsonResponse {
         $query = $requestStack->getCurrentRequest()->get('query', null);
 
         // recherche les projets référents correspondants

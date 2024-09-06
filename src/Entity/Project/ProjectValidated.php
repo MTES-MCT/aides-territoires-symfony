@@ -68,18 +68,18 @@ class ProjectValidated // NOSONAR too much methods
     private ?Backer $financer = null;
 
     #[ORM\ManyToOne(inversedBy: 'projectValidateds')]
-    #[ORM\JoinColumn(onDelete:'SET NULL')]
+    #[ORM\JoinColumn(onDelete: 'SET NULL')]
     private ?Organization $organization = null;
 
     #[ORM\ManyToOne(inversedBy: 'projectValidateds')]
-    #[ORM\JoinColumn(onDelete:'SET NULL')]
+    #[ORM\JoinColumn(onDelete: 'SET NULL')]
     private ?Project $project = null;
 
     private ?float $distance = null;
 
     public function __toString()
     {
-        return 'Projet : '.$this->projectName.' / Aide : '.$this->aidName;
+        return 'Projet : ' . $this->projectName . ' / Aide : ' . $this->aidName;
     }
 
     public function getId(): ?int

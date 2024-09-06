@@ -53,8 +53,7 @@ class CheckboxMultipleSearchType extends AbstractType
 
         if ($options['hideAutocomplete']) {
             $builder
-                ->remove('autocomplete')
-                ;
+                ->remove('autocomplete');
         }
     }
 

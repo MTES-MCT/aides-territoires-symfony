@@ -1,94 +1,95 @@
 {% extends "admin/statistics/_stats_base.html.twig" %}
 
 {% block stats_content %}
-<section id="users-stats" class="fr-container">
+	<section id="users-stats" class="fr-container">
 
-    <div class="table-responsive">
-        <table class="table table-bordered at-table--fullwidth fr-mt-5w">
-            <caption>Nombre de structures par type</caption>
-            <thead>
-                <tr>
-                    <th scope="col">Type</th>
-                    <th scope="col">Nombre d’inscrits</th>
-                    <th scope="col">%</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for organizationType in nbOrganizationsByType %}    
-                <tr>
-                    <td>{{ organizationType.typeName }}</td>
-                    <td>{{ organizationType.nb }}</td>
-                    <td>{{ organizationType.percent|number_format(2, ',', ' ') }} %</td>
-                </tr>
-                {% endfor %}
-                <tr>
-                    <td>TOTAL</td>
-                    <td>{{ nbOrganizations }}</td>
-                    <td>100 %</td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
+		<div class="table-responsive">
+			<table class="table table-bordered at-table--fullwidth fr-mt-5w">
+				<caption>Nombre de structures par type</caption>
+				<thead>
+					<tr>
+						<th scope="col">Type</th>
+						<th scope="col">Nombre d’inscrits</th>
+						<th scope="col">%</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for organizationType in nbOrganizationsByType %}
+						<tr>
+							<td>{{ organizationType.typeName }}</td>
+							<td>{{ organizationType.nb }}</td>
+							<td>{{ organizationType.percent|number_format(2, ',', ' ') }}
+								%</td>
+						</tr>
+					{% endfor %}
+					<tr>
+						<td>TOTAL</td>
+						<td>{{ nbOrganizations }}</td>
+						<td>100 %</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
 
-    <h4 class="fr-mt-0w">Structures :</h4>
+		<h4 class="fr-mt-0w">Structures :</h4>
 
-    <div class="mt-5">
-        {{ form_start(formDateRange) }}
-        <div class="d-flex">
-            <div class="d-flex me-3">
-            {{ form_row(formDateRange.dateMin) }}
-            </div>
-            <div class="d-flex me-3">
-            {{ form_row(formDateRange.dateMax) }}
-            </div>
-            <div class="d-flex me-3">
-            <button type="submit" class="btn btn-primary">Valider</button>
-            </div>
-        </div>
-        {{ form_end(formDateRange) }}
-    </div>
+		<div class="mt-5">
+			{{ form_start(formDateRange) }}
+			<div class="d-flex">
+				<div class="d-flex me-3">
+					{{ form_row(formDateRange.dateMin) }}
+				</div>
+				<div class="d-flex me-3">
+					{{ form_row(formDateRange.dateMax) }}
+				</div>
+				<div class="d-flex me-3">
+					<button type="submit" class="btn btn-primary">Valider</button>
+				</div>
+			</div>
+			{{ form_end(formDateRange) }}
+		</div>
 
-    <div class="table-responsive mt-5">
-        <table class="table table-bordered">
-            <thead>
-                <tr>
-                    <th scope="col">Nom</th>
-                    <th scope="col">Type</th>
-                    <th scope="col">Territoire</th>
-                    <th scope="col">Nombre de collaborateurs</th>
-                    <th scope="col">Date de création</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for organization in myPager.currentPageResults %}
-                <tr>
-                    <td>{{ organization.name }}</td>
-                    <td>
-                        {% if organization.organizationType %}
-                        {{ organization.organizationType.name}}
-                        {% endif %}
-                    </td>
-                    <td>
-                        {% if organization.perimeter %}
-                        {{ organization.perimeter.name }}
-                        {% endif %}
-                    </td>
-                    <td>
-                        {% if organization.beneficiairies %}
-                        {{ organization.beneficiairies|length }}
-                        {% endif %}
-                    </td>
-                    <td>{{ organization.dateCreate|date('d/m/y') }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-    
-    <div class="">
-        {{ pagerfanta(myPager) }}
-    </div>
-    
+		<div class="table-responsive mt-5">
+			<table class="table table-bordered">
+				<thead>
+					<tr>
+						<th scope="col">Nom</th>
+						<th scope="col">Type</th>
+						<th scope="col">Territoire</th>
+						<th scope="col">Nombre de collaborateurs</th>
+						<th scope="col">Date de création</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for organization in myPager.currentPageResults %}
+						<tr>
+							<td>{{ organization.name }}</td>
+							<td>
+								{% if organization.organizationType %}
+									{{ organization.organizationType.name}}
+								{% endif %}
+							</td>
+							<td>
+								{% if organization.perimeter %}
+									{{ organization.perimeter.name }}
+								{% endif %}
+							</td>
+							<td>
+								{% if organization.beneficiairies %}
+									{{ organization.beneficiairies|length }}
+								{% endif %}
+							</td>
+							<td>{{ organization.dateCreate|date('d/m/y') }}</td>
+						</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+		</div>
 
-</section>
+		<div class="">
+			{{ pagerfanta(myPager) }}
+		</div>
+
+
+	</section>
 {% endblock stats_content %}

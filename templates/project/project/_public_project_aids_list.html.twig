@@ -1,77 +1,77 @@
 <div class="fr-table fr-table--no-scroll">
-    <div class="fr-table__wrapper">
-        <div class="fr-table__container">
-            <div class="fr-table__content">
-                <table class="data-table at-table--xl">
-                    <caption>
-                        Liste des aides sélectionnées par le porteur de projet :
-                    </caption>
-                    <thead>
-                        <tr>
-                            <th scope="col" class="fr-text">Nom</th>
-                            <th scope="col" class="fr-text">Echéance</th>
-                            <th scope="col" class="fr-text">Type d’aide</th>
-                            <th scope="col" class="fr-text">Porteur d’aides</th>
-                            <th scope="col" class="fr-text">Ajoutée le</th>
-                        </tr>
-                    </thead>
-                        <tbody>
-                            {% if project.aidProjects|length > 0 %}
-                            {% for aidProject in project.aidProjects %}
-                            <tr> 
-                                <td class="fr-text">
-                                    <a href="{{ path('app_aid_aid_details', {'slug': aidProject.aid.slug}) }}" target="_blank" rel="noopener" id="aid-{{ aidProject.aid.id }}">
-                                        {{ aidProject.aid.name }}
-                                        <span class="fr-sr-only">Ouvre une nouvelle fenêtre</span>
-                                    </a>
-                                </td>
-                                <td class="fr-text">
-                                    <span>{{ aidProject.aid.dateSubmissionDeadline|date('d/m/Y') }}</span>
-                                    {% if aidProject.aid.isOnGoing() %}
-                                        <p class="fr-badge fr-badge--info fr-badge--sm">Permanente</p>
-                                    {% elseif  aidProject.aid.isRecurring() %}
-                                        <p class="fr-badge fr-badge--info fr-badge--sm">Récurrente</p>
-                                    {% elseif  aidProject.aid.isApproachingDeadline() %}
-                                        <p class="fr-badge fr-badge--new fr-badge--sm">Échéance proche</p>                       
-                                    {% elseif  aidProject.aid.hasExpired() %}
-                                        <p class="fr-badge fr-badge--warning fr-badge--sm">Expirée</p>
-                                    {% endif %}
-                            </td>
-                                <td class="fr-text">
-                                    {% for aidType in aidProject.aid.aidTypes %}
-                                        {{ aidType.name }}
-                                    {% endfor %} 
-                                </td>
-                                <td class="fr-text">
-                                    <ul>
-                                    {% for financer in aidProject.aid.aidFinancers %}
-                                        <li>
-                                            <a href="{{ path('app_backer_details', {'id': financer.backer.id, 'slug': financer.backer.slug}) }}" target="_blank" rel="noopener">
-                                            {{ financer.backer.name }}
-                                            <span class="fr-sr-only">Ouvre une nouvelle fenêtre</span>
-                                        </a>
-                                        </li>
-                                    {% endfor %} 
-                                    </ul>
-                                </td>      
-                                <td class="fr-text">
-                                    {{ aidProject.dateCreate|date('d/m/Y') }}
-                                </td>
+	<div class="fr-table__wrapper">
+		<div class="fr-table__container">
+			<div class="fr-table__content">
+				<table class="data-table at-table--xl">
+					<caption>
+						Liste des aides sélectionnées par le porteur de projet :
+					</caption>
+					<thead>
+						<tr>
+							<th scope="col" class="fr-text">Nom</th>
+							<th scope="col" class="fr-text">Echéance</th>
+							<th scope="col" class="fr-text">Type d’aide</th>
+							<th scope="col" class="fr-text">Porteur d’aides</th>
+							<th scope="col" class="fr-text">Ajoutée le</th>
+						</tr>
+					</thead>
+					<tbody>
+						{% if project.aidProjects|length > 0 %}
+							{% for aidProject in project.aidProjects %}
+								<tr>
+									<td class="fr-text">
+										<a href="{{ path('app_aid_aid_details', {'slug': aidProject.aid.slug}) }}" target="_blank" rel="noopener" id="aid-{{ aidProject.aid.id }}">
+											{{ aidProject.aid.name }}
+											<span class="fr-sr-only">Ouvre une nouvelle fenêtre</span>
+										</a>
+									</td>
+									<td class="fr-text">
+										<span>{{ aidProject.aid.dateSubmissionDeadline|date('d/m/Y') }}</span>
+										{% if aidProject.aid.isOnGoing() %}
+											<p class="fr-badge fr-badge--info fr-badge--sm">Permanente</p>
+										{% elseif  aidProject.aid.isRecurring() %}
+											<p class="fr-badge fr-badge--info fr-badge--sm">Récurrente</p>
+										{% elseif  aidProject.aid.isApproachingDeadline() %}
+											<p class="fr-badge fr-badge--new fr-badge--sm">Échéance proche</p>
+										{% elseif  aidProject.aid.hasExpired() %}
+											<p class="fr-badge fr-badge--warning fr-badge--sm">Expirée</p>
+										{% endif %}
+									</td>
+									<td class="fr-text">
+										{% for aidType in aidProject.aid.aidTypes %}
+											{{ aidType.name }}
+										{% endfor %}
+									</td>
+									<td class="fr-text">
+										<ul>
+											{% for financer in aidProject.aid.aidFinancers %}
+												<li>
+													<a href="{{ path('app_backer_details', {'id': financer.backer.id, 'slug': financer.backer.slug}) }}" target="_blank" rel="noopener">
+														{{ financer.backer.name }}
+														<span class="fr-sr-only">Ouvre une nouvelle fenêtre</span>
+													</a>
+												</li>
+											{% endfor %}
+										</ul>
+									</td>
+									<td class="fr-text">
+										{{ aidProject.dateCreate|date('d/m/Y') }}
+									</td>
 
-                            </tr>
-                            {% endfor %}
-                        {% else %}
-                        <tbody>
-                            <tr>
-                                <td colspan="6" class="fr-text at-centered-important">
-                                    Aucune aide n’a été ajouté à ce projet pour l’instant
-                                </td>
-                            </tr>
-                        </tbody>
-                        {% endif %}
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
+								</tr>
+							{% endfor %}
+						{% else %}
+							<tbody>
+								<tr>
+									<td colspan="6" class="fr-text at-centered-important">
+										Aucune aide n’a été ajouté à ce projet pour l’instant
+									</td>
+								</tr>
+							</tbody>
+						{% endif %}
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
 </div>

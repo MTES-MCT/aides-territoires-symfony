@@ -24,9 +24,8 @@ class PerimeterImportCommand extends Command
         protected ManagerRegistry $managerRegistry,
         protected EmailService $emailService,
         protected ParamService $paramService
-    )
-    {
-        ini_set('max_execution_time', 60*60);
+    ) {
+        ini_set('max_execution_time', 60 * 60);
         ini_set('memory_limit', '1G');
         parent::__construct();
     }
@@ -50,19 +49,19 @@ class PerimeterImportCommand extends Command
                 $io->error('Erreur : rien a importer');
                 return Command::SUCCESS;
             }
-    
+
             if ($perimeterImport->isImportProcessing()) {
                 $io->error('Erreur : périmètre déjà en cours d\'import');
                 return Command::SUCCESS;
             }
-    
+
             // passe l'import en cours de traitement
             $perimeterImport->setImportProcessing(true);
             $this->managerRegistry->getManager()->persist($perimeterImport);
             $this->managerRegistry->getManager()->flush();
-    
-            $io->info('Import de périmètre adhoc : '.$perimeterImport->getAdhocPerimeter()->getName().', auteur : '.$perimeterImport->getAuthor()->getEmail());
-    
+
+            $io->info('Import de périmètre adhoc : ' . $perimeterImport->getAdhocPerimeter()->getName() . ', auteur : ' . $perimeterImport->getAuthor()->getEmail());
+
             // Pour économiser la mémoire
             $this->managerRegistry->getConnection()->getConfiguration()->setSQLLogger(null);
 
@@ -73,14 +72,14 @@ class PerimeterImportCommand extends Command
                 ]);
                 if (!$perimeterToAdd instanceof Perimeter) {
                     $notFound[] = $cityCode;
-                    $io->warning('Périmètre introuvable avec ce code insee : '.$cityCode);
+                    $io->warning('Périmètre introuvable avec ce code insee : ' . $cityCode);
                     unset($perimeterToAdd);
                     continue;
                 }
-    
+
                 // ajoute le périmètre correspondant au code insee
                 $perimeterImport->getAdhocPerimeter()->addPerimetersFrom($perimeterToAdd);
-    
+
                 // va recuperer tous les parents du périmètre à ajouter et met le perimètre adhoc dedans,
                 // ex: si perimetreToAdd = commune, alors on ajoute le perimetre adhoc dans le departement, la region, etc.
                 foreach ($perimeterToAdd->getPerimetersTo() as $parentToAdd) {
@@ -88,23 +87,23 @@ class PerimeterImportCommand extends Command
                         $parentToAdd->getId() !== $perimeterImport->getAdhocPerimeter()->getId()
                         && $parentToAdd->getScale() <= Perimeter::SCALE_ADHOC
                     ) {
-                    $perimeterImport->getAdhocPerimeter()->addPerimetersTo($parentToAdd);
+                        $perimeterImport->getAdhocPerimeter()->addPerimetersTo($parentToAdd);
                     }
                 }
                 unset($perimeterToAdd);
             }
-    
+
             // met à jour le perimetre import
             $perimeterImport->setIsImported(true);
             $perimeterImport->setAskProcessing(false);
             $perimeterImport->setImportProcessing(false);
             $perimeterImport->setTimeImported(new \DateTime(date('Y-m-d H:i:s')));
-    
+
             // sauvegarde
             $this->managerRegistry->getManager()->persist($perimeterImport);
             $this->managerRegistry->getManager()->persist($perimeterImport->getAdhocPerimeter());
             $this->managerRegistry->getManager()->flush();
-            
+
             // envoi un mail au créateur et au super admin
             $this->emailService->sendEmail(
                 $perimeterImport->getAuthor()->getEmail(),
@@ -124,16 +123,16 @@ class PerimeterImportCommand extends Command
                     'notFound' => $notFound
                 ]
             );
-    
+
             $timeEnd = microtime(true);
             $time = $timeEnd - $timeStart;
-    
-            $io->success('Import terminé : '.gmdate("H:i:s", $timeEnd).' ('.gmdate("H:i:s", intval($time)).')');
+
+            $io->success('Import terminé : ' . gmdate("H:i:s", $timeEnd) . ' (' . gmdate("H:i:s", intval($time)) . ')');
             $io->success('Mémoire maximale utilisée : ' . intval(round(memory_get_peak_usage() / 1024 / 1024)) . ' MB');
-    
+
             return Command::SUCCESS;
         } catch (\Exception $e) {
-            $io->error('Erreur : '.$e->getMessage());
+            $io->error('Erreur : ' . $e->getMessage());
             return Command::FAILURE;
         }
     }

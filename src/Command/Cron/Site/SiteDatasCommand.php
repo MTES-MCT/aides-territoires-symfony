@@ -32,9 +32,8 @@ class SiteDatasCommand extends Command
     public function __construct(
         private ManagerRegistry $managerRegistry,
         private MessageBusInterface $bus
-    )
-    {
-        ini_set('max_execution_time', 60*60);
+    ) {
+        ini_set('max_execution_time', 60 * 60);
         ini_set('memory_limit', '1G');
         parent::__construct();
     }
@@ -47,7 +46,7 @@ class SiteDatasCommand extends Command
         $io = new SymfonyStyle($input, $output);
         $io->title($this->commandTextStart);
 
-        try  {
+        try {
             // tache
             $this->cronTask($input, $output);
         } catch (\Exception $exception) {
@@ -63,7 +62,7 @@ class SiteDatasCommand extends Command
         $timeStart = microtime(true);
 
         $io = new SymfonyStyle($input, $output);
-        
+
         // // Les projets référents
         $this->projectReferences();
 
@@ -81,7 +80,7 @@ class SiteDatasCommand extends Command
         $time = $timeEnd - $timeStart;
 
         // success
-        $io->success('Temps écoulé : '.gmdate("H:i:s", $timeEnd).' ('.gmdate("H:i:s", intval($time)).')');
+        $io->success('Temps écoulé : ' . gmdate("H:i:s", $timeEnd) . ' (' . gmdate("H:i:s", intval($time)) . ')');
         $io->success('Mémoire maximale utilisée : ' . round(memory_get_peak_usage() / 1024 / 1024) . ' MB');
     }
 
@@ -129,7 +128,7 @@ class SiteDatasCommand extends Command
     {
         /** @var AidRepository $aidRepo */
         $aidRepo = $this->managerRegistry->getRepository(Aid::class);
-        
+
         // charge les aides publiées sans lien cassé de noté
         $nbAids = $aidRepo->countLives();
 
@@ -140,7 +139,7 @@ class SiteDatasCommand extends Command
         $logEvent->setValue($nbAids);
         $this->managerRegistry->getManager()->persist($logEvent);
         $this->managerRegistry->getManager()->flush();
-        
+
         $searchPages = $this->managerRegistry->getRepository(SearchPage::class)->findAll();
         /** @var SearchPage $searchPage */
         foreach ($searchPages as $searchPage) {

@@ -22,12 +22,11 @@ class KeywordRepository extends ServiceEntityRepository
         parent::__construct($registry, Keyword::class);
     }
 
-    public function findCustom(?array $params = null) : array
+    public function findCustom(?array $params = null): array
     {
         $qb = $this->getQueryBuilder($params);
 
         return $qb->getQuery()->getResult();
-        
     }
 
     public function getQueryBuilder(?array $params = null): QueryBuilder
@@ -53,7 +52,7 @@ class KeywordRepository extends ServiceEntityRepository
         // on update les ids actuels pour avoir les futurs id de libre
         $qb = $this->createQueryBuilder('u');
         $qb->update(Keyword::class, 'uu');
-        $qb->set('uu.id', 'uu.id + '.$maxOldId)
+        $qb->set('uu.id', 'uu.id + ' . $maxOldId)
             ->andWhere('uu.oldId IS NOT NULL');
         $qb->getQuery()->execute();
 
@@ -61,7 +60,7 @@ class KeywordRepository extends ServiceEntityRepository
         $qb = $this->createQueryBuilder('u');
         $qb->update(Keyword::class, 'uu');
         $qb->set('uu.id', 'uu.oldId')
-        ->andWhere('uu.oldId IS NOT NULL');
+            ->andWhere('uu.oldId IS NOT NULL');
         $qb->getQuery()->execute();
 
         // met à jour l'auto increment
@@ -71,7 +70,7 @@ class KeywordRepository extends ServiceEntityRepository
         $maxId = $resultMax[0]['maxId'] ?? 1;
 
         $table = $this->getEntityManager()->getClassMetadata(Keyword::class)->getTableName();
-        $sql = 'ALTER TABLE '.$table.' AUTO_INCREMENT = '.$maxId;
+        $sql = 'ALTER TABLE ' . $table . ' AUTO_INCREMENT = ' . $maxId;
 
         $conn = $this->getEntityManager()->getConnection();
         $stmt = $conn->prepare($sql);

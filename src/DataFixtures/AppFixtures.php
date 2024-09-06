@@ -11,6 +11,7 @@ use Doctrine\ORM\Tools\SchemaTool;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\ObjectManager;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+
 /**
  * Pour insérer les données dans une base de données de test, exécutez la commande suivante :
  * php bin/console --env=test doctrine:fixtures:load
@@ -21,8 +22,7 @@ class AppFixtures extends Fixture
         private UserPasswordHasherInterface $passwordEncoder,
         private StringService $stringService,
         private ManagerRegistry $managerRegistry
-    )
-    {
+    ) {
         // Crée ou met à jour les tables de la base de données
         $this->updateSchema($this->managerRegistry->getManager());
     }

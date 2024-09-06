@@ -74,9 +74,9 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Index(columns: ['name_initial'], name: 'name_initial_aid_fulltext', flags: ['fulltext'])]
 #[ORM\Index(columns: ['description'], name: 'description_aid_fulltext', flags: ['fulltext'])]
 #[ORM\Index(columns: ['eligibility'], name: 'eligibility_aid_fulltext', flags: ['fulltext'])]
-#[ORM\Index(columns: ['name','description','eligibility'], name: 'synonym_aid_nde_fulltext', flags: ['fulltext'])]
-#[ORM\Index(columns: ['description','eligibility','project_examples'], name: 'synonym_aid_fulltext', flags: ['fulltext'])]
-#[ORM\Index(columns: ['name', 'name_initial', 'description','eligibility','project_examples'], name: 'synonym_aid_all_fulltext', flags: ['fulltext'])]
+#[ORM\Index(columns: ['name', 'description', 'eligibility'], name: 'synonym_aid_nde_fulltext', flags: ['fulltext'])]
+#[ORM\Index(columns: ['description', 'eligibility', 'project_examples'], name: 'synonym_aid_fulltext', flags: ['fulltext'])]
+#[ORM\Index(columns: ['name', 'name_initial', 'description', 'eligibility', 'project_examples'], name: 'synonym_aid_all_fulltext', flags: ['fulltext'])]
 #[ApiResource(
     operations: [
         new GetCollection(
@@ -107,7 +107,6 @@ use Symfony\Component\Validator\Constraints as Assert;
     paginationItemsPerPage: 30,
     paginationMaximumItemsPerPage: 100,
     paginationClientItemsPerPage: true
-    
 )]
 
 #[ApiFilter(AidTextFilter::class)]
@@ -151,7 +150,7 @@ class Aid // NOSONAR too much methods
         ['slug' => self::STATUS_MERGED, 'name' => 'Mergé'],
         ['slug' => self::STATUS_REVIEWABLE, 'name' => 'En revue'],
     ];
-    
+
     const APPROACHING_DEADLINE_DELTA = 30;  # days
 
     const SLUG_EUROPEAN = 'european';
@@ -164,7 +163,7 @@ class Aid // NOSONAR too much methods
     ];
 
     const MAX_NB_EXPORT_PDF = 20;
-    
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -573,7 +572,7 @@ class Aid // NOSONAR too much methods
     #[ORM\ManyToMany(targetEntity: Category::class, inversedBy: 'aids')]
     private Collection $categories;
 
-    #[ORM\ManyToMany(targetEntity: Keyword::class, inversedBy: 'aids', cascade:['persist'])]
+    #[ORM\ManyToMany(targetEntity: Keyword::class, inversedBy: 'aids', cascade: ['persist'])]
     private Collection $keywords;
 
     #[ApiProperty(
@@ -593,12 +592,12 @@ class Aid // NOSONAR too much methods
         ]
     )]
     #[Groups([self::API_GROUP_LIST, self::API_GROUP_ITEM])]
-    #[ORM\OneToMany(mappedBy: 'aid', targetEntity: AidFinancer::class, orphanRemoval: true, cascade:['persist'])]
+    #[ORM\OneToMany(mappedBy: 'aid', targetEntity: AidFinancer::class, orphanRemoval: true, cascade: ['persist'])]
     #[ORM\OrderBy(['position' => 'ASC'])]
     private Collection $aidFinancers;
 
     #[Groups([self::API_GROUP_LIST, self::API_GROUP_ITEM])]
-    #[ORM\OneToMany(mappedBy: 'aid', targetEntity: AidInstructor::class, orphanRemoval: true, cascade:['persist'])]
+    #[ORM\OneToMany(mappedBy: 'aid', targetEntity: AidInstructor::class, orphanRemoval: true, cascade: ['persist'])]
     #[ORM\OrderBy(['position' => 'ASC'])]
     private Collection $aidInstructors;
 
@@ -611,7 +610,7 @@ class Aid // NOSONAR too much methods
     #[ORM\OneToMany(mappedBy: 'aid', targetEntity: AidSuggestedAidProject::class)]
     private Collection $aidSuggestedAidProjects;
 
-    #[ORM\ManyToMany(targetEntity: Bundle::class, mappedBy: 'aids', cascade:['persist'])]
+    #[ORM\ManyToMany(targetEntity: Bundle::class, mappedBy: 'aids', cascade: ['persist'])]
     private Collection $bundles;
 
     #[ORM\ManyToMany(targetEntity: SearchPage::class, mappedBy: 'excludedAids')]
@@ -643,7 +642,7 @@ class Aid // NOSONAR too much methods
     #[ORM\OneToMany(mappedBy: 'aid', targetEntity: LogAidEligibilityTest::class)]
     #[ORM\JoinColumn(onDelete: DoctrineConstants::SET_NULL)]
     private Collection $logAidEligibilityTests;
-    
+
     /**
      * >Non Database Fields
      */
@@ -673,7 +672,7 @@ class Aid // NOSONAR too much methods
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $originUrlText = null;
 
-    #[ORM\ManyToMany(targetEntity: KeywordReference::class, inversedBy: 'aids', cascade:['persist'])]
+    #[ORM\ManyToMany(targetEntity: KeywordReference::class, inversedBy: 'aids', cascade: ['persist'])]
     private Collection $keywordReferences;
 
     #[Groups([self::API_GROUP_LIST, self::API_GROUP_ITEM])]
@@ -694,7 +693,7 @@ class Aid // NOSONAR too much methods
 
     #[ORM\ManyToMany(targetEntity: SanctuarizedField::class, mappedBy: 'aids')]
     private Collection $sanctuarizedFields;
-      
+
     #[ORM\Column(type: Types::ARRAY, nullable: true)]
     private ?array $importDatas = null;
 
@@ -704,9 +703,9 @@ class Aid // NOSONAR too much methods
     /**
      * @var Collection<int, ProjectReferenceMissing>
      */
-    #[ORM\ManyToMany(targetEntity: ProjectReferenceMissing::class, mappedBy: 'aids', cascade:['persist'])]
+    #[ORM\ManyToMany(targetEntity: ProjectReferenceMissing::class, mappedBy: 'aids', cascade: ['persist'])]
     private Collection $projectReferenceMissings;
-    
+
     /**
      * <Non Database Fields
      */
@@ -2048,33 +2047,35 @@ class Aid // NOSONAR too much methods
      * SPECIFIC
      */
 
-    public function isApproachingDeadline() : bool {
+    public function isApproachingDeadline(): bool
+    {
         $result = false;
 
         if ($this->getDateSubmissionDeadline()) {
             $today = new \DateTime(date('Y-m-d'));
             $interval = $this->getDateSubmissionDeadline()->diff($today);
-    
+
             if ($interval->days <= self::APPROACHING_DEADLINE_DELTA) {
                 $result = true;
             }
         }
-    
+
         return $result;
     }
 
-    public function getDaysBeforeDeadline() : int {
+    public function getDaysBeforeDeadline(): int
+    {
         $result = 0;
 
         if ($this->getDateSubmissionDeadline()) {
             $today = new \DateTime(date('Y-m-d'));
             $interval = $this->getDateSubmissionDeadline()->diff($today);
-    
+
             if ($interval->days <= self::APPROACHING_DEADLINE_DELTA) {
                 $result = $interval->days;
             }
         }
-    
+
         return $result;
     }
 
@@ -2186,7 +2187,7 @@ class Aid // NOSONAR too much methods
         return false;
     }
 
-    public function  hasCalendar() : bool
+    public function hasCalendar(): bool
     {
         if ($this->isOnGoing()) {
             return false;
@@ -2220,29 +2221,28 @@ class Aid // NOSONAR too much methods
     }
     public function getFinancersPublicOrCorporate(): string
     {
-        $corporate=false;
-        $public=false;
-        foreach($this->getAidFinancers() as $aidFinancers){
-            if($aidFinancers->getBacker() && $aidFinancers->getBacker()->isIsCorporate()){
-                $corporate=true;
-            }else{
-                $public=true;
+        $corporate = false;
+        $public = false;
+        foreach ($this->getAidFinancers() as $aidFinancers) {
+            if ($aidFinancers->getBacker() && $aidFinancers->getBacker()->isIsCorporate()) {
+                $corporate = true;
+            } else {
+                $public = true;
             }
         }
 
-        if($corporate && $public){
+        if ($corporate && $public) {
             return 'PORTEURS D\'AIDE PUBLIC ET PRIVÉ';
-        }elseif($corporate && !$public){
+        } elseif ($corporate && !$public) {
             return 'PORTEUR D\'AIDE PRIVÉ';
-        }elseif(!$corporate && $public){
+        } elseif (!$corporate && $public) {
             return 'PORTEUR D\'AIDE PUBLIC';
-        }else{
+        } else {
             return '';
         }
-
     }
 
-    public function getFinancers() : ArrayCollection
+    public function getFinancers(): ArrayCollection
     {
         $financers = new ArrayCollection();
         foreach ($this->getAidFinancers() as $aidFinancer) {
@@ -2255,8 +2255,8 @@ class Aid // NOSONAR too much methods
         $this->financers = $financers;
         return $this;
     }
-    
-    public function getInstructors() : ArrayCollection
+
+    public function getInstructors(): ArrayCollection
     {
         $instructors = new ArrayCollection();
         foreach ($this->getAidInstructors() as $aidInstructor) {
@@ -2270,11 +2270,13 @@ class Aid // NOSONAR too much methods
         return $this;
     }
 
-    public function getNbViews() : int {
+    public function getNbViews(): int
+    {
         return $this->nbViews;
     }
 
-    public function setNbViews(int $nbViews) : static {
+    public function setNbViews(int $nbViews): static
+    {
         $this->nbViews = $nbViews;
         return $this;
     }
@@ -2414,11 +2416,13 @@ class Aid // NOSONAR too much methods
         return $this;
     }
 
-    public function getUrl(): ?string {
+    public function getUrl(): ?string
+    {
         return $this->url;
     }
 
-    public function setUrl(?string $url): static {
+    public function setUrl(?string $url): static
+    {
         $this->url = $url;
         return $this;
     }
@@ -2569,7 +2573,7 @@ class Aid // NOSONAR too much methods
 
         return $this;
     }
-    
+
     public function getAidsFromGenericLive()
     {
         $aids = new ArrayCollection();
@@ -2698,7 +2702,7 @@ class Aid // NOSONAR too much methods
         }
         return $this;
     }
-    
+
     public function getImportDatas(): ?array
     {
         return $this->importDatas;

@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Controller\Admin\Filter\Reference;
 
 use App\Form\Admin\Filter\Reference\KeywordReferenceSuggestedAidFilterType;
@@ -27,7 +28,7 @@ class KeywordReferenceSuggestedAidFilter implements FilterInterface
         if (!$filterDataDto->getValue()) {
             return;
         }
-        $queryBuilder->andWhere($filterDataDto->getEntityAlias().'.aid = :aid');
+        $queryBuilder->andWhere($filterDataDto->getEntityAlias() . '.aid = :aid');
         $queryBuilder->setParameter('aid', $filterDataDto->getValue());
     }
 }

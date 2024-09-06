@@ -1,118 +1,136 @@
 {% extends 'admin/statistics/dashboard.html.twig' %}
 
 {% block date_range_form %}
-    {% include 'admin/statistics/_form_date_range.html.twig' %}
+	{% include 'admin/statistics/_form_date_range.html.twig' %}
 {% endblock date_range_form %}
 
 {% block stats_content %}
-<div id="cote-porteurs-panel" class="tab-pane fade show active" role="tabpanel" aria-labelledby="cote-porteurs">
-    <h3 class="mt-5">Côté Porteurs de projets :</h3>
-    <div class="d-flex">
-        <div class="card col">
-            <div class="card-body d-flex flex-column justify-content-between">
-                <h5 class="card-title">
-                    <a href="#">Nombre de nouveaux comptes</a>
-                </h5>
-                <div class="card-text fs-2">
-                    <p class="text-lg"><strong>{{ nbBeneficiaries|number_format(0, ',', ' ') }}</strong></p>
-                </div>
-            </div>
-        </div>
-        <div class="card col">
-            <div class="card-body d-flex flex-column justify-content-between">
-                <h5 class="card-title">
-                    <a href="#">Nombre de nouvelles structures</a>
-                </h5>
-                <div class="card-text fs-2">
-                    <p class="text-lg"><strong>{{ nbOrganizationWithBeneficiary|number_format(0, ',', ' ') }}</strong></p>
-                </div>
-            </div>
-        </div>
-        <div class="card col">
-            <div class="card-body d-flex flex-column justify-content-between">
-                <h5 class="card-title">
-                    <a href="#">Nombre de nouveaux projets</a>
-                </h5>
-                <div class="card-text fs-2">
-                    <p class="text-lg"><strong>{{ nbProjects|number_format(0, ',', ' ') }}</strong></p>
-                </div>
-            </div>
-        </div>
-        <div class="card col">
-            <div class="card-body d-flex flex-column justify-content-between">
-                <h5 class="card-title">
-                    <a href="#">Nombre d’aides ajoutées dans des projets</a>
-                </h5>
-                <div class="card-text fs-2">
-                    <p class="text-lg"><strong>{{ nbAidProjects|number_format(0, ',', ' ') }}</strong></p>
-                </div>
-            </div>
-        </div>
-    </div>
+	<div id="cote-porteurs-panel" class="tab-pane fade show active" role="tabpanel" aria-labelledby="cote-porteurs">
+		<h3 class="mt-5">Côté Porteurs de projets :</h3>
+		<div class="d-flex">
+			<div class="card col">
+				<div class="card-body d-flex flex-column justify-content-between">
+					<h5 class="card-title">
+						<a href="#">Nombre de nouveaux comptes</a>
+					</h5>
+					<div class="card-text fs-2">
+						<p class="text-lg">
+							<strong>{{ nbBeneficiaries|number_format(0, ',', ' ') }}</strong>
+						</p>
+					</div>
+				</div>
+			</div>
+			<div class="card col">
+				<div class="card-body d-flex flex-column justify-content-between">
+					<h5 class="card-title">
+						<a href="#">Nombre de nouvelles structures</a>
+					</h5>
+					<div class="card-text fs-2">
+						<p class="text-lg">
+							<strong>{{ nbOrganizationWithBeneficiary|number_format(0, ',', ' ') }}</strong>
+						</p>
+					</div>
+				</div>
+			</div>
+			<div class="card col">
+				<div class="card-body d-flex flex-column justify-content-between">
+					<h5 class="card-title">
+						<a href="#">Nombre de nouveaux projets</a>
+					</h5>
+					<div class="card-text fs-2">
+						<p class="text-lg">
+							<strong>{{ nbProjects|number_format(0, ',', ' ') }}</strong>
+						</p>
+					</div>
+				</div>
+			</div>
+			<div class="card col">
+				<div class="card-body d-flex flex-column justify-content-between">
+					<h5 class="card-title">
+						<a href="#">Nombre d’aides ajoutées dans des projets</a>
+					</h5>
+					<div class="card-text fs-2">
+						<p class="text-lg">
+							<strong>{{ nbAidProjects|number_format(0, ',', ' ') }}</strong>
+						</p>
+					</div>
+				</div>
+			</div>
+		</div>
 
-    <h3 class="mt-5">Côté Porteurs d’aides :</h3>
-    <div class="d-flex">
-        <div class="card col">
-            <div class="card-body d-flex flex-column justify-content-between">
-                <h5 class="card-title">
-                    <a href="#">Nombre de nouveaux comptes</a>
-                </h5>
-                <div class="card-text fs-2">
-                    <p class="text-lg"><strong>{{ nbContributors|number_format(0, ',', ' ') }}</strong></p>
-                </div>
-            </div>
-        </div>
-        <div class="card col">
-            <div class="card-body d-flex flex-column justify-content-between">
-                <h5 class="card-title">
-                    <a href="#">Nombre de nouvelles structures</a>
-                </h5>
-                <div class="card-text fs-2">
-                    <p class="text-lg"><strong>{{ nbOrganizationWithContributor|number_format(0, ',', ' ') }}</strong></p>
-                </div>
-            </div>
-        </div>
-        <div class="card col">
-            <div class="card-body d-flex flex-column justify-content-between">
-                <h5 class="card-title">
-                    <a href="#">Nombre de nouvelles aides publiées</a>
-                </h5>
-                <div class="card-text fs-2">
-                    <p class="text-lg"><strong>{{ nbAidsLive|number_format(0, ',', ' ') }}</strong></p>
-                </div>
-            </div>
-        </div>
-        <div class="card col">
-            <div class="card-body d-flex flex-column justify-content-between">
-                <h5 class="card-title">
-                    <a href="#">Nombre de nouveaux comptes porteurs de projets et d’aides</a>
-                </h5>
-                <div class="card-text fs-2">
-                    <p class="text-lg"><strong>{{ nbBeneficiariesAndContributors|number_format(0, ',', ' ') }}</strong></p>
-                </div>
-            </div>
-        </div>
-    </div>
+		<h3 class="mt-5">Côté Porteurs d’aides :</h3>
+		<div class="d-flex">
+			<div class="card col">
+				<div class="card-body d-flex flex-column justify-content-between">
+					<h5 class="card-title">
+						<a href="#">Nombre de nouveaux comptes</a>
+					</h5>
+					<div class="card-text fs-2">
+						<p class="text-lg">
+							<strong>{{ nbContributors|number_format(0, ',', ' ') }}</strong>
+						</p>
+					</div>
+				</div>
+			</div>
+			<div class="card col">
+				<div class="card-body d-flex flex-column justify-content-between">
+					<h5 class="card-title">
+						<a href="#">Nombre de nouvelles structures</a>
+					</h5>
+					<div class="card-text fs-2">
+						<p class="text-lg">
+							<strong>{{ nbOrganizationWithContributor|number_format(0, ',', ' ') }}</strong>
+						</p>
+					</div>
+				</div>
+			</div>
+			<div class="card col">
+				<div class="card-body d-flex flex-column justify-content-between">
+					<h5 class="card-title">
+						<a href="#">Nombre de nouvelles aides publiées</a>
+					</h5>
+					<div class="card-text fs-2">
+						<p class="text-lg">
+							<strong>{{ nbAidsLive|number_format(0, ',', ' ') }}</strong>
+						</p>
+					</div>
+				</div>
+			</div>
+			<div class="card col">
+				<div class="card-body d-flex flex-column justify-content-between">
+					<h5 class="card-title">
+						<a href="#">Nombre de nouveaux comptes porteurs de projets et d’aides</a>
+					</h5>
+					<div class="card-text fs-2">
+						<p class="text-lg">
+							<strong>{{ nbBeneficiariesAndContributors|number_format(0, ',', ' ') }}</strong>
+						</p>
+					</div>
+				</div>
+			</div>
+		</div>
 
-    <h3 class="mt-5">
-        <span aria-hidden="true">📍 </span>Inscriptions de nouvelles communes au cours des 10 dernières semaines :
-    </h3>
-    <div class="alert alert-info">
-        <p>Graphe permettant de représenter l’activité sur la plateforme des nouvelles communes inscrites.</p>
-    </div>
-    <div class="charts mt-5">
-        {{ render_chart(chartCommunes) }}
-    </div>
+		<h3 class="mt-5">
+			<span aria-hidden="true">📍
+			</span>Inscriptions de nouvelles communes au cours des 10 dernières semaines :
+		</h3>
+		<div class="alert alert-info">
+			<p>Graphe permettant de représenter l’activité sur la plateforme des nouvelles communes inscrites.</p>
+		</div>
+		<div class="charts mt-5">
+			{{ render_chart(chartCommunes) }}
+		</div>
 
 
-    <h3 class="mt-5">
-        <span aria-hidden="true">🗺 </span>Inscriptions de nouveaux EPCI au cours des 10 dernières semaines  :
-    </h3>
-    <div class="alert alert-info">
-        <p>Graphe permettant de représenter l’activité sur la plateforme des nouveaux EPCI inscrits.</p>
-    </div>
-    <div class="charts mt-5">
-        {{ render_chart(chartEpcis) }}
-    </div>
-</div>
+		<h3 class="mt-5">
+			<span aria-hidden="true">🗺
+			</span>Inscriptions de nouveaux EPCI au cours des 10 dernières semaines  :
+		</h3>
+		<div class="alert alert-info">
+			<p>Graphe permettant de représenter l’activité sur la plateforme des nouveaux EPCI inscrits.</p>
+		</div>
+		<div class="charts mt-5">
+			{{ render_chart(chartEpcis) }}
+		</div>
+	</div>
 {% endblock stats_content %}

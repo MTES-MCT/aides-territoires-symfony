@@ -29,9 +29,8 @@ class ExportToSibCommand extends Command
         protected ManagerRegistry $managerRegistry,
         protected ParamService $paramService,
         protected EmailService $emailService
-    )
-    {
-        ini_set('max_execution_time', 60*60);
+    ) {
+        ini_set('max_execution_time', 60 * 60);
         ini_set('memory_limit', '1G');
         parent::__construct();
     }
@@ -44,7 +43,7 @@ class ExportToSibCommand extends Command
         $io = new SymfonyStyle($input, $output);
         $io->title($this->commandTextStart);
 
-        try  {
+        try {
             if ($this->kernelInterface->getEnvironment() != 'prod') {
                 $io->info('Uniquement en prod');
                 return Command::FAILURE;
@@ -135,7 +134,7 @@ class ExportToSibCommand extends Command
             // envoi un mail à l'admin
             $this->emailService->sendEmail(
                 $this->paramService->get('email_super_admin'),
-                $nbError. ' utilisateurs non envoyés à SIB',
+                $nbError . ' utilisateurs non envoyés à SIB',
                 'emails/cron/user/errors_export_sib.html.twig',
                 [
                     'errors' => $errors,
@@ -144,7 +143,7 @@ class ExportToSibCommand extends Command
         }
 
         // success
-        $io->success('Envoi de '.count($users).' à l\'api. OK : '.$nbOk.' / Erreur : '.$nbError);
+        $io->success('Envoi de ' . count($users) . ' à l\'api. OK : ' . $nbOk . ' / Erreur : ' . $nbError);
         $io->success('Mémoire maximale utilisée : ' . round(memory_get_peak_usage() / 1024 / 1024) . ' MB');
     }
 }

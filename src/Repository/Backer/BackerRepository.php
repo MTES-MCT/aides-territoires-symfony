@@ -36,14 +36,14 @@ class BackerRepository extends ServiceEntityRepository
     public static function activeCriteria($alias = 'b.'): Criteria
     {
         return Criteria::create()
-            ->andWhere(Criteria::expr()->eq($alias.'active', true))
+            ->andWhere(Criteria::expr()->eq($alias . 'active', true))
         ;
     }
 
     public static function unactiveCriteria($alias = 'b.'): Criteria
     {
         return Criteria::create()
-            ->andWhere(Criteria::expr()->eq($alias.'active', false))
+            ->andWhere(Criteria::expr()->eq($alias . 'active', false))
         ;
     }
 
@@ -75,7 +75,7 @@ class BackerRepository extends ServiceEntityRepository
             ->innerJoin('perimeter.perimetersFrom', 'perimetersFrom')
             ->andWhere('(perimeter.id = :id OR perimetersFrom.id = :id)')
             ->setParameter('id', $params['id'])
-            ;
+        ;
 
         return $queryBuilder->getQuery()->getResult()[0]['nb'] ?? 0;
     }
@@ -100,74 +100,72 @@ class BackerRepository extends ServiceEntityRepository
             $qb
                 ->addCriteria(self::unactiveCriteria());
         }
-        
+
         $qb
             ->innerJoin('b.aidFinancers', 'aidFinancers')
             ->innerJoin('aidFinancers.aid', 'aid')
             // aid live
             ->addCriteria(AidRepository::liveCriteria('aid.'))
-            ;
-            if ($perimeterFrom instanceof Perimeter && $perimeterFrom->getId()) {
-                $ids = $this->getEntityManager()->getRepository(Perimeter::class)->getIdPerimetersContainedIn(array('perimeter' => $perimeterFrom));
-                $ids[] = $perimeterFrom->getId();
-    
-                $qb
+        ;
+        if ($perimeterFrom instanceof Perimeter && $perimeterFrom->getId()) {
+            $ids = $this->getEntityManager()->getRepository(Perimeter::class)->getIdPerimetersContainedIn(['perimeter' => $perimeterFrom]);
+            $ids[] = $perimeterFrom->getId();
+
+            $qb
                 ->innerJoin('b.perimeter', 'perimeter')
                 ->andWhere('perimeter.id IN (:ids)')
                 ->setParameter('ids', $ids)
-                ;
-            }
-            
+            ;
+        }
 
-            if ($organizationType instanceof OrganizationType && $organizationType->getId()) {
-                $qb
-                    ->innerJoin('aid.aidAudiences', 'aidAudiences')
-                    ->andWhere('aidAudiences = :organizationType')
-                    ->setParameter('organizationType', $organizationType)
-                ;
-            }
 
-            if ($aidTypeGroup instanceof AidTypeGroup && $aidTypeGroup->getId()) {
-                $qb
-                    ->innerJoin('aid.aidTypes', 'aidTypes')
-                    ->andWhere('aidTypes.aidTypeGroup = :aidTypeGroup')
-                    ->setParameter('aidTypeGroup', $aidTypeGroup)
-                    ;
-            }
+        if ($organizationType instanceof OrganizationType && $organizationType->getId()) {
+            $qb
+                ->innerJoin('aid.aidAudiences', 'aidAudiences')
+                ->andWhere('aidAudiences = :organizationType')
+                ->setParameter('organizationType', $organizationType)
+            ;
+        }
 
-            if (is_array($categoryIds) && count($categoryIds) > 0) {
-                $qb
-                    ->innerJoin('aid.categories', 'categories')
-                    ->andWhere('categories.id IN (:categoryIds)')
-                    ->setParameter('categoryIds', $categoryIds)
-                    ;
-            }
+        if ($aidTypeGroup instanceof AidTypeGroup && $aidTypeGroup->getId()) {
+            $qb
+                ->innerJoin('aid.aidTypes', 'aidTypes')
+                ->andWhere('aidTypes.aidTypeGroup = :aidTypeGroup')
+                ->setParameter('aidTypeGroup', $aidTypeGroup)
+            ;
+        }
 
-            if (is_array($perimeterScales)) {
-                $qb
-                    ->andWhere('perimeter.scale IN (:perimeterScales)')
-                    ->setParameter('perimeterScales', $perimeterScales)
-                ;
-            }
+        if (is_array($categoryIds) && count($categoryIds) > 0) {
+            $qb
+                ->innerJoin('aid.categories', 'categories')
+                ->andWhere('categories.id IN (:categoryIds)')
+                ->setParameter('categoryIds', $categoryIds)
+            ;
+        }
 
-            if ($backerCategory instanceof BackerCategory && $backerCategory->getId())
-            {
-                $qb
-                    ->innerJoin('b.backerGroup', 'backerGroup')
-                    ->innerJoin('backerGroup.backerSubCategory', 'backerSubCategory')
-                    ->innerJoin('backerSubCategory.backerCategory', 'backerCategory')
-                    ->andWhere('backerCategory = :backerCategory')
-                    ->setParameter('backerCategory', $backerCategory)
-                ;
-            }
+        if (is_array($perimeterScales)) {
+            $qb
+                ->andWhere('perimeter.scale IN (:perimeterScales)')
+                ->setParameter('perimeterScales', $perimeterScales)
+            ;
+        }
 
-            if ($orderBy !== null) {
-                $qb
-                    ->addOrderBy($orderBy['sort'], $orderBy['order'])
-                ;
-            }
+        if ($backerCategory instanceof BackerCategory && $backerCategory->getId()) {
+            $qb
+                ->innerJoin('b.backerGroup', 'backerGroup')
+                ->innerJoin('backerGroup.backerSubCategory', 'backerSubCategory')
+                ->innerJoin('backerSubCategory.backerCategory', 'backerCategory')
+                ->andWhere('backerCategory = :backerCategory')
+                ->setParameter('backerCategory', $backerCategory)
+            ;
+        }
 
-            return $qb->getQuery()->getResult();
+        if ($orderBy !== null) {
+            $qb
+                ->addOrderBy($orderBy['sort'], $orderBy['order']);
+        }
+
+        return $qb->getQuery()->getResult();
     }
 
     public function countWithAids(array $params = null): int
@@ -184,30 +182,30 @@ class BackerRepository extends ServiceEntityRepository
     }
 
 
-    public function countCustom(array $params = null) : int {
+    public function countCustom(array $params = null): int
+    {
         $qb = $this->getQueryBuilder($params);
 
         $qb->select('IFNULL(COUNT(DISTINCT(b.id)), 0) AS nb');
         return $qb->getQuery()->getResult()[0]['nb'] ?? 0;
     }
 
-    public function findAidLive(array $params = null) : array
+    public function findAidLive(array $params = null): array
     {
         $perimeter = $params['perimeter'] ?? null;
 
         $qb = $this->createQueryBuilder('b')
-        ->innerJoin('b.aidFinancers', 'aidFinancers')
-        ->innerJoin('aidFinancers.aid', 'aid')
-        ->innerJoin('aid.aidTypes', 'aidTypes')
-        ->innerJoin('aidTypes.aidTypeGroup', 'aidTypeGroup')
-        ->andWhere('aid.status = :statusPublished')
-        ->setParameter('statusPublished', Aid::STATUS_PUBLISHED)
-        ->andWhere('(aid.dateStart <= :today OR aid.dateStart IS NULL)')
-        ->andWhere('(aid.dateSubmissionDeadline > :today OR aid.dateSubmissionDeadline IS NULL)')
-        ->setParameter('today', new \DateTime(date('Y-m-d')))
-        ->andWhere('b = :backer')
-        ->setParameter('backer', $params['backer'])
-        ;
+            ->innerJoin('b.aidFinancers', 'aidFinancers')
+            ->innerJoin('aidFinancers.aid', 'aid')
+            ->innerJoin('aid.aidTypes', 'aidTypes')
+            ->innerJoin('aidTypes.aidTypeGroup', 'aidTypeGroup')
+            ->andWhere('aid.status = :statusPublished')
+            ->setParameter('statusPublished', Aid::STATUS_PUBLISHED)
+            ->andWhere('(aid.dateStart <= :today OR aid.dateStart IS NULL)')
+            ->andWhere('(aid.dateSubmissionDeadline > :today OR aid.dateSubmissionDeadline IS NULL)')
+            ->setParameter('today', new \DateTime(date('Y-m-d')))
+            ->andWhere('b = :backer')
+            ->setParameter('backer', $params['backer']);
 
         if ($perimeter instanceof Perimeter && $perimeter->getId()) {
             $qb
@@ -219,29 +217,29 @@ class BackerRepository extends ServiceEntityRepository
         }
 
         return $qb
-        ->getQuery()
-        ->getResult()
+            ->getQuery()
+            ->getResult()
         ;
     }
 
-    public function findAidFinancersFinancial(array $params = null) : array
+    public function findAidFinancersFinancial(array $params = null): array
     {
         return $this->createQueryBuilder('b')
-        ->innerJoin('b.aidFinancers', 'aidFinancers')
-        ->innerJoin('aidFinancers.aid', 'aid')
-        ->innerJoin('aid.aidTypes', 'aidTypes')
-        ->innerJoin('aidTypes.aidTypeGroup', 'aidTypeGroup')
-        ->andWhere('aid.status = :statusPublished')
-        ->setParameter('statusPublished', Aid::STATUS_PUBLISHED)
-        ->andWhere('(aid.dateStart <= :today OR aid.dateStart IS NULL)')
-        ->andWhere('(aid.dateSubmissionDeadline > :today OR aid.dateSubmissionDeadline IS NULL)')
-        ->setParameter('today', new \DateTime(date('Y-m-d')))
-        ->andWhere('aidTypeGroup.slug IN (:slugsFinancial)')
-        ->setParameter('slugsFinancial', AidType::TYPE_FINANCIAL_SLUGS)
-        ->andWhere('b = :backer')
-        ->setParameter('backer', $params['backer'])
-        ->getQuery()
-        ->getResult()
+            ->innerJoin('b.aidFinancers', 'aidFinancers')
+            ->innerJoin('aidFinancers.aid', 'aid')
+            ->innerJoin('aid.aidTypes', 'aidTypes')
+            ->innerJoin('aidTypes.aidTypeGroup', 'aidTypeGroup')
+            ->andWhere('aid.status = :statusPublished')
+            ->setParameter('statusPublished', Aid::STATUS_PUBLISHED)
+            ->andWhere('(aid.dateStart <= :today OR aid.dateStart IS NULL)')
+            ->andWhere('(aid.dateSubmissionDeadline > :today OR aid.dateSubmissionDeadline IS NULL)')
+            ->setParameter('today', new \DateTime(date('Y-m-d')))
+            ->andWhere('aidTypeGroup.slug IN (:slugsFinancial)')
+            ->setParameter('slugsFinancial', AidType::TYPE_FINANCIAL_SLUGS)
+            ->andWhere('b = :backer')
+            ->setParameter('backer', $params['backer'])
+            ->getQuery()
+            ->getResult()
         ;
     }
     public function findSelectedForHome(array $params = null): array
@@ -279,17 +277,15 @@ class BackerRepository extends ServiceEntityRepository
         $nbAidsLiveMin = $params['nbAidsLiveMin'] ?? null;
         $backerGroup = $params['backerGroup'] ?? null;
         $orderBy = (isset($params['orderBy']) && isset($params['orderBy']['sort']) && isset($params['orderBy']['order'])) ? $params['orderBy'] : null;
-        
+
         $qb = $this->createQueryBuilder('b');
 
         if ($active === true) {
             $qb
-                ->addCriteria(BackerRepository::activeCriteria())
-            ;
+                ->addCriteria(BackerRepository::activeCriteria());
         } elseif ($active === false) {
             $qb
-                ->addCriteria(BackerRepository::unactiveCriteria())
-            ;
+                ->addCriteria(BackerRepository::unactiveCriteria());
         }
 
         if ($nbAidsLiveMin !== null) {
@@ -301,22 +297,21 @@ class BackerRepository extends ServiceEntityRepository
 
         if ($hasLogo === true) {
             $qb
-                ->andWhere('b.logo IS NOT NULL')
-            ;
+                ->andWhere('b.logo IS NOT NULL');
         }
 
         if ($isSpotlighted === true) {
             $qb
                 ->andWhere('b.isSpotlighted = :isSpotlighted')
                 ->setParameter('isSpotlighted', true)
-                ;
+            ;
         }
 
         if ($nameLike !== null) {
             $qb
                 ->andWhere('b.name LIKE :nameLike')
-                ->setParameter('nameLike', '%'.$nameLike.'%')
-                ;
+                ->setParameter('nameLike', '%' . $nameLike . '%')
+            ;
         }
 
         if ($hasFinancedAids !== null) {
@@ -336,14 +331,14 @@ class BackerRepository extends ServiceEntityRepository
                     ->innerJoin('b.aidFinancers', 'aidFinancersForHasPublishedFinancedAids')
                     ->innerJoin('aidFinancersForHasPublishedFinancedAids.aid', 'aidForHasPublishedFinancedAids')
                     ->addCriteria(AidRepository::liveCriteria('aidForHasPublishedFinancedAids.'))
-                    ;
+                ;
             } else {
                 $qb
                     ->leftJoin('b.aidFinancers', 'aidFinancersForHasPublishedFinancedAids')
                     ->leftJoin('aidFinancersForHasPublishedFinancedAids.aid', 'aidForHasPublishedFinancedAids')
                     ->addCriteria(AidRepository::liveCriteria('aidForHasPublishedFinancedAids.'))
                     ->andWhere('aidForHasPublishedFinancedAids.id IS NULL')
-                    ;
+                ;
             }
         }
 
@@ -375,12 +370,11 @@ class BackerRepository extends ServiceEntityRepository
         return $qb;
     }
 
-    public function getPrograms(int $backer_id){
-        
+    public function getPrograms(int $backer_id)
+    {
     }
 
-    public function getCategories(int $backer_id){
-
+    public function getCategories(int $backer_id)
+    {
     }
-
 }

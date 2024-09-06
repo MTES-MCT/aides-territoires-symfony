@@ -33,8 +33,7 @@ class HomeController extends FrontController
         StringService $stringService,
         AidSearchFormService $aidSearchFormService,
         LogEventRepository $logEventRepository
-    ): Response
-    {
+    ): Response {
         $formAidSearch = $this->createForm(
             AidSearchTypeV2::class,
             $aidSearchFormService->getAidSearchClass(),
@@ -89,7 +88,7 @@ class HomeController extends FrontController
                 'backers_count' => $county->getBackersCount()
             ];
         }
-    
+
         // nb aides
         $nbAids = $logEventRepository->getLatestSiteCountAidLives();
 

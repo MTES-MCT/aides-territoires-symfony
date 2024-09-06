@@ -1,151 +1,176 @@
 {% set aidUrlParams = {'slug': aid.slug} %}
 {% if integration is defined %}
-    {% set aidUrlParams = aidUrlParams|merge({'integration': 'integration'}) %}
+	{% set aidUrlParams = aidUrlParams|merge({'integration': 'integration'}) %}
 {% endif %}
 
 <div class="fr-card fr-enlarge-link  fr-card--grey">
-    <div class="fr-card__body">
-        <div class="fr-card__content">
-            <div class="badges-wrapper">
-                {% set maxDisplay = 2 %}
-                {% set totalProjectReferences = aid.projectReferences|length %}
-                {% set projectReferencesDisplayed = [] %}
-                {% set count = 0 %}
-                {% for projectReference in aid.projectReferencesSearched %}
-                    {% if count < maxDisplay %}
-                        <span class="fr-badge fr-badge--sm fr-badge--success fr-badge--no-icon">{{ projectReference.name }}</span>
-                        {% set count = count + 1 %}
-                    {% endif %}
-                    {% set projectReferencesDisplayed = projectReferencesDisplayed|merge([projectReference]) %}
-                {% endfor %}
-                {% for projectReference in aid.projectReferences %}
-                    {% if projectReference not in aid.projectReferencesSearched and count < maxDisplay %}
-                        <span class="fr-badge fr-badge--sm fr-badge--new fr-badge--no-icon">{{ projectReference.name }}</span>
-                        {% set projectReferencesDisplayed = projectReferencesDisplayed|merge([projectReference]) %}
-                        {% set count = count + 1 %}
-                    {% endif %}
-                {% endfor %}
-                {% if totalProjectReferences > maxDisplay %}
-                    {% set titleOthers = '' %}
-                    {% for projectReference in aid.projectReferences %}
-                        {% if projectReference not in projectReferencesDisplayed %}
-                            {% set titleOthers = titleOthers ~ projectReference.name ~ ', ' %}
-                        {% endif %}
-                    {% endfor %}
-                    <span class="fr-badge fr-badge--sm fr-badge--new fr-badge--no-icon" title="{{ titleOthers }}">+{{ totalProjectReferences - maxDisplay }} {% if totalProjectReferences - maxDisplay > 1 %}autres projets{% else %}autre projet{% endif %}</span>
-                {% endif %}
-            </div>
+	<div class="fr-card__body">
+		<div class="fr-card__content">
+			<div class="badges-wrapper">
+				{% set maxDisplay = 2 %}
+				{% set totalProjectReferences = aid.projectReferences|length %}
+				{% set projectReferencesDisplayed = [] %}
+				{% set count = 0 %}
+				{% for projectReference in aid.projectReferencesSearched %}
+					{% if count < maxDisplay %}
+						<span class="fr-badge fr-badge--sm fr-badge--success fr-badge--no-icon">{{ projectReference.name }}</span>
+						{% set count = count + 1 %}
+					{% endif %}
+					{% set projectReferencesDisplayed = projectReferencesDisplayed|merge([projectReference]) %}
+				{% endfor %}
+				{% for projectReference in aid.projectReferences %}
+					{% if projectReference not in aid.projectReferencesSearched and count < maxDisplay %}
+						<span class="fr-badge fr-badge--sm fr-badge--new fr-badge--no-icon">{{ projectReference.name }}</span>
+						{% set projectReferencesDisplayed = projectReferencesDisplayed|merge([projectReference]) %}
+						{% set count = count + 1 %}
+					{% endif %}
+				{% endfor %}
+				{% if totalProjectReferences > maxDisplay %}
+					{% set titleOthers = '' %}
+					{% for projectReference in aid.projectReferences %}
+						{% if projectReference not in projectReferencesDisplayed %}
+							{% set titleOthers = titleOthers ~ projectReference.name ~ ', ' %}
+						{% endif %}
+					{% endfor %}
+					<span class="fr-badge fr-badge--sm fr-badge--new fr-badge--no-icon" title="{{ titleOthers }}">+{{ totalProjectReferences - maxDisplay }}
+						{% if totalProjectReferences - maxDisplay > 1 %}autres projets{% else %}autre projet
+						{% endif %}
+					</span>
+				{% endif %}
+			</div>
 
-            <h2 class="fr-card__title fr-mb-1w">
-                {% if aid.isApproachingDeadline %}
-                    <span class="deadline deadline-delta fr-tag">J-{{ aid.daysBeforeDeadline }}</span>
-                {% endif %}
+			<h2 class="fr-card__title fr-mb-1w">
+				{% if aid.isApproachingDeadline %}
+					<span class="deadline deadline-delta fr-tag">J-{{ aid.daysBeforeDeadline }}</span>
+				{% endif %}
 
-                {% if aid.perimeter and aid.perimeter.code == "PVD" %}
-                    <span class="deadline deadline-delta fr-tag"><span class="fr-icon-flashlight-line fr-icon--sm" aria-hidden="true"></span>Spécifique PVD</span>
-                {% endif %}
+				{% if aid.perimeter and aid.perimeter.code == "PVD" %}
+					<span class="deadline deadline-delta fr-tag">
+						<span class="fr-icon-flashlight-line fr-icon--sm" aria-hidden="true"></span>Spécifique PVD</span>
+				{% endif %}
 
-                <a class="fr-card__link highlightable" href="{{ path('app_aid_aid_details', aidUrlParams) }}" title="Voir l'aide">
-                    {% if aid.europeanAid %}<span title="aide européenne" aria-hidden="true">🇪🇺 </span>{% endif %}{{ aid.name }} {% if app.user and app.user and isUserGranted(app.user, constant('App\\Entity\\User\\User::ROLE_ADMIN')) %}(st: {{ aid.scoreTotal}}, so: {{ aid.scoreObjects}}){% endif %}
-                </a>
-            </h2>
-            <div class="fr-card__desc">
-                {% if aid.isIsCharged %}
-                <span class="fr-tag at-color--text-inverted-blue-france background-blue"><span class="ri-error-warning-line ri-xl at-icon-align--sub fr-mr-1w" aria-hidden="true"></span><strong>Aide payante</strong></span>
-                {% endif %}
+				<a class="fr-card__link highlightable" href="{{ path('app_aid_aid_details', aidUrlParams) }}" title="Voir l'aide">
+					{% if aid.europeanAid %}
+						<span title="aide européenne" aria-hidden="true">🇪🇺
+						</span>
+					{% endif %}
+					{{ aid.name }}
+					{% if app.user and app.user and isUserGranted(app.user, constant('App\\Entity\\User\\User::ROLE_ADMIN')) %}(st:
+						{{ aid.scoreTotal}}, so:
+						{{ aid.scoreObjects}})
+					{% endif %}
+				</a>
+			</h2>
+			<div class="fr-card__desc">
+				{% if aid.isIsCharged %}
+					<span class="fr-tag at-color--text-inverted-blue-france background-blue">
+						<span class="ri-error-warning-line ri-xl at-icon-align--sub fr-mr-1w" aria-hidden="true"></span>
+						<strong>Aide payante</strong>
+					</span>
+				{% endif %}
 
-                {% if aid.aidFinancers %}
-                    <h3 class="fr-mb-1w fr-mt-3w fr-text--lg at-text--bold at-uppercase">
-                        <span class="ri-hand-coin-line ri-xl at-color--blue at-icon-align--sub fr-mr-1w" aria-hidden="true"></span>
-                        Porteur{% if aid.aidFinancers|length > 1 %}s{% endif %} d’aides
-                    </h3>
-                    <ul class="financers fr-p-0">
-                    {% set maxDisplay = 3 %}
-                    {% set totalFinancers = aid.aidFinancers|length %}
-                    {% for financer in aid.aidFinancers|slice(0, maxDisplay) %}
-                        <li class="fr-list__none">
-                            {{ financer.backer.name }}
-                            {% if financer.backer.isCorporate %}
-                                (Privé)
-                            {% endif %}
-                        </li>
-                    {% endfor %}
-                    {% if totalFinancers > maxDisplay %}
-                        <li class="fr-list__none">+{{ totalFinancers - maxDisplay }} autres</li>
-                    {% endif %}
-                    </ul>
-                {% endif %}
+				{% if aid.aidFinancers %}
+					<h3 class="fr-mb-1w fr-mt-3w fr-text--lg at-text--bold at-uppercase">
+						<span class="ri-hand-coin-line ri-xl at-color--blue at-icon-align--sub fr-mr-1w" aria-hidden="true"></span>
+						Porteur
+						{% if aid.aidFinancers|length > 1 %}s
+						{% endif %}
+						d’aides
+					</h3>
+					<ul class="financers fr-p-0">
+						{% set maxDisplay = 3 %}
+						{% set totalFinancers = aid.aidFinancers|length %}
+						{% for financer in aid.aidFinancers|slice(0, maxDisplay) %}
+							<li class="fr-list__none">
+								{{ financer.backer.name }}
+								{% if financer.backer.isCorporate %}
+									(Privé)
+								{% endif %}
+							</li>
+						{% endfor %}
+						{% if totalFinancers > maxDisplay %}
+							<li class="fr-list__none">+{{ totalFinancers - maxDisplay }}
+								autres</li>
+						{% endif %}
+					</ul>
+				{% endif %}
 
-                {% if aid.isFinancial or aid.isTechnical %}
-                    <h3 class="fr-mb-1w fr-mt-3w fr-text--lg at-text--bold at-uppercase">
-                        <span class="ri-settings-5-fill ri-xl at-color--blue at-icon-align--sub fr-mr-1w" aria-hidden="true"></span>
-                        Nature de l’aide
-                    </h3>
-                    <ul class="fr-p-0">
-                        {% if aid.isFinancial %}
-                        <li class="fr-list__none">
-                            Aide financière
-                        </li>
-                        {% endif %}
-                        {% if aid.isTechnical %}
-                        <li class="fr-list__none">
-                            Aide en ingénierie
-                        </li>
-                        {% endif %}
-                    </ul>
-                {% endif %}
+				{% if aid.isFinancial or aid.isTechnical %}
+					<h3 class="fr-mb-1w fr-mt-3w fr-text--lg at-text--bold at-uppercase">
+						<span class="ri-settings-5-fill ri-xl at-color--blue at-icon-align--sub fr-mr-1w" aria-hidden="true"></span>
+						Nature de l’aide
+					</h3>
+					<ul class="fr-p-0">
+						{% if aid.isFinancial %}
+							<li class="fr-list__none">
+								Aide financière
+							</li>
+						{% endif %}
+						{% if aid.isTechnical %}
+							<li class="fr-list__none">
+								Aide en ingénierie
+							</li>
+						{% endif %}
+					</ul>
+				{% endif %}
 
-                {% if aid.subventionRateMin or aid.subventionRateMax %}
-                    <h3 class="fr-mb-1w fr-mt-3w fr-text--lg at-text--bold at-uppercase">
-                        <span class="ri-percent-line ri-xl at-color--blue at-icon-align--sub fr-mr-1w" aria-hidden="true"></span>
-                        Taux de subvention
-                    </h3>
-                    <ul class="fr-p-0">
-                        {% if aid.subventionRateMin %}
-                            <li class="fr-list__none"><strong>Min :</strong> {{ aid.subventionRateMin }}%</li>
-                        {% endif %}
-                        {% if aid.subventionRateMax %}
-                            <li class="fr-list__none"><strong>Max :</strong> {{ aid.subventionRateMax }}%</li>
-                        {% endif %}
-                    </ul>
-                {% endif %}
+				{% if aid.subventionRateMin or aid.subventionRateMax %}
+					<h3 class="fr-mb-1w fr-mt-3w fr-text--lg at-text--bold at-uppercase">
+						<span class="ri-percent-line ri-xl at-color--blue at-icon-align--sub fr-mr-1w" aria-hidden="true"></span>
+						Taux de subvention
+					</h3>
+					<ul class="fr-p-0">
+						{% if aid.subventionRateMin %}
+							<li class="fr-list__none">
+								<strong>Min :</strong>
+								{{ aid.subventionRateMin }}%</li>
+						{% endif %}
+						{% if aid.subventionRateMax %}
+							<li class="fr-list__none">
+								<strong>Max :</strong>
+								{{ aid.subventionRateMax }}%</li>
+						{% endif %}
+					</ul>
+				{% endif %}
 
-                {% if aid.aidRecurrence %}
-                    <h3 class="fr-mb-1w fr-mt-3w fr-text--lg at-text--bold at-uppercase">
-                        <span class="ri-refresh-line ri-xl at-color--blue at-icon-align--sub fr-mr-1w" aria-hidden="true"></span>
-                        Récurrence
-                    </h3>
-                    <ul class="fr-p-0">
-                        <li class="fr-list__none">{{ aid.aidRecurrence.name }}</li>
-                    </ul>
-                {% endif %}
+				{% if aid.aidRecurrence %}
+					<h3 class="fr-mb-1w fr-mt-3w fr-text--lg at-text--bold at-uppercase">
+						<span class="ri-refresh-line ri-xl at-color--blue at-icon-align--sub fr-mr-1w" aria-hidden="true"></span>
+						Récurrence
+					</h3>
+					<ul class="fr-p-0">
+						<li class="fr-list__none">{{ aid.aidRecurrence.name }}</li>
+					</ul>
+				{% endif %}
 
-                {% if aid.hasCalendar %}
-                    <h3 class="fr-mb-1w fr-mt-3w fr-text--lg at-text--bold at-uppercase">
-                        <span class="ri-calendar-2-fill ri-xl at-color--blue at-icon-align--sub fr-mr-1w" aria-hidden="true"></span>
-                        Calendrier
-                    </h3>
-                    <ul class="fr-p-0">
-                    {% if aid.isComingSoon %}
-                    <li class="fr-list__none" id="coming-soon">Ouverture prochaine de l’aide !</li>
-                    {% endif %}
-                    {% if aid.dateStart %}
-                        <li class="fr-list__none">Ouverture : {{ aid.dateStart|date('d/m/Y') }}</li>
-                    {% endif %}
-                    {% if aid.dateSubmissionDeadline %}
-                        <li class="fr-list__none">Échéance : {{ aid.dateSubmissionDeadline|date('d/m/Y') }}</li>
-                    {% endif %}
-                    </ul>
-                {% endif %}
+				{% if aid.hasCalendar %}
+					<h3 class="fr-mb-1w fr-mt-3w fr-text--lg at-text--bold at-uppercase">
+						<span class="ri-calendar-2-fill ri-xl at-color--blue at-icon-align--sub fr-mr-1w" aria-hidden="true"></span>
+						Calendrier
+					</h3>
+					<ul class="fr-p-0">
+						{% if aid.isComingSoon %}
+							<li class="fr-list__none" id="coming-soon">Ouverture prochaine de l’aide !</li>
+						{% endif %}
+						{% if aid.dateStart %}
+							<li class="fr-list__none">Ouverture :
+								{{ aid.dateStart|date('d/m/Y') }}</li>
+						{% endif %}
+						{% if aid.dateSubmissionDeadline %}
+							<li class="fr-list__none">Échéance :
+								{{ aid.dateSubmissionDeadline|date('d/m/Y') }}</li>
+						{% endif %}
+					</ul>
+				{% endif %}
 
-                {% if aid.eligibilityTest %}
-                    <div class="eligibility-badge fr-btn">
-                        <a href="{{ path('app_aid_aid_details', aidUrlParams) }}" title="Voir l'aide">
-                            Test d’éligibilité disponible
-                        </a>
-                    </div>
-                {% endif %}
-            </div>
-        </div>
-    </div>
+				{% if aid.eligibilityTest %}
+					<div class="eligibility-badge fr-btn">
+						<a href="{{ path('app_aid_aid_details', aidUrlParams) }}" title="Voir l'aide">
+							Test d’éligibilité disponible
+						</a>
+					</div>
+				{% endif %}
+			</div>
+		</div>
+	</div>
 </div>

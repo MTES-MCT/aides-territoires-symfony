@@ -29,7 +29,7 @@ class BackerAssociationType extends AbstractType
             ->add('entityFqcn', HiddenType::class)
             ->add('batchActionUrl', HiddenType::class)
             ->add('batchActionCsrfToken', HiddenType::class)
-            ;
+        ;
     }
 
     public function configureOptions(OptionsResolver $resolver): void

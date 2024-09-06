@@ -19,8 +19,7 @@ class AidProjectDeleteType extends AbstractType
     public function __construct(
         protected UserService $userService,
         protected ManagerRegistry $managerRegistry
-    )
-    {
+    ) {
     }
 
 

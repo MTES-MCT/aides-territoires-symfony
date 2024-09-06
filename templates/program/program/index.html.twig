@@ -1,35 +1,37 @@
 {% extends 'base.html.twig' %}
 
 {% block javascripts %}
-    {{ parent() }}
-    {{ encore_entry_script_tags('front/program/index') }}
+	{{ parent() }}
+	{{ encore_entry_script_tags('front/program/index') }}
 {% endblock %}
 
-{% block title %}Tous les programmes d’aides | Aides-territoires{% endblock %}
+{% block title %}Tous les programmes d’aides | Aides-territoires
+{% endblock %}
 
-{% block meta_description %}Trouvez des aides pour financer et accompagner les projets de votre collectivité en France métropolitaine et en Outre-mer{% endblock %}
+{% block meta_description %}Trouvez des aides pour financer et accompagner les projets de votre collectivité en France métropolitaine et en Outre-mer
+{% endblock %}
 
 
 {% block body %}
-<section id="program-list" class="fr-container fr-mb-5w fr-pb-5w">
-    <div>
-        <div class="fr-grid-row fr-grid-row--center">
-            <div class="fr-col-xs-12 fr-col-md-8">
-                <h1>
-                    Tous les programmes d’aides
-                </h1>
-            </div>
-            <div class="fr-col-xs-12 fr-col-md-4">
-                <input type="text" id="search" class="fr-input" placeholder="Filtrer par nom">
-            </div>
-        </div>
-        <div class="program-list fr-grid-row">
-            {% for program in programs %}
-            <div class="fr-col-xs-12 fr-col-md-4 fr-p-3w">
-                {% include 'program/program/_program_card.html.twig' %}
-            </div>
-            {% endfor %}
-        </div>        
-    </div>
-</section>
+	<section id="program-list" class="fr-container fr-mb-5w fr-pb-5w">
+		<div>
+			<div class="fr-grid-row fr-grid-row--center">
+				<div class="fr-col-xs-12 fr-col-md-8">
+					<h1>
+						Tous les programmes d’aides
+					</h1>
+				</div>
+				<div class="fr-col-xs-12 fr-col-md-4">
+					<input type="text" id="search" class="fr-input" placeholder="Filtrer par nom">
+				</div>
+			</div>
+			<div class="program-list fr-grid-row">
+				{% for program in programs %}
+					<div class="fr-col-xs-12 fr-col-md-4 fr-p-3w">
+						{% include 'program/program/_program_card.html.twig' %}
+					</div>
+				{% endfor %}
+			</div>
+		</div>
+	</section>
 {% endblock %}

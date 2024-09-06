@@ -16,11 +16,11 @@ class BackerListener
         protected ParamService $paramService,
         protected RouterInterface $routerInterface
     ) {
-        
     }
 
 
-    public function onPostUpdate(PostUpdateEventArgs $args): void {
+    public function onPostUpdate(PostUpdateEventArgs $args): void
+    {
         /** @var Backer $backer */
         $backer = $args->getObject();
         // les champs qui ont été modifiés
@@ -37,9 +37,8 @@ class BackerListener
                     foreach ($organization->getBeneficiairies() as $beneficiairy) {
                         $this->notificationService->addNotification(
                             $beneficiairy,
-                            'Validation de '.$backer->getName(),
-                            'La fiche du porteur d\'aides '.$backer->getName().' a été validée. Vous pouvez la consulter en cliquant sur <a href="'.$backerUrl.'" title="Voir la fiche du porteur d\'aides">ce lien</a>.',
-                            
+                            'Validation de ' . $backer->getName(),
+                            'La fiche du porteur d\'aides ' . $backer->getName() . ' a été validée. Vous pouvez la consulter en cliquant sur <a href="' . $backerUrl . '" title="Voir la fiche du porteur d\'aides">ce lien</a>.',
                         );
                     }
                 }

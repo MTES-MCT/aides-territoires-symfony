@@ -40,12 +40,12 @@ class MyCustomLoginListener
 
             // stats login
             $this->userService->setLogUser(
-                array(
+                [
                     'user' => $user,
                     'action' => LogUserLogin::ACTION_LOGIN,
                     'type' => $autoLogin ? LogUserLogin::TYPE_AUTOLOGIN : null,
                     'noFlush' => true
-                )
+                ]
             );
 
             // si première connexion
@@ -63,7 +63,6 @@ class MyCustomLoginListener
             if ($this->authorizationChecker->isGranted(User::ROLE_ADMIN)) {
                 // $this->adminSessionManager->extendSessionLifetime();
             }
-
         }
     }
 }

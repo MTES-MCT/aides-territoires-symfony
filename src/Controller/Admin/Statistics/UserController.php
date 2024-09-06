@@ -2,21 +2,13 @@
 
 namespace App\Controller\Admin\Statistics;
 
-use App\Controller\Admin\DashboardController;
-use App\Entity\Aid\AidProject;
 use App\Entity\Log\LogUserLogin;
-use App\Entity\Organization\Organization;
-use App\Entity\Organization\OrganizationType;
-use App\Entity\Perimeter\Perimeter;
 use App\Entity\User\User;
+use App\Repository\Log\LogUserLoginRepository;
+use App\Repository\User\UserRepository;
 use Doctrine\Persistence\ManagerRegistry;
-use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
-use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractDashboardController;
-use OpenSpout\Common\Entity\Cell;
-use OpenSpout\Common\Entity\Row;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\UX\Chartjs\Builder\ChartBuilderInterface;
 use Symfony\UX\Chartjs\Model\Chart;
@@ -26,16 +18,16 @@ class UserController extends AbstractController
     public function __construct(
         protected ManagerRegistry $managerRegistry,
         protected ChartBuilderInterface $chartBuilderInterface,
-    )
-    {   
+    ) {
     }
 
     #[Route('/admin/statistics/user/dashboard', name: 'admin_statistics_user_dashboard')]
-    public function communeDashboard(
-    ): Response
+    public function communeDashboard(): Response
     {
         // les repository
+        /** @var UserRepository $userRepository */
         $userRepository = $this->managerRegistry->getRepository(User::class);
+        /** @var LogUserLoginRepository $logUserLoginRepository */
         $logUserLoginRepository = $this->managerRegistry->getRepository(LogUserLogin::class);
 
         // les fréquences de connexions
@@ -81,7 +73,7 @@ class UserController extends AbstractController
             $datas[] = $uniqueLoginsByWeekItem['unique_users'];
         }
         $chartLoginsByWeek = $this->getLineChart($labels, $datas, 'Evolution des connexions par semaine');
-        
+
         // retour template
         return $this->render('admin/statistics/user/dashboard.html.twig', [
             'nbUsers' => $nbUsers,
@@ -132,5 +124,4 @@ class UserController extends AbstractController
 
         return $chart;
     }
-
 }

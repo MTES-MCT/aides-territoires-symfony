@@ -27,8 +27,7 @@ class CategoryRepository extends ServiceEntityRepository
         $qb = $this->getQueryBuilder($params);
 
         $qb
-            ->select('c.name')
-        ;
+            ->select('c.name');
 
         $results = $qb->getQuery()->getResult();
 
@@ -66,7 +65,7 @@ class CategoryRepository extends ServiceEntityRepository
 
         return $qb->getQuery()->getResult();
     }
-    
+
     public function getQueryBuilder(array $params = null)
     {
         $groupBy = $params['groupBy'] ?? null;
@@ -84,13 +83,12 @@ class CategoryRepository extends ServiceEntityRepository
         if (is_array($words) && count($words) > 0) {
             $qb->andWhere('c.name IN (:words)')
                 ->setParameter('words', $words)
-                ;
+            ;
         }
 
         if ($orderBy !== null) {
             $qb
-                ->addOrderBy($orderBy['sort'], $orderBy['order'])
-            ;
+                ->addOrderBy($orderBy['sort'], $orderBy['order']);
         }
 
         if ($groupBy !== null) {

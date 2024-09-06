@@ -43,6 +43,8 @@ parameters:
     at_x_auth_token: '%env(AT_X_AUTH_TOKEN)%'
     certificat_region_sud: '%env(CERTIFICAT_REGION_SUD)%'
     certificat_ile_de_france: '%env(CERTIFICAT_ILE_DE_FRANCE)%'
+    allowed_internal_ips: '%env(resolve:TRUSTED_PROXIES)%'
+    forbidden_external_urls: '%env(resolve:FORBIDDEN_EXTERNAL_URLS)%'
 
 services:
     # default configuration for services in *this* file

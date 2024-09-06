@@ -1,49 +1,50 @@
 {% extends 'base.html.twig' %}
 
 {% block stylesheets %}
-    {{ parent() }}
-    {{ encore_entry_link_tags('import-scss/reference/projets_subventionnes') }}
+	{{ parent() }}
+	{{ encore_entry_link_tags('import-scss/reference/projets_subventionnes') }}
 {% endblock %}
 
 {% block javascripts %}
 	{{ parent() }}
 
 	{{ encore_entry_script_tags('front/reference/projets_subventionnes') }}
-    
-    {% cspscript %}
-    <script>
-    let commune_search='{{commune_search}}';
-    </script>
-    {% endcspscript %}
+
+	{% cspscript %}
+	<script>
+		let commune_search ='{{ commune_search }}';
+	</script>
+	{% endcspscript %}
 {% endblock %}
 
-{% block title %}Projets | Aides-territoires{% endblock %}
+{% block title %}Projets | Aides-territoires
+{% endblock %}
 
 {% block body %}
-    {% include 'reference/_form_project_reference.html.twig' %}
+	{% include 'reference/_form_project_reference.html.twig' %}
 
-    <div class="fr-container fr-mb-5w fr-mt-0">
-        <div class="fr-grid-row">
+	<div class="fr-container fr-mb-5w fr-mt-0">
+		<div class="fr-grid-row">
 
-            <div class="fr-col-12 fr-col-md-12">
-                <div class="fr-tabs fr-mt-0w fr-mb-5w">
-                    {% include "reference/_menu_project.html.twig" with { projets_subventionnes: true } %}
+			<div class="fr-col-12 fr-col-md-12">
+				<div class="fr-tabs fr-mt-0w fr-mb-5w">
+					{% include "reference/_menu_project.html.twig" with { projets_subventionnes: true } %}
 
-                    <div id="tabpanel_projets_subventionnes"  class="fr-tabs__panel" role="tabpanel" aria-labelledby="tabpanel_projets_subventionnes" tabindex="1">
+					<div id="tabpanel_projets_subventionnes" class="fr-tabs__panel" role="tabpanel" aria-labelledby="tabpanel_projets_subventionnes" tabindex="1">
 
-                    <div id="projects-list">
-                        {% if projectValidateds|length > 0 %}
-                        {% include "project/project/_projects_validated_result_as_list.html.twig" with { projects: projectValidateds, commune_search: true} %}
-                        {% else %}
-                        <div class="fr-mb-5w">
-                            <div class="fr-alert fr-alert--info fr-alert--sm">
-                                <p>Nous n’avons pu trouver aucun résultat.</p>
-                            </div>
-                        </div>
-                        {% endif %}
-                    </div> 
-                </div>
-            </div>
-        </div>
-    </div>
-{% endblock %}
+						<div id="projects-list">
+							{% if projectValidateds|length > 0 %}
+								{% include "project/project/_projects_validated_result_as_list.html.twig" with { projects: projectValidateds, commune_search: true} %}
+							{% else %}
+								<div class="fr-mb-5w">
+									<div class="fr-alert fr-alert--info fr-alert--sm">
+										<p>Nous n’avons pu trouver aucun résultat.</p>
+									</div>
+								</div>
+							{% endif %}
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	{% endblock %}

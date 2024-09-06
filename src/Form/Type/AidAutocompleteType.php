@@ -21,18 +21,18 @@ class AidAutocompleteType extends AbstractType
             'choice_label' => 'name',
             'data_class' => null,
             'preload' => false,
-            'query_builder' => function(AidRepository $aidRepository) {
+            'query_builder' => function (AidRepository $aidRepository) {
                 return $aidRepository->getQueryBuilder([
                     'showInSearch' => true,
                 ]);
             },
-            'filter_query' => function(QueryBuilder $qb, string $query, AidRepository $repository) {
+            'filter_query' => function (QueryBuilder $qb, string $query, AidRepository $repository) {
                 if (!$query) {
                     return;
                 }
 
                 $qb->andWhere('a.name LIKE :query')
-                    ->setParameter('query', '%'.$query.'%');
+                    ->setParameter('query', '%' . $query . '%');
             },
         ]);
     }

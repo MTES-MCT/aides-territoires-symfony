@@ -15,6 +15,8 @@ use App\Service\Aid\AidSearchFormService;
 use App\Service\Aid\AidService;
 use App\Service\Email\EmailService;
 use App\Service\Various\ParamService;
+use App\Validator\UrlExternalValid;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 #[AsCommand(name: 'at:cron:aid:find_broken_links', description: 'Recherche si des aides publiées ont des liens casssés')]
 class FindBrokenLinksCommand extends Command
@@ -25,15 +27,15 @@ class FindBrokenLinksCommand extends Command
     protected string $commandTextEnd = '>Cron';
 
     public function __construct(
-        protected KernelInterface $kernelInterface,
-        protected ManagerRegistry $managerRegistry,
-        protected AidService $aidService,
-        protected AidSearchFormService $aidSearchFormService,
-        protected EmailService $emailService,
-        protected ParamService $paramService
-    )
-    {
-        ini_set('max_execution_time', 60*60);
+        private KernelInterface $kernelInterface,
+        private ManagerRegistry $managerRegistry,
+        private AidService $aidService,
+        private AidSearchFormService $aidSearchFormService,
+        private EmailService $emailService,
+        private ParamService $paramService,
+        private ValidatorInterface $validator
+    ) {
+        ini_set('max_execution_time', 60 * 60);
         ini_set('memory_limit', '1G');
         parent::__construct();
     }
@@ -46,7 +48,7 @@ class FindBrokenLinksCommand extends Command
         $io = new SymfonyStyle($input, $output);
         $io->title($this->commandTextStart);
 
-        try  {
+        try {
             if ($this->kernelInterface->getEnvironment() != 'prod') {
                 $io->info('Uniquement en prod');
                 return Command::FAILURE;
@@ -87,7 +89,7 @@ class FindBrokenLinksCommand extends Command
                 'originUrlBroken' => false,
                 'applicationUrl' => $aid->getApplicationUrl(),
                 'applicationUrlBroken' => false
-                
+
             ];
 
             // vérifie originUrl
@@ -132,7 +134,7 @@ class FindBrokenLinksCommand extends Command
         if ($nbBrokenLinks > 0) {
             $this->emailService->sendEmail(
                 $this->paramService->get('email_super_admin'),
-                $nbBrokenLinks. ' liens sont cassés dans des fiches aides',
+                $nbBrokenLinks . ' liens sont cassés dans des fiches aides',
                 'emails/aid/find_broken_links.html.twig',
                 [
                     'aidsWithBrokenLinks' => $aidsWithBrokenLinks,
@@ -140,36 +142,44 @@ class FindBrokenLinksCommand extends Command
             );
         }
 
-        
+
         $timeEnd = microtime(true);
         $time = $timeEnd - $timeStart;
 
         // success
-        $io->success('Temps écoulé : '.gmdate("H:i:s", $timeEnd).' ('.gmdate("H:i:s", intval($time)).')');
+        $io->success('Temps écoulé : ' . gmdate("H:i:s", $timeEnd) . ' (' . gmdate("H:i:s", intval($time)) . ')');
         $io->success('Nombre d\'aides avec lien cassé : ' . $nbBrokenLinks);
         $io->success('Mémoire maximale utilisée : ' . round(memory_get_peak_usage() / 1024 / 1024) . ' MB');
     }
 
     private function checkUrl($url): bool
     {
+        // on vérifie d'abord que l'url est valide
+        $constraint = new UrlExternalValid();
+        $violations = $this->validator->validate($url, $constraint);
+        if (!empty($violations)) {
+            return false;
+        }
+
+        // Si url valide, on test son code retour
         $ch = curl_init($url);
 
         // Définir l'option pour retourner le transfert en tant que chaîne
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    
+
         // Définir l'option pour ne récupérer que les en-têtes
         curl_setopt($ch, CURLOPT_HEADER, true);
         curl_setopt($ch, CURLOPT_NOBODY, true);
-    
+
         // Définir un délai d'attente
         curl_setopt($ch, CURLOPT_TIMEOUT, 10);
-    
+
         curl_exec($ch);
-    
+
         $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    
+
         curl_close($ch);
-    
+
         return $httpCode == 200;
     }
 }

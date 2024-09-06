@@ -56,7 +56,7 @@ class ImportFluxAdemeAgirCommand extends ImportFluxCommand
                 }
             }
 
-            $eligibility = 'Ce dispositif est applicable uniquement aux régions suivantes : '.trim($eligibility);
+            $eligibility = 'Ce dispositif est applicable uniquement aux régions suivantes : ' . trim($eligibility);
         }
 
         $return = [
@@ -136,8 +136,8 @@ class ImportFluxAdemeAgirCommand extends ImportFluxCommand
     protected function setPerimeter(array $aidToImport, Aid $aid): Aid // NOSONAR too complex
     {
         $couvertureGeo = isset($aidToImport['couverture_geo']) && isset($aidToImport['couverture_geo']['code'])
-                    ? $aidToImport['couverture_geo']['code']
-                    : null;
+            ? $aidToImport['couverture_geo']['code']
+            : null;
 
         if ((int) $couvertureGeo == 1) {
             $perimeter = $this->managerRegistry->getRepository(Perimeter::class)->findOneBy(['code' => Perimeter::CODE_FRANCE]);

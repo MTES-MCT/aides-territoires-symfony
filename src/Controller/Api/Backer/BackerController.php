@@ -20,8 +20,7 @@ class BackerController extends ApiController
         BackerRepository $backerRepository,
         BackerGroupRepository $backerGroupRepository,
         ParamService $paramService
-    ): JsonResponse
-    {
+    ): JsonResponse {
         // les filtres
         $params = [
             'active' => true
@@ -52,7 +51,7 @@ class BackerController extends ApiController
         // requete pour les résultats avec la pagination
         $params['firstResult'] = ($this->getPage() - 1) * $this->getItemsPerPage();
         $params['maxResults'] = $this->getItemsPerPage();
-    
+
         $results = $backerRepository->findCustom($params);
 
         // spécifique backer
@@ -60,10 +59,10 @@ class BackerController extends ApiController
         /** @var Backer $result */
         foreach ($results as $result) {
             $resultsSpe[] = [
-                'id' => $result->getId().'-'.$result->getSlug(),
+                'id' => $result->getId() . '-' . $result->getSlug(),
                 'text' => $result->getName(),
                 'perimeter' => $result->getPerimeter() ? $result->getPerimeter()->getName() : null,
-                'logo' => $result->getLogo() ? $paramService->get('cloud_image_url').$result->getLogo() : null,
+                'logo' => $result->getLogo() ? $paramService->get('cloud_image_url') . $result->getLogo() : null,
                 'group' => $result->getBackerGroup()
                     ? [
                         'id' => $result->getBackerGroup()->getId(),

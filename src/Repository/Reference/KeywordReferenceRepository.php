@@ -27,7 +27,7 @@ class KeywordReferenceRepository extends ServiceEntityRepository
         $qb = $this->getQueryBuilder($params);
         $qb->select('DISTINCT (kr2.id), kr2.name,  kr2.intention');
         $qb->innerJoin(KeywordReference::class, 'kr2', 'WITH', 'kr2 = kr.parent OR kr.parent = kr2.parent');
-        
+
         return $qb->getQuery()->getResult();
     }
 
@@ -61,14 +61,13 @@ class KeywordReferenceRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult();
     }
 
-    public function findCustom(?array $params = null) : array
+    public function findCustom(?array $params = null): array
     {
         $qb = $this->getQueryBuilder($params);
         return $qb->getQuery()->getResult();
-        
     }
 
-    public function getQueryBuilder(?array $params = null) : QueryBuilder
+    public function getQueryBuilder(?array $params = null): QueryBuilder
     {
         $string = $params['string'] ?? null;
         $name = $params['name'] ?? null;
@@ -84,20 +83,19 @@ class KeywordReferenceRepository extends ServiceEntityRepository
 
         if ($noIntention === true) {
             $qb
-                ->andWhere('kr.intention = 0')
-                ;
+                ->andWhere('kr.intention = 0');
         }
 
         if ($name !== null) {
             $qb->andWhere('kr.name = :name')
-            ->setParameter('name', $name)
+                ->setParameter('name', $name)
             ;
         }
 
         if ($nameLike !== null) {
             $qb->andWhere('kr.name LIKE :nameLike')
-                ->setParameter('nameLike', '%'.$nameLike.'%')
-                ;
+                ->setParameter('nameLike', '%' . $nameLike . '%')
+            ;
         }
 
         if ($onlyParent) {
@@ -107,19 +105,19 @@ class KeywordReferenceRepository extends ServiceEntityRepository
         if (is_array($names) && !empty($names)) {
             $qb->andWhere('kr.name IN (:names)')
                 ->setParameter('names', $names)
-                ;
+            ;
         }
 
         if (is_array($excludeds) && !empty($excludeds)) {
             $qb->andWhere('kr.name NOT IN (:excludeds)')
                 ->setParameter('excludeds', $excludeds)
-                ;
+            ;
         }
 
         if (is_array($words) && !empty($words)) {
             $qb->andWhere('kr.name IN (:words)')
                 ->setParameter('words', $words)
-                ;
+            ;
         }
 
         if ($string) {
@@ -127,10 +125,10 @@ class KeywordReferenceRepository extends ServiceEntityRepository
             if (is_array($words) && !empty($words)) {
                 $qb->andWhere('kr.name IN (:words)')
                     ->setParameter('words', $words)
-                    ;
+                ;
             }
         }
-        
+
         if ($orderBy !== null) {
             if ($orderBy['sort'] == 'projectReferenceCategory.name') {
                 $qb->leftJoin('pr.projectReferenceCategory', 'projectReferenceCategory');
@@ -138,13 +136,13 @@ class KeywordReferenceRepository extends ServiceEntityRepository
             $qb->addOrderBy($orderBy['sort'], $orderBy['order']);
             ;
         }
-        
+
         return $qb;
     }
 
-	public function getAllSynonyms($searchText)
-	{
-        $sql="SELECT distinct(k.name),k.intention
+    public function getAllSynonyms($searchText)
+    {
+        $sql = "SELECT distinct(k.name),k.intention
         from keyword_reference k
         WHERE k.parent_id IN (
             SELECT k2.parent_id
@@ -160,6 +158,5 @@ class KeywordReferenceRepository extends ServiceEntityRepository
         $result = $stmt->executeQuery();
 
         return $result->fetchAllAssociative();
-	}
-
+    }
 }

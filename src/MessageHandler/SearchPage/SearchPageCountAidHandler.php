@@ -27,7 +27,7 @@ class SearchPageCountAidHandler
     {
         /** @var BackerRepository $backerRepo */
         $searchPageRepo = $this->managerRegistry->getRepository(SearchPage::class);
-        
+
         // charge le portail
         $searchPage = $searchPageRepo->find($message->getIdSearchPage());
 
@@ -42,7 +42,7 @@ class SearchPageCountAidHandler
                     'querystring' => $searchPage->getSearchQuerystring() ?? null,
                     'forceOrganizationType' => null,
                     'dontUseUserPerimeter' => true
-                    ]
+                ]
             );
 
             $aidParams = array_merge($aidParams, $this->aidSearchFormService->convertAidSearchClassToAidParams($aidSearchClass));

@@ -1,0 +1,30 @@
+{% extends 'emails/base.html.twig' %}
+
+{% block body %}
+	<p>Message reçu via le formulaire de contact.</p>
+	<p>De :</p>
+	<ul>
+		<li>Email :
+			{{ contact.email }}</li>
+		{% if contact.firstname %}
+			<li>Prénom :
+				{{ contact.firstname }}</li>
+		{% endif %}
+		{% if contact.lastname %}
+			<li>Nom :
+				{{ contact.lastname }}</li>
+		{% endif %}
+		{% if contact.phoneNumber %}
+			<li>Téléphone :
+				{{ contact.phoneNumber }}</li>
+		{% endif %}
+		{% if contact.structureAndFunction %}
+			<li>Structure et fonction :
+				{{ contact.structureAndFunction }}</li>
+		{% endif %}
+		<p>Sujet :
+			{{ constant('App\\Form\\Contact\\ContactType::SUBJECTS')[contact.subject]|default('non défini') }}</p>
+		<p>Message :<br/>
+			{{ contact.message }}</p>
+	</ul>
+{% endblock %}

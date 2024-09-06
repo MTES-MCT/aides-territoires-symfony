@@ -3,25 +3,23 @@
 namespace App\Controller\Perimeter;
 
 use App\Controller\FrontController;
+use App\Security\Voter\InternalRequestVoter;
 use App\Service\Api\InternalApiService;
-use App\Service\Security\SecurityService;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Attribute\Route;
 
 class PerimeterController extends FrontController
 {
-    #[Route('perimeter/ajax-search', name: 'app_perimeter_ajax_search', options: ['expose' => true])]
+    #[Route('perimeter/ajax-search', name: 'app_perimeter_ajax_search', options: ['expose' => true], methods: ['POST'])]
     public function ajaxSearch(
         RequestStack $requestStack,
-        InternalApiService $internalApiService,
-        SecurityService $securityService
-    ): JsonResponse
-    {
+        InternalApiService $internalApiService
+    ): JsonResponse {
         try {
-            if ($securityService->validHostOrgin($requestStack) === false) {
-                // La requête n'est pas interne, retourner une erreur
-                throw $this->createAccessDeniedException('This action can only be performed by the server itself.');
+            // verification requête interne
+            if (!$this->isGranted(InternalRequestVoter::IDENTIFIER)) {
+                throw $this->createAccessDeniedException(InternalRequestVoter::MESSAGE_ERROR);
             }
 
             // recuperer id du perimetre
@@ -46,7 +44,6 @@ class PerimeterController extends FrontController
                 'success' => 1,
                 'results' => $return
             ]);
-
         } catch (\Exception $e) {
             return new JsonResponse([
                 'success' => 0,
@@ -55,22 +52,15 @@ class PerimeterController extends FrontController
         }
     }
 
-    #[Route('perimeter/ajax-datas', name: 'app_perimeter_ajax_datas', options: ['expose' => true])]
+    #[Route('perimeter/ajax-datas', name: 'app_perimeter_ajax_datas', options: ['expose' => true], methods: ['POST'])]
     public function ajaxDatas(
         RequestStack $requestStack,
         InternalApiService $internalApiService
-    ): JsonResponse
-    {
+    ): JsonResponse {
         try {
-            $request = $requestStack->getCurrentRequest();
-            $origin = $request->headers->get('origin');
-            $infosOrigin = parse_url($origin);
-            $hostOrigin = $infosOrigin['host'] ?? null;
-            $serverName = $request->getHost();
-    
-            if ($hostOrigin !== $serverName) {
-                // La requête n'est pas interne, retourner une erreur
-                throw $this->createAccessDeniedException('This action can only be performed by the server itself.');
+            // verification requête interne
+            if (!$this->isGranted(InternalRequestVoter::IDENTIFIER)) {
+                throw $this->createAccessDeniedException(InternalRequestVoter::MESSAGE_ERROR);
             }
 
             // recuperer id du perimetre
@@ -98,7 +88,6 @@ class PerimeterController extends FrontController
                 'success' => 1,
                 'results' => $return
             ]);
-
         } catch (\Exception $e) {
             return new JsonResponse([
                 'success' => 0,

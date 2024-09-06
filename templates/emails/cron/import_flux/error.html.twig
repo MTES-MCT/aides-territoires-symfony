@@ -1,7 +1,13 @@
 {% extends 'emails/base.html.twig' %}
 
 {% block body %}
-<p>Une erreur est survenue lors de l'import du flux : {% if dataSource %}{{ dataSource.name }}{% endif %}</p>
-<p>Message d'erreur : {{ error }}</p>
-<p>A : {{ 'now'|date('Y-m-d H:i:s') }}</p>
+	<p>Une erreur est survenue lors de l'import du flux :
+		{% if dataSource %}
+			{{ dataSource.name }}
+		{% endif %}
+	</p>
+	<p>Message d'erreur :
+		{{ error }}</p>
+	<p>A :
+		{{ 'now'|date('Y-m-d H:i:s') }}</p>
 {% endblock %}

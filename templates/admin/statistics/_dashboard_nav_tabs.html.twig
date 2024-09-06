@@ -1,46 +1,22 @@
 <ul class="nav nav-tabs" role="tablist" aria-label="Différentes statistiques">
-    <li class="nav-item" role="presentation">
-        <a
-            id="consultation"
-            href="{{ path('admin_statistics_dashboard', { '_fragment': 'statistiques' }) }}"
-            class="nav-link {% if consultationSelected is defined %}active{% endif %}"
-            tabindex="{% if consultationSelected is defined %}0{% else %}-1{% endif %}"
-            role="tab"
-            aria-selected="{% if consultationSelected is defined %}true{% else %}false{% endif %}"
-            aria-controls="consultation-panel"
-            ><span aria-hidden="true">👥 </span>Consultation</a>
-    </li>
-    <li class="nav-item" role="presentation">
-        <a
-            id="acquisition"
-            href="{{ path('admin_statistics_acquisition', { '_fragment': 'statistiques' }) }}"
-            class="nav-link {% if acquisitionSelected is defined %}active{% endif %}"
-            tabindex="{% if acquisitionSelected is defined %}0{% else %}-1{% endif %}"
-            role="tab"
-            aria-selected="{% if acquisitionSelected is defined %}true{% else %}false{% endif %}"
-            aria-controls="acquisition-panel"
-            ><span aria-hidden="true">🎣 </span>Acquisition</a>
-    </li>
-    <li class="nav-item" role="presentation">
-        <a
-            id="engagement"
-            href="{{ path('admin_statistics_engagement', { '_fragment': 'statistiques' }) }}"
-            class="nav-link {% if engagementSelected is defined %}active{% endif %}"
-            tabindex="{% if engagementSelected is defined %}0{% else %}-1{% endif %}"
-            role="tab"
-            aria-selected="{% if engagementSelected is defined %}true{% else %}false{% endif %}"
-            aria-controls="engagement-panel"
-            ><span aria-hidden="true">🏅 </span>Engagement</a>
-    </li>
-    <li class="nav-item" role="presentation">
-        <a
-            id="cote-porteurs"
-            href="{{ path('admin_statistics_porteurs', { '_fragment': 'statistiques' }) }}"
-            class="nav-link {% if porteursSelected is defined %}active{% endif %}"
-            tabindex="{% if porteursSelected is defined %}0{% else %}-1{% endif %}"
-            role="tab"
-            aria-selected="{% if porteursSelected is defined %}true{% else %}false{% endif %}"
-            aria-controls="cote-porteurs-panel"
-            ><span aria-hidden="true">💪 </span>Côté porteurs</a>
-    </li>
+	<li class="nav-item" role="presentation">
+		<a id="consultation" href="{{ path('admin_statistics_dashboard', { '_fragment': 'statistiques' }) }}" class="nav-link {% if consultationSelected is defined %}active{% endif %}" tabindex="{% if consultationSelected is defined %}0{% else %}-1{% endif %}" role="tab" aria-selected="{% if consultationSelected is defined %}true{% else %}false{% endif %}" aria-controls="consultation-panel">
+			<span aria-hidden="true">👥
+			</span>Consultation</a>
+	</li>
+	<li class="nav-item" role="presentation">
+		<a id="acquisition" href="{{ path('admin_statistics_acquisition', { '_fragment': 'statistiques' }) }}" class="nav-link {% if acquisitionSelected is defined %}active{% endif %}" tabindex="{% if acquisitionSelected is defined %}0{% else %}-1{% endif %}" role="tab" aria-selected="{% if acquisitionSelected is defined %}true{% else %}false{% endif %}" aria-controls="acquisition-panel">
+			<span aria-hidden="true">🎣
+			</span>Acquisition</a>
+	</li>
+	<li class="nav-item" role="presentation">
+		<a id="engagement" href="{{ path('admin_statistics_engagement', { '_fragment': 'statistiques' }) }}" class="nav-link {% if engagementSelected is defined %}active{% endif %}" tabindex="{% if engagementSelected is defined %}0{% else %}-1{% endif %}" role="tab" aria-selected="{% if engagementSelected is defined %}true{% else %}false{% endif %}" aria-controls="engagement-panel">
+			<span aria-hidden="true">🏅
+			</span>Engagement</a>
+	</li>
+	<li class="nav-item" role="presentation">
+		<a id="cote-porteurs" href="{{ path('admin_statistics_porteurs', { '_fragment': 'statistiques' }) }}" class="nav-link {% if porteursSelected is defined %}active{% endif %}" tabindex="{% if porteursSelected is defined %}0{% else %}-1{% endif %}" role="tab" aria-selected="{% if porteursSelected is defined %}true{% else %}false{% endif %}" aria-controls="cote-porteurs-panel">
+			<span aria-hidden="true">💪
+			</span>Côté porteurs</a>
+	</li>
 </ul>

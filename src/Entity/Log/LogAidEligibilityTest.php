@@ -43,11 +43,11 @@ class LogAidEligibilityTest
     private ?\DateTimeInterface $dateCreate = null;
 
     #[ORM\ManyToOne(inversedBy: 'logAidEligibilityTests')]
-    #[ORM\JoinColumn(onDelete:'SET NULL')]
+    #[ORM\JoinColumn(onDelete: 'SET NULL')]
     private ?Aid $aid = null;
 
     #[ORM\ManyToOne(inversedBy: 'logAidEligibilityTests')]
-    #[ORM\JoinColumn(onDelete:'SET NULL')]
+    #[ORM\JoinColumn(onDelete: 'SET NULL')]
     private ?EligibilityTest $eligibilityTest = null;
 
     public function getId(): ?int

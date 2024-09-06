@@ -178,11 +178,8 @@ $('textarea:not(.trumbowyg-textarea):not(.not-trumbowyg)').trumbowyg({
     plugins: {
         // Image upload
         upload: {
-            serverPath: Routing.generate('app_admin_upload_image'),
+            serverPath: Routing.generate('app_admin_upload_image', {'_token': typeof csrfTokenInternal !== 'undefined' ? csrfTokenInternal : '' }),
             fileFieldName: 'image',
-            // headers: {
-            //     'Authorization': 'Client-ID xxxxxxxxxxxx'
-            // },
             urlPropertyName: 'data.link'
         },
         // nettoyage texte word

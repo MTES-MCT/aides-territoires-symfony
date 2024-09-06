@@ -1,48 +1,57 @@
 <dialog aria-labelledby="fr-modal-title-suggest-aid-modal" role="dialog" id="suggest-aid-modal" class="fr-modal {% if openModalSuggest is defined  and openModalSuggest %} fr-modal--opened {% endif %}">
-    <div class="fr-container fr-container--fluid fr-container-md">
-        <div class="fr-grid-row fr-grid-row--center">
-            <div class="fr-col-12 fr-col-md-8 fr-col-lg-6">
-                <div class="fr-modal__body">
-                    <div class="fr-modal__header">
-                        <button class="fr-btn fr-btn--close" title="Fermer la fenêtre modale" aria-controls="suggest-aid-modal">Fermer</button>
-                    </div>
-                    <div class="fr-modal__content">
-                        <h2 id="fr-modal-title-suggest-aid-modal" class="fr-modal__title fr-mt-0">
-                            <span class="fr-icon-arrow-right-line fr-icon--lg"></span>
-                            Suggérer une aide {% if aidDetailPage is not defined %} pour ce projet {% endif %}
-                        </h2>
-                        <p class="fr-mb-2w">
-                        Vous pouvez désormais suggérer une aide présente sur <a href="{{ path('app_aid_aid') }}" target="_blank" rel="noopener" title="Trouver des aides - ouvre une nouvelle fenêtre">Aides-territoires</a>{% if aidDetailPage is defined %}.{% else %} pour ce projet.{% endif %}
-                        </p>
-                        {% if app.user %}
-                        {{ form_start(formSuggestToProject)}}
-                            <div class="content">
-                                {% if aidDetailPage is defined %}
-                                    {{ form_row(formSuggestToProject.projectFavorites) }}
-                                    {{ form_row(formSuggestToProject.message) }}
-                                    {# <p>Vous n’avez pas encore ajouté de projet à vos favoris</p> #}
-                                {% else %}
-                                    <div id="form-group-project">
-                                        <input type="checkbox" checked hidden name="project" value="{{ project.id }}" id="{{ project.id }}" />
-                                    </div>
-                                    {# {% include '_field_snippet.html' with field=suggest_aid_form.aid %}
-                                    {% include '_field_snippet.html' with field=suggest_aid_form.message %} #}
-                                {% endif %}
+	<div class="fr-container fr-container--fluid fr-container-md">
+		<div class="fr-grid-row fr-grid-row--center">
+			<div class="fr-col-12 fr-col-md-8 fr-col-lg-6">
+				<div class="fr-modal__body">
+					<div class="fr-modal__header">
+						<button class="fr-btn fr-btn--close" title="Fermer la fenêtre modale" aria-controls="suggest-aid-modal">Fermer</button>
+					</div>
+					<div class="fr-modal__content">
+						<h2 id="fr-modal-title-suggest-aid-modal" class="fr-modal__title fr-mt-0">
+							<span class="fr-icon-arrow-right-line fr-icon--lg"></span>
+							Suggérer une aide
+							{% if aidDetailPage is not defined %}
+								pour ce projet
+							{% endif %}
+						</h2>
+						<p class="fr-mb-2w">
+							Vous pouvez désormais suggérer une aide présente sur
+							<a href="{{ path('app_aid_aid') }}" target="_blank" rel="noopener" title="Trouver des aides - ouvre une nouvelle fenêtre">Aides-territoires</a>
+							{% if aidDetailPage is defined %}.
+							{% else %}
+								pour ce projet.
+							{% endif %}
+						</p>
+						{% if app.user %}
+							{{ form_start(formSuggestToProject)}}
+							<div class="content">
+								{% if aidDetailPage is defined %}
+									{{ form_row(formSuggestToProject.projectFavorites) }}
+									{{ form_row(formSuggestToProject.message) }}
+								{% else %}
+									<div id="form-group-project">
+										<input type="checkbox" checked hidden name="project" value="{{ project.id }}" id="{{ project.id }}"/>
+									</div>
+								{% endif %}
 
-                                <footer>
-                                    <button class="btn-block fr-btn fr-mt-2w" type="submit">
-                                        Suggérer une aide
-                                    </button>
-                                    <button class="btn-block fr-btn fr-btn--secondary" type="button" title="Fermer la fenêtre modale" aria-controls="suggest-aid-modal">Annuler</button>
-                                </footer>
-                            </div>
-                        {{ form_end(formSuggestToProject) }}
-                        {% else %}
-                        <p><a href="{{ path('app_login') }}">Connectez-vous</a> ou <a href="{{ path('app_user_user_register') }}">créez un compte</a> afin de suggérer une aide !</p>
-                        {% endif %}
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+								<footer>
+									<button class="btn-block fr-btn fr-mt-2w" type="submit">
+										Suggérer une aide
+									</button>
+									<button class="btn-block fr-btn fr-btn--secondary" type="button" title="Fermer la fenêtre modale" aria-controls="suggest-aid-modal">Annuler</button>
+								</footer>
+							</div>
+							{{ form_end(formSuggestToProject) }}
+						{% else %}
+							<p>
+								<a href="{{ path('app_login') }}">Connectez-vous</a>
+								ou
+								<a href="{{ path('app_user_user_register') }}">créez un compte</a>
+								afin de suggérer une aide !</p>
+						{% endif %}
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
 </dialog>

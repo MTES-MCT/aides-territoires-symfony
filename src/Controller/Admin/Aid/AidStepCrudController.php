@@ -20,7 +20,6 @@ class AidStepCrudController extends AtCrudController
         yield TextField::new('name', 'Nom');
         yield TextField::new('slug', 'Slug')
             ->setFormTypeOption('attr', ['readonly' => true, 'autocomplete' => 'off'])
-            ->setHelp('Laisser vide pour autoremplir.')
-        ;
+            ->setHelp('Laisser vide pour autoremplir.');
     }
 }

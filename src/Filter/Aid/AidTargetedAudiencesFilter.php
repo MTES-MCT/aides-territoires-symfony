@@ -1,6 +1,6 @@
 <?php
-namespace App\Filter\Aid;
 
+namespace App\Filter\Aid;
 
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Doctrine\Orm\Filter\AbstractFilter;
@@ -39,4 +39,3 @@ final class AidTargetedAudiencesFilter extends AbstractFilter
         ];
     }
 }
-?>

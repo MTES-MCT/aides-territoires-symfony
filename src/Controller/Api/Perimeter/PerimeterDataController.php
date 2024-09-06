@@ -11,21 +11,20 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Attribute\AsController;
 use Symfony\Component\Routing\Annotation\Route;
 
-
 #[AsController]
 
 class PerimeterDataController extends ApiController
 {
-    #[Route('/api/perimeters/data/', name: 'api_perimeters_data', priority: 5)]
+    #[Route('/api/perimeters/data/', name: 'api_perimeters_data', priority: 6)]
     public function index(
         PerimeterDataRepository $perimeterDataRepository,
         PerimeterService $perimeterService
-    ): JsonResponse
-    {
+    ): JsonResponse {
         // les filtres
         $params = [];
 
         $perimeterId = $this->requestStack->getCurrentRequest()->get('perimeter_id', null);
+        
         if (!empty($perimeterId)) {
             $params['perimeter'] = $this->managerRegistry->getRepository(Perimeter::class)->find($perimeterId);
             if (!$params['perimeter'] instanceof Perimeter) {

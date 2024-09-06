@@ -37,7 +37,8 @@ class LogAidViewRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult()[0]['nb'] ?? 0;
     }
 
-    public function countCustom(array $params = null) : int {
+    public function countCustom(array $params = null): int
+    {
         $qb = $this->getQueryBuilder($params);
 
         $qb->select('IFNULL(COUNT(lav.id), 0) AS nb');
@@ -51,8 +52,7 @@ class LogAidViewRepository extends ServiceEntityRepository
         $qb = $this->getQueryBuilder($params);
 
         $qb
-            ->innerJoin('lav.aid', 'aidForCount')
-        ;
+            ->innerJoin('lav.aid', 'aidForCount');
         if ($distinctAids !== null) {
             $qb->select('IFNULL(COUNT(DISTINCT(aidForCount.id)), 0) AS nb');
         } else {
@@ -61,7 +61,8 @@ class LogAidViewRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult()[0]['nb'] ?? 0;
     }
 
-    public function countApiByDay(?array $params = null) {
+    public function countApiByDay(?array $params = null)
+    {
         $params['source'] = 'api';
         $qb = $this->getQueryBuilder($params);
         $qb->select('COUNT(lav.id) as nb, DATE_FORMAT(lav.timeCreate, \'%Y-%m-%d\') as dateDay');
@@ -223,16 +224,16 @@ class LogAidViewRepository extends ServiceEntityRepository
                 ->innerJoin('lav.aid', 'aid')
                 ->andWhere('aid.author = :author')
                 ->setParameter('author', $author)
-                ;
+            ;
         }
-        
+
         if ($aid instanceof Aid && $aid->getId()) {
             $qb
                 ->andWhere('lav.aid = :aid')
                 ->setParameter('aid', $aid)
             ;
         }
-        
+
         if (is_array($aidIds) && count($aidIds) > 0) {
             $qb
                 ->andWhere('lav.aid IN (:aidIds)')
@@ -246,19 +247,19 @@ class LogAidViewRepository extends ServiceEntityRepository
                 ->setParameter('dateCreate', $dateCreate)
             ;
         }
-        
+
         if ($dateCreateMin instanceof \DateTime) {
             $qb
                 ->andWhere('lav.dateCreate >= :dateCreateMin')
                 ->setParameter('dateCreateMin', $dateCreateMin)
-                ;
+            ;
         }
 
         if ($dateCreateMax instanceof \DateTime) {
             $qb
                 ->andWhere('lav.dateCreate <= :dateCreateMax')
                 ->setParameter('dateCreateMax', $dateCreateMax)
-                ;
+            ;
         }
 
         if ($dateMin instanceof \DateTime) {

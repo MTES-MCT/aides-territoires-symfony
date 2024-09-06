@@ -22,7 +22,8 @@ class CategoryThemeRepository extends ServiceEntityRepository
         parent::__construct($registry, CategoryTheme::class);
     }
 
-    public function countCustom(array $params = null) : int {
+    public function countCustom(array $params = null): int
+    {
         $qb = $this->getQueryBuilder($params);
 
         $qb->select('IFNULL(COUNT(ct.id), 0) AS nb');
@@ -43,5 +44,4 @@ class CategoryThemeRepository extends ServiceEntityRepository
 
         return $qb;
     }
-
 }

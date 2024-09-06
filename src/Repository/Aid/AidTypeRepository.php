@@ -37,8 +37,7 @@ class AidTypeRepository extends ServiceEntityRepository
         $qb = $this->getQueryBuilder($params);
 
         $qb
-            ->select('at.name')
-        ;
+            ->select('at.name');
 
         $results = $qb->getQuery()->getResult();
 
@@ -67,10 +66,9 @@ class AidTypeRepository extends ServiceEntityRepository
 
         if ($orderBy !== null) {
             $qb
-                ->addOrderBy($orderBy['sort'], $orderBy['order'])
-            ;
+                ->addOrderBy($orderBy['sort'], $orderBy['order']);
         }
-        
+
         return $qb;
     }
 }

@@ -28,85 +28,76 @@ class BlogPromotionPostCrudController extends AtCrudController
     {
         yield FormField::addTab('Article');
         yield IdField::new('id')
-        ->onlyOnIndex();
+            ->onlyOnIndex();
         yield TextField::new('name', 'Titre de l\'article');
         yield TextField::new('slug', 'Fragment d’URL')
-        ->setFormTypeOption('attr', ['readonly' => true, 'autocomplete' => 'off'])
-        ->setHelp('Laisser vide pour autoremplir.')
-        ->onlyOnForms()
-        ;
+            ->setFormTypeOption('attr', ['readonly' => true, 'autocomplete' => 'off'])
+            ->setHelp('Laisser vide pour autoremplir.')
+            ->onlyOnForms();
         yield TrumbowygField::new('shortText', 'Contenu')
-        ->onlyOnForms()
-        ;
+            ->onlyOnForms();
         yield TextField::new('buttonTitle', 'Titre du bouton')
-        ->onlyOnForms();
+            ->onlyOnForms();
         yield UrlField::new('buttonLink', 'Lien du bouton')
-        ->onlyOnForms();
+            ->onlyOnForms();
         yield BooleanField::new('externalLink', 'Lien externe')
-        ->onlyOnForms();
+            ->onlyOnForms();
 
         yield ImageField::new('imageFile', 'Illustration')
-        ->setHelp('Évitez les fichiers trop lourds. Préférez les fichiers SVG.')
-        ->setUploadDir($this->fileService->getUploadTmpDirRelative())
-        ->setBasePath($this->paramService->get('cloud_image_url'))
-        ->setUploadedFileNamePattern(BlogPromotionPost::FOLDER.'/[slug]-[timestamp].[extension]')
-        ->setFormTypeOption('upload_new', function(UploadedFile $file, string $uploadDir, string $fileName) {
-            $this->imageService->sendUploadedImageToCloud($file, BlogPromotionPost::FOLDER, $fileName);
-            $this->getContext()->getEntity()->getInstance()->setImage($fileName);
-        })
-        ->onlyOnForms()
-        ;
+            ->setHelp('Évitez les fichiers trop lourds. Préférez les fichiers SVG.')
+            ->setUploadDir($this->fileService->getUploadTmpDirRelative())
+            ->setBasePath($this->paramService->get('cloud_image_url'))
+            ->setUploadedFileNamePattern(BlogPromotionPost::FOLDER . '/[slug]-[timestamp].[extension]')
+            ->setFormTypeOption('upload_new', function (UploadedFile $file, string $uploadDir, string $fileName) {
+                $this->imageService->sendUploadedImageToCloud($file, BlogPromotionPost::FOLDER, $fileName);
+                $this->getContext()->getEntity()->getInstance()->setImage($fileName);
+            })
+            ->onlyOnForms();
         yield BooleanField::new('deleteImage', 'Supprimer le fichier actuel')
-        ->onlyWhenUpdating();
+            ->onlyWhenUpdating();
 
         yield TextField::new('imageAltText', 'Texte alternatif pour l’image')
-        ->onlyOnForms();
+            ->onlyOnForms();
 
         yield FormField::addFieldset('Filtres conditionnant l\'affichage');
 
 
 
         yield AssociationField::new('organizationTypes', 'Bénéficiaires')
-        ->setFormTypeOption('choice_label', 'name')
-        ->setFormTypeOption(
-            'query_builder',
-            function (EntityRepository $er) {
-                return $er->createQueryBuilder('o')
-                ->orderBy('o.name', 'ASC');
-            }
-        )
-        ->hideOnIndex()
-        ;
+            ->setFormTypeOption('choice_label', 'name')
+            ->setFormTypeOption(
+                'query_builder',
+                function (EntityRepository $er) {
+                    return $er->createQueryBuilder('o')
+                        ->orderBy('o.name', 'ASC');
+                }
+            )
+            ->hideOnIndex();
         yield AssociationField::new('backers', 'Porteurs d’aides')
-        ->setFormTypeOption('choice_label', 'name')
-        ->hideOnIndex()
-        ;
+            ->setFormTypeOption('choice_label', 'name')
+            ->hideOnIndex();
         yield AssociationField::new('programs', 'Programmes')
-        ->setFormTypeOption('choice_label', 'name')
-        ->hideOnIndex()
-        ;
+            ->setFormTypeOption('choice_label', 'name')
+            ->hideOnIndex();
         yield AssociationField::new('perimeter', 'Périmètre')
-        ->hideOnIndex()
-        ->autocomplete(true)
-        ;
+            ->hideOnIndex()
+            ->autocomplete(true);
         yield AssociationField::new('categories', 'Sous-thématiques')
-        ->setFormTypeOption('choice_label', 'name')
-        ->hideOnIndex()
-        ;
+            ->setFormTypeOption('choice_label', 'name')
+            ->hideOnIndex();
 
         yield AssociationField::new('keywordReferences', 'Listes de synonymes')
-        ->setFormTypeOption('choice_label', 'name')
-        ->hideOnIndex()
-        ->setFormTypeOption(
-            'query_builder',
-            function (EntityRepository $er) {
-                return $er->createQueryBuilder('o')
-                ->andWhere('o.parent = o')
-                ->orderBy('o.name', 'ASC')
-                ;
-            }
-        )
-        ;
+            ->setFormTypeOption('choice_label', 'name')
+            ->hideOnIndex()
+            ->setFormTypeOption(
+                'query_builder',
+                function (EntityRepository $er) {
+                    return $er->createQueryBuilder('o')
+                        ->andWhere('o.parent = o')
+                        ->orderBy('o.name', 'ASC')
+                    ;
+                }
+            );
 
         yield FormField::addFieldset('Administration');
         $statusChoices = [];
@@ -114,17 +105,15 @@ class BlogPromotionPostCrudController extends AtCrudController
             $statusChoices[$status['name']] = $status['slug'];
         }
         yield ChoiceField::new('status', 'Statut')
-        ->setChoices($statusChoices);
+            ->setChoices($statusChoices);
 
         yield FormField::addFieldset('Données diverses');
         yield DateTimeField::new('timeCreate', 'Date de création')
-        ->setFormTypeOption('attr', ['readonly' => true])
-        ->hideWhenCreating()
-        ;
+            ->setFormTypeOption('attr', ['readonly' => true])
+            ->hideWhenCreating();
         yield DateTimeField::new('timeUpdate', 'Date de mise à jour')
-        ->setFormTypeOption('attr', ['readonly' => true])
-        ->hideWhenCreating()
-        ->hideOnIndex()
-        ;
-    }    
+            ->setFormTypeOption('attr', ['readonly' => true])
+            ->hideWhenCreating()
+            ->hideOnIndex();
+    }
 }

@@ -51,7 +51,7 @@ final class RegexpFilter extends AbstractFilter
                         new Example('summary', 'description'),
                         new Example('summary2', 'description2'),
                     ],
-                    'allowReserved' => false,// if true, query parameters will be not percent-encoded
+                    'allowReserved' => false, // if true, query parameters will be not percent-encoded
                     'allowEmptyValue' => true,
                     'explode' => false, // to be true, the type must be Type::BUILTIN_TYPE_ARRAY, ?product=blue,green will be ?product=blue&product=green
                 ],

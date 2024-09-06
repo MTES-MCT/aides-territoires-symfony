@@ -12,7 +12,8 @@ class PrePersistListener
 {
     public function __construct(
         protected EntityManagerInterface $em
-    ) {}
+    ) {
+    }
 
     public function prePersist(PrePersistEventArgs $args): void
     {

@@ -36,9 +36,8 @@ class AlertRelaunchWeeklyCommand extends Command
         protected ParamService $paramService,
         protected RouterInterface $routerInterface,
         protected NotificationService $notificationService
-    )
-    {
-        ini_set('max_execution_time', 60*60);
+    ) {
+        ini_set('max_execution_time', 60 * 60);
         ini_set('memory_limit', '1G');
         parent::__construct();
     }
@@ -51,7 +50,7 @@ class AlertRelaunchWeeklyCommand extends Command
         $io = new SymfonyStyle($input, $output);
         $io->title($this->commandTextStart);
 
-        try  {
+        try {
             if ($this->kernelInterface->getEnvironment() != 'prod') {
                 $io->info('Uniquement en prod');
                 return Command::FAILURE;
@@ -75,10 +74,10 @@ class AlertRelaunchWeeklyCommand extends Command
         $context = $this->routerInterface->getContext();
         $context->setHost($host);
         $context->setScheme('https');
-        
+
         /** @var AlertRepository $alertRepo */
         $alertRepo = $this->managerRegistry->getRepository(Alert::class);
-        
+
         // charge les alertes
         $alerts = $alertRepo->findToSendWeekly();
 
@@ -90,7 +89,7 @@ class AlertRelaunchWeeklyCommand extends Command
         $today = new \DateTime(date('Y-m-d'));
         $weekNumber = $today->format('W');
         $year = $today->format('o');
-        
+
         $startOfWeek = new \DateTime();
         $startOfWeek->setISODate($year, $weekNumber, 1);
 
@@ -103,11 +102,11 @@ class AlertRelaunchWeeklyCommand extends Command
             $aidSearchClass = $this->aidSearchFormService->getAidSearchClass(
                 params: [
                     'querystring' => $alert->getQuerystring(),
-                    ]
+                ]
             );
 
             // parametres pour requetes aides
-            $aidParams =[
+            $aidParams = [
                 'showInSearch' => true,
                 'publishedAfter' => $publishedAfter,
                 'publishedBefore' => $startOfWeek,
@@ -130,9 +129,9 @@ class AlertRelaunchWeeklyCommand extends Command
                 $emailSubjectPrefix = $this->paramService->get('email_subject_prefix');
             }
             $today = new \DateTime(date('Y-m-d H:i:s'));
-            $emailSubject = $emailSubjectPrefix . ' '. $today->format('d/m/Y') . ' — De nouvelles aides correspondent à vos recherches';
-            $subject = count($aids).' résultat'.(count($aids) > 1 ? 's' : '').' pour votre alerte';
-                        
+            $emailSubject = $emailSubjectPrefix . ' ' . $today->format('d/m/Y') . ' — De nouvelles aides correspondent à vos recherches';
+            $subject = count($aids) . ' résultat' . (count($aids) > 1 ? 's' : '') . ' pour votre alerte';
+
             // Force le tri par date de publication DESC
             parse_str($alert->getQuerystring(), $params);
             $params['orderBy'] = 'publication_date';
@@ -159,7 +158,7 @@ class AlertRelaunchWeeklyCommand extends Command
             $this->managerRegistry->getManager()->flush();
             // incrémente le compteur
             $nbAlertSend++;
-        
+
 
             // libère mémoire
             unset($aids);
@@ -168,10 +167,10 @@ class AlertRelaunchWeeklyCommand extends Command
 
         // notif admin
         $admin = $this->managerRegistry->getRepository(User::class)->findOneBy(['email' => $this->paramService->get('email_super_admin')]);
-        $this->notificationService->addNotification($admin, 'Envoi des alertes hebdomadaires', $nbAlertSend. ' alertes envoyées pour les aides publiées après le ' . $publishedAfter->format('d/m/Y') . ' inclus');
-        
+        $this->notificationService->addNotification($admin, 'Envoi des alertes hebdomadaires', $nbAlertSend . ' alertes envoyées pour les aides publiées après le ' . $publishedAfter->format('d/m/Y') . ' inclus');
+
         // success
-        $io->success($nbAlertSend.'/'.$nbAlertTotal. ' alertes envoyées');
+        $io->success($nbAlertSend . '/' . $nbAlertTotal . ' alertes envoyées');
         $io->success('Mémoire maximale utilisée : ' . round(memory_get_peak_usage() / 1024 / 1024) . ' MB');
     }
 }

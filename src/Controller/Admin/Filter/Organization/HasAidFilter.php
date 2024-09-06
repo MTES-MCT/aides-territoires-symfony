@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Controller\Admin\Filter\Organization;
 
 use App\Form\Admin\Filter\Organization\HasAidFilterType;
@@ -26,17 +27,15 @@ class HasAidFilter implements FilterInterface
     {
         if ($filterDataDto->getValue() !== null) {
             $queryBuilder
-                ->innerJoin($filterDataDto->getEntityAlias().'.beneficiairies', 'beneficiairies')
+                ->innerJoin($filterDataDto->getEntityAlias() . '.beneficiairies', 'beneficiairies')
                 ->leftJoin('beneficiairies.aids', 'aids')
             ;
             if ($filterDataDto->getValue() === true) {
                 $queryBuilder
-                    ->andWhere('aids.id IS NOT NULL')
-                ;
+                    ->andWhere('aids.id IS NOT NULL');
             } else {
                 $queryBuilder
-                    ->andWhere('aids.id IS NULL')
-                ;
+                    ->andWhere('aids.id IS NULL');
             }
         }
     }

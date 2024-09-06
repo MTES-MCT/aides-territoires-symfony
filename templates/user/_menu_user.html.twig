@@ -1,150 +1,154 @@
 <nav id="account-sidebar-menu" class="fr-col fr-col-md-3 fr-sidemenu fr-mb-2w" role="navigation" aria-label="Menu latéral">
-    <div class="fr-sidemenu__inner">
-        <button class="fr-sidemenu__btn" aria-controls="fr-sidemenu-wrapper" aria-expanded="false" title="Menu mon compte">Mon compte</button>
-        <div class="fr-collapse" id="fr-sidemenu-wrapper">
-            <ul class="fr-sidemenu__list">
-                {% if hideMenu is not defined %}
-                <li class="fr-sidemenu__item {% if dashboard is defined %}fr-sidemenu__item--active{% endif %}">
-                    <a class="fr-sidemenu__link" href="{{ path('app_user_dashboard') }}" target="_self" title="Tableau de bord" {% if dashboard is defined %}aria-current="page"{% endif %} rel="noopener">Tableau de bord</a>
-                </li>     
-                {% if app.user.isContributor %}
-                <li class="fr-sidemenu__item">
-                    <button class="fr-sidemenu__btn" {% if publishAid is defined %} aria-expanded="true" {% else %} aria-expanded="false" {% endif %} aria-controls="fr-sidemenu-item-2" title="Diffuser mes aides">Diffuser mes aides</button>
-                    <div class="fr-collapse" id="fr-sidemenu-item-2">
-                        <ul class="fr-sidemenu__list">
-                            <li class="fr-sidemenu__item {% if aidDraftList is defined %}fr-sidemenu__item--active{% endif %}">
-                                <a class="fr-sidemenu__link" href="{{ path('app_user_aid_publications') }}" target="_self"  {% if aidDraftList is defined %}aria-current="page"{% endif %} rel="noopener" title="Mon portefeuille d’aides">Mon portefeuille d’aides</a>
-                            </li>
-                            <li class="fr-sidemenu__item">
-                                <a class="fr-sidemenu__link" href="{{ path('app_user_aid_detail_publish') }}" target="_self" rel="noopener" title="Publier une aide">Publier une aide</a>
-                            </li>
-                        </ul>
-                    </div>
-                </li>
-                {% endif %}
+	<div class="fr-sidemenu__inner">
+		<button class="fr-sidemenu__btn" aria-controls="fr-sidemenu-wrapper" aria-expanded="false" title="Menu mon compte">Mon compte</button>
+		<div class="fr-collapse" id="fr-sidemenu-wrapper">
+			<ul class="fr-sidemenu__list">
+				{% if hideMenu is not defined %}
+					<li class="fr-sidemenu__item {% if dashboard is defined %}fr-sidemenu__item--active{% endif %}">
+						<a class="fr-sidemenu__link" href="{{ path('app_user_dashboard') }}" target="_self" title="Tableau de bord" {% if dashboard is defined %} aria-current="page" {% endif %} rel="noopener">Tableau de bord</a>
+					</li>
+					{% if app.user.isContributor %}
+						<li class="fr-sidemenu__item">
+							<button class="fr-sidemenu__btn" {% if publishAid is defined %} aria-expanded="true" {% else %} aria-expanded="false" {% endif %} aria-controls="fr-sidemenu-item-2" title="Diffuser mes aides">Diffuser mes aides</button>
+							<div class="fr-collapse" id="fr-sidemenu-item-2">
+								<ul class="fr-sidemenu__list">
+									<li class="fr-sidemenu__item {% if aidDraftList is defined %}fr-sidemenu__item--active{% endif %}">
+										<a class="fr-sidemenu__link" href="{{ path('app_user_aid_publications') }}" target="_self" {% if aidDraftList is defined %} aria-current="page" {% endif %} rel="noopener" title="Mon portefeuille d’aides">Mon portefeuille d’aides</a>
+									</li>
+									<li class="fr-sidemenu__item">
+										<a class="fr-sidemenu__link" href="{{ path('app_user_aid_detail_publish') }}" target="_self" rel="noopener" title="Publier une aide">Publier une aide</a>
+									</li>
+								</ul>
+							</div>
+						</li>
+					{% endif %}
 
-                <li class="fr-sidemenu__item">
-                    <button class="fr-sidemenu__btn" {% if user_project is defined %} aria-expanded="true" {% else %} aria-expanded="false" {% endif %} aria-controls="fr-sidemenu-item-projects">Mes projets</button>
-                    <div class="fr-collapse" id="fr-sidemenu-item-projects">
-                        <ul class="fr-sidemenu__list">
-                            <li class="fr-sidemenu__item {% if user_project_structure is defined %}fr-sidemenu__item--active{% endif %}">
-                                <a class="fr-sidemenu__link" href="{{ path('app_user_project_structure') }}" target="_self" {% if user_project_structure is defined %}aria-current="page"{% endif %} rel="noopener" title="Voir mes projets">
-                                    Voir mes projets
-                                </a>
-                            </li>
-                            <li class="fr-sidemenu__item {% if user_project_favoris is defined %}fr-sidemenu__item--active{% endif %}">
-                                <a class="fr-sidemenu__link" href="{{ path('app_user_project_favoris') }}" target="_self" {% if user_project_favoris is defined %}aria-current="page"{% endif %} rel="noopener" title="Mes projets favoris">
-                                    Favoris
-                                </a>
-                            </li>                           
-                        </ul>
-                    </div>
-                </li>
+					<li class="fr-sidemenu__item">
+						<button class="fr-sidemenu__btn" {% if user_project is defined %} aria-expanded="true" {% else %} aria-expanded="false" {% endif %} aria-controls="fr-sidemenu-item-projects">Mes projets</button>
+						<div class="fr-collapse" id="fr-sidemenu-item-projects">
+							<ul class="fr-sidemenu__list">
+								<li class="fr-sidemenu__item {% if user_project_structure is defined %}fr-sidemenu__item--active{% endif %}">
+									<a class="fr-sidemenu__link" href="{{ path('app_user_project_structure') }}" target="_self" {% if user_project_structure is defined %} aria-current="page" {% endif %} rel="noopener" title="Voir mes projets">
+										Voir mes projets
+									</a>
+								</li>
+								<li class="fr-sidemenu__item {% if user_project_favoris is defined %}fr-sidemenu__item--active{% endif %}">
+									<a class="fr-sidemenu__link" href="{{ path('app_user_project_favoris') }}" target="_self" {% if user_project_favoris is defined %} aria-current="page" {% endif %} rel="noopener" title="Mes projets favoris">
+										Favoris
+									</a>
+								</li>
+							</ul>
+						</div>
+					</li>
 
-                <li class="fr-sidemenu__item {% if alert_list is defined %}fr-sidemenu__item--active{% endif %}">
-                    <a class="fr-sidemenu__link" href="{{ path('app_user_alert') }}" target="_self" rel="noopener" {% if alert_list is defined %}aria-current="page"{% endif %} title="Gérer mes alertes">Gérer mes alertes</a>
-                </li>
+					<li class="fr-sidemenu__item {% if alert_list is defined %}fr-sidemenu__item--active{% endif %}">
+						<a class="fr-sidemenu__link" href="{{ path('app_user_alert') }}" target="_self" rel="noopener" {% if alert_list is defined %} aria-current="page" {% endif %} title="Gérer mes alertes">Gérer mes alertes</a>
+					</li>
 
-                <li class="fr-sidemenu__item {% if menu_notification is defined %}fr-sidemenu__item--active{% endif %}">
-                    <a class="fr-sidemenu__link" href="{{ path('app_user_user_notification') }}" target="_self" rel="noopener" {% if menu_notification is defined %}aria-current="page"{% endif %} title="Voir mes notifications">Voir mes notifications</a>
-                </li>
+					<li class="fr-sidemenu__item {% if menu_notification is defined %}fr-sidemenu__item--active{% endif %}">
+						<a class="fr-sidemenu__link" href="{{ path('app_user_user_notification') }}" target="_self" rel="noopener" {% if menu_notification is defined %} aria-current="page" {% endif %} title="Voir mes notifications">Voir mes notifications</a>
+					</li>
 
-                {% if app.user.searchPages and app.user.searchPages|length > 0 %}
-                <li class="fr-sidemenu__item">
-                    <button class="fr-sidemenu__btn" {% if user_portals is defined %} aria-expanded="true" {% else %} aria-expanded="false" {% endif %} aria-controls="fr-sidemenu-item-portals">Gérer mes portails</button>
-                    <div class="fr-collapse" id="fr-sidemenu-item-portals">
-                        <ul class="fr-sidemenu__list">
-                            {% for searchPage in app.user.searchPages %}
-                            <li class="fr-sidemenu__item {% if user_portal_selected is defined and user_portal_selected == searchPage.id is defined %}fr-sidemenu__item--active{% endif %}">
-                                <a class="fr-sidemenu__link" href="{{ path('app_user_portal_edit', {'id': searchPage.id}) }}" target="_self" {% if user_portal_selected is defined and user_portal_selected == searchPage.id %}aria-current="page"{% endif %} rel="noopener" title="{{ searchPage.name }}">
-                                    {{ searchPage.name }}
-                                </a>
-                            </li>
-                            {% endfor %}                         
-                        </ul>
-                    </div>
-                </li>
-                {% endif %}
+					{% if app.user.searchPages and app.user.searchPages|length > 0 %}
+						<li class="fr-sidemenu__item">
+							<button class="fr-sidemenu__btn" {% if user_portals is defined %} aria-expanded="true" {% else %} aria-expanded="false" {% endif %} aria-controls="fr-sidemenu-item-portals">Gérer mes portails</button>
+							<div class="fr-collapse" id="fr-sidemenu-item-portals">
+								<ul class="fr-sidemenu__list">
+									{% for searchPage in app.user.searchPages %}
+										<li class="fr-sidemenu__item {% if user_portal_selected is defined and user_portal_selected == searchPage.id is defined %}fr-sidemenu__item--active{% endif %}">
+											<a class="fr-sidemenu__link" href="{{ path('app_user_portal_edit', {'id': searchPage.id}) }}" target="_self" {% if user_portal_selected is defined and user_portal_selected == searchPage.id %} aria-current="page" {% endif %} rel="noopener" title="{{ searchPage.name }}">
+												{{ searchPage.name }}
+											</a>
+										</li>
+									{% endfor %}
+								</ul>
+							</div>
+						</li>
+					{% endif %}
 
-                <li class="fr-sidemenu__item">
-                    <button class="fr-sidemenu__btn"  {% if structure is defined %} aria-expanded="true" {% else %} aria-expanded="false" {% endif %} aria-controls="fr-sidemenu-item-4">{% if app.user.organizations and app.user.organizations|length > 1 %}Mes structures{% else %}Ma structure{% endif %}</button>
-                    <div class="fr-collapse" id="fr-sidemenu-item-4">
-                        <ul class="fr-sidemenu__list">
-                            {% for userOrganization in app.user.organizations %}
-                                <li class="fr-sidemenu__item {% if organization is defined and userOrganization.id == organization.id %}fr-sidemenu__item--active{% endif %}">
-                                    <a class="fr-sidemenu__link" href="{{ path('app_organization_structure_information', {'id': userOrganization.id}) }}" target="_self" {% if organization is defined and organization.id == userOrganization.id %}aria-current="page"{% endif %} rel="noopener" title="{{ userOrganization.name }}">{{ userOrganization.name }}</a>
-                                </li>
-                            {% endfor %}
-                            {% if app.user and app.user.organizations|length == 0 %}
-                            <li class="fr-sidemenu__item {% if organization is defined and organization == null %}fr-sidemenu__item--active{% endif %}">
-                                <a class="fr-sidemenu__link" href="{{ path('app_organization_structure_information') }}" target="_self" {% if organization is defined and organization.id == null %}aria-current="page"{% endif %} rel="noopener" title="Nouvelle structure">Nouvelle structure</a>
-                            </li>
-                            {% endif %}
-                            <li class="fr-sidemenu__item {% if structure_invitations is defined %}fr-sidemenu__item--active{% endif %}">
-                                <a class="fr-sidemenu__link" href="{{ path('app_organization_invitations') }}" target="_self" {% if structure_invitations is defined %}aria-current="page"{% endif %} rel="noopener" title="Mes invitations">Mes invitations</a>
-                            </li>
-                        </ul>
-                    </div>
-                </li>
+					<li class="fr-sidemenu__item">
+						<button class="fr-sidemenu__btn" {% if structure is defined %} aria-expanded="true" {% else %} aria-expanded="false" {% endif %} aria-controls="fr-sidemenu-item-4">
+							{% if app.user.organizations and app.user.organizations|length > 1 %}Mes structures{% else %}Ma structure
+							{% endif %}
+						</button>
+						<div class="fr-collapse" id="fr-sidemenu-item-4">
+							<ul class="fr-sidemenu__list">
+								{% for userOrganization in app.user.organizations %}
+									<li class="fr-sidemenu__item {% if organization is defined and userOrganization.id == organization.id %}fr-sidemenu__item--active{% endif %}">
+										<a class="fr-sidemenu__link" href="{{ path('app_organization_structure_information', {'id': userOrganization.id}) }}" target="_self" {% if organization is defined and organization.id == userOrganization.id %} aria-current="page" {% endif %} rel="noopener" title="{{ userOrganization.name }}">{{ userOrganization.name }}</a>
+									</li>
+								{% endfor %}
+								{% if app.user and app.user.organizations|length == 0 %}
+									<li class="fr-sidemenu__item {% if organization is defined and organization == null %}fr-sidemenu__item--active{% endif %}">
+										<a class="fr-sidemenu__link" href="{{ path('app_organization_structure_information') }}" target="_self" {% if organization is defined and organization.id == null %} aria-current="page" {% endif %} rel="noopener" title="Nouvelle structure">Nouvelle structure</a>
+									</li>
+								{% endif %}
+								<li class="fr-sidemenu__item {% if structure_invitations is defined %}fr-sidemenu__item--active{% endif %}">
+									<a class="fr-sidemenu__link" href="{{ path('app_organization_invitations') }}" target="_self" {% if structure_invitations is defined %} aria-current="page" {% endif %} rel="noopener" title="Mes invitations">Mes invitations</a>
+								</li>
+							</ul>
+						</div>
+					</li>
 
-                <li class="fr-sidemenu__item">
-                    <button class="fr-sidemenu__btn" {% if user_parameter is defined %} aria-expanded="true" {% else %} aria-expanded="false" {% endif %} aria-controls="fr-sidemenu-item-5">Mes paramètres</button>
-                    <div class="fr-collapse" id="fr-sidemenu-item-5">
-                        <ul class="fr-sidemenu__list">
-                            <li class="fr-sidemenu__item {% if user_profile is defined %}fr-sidemenu__item--active{% endif %}">
-                                <a class="fr-sidemenu__link" href="{{ path('app_user_parameter_profil') }}" target="_self" {% if user_profile is defined %}aria-current="page"{% endif %} rel="noopener" title="Mon profil">
-                                    Mon profil
-                                </a>
-                            </li>
-                            <li class="fr-sidemenu__item {% if api_token is defined %}fr-sidemenu__item--active{% endif %}">
-                                <a class="fr-sidemenu__link" href="{{ path('app_user_parameter_api_token') }}" target="_self" {% if api_token is defined %}aria-current="page"{% endif %} rel="noopener" title="Ma clé API">
-                                    Ma clé API
-                                </a>
-                            </li>
-                            <li class="fr-sidemenu__item {% if history_login is defined %}fr-sidemenu__item--active{% endif %}">
-                                <a class="fr-sidemenu__link" href="{{ path('app_user_parameter_history_log') }}" target="_self" {% if history_login is defined %}aria-current="page"{% endif %} rel="noopener" title="Mon journal de connexion">
-                                    Mon journal de connexion
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
-                </li>         
-                <li class="fr-sidemenu__item fr-mt-2w">
-                    <div class="fr-pr-2w fr-pl-2w"><hr class="fr-hint-text"/></div>
-                </li>
-                {% endif %}
-                <li class="fr-sidemenu__item">
-                    <a class="fr-sidemenu__link" href="{{ path('app_logout') }}" target="_self" rel="noopener" title="Se déconnecter">Se déconnecter</a>
-                </li>
+					<li class="fr-sidemenu__item">
+						<button class="fr-sidemenu__btn" {% if user_parameter is defined %} aria-expanded="true" {% else %} aria-expanded="false" {% endif %} aria-controls="fr-sidemenu-item-5">Mes paramètres</button>
+						<div class="fr-collapse" id="fr-sidemenu-item-5">
+							<ul class="fr-sidemenu__list">
+								<li class="fr-sidemenu__item {% if user_profile is defined %}fr-sidemenu__item--active{% endif %}">
+									<a class="fr-sidemenu__link" href="{{ path('app_user_parameter_profil') }}" target="_self" {% if user_profile is defined %} aria-current="page" {% endif %} rel="noopener" title="Mon profil">
+										Mon profil
+									</a>
+								</li>
+								<li class="fr-sidemenu__item {% if api_token is defined %}fr-sidemenu__item--active{% endif %}">
+									<a class="fr-sidemenu__link" href="{{ path('app_user_parameter_api_token') }}" target="_self" {% if api_token is defined %} aria-current="page" {% endif %} rel="noopener" title="Ma clé API">
+										Ma clé API
+									</a>
+								</li>
+								<li class="fr-sidemenu__item {% if history_login is defined %}fr-sidemenu__item--active{% endif %}">
+									<a class="fr-sidemenu__link" href="{{ path('app_user_parameter_history_log') }}" target="_self" {% if history_login is defined %} aria-current="page" {% endif %} rel="noopener" title="Mon journal de connexion">
+										Mon journal de connexion
+									</a>
+								</li>
+							</ul>
+						</div>
+					</li>
+					<li class="fr-sidemenu__item fr-mt-2w">
+						<div class="fr-pr-2w fr-pl-2w"><hr class="fr-hint-text"/></div>
+					</li>
+				{% endif %}
+				<li class="fr-sidemenu__item">
+					<a class="fr-sidemenu__link" href="{{ path('app_logout') }}" target="_self" rel="noopener" title="Se déconnecter">Se déconnecter</a>
+				</li>
 
-                {% if isUserGranted(app.user, constant('App\\Entity\\User\\User::ROLE_ADMIN')) %}
-                <li class="fr-sidemenu__item fr-py-2w">
-                    <div class="at-sidemenu__separator fr-px-2w"><hr/></div>
-                </li>
-                <li class="fr-sidemenu__item">
-                    <button class="fr-sidemenu__btn" aria-expanded="false" aria-controls="fr-sidemenu-item-6">
-                        <span class="fr-icon-lock-fill" aria-hidden="true"></span> Admin AT
-                    </button>
-                    <div class="fr-collapse" id="fr-sidemenu-item-6">
-                        <ul class="fr-sidemenu__list">
-                            <li class="fr-sidemenu__item">
-                                <a class="fr-sidemenu__link" href="{{ path('admin') }}" target="_self" rel="noopener">
-                                    <span class="fr-icon-lock-fill fr-mr-1w"></span>
-                                    Backoffice
-                                </a>
-                            </li>
-                            <li class="fr-sidemenu__item">
-                                <a class="fr-sidemenu__link" href="{{ path('admin_statistics_dashboard') }}" target="_self" rel="noopener">
-                                    <span class="fr-icon-lock-fill fr-mr-1w" aria-hidden="true"></span>
-                                    Statistiques
-                                </a>
-                            </li>            
-                        </ul>
-                    </div>
-                </li>
-                {% endif %}
+				{% if isUserGranted(app.user, constant('App\\Entity\\User\\User::ROLE_ADMIN')) %}
+					<li class="fr-sidemenu__item fr-py-2w">
+						<div class="at-sidemenu__separator fr-px-2w"><hr/></div>
+					</li>
+					<li class="fr-sidemenu__item">
+						<button class="fr-sidemenu__btn" aria-expanded="false" aria-controls="fr-sidemenu-item-6">
+							<span class="fr-icon-lock-fill" aria-hidden="true"></span>
+							Admin AT
+						</button>
+						<div class="fr-collapse" id="fr-sidemenu-item-6">
+							<ul class="fr-sidemenu__list">
+								<li class="fr-sidemenu__item">
+									<a class="fr-sidemenu__link" href="{{ path('admin') }}" target="_self" rel="noopener">
+										<span class="fr-icon-lock-fill fr-mr-1w"></span>
+										Backoffice
+									</a>
+								</li>
+								<li class="fr-sidemenu__item">
+									<a class="fr-sidemenu__link" href="{{ path('admin_statistics_dashboard') }}" target="_self" rel="noopener">
+										<span class="fr-icon-lock-fill fr-mr-1w" aria-hidden="true"></span>
+										Statistiques
+									</a>
+								</li>
+							</ul>
+						</div>
+					</li>
+				{% endif %}
 
-            </ul>
-        </div>
-    </div>
+			</ul>
+		</div>
+	</div>
 </nav>

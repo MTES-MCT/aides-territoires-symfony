@@ -1,159 +1,183 @@
 {% extends "_base_pdf.html.twig" %}
 
 {% block title_style %}
-{{ parent() }}
-h1 {
-    font-size: 1.1rem;
-    text-align: center;
-    background: transparent;
-}
+	{{ parent() }}
+	h1 {
+	    font-size: 1.1rem;
+	    text-align: center;
+	    background: transparent;
+	}
 
 {% endblock title_style%}
 
-{% block extratitle %}{{ aid.name }}{% endblock extratitle %}
+{% block extratitle %}
+	{{ aid.name }}
+{% endblock extratitle %}
 
 {% block logo_partner %}
-<img src="{{ absolute_url(asset('build/images/logo/logo_AT_courbes.png')) }}" style="height:60pt" alt="Aides-territoires" />
-{% if aid.author and aid.author.defaultOrganization and aid.author.defaultOrganization.backer and aid.author.defaultOrganization.backer.logo %}
-<img src="{{ getParameter('cloud_image_url') }}{{ aid.author.defaultOrganization.backer.logo }}" style="height:60pt" alt="logo de la structure {{ aid.author.defaultOrganization.name }}" />
-{% endif %}
+	<img src="{{ absolute_url(asset('build/images/logo/logo_AT_courbes.png')) }}" style="height:60pt" alt="Aides-territoires"/>
+	{% if aid.author and aid.author.defaultOrganization and aid.author.defaultOrganization.backer and aid.author.defaultOrganization.backer.logo %}
+		<img src="{{ getParameter('cloud_image_url') }}{{ aid.author.defaultOrganization.backer.logo }}" style="height:60pt" alt="logo de la structure {{ aid.author.defaultOrganization.name }}"/>
+	{% endif %}
 {% endblock logo_partner %}
 
 {% block intro %}{% endblock intro %}
 
 {% block content %}
-<div class="fr-container fr-mb-5w fr-mt-0">
-    <div class="fr-grid-row">
+	<div class="fr-container fr-mb-5w fr-mt-0">
+		<div class="fr-grid-row">
 
-        <div class="fr-col-12 fr-col-md-9">
-            <div class="fr-grid-row">
-                <div class="fr-col-12 fr-col-md-9">
-                    {# name is an obsolete attribute for web but it is the correct one for PDFs #}
-                    <a name="anchor-aid-{{ aid.id }}"></a>
-                    <h1>Présentation de l’aide « {{ aid.name }} »</h1>
-                </div>
-            </div>
+			<div class="fr-col-12 fr-col-md-9">
+				<div class="fr-grid-row">
+					<div
+						class="fr-col-12 fr-col-md-9">
+						{# name is an obsolete attribute for web but it is the correct one for PDFs #}
+						<a name="anchor-aid-{{ aid.id }}"></a>
+						<h1>Présentation de l’aide «
+							{{ aid.name }}
+							»</h1>
+					</div>
+				</div>
 
-            <p>{{ aid.description|raw }}</p>
+				<p>{{ aid.description|raw }}</p>
 
-            {% if aid.isLocal and aid.localCharacteristics %}
-                <h4>Spécificités locales</h4>
+				{% if aid.isLocal and aid.localCharacteristics %}
+					<h4>Spécificités locales</h4>
 
-                {{ aid.localCharacteristics|raw }}
+					{{ aid.localCharacteristics|raw }}
 
-            {% endif %}
+				{% endif %}
 
-            {% if aid.aidAudiences %}
-                <h4>Bénéficiaires de l’aide</h4>
-                <p>
-                {% for audience in aid.aidAudiences %}
-                {{ audience.name }}{% if not loop.last %}, {% endif %}
-                {% endfor %}
-                </p>
-            {% endif %}
+				{% if aid.aidAudiences %}
+					<h4>Bénéficiaires de l’aide</h4>
+					<p>
+						{% for audience in aid.aidAudiences %}
+							{{ audience.name }}
+							{% if not loop.last %},
+							{% endif %}
+						{% endfor %}
+					</p>
+				{% endif %}
 
-            {% if aid.aidTypes %}
-                <h4>Types d’aide</h4>
-                <p>
-                    {% for aidType in aid.aidTypes %}
-                    <strong>{{ aidType.name }}</strong><br />
-                    {% endfor %}
-                </p>
-            {% endif %}
+				{% if aid.aidTypes %}
+					<h4>Types d’aide</h4>
+					<p>
+						{% for aidType in aid.aidTypes %}
+							<strong>{{ aidType.name }}</strong><br/>
+						{% endfor %}
+					</p>
+				{% endif %}
 
-            <h4>Zone géographique couverte par l’aide</h4>
-            <p>{{ aid.perimeter|perimeterSmartRegionNames }}</p>
+				<h4>Zone géographique couverte par l’aide</h4>
+				<p>{{ aid.perimeter|perimeterSmartRegionNames }}</p>
 
-            <h4>Critères d’éligibilité</h4>
+				<h4>Critères d’éligibilité</h4>
 
-            {% if aid.aidSteps %}
-                <h5>État d’avancement du projet pour bénéficier du dispositif</h5>
-                <p>
-                {% for aidStep in aid.aidSteps %}
-                {{ aidStep.name }}{% if not loop.last %}, {% endif %}
-                {% endfor %}
-                </p>
-            {% endif %}
+				{% if aid.aidSteps %}
+					<h5>État d’avancement du projet pour bénéficier du dispositif</h5>
+					<p>
+						{% for aidStep in aid.aidSteps %}
+							{{ aidStep.name }}
+							{% if not loop.last %},
+							{% endif %}
+						{% endfor %}
+					</p>
+				{% endif %}
 
-            {% if aid.aidDestinations %}
-                <h5>Types de dépenses / actions couvertes</h5>
-                <p>
-                {% for aidDestination in aid.aidDestinations %}
-                {{ aidDestination.name }}{% if not loop.last %}, {% endif %}
-                {% endfor %}
-                </p>
-            {% endif %}
+				{% if aid.aidDestinations %}
+					<h5>Types de dépenses / actions couvertes</h5>
+					<p>
+						{% for aidDestination in aid.aidDestinations %}
+							{{ aidDestination.name }}
+							{% if not loop.last %},
+							{% endif %}
+						{% endfor %}
+					</p>
+				{% endif %}
 
-            {% if aid.projectExamples %}
-                <h5>Exemples de projets réalisables</h5>
-                {{ aid.projectExamples|raw }}
-            {% endif %}
+				{% if aid.projectExamples %}
+					<h5>Exemples de projets réalisables</h5>
+					{{ aid.projectExamples|raw }}
+				{% endif %}
 
-            {% if aid.eligibility %}
-                <h5>Autres critères d’éligibilité</h5>
-                {{ aid.eligibility|raw }}
-            {% endif %}
+				{% if aid.eligibility %}
+					<h5>Autres critères d’éligibilité</h5>
+					{{ aid.eligibility|raw }}
+				{% endif %}
 
-            <h4>Porteurs d’aides</h4>
-            <ul>
-            {% for aidFinancer in aid.aidFinancers %}
-                {% if aidFinancer.backer %}
-                <li>{{ aidFinancer.backer.name }}</li>
-                {% endif %}
-            {% endfor %}
-            </ul>
+				<h4>Porteurs d’aides</h4>
+				<ul>
+					{% for aidFinancer in aid.aidFinancers %}
+						{% if aidFinancer.backer %}
+							<li>{{ aidFinancer.backer.name }}</li>
+						{% endif %}
+					{% endfor %}
+				</ul>
 
-            <h4>Calendrier</h4>
-            <ul>
-                {% if aid.aidRecurrence %}<li><strong>Récurrence:</strong> {{ aid.aidRecurrence.name }}</li>{% endif %}
-                {% if aid.dateStart %}
-                    <li><strong>Ouverture:</strong> {{ aid.dateStart|date('d/m/Y') }}</li>
-                {% endif %}
-                {% if aid.dateSubmissionDeadline %}
-                    <li><strong>Clôture:</strong> {{ aid.dateSubmissionDeadline|date('d/m/Y') }}</li>
-                {% endif %}
-            </ul>
+				<h4>Calendrier</h4>
+				<ul>
+					{% if aid.aidRecurrence %}
+						<li>
+							<strong>Récurrence:</strong>
+							{{ aid.aidRecurrence.name }}</li>
+					{% endif %}
+					{% if aid.dateStart %}
+						<li>
+							<strong>Ouverture:</strong>
+							{{ aid.dateStart|date('d/m/Y') }}</li>
+					{% endif %}
+					{% if aid.dateSubmissionDeadline %}
+						<li>
+							<strong>Clôture:</strong>
+							{{ aid.dateSubmissionDeadline|date('d/m/Y') }}</li>
+					{% endif %}
+				</ul>
 
-            {% if aid.originUrl or aid.applicationUrl %}
-                <h4>Liens :</h4>
-                <ul>
-                    {% if aid.originUrl %}
-                        <li>Plus d’informations : <a href="{{ aid.originUrl }}">{{ aid.originUrl }}</a></li>
-                    {% endif %}
-                    {% if aid.applicationUrl %}
-                        <li>Candidater à l’aide : <a href="{{ aid.applicationUrl }}">{{ aid.applicationUrl }}</a></li>
-                    {% endif %}
-                </ul>
-            {% endif %}
+				{% if aid.originUrl or aid.applicationUrl %}
+					<h4>Liens :</h4>
+					<ul>
+						{% if aid.originUrl %}
+							<li>Plus d’informations :
+								<a href="{{ aid.originUrl }}">{{ aid.originUrl }}</a>
+							</li>
+						{% endif %}
+						{% if aid.applicationUrl %}
+							<li>Candidater à l’aide :
+								<a href="{{ aid.applicationUrl }}">{{ aid.applicationUrl }}</a>
+							</li>
+						{% endif %}
+					</ul>
+				{% endif %}
 
-            {% if aid.contact %}
-                <h4>Contact</h4>
-                <p>{{ aid.contact|raw }}</p>
-            {% endif %}
+				{% if aid.contact %}
+					<h4>Contact</h4>
+					<p>{{ aid.contact|raw }}</p>
+				{% endif %}
 
-            <p>
-                <strong>Voir le descriptif complet sur Aides-territoires :</strong>
-            </p>
-            <p>
-                <a href="{{ absolute_url(url('app_aid_aid_details', {'slug': aid.slug})) }}" class="at-pdf-link">
-                    {{ absolute_url(url('app_aid_aid_details', {'slug': aid.slug})) }}
-                </a>
-            </p>
-            <pdf:nextpage />
+				<p>
+					<strong>Voir le descriptif complet sur Aides-territoires :</strong>
+				</p>
+				<p>
+					<a href="{{ absolute_url(url('app_aid_aid_details', {'slug': aid.slug})) }}" class="at-pdf-link">
+						{{ absolute_url(url('app_aid_aid_details', {'slug': aid.slug})) }}
+					</a>
+				</p>
+				<pdf:nextpage/>
 
-            <p>
-                Export valable en date du <strong>{{ "now"|date('d/m/Y') }}</strong>.
-            </p>
-            <p>Pensez à télécharger régulièrement ce document afin de disposer de la dernière mise à jour.</p>
+				<p>
+					Export valable en date du
+					<strong>{{ "now"|date('d/m/Y') }}</strong>.
+				</p>
+				<p>Pensez à télécharger régulièrement ce document afin de disposer de la dernière mise à jour.</p>
 
-        </div>
-    </div>
-</div>
+			</div>
+		</div>
+	</div>
 {% endblock content %}
 
 {% block footer_sup %}
-<span>
-    <br />
-    L’aide citée a été publiée sur la plateforme Aides-territoires depuis laquelle ce fichier a été édité.
-</span>
+	<span>
+		<br/>
+		L’aide citée a été publiée sur la plateforme Aides-territoires depuis laquelle ce fichier a été édité.
+	</span>
 {% endblock footer_sup %}

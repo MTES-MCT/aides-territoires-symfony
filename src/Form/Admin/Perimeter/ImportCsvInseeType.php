@@ -15,8 +15,7 @@ class ImportCsvInseeType extends AbstractType
             ->add('fileCsv', FileType::class, [
                 'label' => 'Liste de communes (codes insee) :',
                 'required' => true
-            ])
-        ;
+            ]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void

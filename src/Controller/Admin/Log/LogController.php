@@ -16,8 +16,7 @@ class LogController extends DashboardController
     #[Route('/admin/log/aids/logs', name: 'admin_log_aids_logs')]
     public function aids(
         AdminContext $adminContext
-    ): Response
-    {
+    ): Response {
         // dates par défaut
         $dateMin = new \DateTime('-1 month');
         $dateMax = new \DateTime();
@@ -54,7 +53,7 @@ class LogController extends DashboardController
             'dateMax' => $dateMax,
             'maxResults' => 10
         ]);
-        
+
         // Logs en savoir plus aides
         $logAidOriginUrlClicks = $this->managerRegistry->getRepository(LogAidOriginUrlClick::class)->countOnPeriod([
             'dateMin' => $dateMin,
@@ -66,14 +65,14 @@ class LogController extends DashboardController
 
         // création du graphique
         $chartOrigin = $this->createChart($allDates, 'Clics en savoir plus aides');
-        
+
         // Top 10 aides en savoir plus
         $topAidOriginUrlClicks = $this->managerRegistry->getRepository(LogAidOriginUrlClick::class)->countTopAidOnPeriod([
             'dateMin' => $dateMin,
             'dateMax' => $dateMax,
             'maxResults' => 10
         ]);
-        
+
         // rendu template
         return $this->render('admin/log/aids.html.twig', [
             'formDateRange' => $formDateRange,

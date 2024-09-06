@@ -22,6 +22,7 @@ class MsgPerimeterImportHandler
         private ParamService $paramService
     ) {
     }
+
     public function __invoke(MsgPerimeterImport $message): void
     {
         $command = ['php', 'bin/console', 'at:cron:perimeter:perimeter_import'];

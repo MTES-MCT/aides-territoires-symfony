@@ -46,8 +46,7 @@ class PerimeterRepository extends ServiceEntityRepository
         $params['scale'] = Perimeter::SCALE_DEPARTEMENT;
 
         $qb = $this->getQueryBuilder($params)
-            ->orderBy('p.code', 'ASC')
-        ;
+            ->orderBy('p.code', 'ASC');
 
         return $qb->getQuery()->getResult();
     }
@@ -86,7 +85,7 @@ class PerimeterRepository extends ServiceEntityRepository
         FROM (
             SELECT DISTINCT (p.name) as name,
             (
-                '. $subSqlOrganization .'
+                ' . $subSqlOrganization . '
             ) as nb_organization
             FROM perimeter p 
             WHERE p.`scale`  = :scalePerimeter
@@ -101,14 +100,15 @@ class PerimeterRepository extends ServiceEntityRepository
         return $result->fetchAllAssociative();
     }
 
-    public function getIdPerimetersContainedIn(array $params = null) : array {
+    public function getIdPerimetersContainedIn(array $params = null): array
+    {
         $ids = [];
-        
+
         $qb = $this->createQueryBuilder('p')
-        ->select('perimetersFrom.id')
-        ->innerJoin('p.perimetersFrom', 'perimetersFrom')
-        ->andWhere('p = :perimeter')
-        ->setParameter('perimeter', $params['perimeter']);
+            ->select('perimetersFrom.id')
+            ->innerJoin('p.perimetersFrom', 'perimetersFrom')
+            ->andWhere('p = :perimeter')
+            ->setParameter('perimeter', $params['perimeter']);
 
         $results = $qb->getQuery()->getResult();
         foreach ($results as $result) {
@@ -116,10 +116,10 @@ class PerimeterRepository extends ServiceEntityRepository
         }
 
         $qb = $this->createQueryBuilder('p')
-        ->select('perimetersTo.id')
-        ->innerJoin('p.perimetersTo', 'perimetersTo')
-        ->andWhere('p = :perimeter')
-        ->setParameter('perimeter', $params['perimeter']);
+            ->select('perimetersTo.id')
+            ->innerJoin('p.perimetersTo', 'perimetersTo')
+            ->andWhere('p = :perimeter')
+            ->setParameter('perimeter', $params['perimeter']);
 
         $results = $qb->getQuery()->getResult();
         foreach ($results as $result) {
@@ -134,34 +134,33 @@ class PerimeterRepository extends ServiceEntityRepository
     public function findNbBackersByCounty(array $params = null): array
     {
         $qb = $this->createQueryBuilder('p')
-        // ->select('IFNULL(COUNT(DISTINCT(backer.id)), 0) AS nbBacker, p.name, p.code')
-        ->select('backersFrom.id as backersFromId, backersTo.id as backersToId, p.name, p.code, perimetersFrom.name as nameTo')
-        ->innerJoin('p.perimetersFrom', 'perimetersFrom')
-        ->innerJoin('perimetersFrom.aids', 'aidsFrom')
-        
-        ->innerJoin('perimetersFrom.backers', 'backersFrom')
-        ->innerJoin('p.perimetersTo', 'perimetersTo')
-        ->innerJoin('perimetersTo.backers', 'backersTo')
-        ->innerJoin('perimetersTo.aids', 'aidsTo')
-        // ->innerJoin('aids.aidFinancers', 'aidFinancers')
-        // ->innerJoin('aidFinancers.backer', 'backer')
-        // aid live
-        ->andWhere('aidsFrom.status = :statusPublished')
-        ->setParameter('statusPublished', Aid::STATUS_PUBLISHED)
-        ->andWhere('(aidsFrom.dateStart <= :today OR aidsFrom.dateStart IS NULL)')
-        ->andWhere('(aidsFrom.dateSubmissionDeadline > :today OR aidsFrom.dateSubmissionDeadline IS NULL)')
-        ->setParameter('today', new \DateTime(date('Y-m-d')))
+            // ->select('IFNULL(COUNT(DISTINCT(backer.id)), 0) AS nbBacker, p.name, p.code')
+            ->select('backersFrom.id as backersFromId, backersTo.id as backersToId, p.name, p.code, perimetersFrom.name as nameTo')
+            ->innerJoin('p.perimetersFrom', 'perimetersFrom')
+            ->innerJoin('perimetersFrom.aids', 'aidsFrom')
 
-        ->andWhere('aidsTo.status = :statusPublished')
-        ->andWhere('(aidsTo.dateStart <= :today OR aidsTo.dateStart IS NULL)')
-        ->andWhere('(aidsTo.dateSubmissionDeadline > :today OR aidsTo.dateSubmissionDeadline IS NULL)')
+            ->innerJoin('perimetersFrom.backers', 'backersFrom')
+            ->innerJoin('p.perimetersTo', 'perimetersTo')
+            ->innerJoin('perimetersTo.backers', 'backersTo')
+            ->innerJoin('perimetersTo.aids', 'aidsTo')
+            // ->innerJoin('aids.aidFinancers', 'aidFinancers')
+            // ->innerJoin('aidFinancers.backer', 'backer')
+            // aid live
+            ->andWhere('aidsFrom.status = :statusPublished')
+            ->setParameter('statusPublished', Aid::STATUS_PUBLISHED)
+            ->andWhere('(aidsFrom.dateStart <= :today OR aidsFrom.dateStart IS NULL)')
+            ->andWhere('(aidsFrom.dateSubmissionDeadline > :today OR aidsFrom.dateSubmissionDeadline IS NULL)')
+            ->setParameter('today', new \DateTime(date('Y-m-d')))
 
-        // departement
-        ->andWhere('p.scale = :scaleCounty')
-        ->setParameter('scaleCounty', Perimeter::SCALE_COUNTY)
-        // ->groupBy('p.code')
-        ->andWhere('p.code = :code')->setParameter('code', '91')
-        ;
+            ->andWhere('aidsTo.status = :statusPublished')
+            ->andWhere('(aidsTo.dateStart <= :today OR aidsTo.dateStart IS NULL)')
+            ->andWhere('(aidsTo.dateSubmissionDeadline > :today OR aidsTo.dateSubmissionDeadline IS NULL)')
+
+            // departement
+            ->andWhere('p.scale = :scaleCounty')
+            ->setParameter('scaleCounty', Perimeter::SCALE_COUNTY)
+            // ->groupBy('p.code')
+            ->andWhere('p.code = :code')->setParameter('code', '91');
 
 
         $results = $qb->getQuery()->getResult();
@@ -197,7 +196,7 @@ class PerimeterRepository extends ServiceEntityRepository
         return $resultsByCode;
     }
 
-    
+
     public function findCounties(array $params = null): array
     {
         $params['scale'] = Perimeter::SCALE_COUNTY;
@@ -211,14 +210,15 @@ class PerimeterRepository extends ServiceEntityRepository
         return $results;
     }
 
-    public function countEpci(?array $params = null) : int
+    public function countEpci(?array $params = null): int
     {
         $params['scale'] = Perimeter::SCALE_EPCI;
         $params['isObsolete'] = false;
-        return $this->countCustom($params);        
+        return $this->countCustom($params);
     }
 
-    public function countCustom(array $params = null) : int {
+    public function countCustom(array $params = null): int
+    {
         $qb = $this->getQueryBuilder($params);
 
         $qb->select('IFNULL(COUNT(DISTINCT(p.id)), 0) AS nb');
@@ -268,7 +268,7 @@ class PerimeterRepository extends ServiceEntityRepository
                 ->setParameter('idParent', $idParent)
             ;
         }
-        
+
         if ($regions && is_array($regions) && count($regions) > 0) {
             $qb
                 ->andWhere("JSON_CONTAINS(p.regions, :regions, '$') = 1 ")
@@ -286,21 +286,20 @@ class PerimeterRepository extends ServiceEntityRepository
             $qb->andWhere('p.isObsolete = :isObsolete')
                 ->setParameter('isObsolete', $isObsolete);
         }
-        if ($nameMatchAgainst !== null)
-        {
+        if ($nameMatchAgainst !== null) {
             $qb
-            ->andWhere('MATCH_AGAINST(p.name) AGAINST (:nameMatchAgainst) > 1')
-            ->setParameter('nameMatchAgainst', $nameMatchAgainst);
+                ->andWhere('MATCH_AGAINST(p.name) AGAINST (:nameMatchAgainst) > 1')
+                ->setParameter('nameMatchAgainst', $nameMatchAgainst);
         }
 
         if ($searchLike !== null) {
             // c'est un code postal
             if (preg_match('/^[0-9]{5}$/', $searchLike)) {
                 $qb
-                ->andWhere('
+                    ->andWhere('
                     p.zipcodes LIKE :zipcodes
                 ')
-                ->setParameter('zipcodes', '%'.$searchLike.'%');
+                    ->setParameter('zipcodes', '%' . $searchLike . '%');
                 ;
             } else { // c'est une string
                 $strings = [$searchLike];
@@ -312,19 +311,18 @@ class PerimeterRepository extends ServiceEntityRepository
                 }
 
                 $sqlWhere = '';
-                for ($i=0; $i < count($strings); $i++) {
-                    $sqlWhere .= ' p.name LIKE :nameLike'.$i;
+                for ($i = 0; $i < count($strings); $i++) {
+                    $sqlWhere .= ' p.name LIKE :nameLike' . $i;
                     if ($i < count($strings) - 1) {
                         $sqlWhere .= ' OR ';
                     }
-                    $qb->setParameter('nameLike'.$i, '%'.$strings[$i].'%');
+                    $qb->setParameter('nameLike' . $i, '%' . $strings[$i] . '%');
                 }
                 $qb
-                ->andWhere($sqlWhere)
-                ;
+                    ->andWhere($sqlWhere);
             }
         }
-        
+
         if (is_array($insees)) {
             $qb
                 ->andWhere('p.insee IN (:insees)')
@@ -334,34 +332,29 @@ class PerimeterRepository extends ServiceEntityRepository
 
         if (is_array($zipcodes)) {
             $sqlZipcodes = '';
-            for ($i=0; $i<count($zipcodes); $i++) {
+            for ($i = 0; $i < count($zipcodes); $i++) {
                 $zipcodes[$i] = (int) $zipcodes[$i];
-                $sqlZipcodes .= 'p.zipcodes LIKE :zipcode'.$i;
+                $sqlZipcodes .= 'p.zipcodes LIKE :zipcode' . $i;
                 if ($i < count($zipcodes) - 1) {
                     $sqlZipcodes .= ' OR ';
                 }
                 $qb
-                    ->setParameter('zipcode'.$i, '%'.$zipcodes[$i].'%');
+                    ->setParameter('zipcode' . $i, '%' . $zipcodes[$i] . '%');
             }
             $qb
-                ->andWhere($sqlZipcodes)
-            ;
+                ->andWhere($sqlZipcodes);
         }
 
-        if ($isVisibleToUsers !== null)
-        {
+        if ($isVisibleToUsers !== null) {
             $qb
-            ->andWhere('p.isVisibleToUsers = :isVisibleToUsers')
-            ->setParameter('isVisibleToUsers', $isVisibleToUsers);
-            
+                ->andWhere('p.isVisibleToUsers = :isVisibleToUsers')
+                ->setParameter('isVisibleToUsers', $isVisibleToUsers);
         }
 
-        if ($scaleLowerThan !== null)
-        {
+        if ($scaleLowerThan !== null) {
             $qb
-            ->andWhere('p.scale < :scaleLowerThan')
-            ->setParameter('scaleLowerThan', $scaleLowerThan);
-            
+                ->andWhere('p.scale < :scaleLowerThan')
+                ->setParameter('scaleLowerThan', $scaleLowerThan);
         }
 
         if ($scale !== null) {

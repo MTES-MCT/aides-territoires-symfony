@@ -1,6 +1,6 @@
 <?php
-namespace App\Filter\Backer;
 
+namespace App\Filter\Backer;
 
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Doctrine\Orm\Filter\AbstractFilter;
@@ -44,4 +44,3 @@ final class HasFinancedAidsFilter extends AbstractFilter
         ];
     }
 }
-?>

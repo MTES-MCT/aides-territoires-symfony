@@ -32,7 +32,7 @@ use Pagerfanta\Pagerfanta;
 
 class ProjectController extends FrontController
 {
-    
+
     const NB_PROJECT_BY_PAGE = 18;
 
 
@@ -45,30 +45,29 @@ class ProjectController extends FrontController
         UserService $userService,
         ReferenceService $referenceService,
         ProjectService $projectService
-    ): Response
-    {
+    ): Response {
         // le user
         $user = $userService->getUserLogged();
 
         // gestion pagination
         $currentPage = (int) $requestStack->getCurrentRequest()->get('page', 1);
-        
+
         $projectsParams = [];
         // formulaire de recherche
         $formProjectSearch = $this->createForm(ProjectPublicSearchType::class, null, ['method' => 'GET']);
         $formProjectSearch->handleRequest($requestStack->getCurrentRequest());
         if ($formProjectSearch->isSubmitted()) {
             if ($formProjectSearch->isValid()) {
-                if($formProjectSearch->get('step')->getData()){
+                if ($formProjectSearch->get('step')->getData()) {
                     $projectsParams['step'] = $formProjectSearch->get('step')->getData();
                 }
-                if($formProjectSearch->get('perimeter')->getData()){
+                if ($formProjectSearch->get('perimeter')->getData()) {
                     $projectsParams['perimeter'] = $formProjectSearch->get('perimeter')->getData();
                 }
-                if($formProjectSearch->get('contractLink')->getData()){
+                if ($formProjectSearch->get('contractLink')->getData()) {
                     $projectsParams['contractLink'] = $formProjectSearch->get('contractLink')->getData();
                 }
-                if($formProjectSearch->get('name')->getData()){
+                if ($formProjectSearch->get('name')->getData()) {
                     $projectsParams['search'] = $formProjectSearch->get('name')->getData();
                     $projectsParams = array_merge($projectsParams, $referenceService->getSynonymes($formProjectSearch->get('name')->getData()));
                 }
@@ -90,8 +89,8 @@ class ProjectController extends FrontController
         ];
 
         $projects = $projectService->searchProjects($projectsParams);
-        
-         // le paginateur
+
+        // le paginateur
         $adapter = new ArrayAdapter($projects);
         $pagerfanta = new Pagerfanta($adapter);
         $pagerfanta->setMaxPerPage(self::NB_PROJECT_BY_PAGE);
@@ -110,7 +109,7 @@ class ProjectController extends FrontController
                 ],
             );
         }
-                
+
         // fil arianne
         $this->breadcrumb->add(
             ' Projets publics',
@@ -134,8 +133,7 @@ class ProjectController extends FrontController
         ManagerRegistry $managerRegistry,
         AidRepository $aidRepository,
         LogService $logService
-    ): Response
-    {
+    ): Response {
         // le projet
         $project = $projectRepository->findOneBy(
             [
@@ -163,7 +161,7 @@ class ProjectController extends FrontController
 
                     $this->tAddFlash(
                         FrontController::FLASH_SUCCESS,
-                        'Le projet «'.$project->getName().'» a bien été ajouté à <a href="'.$this->generateUrl('app_user_project_favoris').'">vos projets favoris</a>.'
+                        'Le projet «' . $project->getName() . '» a bien été ajouté à <a href="' . $this->generateUrl('app_user_project_favoris') . '">vos projets favoris</a>.'
                     );
                 } else {
                     $this->tAddFlash(
@@ -188,7 +186,7 @@ class ProjectController extends FrontController
 
                     $this->tAddFlash(
                         FrontController::FLASH_SUCCESS,
-                        'Le projet «'.$project->getName().'» a bien été retiré de <a href="'.$this->generateUrl('app_user_project_favoris').'">vos projets favoris</a>.'
+                        'Le projet «' . $project->getName() . '» a bien été retiré de <a href="' . $this->generateUrl('app_user_project_favoris') . '">vos projets favoris</a>.'
                     );
                 }
             }
@@ -280,20 +278,19 @@ class ProjectController extends FrontController
         RequestStack $requestStack,
         StringService $stringService,
         PerimeterRepository $perimeterRepository
-    ) : Response
-    {
+    ): Response {
 
         $projects_count = $projectValidatedRepository->count([]);
 
         $formProjectSearch = $this->createForm(ProjectValidatedSearchType::class, null, [
-            'method'=>'GET',
-            'action'=>$this->generateUrl('app_project_project_subsidized_detail')
+            'method' => 'GET',
+            'action' => $this->generateUrl('app_project_project_subsidized_detail')
         ]);
 
         $formProjectSearch->handleRequest($requestStack->getCurrentRequest());
 
-         // formulaire choix département
-        $formCounties = $this->createForm(CountySelectType::class,null,['method'=>'GET','action'=>$this->generateUrl('app_project_project_subsidized_detail')]);
+        // formulaire choix département
+        $formCounties = $this->createForm(CountySelectType::class, null, ['method' => 'GET', 'action' => $this->generateUrl('app_project_project_subsidized_detail')]);
 
 
         // les infos départements pour la carte
@@ -330,47 +327,54 @@ class ProjectController extends FrontController
         ProjectValidatedRepository $projectValidatedRepository,
         LogService $logService,
         UserService $userService
-    ) : Response
-    {
+    ): Response {
         // le user
         $user = $userService->getUserLogged();
-        
+
         // parametres et variables
-        $projects=[];$commune_search=false;$keyword=null;
+        $projects = [];
+        $commune_search = false;
+        $keyword = null;
         $department_search = false;
         $idPerimeter = $requestStack->getCurrentRequest()->query->get('project_perimeter', false);
 
         // formulaire recherche
-        $formProjectSearch = $this->createForm(ProjectValidatedSearchType::class,null,[
-            'method'=>'GET',
-            'dontUseUserPerimeter' => true
+        $formProjectSearch = $this->createForm(
+            ProjectValidatedSearchType::class,
+            null,
+            [
+                'method' => 'GET',
+                'dontUseUserPerimeter' => true
             ]
         );
         $formProjectSearch->handleRequest($requestStack->getCurrentRequest());
         if ($formProjectSearch->isSubmitted()) {
             if ($formProjectSearch->isValid()) {
-                if($formProjectSearch->get('project_perimeter')->getData()){
+                if ($formProjectSearch->get('project_perimeter')->getData()) {
                     $project_perimeter = $formProjectSearch->get('project_perimeter')->getData();
                 }
-                if($formProjectSearch->get('text')->getData()){
+                if ($formProjectSearch->get('text')->getData()) {
                     $keyword = $formProjectSearch->get('text')->getData();
                 }
 
                 $projects = $projectValidatedRepository->findProjectInRadius(
                     [
-                    'perimeter' => $project_perimeter,
-                    'search' => $keyword,
-                    'radius' => 30
+                        'perimeter' => $project_perimeter,
+                        'search' => $keyword,
+                        'radius' => 30
                     ]
                 );
 
-                $commune_search=true;
+                $commune_search = true;
             }
         }
 
         // formulaire par département
-        $formCounties = $this->createForm(CountySelectType::class,null,[
-            'method'=>'GET'
+        $formCounties = $this->createForm(
+            CountySelectType::class,
+            null,
+            [
+                'method' => 'GET'
             ]
         );
         $formCounties->handleRequest($requestStack->getCurrentRequest());
@@ -378,10 +382,10 @@ class ProjectController extends FrontController
             if ($formCounties->isValid()) {
                 $project_perimeter = $perimeterRepository->findOneBy(['code' => $formCounties->get('county')->getData()]);
                 if ($project_perimeter instanceof Perimeter) {
-                    $projects=$projectValidatedRepository->findProjectInCounty(
+                    $projects = $projectValidatedRepository->findProjectInCounty(
                         ['id' => $project_perimeter->getId()]
                     );
-                    $department_search=true;
+                    $department_search = true;
                 }
             }
         }
@@ -392,17 +396,17 @@ class ProjectController extends FrontController
                 if ($project_perimeter->getScale() == Perimeter::SCALE_COMMUNE) {
                     $projects = $projectValidatedRepository->findProjectInRadius(
                         [
-                        'perimeter' => $project_perimeter,
-                        'search' => $keyword,
-                        'radius' => 30
+                            'perimeter' => $project_perimeter,
+                            'search' => $keyword,
+                            'radius' => 30
                         ]
                     );
-                    $commune_search=true;
+                    $commune_search = true;
                 } else {
-                    $projects=$projectValidatedRepository->findProjectInCounty(
+                    $projects = $projectValidatedRepository->findProjectInCounty(
                         ['id' => $project_perimeter->getId()]
                     );
-                    $department_search=true;
+                    $department_search = true;
                 }
             }
         }
@@ -419,7 +423,7 @@ class ProjectController extends FrontController
                 'organization' => ($user && $user->getDefaultOrganization()) ? $user->getDefaultOrganization() : null
             ],
         );
-        
+
         // fil arianne
         $this->breadcrumb->add(
             'Projets subventionnés',

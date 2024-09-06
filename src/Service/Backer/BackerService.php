@@ -33,7 +33,7 @@ class BackerService
                 return true;
             }
         }
-        
+
         return false;
     }
 
@@ -55,7 +55,7 @@ class BackerService
     {
         return $this->userCanEdit($user, $backer);
     }
-    
+
     public function getLock(Backer $backer): ?BackerLock
     {
         foreach ($backer->getBackerLocks() as $backerLock) {
@@ -70,12 +70,12 @@ class BackerService
         $minutesMax = 5;
         foreach ($backer->getBackerLocks() as $backerLock) {
             // si le lock a plus de 5 min, on le supprime
-            if ($backerLock->getTimeStart() < $now->sub(new \DateInterval('PT'.$minutesMax.'M'))) {
+            if ($backerLock->getTimeStart() < $now->sub(new \DateInterval('PT' . $minutesMax . 'M'))) {
                 $this->managerRegistry->getManager()->remove($backerLock);
                 $this->managerRegistry->getManager()->flush();
                 continue;
             }
-            
+
             if ($backerLock->getUser() != $user) {
                 return true;
             }
@@ -87,7 +87,7 @@ class BackerService
     {
         return !$backer->getBackerLocks()->isEmpty();
     }
-    
+
     public function lock(Backer $backer, User $user): void
     {
         if ($backer->getBackerLocks()->isEmpty()) {
@@ -98,8 +98,8 @@ class BackerService
             $this->managerRegistry->getManager()->flush();
         } else {
             $backerLock = (isset($backer->getBackerLocks()[0]) && $backer->getBackerLocks()[0] instanceof BackerLock)
-                        ? $backer->getBackerLocks()[0]
-                        : null;
+                ? $backer->getBackerLocks()[0]
+                : null;
             // on met à jour le lock si le user et l'aide sont bien les mêmes
             if ($backerLock && $backerLock->getUser() == $user && $backerLock->getBacker() == $backer) {
                 $backerLock->setTimeStart(new \DateTime(date('Y-m-d H:i:s')));

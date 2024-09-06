@@ -1,6 +1,6 @@
 <?php
-namespace App\Filter\Backer;
 
+namespace App\Filter\Backer;
 
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Doctrine\Orm\Filter\AbstractFilter;
@@ -18,8 +18,7 @@ final class HasPublishedFinancedAidsFilter extends AbstractFilter
         }
 
         $queryBuilder
-            ->innerJoin('o.aidFinancers', 'aidFinancers')
-        ;
+            ->innerJoin('o.aidFinancers', 'aidFinancers');
     }
 
     public function getDescription(string $resourceClass): array
@@ -40,4 +39,3 @@ final class HasPublishedFinancedAidsFilter extends AbstractFilter
         ];
     }
 }
-?>

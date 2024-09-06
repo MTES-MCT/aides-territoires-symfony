@@ -46,7 +46,7 @@ class LogEvent
     #[ORM\Column(type: Types::DATE_MUTABLE)]
     #[Gedmo\Timestampable(on: 'create')]
     private ?\DateTimeInterface $dateCreate = null;
-    
+
     public function getId(): ?int
     {
         return $this->id;

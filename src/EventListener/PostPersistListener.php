@@ -22,7 +22,8 @@ class PostPersistListener
         protected FirewallMapInterface $firewallMapInterface,
         protected ManagerRegistry $managerRegistry,
         protected UserListener $userListener
-    ) {}
+    ) {
+    }
 
     public function postPersist(PostPersistEventArgs $args): void
     {
@@ -46,18 +47,17 @@ class PostPersistListener
                 if (method_exists($args->getObject(), '__toString')) {
                     $objectRepr = $args->getObject()->__toString();
                 } else {
-                    $objectRepr = get_class($args->getObject()). ' : ' . $args->getObject()->getId();
+                    $objectRepr = get_class($args->getObject()) . ' : ' . $args->getObject()->getId();
                 }
                 $logAdminAction->setObjectRepr($objectRepr);
                 $logAdminAction->setActionFlag(LogAdminAction::ACTION_FLAG_INSERT);
                 $logAdminAction->setAdmin($this->userService->getUserLogged());
-    
+
                 $changeMessage = [
-                    'added' => [
-                    ]
+                    'added' => []
                 ];
                 $logAdminAction->setChangeMessage($changeMessage);
-    
+
                 // sauvegarde
                 $args->getObjectManager()->persist($logAdminAction);
                 $args->getObjectManager()->flush();

@@ -9,16 +9,14 @@ class PerimeterService
 {
     public function __construct(
         protected PerimeterRepository $perimeterRepository
-    )
-    {
-        
+    ) {
     }
 
-    public function getAdhocNameFromInseeCodes($inseeCodes) : string
+    public function getAdhocNameFromInseeCodes($inseeCodes): string
     {
         $regionCodes = [];
         $perimeters = $this->perimeterRepository->findCustom(['scale' => Perimeter::SCALE_COMMUNE, 'codes' => $inseeCodes]);
-        
+
         foreach ($perimeters as $key => $perimeter) {
             if ($perimeter->getRegions()) {
                 foreach ($perimeter->getRegions() as $region) {
@@ -29,29 +27,30 @@ class PerimeterService
         }
         $regionCodes = array_unique($regionCodes);
         sort($regionCodes);
-        return 'regions_'.join('_', $regionCodes);
+        return 'regions_' . join('_', $regionCodes);
     }
 
     public function getAdhocNameFromRegionCodes(array $regionCodes): string
     {
         sort($regionCodes);
-        return 'regions_'.join('_', $regionCodes);
+        return 'regions_' . join('_', $regionCodes);
     }
 
-    public function getSmartName(?Perimeter $perimeter) : string {
+    public function getSmartName(?Perimeter $perimeter): string
+    {
         if (!$perimeter instanceof Perimeter) {
             return '';
         }
         if ($perimeter->getScale() == Perimeter::SCALE_COMMUNE) {
             if (is_array($perimeter->getZipcodes())) {
-                return $perimeter->getName().' (Commune - '.join(', ', $perimeter->getZipcodes()).')';
+                return $perimeter->getName() . ' (Commune - ' . join(', ', $perimeter->getZipcodes()) . ')';
             } else {
-                return $perimeter->getName().' (Commune - '.$perimeter->getZipcodes().')';
+                return $perimeter->getName() . ' (Commune - ' . $perimeter->getZipcodes() . ')';
             }
         } else {
-            if(isset(Perimeter::SCALES_FOR_SEARCH[$perimeter->getScale()]['name'])){
-                return $perimeter->getName(). ' ('.Perimeter::SCALES_FOR_SEARCH[$perimeter->getScale()]['name'].')';
-            }else{
+            if (isset(Perimeter::SCALES_FOR_SEARCH[$perimeter->getScale()]['name'])) {
+                return $perimeter->getName() . ' (' . Perimeter::SCALES_FOR_SEARCH[$perimeter->getScale()]['name'] . ')';
+            } else {
                 return $perimeter->getName();
             }
         }
@@ -64,7 +63,8 @@ class PerimeterService
      * @param Perimeter $perimeter
      * @return string
      */
-    public function getSmartRegionNames(Perimeter $perimeter) : string {
+    public function getSmartRegionNames(Perimeter $perimeter): string
+    {
         if (!preg_match('/regions_(.*)/', $perimeter->getName(), $matches)) {
             return $perimeter->getName();
         } else {
@@ -82,7 +82,7 @@ class PerimeterService
 
             $strPerimeters = '';
             foreach ($perimeters as $perimeter) {
-                $strPerimeters .= $perimeter->getName().', ';
+                $strPerimeters .= $perimeter->getName() . ', ';
             }
             return substr($strPerimeters, 0, -2);
         }
@@ -94,7 +94,7 @@ class PerimeterService
      * @param string $scaleGroup
      * @return array
      */
-    public function getScalesFromGroup(string $scaleGroup) : array
+    public function getScalesFromGroup(string $scaleGroup): array
     {
         $scales = [];
 
@@ -135,7 +135,7 @@ class PerimeterService
         return $scales[$scale] ?? null;
     }
 
-        /**
+    /**
      * Retourne les infos d'une scale en fonction de son identifiant
      *
      * @param string $scale

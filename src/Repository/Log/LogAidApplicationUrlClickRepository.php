@@ -27,7 +27,7 @@ class LogAidApplicationUrlClickRepository extends ServiceEntityRepository
     public function countTopAidOnPeriod(?array $params = null): array
     {
         $maxResults = $params['maxResults'] ?? null;
-        
+
         $qb = $this->getQueryBuilder($params);
         $qb->select('IFNULL(COUNT(laau.id), 0) AS nb, aid.id AS id, aid.name AS name')
             ->innerJoin('laau.aid', 'aid')
@@ -52,7 +52,8 @@ class LogAidApplicationUrlClickRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult();
     }
 
-    public function countCustom(array $params = null) : int {
+    public function countCustom(array $params = null): int
+    {
         $qb = $this->getQueryBuilder($params);
 
         $qb->select('IFNULL(COUNT(laau.id), 0) AS nb');
@@ -75,16 +76,16 @@ class LogAidApplicationUrlClickRepository extends ServiceEntityRepository
                 ->innerJoin('laau.aid', 'aid')
                 ->andWhere('laau.author = :author')
                 ->setParameter('author', $author)
-                ;
+            ;
         }
-        
+
         if ($aid instanceof Aid && $aid->getId()) {
             $qb
                 ->andWhere('laau.aid = :aid')
                 ->setParameter('aid', $aid)
             ;
         }
-        
+
         if ($dateCreate instanceof \DateTime) {
             $qb
                 ->andWhere('laau.dateCreate = :dateCreate')

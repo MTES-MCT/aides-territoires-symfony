@@ -30,8 +30,7 @@ class KeywordReferenceController extends FrontController
     public function ajaxUxAutocomplete(
         KeywordReferenceRepository $keywordReferenceRepository,
         RequestStack $requestStack
-    ): JsonResponse
-    {
+    ): JsonResponse {
         $query = $requestStack->getCurrentRequest()->get('query', null);
 
         $keywordReferences = $keywordReferenceRepository->findCustom([

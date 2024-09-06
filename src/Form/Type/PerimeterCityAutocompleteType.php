@@ -18,25 +18,23 @@ class PerimeterCityAutocompleteType extends AbstractType
         $resolver->setDefaults([
             'class' => Perimeter::class,
             'placeholder' => 'Toutes les communes',
-            'choice_label' => function($entity){
+            'choice_label' => function ($entity) {
 
-                if($entity->getScale() == 1){
+                if ($entity->getScale() == 1) {
                     $return = $entity->getName();
                     if (is_array($entity->getZipcodes())) {
-                        $return .= ' (COMMUNE - '.implode(',', $entity->getZipcodes()).')';
+                        $return .= ' (COMMUNE - ' . implode(',', $entity->getZipcodes()) . ')';
                     } else {
-                        $return .=  ' (COMMUNE - '.(string) $entity->getZipcodes().')';
+                        $return .=  ' (COMMUNE - ' . (string) $entity->getZipcodes() . ')';
                     }
                     return $return;
-                }else{
-                    if(isset(Perimeter::SCALES_FOR_SEARCH[$entity->getScale()]['name'])){
-                        return $entity->getName(). ' ('.Perimeter::SCALES_FOR_SEARCH[$entity->getScale()]['name'].')';
-                    }else{
+                } else {
+                    if (isset(Perimeter::SCALES_FOR_SEARCH[$entity->getScale()]['name'])) {
+                        return $entity->getName() . ' (' . Perimeter::SCALES_FOR_SEARCH[$entity->getScale()]['name'] . ')';
+                    } else {
                         return $entity->getName();
                     }
-                    
                 }
-                
             },
             'data_class' => null,
             'query_builder' => function (PerimeterRepository $perimeterRepository) {
@@ -46,7 +44,7 @@ class PerimeterCityAutocompleteType extends AbstractType
                     'orderby' => ['p.name' => 'ASC']
                 ]);
             },
-            'filter_query' => function(QueryBuilder $qb, string $query, PerimeterRepository $repository) {
+            'filter_query' => function (QueryBuilder $qb, string $query, PerimeterRepository $repository) {
                 if (!$query) {
                     return;
                 }
@@ -55,10 +53,10 @@ class PerimeterCityAutocompleteType extends AbstractType
                 // c'est un code postal
                 if (preg_match('/^[0-9]{5}$/', $query)) {
                     $qb
-                    ->andWhere('
+                        ->andWhere('
                         p.zipcodes LIKE :zipcodes
                     ')
-                    ->setParameter('zipcodes', '%'.$query.'%');
+                        ->setParameter('zipcodes', '%' . $query . '%');
                     ;
                 } else { // c'est une string
                     $strings = [$query];
@@ -70,16 +68,15 @@ class PerimeterCityAutocompleteType extends AbstractType
                     }
 
                     $sqlWhere = '';
-                    for ($i=0; $i < count($strings); $i++) {
-                        $sqlWhere .= ' p.name LIKE :nameLike'.$i;
+                    for ($i = 0; $i < count($strings); $i++) {
+                        $sqlWhere .= ' p.name LIKE :nameLike' . $i;
                         if ($i < count($strings) - 1) {
                             $sqlWhere .= ' OR ';
                         }
-                        $qb->setParameter('nameLike'.$i, '%'.$strings[$i].'%');
+                        $qb->setParameter('nameLike' . $i, '%' . $strings[$i] . '%');
                     }
                     $qb
-                    ->andWhere($sqlWhere)
-                    ;
+                        ->andWhere($sqlWhere);
                 }
             },
         ]);

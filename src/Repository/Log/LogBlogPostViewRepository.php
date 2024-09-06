@@ -29,8 +29,8 @@ class LogBlogPostViewRepository extends ServiceEntityRepository
     {
         $qb = $this->getQueryBuilder($params);
         $qb
-        ->select('lbpv.dateCreate, COUNT(lbpv.id) AS nb')
-        ->groupBy('lbpv.dateCreate')
+            ->select('lbpv.dateCreate, COUNT(lbpv.id) AS nb')
+            ->groupBy('lbpv.dateCreate')
         ;
         return $qb->getQuery()->getResult();
     }
@@ -46,7 +46,7 @@ class LogBlogPostViewRepository extends ServiceEntityRepository
             ->select('blogPostCategoryCount.id, COUNT(lbpv.id) AS nb')
             ->groupBy('blogPostCategoryCount.id')
             ->orderBy('nb', 'DESC')
-            ;
+        ;
         $results = $qb->getQuery()->getResult();
         $return = [];
         foreach ($results as $result) {
@@ -68,7 +68,7 @@ class LogBlogPostViewRepository extends ServiceEntityRepository
             ->select('blogPostCount.id, COUNT(lbpv.id) AS nb')
             ->groupBy('blogPostCount.id')
             ->orderBy('nb', 'DESC')
-            ;
+        ;
         $results = $qb->getQuery()->getResult();
         $return = [];
         foreach ($results as $result) {
@@ -95,17 +95,17 @@ class LogBlogPostViewRepository extends ServiceEntityRepository
                 ->innerJoin('lbpv.blogPost', 'blogPost')
                 ->andWhere('lbpv.blogPost = :blogPost')
                 ->setParameter('blogPost', $blogPost)
-                ;
+            ;
         }
-        
+
         if ($organization instanceof Organization && $organization->getId()) {
             $qb
                 ->innerJoin('lbpv.organization', 'organization')
                 ->andWhere('lbpv.organization = :organization')
                 ->setParameter('organization', $organization)
-                ;
+            ;
         }
-        
+
         if ($dateMin instanceof \DateTime) {
             $qb
                 ->andWhere('lbpv.dateCreate >= :dateMin')
@@ -122,8 +122,7 @@ class LogBlogPostViewRepository extends ServiceEntityRepository
 
         if ($maxResults !== null) {
             $qb
-                ->setMaxResults($maxResults)
-            ;
+                ->setMaxResults($maxResults);
         }
 
         return $qb;

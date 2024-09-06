@@ -22,13 +22,12 @@ class AddKeywordToReferenceCommand extends Command
     protected string $commandTextStart = '<Keywords vers keywordReference';
     protected string $commandTextEnd = '>Keywords vers keywordReference';
 
-    
+
 
     public function __construct(
         private ManagerRegistry $managerRegistry
-    )
-    {
-        ini_set('max_execution_time', 60*60);
+    ) {
+        ini_set('max_execution_time', 60 * 60);
         ini_set('memory_limit', '1G');
         parent::__construct();
     }
@@ -41,7 +40,7 @@ class AddKeywordToReferenceCommand extends Command
         $io = new SymfonyStyle($input, $output);
         $io->title($this->commandTextStart);
 
-        try  {
+        try {
             // import des keywords
             $this->importKeyword($input, $output);
         } catch (\Exception $exception) {
@@ -57,7 +56,7 @@ class AddKeywordToReferenceCommand extends Command
     {
         /** @var KeywordReferenceRepository $keywordReferenceRepository */
         $keywordReferenceRepository = $this->managerRegistry->getRepository(KeywordReference::class);
-        
+
         $keywordReferences = $keywordReferenceRepository->findAll();
 
         $keywordReferencesByName = [];
@@ -70,7 +69,7 @@ class AddKeywordToReferenceCommand extends Command
         $aids = $aidRepository->findCustom([
             'withOldKeywords' => true
         ]);
-        
+
         foreach ($aids as $aid) {
             foreach ($aid->getKeywords() as $keyword) {
                 $keywordReference = $keywordReferencesByName[$keyword->getName()] ?? null;

@@ -35,7 +35,7 @@ class ImportFluxRegionSudCommand extends ImportFluxCommand
     {
         $aidsFromImport = [];
         $client = $this->getClient();
-        for ($i=0; $i<$this->nbPages; $i++) {
+        for ($i = 0; $i < $this->nbPages; $i++) {
             $this->currentPage = $i;
             $importUrl = $this->dataSource->getImportApiUrl();
             if ($this->paginationEnabled) {
@@ -49,7 +49,7 @@ class ImportFluxRegionSudCommand extends ImportFluxCommand
                 );
                 $content = $response->getContent();
                 $content = $response->toArray();
-    
+
                 // retourne directement un tableau d'aides
                 $aidsFromImport = $content;
             } catch (\Exception $e) {
@@ -238,7 +238,7 @@ class ImportFluxRegionSudCommand extends ImportFluxCommand
         if (!isset($aidToImport['Pour qui'])) {
             return $aid;
         }
-        
+
         $mapping = [
             'Collectivité' => [
                 'commune',
@@ -265,7 +265,7 @@ class ImportFluxRegionSudCommand extends ImportFluxCommand
         ];
 
         foreach ($mapping as $key => $values) {
-            if (preg_match('/.*'.$key.'.*/i', $aidToImport['Pour qui'])) {
+            if (preg_match('/.*' . $key . '.*/i', $aidToImport['Pour qui'])) {
                 foreach ($values as $value) {
                     $organizationType = $this->managerRegistry->getRepository(OrganizationType::class)->findOneBy([
                         'slug' => $value
@@ -288,7 +288,7 @@ class ImportFluxRegionSudCommand extends ImportFluxCommand
         ];
 
         foreach ($mapping as $key => $values) {
-            if (preg_match('/.*'.$key.'.*/i', $aidToImport['Pour qui'])) {
+            if (preg_match('/.*' . $key . '.*/i', $aidToImport['Pour qui'])) {
                 foreach ($values as $value) {
                     $category = $this->managerRegistry->getRepository(Category::class)->findOneBy([
                         'slug' => $value
@@ -321,8 +321,9 @@ class ImportFluxRegionSudCommand extends ImportFluxCommand
 
     protected function setAidRecurrence(array $aidToImport, Aid $aid): Aid
     {
-        if (isset($aidToImport['Date d’ouverture']) && trim($aidToImport['Date d’ouverture']) !== ''
-        && isset($aidToImport['Date de clôture']) && trim($aidToImport['Date de clôture']) !== ''
+        if (
+            isset($aidToImport['Date d’ouverture']) && trim($aidToImport['Date d’ouverture']) !== ''
+            && isset($aidToImport['Date de clôture']) && trim($aidToImport['Date de clôture']) !== ''
         ) {
             $aidRecurrence = $this->managerRegistry->getRepository(AidRecurrence::class)->findOneBy(['slug' => AidRecurrence::SLUG_ONEOFF]);
         } else {

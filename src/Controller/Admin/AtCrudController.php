@@ -62,33 +62,28 @@ class AtCrudController extends AbstractCrudController
     public function configureAssets(Assets $assets): Assets
     {
         return $assets
-            // adds the CSS and JS assets associated to the given Webpack Encore entry
-            // it's equivalent to adding these inside the <head> element:
-            // {{ encore_entry_link_tags('...') }} and {{ encore_entry_script_tags('...') }}
-            // ->addWebpackEncoreEntry('admin/admin')
-            ->addWebpackEncoreEntry('import-scss/admin/admin')
-        ;
+            ->addWebpackEncoreEntry('import-scss/admin/admin');
     }
 
     public function configureCrud(Crud $crud): Crud
     {
         $crud = parent::configureCrud($crud)
-        ->addFormTheme('form/text_length_count_type.html.twig')
-        ->addFormTheme('form/url_click_type.html.twig')
-        ->addFormTheme('form/image_field_preview.html.twig')
-        ->addFormTheme('form/add_new_type.html.twig')
-        ->addFormTheme('form/collection_copyable_type.html.twig')
-        ->setDefaultSort(['id' => 'DESC']) // modifie le tri
-        ->showEntityActionsInlined() // met les actions affichées directement
+            ->addFormTheme('form/text_length_count_type.html.twig')
+            ->addFormTheme('form/url_click_type.html.twig')
+            ->addFormTheme('form/image_field_preview.html.twig')
+            ->addFormTheme('form/add_new_type.html.twig')
+            ->addFormTheme('form/collection_copyable_type.html.twig')
+            ->setDefaultSort(['id' => 'DESC']) // modifie le tri
+            ->showEntityActionsInlined() // met les actions affichées directement
         ;
         $entityTest = new (static::getEntityFqcn());
 
         if (method_exists($entityTest, 'getPosition')) {
-            $crud 
-            ->setDefaultSort(['position' => 'ASC']) // modifie le tri
+            $crud
+                ->setDefaultSort(['position' => 'ASC']) // modifie le tri
             ;
         }
-        
+
         return $crud;
     }
 
@@ -101,7 +96,7 @@ class AtCrudController extends AbstractCrudController
         if (!static::getEntityFqcn()) {
             return $actions;
         }
-        
+
         $entityTest = new (static::getEntityFqcn());
 
         if (method_exists($entityTest, 'getPosition')) {
@@ -112,22 +107,22 @@ class AtCrudController extends AbstractCrudController
                 ->setHtmlAttributes(['title' => 'Move to top']) // titre
                 ->linkToCrudAction('moveTop') // l'action appellée
                 ->displayIf(fn ($entity) => $entity->getPosition() > 0); // condition d'affichage
-        
+
             $moveUp = Action::new('moveUp', false, 'fa fa-sort-up')
                 ->setHtmlAttributes(['title' => 'Move up'])
                 ->linkToCrudAction('moveUp')
                 ->displayIf(fn ($entity) => $entity->getPosition() > 0);
-        
+
             $moveDown = Action::new('moveDown', false, 'fa fa-sort-down')
                 ->setHtmlAttributes(['title' => 'Move down'])
                 ->linkToCrudAction('moveDown')
                 ->displayIf(fn ($entity) => $entity->getPosition() < $entityCount - 1);
-        
+
             $moveBottom = Action::new('moveBottom', false, 'fa fa-arrow-down')
                 ->setHtmlAttributes(['title' => 'Move to bottom'])
                 ->linkToCrudAction('moveBottom')
                 ->displayIf(fn ($entity) => $entity->getPosition() < $entityCount - 1);
-        
+
             return $actions
                 ->add(Crud::PAGE_INDEX, $moveBottom)
                 ->add(Crud::PAGE_INDEX, $moveDown)
@@ -142,28 +137,28 @@ class AtCrudController extends AbstractCrudController
     {
         return $this->move($context, Direction::Top);
     }
-    
+
     public function moveUp(AdminContext $context): Response
     {
         return $this->move($context, Direction::Up);
     }
-    
+
     public function moveDown(AdminContext $context): Response
     {
         return $this->move($context, Direction::Down);
     }
-    
+
     public function moveBottom(AdminContext $context): Response
     {
         return $this->move($context, Direction::Bottom);
     }
-    
+
     private function move(AdminContext $context, Direction $direction): Response
     {
         $object = $context->getEntity()->getInstance();
         $entityCount = $this->managerRegistry->getManager()->getRepository(static::getEntityFqcn())->count([]); // compte les entites
         $oldPosition = $object->getPosition();
-        $newPosition = match($direction) {
+        $newPosition = match ($direction) {
             Direction::Top => 0,
             Direction::Up => $object->getPosition() - 1,
             Direction::Down => $object->getPosition() + 1,
@@ -186,7 +181,8 @@ class AtCrudController extends AbstractCrudController
         return $this->redirect($context->getReferrer());
     }
 
-    public function updatePositions(array $params = null) : void {
+    public function updatePositions(array $params = null): void
+    {
         $exclude = $params['exclude'] ?? null;
         $newPosition = $params['newPosition'] ?? null;
         $oldPosition = $params['oldPosition'] ?? null;
@@ -209,18 +205,18 @@ class AtCrudController extends AbstractCrudController
             if ($direction == 'down') {
                 $qb
                     ->andWhere('pt.position >= :newPosition')
-                    ->andWhere('pt.position <= :oldPosition' )
+                    ->andWhere('pt.position <= :oldPosition')
                     ->setParameter('oldPosition', $oldPosition)
                     ->setParameter('newPosition', $newPosition)
-                ;  
+                ;
                 ;
             } else {
                 $qb
                     ->andWhere('pt.position <= :newPosition')
-                    ->andWhere('pt.position >= :oldPosition' )
+                    ->andWhere('pt.position >= :oldPosition')
                     ->setParameter('oldPosition', $oldPosition)
                     ->setParameter('newPosition', $newPosition)
-                ;                
+                ;
             }
         }
 
@@ -229,7 +225,7 @@ class AtCrudController extends AbstractCrudController
 
     public function exportSpreadsheet(AdminContext $context, SpreadsheetExporterService $spreadsheetExporterService, string $filename, string $format = 'csv')
     {
-        ini_set('max_execution_time', 60*60);
+        ini_set('max_execution_time', 60 * 60);
         ini_set('memory_limit', '1G');
 
         $fields = FieldCollection::new($this->configureFields(Crud::PAGE_INDEX));
@@ -257,28 +253,28 @@ class AtCrudController extends AbstractCrudController
     public function getExportXlsxAction()
     {
         return Action::new('exportXlsx')
-        ->linkToUrl(function () {
-            $request = $this->requestStack->getCurrentRequest();
-            return $this->adminUrlGenerator->setAll($request->query->all())
-                ->setAction('exportXlsx')
-                ->generateUrl();
-        })
-        ->addCssClass('btn btn-success')
-        ->setIcon('fa fa-download')
-        ->createAsGlobalAction();
+            ->linkToUrl(function () {
+                $request = $this->requestStack->getCurrentRequest();
+                return $this->adminUrlGenerator->setAll($request->query->all())
+                    ->setAction('exportXlsx')
+                    ->generateUrl();
+            })
+            ->addCssClass('btn btn-success')
+            ->setIcon('fa fa-download')
+            ->createAsGlobalAction();
     }
 
     public function getExportCsvAction()
     {
         return Action::new('exportCsv')
-        ->linkToUrl(function () {
-            $request = $this->requestStack->getCurrentRequest();
-            return $this->adminUrlGenerator->setAll($request->query->all())
-                ->setAction('exportCsv')
-                ->generateUrl();
-        })
-        ->addCssClass('btn btn-success')
-        ->setIcon('fa fa-download')
-        ->createAsGlobalAction();
+            ->linkToUrl(function () {
+                $request = $this->requestStack->getCurrentRequest();
+                return $this->adminUrlGenerator->setAll($request->query->all())
+                    ->setAction('exportCsv')
+                    ->generateUrl();
+            })
+            ->addCssClass('btn btn-success')
+            ->setIcon('fa fa-download')
+            ->createAsGlobalAction();
     }
 }

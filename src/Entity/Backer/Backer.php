@@ -81,7 +81,7 @@ class Backer // NOSONAR too much methods
     const API_DESCRIPTION = 'Lister tous les porteurs d\'aides';
     const API_GROUP_LIST = 'backer:list';
     const FOLDER = 'backers';
-    
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -160,13 +160,13 @@ class Backer // NOSONAR too much methods
     private ?\DateTimeInterface $timeUpdate = null;
 
     #[ORM\ManyToMany(targetEntity: LogAidSearch::class, mappedBy: 'backers')]
-    #[ORM\JoinColumn(onDelete:'SET NULL')]
+    #[ORM\JoinColumn(onDelete: 'SET NULL')]
     private Collection $logAidSearches;
 
     #[ORM\OneToMany(mappedBy: 'backer', targetEntity: LogBackerView::class)]
-    #[ORM\JoinColumn(onDelete:'SET NULL')]
+    #[ORM\JoinColumn(onDelete: 'SET NULL')]
     private Collection $logBackerViews;
-    
+
     #[ORM\Column]
     private ?bool $active = false;
 
@@ -195,7 +195,7 @@ class Backer // NOSONAR too much methods
     private ?ArrayCollection $aidsThematics;
 
     private ?LogBackerEdit $lastLogBackerEdit = null;
-    
+
     public function __construct()
     {
         $this->organizations = new ArrayCollection();
@@ -543,17 +543,18 @@ class Backer // NOSONAR too much methods
      */
 
     private ?array $aidsLive = [];
-    public function getAidsLive() : ?array
+    public function getAidsLive(): ?array
     {
         return $this->aidsLive;
     }
-    public function setAidsLive(?array $aids) : static {
+    public function setAidsLive(?array $aids): static
+    {
         $this->aidsLive = $aids;
         return $this;
     }
 
     private ?array $aidsFinancial = [];
-    public function getAidsFinancial() : ?array
+    public function getAidsFinancial(): ?array
     {
         if (!empty($this->aidsFinancial)) {
             return $this->aidsFinancial;
@@ -563,7 +564,7 @@ class Backer // NOSONAR too much methods
         foreach ($this->getAidsLive() as $aid) {
             foreach ($aid->getAidTypes() as $aidType) {
                 if ($aidType->getAidTypeGroup()->getSlug() == AidTypeGroup::SLUG_FINANCIAL && !$aidsFinancial->contains($aid)) {
-                        $aidsFinancial->add($aid);
+                    $aidsFinancial->add($aid);
                 }
             }
         }
@@ -571,7 +572,7 @@ class Backer // NOSONAR too much methods
         $this->setAidsFinancial($aidsFinancial->toArray());
         return $this->aidsFinancial;
     }
-    public function setAidsFinancial(?array $aids) : static
+    public function setAidsFinancial(?array $aids): static
     {
         $this->aidsFinancial = $aids;
         return $this;
@@ -600,7 +601,7 @@ class Backer // NOSONAR too much methods
     #[ORM\OrderBy(['timecreate' => 'DESC'])]
     private Collection $logBackerEdits;
 
-    public function getAidsTechnical() : ?array
+    public function getAidsTechnical(): ?array
     {
         if (!empty($this->aidsTechnical)) {
             return $this->aidsTechnical;
@@ -617,13 +618,13 @@ class Backer // NOSONAR too much methods
         $this->setAidsTechnical($aidsTechnical->toArray());
         return $this->aidsTechnical;
     }
-    public function setAidsTechnical(?array $aids) : static
+    public function setAidsTechnical(?array $aids): static
     {
         $this->aidsTechnical = $aids;
         return $this;
     }
 
-    public function getAidsByAidTypeSlug($aidTypeSlug = null) : array
+    public function getAidsByAidTypeSlug($aidTypeSlug = null): array
     {
         if (!$aidTypeSlug) {
             return [];
@@ -640,12 +641,12 @@ class Backer // NOSONAR too much methods
 
         return $aids;
     }
-    
-
-    
 
 
-    public function getAidsThematics() : ?ArrayCollection
+
+
+
+    public function getAidsThematics(): ?ArrayCollection
     {
         $thematics = new ArrayCollection();
         foreach ($this->getAidsLive() as $aid) {
@@ -726,13 +727,13 @@ class Backer // NOSONAR too much methods
     public function getCategories(): ArrayCollection
     {
         $categories = new ArrayCollection();
-    
+
         $this->addAidFinancerCategories($categories);
         $this->addAidInstructorCategories($categories);
-    
+
         return $categories;
     }
-    
+
     private function addAidFinancerCategories($categories)
     {
         foreach ($this->getAidFinancers() as $aidFinancer) {
@@ -741,7 +742,7 @@ class Backer // NOSONAR too much methods
             }
         }
     }
-    
+
     private function addAidInstructorCategories($categories)
     {
         foreach ($this->getAidInstructors() as $aidInstructor) {
@@ -750,7 +751,7 @@ class Backer // NOSONAR too much methods
             }
         }
     }
-    
+
     private function addCategories($newCategories, $categories)
     {
         foreach ($newCategories as $category) {
@@ -768,13 +769,13 @@ class Backer // NOSONAR too much methods
     public function getPrograms(): ArrayCollection
     {
         $programs = new ArrayCollection();
-    
+
         $this->addAidFinancerPrograms($programs);
         $this->addAidInstructorPrograms($programs);
-    
+
         return $programs;
     }
-    
+
     private function addAidFinancerPrograms($programs)
     {
         foreach ($this->getAidFinancers() as $aidFinancer) {
@@ -783,7 +784,7 @@ class Backer // NOSONAR too much methods
             }
         }
     }
-    
+
     private function addAidInstructorPrograms($programs)
     {
         foreach ($this->getAidInstructors() as $aidInstructor) {
@@ -792,7 +793,7 @@ class Backer // NOSONAR too much methods
             }
         }
     }
-    
+
     private function addPrograms($newPrograms, $programs)
     {
         foreach ($newPrograms as $program) {
@@ -910,7 +911,7 @@ class Backer // NOSONAR too much methods
     public function setUsefulLinks(?string $usefulLinks): static
     {
         $this->usefulLinks = $usefulLinks;
-        
+
         return $this;
     }
 
@@ -950,7 +951,7 @@ class Backer // NOSONAR too much methods
         return $this;
     }
 
-    public function  __toString(): string
+    public function __toString(): string
     {
         return $this->getName() ?? 'Backer';
     }

@@ -23,7 +23,8 @@ class LogAidSearchRepository extends ServiceEntityRepository
         parent::__construct($registry, LogAidSearch::class);
     }
 
-    public function findKeywordSearchWithFewResults(?array $params = null) : array {
+    public function findKeywordSearchWithFewResults(?array $params = null): array
+    {
         $qb = $this->getQueryBuilder($params);
 
         return $qb->getQuery()->getResult();
@@ -37,7 +38,8 @@ class LogAidSearchRepository extends ServiceEntityRepository
         return (int) $qb->getQuery()->getSingleScalarResult();
     }
 
-    public function countApiByDay(?array $params = null) {
+    public function countApiByDay(?array $params = null)
+    {
         $params['source'] = 'api';
         $qb = $this->getQueryBuilder($params);
         $qb->select('COUNT(l.id) as nb, DATE_FORMAT(l.timeCreate, \'%Y-%m-%d\') as dateDay');
@@ -57,7 +59,8 @@ class LogAidSearchRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult();
     }
 
-    public function getSearchOnPerimeterWithoutOrganization($params) : array {
+    public function getSearchOnPerimeterWithoutOrganization($params): array
+    {
         $dateCreateMin = $params['dateCreateMin'] ?? null;
         $dateCreateMax = $params['dateCreateMax'] ?? null;
 
@@ -69,26 +72,25 @@ class LogAidSearchRepository extends ServiceEntityRepository
             ->andWhere('organizations.id IS NULL')
             ->groupBy('perimeter.id')
             ->orderBy('perimeter.insee')
-            ->setParameter('scales', [Perimeter::SCALE_COMMUNE, Perimeter::SCALE_EPCI])
-            ;
+            ->setParameter('scales', [Perimeter::SCALE_COMMUNE, Perimeter::SCALE_EPCI]);
 
         if ($dateCreateMin instanceof \DateTime) {
             $qb
                 ->andWhere('l.dateCreate >= :dateCreateMin')
                 ->setParameter('dateCreateMin', $dateCreateMin)
-                ;
+            ;
         }
 
         if ($dateCreateMax instanceof \DateTime) {
             $qb
                 ->andWhere('l.dateCreate <= :dateCreateMax')
                 ->setParameter('dateCreateMax', $dateCreateMax)
-                ;
+            ;
         }
-        
+
         return $qb->getQuery()->getResult();
     }
-    
+
     public function getQueryBuilder(?array $params = null): QueryBuilder
     {
         $dateCreateMin = $params['dateCreateMin'] ?? null;
@@ -104,20 +106,19 @@ class LogAidSearchRepository extends ServiceEntityRepository
             $qb
                 ->andWhere('l.dateCreate >= :dateCreateMin')
                 ->setParameter('dateCreateMin', $dateCreateMin)
-                ;
+            ;
         }
 
         if ($dateCreateMax instanceof \DateTime) {
             $qb
                 ->andWhere('l.dateCreate <= :dateCreateMax')
                 ->setParameter('dateCreateMax', $dateCreateMax)
-                ;
+            ;
         }
 
         if ($hasSearch) {
             $qb
-                ->andWhere('l.search IS NOT NULL')
-            ;
+                ->andWhere('l.search IS NOT NULL');
         }
 
         if ($source !== null) {

@@ -36,13 +36,13 @@ class AidType
 
     const TYPE_FINANCIAL_SLUGS = ['grant', 'loan', 'recoverable-advance', 'other', 'cee'];
     const TYPE_TECHNICAL_SLUG = ['technical-engineering', 'financial-engineering', 'legal-engineering'];
-    
+
     const SLUG_GRANT = 'grant';
     const SLUG_LOAN = 'loan';
     const SLUG_RECOVERABLE_ADVANCE = 'recoverable-advance';
     const SLUG_CEE = 'cee';
     const SLUG_OTHER = 'other';
-    
+
     const SLUG_TECHNICAL_ENGINEERING = 'technical-engineering';
     const SLUG_FINANCIAL_ENGINEERING = 'financial-engineering';
     const SLUG_LEGAL_ENGINEERING = 'legal-engineering';
@@ -192,7 +192,7 @@ class AidType
 
         return $this;
     }
-    
+
     public function __toString()
     {
         return $this->getName() ?? '';

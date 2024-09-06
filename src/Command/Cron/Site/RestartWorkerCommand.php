@@ -26,7 +26,7 @@ class RestartWorkerCommand extends Command
         $io = new SymfonyStyle($input, $output);
         $io->title($this->commandTextStart);
 
-        try  {
+        try {
             // Arrêter les workers
             $stopWorkersProcess = new Process(['bin/console', 'messenger:stop-workers']);
             $stopWorkersProcess->run();

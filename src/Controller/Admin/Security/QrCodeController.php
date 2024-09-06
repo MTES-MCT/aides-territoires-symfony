@@ -17,7 +17,6 @@ use Endroid\QrCode\Writer\PngWriter;
 use Scheb\TwoFactorBundle\Security\TwoFactor\Provider\Totp\TotpAuthenticatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
-
 class QrCodeController extends AbstractController
 {
     #[Route(
@@ -31,8 +30,7 @@ class QrCodeController extends AbstractController
         ManagerRegistry $managerRegistry,
         UserRepository $userRepository,
         UserService $userService
-        ): Response
-    {
+    ): Response {
         /** @var User $user */
         $user = $userRepository->find($idUser);
         if (!$userService->isUserGranted($user, User::ROLE_ADMIN)) {

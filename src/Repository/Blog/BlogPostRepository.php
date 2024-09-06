@@ -61,18 +61,18 @@ class BlogPostRepository extends ServiceEntityRepository
 
         if ($blogPostCategory instanceof BlogPostCategory && $blogPostCategory->getId()) {
             $qb
-            ->andWhere('bp.blogPostCategory = :blogPostCategory')
-            ->setParameter('blogPostCategory', $blogPostCategory)
+                ->andWhere('bp.blogPostCategory = :blogPostCategory')
+                ->setParameter('blogPostCategory', $blogPostCategory)
             ;
         }
 
         if ($status !== null) {
             $qb
-            ->andWhere('bp.status = :status')
-            ->setParameter('status', $status)
+                ->andWhere('bp.status = :status')
+                ->setParameter('status', $status)
             ;
         }
-        
+
         if ($limit !== null) {
             $qb->setMaxResults($limit);
         }
@@ -99,7 +99,7 @@ class BlogPostRepository extends ServiceEntityRepository
         // on update les ids actuels pour avoir les futurs id de libre
         $qb = $this->createQueryBuilder('u');
         $qb->update(BlogPost::class, 'uu');
-        $qb->set('uu.id', 'uu.id + '.$maxOldId)
+        $qb->set('uu.id', 'uu.id + ' . $maxOldId)
             ->andWhere('uu.oldId IS NOT NULL');
         $qb->getQuery()->execute();
 
@@ -107,7 +107,7 @@ class BlogPostRepository extends ServiceEntityRepository
         $qb = $this->createQueryBuilder('u');
         $qb->update(BlogPost::class, 'uu');
         $qb->set('uu.id', 'uu.oldId')
-        ->andWhere('uu.oldId IS NOT NULL');
+            ->andWhere('uu.oldId IS NOT NULL');
         $qb->getQuery()->execute();
 
         // met à jour l'auto increment
@@ -117,7 +117,7 @@ class BlogPostRepository extends ServiceEntityRepository
         $maxId = $resultMax[0]['maxId'] ?? 1;
 
         $table = $this->getEntityManager()->getClassMetadata(BlogPost::class)->getTableName();
-        $sql = 'ALTER TABLE '.$table.' AUTO_INCREMENT = '.$maxId;
+        $sql = 'ALTER TABLE ' . $table . ' AUTO_INCREMENT = ' . $maxId;
 
         $conn = $this->getEntityManager()->getConnection();
         $stmt = $conn->prepare($sql);

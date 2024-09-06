@@ -30,7 +30,7 @@ class ImportFluxOccitanieCommand extends ImportFluxCommand
         $aidsFromImport = [];
         $client = $this->getClient();
 
-        for ($i=0; $i<$this->nbPages; $i++) {
+        for ($i = 0; $i < $this->nbPages; $i++) {
             $this->currentPage = $i;
             $importUrl = $this->dataSource->getImportApiUrl();
             if ($this->paginationEnabled) {
@@ -42,13 +42,12 @@ class ImportFluxOccitanieCommand extends ImportFluxCommand
                     $importUrl,
                     $this->getApiOptions()
                 );
-                
+
                 $content = $response->getContent();
                 $content = json_decode($content, true);
 
                 // retourne directement un tableau d'aides
                 $aidsFromImport = $content;
-
             } catch (\Exception $e) {
                 throw new \Exception($e->getMessage());
             }
@@ -127,7 +126,7 @@ class ImportFluxOccitanieCommand extends ImportFluxCommand
             'timePublished' => $timePublished,
             'datePublished' => $datePublished,
             'description' => $this->concatHtmlFields($aidToImport, ['chapo', 'introduction']),
-            'timeUpdate'=> $timeUpdate,
+            'timeUpdate' => $timeUpdate,
             'originUrl' => $aidToImport['url'] ?? null,
             'isCallForProject' => (isset($aidToImport['aides_appels_a_projets']) && $aidToImport['aides_appels_a_projets'] == 'Appels à projets') ? true : false,
             'contact' => "Pour contacter la Région Occitanie ou candidater à l'offre, veuillez cliquer sur le bouton 'Plus d'informations' ou sur le bouton 'Candidater à l'aide'.",
@@ -141,11 +140,11 @@ class ImportFluxOccitanieCommand extends ImportFluxCommand
     protected function setCategories(array $aidToImport, Aid $aid): Aid
     {
         $categories = (isset($aidToImport['thematiques']) && $aidToImport['thematiques'])
-                    ? explode(',', $aidToImport['thematiques'])
-                    : [];
+            ? explode(',', $aidToImport['thematiques'])
+            : [];
         $subCategories = (isset($aidToImport['sous_thematiques']) && $aidToImport['sous_thematiques'])
-                    ? explode(',', $aidToImport['sous_thematiques'])
-                    : [];
+            ? explode(',', $aidToImport['sous_thematiques'])
+            : [];
         $categories = array_merge($categories, $subCategories);
 
         // une partie du mapping à été fait sur les CategoryTheme et non sur les catégories
@@ -203,9 +202,9 @@ class ImportFluxOccitanieCommand extends ImportFluxCommand
             'Sûreté - Sécurité' => [
                 'securite'
             ]
-            
+
         ];
-        
+
         foreach ($categories as $categoryName) {
             $found = false;
             $categoryName = trim($categoryName);

@@ -29,15 +29,14 @@ class AidController extends ApiController
         LogService $logService,
         RequestStack $requestStack,
         UserService $userService
-    ): JsonResponse
-    {
+    ): JsonResponse {
         $aidSearchClass = $aidSearchFormService->getAidSearchClass();
 
         // parametres pour requetes aides
         $aidParams = [
             'showInSearch' => true,
         ];
-        
+
         $aidParams = array_merge($aidParams, $aidSearchFormService->convertAidSearchClassToAidParams($aidSearchClass));
 
         // requete pour compter sans la pagination
@@ -49,7 +48,7 @@ class AidController extends ApiController
 
         // spécifique
         $resultsSpe = $this->getResultsSpe($results, $aidService);
-        
+
         // le retour
         $data = [
             'count' => $count,
@@ -101,8 +100,7 @@ class AidController extends ApiController
     #[Route('/api/aids/all/', name: 'api_aid_all', priority: 5)]
     public function all(
         AidService $aidService
-    ): JsonResponse
-    {
+    ): JsonResponse {
         $params = [];
         $params['showInSearch'] = true;
         $params['orderBy'] = ['sort' => 'a.id', 'order' => 'DESC'];
@@ -110,13 +108,13 @@ class AidController extends ApiController
         // requete pour compter sans la pagination
         $results = $aidService->searchAids($params);
         $count = count($results);
-        
+
         // requete pour les résultats avec la pagination
         $results = array_slice($results, ($this->getPage() - 1) * $this->getItemsPerPage(), $this->getItemsPerPage());
 
         // spécifique
         $resultsSpe = $this->getResultsSpe($results, $aidService);
-        
+
         // le retour
         $data = [
             'count' => $count,
@@ -140,15 +138,14 @@ class AidController extends ApiController
         LogService $logService,
         RequestStack $requestStack,
         UserService $userService
-    ): JsonResponse
-    {
+    ): JsonResponse {
         $params = [];
         $params['id'] = (int) $id;
         $codeStatus = 200;
         $aid = $aidRepository->findOneCustom($params);
         if ($aid instanceof Aid) {
             $results = [$aid];
-        
+
             // spécifique
             $resultsSpe = $this->getResultsSpe($results, $aidService);
             $data = $resultsSpe[0];
@@ -175,7 +172,7 @@ class AidController extends ApiController
                 'source' => LogAidSearch::SOURCE_API,
             ]
         );
-        
+
         // la réponse
         $response =  new JsonResponse($data, $codeStatus, [], false);
         // pour eviter que les urls ne soient ecodées
@@ -191,15 +188,14 @@ class AidController extends ApiController
         LogService $logService,
         RequestStack $requestStack,
         UserService $userService
-    ): JsonResponse
-    {
+    ): JsonResponse {
         $codeStatus = 200;
         $params = [];
         $params['slug'] = $slug;
         $aid = $aidRepository->findOneCustom($params);
         if ($aid instanceof Aid) {
             $results = [$aid];
-        
+
             // spécifique
             $resultsSpe = $this->getResultsSpe($results, $aidService);
             $data = $resultsSpe[0];
@@ -255,7 +251,7 @@ class AidController extends ApiController
                 $financersFull[] = [
                     'id' => $aidFinancer->getBacker()->getId(),
                     'name' => $aidFinancer->getBacker()->getName(),
-                    'logo' => $aidFinancer->getBacker()->getLogo() ? $this->paramService->get('cloud_image_url').$aidFinancer->getBacker()->getLogo() : null
+                    'logo' => $aidFinancer->getBacker()->getLogo() ? $this->paramService->get('cloud_image_url') . $aidFinancer->getBacker()->getLogo() : null
                 ];
             }
             $instructors = [];
@@ -272,7 +268,7 @@ class AidController extends ApiController
                 $instructorsFull[] = [
                     'id' => $aidInstructor->getBacker()->getId(),
                     'name' => $aidInstructor->getBacker()->getName(),
-                    'logo' => $aidInstructor->getBacker()->getLogo() ? $this->paramService->get('cloud_image_url').$aidInstructor->getBacker()->getLogo() : null
+                    'logo' => $aidInstructor->getBacker()->getLogo() ? $this->paramService->get('cloud_image_url') . $aidInstructor->getBacker()->getLogo() : null
                 ];
             }
             $programs = [];
@@ -287,7 +283,7 @@ class AidController extends ApiController
             foreach ($result->getCategories() as $category) {
                 $fullname = '';
                 if ($category->getCategoryTheme()) {
-                    $fullname .= $category->getCategoryTheme()->getName().' / ';
+                    $fullname .= $category->getCategoryTheme()->getName() . ' / ';
                 }
                 $fullname .= $category->getName();
                 $categories[] = $fullname;
@@ -310,7 +306,7 @@ class AidController extends ApiController
                             'id' => $aidType->getAidTypeGroup()->getId(),
                             'name' => $aidType->getAidTypeGroup()->getName()
                         ]
-                    : null
+                        : null
                 ];
             }
             $destinations = [];

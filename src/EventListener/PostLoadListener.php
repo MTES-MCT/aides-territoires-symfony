@@ -16,7 +16,8 @@ class PostLoadListener
     public function __construct(
         protected AidListener $aidListener,
         protected DataExportListener $dataExportListener
-    ) {}
+    ) {
+    }
 
     public function postLoad(PostLoadEventArgs $args): void
     {

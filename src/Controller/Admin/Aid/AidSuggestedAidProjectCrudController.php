@@ -21,29 +21,26 @@ class AidSuggestedAidProjectCrudController extends AbstractCrudController
     {
         yield IdField::new('id')->onlyOnIndex();
         yield TextField::new('aid', 'Aide')
-        ->setFormTypeOption('attr', ['readonly' => true])
-        ;
+            ->setFormTypeOption('attr', ['readonly' => true]);
         yield TextField::new('creator', 'Auteur')
-        ->setFormTypeOption('attr', ['readonly' => true])
-        ;
+            ->setFormTypeOption('attr', ['readonly' => true]);
         yield TextField::new('project', 'Projet')
-        ->setFormTypeOption('attr', ['readonly' => true])
-        ;
+            ->setFormTypeOption('attr', ['readonly' => true]);
         yield BooleanField::new('isAssociated', 'Aide associée')
-        ->setHelp('Cette aide a-t-elle été acceptée par le porteur du projet ?')
-        ->onlyOnForms();
+            ->setHelp('Cette aide a-t-elle été acceptée par le porteur du projet ?')
+            ->onlyOnForms();
         yield DateField::new('timeAssociated', 'Date d’association')
-        ->setHelp('Date à laquelle cette aide a été acceptée par le porteur du projet')
-        ->onlyOnForms();
+            ->setHelp('Date à laquelle cette aide a été acceptée par le porteur du projet')
+            ->onlyOnForms();
         yield BooleanField::new('isRejected', 'Aide rejetée')
-        ->setHelp('Cette aide a-t-elle été rejetée par le porteur du projet ?')
-        ->onlyOnForms();
+            ->setHelp('Cette aide a-t-elle été rejetée par le porteur du projet ?')
+            ->onlyOnForms();
         yield DateField::new('timeRejected', 'Date de rejet')
-        ->setHelp('Date à laquelle cette aide a été rejetée par le porteur du projet')
-        ->onlyOnForms();
+            ->setHelp('Date à laquelle cette aide a été rejetée par le porteur du projet')
+            ->onlyOnForms();
 
         yield DateTimeField::new('dateCreate', 'Date de création')
-        ->setFormTypeOption('attr', ['readonly' => true])
-        ->onlyOnForms();
+            ->setFormTypeOption('attr', ['readonly' => true])
+            ->onlyOnForms();
     }
 }

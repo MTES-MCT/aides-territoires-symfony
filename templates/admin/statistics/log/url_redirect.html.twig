@@ -1,53 +1,51 @@
 {% extends 'admin/statistics/_stats_base.html.twig' %}
 
-{% block breadcrumb %}
-{% endblock %}
+{% block breadcrumb %}{% endblock %}
 
 {% block stats_content %}
-<section class="container">
-    <h1>Statistiques redirections</h1>
-</section>
+	<section class="container">
+		<h1>Statistiques redirections</h1>
+	</section>
 
-<section class="container mt-5">
-    <div>
-        {{ form_start(formDateRange) }}
-        <div class="d-flex">
-            <div class="d-flex me-3">
-            {{ form_row(formDateRange.dateMin) }}
-            </div>
-            <div class="d-flex me-3">
-            {{ form_row(formDateRange.dateMax) }}
-            </div>
-            <div class="d-flex me-3">
-            <button type="submit" class="btn btn-primary">Valider</button>
-            </div>
-        </div>
-        {{ form_end(formDateRange) }}
-    </div>
-</section>
+	<section class="container mt-5">
+		<div>
+			{{ form_start(formDateRange) }}
+			<div class="d-flex">
+				<div class="d-flex me-3">
+					{{ form_row(formDateRange.dateMin) }}
+				</div>
+				<div class="d-flex me-3">
+					{{ form_row(formDateRange.dateMax) }}
+				</div>
+				<div class="d-flex me-3">
+					<button type="submit" class="btn btn-primary">Valider</button>
+				</div>
+			</div>
+			{{ form_end(formDateRange) }}
+		</div>
+	</section>
 
 
-<section class="container mt-5">
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th>De</th>
-                <th>Vers</th>
-                <th>Nombre de redirections</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for urlRedirect in logUrlRedirects %}
-                <tr>
-                    <td>{{ urlRedirect.oldUrl }}</td>
-                    <td>{{ urlRedirect.newUrl }}</td>
-                    <td>{{ urlRedirect.nb }}</td>
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-</section>
+	<section class="container mt-5">
+		<table class="table table-striped">
+			<thead>
+				<tr>
+					<th>De</th>
+					<th>Vers</th>
+					<th>Nombre de redirections</th>
+				</tr>
+			</thead>
+			<tbody>
+				{% for urlRedirect in logUrlRedirects %}
+					<tr>
+						<td>{{ urlRedirect.oldUrl }}</td>
+						<td>{{ urlRedirect.newUrl }}</td>
+						<td>{{ urlRedirect.nb }}</td>
+					</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+	</section>
 
 
 {% endblock %}
-

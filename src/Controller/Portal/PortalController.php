@@ -58,8 +58,7 @@ class PortalController extends FrontController
         ManagerRegistry $managerRegistry,
         LogService $logService,
         ReferenceService $referenceService
-    ): Response
-    {
+    ): Response {
 
         // gestion pagination
         $currentPage = (int) $requestStack->getCurrentRequest()->get('page', 1);
@@ -71,7 +70,7 @@ class PortalController extends FrontController
             [
                 'slug' => $slug
             ]
-            );
+        );
         if (!$search_page instanceof SearchPage) {
             return $this->redirectToRoute('app_portal_portal');
         }
@@ -105,10 +104,10 @@ class PortalController extends FrontController
                 'querystring' => $queryString,
                 'forceOrganizationType' => null,
                 'dontUseUserPerimeter' => true
-                ]
+            ]
         );
 
-         // form recherche d'aide
+        // form recherche d'aide
         $formAidSearchParams = [
             'method' => 'GET',
             'action' => '#aid-list',
@@ -175,7 +174,7 @@ class PortalController extends FrontController
             type: LogService::AID_SEARCH,
             params: $logParams,
         );
-        
+
         // fil arianne
         $this->breadcrumb->add(
             'Portails',
@@ -202,7 +201,7 @@ class PortalController extends FrontController
                         }
                         $alert->setQuerystring($alertlQueryString);
                         $alert->setSource(Alert::SOURCE_AIDES_TERRITOIRES);
-    
+
                         $managerRegistry->getManager()->persist($alert);
                         $managerRegistry->getManager()->flush();
 
@@ -243,7 +242,7 @@ class PortalController extends FrontController
                             $highlightedWords[] = $keyword;
                         }
                     }
-                } 
+                }
                 if (isset($synonyms['objects_string'])) {
                     $keywords = str_getcsv($synonyms['objects_string'], ' ', '"');
                     foreach ($keywords as $keyword) {
@@ -251,7 +250,7 @@ class PortalController extends FrontController
                             $highlightedWords[] = $keyword;
                         }
                     }
-                } 
+                }
                 if (isset($synonyms['simple_words_string'])) {
                     $keywords = str_getcsv($synonyms['simple_words_string'], ' ', '"');
                     foreach ($keywords as $keyword) {
@@ -287,7 +286,7 @@ class PortalController extends FrontController
             'categoriesName' => $categoriesName,
             'highlightedWords' => $highlightedWords,
             'showAudienceField' => $search_page->isShowAudienceField(),
-            'showPerimeterField' => $search_page->isShowPerimeterField(), 
+            'showPerimeterField' => $search_page->isShowPerimeterField(),
             'showTextField' => $search_page->isShowTextField(),
             'showCategoriesField' => $search_page->isShowCategoriesField(),
             'showAidTypeField' => $search_page->isShowAidTypeField(),
@@ -304,14 +303,13 @@ class PortalController extends FrontController
         AidSearchFormService $aidSearchFormService,
         AidService $aidService,
         RequestStack $requestStack
-    ): Response
-    {
+    ): Response {
         // charge le portail
         $search_page = $searchPageRepository->findOneBy(
             [
                 'slug' => $slug
             ]
-            );
+        );
         if (!$search_page instanceof SearchPage) {
             return $this->redirectToRoute('app_portal_portal');
         }
@@ -345,7 +343,7 @@ class PortalController extends FrontController
                 'querystring' => $queryString,
                 'forceOrganizationType' => null,
                 'dontUseUserPerimeter' => true
-                ]
+            ]
         );
 
         // parametres pour requetes aides
@@ -367,7 +365,7 @@ class PortalController extends FrontController
 
         // défini la date de début pour les stats
         $dateStartMatomoto = new \DateTime(date(self::DATE_START_MATOMO));
-    
+
 
         // dates par défaut
         $dateMin = new \DateTime('-1 month');
@@ -405,8 +403,7 @@ class PortalController extends FrontController
     public function ajaxTopAids(
         RequestStack $requestStack,
         LogAidViewRepository $logAidViewRepository
-    ): Response
-    {
+    ): Response {
         // vérification origine
         if (!$this->checkOrigin($requestStack)) {
             return new Response();
@@ -440,13 +437,12 @@ class PortalController extends FrontController
         RequestStack $requestStack,
         LogAidViewRepository $logAidViewRepository,
         ChartBuilderInterface $chartBuilderInterface
-    ): Response
-    {
+    ): Response {
         // vérification origine
         if (!$this->checkOrigin($requestStack)) {
             return new Response();
         }
-        
+
         $session = new Session();
         $aidIds = $session->get('aidIds', []);
 
@@ -488,13 +484,12 @@ class PortalController extends FrontController
         RequestStack $requestStack,
         LogAidViewRepository $logAidViewRepository,
         ChartBuilderInterface $chartBuilderInterface
-    ): Response
-    {
+    ): Response {
         // vérification origine
         if (!$this->checkOrigin($requestStack)) {
             return new Response();
         }
-        
+
         $session = new Session();
         $aidIds = $session->get('aidIds', []);
         $dateMin = $session->get('dateMin', new \DateTime('-1 month'));
@@ -521,7 +516,8 @@ class PortalController extends FrontController
             $labels = [];
             $datas = [];
             foreach ($organizationTypes as $organizationType) {
-                $labels[] = $organizationType['name']. ' ('.$organizationType['percentage'].'%)';;
+                $labels[] = $organizationType['name'] . ' (' . $organizationType['percentage'] . '%)';
+                ;
                 $datas[] = $organizationType['nb'];
             }
             $colors = $this->getPieColors($organizationTypes);
@@ -561,13 +557,12 @@ class PortalController extends FrontController
         SearchPageRepository $searchPageRepository,
         MatomoService $matomoService,
         ChartBuilderInterface $chartBuilderInterface
-    ): Response
-    {
+    ): Response {
         // vérification origine
         if (!$this->checkOrigin($requestStack)) {
             return new Response();
         }
-        
+
         $session = new Session();
         $searchPageId = $session->get('searchPageId', null);
 
@@ -588,7 +583,7 @@ class PortalController extends FrontController
         $url = urlencode($this->generateUrl('app_portal_portal_details', ['slug' => $search_page->getSlug()], UrlGeneratorInterface::ABSOLUTE_URL));
         $visitsByMonth = $matomoService->getMatomoStats(
             'VisitsSummary.get',
-            'pageUrl=='.$url,
+            'pageUrl==' . $url,
             $dateStartStats->format('Y-m-d'),
             $today->format('Y-m-d'),
             'month'

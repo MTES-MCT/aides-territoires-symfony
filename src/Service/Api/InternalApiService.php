@@ -11,11 +11,10 @@ class InternalApiService
     const API_FOLDER = 'api';
     private string $bearerToken = '';
 
-    public function  __construct(
+    public function __construct(
         private RequestStack $requestStack,
         private ParamService $paramService
-    )
-    {
+    ) {
     }
 
     private function getAPiBaseUrl(): string
@@ -50,8 +49,7 @@ class InternalApiService
             ]);
 
             // fait l'appel
-            $response = $client->request('POST', '/'.self::API_FOLDER.'/connexion/', [
-            ]);
+            $response = $client->request('POST', '/' . self::API_FOLDER . '/connexion/', []);
 
             // retour
             $this->bearerToken = json_decode($response->getBody()->getContents())->token;
@@ -65,8 +63,7 @@ class InternalApiService
         string $url,
         ?array $params = null,
         string $method = 'GET'
-    )
-    {
+    ) {
         // créer le client pour appeller l'api
         $client = new Client([
             'base_uri' => $this->getAPiBaseUrl(),
@@ -77,7 +74,7 @@ class InternalApiService
         ]);
 
         // fait l'appel
-        $response = $client->request($method, '/'.self::API_FOLDER.''.$url, [
+        $response = $client->request($method, '/' . self::API_FOLDER . '' . $url, [
             'query' => $params,
         ]);
         if ($response->getStatusCode() == 401) { // token expiré, on relance

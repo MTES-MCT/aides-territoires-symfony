@@ -18,8 +18,7 @@ class ProjectReferenceController extends ApiController
     public function index(
         ProjectReferenceRepository $projectReferenceRepository,
         ProjectReferenceCategoryRepository $projectReferenceCategoryRepository,
-    ): JsonResponse
-    {
+    ): JsonResponse {
         // les filtres
         $params = [];
         $q = $this->requestStack->getCurrentRequest()->get('q', null);
@@ -34,7 +33,6 @@ class ProjectReferenceController extends ApiController
                     $params['projectReferenceCategory'] = $projectReferenceCategory;
                 }
             } catch (\Exception $e) {
-
             }
         }
 
@@ -44,12 +42,12 @@ class ProjectReferenceController extends ApiController
         // requete pour les résultats avec la pagination
         $params['firstResult'] = ($this->getPage() - 1) * $this->getItemsPerPage();
         $params['maxResults'] = $this->getItemsPerPage();
-    
+
         $results = $projectReferenceRepository->findCustom($params);
 
         // on serialize pour ne garder que les champs voulus
         $results = $this->serializerInterface->serialize($results, static::SERIALIZE_FORMAT, ['groups' => ProjectReference::API_GROUP_LIST]);
-        
+
         // le retour
         $data = [
             'count' => $count,

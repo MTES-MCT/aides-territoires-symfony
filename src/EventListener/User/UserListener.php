@@ -28,10 +28,10 @@ class UserListener
         private NotificationService $notificationService,
         private LoggerInterface $loggerInterface
     ) {
-        
     }
 
-    public function onPostPersist(PostPersistEventArgs $args) : void {
+    public function onPostPersist(PostPersistEventArgs $args): void
+    {
         try {
             /** @var User $entity */
             $entity = $args->getObject();
@@ -44,11 +44,11 @@ class UserListener
             </p>
             <p>
                 Si ce n’est pas le cas, n’hésitez pas à
-                <a href="'.$this->urlGeneratorInterface->generate('app_contact_contact', [], UrlGeneratorInterface::ABS_URL).'">nous contacter</a>.
+                <a href="' . $this->urlGeneratorInterface->generate('app_contact_contact', [], UrlGeneratorInterface::ABS_URL) . '">nous contacter</a>.
             </p>
             <p>
                 Vous pouvez paramétrer les notifications que vous souhaitez recevoir
-                via <a href="'.$this->urlGeneratorInterface->generate('app_user_user_notification_settings', [], UrlGeneratorInterface::ABS_URL).'">
+                via <a href="' . $this->urlGeneratorInterface->generate('app_user_user_notification_settings', [], UrlGeneratorInterface::ABS_URL) . '">
                 vos préférences
                 </a>.
             </p>
@@ -58,7 +58,7 @@ class UserListener
                 'Bienvenue sur Aides-territoires !',
                 $message
             );
-            
+
 
             // si optin envoi à sendinblue
             if ($entity->isMlConsent()) {
@@ -73,7 +73,7 @@ class UserListener
             $this->managerRegistry->getManager()->flush();
 
             if ($entity->getFirstname() && $entity->getLastname()) {
-                $userFullName = $entity->getFirstname().' '.$entity->getLastname();
+                $userFullName = $entity->getFirstname() . ' ' . $entity->getLastname();
             } else {
                 $userFullName = $entity->getEmail();
             }
@@ -107,7 +107,7 @@ class UserListener
             $entity = $args->getObject();
             $message = 'Erreur dans le postPersist User';
             if ($entity->getEmail()) {
-                $message .= 'Pour le user '.$entity->getEmail();
+                $message .= 'Pour le user ' . $entity->getEmail();
             }
             $admin = $this->managerRegistry->getRepository(User::class)->findOneBy(['email' => $this->paramService->get('email_super_admin')]);
             if ($admin instanceof User) {
@@ -116,7 +116,8 @@ class UserListener
         }
     }
 
-    public function  onPreRemove(PreRemoveEventArgs $args) : void {
+    public function onPreRemove(PreRemoveEventArgs $args): void
+    {
         /** @var User $user */
         $user = $args->getObject();
 

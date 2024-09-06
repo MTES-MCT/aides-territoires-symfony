@@ -4,7 +4,7 @@ namespace App\Form\User;
 
 use App\Entity\User\User;
 use App\Service\User\UserService;
-use App\Validator\PasswordProfil;  
+use App\Validator\PasswordProfil;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -25,15 +25,14 @@ class UserProfilType extends AbstractType
     public function __construct(
         protected UserService $userService,
         protected UserPasswordHasherInterface $userPasswordHasherInterface
-    )
-    {
+    ) {
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
             ->add('firstname', TextType::class, [
-                'label'=>'Votre prénom :',
+                'label' => 'Votre prénom :',
                 'constraints' => [
                     new Assert\NotBlank([
                         'message' => 'Veuillez saisir votre prénom.',
@@ -41,7 +40,7 @@ class UserProfilType extends AbstractType
                 ]
             ])
             ->add('lastname', TextType::class, [
-                'label'=>'Votre nom :',
+                'label' => 'Votre nom :',
                 'constraints' => [
                     new Assert\NotBlank([
                         'message' => 'Veuillez saisir votre nom.',
@@ -49,8 +48,8 @@ class UserProfilType extends AbstractType
                 ]
             ])
             ->add('email', EmailType::class, [
-                'label'=>'Votre email :',
-                'required'=>true,
+                'label' => 'Votre email :',
+                'required' => true,
                 'help' => 'Par exemple : prenom.nom@domaine.fr',
                 'constraints' => [
                     new Assert\NotBlank([
@@ -71,28 +70,31 @@ class UserProfilType extends AbstractType
                     'Agent territorial' => 'agent',
                     'Autre' => 'other',
                 ],
-                'placeholder' => 'Faites votre choix', 
-                'label' => 'Vous êtes :', 
+                'placeholder' => 'Faites votre choix',
+                'label' => 'Vous êtes :',
                 'required'  => false,
-            
+
             ])
             ->add('beneficiaryRole', TextType::class, [
-                'label'=>'Votre fonction :',
+                'label' => 'Votre fonction :',
                 'constraints' => [
                     new Assert\NotBlank([
                         'message' => 'Veuillez saisir votre fonction.',
                     ]),
                 ]
             ])
-            ->add('isBeneficiary',CheckboxType::class,['label'=>'Trouver des aides', 'required'=>false])
-            ->add('isContributor',CheckboxType::class,['label'=>'Publier des aides', 'required'=>false])
-            ->add('oldPassword',PasswordType::class,[
-                'label'=>'Entrez votre mot de passe actuel',
-                'mapped'=>false,
-                'required'=>false,
-                'attr' => ['placeholder' => 'A remplir seulement en cas de changement de mot de passe']
+            ->add('isBeneficiary', CheckboxType::class, ['label' => 'Trouver des aides', 'required' => false])
+            ->add('isContributor', CheckboxType::class, ['label' => 'Publier des aides', 'required' => false])
+            ->add(
+                'oldPassword',
+                PasswordType::class,
+                [
+                    'label' => 'Entrez votre mot de passe actuel',
+                    'mapped' => false,
+                    'required' => false,
+                    'attr' => ['placeholder' => 'A remplir seulement en cas de changement de mot de passe']
                 ]
-                )
+            )
             ->add('newPassword', RepeatedType::class, [
                 'mapped' => false,
                 'required' => false,
@@ -108,13 +110,13 @@ class UserProfilType extends AbstractType
                     <li>Votre mot de passe ne peut pas être entièrement numérique</li>
                     </ul>',
                     'help_html' => true,
-                    ],
+                ],
                 'second_options' => ['label' => 'Saisissez à nouveau le nouveau mot de passe'],
                 'constraints' => [
                     new PasswordProfil(),
                 ],
             ])
-            
+
             ->addEventListener(
                 FormEvents::SUBMIT,
                 [$this, 'onSubmit']

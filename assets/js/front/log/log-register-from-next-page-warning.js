@@ -6,12 +6,15 @@ $(function(){
             const urlSearchParams = new URLSearchParams(window.location.search);
             const params = Object.fromEntries(urlSearchParams.entries());
 
+            var csrfToken = typeof csrfTokenInternal !== 'undefined' ? csrfTokenInternal : '';
+
             $.ajax({
                 url: Routing.generate('app_log_ajax'),
                 method: 'POST',
                 data: {
                     params: params,
                     type: 'register-from-next-page-warning',
+                    _token: csrfToken
                 },
                 dataType: 'json',
                 success: function(data){

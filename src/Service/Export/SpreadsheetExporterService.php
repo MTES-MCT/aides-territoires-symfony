@@ -38,18 +38,15 @@ class SpreadsheetExporterService
         private HtmlSanitizerInterface $htmlSanitizerInterface,
         private LoggerInterface $loggerInterface,
         private MessageBusInterface $messageBusInterface
-    )
-    {
-        
+    ) {
     }
-    public function  createResponseFromQueryBuilder( // NOSONAR too complex
+    public function createResponseFromQueryBuilder(// NOSONAR too complex
         QueryBuilder $queryBuilder,
         mixed $entityFcqn,
         string $filename,
         string $format = FileService::FORMAT_CSV
-    ): StreamedResponse|Response
-    {
-        ini_set('max_execution_time', 60*60);
+    ): StreamedResponse|Response {
+        ini_set('max_execution_time', 60 * 60);
         ini_set('memory_limit', '1G');
 
         // compte le nombre de résultats
@@ -78,7 +75,7 @@ class SpreadsheetExporterService
             $cronExportSpreadsheet->setSqlRequest($queryBuilder->getQuery()->getDQL());
             $cronExportSpreadsheet->setSqlParams($sqlParams);
             $cronExportSpreadsheet->setEntityFqcn($entityFcqn);
-            $cronExportSpreadsheet->setFilename($filename.'.'.$format);
+            $cronExportSpreadsheet->setFilename($filename . '.' . $format);
             $cronExportSpreadsheet->setFormat($format);
             $cronExportSpreadsheet->setUser($this->userService->getUserLogged());
 
@@ -87,9 +84,8 @@ class SpreadsheetExporterService
 
             // envoi au worker
             $this->messageBusInterface->dispatch(new MsgSpreadsheetToExport());
-            
-            $content = $this->twig->render('admin/cron/cron-launched.html.twig', [
-            ]);
+
+            $content = $this->twig->render('admin/cron/cron-launched.html.twig', []);
 
             return new Response($content);
         }
@@ -106,7 +102,7 @@ class SpreadsheetExporterService
                 $options = new \OpenSpout\Writer\CSV\Options();
                 $options->FIELD_DELIMITER = ';';
                 $options->FIELD_ENCLOSURE = '"';
-    
+
                 $writer = new \OpenSpout\Writer\CSV\Writer($options);
             } elseif ($format == FileService::FORMAT_XLSX) {
                 $sheetView = new SheetView();
@@ -116,7 +112,7 @@ class SpreadsheetExporterService
             }
 
             $now = new \DateTime(date(self::TODAY_DATE_FORMAT));
-            $writer->openToBrowser('export_'.$filename.'_at_'.$now->format('d_m_Y').'.'.$format);
+            $writer->openToBrowser('export_' . $filename . '_at_' . $now->format('d_m_Y') . '.' . $format);
 
             if ($format == FileService::FORMAT_XLSX) {
                 $writer->getCurrentSheet()->setSheetView($sheetView);
@@ -130,7 +126,7 @@ class SpreadsheetExporterService
             foreach ($headers as $csvHeader) {
                 $cells[] = Cell::fromValue($csvHeader);
             }
-            
+
             /** add a row at a time */
             $singleRow = new Row($cells);
             $writer->addRow($singleRow);
@@ -143,10 +139,10 @@ class SpreadsheetExporterService
                 $singleRow = new Row($cells);
                 $writer->addRow($singleRow);
             }
-            
+
             $writer->close();
         });
-    
+
         return $response;
     }
 
@@ -195,10 +191,10 @@ class SpreadsheetExporterService
                     }
                     $rate = '';
                     if ($result->getSubventionRateMin()) {
-                        $rate .= ' Min : '.$result->getSubventionRateMin();
+                        $rate .= ' Min : ' . $result->getSubventionRateMin();
                     }
                     if ($result->getSubventionRateMax()) {
-                        $rate .= ' Max : '.$result->getSubventionRateMax();
+                        $rate .= ' Max : ' . $result->getSubventionRateMax();
                     }
                     $datas[] = [
                         'Nom de l\'aide' => $result->getName(),
@@ -211,14 +207,14 @@ class SpreadsheetExporterService
                         'Taux de subvention, min. et max. (en %, nombre entier)' => $rate,
                         'Taux de subvention (commentaire optionnel)' => $result->getSubventionComment(),
                         'Appel à projet / Manifestation d’intérêt' => $result->isIsCallForProject() ? 'Oui' : 'Non',
-                        
+
                         'Description' => $this->truncateHtml($result->getDescription()),
                         'Exemples d\'applications' => $this->truncateHtml($result->getProjectExamples()),
                         'Sous thématiques' => join("\n", $categories),
                         'Récurrence' => $result->getAidRecurrence() ? $result->getAidRecurrence()->getName() : '',
                         'Date d\'ouverture' => $result->getDateStart() ? $result->getDateStart()->format('d/m/Y') : '',
                         'Date de clôture' => $result->getDateSubmissionDeadline() ? $result->getDateSubmissionDeadline()->format('d/m/Y') : '',
-                        
+
                         'Conditions d\'éligibilité' => $this->truncateHtml($result->getEligibility()),
                         'État d\'avancement du projet pour bénéficier du dispositif' => join("\n", $aidSteps),
                         'Types de dépenses / actions couvertes' => join("\n", $destinations),
@@ -277,7 +273,7 @@ class SpreadsheetExporterService
                     ];
                     unset($results[$key]);
                 }
-            break;
+                break;
 
             case Project::class:
                 /** @var Project $result */
@@ -310,7 +306,7 @@ class SpreadsheetExporterService
                     ];
                     unset($results[$key]);
                 }
-            break;
+                break;
 
             case Backer::class:
                 /** @var Backer $result */
@@ -337,7 +333,7 @@ class SpreadsheetExporterService
                         }
                     }
 
-                    
+
                     $datas[] = [
                         'Nom du porteur' => $result->getName(),
                         'Périmètre' => $result->getPerimeter() ? $result->getPerimeter()->getName() : '',
@@ -349,10 +345,10 @@ class SpreadsheetExporterService
                     ];
                     unset($results[$key]);
                 }
-            break;
+                break;
             default:
-            break;
-                    }
+                break;
+        }
         return $datas;
     }
 
@@ -363,7 +359,7 @@ class SpreadsheetExporterService
                 $options = new \OpenSpout\Writer\CSV\Options();
                 $options->FIELD_DELIMITER = ';';
                 $options->FIELD_ENCLOSURE = '"';
-    
+
                 $writer = new \OpenSpout\Writer\CSV\Writer($options);
             } elseif ($format == FileService::FORMAT_XLSX) {
                 $sheetView = new SheetView();
@@ -373,7 +369,7 @@ class SpreadsheetExporterService
             }
 
             $now = new \DateTime(date(self::TODAY_DATE_FORMAT));
-            $writer->openToBrowser('Aides-territoires_-_'.$now->format('Y-m-d').'_-_'.$project->getSlug());
+            $writer->openToBrowser('Aides-territoires_-_' . $now->format('Y-m-d') . '_-_' . $project->getSlug());
 
             if ($format == FileService::FORMAT_XLSX) {
                 $writer->getCurrentSheet()->setSheetView($sheetView);
@@ -402,7 +398,7 @@ class SpreadsheetExporterService
                 Cell::fromValue('Instructeurs'),
                 Cell::fromValue('Programmes'),
             ];
-            
+
             /** add a row at a time */
             $singleRow = new Row($cells);
             $writer->addRow($singleRow);
@@ -428,10 +424,10 @@ class SpreadsheetExporterService
                 $dateSubmissionDeadline = $aidProject->getAid()->getDateSubmissionDeadline() ? $aidProject->getAid()->getDateSubmissionDeadline()->format('Y-m-d') : '';
                 $rates = '';
                 if ($aidProject->getAid()->getSubventionRateMin()) {
-                    $rates .= ' Min : '.$aidProject->getAid()->getSubventionRateMin();
+                    $rates .= ' Min : ' . $aidProject->getAid()->getSubventionRateMin();
                 }
                 if ($aidProject->getAid()->getSubventionRateMax()) {
-                    $rates .= ' Max : '.$aidProject->getAid()->getSubventionRateMax();
+                    $rates .= ' Max : ' . $aidProject->getAid()->getSubventionRateMax();
                 }
                 $categories = [];
                 foreach ($aidProject->getAid()->getCategories() as $aidCategory) {
@@ -478,7 +474,7 @@ class SpreadsheetExporterService
                 $singleRow = new Row($cells);
                 $writer->addRow($singleRow);
             }
-            
+
             $writer->close();
             exit;
         } catch (\Exception $e) {
@@ -499,24 +495,24 @@ class SpreadsheetExporterService
             if (!is_dir($tmpFolder)) {
                 mkdir($tmpFolder, 0777, true);
             }
-            $fileTarget = $tmpFolder.'/export_'.pathinfo($filename, PATHINFO_FILENAME).'_at_'.$now->format('d_m_Y_H_i_s');
+            $fileTarget = $tmpFolder . '/export_' . pathinfo($filename, PATHINFO_FILENAME) . '_at_' . $now->format('d_m_Y_H_i_s');
             if ($format == FileService::FORMAT_CSV) {
                 $options = new \OpenSpout\Writer\CSV\Options();
                 $options->FIELD_DELIMITER = ';';
                 $options->FIELD_ENCLOSURE = '"';
-                $fileTarget .= '.'.FileService::FORMAT_CSV;
-    
+                $fileTarget .= '.' . FileService::FORMAT_CSV;
+
                 $writer = new \OpenSpout\Writer\CSV\Writer($options);
             } elseif ($format == FileService::FORMAT_XLSX) {
                 $sheetView = new SheetView();
                 $writer = new \OpenSpout\Writer\XLSX\Writer();
-                $fileTarget .= '.'.FileService::FORMAT_XLSX;
+                $fileTarget .= '.' . FileService::FORMAT_XLSX;
             } else {
                 throw new InvalidFileFormatException(self::EXCEPTION_FORMAT_NOT_SUPPORTED_MESSAGE);
             }
-    
+
             $writer->openToFile($fileTarget);
-    
+
             if ($format == FileService::FORMAT_XLSX) {
                 $writer->getCurrentSheet()->setSheetView($sheetView);
             }
@@ -524,16 +520,16 @@ class SpreadsheetExporterService
             if (isset($datas[0])) {
                 $headers = array_keys($datas[0]);
             }
-    
+
             $cells = [];
             foreach ($headers as $csvHeader) {
                 $cells[] = Cell::fromValue($csvHeader);
             }
-            
+
             /** add a row at a time */
             $singleRow = new Row($cells);
             $writer->addRow($singleRow);
-    
+
             foreach ($datas as $data) {
                 $cells = [];
                 foreach ($data as $value) {
@@ -542,7 +538,7 @@ class SpreadsheetExporterService
                 $singleRow = new Row($cells);
                 $writer->addRow($singleRow);
             }
-            
+
             $writer->close();
             return $fileTarget;
         } catch (\Exception $e) {
@@ -553,7 +549,8 @@ class SpreadsheetExporterService
         }
     }
 
-    public function truncateHtml(?string $html, int $length = 32767) : ?string {
+    public function truncateHtml(?string $html, int $length = 32767): ?string
+    {
         if (!$html) {
             return null;
         }

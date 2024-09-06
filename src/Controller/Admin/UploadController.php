@@ -3,6 +3,7 @@
 namespace App\Controller\Admin;
 
 use App\Controller\FrontController;
+use App\Security\Voter\InternalRequestVoter;
 use App\Service\File\FileService;
 use App\Service\Image\ImageService;
 use App\Service\Various\ParamService;
@@ -13,23 +14,36 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\String\Slugger\SluggerInterface;
 
-class UploadController extends FrontController {
-    #[Route('/admin/upload-image', name: 'app_admin_upload_image', options: ['expose' => true])]
-    public function index
-    (
+class UploadController extends FrontController
+{
+    #[Route('/admin/upload-image', name: 'app_admin_upload_image', options: ['expose' => true], methods: ['POST'])]
+    public function index(
         Request $request,
         SluggerInterface $slugger,
         FileService $fileService,
         ImageService $imageService,
         ParamService $paramService
-    ): Response
-    {
+    ): Response {
+        // verification requête interne
+        if (!$this->isGranted(InternalRequestVoter::IDENTIFIER)) {
+            throw $this->createAccessDeniedException(InternalRequestVoter::MESSAGE_ERROR);
+        }
+
         $image = $request->files->get('image', null);
+
+        // verification image
+        if (!$fileService->uploadedFileIsImage($image)) {
+            return new JsonResponse([
+                'url' => null,
+                'exception' => 'Le fichier n\'est pas une image'
+            ]);
+        }
+
+        // nommage de l'image
         if ($image) {
             $originalFilename = pathinfo($image->getClientOriginalName(), PATHINFO_FILENAME);
-            // this is needed to safely include the file name as part of the URL
             $safeFilename = $slugger->slug($originalFilename);
-            $newFilename = $safeFilename.'-'.uniqid().'.'.$image->guessExtension();
+            $newFilename = $safeFilename . '-' . uniqid() . '.' . $image->guessExtension();
         }
 
         // si file, on la met dans le dossier temporaire
@@ -40,13 +54,13 @@ class UploadController extends FrontController {
                 $newFilename
             );
         }
-        
+
         // gestion de l'image
         try {
             $imageService->sendImageToCloud(
-                $fileService->getUploadTmpDir().'/'.$newFilename,
+                $fileService->getUploadTmpDir() . '/' . $newFilename,
                 'upload',
-                'upload/'.$newFilename
+                'upload/' . $newFilename
             );
         } catch (FileException $e) {
             return new JsonResponse([
@@ -54,10 +68,10 @@ class UploadController extends FrontController {
                 'exception' => $e->getMessage()
             ]);
         }
-        
+
         return new JsonResponse([
             'data' => [
-                'link' => $paramService->get('cloud_image_url').'upload/'.$newFilename,
+                'link' => $paramService->get('cloud_image_url') . 'upload/' . $newFilename,
             ],
             'success' => true,
             'code' => 200
@@ -65,7 +79,7 @@ class UploadController extends FrontController {
     }
 
 
-    public function imagickAutorotate(\Imagick $image) :\Imagick
+    public function imagickAutorotate(\Imagick $image): \Imagick
     {
         switch ($image->getImageOrientation()) {
             case \Imagick::ORIENTATION_TOPLEFT:
@@ -100,5 +114,4 @@ class UploadController extends FrontController {
         $image->setImageOrientation(\Imagick::ORIENTATION_TOPLEFT);
         return $image;
     }
-
 }

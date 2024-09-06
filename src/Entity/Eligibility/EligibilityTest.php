@@ -56,7 +56,7 @@ class EligibilityTest // NOSONAR too much methods
     private Collection $aids;
 
     #[ORM\OneToMany(mappedBy: 'eligibilityTest', targetEntity: LogAidEligibilityTest::class)]
-    #[ORM\JoinColumn(onDelete:'SET NULL')]
+    #[ORM\JoinColumn(onDelete: 'SET NULL')]
     private Collection $logAidEligibilityTests;
 
     public function __construct()
@@ -249,7 +249,7 @@ class EligibilityTest // NOSONAR too much methods
     }
 
 
-    public function  __toString(): string
+    public function __toString(): string
     {
         return $this->name ?? 'EligibilityTest';
     }

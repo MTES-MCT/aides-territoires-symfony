@@ -15,12 +15,11 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 class ProjectValidatedSearchType extends AbstractType
 {
-    public function  __construct(
+    public function __construct(
         protected ManagerRegistry $managerRegistry,
         protected UserService $userService,
         protected RouterInterface $routerInterface
-    )
-    {
+    ) {
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -58,7 +57,7 @@ class ProjectValidatedSearchType extends AbstractType
 
         $builder
             ->add('project_perimeter', PerimeterCityAutocompleteType::class, $perimeterParams)
-            ->add('text', TextType::class,  [
+            ->add('text', TextType::class, [
                 'required' => false,
                 'label' => 'Mot-clés',
                 'help' => 'Ex: rénovation énergétique, vélo, tiers lieu, etc.',

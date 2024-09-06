@@ -15,19 +15,16 @@ class UrlRedirectCrudController extends AtCrudController
         return UrlRedirect::class;
     }
 
-    
+
     public function configureFields(string $pageName): iterable
     {
         yield IdField::new('id')->onlyOnIndex();
         yield TextField::new('oldUrl')
-        ->setLabel('Ancienne URL')
-        ->setHelp('le / est obligatoire en début et fin d\'URL.<div class="alert alert-warning">Pour les aides il faut obligatoirement passer par l\'édition de l\'aide (modification du champ Slug).</div>')
-        ;
+            ->setLabel('Ancienne URL')
+            ->setHelp('le / est obligatoire en début et fin d\'URL.<div class="alert alert-warning">Pour les aides il faut obligatoirement passer par l\'édition de l\'aide (modification du champ Slug).</div>');
         yield TextField::new('newUrl')
-        ->setLabel('Nouvelle URL')
-        ->setHelp('le / est obligatoire en début et fin d\'URL')
-        ;
+            ->setLabel('Nouvelle URL')
+            ->setHelp('le / est obligatoire en début et fin d\'URL');
         yield DateTimeField::new('timeCreate')->onlyOnIndex()->setLabel('Date de création');
     }
-    
 }

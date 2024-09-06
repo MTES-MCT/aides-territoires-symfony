@@ -28,8 +28,7 @@ class LogAidSearchController extends AbstractController
     public function __construct(
         private LogAidSearchRepository $logAidSearchRepository,
         private RequestStack $requestStack
-    )
-    {
+    ) {
     }
 
     #[Route('/admin/statistics/log/aid-search', name: 'admin_statistics_log_aid_search')]
@@ -37,8 +36,7 @@ class LogAidSearchController extends AbstractController
         AdminContext $adminContext,
         LogAidSearchRepository $logAidSearchRepository,
         ProjectReferenceRepository $projectReferenceRepository
-    )
-    {
+    ) {
         // dates par défaut
         $dateMin = new \DateTime('-1 week');
         $dateMax = new \DateTime();
@@ -104,8 +102,7 @@ class LogAidSearchController extends AbstractController
         AdminContext $adminContext,
         ChartBuilderInterface $chartBuilderInterface,
         PerimeterRepository $perimeterRepository
-    ): Response
-    {
+    ): Response {
         // dates par défaut
         $dateMin = new \DateTime('-1 week');
         $dateMax = new \DateTime();
@@ -125,7 +122,7 @@ class LogAidSearchController extends AbstractController
 
         // les départements (pour affichage)
         $departments = $perimeterRepository->getDepartments();
-        
+
         $departmentsByCode = [];
         $logAidSearchsByDept = [];
         foreach ($departments as $department) {
@@ -144,7 +141,7 @@ class LogAidSearchController extends AbstractController
             'dateCreateMax' => $dateMax
         ]);
 
-        
+
         foreach ($logAidSearchs as $logAidSearch) {
             if (!$logAidSearch['insee']) {
                 // on recherche le département dans les parents
@@ -158,7 +155,7 @@ class LogAidSearchController extends AbstractController
                     }
                 }
             }
-            
+
             // on met les stats par département
             $dept = ($logAidSearch['insee']) ? substr($logAidSearch['insee'], 0, 2) : 0;
             if ($dept >= 97) {
@@ -178,7 +175,7 @@ class LogAidSearchController extends AbstractController
             $medium = (int) round($countMax / 2, 0);
             $first = (int) floor($medium / 2);
             $last = $medium + $first;
-            
+
             // on reparcours pour attribuer une clase à chaque dept
             foreach ($logAidSearchsByDept as $key => $byDept) {
                 if ($byDept['count'] == 0) {
@@ -209,20 +206,19 @@ class LogAidSearchController extends AbstractController
     }
 
     #[Route('/admin/statistics/log/aid-search/missing-perimeters/export', name: 'admin_statistics_log_aid_search_missing_perimeters_export')]
-    public function exportRegistrationByMonth(
-    ): StreamedResponse
+    public function exportRegistrationByMonth(): StreamedResponse
     {
         $response = new StreamedResponse();
         $response->setCallback(function () {
 
             $dateMin = $this->requestStack->getCurrentRequest()->get('dateMin')
-                    ? new \DateTime($this->requestStack->getCurrentRequest()->get('dateMin'))
-                    : new \DateTime(date('Y-m-d', strtotime('-1 week')));
+                ? new \DateTime($this->requestStack->getCurrentRequest()->get('dateMin'))
+                : new \DateTime(date('Y-m-d', strtotime('-1 week')));
             $dateMax = $this->requestStack->getCurrentRequest()->get('dateMax')
-                    ? new \DateTime($this->requestStack->getCurrentRequest()->get('dateMax'))
-                    : new \DateTime(date('Y-m-d'));
+                ? new \DateTime($this->requestStack->getCurrentRequest()->get('dateMax'))
+                : new \DateTime(date('Y-m-d'));
 
-                    // options CSV
+            // options CSV
             $options = new \OpenSpout\Writer\CSV\Options();
             $options->FIELD_DELIMITER = ';';
             $options->FIELD_ENCLOSURE = '"';
@@ -232,7 +228,7 @@ class LogAidSearchController extends AbstractController
 
             // ouverture fichier
             $now = new \DateTime(date('Y-m-d H:i:s'));
-            $writer->openToBrowser('export_recherche_perimetre_sans_organisation_'.$now->format('d_m_Y').'.csv');
+            $writer->openToBrowser('export_recherche_perimetre_sans_organisation_' . $now->format('d_m_Y') . '.csv');
 
             // entêtes
             $cells = [

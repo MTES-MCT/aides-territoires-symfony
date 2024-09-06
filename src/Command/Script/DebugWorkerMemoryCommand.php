@@ -22,8 +22,7 @@ class DebugWorkerMemoryCommand extends Command
     public function __construct(
         private ManagerRegistry $managerRegistry,
         private MessageBusInterface $bus
-    )
-    {
+    ) {
         parent::__construct();
     }
 
@@ -35,7 +34,7 @@ class DebugWorkerMemoryCommand extends Command
         $io = new SymfonyStyle($input, $output);
         $io->title($this->commandTextStart);
 
-        try  {
+        try {
             // tache
             $this->bus->dispatch(new MsgDebugMemory());
         } catch (\Exception $exception) {

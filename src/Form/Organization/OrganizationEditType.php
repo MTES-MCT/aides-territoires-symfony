@@ -27,7 +27,7 @@ class OrganizationEditType extends AbstractType
         foreach (Organization::INTERCOMMUNALITY_TYPES as $intercommunalityType) {
             $choicesIntercommunalityType[$intercommunalityType['name']] = $intercommunalityType['slug'];
         }
-        
+
         $builder
             ->add('organizationType', EntityType::class, [
                 'required' => true,
@@ -47,7 +47,7 @@ class OrganizationEditType extends AbstractType
             ->add('intercommunalityType', ChoiceType::class, [
                 'required' => false,
                 'mapped' => false,
-                'label' => 'Type d’intercommunalité', 
+                'label' => 'Type d’intercommunalité',
                 'placeholder' => 'Sélectionnez une valeur',
                 'choices' => $choicesIntercommunalityType
             ])
@@ -137,7 +137,6 @@ class OrganizationEditType extends AbstractType
                 }
             }
         }
-                
     }
 
     public function configureOptions(OptionsResolver $resolver): void

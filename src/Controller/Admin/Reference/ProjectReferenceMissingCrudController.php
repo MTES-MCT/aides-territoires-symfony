@@ -16,13 +16,13 @@ class ProjectReferenceMissingCrudController extends AtCrudController
         return ProjectReferenceMissing::class;
     }
 
-    
+
     public function configureFields(string $pageName): iterable
     {
         yield IdField::new('id')->onlyOnIndex();
         yield TextField::new('name', 'Nom du projet manquant');
         yield AssociationField::new('aids', 'Aides')
-        ->autocomplete();
+            ->autocomplete();
     }
 
     public function configureCrud(Crud $crud): Crud

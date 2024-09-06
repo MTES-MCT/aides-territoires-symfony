@@ -18,7 +18,7 @@ class ProjectReferenceMissingRepository extends ServiceEntityRepository
         parent::__construct($registry, ProjectReferenceMissing::class);
     }
 
-    public function findAllOrderByNbAids() : array
+    public function findAllOrderByNbAids(): array
     {
         $qb = $this->getQueryBuilder();
         $qb->addSelect('COUNT(a) as HIDDEN nbAids')

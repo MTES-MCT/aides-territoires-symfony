@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Controller\Admin\Filter\Organization;
 
 use App\Form\Admin\Filter\Organization\HasNoBackerFilterType;
@@ -28,8 +29,8 @@ class HasNoBackerFilter implements FilterInterface
             return;
         }
         $queryBuilder
-            ->leftJoin($filterDataDto->getEntityAlias().'.backer', 'backer')
+            ->leftJoin($filterDataDto->getEntityAlias() . '.backer', 'backer')
             ->andWhere('backer.id IS NULL')
-            ;
+        ;
     }
 }

@@ -21,12 +21,10 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 class CartographySearchType extends AbstractType
 {
-    public function  __construct(
+    public function __construct(
         private UserService $userService,
         protected ManagerRegistry $managerRegistry
-    )
-    {
-
+    ) {
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -51,8 +49,8 @@ class CartographySearchType extends AbstractType
             'required' => true,
             'label' => 'Département',
             'class' => Perimeter::class,
-            'choice_label' => function($entity){
-                return $entity->getCode().' - '.$entity->getName();
+            'choice_label' => function ($entity) {
+                return $entity->getCode() . ' - ' . $entity->getName();
             },
             'query_builder' => function (PerimeterRepository $perimeterRepository) {
                 return $perimeterRepository->getQueryBuilder([
@@ -67,12 +65,12 @@ class CartographySearchType extends AbstractType
             ],
         ];
 
-        if($options['forceDepartement']!==false){
+        if ($options['forceDepartement'] !== false) {
             $departementParams['data'] = $options['forceDepartement'];
         }
 
         $builder
-            ->add('departement', EntityType::class,$departementParams)
+            ->add('departement', EntityType::class, $departementParams)
             ->add('organizationType', EntityType::class, [
                 'required' => false,
                 'label' => 'Public bénéficiaire',
@@ -88,8 +86,8 @@ class CartographySearchType extends AbstractType
                 'required' => false,
                 'label' => 'Type d’aide',
                 'class' => AidTypeGroup::class,
-                'choice_label' => function($entity){
-                    return $entity->getName().' par type';
+                'choice_label' => function ($entity) {
+                    return $entity->getName() . ' par type';
                 },
                 'placeholder' => 'Toutes les aides',
             ])
@@ -104,8 +102,8 @@ class CartographySearchType extends AbstractType
                     'Porteurs locaux uniquement' =>  Perimeter::SLUG_LOCAL_GROUP,
                     'Porteurs nationaux uniquement' => Perimeter::SLUG_NATIONAL_GROUP,
                 ],
-                'placeholder' => 'Toutes les échelles', 
-                'label' => 'Échelle d\'intervention', 
+                'placeholder' => 'Toutes les échelles',
+                'label' => 'Échelle d\'intervention',
                 'required'  => false
             ])
             ->add('backerCategory', EntityType::class, [
@@ -115,7 +113,7 @@ class CartographySearchType extends AbstractType
                 'choice_label' => 'name',
                 'placeholder' => 'Toutes les catégories',
             ])
-            
+
         ;
     }
 
@@ -123,7 +121,7 @@ class CartographySearchType extends AbstractType
     {
         $resolver->setDefaults([
             // Configure your form options here
-            'forceDepartement'=>false
+            'forceDepartement' => false
         ]);
     }
 }

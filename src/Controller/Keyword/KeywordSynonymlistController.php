@@ -14,7 +14,7 @@ class KeywordSynonymlistController extends FrontController
     public function ajaxAutocomplete(
         RequestStack $requestStack,
         KeywordSynonymlistRepository $keywordSynonymlistRepository
-    ) : JsonResponse {
+    ): JsonResponse {
         $query = strip_tags($requestStack->getCurrentRequest()->get('query', null));
 
         $keywords = $keywordSynonymlistRepository->findCustom(

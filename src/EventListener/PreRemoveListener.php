@@ -15,12 +15,13 @@ class PreRemoveListener
     public function __construct(
         protected EntityManagerInterface $em,
         protected UserListener $userListener
-    ) {}
+    ) {
+    }
 
     public function preRemove(PreRemoveEventArgs $args): void
     {
         $entity = $args->getObject();
-        
+
         if ($entity instanceof User) {
             $this->userListener->onPreRemove($args);
         }

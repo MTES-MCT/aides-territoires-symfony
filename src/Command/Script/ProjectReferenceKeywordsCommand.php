@@ -22,13 +22,12 @@ class ProjectReferenceKeywordsCommand extends Command
     protected string $commandTextStart = '<Exclusion de certains mots clés pour certains projets';
     protected string $commandTextEnd = '>Exclusion de certains mots clés pour certains projets';
 
-    
+
 
     public function __construct(
         protected ManagerRegistry $managerRegistry
-    )
-    {
-        ini_set('max_execution_time', 60*60);
+    ) {
+        ini_set('max_execution_time', 60 * 60);
         ini_set('memory_limit', '1G');
         parent::__construct();
     }
@@ -41,7 +40,7 @@ class ProjectReferenceKeywordsCommand extends Command
         $io = new SymfonyStyle($input, $output);
         $io->title($this->commandTextStart);
 
-        try  {
+        try {
             // import des keywords
             $this->task($input, $output);
         } catch (\Exception $exception) {
@@ -101,7 +100,7 @@ class ProjectReferenceKeywordsCommand extends Command
                 $projectReference->addRequiredKeywordReference($fenetreKeyword);
                 $projectReference->addRequiredKeywordReference($porteKeyword);
             }
-            
+
             $this->managerRegistry->getManager()->persist($projectReference);
         }
 
