@@ -65,6 +65,38 @@ class FileService
             'image/avif'
         ];
 
-        return in_array($file->getMimeType(), $allowedMimeTypes);
+        $allowedExtensions = [
+            'jpg',
+            'jpeg',
+            'png',
+            'gif',
+            'svg',
+            'webp',
+            'avif'
+        ];
+    
+
+        // Vérification du type MIME
+        if (!in_array($file->getMimeType(), $allowedMimeTypes)) {
+            return false;
+        }
+
+        // Vérification de l'extension du fichier
+        $extension = $file->getClientOriginalExtension();
+        if (!in_array(strtolower($extension), $allowedExtensions)) {
+            return false;
+        }
+
+        // Vérification avec getimagesize
+        try {
+            $imageSize = getimagesize($file->getPathname());
+            if ($imageSize === false) {
+                return false;
+            }
+        } catch (\Exception $e) {
+            return false;
+        }
+
+        return true;
     }
 }
