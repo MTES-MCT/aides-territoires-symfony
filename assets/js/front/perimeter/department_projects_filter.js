@@ -14,8 +14,6 @@ function department_filter(return_page) {
         if (department.match(SANE_ID_REGEX)) {
             let new_url = window.location.origin + "/projets/projets-subventionnes/resultats/?department_search=true&project_perimeter=" + department;
             window.location.href = new_url + window.location.search;
-        } else {
-            console.log("Invalid department id");
         }
     });
 };
