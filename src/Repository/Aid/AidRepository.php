@@ -494,29 +494,6 @@ class AidRepository extends ServiceEntityRepository
                 ';
 
                 $objects = str_getcsv($objectsString, ' ', '"');
-                // if (!empty($objects)) {
-                //     $sqlObjects .= ' + ';
-
-                //     // on limite le nombre d'objets car le serveur ne tiens pas le coup
-                //     if (count($objects) > 40) {
-                //         $objects = array_slice($objects, 0, 40);
-                //     }
-                //     for ($i = 0; $i<count($objects); $i++) {
-                //         $sqlObjects .= '
-                //         CASE WHEN (
-                //             REGEXP(a.name, :objects'.$i.') = 1
-                //             OR REGEXP(a.nameInitial, :objects'.$i.') = 1
-                //             OR REGEXP(a.description, :objects'.$i.') = 1
-                //         ) THEN 60 ELSE 0 END
-                //         ';
-
-                //         if ($i < count($objects) - 1) {
-                //             $sqlObjects .= ' + ';
-                //         }
-
-                //         $qb->setParameter('objects'.$i, '\\b'.$objects[$i].'\\b');
-                //     }
-                // }
 
                 if (!empty($objects)) {
                     $sqlObjects .= ' + ';
@@ -581,12 +558,6 @@ class AidRepository extends ServiceEntityRepository
             $sqlTotal = '';
             if ($originalName) {
                 $sqlTotal .= $sqlOriginalName;
-            }
-            if ($objectsString) {
-                if ($originalName) {
-                    $sqlTotal .= ' + ';
-                }
-                // $sqlTotal .= $sqlObjects;
             }
             if ($intentionsString && $objectsString) {
                 if ($originalName || $objectsString) {
