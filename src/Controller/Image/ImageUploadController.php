@@ -17,18 +17,6 @@ use Symfony\Component\String\Slugger\SluggerInterface;
 
 class ImageUploadController extends FrontController
 {
-    #[Route('/upload-image', name: 'upload_image_options', methods: ['OPTIONS'])]
-public function options(): Response
-{
-    // Réponse pour la méthode OPTIONS (preflight)
-    $response = new Response();
-    $response->headers->set('Access-Control-Allow-Origin', 'http://localhost');
-    $response->headers->set('Access-Control-Allow-Methods', 'POST, OPTIONS');
-    $response->headers->set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-    $response->headers->set('Access-Control-Allow-Credentials', 'true');
-
-    return $response;
-}
     #[Route('/upload-image', name: 'app_upload_image', options: ['expose' => true], methods: ['POST'])]
     public function index(
         SluggerInterface $slugger,

@@ -11,7 +11,7 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class PerimeterController extends FrontController
 {
-    #[Route('perimeter/ajax-search', name: 'app_perimeter_ajax_search', options: ['expose' => true])]
+    #[Route('perimeter/ajax-search', name: 'app_perimeter_ajax_search', options: ['expose' => true], methods: ['POST'])]
     public function ajaxSearch(
         RequestStack $requestStack,
         InternalApiService $internalApiService
@@ -52,7 +52,7 @@ class PerimeterController extends FrontController
         }
     }
 
-    #[Route('perimeter/ajax-datas', name: 'app_perimeter_ajax_datas', options: ['expose' => true])]
+    #[Route('perimeter/ajax-datas', name: 'app_perimeter_ajax_datas', options: ['expose' => true], methods: ['POST'])]
     public function ajaxDatas(
         RequestStack $requestStack,
         InternalApiService $internalApiService

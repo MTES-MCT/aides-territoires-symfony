@@ -41,9 +41,7 @@
 				<div class="fr-container">
 					<div class="fr-notice__body">
 						<p class="fr-notice__title">
-							Nous vous proposons un formulaire pré-rempli,
-							                        n’hésitez pas à modifier/rectifier les informations,
-							                        notamment le champ email de contact.
+							Nous vous proposons un formulaire pré-rempli, n’hésitez pas à modifier/rectifier les informations, notamment le champ email de contact.
 						</p>
 					</div>
 				</div>
@@ -98,3 +96,13 @@
 		</div>
 	</div>
 {% endblock body %}
+
+{% block javascriptsBottom %}
+	{{ parent() }}
+	{% cspscript %}
+		<script>
+			var csrfTokenInternal = '{{ csrf_token(constant('App\\Security\\Voter\\InternalRequestVoter::CSRF_TOKEN_NAME')) }}';
+		</script>
+	{% endcspscript %}
+{% endblock %}
+

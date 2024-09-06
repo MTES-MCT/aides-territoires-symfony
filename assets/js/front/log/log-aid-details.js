@@ -9,12 +9,15 @@ $(function(){
                 querystring: window.location.search,
             };
 
+            var csrfToken = typeof csrfTokenInternal !== 'undefined' ? csrfTokenInternal : '';
+
             $.ajax({
                 url: Routing.generate('app_log_ajax'),
                 method: 'POST',
                 data: {
                     type: 'originUrl',
                     params: params,
+                    _token: csrfToken,
                 },
                 dataType: 'json',
                 success: function(data){
@@ -37,12 +40,15 @@ $(function(){
                 querystring: window.location.search,
             };
 
+            var csrfToken = typeof csrfTokenInternal !== 'undefined' ? csrfTokenInternal : '';
+
             $.ajax({
                 url: Routing.generate('app_log_ajax'),
                 method: 'POST',
                 data: {
                     type: 'applicationUrl',
                     params: params,
+                    _token: csrfToken
                 },
                 dataType: 'json',
                 success: function(data){
@@ -66,13 +72,16 @@ $(function(){
                     ds_folder_number: (typeof DS_FOLDER_NUMBER !== 'undefined') ? DS_FOLDER_NUMBER : '',
                 };
 
+                var csrfToken = typeof csrfTokenInternal !== 'undefined' ? csrfTokenInternal : '';
+
                 $.ajax({
                     type: 'POST',
                     url: Routing.generate('app_log_ajax'),
                     dataType: 'json',
                     data: {
                         type: 'createDsFolder',
-                        params: params
+                        params: params,
+                        _token: csrfToken
                     }
                 })
                 if (typeof _paq !== 'undefined') {

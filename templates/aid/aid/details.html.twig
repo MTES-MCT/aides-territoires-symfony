@@ -883,74 +883,90 @@
 			</div>
 		</div>
 	{% endif %}
+	</div>
+</div>
+{% endblock %}
 
-</div></div>{% endblock %}{% block modal %}{% include 'aid/aid/_share_modal.html.twig' %}{% include 'aid/aid/_add_to_project_modal.html.twig' %}{% include 'aid/aid/_suggest_aid_modal.html.twig' %}{% endblock %}{% block javascriptsBottom %}{% cspscript %}<script>
-const aidSlug = '{{ aid.slug }}';</script>{% endcspscript %}{% cspscript %}<script>
-{% if dsDatas.prepopulate_application_url %}
-var PREPOPULATE_APPLICATION_URL = true;
-var ORGANIZATION = {% if app.user and app.user.defaultOrganization %}
-parseInt('{{ app.user.defaultOrganization.id }}')
-{% else %}
-0{% endif %};
-var USER = {% if app.user %}
-parseInt('{{ app.user.id }}')
-{% else %}
-0{% endif %};
-var DS_FOLDER_URL = '{{ dsDatas.prepopulate_application_url }}';
-var DS_FOLDER_ID = '{{ dsDatas.ds_folder_id }}';
-var DS_FOLDER_NUMBER = parseInt('{{ dsDatas.ds_folder_number }}');
-{% else %}
-var PREPOPULATE_APPLICATION_URL = false;{% endif %}
-TEXT_SEARCH = {% if aid.keywords and aid.keywords[0] is defined %}'{{ aid.keywords[0].name }}'
-{% else %}
-''{% endif %};
-AID_ID = parseInt('{{ aid.id }}');
-AID_SLUG = '{{ aid.slug }}';
-AID_ELIGIBILITY_TEST_ID = {% if aid.eligibilityTest %}
-parseInt('{{ aid.eligibilityTest.id }}')
-{% else %}
-0{% endif %};
-CURRENT_SEARCH = {% if aid.keywords and aid.keywords[0] is defined %}
-'text= {{ aid.keywords[0].name|url_encode }}'
-{% else %}
-''{% endif %};</script>{% endcspscript %}{% set sib_client_key = getParameter('sib_client_key') %}{% if sib_client_key %}
-{% set sib_email_id = getUserSibEmailId(app.user) %}
-{% cspscript %}
-<script type="text/javascript">
-	(function () {
-window.sib = {
-equeue: [],
-client_key: "{{ sib_client_key }}"
-};{% if sib_email_id %}
-window.sib.email_id = "{{ sib_email_id }}";{% endif %}
-window.sendinblue = {};
-for (var j =[
-'track', 'identify', 'trackLink', 'page'
-], i = 0; i < j.length; i++) {
-(function (k) {
-window.sendinblue[k] = function () {
-var arg = Array.prototype.slice.call(arguments);
-(window.sib[k] || function () {
-var t = {};
-t[k] = arg;
-window.sib.equeue.push(t);
-})(arg[0], arg[1], arg[2], arg[3]);
-};
-})(j[i]);
-}
-var n = document.createElement("script"),
-i = document.getElementsByTagName("script")[0];
-n.type = "text/javascript",
-n.id = "sendinblue-js",
-n.async = !0,
-n.src = "https://sibautomation.com/sa.js?key=" + window.sib.client_key,
-i.parentNode.insertBefore(n, i),
-window.sendinblue.page();
-})();
-</script>
-{% endcspscript %}{% endif %}{% if highlightedWords is defined and highlightedWords|length > 0 %}
-{% cspscript %}
-<script>
-	const highlightedWords = [];{% for word in highlightedWords %}highlightedWords.push('{{ word }}');{% endfor %}
-</script>
-{% endcspscript %}{% endif %}{% endblock %}
+{% block modal %}
+	{% include 'aid/aid/_share_modal.html.twig' %}
+	{% include 'aid/aid/_add_to_project_modal.html.twig' %}
+	{% include 'aid/aid/_suggest_aid_modal.html.twig' %}
+{% endblock %}
+
+{% block javascriptsBottom %}
+    {% cspscript %}
+    <script>
+    const aidSlug = '{{ aid.slug }}';
+    </script>
+    {% endcspscript %}
+    {% cspscript %}
+        <script>
+            {% if dsDatas.prepopulate_application_url %}
+                var PREPOPULATE_APPLICATION_URL = true;
+                var ORGANIZATION = {% if app.user and app.user.defaultOrganization %}parseInt('{{ app.user.defaultOrganization.id }}'){% else %}0{% endif %};
+                var USER = {% if app.user %}parseInt('{{ app.user.id }}'){% else %}0{% endif %};
+                var DS_FOLDER_URL = '{{ dsDatas.prepopulate_application_url }}';
+                var DS_FOLDER_ID = '{{ dsDatas.ds_folder_id }}';
+                var DS_FOLDER_NUMBER = parseInt('{{ dsDatas.ds_folder_number }}');
+            {% else %}
+                var PREPOPULATE_APPLICATION_URL = false;
+            {% endif %}
+            TEXT_SEARCH = {% if aid.keywords and aid.keywords[0] is defined %}'{{ aid.keywords[0].name }}'{% else %}''{% endif %};
+            AID_ID = parseInt('{{ aid.id }}');
+            AID_SLUG = '{{ aid.slug }}';
+            AID_ELIGIBILITY_TEST_ID =  {% if aid.eligibilityTest %}parseInt('{{ aid.eligibilityTest.id }}'){% else %}0{% endif %};
+            CURRENT_SEARCH = {% if aid.keywords and aid.keywords[0] is defined %}'text={{ aid.keywords[0].name|url_encode }}'{% else %}''{% endif %};
+        </script>
+    {% endcspscript %}
+
+    {% set sib_client_key = getParameter('sib_client_key') %}
+    {% if sib_client_key %}
+        {% set sib_email_id = getUserSibEmailId(app.user) %}
+        {% cspscript %}
+        <script type="text/javascript">
+            (function() {
+                window.sib = {
+                    equeue: [],
+                    client_key: "{{ sib_client_key }}"
+                };
+                {% if sib_email_id %}
+                window.sib.email_id = "{{ sib_email_id }}";
+                {% endif %}
+                window.sendinblue = {};
+                for (var j = ['track', 'identify', 'trackLink', 'page'], i = 0; i < j.length; i++) {
+                (function(k) {
+                    window.sendinblue[k] = function() {
+                        var arg = Array.prototype.slice.call(arguments);
+                        (window.sib[k] || function() {
+                                var t = {};
+                                t[k] = arg;
+                                window.sib.equeue.push(t);
+                            })(arg[0], arg[1], arg[2], arg[3]);
+                        };
+                    })(j[i]);
+                }
+                var n = document.createElement("script"),
+                    i = document.getElementsByTagName("script")[0];
+                n.type = "text/javascript", n.id = "sendinblue-js", n.async = !0, n.src = "https://sibautomation.com/sa.js?key=" + window.sib.client_key, i.parentNode.insertBefore(n, i), window.sendinblue.page();
+            })();
+        </script>
+        {% endcspscript %}
+    {% endif %}
+
+    {% if highlightedWords is defined and highlightedWords|length > 0 %}
+        {% cspscript %}
+        <script>
+            const highlightedWords = [];
+            {% for word in highlightedWords %}
+                highlightedWords.push('{{ word }}');
+            {% endfor %}
+        </script>
+        {% endcspscript %}
+    {% endif %}
+
+	{% cspscript %}
+		<script>
+			var csrfTokenInternal = '{{ csrf_token(constant('App\\Security\\Voter\\InternalRequestVoter::CSRF_TOKEN_NAME')) }}';
+		</script>
+	{% endcspscript %}
+{% endblock %}

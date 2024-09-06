@@ -42,11 +42,14 @@ $(window).on('pagehide', function() {
 function lock()
 {
     if (typeof idBacker !== 'undefined') {
+        var csrfToken = typeof csrfTokenInternal !== 'undefined' ? csrfTokenInternal : '';
+
         $.ajax({
             url: Routing.generate('app_organization_backer_ajax_lock'),
             type: 'POST',
             data: {
-                'id': idBacker
+                'id': idBacker,
+                _token: csrfToken
             }
         });
     }
@@ -55,11 +58,14 @@ function lock()
 function unlock()
 {
     if (typeof idBacker !== 'undefined') {
+        var csrfToken = typeof csrfTokenInternal !== 'undefined' ? csrfTokenInternal : '';
+
         $.ajax({
             url: Routing.generate('app_organization_backer_ajax_unlock'),
             type: 'POST',
             data: {
-                'id': idBacker
+                'id': idBacker,
+                _token: csrfToken
             }
         });
     }

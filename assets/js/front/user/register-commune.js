@@ -3,11 +3,14 @@ import Routing from 'fos-router';
 $(function() {
     $(document).on({
         change: function(e) {
+            var csrfToken = typeof csrfTokenInternal !== 'undefined' ? csrfTokenInternal : '';
+
             $.ajax({
                 url: Routing.generate('app_perimeter_ajax_datas'),
                 method: 'POST',
                 data: {
                     perimeter_id: $('#register_commune_perimeter').val(),
+                    _token: csrfToken
                 },
                 dataType: 'json',
                 success: function(data){

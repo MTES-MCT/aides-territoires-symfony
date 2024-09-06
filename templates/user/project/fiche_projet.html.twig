@@ -161,4 +161,9 @@
 		let idProject = {{ project.id }};
 	</script>
 	{% endcspscript %}
+	{% cspscript %}
+	<script>
+	var csrfTokenInternal = '{{ csrf_token(constant('App\\Security\\Voter\\InternalRequestVoter::CSRF_TOKEN_NAME')) }}';
+	</script>
+	{% endcspscript %}
 {% endblock %}

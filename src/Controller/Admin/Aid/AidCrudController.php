@@ -1201,12 +1201,16 @@ class AidCrudController extends AtCrudController implements EventSubscriberInter
 
     public function handleProjectReferenceMissingPersistEvent(BeforeEntityPersistedEvent $event)
     {
-        $this->handleProjectReferenceMissingDuplicates($event->getEntityInstance());
+        if ($event->getEntityInstance() instanceof Aid) {
+            $this->handleProjectReferenceMissingDuplicates($event->getEntityInstance());
+        }
     }
 
     public function handleProjectReferenceMissingUpdateEvent(BeforeEntityUpdatedEvent $event)
     {
-        $this->handleProjectReferenceMissingDuplicates($event->getEntityInstance());
+        if ($event->getEntityInstance() instanceof Aid) {
+            $this->handleProjectReferenceMissingDuplicates($event->getEntityInstance());
+        }
     }
 
     private function handleProjectReferenceMissingDuplicates(Aid $entity): void

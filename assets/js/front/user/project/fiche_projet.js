@@ -36,11 +36,14 @@ $(window).on('pagehide', function() {
 function lock()
 {
     if (typeof idProject !== 'undefined') {
+        var csrfToken = typeof csrfTokenInternal !== 'undefined' ? csrfTokenInternal : '';
+
         $.ajax({
             url: Routing.generate('app_user_project_ajax_lock'),
             type: 'POST',
             data: {
-                'id': idProject
+                'id': idProject,
+                '_token': csrfToken
             }
         });
     }
@@ -49,11 +52,14 @@ function lock()
 function unlock()
 {
     if (typeof idProject !== 'undefined') {
+        var csrfToken = typeof csrfTokenInternal !== 'undefined' ? csrfTokenInternal : '';
+
         $.ajax({
             url: Routing.generate('app_user_project_ajax_unlock'),
             type: 'POST',
             data: {
-                'id': idProject
+                'id': idProject,
+                '_token': csrfToken
             }
         });
     }

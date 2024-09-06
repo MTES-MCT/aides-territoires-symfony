@@ -178,10 +178,20 @@
 			</div>
 		</div>
 	</div>
-</div>{% endblock %}{% block javascriptsBottom %}
-{{ parent() }}
-{% cspscript %}
-<script type="text/javascript">
-	let idBacker = {{ backer.id }};
-</script>
-{% endcspscript %}{% endblock %}
+</div>
+{% endblock %}
+
+{% block javascriptsBottom %}
+	{{ parent() }}
+	{% cspscript %}
+		<script type="text/javascript">
+			let idBacker = {{ backer.id }};
+		</script>
+	{% endcspscript %}
+
+	{% cspscript %}
+		<script>
+			var csrfTokenInternal = '{{ csrf_token(constant('App\\Security\\Voter\\InternalRequestVoter::CSRF_TOKEN_NAME')) }}';
+		</script>
+	{% endcspscript %}
+{% endblock %}

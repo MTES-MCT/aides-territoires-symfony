@@ -73,3 +73,19 @@
 {% block modal %}
 	{% include 'user/dashboard/_modal_organization_not_complete.html.twig' %}
 {% endblock %}
+
+{% block javascriptsBottom %}
+	{{ parent() }}
+	{% if aid.id %}
+		{% cspscript %}
+		<script>
+			var idAid = {{ aid.id }};
+		</script>
+		{% endcspscript %}
+	{% endif %}
+	{% cspscript %}
+		<script>
+			var csrfTokenInternal = '{{ csrf_token(constant('App\\Security\\Voter\\InternalRequestVoter::CSRF_TOKEN_NAME')) }}';
+		</script>
+	{% endcspscript %}
+{% endblock %}

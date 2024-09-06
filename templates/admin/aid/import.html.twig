@@ -59,3 +59,11 @@
 	</main>
 
 {% endblock %}
+
+{% block body_javascript %}
+{% cspscript %}
+<script>
+var csrfTokenInternal = '{{ csrf_token(constant('App\\Security\\Voter\\InternalRequestVoter::CSRF_TOKEN_NAME')) }}';
+</script>
+{% endcspscript %}
+{% endblock body_javascript %}

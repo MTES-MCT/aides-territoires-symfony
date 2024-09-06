@@ -40,7 +40,7 @@ global.launchTrumbowyg = function(elt)
         plugins: {
             // Image upload
             upload: {
-                serverPath: Routing.generate('app_upload_image'),
+                serverPath: Routing.generate('app_upload_image', {'_token': typeof csrfTokenInternal !== 'undefined' ? csrfTokenInternal : ''}),
                 fileFieldName: 'image',
                 urlPropertyName: 'data.link'
             },

@@ -12,8 +12,7 @@ class InternalRequestVoter extends Voter
 {
     const MESSAGE_ERROR = 'Vous n\'êtes pas autorisé à accéder à cette ressource.';
     const IDENTIFIER = 'INTERNAL_REQUEST';
-    const CSRF_TOKEN_NAME = 'internal_action';
-    const CSRF_TOKEN_SESSION_NAME = 'csrf_token_session';
+    const CSRF_TOKEN_NAME = 'csrf_internal';
 
     private RequestStack $requestStack;
     private CsrfTokenManagerInterface $csrfTokenManager;
@@ -38,19 +37,21 @@ class InternalRequestVoter extends Voter
             return false;
         }
 
-        // Récupérer la session via la requête
-        $session = $request->getSession();
-        if (!$session) {
+        // Vérifier le token CSRF
+        if (!$this->validateCsrfToken($request)) {
             return false;
         }
 
-        $csrfTokenSession = $session->get(self::CSRF_TOKEN_SESSION_NAME);
-        if (!$csrfTokenSession) {
+        return true;
+    }
+
+    private function validateCsrfToken($request): bool
+    {
+        $csrfToken = $request->request->get('_token') ?? $request->query->get('_token');
+        if (!$csrfToken) {
             return false;
         }
 
-        // Valider le token CSRF
-        $csrfToken = new CsrfToken(self::CSRF_TOKEN_NAME, $csrfTokenSession);
-        return $this->csrfTokenManager->isTokenValid($csrfToken);
+        return $this->csrfTokenManager->isTokenValid(new CsrfToken(self::CSRF_TOKEN_NAME, $csrfToken));
     }
 }
