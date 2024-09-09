@@ -694,10 +694,10 @@ class AidRepository extends ServiceEntityRepository
 
         if ($organizationTypes) {
             $qb
-                ->innerJoin('a.aidAudiences', 'aidAudiencesForTypes')
-                ->andWhere('aidAudiencesForTypes IN (:organizationTypes)')
+                ->andWhere(':organizationTypes MEMBER OF a.aidAudiences')
                 ->setParameter('organizationTypes', $organizationTypes);
         }
+        
 
         if (is_array($organizationTypeSlugs) && count($organizationTypeSlugs) > 0) {
             $qb
