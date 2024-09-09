@@ -2,8 +2,10 @@
 
 namespace App\Controller;
 
+use App\Entity\Log\LogAidSearchTemp;
 use App\Service\Various\Breadcrumb;
 use App\Validator\UrlExternalValid;
+use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -33,5 +35,24 @@ class FrontController extends AbstractController
             $type,
             $this->translatorInterface->trans($message)
         );
+    }
+
+    #[Route('/test', name: 'app_test')]
+    public function test(
+        ManagerRegistry $managerRegistry
+    )
+    {
+        $logAidSearchTemps = $managerRegistry->getRepository(LogAidSearchTemp::class)->findAll();
+        foreach ($logAidSearchTemps as $logAidSearchTemp) {
+            for ($j=0; $j<20; $j++) {
+                for ($i=0; $i<1000; $i++) {
+                    // on duplique $logAidSearchTemp 1000 fois en clonant l'entite
+                    $logAidSearch = clone $logAidSearchTemp;
+                    $managerRegistry->getManager()->persist($logAidSearch);
+
+                }
+                $managerRegistry->getManager()->flush();
+            }
+        }
     }
 }

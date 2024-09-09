@@ -8,8 +8,8 @@ use App\Entity\Log\LogAccountRegisterFromNextPageWarningClickEvent;
 use App\Entity\Log\LogAidApplicationUrlClick;
 use App\Entity\Log\LogAidCreatedsFolder;
 use App\Entity\Log\LogAidOriginUrlClick;
-use App\Entity\Log\LogAidSearch;
-use App\Entity\Log\LogAidView;
+use App\Entity\Log\LogAidSearchTemp;
+use App\Entity\Log\LogAidViewTemp;
 use App\Entity\Log\LogBackerView;
 use App\Entity\Log\LogBlogPostView;
 use App\Entity\Log\LogBlogPromotionPostClick;
@@ -113,7 +113,7 @@ class LogService
                     break;
 
                 case self::AID_SEARCH:
-                    $log = new LogAidSearch();
+                    $log = new LogAidSearchTemp();
                     $log->setQuerystring($params['querystring'] ?? null);
                     $log->setResultsCount($params['resultsCount'] ?? null);
                     $log->setSource($this->getSiteFromHost($params['host'] ?? null));
@@ -152,7 +152,7 @@ class LogService
                     break;
 
                 case self::AID_VIEW:
-                    $log = new LogAidView();
+                    $log = new LogAidViewTemp();
                     $log->setQuerystring($params['querystring'] ?? null);
                     $log->setSource($this->getSiteFromHost($params['host'] ?? null));
                     if (isset($params['source'])) {
@@ -161,11 +161,6 @@ class LogService
                     $log->setAid($params['aid'] ?? null);
                     $log->setOrganization($params['organization'] ?? null);
                     $log->setUser($params['user'] ?? null);
-                    if (isset($params['organizationTypes'])) {
-                        foreach ($params['organizationTypes'] as $organizationType) {
-                            $log->addOrganizationType($organizationType);
-                        }
-                    }
                     break;
                 case self::BACKER_VIEW:
                     $log = new LogBackerView();

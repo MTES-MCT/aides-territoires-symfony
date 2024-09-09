@@ -9,6 +9,8 @@ use App\Entity\Perimeter\Perimeter;
 use App\Entity\Reference\ProjectReference;
 use App\Entity\Search\SearchPage;
 use App\Message\Backer\BackerCountAid;
+use App\Message\Log\MsgLogAidSearchTempTransfert;
+use App\Message\Log\MsgLogAidViewTempTransfert;
 use App\Message\Perimeter\CountyCountBacker;
 use App\Message\Reference\ProjectReferenceCountAids;
 use App\Message\SearchPage\SearchPageCountAid;
@@ -64,16 +66,19 @@ class SiteDatasCommand extends Command
         $io = new SymfonyStyle($input, $output);
 
         // // Les projets référents
-        $this->projectReferences();
+        // $this->projectReferences();
 
-        // // comptage des porteurs par département
-        $this->countyCountBacker();
+        // // // comptage des porteurs par département
+        // $this->countyCountBacker();
 
-        // comptage d'aide par porteur
-        $this->backerCountAid();
+        // // comptage d'aide par porteur
+        // $this->backerCountAid();
 
-        // compte les aides lives totales et par portail
-        $this->countAidsLive();
+        // // compte les aides lives totales et par portail
+        // $this->countAidsLive();
+
+        // transfert les logs
+        $this->transfertLogs();
 
         // le temps passé
         $timeEnd = microtime(true);
@@ -145,5 +150,11 @@ class SiteDatasCommand extends Command
         foreach ($searchPages as $searchPage) {
             $this->bus->dispatch(new SearchPageCountAid($searchPage->getId()));
         }
+    }
+
+    private function transfertLogs()
+    {
+        $this->bus->dispatch(new MsgLogAidSearchTempTransfert());
+        $this->bus->dispatch(new MsgLogAidViewTempTransfert());
     }
 }

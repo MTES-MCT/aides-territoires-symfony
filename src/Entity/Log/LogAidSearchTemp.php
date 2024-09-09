@@ -10,7 +10,7 @@ use App\Entity\Organization\OrganizationType;
 use App\Entity\Perimeter\Perimeter;
 use App\Entity\Program\Program;
 use App\Entity\User\User;
-use App\Repository\Log\LogAidSearchRepository;
+use App\Repository\Log\LogAidSearchTempRepository;
 use App\Service\Doctrine\DoctrineConstants;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -19,14 +19,10 @@ use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Symfony\Component\Validator\Constraints as Assert;
 
-#[ORM\Entity(repositoryClass: LogAidSearchRepository::class)]
-#[ORM\Index(columns: ['date_create'], name: 'date_create_las')]
-#[ORM\Index(columns: ['source'], name: 'source_las')]
-#[ORM\Index(columns: ['search'], name: 'source_las')]
-class LogAidSearch // NOSONAR too much methods
+#[ORM\Entity(repositoryClass: LogAidSearchTempRepository::class)]
+#[ORM\Index(columns: ['date_create'], name: 'date_create_last')]
+class LogAidSearchTemp
 {
-    const SOURCE_API = 'api';
-
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -42,43 +38,58 @@ class LogAidSearch // NOSONAR too much methods
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $source = null;
 
-    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     #[Gedmo\Timestampable(on: 'create')]
+    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $timeCreate = null;
 
-    #[ORM\Column(type: Types::DATE_MUTABLE)]
     #[Gedmo\Timestampable(on: 'create')]
+    #[ORM\Column(type: Types::DATE_MUTABLE)]
     private ?\DateTimeInterface $dateCreate = null;
 
     #[Assert\Length(max: 255)]
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $search = null;
 
-    #[ORM\ManyToOne(inversedBy: 'logAidSearches')]
+    #[ORM\ManyToOne]
     #[ORM\JoinColumn(onDelete: DoctrineConstants::SET_NULL)]
     private ?Perimeter $perimeter = null;
 
-    #[ORM\ManyToOne(inversedBy: 'logAidSearches')]
+    #[ORM\ManyToOne]
     #[ORM\JoinColumn(onDelete: DoctrineConstants::SET_NULL)]
     private ?Organization $organization = null;
 
-    #[ORM\ManyToOne(inversedBy: 'logAidSearches')]
+    #[ORM\ManyToOne]
     #[ORM\JoinColumn(onDelete: DoctrineConstants::SET_NULL)]
     private ?User $user = null;
 
-    #[ORM\ManyToMany(targetEntity: OrganizationType::class, inversedBy: 'logAidSearches')]
+    /**
+     * @var Collection<int, OrganizationType>
+     */
+    #[ORM\ManyToMany(targetEntity: OrganizationType::class)]
     private Collection $organizationTypes;
 
-    #[ORM\ManyToMany(targetEntity: Backer::class, inversedBy: 'logAidSearches')]
+    /**
+     * @var Collection<int, Backer>
+     */
+    #[ORM\ManyToMany(targetEntity: Backer::class)]
     private Collection $backers;
 
-    #[ORM\ManyToMany(targetEntity: Category::class, inversedBy: 'logAidSearches')]
+    /**
+     * @var Collection<int, Category>
+     */
+    #[ORM\ManyToMany(targetEntity: Category::class)]
     private Collection $categories;
 
-    #[ORM\ManyToMany(targetEntity: Program::class, inversedBy: 'logAidSearches')]
+    /**
+     * @var Collection<int, Program>
+     */
+    #[ORM\ManyToMany(targetEntity: Program::class)]
     private Collection $programs;
 
-    #[ORM\ManyToMany(targetEntity: CategoryTheme::class, inversedBy: 'logAidSearches')]
+    /**
+     * @var Collection<int, CategoryTheme>
+     */
+    #[ORM\ManyToMany(targetEntity: CategoryTheme::class)]
     private Collection $themes;
 
     public function __construct()
