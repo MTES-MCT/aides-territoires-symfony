@@ -85,7 +85,7 @@ class PortalController extends FrontController
             'showInSearch' => true,
         ];
         if (!$search_page->getOrganizationTypes()->isEmpty()) {
-            $aidParams['organizationTypes'] = $search_page->getOrganizationTypes();
+            // $aidParams['organizationTypes'] = $search_page->getOrganizationTypes();
         }
         if (!$search_page->getCategories()->isEmpty()) {
             $aidParams['categories'] = $search_page->getCategories();
