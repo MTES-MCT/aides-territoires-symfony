@@ -2,10 +2,12 @@ framework:
     html_sanitizer:
         sanitizers:
             app.post_sanitizer:
-                # enable either of these
                 allow_safe_elements: true
 
             app.admin_wysiwig_sanitizer:
                 allow_safe_elements: true
                 allow_attributes:
-                    style: ['p', 'div', 'img', 'span', 'ul', 'li', 'table']
+                    style: ['a', 'p', 'div', 'img', 'span', 'ul', 'li', 'table']
+                    href: ['a']
+                    title: ['a']
+                    target: ['a']
