@@ -9,6 +9,7 @@ use App\Service\Matomo\MatomoService;
 use App\Service\User\UserService;
 use App\Service\Various\ParamService;
 use Doctrine\Persistence\ManagerRegistry;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
@@ -22,7 +23,8 @@ class MyCustomLoginListener
         private ManagerRegistry $managerRegistry,
         private UserService $userService,
         private MatomoService $matomoService,
-        private ParamService $paramService
+        private ParamService $paramService,
+        private RequestStack $requestStack
     ) {
         $session = new Session();
         $this->adminSessionManager = new AdminSessionManager($session);
@@ -33,6 +35,14 @@ class MyCustomLoginListener
         // recupere user
         $user = $loginSuccessEvent->getUser();
 
+        // la requete
+        $request = $this->requestStack->getCurrentRequest();
+        
+        // Pour éviter d'être appellé par liip-imagine
+        if ($request && preg_match('/\/media\/cache/', $request->getPathInfo())) {
+            return;
+        }
+        
         // events login
         if ($user instanceof User) {
             // check autologin

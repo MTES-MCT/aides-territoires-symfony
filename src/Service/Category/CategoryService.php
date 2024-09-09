@@ -33,6 +33,7 @@ class CategoryService
     public function categoriesToMetas(ArrayCollection|array $categories): array
     {
         $categoryThemesById = [];
+
         foreach ($categories as $category) {
             if ($category instanceof Category) {
                 if (!isset($categoryThemesById[$category->getCategoryTheme()->getId()])) {
@@ -44,6 +45,19 @@ class CategoryService
 
                 $categoryThemesById[$category->getCategoryTheme()->getId()]['categories'][] = $category;
             }
+        }
+
+        // trie des ['categoryThemesById'] par ordre alphabétique sur le categoryTheme name
+        usort($categoryThemesById, function ($a, $b) {
+            return $a['categoryTheme']->getName() <=> $b['categoryTheme']->getName();
+        });
+
+        // tri des ['categories'] par ordre alphabétique
+        foreach ($categoryThemesById as $key => $categoryTheme) {
+            usort($categoryTheme['categories'], function ($a, $b) {
+                return $a->getName() <=> $b->getName();
+            });
+            $categoryThemesById[$key]['categories'] = $categoryTheme['categories'];
         }
 
         return $categoryThemesById;
