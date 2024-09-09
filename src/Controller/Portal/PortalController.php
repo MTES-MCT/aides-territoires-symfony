@@ -106,6 +106,11 @@ class PortalController extends FrontController
                 'dontUseUserPerimeter' => true
             ]
         );
+        if (isset($aidParams['categories']) && is_iterable($aidParams['categories'])) {
+            foreach ($aidParams['categories'] as $category) {
+                $aidSearchClass->addCategorySearch($category);
+            }
+        }
 
         // form recherche d'aide
         $formAidSearchParams = [
