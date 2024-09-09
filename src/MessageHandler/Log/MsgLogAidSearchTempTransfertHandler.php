@@ -5,13 +5,14 @@ namespace App\MessageHandler\Log;
 use App\Entity\Log\LogAidSearch;
 use App\Entity\Log\LogAidSearchTemp;
 use App\Entity\User\User;
-use App\Message\Log\MsgLogAidViewTempTransfert;
+use App\Message\Log\MsgLogAidSearchTempTransfert;
 use App\Repository\Log\LogAidSearchTempRepository;
 use App\Service\Notification\NotificationService;
 use App\Service\Various\ParamService;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Symfony\Component\HttpKernel\KernelInterface;
+use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 
 #[AsMessageHandler()]
@@ -23,17 +24,22 @@ class MsgLogAidSearchTempTransfertHandler
         private ManagerRegistry $managerRegistry,
         private KernelInterface $kernelInterface,
         private NotificationService $notificationService,
-        private ParamService $paramService
+        private ParamService $paramService,
+        private MessageBusInterface $bus
     ) {
     }
 
-    public function __invoke(MsgLogAidViewTempTransfert $message): void
+    public function __invoke(MsgLogAidSearchTempTransfert $message): void
     {
         try {
             /** @var LogAidSearchTempRepository $logaidSearchTempRepository */
             $logAidSearchTempRepository = $this->managerRegistry->getRepository(LogAidSearchTemp::class);
             
-            $logAidSearchTemps = $logAidSearchTempRepository->findBy(['dateCreate' => new \DateTime('yesterday')]);
+            $logAidSearchTemps = $logAidSearchTempRepository->findBy(
+                ['dateCreate' => new \DateTime('yesterday')],
+                null,
+                500
+            );
 
             $entityManager = $this->managerRegistry->getManager();
             $batchCount = 0;
@@ -75,8 +81,18 @@ class MsgLogAidSearchTempTransfertHandler
             }
 
             $entityManager->flush();
-            $entityManager->clear();
-            
+
+            // vérifie si il en reste
+            $nbLogAidSearchTemps = $logAidSearchTempRepository->countCustom(
+                [
+                    'dateCreate' => new \DateTime('yesterday')
+                ]
+            );
+
+            if ($nbLogAidSearchTemps > 0) {
+                $this->bus->dispatch(new MsgLogAidSearchTempTransfert());
+            }
+
         } catch (ProcessFailedException $exception) {
             // notif admin
             $admin = $this->managerRegistry->getRepository(User::class)->findOneBy(['email' => $this->paramService->get('email_super_admin')]);

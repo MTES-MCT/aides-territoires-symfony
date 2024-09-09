@@ -4,6 +4,7 @@ namespace App\Repository\Log;
 
 use App\Entity\Log\LogAidSearchTemp;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -16,28 +17,30 @@ class LogAidSearchTempRepository extends ServiceEntityRepository
         parent::__construct($registry, LogAidSearchTemp::class);
     }
 
-    //    /**
-    //     * @return LogAidSearchTemp[] Returns an array of LogAidSearchTemp objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('l')
-    //            ->andWhere('l.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('l.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
+    public function countCustom(?array $params = null): int
+    {
+        $qb = $this->getQueryBuilder($params);
 
-    //    public function findOneBySomeField($value): ?LogAidSearchTemp
-    //    {
-    //        return $this->createQueryBuilder('l')
-    //            ->andWhere('l.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+        return (int) $qb
+            ->select('IFNULL(COUNT(l.id), 0)')
+            ->getQuery()
+            ->getSingleScalarResult()
+            ;
+    }
+
+    public function getQueryBuilder(?array $params = null): QueryBuilder
+    {
+        $dateCreate = $params['dateCreate'] ?? null;
+
+        $qb = $this->createQueryBuilder('l');
+
+        if ($dateCreate instanceof \DateTime) {
+            $qb
+                ->andWhere('l.dateCreate = :dateCreate')
+                ->setParameter('dateCreate', $dateCreate)
+                ;
+        }
+
+        return $qb;
+    }
 }
