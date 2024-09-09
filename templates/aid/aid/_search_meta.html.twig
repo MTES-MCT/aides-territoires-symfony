@@ -26,7 +26,7 @@
 				</p>
 			</div>
 		{% endif %}
-		{% if formAidSearch.categorysearch.vars.data %}
+		{% if formAidSearch.categorysearch is defined and formAidSearch.categorysearch.vars.data %}
 			<div class="fr-tags-group categories">
 				{% set categoriesMetas = categoriesToMetas(formAidSearch.categorysearch.vars.data) %}
 				{% for categoryMeta in categoriesMetas %}
@@ -65,7 +65,7 @@
 			</div>
 		{% endif %}
 
-		{% if formAidSearch.backerschoice.vars.data and formAidSearch.backerschoice.vars.data|length > 0 %}
+		{% if formAidSearch.backerschoice is defined and formAidSearch.backerschoice.vars.data and formAidSearch.backerschoice.vars.data|length > 0 %}
 			<div class="fr-tags-group">
 				<p title="Porteurs d’aides" class="fr-tag">
 					<span class="ri-hand-coin-line ri-xl fr-mr-1w at-icon-align--sub" aria-hidden="true"></span>

@@ -237,6 +237,8 @@ class AidRepository extends ServiceEntityRepository
     public function findCustom(array $params = null): array
     {
         $qb = $this->getQueryBuilder($params);
+        $qb->addSelect('projectReferences');
+        $qb->leftJoin('a.projectReferences', 'projectReferences');
 
         $results = $qb->getQuery()->getResult();
         $return = [];
