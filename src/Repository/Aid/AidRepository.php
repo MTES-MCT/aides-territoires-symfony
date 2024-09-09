@@ -697,6 +697,7 @@ class AidRepository extends ServiceEntityRepository
                 ->andWhere(':organizationTypes MEMBER OF a.aidAudiences')
                 ->setParameter('organizationTypes', $organizationTypes);
         }
+        
 
         if (is_array($organizationTypeSlugs) && count($organizationTypeSlugs) > 0) {
             $qb
