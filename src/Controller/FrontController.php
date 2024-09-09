@@ -34,4 +34,10 @@ class FrontController extends AbstractController
             $this->translatorInterface->trans($message)
         );
     }
+
+    #[Route('/admin/test-conf', name: 'app_test_conf')]
+    public function test()
+    {
+        dd($_SERVER);
+    }
 }
