@@ -9,6 +9,8 @@ use App\Entity\Organization\Organization;
 use App\Entity\Organization\OrganizationType;
 use App\Entity\Project\Project;
 use App\Entity\User\User;
+use App\Repository\Organization\OrganizationRepository;
+use App\Repository\User\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
@@ -25,6 +27,23 @@ class UserService
         private TokenStorageInterface $tokenStorageInterface,
         private Security $security
     ) {
+    }
+
+    public function  getDefaultOrganizationByEmail(string $email) : ?Organization {
+        try {
+            /** @var UserRepository $userRepository */
+            $userRepository = $this->entityManagerInterface->getRepository(User::class);    
+
+            /** @var OrganizationRepository $organizationRepository */
+            $organizationRepository = $this->entityManagerInterface->getRepository(Organization::class);
+
+            $defaultOrganizationId = $userRepository->getDefaultOrganizationId(['email' => $email]);
+
+            return $organizationRepository->find($defaultOrganizationId);
+        } catch (\Exception) {
+            return null;
+        }
+
     }
 
     public function isMemberOfOrganization(?Organization $organization, User $user): bool

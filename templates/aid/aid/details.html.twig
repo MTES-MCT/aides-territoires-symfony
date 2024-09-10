@@ -88,9 +88,7 @@
 								<section class="fr-accordion fr-mt-2w">
 									<h3 class="fr-accordion__title">
 										<button class="fr-accordion__btn" aria-expanded="false" aria-controls="accordion-more-aidFinancer">+{{ aidFinancerLeftDisplay }}
-											autre
-											{% if aidFinancerLeftDisplay > 1 %}s
-											{% endif %}
+											autre{% if aidFinancerLeftDisplay > 1 %}s{% endif %}
 										</button>
 									</h3>
 									<div class="fr-collapse no-padding" id="accordion-more-aidFinancer">
@@ -109,8 +107,8 @@
 								{% for aidFinancer in aidFinancerByBackerName|slice(0, maxAidFinancerDisplay) %}
 									{% if aidFinancer.backer.logo %}
 										<p class="fr-mb-0 fr-ml-1w">
-											<a class="fr-col-10 at-link__nodecorator at-link-blank__none" href="{{ path('app_backer_details', {'id': aidFinancer.backer.id, 'slug': aidFinancer.backer.slug}) }}" title="{{ aidFinancer.backer.name }} - Ouvrir dans une nouvelle fenêtre" target="_blank" rel="noopener">
-												<img src="{{ getParameter('cloud_image_url') }}{{ aidFinancer.backer.logo }}" alt="logo {{ aidFinancer.backer.name }}">
+											<a class="at-link__nodecorator at-link-blank__none" href="{{ path('app_backer_details', {'id': aidFinancer.backer.id, 'slug': aidFinancer.backer.slug}) }}" title="{{ aidFinancer.backer.name }} - Ouvrir dans une nouvelle fenêtre" target="_blank" rel="noopener">
+												<img src="{{ aidFinancer.backer.logo|imagine_filter('backer_thumb') }}" alt="logo {{ aidFinancer.backer.name }}">
 											</a>
 										</p>
 									{% endif %}
@@ -120,17 +118,15 @@
 									<section class="fr-accordion fr-mt-2w">
 										<h3 class="fr-accordion__title">
 											<button class="fr-accordion__btn" aria-expanded="false" aria-controls="accordion-more-aidFinancer-logo">+{{ aidFinancerLeftDisplay }}
-												autre
-												{% if aidFinancerLeftDisplay > 1 %}s
-												{% endif %}
+												autre{% if aidFinancerLeftDisplay > 1 %}s{% endif %}
 											</button>
 										</h3>
 										<div class="fr-collapse no-padding" id="accordion-more-aidFinancer-logo">
 											{% for aidFinancer in aidFinancerByBackerName|slice(maxAidFinancerDisplay) %}
 												{% if aidFinancer.backer.logo %}
 													<p class="fr-mb-0 fr-ml-1w">
-														<a class="fr-col-10 at-link__nodecorator at-link-blank__none" href="{{ path('app_backer_details', {'id': aidFinancer.backer.id, 'slug': aidFinancer.backer.slug}) }}" title="{{ aidFinancer.backer.name }} - Ouvrir dans une nouvelle fenêtre" target="_blank" rel="noopener">
-															<img src="{{ getParameter('cloud_image_url') }}{{ aidFinancer.backer.logo }}" alt="logo {{ aidFinancer.backer.name }}">
+														<a class="at-link__nodecorator at-link-blank__none" href="{{ path('app_backer_details', {'id': aidFinancer.backer.id, 'slug': aidFinancer.backer.slug}) }}" title="{{ aidFinancer.backer.name }} - Ouvrir dans une nouvelle fenêtre" target="_blank" rel="noopener">
+															<img src="{{ aidFinancer.backer.logo|imagine_filter('backer_thumb') }}" alt="logo {{ aidFinancer.backer.name }}">
 														</a>
 													</p>
 												{% endif %}
@@ -166,9 +162,7 @@
 								<section class="fr-accordion fr-mt-2w">
 									<h3 class="fr-accordion__title">
 										<button class="fr-accordion__btn" aria-expanded="false" aria-controls="accordion-more-aidInstructor">+{{ aidFinancerLeftDisplay }}
-											autre
-											{% if aidFinancerLeftDisplay > 1 %}s
-											{% endif %}
+											autre{% if aidFinancerLeftDisplay > 1 %}s{% endif %}
 										</button>
 									</h3>
 									<div class="fr-collapse no-padding" id="accordion-more-aidInstructor">
@@ -188,7 +182,7 @@
 									{% if aidInstructor.backer.logo %}
 										<p class="fr-mb-0 fr-ml-1w">
 											<a class="fr-col-10 at-link__nodecorator at-link-blank__none" href="{{ path('app_backer_details', {'id': aidInstructor.backer.id, 'slug': aidInstructor.backer.slug}) }}" title="{{ aidInstructor.backer.name }} - Ouvrir dans une nouvelle fenêtre" target="_blank" rel="noopener">
-												<img src="{{ getParameter('cloud_image_url') }}{{ aidInstructor.backer.logo }}" alt="logo {{ aidInstructor.backer.name }}">
+												<img src="{{ aidInstructor.backer.logo|imagine_filter('backer_thumb') }}" alt="logo {{ aidInstructor.backer.name }}">
 											</a>
 										</p>
 									{% endif %}
@@ -198,9 +192,7 @@
 									<section class="fr-accordion fr-mt-2w">
 										<h3 class="fr-accordion__title">
 											<button class="fr-accordion__btn" aria-expanded="false" aria-controls="accordion-more-aidFinancer-logo">+{{ aidFinancerLeftDisplay }}
-												autre
-												{% if aidFinancerLeftDisplay > 1 %}s
-												{% endif %}
+												autre{% if aidFinancerLeftDisplay > 1 %}s{% endif %}
 											</button>
 										</h3>
 										<div class="fr-collapse no-padding" id="accordion-more-aidFinancer-logo">
@@ -208,7 +200,7 @@
 												{% if aidInstructor.backer.logo %}
 													<p class="fr-mb-0 fr-ml-1w">
 														<a class="fr-col-10 at-link__nodecorator at-link-blank__none" href="{{ path('app_backer_details', {'id': aidInstructor.backer.id, 'slug': aidInstructor.backer.slug}) }}" title="{{ aidInstructor.backer.name }} - Ouvrir dans une nouvelle fenêtre" target="_blank" rel="noopener">
-															<img src="{{ getParameter('cloud_image_url') }}{{ aidInstructor.backer.logo }}" alt="logo {{ aidInstructor.backer.name }}">
+															<img src="{{ aidInstructor.backer.logo|imagine_filter('backer_thumb') }}" alt="logo {{ aidInstructor.backer.name }}">
 														</a>
 													</p>
 												{% endif %}
@@ -476,7 +468,7 @@
 							{% for program in aid.programs %}
 								{% if program.logo %}
 									<a href="{{ path('app_program_details', {'slug': program.slug}) }}" class="fr-col-10 at-link__nodecorator" title="{{ program.name }}">
-										<img src="{{ getParameter('cloud_image_url') }}{{ program.logo }}" class="fr-responsive-img" alt="{{ program.name }}"/>
+										<img src="{{ program.logo|imagine_filter('program_thumb_aid') }}" alt="{{ program.name }}"/>
 									</a>
 								{% else %}
 									<a href="{{ path('app_program_details', {'slug': program.slug}) }}" class="fr-col-10" title="{{ program.name }}">

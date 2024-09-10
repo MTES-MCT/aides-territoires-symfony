@@ -76,10 +76,20 @@ liip_imagine:
                 scale:
                     dim: [null, 70]
 
+        program_thumb_aid:
+            data_loader: 's3_loader'
+            cache: 's3_resolver'
+            quality : 75
+            filters:
+                thumbnail: { size: [200, 100], mode: inset }
+                strip: ~
+                background: { color: '#ffffff', size: [200, 100], position: center }
+
         backer_thumb:
             data_loader: 's3_loader'
             cache: 's3_resolver'
             quality : 75
-            filters :
-                scale:
-                    dim: [null, 70]
+            filters:
+                thumbnail: { size: [150, 75], mode: inset }
+                strip: ~
+                background: { color: '#ffffff', size: [150, 75], position: center }

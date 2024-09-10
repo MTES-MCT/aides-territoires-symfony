@@ -3,6 +3,7 @@
 namespace App\Controller\Admin\User;
 
 use App\Controller\Admin\AtCrudController;
+use App\Controller\Admin\Filter\User\UserOganizationTypeFilter;
 use App\Controller\Admin\Filter\UserAdministratorOfSearchPageFilter;
 use App\Controller\Admin\Filter\UserCountyFilter;
 use App\Controller\Admin\Filter\UserRoleFilter;
@@ -45,6 +46,7 @@ class UserCrudController extends AtCrudController
         ->add('mlConsent', 'Consentement newsletter')
         ->add('userGroups')
         ->add(UserCountyFilter::new('perimeter', 'Département'))
+        ->add(UserOganizationTypeFilter::new('organizationType', 'Type de structure'))
         ;
     }
     
