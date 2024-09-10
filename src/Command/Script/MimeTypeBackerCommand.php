@@ -90,10 +90,10 @@ class MimeTypeBackerCommand extends Command
                 // le mimeType actuel
                 $mimeType = $result['ContentType'];
 
-                if (!in_array($mimeType, ['image/jpeg', 'image/png', 'image/gif', 'image/svg+xml'])) {
+                if (!in_array($mimeType, ['image/jpeg', 'image/png', 'image/gif', 'image/svg+xml', 'image/webp'])) {
                     // Vérifiez si l'objet est une image, un PDF, un CSV ou un JSON en fonction de son extension
                     $extension = pathinfo($backer->getLogo(), PATHINFO_EXTENSION);
-                    if (in_array($extension, ['jpg', 'jpeg', 'png', 'gif', 'svg'])) {
+                    if (in_array($extension, ['jpg', 'jpeg', 'png', 'gif', 'svg', 'webp'])) {
                         // Déterminez le type MIME en fonction de l'extension
                         $mimeType = 'image/jpeg';
                         if ($extension == 'png') {
@@ -102,6 +102,8 @@ class MimeTypeBackerCommand extends Command
                             $mimeType = 'image/gif';
                         } elseif ($extension == 'svg') {
                             $mimeType = 'image/svg+xml';
+                        } elseif ($extension == 'webp') {
+                            $mimeType = 'image/webp';
                         }
 
                         // Chemin vers le fichier temporaire
