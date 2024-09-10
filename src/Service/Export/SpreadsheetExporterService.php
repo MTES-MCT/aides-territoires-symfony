@@ -7,6 +7,7 @@ use App\Entity\Backer\Backer;
 use App\Entity\Cron\CronExportSpreadsheet;
 use App\Entity\Project\Project;
 use App\Entity\User\User;
+use App\Exception\InvalidFileFormatException as ExceptionInvalidFileFormatException;
 use App\Message\Export\MsgSpreadsheetToExport;
 use App\Repository\Aid\AidRepository;
 use App\Repository\User\UserRepository;
@@ -109,7 +110,7 @@ class SpreadsheetExporterService
                 $sheetView = new SheetView();
                 $writer = new \OpenSpout\Writer\XLSX\Writer();
             } else {
-                throw new InvalidFileFormatException(self::EXCEPTION_FORMAT_NOT_SUPPORTED_MESSAGE);
+                throw new ExceptionInvalidFileFormatException(self::EXCEPTION_FORMAT_NOT_SUPPORTED_MESSAGE);
             }
 
             $now = new \DateTime(date(self::TODAY_DATE_FORMAT));
@@ -513,7 +514,7 @@ class SpreadsheetExporterService
                 $writer = new \OpenSpout\Writer\XLSX\Writer();
                 $fileTarget .= '.' . FileService::FORMAT_XLSX;
             } else {
-                throw new InvalidFileFormatException(self::EXCEPTION_FORMAT_NOT_SUPPORTED_MESSAGE);
+                throw new ExceptionInvalidFileFormatException(self::EXCEPTION_FORMAT_NOT_SUPPORTED_MESSAGE);
             }
 
             $writer->openToFile($fileTarget);
