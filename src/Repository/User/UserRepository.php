@@ -28,6 +28,29 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         parent::__construct($registry, User::class);
     }
 
+    public function getDefaultOrganizationId(?array $params = null)
+    {
+        $qb = $this->getQueryBuilder($params);
+        $qb
+            ->innerJoin('u.organizations', 'organizations')
+            ->select('organizations.id')
+            ->setMaxResults(1)
+        ;
+
+        return $qb->getQuery()->getOneOrNullResult();
+    }
+
+    public function countProjectWithAids(?array $params = null)
+    {
+        $qb = $this->getQueryBuilder($params);
+        $qb 
+            ->select('COUNT(DISTINCT(projects))')
+            ->innerJoin('u.projects', 'projects')
+            ->innerJoin('projects.aidProjects', 'aidProjects');
+            ;
+        return (int) $qb->getQuery()->getSingleScalarResult();
+    }
+
     public function countCustom(?array $params = null)
     {
         $qb = $this->getQueryBuilder($params);

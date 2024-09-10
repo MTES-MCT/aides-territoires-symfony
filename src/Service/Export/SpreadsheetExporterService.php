@@ -9,6 +9,7 @@ use App\Entity\Project\Project;
 use App\Entity\User\User;
 use App\Message\Export\MsgSpreadsheetToExport;
 use App\Repository\Aid\AidRepository;
+use App\Repository\User\UserRepository;
 use App\Service\File\FileService;
 use App\Service\User\UserService;
 use App\Src\Exception\InvalidFileFormatException;
@@ -233,33 +234,35 @@ class SpreadsheetExporterService
                 }
                 break;
             case User::class:
+                /** @var UserRepository $userRepository */
+                $userRepository = $this->managerRegistry->getRepository(User::class);
+                
                 /** @var User $result */
                 foreach ($results as $key => $result) {
                     $projectsHaveAids = false;
-                    if ($result->getDefaultOrganization() && $result->getDefaultOrganization()->getProjects()) {
-                        foreach ($result->getDefaultOrganization()->getProjects() as $project) {
-                            if ($project->getAidProjects()) {
-                                $projectsHaveAids = true;
-                                break;
-                            }
-                        }
-                    }
+                    $nbProjectWithAids = $userRepository->countProjectWithAids([
+                        'email' => $result->getEmail()
+                    ]);
+                    $projectsHaveAids = $nbProjectWithAids > 0;
+
+                    $defaultOrganization = $this->userService->getDefaultOrganizationByEmail($result->getEmail());
+
                     $datas[] = [
                         'id' => $result->getId(),
                         'Prénom' => $result->getFirstname(),
                         'Nom' => $result->getLastname(),
                         'Adresse e-mail' => $result->getEmail(),
                         'Numéro de téléphone' => $result->getContributorContactPhone(),
-                        'Périmètre de l\'organization' => ($result->getDefaultOrganization() && $result->getDefaultOrganization()->getPerimeter()) ? $result->getDefaultOrganization()->getPerimeter()->getName() : '',
-                        'Périmètre (region)' => ($result->getDefaultOrganization() && $result->getDefaultOrganization()->getPerimeterRegion()) ? $result->getDefaultOrganization()->getPerimeterRegion()->getName() : '',
-                        'Périmètre (Département)' => ($result->getDefaultOrganization() && $result->getDefaultOrganization()->getPerimeterDepartment()) ? $result->getDefaultOrganization()->getPerimeterDepartment()->getName() : '',
-                        'Périmètre (Population)' => ($result->getDefaultOrganization() && $result->getDefaultOrganization()->getPerimeter()) ? $result->getDefaultOrganization()->getPerimeter()->getPopulation() : '',
+                        'Périmètre de l\'organization' => ($defaultOrganization && $defaultOrganization->getPerimeter()) ? $defaultOrganization->getPerimeter()->getName() : '',
+                        'Périmètre (region)' => ($defaultOrganization && $defaultOrganization->getPerimeterRegion()) ? $defaultOrganization->getPerimeterRegion()->getName() : '',
+                        'Périmètre (Département)' => ($defaultOrganization && $defaultOrganization->getPerimeterDepartment()) ? $defaultOrganization->getPerimeterDepartment()->getName() : '',
+                        'Périmètre (Population)' => ($defaultOrganization && $defaultOrganization->getPerimeter()) ? $defaultOrganization->getPerimeter()->getPopulation() : '',
                         'Contributeur ?' => $result->isIsContributor() ? 'Oui' : 'Non',
                         'Bénéficiaire ?' => $result->isIsBeneficiary() ? 'Oui' : 'Non',
                         'Nombre d\'aides' => $result->getAids() ? count($result->getAids()) : 0,
-                        'Structure du bénéficiaire' => $result->getDefaultOrganization() ? $result->getDefaultOrganization()->getName() : '',
-                        'ID de l\'organisation' => $result->getDefaultOrganization() ? $result->getDefaultOrganization()->getId() : '',
-                        'Nombre de projets de l\'organisation' => ($result->getDefaultOrganization() && $result->getDefaultOrganization()->getProjects()) ? count($result->getDefaultOrganization()->getProjects()) : 0,
+                        'Structure du bénéficiaire' => $defaultOrganization ? $defaultOrganization->getName() : '',
+                        'ID de l\'organisation' => $defaultOrganization ? $defaultOrganization->getId() : '',
+                        'Nombre de projets de l\'organisation' => ($defaultOrganization && $defaultOrganization->getProjects()) ? count($defaultOrganization->getProjects()) : 0,
                         'Présence d\'aides associées à un projet' => $projectsHaveAids ? 'VRAI' : '',
                         'Organisme (ancien champ)' => $result->getContributorOrganization(),
                         'Fonction du bénéficiaire' => $result->getBeneficiaryFunction(),
@@ -268,11 +271,13 @@ class SpreadsheetExporterService
                         'Date de création' => $result->getTimeCreate() ? $result->getTimeCreate()->format(self::TODAY_DATE_FORMAT) : '',
                         'Date de mise à jour' => $result->getTimeUpdate() ? $result->getTimeUpdate()->format(self::TODAY_DATE_FORMAT) : '',
                         'dernière connexion' => $result->getTimeLastLogin() ? $result->getTimeLastLogin()->format(self::TODAY_DATE_FORMAT) : '',
-                        'Type de structure' => ($result->getDefaultOrganization() && $result->getDefaultOrganization()->getOrganizationType()) ? $result->getDefaultOrganization()->getOrganizationType()->getName() : '',
-                        'Code postal de la structure' => $result->getDefaultOrganization() ? $result->getDefaultOrganization()->getZipCode() : '',
+                        'Type de structure' => ($defaultOrganization && $defaultOrganization->getOrganizationType()) ? $defaultOrganization->getOrganizationType()->getName() : '',
+                        'Code postal de la structure' => $defaultOrganization ? $defaultOrganization->getZipCode() : '',
                     ];
                     unset($results[$key]);
+                    unset($defaultOrganization);
                 }
+
                 break;
 
             case Project::class:
