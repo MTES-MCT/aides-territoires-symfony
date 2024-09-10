@@ -6,7 +6,7 @@ liip_imagine:
                 filesystem_service: 's3.storage'
 
     # valid drivers options include "gd" or "gmagick" or "imagick"
-    driver: "gd"
+    driver: "imagick"
 
     twig:
         mode: lazy
