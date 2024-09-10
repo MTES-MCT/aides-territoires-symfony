@@ -61,12 +61,17 @@ class SpreadsheetExporterService
             $sqlParams = [];
             if ($params) {
                 foreach ($params as $param) {
+                    // si ArrayCollection
                     if ($param->getValue() instanceof ArrayCollection) {
                         $values = [];
                         foreach ($param->getValue() as $value) {
                             $values[] = $value->getId();
                         }
                         $sqlParams[] = ['name' => $param->getName(), 'value' => $values];
+                    // Si object
+                    } elseif (is_object($param->getValue())) {
+                        $sqlParams[] = ['name' => $param->getName(), 'value' => $param->getValue()->getId()];
+                    // Si string
                     } else {
                         $sqlParams[] = ['name' => $param->getName(), 'value' => $param->getValue()];
                     }
