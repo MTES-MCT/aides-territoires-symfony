@@ -341,6 +341,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: LogBackerEdit::class)]
     private Collection $logBackerEdits;
 
+    /**
+     * @var Collection<int, SearchPage>
+     */
+    #[ORM\ManyToMany(targetEntity: SearchPage::class, mappedBy: 'editors')]
+    private Collection $editorSearchPages;
+
     public function __construct()
     {
         $this->logUserLogins = new ArrayCollection();
@@ -383,6 +389,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
         $this->searchPageLocks = new ArrayCollection();
         $this->backerAskAssociates = new ArrayCollection();
         $this->logBackerEdits = new ArrayCollection();
+        $this->editorSearchPages = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -2055,6 +2062,33 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
             if ($logBackerEdit->getUser() === $this) {
                 $logBackerEdit->setUser(null);
             }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, SearchPage>
+     */
+    public function getEditorSearchPages(): Collection
+    {
+        return $this->editorSearchPages;
+    }
+
+    public function addEditorSearchPage(SearchPage $editorSearchPage): static
+    {
+        if (!$this->editorSearchPages->contains($editorSearchPage)) {
+            $this->editorSearchPages->add($editorSearchPage);
+            $editorSearchPage->addEditor($this);
+        }
+
+        return $this;
+    }
+
+    public function removeEditorSearchPage(SearchPage $editorSearchPage): static
+    {
+        if ($this->editorSearchPages->removeElement($editorSearchPage)) {
+            $editorSearchPage->removeEditor($this);
         }
 
         return $this;

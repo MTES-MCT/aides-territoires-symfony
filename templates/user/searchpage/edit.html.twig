@@ -24,97 +24,106 @@
 			{% include "user/_menu_user.html.twig" with { user_portals:true, user_portal_selected: searchPage.id } %}
 
 			<div class="fr-col-12 fr-col-md-9">
-				<h1 class="fr-h3">Mon portail «
-					{{ searchPage.name }}
-					»</h1>
+				<h1 class="fr-h3">Mon portail «{{ searchPage.name }}»</h1>
 
 				<div class="link-to-visit fr-mb-2w">
 					<a href="{{ path('app_portal_portal_details', {'slug': searchPage.slug}) }}" class="fr-btn fr-btn--secondary" target="_blank" title="Voir le portail - Ouvre un nouvel onglet">Voir le portail</a>
 				</div>
 
-				{{ form_start(form) }}
-				<fieldset class="optgroup fr-mb-2w">
-					<legend>Contenu</legend>
-					{{ form_row(form.description) }}
-					{{ form_row(form.moreContent) }}
-				</fieldset>
+				{% if isLocked and lock and lock.user and lock.user != app.user %}
+					<p class="fr-alert fr-alert--info fr-mt-4w">Le portail est actuellement en cours d'édition par un autre utilisateur{% if lock.user %} ({{ lock.user.email}}){% endif %}. Cela peu prendre jusqu'à 5 minutes après qu'il ai quitté la page avant que vous ne puissiez éditer le portail.</p>
+				{% else %}
+					{{ form_start(form) }}
 
-				<fieldset class="optgroup fr-mb-2w">
-					<legend>À propos de cette page</legend>
-					{% if searchPage.timeCreate %}
-						<p>
-							Date de création :
-							<br/>
-							{{ searchPage.timeCreate|format_datetime('long', 'short', locale='fr') }}
-						</p>
-						<hr/>
-					{% endif %}
-					{% if searchPage.timeUpdate %}
-						<p>
-							Date de mise à jour :
-							<br/>
-							{{ searchPage.timeUpdate|format_datetime('long', 'short', locale='fr') }}
-						</p>
-						<hr/>
-					{% endif %}
-					<p>
-						Nombre d’aides actuellement visibles :
-						<br/>
-						{{ nbAids }}
-						(dont aides locales :
-						{{ nbLocals }})
-					</p>
-				</fieldset>
-			</fieldset>
+						{% if form.editors is defined %}
+							<fieldset class="optgroup fr-mb-2w">
+								<legend>Editeurs</legend>
+								{{ form_row(form.editors) }}
+							</fieldset>
+						{% endif %}
 
-			<fieldset class="optgroup fr-mb-2w">
-				<legend>Mettre en avant des aides</legend>
-				{{ form_row(form.highlightedAids) }}
-			</fieldset>
+						<fieldset class="optgroup fr-mb-2w">
+							<legend>Contenu</legend>
+							{{ form_row(form.description) }}
+							{{ form_row(form.moreContent) }}
+						</fieldset>
 
-			<fieldset class="optgroup fr-mb-2w">
-				<legend>Exclure des aides des résultats</legend>
-				{{ form_row(form.excludedAids) }}
-			</fieldset>
+						<fieldset class="optgroup fr-mb-2w">
+							<legend>À propos de cette page</legend>
+							{% if searchPage.timeCreate %}
+								<p>
+									Date de création :
+									<br/>
+									{{ searchPage.timeCreate|format_datetime('long', 'short', locale='fr') }}
+								</p>
+								<hr/>
+							{% endif %}
+							{% if searchPage.timeUpdate %}
+								<p>
+									Date de mise à jour :
+									<br/>
+									{{ searchPage.timeUpdate|format_datetime('long', 'short', locale='fr') }}
+								</p>
+								<hr/>
+							{% endif %}
+							<p>
+								Nombre d’aides actuellement visibles :
+								<br/>
+								{{ nbAids }}
+								(dont aides locales :
+								{{ nbLocals }})
+							</p>
+						</fieldset>
 
-			<fieldset class="optgroup fr-mb-2w">
-				<legend>Onglets</legend>
-				<div class="form-group form-control-width-auto">
-					{{ form_label(form.pages) }}
-					{# store the prototype on the data-prototype attribute #}
-					<div id="pages-list" class="form-group-display-inline-block" data-prototype="{{ form_widget(form.pages.vars.prototype)|e }}" data-widget-tags="{{ '<div class="collection-item-wrapper-generic fr-mb-2w"></div>'|e }}" data-widget-counter="{{ form.pages|length }}">
-						{% for page in form.pages %}
-							<div class="collection-item-wrapper-generic fr-mb-2w">
-								{{ form_errors(page) }}
-								{{ form_widget(page) }}
+						<fieldset class="optgroup fr-mb-2w">
+							<legend>Mettre en avant des aides</legend>
+							{{ form_row(form.highlightedAids) }}
+						</fieldset>
+
+						<fieldset class="optgroup fr-mb-2w">
+							<legend>Exclure des aides des résultats</legend>
+							{{ form_row(form.excludedAids) }}
+						</fieldset>
+
+						<fieldset class="optgroup fr-mb-2w">
+							<legend>Onglets</legend>
+							<div class="form-group form-control-width-auto">
+								{{ form_label(form.pages) }}
+								{# store the prototype on the data-prototype attribute #}
+								<div id="pages-list" class="form-group-display-inline-block" data-prototype="{{ form_widget(form.pages.vars.prototype)|e }}" data-widget-tags="{{ '<div class="collection-item-wrapper-generic fr-mb-2w"></div>'|e }}" data-widget-counter="{{ form.pages|length }}">
+									{% for page in form.pages %}
+										<div class="collection-item-wrapper-generic fr-mb-2w">
+											{{ form_errors(page) }}
+											{{ form_widget(page) }}
+										</div>
+									{% endfor %}
+								</div>
+
+								<button type="button" class="add-another-collection-widget fr-btn fr-btn--secondary fr-btn--icon-left fr-icon-add-circle-line" data-list-selector="#pages-list">Ajouter un autre onglet</button>
 							</div>
-						{% endfor %}
-					</div>
+						</fieldset>
 
-					<button type="button" class="add-another-collection-widget fr-btn fr-btn--secondary fr-btn--icon-left fr-icon-add-circle-line" data-list-selector="#pages-list">Ajouter un autre onglet</button>
-				</div>
-			</fieldset>
+						<fieldset class="optgroup fr-mb-2w">
+							<legend>Personnaliser le formulaire de recherche</legend>
+							{{ form_row(form.showAudienceField) }}
+							{{ form_row(form.organizationTypes) }}
+							{{ form_row(form.showPerimeterField) }}
+							{{ form_row(form.showTextField) }}
+							{{ form_row(form.showCategoriesField) }}
+							{{ form_row(form.categories) }}
+							{{ form_row(form.showAidTypeField) }}
+							{{ form_row(form.showBackersField) }}
+							{{ form_row(form.showMobilizationStepField) }}
+						</fieldset>
 
-			<fieldset class="optgroup fr-mb-2w">
-				<legend>Personnaliser le formulaire de recherche</legend>
-				{{ form_row(form.showAudienceField) }}
-				{{ form_row(form.organizationTypes) }}
-				{{ form_row(form.showPerimeterField) }}
-				{{ form_row(form.showTextField) }}
-				{{ form_row(form.showCategoriesField) }}
-				{{ form_row(form.categories) }}
-				{{ form_row(form.showAidTypeField) }}
-				{{ form_row(form.showBackersField) }}
-				{{ form_row(form.showMobilizationStepField) }}
-			</fieldset>
+						<footer class="fr-mt-5w">
+							<button type="submit" class="fr-btn">Modifier</button>
+						</footer>
 
-			<footer class="fr-mt-5w">
-				<button type="submit" class="fr-btn">Modifier</button>
-			</footer>
+						<p class="fr-hint-text fr-mt-2w">Les champs marqués d’un astérisque (*) sont obligatoires.</p>
 
-			<p class="fr-hint-text fr-mt-2w">Les champs marqués d’un astérisque (*) sont obligatoires.</p>
-
-			{{ form_end(form) }}
+					{{ form_end(form) }}
+				{% endif %}
 		</div>
 	</div>
 </div>
