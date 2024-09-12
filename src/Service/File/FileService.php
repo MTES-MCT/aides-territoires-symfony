@@ -14,6 +14,11 @@ class FileService
     const UPLOAD_TMP_FOLDER = '/uploads_tmp';
     const EXCEPTION_FORMAT_NOT_SUPPORTED_MESSAGE = 'Format non supporté';
 
+    const ENV_TEST = 'test';
+    const ENV_DEV = 'dev';
+    const ENV_PROD = 'prod';
+    const ENV_STAGING = 'staging';
+    
     public function __construct(
         private KernelInterface $kernelInterface
     ) {

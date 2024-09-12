@@ -2,6 +2,8 @@
 
 namespace App\Tests\Controller\Security;
 
+use App\Entity\User\User;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Routing\RouterInterface;
@@ -69,5 +71,48 @@ class SecurityControllerTest extends WebTestCase
     public function provideUsers(): \Generator
     {
         yield 'User login' => ['user@aides-territoires.beta.gouv.fr', '/comptes/moncompte/'];
+    }
+
+    public function testApiLoginWithoutAuthToken(): void
+    {
+        /** @var RouterInterface $router */
+        $router = static::getContainer()->get(RouterInterface::class);
+
+        $route = $router->generate('app_login_api');
+
+        $this->client->request('POST', $route);
+
+        $this->assertResponseStatusCodeSame(401);
+    }
+
+    public function testApiLogin(): void
+    {
+        // Récupérer l'utilisateur des fixtures
+        /** @var EntityManagerInterface $entityManager */
+        $entityManager = static::getContainer()->get(EntityManagerInterface::class);
+        $user = $entityManager->getRepository(User::class)->findOneBy(['email' => 'user@aides-territoires.beta.gouv.fr']);
+
+        // Vérifier que l'utilisateur existe et a un apiToken
+        $this->assertNotNull($user);
+        $this->assertNotEmpty($user->getApiToken());
+
+        // Récupérer le routeur pour générer l'URL de l'API de connexion
+        /** @var RouterInterface $router */
+        $router = static::getContainer()->get(RouterInterface::class);
+        $route = $router->generate('app_login_api');
+
+        // Envoyer la requête GET à l'API de connexion avec le token dans les en-têtes
+        $this->client->request('POST', $route, [], [], [
+            'HTTP_X-AUTH-TOKEN' => $user->getApiToken(),
+        ]);
+
+        // Vérifier que la réponse est de type JSON
+        $this->assertResponseIsSuccessful();
+        $this->assertJson($this->client->getResponse()->getContent());
+
+        // Vérifier que la réponse contient un token
+        $responseData = json_decode($this->client->getResponse()->getContent(), true);
+        $this->assertArrayHasKey('token', $responseData);
+        $this->assertNotEmpty($responseData['token']);
     }
 }

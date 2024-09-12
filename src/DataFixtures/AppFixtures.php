@@ -3,6 +3,8 @@
 namespace App\DataFixtures;
 
 use App\Entity\Organization\Organization;
+use App\Entity\Organization\OrganizationType;
+use App\Entity\Organization\OrganizationTypeGroup;
 use App\Entity\Perimeter\Perimeter;
 use App\Entity\User\User;
 use App\Service\Various\StringService;
@@ -11,6 +13,11 @@ use Doctrine\ORM\Tools\SchemaTool;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\ObjectManager;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Doctrine\DBAL\Connection;
+use Symfony\Component\Console\Input\ArrayInput;
+use Symfony\Component\Console\Output\NullOutput;
+use Symfony\Bundle\FrameworkBundle\Console\Application;
+use Symfony\Component\HttpKernel\KernelInterface;
 
 /**
  * Pour insérer les données dans une base de données de test, exécutez la commande suivante :
@@ -21,10 +28,11 @@ class AppFixtures extends Fixture
     public function __construct(
         private UserPasswordHasherInterface $passwordEncoder,
         private StringService $stringService,
-        private ManagerRegistry $managerRegistry
+        private ManagerRegistry $managerRegistry,
+        private KernelInterface $kernel
     ) {
-        // Crée ou met à jour les tables de la base de données
-        $this->updateSchema($this->managerRegistry->getManager());
+        // Supprimer et recréer la base de données
+        $this->resetDatabase();
     }
 
     public function load(ObjectManager $manager): void
@@ -39,10 +47,23 @@ class AppFixtures extends Fixture
         $perimeter->setCountry(Perimeter::CODE_FRANCE);
         $manager->persist($perimeter);
 
+        // organizationTypeGroup
+        $organizationTypeGroup = new OrganizationTypeGroup();
+        $organizationTypeGroup->setName('Collectivités');
+        $manager->persist($organizationTypeGroup);
+
+        // organizationType
+        $organizationType = new OrganizationType();
+        $organizationType->setName('Commune');
+        $organizationType->setSlug($this->stringService->getSlug($organizationType->getName()));
+        $organizationType->setOrganizationTypeGroup($organizationTypeGroup);
+        $manager->persist($organizationType);
+
         // organization  test
         $organization = new Organization();
         $organization->setName('organizationTest');
         $organization->setSlug($this->stringService->getSlug($organization->getName()));
+        $organization->setOrganizationType($organizationType);
 
         /**
          * USER ADMIN
@@ -66,6 +87,7 @@ class AppFixtures extends Fixture
         $user->setPassword($this->passwordEncoder->hashPassword($user, '#123Password'));
         $user->addRole(User::ROLE_USER);
         $user->setPerimeter($perimeter);
+        $user->setApiToken('tokenApiTest');
         $organization->addBeneficiairy($user);
         $manager->persist($user);
 
@@ -83,5 +105,35 @@ class AppFixtures extends Fixture
             $schemaTool = new SchemaTool($manager);
             $schemaTool->updateSchema($classes, true);
         }
+    }
+
+    private function resetDatabase(): void
+    {
+        $application = new Application($this->kernel);
+        $application->setAutoExit(false);
+
+        // Supprimer la base de données
+        $input = new ArrayInput([
+            'command' => 'doctrine:database:drop',
+            '--force' => true,
+            '--if-exists' => true,
+            '--env' => 'test',
+        ]);
+        $application->run($input, new NullOutput());
+
+        // Créer la base de données
+        $input = new ArrayInput([
+            'command' => 'doctrine:database:create',
+            '--env' => 'test',
+        ]);
+        $application->run($input, new NullOutput());
+
+        // Mettre à jour le schéma
+        $input = new ArrayInput([
+            'command' => 'doctrine:schema:update',
+            '--force' => true,
+            '--env' => 'test',
+        ]);
+        $application->run($input, new NullOutput());
     }
 }

@@ -49,7 +49,7 @@ class ChangePasswordCrudController extends AbstractCrudController implements Eve
             ->onlyOnForms();
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             BeforeEntityPersistedEvent::class => ['passwordPersistEvent'],

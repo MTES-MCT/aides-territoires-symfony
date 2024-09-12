@@ -1191,7 +1191,7 @@ class AidCrudController extends AtCrudController implements EventSubscriberInter
         return $this->redirect($batchActionDto->getReferrerUrl());
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             BeforeEntityPersistedEvent::class => ['handleProjectReferenceMissingPersistEvent'],
