@@ -87,6 +87,7 @@ class AppFixtures extends Fixture
         $user->setPassword($this->passwordEncoder->hashPassword($user, '#123Password'));
         $user->addRole(User::ROLE_USER);
         $user->setPerimeter($perimeter);
+        $user->setApiToken('tokenApiTest');
         $organization->addBeneficiairy($user);
         $manager->persist($user);
 
