@@ -66,7 +66,8 @@ class SearchPageEditType extends AbstractType
                 'attr' => [
                     'class' => 'trumbowyg',
                     'cols' => 40,
-                    'rows' => 10
+                    'rows' => 10,
+                    'autocomplete' => 'off'
                 ],
                 'sanitize_html' => true,
                 'constraints' => [
@@ -82,7 +83,8 @@ class SearchPageEditType extends AbstractType
                 'attr' => [
                     'class' => 'trumbowyg',
                     'cols' => 40,
-                    'rows' => 10
+                    'rows' => 10,
+                    'autocomplete' => 'off'
                 ],
                 'sanitize_html' => true,
             ])
