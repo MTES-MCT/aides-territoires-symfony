@@ -108,7 +108,7 @@
 									{% if aidFinancer.backer.logo %}
 										<p class="fr-mb-0 fr-ml-1w">
 											<a class="at-link__nodecorator at-link-blank__none" href="{{ path('app_backer_details', {'id': aidFinancer.backer.id, 'slug': aidFinancer.backer.slug}) }}" title="{{ aidFinancer.backer.name }} - Ouvrir dans une nouvelle fenêtre" target="_blank" rel="noopener">
-												<img src="{{ aidFinancer.backer.logo|imagine_filter('backer_thumb') }}" alt="logo {{ aidFinancer.backer.name }}">
+												<img src="{{ aidFinancer.backer.logo|imagine_filter('backer_thumb') }}" alt="logo {{ aidFinancer.backer.name }}" loading="lazy" />
 											</a>
 										</p>
 									{% endif %}
@@ -126,7 +126,7 @@
 												{% if aidFinancer.backer.logo %}
 													<p class="fr-mb-0 fr-ml-1w">
 														<a class="at-link__nodecorator at-link-blank__none" href="{{ path('app_backer_details', {'id': aidFinancer.backer.id, 'slug': aidFinancer.backer.slug}) }}" title="{{ aidFinancer.backer.name }} - Ouvrir dans une nouvelle fenêtre" target="_blank" rel="noopener">
-															<img src="{{ aidFinancer.backer.logo|imagine_filter('backer_thumb') }}" alt="logo {{ aidFinancer.backer.name }}">
+															<img src="{{ aidFinancer.backer.logo|imagine_filter('backer_thumb') }}" alt="logo {{ aidFinancer.backer.name }}" loading="lazy" />
 														</a>
 													</p>
 												{% endif %}
@@ -182,7 +182,7 @@
 									{% if aidInstructor.backer.logo %}
 										<p class="fr-mb-0 fr-ml-1w">
 											<a class="fr-col-10 at-link__nodecorator at-link-blank__none" href="{{ path('app_backer_details', {'id': aidInstructor.backer.id, 'slug': aidInstructor.backer.slug}) }}" title="{{ aidInstructor.backer.name }} - Ouvrir dans une nouvelle fenêtre" target="_blank" rel="noopener">
-												<img src="{{ aidInstructor.backer.logo|imagine_filter('backer_thumb') }}" alt="logo {{ aidInstructor.backer.name }}">
+												<img src="{{ aidInstructor.backer.logo|imagine_filter('backer_thumb') }}" alt="logo {{ aidInstructor.backer.name }}" loading="lazy" />
 											</a>
 										</p>
 									{% endif %}
@@ -200,7 +200,7 @@
 												{% if aidInstructor.backer.logo %}
 													<p class="fr-mb-0 fr-ml-1w">
 														<a class="fr-col-10 at-link__nodecorator at-link-blank__none" href="{{ path('app_backer_details', {'id': aidInstructor.backer.id, 'slug': aidInstructor.backer.slug}) }}" title="{{ aidInstructor.backer.name }} - Ouvrir dans une nouvelle fenêtre" target="_blank" rel="noopener">
-															<img src="{{ aidInstructor.backer.logo|imagine_filter('backer_thumb') }}" alt="logo {{ aidInstructor.backer.name }}">
+															<img src="{{ aidInstructor.backer.logo|imagine_filter('backer_thumb') }}" alt="logo {{ aidInstructor.backer.name }}" loading="lazy" />
 														</a>
 													</p>
 												{% endif %}
@@ -468,7 +468,7 @@
 							{% for program in aid.programs %}
 								{% if program.logo %}
 									<a href="{{ path('app_program_details', {'slug': program.slug}) }}" class="fr-col-10 at-link__nodecorator" title="{{ program.name }}">
-										<img src="{{ program.logo|imagine_filter('program_thumb_aid') }}" alt="{{ program.name }}"/>
+										<img src="{{ program.logo|imagine_filter('program_thumb_aid') }}" alt="{{ program.name }}" loading="lazy" />
 									</a>
 								{% else %}
 									<a href="{{ path('app_program_details', {'slug': program.slug}) }}" class="fr-col-10" title="{{ program.name }}">
