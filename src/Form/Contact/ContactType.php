@@ -3,6 +3,7 @@
 namespace App\Form\Contact;
 
 use App\Entity\Contact\ContactMessage;
+use App\Service\File\FileService;
 use Gregwar\CaptchaBundle\Type\CaptchaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\AbstractType;
@@ -25,6 +26,12 @@ class ContactType extends AbstractType
         'contact_fonds_vert' => 'J’ai une question sur le fonds vert',
         'contact_other' => 'Autres',
     ];
+
+    public function __construct(
+        private FileService $fileService
+    )
+    {   
+    }
 
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -111,8 +118,11 @@ class ContactType extends AbstractType
                     ]),
                 ],
             ])
-            ->add('captcha', CaptchaType::class)
         ;
+
+        if ($this->fileService->getEnvironment() !== FileService::ENV_TEST) {
+            $builder->add('captcha', CaptchaType::class);
+        }
     }
 
     public function configureOptions(OptionsResolver $resolver): void
