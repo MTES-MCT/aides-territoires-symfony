@@ -263,6 +263,7 @@ class BackerRepository extends ServiceEntityRepository
 
     public function getQueryBuilder(array $params = null): QueryBuilder
     {
+        $ids = $params['ids'] ?? null;
         $hasLogo = $params['hasLogo'] ?? null;
         $isSpotlighted = $params['isSpotlighted'] ?? null;
         $orderRand = $params['orderRand'] ?? null;
@@ -280,6 +281,12 @@ class BackerRepository extends ServiceEntityRepository
 
         $qb = $this->createQueryBuilder('b');
 
+        if (is_array($ids) && !empty($ids)) {
+            $qb
+                ->andWhere('b.id IN (:ids)')
+                ->setParameter('ids', $ids);
+        }
+        
         if ($active === true) {
             $qb
                 ->addCriteria(BackerRepository::activeCriteria());

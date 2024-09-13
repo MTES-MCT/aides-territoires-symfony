@@ -54,9 +54,16 @@ class OrganizationTypeRepository extends ServiceEntityRepository
 
     public function getQueryBuilder(array $params = null): QueryBuilder
     {
+        $slugs = $params['slugs'] ?? null;
         $orderBy = (isset($params['orderBy']) && isset($params['orderBy']['sort']) && isset($params['orderBy']['order'])) ? $params['orderBy'] : null;
 
         $qb = $this->createQueryBuilder('ot');
+
+        if (is_array($slugs)) {
+            $qb
+                ->andWhere('ot.slug IN (:slugs)')
+                ->setParameter('slugs', $slugs);
+        }
 
         if ($orderBy !== null) {
             $qb

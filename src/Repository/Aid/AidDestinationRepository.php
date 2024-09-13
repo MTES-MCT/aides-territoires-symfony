@@ -54,10 +54,25 @@ class AidDestinationRepository extends ServiceEntityRepository
 
     public function getQueryBuilder(array $params = null): QueryBuilder
     {
+        $ids = $params['ids'] ?? null;
+        $slugs = $params['slugs'] ?? null;
+
         $orderBy = (isset($params['orderBy']) && isset($params['orderBy']['sort']) && isset($params['orderBy']['order'])) ? $params['orderBy'] : null;
 
         $qb = $this->createQueryBuilder('ad');
 
+        if (is_array($ids) && !empty($ids)) {
+            $qb
+                ->andWhere('ad.id IN (:ids)')
+                ->setParameter('ids', $ids);
+        }
+
+        if (is_array($slugs) && !empty($slugs)) {
+            $qb
+                ->andWhere('ad.slug IN (:slugs)')
+                ->setParameter('slugs', $slugs);
+        }
+        
         if ($orderBy !== null) {
             $qb
                 ->addOrderBy($orderBy['sort'], $orderBy['order']);

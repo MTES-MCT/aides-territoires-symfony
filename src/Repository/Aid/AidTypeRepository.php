@@ -54,12 +54,18 @@ class AidTypeRepository extends ServiceEntityRepository
 
     public function getQueryBuilder(array $params = null): QueryBuilder
     {
+        $ids = $params['ids'] ?? null;
         $slugs = $params['slugs'] ?? null;
         $orderBy = (isset($params['orderBy']) && isset($params['orderBy']['sort']) && isset($params['orderBy']['order'])) ? $params['orderBy'] : null;
 
         $qb = $this->createQueryBuilder('at');
 
-        if (is_array($slugs)) {
+        if (is_array($ids) && !empty($ids)) {
+            $qb->andWhere('at.id IN (:ids)')
+                ->setParameter('ids', $ids);
+        }
+        
+        if (is_array($slugs) && !empty($slugs)) {
             $qb->andWhere('at.slug IN (:slugs)')
                 ->setParameter('slugs', $slugs);
         }
