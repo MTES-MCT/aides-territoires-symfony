@@ -60,6 +60,7 @@ class AidTypeRepository extends ServiceEntityRepository
 
         $qb = $this->createQueryBuilder('at');
 
+
         if (is_array($ids) && !empty($ids)) {
             $qb->andWhere('at.id IN (:ids)')
                 ->setParameter('ids', $ids);

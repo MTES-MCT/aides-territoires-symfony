@@ -30,8 +30,6 @@ class Alert // NOSONAR too much methods
     #[ORM\CustomIdGenerator(class: 'doctrine.uuid_generator')]
     private ?Uuid $id = null;
 
-    #[Assert\NotNull()]
-    #[Assert\NotBlank()]
     #[Assert\Length(max: 255)]
     #[ORM\Column(length: 255)]
     private ?string $email = null;

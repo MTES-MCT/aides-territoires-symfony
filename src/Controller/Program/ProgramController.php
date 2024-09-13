@@ -117,7 +117,7 @@ class ProgramController extends FrontController
             'programs' => [$program],
         ];
         $aidParams = array_merge($aidParams, $aidSearchFormService->convertAidSearchClassToAidParams($aidSearchClass));
-        $showExtended = $aidSearchFormService->setShowExtendedV2($aidSearchClass);
+        $showExtended = $aidSearchFormService->setShowExtended($aidSearchClass);
 
         // le paginateur
         $aids = $aidService->searchAids($aidParams);

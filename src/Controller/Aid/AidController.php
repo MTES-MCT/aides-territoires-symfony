@@ -83,17 +83,20 @@ class AidController extends FrontController
 
         // formulaire recherche aides
         $aidSearchClass = $aidSearchFormService->getAidSearchClass();
+
         $formAidSearch = $this->createForm(
             AidSearchTypeV2::class,
             $aidSearchClass,
             $formAidSearchParams
         );
-        $formAidSearch->handleRequest($requestStack->getCurrentRequest());
+
+        // $formAidSearch->handleRequest($requestStack->getCurrentRequest());
 
         // parametres pour requetes aides
         $aidParams = [
             'showInSearch' => true,
         ];
+
 
         $aidParams = array_merge($aidParams, $aidSearchFormService->convertAidSearchClassToAidParams($aidSearchClass));
         $query = parse_url($requestStack->getCurrentRequest()->getRequestUri(), PHP_URL_QUERY) ?? null;
@@ -175,7 +178,7 @@ class AidController extends FrontController
         }
 
         // check si on affiche ou pas le formulaire étendu
-        $showExtended = $aidSearchFormService->setShowExtendedV2($aidSearchClass);
+        $showExtended = $aidSearchFormService->setShowExtended($aidSearchClass);
 
         // formulaire creer alerte
         $alert = new Alert();
