@@ -28,9 +28,9 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class AidSearchFormService
 {
-    const CATEGORY_SEARCH_PARAM_NAME = 'categorysearch[]';
-    const AID_TYPE_PARAM_NAME = 'aidTypes[]';
-    const BACKERS_PARAM_NAME = 'backers[]';
+    const CATEGORY_SEARCH_PARAM_NAME = 'categorysearch';
+    const AID_TYPE_PARAM_NAME = 'aidTypes';
+    const BACKERS_PARAM_NAME = 'backers';
     const PROGRAMS_PARAM_NAME = 'programs[]';
     const AID_STEPS_PARAM_NAME = 'aidSteps[]';
     const AID_DESTINATIONS_PARAM_NAME = 'aidDestinations[]';
@@ -98,7 +98,7 @@ class AidSearchFormService
             foreach ($aidSearchClass->getCategorySearch() as $category) {
                 $categories[] = $category->getId();
             }
-            $params['categorySearch'] = $categories;
+            $params['categorysearch'] = $categories;
         }
         if ($aidSearchClass->isNewIntegration()) {
             $params['newIntegration'] = $aidSearchClass->isNewIntegration();
@@ -268,26 +268,24 @@ class AidSearchFormService
             }
         }
 
-        $queryParams = [];
-        $queryItems = explode('&', (string) $query);
+        // conversion categorySearch en categorysearch (ancien paramètre d'alerte / api)
+        $query = str_replace('categorySearch', 'categorysearch', $query);
 
-        if (is_array($queryItems)) {
-            foreach ($queryItems as $queyItem) {
-                $param = explode('=', urldecode($queyItem));
-                if (isset($param[0]) && isset($param[1])) {
-                    $param[0] = strip_tags($param[0]);
-                    $param[1] = strip_tags($param[1]);
-                    if (isset($queryParams[$param[0]]) && is_array($queryParams[$param[0]])) {
-                        $queryParams[$param[0]][] = $param[1];
-                    } elseif (isset($queryParams[$param[0]]) && !is_array($queryParams[$param[0]])) {
-                        $queryParams[$param[0]] = [$queryParams[$param[0]]];
-                        $queryParams[$param[0]][] = $param[1];
-                    } else {
-                        $queryParams[$param[0]] = $param[1];
-                    }
-                }
+        // on met tous les paramètres dans un tableau
+        $queryParams = [];
+        parse_str($query, $queryParams);
+
+        // Nettoyage des paramètres
+        foreach ($queryParams as $key => $value) {
+            $cleanKey = strip_tags($key);
+            if (is_array($value)) {
+                $cleanValues = array_map('strip_tags', $value);
+                $queryParams[$cleanKey] = $cleanValues;
+            } else {
+                $queryParams[$cleanKey] = strip_tags($value);
             }
         }
+        
 
         // > les paramètres en query
 
