@@ -2,35 +2,37 @@
 
 namespace App\Tests\Controller\Contact;
 
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use App\Tests\AtWebTestCase;
 
 // php bin/phpunit src/Tests/Controller/Contact/ContactControllerTest.php
-class ContactControllerTest extends WebTestCase
+class ContactControllerTest extends AtWebTestCase
 {
     public function testSubmitValidContactForm()
     {
-        $client = static::createClient();
-        $crawler = $client->request('GET', '/contact/');
+        $route = $this->router->generate('app_contact_contact');
+        $routeSuccess = $this->router->generate('app_contact_contact', ['success' => 1]);
+        $crawler = $this->client->request('GET', $route);
 
         $form = $crawler->selectButton('Envoyer')->form([
             'contact[firstname]' => 'Test',
             'contact[lastname]' => 'User',
-            'contact[email]' => 'test@example.com',
+            'contact[email]' => 'test@at.com',
             'contact[phoneNumber]' => '0123456789',
             'contact[structureAndFunction]' => 'Test Structure',
             'contact[subject]' => 'contact_tech',
             'contact[message]' => 'Test Message',
         ]);
 
-        $client->submit($form);
+        $this->client->submit($form);
 
-        $this->assertResponseRedirects('/contact/?success=1');
+        $this->assertResponseRedirects($routeSuccess);
     }
 
     public function testSubmitInvalidContactForm()
     {
-        $client = static::createClient();
-        $crawler = $client->request('GET', '/contact/');
+        $route = $this->router->generate('app_contact_contact');
+        $routeError = $this->router->generate('app_contact_contact', ['success' => 0]);
+        $crawler = $this->client->request('GET', $route);
 
         $form = $crawler->selectButton('Envoyer')->form([
             'contact[firstname]' => '',
@@ -42,8 +44,8 @@ class ContactControllerTest extends WebTestCase
             'contact[message]' => '',
         ]);
 
-        $client->submit($form);
+        $this->client->submit($form);
 
-        $this->assertResponseRedirects('/contact/?success=0');
+        $this->assertResponseRedirects($routeError);
     }
 }
