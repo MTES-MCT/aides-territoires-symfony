@@ -64,7 +64,7 @@
 
 
 							<div class="wysiwyg-wrapper">
-								{{ addMailtoToEmailLinks(optimizeHtmlFromWysiwyg(blogPost.description))|sanitize_html('app.admin_wysiwig_sanitizer')|raw }}
+								{{ addMailtoToEmailLinks(optimizeHtmlFromWysiwyg(blogPost.description|sanitize_html('app.admin_wysiwig_sanitizer')))|raw }}
 							</div>
 
 

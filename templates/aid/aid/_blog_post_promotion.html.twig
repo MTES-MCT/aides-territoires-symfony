@@ -6,7 +6,7 @@
 					{{ promotion.name }}
 				</h3>
 				{% if promotion.shortText %}
-					<div class="fr-card__desc fr-mt-3w">{{ addMailtoToEmailLinks(promotion.shortText)|sanitize_html('app.admin_wysiwig_sanitizer')|raw }}</div>
+					<div class="fr-card__desc fr-mt-3w">{{ addMailtoToEmailLinks(promotion.shortText|sanitize_html('app.admin_wysiwig_sanitizer'))|raw }}</div>
 				{% endif %}
 			</div>
 			<div class="fr-card__footer">

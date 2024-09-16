@@ -3,7 +3,6 @@
 namespace App\Tests\Controller;
 
 use App\Tests\AtWebTestCase;
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouterInterface;
 
