@@ -53,17 +53,17 @@ class AlertController extends FrontController
         AlertRepository $alertRepository,
         ManagerRegistry $managerRegistry
     ) {
-        // alerte a supprimer
-        $alert = $alertRepository->findOneBy(
-            [
-                'id' => $id,
-            ]
-        );
-        if (!$alert instanceof Alert) {
-            throw new NotFoundHttpException('Alerte introuvable');
-        }
-
         try {
+            // alerte a supprimer
+            $alert = $alertRepository->findOneBy(
+                [
+                    'id' => $id,
+                ]
+            );
+            if (!$alert instanceof Alert) {
+                throw new NotFoundHttpException('Alerte introuvable');
+            }
+
             $managerRegistry->getManager()->remove($alert);
             $managerRegistry->getManager()->flush();
 
@@ -88,21 +88,21 @@ class AlertController extends FrontController
         AlertRepository $alertRepository,
         ManagerRegistry $managerRegistry
     ) {
-        // user actuel
-        $user = $userService->getUserLogged();
-
-        // alerte a supprimer
-        $alert = $alertRepository->findOneBy(
-            [
-                'id' => $id,
-                'email' => $user->getEmail()
-            ]
-        );
-        if (!$alert instanceof Alert) {
-            throw new NotFoundHttpException('Alerte introuvable');
-        }
-
         try {
+            // user actuel
+            $user = $userService->getUserLogged();
+
+            // alerte a supprimer
+            $alert = $alertRepository->findOneBy(
+                [
+                    'id' => $id,
+                    'email' => $user->getEmail()
+                ]
+            );
+            if (!$alert instanceof Alert) {
+                throw new NotFoundHttpException('Alerte introuvable');
+            }
+            
             $managerRegistry->getManager()->remove($alert);
             $managerRegistry->getManager()->flush();
 
