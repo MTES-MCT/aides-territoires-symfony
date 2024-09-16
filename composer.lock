@@ -320,16 +320,16 @@
         },
         {
             "name": "babdev/pagerfanta-bundle",
-            "version": "v4.3.0",
+            "version": "v4.4.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/BabDev/PagerfantaBundle.git",
-                "reference": "8fd8d4393fbfd568984e24fda79d8238c534d9a4"
+                "reference": "b2f0d87ed0592830ebea54238ffe9702e8524972"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/BabDev/PagerfantaBundle/zipball/8fd8d4393fbfd568984e24fda79d8238c534d9a4",
-                "reference": "8fd8d4393fbfd568984e24fda79d8238c534d9a4",
+                "url": "https://api.github.com/repos/BabDev/PagerfantaBundle/zipball/b2f0d87ed0592830ebea54238ffe9702e8524972",
+                "reference": "b2f0d87ed0592830ebea54238ffe9702e8524972",
                 "shasum": ""
             },
             "require": {
@@ -395,7 +395,7 @@
             ],
             "support": {
                 "issues": "https://github.com/BabDev/PagerfantaBundle/issues",
-                "source": "https://github.com/BabDev/PagerfantaBundle/tree/v4.3.0"
+                "source": "https://github.com/BabDev/PagerfantaBundle/tree/v4.4.0"
             },
             "funding": [
                 {
@@ -403,7 +403,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2023-12-13T01:02:35+00:00"
+            "time": "2023-12-20T23:40:09+00:00"
         },
         {
             "name": "bacon/bacon-qr-code",
