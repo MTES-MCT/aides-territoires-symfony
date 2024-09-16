@@ -20,11 +20,8 @@ use App\Entity\Reference\ProjectReference;
 use App\Entity\User\User;
 use App\Service\Various\StringService;
 use Doctrine\Bundle\FixturesBundle\Fixture;
-use Doctrine\ORM\Tools\SchemaTool;
-use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\ObjectManager;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
-use Doctrine\DBAL\Connection;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
@@ -36,15 +33,21 @@ use Symfony\Component\HttpKernel\KernelInterface;
  */
 class AppFixtures extends Fixture
 {
+    private UserPasswordHasherInterface $passwordEncoder;
+    private StringService $stringService;
+    private KernelInterface $kernel;
+
     public function __construct(
-        private UserPasswordHasherInterface $passwordEncoder,
-        private StringService $stringService,
-        private ManagerRegistry $managerRegistry,
-        private KernelInterface $kernel
+        UserPasswordHasherInterface $passwordEncoder,
+        StringService $stringService,
+        KernelInterface $kernel
     ) {
+        $this->passwordEncoder = $passwordEncoder;
+        $this->stringService = $stringService;
+        $this->kernel = $kernel;
+
         // Supprimer et recréer la base de données
         $this->resetDatabase();
-        // $this->updateSchema($managerRegistry->getManager());
     }
 
     public function load(ObjectManager $manager): void
@@ -210,16 +213,6 @@ class AppFixtures extends Fixture
          * SAUVEGARDE
          */
         $manager->flush();
-    }
-
-    private function updateSchema(ObjectManager $manager): void
-    {
-        $classes = $manager->getMetadataFactory()->getAllMetadata();
-
-        if (!empty($classes)) {
-            $schemaTool = new SchemaTool($manager);
-            $schemaTool->updateSchema($classes, true);
-        }
     }
 
     private function resetDatabase(): void
