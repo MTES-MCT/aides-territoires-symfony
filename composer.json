@@ -174,7 +174,6 @@
         }
     },
     "require-dev": {
-        "deployer/deployer": "^7.3",
         "doctrine/doctrine-fixtures-bundle": "^3.4",
         "friendsofphp/php-cs-fixer": "^3.64",
         "friendsoftwig/twigcs": "^6.4",

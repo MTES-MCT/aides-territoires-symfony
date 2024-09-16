@@ -10,7 +10,7 @@ class StringService
      * @param [type] $string
      * @return string
      */
-    public function cleanString($string): string
+    public function cleanString(string $string): string
     {
         return trim(strip_tags($string));
     }

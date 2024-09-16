@@ -502,7 +502,7 @@ class AidController extends FrontController
                     $aidSuggestedAidProject->setProject($project);
                     $aidSuggestedAidProject->setCreator($user);
                     $this->managerRegistry->getManager()->persist($aidSuggestedAidProject);
-                    $message = $stringService->cleanString($formSuggestToProject->get('message')->getData());
+                    $message = $stringService->cleanString((string) $formSuggestToProject->get('message')->getData());
 
 
 
