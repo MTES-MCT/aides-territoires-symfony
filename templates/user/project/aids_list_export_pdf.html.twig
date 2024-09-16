@@ -3,15 +3,15 @@
 {% block title_style %}
 	{{ parent() }}
 	h1 {
-	    text-align: center;
-	    background-color: #f5f5fe;
+		text-align: center;
+		background-color: #f5f5fe;
 	}
 	h3 {
-	    background-color: #f5f5fe;
-	    padding: 12px;
+		background-color: #f5f5fe;
+		padding: 12px;
 	}
 	#header-wrapper{
-	    margin-bottom: 130px;
+		margin-bottom: 130px;
 	}
 {% endblock title_style %}
 
@@ -151,7 +151,7 @@
 						{% if aidProject.aid.isLocal and aidProject.aid.localCharacteristics %}
 							<h4>Spécificités locales</h4>
 
-							{{ aid.localCharacteristics|sanitize_html|raw }}
+							{{ aidProject.aid.localCharacteristics|sanitize_html|raw }}
 
 						{% endif %}
 
@@ -240,8 +240,7 @@
 
 				<p>
 					Export valable en date du
-					<strong>{{ today|format_datetime('long', 'none', locale='fr') }}</strong>, pensez à revenir régulièrement sur Aides-territoires
-												                pour rester informé des nouveaux dispositifs d’aides mobilisables.
+					<strong>{{ today|format_datetime('long', 'none', locale='fr') }}</strong>, pensez à revenir régulièrement sur Aides-territoires pour rester informé des nouveaux dispositifs d’aides mobilisables.
 				</p>
 
 			</div>
