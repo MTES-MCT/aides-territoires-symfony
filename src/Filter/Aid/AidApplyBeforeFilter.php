@@ -18,8 +18,8 @@ final class AidApplyBeforeFilter extends AbstractFilter
     public function getDescription(string $resourceClass): array
     {
         return [
-            'apply_before' => [
-                'property' => 'apply_before',
+            'applyBefore' => [
+                'property' => 'applyBefore',
                 'type' => 'date',
                 'required' => false,
                 'description' => 'Candidater avant...',

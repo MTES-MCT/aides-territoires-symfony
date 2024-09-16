@@ -7,7 +7,6 @@ use ApiPlatform\Doctrine\Orm\Filter\AbstractFilter;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\OpenApi\Model\Example;
 use App\Entity\Aid\AidStep;
-use App\Entity\Aid\AidTypeGroup;
 use Doctrine\ORM\QueryBuilder;
 use Symfony\Component\PropertyInfo\Type;
 
@@ -28,11 +27,11 @@ final class AidMobilizationStepFilter extends AbstractFilter
             $examples[] = new Example($aidStep->getName(), null, $aidStep->getSlug());
         }
         return [
-            'mobilization_step' => [
-                'property' => 'mobilization_step',
+            'aidStepSlugs' => [
+                'property' => 'aidStepSlugs',
                 'type' => Type::BUILTIN_TYPE_STRING,
                 'required' => false,
-                'description' => '<div class="renderedMarkdown"><p>Avancement du projet.<br><br>Voir aussi <code>/api/aids/steps/</code> pour la liste complète.</p></div>',
+                'description' => '<div class="renderedMarkdown"><p>Avancement du projet.<br><br>Vous pouvez passer plusieurs fois ce paramètre pour rechercher sur plusieurs types, ex : ...&aidStepSlugs=preop&aidStepSlugs=postop...<br><br>Voir aussi <code>/api/aids/steps/</code> pour la liste complète.</p></div>',
                 'openapi' => [
                     'examples' => $examples,
                 ],

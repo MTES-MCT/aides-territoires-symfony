@@ -43,7 +43,6 @@ use App\Filter\Aid\AidCallForProjectOnlyFilter;
 use App\Filter\Aid\AidCategoriesFilter;
 use App\Filter\Aid\AidDestinationFilter;
 use App\Filter\Aid\AidEuropeanFilter;
-use App\Filter\Aid\AidFinancialAidFilter;
 use App\Filter\Aid\AidIsChargedFilter;
 use App\Filter\Aid\AidMobilizationStepFilter;
 use App\Filter\Aid\AidPerimeterFilter;
@@ -51,8 +50,8 @@ use App\Filter\Aid\AidProjectReferenceFilter;
 use App\Filter\Aid\AidPublishedAfterFilter;
 use App\Filter\Aid\AidRecurrenceFilter;
 use App\Filter\Aid\AidTargetedAudiencesFilter;
-use App\Filter\Aid\AidTechnicalAidFilter;
 use App\Filter\Aid\AidTextFilter;
+use App\Filter\Aid\AidTypeFilter;
 use App\Filter\Aid\AidTypeGroupFilter;
 use App\Filter\Backer\BackerFilter;
 use App\Filter\Backer\BackerGroupFilter;
@@ -115,8 +114,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ApiFilter(AidApplyBeforeFilter::class)]
 #[ApiFilter(AidPublishedAfterFilter::class)]
 #[ApiFilter(AidTypeGroupFilter::class)]
-#[ApiFilter(AidFinancialAidFilter::class)]
-#[ApiFilter(AidTechnicalAidFilter::class)]
+#[ApiFilter(AidTypeFilter::class)]
 #[ApiFilter(AidMobilizationStepFilter::class)]
 #[ApiFilter(AidDestinationFilter::class)]
 #[ApiFilter(AidRecurrenceFilter::class)]

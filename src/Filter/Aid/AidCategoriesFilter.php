@@ -28,11 +28,11 @@ final class AidCategoriesFilter extends AbstractFilter
             $examples[] = new Example($category->getName(), null, $category->getSlug());
         }
         return [
-            'categories' => [
-                'property' => 'categories',
+            'categorySlugs' => [
+                'property' => 'categorySlugs',
                 'type' => Type::BUILTIN_TYPE_STRING,
                 'required' => false,
-                'description' => '<div class="renderedMarkdown"><p>Les thématiques pour lesquelles vous recherchez des aides. Vous pouvez passer plusieurs fois ce paramètre pour rechercher sur plusieurs thématiques, ex : ...&categories=eau-potable&categories=eau-souterraine...<br><br>Voir aussi <code>/api/aids/themes/</code> pour la liste complète.</p></div>',
+                'description' => '<div class="renderedMarkdown"><p>Les thématiques pour lesquelles vous recherchez des aides. Vous pouvez passer plusieurs fois ce paramètre pour rechercher sur plusieurs thématiques, ex : ...&categorySlugs=eau-potable&categorySlugs=eau-souterraine...<br><br>Voir aussi <code>/api/aids/themes/</code> pour la liste complète.</p></div>',
                 'openapi' => [
                     'examples' => $examples,
                 ],

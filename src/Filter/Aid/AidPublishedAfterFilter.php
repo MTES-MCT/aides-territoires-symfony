@@ -17,8 +17,8 @@ final class AidPublishedAfterFilter extends AbstractFilter
     public function getDescription(string $resourceClass): array
     {
         return [
-            'published_after' => [
-                'property' => 'published_after',
+            'publishedAfter' => [
+                'property' => 'publishedAfter',
                 'type' => 'date',
                 'required' => false,
                 'description' => 'Publiée après...',

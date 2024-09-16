@@ -448,7 +448,6 @@ class AidSearchFormService
         /**
          * > AidType
          */
-
         if (isset($queryParams[self::QUERYSTRING_KEY_AID_TYPE_GROUP_SLUG])) {
             $aidTypeGroup = $this->managerRegistry->getRepository(AidTypeGroup::class)->findOneBy(['slug' => $queryParams[self::QUERYSTRING_KEY_AID_TYPE_GROUP_SLUG]]);
             if ($aidTypeGroup instanceof AidTypeGroup) {
@@ -472,8 +471,8 @@ class AidSearchFormService
             }
         }
 
-        if (isset($queryParams[self::QUERYSTRING_KEY_AID_STEP_SLUGS])) {
-            $aidTypeSlugs = is_array($queryParams[self::QUERYSTRING_KEY_AID_STEP_SLUGS]) ? $queryParams[self::QUERYSTRING_KEY_AID_STEP_SLUGS] : [$queryParams[self::QUERYSTRING_KEY_AID_STEP_SLUGS]];
+        if (isset($queryParams[self::QUERYSTRING_KEY_AID_TYPE_SLUGS])) {
+            $aidTypeSlugs = is_array($queryParams[self::QUERYSTRING_KEY_AID_TYPE_SLUGS]) ? $queryParams[self::QUERYSTRING_KEY_AID_TYPE_SLUGS] : [$queryParams[self::QUERYSTRING_KEY_AID_TYPE_SLUGS]];
             $aidTypeGroupSlugs = [AidTypeGroup::SLUG_FINANCIAL, AidTypeGroup::SLUG_TECHNICAL];
             
             // on regarde si il y a des slugs de groupes pour les extraires

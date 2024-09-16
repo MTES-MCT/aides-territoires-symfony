@@ -27,11 +27,11 @@ final class AidTargetedAudiencesFilter extends AbstractFilter
             $examples[] = new Example($organizationType->getName(), null, $organizationType->getSlug());
         }
         return [
-            'targeted_audiences' => [
-                'property' => 'targeted_audiences',
+            'organizationTypeSlugs' => [
+                'property' => 'organizationTypeSlugs',
                 'type' => Type::BUILTIN_TYPE_STRING,
                 'required' => false,
-                'description' => '<div class="renderedMarkdown"><p>Le type de structure pour lequelle vous recherchez des aides. Vous pouvez passer plusieurs fois ce paramètre pour rechercher sur plusieurs types, ex : ...&targeted_audiences=commune&targeted_audiences=epci...<br><br>Voir aussi <code>/api/aids/audiences/</code> pour la liste complète.</p></div>',
+                'description' => '<div class="renderedMarkdown"><p>Le type de structure pour lequelle vous recherchez des aides. Vous pouvez passer plusieurs fois ce paramètre pour rechercher sur plusieurs types, ex : ...&organizationTypeSlugs=commune&organizationTypeSlugs=epci...<br><br>Voir aussi <code>/api/aids/audiences/</code> pour la liste complète.</p></div>',
                 'openapi' => [
                     'examples' => $examples,
                 ],

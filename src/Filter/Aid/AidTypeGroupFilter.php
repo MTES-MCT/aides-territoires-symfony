@@ -27,8 +27,8 @@ final class AidTypeGroupFilter extends AbstractFilter
             $examples[] = new Example($aidTypeGroup->getName(), null, $aidTypeGroup->getSlug());
         }
         return [
-            'aid_type' => [
-                'property' => 'aid_type',
+            'aidTypeGroupSlug' => [
+                'property' => 'aidTypeGroupSlug',
                 'type' => Type::BUILTIN_TYPE_STRING,
                 'required' => false,
                 'description' => 'Nature de l\'aide.',
