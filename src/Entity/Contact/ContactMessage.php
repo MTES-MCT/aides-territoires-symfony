@@ -56,7 +56,7 @@ class ContactMessage
 
     public function getFirstname(): ?string
     {
-        return strip_tags($this->firstname);
+        return strip_tags((string) $this->firstname);
     }
 
     public function setFirstname(?string $firstname): static
@@ -68,7 +68,7 @@ class ContactMessage
 
     public function getLastname(): ?string
     {
-        return strip_tags($this->lastname);
+        return strip_tags((string) $this->lastname);
     }
 
     public function setLastname(?string $lastname): static
@@ -80,7 +80,7 @@ class ContactMessage
 
     public function getEmail(): ?string
     {
-        return html_entity_decode(strip_tags($this->email));
+        return html_entity_decode(strip_tags((string) $this->email));
     }
 
     public function setEmail(string $email): static
@@ -92,7 +92,7 @@ class ContactMessage
 
     public function getPhoneNumber(): ?string
     {
-        return strip_tags($this->phoneNumber);
+        return strip_tags((string) $this->phoneNumber);
     }
 
     public function setPhoneNumber(?string $phoneNumber): static
@@ -104,7 +104,7 @@ class ContactMessage
 
     public function getStructureAndFunction(): ?string
     {
-        return strip_tags($this->structureAndFunction);
+        return strip_tags((string) $this->structureAndFunction);
     }
 
     public function setStructureAndFunction(?string $structureAndFunction): static
@@ -116,7 +116,7 @@ class ContactMessage
 
     public function getSubject(): ?string
     {
-        return strip_tags($this->subject);
+        return strip_tags((string) $this->subject);
     }
 
     public function setSubject(string $subject): static
@@ -128,7 +128,7 @@ class ContactMessage
 
     public function getMessage(): ?string
     {
-        return strip_tags($this->message);
+        return strip_tags((string) $this->message);
     }
 
     public function setMessage(?string $message): static

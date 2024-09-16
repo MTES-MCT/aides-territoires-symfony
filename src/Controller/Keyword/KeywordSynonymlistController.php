@@ -15,8 +15,10 @@ class KeywordSynonymlistController extends FrontController
         RequestStack $requestStack,
         KeywordSynonymlistRepository $keywordSynonymlistRepository
     ): JsonResponse {
-        $query = strip_tags($requestStack->getCurrentRequest()->get('query', null));
-
+        $query = $requestStack->getCurrentRequest()->get('query', null);
+        if ($query) {
+            $query = trim(strip_tags((string) $query));
+        }
         $keywords = $keywordSynonymlistRepository->findCustom(
             [
                 'nameLike' => $query,

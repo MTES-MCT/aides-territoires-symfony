@@ -59,6 +59,7 @@ class AppFixtures extends Fixture
         $perimeter->setScale(Perimeter::SCALE_ADHOC);
         $perimeter->setContinent(Perimeter::CODE_EUROPE);
         $perimeter->setCountry(Perimeter::CODE_FRANCE);
+        $perimeter->setIsVisibleToUsers(true);
         $manager->persist($perimeter);
 
         // organizationTypeGroup

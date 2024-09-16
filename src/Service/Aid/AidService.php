@@ -667,9 +667,9 @@ class AidService // NOSONAR too complex
     {
         // concatene les textes bruts
         $text = $aid->getName() . ' '
-            . strip_tags($aid->getDescription()) . ' '
-            . strip_tags($aid->getEligibility()) . ' '
-            . strip_tags($aid->getContact());
+            . strip_tags((string) $aid->getDescription()) . ' '
+            . strip_tags((string) $aid->getEligibility()) . ' '
+            . strip_tags((string) $aid->getContact());
 
         $commonWords = [
             'pour',

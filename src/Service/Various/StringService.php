@@ -12,7 +12,7 @@ class StringService
      */
     public function cleanString(string $string): string
     {
-        return trim(strip_tags($string));
+        return trim(strip_tags((string) $string));
     }
 
     /**

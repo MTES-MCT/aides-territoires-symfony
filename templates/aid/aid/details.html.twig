@@ -662,7 +662,7 @@
 				<h2 class="fr-h3 fr-mb-2w">Description</h2>
 				{% if aid.description %}
 					<div class="wysiwyg-wrapper">
-						{{ addMailtoToEmailLinks(aid.description)|sanitize_html('app.admin_wysiwig_sanitizer')|raw }}
+						{{ addMailtoToEmailLinks(aid.description|sanitize_html('app.admin_wysiwig_sanitizer'))|raw }}
 					</div>
 				{% else %}
 					<p>Aucune description détaillée n’a été renseignée.</p>
@@ -751,7 +751,7 @@
 					<h2 class="fr-h3 fr-mb-2w">Contact</h2>
 					<div>
 						{% if aid.contact %}
-							{{ addMailtoToEmailLinks(aid.contact)|sanitize_html('app.admin_wysiwig_sanitizer')|raw }}
+							{{ addMailtoToEmailLinks(aid.contact|sanitize_html('app.admin_wysiwig_sanitizer'))|raw }}
 						{% endif %}
 
 						<ul class="fr-btns-group fr-btns-group--inline-md fr-btns-group--right">

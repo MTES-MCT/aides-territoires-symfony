@@ -70,8 +70,8 @@ class ImportFluxDepartementDromeCommand extends ImportFluxCommand
 
         $return = [
             'importDataMention' => 'Ces données sont mises à disposition par le Conseil départemental de la Drôme.',
-            'name' => isset($aidToImport['name']) ? strip_tags($aidToImport['name']) : null,
-            'nameInitial' => isset($aidToImport['name']) ? strip_tags($aidToImport['name']) : null,
+            'name' => isset($aidToImport['name']) ? strip_tags((string) $aidToImport['name']) : null,
+            'nameInitial' => isset($aidToImport['name']) ? strip_tags((string) $aidToImport['name']) : null,
             'description' => $description,
             'eligibility' => $eligibility,
             'originUrl' => isset($aidToImport['origin_url']) ? $aidToImport['origin_url'] : null,

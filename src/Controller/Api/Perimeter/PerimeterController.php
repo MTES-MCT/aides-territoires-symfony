@@ -45,12 +45,12 @@ class PerimeterController extends ApiController
             } else {
                 $q = $queryParams['q'];
             }
-            $q = trim(strip_tags($q));
+            $q = trim(strip_tags((string) $q));
             $params['nameMatchAgainst'] = $q;
         }
 
         if (isset($queryParams['searchLike'])) {
-            $params['searchLike'] = trim(strip_tags($queryParams['searchLike']));
+            $params['searchLike'] = trim(strip_tags((string) $queryParams['searchLike']));
         }
 
         if (isset($queryParams['scale'])) {
@@ -59,13 +59,13 @@ class PerimeterController extends ApiController
             } else {
                 $scale = $queryParams['scale'];
             }
-            $scale = trim(strip_tags($scale));
+            $scale = trim(strip_tags((string) $scale));
             $params['scale'] = $perimeterService->getScaleFromSlug($scale)['scale'] ?? null;
         }
 
         if (isset($queryParams['zipcodes'])) {
             if (!is_array($queryParams['zipcodes'])) {
-                $zipcodes = [trim(strip_tags($queryParams['zipcodes']))];
+                $zipcodes = [trim(strip_tags((string) $queryParams['zipcodes']))];
             } else {
                 $zipcodes = $queryParams['zipcodes'];
             }
@@ -74,7 +74,7 @@ class PerimeterController extends ApiController
 
         if (isset($queryParams['insees'])) {
             if (!is_array($queryParams['insees'])) {
-                $insees = [trim(strip_tags($queryParams['insees']))];
+                $insees = [trim(strip_tags((string) $queryParams['insees']))];
             } else {
                 $insees = $queryParams['insees'];
             }

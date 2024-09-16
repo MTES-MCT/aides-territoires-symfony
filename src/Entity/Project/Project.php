@@ -200,7 +200,7 @@ class Project // NOSONAR too much methods
 
     public function getName(): ?string
     {
-        return html_entity_decode(strip_tags($this->name));
+        return html_entity_decode(strip_tags((string) $this->name));
     }
 
     public function setName(string $name): static

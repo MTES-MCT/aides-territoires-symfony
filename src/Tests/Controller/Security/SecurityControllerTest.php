@@ -3,34 +3,19 @@
 namespace App\Tests\Controller\Security;
 
 use App\Entity\User\User;
-use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bundle\FrameworkBundle\KernelBrowser;
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-use Symfony\Component\Routing\RouterInterface;
+use App\Tests\AtWebTestCase;
 
 /**
  * php bin/phpunit src/Tests/Controller/Security/SecurityControllerTest.php
  */
-class SecurityControllerTest extends WebTestCase
+class SecurityControllerTest extends AtWebTestCase
 {
-    private ?KernelBrowser $client = null;
-
-    protected function setUp(): void
-    {
-        self::ensureKernelShutdown();
-        $this->client = static::createClient();
-    }
-
-
     /**
      * @dataProvider provideAdmins
      */
     public function testLoginAdmins(string $email, string $redirectUrl): void
     {
-        /** @var RouterInterface $router */
-        $router = static::getContainer()->get(RouterInterface::class);
-
-        $route = $router->generate('app_login_admin');
+        $route = $this->router->generate('app_login_admin');
 
         $crawler = $this->client->request('GET', $route);
 
@@ -53,10 +38,7 @@ class SecurityControllerTest extends WebTestCase
      */
     public function testLogin(string $email, string $redirectUrl): void
     {
-        /** @var RouterInterface $router */
-        $router = static::getContainer()->get(RouterInterface::class);
-
-        $route = $router->generate('app_login');
+        $route = $this->router->generate('app_login');
 
         $crawler = $this->client->request('GET', $route);
 
@@ -75,10 +57,7 @@ class SecurityControllerTest extends WebTestCase
 
     public function testApiLoginWithoutAuthToken(): void
     {
-        /** @var RouterInterface $router */
-        $router = static::getContainer()->get(RouterInterface::class);
-
-        $route = $router->generate('app_login_api');
+        $route = $this->router->generate('app_login_api');
 
         $this->client->request('POST', $route);
 
@@ -88,18 +67,14 @@ class SecurityControllerTest extends WebTestCase
     public function testApiLogin(): void
     {
         // Récupérer l'utilisateur des fixtures
-        /** @var EntityManagerInterface $entityManager */
-        $entityManager = static::getContainer()->get(EntityManagerInterface::class);
-        $user = $entityManager->getRepository(User::class)->findOneBy(['email' => 'user@aides-territoires.beta.gouv.fr']);
+        $user = $this->managerRegistry->getRepository(User::class)->findOneBy(['email' => 'user@aides-territoires.beta.gouv.fr']);
 
         // Vérifier que l'utilisateur existe et a un apiToken
         $this->assertNotNull($user);
         $this->assertNotEmpty($user->getApiToken());
 
         // Récupérer le routeur pour générer l'URL de l'API de connexion
-        /** @var RouterInterface $router */
-        $router = static::getContainer()->get(RouterInterface::class);
-        $route = $router->generate('app_login_api');
+        $route = $this->router->generate('app_login_api');
 
         // Envoyer la requête GET à l'API de connexion avec le token dans les en-têtes
         $this->client->request('POST', $route, [], [], [

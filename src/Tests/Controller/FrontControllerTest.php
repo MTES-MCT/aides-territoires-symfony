@@ -2,7 +2,7 @@
 
 namespace App\Tests\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use App\Tests\AtWebTestCase;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouterInterface;
 
@@ -10,21 +10,19 @@ use Symfony\Component\Routing\RouterInterface;
  * php bin/phpunit src/Tests/Controller/FrontControllerTest.php
  * On test que les pages du site n'ont pas de code 500 ou plus (codes d'erreurs)
  */
-class FrontControllerTest extends WebTestCase
+class FrontControllerTest extends AtWebTestCase
 {
     /**
      * @dataProvider provideRoutes
      */
     public function testPageSuccessfullyRespondWithoutError500(string $path, int $statusCode): void
     {
-        self::ensureKernelShutdown();
-        $client = static::createClient();
-        $client->request('GET', $path);
+        $this->client->request('GET', $path);
 
         $this->assertLessThan(
             $statusCode,
-            $client->getResponse()->getStatusCode(),
-            sprintf('Result value: %d', $client->getResponse()->getStatusCode())
+            $this->client->getResponse()->getStatusCode(),
+            sprintf('Result value: %d', $this->client->getResponse()->getStatusCode())
         );
     }
 

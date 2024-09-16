@@ -90,8 +90,8 @@ class ImportFluxNouvelleAquitaineCommand extends ImportFluxCommand
         }
         $return = [
             'importDataMention' => 'Ces données sont mises à disposition par le Conseil régional de Nouvelle-Aquitaine .',
-            'name' => isset($aidToImport['title']) ? strip_tags($aidToImport['title']) : null,
-            'nameInitial' => isset($aidToImport['title']) ? strip_tags($aidToImport['title']) : null,
+            'name' => isset($aidToImport['title']) ? strip_tags((string) $aidToImport['title']) : null,
+            'nameInitial' => isset($aidToImport['title']) ? strip_tags((string) $aidToImport['title']) : null,
             'description' => $description,
             'originUrl' => isset($aidToImport['guid']) ? $aidToImport['guid'] : null,
             'dateStart' => $dateStart,
