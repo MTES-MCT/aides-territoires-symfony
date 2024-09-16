@@ -24,21 +24,21 @@ class StringService
     {
         $parts = preg_split('/(\s+)/u', $text, -1, PREG_SPLIT_DELIM_CAPTURE);
         $parts_count = count($parts);
-
+    
         $lengthCalcul = 0;
         $last_part = 0;
         for (; $last_part < $parts_count; ++$last_part) {
-            $lengthCalcul += strlen($parts[$last_part]);
+            $lengthCalcul += mb_strlen($parts[$last_part], 'UTF-8');
             if ($lengthCalcul > $length) {
                 break;
             }
         }
-
+    
         $return = implode(array_slice($parts, 0, $last_part));
-        if (strlen($text) > $length) {
-            $return = substr($return, 0, $length - 3) . '...';
+        if (mb_strlen($text, 'UTF-8') > $length) {
+            $return = mb_substr($return, 0, $length - 3, 'UTF-8') . '...';
         }
-
+    
         return $return;
     }
 
