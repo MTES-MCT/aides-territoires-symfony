@@ -10,6 +10,39 @@ use App\Tests\AtWebTestCase;
 // php bin/phpunit src/Tests/Controller/Aid/AidControllerTest.php
 class AidControllerTest extends AtWebTestCase
 {
+    /**
+     * Test la validation du formulaire de recherche d'aides
+     *
+     * @return void
+     */
+    public function testAidSearch()
+    {
+        $route = $this->router->generate('app_aid_aid');
+        $routeSuccess = $this->router->generate('app_aid_aid');
+        $crawler = $this->client->request('GET', $route);
+
+        // Ajouter dynamiquement une option au champ <select>
+        $select = $crawler->filter('select[name="searchPerimeter"]')->first();
+        $domSelect = $select->getNode(0);
+        $option = $domSelect->ownerDocument->createElement('option', 'perimeterTest (Ad-hoc)');
+        $option->setAttribute('value', '1');
+        $domSelect->appendChild($option);
+        
+        $form = $crawler->selectButton('Rechercher')->form([
+            'organizationType' => 'commune',
+            'searchPerimeter' => 1,
+        ]);
+
+        $this->client->submit($form);
+
+        // Vérifier que la réponse est réussie
+        $this->assertResponseIsSuccessful();
+
+        // Vérifier que la route de succès est atteinte
+        $this->assertStringContainsString($routeSuccess, $this->client->getRequest()->getUri(), "La requête n'a pas atteint la route attendue.");
+    }
+
+    // test la création d'alerte
     public function testCreateAlert()
     {
         /** @var UserRepository $userRepository */
