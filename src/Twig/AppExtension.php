@@ -211,9 +211,23 @@ class AppExtension extends AbstractExtension // NOSONAR too much methods
 
     public function addMailtoToEmailLinks($html)
     {
+        // Utiliser tidy pour nettoyer le HTML
+        if (extension_loaded('tidy')) {
+            $tidy = new \tidy();
+            $config = [
+                'clean' => true,
+                'output-html' => true,
+                'show-body-only' => false,
+                'wrap' => 0,
+            ];
+            $tidy->parseString($html, $config, 'utf8');
+            $tidy->cleanRepair();
+            $html = $tidy->value;
+        }
+
         $dom = new \DOMDocument();
         // pour garder le utf-8
-        $dom->loadHTML(mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8'), LIBXML_HTML_NODEFDTD);
+        @$dom->loadHTML(mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8'), LIBXML_HTML_NODEFDTD);
         $x = new \DOMXPath($dom);
 
         foreach ($x->query("//a") as $node) {
