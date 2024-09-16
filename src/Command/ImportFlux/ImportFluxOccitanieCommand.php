@@ -121,8 +121,8 @@ class ImportFluxOccitanieCommand extends ImportFluxCommand
         $timeUpdate = $this->getDateTimeOrNull($aidToImport['date_modification'] ?? null);
 
         $return = [
-            'name' => isset($aidToImport['titre']) ? strip_tags($aidToImport['titre']) : null,
-            'nameInitial' => isset($aidToImport['titre']) ? strip_tags($aidToImport['titre']) : null,
+            'name' => isset($aidToImport['titre']) ? strip_tags((string) $aidToImport['titre']) : null,
+            'nameInitial' => isset($aidToImport['titre']) ? strip_tags((string) $aidToImport['titre']) : null,
             'timePublished' => $timePublished,
             'datePublished' => $datePublished,
             'description' => $this->concatHtmlFields($aidToImport, ['chapo', 'introduction']),

@@ -261,7 +261,7 @@ class AidSearchFormService
         $query = '';
         if (isset($params['querystring'])) {
             // on nettoie la chaine car certaines anciennes alertes ont des caractères HTML
-            $query = strip_tags(str_replace(['&amp;'], ['&'], urldecode($params['querystring'])));
+            $query = strip_tags(str_replace(['&amp;'], ['&'], urldecode((string) $params['querystring'])));
         } else {
             if ($this->requestStack->getCurrentRequest()) {
                 $query = parse_url($this->requestStack->getCurrentRequest()->getRequestUri(), PHP_URL_QUERY) ?? null;
@@ -275,8 +275,8 @@ class AidSearchFormService
             foreach ($queryItems as $queyItem) {
                 $param = explode('=', urldecode($queyItem));
                 if (isset($param[0]) && isset($param[1])) {
-                    $param[0] = strip_tags($param[0]);
-                    $param[1] = strip_tags($param[1]);
+                    $param[0] = strip_tags((string) $param[0]);
+                    $param[1] = strip_tags((string) $param[1]);
                     if (isset($queryParams[$param[0]]) && is_array($queryParams[$param[0]])) {
                         $queryParams[$param[0]][] = $param[1];
                     } elseif (isset($queryParams[$param[0]]) && !is_array($queryParams[$param[0]])) {

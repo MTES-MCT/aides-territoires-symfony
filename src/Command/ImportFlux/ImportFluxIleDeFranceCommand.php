@@ -87,9 +87,9 @@ class ImportFluxIleDeFranceCommand extends ImportFluxCommand
     protected function getFieldsMapping(array $aidToImport, array $params = null): array
     {
         try {
-            $aidName = isset($aidToImport['libelle']) ? strip_tags($aidToImport['libelle']) : null;
+            $aidName = isset($aidToImport['libelle']) ? strip_tags((string) $aidToImport['libelle']) : null;
             if (!$aidName) {
-                $aidName = isset($aidToImport['title']) ? strip_tags($aidToImport['title']) : '';
+                $aidName = isset($aidToImport['title']) ? strip_tags((string) $aidToImport['title']) : '';
             }
 
             $originUrl = 'https://www.iledefrance.fr/aides-et-appels-a-projets/' . $this->stringService->getSlug(str_replace(["'", "’", 'à'], [''], preg_replace('/(\d{2,4})[-.](\d{2})[-.](\d{2,4})/', '$1$2$3', $aidName)));

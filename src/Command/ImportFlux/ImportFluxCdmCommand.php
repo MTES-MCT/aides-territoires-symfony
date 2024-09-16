@@ -49,8 +49,8 @@ class ImportFluxCdmCommand extends ImportFluxCommand
 
         $return = [
             'importDataMention' => 'Ces données sont mises à disposition par le Conseil départemental de la Manche.',
-            'name' => isset($aidToImport['name']) ? strip_tags($aidToImport['name']) : null,
-            'nameInitial' => isset($aidToImport['name']) ? strip_tags($aidToImport['name']) : null,
+            'name' => isset($aidToImport['name']) ? strip_tags((string) $aidToImport['name']) : null,
+            'nameInitial' => isset($aidToImport['name']) ? strip_tags((string) $aidToImport['name']) : null,
             'description' => isset($aidToImport['description']) ? $this->getCleanHtml($aidToImport['description']) : null,
             'originUrl' => isset($aidToImport['origin_url']) ? $aidToImport['origin_url'] : null,
             'applicationUrl' => isset($aidToImport['application_url']) ? $aidToImport['application_url'] : null,

@@ -332,7 +332,7 @@ class AidRepository extends ServiceEntityRepository
 
         $keyword = $params['keyword'] ?? null;
         if ($keyword !== null) {
-            $keyword = strip_tags($keyword);
+            $keyword = strip_tags((string) $keyword);
             $synonyms = $this->referenceService->getSynonymes($keyword);
         }
 

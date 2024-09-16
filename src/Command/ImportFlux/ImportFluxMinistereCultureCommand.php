@@ -76,8 +76,8 @@ class ImportFluxMinistereCultureCommand extends ImportFluxCommand
 
             $return = [
                 'importDataMention' => 'Ces données sont mises à disposition par le Ministère de la Culture.',
-                'name' => isset($aidToImport['title']) ? strip_tags($aidToImport['title']) : null,
-                'nameInitial' => isset($aidToImport['title']) ? strip_tags($aidToImport['title']) : null,
+                'name' => isset($aidToImport['title']) ? strip_tags((string) $aidToImport['title']) : null,
+                'nameInitial' => isset($aidToImport['title']) ? strip_tags((string) $aidToImport['title']) : null,
                 'description' => $description,
                 'originUrl' => isset($aidToImport['url']) ? $aidToImport['url'] : null,
                 'contact' => isset($aidToImport['contact']) ? $this->htmlSanitizerInterface->sanitize($aidToImport['contact']) : null,

@@ -103,8 +103,8 @@ class ImportFluxRegionSudCommand extends ImportFluxCommand
 
         $return = [
             'importDataMention' => 'Ces données sont mises à disposition par le Conseil Régional PACA.',
-            'name' => isset($aidToImport['Nom de l’aide']) ? strip_tags($aidToImport['Nom de l’aide']) : null,
-            'nameInitial' => isset($aidToImport['Nom de l’aide']) ? strip_tags($aidToImport['Nom de l’aide']) : null,
+            'name' => isset($aidToImport['Nom de l’aide']) ? strip_tags((string) $aidToImport['Nom de l’aide']) : null,
+            'nameInitial' => isset($aidToImport['Nom de l’aide']) ? strip_tags((string) $aidToImport['Nom de l’aide']) : null,
             'description' => $this->concatHtmlFields($aidToImport, ['Chapo', 'Pour qui', 'Pourquoi candidater', 'Quelle est la nature de l’aide (type d’aide)', 'Plus d’infos']),
             'eligibility' => $this->concatHtmlFields($aidToImport, ['Quelles sont les critères d’éligibilité', 'Comment en bénéficier ']),
             'originUrl' => isset($aidToImport['Lien vers le descriptif complet']) ? $aidToImport['Lien vers le descriptif complet'] : null,

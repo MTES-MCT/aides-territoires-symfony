@@ -61,8 +61,8 @@ class ImportFluxAdemeAgirCommand extends ImportFluxCommand
 
         $return = [
             'importDataMention' => 'Ces données sont mises à disposition par l\'ADEME.',
-            'name' => isset($aidToImport['titre']) ? strip_tags($aidToImport['titre']) : null,
-            'nameInitial' => isset($aidToImport['titre']) ? strip_tags($aidToImport['titre']) : null,
+            'name' => isset($aidToImport['titre']) ? strip_tags((string) $aidToImport['titre']) : null,
+            'nameInitial' => isset($aidToImport['titre']) ? strip_tags((string) $aidToImport['titre']) : null,
             'description' => isset($aidToImport['description_longue']) ? $this->htmlSanitizerInterface->sanitize($aidToImport['description_longue']) : null,
             'originUrl' => isset($aidToImport['url_agir']) ? $aidToImport['url_agir'] : null,
             'applicationUrl' => isset($aidToImport['url_agir']) ? $aidToImport['url_agir'] : null,
