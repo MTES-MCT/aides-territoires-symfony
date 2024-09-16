@@ -50,7 +50,7 @@ class DateRangeType extends AbstractType
         });
     }
 
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return $this->blockPrefix == '' ? 'date_range' : $this->blockPrefix;
     }
