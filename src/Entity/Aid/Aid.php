@@ -607,7 +607,7 @@ class Aid // NOSONAR too much methods
     #[ORM\OneToMany(mappedBy: 'aid', targetEntity: AidProject::class, orphanRemoval: true)]
     private Collection $aidProjects;
 
-    #[ORM\OneToMany(mappedBy: 'aid', targetEntity: AidSuggestedAidProject::class)]
+    #[ORM\OneToMany(mappedBy: 'aid', targetEntity: AidSuggestedAidProject::class, orphanRemoval: true)]
     private Collection $aidSuggestedAidProjects;
 
     #[ORM\ManyToMany(targetEntity: Bundle::class, mappedBy: 'aids', cascade: ['persist'])]
