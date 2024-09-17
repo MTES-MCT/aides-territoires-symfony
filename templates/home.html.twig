@@ -193,10 +193,12 @@
 
 									<div class="fr-card__header">
 										<div class="fr-card__img">
+											{% if blogPost.logo %}
 											<picture>
 												<source srcset="{{ blogPost.logo|imagine_filter('blog_thumb_mobile') }}" media="(max-width: 768px)"/>
 												<img src="{{ blogPost.logo|imagine_filter('blog_thumb_desktop') }}" class="fr-responsive-img" alt="Illustration article {{ blogPost.name }}" loading="lazy" data-fr-js-ratio="true"/>
 											</picture>
+											{% endif %}
 										</div>
 									</div>
 								</div>
