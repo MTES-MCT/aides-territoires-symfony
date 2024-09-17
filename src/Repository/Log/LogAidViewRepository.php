@@ -209,6 +209,7 @@ class LogAidViewRepository extends ServiceEntityRepository
         $aid = $params['aid'] ?? null;
         $aidIds = $params['aidIds'] ?? null;
         $excludeSources = $params['excludeSources'] ?? null;
+        $notSource = $params['notSource'] ?? null;
         $maxResults = $params['maxResults'] ?? null;
 
         $qb = $this->createQueryBuilder('lav');
@@ -217,6 +218,13 @@ class LogAidViewRepository extends ServiceEntityRepository
             $qb
                 ->andWhere('lav.source NOT IN (:excludeSources)')
                 ->setParameter('excludeSources', $excludeSources)
+            ;
+        }
+
+        if ($notSource !== null) {
+            $qb
+                ->andWhere('lav.source != :notSource')
+                ->setParameter('notSource', $notSource)
             ;
         }
         if ($author instanceof User && $author->getId()) {
@@ -251,28 +259,28 @@ class LogAidViewRepository extends ServiceEntityRepository
         if ($dateCreateMin instanceof \DateTime) {
             $qb
                 ->andWhere('lav.dateCreate >= :dateCreateMin')
-                ->setParameter('dateCreateMin', $dateCreateMin)
+                ->setParameter('dateCreateMin', $dateCreateMin->format('Y-m-d'))
             ;
         }
 
         if ($dateCreateMax instanceof \DateTime) {
             $qb
                 ->andWhere('lav.dateCreate <= :dateCreateMax')
-                ->setParameter('dateCreateMax', $dateCreateMax)
+                ->setParameter('dateCreateMax', $dateCreateMax->format('Y-m-d'))
             ;
         }
 
         if ($dateMin instanceof \DateTime) {
             $qb
                 ->andWhere('lav.dateCreate >= :dateMin')
-                ->setParameter('dateMin', $dateMin)
+                ->setParameter('dateMin', $dateMin->format('Y-m-d'))
             ;
         }
 
         if ($dateMax instanceof \DateTime) {
             $qb
                 ->andWhere('lav.dateCreate <= :dateMax')
-                ->setParameter('dateMax', $dateMax)
+                ->setParameter('dateMax', $dateMax->format('Y-m-d'))
             ;
         }
 
