@@ -28,6 +28,7 @@ doctrine:
                 RAND: DoctrineExtensions\Query\Mysql\Rand
                 IFNULL: DoctrineExtensions\Query\Mysql\IfNull
                 WEEKDAY: DoctrineExtensions\Query\Mysql\WeekDay
+                YEAR: DoctrineExtensions\Query\Mysql\Year
                 NOW: DoctrineExtensions\Query\Mysql\Now
                 CAST: DoctrineExtensions\Query\Mysql\Cast
                 PI: DoctrineExtensions\Query\Mysql\Pi

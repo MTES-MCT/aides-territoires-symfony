@@ -46,6 +46,7 @@ Encore
     .addEntry('admin/statistics/blog/dashboard', './assets/js/admin/statistics/blog/dashboard.js')
     .addEntry('admin/statistics/project_reference/dashboard', './assets/js/admin/statistics/project_reference/dashboard.js')
     .addEntry('admin/statistics/log/perimeter-missing', './assets/js/admin/statistics/log/perimeter-missing.js')
+    .addEntry('admin/statistics/log/aid-nb-views', './assets/js/admin/statistics/log/aid-nb-views.js')
     .addEntry('admin/aid/associate', './assets/js/admin/aid/associate.js')
     .addEntry('admin/organization/associate', './assets/js/admin/organization/associate.js')
     .addEntry('admin/program/faq-order', './assets/js/admin/program/faq-order.js')

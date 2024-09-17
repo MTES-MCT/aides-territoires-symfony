@@ -4,6 +4,11 @@
 	{% include 'admin/statistics/_form_date_range.html.twig' %}
 {% endblock date_range_form %}
 
+{% block head_javascript %}
+	{{ parent() }}
+	{{ encore_entry_script_tags('admin/statistics/log/aid-nb-views') }}
+{% endblock head_javascript %}
+
 
 {% block stats_content %}
 	<div id="consultation-panel" class="fr-tabs__panel fr-tabs__panel--selected" role="tabpanel" aria-labelledby="consultation" tabindex="0">
@@ -82,9 +87,11 @@
 						</a>
 					</h5>
 					<p class="card-text fs-2">
-						<strong>
+						<strong id="nb-aid-views">
 							{% if nbAidViews is defined %}
 								{{ nbAidViews|number_format(0, ',', ' ') }}
+							{% else %}
+								En cours...
 							{% endif %}
 						</strong>
 					</p>
@@ -99,9 +106,11 @@
 						</a>
 					</h5>
 					<p class="card-text fs-2">
-						<strong>
+						<strong id="nb-aid-views-distinct">
 							{% if nbAidViewsDistinct is defined %}
 								{{ nbAidViewsDistinct|number_format(0, ',', ' ') }}
+							{% else %}
+								En cours...
 							{% endif %}
 						</strong>
 					</p>

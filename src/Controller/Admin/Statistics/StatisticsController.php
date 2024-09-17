@@ -19,6 +19,7 @@ use App\Entity\Project\Project;
 use App\Entity\Search\SearchPage;
 use App\Entity\User\User;
 use App\Form\Admin\Filter\DateRangeType;
+use App\Repository\Log\LogAidViewRepository;
 use App\Service\Matomo\MatomoService;
 use App\Service\User\UserService;
 use App\Service\Various\Breadcrumb;
@@ -27,6 +28,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
 use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
 use Pagerfanta\Doctrine\ORM\QueryAdapter;
 use Pagerfanta\Pagerfanta;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Routing\Attribute\Route;
@@ -182,20 +184,6 @@ class StatisticsController extends DashboardController
             toDateString: null
         );
 
-        // nombre d'aides vues
-        $nbAidViews = $this->managerRegistry->getRepository(LogAidView::class)->countAidsViews([
-            'dateMin' => $dateMin,
-            'dateMax' => $dateMax,
-            'excludeSources' => ['api'],
-        ]);
-
-        $nbAidViewsDistinct = $this->managerRegistry->getRepository(LogAidView::class)->countAidsViews([
-            'dateMin' => $dateMin,
-            'dateMax' => $dateMax,
-            'excludeSources' => ['api'],
-            'distinctAids' => true
-        ]);
-
         $labels = [];
         $visitsUnique = [];
         $registers = [];
@@ -253,8 +241,6 @@ class StatisticsController extends DashboardController
             'statsMatomo' => $statsMatomo[0] ?? [],
             'statsMatomoActions' => $statsMatomoActions[0] ?? [],
             'statsMatomoLast10Weeks' => $statsMatomoLast10Weeks,
-            'nbAidViews' => $nbAidViews,
-            'nbAidViewsDistinct' => $nbAidViewsDistinct,
             'chartLast10Weeks' => $chartLast10Weeks,
 
             'consultationSelected' => true,
@@ -1467,5 +1453,60 @@ class StatisticsController extends DashboardController
             'projects' => $projects,
             'myPager' => $pagerfanta,
         ]);
+    }
+
+    #[Route('/admin/statistics/consultation/ajax/aid-nb-views', name: 'admin_statistics_consultation_ajax_aid_nb_views', options: ['expose' => true])]
+    public function ajaxAidNbViews(
+        RequestStack $requestStack
+    ): Response
+    {
+        try {
+            $dateCreateMin = $requestStack->getCurrentRequest()->get('dateCreateMin');
+            $dateCreateMax = $requestStack->getCurrentRequest()->get('dateCreateMax');
+
+            $dateCreateMin = new \DateTime(date($dateCreateMin));
+            $dateCreateMax = new \DateTime(date($dateCreateMax));
+
+            /** @var LogAidViewRepository $logAidViewRepository */
+            $logAidViewRepository = $this->managerRegistry->getRepository(LogAidView::class);
+
+            $nbAidViews = $logAidViewRepository->countAidsViews([
+                'dateCreateMin' => $dateCreateMin,
+                'dateCreateMax' => $dateCreateMax,
+                'notSource' => 'api',
+            ]);
+            return $this->json(['nbAidViews' => $nbAidViews]);
+        } catch (\Exception) {
+            return $this->json(['error' => true, 'nbAidViews' => 0], Response::HTTP_BAD_REQUEST);
+        }
+
+    }
+
+    #[Route('/admin/statistics/consultation/ajax/aid-nb-views-distinct', name: 'admin_statistics_consultation_ajax_aid_nb_views_distinct', options: ['expose' => true])]
+    public function ajaxAidNbViewsDistinct(
+        RequestStack $requestStack
+    ): Response
+    {
+        try {
+            $dateCreateMin = $requestStack->getCurrentRequest()->get('dateCreateMin');
+            $dateCreateMax = $requestStack->getCurrentRequest()->get('dateCreateMax');
+
+            $dateCreateMin = new \DateTime(date($dateCreateMin));
+            $dateCreateMax = new \DateTime(date($dateCreateMax));
+
+            /** @var LogAidViewRepository $logAidViewRepository */
+            $logAidViewRepository = $this->managerRegistry->getRepository(LogAidView::class);
+
+            $nbAidViewsDistinct = $logAidViewRepository->countAidsViews([
+                'dateMin' => $dateCreateMin,
+                'dateMax' => $dateCreateMax,
+                'notSource' => 'api',
+                'distinctAids' => true
+            ]);
+            return $this->json(['nbAidViewsDistinct' => $nbAidViewsDistinct]);
+        } catch (\Exception) {
+            return $this->json(['error' => true, 'nbAidViewsDistinct' => 0], Response::HTTP_BAD_REQUEST);
+        }
+
     }
 }
