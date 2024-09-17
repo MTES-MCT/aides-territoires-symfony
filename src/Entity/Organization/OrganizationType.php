@@ -23,6 +23,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: OrganizationTypeRepository::class)]
 #[ORM\Index(columns: ['date_create'], name: 'date_create_orgt')]
+#[ORM\Index(columns: ['slug'], name: 'slug_orgt')]
 #[ApiResource(
     shortName: 'Aid',
     operations: [

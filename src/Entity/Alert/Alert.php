@@ -11,6 +11,7 @@ use Gedmo\Mapping\Annotation as Gedmo;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Index(columns: ['email'], name: 'email_alert')]
+#[ORM\Index(columns: ['date_create'], name: 'date_create_alert')]
 #[ORM\Index(columns: ['date_latest_alert'], name: 'date_latest_alert_alert')]
 #[ORM\Entity(repositoryClass: AlertRepository::class)]
 class Alert // NOSONAR too much methods
@@ -57,6 +58,10 @@ class Alert // NOSONAR too much methods
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     #[Gedmo\Timestampable(on: 'create')]
     private ?\DateTimeInterface $timeCreate = null;
+
+    #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
+    #[Gedmo\Timestampable(on: 'create')]
+    private ?\DateTimeInterface $dateCreate = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     #[Gedmo\Timestampable(on: 'update')]
@@ -201,6 +206,18 @@ class Alert // NOSONAR too much methods
     public function setDateLatestAlert(?\DateTimeInterface $dateLatestAlert): static
     {
         $this->dateLatestAlert = $dateLatestAlert;
+
+        return $this;
+    }
+
+    public function getDateCreate(): ?\DateTimeInterface
+    {
+        return $this->dateCreate;
+    }
+
+    public function setDateCreate(?\DateTimeInterface $dateCreate): static
+    {
+        $this->dateCreate = $dateCreate;
 
         return $this;
     }

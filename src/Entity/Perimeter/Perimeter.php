@@ -62,6 +62,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Entity(repositoryClass: PerimeterRepository::class)]
 #[ORM\Index(columns: ['date_create'], name: 'date_create_peri')]
 #[ORM\Index(columns: ['scale'], name: 'scale_peri')]
+#[ORM\Index(columns: ['is_obsolete'], name: 'is_obsolete_peri')]
 #[ORM\Index(columns: ['insee'], name: 'insee_peri')]
 #[ORM\Index(columns: ['code'], name: 'codpe_peri')]
 #[ORM\Index(columns: ['name'], name: 'name_peri')]
