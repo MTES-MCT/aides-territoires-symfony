@@ -32,8 +32,8 @@ class UserCountyFilter implements FilterInterface
         $queryBuilder
             ->innerJoin('entity.organizations', 'organizationsForDept')
             ->innerJoin('organizationsForDept.perimeterDepartment', 'perimeterDepartment')
-            ->andWhere('perimeterDepartment.id = :id')
-            ->setParameter('id', $filterDataDto->getValue());
+            ->andWhere('perimeterDepartment.id = :idPerimeterDepartment')
+            ->setParameter('idPerimeterDepartment', $filterDataDto->getValue());
         ;
 
         return;

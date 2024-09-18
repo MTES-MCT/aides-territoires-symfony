@@ -30,10 +30,10 @@ class UserOganizationTypeFilter implements FilterInterface
         }
 
         $queryBuilder
-            ->innerJoin('entity.organizations', 'organizations')
-            ->innerJoin('organizations.organizationType', 'organizationType')
-            ->andWhere('organizationType.id = :id')
-            ->setParameter('id', $filterDataDto->getValue());
+            ->innerJoin('entity.organizations', 'organizationsForOt')
+            ->innerJoin('organizationsForOt.organizationType', 'organizationTypeForFilter')
+            ->andWhere('organizationTypeForFilter.id = :idOrganizationTypeForFilter')
+            ->setParameter('idOrganizationTypeForFilter', $filterDataDto->getValue());
     ;
 
 
