@@ -14,10 +14,15 @@ use App\Entity\Reference\ProjectReference;
 use App\Entity\Search\SearchPage;
 use App\Entity\User\User;
 use App\Repository\Aid\AidRepository;
+use App\Service\Log\LogAidApplicationUrlClickService;
+use App\Service\Log\LogAidOriginUrlClickService;
+use App\Service\Log\LogAidViewService;
 use App\Service\Reference\ReferenceService;
 use App\Service\User\UserService;
+use App\Service\Various\StringService;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Persistence\ManagerRegistry;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
@@ -796,5 +801,106 @@ class AidService // NOSONAR too complex
         }
 
         return $keywordsReturn;
+    }
+
+    public function getAidStatsSpreadSheetOfUser(
+        User $user,
+        \DateTime $dateMin,
+        \DateTime $dateMax,
+        AidRepository $aidRepository,
+        StringService $stringService,
+        LogAidViewService $logAidViewService,
+        LogAidApplicationUrlClickService $logAidApplicationUrlClickService,
+        LogAidOriginUrlClickService $logAidOriginUrlClickService,
+        AidProjectService $aidProjectService
+
+    ): Spreadsheet
+    {
+        // paramètre filtre aides
+        $aidsParams = [
+        'author' => $user,
+        'orderBy' => [
+            'sort' => 'a.dateCreate',
+            'order' => 'DESC'
+            ]
+        ];
+
+        // les aides du user
+        $aids = $aidRepository->findCustom($aidsParams);
+        
+        // Création du fichier Excel
+        $spreadsheet = new Spreadsheet();
+
+        // Parcours les aides
+        $firstAid = true;
+        foreach ($aids as $aid) {
+            // gestion feuille
+            if ($firstAid) {
+                $sheet = $spreadsheet->getActiveSheet();
+                $firstAid = false;
+            } else {
+                $sheet = $spreadsheet->createSheet();
+            }
+
+            // met le nom à la feuille
+            $sheet->setTitle($stringService->truncate($aid->getId().'_'.$aid->getName(), 31)); // Définir le nom de la feuille
+
+            // Infos aides
+            $sheet->setCellValue('A1', 'Nom de l’aide');
+            $sheet->setCellValue('B1', $aid->getName());
+            $sheet->setCellValue('A2', 'Url de l\'aide');
+            $sheet->setCellValue('B2', $aid->getUrl());
+
+            // saut de ligne
+            $sheet->setCellValue('A3', '');
+
+            // Ajout des en-têtes
+            $headers = [
+                'Date',
+                'Nombre de vues',
+                'Nombre de clics sur Candidater',
+                'Nombre de clics sur Plus d’informations',
+                'Nombre de projets privés liés',
+                'Nombre de projets publics liés'
+            ];
+            $sheet->fromArray($headers, null, 'A4');
+
+            // Nombre de vues par jours
+            $nbViewsByDay = $logAidViewService->getCountByDay($aid, $dateMin, $dateMax);
+
+            // Nombre de clics sur Candidater par jours
+            $nbApplicationUrlClicksByDay = $logAidApplicationUrlClickService->getCountByDay($aid, $dateMin, $dateMax);
+
+            // Nombre de clics sur Plus d’informations par jours
+            $nbOriginUrlClicksByDay = $logAidOriginUrlClickService->getCountByDay($aid, $dateMin, $dateMax);
+
+            // nb project public associés
+            $nbProjectPublicsByDay = $aidProjectService->getCountByDay($aid, $dateMin, $dateMax, true);
+
+            // nb project prive associés
+            $nbProjectPrivatesByDay =  $aidProjectService->getCountByDay($aid, $dateMin, $dateMax, false);
+
+            // Parcours les dates
+            $currentDay = clone $dateMin;
+            $rowIndex = 5; // Ligne de départ pour les données
+            while ($currentDay <= $dateMax) {
+                $dataRow = [
+                    $currentDay->format('d/m/Y'),
+                    $nbViewsByDay[$currentDay->format('Y-m-d')] ?? '0',
+                    $nbApplicationUrlClicksByDay[$currentDay->format('Y-m-d')] ?? '0',
+                    $nbOriginUrlClicksByDay[$currentDay->format('Y-m-d')] ?? '0',
+                    $nbProjectPublicsByDay[$currentDay->format('Y-m-d')] ?? '0',
+                    $nbProjectPrivatesByDay[$currentDay->format('Y-m-d')] ?? '0'
+                ];
+                $sheet->fromArray($dataRow, null, 'A' . $rowIndex);
+                $rowIndex++;
+                $currentDay->add(new \DateInterval('P1D'));
+            }
+
+            // Ajout des filtres automatiques aux en-têtes
+            $sheet->setAutoFilter('A4:F4');
+        }
+
+        return $spreadsheet;
     }
 }

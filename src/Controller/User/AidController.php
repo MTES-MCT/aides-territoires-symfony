@@ -911,7 +911,8 @@ class AidController extends FrontController
         LogAidApplicationUrlClickService $logAidApplicationUrlClickService,
         LogAidOriginUrlClickService $logAidOriginUrlClickService,
         AidProjectService $aidProjectService,
-        StringService $stringService
+        StringService $stringService,
+        AidService $aidService
     ) {
         // gestion dates
         $dateMinGet = $requestStack->getCurrentRequest()->get('dateMin', null);
@@ -940,93 +941,22 @@ class AidController extends FrontController
                 $dateMin,
                 $dateMax,
                 $user,
-                $stringService
+                $stringService,
+                $aidService
             ) {
-                // paramètre filtre aides
-                $aidsParams = [
-                    'author' => $user,
-                    'orderBy' => [
-                        'sort' => 'a.dateCreate',
-                        'order' => 'DESC'
-                    ]
-                ];
-
-                // les aides du user
-                $aids = $aidRepository->findCustom($aidsParams);
+ 
+                $spreadsheet = $aidService->getAidStatsSpreadSheetOfUser(
+                    $user,
+                    $dateMin,
+                    $dateMax,
+                    $aidRepository,
+                    $stringService,
+                    $logAidViewService,
+                    $logAidApplicationUrlClickService,
+                    $logAidOriginUrlClickService,
+                    $aidProjectService,
+                );
                 
-                // Création du fichier Excel
-                $spreadsheet = new Spreadsheet();
-
-                // Parcours les aides
-                $firstAid = true;
-                foreach ($aids as $aid) {
-                    // gestion feuille
-                    if ($firstAid) {
-                        $sheet = $spreadsheet->getActiveSheet();
-                        $firstAid = false;
-                    } else {
-                        $sheet = $spreadsheet->createSheet();
-                    }
-
-                    // met le nom à la feuille
-                    $sheet->setTitle($stringService->truncate($aid->getId().'_'.$aid->getName(), 31)); // Définir le nom de la feuille
-
-                    // Infos aides
-                    $sheet->setCellValue('A1', 'Nom de l’aide');
-                    $sheet->setCellValue('B1', $aid->getName());
-                    $sheet->setCellValue('A2', 'Url de l\'aide');
-                    $sheet->setCellValue('B2', $aid->getUrl());
-
-                    // saut de ligne
-                    $sheet->setCellValue('A3', '');
-
-                    // Ajout des en-têtes
-                    $headers = [
-                        'Date',
-                        'Nombre de vues',
-                        'Nombre de clics sur Candidater',
-                        'Nombre de clics sur Plus d’informations',
-                        'Nombre de projets privés liés',
-                        'Nombre de projets publics liés'
-                    ];
-                    $sheet->fromArray($headers, null, 'A4');
-
-                    // Nombre de vues par jours
-                    $nbViewsByDay = $logAidViewService->getCountByDay($aid, $dateMin, $dateMax);
-
-                    // Nombre de clics sur Candidater par jours
-                    $nbApplicationUrlClicksByDay = $logAidApplicationUrlClickService->getCountByDay($aid, $dateMin, $dateMax);
-
-                    // Nombre de clics sur Plus d’informations par jours
-                    $nbOriginUrlClicksByDay = $logAidOriginUrlClickService->getCountByDay($aid, $dateMin, $dateMax);
-
-                    // nb project public associés
-                    $nbProjectPublicsByDay = $aidProjectService->getCountByDay($aid, $dateMin, $dateMax, true);
-
-                    // nb project prive associés
-                    $nbProjectPrivatesByDay =  $aidProjectService->getCountByDay($aid, $dateMin, $dateMax, false);
-
-                    // Parcours les dates
-                    $currentDay = clone $dateMin;
-                    $rowIndex = 5; // Ligne de départ pour les données
-                    while ($currentDay <= $dateMax) {
-                        $dataRow = [
-                            $currentDay->format('d/m/Y'),
-                            $nbViewsByDay[$currentDay->format('Y-m-d')] ?? '0',
-                            $nbApplicationUrlClicksByDay[$currentDay->format('Y-m-d')] ?? '0',
-                            $nbOriginUrlClicksByDay[$currentDay->format('Y-m-d')] ?? '0',
-                            $nbProjectPublicsByDay[$currentDay->format('Y-m-d')] ?? '0',
-                            $nbProjectPrivatesByDay[$currentDay->format('Y-m-d')] ?? '0'
-                        ];
-                        $sheet->fromArray($dataRow, null, 'A' . $rowIndex);
-                        $rowIndex++;
-                        $currentDay->add(new \DateInterval('P1D'));
-                    }
-
-                    // Ajout des filtres automatiques aux en-têtes
-                    $sheet->setAutoFilter('A4:F4');
-                }
-
                 // Génération du fichier Excel
                 $writer = new Xlsx($spreadsheet);
                 $writer->save('php://output');
