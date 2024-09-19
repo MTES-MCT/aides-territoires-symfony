@@ -46,6 +46,19 @@ class LogAidViewRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult()[0]['nb'] ?? 0;
     }
 
+    public function countByDay(?array $params = null): array
+    {
+        $qb = $this->getQueryBuilder($params);
+
+        $qb->select('IFNULL(COUNT(lav.id), 0) AS nb')
+            ->addSelect('DATE_FORMAT(lav.dateCreate, \'%Y-%m-%d\') as dateDay')
+            ->groupBy('dateDay')
+            ->orderBy('dateDay', 'ASC')
+        ;
+
+        return $qb->getQuery()->getResult();
+    }
+
     public function countAidsViews(?array $params = null): int
     {
         $distinctAids = $params['distinctAids'] ?? null;

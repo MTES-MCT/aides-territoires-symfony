@@ -36,7 +36,7 @@ class LogController extends DashboardController
 
         // Logs candidater aides
         // récupération des données
-        $logAidApplicationUrlClicks = $this->managerRegistry->getRepository(LogAidApplicationUrlClick::class)->countOnPeriod([
+        $logAidApplicationUrlClicks = $this->managerRegistry->getRepository(LogAidApplicationUrlClick::class)->countByDay([
             'dateMin' => $dateMin,
             'dateMax' => $dateMax,
         ]);
@@ -55,7 +55,7 @@ class LogController extends DashboardController
         ]);
 
         // Logs en savoir plus aides
-        $logAidOriginUrlClicks = $this->managerRegistry->getRepository(LogAidOriginUrlClick::class)->countOnPeriod([
+        $logAidOriginUrlClicks = $this->managerRegistry->getRepository(LogAidOriginUrlClick::class)->countByDay([
             'dateMin' => $dateMin,
             'dateMax' => $dateMax,
         ]);

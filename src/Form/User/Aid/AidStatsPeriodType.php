@@ -21,9 +21,6 @@ class AidStatsPeriodType extends AbstractType
                     new Assert\NotBlank([
                         'message' => 'Veuillez sélectionner une date de début.',
                     ]),
-                    new Assert\Date([
-                        'message' => 'La date de début n\'est pas valide.',
-                    ]),
                 ],
             ])
             ->add('dateMax', DateType::class, [
@@ -33,9 +30,6 @@ class AidStatsPeriodType extends AbstractType
                 'constraints' => [
                     new Assert\NotBlank([
                         'message' => 'Veuillez sélectionner une date de fin.',
-                    ]),
-                    new Assert\Date([
-                        'message' => 'La date de fin n\'est pas valide.',
                     ]),
                 ],
             ])
