@@ -37,6 +37,8 @@ use Dompdf\Options;
 use OpenSpout\Common\Entity\Cell;
 use OpenSpout\Common\Entity\Row;
 use OpenSpout\Writer\XLSX\Entity\SheetView;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -908,7 +910,8 @@ class AidController extends FrontController
         LogAidViewService $logAidViewService,
         LogAidApplicationUrlClickService $logAidApplicationUrlClickService,
         LogAidOriginUrlClickService $logAidOriginUrlClickService,
-        AidProjectService $aidProjectService
+        AidProjectService $aidProjectService,
+        StringService $stringService
     ) {
         // gestion dates
         $dateMinGet = $requestStack->getCurrentRequest()->get('dateMin', null);
@@ -925,6 +928,9 @@ class AidController extends FrontController
 
         $response = new StreamedResponse();
         try {
+            // nom de fichier
+            $filename = 'AT_statistiques_aides_'.$dateMin->format('d_m_Y').'_au_'.$dateMax->format('d_m_Y').'.xlsx';
+            
             $response->setCallback(function () use (
                 $aidRepository,
                 $logAidViewService,
@@ -933,7 +939,8 @@ class AidController extends FrontController
                 $aidProjectService,
                 $dateMin,
                 $dateMax,
-                $user
+                $user,
+                $stringService
             ) {
                 // paramètre filtre aides
                 $aidsParams = [
@@ -946,27 +953,32 @@ class AidController extends FrontController
 
                 // les aides du user
                 $aids = $aidRepository->findCustom($aidsParams);
-
-                // nom de fichier
-                $filename = 'AT_statistiques_aides_'.$dateMin->format('d_m_Y').'_au_'.$dateMax->format('d_m_Y').'.xlsx';
                 
-                // Le fichier xslx
-                $writer = new \OpenSpout\Writer\XLSX\Writer();
-                $writer->openToBrowser($filename);
+                // Création du fichier Excel
+                $spreadsheet = new Spreadsheet();
 
                 // Parcours les aides
                 $firstAid = true;
                 foreach ($aids as $aid) {
                     // gestion feuille
                     if ($firstAid) {
-                        $sheet = $writer->getCurrentSheet();
+                        $sheet = $spreadsheet->getActiveSheet();
                         $firstAid = false;
                     } else {
-                        $sheet = $writer->addNewSheetAndMakeItCurrent();
+                        $sheet = $spreadsheet->createSheet();
                     }
 
                     // met le nom à la feuille
-                    $sheet->setName($aid->getName()); // Définir le nom de la feuille
+                    $sheet->setTitle($stringService->truncate($aid->getId().'_'.$aid->getName(), 31)); // Définir le nom de la feuille
+
+                    // Infos aides
+                    $sheet->setCellValue('A1', 'Nom de l’aide');
+                    $sheet->setCellValue('B1', $aid->getName());
+                    $sheet->setCellValue('A2', 'Url de l\'aide');
+                    $sheet->setCellValue('B2', $aid->getUrl());
+
+                    // saut de ligne
+                    $sheet->setCellValue('A3', '');
 
                     // Ajout des en-têtes
                     $headers = [
@@ -977,12 +989,7 @@ class AidController extends FrontController
                         'Nombre de projets privés liés',
                         'Nombre de projets publics liés'
                     ];
-                    $cells = [];
-                    foreach ($headers as $headerItem) {
-                        $cells[] = Cell::fromValue($headerItem);
-                    }
-                    $singleRow = new Row($cells);
-                    $writer->addRow($singleRow);
+                    $sheet->fromArray($headers, null, 'A4');
 
                     // Nombre de vues par jours
                     $nbViewsByDay = $logAidViewService->getCountByDay($aid, $dateMin, $dateMax);
@@ -1001,23 +1008,35 @@ class AidController extends FrontController
 
                     // Parcours les dates
                     $currentDay = clone $dateMin;
+                    $rowIndex = 5; // Ligne de départ pour les données
                     while ($currentDay <= $dateMax) {
-                        $cells = [];
-                        $cells[] = Cell::fromValue($currentDay->format('d/m/Y'));
-                        $cells[] = Cell::fromValue($nbViewsByDay[$currentDay->format('Y-m-d')] ?? 0);
-                        $cells[] = Cell::fromValue($nbApplicationUrlClicksByDay[$currentDay->format('Y-m-d')] ?? 0);
-                        $cells[] = Cell::fromValue($nbOriginUrlClicksByDay[$currentDay->format('Y-m-d')] ?? 0);
-                        $cells[] = Cell::fromValue($nbProjectPublicsByDay[$currentDay->format('Y-m-d')] ?? 0);
-                        $cells[] = Cell::fromValue($nbProjectPrivatesByDay[$currentDay->format('Y-m-d')] ?? 0);
-                        $singleRow = new Row($cells);
-                        $writer->addRow($singleRow);
-
+                        $dataRow = [
+                            $currentDay->format('d/m/Y'),
+                            $nbViewsByDay[$currentDay->format('Y-m-d')] ?? '0',
+                            $nbApplicationUrlClicksByDay[$currentDay->format('Y-m-d')] ?? '0',
+                            $nbOriginUrlClicksByDay[$currentDay->format('Y-m-d')] ?? '0',
+                            $nbProjectPublicsByDay[$currentDay->format('Y-m-d')] ?? '0',
+                            $nbProjectPrivatesByDay[$currentDay->format('Y-m-d')] ?? '0'
+                        ];
+                        $sheet->fromArray($dataRow, null, 'A' . $rowIndex);
+                        $rowIndex++;
                         $currentDay->add(new \DateInterval('P1D'));
                     }
+
+                    // Ajout des filtres automatiques aux en-têtes
+                    $sheet->setAutoFilter('A4:F4');
                 }
 
-                $writer->close();
+                // Génération du fichier Excel
+                $writer = new Xlsx($spreadsheet);
+                $writer->save('php://output');
             });
+
+            // Configuration des en-têtes de la réponse
+            $response->headers->set('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+            $response->headers->set('Content-Disposition', 'attachment;filename="' . $filename . '"');
+            $response->headers->set('Cache-Control', 'max-age=0');
+
             return $response;
         } catch (\Exception $e) {
             throw new NotFoundHttpException('Impossible de générer votre export.');
