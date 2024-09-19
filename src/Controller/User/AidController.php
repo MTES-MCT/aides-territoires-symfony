@@ -14,6 +14,7 @@ use App\Form\User\Aid\AidExportType;
 use App\Form\User\Aid\AidFilterType;
 use App\Form\User\Aid\AidStatsPeriodType;
 use App\Message\User\AidsExportPdf;
+use App\Message\User\MsgAidStatsSpreadsheetOfUser;
 use App\Repository\Aid\AidProjectRepository;
 use App\Repository\Aid\AidRepository;
 use App\Repository\Log\LogAidApplicationUrlClickRepository;
@@ -147,7 +148,8 @@ class AidController extends FrontController
         UserService $userService,
         AidRepository $aidRepository,
         LogAidViewRepository $logAidViewRepository,
-        RequestStack $requestStack
+        RequestStack $requestStack,
+        MessageBusInterface $bus
     ): Response {
         // le user
         $user = $userService->getUserLogged();
@@ -249,7 +251,22 @@ class AidController extends FrontController
             if ($formAidStatsPeriod->isValid()) {
                 $dateMin = $formAidStatsPeriod->get('dateMin')->getData();
                 $dateMax = $formAidStatsPeriod->get('dateMax')->getData();
-                return $this->redirectToRoute('app_user_aid_all_export_stats', ['dateMin' => $dateMin->format('Y-m-d'), 'dateMax' => $dateMax->format('Y-m-d')]);
+                // Si plus de 10 aides ou période de plus de 90 jours, on passe par le worker
+                if (count($aids) > 10) {
+                    $bus->dispatch(new MsgAidStatsSpreadsheetOfUser(
+                        $user->getId(),
+                        $dateMin,
+                        $dateMax
+                    ));
+
+                    $this->addFlash(
+                        FrontController::FLASH_SUCCESS,
+                        'Votre export est trop volumineux, il sera lancé par une tâche automatique et vous recevrez un mail avec le document en pièce jointe.'
+                    );
+                } else {
+                    // Sinon téléchargement direct du fichier
+                    return $this->redirectToRoute('app_user_aid_all_export_stats', ['dateMin' => $dateMin->format('Y-m-d'), 'dateMax' => $dateMax->format('Y-m-d')]);
+                }
             } else {
                 $this->addFlash(
                     FrontController::FLASH_ERROR,
@@ -944,7 +961,7 @@ class AidController extends FrontController
                 $stringService,
                 $aidService
             ) {
- 
+
                 $spreadsheet = $aidService->getAidStatsSpreadSheetOfUser(
                     $user,
                     $dateMin,
