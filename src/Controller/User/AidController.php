@@ -251,8 +251,12 @@ class AidController extends FrontController
             if ($formAidStatsPeriod->isValid()) {
                 $dateMin = $formAidStatsPeriod->get('dateMin')->getData();
                 $dateMax = $formAidStatsPeriod->get('dateMax')->getData();
+
+                // Calcule la différence entre les deux dates
+                $dateInterval = $dateMin->diff($dateMax);
+
                 // Si plus de 10 aides ou période de plus de 90 jours, on passe par le worker
-                if (count($aids) > 10) {
+                if (count($aids) > 10 || $dateInterval->days >= 90) {
                     $bus->dispatch(new MsgAidStatsSpreadsheetOfUser(
                         $user->getId(),
                         $dateMin,
