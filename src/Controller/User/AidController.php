@@ -229,6 +229,34 @@ class AidController extends FrontController
             ]
         );
 
+        // formulaire periode
+        $dateMinGet = $requestStack->getCurrentRequest()->get('dateMin', null);
+        $dateMaxGet = $requestStack->getCurrentRequest()->get('dateMax', null);
+        $dateMin = $dateMinGet ? new \DateTime(date($dateMinGet)) : new \DateTime('-1 month');
+        $dateMax = $dateMaxGet ? new \DateTime(date($dateMaxGet)) : new \DateTime(date('Y-m-d'));
+
+        $formAidStatsPeriod = $this->createForm(AidStatsPeriodType::class);
+        if ($dateMin) {
+            $formAidStatsPeriod->get('dateMin')->setData($dateMin);
+        }
+        if ($dateMax) {
+            $formAidStatsPeriod->get('dateMax')->setData($dateMax);
+        }
+        $formAidStatsPeriod->handleRequest($requestStack->getCurrentRequest());
+        if ($formAidStatsPeriod->isSubmitted()) {
+            if ($formAidStatsPeriod->isValid()) {
+                $dateMin = $formAidStatsPeriod->get('dateMin')->getData();
+                $dateMax = $formAidStatsPeriod->get('dateMax')->getData();
+                return $this->redirectToRoute('app_user_aid_all_export_stats', ['dateMin' => $dateMin->format('Y-m-d'), 'dateMax' => $dateMax->format('Y-m-d')]);
+            } else {
+                $this->addFlash(
+                    FrontController::FLASH_ERROR,
+                    'Nous n’avons pas pu traiter votre formulaire car les données saisies sont invalides et / ou incomplètes. Merci de bien vouloir vérifier votre saisie et corriger les erreurs avant de réessayer. '
+                );
+            }
+            
+        }
+
         // fil arianne
         $this->breadcrumb->add(
             'Mon compte',
@@ -245,7 +273,8 @@ class AidController extends FrontController
             'nbAidsViews' => $nbAidsViews,
             'nbAidsViewsMonth' => $nbAidsViewsMonth,
             'formAidFilter' => $formAidFilter->createView(),
-            'formExport' => $formExport->createView()
+            'formExport' => $formExport->createView(),
+            'formAidStatsPeriod' => $formAidStatsPeriod
         ]);
     }
 
