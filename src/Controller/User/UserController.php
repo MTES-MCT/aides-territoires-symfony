@@ -18,6 +18,7 @@ use App\Service\User\UserService;
 use App\Service\Various\ParamService;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
@@ -46,91 +47,97 @@ class UserController extends FrontController
         $formRegister->handleRequest($requestStack->getCurrentRequest());
         if ($formRegister->isSubmitted()) {
             if ($formRegister->isValid()) {
-                $user->addRole(User::ROLE_USER);
-                $user->setPassword($userPasswordHasherInterface->hashPassword($user, $formRegister->get('password')->getData()));
-
-                // si abonné newsletter
-                if ($user->isMlConsent()) {
-                    // inscription à la newsletter
-                    if ($emailService->subscribeUser($user)) {
-                        $this->tAddFlash(
-                            FrontController::FLASH_SUCCESS,
-                            'Votre demande d’inscription à la newsletter a bien été prise en compte.<br />
-                            <strong>Afin de finaliser votre inscription il vous reste à cliquer sur le lien
-                            de confirmation présent dans l’e-mail que vous allez recevoir.</strong>'
-                        );
-                    } else {
-                        // erreur Service, on notifie l'utilisateur
-                        $this->tAddFlash(
-                            FrontController::FLASH_ERROR,
-                            'Une erreur s\'est produite lors de votre inscription à la newsletter'
-                        );
-                    }
-                }
-
-                // si infos organization
-                if ($formRegister->get('organizationName')->getData() && $formRegister->get('organizationType')->getData()) {
-                    $organization = new Organization();
-                    $organization->setName($formRegister->get('organizationName')->getData());
-                    $organization->setOrganizationType($formRegister->get('organizationType')->getData());
-                    $organization->setPerimeter($user->getPerimeter());
-                    $departementsCode = ($organization->getPerimeter()) ? $organization->getPerimeter()->getDepartments() : null;
-                    $departementCode = $departementsCode[0] ?? null;
-                    if ($departementCode) {
-                        $departement = $perimeterRepository->findOneBy([
-                            'code' => $departementCode,
-                            'scale' => Perimeter::SCALE_COUNTY
-                        ]);
-                        if ($departement instanceof Perimeter) {
-                            $organization->setPerimeterDepartment($departement);
-                        }
-                    }
-
-                    $regionsCode = ($organization->getPerimeter()) ? $organization->getPerimeter()->getRegions() : null;
-                    $regionCode = $regionsCode[0] ?? null;
-                    if ($regionCode) {
-                        $region = $perimeterRepository->findOneBy([
-                            'code' => $regionCode,
-                            'scale' => Perimeter::SCALE_REGION
-                        ]);
-                        if ($region instanceof Perimeter) {
-                            $organization->setPerimeterRegion($region);
-                        }
-                    }
-                    $organization->setIntercommunalityType($formRegister->get('intercommunalityType')->getData());
-
-                    $user->addOrganization($organization);
-                }
-
-                // sauvegarde le user et son organization
-                $managerRegistry->getManager()->persist($user);
-                $managerRegistry->getManager()->flush();
-
-                // authentifie le user
-                $security->login($user, 'form_login', 'main');
-
-                // message success
-                $this->tAddFlash(
-                    FrontController::FLASH_SUCCESS,
-                    'Vous êtes bien enregistré !'
-                );
-
-                // track goal
-                $matomoService->trackGoal($paramService->get('goal_register_id'));
-
-                // regarde si il y a des invitations sur ce compte
-                $organizationInvitations = $managerRegistry->getRepository(OrganizationInvitation::class)->findBy([
-                    'email' => $user->getEmail()
-                ]);
-                if (count($organizationInvitations) > 0) {
-                    $urlRedirect = $this->generateUrl('app_organization_invitations');
-                }
-
-                // redirection
-                if (isset($urlRedirect)) {
-                    return $this->redirect($urlRedirect);
+                // Vérification manuelle de l'unicité de l'email, parfois l'UniqueEntity ne fonctionne pas
+                $existingUser = $managerRegistry->getRepository(User::class)->findOneBy(['email' => $user->getEmail()]);
+                if ($existingUser) {
+                    $formRegister->get('email')->addError(new FormError('Cet email n\'est pas disponible.'));
                 } else {
-                    return $this->redirectToRoute('app_user_dashboard');
+                    $user->addRole(User::ROLE_USER);
+                    $user->setPassword($userPasswordHasherInterface->hashPassword($user, $formRegister->get('password')->getData()));
+
+                    // si abonné newsletter
+                    if ($user->isMlConsent()) {
+                        // inscription à la newsletter
+                        if ($emailService->subscribeUser($user)) {
+                            $this->tAddFlash(
+                                FrontController::FLASH_SUCCESS,
+                                'Votre demande d’inscription à la newsletter a bien été prise en compte.<br />
+                                <strong>Afin de finaliser votre inscription il vous reste à cliquer sur le lien
+                                de confirmation présent dans l’e-mail que vous allez recevoir.</strong>'
+                            );
+                        } else {
+                            // erreur Service, on notifie l'utilisateur
+                            $this->tAddFlash(
+                                FrontController::FLASH_ERROR,
+                                'Une erreur s\'est produite lors de votre inscription à la newsletter'
+                            );
+                        }
+                    }
+
+                    // si infos organization
+                    if ($formRegister->get('organizationName')->getData() && $formRegister->get('organizationType')->getData()) {
+                        $organization = new Organization();
+                        $organization->setName($formRegister->get('organizationName')->getData());
+                        $organization->setOrganizationType($formRegister->get('organizationType')->getData());
+                        $organization->setPerimeter($user->getPerimeter());
+                        $departementsCode = ($organization->getPerimeter()) ? $organization->getPerimeter()->getDepartments() : null;
+                        $departementCode = $departementsCode[0] ?? null;
+                        if ($departementCode) {
+                            $departement = $perimeterRepository->findOneBy([
+                                'code' => $departementCode,
+                                'scale' => Perimeter::SCALE_COUNTY
+                            ]);
+                            if ($departement instanceof Perimeter) {
+                                $organization->setPerimeterDepartment($departement);
+                            }
+                        }
+
+                        $regionsCode = ($organization->getPerimeter()) ? $organization->getPerimeter()->getRegions() : null;
+                        $regionCode = $regionsCode[0] ?? null;
+                        if ($regionCode) {
+                            $region = $perimeterRepository->findOneBy([
+                                'code' => $regionCode,
+                                'scale' => Perimeter::SCALE_REGION
+                            ]);
+                            if ($region instanceof Perimeter) {
+                                $organization->setPerimeterRegion($region);
+                            }
+                        }
+                        $organization->setIntercommunalityType($formRegister->get('intercommunalityType')->getData());
+
+                        $user->addOrganization($organization);
+                    }
+
+                    // sauvegarde le user et son organization
+                    $managerRegistry->getManager()->persist($user);
+                    $managerRegistry->getManager()->flush();
+
+                    // authentifie le user
+                    $security->login($user, 'form_login', 'main');
+
+                    // message success
+                    $this->tAddFlash(
+                        FrontController::FLASH_SUCCESS,
+                        'Vous êtes bien enregistré !'
+                    );
+
+                    // track goal
+                    $matomoService->trackGoal($paramService->get('goal_register_id'));
+
+                    // regarde si il y a des invitations sur ce compte
+                    $organizationInvitations = $managerRegistry->getRepository(OrganizationInvitation::class)->findBy([
+                        'email' => $user->getEmail()
+                    ]);
+                    if (count($organizationInvitations) > 0) {
+                        $urlRedirect = $this->generateUrl('app_organization_invitations');
+                    }
+
+                    // redirection
+                    if (isset($urlRedirect)) {
+                        return $this->redirect($urlRedirect);
+                    } else {
+                        return $this->redirectToRoute('app_user_dashboard');
+                    }
                 }
             } else {
                 $formErrors = true;
@@ -182,59 +189,65 @@ class UserController extends FrontController
         $formRegisterCommune->handleRequest($requestStack->getCurrentRequest());
         if ($formRegisterCommune->isSubmitted()) {
             if ($formRegisterCommune->isValid()) {
-                // encode le password
-                $user->setPassword($userPasswordHasherInterface->hashPassword($user, $formRegisterCommune->get('password')->getData()));
+                // Vérification manuelle de l'unicité de l'email, parfois l'UniqueEntity ne fonctionne pas
+                $existingUser = $managerRegistry->getRepository(User::class)->findOneBy(['email' => $user->getEmail()]);
+                if ($existingUser) {
+                    $formRegisterCommune->get('email')->addError(new FormError('Cet email n\'est pas disponible.'));
+                } else {
+                    // encode le password
+                    $user->setPassword($userPasswordHasherInterface->hashPassword($user, $formRegisterCommune->get('password')->getData()));
 
-                // assigne le perimetre à l'organisation
-                $organization->setPerimeter($user->getPerimeter());
+                    // assigne le perimetre à l'organisation
+                    $organization->setPerimeter($user->getPerimeter());
 
-                // le nom de l'organization en fonction du perimetre
-                $organization->setName('Mairie de ' . $organization->getPerimeter()->getName());
+                    // le nom de l'organization en fonction du perimetre
+                    $organization->setName('Mairie de ' . $organization->getPerimeter()->getName());
 
-                // defini le departement de l'organisation
-                $departementsCode = ($organization->getPerimeter()) ? $organization->getPerimeter()->getDepartments() : null;
-                $departementCode = $departementsCode[0] ?? null;
-                if ($departementCode) {
-                    $departement = $perimeterRepository->findOneBy([
-                        'code' => $departementCode,
-                        'scale' => Perimeter::SCALE_COUNTY
-                    ]);
-                    if ($departement instanceof Perimeter) {
-                        $organization->setPerimeterDepartment($departement);
+                    // defini le departement de l'organisation
+                    $departementsCode = ($organization->getPerimeter()) ? $organization->getPerimeter()->getDepartments() : null;
+                    $departementCode = $departementsCode[0] ?? null;
+                    if ($departementCode) {
+                        $departement = $perimeterRepository->findOneBy([
+                            'code' => $departementCode,
+                            'scale' => Perimeter::SCALE_COUNTY
+                        ]);
+                        if ($departement instanceof Perimeter) {
+                            $organization->setPerimeterDepartment($departement);
+                        }
                     }
-                }
 
-                // défini la région de l'organisation
-                $regionsCode = ($organization->getPerimeter()) ? $organization->getPerimeter()->getRegions() : null;
-                $regionCode = $regionsCode[0] ?? null;
-                if ($regionCode) {
-                    $region = $perimeterRepository->findOneBy([
-                        'code' => $regionCode,
-                        'scale' => Perimeter::SCALE_REGION
-                    ]);
-                    if ($region instanceof Perimeter) {
-                        $organization->setPerimeterRegion($region);
+                    // défini la région de l'organisation
+                    $regionsCode = ($organization->getPerimeter()) ? $organization->getPerimeter()->getRegions() : null;
+                    $regionCode = $regionsCode[0] ?? null;
+                    if ($regionCode) {
+                        $region = $perimeterRepository->findOneBy([
+                            'code' => $regionCode,
+                            'scale' => Perimeter::SCALE_REGION
+                        ]);
+                        if ($region instanceof Perimeter) {
+                            $organization->setPerimeterRegion($region);
+                        }
                     }
+
+                    // on sauvegarde le nouveau user et on organization
+                    $managerRegistry->getManager()->persist($user);
+                    $managerRegistry->getManager()->flush();
+
+                    // authentifie le user
+                    $security->login($user, 'form_login', 'main');
+
+                    // message success
+                    $this->tAddFlash(
+                        FrontController::FLASH_SUCCESS,
+                        'Vous êtes bien enregistré !'
+                    );
+
+                    // track goal
+                    $matomoService->trackGoal($paramService->get('goal_register_id'));
+
+                    // redirection
+                    return $this->redirectToRoute('app_user_dashboard');
                 }
-
-                // on sauvegarde le nouveau user et on organization
-                $managerRegistry->getManager()->persist($user);
-                $managerRegistry->getManager()->flush();
-
-                // authentifie le user
-                $security->login($user, 'form_login', 'main');
-
-                // message success
-                $this->tAddFlash(
-                    FrontController::FLASH_SUCCESS,
-                    'Vous êtes bien enregistré !'
-                );
-
-                // track goal
-                $matomoService->trackGoal($paramService->get('goal_register_id'));
-
-                // redirection
-                return $this->redirectToRoute('app_user_dashboard');
             } else {
                 $this->addFlash(
                     FrontController::FLASH_ERROR,
