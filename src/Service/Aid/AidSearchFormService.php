@@ -48,7 +48,8 @@ class AidSearchFormService
     const QUERYSTRING_KEY_CATEGORY_IDS = 'category_ids';
     const QUERYSTRING_KEY_APPLY_BEFORE = 'apply_before';
     const QUERYSTRING_KEY_PUBLISHED_AFTER = 'published_after';
-    const QUERYSTRING_KEY_AID_TYPE_GROUP_SLUG = 'aidTypeGroupSlug';
+    const QUERYSTRING_KEY_AID_TYPE_GROUP_SLUG = 'aid_type_group_slug';
+    const QUERYSTRING_KEY_AID_TYPE_GROUP_ID = 'aid_type_group_id';
     const QUERYSTRING_KEY_AID_TYPE_SLUGS = 'aidTypeSlugs';
     const QUERYSTRING_KEY_AID_TYPE_IDS = 'aidTypeIds';
     const QUERYSTRING_KEY_AID_STEP_SLUGS = 'aidStepSlugs';
@@ -470,7 +471,7 @@ class AidSearchFormService
 
 
         /**
-         * > AidType
+         * > AidTypeGroup
          */
         if (isset($queryParams[self::QUERYSTRING_KEY_AID_TYPE_GROUP_SLUG])) {
             $aidTypeGroup = $this->managerRegistry->getRepository(AidTypeGroup::class)->findOneBy(['slug' => $queryParams[self::QUERYSTRING_KEY_AID_TYPE_GROUP_SLUG]]);
@@ -481,6 +482,22 @@ class AidSearchFormService
             }
         }
 
+        if (isset($queryParams[self::QUERYSTRING_KEY_AID_TYPE_GROUP_ID])) {
+            $aidTypeGroup = $this->managerRegistry->getRepository(AidTypeGroup::class)->find($queryParams[self::QUERYSTRING_KEY_AID_TYPE_GROUP_ID]);
+            if ($aidTypeGroup instanceof AidTypeGroup) {
+                foreach ($aidTypeGroup->getAidTypes() as $aidType) {
+                    $aidSearchClass->addAidType($aidType);
+                }
+            }
+        }
+
+        /**
+         * < AidType
+         */
+
+        /**
+         * > AidType
+         */
         if (isset($queryParams[self::QUERYSTRING_KEY_AID_TYPE_IDS])) {
             $aidTypeIds = is_array($queryParams[self::QUERYSTRING_KEY_AID_TYPE_IDS]) ? $queryParams[self::QUERYSTRING_KEY_AID_TYPE_IDS] : [$queryParams[self::QUERYSTRING_KEY_AID_TYPE_IDS]];
             /** @var AidTypeRepository $aidTypeRepository */
@@ -955,12 +972,12 @@ class AidSearchFormService
             // Si la clé normalisée existe déjà, ajoute la valeur au tableau existant
             if (isset($normalizedParams[$normalizedKey])) {
                 if (is_array($normalizedParams[$normalizedKey])) {
-                    $normalizedParams[$normalizedKey][] = $value;
+                    $normalizedParams[$normalizedKey][] = str_replace(['_'], ['-'], $value);
                 } else {
-                    $normalizedParams[$normalizedKey] = [$normalizedParams[$normalizedKey], $value];
+                    $normalizedParams[$normalizedKey] = [$normalizedParams[$normalizedKey], str_replace(['_'], ['-'], $value)];
                 }
             } else {
-                $normalizedParams[$normalizedKey] = $value;
+                $normalizedParams[$normalizedKey] = str_replace(['_'], ['-'], $value);
             }
         }
 

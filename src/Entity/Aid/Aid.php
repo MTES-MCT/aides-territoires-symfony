@@ -54,7 +54,8 @@ use App\Filter\Aid\AidRecurrenceFilter;
 use App\Filter\Aid\AidTargetedAudiencesFilter;
 use App\Filter\Aid\AidTextFilter;
 use App\Filter\Aid\AidTypeFilter;
-use App\Filter\Aid\AidTypeGroupFilter;
+use App\Filter\Aid\AidTypeGroupSlugFilter;
+use App\Filter\Aid\AidTypeGroupIdFilter;
 use App\Filter\Backer\BackerFilter;
 use App\Filter\Backer\BackerGroupFilter;
 use App\Service\Doctrine\DoctrineConstants;
@@ -117,7 +118,8 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ApiFilter(AidCategoriesIdsFilter::class)]
 #[ApiFilter(AidApplyBeforeFilter::class)]
 #[ApiFilter(AidPublishedAfterFilter::class)]
-#[ApiFilter(AidTypeGroupFilter::class)]
+#[ApiFilter(AidTypeGroupSlugFilter::class)]
+#[ApiFilter(AidTypeGroupIdFilter::class)]
 #[ApiFilter(AidTypeFilter::class)]
 #[ApiFilter(AidMobilizationStepFilter::class)]
 #[ApiFilter(AidDestinationFilter::class)]

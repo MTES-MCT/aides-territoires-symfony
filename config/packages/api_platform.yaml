@@ -20,7 +20,7 @@ api_platform:
                                 <li><em>text</em> => <strong>keyword</strong></li>
                                 <li><em>targeted_audiences</em> => <strong>organization_type_slugs</strong></li>
                                 <li><em>categories</em> => <strong>category_slugs</strong></li>
-                                <li><em>aid_type</em> => <strong>aidTypeGroupSlug</strong></li>
+                                <li><em>aid_type</em> => <strong>aid_type_group_slug</strong></li>
                                 <li>
                                     <p><em>financial_aids</em> && <em>technical_aids</em> => <strong>aidTypeSlugs</strong></p>
                                     <p>Ces deux champs ont fusionnés en un seul champ <strong>aidTypeSlugs</strong> qui prend en compte les deux types d'aides.</p>
@@ -32,6 +32,7 @@ api_platform:
                             <ul>
                                 <li><strong>organization_type_ids</strong> : Recherche sur les types de structure par ids, ex: organizationTypeIds=1&organizationTypeIds=2</li>
                                 <li><strong>category_ids</strong> : Recherche sur les thématiques par ids, ex: category_ids=1&category_ids=2</li>
+                                <li><strong>aid_type_group_id</strong> : Recherche sur le groupe de la nature de l'aide par id.</li>
                             </ul>
                             <h5>Données :</h5>
                             <ul>
