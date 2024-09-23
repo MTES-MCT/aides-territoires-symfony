@@ -43,6 +43,8 @@ use App\Filter\Aid\AidCallForProjectOnlyFilter;
 use App\Filter\Aid\AidCategoriesFilter;
 use App\Filter\Aid\AidCategoriesIdsFilter;
 use App\Filter\Aid\AidDestinationFilter;
+use App\Filter\Aid\AidDestinationIdsFilter;
+use App\Filter\Aid\AidDestinationSlugsFilter;
 use App\Filter\Aid\AidEuropeanFilter;
 use App\Filter\Aid\AidIsChargedFilter;
 use App\Filter\Aid\AidMobilizationStepFilter;
@@ -127,7 +129,8 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ApiFilter(AidTypeIdsFilter::class)]
 #[ApiFilter(AidStepSlugsFilter::class)]
 #[ApiFilter(AidStepIdsFilter::class)]
-#[ApiFilter(AidDestinationFilter::class)]
+#[ApiFilter(AidDestinationSlugsFilter::class)]
+#[ApiFilter(AidDestinationIdsFilter::class)]
 #[ApiFilter(AidRecurrenceFilter::class)]
 #[ApiFilter(AidCallForProjectOnlyFilter::class)]
 #[ApiFilter(AidIsChargedFilter::class)]

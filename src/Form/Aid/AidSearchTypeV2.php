@@ -241,7 +241,7 @@ class AidSearchTypeV2 extends AbstractType
                     'multiple' => true,
                     'expanded' => true
                 ])
-                ->add('aidDestinations', EntityCheckboxAbsoluteType::class, [
+                ->add(AidSearchFormService::QUERYSTRING_KEY_AID_DESTINATION_IDS, EntityCheckboxAbsoluteType::class, [
                     'required' => false,
                     'label' => 'Actions concernées',
                     'placeholder' => 'Tous les types de dépenses',

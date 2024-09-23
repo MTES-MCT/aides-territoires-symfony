@@ -55,7 +55,7 @@ class AidSearchClass // NOSONAR too much methods
     /**
      * @var ?ArrayCollection|AidDestination[]
      */
-    private $aidDestinations;
+    private $aid_destination_ids;
     private ?bool $isCharged;
     private ?string $europeanAid;
     private ?bool $isCallForProject;
@@ -79,7 +79,7 @@ class AidSearchClass // NOSONAR too much methods
         $this->published_after = null;
         $this->programs = null;
         $this->aid_step_ids = null;
-        $this->aidDestinations = null;
+        $this->aid_destination_ids = null;
         $this->isCharged = null;
         $this->europeanAid = null;
         $this->isCallForProject = null;
@@ -287,23 +287,23 @@ class AidSearchClass // NOSONAR too much methods
         }
     }
 
-    public function getAidDestinations(): ?ArrayCollection
+    public function getAidDestinationIds(): ?ArrayCollection
     {
-        return $this->aidDestinations;
+        return $this->aid_destination_ids;
     }
 
-    public function setAidDestinations(?ArrayCollection $aidDestinations): void
+    public function setAidDestinationIds(?ArrayCollection $aidDestinationIds): void
     {
-        $this->aidDestinations = $aidDestinations;
+        $this->aid_destination_ids = $aidDestinationIds;
     }
 
-    public function addAidDestination($aidDestination): void
+    public function addAidDestinationId(AidDestination $aidDestination): void
     {
-        if (!$this->aidDestinations) {
-            $this->aidDestinations = new ArrayCollection();
+        if (!$this->aid_destination_ids) {
+            $this->aid_destination_ids = new ArrayCollection();
         }
-        if (!$this->aidDestinations->contains($aidDestination)) {
-            $this->aidDestinations->add($aidDestination);
+        if (!$this->aid_destination_ids->contains($aidDestination)) {
+            $this->aid_destination_ids->add($aidDestination);
         }
     }
 

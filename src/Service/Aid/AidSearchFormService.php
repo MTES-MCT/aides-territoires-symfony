@@ -54,8 +54,8 @@ class AidSearchFormService
     const QUERYSTRING_KEY_AID_TYPE_IDS = 'aid_type_ids';
     const QUERYSTRING_KEY_AID_STEP_SLUGS = 'aid_step_slugs';
     const QUERYSTRING_KEY_AID_STEP_IDS = 'aid_step_ids';
-    const QUERYSTRING_KEY_AID_DESTINATION_SLUGS = 'aidDestinationSlugs';
-    const QUERYSTRING_KEY_AID_DESTINATION_IDS = 'aidDestinationIds';
+    const QUERYSTRING_KEY_AID_DESTINATION_SLUGS = 'aid_destination_slugs';
+    const QUERYSTRING_KEY_AID_DESTINATION_IDS = 'aid_destination_ids';
     const QUERYSTRING_KEY_AID_RECURRENCE_SLUG = 'aidRecurrenceSlug';
     const QUERYSTRING_KEY_IS_CALL_FOR_PROJECT = 'isCallForProject';
     const QUERYSTRING_KEY_IS_CHARGED = 'isCharged';
@@ -173,9 +173,9 @@ class AidSearchFormService
             }
             $params[self::QUERYSTRING_KEY_AID_STEP_IDS] = $aidSteps;
         }
-        if ($aidSearchClass->getAidDestinations()) {
+        if ($aidSearchClass->getAidDestinationIds()) {
             $aidDestinations = [];
-            foreach ($aidSearchClass->getAidDestinations() as $aidDestination) {
+            foreach ($aidSearchClass->getAidDestinationIds() as $aidDestination) {
                 $aidDestinations[] = $aidDestination->getId();
             }
             $params[self::QUERYSTRING_KEY_AID_DESTINATION_IDS] = $aidDestinations;
@@ -261,8 +261,8 @@ class AidSearchFormService
             $aidParams['aidSteps'] = $aidSearchClass->getAidStepIds();
         }
 
-        if ($aidSearchClass->getAidDestinations()) {
-            $aidParams['aidDestinations'] = $aidSearchClass->getAidDestinations();
+        if ($aidSearchClass->getAidDestinationIds()) {
+            $aidParams['aidDestinations'] = $aidSearchClass->getAidDestinationIds();
         }
 
         if ($aidSearchClass->getIsCharged() !== null) {
@@ -706,7 +706,7 @@ class AidSearchFormService
                 ]
             );
             foreach ($aidDestinations as $aidDestination) {
-                $aidSearchClass->addAidDestination($aidDestination);
+                $aidSearchClass->addAidDestinationId($aidDestination);
             }
         }
 
@@ -720,7 +720,7 @@ class AidSearchFormService
                 ]
             );
             foreach ($aidDestinations as $aidDestination) {
-                $aidSearchClass->addAidDestination($aidDestination);
+                $aidSearchClass->addAidDestinationId($aidDestination);
             }
         }
 
@@ -890,7 +890,7 @@ class AidSearchFormService
             $aidSearchClass->getApplyBefore() ||
             $aidSearchClass->getPrograms() ||
             $aidSearchClass->getAidStepIds() ||
-            $aidSearchClass->getAidDestinations() ||
+            $aidSearchClass->getAidDestinationIds() ||
             $aidSearchClass->getIsCharged() !== null ||
             $aidSearchClass->getEuropeanAid() ||
             $aidSearchClass->getIsCallForProject() ||
