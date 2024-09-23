@@ -27,7 +27,7 @@ class AidSearchClass // NOSONAR too much methods
     /**
      * @var ?ArrayCollection|Category[]
      */
-    private $categorysearch;
+    private $category_ids;
     private ?bool $newIntegration;
     private ?string $orderBy;
     /**
@@ -41,7 +41,9 @@ class AidSearchClass // NOSONAR too much methods
     private $backerschoice;
     private ?BackerGroup $backerGroup;
 
-    private ?\DateTime $applyBefore;
+    private ?\DateTime $apply_before;
+    private ?\DateTime $published_after;
+
     /**
      * @var ?ArrayCollection|Program[]
      */
@@ -67,13 +69,14 @@ class AidSearchClass // NOSONAR too much methods
         $this->audiences = null;
         $this->searchPerimeter = null;
         $this->keyword = null;
-        $this->categorysearch = null;
+        $this->category_ids = null;
         $this->newIntegration = null;
         $this->aidTypes = null;
         $this->orderBy = null;
         $this->backerschoice = null;
         $this->backerGroup = null;
-        $this->applyBefore = null;
+        $this->apply_before = null;
+        $this->published_after = null;
         $this->programs = null;
         $this->aidSteps = null;
         $this->aidDestinations = null;
@@ -134,23 +137,23 @@ class AidSearchClass // NOSONAR too much methods
         $this->keyword = $keyword;
     }
 
-    public function getCategorySearch(): ?ArrayCollection
+    public function getCategoryIds(): ?ArrayCollection
     {
-        return $this->categorysearch;
+        return $this->category_ids;
     }
 
-    public function setCategorySearch(?ArrayCollection $categories): void
+    public function setCategoryIds(?ArrayCollection $categoryIds): void
     {
-        $this->categorysearch = $categories;
+        $this->category_ids = $categoryIds;
     }
 
-    public function addCategorySearch(Category $category): void
+    public function addCategoryId(Category $category): void
     {
-        if (!$this->categorysearch) {
-            $this->categorysearch = new ArrayCollection();
+        if (!$this->category_ids) {
+            $this->category_ids = new ArrayCollection();
         }
-        if (!$this->categorysearch->contains($category)) {
-            $this->categorysearch->add($category);
+        if (!$this->category_ids->contains($category)) {
+            $this->category_ids->add($category);
         }
     }
 
@@ -226,14 +229,24 @@ class AidSearchClass // NOSONAR too much methods
 
     public function getApplyBefore(): ?\DateTime
     {
-        return $this->applyBefore;
+        return $this->apply_before;
     }
 
     public function setApplyBefore(?\DateTime $applyBefore): void
     {
-        $this->applyBefore = $applyBefore;
+        $this->apply_before = $applyBefore;
     }
 
+    public function getPublishedAfter(): ?\DateTime
+    {
+        return $this->published_after;
+    }
+
+    public function setPublishedAfter(?\DateTime $publishedAfter): void
+    {
+        $this->published_after = $publishedAfter;
+    }
+    
     public function getPrograms(): ?ArrayCollection
     {
         return $this->programs;

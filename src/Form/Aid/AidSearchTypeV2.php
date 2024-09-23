@@ -92,7 +92,7 @@ class AidSearchTypeV2 extends AbstractType
                     'placeholder' => 'Votre commune, EPCI...'
                 ]
             ])
-            ->add('keyword', TextType::class, [
+            ->add(AidSearchFormService::QUERYSTRING_KEY_KEYWORD, TextType::class, [
                 'required' => false,
                 'label' => 'Projet référent ou mot-clé',
                 'attr' => [
@@ -113,7 +113,7 @@ class AidSearchTypeV2 extends AbstractType
                 'sanitize_html' => true,
 
             ])
-            ->add('categorysearch', EntityCheckboxGroupAbsoluteType::class, [
+            ->add(AidSearchFormService::QUERYSTRING_KEY_CATEGORY_IDS, EntityCheckboxGroupAbsoluteType::class, [
                 'required' => false,
                 'label' => 'Thématiques de l\'aide',
                 'placeholder' => 'Toutes les sous-thématiques',
@@ -215,7 +215,7 @@ class AidSearchTypeV2 extends AbstractType
                         ]);
                     },
                 ])
-                ->add('applyBefore', DateType::class, [
+                ->add(AidSearchFormService::QUERYSTRING_KEY_APPLY_BEFORE, DateType::class, [
                     'required' => false,
                     'label' => 'Candidater avant...',
                     'widget' => 'single_text'

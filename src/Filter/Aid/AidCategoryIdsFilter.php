@@ -11,7 +11,7 @@ use App\Service\Aid\AidSearchFormService;
 use Doctrine\ORM\QueryBuilder;
 use Symfony\Component\PropertyInfo\Type;
 
-final class AidCategoriesFilter extends AbstractFilter
+final class AidCategoriesIdsFilter extends AbstractFilter
 {
     protected function filterProperty(string $property, $value, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, Operation $operation = null, array $context = []): void
     {
@@ -26,14 +26,14 @@ final class AidCategoriesFilter extends AbstractFilter
         );
         $examples = [];
         foreach ($categories as $category) {
-            $examples[] = new Example($category->getName(), null, $category->getSlug());
+            $examples[] = new Example($category->getName(), null, $category->getId());
         }
         return [
-            AidSearchFormService::QUERYSTRING_KEY_CATEGORY_SLUGS => [
-                'property' => AidSearchFormService::QUERYSTRING_KEY_CATEGORY_SLUGS,
+            AidSearchFormService::QUERYSTRING_KEY_CATEGORY_IDS => [
+                'property' => AidSearchFormService::QUERYSTRING_KEY_CATEGORY_IDS,
                 'type' => Type::BUILTIN_TYPE_STRING,
                 'required' => false,
-                'description' => '<div class="renderedMarkdown"><p>Les thématiques pour lesquelles vous recherchez des aides. Vous pouvez passer plusieurs fois ce paramètre pour rechercher sur plusieurs thématiques, ex : ...&'.AidSearchFormService::QUERYSTRING_KEY_CATEGORY_SLUGS.'=eau-potable&'.AidSearchFormService::QUERYSTRING_KEY_CATEGORY_SLUGS.'=eau-souterraine...<br><br>Voir aussi <code>/api/aids/themes/</code> pour la liste complète.</p></div>',
+                'description' => '<div class="renderedMarkdown"><p>Les thématiques pour lesquelles vous recherchez des aides. Vous pouvez passer plusieurs fois ce paramètre pour rechercher sur plusieurs thématiques, ex : ...&'.AidSearchFormService::QUERYSTRING_KEY_CATEGORY_IDS.'=1&'.AidSearchFormService::QUERYSTRING_KEY_CATEGORY_IDS.'=5...<br><br>Voir aussi <code>/api/aids/themes/</code> pour la liste complète.</p></div>',
                 'openapi' => [
                     'examples' => $examples,
                 ],

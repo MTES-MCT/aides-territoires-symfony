@@ -44,10 +44,10 @@ class AidSearchFormService
     const QUERYSTRING_KEY_ORGANIZATION_TYPE_SLUGS = 'organization_type_slugs';
     const QUERYSTRING_KEY_ORGANIZATION_TYPE_SLUG = 'organization_type_slug';
     const QUERYSTRING_KEY_ORGANIZATION_TYPE_IDS = 'organization_type_ids';
-    const QUERYSTRING_KEY_CATEGORY_SLUGS = 'categorySlugs';
-    const QUERYSTRING_KEY_CATEGORY_IDS = 'categoryIds';
-    const QUERYSTRING_KEY_APPLY_BEFORE = 'applyBefore';
-    const QUERYSTRING_KEY_PUBLISHED_AFTER = 'publishedAfter';
+    const QUERYSTRING_KEY_CATEGORY_SLUGS = 'category_slugs';
+    const QUERYSTRING_KEY_CATEGORY_IDS = 'category_ids';
+    const QUERYSTRING_KEY_APPLY_BEFORE = 'apply_before';
+    const QUERYSTRING_KEY_PUBLISHED_AFTER = 'published_after';
     const QUERYSTRING_KEY_AID_TYPE_GROUP_SLUG = 'aidTypeGroupSlug';
     const QUERYSTRING_KEY_AID_TYPE_SLUGS = 'aidTypeSlugs';
     const QUERYSTRING_KEY_AID_TYPE_IDS = 'aidTypeIds';
@@ -116,8 +116,8 @@ class AidSearchFormService
     { // NOSONAR too complex
         $params = [];
 
-        if ($aidSearchClass->getOrganizationType()) {
-            $params[self::QUERYSTRING_KEY_ORGANIZATION_TYPE_SLUG] = $aidSearchClass->getOrganizationType()->getSlug();
+        if ($aidSearchClass->getOrganizationTypeSlug()) {
+            $params[self::QUERYSTRING_KEY_ORGANIZATION_TYPE_SLUG] = $aidSearchClass->getOrganizationTypeSlug()->getSlug();
         }
         if ($aidSearchClass->getSearchPerimeter()) {
             $params[self::QUERYSTRING_KEY_SEARCH_PERIMETER] = $aidSearchClass->getSearchPerimeter()->getId();
@@ -125,9 +125,9 @@ class AidSearchFormService
         if ($aidSearchClass->getKeyword()) {
             $params[self::QUERYSTRING_KEY_KEYWORD] = $aidSearchClass->getKeyword();
         }
-        if ($aidSearchClass->getCategorySearch()) {
+        if ($aidSearchClass->getCategoryIds()) {
             $categories = [];
-            foreach ($aidSearchClass->getCategorySearch() as $category) {
+            foreach ($aidSearchClass->getCategoryIds() as $category) {
                 $categories[] = $category->getId();
             }
             $params[self::QUERYSTRING_KEY_CATEGORY_IDS] = $categories;
@@ -224,8 +224,8 @@ class AidSearchFormService
             }
         }
 
-        if ($aidSearchClass->getCategorySearch()) {
-            $aidParams['categories'] = $aidSearchClass->getCategorySearch();
+        if ($aidSearchClass->getCategoryIds()) {
+            $aidParams['categories'] = $aidSearchClass->getCategoryIds();
         }
 
         if ($aidSearchClass->getAidTypes()) {
@@ -246,6 +246,10 @@ class AidSearchFormService
 
         if ($aidSearchClass->getApplyBefore()) {
             $aidParams['applyBefore'] = $aidSearchClass->getApplyBefore();
+        }
+
+        if ($aidSearchClass->getPublishedAfter()) {
+            $aidParams['publishedAfter'] = $aidSearchClass->getPublishedAfter();
         }
 
         if ($aidSearchClass->getPrograms()) {
@@ -430,30 +434,34 @@ class AidSearchFormService
 
         if (isset($queryParams[self::QUERYSTRING_KEY_CATEGORY_SLUGS])) {
             $categorySlugs = is_array($queryParams[self::QUERYSTRING_KEY_CATEGORY_SLUGS]) ? $queryParams[self::QUERYSTRING_KEY_CATEGORY_SLUGS] : [$queryParams[self::QUERYSTRING_KEY_CATEGORY_SLUGS]];
-            /** @var CategoryRepository $categoryRepository */
-            $categoryRepository = $this->managerRegistry->getRepository(Category::class);
-            $categories = $categoryRepository->findCustom(
-                [
-                    'slugs' => $categorySlugs
-                ]
-            );
-            foreach ($categories as $category) {
-                $aidSearchClass->addCategorySearch($category);
+            if (!empty($categorySlugs)) {
+                /** @var CategoryRepository $categoryRepository */
+                $categoryRepository = $this->managerRegistry->getRepository(Category::class);
+                $categories = $categoryRepository->findCustom(
+                    [
+                        'slugs' => $categorySlugs
+                    ]
+                );
+                foreach ($categories as $category) {
+                    $aidSearchClass->addCategoryId($category);
+                }
             }
         }
 
         if (isset($queryParams[self::QUERYSTRING_KEY_CATEGORY_IDS])) {
             $categoryIds = is_array($queryParams[self::QUERYSTRING_KEY_CATEGORY_IDS]) ? $queryParams[self::QUERYSTRING_KEY_CATEGORY_IDS] : [$queryParams[self::QUERYSTRING_KEY_CATEGORY_IDS]];
-            /** @var CategoryRepository $categoryRepository */
-            $categoryRepository = $this->managerRegistry->getRepository(Category::class);
-            
-            $categories = $categoryRepository->findCustom(
-                [
-                    'ids' => $categoryIds
-                ]
-            );
-            foreach ($categories as $category) {
-                $aidSearchClass->addCategorySearch($category);
+            if (!empty($categoryIds)) {
+                /** @var CategoryRepository $categoryRepository */
+                $categoryRepository = $this->managerRegistry->getRepository(Category::class);
+                
+                $categories = $categoryRepository->findCustom(
+                    [
+                        'ids' => $categoryIds
+                    ]
+                );
+                foreach ($categories as $category) {
+                    $aidSearchClass->addCategoryId($category);
+                }
             }
         }
         /**
@@ -580,7 +588,7 @@ class AidSearchFormService
 
             // il peu y avoir des slugs dans ce paramètre
             $slugs = [];
-            foreach ($queryParams[self::QUERYSTRING_KEY_PROGRAM_IDS] as $idProgram) {
+            foreach ($programIds as $idProgram) {
                 if (!is_numeric($idProgram)) {
                     $slugs[] = $idProgram;
                 }
@@ -783,10 +791,39 @@ class AidSearchFormService
                 $aidSearchClass->setProjectReference($projectReference);
             }
         }
-
         /**
          * > ProjectReference
          */
+
+
+        /**
+         * < ApplyBefore
+         */
+        if (isset($queryParams[self::QUERYSTRING_KEY_APPLY_BEFORE])) {
+            $applyBefore = \DateTime::createFromFormat('Y-m-d', $queryParams[self::QUERYSTRING_KEY_APPLY_BEFORE]);
+            if ($applyBefore instanceof \DateTime) {
+                $aidSearchClass->setApplyBefore($applyBefore);
+            }
+        }
+        /**
+         * > ApplyBefore
+         */
+
+
+        /**
+         * < PublishedAfter
+         */
+        if (isset($queryParams[self::QUERYSTRING_KEY_PUBLISHED_AFTER])) {
+            $publishedAfter = \DateTime::createFromFormat('Y-m-d', $queryParams[self::QUERYSTRING_KEY_PUBLISHED_AFTER]);
+            if ($publishedAfter instanceof \DateTime) {
+                $aidSearchClass->setPublishedAfter($publishedAfter);
+            }
+        }
+        /**
+         * > PublishedAfter
+         */
+
+
 
         return $aidSearchClass;
     }
@@ -879,8 +916,8 @@ class AidSearchFormService
             'themes' => self::QUERYSTRING_KEY_CATEGORY_SLUGS,
             'categorysearch' => self::QUERYSTRING_KEY_CATEGORY_IDS,
             'categorySearch' => self::QUERYSTRING_KEY_CATEGORY_IDS,
-            'apply_before' => self::QUERYSTRING_KEY_APPLY_BEFORE,
-            'published_after' => self::QUERYSTRING_KEY_PUBLISHED_AFTER,
+            'applyBefore' => self::QUERYSTRING_KEY_APPLY_BEFORE,
+            'publishedAfter' => self::QUERYSTRING_KEY_PUBLISHED_AFTER,
             'aidTypeGroup' => self::QUERYSTRING_KEY_AID_TYPE_GROUP_SLUG,
             'aid_type' => self::QUERYSTRING_KEY_AID_TYPE_SLUGS,
             'aidType' => self::QUERYSTRING_KEY_AID_TYPE_SLUGS,
@@ -914,9 +951,19 @@ class AidSearchFormService
             $normalizedKey = preg_replace('/\[\d*\]$/', '', $key);
             // Vérifie si la clé normalisée existe dans le tableau de transition
             $normalizedKey = $transitionKeys[$normalizedKey] ?? $normalizedKey;
-            $normalizedParams[$normalizedKey] = $value;
+        
+            // Si la clé normalisée existe déjà, ajoute la valeur au tableau existant
+            if (isset($normalizedParams[$normalizedKey])) {
+                if (is_array($normalizedParams[$normalizedKey])) {
+                    $normalizedParams[$normalizedKey][] = $value;
+                } else {
+                    $normalizedParams[$normalizedKey] = [$normalizedParams[$normalizedKey], $value];
+                }
+            } else {
+                $normalizedParams[$normalizedKey] = $value;
+            }
         }
-    
+
         return $normalizedParams;
     }
 }

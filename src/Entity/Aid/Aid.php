@@ -41,6 +41,7 @@ use App\Controller\Api\Aid\AidController as AidAidController;
 use App\Filter\Aid\AidApplyBeforeFilter;
 use App\Filter\Aid\AidCallForProjectOnlyFilter;
 use App\Filter\Aid\AidCategoriesFilter;
+use App\Filter\Aid\AidCategoriesIdsFilter;
 use App\Filter\Aid\AidDestinationFilter;
 use App\Filter\Aid\AidEuropeanFilter;
 use App\Filter\Aid\AidIsChargedFilter;
@@ -113,6 +114,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ApiFilter(AidTargetedAudiencesFilter::class)]
 #[ApiFilter(AidOrganizationTypeIdsFilter::class)]
 #[ApiFilter(AidCategoriesFilter::class)]
+#[ApiFilter(AidCategoriesIdsFilter::class)]
 #[ApiFilter(AidApplyBeforeFilter::class)]
 #[ApiFilter(AidPublishedAfterFilter::class)]
 #[ApiFilter(AidTypeGroupFilter::class)]

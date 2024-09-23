@@ -26,9 +26,9 @@
 				</p>
 			</div>
 		{% endif %}
-		{% if formAidSearch.categorysearch is defined and formAidSearch.categorysearch.vars.data %}
+		{% if formAidSearch.category_ids is defined and formAidSearch.category_ids.vars.data %}
 			<div class="fr-tags-group categories">
-				{% set categoriesMetas = categoriesToMetas(formAidSearch.categorysearch.vars.data) %}
+				{% set categoriesMetas = categoriesToMetas(formAidSearch.category_ids.vars.data) %}
 				{% for categoryMeta in categoriesMetas %}
 					<div class="theme fr-tag">
 						<div>
@@ -145,6 +145,14 @@
 				</p>
 			</div>
 		{% endif %}
+
+		{% if formAidSearch.apply_before is defined and formAidSearch.apply_before.vars.data %}
+			<div class="fr-tags-group">
+				<p title="Candidater avant :" class="fr-tag fr-icon-arrow-right-line fr-tag--icon-left">
+					Candidater avant : {{ formAidSearch.apply_before.vars.data|date('d/m/Y') }}
+				</p>
+			</div>
+		{% endif %}		
 
 	</div>
 {% endif %}
