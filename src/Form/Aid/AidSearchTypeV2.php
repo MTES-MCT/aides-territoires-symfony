@@ -232,7 +232,7 @@ class AidSearchTypeV2 extends AbstractType
                         return $entityRepository->createQueryBuilder('b')->orderBy('b.name', 'ASC');
                     }
                 ])
-                ->add('aidSteps', EntityCheckboxAbsoluteType::class, [
+                ->add(AidSearchFormService::QUERYSTRING_KEY_AID_STEP_IDS, EntityCheckboxAbsoluteType::class, [
                     'required' => false,
                     'label' => 'Avancement du projet',
                     'placeholder' => 'Toutes les étapes',

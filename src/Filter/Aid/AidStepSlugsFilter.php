@@ -7,10 +7,11 @@ use ApiPlatform\Doctrine\Orm\Filter\AbstractFilter;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\OpenApi\Model\Example;
 use App\Entity\Aid\AidStep;
+use App\Service\Aid\AidSearchFormService;
 use Doctrine\ORM\QueryBuilder;
 use Symfony\Component\PropertyInfo\Type;
 
-final class AidMobilizationStepFilter extends AbstractFilter
+final class AidStepSlugsFilter extends AbstractFilter
 {
     protected function filterProperty(string $property, $value, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, Operation $operation = null, array $context = []): void
     {
@@ -23,15 +24,16 @@ final class AidMobilizationStepFilter extends AbstractFilter
             ['name' => 'ASC']
         );
         $examples = [];
+        $examples[] = new Example('Choisir un exemple', null, null);
         foreach ($aidSteps as $aidStep) {
             $examples[] = new Example($aidStep->getName(), null, $aidStep->getSlug());
         }
         return [
-            'aidStepSlugs' => [
-                'property' => 'aidStepSlugs',
+            AidSearchFormService::QUERYSTRING_KEY_AID_STEP_SLUGS => [
+                'property' => AidSearchFormService::QUERYSTRING_KEY_AID_STEP_SLUGS,
                 'type' => Type::BUILTIN_TYPE_STRING,
                 'required' => false,
-                'description' => '<div class="renderedMarkdown"><p>Avancement du projet.<br><br>Vous pouvez passer plusieurs fois ce paramètre pour rechercher sur plusieurs types, ex : ...&aidStepSlugs=preop&aidStepSlugs=postop...<br><br>Voir aussi <code>/api/aids/steps/</code> pour la liste complète.</p></div>',
+                'description' => '<div class="renderedMarkdown"><p>Avancement du projet.<br><br>Vous pouvez passer plusieurs fois ce paramètre pour rechercher sur plusieurs types, ex : ...&'.AidSearchFormService::QUERYSTRING_KEY_AID_STEP_SLUGS.'=preop&'.AidSearchFormService::QUERYSTRING_KEY_AID_STEP_SLUGS.'=postop...<br><br>Voir aussi <code>/api/aids/steps/</code> pour la liste complète.</p></div>',
                 'openapi' => [
                     'examples' => $examples,
                 ],

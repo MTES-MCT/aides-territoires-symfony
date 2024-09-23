@@ -51,6 +51,8 @@ use App\Filter\Aid\AidPerimeterFilter;
 use App\Filter\Aid\AidProjectReferenceFilter;
 use App\Filter\Aid\AidPublishedAfterFilter;
 use App\Filter\Aid\AidRecurrenceFilter;
+use App\Filter\Aid\AidStepIdsFilter;
+use App\Filter\Aid\AidStepSlugsFilter;
 use App\Filter\Aid\AidTargetedAudiencesFilter;
 use App\Filter\Aid\AidTextFilter;
 use App\Filter\Aid\AidTypeSlugsFilter;
@@ -123,7 +125,8 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ApiFilter(AidTypeGroupIdFilter::class)]
 #[ApiFilter(AidTypeSlugsFilter::class)]
 #[ApiFilter(AidTypeIdsFilter::class)]
-#[ApiFilter(AidMobilizationStepFilter::class)]
+#[ApiFilter(AidStepSlugsFilter::class)]
+#[ApiFilter(AidStepIdsFilter::class)]
 #[ApiFilter(AidDestinationFilter::class)]
 #[ApiFilter(AidRecurrenceFilter::class)]
 #[ApiFilter(AidCallForProjectOnlyFilter::class)]

@@ -52,8 +52,8 @@ class AidSearchFormService
     const QUERYSTRING_KEY_AID_TYPE_GROUP_ID = 'aid_type_group_id';
     const QUERYSTRING_KEY_AID_TYPE_SLUGS = 'aid_type_slugs';
     const QUERYSTRING_KEY_AID_TYPE_IDS = 'aid_type_ids';
-    const QUERYSTRING_KEY_AID_STEP_SLUGS = 'aidStepSlugs';
-    const QUERYSTRING_KEY_AID_STEP_IDS = 'aidStepIds';
+    const QUERYSTRING_KEY_AID_STEP_SLUGS = 'aid_step_slugs';
+    const QUERYSTRING_KEY_AID_STEP_IDS = 'aid_step_ids';
     const QUERYSTRING_KEY_AID_DESTINATION_SLUGS = 'aidDestinationSlugs';
     const QUERYSTRING_KEY_AID_DESTINATION_IDS = 'aidDestinationIds';
     const QUERYSTRING_KEY_AID_RECURRENCE_SLUG = 'aidRecurrenceSlug';
@@ -166,9 +166,9 @@ class AidSearchFormService
             }
             $params[self::QUERYSTRING_KEY_PROGRAM_IDS] = $programs;
         }
-        if ($aidSearchClass->getAidSteps()) {
+        if ($aidSearchClass->getAidStepIds()) {
             $aidSteps = [];
-            foreach ($aidSearchClass->getAidSteps() as $aidStep) {
+            foreach ($aidSearchClass->getAidStepIds() as $aidStep) {
                 $aidSteps[] = $aidStep->getId();
             }
             $params[self::QUERYSTRING_KEY_AID_STEP_IDS] = $aidSteps;
@@ -257,8 +257,8 @@ class AidSearchFormService
             $aidParams['programs'] = $aidSearchClass->getPrograms();
         }
 
-        if ($aidSearchClass->getAidSteps()) {
-            $aidParams['aidSteps'] = $aidSearchClass->getAidSteps();
+        if ($aidSearchClass->getAidStepIds()) {
+            $aidParams['aidSteps'] = $aidSearchClass->getAidStepIds();
         }
 
         if ($aidSearchClass->getAidDestinations()) {
@@ -643,29 +643,33 @@ class AidSearchFormService
 
         if (isset($queryParams[self::QUERYSTRING_KEY_AID_STEP_SLUGS])) {
             $aidStepSlugs = is_array($queryParams[self::QUERYSTRING_KEY_AID_STEP_SLUGS]) ? $queryParams[self::QUERYSTRING_KEY_AID_STEP_SLUGS] : [$queryParams[self::QUERYSTRING_KEY_AID_STEP_SLUGS]];
-            /** @var AidStepRepository $aidStepRepository */
-            $aidStepRepository = $this->managerRegistry->getRepository(AidStep::class);
-            $aidSteps = $aidStepRepository->findCustom(
-                [
-                    'slugs' => $aidStepSlugs
-                ]
-            );
-            foreach ($aidSteps as $aidStep) {
-                $aidSearchClass->addAidStep($aidStep);
+            if (!empty($aidStepSlugs)) {
+                /** @var AidStepRepository $aidStepRepository */
+                $aidStepRepository = $this->managerRegistry->getRepository(AidStep::class);
+                $aidSteps = $aidStepRepository->findCustom(
+                    [
+                        'slugs' => $aidStepSlugs
+                    ]
+                );
+                foreach ($aidSteps as $aidStep) {
+                    $aidSearchClass->addAidStepId($aidStep);
+                }
             }
         }
 
         if (isset($queryParams[self::QUERYSTRING_KEY_AID_STEP_IDS])) {
             $aidStepIds = is_array($queryParams[self::QUERYSTRING_KEY_AID_STEP_IDS]) ? $queryParams[self::QUERYSTRING_KEY_AID_STEP_IDS] : [$queryParams[self::QUERYSTRING_KEY_AID_STEP_IDS]];
-            /** @var AidStepRepository $aidStepRepository */
-            $aidStepRepository = $this->managerRegistry->getRepository(AidStep::class);
-            $aidSteps = $aidStepRepository->findCustom(
-                [
-                    'ids' => $aidStepIds
-                ]
-            );
-            foreach ($aidSteps as $aidStep) {
-                $aidSearchClass->addAidStep($aidStep);
+            if (!empty($aidStepIds)) {
+                /** @var AidStepRepository $aidStepRepository */
+                $aidStepRepository = $this->managerRegistry->getRepository(AidStep::class);
+                $aidSteps = $aidStepRepository->findCustom(
+                    [
+                        'ids' => $aidStepIds
+                    ]
+                );
+                foreach ($aidSteps as $aidStep) {
+                    $aidSearchClass->addAidStepId($aidStep);
+                }
             }
         }
         /**
@@ -885,7 +889,7 @@ class AidSearchFormService
             $aidSearchClass->getBackerschoice() ||
             $aidSearchClass->getApplyBefore() ||
             $aidSearchClass->getPrograms() ||
-            $aidSearchClass->getAidSteps() ||
+            $aidSearchClass->getAidStepIds() ||
             $aidSearchClass->getAidDestinations() ||
             $aidSearchClass->getIsCharged() !== null ||
             $aidSearchClass->getEuropeanAid() ||

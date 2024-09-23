@@ -51,7 +51,7 @@ class AidSearchClass // NOSONAR too much methods
     /**
      * @var ?ArrayCollection|AidStep[]
      */
-    private $aidSteps;
+    private $aid_step_ids;
     /**
      * @var ?ArrayCollection|AidDestination[]
      */
@@ -78,7 +78,7 @@ class AidSearchClass // NOSONAR too much methods
         $this->apply_before = null;
         $this->published_after = null;
         $this->programs = null;
-        $this->aidSteps = null;
+        $this->aid_step_ids = null;
         $this->aidDestinations = null;
         $this->isCharged = null;
         $this->europeanAid = null;
@@ -267,23 +267,23 @@ class AidSearchClass // NOSONAR too much methods
         }
     }
 
-    public function getAidSteps(): ?ArrayCollection
+    public function getAidStepIds(): ?ArrayCollection
     {
-        return $this->aidSteps;
+        return $this->aid_step_ids;
     }
 
-    public function setAidSteps(?ArrayCollection $aidSteps): void
+    public function setAidStepIds(?ArrayCollection $aidStepIds): void
     {
-        $this->aidSteps = $aidSteps;
+        $this->aid_step_ids = $aidStepIds;
     }
 
-    public function addAidStep(AidStep $aidStep): void
+    public function addAidStepId(AidStep $aidStep): void
     {
-        if (!$this->aidSteps) {
-            $this->aidSteps = new ArrayCollection();
+        if (!$this->aid_step_ids) {
+            $this->aid_step_ids = new ArrayCollection();
         }
-        if (!$this->aidSteps->contains($aidStep)) {
-            $this->aidSteps->add($aidStep);
+        if (!$this->aid_step_ids->contains($aidStep)) {
+            $this->aid_step_ids->add($aidStep);
         }
     }
 

@@ -98,10 +98,10 @@
 				</p>
 			</div>
 		{% endif %}
-		{% if formAidSearch.aidSteps.vars.data and formAidSearch.aidSteps.vars.data|length > 0 %}
+		{% if formAidSearch.aid_step_ids.vars.data and formAidSearch.aid_step_ids.vars.data|length > 0 %}
 			<div class="fr-tags-group">
 				<p title="Avancement du projet" class="fr-tag fr-icon-arrow-right-line fr-tag--icon-left">
-					{% for aidStep in formAidSearch.aidSteps.vars.data %}
+					{% for aidStep in formAidSearch.aid_step_ids.vars.data %}
 						{{ aidStep.name}}
 						{% if not loop.last %},
 						{% endif %}

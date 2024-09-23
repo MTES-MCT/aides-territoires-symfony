@@ -26,7 +26,7 @@ api_platform:
                                     <p>Ces deux champs ont fusionnés en un seul champ <code>aid_type_slugs</code> qui prend en compte les deux types d'aides.</p>
                                     <p>Vous pouvez également rechercher sur plusieurs types en ajoutant plusieurs fois le même paramètre, ex: aid_type_slugs=recoverable-advance&aid_type_slugs=legal-engineering.</p>
                                 </li>
-                                <li><em>mobilization_step</em> => <code>aidStepSlugs</code>. Vous pouvez maintenant passer plusieurs le paramètre avec des valeurs différentes.</li>
+                                <li><em>mobilization_step</em> => <code>aid_step_slugs</code>. Vous pouvez maintenant passer plusieurs fois le même paramètre avec des valeurs différentes.</li>
                             </ul>
                             <h4>Ajouts :</h4>
                             <ul>
@@ -35,6 +35,7 @@ api_platform:
                                 <li><code>aid_type_group_id</code> : Recherche sur le groupe de la nature de l'aide par id.</li>
                                 <li><code>aid_type_slugs</code> : Recherche sur les natures de l'aide, ex: aid_type_slugs=recoverable-advance&aid_type_slugs=legal-engineering.</li>
                                 <li><code>aid_type_ids</code> : Recherche sur les natures de l'aide par ids, ex: aid_type_ids=3&aid_type_ids=8.</li>
+                                <li><code>aid_step_ids</code>. Recherche sur l'avancement du projet par ids, ex: aid_step_ids=1&aid_step_ids=2.</li>
                             </ul>
                             <h5>Données :</h5>
                             <h6>/api/aids/types/ :</h6>
