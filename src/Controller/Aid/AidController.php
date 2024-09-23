@@ -155,8 +155,8 @@ class AidController extends FrontController
             $pageTitle .= 's';
         }
         $pageTitle .= ' de recherche : ';
-        if ($formAidSearch->get('organizationType')->getData()) {
-            $pageTitle .= ' Structure : ' . $formAidSearch->get('organizationType')->getData()->getName() . ' ';
+        if ($formAidSearch->get(AidSearchFormService::QUERYSTRING_KEY_ORGANIZATION_TYPE_SLUG)->getData()) {
+            $pageTitle .= ' Structure : ' . $formAidSearch->get(AidSearchFormService::QUERYSTRING_KEY_ORGANIZATION_TYPE_SLUG)->getData()->getName() . ' ';
         }
         if ($formAidSearch->get('searchPerimeter')->getData()) {
             $pageTitle .= ' - Périmètre : ' . $formAidSearch->get('searchPerimeter')->getData()->getName() . ' ';

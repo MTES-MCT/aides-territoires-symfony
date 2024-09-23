@@ -41,8 +41,9 @@ class AidSearchFormService
     const AID_DESTINATIONS_PARAM_NAME = 'aidDestinations[]';
 
     const QUERYSTRING_KEY_KEYWORD = 'keyword';
-    const QUERYSTRING_KEY_ORGANIZATION_TYPE_SLUGS = 'organizationTypeSlugs';
-    const QUERYSTRING_KEY_ORGANIZATION_TYPE_SLUG = 'organizationTypeSlug';
+    const QUERYSTRING_KEY_ORGANIZATION_TYPE_SLUGS = 'organization_type_slugs';
+    const QUERYSTRING_KEY_ORGANIZATION_TYPE_SLUG = 'organization_type_slug';
+    const QUERYSTRING_KEY_ORGANIZATION_TYPE_IDS = 'organization_type_ids';
     const QUERYSTRING_KEY_CATEGORY_SLUGS = 'categorySlugs';
     const QUERYSTRING_KEY_CATEGORY_IDS = 'categoryIds';
     const QUERYSTRING_KEY_APPLY_BEFORE = 'applyBefore';
@@ -201,8 +202,8 @@ class AidSearchFormService
     {
         $aidParams = [];
 
-        if ($aidSearchClass->getOrganizationType()) {
-            $aidParams['organizationType'] = $aidSearchClass->getOrganizationType();
+        if ($aidSearchClass->getOrganizationTypeSlug()) {
+            $aidParams['organizationType'] = $aidSearchClass->getOrganizationTypeSlug();
         }
         if ($aidSearchClass->getAudiences()) {
             $aidParams['organizationTypes'] = $aidSearchClass->getAudiences();
@@ -313,13 +314,28 @@ class AidSearchFormService
          */
         if (isset($queryParams[self::QUERYSTRING_KEY_ORGANIZATION_TYPE_SLUGS])) {
             $organizationTypes = is_array($queryParams[self::QUERYSTRING_KEY_ORGANIZATION_TYPE_SLUGS]) ? $queryParams[self::QUERYSTRING_KEY_ORGANIZATION_TYPE_SLUGS] : [$queryParams[self::QUERYSTRING_KEY_ORGANIZATION_TYPE_SLUGS]];
-            /** @var OrganizationTypeRepository $organizationTypeRepository */
-            $organizationTypeRepository = $this->managerRegistry->getRepository(OrganizationType::class);
-            $organizationTypes = $organizationTypeRepository->findCustom([
-                'slugs' => $organizationTypes
-            ]);
-            foreach ($organizationTypes as $organizationType) {
-                $aidSearchClass->addAudience($organizationType);
+            if (!empty($organizationTypes)) {
+                /** @var OrganizationTypeRepository $organizationTypeRepository */
+                $organizationTypeRepository = $this->managerRegistry->getRepository(OrganizationType::class);
+                $organizationTypes = $organizationTypeRepository->findCustom([
+                    'slugs' => $organizationTypes
+                ]);
+                foreach ($organizationTypes as $organizationType) {
+                    $aidSearchClass->addAudience($organizationType);
+                }
+            }
+        }
+        if (isset($queryParams[self::QUERYSTRING_KEY_ORGANIZATION_TYPE_IDS])) {
+            $organizationTypes = is_array($queryParams[self::QUERYSTRING_KEY_ORGANIZATION_TYPE_IDS]) ? $queryParams[self::QUERYSTRING_KEY_ORGANIZATION_TYPE_IDS] : [$queryParams[self::QUERYSTRING_KEY_ORGANIZATION_TYPE_IDS]];
+            if (!empty($organizationTypes)) {
+                /** @var OrganizationTypeRepository $organizationTypeRepository */
+                $organizationTypeRepository = $this->managerRegistry->getRepository(OrganizationType::class);
+                $organizationTypes = $organizationTypeRepository->findCustom([
+                    'ids' => $organizationTypes
+                ]);
+                foreach ($organizationTypes as $organizationType) {
+                    $aidSearchClass->addAudience($organizationType);
+                }
             }
         }
         /**
@@ -333,31 +349,31 @@ class AidSearchFormService
         if (isset($queryParams[self::QUERYSTRING_KEY_ORGANIZATION_TYPE_SLUG])) {
             $organizationType = $this->managerRegistry->getRepository(OrganizationType::class)->findOneBy(['slug' => (string) $queryParams[self::QUERYSTRING_KEY_ORGANIZATION_TYPE_SLUG]]);
             if ($organizationType instanceof OrganizationType) {
-                $aidSearchClass->setOrganizationType($organizationType);
+                $aidSearchClass->setOrganizationTypeSlug($organizationType);
             }
         }
 
         // si pas de paramètre et pas de paramètres dans l'url on pends le type de l'organisation par défaut du user (on viens direcement sur l'url de recherche d'aide ou page d'accueil)
         if (
-            !$aidSearchClass->getOrganizationType()
+            !$aidSearchClass->getOrganizationTypeSlug()
             && empty($queryParams)
             && $user
             && $user->getDefaultOrganization()
             && $user->getDefaultOrganization()->getOrganizationType()
         ) {
-            $aidSearchClass->setOrganizationType($user->getDefaultOrganization()->getOrganizationType());
+            $aidSearchClass->setOrganizationTypeSlug($user->getDefaultOrganization()->getOrganizationType());
         }
 
         if (
             is_array($params)
             && array_key_exists('forceOrganizationType', $params)
-            && !$aidSearchClass->getOrganizationType()
+            && !$aidSearchClass->getOrganizationTypeSlug()
         ) {
-            $aidSearchClass->setOrganizationType($params['forceOrganizationType']);
+            $aidSearchClass->setOrganizationTypeSlug($params['forceOrganizationType']);
         }
 
-        if (isset($queryParams['forceOrganizationType']) && $queryParams['forceOrganizationType'] == 'null' && !$aidSearchClass->getOrganizationType()) {
-            $aidSearchClass->setOrganizationType(null);
+        if (isset($queryParams['forceOrganizationType']) && $queryParams['forceOrganizationType'] == 'null' && !$aidSearchClass->getOrganizationTypeSlug()) {
+            $aidSearchClass->setOrganizationTypeSlug(null);
         }
 
         /**

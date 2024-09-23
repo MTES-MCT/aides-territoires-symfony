@@ -1,10 +1,10 @@
 {% if formAidSearch is defined %}
 	<div class="search-meta fr-mb-2w">
-		{% if formAidSearch.organizationType.vars.data %}
+		{% if formAidSearch.organization_type_slug.vars.data %}
 			<div class="fr-tags-group">
 				<p title="Bénéficiaires de l’aide" class="fr-tag">
 					<span class="ri-home-8-line ri-xl fr-mr-1w at-icon-align--sub" aria-hidden="true"></span>
-					{{ formAidSearch.organizationType.vars.data.name }}
+					{{ formAidSearch.organization_type_slug.vars.data.name }}
 				</p>
 			</div>
 		{% endif %}

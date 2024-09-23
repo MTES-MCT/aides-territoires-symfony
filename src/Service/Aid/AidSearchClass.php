@@ -17,7 +17,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 
 class AidSearchClass // NOSONAR too much methods
 {
-    private ?OrganizationType $organizationType;
+    private ?OrganizationType $organization_type_slug;
     /**
      * @var ?ArrayCollection|OrganizationType[]
      */
@@ -63,7 +63,7 @@ class AidSearchClass // NOSONAR too much methods
 
     public function __construct()
     {
-        $this->organizationType = null;
+        $this->organization_type_slug = null;
         $this->audiences = null;
         $this->searchPerimeter = null;
         $this->keyword = null;
@@ -84,14 +84,14 @@ class AidSearchClass // NOSONAR too much methods
         $this->aidRecurrence = null;
     }
 
-    public function getOrganizationType(): ?OrganizationType
+    public function getOrganizationTypeSlug(): ?OrganizationType
     {
-        return $this->organizationType;
+        return $this->organization_type_slug;
     }
 
-    public function setOrganizationType(?OrganizationType $organizationType): void
+    public function setOrganizationTypeSlug(?OrganizationType $organizationType): void
     {
-        $this->organizationType = $organizationType;
+        $this->organization_type_slug = $organizationType;
     }
 
     public function getAudiences(): ?ArrayCollection

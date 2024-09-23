@@ -45,6 +45,7 @@ use App\Filter\Aid\AidDestinationFilter;
 use App\Filter\Aid\AidEuropeanFilter;
 use App\Filter\Aid\AidIsChargedFilter;
 use App\Filter\Aid\AidMobilizationStepFilter;
+use App\Filter\Aid\AidOrganizationTypeIdsFilter;
 use App\Filter\Aid\AidPerimeterFilter;
 use App\Filter\Aid\AidProjectReferenceFilter;
 use App\Filter\Aid\AidPublishedAfterFilter;
@@ -110,6 +111,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 #[ApiFilter(AidTextFilter::class)]
 #[ApiFilter(AidTargetedAudiencesFilter::class)]
+#[ApiFilter(AidOrganizationTypeIdsFilter::class)]
 #[ApiFilter(AidCategoriesFilter::class)]
 #[ApiFilter(AidApplyBeforeFilter::class)]
 #[ApiFilter(AidPublishedAfterFilter::class)]

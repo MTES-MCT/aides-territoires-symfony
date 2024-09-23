@@ -21,6 +21,7 @@ use App\Form\Type\PerimeterAutocompleteType;
 use App\Repository\Backer\BackerGroupRepository;
 use App\Repository\Backer\BackerRepository;
 use App\Service\Aid\AidSearchClass;
+use App\Service\Aid\AidSearchFormService;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
@@ -64,7 +65,7 @@ class AidSearchTypeV2 extends AbstractType
 
         // Builder
         $builder
-            ->add('organizationType', EntityType::class, [
+            ->add(AidSearchFormService::QUERYSTRING_KEY_ORGANIZATION_TYPE_SLUG, EntityType::class, [
                 'required' => false,
                 'label' => 'Vous cherchez pour…',
                 'class' => OrganizationType::class,
