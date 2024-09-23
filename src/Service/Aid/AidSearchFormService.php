@@ -50,8 +50,8 @@ class AidSearchFormService
     const QUERYSTRING_KEY_PUBLISHED_AFTER = 'published_after';
     const QUERYSTRING_KEY_AID_TYPE_GROUP_SLUG = 'aid_type_group_slug';
     const QUERYSTRING_KEY_AID_TYPE_GROUP_ID = 'aid_type_group_id';
-    const QUERYSTRING_KEY_AID_TYPE_SLUGS = 'aidTypeSlugs';
-    const QUERYSTRING_KEY_AID_TYPE_IDS = 'aidTypeIds';
+    const QUERYSTRING_KEY_AID_TYPE_SLUGS = 'aid_type_slugs';
+    const QUERYSTRING_KEY_AID_TYPE_IDS = 'aid_type_ids';
     const QUERYSTRING_KEY_AID_STEP_SLUGS = 'aidStepSlugs';
     const QUERYSTRING_KEY_AID_STEP_IDS = 'aidStepIds';
     const QUERYSTRING_KEY_AID_DESTINATION_SLUGS = 'aidDestinationSlugs';
@@ -139,9 +139,9 @@ class AidSearchFormService
         if ($aidSearchClass->getOrderBy()) {
             $params[self::QUERYSTRING_KEY_ORDER_BY] = $aidSearchClass->getOrderBy();
         }
-        if ($aidSearchClass->getAidTypes()) {
+        if ($aidSearchClass->getAidTypeIds()) {
             $aidTypes = [];
-            foreach ($aidSearchClass->getAidTypes() as $aidType) {
+            foreach ($aidSearchClass->getAidTypeIds() as $aidType) {
                 $aidTypes[] = $aidType->getId();
             }
             $params[self::QUERYSTRING_KEY_AID_TYPE_IDS] = $aidTypes;
@@ -229,8 +229,8 @@ class AidSearchFormService
             $aidParams['categories'] = $aidSearchClass->getCategoryIds();
         }
 
-        if ($aidSearchClass->getAidTypes()) {
-            $aidParams['aidTypes'] = $aidSearchClass->getAidTypes();
+        if ($aidSearchClass->getAidTypeIds()) {
+            $aidParams['aidTypes'] = $aidSearchClass->getAidTypeIds();
         }
 
         if ($aidSearchClass->getOrderBy()) {
@@ -477,7 +477,7 @@ class AidSearchFormService
             $aidTypeGroup = $this->managerRegistry->getRepository(AidTypeGroup::class)->findOneBy(['slug' => $queryParams[self::QUERYSTRING_KEY_AID_TYPE_GROUP_SLUG]]);
             if ($aidTypeGroup instanceof AidTypeGroup) {
                 foreach ($aidTypeGroup->getAidTypes() as $aidType) {
-                    $aidSearchClass->addAidType($aidType);
+                    $aidSearchClass->addAidTypeId($aidType);
                 }
             }
         }
@@ -486,7 +486,7 @@ class AidSearchFormService
             $aidTypeGroup = $this->managerRegistry->getRepository(AidTypeGroup::class)->find($queryParams[self::QUERYSTRING_KEY_AID_TYPE_GROUP_ID]);
             if ($aidTypeGroup instanceof AidTypeGroup) {
                 foreach ($aidTypeGroup->getAidTypes() as $aidType) {
-                    $aidSearchClass->addAidType($aidType);
+                    $aidSearchClass->addAidTypeId($aidType);
                 }
             }
         }
@@ -508,7 +508,7 @@ class AidSearchFormService
                 ]
             );
             foreach ($aidTypes as $aidType) {
-                $aidSearchClass->addAidType($aidType);
+                $aidSearchClass->addAidTypeId($aidType);
             }
         }
 
@@ -531,7 +531,7 @@ class AidSearchFormService
                     $aidTypeGroup = $aidTypeGroupRepository->findOneBy(['slug' => $groupSlug]);
                     if ($aidTypeGroup instanceof AidTypeGroup) {
                         foreach ($aidTypeGroup->getAidTypes() as $aidType) {
-                            $aidSearchClass->addAidType($aidType);
+                            $aidSearchClass->addAidTypeId($aidType);
                         }
                     }
                 }
@@ -545,7 +545,7 @@ class AidSearchFormService
                     'slugs' => $aidTypeSlugs
                 ]);
                 foreach ($aidTypes as $aidType) {
-                    $aidSearchClass->addAidType($aidType);
+                    $aidSearchClass->addAidTypeId($aidType);
                 }
             }
         }
@@ -881,7 +881,7 @@ class AidSearchFormService
      */
     public function setShowExtended(AidSearchClass $aidSearchClass): bool
     {
-        return $aidSearchClass->getAidTypes() ||
+        return $aidSearchClass->getAidTypeIds() ||
             $aidSearchClass->getBackerschoice() ||
             $aidSearchClass->getApplyBefore() ||
             $aidSearchClass->getPrograms() ||

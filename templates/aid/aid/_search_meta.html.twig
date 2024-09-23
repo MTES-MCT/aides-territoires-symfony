@@ -52,11 +52,11 @@
 			</div>
 		{% endif %}
 
-		{% if formAidSearch.aidTypes.vars.data and formAidSearch.aidTypes.vars.data|length > 0 %}
+		{% if formAidSearch.aid_type_ids.vars.data and formAidSearch.aid_type_ids.vars.data|length > 0 %}
 			<div class="fr-tags-group">
 				<p title="Nature de l’aide" class="fr-tag">
 					<span class="ri-money-euro-circle-line ri-xl fr-mr-1w at-icon-align--sub" aria-hidden="true"></span>
-					{% for aidType in formAidSearch.aidTypes.vars.data %}
+					{% for aidType in formAidSearch.aid_type_ids.vars.data %}
 						{{ aidType.name }}
 						{% if not loop.last %},
 						{% endif %}

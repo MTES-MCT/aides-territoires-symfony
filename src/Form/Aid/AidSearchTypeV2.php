@@ -174,7 +174,7 @@ class AidSearchTypeV2 extends AbstractType
                         'title' => 'Choisissez un ordre de tri – La sélection recharge la page'
                     ]
                 ])
-                ->add('aidTypes', EntityCheckboxGroupAbsoluteType::class, [
+                ->add(AidSearchFormService::QUERYSTRING_KEY_AID_TYPE_IDS, EntityCheckboxGroupAbsoluteType::class, [
                     'required' => false,
                     'label' => 'Nature de l\'aide',
                     'placeholder' => 'Toutes les natures d\'aide',

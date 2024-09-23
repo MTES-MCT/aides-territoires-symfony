@@ -33,7 +33,7 @@ class AidSearchClass // NOSONAR too much methods
     /**
      * @var ?ArrayCollection|AidType[]
      */
-    private $aidTypes;
+    private $aid_type_ids;
 
     /**
      * @var ?ArrayCollection|AidType[]
@@ -71,7 +71,7 @@ class AidSearchClass // NOSONAR too much methods
         $this->keyword = null;
         $this->category_ids = null;
         $this->newIntegration = null;
-        $this->aidTypes = null;
+        $this->aid_type_ids = null;
         $this->orderBy = null;
         $this->backerschoice = null;
         $this->backerGroup = null;
@@ -177,23 +177,23 @@ class AidSearchClass // NOSONAR too much methods
         $this->orderBy = $orderBy;
     }
 
-    public function getAidTypes(): ?ArrayCollection
+    public function getAidTypeIds(): ?ArrayCollection
     {
-        return $this->aidTypes;
+        return $this->aid_type_ids;
     }
 
-    public function setAidTypes(?ArrayCollection $aidTypes): void
+    public function setAidTypeIds(?ArrayCollection $aidTypeIds): void
     {
-        $this->aidTypes = $aidTypes;
+        $this->aid_type_ids = $aidTypeIds;
     }
 
-    public function addAidType(AidType $aidType): void
+    public function addAidTypeId(AidType $aidType): void
     {
-        if (!$this->aidTypes) {
-            $this->aidTypes = new ArrayCollection();
+        if (!$this->aid_type_ids) {
+            $this->aid_type_ids = new ArrayCollection();
         }
-        if (!$this->aidTypes->contains($aidType)) {
-            $this->aidTypes->add($aidType);
+        if (!$this->aid_type_ids->contains($aidType)) {
+            $this->aid_type_ids->add($aidType);
         }
     }
 
@@ -246,7 +246,7 @@ class AidSearchClass // NOSONAR too much methods
     {
         $this->published_after = $publishedAfter;
     }
-    
+
     public function getPrograms(): ?ArrayCollection
     {
         return $this->programs;

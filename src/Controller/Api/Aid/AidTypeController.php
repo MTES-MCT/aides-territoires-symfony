@@ -28,10 +28,20 @@ class AidTypeController extends ApiController
         // spécifique
         $resultsSpe = [];
         foreach ($results as $result) {
+            $typeFull = [];
+            if ($result->getAidTypeGroup()) {
+                $typeFull = [
+                    'id' => $result->getAidTypeGroup()->getId(),
+                    'slug' => $result->getAidTypeGroup()->getSlug(),
+                    'name' => $result->getAidTypeGroup()->getName()
+                ];
+            }
             $resultsSpe[] = [
-                'id' => $result->getSlug(),
+                'id' => $result->getId(),
+                'slug' => $result->getSlug(),
                 'name' => $result->getName(),
-                'type' => $result->getAidTypeGroup() ? $result->getAidTypeGroup()->getName() : null
+                'type' => $result->getAidTypeGroup() ? $result->getAidTypeGroup()->getName() : null,
+                'type_full' => $typeFull
             ];
         }
 

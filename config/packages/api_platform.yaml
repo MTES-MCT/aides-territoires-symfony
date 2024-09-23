@@ -15,28 +15,33 @@ api_platform:
                             <p>Vos anciens paramètres devraient toujours foncitonner mais <strong>nous vous invitons fortement à les mettre à jour</strong>.</p>
                             <h3>Aides :</h3>
                             <h4>Modifications :</h4>
-                            <h5>Recherche :</h5>
+                            <h5>Recherche aides :</h5>
                             <ul>
-                                <li><em>text</em> => <strong>keyword</strong></li>
-                                <li><em>targeted_audiences</em> => <strong>organization_type_slugs</strong></li>
-                                <li><em>categories</em> => <strong>category_slugs</strong></li>
-                                <li><em>aid_type</em> => <strong>aid_type_group_slug</strong></li>
+                                <li><em>text</em> => <code>keyword</code></li>
+                                <li><em>targeted_audiences</em> => <code>organization_type_slugs</code></li>
+                                <li><em>categories</em> => <code>category_slugs</code></li>
+                                <li><em>aid_type</em> => <code>aid_type_group_slug</code></li>
                                 <li>
-                                    <p><em>financial_aids</em> && <em>technical_aids</em> => <strong>aidTypeSlugs</strong></p>
-                                    <p>Ces deux champs ont fusionnés en un seul champ <strong>aidTypeSlugs</strong> qui prend en compte les deux types d'aides.</p>
-                                    <p>Vous pouvez également rechercher sur plusieurs types en ajoutant plusieurs fois le même paramètre, ex: aidTypeSlugs=recoverable-advance&aidTypeSlugs=legal-engineering.</p>
+                                    <p><em>financial_aids</em> && <em>technical_aids</em> => <code>aid_type_slugs</code></p>
+                                    <p>Ces deux champs ont fusionnés en un seul champ <code>aid_type_slugs</code> qui prend en compte les deux types d'aides.</p>
+                                    <p>Vous pouvez également rechercher sur plusieurs types en ajoutant plusieurs fois le même paramètre, ex: aid_type_slugs=recoverable-advance&aid_type_slugs=legal-engineering.</p>
                                 </li>
-                                <li><em>mobilization_step</em> => <strong>aidStepSlugs</strong>. Vous pouvez maintenant passer plusieurs le paramètre avec des valeurs différentes.</li>
+                                <li><em>mobilization_step</em> => <code>aidStepSlugs</code>. Vous pouvez maintenant passer plusieurs le paramètre avec des valeurs différentes.</li>
                             </ul>
                             <h4>Ajouts :</h4>
                             <ul>
-                                <li><strong>organization_type_ids</strong> : Recherche sur les types de structure par ids, ex: organizationTypeIds=1&organizationTypeIds=2</li>
-                                <li><strong>category_ids</strong> : Recherche sur les thématiques par ids, ex: category_ids=1&category_ids=2</li>
-                                <li><strong>aid_type_group_id</strong> : Recherche sur le groupe de la nature de l'aide par id.</li>
+                                <li><code>organization_type_ids</code> : Recherche sur les types de structure par ids, ex: organizationTypeIds=1&organizationTypeIds=2</li>
+                                <li><code>category_ids</code> : Recherche sur les thématiques par ids, ex: category_ids=1&category_ids=2</li>
+                                <li><code>aid_type_group_id</code> : Recherche sur le groupe de la nature de l'aide par id.</li>
+                                <li><code>aid_type_slugs</code> : Recherche sur les natures de l'aide, ex: aid_type_slugs=recoverable-advance&aid_type_slugs=legal-engineering.</li>
+                                <li><code>aid_type_ids</code> : Recherche sur les natures de l'aide par ids, ex: aid_type_ids=3&aid_type_ids=8.</li>
                             </ul>
                             <h5>Données :</h5>
+                            <h6>/api/aids/types/ :</h6>
                             <ul>
-                                <li></li>
+                                <li><strong>id</strong> retourne un identifiant au format integer.</li>
+                                <li><strong>slug</strong> retourne un identifiant au format string.</li>
+                                <li>ajout de <strong>type_full</strong> qui retourne le type complet de l'aide.</li>
                             </ul>
                         </td>
                     </tr>
