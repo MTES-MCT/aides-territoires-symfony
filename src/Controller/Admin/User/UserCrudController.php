@@ -104,7 +104,7 @@ class UserCrudController extends AtCrudController
         ->hideOnIndex();
 
         yield FormField::addFieldset('Espace administrateur');
-        yield AssociationField::new('searchPages', 'Recherche personnalisée')
+        yield AssociationField::new('searchPages', 'Portails dont l\'utilisateur est administrateur')
         ->autocomplete()
         ->hideOnIndex();
 
