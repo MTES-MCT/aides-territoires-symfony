@@ -112,6 +112,7 @@ class ContactType extends AbstractType
                 'required' => true,
                 'attr' => ['class' => 'fr-input', 'cols' => 40, 'rows' => 10],
                 'sanitize_html' => true,
+                'sanitizer' => 'app.post_sanitizer',
                 'constraints' => [
                     new Assert\NotBlank([
                         'message' => 'Veuillez saisir un message.',

@@ -49,6 +49,8 @@ class ContactController extends FrontController
 
         if ($formContact->isSubmitted()) {
             if ($formContact->isValid()) {
+                // décode les apostrophe et saut de lignes bloqué par le santize
+                $contact->setMessage(html_entity_decode($contact->getMessage()));
                 // log
                 $logContactFormSend = new LogContactFormSend();
                 $logContactFormSend->setSubject($formContact->get('subject')->getData());
@@ -80,11 +82,10 @@ class ContactController extends FrontController
             }
         }
 
-
         return $this->render('contact/contact/index.html.twig', [
             'controller_name' => 'ContactController',
             'formContact' => $formContact->createView(),
-            'success' => $requestStack->getCurrentRequest()->get('success', null)
+            'success' => $requestStack->getCurrentRequest()->get('success', null),
         ]);
     }
 }
