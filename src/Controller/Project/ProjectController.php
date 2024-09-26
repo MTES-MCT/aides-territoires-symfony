@@ -295,13 +295,19 @@ class ProjectController extends FrontController
 
         // les infos départements pour la carte
         $counties = $perimeterRepository->findCounties();
+        $nbProjectInCountiesByIdPerimeter = [];
+        $nbProjectInCounties = $projectValidatedRepository->countProjectInCounties();
+        foreach ($nbProjectInCounties as $nbProjectInCounty) {
+            $nbProjectInCountiesByIdPerimeter[$nbProjectInCounty['id']] = $nbProjectInCounty['nb'];
+        }
+
         $departmentsData = [];
         foreach ($counties as $county) {
             $departmentsData[] = [
                 'code' => $county->getCode(),
                 'name' => $county->getName(),
                 'id' => $county->getId(),
-                'projects_count' => $projectValidatedRepository->countProjectInCounty(['id' => $county->getId()])
+                'projects_count' => $nbProjectInCountiesByIdPerimeter[$county->getId()] ?? 0
             ];
         }
 

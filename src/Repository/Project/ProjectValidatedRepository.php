@@ -28,6 +28,19 @@ class ProjectValidatedRepository extends ServiceEntityRepository
         parent::__construct($registry, ProjectValidated::class);
     }
 
+    public function countProjectInCounties(?array $params = null): array
+    {
+        $qb = $this->createQueryBuilder('p');
+        $qb
+            ->select('COUNT(DISTINCT(p.id)) as nb, perimeterDepartment.id as id')
+            ->innerJoin('p.organization', 'organization')
+            ->innerJoin('organization.perimeterDepartment', 'perimeterDepartment')
+            ->groupBy('perimeterDepartment.id')
+            ;
+
+        return $qb->getQuery()->getResult();
+
+    }
     public function countProjectInCounty(array $params = null): int
     {
         $queryBuilder = $this->createQueryBuilder('p');
