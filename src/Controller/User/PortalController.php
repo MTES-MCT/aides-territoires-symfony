@@ -9,6 +9,7 @@ use App\Entity\User\User;
 use App\Form\User\SearchPage\SearchPageEditType;
 use App\Repository\Search\SearchPageRepository;
 use App\Security\Voter\InternalRequestVoter;
+use App\Security\Voter\User\UserCanEditSearchPageVoter;
 use App\Service\Aid\AidSearchFormService;
 use App\Service\Aid\AidService;
 use App\Service\SearchPage\SearchPageService;
@@ -29,7 +30,8 @@ class PortalController extends FrontController
         UserService $userService,
         ManagerRegistry $managerRegistry,
         AidSearchFormService $aidSearchFormService,
-        AidService $aidService
+        AidService $aidService,
+        SearchPageService $searchPageService
     ): Response {
         // verification user
         $user = $userService->getUserLogged();
@@ -37,9 +39,14 @@ class PortalController extends FrontController
             return $this->redirectToRoute('app_user_dashboard');
         }
 
-        // verification searchPage et administrateur
+        // verification searchPage
         $searchPage = $searchPageRepository->find((int) $id);
-        if (!$searchPage instanceof SearchPage || $searchPage->getAdministrator() !== $user) {
+        if (!$searchPage instanceof SearchPage) {
+            return $this->redirectToRoute('app_user_dashboard');
+        }
+
+        // vérification accès
+        if (!$this->isGranted(UserCanEditSearchPageVoter::IDENTIFIER, $searchPage)) {
             return $this->redirectToRoute('app_user_dashboard');
         }
 
@@ -96,7 +103,9 @@ class PortalController extends FrontController
             'form' => $form,
             'searchPage' => $searchPage,
             'nbAids' => $nbAids,
-            'nbLocals' => $nbLocals
+            'nbLocals' => $nbLocals,
+            'isLocked' => $searchPageService->isLocked($searchPage),
+            'lock' => $searchPageService->getLock($searchPage)
         ]);
     }
 
@@ -121,9 +130,6 @@ class PortalController extends FrontController
 
             // le user
             $user = $userService->getUserLogged();
-            if (!$user instanceof User) {
-                throw new \Exception('User manquant');
-            }
 
             // charge portal
             $searchPage = $searchPageRepository->find($id);
@@ -132,8 +138,7 @@ class PortalController extends FrontController
             }
 
             // verifie que le user peut lock
-            $canLock = $searchPageService->canUserLock($searchPage, $user);
-            if (!$canLock) {
+            if (!$this->isGranted(UserCanEditSearchPageVoter::IDENTIFIER, $searchPage)) {
                 throw new \Exception('Vous ne pouvez pas bloquer ce portail');
             }
 

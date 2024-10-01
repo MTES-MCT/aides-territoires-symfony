@@ -46,6 +46,9 @@ class SearchPageCrudController extends AtCrudController
         yield AssociationField::new('administrator', 'Administrateur')
             ->autocomplete()
             ->hideOnIndex();
+        yield AssociationField::new('editors', 'Éditeurs')
+            ->autocomplete()
+            ->hideOnIndex();
         yield TextField::new('shortTitle', 'Titre court')
             ->setHelp('Un titre plus concis, pour affichage spécifique')
             ->hideOnIndex();

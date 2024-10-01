@@ -175,6 +175,12 @@ class SearchPage // NOSONAR too much methods
     #[ORM\OneToMany(mappedBy: 'searchPage', targetEntity: SearchPageLock::class, orphanRemoval: true)]
     private Collection $searchPageLocks;
 
+    /**
+     * @var Collection<int, User>
+     */
+    #[ORM\ManyToMany(targetEntity: User::class, inversedBy: 'editorSearchPages')]
+    private Collection $editors;
+
     public function __construct()
     {
         $this->organizationTypes = new ArrayCollection();
@@ -183,6 +189,7 @@ class SearchPage // NOSONAR too much methods
         $this->highlightedAids = new ArrayCollection();
         $this->pages = new ArrayCollection();
         $this->searchPageLocks = new ArrayCollection();
+        $this->editors = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -788,6 +795,30 @@ class SearchPage // NOSONAR too much methods
                 $searchPageLock->setSearchPage(null);
             }
         }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, User>
+     */
+    public function getEditors(): Collection
+    {
+        return $this->editors;
+    }
+
+    public function addEditor(User $editor): static
+    {
+        if (!$this->editors->contains($editor)) {
+            $this->editors->add($editor);
+        }
+
+        return $this;
+    }
+
+    public function removeEditor(User $editor): static
+    {
+        $this->editors->removeElement($editor);
 
         return $this;
     }

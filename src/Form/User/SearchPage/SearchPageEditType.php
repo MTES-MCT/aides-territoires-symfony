@@ -6,9 +6,11 @@ use App\Entity\Aid\Aid;
 use App\Entity\Category\Category;
 use App\Entity\Organization\OrganizationType;
 use App\Entity\Search\SearchPage;
+use App\Entity\User\User;
 use App\Form\Type\AidAutocompleteType;
 use App\Form\Type\EntityCheckboxAbsoluteType;
 use App\Form\Type\EntityCheckboxGroupAbsoluteType;
+use App\Service\User\UserService;
 use Doctrine\ORM\EntityRepository;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
@@ -24,11 +26,38 @@ use Symfony\Component\Validator\Constraints as Assert;
 class SearchPageEditType extends AbstractType
 {
     public function __construct(
-        private RouterInterface $routerInterface
+        private RouterInterface $routerInterface,
+        private UserService $userService
     ) {
     }
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $currentUser = $this->userService->getUserLogged();
+        $searchPage = $options['data'] ?? null;
+
+        if ($searchPage instanceof SearchPage && $searchPage->getAdministrator() == $currentUser) {
+            $builder
+                ->add('editors', EntityType::class, [
+                    'required' => true,
+                    'label' => 'Éditeur(s) de la page',
+                    'help' => 'Vous pouvez ajouter plusieurs éditeurs à la page. Les éditeurs peuvent modifier le contenu de la page, ils doivent faire parti de vos structures.',
+                    'class' => User::class,
+                    'choice_label' => 'email',
+                    'multiple' => true,
+                    'expanded' => true,
+                    'query_builder' => function (EntityRepository $er) use ($currentUser) {
+                        return $er->createQueryBuilder('u')
+                            ->innerJoin('u.organizations', 'o')
+                            ->andWhere('o IN (:organizations)')
+                            ->setParameter('organizations', $currentUser->getOrganizations())
+                            ->andWhere('u != :currentUser')
+                            ->setParameter('currentUser', $currentUser)
+                            ->orderBy('u.email', 'ASC');
+                    },
+                ]
+            );
+        }
+
         $builder
             ->add('description', TextareaType::class, [
                 'required' => true,
@@ -37,7 +66,8 @@ class SearchPageEditType extends AbstractType
                 'attr' => [
                     'class' => 'trumbowyg',
                     'cols' => 40,
-                    'rows' => 10
+                    'rows' => 10,
+                    'autocomplete' => 'off'
                 ],
                 'sanitize_html' => true,
                 'constraints' => [
@@ -53,7 +83,8 @@ class SearchPageEditType extends AbstractType
                 'attr' => [
                     'class' => 'trumbowyg',
                     'cols' => 40,
-                    'rows' => 10
+                    'rows' => 10,
+                    'autocomplete' => 'off'
                 ],
                 'sanitize_html' => true,
             ])
