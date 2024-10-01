@@ -42,10 +42,11 @@ class LogAidOriginUrlClickRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult();
     }
 
-    public function countOnPeriod(?array $params = null): array
+    public function countByDay(?array $params = null): array
     {
         $qb = $this->getQueryBuilder($params);
-        $qb->select('IFNULL(COUNT(laouc.id), 0) AS nb, laouc.dateCreate AS dateCreate')
+        $qb->select('IFNULL(COUNT(laouc.id), 0) AS nb')
+            ->addSelect('DATE_FORMAT(laouc.dateCreate, \'%Y-%m-%d\') as dateDay')
             ->groupBy('laouc.dateCreate')
             ->orderBy('laouc.dateCreate', 'ASC')
         ;

@@ -7,7 +7,6 @@ use App\Entity\Aid\Aid;
 use App\Entity\Aid\AidFinancer;
 use App\Entity\Aid\AidInstructor;
 use App\Entity\User\User;
-use App\Exception\InvalidFileFormatException;
 use App\Exception\NotFoundException\AidNotFoundException;
 use App\Form\Aid\AidDeleteType;
 use App\Form\Aid\AidEditType;
@@ -15,14 +14,19 @@ use App\Form\User\Aid\AidExportType;
 use App\Form\User\Aid\AidFilterType;
 use App\Form\User\Aid\AidStatsPeriodType;
 use App\Message\User\AidsExportPdf;
+use App\Message\User\MsgAidStatsSpreadsheetOfUser;
 use App\Repository\Aid\AidProjectRepository;
 use App\Repository\Aid\AidRepository;
 use App\Repository\Log\LogAidApplicationUrlClickRepository;
 use App\Repository\Log\LogAidOriginUrlClickRepository;
 use App\Repository\Log\LogAidViewRepository;
 use App\Security\Voter\InternalRequestVoter;
+use App\Service\Aid\AidProjectService;
 use App\Service\Aid\AidService;
 use App\Service\File\FileService;
+use App\Service\Log\LogAidApplicationUrlClickService;
+use App\Service\Log\LogAidOriginUrlClickService;
+use App\Service\Log\LogAidViewService;
 use App\Service\User\UserService;
 use App\Service\Various\StringService;
 use Doctrine\Persistence\ManagerRegistry;
@@ -34,12 +38,16 @@ use Dompdf\Options;
 use OpenSpout\Common\Entity\Cell;
 use OpenSpout\Common\Entity\Row;
 use OpenSpout\Writer\XLSX\Entity\SheetView;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
+
+use function Symfony\Component\Clock\now;
 
 class AidController extends FrontController
 {
@@ -140,7 +148,8 @@ class AidController extends FrontController
         UserService $userService,
         AidRepository $aidRepository,
         LogAidViewRepository $logAidViewRepository,
-        RequestStack $requestStack
+        RequestStack $requestStack,
+        MessageBusInterface $bus
     ): Response {
         // le user
         $user = $userService->getUserLogged();
@@ -172,8 +181,6 @@ class AidController extends FrontController
                 }
             }
         }
-
-
 
         // les aides du user
         $aids = $aidRepository->findCustom($aidsParams);
@@ -224,6 +231,50 @@ class AidController extends FrontController
             ]
         );
 
+        // formulaire periode
+        $dateMinGet = $requestStack->getCurrentRequest()->get('dateMin', null);
+        $dateMaxGet = $requestStack->getCurrentRequest()->get('dateMax', null);
+        $dateMin = $dateMinGet ? new \DateTime(date($dateMinGet)) : new \DateTime('-1 month');
+        $dateMax = $dateMaxGet ? new \DateTime(date($dateMaxGet)) : new \DateTime(date('Y-m-d'));
+
+        $formAidStatsPeriod = $this->createForm(AidStatsPeriodType::class);
+        if ($dateMin) {
+            $formAidStatsPeriod->get('dateMin')->setData($dateMin);
+        }
+        if ($dateMax) {
+            $formAidStatsPeriod->get('dateMax')->setData($dateMax);
+        }
+        $formAidStatsPeriod->handleRequest($requestStack->getCurrentRequest());
+        if ($formAidStatsPeriod->isSubmitted()) {
+            if ($formAidStatsPeriod->isValid()) {
+                $dateMin = $formAidStatsPeriod->get('dateMin')->getData();
+                $dateMax = $formAidStatsPeriod->get('dateMax')->getData();
+
+                // Si plus de 10 aides ou période de plus de 90 jours, on passe par le worker
+                if (count($aids) > 10) {
+                    $bus->dispatch(new MsgAidStatsSpreadsheetOfUser(
+                        $user->getId(),
+                        $dateMin,
+                        $dateMax
+                    ));
+
+                    $this->addFlash(
+                        FrontController::FLASH_SUCCESS,
+                        'Votre export est trop volumineux, il sera lancé par une tâche automatique et vous recevrez un mail avec le document en pièce jointe.'
+                    );
+                } else {
+                    // Sinon téléchargement direct du fichier
+                    return $this->redirectToRoute('app_user_aid_all_export_stats', ['dateMin' => $dateMin->format('Y-m-d'), 'dateMax' => $dateMax->format('Y-m-d')]);
+                }
+            } else {
+                $this->addFlash(
+                    FrontController::FLASH_ERROR,
+                    'Nous n’avons pas pu traiter votre formulaire car les données saisies sont invalides et / ou incomplètes. Merci de bien vouloir vérifier votre saisie et corriger les erreurs avant de réessayer. '
+                );
+            }
+            
+        }
+
         // fil arianne
         $this->breadcrumb->add(
             'Mon compte',
@@ -240,7 +291,8 @@ class AidController extends FrontController
             'nbAidsViews' => $nbAidsViews,
             'nbAidsViewsMonth' => $nbAidsViewsMonth,
             'formAidFilter' => $formAidFilter->createView(),
-            'formExport' => $formExport->createView()
+            'formExport' => $formExport->createView(),
+            'formAidStatsPeriod' => $formAidStatsPeriod
         ]);
     }
 
@@ -749,7 +801,7 @@ class AidController extends FrontController
         LogAidApplicationUrlClickRepository $logAidApplicationUrlClickRepository,
         LogAidOriginUrlClickRepository $logAidOriginUrlClickRepository,
         AidProjectRepository $aidProjectRepository,
-        AidService $aidService
+        AidService $aidService,
     ) {
         // le user
         $user = $userService->getUserLogged();
@@ -866,18 +918,98 @@ class AidController extends FrontController
         ]);
     }
 
+    #[Route('/comptes/aides/exporter-les-stats/', name: 'app_user_aid_all_export_stats')]
+    public function aidsAllExportStats(
+        UserService $userService,
+        RequestStack $requestStack,
+        AidRepository $aidRepository,
+        LogAidViewService $logAidViewService,
+        LogAidApplicationUrlClickService $logAidApplicationUrlClickService,
+        LogAidOriginUrlClickService $logAidOriginUrlClickService,
+        AidProjectService $aidProjectService,
+        StringService $stringService,
+        AidService $aidService
+    ) {
+        // gestion dates
+        $dateMinGet = $requestStack->getCurrentRequest()->get('dateMin', null);
+        $dateMaxGet = $requestStack->getCurrentRequest()->get('dateMax', null);
+        try {
+            $dateMin = new \DateTime(date($dateMinGet));
+            $dateMax = new \DateTime(date($dateMaxGet));
+        } catch (\Exception $e) {
+            throw new NotFoundHttpException('Vous devez choisir une plage de dates');
+        }
+
+        // le user
+        $user = $userService->getUserLogged();
+
+        $response = new StreamedResponse();
+        try {
+            // nom de fichier
+            $filename = 'AT_statistiques_aides_'.$dateMin->format('d_m_Y').'_au_'.$dateMax->format('d_m_Y').'.xlsx';
+            
+            $response->setCallback(function () use (
+                $aidRepository,
+                $logAidViewService,
+                $logAidApplicationUrlClickService,
+                $logAidOriginUrlClickService,
+                $aidProjectService,
+                $dateMin,
+                $dateMax,
+                $user,
+                $stringService,
+                $aidService
+            ) {
+
+                $spreadsheet = $aidService->getAidStatsSpreadSheetOfUser(
+                    $user,
+                    $dateMin,
+                    $dateMax,
+                    $aidRepository,
+                    $stringService,
+                    $logAidViewService,
+                    $logAidApplicationUrlClickService,
+                    $logAidOriginUrlClickService,
+                    $aidProjectService,
+                );
+                
+                // Génération du fichier Excel
+                $writer = new Xlsx($spreadsheet);
+                $writer->save('php://output');
+            });
+
+            // Configuration des en-têtes de la réponse
+            $response->headers->set('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+            $response->headers->set('Content-Disposition', 'attachment;filename="' . $filename . '"');
+            $response->headers->set('Cache-Control', 'max-age=0');
+
+            return $response;
+        } catch (\Exception $e) {
+            throw new NotFoundHttpException('Impossible de générer votre export.');
+        }
+    }
+
     #[Route('/comptes/aides/exporter-les-stats/{slug}', name: 'app_user_aid_export_stats', requirements: ['slug' => '[a-zA-Z0-9\-_]+'])]
     public function aidsExportStats(
         $slug,
         UserService $userService,
         RequestStack $requestStack,
         AidRepository $aidRepository,
-        LogAidViewRepository $logAidViewRepository,
-        LogAidApplicationUrlClickRepository $logAidApplicationUrlClickRepository,
-        LogAidOriginUrlClickRepository $logAidOriginUrlClickRepository,
-        AidProjectRepository $aidProjectRepository,
-        AidService $aidService
+        AidService $aidService,
+        LogAidViewService $logAidViewService,
+        LogAidApplicationUrlClickService $logAidApplicationUrlClickService,
+        LogAidOriginUrlClickService $logAidOriginUrlClickService,
+        AidProjectService $aidProjectService
     ) {
+        $dateMinGet = $requestStack->getCurrentRequest()->get('dateMin', null);
+        $dateMaxGet = $requestStack->getCurrentRequest()->get('dateMax', null);
+        try {
+            $dateMin = new \DateTime(date($dateMinGet));
+            $dateMax = new \DateTime(date($dateMaxGet));
+        } catch (\Exception $e) {
+            throw new NotFoundHttpException('Vous devez choisir une plage de dates');
+        }
+
         // le user
         $user = $userService->getUserLogged();
 
@@ -896,94 +1028,80 @@ class AidController extends FrontController
             return $this->redirectToRoute('app_user_aid_publications');
         }
 
-
-        $dateMinGet = $requestStack->getCurrentRequest()->get('dateMin', null);
-        $dateMaxGet = $requestStack->getCurrentRequest()->get('dateMax', null);
+        $response = new StreamedResponse();
         try {
-            $dateMin = new \DateTime(date($dateMinGet));
-            $dateMax = new \DateTime(date($dateMaxGet));
-        } catch (\Exception $e) {
-            throw new NotFoundHttpException('Cette aide n\'existe pas');
-        }
+            $response->setCallback(function () use (
+                $logAidViewService,
+                $logAidApplicationUrlClickService,
+                $logAidOriginUrlClickService,
+                $aidProjectService,
+                $dateMin,
+                $dateMax,
+                $aid
+            ) {
+                // nom de fichier
+                $filename = 'AT_statistiques_aide_'.$dateMin->format('d_m_Y').'_au_'.$dateMax->format('d_m_Y').'.xlsx';
 
-        // nom de fichier
-        $filename = 'Aides-territoires-statistiques';
+                // Le fichier xslx
+                $writer = new \OpenSpout\Writer\XLSX\Writer();
+                $writer->openToBrowser($filename);
+                $sheet = $writer->getCurrentSheet();
+                // met le nom à la feuille
+                $sheet->setName($aid->getName()); // Définir le nom de la feuille
 
-        $response = new StreamedResponse(function () use (
-            $aid,
-            $dateMin,
-            $dateMax,
-            $logAidViewRepository,
-            $logAidApplicationUrlClickRepository,
-            $logAidOriginUrlClickRepository,
-            $aidProjectRepository
-        ) {
-            $csv = fopen('php://output', 'w+');
-            fputcsv($csv, [
-                'Date',
-                'Nombre de vues',
-                'Nombre de clics sur Candidater',
-                'Nombre de clics sur Plus d’informations',
-                'Nombre de projets privés liés',
-                'Nombre de projets publics liés',
-            ]);
+                // Ajout des en-têtes
+                $headers = [
+                    'Date',
+                    'Nombre de vues',
+                    'Nombre de clics sur Candidater',
+                    'Nombre de clics sur Plus d’informations',
+                    'Nombre de projets privés liés',
+                    'Nombre de projets publics liés'
+                ];
+                $cells = [];
+                foreach ($headers as $headerItem) {
+                    $cells[] = Cell::fromValue($headerItem);
+                }
+                $singleRow = new Row($cells);
+                $writer->addRow($singleRow);
 
-            $currentDay = new \DateTime(date($dateMin->format('Y-m-d')));
-            while ($currentDay <= $dateMax) {
-                // nb vues
-                $nbviews = $logAidViewRepository->countCustom(
-                    [
-                        'aid' => $aid,
-                        'dateCreate' => $currentDay,
-                    ]
-                );
+                // Nombre de vues par jours
+                $nbViewsByDay = $logAidViewService->getCountByDay($aid, $dateMin, $dateMax);
 
-                // nb click application url
-                $nbApplicationUrlClicks = $logAidApplicationUrlClickRepository->countCustom(
-                    [
-                        'aid' => $aid,
-                        'dateCreate' => $currentDay,
-                    ]
-                );
+                // Nombre de clics sur Candidater par jours
+                $nbApplicationUrlClicksByDay = $logAidApplicationUrlClickService->getCountByDay($aid, $dateMin, $dateMax);
 
-                // nb click origin url
-                $nbOriginUrlClicks = $logAidOriginUrlClickRepository->countCustom(
-                    [
-                        'aid' => $aid,
-                        'dateCreate' => $currentDay,
-                    ]
-                );
+                // Nombre de clics sur Plus d’informations par jours
+                $nbOriginUrlClicksByDay = $logAidOriginUrlClickService->getCountByDay($aid, $dateMin, $dateMax);
 
                 // nb project public associés
-                $nbProjectPublics = $aidProjectRepository->countProjectByAid($aid, [
-                    'projectPublic' => true,
-                    'dateCreate' => $currentDay,
-                ]);
+                $nbProjectPublicsByDay = $aidProjectService->getCountByDay($aid, $dateMin, $dateMax, true);
 
                 // nb project prive associés
-                $nbProjectPrivates = $aidProjectRepository->countProjectByAid($aid, [
-                    'projectPublic' => false,
-                    'dateCreate' => $currentDay,
-                ]);
+                $nbProjectPrivatesByDay =  $aidProjectService->getCountByDay($aid, $dateMin, $dateMax, false);
 
-                fputcsv($csv, [
-                    $currentDay->format('d/m/Y'),
-                    $nbviews,
-                    $nbApplicationUrlClicks,
-                    $nbOriginUrlClicks,
-                    $nbProjectPublics,
-                    $nbProjectPrivates,
-                ]);
+                // Parcours les dates
+                $currentDay = clone $dateMin;
+                while ($currentDay <= $dateMax) {
+                    $cells = [];
+                    $cells[] = Cell::fromValue($currentDay->format('d/m/Y'));
+                    $cells[] = Cell::fromValue($nbViewsByDay[$currentDay->format('Y-m-d')] ?? 0);
+                    $cells[] = Cell::fromValue($nbApplicationUrlClicksByDay[$currentDay->format('Y-m-d')] ?? 0);
+                    $cells[] = Cell::fromValue($nbOriginUrlClicksByDay[$currentDay->format('Y-m-d')] ?? 0);
+                    $cells[] = Cell::fromValue($nbProjectPublicsByDay[$currentDay->format('Y-m-d')] ?? 0);
+                    $cells[] = Cell::fromValue($nbProjectPrivatesByDay[$currentDay->format('Y-m-d')] ?? 0);
+                    $singleRow = new Row($cells);
+                    $writer->addRow($singleRow);
 
-                $currentDay->add(new \DateInterval('P1D'));
-            }
-            fclose($csv);
-        });
+                    $currentDay->add(new \DateInterval('P1D'));
+                }
 
-        $response->headers->set('Content-Type', 'application/vnd.ms-excel; charset=utf-8');
-        $response->headers->set('Content-Disposition', 'attachment; filename="' . $filename . '.xlsx"');
-
-        return $response;
+                $writer->close();
+            });
+            return $response;
+        } catch (\Exception $e) {
+            throw new NotFoundHttpException('Impossible de générer votre export.');
+        }
     }
 
     #[Route('/comptes/aides/ajax-lock/', name: 'app_user_aid_ajax_lock', options: ['expose' => true])]

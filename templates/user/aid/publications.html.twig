@@ -150,6 +150,22 @@
 				<button type="button" class="fr-btn fr-icon-download-line fr-btn--icon-left fr-mb-5w" id="export-aids-btn" data-fr-opened="false" aria-controls="export-aids-modal-{{ app.user.id }}" {% if app.user.organizations|length == 0 or nbAidsLive == 0 %} disabled="disabled" {% endif %}>
 					Exporter toutes les aides publiées de votre structure
 				</button>
+
+				<h2 class="fr-h2">Statistiques de vos aides</h2>
+				<div class="fr-alert fr-alert--warning fr-alert--sm fr-mb-2w fr-mt-2w">
+					<p>Pour des raisons de performances, l'export est limité à une période maximale de trois mois.</p>
+				</div>
+				{{ form_start(formAidStatsPeriod)}}
+					<div class="fr-grid-row fr-grid-row--gutters fr-mb-3w">
+						<div class="fr-col-12 fr-col-md-6">
+							{{ form_row(formAidStatsPeriod.dateMin)}}
+						</div>
+						<div class="fr-col-12 fr-col-md-6">
+							{{ form_row(formAidStatsPeriod.dateMax)}}
+						</div>
+					</div>
+					<button type="submit" class="fr-btn fr-icon-download-line fr-btn--icon-left fr-mb-5w">Télécharger les statistiques de toutes vos aides sur cette période</button>
+				{{ form_end(formAidStatsPeriod)}}
 			</div>
 		</div>
 	</div>

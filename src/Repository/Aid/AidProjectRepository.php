@@ -44,6 +44,21 @@ class AidProjectRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult()[0]['nb'] ?? 0;
     }
 
+    public function countProjectByAidByDay(Aid $aid, array $params = null): array
+    {
+        $params['aid'] = $aid;
+        $qb = $this->getQueryBuilder($params);
+
+        $qb
+            ->select('IFNULL(COUNT(ap.id), 0) AS nb')
+            ->addSelect('DATE_FORMAT(ap.dateCreate, \'%Y-%m-%d\') as dateDay')
+            ->groupBy('dateDay')
+            ->orderBy('dateDay', 'ASC')
+        ;
+
+        return $qb->getQuery()->getResult();
+    }
+
     public function countCustom(array $params = null): int
     {
         $qb = $this->getQueryBuilder($params);
