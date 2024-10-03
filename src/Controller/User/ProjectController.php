@@ -37,6 +37,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class ProjectController extends FrontController
@@ -318,7 +319,6 @@ class ProjectController extends FrontController
     public function aides(
         $id,
         ProjectRepository $ProjectRepository,
-        ProjectReferenceRepository $projectReferenceRepository,
         UserService $userService,
         RequestStack $requestStack,
         AidProjectRepository $aidProjectRepository,
@@ -326,7 +326,8 @@ class ProjectController extends FrontController
         NotificationService $notificationService,
         ReferenceService $referenceService,
         SpreadsheetExporterService $spreadsheetExporterService,
-        AidService $aidService
+        AidService $aidService,
+        MessageBusInterface $bus
     ): Response {
         $projectCreated = $requestStack->getCurrentRequest()->get('projectCreated', 0);
 
@@ -462,18 +463,22 @@ class ProjectController extends FrontController
         $formExportProject->handleRequest($requestStack->getCurrentRequest());
         if ($formExportProject->isSubmitted()) {
             if ($formExportProject->isValid()) {
-                switch ($formExportProject->get('format')->getData()) {
-                    case FileService::FORMAT_CSV:
-                        return $spreadsheetExporterService->exportProjectAids($project, FileService::FORMAT_CSV);
-                        break;
-                    case FileService::FORMAT_XLSX:
-                        return $spreadsheetExporterService->exportProjectAids($project, FileService::FORMAT_XLSX);
-                        break;
-                    case FileService::FORMAT_PDF:
-                        return $this->exportAidsToPdf($project);
-                        break;
-                    default:
-                        $this->addFlash(FrontController::FLASH_ERROR, 'Format non supporté');
+                // Si plus de 10 aides, on passe par le worker
+                if (count($project->getAidProjects()) > 10) {
+                } else {
+                    switch ($formExportProject->get('format')->getData()) {
+                        case FileService::FORMAT_CSV:
+                            return $spreadsheetExporterService->exportProjectAids($project, FileService::FORMAT_CSV);
+                            break;
+                        case FileService::FORMAT_XLSX:
+                            return $spreadsheetExporterService->exportProjectAids($project, FileService::FORMAT_XLSX);
+                            break;
+                        case FileService::FORMAT_PDF:
+                            return $this->exportAidsToPdf($project);
+                            break;
+                        default:
+                            $this->addFlash(FrontController::FLASH_ERROR, 'Format non supporté');
+                    }
                 }
             } else {
                 $this->addFlash(FrontController::FLASH_ERROR, 'Erreur lors de l\'export');
