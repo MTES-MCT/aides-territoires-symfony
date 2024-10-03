@@ -189,6 +189,7 @@ class AppFixtures extends Fixture
         $aid->setApplicationUrl('https://www.example.com');
 
         $aid->setStatus(Aid::STATUS_PUBLISHED);
+        $aid->setIsGeneric(true);
         $aid->setTimePublished(new \DateTime());
         $aid->setDatePublished(new \DateTime());
         $manager->persist($aid);

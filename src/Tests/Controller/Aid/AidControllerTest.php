@@ -2,6 +2,7 @@
 
 namespace App\Tests\Controller\Aid;
 
+use App\Entity\Aid\Aid;
 use App\Entity\Alert\Alert;
 use App\Entity\User\User;
 use App\Repository\User\UserRepository;
@@ -66,5 +67,39 @@ class AidControllerTest extends AtWebTestCase
 
         // On vérifie la présence du message flash
         $this->assertStringContainsString('Votre alerte a bien été créée', $this->client->getResponse()->getContent());
+    }
+
+    public function testAidDetails()
+    {
+        /** @var AidRepository $aidRepository */
+        $aidRepository = $this->managerRegistry->getRepository(Aid::class);
+        $aid = $aidRepository->find(1);
+        $route = $this->router->generate('app_aid_aid_details', ['slug' => $aid->getSlug()]);
+        $crawler = $this->client->request('GET', $route);
+
+        // Vérifier que la réponse est réussie
+        $this->assertResponseIsSuccessful();
+    }
+
+    public function testAidGenericToLocal()
+    {
+        /** @var UserRepository $userRepository */
+        $userRepository = $this->managerRegistry->getRepository(User::class);
+        // Charge utilisateur
+        $user = $userRepository->find(1);
+        // Identifie utilisateur
+        $this->client->loginUser($user);
+
+        /** @var AidRepository $aidRepository */
+        $aidRepository = $this->managerRegistry->getRepository(Aid::class);
+        $aid = $aidRepository->find(1);
+        
+        $route = $this->router->generate('app_aid_generic_to_local', ['slug' => $aid->getSlug()]);
+
+        // Effectue la requête
+        $this->client->request('GET', $route);
+
+        // Vérifie qu'il y a une redirection
+        $this->assertTrue($this->client->getResponse()->isRedirect(), 'La réponse n\'est pas une redirection.');
     }
 }
