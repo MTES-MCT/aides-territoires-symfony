@@ -7,7 +7,6 @@ framework:
     
     trusted_proxies: '%env(resolve:TRUSTED_PROXIES)%'
     trusted_headers: ['x-forwarded-for', 'x-forwarded-host', 'x-forwarded-proto', 'x-forwarded-port', 'x-forwarded-prefix']
-    trusted_hosts: '%env(resolve:TRUSTED_HOSTS)%'
 
     uid:
         default_uuid_version: 4
