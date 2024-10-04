@@ -11,7 +11,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
-use PhpOffice\PhpSpreadsheet\Writer\Csv;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 #[AsCommand(name: 'at:script:fv_2023_stats', description: 'Stats fond vert 2023')]
 class FondVert2023StatsCommand extends Command
@@ -77,7 +77,7 @@ class FondVert2023StatsCommand extends Command
         }
 
         $filename = 'fond-vert-2023-stats';
-        $fileTarget = $tmpFolder . '/' . $filename . '.csv';
+        $fileTarget = $tmpFolder . '/' . $filename . '.xlsx';
 
         $spreadSheet = new Spreadsheet();
         $sheet = $spreadSheet->getActiveSheet();
@@ -101,7 +101,10 @@ class FondVert2023StatsCommand extends Command
             $row++;
         }
 
-        $writer = new Csv($spreadSheet);
+        // Filtre sur toutes les colonnes
+        $sheet->setAutoFilter('A1:G1');
+
+        $writer = new Xlsx($spreadSheet);
         $writer->save($fileTarget);
 
         // Envoi l'email
@@ -159,8 +162,7 @@ class FondVert2023StatsCommand extends Command
             $cityFound = false;
             $organizationFound = false;
 
-            $cityName = str_replace('-', ' ', $organization['city_name']);
-            if (in_array($cityName, $cities) && in_array($organization['name_organization'], $organizationNames)) {
+            if (in_array($organization['city_name_fv'], $cities)) {
                 $cityFound = true;
             }
 
