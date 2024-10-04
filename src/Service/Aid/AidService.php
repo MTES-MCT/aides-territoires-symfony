@@ -813,7 +813,6 @@ class AidService // NOSONAR too complex
         LogAidApplicationUrlClickService $logAidApplicationUrlClickService,
         LogAidOriginUrlClickService $logAidOriginUrlClickService,
         AidProjectService $aidProjectService
-
     ): Spreadsheet
     {
         // paramètre filtre aides

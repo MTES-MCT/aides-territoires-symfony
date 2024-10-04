@@ -13,10 +13,10 @@ use App\Form\User\Project\AidProjectDeleteType;
 use App\Form\User\Project\AidProjectStatusType;
 use App\Form\User\Project\ProjectDeleteType;
 use App\Form\User\Project\ProjectExportType;
+use App\Message\User\MsgProjectExportAids;
 use App\Repository\Aid\AidProjectRepository;
 use App\Repository\Project\ProjectRepository;
 use App\Repository\Project\ProjectValidatedRepository;
-use App\Repository\Reference\ProjectReferenceRepository;
 use App\Security\Voter\InternalRequestVoter;
 use App\Service\Aid\AidService;
 use App\Service\Export\SpreadsheetExporterService;
@@ -27,8 +27,6 @@ use App\Service\Project\ProjectService;
 use App\Service\Reference\ReferenceService;
 use App\Service\User\UserService;
 use Doctrine\Persistence\ManagerRegistry;
-use Dompdf\Dompdf;
-use Dompdf\Options;
 use Pagerfanta\Adapter\ArrayAdapter;
 use Pagerfanta\Pagerfanta;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -327,7 +325,8 @@ class ProjectController extends FrontController
         ReferenceService $referenceService,
         SpreadsheetExporterService $spreadsheetExporterService,
         AidService $aidService,
-        MessageBusInterface $bus
+        MessageBusInterface $bus,
+        ProjectService $projectService
     ): Response {
         $projectCreated = $requestStack->getCurrentRequest()->get('projectCreated', 0);
 
@@ -465,6 +464,8 @@ class ProjectController extends FrontController
             if ($formExportProject->isValid()) {
                 // Si plus de 10 aides, on passe par le worker
                 if (count($project->getAidProjects()) > 10) {
+                    $bus->dispatch(new MsgProjectExportAids($user->getId(), $project->getId(), $formExportProject->get('format')->getData()));
+                    $this->addFlash(FrontController::FLASH_SUCCESS, 'Votre export est en cours de traitement, vous recevrez un email dès qu\'il sera prêt.');
                 } else {
                     switch ($formExportProject->get('format')->getData()) {
                         case FileService::FORMAT_CSV:
@@ -474,7 +475,7 @@ class ProjectController extends FrontController
                             return $spreadsheetExporterService->exportProjectAids($project, FileService::FORMAT_XLSX);
                             break;
                         case FileService::FORMAT_PDF:
-                            return $this->exportAidsToPdf($project);
+                            return $this->exportAidsToPdf($project, $projectService);
                             break;
                         default:
                             $this->addFlash(FrontController::FLASH_ERROR, 'Format non supporté');
@@ -507,31 +508,13 @@ class ProjectController extends FrontController
         ]);
     }
 
-    private function exportAidsToPdf(Project $project)
+    private function exportAidsToPdf(Project $project, ProjectService $projectService): Response
     {
         $now = new \DateTime(date('Y-m-d H:i:s'));
         $filename = 'Aides-territoires_-_' . $now->format('Y-m-d') . '_-_' . $project->getSlug() . '.pdf';
-        $pdfOptions = new Options();
-        $pdfOptions->setIsRemoteEnabled(true);
 
-        // instantiate and use the dompdf class
-        $dompdf = new Dompdf($pdfOptions);
-
-        $dompdf->loadHtml(
-            $this->renderView('user/project/aids_list_export_pdf.html.twig', [
-                'project' => $project,
-                'organization' => ($project->getAuthor() && $project->getAuthor()->getDefaultOrganization()) ? $project->getAuthor()->getDefaultOrganization() : null,
-                'today' => new \DateTime(date('Y-m-d H:i:s'))
-            ])
-        );
-
-        // (Optional) Setup the paper size and orientation
-        $dompdf->setPaper('A4', 'portrait');
-
-        // Render the HTML as PDF
-        $dompdf->render();
-
-        $pdfContent = $dompdf->output();
+        // Récupérez le contenu du PDF
+        $pdfContent = $projectService->getProjectAidsExportPdfContent($project);
 
         // Créez une réponse avec le contenu du PDF
         $response = new Response($pdfContent);
@@ -541,15 +524,7 @@ class ProjectController extends FrontController
         $response->headers->set('Content-Disposition', 'inline; filename="' . $filename . '.pdf"');
 
         return $response;
-
-        // // Output the generated PDF to Browser (inline view)
-        // $response = $dompdf->stream($filename.'.pdf', [
-        //     "Attachment" => false
-        // ]);
-
-        // return $response;
     }
-
 
     #[Route('/comptes/projets/similaires/{id}-{slug}/', name: 'app_user_project_similaires', requirements: ['id' => '[0-9]+', 'slug' => '[a-zA-Z0-9\-_]+'])]
     public function similaires(

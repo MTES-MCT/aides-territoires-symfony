@@ -90,11 +90,12 @@ class MsgAidStatsSpreadsheetOfUserHandler
                 ]
             );
 
+            // Supprime le fichier
+            @unlink($fileTarget);
+            
             if (!$send) {
                 throw new \Exception('Erreur lors de l\'envoi de l\'email');
             }
-            // Supprime le fichier
-            @unlink($fileTarget);
         } catch (\Exception $e) {
             // notif admin erreur
             $admin = $this->userRepository->findOneBy(['email' => $this->paramService->get('email_super_admin')]);
