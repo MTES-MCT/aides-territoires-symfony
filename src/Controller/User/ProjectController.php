@@ -455,7 +455,11 @@ class ProjectController extends FrontController
         }
 
         // formulaire export projet
-        $formExportProject = $this->createForm(ProjectExportType::class, null, ['attr' => ['target' => '_blank']]);
+        $nbMaxAids = 10;
+        $formExportProjectParams = count($project->getAidProjects()) > $nbMaxAids
+            ? []
+            : ['attr' => ['target' => '_blank']];
+        $formExportProject = $this->createForm(ProjectExportType::class, null, $formExportProjectParams);
         if ($project->getId()) {
             $formExportProject->get('idProject')->setData($project->getId());
         }
@@ -463,7 +467,7 @@ class ProjectController extends FrontController
         if ($formExportProject->isSubmitted()) {
             if ($formExportProject->isValid()) {
                 // Si plus de 10 aides, on passe par le worker
-                if (count($project->getAidProjects()) > 10) {
+                if (count($project->getAidProjects()) > $nbMaxAids) {
                     $bus->dispatch(new MsgProjectExportAids($user->getId(), $project->getId(), $formExportProject->get('format')->getData()));
                     $this->addFlash(FrontController::FLASH_SUCCESS, 'Votre export est en cours de traitement, vous recevrez un email dès qu\'il sera prêt.');
                 } else {

@@ -27,19 +27,23 @@ class UserProjectAidsVoter extends Voter
 
     protected function voteOnAttribute(string $attribute, $subject, TokenInterface $token): bool
     {
-        $request = $this->requestStack->getCurrentRequest();
-        if (!$request) {
+        // Récupérer l'utilisateur optionnel depuis le sujet
+        $optionalUser = $subject['user'] ?? null;
+        $project = $subject['project'] ?? null;
+
+        if (!$project instanceof Project) {
             return false;
         }
 
-        // l'utilisateur courant
-        $currentUser = $this->userService->getUserLogged();
+        // l'utilisateur courant ou l'utilisateur optionnel
+        $currentUser = $optionalUser ?? $this->userService->getUserLogged();
+
 
         if (
             $this->isUserConnected($currentUser)
             && (
-                $this->isUserAuthor($currentUser, $subject)
-                || $this->isUserMemberOfOrganization($currentUser, $subject)
+                $this->isUserAuthor($currentUser, $project)
+                || $this->isUserMemberOfOrganization($currentUser, $project)
                 )
             ) {
             return true;
@@ -48,7 +52,7 @@ class UserProjectAidsVoter extends Voter
         return false;
     }
 
-    private function isUserConnected(?User $user) : bool 
+    private function isUserConnected(?User $user) : bool
     {
         if (!$user instanceof User || !$user->getId()) {
             return false;
@@ -56,12 +60,12 @@ class UserProjectAidsVoter extends Voter
         return true;
     }
 
-    private function isUserAuthor(?User $user, Project $project) : bool 
+    private function isUserAuthor(?User $user, Project $project) : bool
     {
         return $project->getAuthor()->getId() === $user->getId();
     }
 
-    private function isUserMemberOfOrganization(?User $user, Project $project) : bool 
+    private function isUserMemberOfOrganization(?User $user, Project $project) : bool
     {
         return $project->getOrganization()->getBeneficiairies()->contains($user);
     }

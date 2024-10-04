@@ -61,7 +61,7 @@ class MsgProjectExportAidsHandler
             }
 
             // vérification accès
-            if (!$this->authorizationChecker->isGranted(UserProjectAidsVoter::IDENTIFIER, $project)) {
+            if (!$this->authorizationChecker->isGranted(UserProjectAidsVoter::IDENTIFIER, ['user' => $user, 'project' => $project])) {
                 throw new \Exception(UserProjectAidsVoter::MESSAGE_ERROR);
             }
 
@@ -80,6 +80,7 @@ class MsgProjectExportAidsHandler
             }
             
         } catch (\Exception $e) {
+            dd($e->getMessage());
             // notif erreur
             $this->loggerInterface->error('Erreur dans export aides du projet', [
                 'exception' => $e,
@@ -152,7 +153,7 @@ class MsgProjectExportAidsHandler
     {
         // Création du tableur
         $spreadsheet = $this->spreadsheetExporterService->getProjectAidsSpreadsheet($project);
-        $format = FileService::FORMAT_CSV;
+        $format = FileService::FORMAT_XLSX;
 
         // Passage au format CSV
         $writer = new Xlsx($spreadsheet);
