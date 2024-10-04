@@ -496,7 +496,7 @@ class ProjectController extends FrontController
 
         // fil arianne
         $this->breadcrumb->add("Mon compte", $this->generateUrl('app_user_dashboard'));
-        $this->breadcrumb->add("Mes projets");
+        $this->breadcrumb->add("Mes projets", $this->generateUrl('app_user_project_structure'));
         $this->breadcrumb->add("Projet " . $project->getName(), null);
 
         // rendu template
