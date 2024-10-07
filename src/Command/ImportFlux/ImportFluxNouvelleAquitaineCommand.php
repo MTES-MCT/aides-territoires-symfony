@@ -45,7 +45,7 @@ class ImportFluxNouvelleAquitaineCommand extends ImportFluxCommand
 
             $content = $response->getContent();
             $data = json_decode($content, true);
-    
+            dd(json_last_error(), $data);
             if (json_last_error() !== JSON_ERROR_NONE) {
                 throw new \Exception('Erreur lors du décodage du JSON : ' . json_last_error_msg());
             }
