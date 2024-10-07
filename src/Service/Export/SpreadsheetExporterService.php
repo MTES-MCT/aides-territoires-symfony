@@ -655,22 +655,29 @@ class SpreadsheetExporterService
             
             $aid = $aidProject->getAid();
 
+            // Nettoyer le HTML et conserver les sauts de ligne
+            $description = $this->cleanHtml($aid->getDescription());
+            $projectExamples = $this->cleanHtml($aid->getProjectExamples());
+            $subventionComment = $this->cleanHtml($aid->getSubventionComment());
+            $otherFinancialAidComment = $this->cleanHtml($aid->getOtherFinancialAidComment());
+            $contact = $this->cleanHtml($aid->getContact());
+
             $cells = [
                 $aid->getUrl(),
                 $aid->getName(),
-                $aid->getDescription(),
-                $aid->getProjectExamples(),
+                $description,
+                $projectExamples,
                 implode(',', $aidSteps),
                 implode(',', $aidTypes),
                 implode(',', $aidDestinations),
                 $dateStart,
                 $dateSubmissionDeadline,
                 $rates,
-                $aid->getSubventionComment() ?? '',
+                $subventionComment,
                 $aid->getRecoverableAdvanceAmount() ?? '',
                 $aid->getLoanAmount() ?? '',
-                $aid->getOtherFinancialAidComment() ?? '',
-                $aid->getContact() ?? '',
+                $otherFinancialAidComment,
+                $contact,
                 $aidRecurrence,
                 $aid->isIsCallForProject() ? 'Oui' : 'Non',
                 implode(',', $categories),
@@ -762,5 +769,18 @@ class SpreadsheetExporterService
 
         // Assainit le HTML tronqué
         return $this->htmlSanitizerInterface->sanitize($truncatedHtml);
+    }
+
+    private function cleanHtml(?string $html): string
+    {
+        if (!$html) {
+            return '';
+        }
+
+        // Supprimer toutes les balises HTML
+        $text = strip_tags($html);
+
+        // Décoder les entités HTML
+        return trim(html_entity_decode($text, ENT_QUOTES | ENT_HTML5));
     }
 }
