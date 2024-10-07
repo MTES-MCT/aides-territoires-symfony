@@ -5,6 +5,7 @@ namespace App\Command\ImportFlux;
 use Symfony\Component\Console\Attribute\AsCommand;
 use App\Command\ImportFlux\ImportFluxCommand;
 use App\Entity\Aid\Aid;
+use App\Entity\Aid\AidRecurrence;
 use App\Entity\Category\Category;
 use App\Entity\Organization\OrganizationType;
 
@@ -19,54 +20,40 @@ class ImportFluxNouvelleAquitaineCommand extends ImportFluxCommand
 
     protected function getImportUniqueid($aidToImport): ?string
     {
-        if (!isset($aidToImport['guid'])) {
+        if (!isset($aidToImport['Lien'])) {
             return null;
         }
 
         // Utilisation de md5 pour des raisons historiques. Les données ne sont pas sensibles.
-        return $this->importUniqueidPrefix . md5($aidToImport['guid']);
+        return $this->importUniqueidPrefix . md5($aidToImport['Lien']);
     }
 
     protected function callApi()
     {
-        $aidsFromImport = [];
-        $client = $this->getClient();
-
-        for ($i = 0; $i < $this->nbPages; $i++) {
-            $this->currentPage = $i;
+        try {
+            $data = [];
+            $client = $this->getClient();
             $importUrl = $this->dataSource->getImportApiUrl();
-
-            try {
-                $response = $client->request(
-                    'GET',
-                    $importUrl,
-                    $this->getApiOptions()
-                );
-
-                $content = $response->getContent();
-
-                // Convertit le contenu XML en un objet SimpleXMLElement
-                $xml = simplexml_load_string($content, "SimpleXMLElement", LIBXML_NOCDATA);
-
-                // Convertit l'objet SimpleXMLElement en un tableau
-                $json = json_encode($xml);
-                $content = json_decode($json, true);
-
-                // Assigne les items du flux à $aidToImport
-                if (isset($content['channel']['item'])) {
-                    $aidsFromImport = $content['channel']['item'];
-                } else {
-                    throw new \Exception('Le flux ne contient aucun item');
-                }
-            } catch (\Exception $e) {
-                throw new \Exception($e->getMessage());
+            $response = $client->request(
+                'GET',
+                $importUrl,
+                $this->getApiOptions()
+            );
+            if ($response->getStatusCode() !== 200) {
+                throw new \Exception('Erreur lors de la récupération du flux');
             }
-            if (!count($aidsFromImport)) {
-                throw new \Exception('Le flux ne contient aucune aide');
+
+            $content = $response->getContent();
+            $data = json_decode($content, true);
+    
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                throw new \Exception('Erreur lors du décodage du JSON : ' . json_last_error_msg());
             }
+        } catch (\Exception $e) {
+            throw new \Exception($e->getMessage());
         }
 
-        return $aidsFromImport;
+        return $data;
     }
 
 
@@ -81,24 +68,21 @@ class ImportFluxNouvelleAquitaineCommand extends ImportFluxCommand
 
     protected function getFieldsMapping(array $aidToImport, array $params = null): array
     {
-        $dateStart = (isset($aidToImport['pubDate']) && $aidToImport['pubDate'] !== '' && $aidToImport['pubDate'] !== null) ? \DateTime::createFromFormat('D, d M y H:i:s O', $aidToImport['pubDate']) : null;
-        if ($dateStart instanceof \DateTime) {
-            // Force pour éviter les différence sur le fuseau horaire
-            $dateStart = new \DateTime(date($dateStart->format('Y-m-d')));
-            // Force les heures, minutes, et secondes à 00:00:00
-            $dateStart->setTime(0, 0, 0);
-        }
-        $description = $this->concatHtmlFields($aidToImport, ['description']);
-        if (isset($aidToImport['source']) && $aidToImport['source'] !== '') {
-            $description .= '<h2>Source :</h2><div>' . $aidToImport['source'] . '</div>';
-        }
+        $dateStart = $this->getDateTimeOrNull($aidToImport['Date de début']);
+        $dateSubmissionDeadline = $this->getDateTimeOrNull($aidToImport['Date de fin']);
+
+        $description = $this->concatHtmlFields($aidToImport, ['Resumé', 'Objectifs', 'Montant']);
+        $eligibility = $this->concatHtmlFields($aidToImport, ['Bénéficiaires', 'Comment faire ma demande', 'Critère de sélection']);
+        $isEuropean = $this->getBooleanOrNull($aidToImport, 'Fonds européens'); // voir avec Jo
         $return = [
             'importDataMention' => 'Ces données sont mises à disposition par le Conseil régional de Nouvelle-Aquitaine .',
-            'name' => isset($aidToImport['title']) ? $this->cleanName($aidToImport['title']) : null,
-            'nameInitial' => isset($aidToImport['title']) ? $this->cleanName($aidToImport['title']) : null,
+            'name' => isset($aidToImport['Nom']) ? $this->cleanName($aidToImport['Nom']) : null,
+            'nameInitial' => isset($aidToImport['Nom']) ? $this->cleanName($aidToImport['Nom']) : null,
             'description' => $description,
-            'originUrl' => isset($aidToImport['guid']) ? $aidToImport['guid'] : null,
+            'originUrl' => isset($aidToImport['Lien']) ? $aidToImport['Lien'] : null,
             'dateStart' => $dateStart,
+            'dateSubmissionDeadline' => $dateSubmissionDeadline,
+            'eligibility' => $eligibility,
         ];
 
         // on ajoute les données brut d'import pour comparer avec les données actuelles
@@ -108,10 +92,10 @@ class ImportFluxNouvelleAquitaineCommand extends ImportFluxCommand
     protected function setCategories(array $aidToImport, Aid $aid): Aid
     {
         // les categories du flux
-        if (!isset($aidToImport['category'])) {
+        if (!isset($aidToImport['Thématiques'])) {
             return $aid;
         }
-        $categoriesToImport = explode(',', $aidToImport['category']);
+        $categoriesToImport = explode(',', $aidToImport['Thématiques']);
 
         // le mapping avec notre base
         $mapping = [
@@ -213,10 +197,10 @@ class ImportFluxNouvelleAquitaineCommand extends ImportFluxCommand
 
     protected function setAidAudiences(array $aidToImport, Aid $aid): Aid
     {
-        if (!isset($aidToImport['category'])) {
+        if (!isset($aidToImport['Profils'])) {
             return $aid;
         }
-        $audiences = explode(',', $aidToImport['category']);
+        $audiences = explode(',', $aidToImport['Profils']);
 
         $mapping = [
             'Agriculteur' => [11],
@@ -260,5 +244,25 @@ class ImportFluxNouvelleAquitaineCommand extends ImportFluxCommand
         }
 
         return $aid;
+    }
+
+    protected function setAidRecurrence(array $aidToImport, Aid $aid): Aid
+    {
+        $dateStart = $this->getDateTimeOrNull($aidToImport['Date de début']);
+        $dateSubmissionDeadline = $this->getDateTimeOrNull($aidToImport['Date de fin']);
+
+        if ($dateStart instanceof \DateTime || $dateSubmissionDeadline instanceof \DateTime) {
+            $aid->setAidRecurrence($this->aidRecurrenceOneOff);
+        } else {
+            $aid->setAidRecurrence($this->aidRecurrenceRecurring);
+        }
+
+        return $aid;
+    }
+
+    protected function setInternalAidRecurrences(): void
+    {
+        $this->aidRecurrenceOneOff = $this->managerRegistry->getRepository(AidRecurrence::class)->findOneBy(['slug' => AidRecurrence::SLUG_ONEOFF]);
+        $this->aidRecurrenceRecurring = $this->managerRegistry->getRepository(AidRecurrence::class)->findOneBy(['slug' => AidRecurrence::SLUG_RECURRING]);
     }
 }
