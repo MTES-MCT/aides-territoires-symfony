@@ -50,4 +50,8 @@ export default class extends Controller {
                 });
         };
     }
+    
+    _onConnect(event) {
+        // TomSelect has just been intialized and you can access details from the event
+    }
 }

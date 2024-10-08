@@ -196,6 +196,7 @@ class AidSearchTypeV2 extends AbstractType
                 ->add('backerschoice', BackerAutocompleteType::class, [
                     'required' => false,
                     'label' => 'Porteurs d\'aides',
+                    'help' => 'Filtré par le champ "Votre territoire"',
                     'class' => Backer::class,
                     'choice_label' => 'name',
                     'attr' => [
