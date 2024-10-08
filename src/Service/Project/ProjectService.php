@@ -7,12 +7,16 @@ use App\Entity\Project\ProjectLock;
 use App\Entity\User\User;
 use App\Repository\Project\ProjectRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Dompdf\Dompdf;
+use Dompdf\Options;
+use Twig\Environment;
 
 class ProjectService
 {
     public function __construct(
         private ProjectRepository $projectRepository,
-        private ManagerRegistry $managerRegistry
+        private ManagerRegistry $managerRegistry,
+        private Environment $twig
     ) {
     }
 
@@ -96,5 +100,31 @@ class ProjectService
             $this->managerRegistry->getManager()->remove($projectLock);
         }
         $this->managerRegistry->getManager()->flush();
+    }
+
+    public function getProjectAidsExportPdfContent($project)
+    {
+        $pdfOptions = new Options();
+        $pdfOptions->setIsRemoteEnabled(true);
+
+        // instantiate and use the dompdf class
+        $dompdf = new Dompdf($pdfOptions);
+
+        $dompdf->loadHtml(
+            $this->twig->render('user/project/aids_list_export_pdf.html.twig', [
+                'project' => $project,
+                'organization' => ($project->getAuthor() && $project->getAuthor()->getDefaultOrganization()) ? $project->getAuthor()->getDefaultOrganization() : null,
+                'today' => new \DateTime(date('Y-m-d H:i:s'))
+            ])
+        );
+
+        // (Optional) Setup the paper size and orientation
+        $dompdf->setPaper('A4', 'portrait');
+
+        // Render the HTML as PDF
+        $dompdf->render();
+
+        
+        return $dompdf->output();
     }
 }

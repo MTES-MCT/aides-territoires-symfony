@@ -13,13 +13,16 @@ use App\Repository\Aid\AidRepository;
 use App\Repository\User\UserRepository;
 use App\Service\File\FileService;
 use App\Service\User\UserService;
-use App\Src\Exception\InvalidFileFormatException;
+use App\Service\Various\StringService;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use OpenSpout\Common\Entity\Cell;
 use OpenSpout\Common\Entity\Row;
 use OpenSpout\Writer\XLSX\Entity\SheetView;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Csv;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HtmlSanitizer\HtmlSanitizerInterface;
 use Symfony\Component\HttpFoundation\Response;
@@ -39,7 +42,8 @@ class SpreadsheetExporterService
         private FileService $fileService,
         private HtmlSanitizerInterface $htmlSanitizerInterface,
         private LoggerInterface $loggerInterface,
-        private MessageBusInterface $messageBusInterface
+        private MessageBusInterface $messageBusInterface,
+        private StringService $stringService
     ) {
     }
     public function createResponseFromQueryBuilder(// NOSONAR too complex
@@ -363,7 +367,7 @@ class SpreadsheetExporterService
         return $datas;
     }
 
-    public function exportProjectAids(Project $project, string $format = 'csv') // NOSONAR too complex
+    public function exportProjectAidsBck(Project $project, string $format = 'csv') // NOSONAR too complex
     {
         try {
             if ($format == FileService::FORMAT_CSV) {
@@ -376,11 +380,12 @@ class SpreadsheetExporterService
                 $sheetView = new SheetView();
                 $writer = new \OpenSpout\Writer\XLSX\Writer();
             } else {
-                throw new InvalidFileFormatException(self::EXCEPTION_FORMAT_NOT_SUPPORTED_MESSAGE);
+                throw new ExceptionInvalidFileFormatException(self::EXCEPTION_FORMAT_NOT_SUPPORTED_MESSAGE);
             }
 
             $now = new \DateTime(date(self::TODAY_DATE_FORMAT));
-            $writer->openToBrowser('Aides-territoires_-_' . $now->format('Y-m-d') . '_-_' . $project->getSlug());
+            $filename = 'Aides-territoires_-_' . $now->format('Y-m-d') . '_-_' . $project->getSlug().'.'.$format;
+            $writer->openToBrowser($filename);
 
             if ($format == FileService::FORMAT_XLSX) {
                 $writer->getCurrentSheet()->setSheetView($sheetView);
@@ -496,6 +501,200 @@ class SpreadsheetExporterService
         }
     }
 
+    public function exportProjectAids(Project $project, string $format = 'csv')
+    : Response
+    {
+        try {
+            // Création du tableur
+            $spreadsheet = $this->getProjectAidsSpreadsheet($project);
+
+            if ($format == FileService::FORMAT_CSV) {
+                // Passage au format CSV
+                $writer = new Csv($spreadsheet);
+                $writer->setDelimiter(';');
+                $writer->setEnclosure('"');
+                $contentType = 'text/csv';
+            } elseif ($format == FileService::FORMAT_XLSX) {
+                // Passage au format Xlsx
+                $writer = new Xlsx($spreadsheet);
+                $contentType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+            } else {
+                throw new ExceptionInvalidFileFormatException(self::EXCEPTION_FORMAT_NOT_SUPPORTED_MESSAGE);
+            }
+
+            $now = new \DateTime(date(self::TODAY_DATE_FORMAT));
+            $filename = 'Aides-territoires_-_' . $now->format('Y-m-d') . '_-_' . $project->getSlug().'.'.$format;
+
+            // StreamedResponse pour le téléchargement
+            $response = new StreamedResponse(function() use ($writer) {
+                $writer->save('php://output');
+            });
+
+            $response->headers->set('Content-Type', $contentType);
+            $response->headers->set('Content-Disposition', 'attachment;filename="' . $filename . '"');
+            $response->headers->set('Cache-Control', 'max-age=0');
+
+            return $response;
+        } catch (\Exception $e) {
+            $this->loggerInterface->error('Erreur exportProjectAids', [
+                'exception' => $e,
+                'idProject' => $project->getId(),
+            ]);
+
+            // Retour erreur
+            return new Response('Erreur lors de l\'exportation des aides du projet', Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public function getProjectAidsSpreadsheet(Project $project): Spreadsheet
+    {
+        // Création du tableur
+        $spreadsheet = new Spreadsheet();
+
+        // selectionne la feuille courante
+        $sheet = $spreadsheet->getActiveSheet();
+
+        // met le nom à la feuille
+        $sheet->setTitle($this->stringService->truncate($project->getName(), 31));
+
+        // Création des entêtes
+        $spreadsheet = $this->headersProjectAidsSpreadSheetExport($spreadsheet);
+
+        // Ajout des données
+        $spreadsheet = $this->dataProjectAidsSpreadSheetExport($spreadsheet, $project);
+
+        return $spreadsheet;
+    }
+
+    private function headersProjectAidsSpreadSheetExport(
+        Spreadsheet $spreadsheet,
+        int $row = 1
+    ): Spreadsheet
+    {
+        $headers = [
+            'Adresse de la fiche aide',
+            'Nom',
+            'Description complète de l’aide et de ses objectifs',
+            'Exemples de projets réalisables',
+            'État d’avancement du projet pour bénéficier du dispositif',
+            'Types d’aide',
+            'Types de dépenses / actions couvertes',
+            'Date d’ouverture',
+            'Date de clôture',
+            'Taux de subvention, min. et max. (en %, nombre entier)',
+            'Taux de subvention (commentaire optionnel)',
+            'Montant de l’avance récupérable',
+            'Montant du prêt maximum',
+            'Autre aide financière (commentaire optionnel)',
+            'Contact',
+            'Récurrence',
+            'Appel à projet / Manifestation d’intérêt',
+            'Sous-thématiques',
+            'Porteurs d’aides',
+            'Instructeurs',
+            'Programmes',
+        ];
+
+        $sheet = $spreadsheet->getActiveSheet();
+        $sheet->fromArray($headers, null, 'A'.$row);
+
+        return $spreadsheet;
+    }
+
+    private function dataProjectAidsSpreadSheetExport(
+        Spreadsheet $spreadsheet,
+        Project $project,
+        int $startRow = 2
+    ): Spreadsheet
+    {
+        $row = $startRow;
+
+        foreach ($project->getAidProjects() as $aidProject) {
+            if (!$aidProject->getAid() instanceof Aid) {
+                continue;
+            }
+
+            $aidSteps = [];
+            foreach ($aidProject->getAid()->getAidSteps() as $aidStep) {
+                $aidSteps[] = $aidStep->getName();
+            }
+            $aidTypes = [];
+            foreach ($aidProject->getAid()->getAidTypes() as $aidType) {
+                $aidTypes[] = $aidType->getName();
+            }
+            $aidDestinations = [];
+            foreach ($aidProject->getAid()->getAidDestinations() as $aidDestination) {
+                $aidDestinations[] = $aidDestination->getName();
+            }
+            $dateStart = $aidProject->getAid()->getDateStart() ? $aidProject->getAid()->getDateStart()->format('Y-m-d') : '';
+            $dateSubmissionDeadline = $aidProject->getAid()->getDateSubmissionDeadline() ? $aidProject->getAid()->getDateSubmissionDeadline()->format('Y-m-d') : '';
+            $rates = '';
+            if ($aidProject->getAid()->getSubventionRateMin()) {
+                $rates .= ' Min : ' . $aidProject->getAid()->getSubventionRateMin();
+            }
+            if ($aidProject->getAid()->getSubventionRateMax()) {
+                $rates .= ' Max : ' . $aidProject->getAid()->getSubventionRateMax();
+            }
+            $categories = [];
+            foreach ($aidProject->getAid()->getCategories() as $aidCategory) {
+                $categories[] = $aidCategory->getName();
+            }
+            $aidRecurrence = $aidProject->getAid()->getAidRecurrence() ? $aidProject->getAid()->getAidRecurrence()->getName() : '';
+            $financers = [];
+            foreach ($aidProject->getAid()->getAidFinancers() as $aidFinancer) {
+                $financers[] = $aidFinancer->getBacker()->getName();
+            }
+            $instructors = [];
+            foreach ($aidProject->getAid()->getAidInstructors() as $aidInstructor) {
+                $instructors[] = $aidInstructor->getBacker()->getName();
+            }
+            $programs = [];
+            foreach ($aidProject->getAid()->getPrograms() as $aidProgram) {
+                $programs[] = $aidProgram->getName();
+            }
+            
+            $aid = $aidProject->getAid();
+
+            // Nettoyer le HTML et conserver les sauts de ligne
+            $description = $this->cleanHtml($aid->getDescription());
+            $projectExamples = $this->cleanHtml($aid->getProjectExamples());
+            $subventionComment = $this->cleanHtml($aid->getSubventionComment());
+            $otherFinancialAidComment = $this->cleanHtml($aid->getOtherFinancialAidComment());
+            $contact = $this->cleanHtml($aid->getContact());
+
+            $cells = [
+                $aid->getUrl(),
+                $aid->getName(),
+                $description,
+                $projectExamples,
+                implode(',', $aidSteps),
+                implode(',', $aidTypes),
+                implode(',', $aidDestinations),
+                $dateStart,
+                $dateSubmissionDeadline,
+                $rates,
+                $subventionComment,
+                $aid->getRecoverableAdvanceAmount() ?? '',
+                $aid->getLoanAmount() ?? '',
+                $otherFinancialAidComment,
+                $contact,
+                $aidRecurrence,
+                $aid->isIsCallForProject() ? 'Oui' : 'Non',
+                implode(',', $categories),
+                implode(',', $financers),
+                implode(',', $instructors),
+                implode(',', $programs),
+            ];
+
+            // Ajoute les datas à la feuille
+            $sheet = $spreadsheet->getActiveSheet();
+            $sheet->fromArray($cells, null, 'A'.$row);
+            $row++;
+        }
+
+        return $spreadsheet;
+    }
+
     public function exportToFile(array $results, string $entityFqcn, string $filename, string $format = FileService::FORMAT_CSV)
     {
         try {
@@ -570,5 +769,18 @@ class SpreadsheetExporterService
 
         // Assainit le HTML tronqué
         return $this->htmlSanitizerInterface->sanitize($truncatedHtml);
+    }
+
+    private function cleanHtml(?string $html): string
+    {
+        if (!$html) {
+            return '';
+        }
+
+        // Supprimer toutes les balises HTML
+        $text = strip_tags($html);
+
+        // Décoder les entités HTML
+        return trim(html_entity_decode($text, ENT_QUOTES | ENT_HTML5));
     }
 }

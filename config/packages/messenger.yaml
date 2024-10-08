@@ -38,3 +38,4 @@ framework:
             'App\Message\Site\MsgDebugMemory': async
             'App\Message\User\AidsExportPdf': async
             'App\Message\User\MsgAidStatsSpreadsheetOfUser': async
+            'App\Message\User\MsgProjectExportAids': async
