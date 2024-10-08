@@ -75,7 +75,7 @@ class ImportFluxNouvelleAquitaineCommand extends ImportFluxCommand
         $examples = $this->concatHtmlFields($aidToImport, ['Montant']);
         $eligibility = $this->concatHtmlFields($aidToImport, ['Bénéficiaires', 'Critère de sélection']);
         $contact = $this->concatHtmlFields($aidToImport, ['Comment faire ma demande']);
-        $isEuropean = $this->getBooleanOrNull($aidToImport, 'Fonds européens ?');
+        $isEuropean = $this->getBooleanOrNull($aidToImport, 'Fond Européen ?');
         $europeanAid = $isEuropean ? Aid::SLUG_EUROPEAN_ORGANIZATIONAL : null;
 
         $return = [
