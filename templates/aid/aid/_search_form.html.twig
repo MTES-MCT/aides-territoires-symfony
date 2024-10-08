@@ -29,7 +29,7 @@
 					</div>
 
 					<div id="search-form-extra-fields" class="{% if showExtended %}show{% endif %}">
-						<div class="fr-grid-row fr-grid-row--gutters fr-grid-row--center fr-mb-2w">
+						<div class="fr-grid-row fr-grid-row--gutters fr-grid-row--bottom fr-mb-2w">
 							<div class="fr-col-12 fr-col-md-3 {% if showAidTypeField is defined and not showAidTypeField %}fr-hidden{% endif %}">
 								{{ form_row(formAidSearch.aidTypes)}}
 							</div>
@@ -66,7 +66,7 @@
 							{% endif %}
 						</div>
 
-						<div class="fr-grid-row fr-grid-row--gutters fr-grid-row--center fr-mb-2w fr-grid-row--bottom">
+						<div class="fr-grid-row fr-grid-row--gutters fr-grid-row--bottom fr-mb-2w fr-grid-row--bottom">
 							<div class="fr-col-12 fr-col-md-3">
 								{{ form_row(formAidSearch.backerGroup)}}
 							</div>
