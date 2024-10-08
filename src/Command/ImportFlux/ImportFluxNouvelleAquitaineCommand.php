@@ -75,7 +75,9 @@ class ImportFluxNouvelleAquitaineCommand extends ImportFluxCommand
         $examples = $this->concatHtmlFields($aidToImport, ['Montant']);
         $eligibility = $this->concatHtmlFields($aidToImport, ['Bénéficiaires', 'Critère de sélection']);
         $contact = $this->concatHtmlFields($aidToImport, ['Comment faire ma demande']);
-        $isEuropean = $this->getBooleanOrNull($aidToImport, 'Fonds européens'); // voir avec Jo
+        $isEuropean = $this->getBooleanOrNull($aidToImport, 'Fonds européens');
+        $europeanAid = $isEuropean ? Aid::SLUG_EUROPEAN_ORGANIZATIONAL : null;
+
         $return = [
             'importDataMention' => 'Ces données sont mises à disposition par le Conseil régional de Nouvelle-Aquitaine .',
             'name' => isset($aidToImport['Nom']) ? $this->cleanName($aidToImport['Nom']) : null,
@@ -86,7 +88,8 @@ class ImportFluxNouvelleAquitaineCommand extends ImportFluxCommand
             'dateSubmissionDeadline' => $dateSubmissionDeadline,
             'eligibility' => $eligibility,
             'projectExamples' => $examples,
-            'contact' => $contact
+            'contact' => $contact,
+            'europeanAid' => $europeanAid
         ];
 
         // on ajoute les données brut d'import pour comparer avec les données actuelles
