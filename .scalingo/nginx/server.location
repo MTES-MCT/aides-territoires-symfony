@@ -1,7 +1,7 @@
 add_header X-Frame-Options "deny";
 
 # Bloquer l'hôte spécifique 'asd6hyz27' et ses variations
-if ($host ~* "asd6hyz27") {
+if ($host ~* ".*asd6hyz27.*") {
     return 444;
 }
 
