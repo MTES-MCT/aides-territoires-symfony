@@ -14,6 +14,7 @@ use App\Entity\Category\CategoryTheme;
 use App\Entity\Organization\OrganizationType;
 use App\Entity\Program\Program;
 use App\Entity\Search\SearchPage;
+use App\Form\Type\BackerAutocompleteType;
 use App\Service\User\UserService;
 use App\Form\Type\EntityCheckboxAbsoluteType;
 use App\Form\Type\EntityCheckboxGroupAbsoluteType;
@@ -99,7 +100,6 @@ class AidSearchTypeV2 extends AbstractType
                     'placeholder' => 'Projet référent ou mot-clé'
                 ],
                 'autocomplete' => true,
-                'autocomplete_url' => $this->routerInterface->generate('app_project_reference_ajax_ux_autocomplete'),
                 'tom_select_options' => [
                     'create' => true,
                     'createOnBlur' => true,
@@ -193,26 +193,17 @@ class AidSearchTypeV2 extends AbstractType
                     'multiple' => true,
                     'expanded' => true
                 ])
-                ->add('backerschoice', EntityType::class, [
+                ->add('backerschoice', BackerAutocompleteType::class, [
                     'required' => false,
                     'label' => 'Porteurs d\'aides',
                     'class' => Backer::class,
                     'choice_label' => 'name',
                     'attr' => [
+                        'data-controller' => 'backer-autocomplete',
                         'placeholder' => 'Tous les porteurs d\'aides',
                     ],
                     'autocomplete' => true,
                     'multiple' => true,
-                    'query_builder' => function (BackerRepository $backerRepository) {
-                        return $backerRepository->getQueryBuilder([
-                            'hasFinancedAids' => true,
-                            'active' => true,
-                            'orderBy' => [
-                                'sort' => 'b.name',
-                                'order' => 'ASC'
-                            ]
-                        ]);
-                    },
                 ])
                 ->add('applyBefore', DateType::class, [
                     'required' => false,
