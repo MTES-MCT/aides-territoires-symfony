@@ -1,6 +1,6 @@
 add_header X-Frame-Options "deny";
 
-if ($host ~* ".*[^\w]*asd6hyz27.*") {
+if ($host ~* "asd6hyz27") {
     return 444;
 }
 
