@@ -192,7 +192,7 @@ class Backer // NOSONAR too much methods
     private ArrayCollection $categories;
 
     private ArrayCollection $programs;
-    private ?ArrayCollection $aidsThematics;
+    private ?ArrayCollection $aidsThematics = null;
 
     private ?LogBackerEdit $lastLogBackerEdit = null;
 
@@ -211,6 +211,7 @@ class Backer // NOSONAR too much methods
         $this->backerLocks = new ArrayCollection();
         $this->backerAskAssociates = new ArrayCollection();
         $this->logBackerEdits = new ArrayCollection();
+        $this->aidsThematics = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -648,6 +649,10 @@ class Backer // NOSONAR too much methods
 
     public function getAidsThematics(): ?ArrayCollection
     {
+        // vérifie si on a déjà calculé les thématiques
+        if ($this->aidsThematics) {
+            return $this->aidsThematics;
+        }
         $thematics = new ArrayCollection();
         foreach ($this->getAidsLive() as $aid) {
             foreach ($aid->getCategories() as $category) {

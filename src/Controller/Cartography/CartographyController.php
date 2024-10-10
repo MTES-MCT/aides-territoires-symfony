@@ -10,6 +10,7 @@ use App\Form\Program\CountySelectType;
 use App\Repository\Aid\AidRepository;
 use App\Repository\Backer\BackerRepository;
 use App\Repository\Category\CategoryRepository;
+use App\Repository\Category\CategoryThemeRepository;
 use App\Repository\Perimeter\PerimeterRepository;
 use App\Repository\Program\ProgramRepository;
 use App\Service\Aid\AidService;
@@ -90,9 +91,9 @@ class CartographyController extends FrontController
         BackerRepository $backerRepository,
         RequestStack $requestStack,
         StringService $stringService,
-        AidRepository $aidRepository,
         PerimeterService $perimeterService,
         CategoryRepository $categoryRepository,
+        CategoryThemeRepository $categoryThemeRepository,
         AidService $aidService
     ): Response {
         // departement courant
@@ -149,7 +150,7 @@ class CartographyController extends FrontController
 
         // la liste des backers
         $backers = $backerRepository->findBackerWithAidInCounty($backerParams);
-
+        
         // actions selon type d'aide
         $aidTypeGroupSlug = null;
         $aidTypeGroup = $formBackerSearch->get('aidTypeGroup')->getData();
@@ -166,8 +167,7 @@ class CartographyController extends FrontController
             'categoryIds' => $backerParams['categoryIds'] ?? null,
             'perimeterScales' => $backerParams['perimeterScales'] ?? null,
             'backerCategory' => $backerParams['backerCategory'] ?? null,
-            'notRelaunch' => true,
-            'notPostPopulate' => true,
+            'noPostPopulate' => true,
         ];
         switch ($aidTypeGroupSlug) {
             case AidTypeGroup::SLUG_FINANCIAL:
@@ -200,10 +200,6 @@ class CartographyController extends FrontController
             $aidsParams['backer'] = $backer;
             // défini les aides lives, à partir de quoi on pourra récupérer les financières, techniques, les thématiques
             $backer->setAidsLive($aidService->searchAids($aidsParams));
-            // si pas d'aide live on retire la ligne
-            if (empty($backer->getAidsLive())) {
-                unset($backers[$key]);
-            }
         }
 
         // fil arianne

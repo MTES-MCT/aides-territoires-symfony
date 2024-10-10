@@ -28,7 +28,7 @@
 								<td>
 									<a href="{{ path('app_backer_details', {'id': backer.id, 'slug': backer.slug}) }}" title="Voir les détails du porteur d'aide {{ backer.name }}">{{ backer.name }}</a>
 								</td>
-								<td data-sort="{{ backer.perimeter.scale }}">{{ backer.perimeter.name }}</td>
+								<td data-sort="{% if backer.perimeter %}{{ backer.perimeter.scale }}{% endif %}">{% if backer.perimeter %}{{ backer.perimeter.name }}{% else %}Non renseigné{% endif %}</td>
 								<td>
 									{% for thematic in backer.aidsThematics %}
 										{% if 

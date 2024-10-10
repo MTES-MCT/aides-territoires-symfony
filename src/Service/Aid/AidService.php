@@ -248,7 +248,7 @@ class AidService // NOSONAR too complex
             }
         }
 
-        if (!isset($aidParams['noPostPopulate']) && !isset($aidParams['notPostPopulate'])) {
+        if (!isset($aidParams['noPostPopulate'])) {
             $aids = $this->postPopulateAids($aids, $aidParams);
         }
 
