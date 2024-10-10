@@ -4,6 +4,7 @@ namespace App\Command\ImportFlux;
 
 use App\Entity\Aid\Aid;
 use App\Entity\Aid\AidFinancer;
+use App\Entity\Aid\AidRecurrence;
 use App\Entity\DataSource\DataSource;
 use App\Service\Email\EmailService;
 use App\Service\File\FileService;
@@ -33,6 +34,10 @@ class ImportFluxCommand extends Command // NOSONAR too much methods
 
     protected array $aidsLabelSearch = ['result', 'results', 'aides', 'records', 'ListeDispositifs'];
 
+    protected ?AidRecurrence $aidRecurrenceOneOff = null;
+    protected ?AidRecurrence $aidRecurrenceOnGoing = null;
+    protected ?AidRecurrence $aidRecurrenceRecurring = null;
+
     protected bool $paginationEnabled = false;
     protected int $nbPages = 1;
     protected int $nbByPages = 20;
@@ -61,6 +66,7 @@ class ImportFluxCommand extends Command // NOSONAR too much methods
         ini_set('memory_limit', '1G');
         parent::__construct();
         $this->dateImportStart = new \DateTime(date('Y-m-d H:i:s'));
+        $this->setInternalAidRecurrences();
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -73,10 +79,10 @@ class ImportFluxCommand extends Command // NOSONAR too much methods
         $io = new SymfonyStyle($input, $output);
         $io->title($this->commandTextStart);
 
-        if ($this->kernelInterface->getEnvironment() != 'prod') {
-            $io->info('Uniquement en prod');
-            return Command::FAILURE;
-        }
+        // if ($this->kernelInterface->getEnvironment() != 'prod') {
+        //     $io->info('Uniquement en prod');
+        //     return Command::FAILURE;
+        // }
 
         try {
             // set la dataSource
@@ -501,21 +507,40 @@ class ImportFluxCommand extends Command // NOSONAR too much methods
         if (!$date) {
             return null;
         }
-        try {
-            $dateTemp = new \DateTime($date);
-
-            if (!isset($params['keepTime'])) {
-                // Force pour éviter les différence sur le fuseau horaire
-                $date = new \DateTime($dateTemp->format('Y-m-d'));
-                // Force les heures, minutes, et secondes à 00:00:00
-                $date->setTime(0, 0, 0);
-            } else {
-                $date = new \DateTime($date);
+    
+        $formats = ['Y-m-d', 'd/m/Y'];
+        $dateTemp = null;
+    
+        foreach ($formats as $format) {
+            $dateTemp = \DateTime::createFromFormat($format, $date);
+            if ($dateTemp !== false) {
+                break;
             }
-        } catch (\Exception $e) {
-            $date = null;
         }
+    
+        if ($dateTemp === false) {
+            return null;
+        }
+    
+        if (!isset($params['keepTime'])) {
+            // Force pour éviter les différences sur le fuseau horaire
+            $date = new \DateTime($dateTemp->format('Y-m-d'));
+            // Force les heures, minutes, et secondes à 00:00:00
+            $date->setTime(0, 0, 0);
+        } else {
+            $date = $dateTemp;
+        }
+    
         return $date;
+    }
+
+    protected function getBooleanOrNull(?array $aidToImport, ?string $key): ?bool
+    {
+        if (!is_array($aidToImport) || !$key || !isset($aidToImport[$key])) {
+            return null;
+        }
+        $value = trim(strtolower($aidToImport[$key]));
+        return $value == '1' || $value == 'true' || $value == 'oui';
     }
 
     protected function cleanName(string $name): string
@@ -556,5 +581,9 @@ class ImportFluxCommand extends Command // NOSONAR too much methods
         $html = trim($html);
 
         return $html !== '' ? $html : null;
+    }
+
+    protected function setInternalAidRecurrences(): void // NOSONAR methode generique pour surcharge
+    {
     }
 }
