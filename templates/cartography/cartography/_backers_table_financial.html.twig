@@ -1,13 +1,5 @@
 <div class="fr-mb-5w">
-	<h2>{{ current_dept.name }}
-		:
-		{{ backers|length }}
-		porteur
-		{% if backers|length > 1 %}s
-		{% endif %}
-		d‘aides financières présent
-		{% if backers|length > 1 %}s
-		{% endif %}
+	<h2>{{ current_dept.name }} : {{ backers|length }} porteur{% if backers|length > 1 %}s{% endif %} d‘aides financières présent{% if backers|length > 1 %}s{% endif %}
 	</h2>
 </div>
 <div class="fr-table fr-table--no-scroll">
