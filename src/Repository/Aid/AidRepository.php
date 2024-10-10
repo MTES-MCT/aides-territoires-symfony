@@ -326,6 +326,7 @@ class AidRepository extends ServiceEntityRepository
         $organizationTypeSlugs = $params['organizationTypeSlugs'] ?? null;
         $perimeterFrom = $params['perimeterFrom'] ?? null;
         $perimeterFromId = $params['perimeterFromId'] ?? null;
+        $perimeterFromIds = $params['perimeterFromIds'] ?? null;
         $perimeterTo = $params['perimeterTo'] ?? null;
         $perimeter = $params['perimeter'] ?? null;
         $perimeterScales = $params['perimeterScales'] ?? null;
@@ -747,6 +748,14 @@ class AidRepository extends ServiceEntityRepository
                 ->innerJoin('perimeter.perimetersFrom', 'perimetersFrom')
                 ->andWhere('(perimetersFrom.id = :perimeterFromId OR perimeter.id = :perimeterFromId)')
                 ->setParameter('perimeterFromId', (int) $perimeterFromId)
+            ;
+        }
+
+        if (is_array($perimeterFromIds) && !empty($perimeterFromIds)) {
+            $qb
+                ->innerJoin('a.perimeter', 'perimeter')
+                ->andWhere('perimeter.id IN (:ids)')
+                ->setParameter('ids', $perimeterFromIds)
             ;
         }
 

@@ -160,10 +160,13 @@ class CartographyController extends FrontController
             $aidTypeGroupSlug = $aidTypeGroup->getSlug();
         }
 
+        $perimeterIds = $perimeterRepository->getIdPerimetersContainedIn(['perimeter' => $current_dep]);
+        $perimeterIds[] = $current_dep->getId();
+
         // les paramètres pour les aides
         $aidsParams = [
             'showInSearch' => true,
-            'perimeterFrom' => $current_dep,
+            'perimeterFromIds' => $perimeterIds,
             'organizationType' => $backerParams['organizationType'] ?? null,
             'aidTypeGroup' => $backerParams['aidTypeGroup'] ?? null,
             'categoryIds' => $backerParams['categoryIds'] ?? null,
