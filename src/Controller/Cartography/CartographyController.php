@@ -3,6 +3,7 @@
 namespace App\Controller\Cartography;
 
 use App\Controller\FrontController;
+use App\Entity\Aid\Aid;
 use App\Entity\Aid\AidTypeGroup;
 use App\Entity\Perimeter\Perimeter;
 use App\Form\Cartography\CartographySearchType;
@@ -94,7 +95,8 @@ class CartographyController extends FrontController
         PerimeterService $perimeterService,
         CategoryRepository $categoryRepository,
         CategoryThemeRepository $categoryThemeRepository,
-        AidService $aidService
+        AidService $aidService,
+        AidRepository $aidRepository
     ): Response {
         // departement courant
         $current_dep = $perimeterRepository->findOneBy([
@@ -195,11 +197,38 @@ class CartographyController extends FrontController
             }
         }
 
+        // on charge toute les thematiques
+        $categoryThemes = $categoryThemeRepository->findAll();
+        $categoryThemesById = [];
+        foreach ($categoryThemes as $categoryTheme) {
+            $categoryThemesById[$categoryTheme->getId()] = $categoryTheme;
+        }
+
         // assigne les aides aux backers
         foreach ($backers as $key => $backer) {
             $aidsParams['backer'] = $backer;
             // défini les aides lives, à partir de quoi on pourra récupérer les financières, techniques, les thématiques
             $backer->setAidsLive($aidService->searchAids($aidsParams));
+
+            /** @var Aid $aid */
+            $aidsLiveIds = [];
+            foreach ($backer->getAidsLive() as $aid) {
+                $aidsLiveIds[] = $aid->getId();
+            }
+
+            $categoryThemesIds = $aidRepository->getCategoryThemesIdsFromIds($aidsLiveIds);
+            $backerCategoryThemes = new ArrayCollection();
+            foreach ($categoryThemesIds as $categoryThemeId) {
+                if (isset($categoryThemesById[$categoryThemeId])) {
+                    $backerCategoryThemes->add($categoryThemesById[$categoryThemeId]);
+                }
+            }
+            $backer->setAidsThematics($backerCategoryThemes);
+            $iterator = $backer->getAidsThematics()->getIterator();
+            $iterator->uasort(function ($a, $b) {
+                return ($a->getSlug() < $b->getSlug()) ? -1 : 1;
+            });
+            $backer->setAidsThematics(new ArrayCollection(iterator_to_array($iterator)));
         }
 
         // fil arianne

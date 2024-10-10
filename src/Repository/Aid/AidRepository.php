@@ -46,6 +46,21 @@ class AidRepository extends ServiceEntityRepository
         parent::__construct($registry, Aid::class);
     }
 
+    public function getCategoryThemesIdsFromIds(array $ids): array
+    {
+        $qb = $this->createQueryBuilder('a')
+            ->select('DISTINCT(categoryTheme.id) as categoryTheme_id')
+            ->innerJoin('a.categories', 'category')
+            ->innerJoin('category.categoryTheme', 'categoryTheme')
+            ->andWhere('a.id IN (:ids)')
+            ->setParameter('ids', $ids)
+            ;
+
+        $results = $qb->getQuery()->getResult();
+
+        return array_column($results, 'categoryTheme_id');
+    }
+
     public function getScaleCovered($scale, ?array $params = null): array
     {
         $qb = $this->getQueryBuilder($params)
