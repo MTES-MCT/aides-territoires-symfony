@@ -170,8 +170,7 @@
                 ".scalingo/nginx/nginx-app.conf",
                 ".scalingo/nginx/server.location",
                 ".scalingo/nginx/nginx-ips-filtering.conf",
-                ".scalingo/nginx/permission-policy.conf",
-                ".scalingo/nginx/nginx-map.conf"
+                ".scalingo/nginx/permission-policy.conf"
             ]
         }
     },
