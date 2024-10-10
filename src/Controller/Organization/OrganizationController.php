@@ -421,7 +421,7 @@ class OrganizationController extends FrontController
         $user = $userService->getUserLogged();
 
         $organizationInvitation = $organizationInvitationRepository->find($id);
-        if ($organizationInvitation->getEmail() !== $user->getEmail()) {
+        if (strtolower($organizationInvitation->getEmail()) !== strtolower($user->getEmail())) {
             return $this->redirectToRoute('app_organization_invitations');
         }
 

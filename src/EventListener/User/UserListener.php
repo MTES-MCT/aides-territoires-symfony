@@ -11,6 +11,7 @@ use App\Service\Matomo\MatomoService;
 use App\Service\Notification\NotificationService;
 use App\Service\Various\ParamService;
 use Doctrine\ORM\Event\PostPersistEventArgs;
+use Doctrine\ORM\Event\PrePersistEventArgs;
 use Doctrine\ORM\Event\PreRemoveEventArgs;
 use Doctrine\Persistence\ManagerRegistry;
 use Psr\Log\LoggerInterface;
@@ -28,6 +29,15 @@ class UserListener
         private NotificationService $notificationService,
         private LoggerInterface $loggerInterface
     ) {
+    }
+
+    public function onPrePersist(PrePersistEventArgs $args): void
+    {
+        /** @var User $entity */
+        $entity = $args->getObject();
+
+        // on force les minuscules sur l'email de l'utilisateur
+        $entity->setEmail(strtolower($entity->getEmail()));
     }
 
     public function onPostPersist(PostPersistEventArgs $args): void
