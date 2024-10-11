@@ -79,10 +79,10 @@ class ImportFluxCommand extends Command // NOSONAR too much methods
         $io = new SymfonyStyle($input, $output);
         $io->title($this->commandTextStart);
 
-        // if ($this->kernelInterface->getEnvironment() != 'prod') {
-        //     $io->info('Uniquement en prod');
-        //     return Command::FAILURE;
-        // }
+        if ($this->kernelInterface->getEnvironment() != 'prod') {
+            $io->info('Uniquement en prod');
+            return Command::FAILURE;
+        }
 
         try {
             // set la dataSource
