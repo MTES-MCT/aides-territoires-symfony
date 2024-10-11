@@ -3,6 +3,7 @@
 namespace App\Repository\Aid;
 
 use App\Entity\Aid\AidType;
+use App\Entity\Aid\AidTypeGroup;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
@@ -20,6 +21,20 @@ class AidTypeRepository extends ServiceEntityRepository
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, AidType::class);
+    }
+
+    public function getIdsFromAidTypeGroup(AidTypeGroup $aidTypeGroup) : array
+    {
+        $qb = $this->createQueryBuilder('at');
+
+        $qb
+            ->select('at.id')
+            ->where('at.aidTypeGroup = :aidTypeGroup')
+            ->setParameter('aidTypeGroup', $aidTypeGroup);
+
+        $results = $qb->getQuery()->getResult();
+
+        return array_column($results, 'id');
     }
 
     public function countCustom(array $params = null): int

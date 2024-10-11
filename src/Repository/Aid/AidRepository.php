@@ -46,6 +46,40 @@ class AidRepository extends ServiceEntityRepository
         parent::__construct($registry, Aid::class);
     }
 
+    public function countAidsFromIds(array $ids, ?array $params = null): int
+    {
+        $aidTypeGroup = $params['aidTypeGroup'] ?? null;
+
+        $qb = $this->createQueryBuilder('a')
+            ->select('IFNULL(COUNT(DISTINCT(a.id)), 0) AS nb')
+            ->andWhere('a.id IN (:ids)')
+            ->setParameter('ids', $ids);
+
+        if ($aidTypeGroup instanceof AidTypeGroup && $aidTypeGroup->getId()) {
+            $qb
+                ->innerJoin('a.aidTypes', 'aidType')
+                ->andWhere('aidType.aidTypeGroup = :aidTypeGroup')
+                ->setParameter('aidTypeGroup', $aidTypeGroup);
+        }
+
+        return $qb->getQuery()->getResult()[0]['nb'] ?? 0;
+    }
+
+    public function getCategoryThemesIdsFromIds(array $ids): array
+    {
+        $qb = $this->createQueryBuilder('a')
+            ->select('DISTINCT(categoryTheme.id) as categoryTheme_id')
+            ->innerJoin('a.categories', 'category')
+            ->innerJoin('category.categoryTheme', 'categoryTheme')
+            ->andWhere('a.id IN (:ids)')
+            ->setParameter('ids', $ids)
+            ;
+
+        $results = $qb->getQuery()->getResult();
+
+        return array_column($results, 'categoryTheme_id');
+    }
+
     public function getScaleCovered($scale, ?array $params = null): array
     {
         $qb = $this->getQueryBuilder($params)
@@ -311,6 +345,7 @@ class AidRepository extends ServiceEntityRepository
         $organizationTypeSlugs = $params['organizationTypeSlugs'] ?? null;
         $perimeterFrom = $params['perimeterFrom'] ?? null;
         $perimeterFromId = $params['perimeterFromId'] ?? null;
+        $perimeterFromIds = $params['perimeterFromIds'] ?? null;
         $perimeterTo = $params['perimeterTo'] ?? null;
         $perimeter = $params['perimeter'] ?? null;
         $perimeterScales = $params['perimeterScales'] ?? null;
@@ -732,6 +767,14 @@ class AidRepository extends ServiceEntityRepository
                 ->innerJoin('perimeter.perimetersFrom', 'perimetersFrom')
                 ->andWhere('(perimetersFrom.id = :perimeterFromId OR perimeter.id = :perimeterFromId)')
                 ->setParameter('perimeterFromId', (int) $perimeterFromId)
+            ;
+        }
+
+        if (is_array($perimeterFromIds) && !empty($perimeterFromIds)) {
+            $qb
+                ->innerJoin('a.perimeter', 'perimeter')
+                ->andWhere('perimeter.id IN (:ids)')
+                ->setParameter('ids', $perimeterFromIds)
             ;
         }
 

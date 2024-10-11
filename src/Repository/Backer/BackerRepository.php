@@ -65,16 +65,19 @@ class BackerRepository extends ServiceEntityRepository
 
         $queryBuilder = $this->createQueryBuilder('b');
 
+        $perimeterFrom = $this->getEntityManager()->getRepository(Perimeter::class)->find($params['id']);
+        $ids = $this->getEntityManager()->getRepository(Perimeter::class)->getIdPerimetersContainedIn(['perimeter' => $perimeterFrom]);
+        $ids[] = $perimeterFrom->getId();
+
         $queryBuilder
             ->select('COUNT(DISTINCT(b.id)) as nb')
             ->addCriteria(self::activeCriteria())
             ->innerJoin('b.aidFinancers', 'aidFinancers')
             ->innerJoin('aidFinancers.aid', 'aid')
-            ->addCriteria(AidRepository::liveCriteria('aid.'))
+            ->addCriteria(AidRepository::showInSearchCriteria('aid.'))
             ->innerJoin('b.perimeter', 'perimeter')
-            ->innerJoin('perimeter.perimetersFrom', 'perimetersFrom')
-            ->andWhere('(perimeter.id = :id OR perimetersFrom.id = :id)')
-            ->setParameter('id', $params['id'])
+            ->andWhere('perimeter.id IN (:ids)')
+            ->setParameter('ids', $ids)
         ;
 
         return $queryBuilder->getQuery()->getResult()[0]['nb'] ?? 0;
@@ -102,10 +105,12 @@ class BackerRepository extends ServiceEntityRepository
         }
 
         $qb
+            ->leftJoin('b.backerGroup', 'backerGroup')
+            ->addSelect('backerGroup')
             ->innerJoin('b.aidFinancers', 'aidFinancers')
             ->innerJoin('aidFinancers.aid', 'aid')
             // aid live
-            ->addCriteria(AidRepository::liveCriteria('aid.'))
+            ->addCriteria(AidRepository::showInSearchCriteria('aid.'))
         ;
         if ($perimeterFrom instanceof Perimeter && $perimeterFrom->getId()) {
             $ids = $this->getEntityManager()->getRepository(Perimeter::class)->getIdPerimetersContainedIn(['perimeter' => $perimeterFrom]);
@@ -113,6 +118,7 @@ class BackerRepository extends ServiceEntityRepository
 
             $qb
                 ->innerJoin('b.perimeter', 'perimeter')
+                ->addSelect('perimeter')
                 ->andWhere('perimeter.id IN (:ids)')
                 ->setParameter('ids', $ids)
             ;

@@ -192,7 +192,9 @@ class Backer // NOSONAR too much methods
     private ArrayCollection $categories;
 
     private ArrayCollection $programs;
-    private ?ArrayCollection $aidsThematics;
+    private ?ArrayCollection $aidsThematics = null;
+    private array $nbAidsByTypeGroupSlug = [];
+    private array $nbAidsByTypeSlug = [];
 
     private ?LogBackerEdit $lastLogBackerEdit = null;
 
@@ -211,6 +213,7 @@ class Backer // NOSONAR too much methods
         $this->backerLocks = new ArrayCollection();
         $this->backerAskAssociates = new ArrayCollection();
         $this->logBackerEdits = new ArrayCollection();
+        $this->aidsThematics = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -648,6 +651,10 @@ class Backer // NOSONAR too much methods
 
     public function getAidsThematics(): ?ArrayCollection
     {
+        // vérifie si on a déjà calculé les thématiques
+        if ($this->aidsThematics) {
+            return $this->aidsThematics;
+        }
         $thematics = new ArrayCollection();
         foreach ($this->getAidsLive() as $aid) {
             foreach ($aid->getCategories() as $category) {
@@ -1054,6 +1061,28 @@ class Backer // NOSONAR too much methods
     public function setLastLogBackerEdit(?LogBackerEdit $lastLogBackerEdit): static
     {
         $this->lastLogBackerEdit = $lastLogBackerEdit;
+        return $this;
+    }
+
+    public function getNbAidsByTypeGroupSlug(): array
+    {
+        return $this->nbAidsByTypeGroupSlug;
+    }
+
+    public function setNbAidsByTypeGroupSlug(array $nbAidsByTypeGroupSlug): static
+    {
+        $this->nbAidsByTypeGroupSlug = $nbAidsByTypeGroupSlug;
+        return $this;
+    }
+
+    public function getNbAidsByTypeSlug(): array
+    {
+        return $this->nbAidsByTypeSlug;
+    }
+
+    public function setNbAidsByTypeSlug(array $nbAidsByTypeSlug): static
+    {
+        $this->nbAidsByTypeSlug = $nbAidsByTypeSlug;
         return $this;
     }
 }
