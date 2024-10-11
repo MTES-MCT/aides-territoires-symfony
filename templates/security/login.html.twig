@@ -5,6 +5,11 @@
 {% block meta_description %}🔍 Trouvez des aides pour financer et accompagner les projets de votre collectivité en France métropolitaine et en Outre-mer
 {% endblock %}
 
+{% block stylesheets %}
+	{{ parent() }}
+	{{ encore_entry_link_tags('import-scss/security/login') }}
+{% endblock %}
+
 {% block body %}
 	<main role="main" class="fr-container-fluid" id="at-main">
 		<div id="login-form" class="main-content">
@@ -49,6 +54,16 @@
 							</div>
 						</div>
 					</div>
+				</div>
+
+				<div class="fr-connect-group">
+					<button class="fr-connect">
+						<span class="fr-connect__login">S’identifier avec</span>
+						<span class="fr-connect__brand">ProConnect</span>
+					</button>
+					<p>
+						<a href="https://www.proconnect.gouv.fr/" target="_blank"  rel="noopener" title="Qu'est-ce que ProConnect ? - nouvelle fenêtre">Qu'est-ce que ProConnect ?</a>
+					</p>
 				</div>
 			</div>
 		</div>
