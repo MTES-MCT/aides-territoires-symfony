@@ -122,6 +122,8 @@ class BackerRepository extends ServiceEntityRepository
                 ->andWhere('perimeter.id IN (:ids)')
                 ->setParameter('ids', $ids)
             ;
+
+            $backerGroupAdded = true;
         }
 
 
@@ -157,8 +159,12 @@ class BackerRepository extends ServiceEntityRepository
         }
 
         if ($backerCategory instanceof BackerCategory && $backerCategory->getId()) {
+            if (!isset($backerGroupAdded)) {
+                $qb
+                    ->innerJoin('b.backerGroup', 'backerGroup')
+                ;
+            }
             $qb
-                ->innerJoin('b.backerGroup', 'backerGroup')
                 ->innerJoin('backerGroup.backerSubCategory', 'backerSubCategory')
                 ->innerJoin('backerSubCategory.backerCategory', 'backerCategory')
                 ->andWhere('backerCategory = :backerCategory')
