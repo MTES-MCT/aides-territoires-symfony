@@ -105,6 +105,8 @@ class BackerRepository extends ServiceEntityRepository
         }
 
         $qb
+            ->innerJoin('b.backerGroup', 'backerGroup')
+            ->addSelect('backerGroup')
             ->innerJoin('b.aidFinancers', 'aidFinancers')
             ->innerJoin('aidFinancers.aid', 'aid')
             // aid live
