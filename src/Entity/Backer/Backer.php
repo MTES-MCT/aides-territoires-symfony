@@ -193,6 +193,8 @@ class Backer // NOSONAR too much methods
 
     private ArrayCollection $programs;
     private ?ArrayCollection $aidsThematics = null;
+    private array $nbAidsByTypeGroupSlug = [];
+    private array $nbAidsByTypeSlug = [];
 
     private ?LogBackerEdit $lastLogBackerEdit = null;
 
@@ -1059,6 +1061,28 @@ class Backer // NOSONAR too much methods
     public function setLastLogBackerEdit(?LogBackerEdit $lastLogBackerEdit): static
     {
         $this->lastLogBackerEdit = $lastLogBackerEdit;
+        return $this;
+    }
+
+    public function getNbAidsByTypeGroupSlug(): array
+    {
+        return $this->nbAidsByTypeGroupSlug;
+    }
+
+    public function setNbAidsByTypeGroupSlug(array $nbAidsByTypeGroupSlug): static
+    {
+        $this->nbAidsByTypeGroupSlug = $nbAidsByTypeGroupSlug;
+        return $this;
+    }
+
+    public function getNbAidsByTypeSlug(): array
+    {
+        return $this->nbAidsByTypeSlug;
+    }
+
+    public function setNbAidsByTypeSlug(array $nbAidsByTypeSlug): static
+    {
+        $this->nbAidsByTypeSlug = $nbAidsByTypeSlug;
         return $this;
     }
 }

@@ -46,6 +46,25 @@ class AidRepository extends ServiceEntityRepository
         parent::__construct($registry, Aid::class);
     }
 
+    public function countAidsFromIds(array $ids, ?array $params = null): int
+    {
+        $aidTypeGroup = $params['aidTypeGroup'] ?? null;
+
+        $qb = $this->createQueryBuilder('a')
+            ->select('IFNULL(COUNT(DISTINCT(a.id)), 0) AS nb')
+            ->andWhere('a.id IN (:ids)')
+            ->setParameter('ids', $ids);
+
+        if ($aidTypeGroup instanceof AidTypeGroup && $aidTypeGroup->getId()) {
+            $qb
+                ->innerJoin('a.aidTypes', 'aidType')
+                ->andWhere('aidType.aidTypeGroup = :aidTypeGroup')
+                ->setParameter('aidTypeGroup', $aidTypeGroup);
+        }
+
+        return $qb->getQuery()->getResult()[0]['nb'] ?? 0;
+    }
+
     public function getCategoryThemesIdsFromIds(array $ids): array
     {
         $qb = $this->createQueryBuilder('a')

@@ -9,6 +9,8 @@ use App\Entity\Perimeter\Perimeter;
 use App\Form\Cartography\CartographySearchType;
 use App\Form\Program\CountySelectType;
 use App\Repository\Aid\AidRepository;
+use App\Repository\Aid\AidTypeGroupRepository;
+use App\Repository\Aid\AidTypeRepository;
 use App\Repository\Backer\BackerRepository;
 use App\Repository\Category\CategoryRepository;
 use App\Repository\Category\CategoryThemeRepository;
@@ -96,7 +98,9 @@ class CartographyController extends FrontController
         CategoryRepository $categoryRepository,
         CategoryThemeRepository $categoryThemeRepository,
         AidService $aidService,
-        AidRepository $aidRepository
+        AidRepository $aidRepository,
+        AidTypeRepository $aidTypeRepository,
+        AidTypeGroupRepository $aidTypeGroupRepository
     ): Response {
         // departement courant
         $current_dep = $perimeterRepository->findOneBy([
@@ -152,7 +156,7 @@ class CartographyController extends FrontController
 
         // la liste des backers
         $backers = $backerRepository->findBackerWithAidInCounty($backerParams);
-        
+
         // actions selon type d'aide
         $aidTypeGroupSlug = null;
         $aidTypeGroup = $formBackerSearch->get('aidTypeGroup')->getData();
@@ -160,6 +164,7 @@ class CartographyController extends FrontController
             $aidTypeGroupSlug = $aidTypeGroup->getSlug();
         }
 
+        // Tableau des ids de périmètres contenus dans le département courant
         $perimeterIds = $perimeterRepository->getIdPerimetersContainedIn(['perimeter' => $current_dep]);
         $perimeterIds[] = $current_dep->getId();
 
@@ -188,6 +193,7 @@ class CartographyController extends FrontController
                 break;
         }
 
+        // Si il y a un filtre sur les categoryTheme
         $categoryThemesSelected = new ArrayCollection();
         if (isset($backerParams['categoryIds'])) {
             $categories = $categoryRepository->findCustom([
@@ -207,8 +213,12 @@ class CartographyController extends FrontController
             $categoryThemesById[$categoryTheme->getId()] = $categoryTheme;
         }
 
+        // Les groupes de type d'aides
+        $aidTypeGroupTechnical = $aidTypeGroupRepository->findOneBy(['slug' => AidTypeGroup::SLUG_TECHNICAL]);
+        $aidTypeGroupFinancial = $aidTypeGroupRepository->findOneBy(['slug' => AidTypeGroup::SLUG_FINANCIAL]);
+
         // assigne les aides aux backers
-        foreach ($backers as $key => $backer) {
+        foreach ($backers as $backer) {
             $aidsParams['backer'] = $backer;
             // défini les aides lives, à partir de quoi on pourra récupérer les financières, techniques, les thématiques
             $backer->setAidsLive($aidService->searchAids($aidsParams));
@@ -219,6 +229,7 @@ class CartographyController extends FrontController
                 $aidsLiveIds[] = $aid->getId();
             }
 
+            // on récupère les thématiques des aides
             $categoryThemesIds = $aidRepository->getCategoryThemesIdsFromIds($aidsLiveIds);
             $backerCategoryThemes = new ArrayCollection();
             foreach ($categoryThemesIds as $categoryThemeId) {
@@ -232,6 +243,12 @@ class CartographyController extends FrontController
                 return ($a->getSlug() < $b->getSlug()) ? -1 : 1;
             });
             $backer->setAidsThematics(new ArrayCollection(iterator_to_array($iterator)));
+
+            // on récupère les groupes de types d'aides des aides
+            $backer->setNbAidsByTypeGroupSlug([
+                AidTypeGroup::SLUG_FINANCIAL => $aidRepository->countAidsFromIds($aidsLiveIds, ['aidTypeGroup' => $aidTypeGroupFinancial]),
+                AidTypeGroup::SLUG_TECHNICAL => $aidRepository->countAidsFromIds($aidsLiveIds, ['aidTypeGroup' => $aidTypeGroupTechnical]),
+            ]);
         }
 
         // fil arianne
