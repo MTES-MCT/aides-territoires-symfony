@@ -13,7 +13,9 @@ use App\Form\User\UserProfilType;
 use App\Repository\Log\LogUserLoginRepository;
 use App\Repository\User\ApiTokenAskRepository;
 use App\Service\Email\EmailService;
+use App\Service\Security\ProConnectService;
 use App\Service\User\UserService;
+use AWS\CRT\HTTP\Request;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -29,6 +31,40 @@ class ParameterController extends FrontController
 {
     const NB_HISTORY_LOG_BY_PAGE = 20;
 
+    #[Route('/comptes/moncompte/', name: 'app_user_dashboard')]
+    public function myAccount(
+        RequestStack $requestStack,
+        ProConnectService $proConnectService
+    ): Response
+    {
+        // tous les paramètres get dans un tableau
+        $params = $requestStack->getCurrentRequest()->query->all();
+        $state = $params['state'] ?? null;
+
+        // si le state est null ou non valide
+        if (!$state || !$proConnectService->isValidState($state)) {
+            // redirection
+            return $this->redirectToRoute('app_login');
+        }
+
+        // On stocke le code
+        $code = $params['code'] ?? null;
+        if (!$code) {
+            // redirection
+            return $this->redirectToRoute('app_login');
+        }
+        $proConnectService->setCodeToken($code);
+
+        // on va generer le token
+        $token = $proConnectService->generateToken();
+
+        dd($params);
+        // afficher le referer
+        $referer = $requestStack->getCurrentRequest()->headers->get('referer');
+        dd($referer);
+        return $this->redirectToRoute('app_user_parameter_profil');
+    }
+    
     #[Route('/comptes/monprofil/', name: 'app_user_parameter_profil')]
     public function profil(UserPasswordHasherInterface $userPasswordHasher, UserService $userService, ManagerRegistry $managerRegistry, RequestStack $requestStack): Response
     {

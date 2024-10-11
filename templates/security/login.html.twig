@@ -56,15 +56,19 @@
 					</div>
 				</div>
 
-				<div class="fr-connect-group">
-					<button class="fr-connect">
-						<span class="fr-connect__login">S’identifier avec</span>
-						<span class="fr-connect__brand">ProConnect</span>
-					</button>
-					<p>
-						<a href="https://www.proconnect.gouv.fr/" target="_blank"  rel="noopener" title="Qu'est-ce que ProConnect ? - nouvelle fenêtre">Qu'est-ce que ProConnect ?</a>
-					</p>
-				</div>
+				<form action="{{ path('app_login_proconnect') }}" method="post">
+					<input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+					<div class="fr-connect-group">
+						<button type="submit" class="fr-connect">
+							<span class="fr-connect__login">S’identifier avec</span>
+							<span class="fr-connect__brand">ProConnect</span>
+						</button>
+						<p>
+							<a href="https://www.proconnect.gouv.fr/" target="_blank"  rel="noopener" title="Qu'est-ce que ProConnect ? - nouvelle fenêtre">Qu'est-ce que ProConnect ?</a>
+						</p>
+					</div>
+				</form>
+
 			</div>
 		</div>
 	</main>

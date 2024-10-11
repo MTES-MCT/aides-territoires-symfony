@@ -5,9 +5,11 @@ namespace App\Controller;
 use App\Exception\NotFoundException\UserRegisterConfirmationNotFoundException;
 use App\Form\Security\LoginType;
 use App\Repository\User\UserRegisterConfirmationRepository;
+use App\Service\Security\ProConnectService;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -39,6 +41,19 @@ class SecurityController extends FrontController
             'formLogin' => $formLogin->createView(),
             'error' => $error
         ]);
+    }
+
+    #[Route('/comptes/connexion/proconnect/', name: 'app_login_proconnect')]
+    public function loginByPronnect(
+        ProConnectService $proConnectService
+    ) : Response {
+        // On recupère les informations de proconnect
+        $autorizationEndpoint = $proConnectService->getAuthorizationEndpoint();
+// dd($autorizationEndpoint);
+        return new RedirectResponse($autorizationEndpoint);
+        // génération state et nonce
+
+        // return new Response('ok');
     }
 
     #[Route('/comptes/connexion/{token}', name: 'app_user_user_register_confirmation')]
