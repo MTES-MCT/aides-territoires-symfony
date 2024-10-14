@@ -2,10 +2,9 @@
 
 namespace App\Service\Security;
 
+use App\Exception\Security\ProConnectException;
 use App\Service\Various\ParamService;
 use CoderCat\JWKToPEM\JWKConverter;
-use Jose\Component\Core\JWK;
-use Jose\Component\KeyManagement\KeyConverter\RSAKey;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
@@ -17,7 +16,6 @@ use Lcobucci\JWT\Encoding\JoseEncoder;
 use Lcobucci\JWT\Signer\Rsa\Sha256;
 use Lcobucci\JWT\Token\Parser;
 use Lcobucci\JWT\Validation\Constraint\HasClaimWithValue;
-use Lcobucci\JWT\Validation\Constraint\RelatedTo;
 
 class ProConnectService
 {
@@ -56,6 +54,25 @@ class ProConnectService
         // $this->urlRedirectLogin = $this->routerInterface->generate('app_user_parameter_profil', [], RouterInterface::ABSOLUTE_URL);
         $this->urlRedirectLogin = $this->routerInterface->generate('app_user_dashboard', [], RouterInterface::ABSOLUTE_URL);
         $this->urlRedirectLogout = $this->routerInterface->generate('app_home', [], RouterInterface::ABSOLUTE_URL);
+    }
+
+    public function getDataFromProconnect(array $params) : array {
+        $state = $params['state'] ?? null;
+
+        // si le state est null ou non valide
+        if (!$state || !$this->isValidState($state)) {
+            throw new ProConnectException('Erreur lors de la récupération du state');
+        }
+
+        // On stocke le code
+        $code = $params['code'] ?? null;
+        if (!$code) {
+            throw new ProConnectException('Erreur lors de la récupération du code');
+        }
+        $this->setCodeToken($code);
+
+        // On récupère les infos de l'utilisateur
+        return $this->getUserInfo();
     }
 
     /**
@@ -106,7 +123,13 @@ class ProConnectService
         return $this->authorizationEndpoint . '?' . $query;
     }
 
-    public function generateToken()
+
+    /**
+     * Stocke les tokens liés à l'utilisateur dans la session
+     *
+     * @return array
+     */
+    public function storeUserTokens(): void
     {
         if (!$this->tokenEndpoint) {
             $this->getDiscovery();
@@ -129,26 +152,42 @@ class ProConnectService
 
         $content = $response->toArray();
 
-        $this->accessToken = $content['access_token'] ?? '';
-        $this->idToken = $content['id_token'] ?? '';
+        // les tokens
+        $accessToken = $content['access_token'] ?? '';
+        $idToken = $content['id_token'] ?? '';
+
+        // on vérifie que non vide
+        if (empty($accessToken) || empty($idToken)) {
+            throw new ProConnectException('Erreur lors de la récupération des tokens');
+        }
 
         // Vérification de l'id_token et du nonce
-        $this->verifyIdToken($this->idToken);
+        if (!$this->verifyIdToken($idToken)) {
+            throw new ProConnectException('Erreur lors de la vérification du token');
+        }
         
+        // On assigne à l'objet
+        $this->accessToken = $accessToken;
+        $this->idToken = $idToken;
+
         // stockage du id_token dans la session
         $session = new Session();
         $session->set(self::SESSION_KEY_ID_TOKEN, $this->idToken);
-
-        // recupération des infos de l'utilisateur
-        $this->getUserInfo();
-        return $content;
     }
 
-    private function getUserInfo()
+    /**
+     * Pour récupérer les infos de l'utilisateurs (email, etc..)
+     *
+     * @return array
+     */
+    private function getUserInfo(): array
     {
         if (!$this->userInfoEndpoint) {
             $this->getDiscovery();
         }
+
+        // recupère les tokens de l'utilisateurs
+        $this->storeUserTokens();
 
         $response = $this->client->request('GET', $this->userInfoEndpoint, [
             'headers' => [
@@ -162,11 +201,18 @@ class ProConnectService
         $parser = new Parser(new JoseEncoder());
         $token = $parser->parse($userToken);
 
-        // les infos utilisateurs sont dans claims -> data
-        dd($token);
-        return $response->getContent();
+        // Vérification du token
+        $this->verifyIdToken($this->idToken);
+        
+        // les infos utilisateurs sont dans claims
+        return $token->claims()->all();
     }
 
+    /**
+     * Vérifie que le token est bien signé par ProConnect
+     *
+     * @return void
+     */
     private function verifyIdToken(string $idToken)
     {
         $response = $this->client->request('GET', $this->jwksUri, [
@@ -215,12 +261,23 @@ class ProConnectService
         return true;
     }
     
+    /**
+     * Convertir la cle JWK en cle PEM pour la validation
+     *
+     * @param array $jwk
+     * @return string
+     */
     private function convertJwkToPem(array $jwk): string
     {
         $jwkConverter = new JWKConverter();
         return $jwkConverter->toPEM($jwk);
     }
     
+    /**
+     * Récupère le code token
+     *
+     * @return string
+     */
     public function getCodeToken(): string
     {
         // Si il est déjà assigné
@@ -240,6 +297,13 @@ class ProConnectService
         return '';
     }
 
+
+    /**
+     * Stocke le code token
+     *
+     * @param string $codeToken
+     * @return void
+     */
     public function setCodeToken(string $codeToken): void
     {
         $this->codeToken = $codeToken;

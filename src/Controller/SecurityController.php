@@ -47,13 +47,15 @@ class SecurityController extends FrontController
     public function loginByPronnect(
         ProConnectService $proConnectService
     ) : Response {
-        // On recupère les informations de proconnect
-        $autorizationEndpoint = $proConnectService->getAuthorizationEndpoint();
-// dd($autorizationEndpoint);
-        return new RedirectResponse($autorizationEndpoint);
-        // génération state et nonce
-
-        // return new Response('ok');
+        try {
+            return new RedirectResponse($proConnectService->getAuthorizationEndpoint());
+        } catch (\Exception $e) {
+            $this->tAddFlash(
+                FrontController::FLASH_ERROR,
+                'Une erreur est survenue lors de la connexion à ProConnect'
+            );
+            return $this->redirectToRoute('app_login');
+        }
     }
 
     #[Route('/comptes/connexion/{token}', name: 'app_user_user_register_confirmation')]

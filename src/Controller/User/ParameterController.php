@@ -39,26 +39,11 @@ class ParameterController extends FrontController
     {
         // tous les paramètres get dans un tableau
         $params = $requestStack->getCurrentRequest()->query->all();
-        $state = $params['state'] ?? null;
+        
+        // on recupère les infos de ProConnect
+        $userInfos = $proConnectService->getDataFromProconnect($params);
 
-        // si le state est null ou non valide
-        if (!$state || !$proConnectService->isValidState($state)) {
-            // redirection
-            return $this->redirectToRoute('app_login');
-        }
-
-        // On stocke le code
-        $code = $params['code'] ?? null;
-        if (!$code) {
-            // redirection
-            return $this->redirectToRoute('app_login');
-        }
-        $proConnectService->setCodeToken($code);
-
-        // on va generer le token
-        $token = $proConnectService->generateToken();
-
-        dd($params);
+        dd($userInfos);
         // afficher le referer
         $referer = $requestStack->getCurrentRequest()->headers->get('referer');
         dd($referer);
