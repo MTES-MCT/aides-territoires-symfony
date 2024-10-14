@@ -104,7 +104,7 @@ class LogController extends DashboardController
     public function getDateValueInArray(array $data, \DateTime $date): int
     {
         foreach ($data as $item) {
-            if ($item['dateCreate']->format('Y-m-d') == $date->format('Y-m-d')) {
+            if ($item instanceof \DateTime && $item['dateCreate']->format('Y-m-d') == $date->format('Y-m-d')) {
                 return $item['nb'];
             }
         }
