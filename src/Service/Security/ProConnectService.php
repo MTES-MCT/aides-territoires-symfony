@@ -3,16 +3,21 @@
 namespace App\Service\Security;
 
 use App\Service\Various\ParamService;
+use CoderCat\JWKToPEM\JWKConverter;
+use Jose\Component\Core\JWK;
+use Jose\Component\KeyManagement\KeyConverter\RSAKey;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
-use Lcobucci\JWT\Configuration;
-use Lcobucci\JWT\Signer\Hmac\Sha256;
 use Lcobucci\JWT\Validation\Constraint\SignedWith;
-use Lcobucci\JWT\Validation\Constraint\ValidAt;
 use Lcobucci\JWT\Validation\RequiredConstraintsViolated;
 use Lcobucci\JWT\Validation\Validator;
 use Lcobucci\JWT\Signer\Key\InMemory;
+use Lcobucci\JWT\Encoding\JoseEncoder;
+use Lcobucci\JWT\Signer\Rsa\Sha256;
+use Lcobucci\JWT\Token\Parser;
+use Lcobucci\JWT\Validation\Constraint\HasClaimWithValue;
+use Lcobucci\JWT\Validation\Constraint\RelatedTo;
 
 class ProConnectService
 {
@@ -152,7 +157,13 @@ class ProConnectService
         ]);
 
         // JSON Web Token signé par l'algorithme spécifié à ProConnect, contenant les claims transmis par le FI
-        dd($response->getContent());
+        $userToken = $response->getContent();
+
+        $parser = new Parser(new JoseEncoder());
+        $token = $parser->parse($userToken);
+
+        // les infos utilisateurs sont dans claims -> data
+        dd($token);
         return $response->getContent();
     }
 
@@ -163,75 +174,53 @@ class ProConnectService
                 'Accept' => 'application/json',
             ],
         ]);
-
+    
         $jwksData = json_decode($response->getContent(), true);
-
+    
         // Extraire la clé publique pour RS256
         $publicKeyData = null;
         foreach ($jwksData['keys'] as $key) {
-            if ($key['alg'] === 'RS256') {
+            if ($key['alg'] === 'RS256' && $key['kty'] === 'RSA') {
                 $publicKeyData = $key;
                 break;
             }
         }
-        
+    
         if (!$publicKeyData) {
             throw new \Exception('Clé publique RS256 non trouvée');
         }
-        
-        // Convertir la clé publique en format PEM
-        $publicKey = "-----BEGIN PUBLIC KEY-----\n" .
-            chunk_split(base64_encode(
-                "\x30\x82\x01\x22\x30\x0d\x06\x09\x2a\x86\x48\x86\xf7\x0d\x01\x01\x01\x05\x00\x03\x82\x01\x0f\x00" .
-                hex2bin($publicKeyData['n']) .
-                "\x02\x03\x01\x00\x01"
-            ), 64) .
-            "\n-----END PUBLIC KEY-----";
-        
-        // Configuration de JWT
-        $configuration = Configuration::forAsymmetricSigner(
-            new Sha256(),
-            InMemory::plainText(''),
-            InMemory::plainText($publicKey)
-        );
-        
-        // Parser le token
-        $parsedToken = $configuration->parser()->parse($idToken);
 
-        // Contraintes de validation
-        $constraints = [
-            new SignedWith(new Sha256(), InMemory::plainText($publicKey)),
-            new ValidAt(new \DateTimeImmutable()),
-        ];
+        $publicKey = $this->convertJwkToPem($publicKeyData);
 
-        // Validateur
+        $parser = new Parser(new JoseEncoder());
+        $token = $parser->parse($idToken);
+
         $validator = new Validator();
 
-        // Vérifier le token
         try {
-            $validator->assert($parsedToken, ...$constraints);
-            dump('Token valide');
+            // Valide que le token est bien signé en Sha256 avec la clé publique récupérée
+            $validator->assert(
+                $token,
+                new SignedWith(
+                    new Sha256(),
+                    InMemory::plainText($publicKey)
+                )
+            );
+            // valide que le nonce est bien celui que nous avons fourni
+            $validator->assert($token, new HasClaimWithValue('nonce', $this->getNonce()));
         } catch (RequiredConstraintsViolated $e) {
-            dd('Token invalide: ' . $e->getMessage());
+            return false;
         }
-
-        // Extraire le nonce du token
-        $nonce = $parsedToken->claims()->get('nonce');
-
-        // Vérifier le nonce avec celui stocké dans la session
-        $sessionNonce = $_SESSION['nonce']; // Assurez-vous que le nonce est stocké dans la session
-        if ($nonce === $sessionNonce) {
-            dump('Nonce valide');
-        } else {
-            dd('Nonce invalide');
-        }
-
-        // Afficher les claims du token
-        dd($parsedToken->claims()->all());
-
+        
         return true;
     }
-
+    
+    private function convertJwkToPem(array $jwk): string
+    {
+        $jwkConverter = new JWKConverter();
+        return $jwkConverter->toPEM($jwk);
+    }
+    
     public function getCodeToken(): string
     {
         // Si il est déjà assigné
