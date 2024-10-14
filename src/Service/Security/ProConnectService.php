@@ -6,10 +6,13 @@ use App\Service\Various\ParamService;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
-use Lcobucci\JWT\Encoding\JoseEncoder;
-use Lcobucci\JWT\Token\Parser;
-use Lcobucci\JWT\Validation\Constraint\RelatedTo;
+use Lcobucci\JWT\Configuration;
+use Lcobucci\JWT\Signer\Hmac\Sha256;
+use Lcobucci\JWT\Validation\Constraint\SignedWith;
+use Lcobucci\JWT\Validation\Constraint\ValidAt;
+use Lcobucci\JWT\Validation\RequiredConstraintsViolated;
 use Lcobucci\JWT\Validation\Validator;
+use Lcobucci\JWT\Signer\Key\InMemory;
 
 class ProConnectService
 {
@@ -24,6 +27,8 @@ class ProConnectService
     private string $tokenEndpoint = '';
     private string $userInfoEndpoint = '';
     private string $endSessionEndpoint = '';
+    private string $jwksUri = '';
+
     private string $codeToken = '';
     private string $accessToken = '';
     private string $idToken = '';
@@ -31,6 +36,7 @@ class ProConnectService
     const SESSION_KEY_STATE = 'pr_state';
     const SESSION_KEY_NONCE = 'pr_nonce';
     const SESSION_KEY_CODE_TOKEN = 'pr_code_token';
+    const SESSION_KEY_ID_TOKEN = 'pr_id_token';
 
     public function __construct(
         private ParamService $paramService,
@@ -62,11 +68,12 @@ class ProConnectService
         ]);
 
         $content = $response->toArray();
-
+        
         $this->authorizationEndpoint = $content['authorization_endpoint'] ?? '';
         $this->tokenEndpoint = $content['token_endpoint'] ?? '';
         $this->userInfoEndpoint = $content['userinfo_endpoint'] ?? '';
         $this->endSessionEndpoint = $content['end_session_endpoint'] ?? '';
+        $this->jwksUri = $content['jwks_uri'] ?? '';
     }
 
     /**
@@ -123,25 +130,106 @@ class ProConnectService
         // Vérification de l'id_token et du nonce
         $this->verifyIdToken($this->idToken);
         
+        // stockage du id_token dans la session
+        $session = new Session();
+        $session->set(self::SESSION_KEY_ID_TOKEN, $this->idToken);
+
+        // recupération des infos de l'utilisateur
+        $this->getUserInfo();
         return $content;
+    }
+
+    private function getUserInfo()
+    {
+        if (!$this->userInfoEndpoint) {
+            $this->getDiscovery();
+        }
+
+        $response = $this->client->request('GET', $this->userInfoEndpoint, [
+            'headers' => [
+                'Authorization' => 'Bearer ' . $this->accessToken,
+            ],
+        ]);
+
+        // JSON Web Token signé par l'algorithme spécifié à ProConnect, contenant les claims transmis par le FI
+        dd($response->getContent());
+        return $response->getContent();
     }
 
     private function verifyIdToken(string $idToken)
     {
-        $parser = new Parser(new JoseEncoder());
+        $response = $this->client->request('GET', $this->jwksUri, [
+            'headers' => [
+                'Accept' => 'application/json',
+            ],
+        ]);
 
-        $token = $parser->parse($idToken);
+        $jwksData = json_decode($response->getContent(), true);
 
+        // Extraire la clé publique pour RS256
+        $publicKeyData = null;
+        foreach ($jwksData['keys'] as $key) {
+            if ($key['alg'] === 'RS256') {
+                $publicKeyData = $key;
+                break;
+            }
+        }
+        
+        if (!$publicKeyData) {
+            throw new \Exception('Clé publique RS256 non trouvée');
+        }
+        
+        // Convertir la clé publique en format PEM
+        $publicKey = "-----BEGIN PUBLIC KEY-----\n" .
+            chunk_split(base64_encode(
+                "\x30\x82\x01\x22\x30\x0d\x06\x09\x2a\x86\x48\x86\xf7\x0d\x01\x01\x01\x05\x00\x03\x82\x01\x0f\x00" .
+                hex2bin($publicKeyData['n']) .
+                "\x02\x03\x01\x00\x01"
+            ), 64) .
+            "\n-----END PUBLIC KEY-----";
+        
+        // Configuration de JWT
+        $configuration = Configuration::forAsymmetricSigner(
+            new Sha256(),
+            InMemory::plainText(''),
+            InMemory::plainText($publicKey)
+        );
+        
+        // Parser le token
+        $parsedToken = $configuration->parser()->parse($idToken);
+
+        // Contraintes de validation
+        $constraints = [
+            new SignedWith(new Sha256(), InMemory::plainText($publicKey)),
+            new ValidAt(new \DateTimeImmutable()),
+        ];
+
+        // Validateur
         $validator = new Validator();
 
-        dd($this->getNonce(), $token);
-        if (!$validator->validate($token, new RelatedTo($this->getNonce()))) {
-            dd('Invalid token (1)!');
+        // Vérifier le token
+        try {
+            $validator->assert($parsedToken, ...$constraints);
+            dump('Token valide');
+        } catch (RequiredConstraintsViolated $e) {
+            dd('Token invalide: ' . $e->getMessage());
         }
 
-        dd('ok');
-        return true;
+        // Extraire le nonce du token
+        $nonce = $parsedToken->claims()->get('nonce');
 
+        // Vérifier le nonce avec celui stocké dans la session
+        $sessionNonce = $_SESSION['nonce']; // Assurez-vous que le nonce est stocké dans la session
+        if ($nonce === $sessionNonce) {
+            dump('Nonce valide');
+        } else {
+            dd('Nonce invalide');
+        }
+
+        // Afficher les claims du token
+        dd($parsedToken->claims()->all());
+
+        return true;
     }
 
     public function getCodeToken(): string
