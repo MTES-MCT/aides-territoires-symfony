@@ -13,7 +13,7 @@
 						<a class="card-link" href="#">Entrées directes</a>
 					</h5>
 					<p class="card-text fs-2">
-						<strong>{{ statsMatomoReferer.Referrers_visitorsFromDirectEntry }}</strong>
+						<strong>{{ statsMatomoReferer.Referrers_visitorsFromDirectEntry|number_format(0, ',', ' ') }}</strong>
 					</p>
 				</div>
 			</div>
@@ -23,7 +23,7 @@
 						<a class="card-link" href="#">Depuis les moteurs</a>
 					</h5>
 					<p class="card-text fs-2">
-						<strong>{{ statsMatomoReferer.Referrers_visitorsFromSearchEngines }}</strong>
+						<strong>{{ statsMatomoReferer.Referrers_visitorsFromSearchEngines|number_format(0, ',', ' ') }}</strong>
 					</p>
 				</div>
 			</div>
@@ -33,7 +33,7 @@
 						<a class="card-link" href="#">Depuis d’autres sites</a>
 					</h5>
 					<p class="card-text fs-2">
-						<strong>{{ statsMatomoReferer.Referrers_visitorsFromWebsites }}</strong>
+						<strong>{{ statsMatomoReferer.Referrers_visitorsFromWebsites|number_format(0, ',', ' ') }}</strong>
 					</p>
 				</div>
 			</div>
@@ -43,7 +43,7 @@
 						<a class="card-link" href="#">Depuis les newsletters</a>
 					</h5>
 					<p class="card-text fs-2">
-						<strong>{{ statsMatomoReferer.Referrers_visitorsFromCampaigns }}</strong>
+						<strong>{{ statsMatomoReferer.Referrers_visitorsFromCampaigns|number_format(0, ',', ' ') }}</strong>
 					</p>
 				</div>
 			</div>
@@ -53,7 +53,7 @@
 						<a class="card-link" href="#">Depuis les réseaux sociaux</a>
 					</h5>
 					<p class="card-text fs-2">
-						<strong>{{ statsMatomoReferer.Referrers_visitorsFromSocialNetworks }}</strong>
+						<strong>{{ statsMatomoReferer.Referrers_visitorsFromSocialNetworks|number_format(0, ',', ' ') }}</strong>
 					</p>
 				</div>
 			</div>

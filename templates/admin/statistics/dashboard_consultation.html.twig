@@ -20,12 +20,13 @@
 							Nombre de visiteurs
 						</a>
 					</h5>
-					<p class="card-text fs-2">
-						<strong>
-							{% if statsMatomo.nb_visits is defined %}
-								{{ statsMatomo.nb_visits|number_format(0, ',', ' ') }}
-							{% endif %}
-						</strong>
+					<p class="card-text">
+						{% if statsMatomo.nb_visits is defined %}
+							<strong class="fs-2">{{ statsMatomo.nb_visits|number_format(0, ',', ' ') }}</strong> visiteurs
+						{% endif %}
+						{% if statsMatomo.nb_uniq_visitors is defined %}
+							<br /><strong class="fs-2">{{ statsMatomo.nb_uniq_visitors|number_format(0, ',', ' ') }}</strong> uniques
+						{% endif %}
 					</p>
 				</div>
 			</div>
@@ -55,7 +56,7 @@
 					<p class="card-text fs-2">
 						<strong>
 							{% if statsMatomo.avg_time_on_site is defined %}
-								{{ statsMatomo.avg_time_on_site|number_format(0, ',', ' ') }}
+								{{ statsMatomo.avg_time_on_site|secondsToMinutes }}
 							{% endif %}
 						</strong>
 					</p>
@@ -86,14 +87,13 @@
 							Nombre d’aides vues (sans l’API)
 						</a>
 					</h5>
-					<p class="card-text fs-2">
-						<strong id="nb-aid-views">
-							{% if nbAidViews is defined %}
-								{{ nbAidViews|number_format(0, ',', ' ') }}
-							{% else %}
-								En cours...
-							{% endif %}
-						</strong>
+					<p class="card-text">
+						{% if nbAidViews is defined %}
+							<strong class="fs-2">{{ nbAidViews|number_format(0, ',', ' ') }}</strong> vues
+						{% endif %}
+						{% if nbAidVisits is defined %}
+							<br /><strong class="fs-2">{{ nbAidVisits|number_format(0, ',', ' ') }}</strong> uniques
+						{% endif %}
 					</p>
 				</div>
 			</div>
@@ -105,14 +105,10 @@
 							Nombre d’aides vues différentes (sans l’API)
 						</a>
 					</h5>
-					<p class="card-text fs-2">
-						<strong id="nb-aid-views-distinct">
-							{% if nbAidViewsDistinct is defined %}
-								{{ nbAidViewsDistinct|number_format(0, ',', ' ') }}
-							{% else %}
-								En cours...
-							{% endif %}
-						</strong>
+					<p class="card-text">
+						{% if nbAids is defined %}
+							<strong class="fs-2">{{ nbAids|number_format(0, ',', ' ') }}</strong> aides
+						{% endif %}
 					</p>
 				</div>
 			</div>

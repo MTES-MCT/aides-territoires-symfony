@@ -70,6 +70,7 @@ class AppExtension extends AbstractExtension // NOSONAR too much methods
             new TwigFilter('aidStatusDisplay', [$this, 'aidStatusDisplay']),
             new TwigFilter('alertFrequencyDisplay', [$this, 'alertFrequencyDisplay']),
             new TwigFilter('projectStepDisplay', [$this, 'projectStepDisplay']),
+            new TwigFilter('secondsToMinutes', [$this, 'secondsToMinutes']),
         ];
     }
 
@@ -150,6 +151,14 @@ class AppExtension extends AbstractExtension // NOSONAR too much methods
             }
         }
         return '';
+    }
+
+    public function secondsToMinutes(int $seconds): string
+    {
+        $minutes = floor($seconds / 60);
+        $remainingSeconds = $seconds % 60;
+
+        return sprintf('%d min %d sec', $minutes, $remainingSeconds);
     }
 
     /**
