@@ -56,6 +56,67 @@ class ProConnectService
         $this->urlRedirectLogout = $this->routerInterface->generate('app_home', [], RouterInterface::ABSOLUTE_URL);
     }
 
+    /**
+     * Pour récupérer le authorization endpoint en lui donnant les paramètres nécessaires
+     * C'est l'url sur laquelle on envoit l'utilisateur lorsqu'il clique sur le bouton ProConnect
+     *
+     * @return string
+     */
+    public function getAuthorizationEndpoint(): string
+    {
+        if (!$this->authorizationEndpoint) {
+            $this->getDiscovery();
+        }
+
+        $params = [
+            'response_type' => 'code',
+            'client_id' => $this->proconnectClientId,
+            'redirect_uri' => $this->urlRedirectLogin,
+            'acr_values' => 'eidas1',
+            'scope' => 'openid given_name usual_name email uid',
+            'state' => $this->getState(),
+            'nonce' => $this->getNonce(),
+        ];
+        $query = http_build_query($params);
+        return $this->authorizationEndpoint . '?' . $query;
+    }
+
+    /**
+     * Redirige l'utilisateur sur l'url de déconnexion de ProConnect si besoin
+     *
+     * @return RedirectResponse|null
+     */
+    public function logout() : ?RedirectResponse {
+        // On vérifie qu'il y a bien un idToken en session
+        $idToken = $this->getIdToken();
+        if (empty($idToken)) {
+            return null;
+        }
+
+        // on appelle le end_session_endpoint
+        if (!$this->endSessionEndpoint) {
+            $this->getDiscovery();
+        }
+
+        // les paramètres pour l'appel
+        $params = [
+            'id_token_hint' => $idToken,
+            'state' => $this->getState(),
+            'post_logout_redirect_uri' => $this->urlRedirectLogout,
+        ];
+
+        $query = http_build_query($params);
+
+        // on redirige
+        return new RedirectResponse($this->endSessionEndpoint . '?' . $query);
+    }
+        
+    /**
+     * Recupère les données de l'utilisateur depuis ProConnect
+     *
+     * @param array $params
+     * @return array
+     */
     public function getDataFromProconnect(array $params) : array {
         $state = $params['state'] ?? null;
 
@@ -97,32 +158,6 @@ class ProConnectService
         $this->endSessionEndpoint = $content['end_session_endpoint'] ?? '';
         $this->jwksUri = $content['jwks_uri'] ?? '';
     }
-
-    /**
-     * Pour récupérer le authorization endpoint en lui donnant les paramètres nécessaires
-     * C'est l'url sur laquelle on envoit l'utilisateur lorsqu'il clique sur le bouton ProConnect
-     *
-     * @return string
-     */
-    public function getAuthorizationEndpoint(): string
-    {
-        if (!$this->authorizationEndpoint) {
-            $this->getDiscovery();
-        }
-
-        $params = [
-            'response_type' => 'code',
-            'client_id' => $this->proconnectClientId,
-            'redirect_uri' => $this->urlRedirectLogin,
-            'acr_values' => 'eidas1',
-            'scope' => 'openid given_name usual_name email uid',
-            'state' => $this->getState(),
-            'nonce' => $this->getNonce(),
-        ];
-        $query = http_build_query($params);
-        return $this->authorizationEndpoint . '?' . $query;
-    }
-
 
     /**
      * Stocke les tokens liés à l'utilisateur dans la session
@@ -261,31 +296,6 @@ class ProConnectService
         return true;
     }
 
-    public function logout() : ?RedirectResponse {
-        // On vérifie qu'il y a bien un idToken en session
-        $idToken = $this->getIdToken();
-        if (empty($idToken)) {
-            return null;
-        }
-
-        // on appelle le end_session_endpoint
-        if (!$this->endSessionEndpoint) {
-            $this->getDiscovery();
-        }
-
-        // les paramètres pour l'appel
-        $params = [
-            'id_token_hint' => $idToken,
-            'state' => $this->getState(),
-            'post_logout_redirect_uri' => $this->urlRedirectLogout,
-        ];
-
-        $query = http_build_query($params);
-
-        // on redirige
-        return new RedirectResponse($this->endSessionEndpoint . '?' . $query);
-    }
-    
     /**
      * Convertir la cle JWK en cle PEM pour la validation
      *
