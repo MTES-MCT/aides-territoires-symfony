@@ -260,6 +260,31 @@ class ProConnectService
         
         return true;
     }
+
+    public function logout() : void {
+        // On vérifie qu'il y a bien un idToken en session
+        $idToken = $this->getIdToken();
+        if (empty($idToken)) {
+            return;
+        }
+
+        // on appelle le end_session_endpoint
+        if (!$this->endSessionEndpoint) {
+            $this->getDiscovery();
+        }
+
+        // les paramètres pour l'appel
+        $params = [
+            'id_token_hint' => $idToken,
+            'state' => $this->getState(),
+            'post_logout_redirect_uri' => $this->urlRedirectLogout,
+        ];
+
+        $query = http_build_query($params);
+
+        // on redirige
+        header('Location: ' . $this->endSessionEndpoint . '?' . $query);
+    }
     
     /**
      * Convertir la cle JWK en cle PEM pour la validation
@@ -273,6 +298,30 @@ class ProConnectService
         return $jwkConverter->toPEM($jwk);
     }
     
+    /**
+     * Récupère le id_token
+     *
+     * @return string
+     */
+    public function getIdToken(): string
+    {
+        // Si il est déjà assigné
+        if ($this->idToken !== '') {
+            return $this->idToken;
+        }
+
+        // On vérifie si le codeToken est en session
+        $session = new Session();
+        $idToken = $session->get(self::SESSION_KEY_ID_TOKEN);
+
+        if ($idToken) {
+            $this->idToken = $idToken;
+            return $idToken;
+        }
+
+        return '';
+    }
+
     /**
      * Récupère le code token
      *

@@ -14,6 +14,7 @@ use App\Repository\Organization\OrganizationTypeRepository;
 use App\Repository\Perimeter\PerimeterRepository;
 use App\Service\Email\EmailService;
 use App\Service\Matomo\MatomoService;
+use App\Service\Security\SecurityService;
 use App\Service\User\UserService;
 use App\Service\Various\ParamService;
 use Doctrine\Persistence\ManagerRegistry;
@@ -113,7 +114,7 @@ class UserController extends FrontController
                     $managerRegistry->getManager()->flush();
 
                     // authentifie le user
-                    $security->login($user, 'form_login', 'main');
+                    $security->login($user, SecurityService::DEFAULT_AUTHENTICATOR_NAME, SecurityService::DEFAULT_FIREWALL_NAME);
 
                     // message success
                     $this->tAddFlash(
