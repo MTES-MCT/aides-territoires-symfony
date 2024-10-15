@@ -16,6 +16,7 @@ use Lcobucci\JWT\Encoding\JoseEncoder;
 use Lcobucci\JWT\Signer\Rsa\Sha256;
 use Lcobucci\JWT\Token\Parser;
 use Lcobucci\JWT\Validation\Constraint\HasClaimWithValue;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 
 class ProConnectService
 {
@@ -261,11 +262,11 @@ class ProConnectService
         return true;
     }
 
-    public function logout() : void {
+    public function logout() : ?RedirectResponse {
         // On vérifie qu'il y a bien un idToken en session
         $idToken = $this->getIdToken();
         if (empty($idToken)) {
-            return;
+            return null;
         }
 
         // on appelle le end_session_endpoint
@@ -283,7 +284,7 @@ class ProConnectService
         $query = http_build_query($params);
 
         // on redirige
-        header('Location: ' . $this->endSessionEndpoint . '?' . $query);
+        return new RedirectResponse($this->endSessionEndpoint . '?' . $query);
     }
     
     /**
