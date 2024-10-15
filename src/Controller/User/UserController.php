@@ -8,6 +8,7 @@ use App\Entity\Organization\OrganizationInvitation;
 use App\Entity\Organization\OrganizationType;
 use App\Entity\Perimeter\Perimeter;
 use App\Entity\User\User;
+use App\Form\Security\ProConnectType;
 use App\Form\User\RegisterCommuneType;
 use App\Form\User\RegisterType;
 use App\Repository\Organization\OrganizationTypeRepository;
@@ -145,9 +146,13 @@ class UserController extends FrontController
             }
         }
 
+        // formulaire proConnnect
+        $formProConnect = $this->createForm(ProConnectType::class, null, ['action' => $this->generateUrl('app_login_proconnect')]);
+
         // rendu template
         return $this->render('user/user/register.html.twig', [
-            'formRegister' => $formRegister->createView(),
+            'formRegister' => $formRegister,
+            'formProConnect' => $formProConnect,
             'no_breadcrumb' => true,
             'formErrors' => $formErrors
         ]);
@@ -257,9 +262,14 @@ class UserController extends FrontController
             }
         }
 
+        // formulaire proConnnect
+        $formProConnect = $this->createForm(ProConnectType::class, null, ['action' => $this->generateUrl('app_login_proconnect')]);
+
+
         // rendu template
         return $this->render('user/user/register_commune.html.twig', [
-            'formRegisterCommune' => $formRegisterCommune
+            'formRegisterCommune' => $formRegisterCommune,
+            'formProConnect' => $formProConnect
         ]);
     }
 }
