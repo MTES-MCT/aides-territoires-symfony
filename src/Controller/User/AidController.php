@@ -999,7 +999,8 @@ class AidController extends FrontController
         LogAidViewService $logAidViewService,
         LogAidApplicationUrlClickService $logAidApplicationUrlClickService,
         LogAidOriginUrlClickService $logAidOriginUrlClickService,
-        AidProjectService $aidProjectService
+        AidProjectService $aidProjectService,
+        StringService $stringService
     ) {
         $dateMinGet = $requestStack->getCurrentRequest()->get('dateMin', null);
         $dateMaxGet = $requestStack->getCurrentRequest()->get('dateMax', null);
@@ -1037,7 +1038,8 @@ class AidController extends FrontController
                 $aidProjectService,
                 $dateMin,
                 $dateMax,
-                $aid
+                $aid,
+                $stringService
             ) {
                 // nom de fichier
                 $filename = 'AT_statistiques_aide_'.$dateMin->format('d_m_Y').'_au_'.$dateMax->format('d_m_Y').'.xlsx';
@@ -1047,7 +1049,7 @@ class AidController extends FrontController
                 $writer->openToBrowser($filename);
                 $sheet = $writer->getCurrentSheet();
                 // met le nom à la feuille
-                $sheet->setName($aid->getName()); // Définir le nom de la feuille
+                $sheet->setName($stringService->truncate($aid->getName(), 31)); // Définir le nom de la feuille
 
                 // Ajout des en-têtes
                 $headers = [
