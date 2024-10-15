@@ -18,7 +18,6 @@ use App\Service\Email\EmailService;
 use App\Service\Security\ProConnectService;
 use App\Service\Security\SecurityService;
 use App\Service\User\UserService;
-use AWS\CRT\HTTP\Request;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -26,6 +25,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Pagerfanta\Doctrine\ORM\QueryAdapter;
 use Pagerfanta\Pagerfanta;
+use Psr\Log\LoggerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
@@ -35,14 +35,15 @@ class ParameterController extends FrontController
 {
     const NB_HISTORY_LOG_BY_PAGE = 20;
 
-    #[Route('/comptes/moncompte/', name: 'app_user_dashboard')]
+    #[Route('/comptes/proconnect/', name: 'app_user_proconnect')]
     public function myAccount(
         RequestStack $requestStack,
         ProConnectService $proConnectService,
         UserRepository $userRepository,
         ManagerRegistry $managerRegistry,
         UserPasswordHasherInterface $userPasswordHasher,
-        Security $security
+        Security $security,
+        LoggerInterface $loggerInterface
     ): Response
     {
         try {
@@ -60,6 +61,7 @@ class ParameterController extends FrontController
                 $user->setEmail($userInfos['email']);
                 $user->setFirstname($userInfos['given_name']);
                 $user->setLastname($userInfos['usual_name']);
+                $user->addRole(User::ROLE_USER);
                 // On met un password random
                 $user->setPassword($userPasswordHasher->hashPassword($user, bin2hex(random_bytes(10))));
 
@@ -80,9 +82,12 @@ class ParameterController extends FrontController
             $security->login($user, SecurityService::DEFAULT_AUTHENTICATOR_NAME, SecurityService::DEFAULT_FIREWALL_NAME);
 
             // on le redirige
-            return $this->redirectToRoute('app_user_parameter_profil');
+            return $this->redirectToRoute('app_user_dashboard');
         } catch (\Exception $e) {
-            dd($e);
+            $loggerInterface->error('Erreur ProConnect', [
+                'exception' => $e
+            ]);
+
             $this->tAddFlash(
                 FrontController::FLASH_ERROR,
                 'Une erreur est survenue lors de la connexion à ProConnect'

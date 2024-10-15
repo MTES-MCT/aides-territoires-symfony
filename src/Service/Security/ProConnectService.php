@@ -52,8 +52,7 @@ class ProConnectService
         $this->proconnectClientSecret =  $this->paramService->get('proconnect_client_secret');
         $this->proconnectDomain =  $this->paramService->get('proconnect_domain');
 
-        // $this->urlRedirectLogin = $this->routerInterface->generate('app_user_parameter_profil', [], RouterInterface::ABSOLUTE_URL);
-        $this->urlRedirectLogin = $this->routerInterface->generate('app_user_dashboard', [], RouterInterface::ABSOLUTE_URL);
+        $this->urlRedirectLogin = $this->routerInterface->generate('app_user_proconnect', [], RouterInterface::ABSOLUTE_URL);
         $this->urlRedirectLogout = $this->routerInterface->generate('app_home', [], RouterInterface::ABSOLUTE_URL);
     }
 
@@ -234,7 +233,7 @@ class ProConnectService
         }
     
         if (!$publicKeyData) {
-            throw new \Exception('Clé publique RS256 non trouvée');
+            throw new ProConnectException('Clé publique RS256 non trouvée');
         }
 
         $publicKey = $this->convertJwkToPem($publicKeyData);

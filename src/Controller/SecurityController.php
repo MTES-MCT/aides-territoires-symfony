@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Exception\NotFoundException\UserRegisterConfirmationNotFoundException;
 use App\Form\Security\LoginType;
+use App\Form\Security\ProConnectType;
 use App\Repository\User\UserRegisterConfirmationRepository;
 use App\Service\Security\ProConnectService;
 use Doctrine\Persistence\ManagerRegistry;
@@ -32,13 +33,18 @@ class SecurityController extends FrontController
         // last username entered by the user
         $lastUsername = $authenticationUtils->getLastUsername();
 
+        // formulaire login classique
         $formLogin = $this->createForm(LoginType::class);
         if ($lastUsername) {
             $formLogin->get('_username')->setData($lastUsername);
         }
 
+        // formulaire proConnnect
+        $formProConnect = $this->createForm(ProConnectType::class, null, ['action' => $this->generateUrl('app_login_proconnect')]);
+
         return $this->render('security/login.html.twig', [
-            'formLogin' => $formLogin->createView(),
+            'formLogin' => $formLogin,
+            'formProConnect' => $formProConnect,
             'error' => $error
         ]);
     }
