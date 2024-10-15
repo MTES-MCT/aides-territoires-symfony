@@ -451,15 +451,13 @@ class StatisticsController extends DashboardController
             'dateCreateMin' => $dateMin,
             'dateCreateMax' => $dateMax,
         ]);
-        $nbContactClicks = $this->managerRegistry->getRepository(LogAidContactClick::class)->countCustom([
+
+        $nbInformationsTotal = $this->managerRegistry->getRepository(LogAidOriginUrlClick::class)->countCustom([
             'dateMin' => $dateMin,
             'dateMax' => $dateMax,
         ]);
-        $nbInformations = $this->managerRegistry->getRepository(LogAidOriginUrlClick::class)->countCustom([
-            'dateMin' => $dateMin,
-            'dateMax' => $dateMax,
-        ]);
-        $nbApplications = $this->managerRegistry->getRepository(LogAidApplicationUrlClick::class)->countCustom([
+
+        $nbApplicationsTotal = $this->managerRegistry->getRepository(LogAidApplicationUrlClick::class)->countCustom([
             'dateMin' => $dateMin,
             'dateMax' => $dateMax,
         ]);
@@ -541,7 +539,6 @@ class StatisticsController extends DashboardController
         
         $topAids = [];
         foreach ($statsMatomoTopAids as $stats) {
-            dump($stats);
             preg_match('/^\/(aides\/)?(.*)\/$/', $stats->label, $matches);
             $slug = $matches[2] ?? null;
             $aid = null;
@@ -664,9 +661,8 @@ class StatisticsController extends DashboardController
             'nbLogins' => $nbLogins,
             'nbAidSearch' => $nbAidSearch,
             'nbAlerts' => $nbAlerts,
-            'nbContactClicks' => $nbContactClicks,
-            'nbInformations' => $nbInformations,
-            'nbApplications' => $nbApplications,
+            'nbInformationsTotal' => $nbInformationsTotal,
+            'nbApplicationsTotal' => $nbApplicationsTotal,
             'chartRegisters' => $chartRegisters,
             'topAids' => $topAids,
             'chartActivity' => $chartActivity,
