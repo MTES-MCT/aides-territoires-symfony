@@ -13,6 +13,8 @@ class MatomoService
     const MATOMO_GET_PAGE_TITLE_API_METHOD = "Actions.getPageTitle";
     const GOAL_KEY = "_analytics_goal";
 
+    const REGEXP_AID_URL = 'aides/(.+)';
+
     public function __construct(
         protected RequestStack $requestStack,
         protected ParamService $paramService,

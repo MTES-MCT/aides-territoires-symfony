@@ -171,18 +171,45 @@ class StatisticsController extends DashboardController
             fromDateString: $dateMin->format('Y-m-d'),
             toDateString: $dateMax->format('Y-m-d')
         );
+
         $statsMatomoActions = $matomoService->getMatomoStats(
             apiMethod: 'Actions.get',
             customSegment: null,
             fromDateString: $dateMin->format('Y-m-d'),
             toDateString: $dateMax->format('Y-m-d')
         );
+
         $statsMatomoLast10Weeks = $matomoService->getMatomoStats(
             apiMethod: 'VisitsSummary.get',
             period: 'week',
             fromDateString: 'last10',
             toDateString: null
         );
+
+        // vues des aides (totales et distinces)
+        // on filtre sur le label pour récupérer le groupement aides / autres de matomo
+        $statsAidsViews = $matomoService->getMatomoStats(
+            apiMethod: MatomoService::MATOMO_GET_PAGE_URLS_API_METHOD,
+            fromDateString: $dateMin->format('Y-m-d'),
+            toDateString: $dateMax->format('Y-m-d'),
+            options: [
+                'flat' => 1,
+                'filter_column' => 'label',
+                'filter_pattern' => 'aides'
+            ],
+        );
+
+        $nbAidVisits = 0;
+        $nbAidViews = 0;
+        $nbAids = 0;
+        foreach ($statsAidsViews as $statsAidsView) {
+            if ($statsAidsView->label == '/aides/') {
+                continue;
+            }
+            $nbAidVisits += $statsAidsView->nb_visits;
+            $nbAidViews += $statsAidsView->nb_hits;
+            $nbAids++;
+        }
 
         $labels = [];
         $visitsUnique = [];
@@ -193,7 +220,7 @@ class StatisticsController extends DashboardController
             $dates = explode(',', $key);
             $dateStart = new \DateTime($dates[0]);
             $dateEnd = new \DateTime($dates[1]);
-            // dd($registersByWeek, $dateStart->format('Y-W'));
+
             $labels[] = $dateStart->format('d/m/Y') . ' au ' . $dateEnd->format('d/m/Y');
             $visitsUnique[] = $stats[0]->nb_uniq_visitors ?? 0;
             $registers[] = $this->managerRegistry->getRepository(User::class)->countRegisters(['dateCreateMin' => $dateStart, 'dateCreateMax' => $dateMax]);
@@ -242,7 +269,9 @@ class StatisticsController extends DashboardController
             'statsMatomoActions' => $statsMatomoActions[0] ?? [],
             'statsMatomoLast10Weeks' => $statsMatomoLast10Weeks,
             'chartLast10Weeks' => $chartLast10Weeks,
-
+            'nbAidVisits' => $nbAidVisits,
+            'nbAidViews' => $nbAidViews,
+            'nbAids' => count($statsAidsViews),
             'consultationSelected' => true,
         ]);
     }
@@ -504,14 +533,15 @@ class StatisticsController extends DashboardController
             toDateString: $dateMax->format('Y-m-d'),
             options: [
                 'flat' => 1,
-                'filter_column' => 'label',
+                'filter_column' => 'url',
                 'filter_limit' => 100 * 1.3,
-                'filter_pattern' => '^/(aides/)?([a-z0-9]){4}-'
+                'filter_pattern' => MatomoService::REGEXP_AID_URL
             ]
         );
-        // dd($statsMatomoTopAids);
+        
         $topAids = [];
         foreach ($statsMatomoTopAids as $stats) {
+            dump($stats);
             preg_match('/^\/(aides\/)?(.*)\/$/', $stats->label, $matches);
             $slug = $matches[2] ?? null;
             $aid = null;
@@ -1507,6 +1537,5 @@ class StatisticsController extends DashboardController
         } catch (\Exception) {
             return $this->json(['error' => true, 'nbAidViewsDistinct' => 0], Response::HTTP_BAD_REQUEST);
         }
-
     }
 }
