@@ -86,12 +86,16 @@ class ProConnectService
      *
      * @return RedirectResponse|null
      */
-    public function logout() : ?RedirectResponse {
+    public function getLogoutUrl() : ?string {
         // On vérifie qu'il y a bien un idToken en session
         $idToken = $this->getIdToken();
         if (empty($idToken)) {
             return null;
         }
+
+        // On supprime le token de la session
+        $session = new Session();
+        $session->remove(self::SESSION_KEY_ID_TOKEN);
 
         // on appelle le end_session_endpoint
         if (!$this->endSessionEndpoint) {
@@ -108,7 +112,7 @@ class ProConnectService
         $query = http_build_query($params);
 
         // on redirige
-        return new RedirectResponse($this->endSessionEndpoint . '?' . $query);
+        return $this->endSessionEndpoint . '?' . $query;
     }
         
     /**
