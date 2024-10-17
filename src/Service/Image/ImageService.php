@@ -2,6 +2,7 @@
 
 namespace App\Service\Image;
 
+use App\Exception\InvalidFileFormatException;
 use App\Service\File\FileService;
 use App\Service\Various\ParamService;
 use App\Service\Various\StringService;
@@ -146,6 +147,11 @@ class ImageService
         }
         // Upload a publicly accessible file. The file size and type are determined by the SDK.
         try {
+            // verification image
+            if (!$this->fileService->uploadedFileIsImage($file)) {
+                throw new InvalidFileFormatException('Le fichier n\'est pas une image');
+            }
+
             // créer dossier temporaire si besoin
             $tmpFolder = $this->fileService->getUploadTmpDir();
             if (!is_dir($tmpFolder)) {
