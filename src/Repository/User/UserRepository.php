@@ -28,6 +28,16 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         parent::__construct($registry, User::class);
     }
 
+    public function findWithProConnectInfo(array $userInfos) : ?User {
+        $qb = $this->createQueryBuilder('u')
+            ->andWhere('(u.email = :email OR u.proConnectUid = :proConnectUid)')
+            ->setParameter('email', $userInfos['email'])
+            ->setParameter('proConnectUid', $userInfos['uid'])
+        ;
+
+        return $qb->getQuery()->getOneOrNullResult();
+    }
+
     public function getDefaultOrganizationId(?array $params = null)
     {
         $qb = $this->getQueryBuilder($params);

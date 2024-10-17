@@ -1,0 +1,19 @@
+{% if formProConnect is defined %}
+<div class="fr-my-5w">
+    <div class="fr-grid-row fr-grid-row--center">
+        {{ form_start(formProConnect)}}
+            <div class="fr-connect-group">
+                <button type="submit" class="fr-connect">
+                    <span class="fr-connect__login">S’identifier avec</span>
+                    <span class="fr-connect__brand">ProConnect</span>
+                </button>
+                <p>
+                    <a href="https://www.proconnect.gouv.fr/" target="_blank"  rel="noopener" title="Qu'est-ce que ProConnect ? - nouvelle fenêtre">Qu'est-ce que ProConnect ?</a>
+                </p>
+            </div>
+        {{ form_end(formProConnect)}}
+    </div>
+
+    <div class="separator-pro-connect">OU</div>
+</div>
+{% endif %}
