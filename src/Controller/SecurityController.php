@@ -8,6 +8,7 @@ use App\Form\Security\ProConnectType;
 use App\Repository\User\UserRegisterConfirmationRepository;
 use App\Service\Security\ProConnectService;
 use Doctrine\Persistence\ManagerRegistry;
+use Psr\Log\LoggerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -51,11 +52,16 @@ class SecurityController extends FrontController
 
     #[Route('/comptes/connexion/proconnect/', name: 'app_login_proconnect')]
     public function loginByPronnect(
-        ProConnectService $proConnectService
+        ProConnectService $proConnectService,
+        LoggerInterface $loggerInterface
     ) : Response {
         try {
             return new RedirectResponse($proConnectService->getAuthorizationEndpoint());
         } catch (\Exception $e) {
+            $loggerInterface->error('Erreur ProConnect getAuthorizationEndpoint', [
+                'exception' => $e
+            ]);
+
             $this->tAddFlash(
                 FrontController::FLASH_ERROR,
                 'Une erreur est survenue lors de la connexion à ProConnect'

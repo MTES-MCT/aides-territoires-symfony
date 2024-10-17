@@ -6,6 +6,7 @@ use App\Controller\FrontController;
 use App\Entity\Project\Project;
 use App\Entity\User\ApiTokenAsk;
 use App\Entity\User\User;
+use App\Exception\Security\ProConnectException;
 use App\Form\User\ApiTokenAskCreateType;
 use App\Form\User\DeleteType;
 use App\Form\User\TransfertAidType;
@@ -36,7 +37,7 @@ class ParameterController extends FrontController
     const NB_HISTORY_LOG_BY_PAGE = 20;
 
     #[Route('/comptes/proconnect/', name: 'app_user_proconnect')]
-    public function myAccount(
+    public function loginWithProconnect(
         RequestStack $requestStack,
         ProConnectService $proConnectService,
         UserRepository $userRepository,
@@ -52,6 +53,10 @@ class ParameterController extends FrontController
             
             // on recupère les infos de ProConnect
             $userInfos = $proConnectService->getDataFromProconnect($params);
+            // on vérifie que $userInfos contient bien les 4 clés attendues
+            if (!isset($userInfos['uid'], $userInfos['email'], $userInfos['given_name'], $userInfos['usual_name'])) {
+                throw new ProConnectException('Les informations de ProConnect sont incomplètes');
+            }
 
             $user = $userRepository->findWithProConnectInfo($userInfos);
             if (!$user) {

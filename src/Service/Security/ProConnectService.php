@@ -236,9 +236,9 @@ class ProConnectService
         $parser = new Parser(new JoseEncoder());
         $token = $parser->parse($userToken);
 
-        // Vérification du token
-        $this->verifyIdToken($this->idToken);
-        
+        if (!$this->verifyIdToken($this->idToken)) {
+            throw new ProConnectException('Erreur lors de la vérification du token');
+        }
         // les infos utilisateurs sont dans claims
         return $token->claims()->all();
     }
