@@ -1,12 +1,12 @@
-@import 'trumbowyg/dist/ui/trumbowyg.min.css';
-@import 'remixicon/fonts/remixicon.css';
-@import '../../_variables';
-@import '../../_mixins';
-@import '../../form/tom-select-override';
-@import '../../form/entity-checkbox-absolute-type';
-@import '../../form/trumbowyg-override';
-@import '../../form/label';
-@import '../../form/legend';
+@use 'trumbowyg/dist/ui/trumbowyg.min';
+@use 'remixicon/fonts/remixicon';
+@use '../../_variables';
+@use '../../_mixins';
+@use '../../form/tom-select-override';
+@use '../../form/entity-checkbox-absolute-type';
+@use '../../form/trumbowyg-override';
+@use '../../form/label';
+@use '../../form/legend';
 
 .link-to-visit{
     text-align: right;

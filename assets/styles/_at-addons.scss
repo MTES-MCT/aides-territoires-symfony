@@ -1,15 +1,15 @@
 // gestion overflow balise pre
-@import '_mixins';
+@use '_mixins';
 
 .at-pre-overflow{
-    @include is-mobile{
+    @include mixins.is-mobile{
         max-width: 320px;
         overflow: auto;
     }
 }
 
 .wysiwyg-wrapper{
-    @include img-reponsive();
+    @include mixins.img-reponsive();
 
     .text-left{
         text-align: left;

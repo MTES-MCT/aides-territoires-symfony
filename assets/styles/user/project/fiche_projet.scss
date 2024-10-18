@@ -1,13 +1,13 @@
 
-@import 'trumbowyg/dist/ui/trumbowyg.min.css';
-@import '../../_variables';
-@import '../../_mixins';
-@import '../../form/tom-select-override';
-@import '../../form/trumbowyg-override';
-@import '../../form/category-autocomplete-multiple';
-@import '../../form/entity-checkbox-absolute-type';
-@import '../../form/label';
-@import '../../form/legend';
+@use 'trumbowyg/dist/ui/trumbowyg.min';
+@use '../../_variables';
+@use '../../_mixins';
+@use '../../form/tom-select-override';
+@use '../../form/trumbowyg-override';
+@use '../../form/category-autocomplete-multiple';
+@use '../../form/entity-checkbox-absolute-type';
+@use '../../form/label';
+@use '../../form/legend';
 
 .ea-fileupload{
     .input-group{
