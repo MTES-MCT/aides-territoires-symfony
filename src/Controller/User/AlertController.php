@@ -102,7 +102,7 @@ class AlertController extends FrontController
             if (!$alert instanceof Alert) {
                 throw new NotFoundHttpException('Alerte introuvable');
             }
-            
+
             $managerRegistry->getManager()->remove($alert);
             $managerRegistry->getManager()->flush();
 

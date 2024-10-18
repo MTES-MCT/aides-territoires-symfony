@@ -507,21 +507,21 @@ class ImportFluxCommand extends Command // NOSONAR too much methods
         if (!$date) {
             return null;
         }
-    
+
         $formats = ['Y-m-d', 'd/m/Y'];
         $dateTemp = null;
-    
+
         foreach ($formats as $format) {
             $dateTemp = \DateTime::createFromFormat($format, $date);
             if ($dateTemp !== false) {
                 break;
             }
         }
-    
+
         if ($dateTemp === false) {
             return null;
         }
-    
+
         if (!isset($params['keepTime'])) {
             // Force pour éviter les différences sur le fuseau horaire
             $date = new \DateTime($dateTemp->format('Y-m-d'));
@@ -530,7 +530,7 @@ class ImportFluxCommand extends Command // NOSONAR too much methods
         } else {
             $date = $dateTemp;
         }
-    
+
         return $date;
     }
 

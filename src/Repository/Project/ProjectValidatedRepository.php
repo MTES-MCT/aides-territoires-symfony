@@ -4,7 +4,6 @@ namespace App\Repository\Project;
 
 use App\Entity\Organization\OrganizationType;
 use App\Entity\Perimeter\Perimeter;
-use App\Entity\Project\Project;
 use App\Entity\Project\ProjectValidated;
 use App\Service\Reference\ReferenceService;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
@@ -39,8 +38,8 @@ class ProjectValidatedRepository extends ServiceEntityRepository
         ;
 
         return $qb->getQuery()->getResult();
-
     }
+
     public function countProjectInCounty(array $params = null): int
     {
         $queryBuilder = $this->createQueryBuilder('p');
@@ -74,10 +73,6 @@ class ProjectValidatedRepository extends ServiceEntityRepository
 
     public function findProjectInRadius(array $params = null): array
     {
-        $keyword = $params['keyword'] ?? null;
-        $intentions_string = $params['intentions_string'] ?? null;
-        $objects_string = $params['objects_string'] ?? null;
-        $simple_words_string = $params['simple_words_string'] ?? null;
         $perimeter = $params['perimeter'] ?? null;
         $radius = $params['radius'] ?? null;
         $search = $params['search'] ?? null;
@@ -88,30 +83,51 @@ class ProjectValidatedRepository extends ServiceEntityRepository
 
         if ($search !== null) {
             $synonyms = $this->referenceService->getSynonymes($search);
-            $originalName = (isset($synonyms['original_name']) && trim($synonyms['original_name']) !== '')  ? $synonyms['original_name'] : null;
-            $intentionsString = (isset($synonyms['intentions_string']) && trim($synonyms['intentions_string']) !== '')  ? $synonyms['intentions_string'] : null;
-            $objectsString = (isset($synonyms['objects_string']) && trim($synonyms['objects_string']) !== '')  ? $synonyms['objects_string'] : null;
-            $simpleWordsString = (isset($synonyms['simple_words_string']) && trim($synonyms['simple_words_string']) !== '')  ? $synonyms['simple_words_string'] : null;
+            $originalName =
+                (isset($synonyms['original_name'])
+                && trim($synonyms['original_name']) !== '')
+                    ? $synonyms['original_name']
+                    : null
+            ;
+            $intentionsString =
+                (isset($synonyms['intentions_string'])
+                && trim($synonyms['intentions_string']) !== '')
+                    ? $synonyms['intentions_string']
+                    : null
+            ;
+            $objectsString =
+                (isset($synonyms['objects_string'])
+                && trim($synonyms['objects_string']) !== '')
+                    ? $synonyms['objects_string']
+                    : null
+            ;
+            $simpleWordsString =
+                (isset($synonyms['simple_words_string'])
+                && trim($synonyms['simple_words_string']) !== '')
+                    ? $synonyms['simple_words_string']
+                    : null
+            ;
 
             if ($originalName) {
                 $sqlOriginalName = '
-                CASE WHEN (p.projectName = :originalName) THEN 500 ELSE 0 END 
+                CASE WHEN (p.projectName = :originalName) THEN 500 ELSE 0 END
                 ';
                 $queryBuilder->setParameter('originalName', $originalName);
             }
 
             if ($objectsString) {
                 $sqlObjects = '
-                CASE WHEN (MATCH_AGAINST(p.projectName) AGAINST(:objects_string IN BOOLEAN MODE) > 1) THEN 90 ELSE 0 END +
-                CASE WHEN (MATCH_AGAINST(p.description) AGAINST(:objects_string IN BOOLEAN MODE) > 1) THEN 10 ELSE 0 END 
+                CASE WHEN (MATCH_AGAINST(p.projectName) AGAINST(:objects_string IN BOOLEAN MODE) > 1)
+                THEN 90 ELSE 0 END +
+                CASE WHEN (MATCH_AGAINST(p.description) AGAINST(:objects_string IN BOOLEAN MODE) > 1)
+                THEN 10 ELSE 0 END
                 ';
 
                 $objects = str_getcsv($objectsString, ' ', '"');
-                if (count($objects) > 0) {
+                if (!empty($objects)) {
                     $sqlObjects .= ' + ';
                 }
                 for ($i = 0; $i < count($objects); $i++) {
-
                     $sqlObjects .= '
                         CASE WHEN (p.projectName LIKE :objects' . $i . ') THEN 30 ELSE 0 END
                     ';
@@ -125,16 +141,20 @@ class ProjectValidatedRepository extends ServiceEntityRepository
             }
             if ($intentionsString && $objectsString) {
                 $sqlIntentions = '
-                CASE WHEN (MATCH_AGAINST(p.projectName) AGAINST(:intentions_string IN BOOLEAN MODE) > 1) THEN 5 ELSE 0 END +
-                CASE WHEN (MATCH_AGAINST(p.description) AGAINST(:intentions_string IN BOOLEAN MODE) > 1) THEN 1 ELSE 0 END 
+                CASE WHEN (MATCH_AGAINST(p.projectName) AGAINST(:intentions_string IN BOOLEAN MODE) > 1)
+                THEN 5 ELSE 0 END +
+                CASE WHEN (MATCH_AGAINST(p.description) AGAINST(:intentions_string IN BOOLEAN MODE) > 1)
+                THEN 1 ELSE 0 END
                 ';
                 $queryBuilder->setParameter('intentions_string', $intentionsString);
             }
 
             if ($simpleWordsString) {
                 $sqlSimpleWords = '
-                CASE WHEN (MATCH_AGAINST(p.projectName) AGAINST(:simple_words_string IN BOOLEAN MODE) > 1) THEN 30 ELSE 0 END +
-                CASE WHEN (MATCH_AGAINST(p.description) AGAINST(:simple_words_string IN BOOLEAN MODE) > 1) THEN 5 ELSE 0 END 
+                CASE WHEN (MATCH_AGAINST(p.projectName) AGAINST(:simple_words_string IN BOOLEAN MODE) > 1)
+                THEN 30 ELSE 0 END +
+                CASE WHEN (MATCH_AGAINST(p.description) AGAINST(:simple_words_string IN BOOLEAN MODE) > 1)
+                THEN 5 ELSE 0 END
                 ';
                 $queryBuilder->setParameter('simple_words_string', $simpleWordsString);
             }
@@ -168,10 +188,18 @@ class ProjectValidatedRepository extends ServiceEntityRepository
                 $queryBuilder->andHaving('score_total >= ' . $scoreTotalMin);
             }
         }
-        if ($perimeter instanceof Perimeter && $perimeter->getLatitude() && $perimeter->getLongitude() && $radius !== null) {
+        if (
+            $perimeter instanceof Perimeter
+            && $perimeter->getLatitude()
+            && $perimeter->getLongitude()
+            && $radius !== null
+        ) {
             $queryBuilder
-                ->addSelect('(((ACOS(SIN(:lat * PI() / 180) * SIN(perimeter.latitude * PI() / 180) + COS(:lat * PI() / 180) *
-                 COS(perimeter.latitude * PI() / 180) * COS((:lng - perimeter.longitude) * PI() / 180)) * 180 / PI()) * 60 * 1.1515) * 1.6093) AS dist')
+                ->addSelect('(((ACOS(SIN(:lat * PI() / 180)
+                * SIN(perimeter.latitude * PI() / 180) + COS(:lat * PI() / 180)
+                * COS(perimeter.latitude * PI() / 180)
+                * COS((:lng - perimeter.longitude) * PI() / 180)) * 180 / PI()) * 60 * 1.1515) * 1.6093)
+                AS dist')
                 ->innerJoin('p.organization', 'organization')
                 ->innerJoin('organization.perimeter', 'perimeter')
                 ->setParameter('lat', $perimeter->getLatitude())
@@ -248,8 +276,11 @@ class ProjectValidatedRepository extends ServiceEntityRepository
             && $perimeter->getLongitude()
         ) {
             $qb
-                ->addSelect('(((ACOS(SIN(:lat * PI() / 180) * SIN(perimeter.latitude * PI() / 180) + COS(:lat * PI() / 180) *
-            COS(perimeter.latitude * PI() / 180) * COS((:lng - perimeter.longitude) * PI() / 180)) * 180 / PI()) * 60 * 1.1515) * 1.6093) AS dist')
+                ->addSelect('(((ACOS(SIN(:lat * PI() / 180)
+                * SIN(perimeter.latitude * PI() / 180) + COS(:lat * PI() / 180)
+                * COS(perimeter.latitude * PI() / 180)
+                * COS((:lng - perimeter.longitude) * PI() / 180)) * 180 / PI()) * 60 * 1.1515) * 1.6093)
+                AS dist')
                 ->innerJoin('p.organization', 'organization')
                 ->innerJoin('organization.perimeter', 'perimeter')
                 ->setParameter('lat', $perimeter->getLatitude())

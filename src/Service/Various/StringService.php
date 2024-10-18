@@ -24,7 +24,7 @@ class StringService
     {
         $parts = preg_split('/(\s+)/u', $text, -1, PREG_SPLIT_DELIM_CAPTURE);
         $parts_count = count($parts);
-    
+
         $lengthCalcul = 0;
         $last_part = 0;
         for (; $last_part < $parts_count; ++$last_part) {
@@ -33,12 +33,12 @@ class StringService
                 break;
             }
         }
-    
+
         $return = implode(array_slice($parts, 0, $last_part));
         if (mb_strlen($text, 'UTF-8') > $length) {
             $return = mb_substr($return, 0, $length - 3, 'UTF-8') . '...';
         }
-    
+
         return $return;
     }
 

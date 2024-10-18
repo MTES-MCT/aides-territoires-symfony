@@ -49,7 +49,7 @@ class UserCrudController extends AtCrudController
         ->add(UserOganizationTypeFilter::new('organizationType', 'Type de structure'))
         ;
     }
-    
+
     public function configureFields(string $pageName): iterable
     {
         yield IdField::new('id')->onlyOnIndex();
@@ -179,7 +179,7 @@ class UserCrudController extends AtCrudController
 
         $exportCsvAction = $this->getExportCsvAction();
         $exportXlsxAction = $this->getExportXlsxAction();
-        
+
         $changePassword = Action::new('changePassword', 'Changer le mot de passe')
         ->linkToCrudAction('changePassword')
         ;
@@ -209,7 +209,7 @@ class UserCrudController extends AtCrudController
     public function showQrCode(AdminContext $context): Response
     {
         $object = $context->getEntity()->getInstance();
-        
+
         return $this->redirectToRoute('app_admin_qr_code_ga', ['idUser' => $object->getId()]);
     }
 

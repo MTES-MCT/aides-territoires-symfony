@@ -1,4 +1,5 @@
 <?php
+
 // api/src/Filter/RegexpFilter.php
 
 declare(strict_types=1);

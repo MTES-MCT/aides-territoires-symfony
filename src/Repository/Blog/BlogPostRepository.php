@@ -55,7 +55,13 @@ class BlogPostRepository extends ServiceEntityRepository
         $status = $params['status'] ?? null;
         $limit = $params['limit'] ?? null;
         $offset = $params['offset'] ?? null;
-        $orderBy = (isset($params['orderBy']) && isset($params['orderBy']['sort']) && isset($params['orderBy']['order'])) ? $params['orderBy'] : null;
+        $orderBy =
+            (isset($params['orderBy'])
+            && isset($params['orderBy']['sort'])
+            && isset($params['orderBy']['order']))
+                ? $params['orderBy']
+                : null
+        ;
 
         $qb = $this->createQueryBuilder('bp');
 

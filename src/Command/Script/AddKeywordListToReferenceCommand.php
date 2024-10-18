@@ -15,7 +15,6 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 #[AsCommand(name: 'at:script:keyword_synonyms_to_reference', description: 'Import des mots-clés référents')]
 class AddKeywordListToReferenceCommand extends Command
 {
-
     protected InputInterface $input;
     protected OutputInterface $output;
     protected string $commandTextStart = '<Import des anciens mots-clés';

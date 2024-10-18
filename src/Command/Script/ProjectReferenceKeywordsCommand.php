@@ -16,7 +16,6 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 #[AsCommand(name: 'at:script:project_reference:keywords', description: 'Exclusion de certains mots clés pour certains projets')]
 class ProjectReferenceKeywordsCommand extends Command
 {
-
     protected InputInterface $input;
     protected OutputInterface $output;
     protected string $commandTextStart = '<Exclusion de certains mots clés pour certains projets';

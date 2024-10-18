@@ -246,7 +246,7 @@ class SpreadsheetExporterService
             case User::class:
                 /** @var UserRepository $userRepository */
                 $userRepository = $this->managerRegistry->getRepository(User::class);
-                
+
                 /** @var User $result */
                 foreach ($results as $key => $result) {
                     $projectsHaveAids = false;
@@ -384,7 +384,7 @@ class SpreadsheetExporterService
             }
 
             $now = new \DateTime(date(self::TODAY_DATE_FORMAT));
-            $filename = 'Aides-territoires_-_' . $now->format('Y-m-d') . '_-_' . $project->getSlug().'.'.$format;
+            $filename = 'Aides-territoires_-_' . $now->format('Y-m-d') . '_-_' . $project->getSlug() . '.' . $format;
             $writer->openToBrowser($filename);
 
             if ($format == FileService::FORMAT_XLSX) {
@@ -501,8 +501,7 @@ class SpreadsheetExporterService
         }
     }
 
-    public function exportProjectAids(Project $project, string $format = 'csv')
-    : Response
+    public function exportProjectAids(Project $project, string $format = 'csv'): Response
     {
         try {
             // Création du tableur
@@ -523,7 +522,7 @@ class SpreadsheetExporterService
             }
 
             $now = new \DateTime(date(self::TODAY_DATE_FORMAT));
-            $filename = 'Aides-territoires_-_' . $now->format('Y-m-d') . '_-_' . $project->getSlug().'.'.$format;
+            $filename = 'Aides-territoires_-_' . $now->format('Y-m-d') . '_-_' . $project->getSlug() . '.' . $format;
 
             // StreamedResponse pour le téléchargement
             $response = new StreamedResponse(function () use ($writer) {
@@ -595,7 +594,7 @@ class SpreadsheetExporterService
         ];
 
         $sheet = $spreadsheet->getActiveSheet();
-        $sheet->fromArray($headers, null, 'A'.$row);
+        $sheet->fromArray($headers, null, 'A' . $row);
 
         return $spreadsheet;
     }
@@ -650,7 +649,7 @@ class SpreadsheetExporterService
             foreach ($aidProject->getAid()->getPrograms() as $aidProgram) {
                 $programs[] = $aidProgram->getName();
             }
-            
+
             $aid = $aidProject->getAid();
 
             // Nettoyer le HTML et conserver les sauts de ligne
@@ -686,7 +685,7 @@ class SpreadsheetExporterService
 
             // Ajoute les datas à la feuille
             $sheet = $spreadsheet->getActiveSheet();
-            $sheet->fromArray($cells, null, 'A'.$row);
+            $sheet->fromArray($cells, null, 'A' . $row);
             $row++;
         }
 

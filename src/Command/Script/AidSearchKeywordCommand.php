@@ -17,7 +17,6 @@ use Symfony\Component\Messenger\MessageBusInterface;
 #[AsCommand(name: 'at:script:aid:search_keywords', description: 'Recherche des mots clés référents dans les aides')]
 class AidSearchKeywordCommand extends Command
 {
-
     protected InputInterface $input;
     protected OutputInterface $output;
     protected string $commandTextStart = '<Recherche des mots clés référents dans les aides';

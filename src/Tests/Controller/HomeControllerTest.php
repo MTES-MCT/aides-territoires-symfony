@@ -24,7 +24,7 @@ class HomeControllerTest extends AtWebTestCase
         $option = $domSelect->ownerDocument->createElement('option', 'perimeterTest (Ad-hoc)');
         $option->setAttribute('value', '1');
         $domSelect->appendChild($option);
-        
+
         $form = $crawler->filter('#tabpanel-aids-panel form')->form([
             'organizationType' => 'commune',
             'searchPerimeter' => 1,

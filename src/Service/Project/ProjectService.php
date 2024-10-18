@@ -124,7 +124,7 @@ class ProjectService
         // Render the HTML as PDF
         $dompdf->render();
 
-        
+
         return $dompdf->output();
     }
 }

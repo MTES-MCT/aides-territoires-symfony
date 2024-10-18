@@ -13,7 +13,6 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 #[AsCommand(name: 'at:script:keyword_import_references', description: 'Import des mots-clés référents')]
 class ImportKeywordReferenceCommand extends Command
 {
-
     protected InputInterface $input;
     protected OutputInterface $output;
     protected string $commandTextStart = '<Import des mots-clés référents';

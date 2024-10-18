@@ -24,7 +24,7 @@ class PerimeterDataController extends ApiController
         $params = [];
 
         $perimeterId = $this->requestStack->getCurrentRequest()->get('perimeter_id', null);
-        
+
         if (!empty($perimeterId)) {
             $params['perimeter'] = $this->managerRegistry->getRepository(Perimeter::class)->find($perimeterId);
             if (!$params['perimeter'] instanceof Perimeter) {

@@ -46,7 +46,13 @@ class BlogPromotionPostRepository extends ServiceEntityRepository
         if ($keyword) {
             $synonyms = $this->referenceService->getSynonymes($keyword);
         }
-        $orderBy = (isset($params['orderBy']) && isset($params['orderBy']['sort']) && isset($params['orderBy']['order'])) ? $params['orderBy'] : null;
+        $orderBy =
+            (isset($params['orderBy'])
+            && isset($params['orderBy']['sort'])
+            && isset($params['orderBy']['order']))
+                ? $params['orderBy']
+                : null
+        ;
 
         $qb = $this->createQueryBuilder('bpp');
         if (isset($synonyms) && isset($synonyms['objects_string'])) {
@@ -82,7 +88,8 @@ class BlogPromotionPostRepository extends ServiceEntityRepository
         }
 
         if ($perimeterFrom instanceof Perimeter && $perimeterFrom->getId()) {
-            $ids = $this->getEntityManager()->getRepository(Perimeter::class)->getIdPerimetersContainedIn(['perimeter' => $perimeterFrom]);
+            $ids = $this->getEntityManager()->getRepository(Perimeter::class)
+                ->getIdPerimetersContainedIn(['perimeter' => $perimeterFrom]);
             $ids[] = $perimeterFrom->getId();
             $qb
                 ->leftJoin('bpp.perimeter', 'perimeter')

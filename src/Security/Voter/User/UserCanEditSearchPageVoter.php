@@ -11,8 +11,8 @@ use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 
 class UserCanEditSearchPageVoter extends Voter
 {
-    const MESSAGE_ERROR = 'Vous n\'êtes pas autorisé à accéder à cette ressource.';
-    const IDENTIFIER = 'USER_ACCESS_SEARCH_PAGE';
+    public const MESSAGE_ERROR = 'Vous n\'êtes pas autorisé à accéder à cette ressource.';
+    public const IDENTIFIER = 'USER_ACCESS_SEARCH_PAGE';
 
     public function __construct(
         private RequestStack $requestStack,
@@ -45,7 +45,7 @@ class UserCanEditSearchPageVoter extends Voter
         return false;
     }
 
-    private function isUserConnected(?User $user) : bool
+    private function isUserConnected(?User $user): bool
     {
         if (!$user instanceof User || !$user->getId()) {
             return false;
@@ -53,7 +53,7 @@ class UserCanEditSearchPageVoter extends Voter
         return true;
     }
 
-    private function isUserAdministrator(?User $user, SearchPage $searchPage) : bool
+    private function isUserAdministrator(?User $user, SearchPage $searchPage): bool
     {
         if ($searchPage->getAdministrator()->getId() !== $user->getId()) {
             return false;
@@ -62,12 +62,12 @@ class UserCanEditSearchPageVoter extends Voter
         return true;
     }
 
-    private function isUserEditor(?User $user, SearchPage $searchPage) : bool
+    private function isUserEditor(?User $user, SearchPage $searchPage): bool
     {
         if (!$searchPage->getEditors()->contains($user)) {
             return false;
         }
-        
+
         return true;
     }
 }

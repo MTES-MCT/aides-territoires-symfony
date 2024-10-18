@@ -29,7 +29,6 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 #[Route(priority: 5)]
 class ProjectReferenceController extends FrontController
 {
-
     const NB_PAID_BY_PAGE = 30;
     const NB_PROJECT_BY_PAGE = 18;
 

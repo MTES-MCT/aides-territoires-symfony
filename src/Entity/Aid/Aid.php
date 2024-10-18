@@ -2052,14 +2052,14 @@ class Aid // NOSONAR too much methods
         if ($this->getDateSubmissionDeadline()) {
             $today = new \DateTime(date('Y-m-d'));
             $interval = $today->diff($this->getDateSubmissionDeadline());
-    
+
             // Vérifiez si le nombre de jours est inférieur ou égal à APPROACHING_DEADLINE_DELTA
             // et si la date limite de soumission est dans le futur
             if ($interval->days <= self::APPROACHING_DEADLINE_DELTA && $interval->invert == 0) {
                 return true;
             }
         }
-    
+
         return false;
     }
 

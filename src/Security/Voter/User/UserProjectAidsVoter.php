@@ -11,8 +11,8 @@ use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 
 class UserProjectAidsVoter extends Voter
 {
-    const MESSAGE_ERROR = 'Vous n\'êtes pas autorisé à accéder à cette ressource.';
-    const IDENTIFIER = 'USER_PROJECT_AIDS';
+    public const MESSAGE_ERROR = 'Vous n\'êtes pas autorisé à accéder à cette ressource.';
+    public const IDENTIFIER = 'USER_PROJECT_AIDS';
 
     public function __construct(
         private RequestStack $requestStack,
@@ -52,7 +52,7 @@ class UserProjectAidsVoter extends Voter
         return false;
     }
 
-    private function isUserConnected(?User $user) : bool
+    private function isUserConnected(?User $user): bool
     {
         if (!$user instanceof User || !$user->getId()) {
             return false;
@@ -60,12 +60,12 @@ class UserProjectAidsVoter extends Voter
         return true;
     }
 
-    private function isUserAuthor(?User $user, Project $project) : bool
+    private function isUserAuthor(?User $user, Project $project): bool
     {
         return $project->getAuthor()->getId() === $user->getId();
     }
 
-    private function isUserMemberOfOrganization(?User $user, Project $project) : bool
+    private function isUserMemberOfOrganization(?User $user, Project $project): bool
     {
         return $project->getOrganization()->getBeneficiairies()->contains($user);
     }

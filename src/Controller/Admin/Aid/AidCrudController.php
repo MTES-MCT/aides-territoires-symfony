@@ -873,7 +873,6 @@ class AidCrudController extends AtCrudController implements EventSubscriberInter
                 $extension = $fileService->getExtension($form->get('file')->getData()->getClientOriginalName());
                 switch ($extension) {
                     case 'csv':
-
                         $options = new OptionsCsv();
                         $options->FIELD_DELIMITER = ';';
                         $options->FIELD_ENCLOSURE = '"';

@@ -29,7 +29,7 @@ class UserService
     ) {
     }
 
-    public function getDefaultOrganizationByEmail(string $email) : ?Organization
+    public function getDefaultOrganizationByEmail(string $email): ?Organization
     {
         try {
             /** @var UserRepository $userRepository */
@@ -44,7 +44,6 @@ class UserService
         } catch (\Exception) {
             return null;
         }
-
     }
 
     public function isMemberOfOrganization(?Organization $organization, User $user): bool

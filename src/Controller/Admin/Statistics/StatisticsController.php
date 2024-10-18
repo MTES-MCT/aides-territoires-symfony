@@ -536,7 +536,7 @@ class StatisticsController extends DashboardController
                 'filter_pattern' => MatomoService::REGEXP_AID_URL
             ]
         );
-        
+
         $topAids = [];
         foreach ($statsMatomoTopAids as $stats) {
             preg_match('/^\/(aides\/)?(.*)\/$/', $stats->label, $matches);
@@ -1396,7 +1396,6 @@ class StatisticsController extends DashboardController
         $charts = [];
 
         foreach ($interco_types as $interco_type) {
-
             $chart = $this->getChartObjectif($interco_type['current_chart'], $interco_type['total'], null);
 
             $charts[$interco_type['code']] = $chart;
@@ -1504,7 +1503,6 @@ class StatisticsController extends DashboardController
         } catch (\Exception) {
             return $this->json(['error' => true, 'nbAidViews' => 0], Response::HTTP_BAD_REQUEST);
         }
-
     }
 
     #[Route('/admin/statistics/consultation/ajax/aid-nb-views-distinct', name: 'admin_statistics_consultation_ajax_aid_nb_views_distinct', options: ['expose' => true])]

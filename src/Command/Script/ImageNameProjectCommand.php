@@ -19,7 +19,6 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 #[AsCommand(name: 'at:script:img_name_project_fix', description: 'Fix des mimes types sur s3')]
 class ImageNameProjectCommand extends Command
 {
-
     protected InputInterface $input;
     protected OutputInterface $output;
     protected string $commandTextStart = '<Fix des mimes types sur s3';

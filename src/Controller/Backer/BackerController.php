@@ -77,10 +77,7 @@ class BackerController extends FrontController
         $categories_by_theme = [];
         $programs_list = [];
         foreach ($backer->getAidsLive() as $aid) {
-
-
             foreach ($aid->getCategories() as $category) {
-
                 if (!isset($categories_by_theme[$category->getCategoryTheme()->getId()])) {
                     $categories_by_theme[$category->getCategoryTheme()->getId()] = [
                         'categoryTheme' => $category->getCategoryTheme(),
@@ -93,7 +90,6 @@ class BackerController extends FrontController
             }
 
             foreach ($aid->getPrograms() as $program) {
-
                 if (!isset($programs_list[$program->getId()])) {
                     $programs_list[$program->getId()] = [
                         'program' => $program,

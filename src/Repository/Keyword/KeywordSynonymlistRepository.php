@@ -41,7 +41,13 @@ class KeywordSynonymlistRepository extends ServiceEntityRepository
     public function getQueryBuilder(array $params = null): QueryBuilder
     {
         $nameLike = $params['nameLike'] ?? null;
-        $orderBy = (isset($params['orderBy']) && isset($params['orderBy']['sort']) && isset($params['orderBy']['order'])) ? $params['orderBy'] : null;
+        $orderBy =
+            (isset($params['orderBy'])
+            && isset($params['orderBy']['sort'])
+            && isset($params['orderBy']['order']))
+                ? $params['orderBy']
+                : null
+        ;
         $limit = $params['limit'] ?? null;
 
         $qb = $this->createQueryBuilder('ks');

@@ -825,7 +825,7 @@ class AidService // NOSONAR too complex
 
         // les aides du user
         $aids = $aidRepository->findCustom($aidsParams);
-        
+
         // Création du fichier Excel
         $spreadsheet = new Spreadsheet();
 
@@ -841,7 +841,7 @@ class AidService // NOSONAR too complex
             }
 
             // met le nom à la feuille
-            $sheet->setTitle($stringService->truncate($aid->getId().'_'.$aid->getName(), 31)); // Définir le nom de la feuille
+            $sheet->setTitle($stringService->truncate($aid->getId() . '_' . $aid->getName(), 31)); // Définir le nom de la feuille
 
             // Infos aides
             $sheet->setCellValue('A1', 'Nom de l’aide');

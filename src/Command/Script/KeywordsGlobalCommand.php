@@ -14,7 +14,6 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 #[AsCommand(name: 'at:script:keyword_global', description: 'Import des mots-clés')]
 class KeywordsGlobalCommand extends Command
 {
-
     protected InputInterface $input;
     protected OutputInterface $output;
     protected string $commandTextStart = '<Import des mots-clés';

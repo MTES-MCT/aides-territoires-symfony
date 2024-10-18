@@ -18,7 +18,7 @@ class FileService
     const ENV_DEV = 'dev';
     const ENV_PROD = 'prod';
     const ENV_STAGING = 'staging';
-    
+
     public function __construct(
         private KernelInterface $kernelInterface
     ) {
@@ -79,7 +79,7 @@ class FileService
             'webp',
             'avif'
         ];
-    
+
 
         // Vérification du type MIME
         if (!in_array($file->getMimeType(), $allowedMimeTypes)) {

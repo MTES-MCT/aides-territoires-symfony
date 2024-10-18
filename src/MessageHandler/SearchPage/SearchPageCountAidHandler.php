@@ -45,7 +45,10 @@ class SearchPageCountAidHandler
                 ]
             );
 
-            $aidParams = array_merge($aidParams, $this->aidSearchFormService->convertAidSearchClassToAidParams($aidSearchClass));
+            $aidParams = array_merge(
+                $aidParams,
+                $this->aidSearchFormService->convertAidSearchClassToAidParams($aidSearchClass)
+            );
 
             $aids = $this->aidService->searchAids($aidParams);
 

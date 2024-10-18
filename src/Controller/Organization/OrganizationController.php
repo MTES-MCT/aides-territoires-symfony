@@ -265,9 +265,11 @@ class OrganizationController extends FrontController
                 }
 
                 // verifie que la personne ne fait pas déjà partie de l'organization
-                if ($organization->getBeneficiairies()->filter(function ($beneficiary) use ($organizationInvitation) {
-                    return $beneficiary->getEmail() === $organizationInvitation->getEmail();
-                })->count()) {
+                if (
+                    $organization->getBeneficiairies()->filter(function ($beneficiary) use ($organizationInvitation) {
+                        return $beneficiary->getEmail() === $organizationInvitation->getEmail();
+                    })->count()
+                ) {
                     $this->addFlash(
                         FrontController::FLASH_ERROR,
                         'Cette personne fait déjà partie de cette organization.'

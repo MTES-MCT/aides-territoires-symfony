@@ -57,7 +57,7 @@ class SearchPageEditType extends AbstractType
                             ->setParameter('currentUser', $currentUser)
                             ->orderBy('u.email', 'ASC');
                     },
-                ]
+                    ]
                 );
         }
 

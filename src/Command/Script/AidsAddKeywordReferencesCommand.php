@@ -15,7 +15,6 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 #[AsCommand(name: 'at:script:import_keyword_aid', description: 'Transfert des mots-clés référents')]
 class AidsAddKeywordReferencesCommand extends Command
 {
-
     protected InputInterface $input;
     protected OutputInterface $output;
     protected string $commandTextStart = '<Transfert des mots-clés référents';

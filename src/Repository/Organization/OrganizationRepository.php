@@ -5,6 +5,7 @@ namespace App\Repository\Organization;
 use App\Entity\Organization\Organization;
 use App\Entity\Organization\OrganizationType;
 use App\Entity\Perimeter\Perimeter;
+use App\Entity\Project\Project;
 use App\Entity\User\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\QueryBuilder;
@@ -86,9 +87,11 @@ class OrganizationRepository extends ServiceEntityRepository
         $params['isImported'] = false;
         $qb = $this->getQueryBuilder($params);
         $qb->select('o.name, o.dateCreate');
+        $projectClass = $this->getEntityManager()->getClassMetadata(Project::class)->getName();
         $qb->addSelect(
             '
-        (SELECT COUNT(DISTINCT(projects.id)) FROM App\Entity\Project\Project projects WHERE projects.organization = o) as projects_count'
+        (SELECT COUNT(DISTINCT(projects.id)) FROM ' . $projectClass . ' projects WHERE projects.organization = o)
+        as projects_count'
         );
         $qb->innerJoin('o.perimeter', 'perimeter');
         $qb->addSelect('perimeter.code AS perimeter__code, perimeter.name as perimeter__name');
@@ -133,12 +136,18 @@ class OrganizationRepository extends ServiceEntityRepository
         $params['isImported'] = false;
         $qb = $this->getQueryBuilder($params);
         $qb->select('o.name, o.dateCreate');
-        $qb->addSelect(
-            '
-        (SELECT COUNT(DISTINCT(projects.id)) FROM App\Entity\Project\Project projects WHERE projects.organization = o) as projects_count'
-        );
+        $projectClass = $this->getEntityManager()->getClassMetadata(Project::class)->getName();
+
+        $qb->addSelect('
+            (SELECT COUNT(DISTINCT(projects.id)) FROM ' . $projectClass . ' projects WHERE projects.organization = o)
+            as projects_count
+        ');
         $qb->innerJoin('o.perimeter', 'perimeter');
-        $qb->addSelect('perimeter.id AS perimeter__id, perimeter.code AS perimeter__code, perimeter.name as perimeter__name');
+        $qb->addSelect('
+            perimeter.id AS perimeter__id,
+            perimeter.code AS perimeter__code,
+            perimeter.name as perimeter__name
+        ');
         $qb->innerJoin('o.beneficiairies', 'beneficiairiesForEpcis');
         $qb->addSelect('beneficiairiesForEpcis.email AS user__email');
         $qb->addSelect('organizationType.name AS organization_type');

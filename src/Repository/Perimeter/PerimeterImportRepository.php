@@ -25,13 +25,13 @@ class PerimeterImportRepository extends ServiceEntityRepository
 
     public function findNextToImport(array $params = null): ?PerimeterImport
     {
-        $params = [
+        $params = array_merge($params, [
             'askProcessing' => true,
             'orderBy' => [
                 'sort' => 'pi.id',
                 'order' => 'DESC'
             ]
-        ];
+        ]);
 
         return $this->findOneCustom($params);
     }
@@ -54,13 +54,20 @@ class PerimeterImportRepository extends ServiceEntityRepository
 
         return $qb->getQuery()->getOneOrNullResult();
     }
+
     public function getQueryBuilder(array $params = null): QueryBuilder
     {
         $exclude = $params['exclude'] ?? null;
         $askProcessing = $params['askProcessing'] ?? null;
         $importProcessing = $params['importProcessing'] ?? null;
         $isImported = $params['isImported'] ?? null;
-        $orderBy = (isset($params['orderBy']) && isset($params['orderBy']['sort']) && isset($params['orderBy']['order'])) ? $params['orderBy'] : null;
+        $orderBy =
+            (isset($params['orderBy'])
+            && isset($params['orderBy']['sort'])
+            && isset($params['orderBy']['order']))
+                ? $params['orderBy']
+                : null
+        ;
         $maxResults = $params['maxResults'] ?? null;
 
         $qb = $this->createQueryBuilder('pi');

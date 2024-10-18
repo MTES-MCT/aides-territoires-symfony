@@ -53,7 +53,7 @@ class AppFixtures extends Fixture
     public function load(ObjectManager $manager): void
     {
 
-        
+
         // perimeterTest
         $perimeter = new Perimeter();
         $perimeter->setName('perimeterTest');

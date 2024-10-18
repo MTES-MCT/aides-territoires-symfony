@@ -46,7 +46,7 @@ class ApiTokenAskCrudController extends AtCrudController
             ->linkToCrudAction('accept') // l'action appellée
             ->displayIf(fn ($entity) => !$entity->getUser()->getApiToken()); // condition d'affichage
         ;
-        
+
         return $actions
             ->add(Crud::PAGE_INDEX, $accept)
             ->add(Crud::PAGE_EDIT, $accept)
@@ -60,7 +60,7 @@ class ApiTokenAskCrudController extends AtCrudController
             $object->getUser()->setApiToken($this->userService->generateApiToken());
             $this->managerRegistry->getManager()->persist($object->getUser());
         }
-        
+
         $object->setTimeAccept(new \DateTime(date('Y-m-d H:i:s')));
         $this->managerRegistry->getManager()->persist($object);
 

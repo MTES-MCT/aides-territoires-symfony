@@ -23,7 +23,7 @@ class AidTypeRepository extends ServiceEntityRepository
         parent::__construct($registry, AidType::class);
     }
 
-    public function getIdsFromAidTypeGroup(AidTypeGroup $aidTypeGroup) : array
+    public function getIdsFromAidTypeGroup(AidTypeGroup $aidTypeGroup): array
     {
         $qb = $this->createQueryBuilder('at');
 
@@ -70,7 +70,13 @@ class AidTypeRepository extends ServiceEntityRepository
     public function getQueryBuilder(array $params = null): QueryBuilder
     {
         $slugs = $params['slugs'] ?? null;
-        $orderBy = (isset($params['orderBy']) && isset($params['orderBy']['sort']) && isset($params['orderBy']['order'])) ? $params['orderBy'] : null;
+        $orderBy =
+            (isset($params['orderBy'])
+            && isset($params['orderBy']['sort'])
+            && isset($params['orderBy']['order']))
+                ? $params['orderBy']
+                : null
+        ;
 
         $qb = $this->createQueryBuilder('at');
 

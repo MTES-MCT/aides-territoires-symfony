@@ -18,7 +18,6 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 #[AsCommand(name: 'at:script:mime_type_program_fix', description: 'Fix des mimes types sur s3')]
 class MimeTypeProgramCommand extends Command
 {
-
     protected InputInterface $input;
     protected OutputInterface $output;
     protected string $commandTextStart = '<Fix des mimes types sur s3';
