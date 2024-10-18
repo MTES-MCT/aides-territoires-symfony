@@ -3,6 +3,7 @@
 namespace App\Service\Security;
 
 use App\Exception\Security\ProConnectException;
+use App\Service\File\FileService;
 use App\Service\Various\ParamService;
 use CoderCat\JWKToPEM\JWKConverter;
 use Symfony\Component\HttpFoundation\Session\Session;
@@ -17,6 +18,7 @@ use Lcobucci\JWT\Signer\Rsa\Sha256;
 use Lcobucci\JWT\Token\Parser;
 use Lcobucci\JWT\Validation\Constraint\HasClaimWithValue;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\Routing\RequestContext;
 
 class ProConnectService
 {
@@ -45,16 +47,22 @@ class ProConnectService
     public function __construct(
         private ParamService $paramService,
         private HttpClientInterface $client,
-        private RouterInterface $routerInterface
+        private RouterInterface $routerInterface,
+        private RequestContext $context,
+        private FileService $fileService
     )
     {
         $this->proconnectClientId =  $this->paramService->get('proconnect_client_id');
         $this->proconnectClientSecret =  $this->paramService->get('proconnect_client_secret');
         $this->proconnectDomain =  $this->paramService->get('proconnect_domain');
 
+        // Forcer le schéma HTTPS
+        if (!in_array($this->fileService->getEnvironment(), [FileService::ENV_DEV, FileService::ENV_TEST])) {
+            $this->context->setScheme('https');
+        }
+
         $this->urlRedirectLogin = $this->routerInterface->generate('app_user_proconnect', [], RouterInterface::ABSOLUTE_URL);
         $this->urlRedirectLogout = $this->routerInterface->generate('app_logout', [], RouterInterface::ABSOLUTE_URL).'/';
-        dd($this->urlRedirectLogin, $this->urlRedirectLogout);
     }
 
     /**
