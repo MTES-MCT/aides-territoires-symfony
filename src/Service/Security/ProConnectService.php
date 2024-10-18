@@ -54,6 +54,7 @@ class ProConnectService
 
         $this->urlRedirectLogin = $this->routerInterface->generate('app_user_proconnect', [], RouterInterface::ABSOLUTE_URL);
         $this->urlRedirectLogout = $this->routerInterface->generate('app_logout', [], RouterInterface::ABSOLUTE_URL).'/';
+        dd($this->urlRedirectLogin, $this->urlRedirectLogout);
     }
 
     /**
