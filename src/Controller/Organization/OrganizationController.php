@@ -38,7 +38,11 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class OrganizationController extends FrontController
 {
-    #[Route('/comptes/structure/information/{id?}', name: 'app_organization_structure_information', requirements: ['id' => '\d+'])]
+    #[Route(
+        '/comptes/structure/information/{id?}',
+        name: 'app_organization_structure_information',
+        requirements: ['id' => '\d+']
+    )]
     public function informationEdit(
         UserService $userService,
         ManagerRegistry $managerRegistry,
@@ -126,7 +130,10 @@ class OrganizationController extends FrontController
                 );
 
                 // redirection
-                return $this->redirectToRoute('app_organization_structure_information', ['id' => $organization->getId()]);
+                return $this->redirectToRoute(
+                    'app_organization_structure_information',
+                    ['id' => $organization->getId()]
+                );
             } else {
                 $this->addFlash(
                     FrontController::FLASH_ERROR,
@@ -162,7 +169,10 @@ class OrganizationController extends FrontController
         if ($formOrganizationChoice->isSubmitted()) {
             if ($formOrganizationChoice->isValid()) {
                 $organization = $formOrganizationChoice->get('organization')->getData();
-                return $this->redirectToRoute('app_organization_donnees_cles_details', ['id' => $organization->getId()]);
+                return $this->redirectToRoute(
+                    'app_organization_donnees_cles_details',
+                    ['id' => $organization->getId()
+                ]);
             }
         }
 
@@ -171,7 +181,11 @@ class OrganizationController extends FrontController
         ]);
     }
 
-    #[Route('/comptes/structure/donnees-cles/{id}', name: 'app_organization_donnees_cles_details', requirements: ['id' => '[0-9]+'])]
+    #[Route(
+        '/comptes/structure/donnees-cles/{id}',
+        name: 'app_organization_donnees_cles_details',
+        requirements: ['id' => '[0-9]+']
+    )]
     public function donneesClesDetails(
         int $id,
         UserService $userService,
@@ -199,7 +213,10 @@ class OrganizationController extends FrontController
                 $managerRegistry->getManager()->persist($organization);
                 $managerRegistry->getManager()->flush();
                 $this->addFlash(FrontController::FLASH_SUCCESS, 'Vos modifications ont été enregistrées avec succès.');
-                return $this->redirectToRoute('app_organization_donnees_cles_details', ['id' => $organization->getId()]);
+                return $this->redirectToRoute(
+                    'app_organization_donnees_cles_details',
+                    ['id' => $organization->getId()]
+                );
             } else {
                 $this->addFlash(FrontController::FLASH_ERROR, 'Votre formulaire contient des erreurs.');
             }
@@ -217,7 +234,11 @@ class OrganizationController extends FrontController
         ]);
     }
 
-    #[Route('/comptes/structure/collaborateurs/{id}', name: 'app_organization_collaborateurs', requirements: ['id' => '[0-9]+'])]
+    #[Route(
+        '/comptes/structure/collaborateurs/{id}',
+        name: 'app_organization_collaborateurs',
+        requirements: ['id' => '[0-9]+']
+    )]
     public function collaborateurs(
         $id,
         UserService $userService,
@@ -338,7 +359,10 @@ class OrganizationController extends FrontController
                     'name' => $beneficiary->getFirstname() . ' ' . $beneficiary->getLastname(),
                     'email' => $beneficiary->getEmail(),
                     'role' => $beneficiary->getBeneficiaryRole() ?? '',
-                    'dateInvite' => ($userInvitation && $userInvitation->getDateCreate()) ? $userInvitation->getDateCreate()->format('d/m/Y') : '',
+                    'dateInvite' => ($userInvitation && $userInvitation->getDateCreate())
+                        ? $userInvitation->getDateCreate()->format('d/m/Y')
+                        : ''
+                    ,
                     'status' => $status,
                     'excludable' => $excludable,
                     'invitationId' => $invitationId,
@@ -375,7 +399,10 @@ class OrganizationController extends FrontController
                 'name' => $organizationInvitation->getFirstname() . ' ' . $organizationInvitation->getLastname(),
                 'email' => $organizationInvitation->getEmail(),
                 'role' => '',
-                'dateInvite' => ($organizationInvitation->getDateCreate()) ? $organizationInvitation->getDateCreate()->format('d/m/Y') : '',
+                'dateInvite' => ($organizationInvitation->getDateCreate())
+                    ? $organizationInvitation->getDateCreate()->format('d/m/Y')
+                    : ''
+                ,
                 'status' => $status,
                 'excludable' => $excludable,
                 'invitationId' => $organizationInvitation->getId(),
@@ -446,7 +473,11 @@ class OrganizationController extends FrontController
             rejoindre votre structure ' . $organization->getName() . '.
         </p>
         ';
-        $notificationService->addNotification($organizationInvitation->getAuthor(), 'Votre invitation a été acceptée', $message);
+        $notificationService->addNotification(
+            $organizationInvitation->getAuthor(),
+            'Votre invitation a été acceptée',
+            $message
+        );
 
         // notification aux autres membres de l'organization
         foreach ($organization->getBeneficiairies() as $beneficiary) {
@@ -455,12 +486,19 @@ class OrganizationController extends FrontController
                 continue;
             }
 
-            $message = '
-            <p>
-            ' . $user->getFirstname() . ' ' . $user->getLastname() . ' a accepté l’invitation de ' . $organizationInvitation->getAuthor()->getFirstname() . ' ' . $organizationInvitation->getAuthor()->getLastname() . '
-            et vient de rejoindre votre structure ' . $organization->getName() . '.
-            </p>
-            ';
+            $message =
+            '<p>'
+            . $user->getFirstname()
+            . ' '
+            . $user->getLastname()
+            . ' a accepté l’invitation de '
+            . $organizationInvitation->getAuthor()->getFirstname()
+            . ' '
+            . $organizationInvitation->getAuthor()->getLastname()
+            . ' et vient de rejoindre votre structure '
+            . $organization->getName()
+            . '.</p>'
+            ;
             $notificationService->addNotification($beneficiary, 'Une invitation a été acceptée', $message);
         }
         // message
@@ -499,7 +537,11 @@ class OrganizationController extends FrontController
             ' . $user->getFirstname() . ' ' . $user->getLastname() . ' a refusé votre invitation.
         </p>
         ';
-        $notificationService->addNotification($organizationInvitation->getAuthor(), 'Votre invitation a été refusée', $message);
+        $notificationService->addNotification(
+            $organizationInvitation->getAuthor(),
+            'Votre invitation a été refusée',
+            $message
+        );
 
         // message
         $this->addFlash(
@@ -528,21 +570,36 @@ class OrganizationController extends FrontController
         }
 
         // ajout notification a l'utilisation de l'invitation
-        $organizationName = $organizationInvitation->getOrganization() ? $organizationInvitation->getOrganization()->getName() : 'une structure';
-        $message = '
-        <p>
-            ' . $user->getFirstname() . ' ' . $user->getLastname() . ' vous à exclu de l\'organization ' . $organizationName . '.
-        </p>
-        ';
+        $organizationName = $organizationInvitation->getOrganization()
+            ? $organizationInvitation->getOrganization()->getName()
+            : 'une structure'
+        ;
+        $message =
+        '<p>'
+        . $user->getFirstname()
+        . ' '
+        . $user->getLastname()
+        . ' vous à exclu de l\'organization '
+        . $organizationName
+        . '.</p>'
+        ;
 
         if ($organizationInvitation->getGuest()) {
-            $notificationService->addNotification($organizationInvitation->getGuest(), 'Vous avez été exclu de ' . $organizationName, $message);
+            $notificationService->addNotification(
+                $organizationInvitation->getGuest(),
+                'Vous avez été exclu de ' . $organizationName,
+                $message
+            );
         }
 
         // message
         $this->addFlash(
             FrontController::FLASH_SUCCESS,
-            'Vous avez exclu ' . $organizationInvitation->getFirstname() . ' ' . $organizationInvitation->getLastname() . ' de l\'organization.'
+            'Vous avez exclu '
+            . $organizationInvitation->getFirstname()
+            . ' '
+            . $organizationInvitation->getLastname()
+            . ' de l\'organization.'
         );
 
         // retire l'organization à l'utilisateur
@@ -557,10 +614,17 @@ class OrganizationController extends FrontController
         // sauvegarde
         $managerRegistry->getManager()->flush();
 
-        return $this->redirectToRoute('app_organization_collaborateurs', ['id' => $organizationInvitation->getOrganization()->getId()]);
+        return $this->redirectToRoute(
+            'app_organization_collaborateurs',
+            ['id' => $organizationInvitation->getOrganization()->getId()]
+        );
     }
 
-    #[Route('/comptes/structure/{id}/porteur/{idBacker?}/', name: 'app_organization_backer_edit', requirements: ['id' => '\d+', 'idBacker' => '\d+'])]
+    #[Route(
+        '/comptes/structure/{id}/porteur/{idBacker?}/',
+        name: 'app_organization_backer_edit',
+        requirements: ['id' => '\d+', 'idBacker' => '\d+']
+    )]
     public function backerEdit(
         int $id,
         int $idBacker = null,
@@ -582,13 +646,19 @@ class OrganizationController extends FrontController
         $organization = $organizationRepository->find($id);
 
         if (!$organizationService->canEdit($user, $organization)) {
-            $this->addFlash(FrontController::FLASH_ERROR, 'Vous n\'avez pas les droits pour éditer cette fiche porteur d\'aide.');
+            $this->addFlash(
+                FrontController::FLASH_ERROR,
+                'Vous n\'avez pas les droits pour éditer cette fiche porteur d\'aide.'
+            );
             return $this->redirectToRoute('app_user_dashboard');
         }
 
         // si l'organization à un porteur associé mais qu'on a pas l'id en paramètre, on redirige
         if ($organization->getBacker() && !$idBacker) {
-            return $this->redirectToRoute('app_organization_backer_edit', ['id' => $organization->getId(), 'idBacker' => $organization->getBacker()->getId()]);
+            return $this->redirectToRoute(
+                'app_organization_backer_edit',
+                ['id' => $organization->getId(), 'idBacker' => $organization->getBacker()->getId()]
+            );
         }
 
         // regarde si backer
@@ -597,7 +667,10 @@ class OrganizationController extends FrontController
             $backer = $backerRepository->find($idBacker);
             // on vérifie que le porteur d'aide peu bien être éditer par l'utilisateur de cette organization
             if (!$backerService->userCanEdit($user, $backer)) {
-                $this->addFlash(FrontController::FLASH_ERROR, 'Vous n\'avez pas les droits pour éditer cette fiche porteur d\'aide.');
+                $this->addFlash(
+                    FrontController::FLASH_ERROR,
+                    'Vous n\'avez pas les droits pour éditer cette fiche porteur d\'aide.'
+                );
                 return $this->redirectToRoute('app_user_dashboard');
             }
         }
@@ -625,7 +698,10 @@ class OrganizationController extends FrontController
                     $managerRegistry->getManager()->persist($backerAskAssociate);
                     $managerRegistry->getManager()->flush();
                     $this->addFlash(FrontController::FLASH_SUCCESS, 'Votre demande d\'association a bien été envoyée.');
-                    return $this->redirectToRoute('app_organization_backer_edit', ['id' => $organization->getId(), 'idBacker' => 0]);
+                    return $this->redirectToRoute(
+                        'app_organization_backer_edit',
+                        ['id' => $organization->getId(), 'idBacker' => 0]
+                    );
                 } else {
                     $this->addFlash(FrontController::FLASH_ERROR, 'Le formulaire contient des erreurs.');
                 }
@@ -647,7 +723,9 @@ class OrganizationController extends FrontController
                 // traitement image
                 $logoFile = $form->get('logoFile')->getData();
                 if ($logoFile instanceof UploadedFile) {
-                    $backer->setLogo(Backer::FOLDER . '/' . $imageService->getSafeFileName($logoFile->getClientOriginalName()));
+                    $backer->setLogo(
+                        Backer::FOLDER . '/' . $imageService->getSafeFileName($logoFile->getClientOriginalName())
+                    );
                     $backer->setLogoFile(null);
                     $imageService->sendUploadedImageToCloud($logoFile, Backer::FOLDER, $backer->getLogo());
                 }
@@ -668,17 +746,29 @@ class OrganizationController extends FrontController
                             $notificationService->addNotification(
                                 $beneficiary,
                                 'La fiche du porteur d\'aide ' . $backer->getName() . ' à été créee',
-                                '<p>
-                                ' . $user->getFirstname() . ' ' . $user->getLastname() . ' de la structure ' . $organization->getName() . ' a créé la fiche du porteur d\'aide ' . $backer->getName() . '.
-                                </p>'
+                                '<p>'
+                                . $user->getFirstname()
+                                . ' '
+                                . $user->getLastname()
+                                . ' de la structure '
+                                . $organization->getName()
+                                . ' a créé la fiche du porteur d\'aide '
+                                . $backer->getName()
+                                . '.</p>'
                             );
                         } else {
                             $notificationService->addNotification(
                                 $beneficiary,
                                 'La fiche du porteur d\'aide ' . $backer->getName() . ' à été modifiée',
-                                '<p>
-                                ' . $user->getFirstname() . ' ' . $user->getLastname() . ' de la structure ' . $organization->getName() . ' a mis à jour la fiche du porteur d\'aide ' . $backer->getName() . '.
-                                </p>'
+                                '<p>'
+                                . $user->getFirstname()
+                                . ' '
+                                . $user->getLastname()
+                                . ' de la structure '
+                                . $organization->getName()
+                                . ' a mis à jour la fiche du porteur d\'aide '
+                                . $backer->getName()
+                                . '.</p>'
                             );
                         }
                     }
@@ -694,14 +784,24 @@ class OrganizationController extends FrontController
 
                 // message ok
                 if (isset($create)) {
-                    $this->addFlash(FrontController::FLASH_SUCCESS, 'La fiche porteur d\'aide a bien été créée. Elle sera validée par un administrateur avant d\'être publiée');
+                    $this->addFlash(
+                        FrontController::FLASH_SUCCESS,
+                        'La fiche porteur d\'aide a bien été créée. '
+                        . 'Elle sera validée par un administrateur avant d\'être publiée'
+                    );
                 } else {
-                    $this->addFlash(FrontController::FLASH_SUCCESS, 'La fiche porteur d\'aide a bien été modifiée.');
+                    $this->addFlash(
+                        FrontController::FLASH_SUCCESS,
+                        'La fiche porteur d\'aide a bien été modifiée.'
+                    );
                 }
 
 
                 // redirection
-                return $this->redirectToRoute('app_organization_backer_edit', ['id' => $organization->getId(), 'idBacker' => $backer->getId()]);
+                return $this->redirectToRoute(
+                    'app_organization_backer_edit',
+                    ['id' => $organization->getId(), 'idBacker' => $backer->getId()
+                ]);
             } else {
                 $this->addFlash(FrontController::FLASH_ERROR, 'Le formulaire contient des erreurs.');
             }
@@ -728,7 +828,11 @@ class OrganizationController extends FrontController
         ]);
     }
 
-    #[Route('/comptes/structure/porteur/ajax-lock/', name: 'app_organization_backer_ajax_lock', options: ['expose' => true], methods: ['POST'])]
+    #[Route(
+        '/comptes/structure/porteur/ajax-lock/',
+        name: 'app_organization_backer_ajax_lock',
+        options: ['expose' => true], methods: ['POST']
+    )]
     public function ajaxLock(
         RequestStack $requestStack,
         BackerRepository $backerRepository,
@@ -785,7 +889,11 @@ class OrganizationController extends FrontController
         }
     }
 
-    #[Route('/comptes/structure/{id}/porteur/{idBacker}/unlock/', name: 'app_organization_backer_unlock', requirements: ['id' => '\d+', 'idBacker' => '\d+'])]
+    #[Route(
+        '/comptes/structure/{id}/porteur/{idBacker}/unlock/',
+        name: 'app_organization_backer_unlock',
+        requirements: ['id' => '\d+', 'idBacker' => '\d+']
+    )]
     public function unlock(
         $id,
         $idBacker,
@@ -833,11 +941,18 @@ class OrganizationController extends FrontController
             $this->addFlash(FrontController::FLASH_ERROR, 'Impossible de débloquer la fiche porteur d\'aides');
 
             // retour
-            return $this->redirectToRoute('app_organization_backer_edit', ['id' => $organization->getId(), 'idBacker' => $backer->getId()]);
+            return $this->redirectToRoute(
+                'app_organization_backer_edit',
+                ['id' => $organization->getId(), 'idBacker' => $backer->getId()]
+            );
         }
     }
 
-    #[Route('/comptes/structure/porteur/ajax-unlock/', name: 'app_organization_backer_ajax_unlock', options: ['expose' => true])]
+    #[Route(
+        '/comptes/structure/porteur/ajax-unlock/',
+        name: 'app_organization_backer_ajax_unlock',
+        options: ['expose' => true]
+    )]
     public function ajaxUnlock(
         RequestStack $requestStack,
         BackerRepository $backerRepository,
