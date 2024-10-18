@@ -29,10 +29,11 @@ class UserService
     ) {
     }
 
-    public function  getDefaultOrganizationByEmail(string $email) : ?Organization {
+    public function getDefaultOrganizationByEmail(string $email) : ?Organization
+    {
         try {
             /** @var UserRepository $userRepository */
-            $userRepository = $this->entityManagerInterface->getRepository(User::class);    
+            $userRepository = $this->entityManagerInterface->getRepository(User::class);
 
             /** @var OrganizationRepository $organizationRepository */
             $organizationRepository = $this->entityManagerInterface->getRepository(Organization::class);

@@ -38,14 +38,14 @@ class UserCanEditSearchPageVoter extends Voter
         if (
             $this->isUserConnected($currentUser)
             && ($this->isUserAdministrator($currentUser, $subject) || $this->isUserEditor($currentUser, $subject))
-            ) {
+        ) {
             return true;
         }
 
         return false;
     }
 
-    private function isUserConnected(?User $user) : bool 
+    private function isUserConnected(?User $user) : bool
     {
         if (!$user instanceof User || !$user->getId()) {
             return false;
@@ -53,7 +53,7 @@ class UserCanEditSearchPageVoter extends Voter
         return true;
     }
 
-    private function isUserAdministrator(?User $user, SearchPage $searchPage) : bool 
+    private function isUserAdministrator(?User $user, SearchPage $searchPage) : bool
     {
         if ($searchPage->getAdministrator()->getId() !== $user->getId()) {
             return false;
@@ -62,7 +62,7 @@ class UserCanEditSearchPageVoter extends Voter
         return true;
     }
 
-    private function isUserEditor(?User $user, SearchPage $searchPage) : bool 
+    private function isUserEditor(?User $user, SearchPage $searchPage) : bool
     {
         if (!$searchPage->getEditors()->contains($user)) {
             return false;

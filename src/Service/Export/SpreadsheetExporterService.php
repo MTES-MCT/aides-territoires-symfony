@@ -72,10 +72,10 @@ class SpreadsheetExporterService
                             $values[] = $value->getId();
                         }
                         $sqlParams[] = ['name' => $param->getName(), 'value' => $values];
-                    // Si object
+                        // Si object
                     } elseif (is_object($param->getValue())) {
                         $sqlParams[] = ['name' => $param->getName(), 'value' => $param->getValue()->getId()];
-                    // Si string
+                        // Si string
                     } else {
                         $sqlParams[] = ['name' => $param->getName(), 'value' => $param->getValue()];
                     }
@@ -526,7 +526,7 @@ class SpreadsheetExporterService
             $filename = 'Aides-territoires_-_' . $now->format('Y-m-d') . '_-_' . $project->getSlug().'.'.$format;
 
             // StreamedResponse pour le téléchargement
-            $response = new StreamedResponse(function() use ($writer) {
+            $response = new StreamedResponse(function () use ($writer) {
                 $writer->save('php://output');
             });
 
@@ -569,8 +569,7 @@ class SpreadsheetExporterService
     private function headersProjectAidsSpreadSheetExport(
         Spreadsheet $spreadsheet,
         int $row = 1
-    ): Spreadsheet
-    {
+    ): Spreadsheet {
         $headers = [
             'Adresse de la fiche aide',
             'Nom',
@@ -605,8 +604,7 @@ class SpreadsheetExporterService
         Spreadsheet $spreadsheet,
         Project $project,
         int $startRow = 2
-    ): Spreadsheet
-    {
+    ): Spreadsheet {
         $row = $startRow;
 
         foreach ($project->getAidProjects() as $aidProject) {

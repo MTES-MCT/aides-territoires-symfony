@@ -44,8 +44,8 @@ class UserProjectAidsVoter extends Voter
             && (
                 $this->isUserAuthor($currentUser, $project)
                 || $this->isUserMemberOfOrganization($currentUser, $project)
-                )
-            ) {
+            )
+        ) {
             return true;
         }
 

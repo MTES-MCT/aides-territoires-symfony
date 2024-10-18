@@ -29,8 +29,7 @@ class ContactType extends AbstractType
 
     public function __construct(
         private FileService $fileService
-    )
-    {   
+    ) {
     }
 
 

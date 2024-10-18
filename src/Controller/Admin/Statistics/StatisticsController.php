@@ -1484,8 +1484,7 @@ class StatisticsController extends DashboardController
     #[Route('/admin/statistics/consultation/ajax/aid-nb-views', name: 'admin_statistics_consultation_ajax_aid_nb_views', options: ['expose' => true])]
     public function ajaxAidNbViews(
         RequestStack $requestStack
-    ): Response
-    {
+    ): Response {
         try {
             $dateCreateMin = $requestStack->getCurrentRequest()->get('dateCreateMin');
             $dateCreateMax = $requestStack->getCurrentRequest()->get('dateCreateMax');
@@ -1511,8 +1510,7 @@ class StatisticsController extends DashboardController
     #[Route('/admin/statistics/consultation/ajax/aid-nb-views-distinct', name: 'admin_statistics_consultation_ajax_aid_nb_views_distinct', options: ['expose' => true])]
     public function ajaxAidNbViewsDistinct(
         RequestStack $requestStack
-    ): Response
-    {
+    ): Response {
         try {
             $dateCreateMin = $requestStack->getCurrentRequest()->get('dateCreateMin');
             $dateCreateMax = $requestStack->getCurrentRequest()->get('dateCreateMax');

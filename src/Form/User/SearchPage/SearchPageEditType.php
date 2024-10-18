@@ -37,7 +37,10 @@ class SearchPageEditType extends AbstractType
 
         if ($searchPage instanceof SearchPage && $searchPage->getAdministrator() == $currentUser) {
             $builder
-                ->add('editors', EntityType::class, [
+                ->add(
+                    'editors',
+                    EntityType::class,
+                    [
                     'required' => true,
                     'label' => 'Éditeur(s) de la page',
                     'help' => 'Vous pouvez ajouter plusieurs éditeurs à la page. Les éditeurs peuvent modifier le contenu de la page, ils doivent faire parti de vos structures.',
@@ -55,7 +58,7 @@ class SearchPageEditType extends AbstractType
                             ->orderBy('u.email', 'ASC');
                     },
                 ]
-            );
+                );
         }
 
         $builder

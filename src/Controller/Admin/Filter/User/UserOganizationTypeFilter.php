@@ -34,7 +34,7 @@ class UserOganizationTypeFilter implements FilterInterface
             ->innerJoin('organizationsForOt.organizationType', 'organizationTypeForFilter')
             ->andWhere('organizationTypeForFilter.id = :idOrganizationTypeForFilter')
             ->setParameter('idOrganizationTypeForFilter', $filterDataDto->getValue());
-    ;
+        ;
 
 
         return;

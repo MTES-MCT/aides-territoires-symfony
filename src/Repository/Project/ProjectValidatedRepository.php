@@ -36,7 +36,7 @@ class ProjectValidatedRepository extends ServiceEntityRepository
             ->innerJoin('p.organization', 'organization')
             ->innerJoin('organization.perimeterDepartment', 'perimeterDepartment')
             ->groupBy('perimeterDepartment.id')
-            ;
+        ;
 
         return $qb->getQuery()->getResult();
 

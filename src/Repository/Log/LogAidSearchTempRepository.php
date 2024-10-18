@@ -25,7 +25,7 @@ class LogAidSearchTempRepository extends ServiceEntityRepository
             ->select('IFNULL(COUNT(l.id), 0)')
             ->getQuery()
             ->getSingleScalarResult()
-            ;
+        ;
     }
 
     public function getQueryBuilder(?array $params = null): QueryBuilder
@@ -38,7 +38,7 @@ class LogAidSearchTempRepository extends ServiceEntityRepository
             $qb
                 ->andWhere('l.dateCreate = :dateCreate')
                 ->setParameter('dateCreate', $dateCreate)
-                ;
+            ;
         }
 
         return $qb;

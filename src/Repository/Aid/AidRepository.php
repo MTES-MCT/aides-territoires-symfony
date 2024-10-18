@@ -73,7 +73,7 @@ class AidRepository extends ServiceEntityRepository
             ->innerJoin('category.categoryTheme', 'categoryTheme')
             ->andWhere('a.id IN (:ids)')
             ->setParameter('ids', $ids)
-            ;
+        ;
 
         $results = $qb->getQuery()->getResult();
 

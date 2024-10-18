@@ -26,8 +26,7 @@ class FondVert2023StatsCommand extends Command
         private EntityManagerInterface $managerRegistry,
         private FileService $fileService,
         private EmailService $emailService
-    )
-    {
+    ) {
         ini_set('max_execution_time', 60*60);
         ini_set('memory_limit', '1G');
         parent::__construct();
