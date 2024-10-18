@@ -1,3 +1,5 @@
+@use '../../mixins';
+
 .search-meta {
     .fr-tags-group.categories {
         display: flex;
@@ -12,7 +14,7 @@
         }
 
         ul {
-            @include is-bigger-than-mobile {
+            @include mixins.is-bigger-than-mobile {
                 columns: 3;
                 column-gap: 40px;
             }

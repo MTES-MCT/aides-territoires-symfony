@@ -1,16 +1,16 @@
-@import '@gouvfr/dsfr/dist/dsfr.min.css';
-@import '@gouvfr/dsfr/dist/utility/utility.main.min.css';
-@import '@gouvfr/dsfr/dist/scheme/scheme.min.css';
+@use '@gouvfr/dsfr/dist/dsfr.min';
+@use '@gouvfr/dsfr/dist/utility/utility.main.min';
+@use '@gouvfr/dsfr/dist/scheme/scheme.min';
 
-@import '_dsfr-addons';
-@import '_at-addons';
-@import '_reset';
-@import '_variables';
-@import '_mixins';
-@import 'form/fieldset';
+@use '_dsfr-addons';
+@use '_at-addons';
+@use '_reset';
+@use '_variables';
+@use '_mixins';
+@use 'form/fieldset';
 
 
 .highlight{
-    background-color: $highlightColor;
+    background-color: variables.$highlightColor;
     font-weight: bold;
 }

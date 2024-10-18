@@ -1,14 +1,14 @@
-@import '_variables';
+@use '_variables';
 
 @mixin is-small{
-  @media (max-width: $deviceSmallBreakpointMax) { @content; }
+  @media (max-width: variables.$deviceSmallBreakpointMax) { @content; }
 }
 @mixin is-mobile {
-    @media (max-width: $deviceMobileBreakpointMax) { @content; }
+    @media (max-width: variables.$deviceMobileBreakpointMax) { @content; }
 }
 
 @mixin is-bigger-than-mobile {
-    @media (min-width: $deviceMobileBreakpointMin) { @content; }
+    @media (min-width: variables.$deviceMobileBreakpointMin) { @content; }
 }
 
 @mixin img-reponsive{
