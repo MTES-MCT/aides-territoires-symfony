@@ -33,7 +33,7 @@
         "@fortawesome/fontawesome-free": "^6.4.0",
         "@gouvfr/dsfr": "^1.12.1",
         "axios": "^1.7.7",
-        "browser-sync": "^3.0.3",
+        "browser-sync": "^2.27.10",
         "chartjs-plugin-annotation": "3.1.0",
         "datatables": "^1.10.18",
         "jquery": "^3.7.0",
@@ -47,7 +47,9 @@
         "trumbowyg": "^2.27.3"
     },
     "resolutions": {
-        "axios": "1.7.7"
+        "axios": "1.7.7",
+        "serve-static": "1.16.2",
+        "send": "1.1.0"
     },
     "engines": {
         "node": "<18.20.3"
