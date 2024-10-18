@@ -113,9 +113,9 @@ Nous utilisons `squizlabs/php_codesniffer`, `phpstan/phpstan` et `black`
 
     vendor/bin/phpcs --standard=PSR12 src/
 
-    vendor/bin/phpstan analyse src --level=max
+    vendor/bin/phpstan analyse src
 
-
+    vendor/bin/php-cs-fixer fix src
 
 Pour vérifier son code, on peut intégrer le linter adapté à
 son IDE et aussi faire ceci :
