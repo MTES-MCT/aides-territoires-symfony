@@ -48,6 +48,14 @@ class UrlExternalValidValidator extends ConstraintValidator
             // Vérifie url externe
             $forbiddenUrls = explode(',', $this->paramService->get('forbidden_external_urls'));
             $host = parse_url($value, PHP_URL_HOST);
+
+            // Vérifie que l'hôte n'est pas une adresse IP
+            if (filter_var($host, FILTER_VALIDATE_IP)) {
+                $this->context->buildViolation('L\'hôte ne doit pas être une adresse IP.')->addViolation();
+                return;
+            }
+
+            // vérifie que l'hote n'est pas dans la liste des urls interdites
             foreach ($forbiddenUrls as $forbiddenUrl) {
                 if (strpos($host, $forbiddenUrl) !== false) {
                     $this->context->buildViolation($this->message)->addViolation();
