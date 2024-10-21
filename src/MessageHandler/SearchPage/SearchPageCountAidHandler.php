@@ -52,7 +52,7 @@ class SearchPageCountAidHandler
             $logEvent = new LogEvent();
             $logEvent->setCategory('aid');
             $logEvent->setEvent('live_count');
-            $logEvent->setSource($searchPage->getSlug());
+            $logEvent->setSource(substr($searchPage->getSlug(), 0, 255));
             $logEvent->setValue(count($aids));
 
             $this->managerRegistry->getManager()->persist($logEvent);

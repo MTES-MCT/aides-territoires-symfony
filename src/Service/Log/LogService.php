@@ -118,7 +118,7 @@ class LogService
                     $log->setResultsCount($params['resultsCount'] ?? null);
                     $log->setSource($this->getSiteFromHost($params['host'] ?? null));
                     if (isset($params['source'])) {
-                        $log->setSource($params['source']);
+                        $log->setSource(substr($params['source'], 0, 255));
                     }
                     $log->setSearch(isset($params['search']) ? substr($params['search'], 0, 255) : null);
                     $log->setPerimeter($params['perimeter'] ?? null);
@@ -156,7 +156,7 @@ class LogService
                     $log->setQuerystring($params['querystring'] ?? null);
                     $log->setSource($this->getSiteFromHost($params['host'] ?? null));
                     if (isset($params['source'])) {
-                        $log->setSource($params['source']);
+                        $log->setSource(substr($params['source'], 0, 255));
                     }
                     $log->setAid($params['aid'] ?? null);
                     $log->setOrganization($params['organization'] ?? null);
