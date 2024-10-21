@@ -43,7 +43,9 @@ class SearchPageEditType extends AbstractType
                     [
                     'required' => true,
                     'label' => 'Éditeur(s) de la page',
-                    'help' => 'Vous pouvez ajouter plusieurs éditeurs à la page. Les éditeurs peuvent modifier le contenu de la page, ils doivent faire parti de vos structures.',
+                    'help' => 'Vous pouvez ajouter plusieurs éditeurs à la page. '
+                                    .' Les éditeurs peuvent modifier le contenu de la page, '
+                                    . 'ils doivent faire parti de vos structures.',
                     'class' => User::class,
                     'choice_label' => 'email',
                     'multiple' => true,
@@ -95,7 +97,10 @@ class SearchPageEditType extends AbstractType
             ->add('highlightedAids', AidAutocompleteType::class, [
                 'required' => false,
                 'label' => 'Mettre en avant des aides',
-                'help' => 'Tapez le nom exact de l\'aide pour la sélectionner. Il est possible de mettre jusqu’à 9 aides en avant. Les aides mises en avant s’affichent en haut des résultats du portail, et n’ont pas de mise en forme particulière.',
+                'help' => 'Tapez le nom exact de l\'aide pour la sélectionner. '
+                            . 'Il est possible de mettre jusqu’à 9 aides en avant. '
+                            . 'Les aides mises en avant s’affichent en haut des résultats du portail, '
+                            . 'et n’ont pas de mise en forme particulière.',
                 'class' => Aid::class,
                 'choice_label' => 'name',
                 'multiple' => true,

@@ -75,7 +75,10 @@ class ImageService
 
 
             // Créer un objet Credentials en utilisant les clés d'accès AWS
-            $credentials = new Credentials($this->paramService->get('aws_access_key_id'), $this->paramService->get('aws_secret_access_key'));
+            $credentials = new Credentials(
+                $this->paramService->get('aws_access_key_id'),
+                $this->paramService->get('aws_secret_access_key')
+            );
 
             // Créer un client S3
             $s3 = new S3Client([
@@ -110,7 +113,10 @@ class ImageService
         }
 
         // Créer un objet Credentials en utilisant les clés d'accès AWS
-        $credentials = new Credentials($this->paramService->get('aws_access_key_id'), $this->paramService->get('aws_secret_access_key'));
+        $credentials = new Credentials(
+            $this->paramService->get('aws_access_key_id'),
+            $this->paramService->get('aws_secret_access_key')
+        );
 
 
         // Créer un client S3
@@ -163,7 +169,9 @@ class ImageService
                 $tmpFolder,
                 preg_replace('/' . preg_quote($uploadDir, '/') . '/', '', $fileName)
             );
-            $tmpFile = rtrim($tmpFolder, '/') . '/' . ltrim(preg_replace('/' . preg_quote($uploadDir, '/') . '/', '', $fileName), '/');
+            $tmpFile = rtrim($tmpFolder, '/')
+                . '/'
+                . ltrim(preg_replace('/' . preg_quote($uploadDir, '/') . '/', '', $fileName), '/');
 
             // resize image avec \Imagick
             $imagick = new \Imagick($tmpFile);
@@ -199,7 +207,10 @@ class ImageService
             $imagick->clear();
 
             // Créer un objet Credentials en utilisant les clés d'accès AWS
-            $credentials = new Credentials($this->paramService->get('aws_access_key_id'), $this->paramService->get('aws_secret_access_key'));
+            $credentials = new Credentials(
+                $this->paramService->get('aws_access_key_id'),
+                $this->paramService->get('aws_secret_access_key')
+            );
 
             // Créer un client S3
             $s3 = new S3Client([

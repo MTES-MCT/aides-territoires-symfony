@@ -28,22 +28,29 @@ class AidProjectStatusType extends AbstractType
             ->add('aidRequested', CheckboxType::class, [
                 'required' => false,
                 'label' => 'Aide demandée',
-                'help' => 'Vous avez déposé un dossier de candidature, ou effectué une demande d’aide officielle auprès de son porteur/instructeur.'
+                'help' => 'Vous avez déposé un dossier de candidature, ou effectué une demande d’aide officielle '
+                            . 'auprès de son porteur/instructeur.'
             ])
             ->add('aidObtained', CheckboxType::class, [
                 'required' => false,
                 'label' => 'Aide obtenue',
-                'help' => 'Vous avez été notifié par le porteur/instructeur que votre dossier/demande était accepté(e), mais n’avez pas encore bénéficié de l’aide. (L’aide ne peut être à la fois « obtenue » et « refusée »)'
+                'help' => 'Vous avez été notifié par le porteur/instructeur que votre '
+                            . 'dossier/demande était accepté(e), mais n’avez pas encore bénéficié de l’aide. '
+                            . '(L’aide ne peut être à la fois « obtenue » et « refusée »)'
             ])
             ->add('aidPaid', CheckboxType::class, [
                 'required' => false,
                 'label' => 'Aide reçue',
-                'help' => 'Vous avez bénéficié du versement d’au moins une partie de l’aide obtenue, ou la prestation en ingénierie a été réalisée. (L’aide ne peut être à la fois « obtenue » et « refusée »)'
+                'help' => 'Vous avez bénéficié du versement d’au moins une partie de l’aide obtenue, '
+                            . 'ou la prestation en ingénierie a été réalisée. '
+                            . '(L’aide ne peut être à la fois « obtenue » et « refusée »)'
             ])
             ->add('aidDenied', CheckboxType::class, [
                 'required' => false,
                 'label' => 'Aide refusée',
-                'help' => 'Vous avez été notifié par le porteur/instructeur que votre dossier/demande n’avait pas été accepté. (L’aide ne peut être à la fois « obtenue » ou « reçue » et « refusée »)'
+                'help' => 'Vous avez été notifié par le porteur/instructeur que votre '
+                        . 'dossier/demande n’avait pas été accepté. '
+                        . '(L’aide ne peut être à la fois « obtenue » ou « reçue » et « refusée »)'
             ])
 
             ->addEventListener(
@@ -67,7 +74,12 @@ class AidProjectStatusType extends AbstractType
                 || !$aidProject->getProject()->getOrganization()
                 || !$this->userService->isMemberOfOrganization($aidProject->getProject()->getOrganization(), $user)
             ) {
-                $event->getForm()->get('idAidProject')->addError(new FormError('Ce projet ne vous appartient pas, vous ne pouvez pas le modifier'));
+                $event->getForm()->get('idAidProject')
+                    ->addError(
+                        new FormError(
+                            'Ce projet ne vous appartient pas, vous ne pouvez pas le modifier'
+                        )
+                    );
             }
 
             // les status passés
@@ -78,16 +90,31 @@ class AidProjectStatusType extends AbstractType
 
             // Si aide payée, elle doit forcément avoir été demandée et obtenue et ne pas être refusée
             if ($aidPaid && ($aidDenied || !$aidRequested || !$aidObtained)) {
-                $event->getForm()->get('aidPaid')->addError(new FormError('L\'aide ne peut être payée que si elle a été demandée et obtenue et n\'a pas été refusée'));
+                $event->getForm()->get('aidPaid')
+                    ->addError(
+                        new FormError(
+                            'L\'aide ne peut être payée que si elle a été demandée et obtenue et n\'a pas été refusée'
+                        )
+                    );
             }
             // si aide refusée, elle doit foircément avoir été demandée et non obtenue et non payée
             if ($aidDenied && ($aidPaid || $aidObtained || !$aidRequested)) {
-                $event->getForm()->get('aidDenied')->addError(new FormError('L\'aide ne peut être refusée que si elle a été demandée et non obtenue et non payée'));
+                $event->getForm()->get('aidDenied')
+                    ->addError(
+                        new FormError(
+                            'L\'aide ne peut être refusée que si elle a été demandée et non obtenue et non payée'
+                        )
+                    );
             }
 
             // si aide obtenue, elle doit avoir été demandée et ne pas être refusée
             if ($aidObtained && ($aidDenied || !$aidRequested)) {
-                $event->getForm()->get('aidObtained')->addError(new FormError('L\'aide ne peut être obtenue que si elle a été demandée et non refusée'));
+                $event->getForm()->get('aidObtained')
+                    ->addError(
+                        new FormError(
+                            'L\'aide ne peut être obtenue que si elle a été demandée et non refusée'
+                        )
+                    );
             }
         } catch (\Exception $e) {
             $event->getForm()->addError(new FormError('Impossible de modifier'));

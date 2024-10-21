@@ -7,17 +7,17 @@ use Symfony\Component\HttpKernel\KernelInterface;
 
 class FileService
 {
-    const FORMAT_CSV = 'csv';
-    const FORMAT_XLSX = 'xlsx';
-    const FORMAT_PDF = 'pdf';
+    public const FORMAT_CSV = 'csv';
+    public const FORMAT_XLSX = 'xlsx';
+    public const FORMAT_PDF = 'pdf';
 
-    const UPLOAD_TMP_FOLDER = '/uploads_tmp';
-    const EXCEPTION_FORMAT_NOT_SUPPORTED_MESSAGE = 'Format non supporté';
+    public const UPLOAD_TMP_FOLDER = '/uploads_tmp';
+    public const EXCEPTION_FORMAT_NOT_SUPPORTED_MESSAGE = 'Format non supporté';
 
-    const ENV_TEST = 'test';
-    const ENV_DEV = 'dev';
-    const ENV_PROD = 'prod';
-    const ENV_STAGING = 'staging';
+    public const ENV_TEST = 'test';
+    public const ENV_DEV = 'dev';
+    public const ENV_PROD = 'prod';
+    public const ENV_STAGING = 'staging';
 
     public function __construct(
         private KernelInterface $kernelInterface

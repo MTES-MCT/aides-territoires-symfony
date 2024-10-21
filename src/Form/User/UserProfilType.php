@@ -128,8 +128,14 @@ class UserProfilType extends AbstractType
     {
         if ($event->getForm()->has('oldPassword') && $event->getForm()->get('oldPassword')->getData()) {
             $user = $this->userService->getUserLogged();
-            if (!$this->userPasswordHasherInterface->isPasswordValid($user, $event->getForm()->get('oldPassword')->getData())) {
-                $event->getForm()->get('oldPassword')->addError(new FormError('Le mot de passe actuel est incorrect.'));
+            if (
+                !$this->userPasswordHasherInterface->isPasswordValid(
+                    $user,
+                    $event->getForm()->get('oldPassword')->getData()
+                )
+            ) {
+                $event->getForm()->get('oldPassword')
+                    ->addError(new FormError('Le mot de passe actuel est incorrect.'));
             }
         }
     }

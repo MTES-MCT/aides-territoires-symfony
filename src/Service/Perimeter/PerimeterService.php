@@ -15,7 +15,8 @@ class PerimeterService
     public function getAdhocNameFromInseeCodes($inseeCodes): string
     {
         $regionCodes = [];
-        $perimeters = $this->perimeterRepository->findCustom(['scale' => Perimeter::SCALE_COMMUNE, 'codes' => $inseeCodes]);
+        $perimeters = $this->perimeterRepository
+            ->findCustom(['scale' => Perimeter::SCALE_COMMUNE, 'codes' => $inseeCodes]);
 
         foreach ($perimeters as $key => $perimeter) {
             if ($perimeter->getRegions()) {
@@ -49,7 +50,10 @@ class PerimeterService
             }
         } else {
             if (isset(Perimeter::SCALES_FOR_SEARCH[$perimeter->getScale()]['name'])) {
-                return $perimeter->getName() . ' (' . Perimeter::SCALES_FOR_SEARCH[$perimeter->getScale()]['name'] . ')';
+                return $perimeter->getName()
+                    . ' ('
+                    . Perimeter::SCALES_FOR_SEARCH[$perimeter->getScale()]['name']
+                    . ')';
             } else {
                 return $perimeter->getName();
             }

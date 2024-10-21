@@ -120,7 +120,8 @@ class UserService
     {
         $action = $params['action'] ?? null;
         $log = match ($action) {
-            LogUserLogin::ACTION_LOGOUT, LogUserLogin::ACTION_LOST_PASSWORD, LogUserLogin::ACTION_LOGIN => new LogUserLogin(),
+            LogUserLogin::ACTION_LOGOUT, LogUserLogin::ACTION_LOST_PASSWORD, LogUserLogin::ACTION_LOGIN
+                => new LogUserLogin(),
             default => new LogUserAction(),
         };
 

@@ -25,16 +25,16 @@ use Psr\Log\LoggerInterface;
 
 class LogService
 {
-    const AID_SEARCH = 'aidSearch';
-    const AID_VIEW = 'aidView';
-    const BACKER_VIEW = 'backerView';
-    const BLOG_POST_VIEW = 'blogPostView';
-    const BLOG_PROMOTION_POST_CLICK = 'blogPromotionPostClick';
-    const BLOG_PROMOTION_POST_DISPLAY = 'blogPromotionPostDisplay';
-    const PROGRAM_VIEW = 'programView';
-    const PROJECT_VALIDATED_SEARCH = 'projectValidatedSearch';
-    const PROJECT_PUBLIC_SEARCH = 'projectPublicSearch';
-    const PROJECT_PUBLIC_VIEW = 'projectPublicView';
+    public const AID_SEARCH = 'aidSearch';
+    public const AID_VIEW = 'aidView';
+    public const BACKER_VIEW = 'backerView';
+    public const BLOG_POST_VIEW = 'blogPostView';
+    public const BLOG_PROMOTION_POST_CLICK = 'blogPromotionPostClick';
+    public const BLOG_PROMOTION_POST_DISPLAY = 'blogPromotionPostDisplay';
+    public const PROGRAM_VIEW = 'programView';
+    public const PROJECT_VALIDATED_SEARCH = 'projectValidatedSearch';
+    public const PROJECT_PUBLIC_SEARCH = 'projectPublicSearch';
+    public const PROJECT_PUBLIC_VIEW = 'projectPublicView';
 
     public function __construct(
         private ManagerRegistry $managerRegistry,
@@ -73,7 +73,8 @@ class LogService
                     $log->setSource($this->getSiteFromHost($params['host']));
                     $aid = null;
                     if (isset($params['aidSlug'])) {
-                        $aid = $this->managerRegistry->getRepository(Aid::class)->findOneBy(['slug' => $params['aidSlug']]);
+                        $aid = $this->managerRegistry->getRepository(Aid::class)
+                            ->findOneBy(['slug' => $params['aidSlug']]);
                     }
                     $log->setAid($aid);
                     break;
@@ -84,7 +85,8 @@ class LogService
                     $log->setSource($this->getSiteFromHost($params['host']));
                     $aid = null;
                     if (isset($params['aidSlug'])) {
-                        $aid = $this->managerRegistry->getRepository(Aid::class)->findOneBy(['slug' => $params['aidSlug']]);
+                        $aid = $this->managerRegistry->getRepository(Aid::class)
+                            ->findOneBy(['slug' => $params['aidSlug']]);
                     }
                     $log->setAid($aid);
                     break;
@@ -96,12 +98,14 @@ class LogService
                     $log->setDsFolderNumber($params['dsFolderNumber'] ?? null);
                     $aid = null;
                     if (isset($params['aidSlug'])) {
-                        $aid = $this->managerRegistry->getRepository(Aid::class)->findOneBy(['slug' => (string) $params['aidSlug']]);
+                        $aid = $this->managerRegistry->getRepository(Aid::class)
+                            ->findOneBy(['slug' => (string) $params['aidSlug']]);
                     }
                     $log->setAid($aid);
                     $origanization = null;
                     if (isset($params['organization'])) {
-                        $origanization = $this->managerRegistry->getRepository(Organization::class)->find((int) $params['organization']);
+                        $origanization = $this->managerRegistry->getRepository(Organization::class)
+                            ->find((int) $params['organization']);
                     }
                     $log->setOrganization($origanization);
 
@@ -183,7 +187,8 @@ class LogService
                     $log->setSource($this->getSiteFromHost($params['host'] ?? null));
                     $blogPromotionPost = null;
                     if (isset($params['blogPromotionPostId'])) {
-                        $blogPromotionPost = $this->managerRegistry->getRepository(BlogPromotionPost::class)->find((int) $params['blogPromotionPostId']);
+                        $blogPromotionPost = $this->managerRegistry->getRepository(BlogPromotionPost::class)
+                            ->find((int) $params['blogPromotionPostId']);
                     }
                     $log->setBlogPromotionPost($blogPromotionPost);
                     break;
@@ -194,7 +199,8 @@ class LogService
                     $log->setSource($this->getSiteFromHost($params['host'] ?? null));
                     $blogPromotionPost = null;
                     if (isset($params['blogPromotionPostId'])) {
-                        $blogPromotionPost = $this->managerRegistry->getRepository(BlogPromotionPost::class)->find((int) $params['blogPromotionPostId']);
+                        $blogPromotionPost = $this->managerRegistry->getRepository(BlogPromotionPost::class)
+                            ->find((int) $params['blogPromotionPostId']);
                     }
                     $log->setBlogPromotionPost($blogPromotionPost);
                     break;

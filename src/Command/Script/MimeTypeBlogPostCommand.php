@@ -92,9 +92,10 @@ class MimeTypeBlogPostCommand extends Command
                 // le mimeType actuel
                 $mimeType = $result['ContentType'];
 
-                if (!in_array(
-                    $mimeType,
-                    [
+                if (
+                    !in_array(
+                        $mimeType,
+                        [
                         'image/jpeg',
                         'image/png',
                         'image/gif',
@@ -102,8 +103,9 @@ class MimeTypeBlogPostCommand extends Command
                         'application/pdf',
                         'text/csv',
                         'application/json'
-                    ]
-                )) {
+                        ]
+                    )
+                ) {
                     // Vérifiez si l'objet est une image, un PDF, un CSV ou un JSON en fonction de son extension
                     $extension = pathinfo($blogPost->getLogo(), PATHINFO_EXTENSION);
                     if (in_array($extension, ['jpg', 'jpeg', 'png', 'gif', 'svg', 'pdf', 'csv', 'json'])) {

@@ -43,7 +43,8 @@ class AidProjectDeleteType extends AbstractType
         try {
             // verifie que l'aidProject existe
             /** @var AidProject $aidProject **/
-            $aidProject = $this->managerRegistry->getRepository(AidProject::class)->find($event->getForm()->get('idAidProject')->getData());
+            $aidProject = $this->managerRegistry->getRepository(AidProject::class)
+                ->find($event->getForm()->get('idAidProject')->getData());
             if (!$aidProject instanceof AidProject) {
                 $event->getForm()->get('idAidProject')->addError(new FormError('Ce aide n\'existe pas'));
             }
@@ -56,7 +57,12 @@ class AidProjectDeleteType extends AbstractType
                 || !$aidProject->getProject()->getOrganization()
                 || !$this->userService->isMemberOfOrganization($aidProject->getProject()->getOrganization(), $user)
             ) {
-                $event->getForm()->get('idAidProject')->addError(new FormError('Ce projet ne vous appartient pas, vous ne pouvez pas lui supprimer d\'aide'));
+                $event->getForm()->get('idAidProject')
+                    ->addError(
+                        new FormError(
+                            'Ce projet ne vous appartient pas, vous ne pouvez pas lui supprimer d\'aide'
+                        )
+                    );
             }
         } catch (\Exception $e) {
             $event->getForm()->addError(new FormError('Impossible de supprimer'));

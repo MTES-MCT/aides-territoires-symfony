@@ -76,11 +76,17 @@ class SearchPageService
             $this->managerRegistry->getManager()->persist($searchPageLock);
             $this->managerRegistry->getManager()->flush();
         } else {
-            $searchPageLock = (isset($searchPage->getSearchPageLocks()[0]) && $searchPage->getSearchPageLocks()[0] instanceof SearchPageLock)
+            $searchPageLock = (
+                isset($searchPage->getSearchPageLocks()[0])
+                && $searchPage->getSearchPageLocks()[0] instanceof SearchPageLock
+            )
                 ? $searchPage->getSearchPageLocks()[0]
                 : null;
             // on met à jour le lock si le user et l'aide sont bien les mêmes
-            if ($searchPageLock && $searchPageLock->getUser() == $user && $searchPageLock->getSearchPage() == $searchPage) {
+            if (
+                $searchPageLock && $searchPageLock->getUser() == $user
+                && $searchPageLock->getSearchPage() == $searchPage
+            ) {
                 $searchPageLock->setTimeStart(new \DateTime(date('Y-m-d H:i:s')));
                 $searchPageLock->setSearchPage($searchPage);
                 $searchPageLock->setUser($user);

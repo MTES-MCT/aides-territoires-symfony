@@ -39,14 +39,20 @@ class ProjectDeleteType extends AbstractType
     public function onSubmit(FormEvent $event): void
     {
         // verifie que le project existe
-        $project = $this->managerRegistry->getRepository(Project::class)->find($event->getForm()->get('idProject')->getData());
+        $project = $this->managerRegistry->getRepository(Project::class)
+            ->find($event->getForm()->get('idProject')->getData());
         if (!$project instanceof Project) {
             $event->getForm()->get('idProject')->addError(new FormError('Ce projet n\'existe pas'));
         }
 
         // verifie que le project appartient bien à l'utilisateur
         if ($project->getAuthor() != $this->userService->getUserLogged()) {
-            $event->getForm()->get('idProject')->addError(new FormError('Ce projet ne vous appartient pas, vous ne pouvez pas le supprimer'));
+            $event->getForm()->get('idProject')
+                ->addError(
+                    new FormError(
+                        'Ce projet ne vous appartient pas, vous ne pouvez pas le supprimer'
+                    )
+                );
         }
     }
 
