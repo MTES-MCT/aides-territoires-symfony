@@ -25,7 +25,11 @@ class BackerController extends FrontController
         return $this->redirectToRoute('app_cartography_cartography');
     }
 
-    #[Route('/partenaires/{id}-{slug}/', name: 'app_backer_details', requirements: ['id' => '[0-9]+', 'slug' => '[a-zA-Z0-9\-_]+'])]
+    #[Route(
+        '/partenaires/{id}-{slug}/',
+        name: 'app_backer_details',
+        requirements: ['id' => '[0-9]+', 'slug' => '[a-zA-Z0-9\-_]+']
+    )]
     public function details(
         $id,
         $slug,
@@ -68,7 +72,9 @@ class BackerController extends FrontController
             params: [
                 'host' => $requestStack->getCurrentRequest()->getHost(),
                 'backer' => $backer,
-                'organization' => $userService->getUserLogged() ? $userService->getUserLogged()->getDefaultOrganization() : null,
+                'organization' => $userService->getUserLogged()
+                    ? $userService->getUserLogged()->getDefaultOrganization()
+                    : null,
                 'user' => $userService->getUserLogged(),
             ]
         );

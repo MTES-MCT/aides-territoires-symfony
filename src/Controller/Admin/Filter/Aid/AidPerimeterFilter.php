@@ -24,13 +24,18 @@ class AidPerimeterFilter implements FilterInterface
             ->setFormType(AidPerimeterFilterType::class);
     }
 
-    public function apply(QueryBuilder $queryBuilder, FilterDataDto $filterDataDto, ?FieldDto $fieldDto, EntityDto $entityDto): void
-    {
+    public function apply(
+        QueryBuilder $queryBuilder,
+        FilterDataDto $filterDataDto,
+        ?FieldDto $fieldDto,
+        EntityDto $entityDto
+    ): void {
         if (!$filterDataDto->getValue()) {
             return;
         }
 
-        $ids = $queryBuilder->getEntityManager()->getRepository(Perimeter::class)->getIdPerimetersContainedIn(['perimeter' => $filterDataDto->getValue()]);
+        $ids = $queryBuilder->getEntityManager()->getRepository(Perimeter::class)
+            ->getIdPerimetersContainedIn(['perimeter' => $filterDataDto->getValue()]);
 
         $queryBuilder
             ->innerJoin(sprintf('%s.perimeter', $filterDataDto->getEntityAlias()), 'perimeterFilter')

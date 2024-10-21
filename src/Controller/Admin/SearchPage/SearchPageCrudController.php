@@ -40,7 +40,10 @@ class SearchPageCrudController extends AtCrudController
         yield FormField::addTab('Informations générales');
         yield IdField::new('id')->onlyOnIndex();
         yield TextField::new('slug', 'Url')
-            ->setHelp('Par exemple, « /a_propos/contact/ ». Vérifiez la présence du caractère « / » en début et en fin de chaîne.');
+            ->setHelp(
+                'Par exemple, « /a_propos/contact/ ». '
+                . 'Vérifiez la présence du caractère « / » en début et en fin de chaîne.'
+            );
         yield TextField::new('name', 'Titre')
             ->setHelp('Le titre principal.');
         yield AssociationField::new('administrator', 'Administrateur')
@@ -69,7 +72,12 @@ class SearchPageCrudController extends AtCrudController
         yield FormField::addTab('Configuration');
         yield AssociationField::new('searchPageRedirect', 'Portail vers lequel rediriger');
         yield TextLengthCountField::new('slug', 'Fragment d’URL')
-            ->setHelp('Cette partie est utilisée dans l’URL. NE PAS CHANGER pour une page. DOIT être en minuscule pour les sites partenaires. Longueur max :33 caractères, mais si possible ne pas dépasser 23.')
+            ->setHelp(
+                'Cette partie est utilisée dans l’URL. '
+                . 'NE PAS CHANGER pour une page. '
+                . 'DOIT être en minuscule pour les sites partenaires. '
+                . 'Longueur max :33 caractères, mais si possible ne pas dépasser 23.'
+            )
             ->setFormTypeOption('attr', ['maxlength' => 33]);
         yield UrlField::new('contactLink', 'URL du lien contact')
             ->setHelp('URL ou adresse email qui sera utilisé pour le lien « contact » dans le footer.')
@@ -138,7 +146,10 @@ class SearchPageCrudController extends AtCrudController
             $aidParams = [
                 'showInSearch' => true,
             ];
-            $aidParams = array_merge($aidParams, $this->aidSearchFormService->convertAidSearchClassToAidParams($aidSearchClass));
+            $aidParams = array_merge(
+                $aidParams,
+                $this->aidSearchFormService->convertAidSearchClassToAidParams($aidSearchClass)
+            );
             $aidParams['searchPage'] = $entity;
             $aids = $this->aidService->searchAids($aidParams);
             $nbAids = count($aids);
@@ -169,7 +180,11 @@ class SearchPageCrudController extends AtCrudController
 
         yield FormField::addFieldset('Mettre en avant des aides');
         yield AssociationField::new('highlightedAids', 'Aides à mettre en avant')
-            ->setHelp('Il est possible de mettre jusqu’à 9 aides en avant. Les aides mises en avant s’affichent en haut des résultats du portail, et n’ont pas de mise en forme particulière.')
+            ->setHelp(
+                'Il est possible de mettre jusqu’à 9 aides en avant. '
+                . 'Les aides mises en avant s’affichent en haut des résultats du portail, '
+                . 'et n’ont pas de mise en forme particulière.'
+            )
             ->autocomplete()
             ->hideOnIndex();
 
@@ -193,7 +208,11 @@ class SearchPageCrudController extends AtCrudController
 
         yield FormField::addTab('SEO');
         yield TextLengthCountField::new('metaTitle', 'Titre (balise meta)')
-            ->setHelp('Le titre qui sera affiché dans les SERPs. Il est recommandé de le garder < 60 caractères. Laissez vide pour réutiliser le titre de la page.')
+            ->setHelp(
+                'Le titre qui sera affiché dans les SERPs. '
+                . 'Il est recommandé de le garder < 60 caractères. '
+                . 'Laissez vide pour réutiliser le titre de la page.'
+            )
             ->setFormTypeOption('attr', ['maxlength' => 180])
             ->hideOnIndex();
         yield TextLengthCountField::new('metaDescription', 'Description (balise meta)')
@@ -244,7 +263,11 @@ class SearchPageCrudController extends AtCrudController
 
         //set the link using a string or a callable (function like its being used here)
         $displayOnFront->linkToUrl(function ($entity) {
-            return $this->generateUrl('app_portal_portal_details', ['slug' => $entity->getSlug()], UrlGeneratorInterface::ABSOLUTE_URL);
+            return $this->generateUrl(
+                'app_portal_portal_details',
+                ['slug' => $entity->getSlug()],
+                UrlGeneratorInterface::ABSOLUTE_URL
+            );
         });
 
         return parent::configureActions($actions)

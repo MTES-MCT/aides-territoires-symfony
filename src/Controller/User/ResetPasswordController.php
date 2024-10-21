@@ -45,8 +45,7 @@ class ResetPasswordController extends AbstractController
         EmailService $emailService,
         TranslatorInterface $translator,
         RouterInterface $routerInterface
-    ): Response
-    {
+    ): Response {
         $form = $this->createForm(ResetPasswordRequestFormType::class);
         $form->handleRequest($request);
 
@@ -95,8 +94,7 @@ class ResetPasswordController extends AbstractController
         UserPasswordHasherInterface $passwordHasher,
         TranslatorInterface $translator,
         string $token = null
-    ): Response
-    {
+    ): Response {
         if ($token) {
             // We store the token in session and remove it from the URL, to avoid the URL being
             // loaded in a browser and potentially leaking the token to 3rd party JavaScript.

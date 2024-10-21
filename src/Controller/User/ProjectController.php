@@ -313,7 +313,9 @@ class ProjectController extends FrontController
                                 [
                                     'id' => $project->getId(),
                                     'slug' => $project->getSlug()
-                                ], UrlGeneratorInterface::ABSOLUTE_URL)
+                                ],
+                                UrlGeneratorInterface::ABSOLUTE_URL
+                            )
                             . '">' . $project->getName() . '</a>.
                             </p>'
                         );

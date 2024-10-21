@@ -59,7 +59,10 @@ class PerimeterCrudController extends AtCrudController
 
         yield DateTimeField::new('timeObsolete', 'Date d\'obsolescence')
             ->onlyOnForms()
-            ->setHelp('Date de mise à jour des périmètres à laquelle ce périmètre ne figurait plus dans les sources officielles');
+            ->setHelp(
+                'Date de mise à jour des périmètres à laquelle '
+                . 'ce périmètre ne figurait plus dans les sources officielles'
+            );
         yield BooleanField::new('isVisibleToUsers', 'Le périmètre est visible pour les utilisateurs');
         yield DateTimeField::new('timeCreate', 'Date de création')
             ->onlyWhenUpdating()
@@ -209,7 +212,13 @@ class PerimeterCrudController extends AtCrudController
 
             // ouverture fichier
             $now = new \DateTime(date('Y-m-d H:i:s'));
-            $writer->openToBrowser('export_' . $this->stringService->getSlug($perimeter->getName()) . '_' . $now->format('Y-m-d_H-i-s') . '.csv');
+            $writer->openToBrowser(
+                'export_'
+                . $this->stringService->getSlug($perimeter->getName())
+                . '_'
+                . $now->format('Y-m-d_H-i-s')
+                . '.csv'
+            );
 
             // entêtes
             $cells = [

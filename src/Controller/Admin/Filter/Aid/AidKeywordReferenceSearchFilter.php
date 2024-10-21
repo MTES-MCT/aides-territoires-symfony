@@ -24,13 +24,18 @@ class AidKeywordReferenceSearchFilter implements FilterInterface
             ->setFormType(AidKeywordReferenceSearchFilterType::class);
     }
 
-    public function apply(QueryBuilder $queryBuilder, FilterDataDto $filterDataDto, ?FieldDto $fieldDto, EntityDto $entityDto): void
-    {
+    public function apply(
+        QueryBuilder $queryBuilder,
+        FilterDataDto $filterDataDto,
+        ?FieldDto $fieldDto,
+        EntityDto $entityDto
+    ): void {
         if (!$filterDataDto->getValue()) {
             return;
         }
         $search = $filterDataDto->getValue()->getName();
-        $synonyms = $queryBuilder->getEntityManager()->getRepository(KeywordReference::class)->findCustom(['string' => $search, 'noIntention' => true]);
+        $synonyms = $queryBuilder->getEntityManager()->getRepository(KeywordReference::class)
+        ->findCustom(['string' => $search, 'noIntention' => true]);
 
         $objectsString = '';
         foreach ($synonyms as $synonym) {
@@ -41,16 +46,32 @@ class AidKeywordReferenceSearchFilter implements FilterInterface
         $select = '(';
         $select .=
             '
-        MATCH_AGAINST(' . $filterDataDto->getEntityAlias() . '.name) AGAINST(:searchKey IN BOOLEAN MODE)
-        + 
-        MATCH_AGAINST(' . $filterDataDto->getEntityAlias() . '.description, ' . $filterDataDto->getEntityAlias() . '.eligibility, ' . $filterDataDto->getEntityAlias() . '.projectExamples) AGAINST(:searchKey IN BOOLEAN MODE)
+        MATCH_AGAINST('
+            . $filterDataDto->getEntityAlias()
+            . '.name) AGAINST(:searchKey IN BOOLEAN MODE)
+        +
+        MATCH_AGAINST('
+            . $filterDataDto->getEntityAlias()
+            . '.description, '
+            . $filterDataDto->getEntityAlias()
+            . '.eligibility, '
+            . $filterDataDto->getEntityAlias()
+            . '.projectExamples) AGAINST(:searchKey IN BOOLEAN MODE)
         ';
         $select .=
             '
         +
-        MATCH_AGAINST(' . $filterDataDto->getEntityAlias() . '.name) AGAINST(:objectsStringKey IN BOOLEAN MODE)
-        + 
-        MATCH_AGAINST(' . $filterDataDto->getEntityAlias() . '.description, ' . $filterDataDto->getEntityAlias() . '.eligibility, ' . $filterDataDto->getEntityAlias() . '.projectExamples) AGAINST(:objectsStringKey IN BOOLEAN MODE)
+        MATCH_AGAINST('
+            . $filterDataDto->getEntityAlias()
+            . '.name) AGAINST(:objectsStringKey IN BOOLEAN MODE)
+        +
+        MATCH_AGAINST('
+            . $filterDataDto->getEntityAlias()
+            . '.description, '
+            . $filterDataDto->getEntityAlias()
+            . '.eligibility, '
+            . $filterDataDto->getEntityAlias()
+            . '.projectExamples) AGAINST(:objectsStringKey IN BOOLEAN MODE)
         ';
 
         $select .= ') as HIDDEN score_key';

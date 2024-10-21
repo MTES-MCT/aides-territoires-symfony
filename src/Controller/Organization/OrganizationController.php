@@ -172,7 +172,8 @@ class OrganizationController extends FrontController
                 return $this->redirectToRoute(
                     'app_organization_donnees_cles_details',
                     ['id' => $organization->getId()
-                ]);
+                    ]
+                );
             }
         }
 
@@ -801,7 +802,8 @@ class OrganizationController extends FrontController
                 return $this->redirectToRoute(
                     'app_organization_backer_edit',
                     ['id' => $organization->getId(), 'idBacker' => $backer->getId()
-                ]);
+                    ]
+                );
             } else {
                 $this->addFlash(FrontController::FLASH_ERROR, 'Le formulaire contient des erreurs.');
             }
@@ -831,7 +833,8 @@ class OrganizationController extends FrontController
     #[Route(
         '/comptes/structure/porteur/ajax-lock/',
         name: 'app_organization_backer_ajax_lock',
-        options: ['expose' => true], methods: ['POST']
+        options: ['expose' => true],
+        methods: ['POST']
     )]
     public function ajaxLock(
         RequestStack $requestStack,

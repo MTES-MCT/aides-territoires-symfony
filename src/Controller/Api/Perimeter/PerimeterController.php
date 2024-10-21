@@ -151,7 +151,12 @@ class PerimeterController extends ApiController
         return $response;
     }
 
-    #[Route('/api/perimeters/{id}/', name: 'api_perimeters_details', priority: 5, requirements: ['id' => '[A-Za-z0-9\-]+'])]
+    #[Route(
+        '/api/perimeters/{id}/',
+        name: 'api_perimeters_details',
+        priority: 5,
+        requirements: ['id' => '[A-Za-z0-9\-]+']
+    )]
     public function details(
         string $id,
         PerimeterRepository $perimeterRepository,

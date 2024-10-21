@@ -40,7 +40,10 @@ class UserCrudController extends AtCrudController
         ->add('isContributor')
         ->add('isBeneficiary')
         ->add(UserAdministratorOfSearchPageFilter::new('app', 'Administrateur de PP'))
-        ->add(ChoiceFilter::new('acquisitionChannel', 'Animateur local')->setChoices(['Animateur' => User::ACQUISITION_CHANNEL_ANIMATOR]))
+        ->add(
+            ChoiceFilter::new('acquisitionChannel', 'Animateur local')
+            ->setChoices(['Animateur' => User::ACQUISITION_CHANNEL_ANIMATOR])
+        )
         ->add(NullFilter::new('apiToken', 'Token API')->setChoiceLabels('Pas de token', 'A un token'))
         ->add('isCertified')
         ->add('mlConsent', 'Consentement newsletter')
@@ -174,7 +177,9 @@ class UserCrudController extends AtCrudController
         $showQrCode = Action::new('showQrCode', 'Afficher le QrCode', 'fas fa-qrcode')
             ->setHtmlAttributes(['title' => 'Afficher le QrCode', 'target' => '_blank']) // titre
             ->linkToCrudAction('showQrCode') // l'action appellée
-            ->displayIf(fn ($entity) => $this->userService->isUserGranted($entity, User::ROLE_ADMIN)) // condition d'affichage
+            ->displayIf(
+                fn ($entity) => $this->userService->isUserGranted($entity, User::ROLE_ADMIN)
+            )
         ;
 
         $exportCsvAction = $this->getExportCsvAction();
@@ -213,13 +218,19 @@ class UserCrudController extends AtCrudController
         return $this->redirectToRoute('app_admin_qr_code_ga', ['idUser' => $object->getId()]);
     }
 
-    public function exportXlsx(AdminContext $context, SpreadsheetExporterService $spreadsheetExporterService, string $filename = 'utilisateur')
-    {
+    public function exportXlsx(
+        AdminContext $context,
+        SpreadsheetExporterService $spreadsheetExporterService,
+        string $filename = 'utilisateur'
+    ) {
         return $this->exportSpreadsheet($context, $spreadsheetExporterService, $filename, 'xlsx');
     }
 
-    public function exportCsv(AdminContext $context, SpreadsheetExporterService $spreadsheetExporterService, string $filename = 'utilisateur')
-    {
+    public function exportCsv(
+        AdminContext $context,
+        SpreadsheetExporterService $spreadsheetExporterService,
+        string $filename = 'utilisateur'
+    ) {
         return $this->exportSpreadsheet($context, $spreadsheetExporterService, $filename, 'csv');
     }
 }
