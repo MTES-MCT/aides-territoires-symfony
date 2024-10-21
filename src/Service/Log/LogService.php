@@ -286,7 +286,7 @@ class LogService
         }
 
         if (strpos($host, "aides-territoires") !== false) {
-            return explode(".", $host)[0];
+            return substr(explode(".", $host)[0], 0, 255);
         }
 
         return $host;
