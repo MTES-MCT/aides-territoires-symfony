@@ -111,7 +111,7 @@ En local vous pouvez laisser cette configuration dans votre .env
 
 Nous utilisons `squizlabs/php_codesniffer`, `phpstan/phpstan` et `black`
 
-    vendor/bin/phpcs --standard=PSR12 src/
+    vendor/bin/phpcs src
 
     vendor/bin/phpstan analyse src
 
