@@ -1,7 +1,5 @@
 <?php
 
-// api/src/Filter/RegexpFilter.php
-
 declare(strict_types=1);
 
 namespace App\Filter;
@@ -34,8 +32,16 @@ final class AtSearchFilter extends AbstractFilter implements SearchFilterInterfa
 
     public const DOCTRINE_INTEGER_TYPE = Types::INTEGER;
 
-    public function __construct(ManagerRegistry $managerRegistry, IriConverterInterface|LegacyIriConverterInterface $iriConverter, PropertyAccessorInterface $propertyAccessor = null, LoggerInterface $logger = null, array $properties = null, IdentifiersExtractorInterface|LegacyIdentifiersExtractorInterface $identifiersExtractor = null, NameConverterInterface $nameConverter = null, protected array $swaggerDescription = [])
-    {
+    public function __construct(
+        ManagerRegistry $managerRegistry,
+        IriConverterInterface|LegacyIriConverterInterface $iriConverter,
+        PropertyAccessorInterface $propertyAccessor = null,
+        LoggerInterface $logger = null,
+        array $properties = null,
+        IdentifiersExtractorInterface|LegacyIdentifiersExtractorInterface $identifiersExtractor = null,
+        NameConverterInterface $nameConverter = null,
+        protected array $swaggerDescription = []
+    ) {
         parent::__construct($managerRegistry, $logger, $properties, $nameConverter);
 
         $this->iriConverter = $iriConverter;
@@ -56,8 +62,15 @@ final class AtSearchFilter extends AbstractFilter implements SearchFilterInterfa
     /**
      * {@inheritdoc}
      */
-    protected function filterProperty(string $property, $value, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, Operation $operation = null, array $context = []): void
-    {
+    protected function filterProperty(
+        string $property,
+        $value,
+        QueryBuilder $queryBuilder,
+        QueryNameGeneratorInterface $queryNameGenerator,
+        string $resourceClass,
+        Operation $operation = null,
+        array $context = []
+    ): void {
         if (
             null === $value
             || !$this->isPropertyEnabled($property, $resourceClass)
@@ -76,7 +89,14 @@ final class AtSearchFilter extends AbstractFilter implements SearchFilterInterfa
 
         $associations = [];
         if ($this->isPropertyNested($property, $resourceClass)) {
-            [$alias, $field, $associations] = $this->addJoinsForNestedProperty($property, $alias, $queryBuilder, $queryNameGenerator, $resourceClass, Join::INNER_JOIN);
+            [$alias, $field, $associations] = $this->addJoinsForNestedProperty(
+                $property,
+                $alias,
+                $queryBuilder,
+                $queryNameGenerator,
+                $resourceClass,
+                Join::INNER_JOIN
+            );
         }
 
         $caseSensitive = true;
@@ -98,13 +118,26 @@ final class AtSearchFilter extends AbstractFilter implements SearchFilterInterfa
 
             if (!$this->hasValidValues($values, $this->getDoctrineFieldType($property, $resourceClass))) {
                 $this->logger->notice('Invalid filter ignored', [
-                    'exception' => new InvalidArgumentException(sprintf('Values for field "%s" are not valid according to the doctrine type.', $field)),
+                    'exception' => new InvalidArgumentException(
+                        sprintf(
+                            'Values for field "%s" are not valid according to the doctrine type.',
+                            $field
+                        )
+                    ),
                 ]);
 
                 return;
             }
 
-            $this->addWhereByStrategy($strategy, $queryBuilder, $queryNameGenerator, $alias, $field, $values, $caseSensitive);
+            $this->addWhereByStrategy(
+                $strategy,
+                $queryBuilder,
+                $queryNameGenerator,
+                $alias,
+                $field,
+                $values,
+                $caseSensitive
+            );
 
             return;
         }
@@ -136,7 +169,12 @@ final class AtSearchFilter extends AbstractFilter implements SearchFilterInterfa
                  */
                 if (!$this->hasValidValues([$value], $doctrineTypeField)) {
                     $this->logger->notice('Invalid filter ignored', [
-                        'exception' => new InvalidArgumentException(sprintf('Values for field "%s" are not valid according to the doctrine type.', $associationFieldIdentifier)),
+                        'exception' => new InvalidArgumentException(
+                            sprintf(
+                                'Values for field "%s" are not valid according to the doctrine type.',
+                                $associationFieldIdentifier
+                            )
+                        ),
                     ]);
 
                     return null;
@@ -153,7 +191,12 @@ final class AtSearchFilter extends AbstractFilter implements SearchFilterInterfa
              * Shouldn't this actually fail harder?
              */
             $this->logger->notice('Invalid filter ignored', [
-                'exception' => new InvalidArgumentException(sprintf('Values for field "%s" are not valid according to the doctrine type.', $field)),
+                'exception' => new InvalidArgumentException(
+                    sprintf(
+                        'Values for field "%s" are not valid according to the doctrine type.',
+                        $field
+                    )
+                ),
             ]);
 
             return;
@@ -161,12 +204,28 @@ final class AtSearchFilter extends AbstractFilter implements SearchFilterInterfa
 
         $associationAlias = $alias;
         $associationField = $field;
-        if ($metadata->isCollectionValuedAssociation($associationField) || $metadata->isAssociationInverseSide($field)) {
-            $associationAlias = QueryBuilderHelper::addJoinOnce($queryBuilder, $queryNameGenerator, $alias, $associationField);
+        if (
+            $metadata->isCollectionValuedAssociation($associationField)
+            || $metadata->isAssociationInverseSide($field)
+        ) {
+            $associationAlias = QueryBuilderHelper::addJoinOnce(
+                $queryBuilder,
+                $queryNameGenerator,
+                $alias,
+                $associationField
+            );
             $associationField = $associationFieldIdentifier;
         }
 
-        $this->addWhereByStrategy($strategy, $queryBuilder, $queryNameGenerator, $associationAlias, $associationField, $values, $caseSensitive);
+        $this->addWhereByStrategy(
+            $strategy,
+            $queryBuilder,
+            $queryNameGenerator,
+            $associationAlias,
+            $associationField,
+            $values,
+            $caseSensitive
+        );
     }
 
     /**
@@ -174,8 +233,15 @@ final class AtSearchFilter extends AbstractFilter implements SearchFilterInterfa
      *
      * @throws InvalidArgumentException If strategy does not exist
      */
-    protected function addWhereByStrategy(string $strategy, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $alias, string $field, mixed $values, bool $caseSensitive): void
-    {
+    protected function addWhereByStrategy(
+        string $strategy,
+        QueryBuilder $queryBuilder,
+        QueryNameGeneratorInterface $queryNameGenerator,
+        string $alias,
+        string $field,
+        mixed $values,
+        bool $caseSensitive
+    ): void {
         if (!\is_array($values)) {
             $values = [$values];
         }
@@ -266,7 +332,9 @@ final class AtSearchFilter extends AbstractFilter implements SearchFilterInterfa
             Types::ARRAY => 'array',
             Types::BIGINT, Types::INTEGER, Types::SMALLINT => 'int',
             Types::BOOLEAN => 'bool',
-            Types::DATE_MUTABLE, Types::TIME_MUTABLE, Types::DATETIME_MUTABLE, Types::DATETIMETZ_MUTABLE, Types::DATE_IMMUTABLE, Types::TIME_IMMUTABLE, Types::DATETIME_IMMUTABLE, Types::DATETIMETZ_IMMUTABLE => \DateTimeInterface::class,
+            Types::DATE_MUTABLE, Types::TIME_MUTABLE, Types::DATETIME_MUTABLE, Types::DATETIMETZ_MUTABLE,
+            Types::DATE_IMMUTABLE, Types::TIME_IMMUTABLE, Types::DATETIME_IMMUTABLE, Types::DATETIMETZ_IMMUTABLE
+                => \DateTimeInterface::class,
             Types::FLOAT => 'float',
             default => 'string',
         };
@@ -304,7 +372,8 @@ final class AtSearchFilter extends AbstractFilter implements SearchFilterInterfa
                 }
 
                 if (isset($this->swaggerDescription['openapi']['example'])) {
-                    $description[$this->swaggerDescription['name']]['openapi']['example'] = $this->swaggerDescription['openapi']['example'];
+                    $description[$this->swaggerDescription['name']]['openapi']['example'] =
+                        $this->swaggerDescription['openapi']['example'];
                 }
             }
         }

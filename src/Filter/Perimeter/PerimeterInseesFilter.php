@@ -11,8 +11,15 @@ use Symfony\Component\PropertyInfo\Type;
 
 final class PerimeterInseesFilter extends AbstractFilter
 {
-    protected function filterProperty(string $property, $value, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, Operation $operation = null, array $context = []): void
-    {
+    protected function filterProperty(
+        string $property,
+        $value,
+        QueryBuilder $queryBuilder,
+        QueryNameGeneratorInterface $queryNameGenerator,
+        string $resourceClass,
+        Operation $operation = null,
+        array $context = []
+    ): void {
         // ajouté pour être conforme à l'extends
     }
 
@@ -25,7 +32,10 @@ final class PerimeterInseesFilter extends AbstractFilter
                 'property' => 'insees',
                 'type' => Type::BUILTIN_TYPE_STRING,
                 'required' => false,
-                'description' => '<div class="renderedMarkdown"><p>Filtrer par code insees. Vous pouvez passer plusieurs fois le paramètre pour en rechercher plusieurs, ex: &insees=91111&insees=91243</p></div>',
+                'description' => '<div class="renderedMarkdown"><p>'
+                                    . 'Filtrer par code insees. '
+                                    . 'Vous pouvez passer plusieurs fois le paramètre pour en rechercher plusieurs, '
+                                    . 'ex: &insees=91111&insees=91243</p></div>',
                 'openapi' => [
                     'examples' => $examples,
                 ],
