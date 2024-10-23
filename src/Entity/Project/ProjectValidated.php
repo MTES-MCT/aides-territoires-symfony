@@ -12,7 +12,11 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Index(columns: ['project_name'], name: 'project_name_project_validated_fulltext', flags: ['fulltext'])]
 #[ORM\Index(columns: ['description'], name: 'description_project_validated_fulltext', flags: ['fulltext'])]
-#[ORM\Index(columns: ['project_name', 'description'], name: 'project_name_description_project_validated_fulltext', flags: ['fulltext'])]
+#[ORM\Index(
+    columns: ['project_name', 'description'],
+    name: 'project_name_description_project_validated_fulltext',
+    flags: ['fulltext']
+)]
 #[ORM\Entity(repositoryClass: ProjectValidatedRepository::class)]
 class ProjectValidated // NOSONAR too much methods
 {

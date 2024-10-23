@@ -57,7 +57,11 @@ class PageCrudController extends AtCrudController
         yield IdField::new('id', 'Id')
             ->onlyOnIndex();
         yield TextField::new('url', 'Url')
-            ->setHelp('ATTENTION ! NE PAS CHANGER l\'url des pages du menu principal. Par exemple, « /a_propos/contact/ ». Vérifiez la présence du caractère « / » en début et en fin de chaîne.');
+            ->setHelp(
+                'ATTENTION ! NE PAS CHANGER l\'url des pages du menu principal. '
+                . 'Par exemple, « /a_propos/contact/ ». '
+                . 'Vérifiez la présence du caractère « / » en début et en fin de chaîne.'
+            );
         yield TextField::new('name', 'Titre');
         yield TrumbowygField::new('description', 'Contenu')
             ->onlyOnForms();
@@ -68,7 +72,11 @@ class PageCrudController extends AtCrudController
         yield FormField::addTab('Seo');
         yield TextField::new('meta_title', 'Titre (balise meta)')
             ->onlyOnForms()
-            ->setHelp('Le titre qui sera affiché dans les SERPs. Il est recommandé de le garder < 60 caractères. Laissez vide pour réutiliser le titre de la page.');
+            ->setHelp(
+                'Le titre qui sera affiché dans les SERPs. '
+                . 'Il est recommandé de le garder < 60 caractères. '
+                . 'Laissez vide pour réutiliser le titre de la page.'
+            );
         yield TextField::new('meta_description', 'Description (balise meta)')
             ->onlyOnForms()
             ->setHelp('Le titre qui sera affiché dans les SERPs. Il est recommandé de le garder < 120 caractères.');

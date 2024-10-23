@@ -59,7 +59,8 @@ class CommuneController extends AbstractController
     public function communeDashboard(): Response
     {
         // compte les inscriptions de commune mois par mois
-        $communeRegistrationsByMonth = $this->managerRegistry->getRepository(Organization::class)->countRegistrationsByMonth([
+        $communeRegistrationsByMonth = $this->managerRegistry->getRepository(Organization::class)
+        ->countRegistrationsByMonth([
             'typeSlug' =>  OrganizationType::SLUG_COMMUNE,
             'perimeterScale' => Perimeter::SCALE_COMMUNE,
         ]);
@@ -138,7 +139,11 @@ class CommuneController extends AbstractController
         $nbPerimeterTotal = 0;
         foreach ($reducedArray as $nbPerimeter) {
             $percentage = $total == 0 ? 0 : number_format(($nbPerimeter['nb_perimeter'] * 100 / $total), 2);
-            $labels[] = $nbPerimeter['nb_perimeter'] . ' commune(s) ont ' . $nbPerimeter['nb_organization'] . ' structure(s) (de tous type) : (' . $percentage . '%)';
+            $labels[] =
+                $nbPerimeter['nb_perimeter']
+                . ' commune(s) ont '
+                . $nbPerimeter['nb_organization']
+                . ' structure(s) (de tous type) : (' . $percentage . '%)';
             $datas[] = $nbPerimeter['nb_perimeter'];
             $colors[] = 'rgb(' . rand(0, 255) . ', ' . rand(0, 255) . ', ' . rand(0, 255) . ')';
             $nbPerimeterTotal += $nbPerimeter['nb_perimeter'];
@@ -226,7 +231,10 @@ class CommuneController extends AbstractController
         ]);
     }
 
-    #[Route('/admin/statistics/commune/export/registration-by-month', name: 'admin_statistics_commune_export_registration_by_month')]
+    #[Route(
+        '/admin/statistics/commune/export/registration-by-month',
+        name: 'admin_statistics_commune_export_registration_by_month'
+    )]
     public function exportRegistrationByMonth(): StreamedResponse
     {
         ini_set('max_execution_time', 60 * 60);
@@ -255,7 +263,8 @@ class CommuneController extends AbstractController
             $writer->addRow($singleRow);
 
             // les inscriptions
-            $communeRegistrationsByMonth = $this->managerRegistry->getRepository(Organization::class)->countRegistrationsByMonth([
+            $communeRegistrationsByMonth = $this->managerRegistry->getRepository(Organization::class)
+            ->countRegistrationsByMonth([
                 'typeSlug' =>  OrganizationType::SLUG_COMMUNE,
                 'perimeterScale' => Perimeter::SCALE_COMMUNE,
             ]);

@@ -86,7 +86,8 @@ class DashboardController extends AbstractDashboardController
     public function index(): Response
     {
         // Aides en attente de revue
-        $nbAidsInReview = $this->managerRegistry->getRepository(Aid::class)->countCustom(['status' => Aid::STATUS_REVIEWABLE]);
+        $nbAidsInReview = $this->managerRegistry->getRepository(Aid::class)
+        ->countCustom(['status' => Aid::STATUS_REVIEWABLE]);
         $urlAidsInReview = $this->adminUrlGenerator
             ->setController(AidCrudController::class)
             ->setAction(Action::INDEX)
@@ -97,7 +98,8 @@ class DashboardController extends AbstractDashboardController
         // aides publiées depuis la semaine dernière
         $lastWeek = new \DateTime();
         $lastWeek->modify('-7 days');
-        $nbAidsPublishedLastWeek = $this->managerRegistry->getRepository(Aid::class)->countCustom(['status' => Aid::STATUS_PUBLISHED, 'publishedAfter' => $lastWeek]);
+        $nbAidsPublishedLastWeek = $this->managerRegistry->getRepository(Aid::class)
+        ->countCustom(['status' => Aid::STATUS_PUBLISHED, 'publishedAfter' => $lastWeek]);
         $urlAidsPublishedLastWeek = $this->adminUrlGenerator
             ->setController(AidCrudController::class)
             ->setAction(Action::INDEX)
@@ -108,7 +110,8 @@ class DashboardController extends AbstractDashboardController
             ->generateUrl();
 
         // Demandes de token API
-        $nbApiTokenAsks = $this->managerRegistry->getRepository(ApiTokenAsk::class)->countPendingAccept();
+        $nbApiTokenAsks = $this->managerRegistry->getRepository(ApiTokenAsk::class)
+        ->countPendingAccept();
         $urlApiTokenAsk = $this->adminUrlGenerator
             ->setController(ApiTokenAskCrudController::class)
             ->setAction(Action::INDEX)
@@ -117,7 +120,8 @@ class DashboardController extends AbstractDashboardController
         // inscriptions
         $lastMonth = new \DateTime();
         $lastMonth->modify('-1 month');
-        $registerByDay = $this->managerRegistry->getRepository(User::class)->countRegisterByDay(['dateCreateMin' => $lastMonth]);
+        $registerByDay = $this->managerRegistry->getRepository(User::class)
+        ->countRegisterByDay(['dateCreateMin' => $lastMonth]);
         $labels = [];
         $datas = [];
 
@@ -201,7 +205,12 @@ class DashboardController extends AbstractDashboardController
 
     public function configureMenuItems(): iterable
     {
-        yield MenuItem::linkToRoute('Visiter le site', 'fas fa-external-link-alt', 'app_home', [])->setLinkTarget('_blank');
+        yield MenuItem::linkToRoute(
+            'Visiter le site',
+            'fas fa-external-link-alt',
+            'app_home',
+            []
+        )->setLinkTarget('_blank');
         yield MenuItem::linkToDashboard('Tableau de bord', 'fa fa-home');
 
         yield MenuItem::subMenu('Utilisateurs', 'fas fa-user')->setSubItems([
@@ -303,8 +312,18 @@ class DashboardController extends AbstractDashboardController
             MenuItem::linkToRoute('Communes - Inscriptions', 'fas fa-list', 'admin_statistics_commune_dashboard', []),
             MenuItem::linkToRoute('Commnunes - Carte', 'fas fa-list', 'admin_statistics_commune_population', []),
             MenuItem::linkToRoute('Blog', 'fas fa-list', 'admin_statistics_blog_dashboard', []),
-            MenuItem::linkToRoute('Périmètres manquants', 'fas fa-list', 'admin_statistics_log_aid_search_missing_perimeters', []),
-            MenuItem::linkToRoute('Projets référents', 'fas fa-list', 'admin_statistics_project_reference_dashboard', []),
+            MenuItem::linkToRoute(
+                'Périmètres manquants',
+                'fas fa-list',
+                'admin_statistics_log_aid_search_missing_perimeters',
+                []
+            ),
+            MenuItem::linkToRoute(
+                'Projets référents',
+                'fas fa-list',
+                'admin_statistics_project_reference_dashboard',
+                []
+            ),
             MenuItem::linkToRoute('Porteurs d\'aides', 'fas fa-list', 'admin_statistics_backer_dashboard', []),
             MenuItem::linkToRoute('Recherche', 'fas fa-list', 'admin_statistics_log_aid_search', []),
             MenuItem::linkToRoute('Redirections', 'fas fa-list', 'admin_statistics_log_url_redirect', []),

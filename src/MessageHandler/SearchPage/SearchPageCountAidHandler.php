@@ -45,14 +45,17 @@ class SearchPageCountAidHandler
                 ]
             );
 
-            $aidParams = array_merge($aidParams, $this->aidSearchFormService->convertAidSearchClassToAidParams($aidSearchClass));
+            $aidParams = array_merge(
+                $aidParams,
+                $this->aidSearchFormService->convertAidSearchClassToAidParams($aidSearchClass)
+            );
 
             $aids = $this->aidService->searchAids($aidParams);
 
             $logEvent = new LogEvent();
             $logEvent->setCategory('aid');
             $logEvent->setEvent('live_count');
-            $logEvent->setSource(substr($searchPage->getSlug(), 0, 255));
+            $logEvent->setSource($searchPage->getSlug());
             $logEvent->setValue(count($aids));
 
             $this->managerRegistry->getManager()->persist($logEvent);

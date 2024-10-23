@@ -79,7 +79,8 @@ class FaqCrudController extends AtCrudController
                                 if (isset($faqCategoryItem->children) && is_array($faqCategoryItem->children)) {
                                     $positionQuestion = 0;
                                     foreach ($faqCategoryItem->children as $faqQuestionAnswserItem) {
-                                        $faqQuestionAnswser = $faqQuestionAnswserRepository->find($faqQuestionAnswserItem->id);
+                                        $faqQuestionAnswser = $faqQuestionAnswserRepository
+                                            ->find($faqQuestionAnswserItem->id);
                                         if ($faqQuestionAnswser instanceof FaqQuestionAnswser) {
                                             $faqQuestionAnswser->setPosition($positionQuestion);
                                             $positionQuestion++;

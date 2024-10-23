@@ -26,7 +26,11 @@ class ProjectReferenceCategoryController extends ApiController
         $results = $projectReferenceCategoryRepository->findCustom();
 
         // on serialize pour ne garder que les champs voulus
-        $results = $this->serializerInterface->serialize($results, static::SERIALIZE_FORMAT, ['groups' => ProjectReferenceCategory::API_GROUP_LIST]);
+        $results = $this->serializerInterface->serialize(
+            $results,
+            static::SERIALIZE_FORMAT,
+            ['groups' => ProjectReferenceCategory::API_GROUP_LIST]
+        );
 
         // le retour
         $data = [

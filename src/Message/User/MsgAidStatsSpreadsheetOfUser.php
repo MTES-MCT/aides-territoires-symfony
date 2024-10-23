@@ -12,8 +12,7 @@ class MsgAidStatsSpreadsheetOfUser
         int $idUser,
         \DateTime $dateMin,
         \DateTime $dateMax
-    )
-    {
+    ) {
         $this->idUser = $idUser;
         $this->dateMin = $dateMin;
         $this->dateMax = $dateMax;

@@ -21,7 +21,8 @@ class SendNotificationHandler
 
     public function __invoke(SendNotification $message)
     {
-        $admin = $this->managerRegistry->getRepository(User::class)->findOneBy(['email' => $this->paramService->get('email_super_admin')]);
+        $admin = $this->managerRegistry->getRepository(User::class)
+        ->findOneBy(['email' => $this->paramService->get('email_super_admin')]);
         $this->notificationService->addNotification(
             $admin,
             $message->getTitle(),

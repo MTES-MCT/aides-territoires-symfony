@@ -40,21 +40,21 @@ use Symfony\Component\Validator\Constraints as Assert;
 )]
 class OrganizationType // NOSONAR too much methods
 {
-    const API_GROUP_LIST = 'organization_type:list';
-    const API_DESCRIPTION = 'Lister tous les choix de bénéficiaires';
+    public const API_GROUP_LIST = 'organization_type:list';
+    public const API_DESCRIPTION = 'Lister tous les choix de bénéficiaires';
 
-    const SLUG_COMMUNE = 'commune';
-    const SLUG_EPCI = 'epci';
-    const SLUG_DEPARTMENT = 'department';
-    const SLUG_REGION = 'region';
-    const SLUG_SPECIAL = 'special';
-    const SLUG_PUBLIC_ORG = 'public-org';
-    const SLUG_PUBLIC_CIES = 'public-cies';
-    const SLUG_ASSOCIATION = 'association';
-    const SLUG_PRIVATE_SECTOR = 'private-sector';
-    const SLUG_PRIVATE_PERSON = 'private-person';
-    const SLUG_FARMER = 'farmer';
-    const SLUG_RESEARCHER = 'researcher';
+    public const SLUG_COMMUNE = 'commune';
+    public const SLUG_EPCI = 'epci';
+    public const SLUG_DEPARTMENT = 'department';
+    public const SLUG_REGION = 'region';
+    public const SLUG_SPECIAL = 'special';
+    public const SLUG_PUBLIC_ORG = 'public-org';
+    public const SLUG_PUBLIC_CIES = 'public-cies';
+    public const SLUG_ASSOCIATION = 'association';
+    public const SLUG_PRIVATE_SECTOR = 'private-sector';
+    public const SLUG_PRIVATE_PERSON = 'private-person';
+    public const SLUG_FARMER = 'farmer';
+    public const SLUG_RESEARCHER = 'researcher';
 
 
     #[ORM\Id]

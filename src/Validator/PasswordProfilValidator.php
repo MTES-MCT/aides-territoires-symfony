@@ -9,7 +9,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class PasswordProfilValidator extends ConstraintValidator
 {
-    const PASSWORD_COMMONS = [
+    private const PASSWORD_COMMONS = [
         '1234',
         '123456789',
         'azerty',

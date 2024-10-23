@@ -18,7 +18,10 @@ use App\Service\Various\ParamService;
 use App\Validator\UrlExternalValid;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
-#[AsCommand(name: 'at:cron:aid:find_broken_links', description: 'Recherche si des aides publiées ont des liens casssés')]
+#[AsCommand(
+    name: 'at:cron:aid:find_broken_links',
+    description: 'Recherche si des aides publiées ont des liens casssés'
+)]
 class FindBrokenLinksCommand extends Command
 {
     protected InputInterface $input;

@@ -34,8 +34,10 @@ class ImportFluxMinistereCultureCommand extends ImportFluxCommand
     protected function getFieldsMapping(array $aidToImport, array $params = null): array // NOSONAR too complex
     {
         try {
-            $description1 = isset($aidToImport['summary']) ? $this->htmlSanitizerInterface->sanitize($aidToImport['summary']) : '';
-            $description2 = isset($aidToImport['body']) ? $this->htmlSanitizerInterface->sanitize($aidToImport['body']) : '';
+            $description1 = isset($aidToImport['summary'])
+                ? $this->htmlSanitizerInterface->sanitize($aidToImport['summary']) : '';
+            $description2 = isset($aidToImport['body'])
+                ? $this->htmlSanitizerInterface->sanitize($aidToImport['body']) : '';
             $type = isset($aidToImport['type']) ? $aidToImport['type'] : '';
             $aidToDelete = '';
             if (in_array($type, ['Demande d\'autorisation', 'Demande de labellisation'])) {
@@ -80,7 +82,8 @@ class ImportFluxMinistereCultureCommand extends ImportFluxCommand
                 'nameInitial' => isset($aidToImport['title']) ? strip_tags((string) $aidToImport['title']) : null,
                 'description' => $description,
                 'originUrl' => isset($aidToImport['url']) ? $aidToImport['url'] : null,
-                'contact' => isset($aidToImport['contact']) ? $this->htmlSanitizerInterface->sanitize($aidToImport['contact']) : null,
+                'contact' => isset($aidToImport['contact'])
+                    ? $this->htmlSanitizerInterface->sanitize($aidToImport['contact']) : null,
                 'eligibility' => $eligility,
                 'isCallForProject' => $isCallForProject,
             ];
@@ -495,9 +498,11 @@ class ImportFluxMinistereCultureCommand extends ImportFluxCommand
     protected function setAidRecurrence(array $aidToImport, Aid $aid): Aid
     {
         if (!isset($aidToImport['deadline']) || !$aidToImport['deadline']) {
-            $aidRecurrence = $this->managerRegistry->getRepository(AidRecurrence::class)->findOneBy(['slug' => AidRecurrence::SLUG_ONGOING]);
+            $aidRecurrence = $this->managerRegistry->getRepository(AidRecurrence::class)
+                ->findOneBy(['slug' => AidRecurrence::SLUG_ONGOING]);
         } else {
-            $aidRecurrence = $this->managerRegistry->getRepository(AidRecurrence::class)->findOneBy(['slug' => AidRecurrence::SLUG_ONEOFF]);
+            $aidRecurrence = $this->managerRegistry->getRepository(AidRecurrence::class)
+                ->findOneBy(['slug' => AidRecurrence::SLUG_ONEOFF]);
         }
 
         if ($aidRecurrence instanceof AidRecurrence) {
@@ -513,7 +518,8 @@ class ImportFluxMinistereCultureCommand extends ImportFluxCommand
         }
 
         if (in_array($aidToImport['type'], ['Subvention', 'Aide', 'Aide & subvention'])) {
-            $aidType = $this->managerRegistry->getRepository(AidType::class)->findOneBy(['slug' => AidType::SLUG_GRANT]);
+            $aidType = $this->managerRegistry->getRepository(AidType::class)
+                ->findOneBy(['slug' => AidType::SLUG_GRANT]);
             if ($aidType instanceof AidType) {
                 $aid->addAidType($aidType);
             }

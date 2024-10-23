@@ -62,7 +62,11 @@ class ProgramCrudController extends AtCrudController
 
         yield FormField::addFieldset('SEO');
         yield TextField::new('metaTitle', 'Titre (balise meta)')
-            ->setHelp('Le titre qui sera affiché dans les SERPs. Il est recommandé de le garder < 60 caractères. Laissez vide pour réutiliser le nom du programme.')
+            ->setHelp(
+                'Le titre qui sera affiché dans les SERPs. '
+                . 'Il est recommandé de le garder < 60 caractères. '
+                . 'Laissez vide pour réutiliser le nom du programme.'
+            )
             ->hideOnIndex();
         yield TextField::new('metaDescription', 'Description (balise meta)')
             ->setHelp('Sera affichée dans les SERPs. À garder < 120 caractères.')
@@ -85,7 +89,11 @@ class ProgramCrudController extends AtCrudController
 
         //set the link using a string or a callable (function like its being used here)
         $displayOnFront->linkToUrl(function ($entity) {
-            return $this->generateUrl('app_program_details', ['slug' => $entity->getSlug()], UrlGeneratorInterface::ABSOLUTE_URL);
+            return $this->generateUrl(
+                'app_program_details',
+                ['slug' => $entity->getSlug()],
+                UrlGeneratorInterface::ABSOLUTE_URL
+            );
         });
 
         return parent::configureActions($actions)

@@ -98,7 +98,13 @@ class LogAidSearchRepository extends ServiceEntityRepository
         $hasSearch = $params['hasSearch'] ?? null;
         $source = $params['source'] ?? null;
         $resultsCountMax = $params['resultsCountMax'] ?? null;
-        $orderBy = (isset($params['orderBy']) && isset($params['orderBy']['sort']) && isset($params['orderBy']['order'])) ? $params['orderBy'] : null;
+        $orderBy =
+            (isset($params['orderBy'])
+            && isset($params['orderBy']['sort'])
+            && isset($params['orderBy']['order']))
+                ? $params['orderBy']
+                : null
+        ;
 
         $qb = $this->createQueryBuilder('l');
 

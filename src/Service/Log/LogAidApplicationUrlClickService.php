@@ -9,8 +9,7 @@ class LogAidApplicationUrlClickService
 {
     public function __construct(
         private LogAidApplicationUrlClickRepository $logAidApplicationUrlClickRepository
-    )
-    {
+    ) {
     }
 
     public function getCountByDay(Aid $aid, \DateTime $dateMin, \DateTime $dateMax): array

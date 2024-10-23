@@ -12,9 +12,16 @@ use Symfony\Component\PropertyInfo\Type;
 
 final class AidPerimeterFilter extends AbstractFilter
 {
-    // empty method
-    protected function filterProperty(string $property, $value, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, Operation $operation = null, array $context = []): void
-    {
+    protected function filterProperty(
+        string $property,
+        $value,
+        QueryBuilder $queryBuilder,
+        QueryNameGeneratorInterface $queryNameGenerator,
+        string $resourceClass,
+        Operation $operation = null,
+        array $context = []
+    ): void {
+        // ajouté pour être conforme à l'extends
     }
 
     public function getDescription(string $resourceClass): array
@@ -32,7 +39,10 @@ final class AidPerimeterFilter extends AbstractFilter
                 'property' => 'perimeter',
                 'type' => Type::BUILTIN_TYPE_STRING,
                 'required' => false,
-                'description' => '<div class="renderedMarkdown"><p>Le territoire.<br><br>Voir <code>/api/perimeters/</code> pour la liste complète.<br><br>Note : passer seulement l\'id du périmètre suffit (perimeter=70973).</p></div>',
+                'description' => '<div class="renderedMarkdown"><p>'
+                                    . 'Le territoire.<br><br>Voir <code>/api/perimeters/</code> '
+                                    . 'pour la liste complète.<br><br>'
+                                    . 'Note : passer seulement l\'id du périmètre suffit (perimeter=70973).</p></div>',
                 'openapi' => [
                     'examples' => [
                         new Example('...', null, null),

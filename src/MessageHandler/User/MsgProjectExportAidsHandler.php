@@ -61,7 +61,12 @@ class MsgProjectExportAidsHandler
             }
 
             // vérification accès
-            if (!$this->authorizationChecker->isGranted(UserProjectAidsVoter::IDENTIFIER, ['user' => $user, 'project' => $project])) {
+            if (
+                !$this->authorizationChecker->isGranted(
+                    UserProjectAidsVoter::IDENTIFIER,
+                    ['user' => $user, 'project' => $project]
+                )
+            ) {
                 throw new \Exception(UserProjectAidsVoter::MESSAGE_ERROR);
             }
 
@@ -78,7 +83,6 @@ class MsgProjectExportAidsHandler
                 default:
                     throw new \Exception('Format non géré');
             }
-            
         } catch (\Exception $e) {
             dd($e->getMessage());
             // notif erreur
@@ -105,13 +109,13 @@ class MsgProjectExportAidsHandler
         if (!file_put_contents($fileTarget, $pdfContent)) {
             throw new \Exception('Erreur lors de la création du fichier PDF');
         }
-        
+
         // Envoi l'email
         $send = $this->sendExportByEmail($user, $fileTarget);
 
         // Supprime le fichier
         @unlink($fileTarget);
-        
+
         if (!$send) {
             throw new \Exception('Erreur lors de l\'envoi de l\'email');
         }
@@ -127,10 +131,10 @@ class MsgProjectExportAidsHandler
         $writer = new Csv($spreadsheet);
         $writer->setDelimiter(';');
         $writer->setEnclosure('"');
-        
+
         // nom de fichier
         $now = new \DateTime(date(SpreadsheetExporterService::TODAY_DATE_FORMAT));
-        $filename = 'Aides-territoires_-_' . $now->format('Y-m-d') . '_-_' . $project->getSlug().'.'.$format;
+        $filename = 'Aides-territoires_-_' . $now->format('Y-m-d') . '_-_' . $project->getSlug() . '.' . $format;
 
         // cible
         $fileTarget = $this->getFileTarget($filename);
@@ -143,7 +147,7 @@ class MsgProjectExportAidsHandler
 
         // Supprime le fichier
         @unlink($fileTarget);
-        
+
         if (!$send) {
             throw new \Exception('Erreur lors de l\'envoi de l\'email');
         }
@@ -157,10 +161,10 @@ class MsgProjectExportAidsHandler
 
         // Passage au format CSV
         $writer = new Xlsx($spreadsheet);
-        
+
         // nom de fichier
         $now = new \DateTime(date(SpreadsheetExporterService::TODAY_DATE_FORMAT));
-        $filename = 'Aides-territoires_-_' . $now->format('Y-m-d') . '_-_' . $project->getSlug().'.'.$format;
+        $filename = 'Aides-territoires_-_' . $now->format('Y-m-d') . '_-_' . $project->getSlug() . '.' . $format;
 
         // cible
         $fileTarget = $this->getFileTarget($filename);
@@ -173,7 +177,7 @@ class MsgProjectExportAidsHandler
 
         // Supprime le fichier
         @unlink($fileTarget);
-        
+
         if (!$send) {
             throw new \Exception('Erreur lors de l\'envoi de l\'email');
         }
@@ -186,7 +190,7 @@ class MsgProjectExportAidsHandler
         if (!is_dir($tmpFolder)) {
             mkdir($tmpFolder, 0777, true);
         }
-        
+
         // cible
         return $tmpFolder . '/' . $filename;
     }

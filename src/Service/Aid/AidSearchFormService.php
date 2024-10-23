@@ -63,7 +63,7 @@ class AidSearchFormService
             if (in_array($propertyName, $ignoreProperties)) {
                 continue;
             }
-            
+
             $getter = 'get' . ucfirst($propertyName);
             if (method_exists($aidSearchClass, $getter)) {
                 $value = $aidSearchClass->$getter();
@@ -81,7 +81,8 @@ class AidSearchFormService
     }
 
     public function convertAidSearchClassToQueryString(AidSearchClass $aidSearchClass): string
-    { // NOSONAR too complex
+    {
+        // NOSONAR too complex
         $params = [];
 
         if ($aidSearchClass->getOrganizationType()) {
@@ -1073,7 +1074,8 @@ class AidSearchFormService
      * @return array
      */
     public function completeAidParams(Form $formAidSearch): array
-    { // NOSONAR too complex
+    {
+        // NOSONAR too complex
         $aidParams = [];
         if ($formAidSearch->get('organizationType')->getData()) {
             $aidParams['organizationType'] = $formAidSearch->get('organizationType')->getData();

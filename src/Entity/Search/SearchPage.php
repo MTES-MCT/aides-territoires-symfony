@@ -19,7 +19,7 @@ use Gedmo\Mapping\Annotation as Gedmo;
 #[ORM\Entity(repositoryClass: SearchPageRepository::class)]
 class SearchPage // NOSONAR too much methods
 {
-    const FOLDER = 'minisites';
+    public const FOLDER = 'minisites';
 
     #[ORM\Id]
     #[ORM\GeneratedValue]

@@ -58,7 +58,13 @@ class ProjectReferenceRepository extends ServiceEntityRepository
         $nameMatchAgainst = $params['nameMatchAgainst'] ?? null;
         $nameLike = $params['nameLike'] ?? null;
         $excludes = $params['excludes'] ?? null;
-        $orderBy = (isset($params['orderBy']) && isset($params['orderBy']['sort']) && isset($params['orderBy']['order'])) ? $params['orderBy'] : null;
+        $orderBy =
+            (isset($params['orderBy'])
+            && isset($params['orderBy']['sort'])
+            && isset($params['orderBy']['order']))
+                ? $params['orderBy']
+                : null
+        ;
         $addOrderBy = $params['addOrderBy'] ?? null;
         $firstResult = $params['firstResult'] ?? null;
         $maxResults = $params['maxResults'] ?? null;

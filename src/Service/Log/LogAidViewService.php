@@ -9,8 +9,7 @@ class LogAidViewService
 {
     public function __construct(
         private LogAidViewRepository $logAidViewRepository
-    )
-    {
+    ) {
     }
 
     public function getCountByDay(Aid $aid, \DateTime $dateMin, \DateTime $dateMax): array

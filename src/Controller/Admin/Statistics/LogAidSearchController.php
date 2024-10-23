@@ -2,7 +2,6 @@
 
 namespace App\Controller\Admin\Statistics;
 
-use App\Controller\Admin\DashboardController;
 use App\Entity\Log\LogAidSearch;
 use App\Entity\Perimeter\Perimeter;
 use App\Form\Admin\Filter\DateRangeType;
@@ -10,18 +9,14 @@ use App\Repository\Log\LogAidSearchRepository;
 use App\Repository\Perimeter\PerimeterRepository;
 use App\Repository\Reference\ProjectReferenceRepository;
 use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
-use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
 use OpenSpout\Common\Entity\Cell;
 use OpenSpout\Common\Entity\Row;
-use Psr\Http\Message\RequestInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\UX\Chartjs\Builder\ChartBuilderInterface;
-use Symfony\UX\Chartjs\Model\Chart;
 
 class LogAidSearchController extends AbstractController
 {
@@ -96,7 +91,10 @@ class LogAidSearchController extends AbstractController
     }
 
 
-    #[Route('/admin/statistics/log/aid-search/missing-perimeters', name: 'admin_statistics_log_aid_search_missing_perimeters')]
+    #[Route(
+        '/admin/statistics/log/aid-search/missing-perimeters',
+        name: 'admin_statistics_log_aid_search_missing_perimeters'
+    )]
     public function missingPerimeters(
         LogAidSearchRepository $logAidSearchRepository,
         AdminContext $adminContext,
@@ -205,7 +203,10 @@ class LogAidSearchController extends AbstractController
         ]);
     }
 
-    #[Route('/admin/statistics/log/aid-search/missing-perimeters/export', name: 'admin_statistics_log_aid_search_missing_perimeters_export')]
+    #[Route(
+        '/admin/statistics/log/aid-search/missing-perimeters/export',
+        name: 'admin_statistics_log_aid_search_missing_perimeters_export'
+    )]
     public function exportRegistrationByMonth(): StreamedResponse
     {
         $response = new StreamedResponse();

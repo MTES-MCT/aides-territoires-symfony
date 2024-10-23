@@ -46,19 +46,32 @@ final class WithoutOrganizationListener
                 $session =  new Session();
                 $session->getFlashBag()->add(
                     FrontController::FLASH_ERROR,
-                    'Vous devez renseigner les informations de votre structure ou accepter une invitation avant de pouvoir accéder à cette page.'
+                    'Vous devez renseigner les informations de votre structure ou accepter '
+                        . 'une invitation avant de pouvoir accéder à cette page.'
                 );
 
                 // regarde si cet utilisateur à été invité à rejoindre une structure
-                $organizationInvitationRepo = $this->entityManagerInterface->getRepository(OrganizationInvitation::class);
+                $organizationInvitationRepo = $this->entityManagerInterface
+                    ->getRepository(OrganizationInvitation::class);
                 $hasPendingInvitations = $organizationInvitationRepo->userHasPendingInvitation($user);
                 if ($hasPendingInvitations) {
-                    $event->setResponse(new RedirectResponse($this->routerInterface->generate('app_organization_invitations')));
+                    $event->setResponse(
+                        new RedirectResponse(
+                            $this->routerInterface->generate('app_organization_invitations')
+                        )
+                    );
                     return;
                 }
 
                 // sinon on redirige vers la page d'information de la structure
-                $event->setResponse(new RedirectResponse($this->routerInterface->generate('app_organization_structure_information', ['id' => 0])));
+                $event->setResponse(
+                    new RedirectResponse(
+                        $this->routerInterface->generate(
+                            'app_organization_structure_information',
+                            ['id' => 0]
+                        )
+                    )
+                );
             }
         }
     }

@@ -55,13 +55,17 @@ class MsgAidStatsSpreadsheetOfUserHandler
                 $this->logAidOriginUrlClickService,
                 $this->aidProjectService,
             );
-            
+
             // Génération du fichier Excel
             $writer = new Xlsx($spreadsheet);
 
             // nom de fichier
-            $filename = 'AT_statistiques_aides_'.$dateMin->format('d_m_Y').'_au_'.$dateMax->format('d_m_Y').'.xlsx';
-            
+            $filename =
+                'AT_statistiques_aides_'
+                . $dateMin->format('d_m_Y')
+                . '_au_' . $dateMax->format('d_m_Y')
+                . '.xlsx';
+
             // dossier temp
             $tmpFolder = $this->fileService->getUploadTmpDir();
             if (!is_dir($tmpFolder)) {
@@ -92,7 +96,7 @@ class MsgAidStatsSpreadsheetOfUserHandler
 
             // Supprime le fichier
             @unlink($fileTarget);
-            
+
             if (!$send) {
                 throw new \Exception('Erreur lors de l\'envoi de l\'email');
             }

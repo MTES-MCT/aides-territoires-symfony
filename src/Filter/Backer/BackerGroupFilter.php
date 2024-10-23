@@ -12,9 +12,16 @@ use Symfony\Component\PropertyInfo\Type;
 
 final class BackerGroupFilter extends AbstractFilter
 {
-    protected function filterProperty(string $property, $value, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, Operation $operation = null, array $context = []): void
-    {
-        // pour extends AbstractFilter
+    protected function filterProperty(
+        string $property,
+        $value,
+        QueryBuilder $queryBuilder,
+        QueryNameGeneratorInterface $queryNameGenerator,
+        string $resourceClass,
+        Operation $operation = null,
+        array $context = []
+    ): void {
+        // ajouté pour être conforme à l'extends
     }
 
     public function getDescription(string $resourceClass): array
@@ -32,7 +39,9 @@ final class BackerGroupFilter extends AbstractFilter
                 'property' => 'backerGroup',
                 'type' => Type::BUILTIN_TYPE_STRING,
                 'required' => false,
-                'description' => '<div class="renderedMarkdown"><p>Groupe de porteurs d\'aides.<br><br>Voir aussi <code>/api/backer-groups/</code> pour la liste complète.</p></div>',
+                'description' => '<div class="renderedMarkdown"><p>'
+                                    . 'Groupe de porteurs d\'aides.<br><br>'
+                                    . 'Voir aussi <code>/api/backer-groups/</code> pour la liste complète.</p></div>',
                 'openapi' => [
                     'examples' => $examples,
                 ],

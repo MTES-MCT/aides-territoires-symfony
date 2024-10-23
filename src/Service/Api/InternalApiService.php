@@ -8,7 +8,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class InternalApiService
 {
-    const API_FOLDER = 'api';
+    public const API_FOLDER = 'api';
     private string $bearerToken = '';
 
     public function __construct(

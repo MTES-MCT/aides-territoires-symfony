@@ -24,7 +24,7 @@ class HomeControllerTest extends AtWebTestCase
         $option = $domSelect->ownerDocument->createElement('option', 'perimeterTest (Ad-hoc)');
         $option->setAttribute('value', '1');
         $domSelect->appendChild($option);
-        
+
         $form = $crawler->filter('#tabpanel-aids-panel form')->form([
             'organizationType' => 'commune',
             'searchPerimeter' => 1,
@@ -36,6 +36,10 @@ class HomeControllerTest extends AtWebTestCase
         $this->assertResponseIsSuccessful();
 
         // Vérifier que la route de succès est atteinte
-        $this->assertStringContainsString($routeSuccess, $this->client->getRequest()->getUri(), "La requête n'a pas atteint la route attendue.");
+        $this->assertStringContainsString(
+            $routeSuccess,
+            $this->client->getRequest()->getUri(),
+            "La requête n'a pas atteint la route attendue."
+        );
     }
 }

@@ -16,7 +16,10 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\HttpKernel\KernelInterface;
 
-#[AsCommand(name: 'at:cron:user:export_to_sib', description: 'Export les utilisateurs vers le système de mailing (SIB)')]
+#[AsCommand(
+    name: 'at:cron:user:export_to_sib',
+    description: 'Export les utilisateurs vers le système de mailing (SIB)'
+)]
 class ExportToSibCommand extends Command
 {
     protected InputInterface $input;
@@ -104,13 +107,16 @@ class ExportToSibCommand extends Command
             ];
 
             if ($user->getLastestAidPublished() instanceof Aid) {
-                $attributes['DATE_DERNIERE_AIDE_PUBLIEE'] = $user->getLastestAidPublished()->getTimePublished()->format(DateTime::ATOM);
+                $attributes['DATE_DERNIERE_AIDE_PUBLIEE'] =
+                    $user->getLastestAidPublished()->getTimePublished()->format(DateTime::ATOM);
             }
             if ($user->getLastestAidDraft() instanceof Aid) {
-                $attributes['DATE_DERNIER_BROUILLON'] = $user->getLastestAidDraft()->getTimeCreate()->format(DateTime::ATOM);
+                $attributes['DATE_DERNIER_BROUILLON'] =
+                    $user->getLastestAidDraft()->getTimeCreate()->format(DateTime::ATOM);
             }
             if ($user->getLatestAidExpired() instanceof Aid) {
-                $attributes['DATE_DERNIERE_EXPIRATION'] = $user->getLatestAidExpired()->getDateSubmissionDeadline()->format(DateTime::ATOM);
+                $attributes['DATE_DERNIERE_EXPIRATION'] =
+                    $user->getLatestAidExpired()->getDateSubmissionDeadline()->format(DateTime::ATOM);
             }
 
             $update = $this->emailService->updateUser(

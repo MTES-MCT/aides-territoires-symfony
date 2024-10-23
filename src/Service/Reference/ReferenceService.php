@@ -10,7 +10,6 @@ use Doctrine\Inflector\InflectorFactory;
 
 class ReferenceService
 {
-
     public function __construct(
         private KeywordReferenceRepository $keywordReferenceRepository,
         private ProjectReferenceRepository $projectReferenceRepository

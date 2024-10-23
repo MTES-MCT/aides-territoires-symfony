@@ -144,7 +144,10 @@ class LogAidViewRepository extends ServiceEntityRepository
         $dateMax = $params['dateMax'] ?? null;
 
         $qb = $this->getQueryBuilder($params);
-        $qb->select('IFNULL(COUNT(DISTINCT(organization.id)), 0) AS nb, organizationType.id AS id, organizationType.name AS name, organizationType.slug AS slug')
+        $qb->select('IFNULL(COUNT(DISTINCT(organization.id)), 0) AS nb,
+            organizationType.id AS id,
+            organizationType.name AS name,
+            organizationType.slug AS slug')
             ->leftJoin('lav.organization', 'organization')
             ->leftJoin('organization.organizationType', 'organizationType')
             ->groupBy('organizationType.id')

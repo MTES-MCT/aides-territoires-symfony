@@ -66,7 +66,8 @@ class BackerRepository extends ServiceEntityRepository
         $queryBuilder = $this->createQueryBuilder('b');
 
         $perimeterFrom = $this->getEntityManager()->getRepository(Perimeter::class)->find($params['id']);
-        $ids = $this->getEntityManager()->getRepository(Perimeter::class)->getIdPerimetersContainedIn(['perimeter' => $perimeterFrom]);
+        $ids = $this->getEntityManager()->getRepository(Perimeter::class)
+        ->getIdPerimetersContainedIn(['perimeter' => $perimeterFrom]);
         $ids[] = $perimeterFrom->getId();
 
         $queryBuilder
@@ -92,7 +93,13 @@ class BackerRepository extends ServiceEntityRepository
         $perimeterScales = $params['perimeterScales'] ?? null;
         $backerCategory = $params['backerCategory'] ?? null;
         $active = isset($params['active']) ? $params['active'] : null;
-        $orderBy = (isset($params['orderBy']) && isset($params['orderBy']['sort']) && isset($params['orderBy']['order'])) ? $params['orderBy'] : null;
+        $orderBy =
+            (isset($params['orderBy'])
+            && isset($params['orderBy']['sort'])
+            && isset($params['orderBy']['order']))
+                ? $params['orderBy']
+                : null
+        ;
 
         $qb = $this->createQueryBuilder('b');
 
@@ -113,7 +120,8 @@ class BackerRepository extends ServiceEntityRepository
             ->addCriteria(AidRepository::showInSearchCriteria('aid.'))
         ;
         if ($perimeterFrom instanceof Perimeter && $perimeterFrom->getId()) {
-            $ids = $this->getEntityManager()->getRepository(Perimeter::class)->getIdPerimetersContainedIn(['perimeter' => $perimeterFrom]);
+            $ids = $this->getEntityManager()->getRepository(Perimeter::class)
+            ->getIdPerimetersContainedIn(['perimeter' => $perimeterFrom]);
             $ids[] = $perimeterFrom->getId();
 
             $qb
@@ -281,14 +289,19 @@ class BackerRepository extends ServiceEntityRepository
         $limit = $params['limit'] ?? null;
         $firstResult = $params['firstResult'] ?? null;
         $maxResults = $params['maxResults'] ?? null;
-        $limit = $params['limit'] ?? null;
         $nameLike = $params['nameLike'] ?? null;
         $hasFinancedAids = $params['hasFinancedAids'] ?? null;
         $hasPublishedFinancedAids = $params['hasPublishedFinancedAids'] ?? null;
         $active = isset($params['active']) ? $params['active'] : null;
         $nbAidsLiveMin = $params['nbAidsLiveMin'] ?? null;
         $backerGroup = $params['backerGroup'] ?? null;
-        $orderBy = (isset($params['orderBy']) && isset($params['orderBy']['sort']) && isset($params['orderBy']['order'])) ? $params['orderBy'] : null;
+        $orderBy =
+            (isset($params['orderBy'])
+            && isset($params['orderBy']['sort'])
+            && isset($params['orderBy']['order']))
+                ? $params['orderBy']
+                : null
+        ;
 
         $qb = $this->createQueryBuilder('b');
 

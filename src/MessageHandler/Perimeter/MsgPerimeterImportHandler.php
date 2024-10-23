@@ -28,13 +28,14 @@ class MsgPerimeterImportHandler
         $command = ['php', 'bin/console', 'at:cron:perimeter:perimeter_import'];
 
         $process = new Process($command);
-        $process->setWorkingDirectory($this->kernelInterface->getProjectDir()); // Assurez-vous de définir le bon répertoire de travail
+        $process->setWorkingDirectory($this->kernelInterface->getProjectDir());
 
         try {
             $process->mustRun();
         } catch (ProcessFailedException $exception) {
             // notif admin
-            $admin = $this->managerRegistry->getRepository(User::class)->findOneBy(['email' => $this->paramService->get('email_super_admin')]);
+            $admin = $this->managerRegistry->getRepository(User::class)
+            ->findOneBy(['email' => $this->paramService->get('email_super_admin')]);
             $this->notificationService->addNotification(
                 $admin,
                 'Envoi MsgPerimeterImport',

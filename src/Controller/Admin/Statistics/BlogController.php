@@ -60,7 +60,9 @@ class BlogController extends DashboardController
             $total += $category['nb'];
         }
         foreach ($topBlogPostsCategories as $key => $category) {
-            $topBlogPostsCategories[$key]['percentage'] = $total == 0 ? 0 : number_format(($category['nb'] * 100 / $total), 2);
+            $topBlogPostsCategories[$key]['percentage'] = $total == 0
+                ? 0
+                : number_format(($category['nb'] * 100 / $total), 2);
         }
 
         $labels = [];
@@ -91,9 +93,14 @@ class BlogController extends DashboardController
         $dateMaxEvolution = new \DateTime();
 
 
-        $formDateRangeEvolution = $formFactoryInterface->createNamed('date_range_evolution', DateRangeType::class, null, [
-            'action' => $this->adminUrlGenerator->generateUrl('admin_statistics_blog_dashboard') . '#evolution',
-        ]);
+        $formDateRangeEvolution = $formFactoryInterface->createNamed(
+            'date_range_evolution',
+            DateRangeType::class,
+            null,
+            [
+                'action' => $this->adminUrlGenerator->generateUrl('admin_statistics_blog_dashboard') . '#evolution',
+            ]
+        );
         $formDateRangeEvolution->add('blogPost', EntityType::class, [
             'required' => true,
             'class' => BlogPost::class,

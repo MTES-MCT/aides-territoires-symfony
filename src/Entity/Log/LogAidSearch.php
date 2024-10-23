@@ -25,7 +25,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Index(columns: ['search'], name: 'source_las')]
 class LogAidSearch // NOSONAR too much methods
 {
-    const SOURCE_API = 'api';
+    public const SOURCE_API = 'api';
 
     #[ORM\Id]
     #[ORM\GeneratedValue]

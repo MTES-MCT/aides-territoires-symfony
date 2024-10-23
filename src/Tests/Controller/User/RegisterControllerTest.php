@@ -34,6 +34,5 @@ class RegisterControllerTest extends AtWebTestCase
         // Vérifier l'URL de redirection
         $redirectUrl = $this->client->getResponse()->headers->get('Location');
         $this->assertEquals($routeSuccess, $redirectUrl, "L'URL de redirection est incorrecte : $redirectUrl");
-        
     }
 }

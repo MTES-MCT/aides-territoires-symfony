@@ -61,16 +61,22 @@ class ImportFluxAdemeAgirCommand extends ImportFluxCommand
 
         $return = [
             'importDataMention' => 'Ces données sont mises à disposition par l\'ADEME.',
-            'name' => isset($aidToImport['titre']) ? strip_tags((string) $aidToImport['titre']) : null,
-            'nameInitial' => isset($aidToImport['titre']) ? strip_tags((string) $aidToImport['titre']) : null,
-            'description' => isset($aidToImport['description_longue']) ? $this->htmlSanitizerInterface->sanitize($aidToImport['description_longue']) : null,
-            'originUrl' => isset($aidToImport['url_agir']) ? $aidToImport['url_agir'] : null,
-            'applicationUrl' => isset($aidToImport['url_agir']) ? $aidToImport['url_agir'] : null,
+            'name' => isset($aidToImport['titre'])
+                ? strip_tags((string) $aidToImport['titre']) : null,
+            'nameInitial' => isset($aidToImport['titre'])
+                ? strip_tags((string) $aidToImport['titre']) : null,
+            'description' => isset($aidToImport['description_longue'])
+                ? $this->htmlSanitizerInterface->sanitize($aidToImport['description_longue']) : null,
+            'originUrl' => isset($aidToImport['url_agir'])
+                ? $aidToImport['url_agir'] : null,
+            'applicationUrl' => isset($aidToImport['url_agir'])
+                ? $aidToImport['url_agir'] : null,
             'isCallForProject' => $isCallForProject,
             'dateStart' => $dateStart,
             'dateSubmissionDeadline' => $dateSubmissionDeadline,
             'eligibility' => $eligibility,
-            'contact' => 'Pour contacter l\'Ademe ou candidater à l\'offre, veuillez cliquer sur le lien vers le descriptif complet.'
+            'contact' => 'Pour contacter l\'Ademe ou candidater à l\'offre, '
+                . 'veuillez cliquer sur le lien vers le descriptif complet.'
         ];
 
         // on ajoute les données brut d'import pour comparer avec les données actuelles
@@ -105,9 +111,11 @@ class ImportFluxAdemeAgirCommand extends ImportFluxCommand
     protected function setAidRecurrence(array $aidToImport, Aid $aid): Aid
     {
         if (isset($aidToImport['date_debut']) && isset($aidToImport['date_fin'])) {
-            $aidRecurrence = $this->managerRegistry->getRepository(AidRecurrence::class)->findOneBy(['slug' => AidRecurrence::SLUG_ONEOFF]);
+            $aidRecurrence = $this->managerRegistry->getRepository(AidRecurrence::class)
+                ->findOneBy(['slug' => AidRecurrence::SLUG_ONEOFF]);
         } else {
-            $aidRecurrence = $this->managerRegistry->getRepository(AidRecurrence::class)->findOneBy(['slug' => AidRecurrence::SLUG_ONGOING]);
+            $aidRecurrence = $this->managerRegistry->getRepository(AidRecurrence::class)
+                ->findOneBy(['slug' => AidRecurrence::SLUG_ONGOING]);
         }
         if ($aidRecurrence instanceof AidRecurrence) {
             $aid->setAidRecurrence($aidRecurrence);
@@ -140,9 +148,11 @@ class ImportFluxAdemeAgirCommand extends ImportFluxCommand
             : null;
 
         if ((int) $couvertureGeo == 1) {
-            $perimeter = $this->managerRegistry->getRepository(Perimeter::class)->findOneBy(['code' => Perimeter::CODE_FRANCE]);
+            $perimeter = $this->managerRegistry->getRepository(Perimeter::class)
+                ->findOneBy(['code' => Perimeter::CODE_FRANCE]);
         } elseif ((int) $couvertureGeo == 2 || (int) $couvertureGeo == 3) {
-            $perimeter = $this->managerRegistry->getRepository(Perimeter::class)->findOneBy(['code' => Perimeter::CODE_EUROPE]);
+            $perimeter = $this->managerRegistry->getRepository(Perimeter::class)
+                ->findOneBy(['code' => Perimeter::CODE_EUROPE]);
         } elseif ((int) $couvertureGeo == 4) {
             $regionCodes = $aidToImport['regions'] ?? [];
             if (count($regionCodes) == 1) {

@@ -65,7 +65,11 @@ class AidListener
                             'NOM' => $aid->getAuthor()->getLastname(),
                             'AIDE_NOM' => $aid->getName(),
                             'AIDE_URL' => $this->aidService->getUrl($aid, UrlGeneratorInterface::ABSOLUTE_URL),
-                            'BASE_URL' => $this->routerInterface->generate('app_home', [], UrlGeneratorInterface::ABSOLUTE_URL)
+                            'BASE_URL' => $this->routerInterface->generate(
+                                'app_home',
+                                [],
+                                UrlGeneratorInterface::ABSOLUTE_URL
+                            )
                         ]
                     );
                 }
@@ -118,7 +122,8 @@ class AidListener
                 $session =  new Session();
                 $session->getFlashBag()->add(
                     'alert alert-info alert-dismissible fade show',
-                    'La nouvelle url était dans les redirection, la redirection à été supprimée pour éviter les redirections en boucle.'
+                    'La nouvelle url était dans les redirection, '
+                        . 'la redirection à été supprimée pour éviter les redirections en boucle.'
                 );
             }
 

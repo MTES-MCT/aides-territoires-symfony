@@ -23,6 +23,6 @@ use App\Controller\Api\Perimeter\PerimeterController;
 )]
 class PerimeterScaleResource
 {
-    const API_OPERATION_NAME = 'perimeter_scales_list';
-    const API_GROUP_LIST = 'perimeter_scales:list';
+    public const API_OPERATION_NAME = 'perimeter_scales_list';
+    public const API_GROUP_LIST = 'perimeter_scales:list';
 }

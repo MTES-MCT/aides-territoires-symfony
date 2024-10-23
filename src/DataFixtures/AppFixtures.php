@@ -29,7 +29,7 @@ use Symfony\Component\HttpKernel\KernelInterface;
 
 /**
  * Pour insérer les données dans une base de données de test, exécutez la commande suivante :
- * php bin/console --env=test doctrine:fixtures:load
+ * php bin/console doctrine:fixtures:load --env=test
  */
 class AppFixtures extends Fixture
 {
@@ -53,7 +53,7 @@ class AppFixtures extends Fixture
     public function load(ObjectManager $manager): void
     {
 
-        
+
         // perimeterTest
         $perimeter = new Perimeter();
         $perimeter->setName('perimeterTest');

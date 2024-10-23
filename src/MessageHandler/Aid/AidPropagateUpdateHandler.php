@@ -5,15 +5,9 @@ namespace App\MessageHandler\Aid;
 use App\Entity\Aid\Aid;
 use App\Entity\Aid\AidFinancer;
 use App\Entity\Aid\AidInstructor;
-use App\Entity\Reference\KeywordReference;
-use App\Entity\Reference\KeywordReferenceSuggested;
-use App\Message\Aid\AidExtractKeyword;
 use App\Message\Aid\AidPropagateUpdate;
 use App\Repository\Aid\AidRepository;
-use App\Service\Aid\AidService;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
-use App\Service\Notification\NotificationService;
-use App\Service\Various\ParamService;
 use Doctrine\Persistence\ManagerRegistry;
 
 #[AsMessageHandler()]
@@ -57,12 +51,16 @@ class AidPropagateUpdateHandler
                     method_exists($aidLocal, 'set' . ucfirst($sanctuarizedField->getName()))
                     && method_exists($aidGeneric, 'get' . ucfirst($sanctuarizedField->getName()))
                 ) {
-                    $aidLocal->{'set' . ucfirst($sanctuarizedField->getName())}($aidGeneric->{'get' . ucfirst($sanctuarizedField->getName())}());
+                    $aidLocal->{'set' . ucfirst($sanctuarizedField->getName())}(
+                        $aidGeneric->{'get' . ucfirst($sanctuarizedField->getName())}()
+                    );
                 } elseif (
                     method_exists($aidLocal, 'set' . ucfirst($sanctuarizedField->getName()))
                     && method_exists($aidGeneric, 'is' . ucfirst($sanctuarizedField->getName()))
                 ) {
-                    $aidLocal->{'set' . ucfirst($sanctuarizedField->getName())}($aidGeneric->{'is' . ucfirst($sanctuarizedField->getName())}());
+                    $aidLocal->{'set' . ucfirst($sanctuarizedField->getName())}(
+                        $aidGeneric->{'is' . ucfirst($sanctuarizedField->getName())}()
+                    );
                 }
             }
         }

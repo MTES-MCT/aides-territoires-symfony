@@ -23,8 +23,12 @@ class EmailDomainFilter implements FilterInterface
             ->setFormType(EmailDomainFilterType::class);
     }
 
-    public function apply(QueryBuilder $queryBuilder, FilterDataDto $filterDataDto, ?FieldDto $fieldDto, EntityDto $entityDto): void
-    {
+    public function apply(
+        QueryBuilder $queryBuilder,
+        FilterDataDto $filterDataDto,
+        ?FieldDto $fieldDto,
+        EntityDto $entityDto
+    ): void {
         if (!$filterDataDto->getValue()) {
             return;
         }

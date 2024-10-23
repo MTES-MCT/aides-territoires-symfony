@@ -64,7 +64,8 @@ class RegisterType extends AbstractType
             ->add('email', EmailType::class, [
                 'required' => true,
                 'label' => 'Votre adresse e-mail',
-                'help' => 'Par exemple : prenom.nom@domaine.fr<br />Nous enverrons un e-mail de confirmation à cette adresse avant de valider le compte.',
+                'help' => 'Par exemple : prenom.nom@domaine.fr<br />'
+                            . 'Nous enverrons un e-mail de confirmation à cette adresse avant de valider le compte.',
                 'help_html' => true,
                 'attr' => [
                     'placeholder' => 'Merci de bien vérifier l\'adresse saisie'
@@ -85,7 +86,8 @@ class RegisterType extends AbstractType
                 'first_options'  => [
                     'label' => 'Mot de passe',
                     'help' => '<ul>
-                                <li>Votre mot de passe ne peut pas trop ressembler à vos autres informations personnelles.</li>
+                                <li>Votre mot de passe ne peut pas trop ressembler '
+                                    . 'à vos autres informations personnelles.</li>
                                 <li>Votre mot de passe doit contenir au minimum 9 caractères.</li>
                                 <li>Votre mot de passe ne peut pas être un mot de passe couramment utilisé.</li>
                                 <li>Votre mot de passe ne peut pas être entièrement numérique.</li>
@@ -125,7 +127,8 @@ class RegisterType extends AbstractType
             ->add('perimeter', PerimeterAutocompleteType::class, [
                 'required' => true,
                 'label' => 'Votre territoire',
-                'help' => 'Tous les périmètres géographiques sont disponibles : CA, CU, CC, pays, parc, etc. Contactez-nous si vous ne trouvez pas le vôtre.',
+                'help' => 'Tous les périmètres géographiques sont disponibles : '
+                                . 'CA, CU, CC, pays, parc, etc. Contactez-nous si vous ne trouvez pas le vôtre.',
                 'placeholder' => 'Tapez les premiers caractères',
                 'class' => Perimeter::class,
                 'constraints' => [
@@ -138,8 +141,9 @@ class RegisterType extends AbstractType
                 'required' => false,
                 'mapped' => false,
                 'label' => 'Nom de votre structure',
-                'help' => 'En fonction des informations saisies précédemment, nous pouvons, parfois pré-remplir ce champ automatiquement. Vous pouvez cependant corriger le nom proposé si besoin.',
-                // 'sanitize_html' => true,
+                'help' => 'En fonction des informations saisies précédemment, '
+                            . 'nous pouvons, parfois pré-remplir ce champ automatiquement. '
+                            . 'Vous pouvez cependant corriger le nom proposé si besoin.',
             ])
             ->add('beneficiaryFunction', ChoiceType::class, [
                 'required' => false,
