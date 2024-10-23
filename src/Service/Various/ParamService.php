@@ -21,17 +21,17 @@ class ParamService
     {
         $param = null;
         try {
-            $param = $this->parameterBagInterface->resolve($paramKey);
-        } catch (\Exception $e) {
-            $param = null;
-        }
-        if (!$param || $param == '') {
-            try {
-                $param = $this->parameterBagInterface->get($paramKey);
-            } catch (\Exception $e) {
+            $this->parameterBagInterface->resolve();
+
+            $param = $this->parameterBagInterface->get($paramKey);
+
+            if ($param == '') {
                 $param = null;
             }
+
+            return $param;
+        } catch (\Exception $e) {
+            return null;
         }
-        return $param;
     }
 }

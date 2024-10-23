@@ -331,17 +331,6 @@ class AppExtension extends AbstractExtension // NOSONAR too much methods
         return $this->categoryService->categoriesToMetas($categories);
     }
 
-    public function getEntityById(string $entityName, int $id): mixed
-    {
-        try {
-            /** @var ObjectRepository<object> $repository */
-            $repository = $this->managerRegistry->getRepository('App\Entity\\'.$entityName);
-            return $repository->find($id);
-        } catch (\Exception $e) {
-            return null;
-        }
-    }
-
     public function getUserSibEmailId(?User $user): string
     {
         return $this->userService->getSibEmailId($user);

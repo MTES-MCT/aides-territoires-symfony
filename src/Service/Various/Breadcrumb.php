@@ -4,6 +4,9 @@ namespace App\Service\Various;
 
 class Breadcrumb
 {
+    /**
+     * @var array<array{text: string, url: ?string}>
+     */
     protected $items = [];
 
     public function add(string $text, ?string $url = null): self
@@ -13,7 +16,7 @@ class Breadcrumb
     }
 
     /**
-     * @return array
+     * @return array<array{text: string, url: ?string}>
      */
     public function getItems(): array
     {
@@ -21,7 +24,7 @@ class Breadcrumb
     }
 
     /**
-     * @param array $items
+     * @param array<array{text: string, url: ?string}> $items
      */
     public function setItems($items): void
     {
