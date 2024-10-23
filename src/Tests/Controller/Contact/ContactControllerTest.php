@@ -7,7 +7,7 @@ use App\Tests\AtWebTestCase;
 // php bin/phpunit src/Tests/Controller/Contact/ContactControllerTest.php
 class ContactControllerTest extends AtWebTestCase
 {
-    public function testSubmitValidContactForm()
+    public function testSubmitValidContactForm(): void
     {
         $route = $this->router->generate('app_contact_contact');
         $routeSuccess = $this->router->generate('app_contact_contact', ['success' => 1]);
@@ -28,7 +28,7 @@ class ContactControllerTest extends AtWebTestCase
         $this->assertResponseRedirects($routeSuccess);
     }
 
-    public function testSubmitInvalidContactForm()
+    public function testSubmitInvalidContactForm(): void
     {
         $route = $this->router->generate('app_contact_contact');
         $routeError = $this->router->generate('app_contact_contact', ['success' => 0]);

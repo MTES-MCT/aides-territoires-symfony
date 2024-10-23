@@ -7,7 +7,7 @@ class StringService
     /**
      * Nettoie une chaine de caractères
      *
-     * @param [type] $string
+     * @param string $string
      * @return string
      */
     public function cleanString(string $string): string
@@ -18,7 +18,7 @@ class StringService
     /**
      * @param $text
      * @param $length
-     * @return null|string|string[]
+     * @return string
      */
     public function truncate(string $text, int $length): string
     {
@@ -46,7 +46,7 @@ class StringService
      * Fonction qui retourne un nom nettoyé (sans accent, espace, etc...)
      * @param $string
      * @param string $replacement
-     * @return mixed
+     * @return string
      */
     public function getSlug(string $string, string $replacement = '-'): string
     {

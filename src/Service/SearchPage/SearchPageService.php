@@ -5,7 +5,6 @@ namespace App\Service\SearchPage;
 use App\Entity\Search\SearchPage;
 use App\Entity\Search\SearchPageLock;
 use App\Entity\User\User;
-use App\Service\Organization\OrganizationService;
 use App\Service\User\UserService;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -13,12 +12,11 @@ class SearchPageService
 {
     public function __construct(
         private UserService $userService,
-        private OrganizationService $organizationService,
         private ManagerRegistry $managerRegistry
     ) {
     }
 
-    public function userCanViewEdit(SearchPage $searchPage, User $user)
+    public function userCanViewEdit(SearchPage $searchPage, User $user): bool
     {
         // si c'est l'auteur ou un admin
         if ($searchPage->getAdministrator() == $user || $this->userService->isUserGranted($user, User::ROLE_ADMIN)) {

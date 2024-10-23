@@ -5,6 +5,7 @@ namespace App\Tests\Controller\Aid;
 use App\Entity\Aid\Aid;
 use App\Entity\Alert\Alert;
 use App\Entity\User\User;
+use App\Repository\Aid\AidRepository;
 use App\Repository\User\UserRepository;
 use App\Tests\AtWebTestCase;
 
@@ -16,7 +17,7 @@ class AidControllerTest extends AtWebTestCase
      *
      * @return void
      */
-    public function testAidSearch()
+    public function testAidSearch(): void
     {
         $route = $this->router->generate('app_aid_aid');
         $routeSuccess = $this->router->generate('app_aid_aid');
@@ -48,7 +49,7 @@ class AidControllerTest extends AtWebTestCase
     }
 
     // test la création d'alerte
-    public function testCreateAlert()
+    public function testCreateAlert(): void
     {
         /** @var UserRepository $userRepository */
         $userRepository = $this->managerRegistry->getRepository(User::class);
@@ -73,7 +74,7 @@ class AidControllerTest extends AtWebTestCase
         $this->assertStringContainsString('Votre alerte a bien été créée', $this->client->getResponse()->getContent());
     }
 
-    public function testAidDetails()
+    public function testAidDetails(): void
     {
         /** @var AidRepository $aidRepository */
         $aidRepository = $this->managerRegistry->getRepository(Aid::class);
@@ -85,7 +86,7 @@ class AidControllerTest extends AtWebTestCase
         $this->assertResponseIsSuccessful();
     }
 
-    public function testAidGenericToLocal()
+    public function testAidGenericToLocal(): void
     {
         /** @var UserRepository $userRepository */
         $userRepository = $this->managerRegistry->getRepository(User::class);

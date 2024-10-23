@@ -3,8 +3,8 @@
 namespace App\Validator;
 
 use App\Entity\Aid\Aid;
-use App\Repository\Aid\AidRepository;
 use App\Exception\CustomValidatorException;
+use App\Repository\Aid\AidRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Validator\Constraint;
@@ -15,14 +15,15 @@ class AidValidUrlValidator extends ConstraintValidator
 {
     protected string $message =
         'Cette URL ne correspond pas à une aide actuellement publiée. Merci de saisir une URL correcte. ';
+
     public function __construct(
         protected TranslatorInterface $translator,
         protected ManagerRegistry $managerRegistry,
-        protected RequestStack $requestStack
+        protected RequestStack $requestStack,
     ) {
     }
 
-    public function validate($value, Constraint $constraint): void
+    public function validate(mixed $value, Constraint $constraint): void
     {
         try {
             // parse l'url données
@@ -44,7 +45,7 @@ class AidValidUrlValidator extends ConstraintValidator
             $aidRepo = $this->managerRegistry->getRepository(Aid::class);
             $aidTest = $aidRepo->findOneCustom([
                 'showInSearch' => true,
-                'slug' => $matches[1]
+                'slug' => $matches[1],
             ]);
             if (!$aidTest instanceof Aid) {
                 throw new CustomValidatorException($this->message);

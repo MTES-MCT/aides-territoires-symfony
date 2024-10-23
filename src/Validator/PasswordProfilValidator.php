@@ -14,20 +14,20 @@ class PasswordProfilValidator extends ConstraintValidator
         '123456789',
         'azerty',
         'password',
-        'motdepasse'
+        'motdepasse',
     ];
 
-    protected $translator;
+    protected TranslatorInterface $translator;
 
     public function __construct(TranslatorInterface $translator)
     {
         $this->translator = $translator;
     }
 
-    public function validate($value, Constraint $constraint): void
+    public function validate(mixed $value, Constraint $constraint): void
     {
         $errorMessage = 'Le mot de passe ne respècte pas les règles';
-        if ($value != "") {
+        if ('' != $value) {
             try {
                 // longueur
                 if (strlen($value) < 9) {
