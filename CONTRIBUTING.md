@@ -109,7 +109,7 @@ En local vous pouvez laisser cette configuration dans votre .env
 
 ## Linter de code / Code Style
 
-Nous utilisons `squizlabs/php_codesniffer`, `phpstan/phpstan` et `black`
+Nous utilisons `squizlabs/php_codesniffer` et `phpstan/phpstan`
 
     vendor/bin/phpcs src
 
