@@ -11,31 +11,24 @@ use Symfony\Component\PropertyInfo\Type;
 
 final class AidTextFilter extends AbstractFilter
 {
-    protected function filterProperty(
-        string $property,
-        $value,
-        QueryBuilder $queryBuilder,
-        QueryNameGeneratorInterface $queryNameGenerator,
-        string $resourceClass,
-        Operation $operation = null,
-        array $context = []
-    ): void {
-        // ajouté pour être conforme à l'extends
+    protected function filterProperty(string $property, $value, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, Operation $operation = null, array $context = []): void
+    {
     }
 
     public function getDescription(string $resourceClass): array
     {
         return [
-            'text' => [
-                'property' => 'text',
+            'keyword' => [
+                'property' => 'keyword',
                 'type' => Type::BUILTIN_TYPE_STRING,
                 'required' => false,
                 'description' => 'Recherche textuelle.',
                 'openapi' => [
                     'examples' => [
-                        new Example('velo', null, 'velo'),
-                        new Example('piste OU velo', null, 'piste, velo'),
-                        new Example('piste ET velo', null, 'piste velo')
+                        new Example('vélo', null, 'vélo'),
+                        new Example('piscine', null, 'piscine'),
+                        new Example('piscine, bassin municipal', null, 'piscine, bassin municipal'),
+                        new Example('Construction d\'une piscine', null, 'Construction d\'une piscine')
                     ],
                 ],
             ],
