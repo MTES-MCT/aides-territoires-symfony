@@ -55,7 +55,7 @@ class LogService
                             if ('_token' == $key) { // pas besoin de stocker le tocken
                                 continue;
                             }
-                            $querystring .= $key.'='.$param.'&';
+                            $querystring .= $key . '=' . $param . '&';
                         }
                         $querystring = substr($querystring, 0, -1); // on enlève le dernier & (qui est en trop)
                     }

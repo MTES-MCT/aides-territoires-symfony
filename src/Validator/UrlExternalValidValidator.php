@@ -65,9 +65,11 @@ class UrlExternalValidValidator extends ConstraintValidator
             }
 
             // vérifie que l'hote n'est pas une short ip
-            if (filter_var($host, FILTER_VALIDATE_REGEXP, [
+            if (
+                filter_var($host, FILTER_VALIDATE_REGEXP, [
                 'options' => ['regexp' => '/^127\./'],
-            ])) {
+                ])
+            ) {
                 $this->context->buildViolation($this->message)->addViolation();
 
                 return;
