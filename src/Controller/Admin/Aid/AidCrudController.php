@@ -137,7 +137,10 @@ class AidCrudController extends AtCrudController implements EventSubscriberInter
             ->add('projectReferences')
             ->add(AidKeywordReferenceSearchFilter::new('keyReferenceSearch', 'Recherche de mot-clé référence'))
             ->add(AidReferenceSearchFilter::new('referenceSearch', 'Recherche de référence'))
-            ->add(AidReferenceSearchObjectFilter::new('referenceSearchObject', 'Recherche de référence (objets uniquement)'))
+            ->add(AidReferenceSearchObjectFilter::new(
+                'referenceSearchObject',
+                'Recherche de référence (objets uniquement)'
+            ))
             ->add(AidNoReferenceFilter::new('noReference', 'Pas de projet référent associé'))
         ;
     }
@@ -202,7 +205,11 @@ class AidCrudController extends AtCrudController implements EventSubscriberInter
 
         //set the link using a string or a callable (function like its being used here)
         $displayOnFront->linkToUrl(function ($entity) {
-            return $this->generateUrl('app_aid_aid_details', ['slug' => $entity->getSlug()], UrlGeneratorInterface::ABSOLUTE_URL);
+            return $this->generateUrl(
+                'app_aid_aid_details',
+                ['slug' => $entity->getSlug()],
+                UrlGeneratorInterface::ABSOLUTE_URL
+            );
         });
 
         // lien affichage stats
@@ -275,7 +282,10 @@ class AidCrudController extends AtCrudController implements EventSubscriberInter
         yield FormField::addFieldset('Noms');
         yield IdField::new('id')->onlyOnIndex();
         yield TextLengthCountField::new('name', 'Nom')
-            ->setHelp('Le titre doit commencer par un verbe à l’infinitif pour que l’objectif de l’aide soit explicite vis-à-vis de ses bénéficiaires.')
+            ->setHelp(
+                'Le titre doit commencer par un verbe à l’infinitif pour que l’objectif '
+                . 'de l’aide soit explicite vis-à-vis de ses bénéficiaires.'
+            )
             ->setFormTypeOption('attr', ['maxlength' => 180])
             ->setColumns(12);
 
@@ -292,7 +302,12 @@ class AidCrudController extends AtCrudController implements EventSubscriberInter
                         ->setAction(Action::EDIT)
                         ->setEntityId($aidDuplicate->getId())
                         ->generateUrl();
-                    $slugHelp .= '<li><a href="' . $urlEditAid . '" target="_blank">' . $aidDuplicate->getName() . '</a></li>';
+                    $slugHelp .=
+                        '<li><a href="'
+                        . $urlEditAid
+                        . '" target="_blank">'
+                        . $aidDuplicate->getName()
+                        . '</a></li>';
                 }
                 $slugHelp .= '</ul>';
                 $slugHelp .= '</div>';
@@ -365,7 +380,9 @@ class AidCrudController extends AtCrudController implements EventSubscriberInter
 
         if ($entity instanceof Aid) {
             $entity->setProjectReferencesSuggestions($projectReferencesSuggestions);
-            $help = !empty($projectReferencesSuggestions) ? 'Ces résultats sont proposés en fonction de ce que donne la recherche.' : 'Aucun projet référent suggéré pour cette aide.';
+            $help = !empty($projectReferencesSuggestions)
+                ? 'Ces résultats sont proposés en fonction de ce que donne la recherche.'
+                : 'Aucun projet référent suggéré pour cette aide.';
 
             yield CollectionCopyableField::new('projectReferencesSuggestions', 'Projets référents suggérés')
                 ->setHelp($help)
@@ -532,8 +549,14 @@ class AidCrudController extends AtCrudController implements EventSubscriberInter
         yield TrumbowygField::new('description', 'Description complète de l’aide et de ses objectifs')
             ->hideOnIndex()
             ->setColumns(12);
-        yield TrumbowygField::new('projectExamples', 'Exemples d’applications ou de projets réalisés grâce à cette aide')
-            ->setHelp('Afin d’aider les territoires à mieux comprendre votre aide, donnez ici quelques exemples concrets de projets réalisables ou réalisés.')
+        yield TrumbowygField::new(
+            'projectExamples',
+            'Exemples d’applications ou de projets réalisés grâce à cette aide'
+        )
+            ->setHelp(
+                'Afin d’aider les territoires à mieux comprendre votre aide, '
+                    . 'donnez ici quelques exemples concrets de projets réalisables ou réalisés.'
+            )
             ->hideOnIndex()
             ->setColumns(12);
         yield TrumbowygField::new('eligibility', 'Conditions d’éligibilité')
@@ -553,8 +576,19 @@ class AidCrudController extends AtCrudController implements EventSubscriberInter
 
         //-------------------------------------------------------
 
-        $hasNoBacker = ($entity && $entity->getOrganization() && !$entity->getOrganization()->getBacker()) ? true : false;
-        $hasBackerNotValide = ($entity && $entity->getOrganization() && $entity->getOrganization()->getBacker() && !$entity->getOrganization()->getBacker()->isActive()) ? true : false;
+        $hasNoBacker =
+        (
+            $entity
+            && $entity->getOrganization()
+            && !$entity->getOrganization()->getBacker()
+        ) ? true : false;
+        $hasBackerNotValide =
+        (
+            $entity
+            && $entity->getOrganization()
+            && $entity->getOrganization()->getBacker()
+            && !$entity->getOrganization()->getBacker()->isActive()
+        ) ? true : false;
         $symbol = ($hasNoBacker || $hasBackerNotValide) ? ' ' . $this->symbolWarning : '';
         yield FormField::addTab('Auteur' . $symbol);
 
@@ -651,7 +685,10 @@ class AidCrudController extends AtCrudController implements EventSubscriberInter
 
         yield FormField::addFieldset('Porteurs d\'aides suggérés');
         yield TextField::new('financerSuggestion', 'Porteurs suggérés')
-            ->setHelp('Ce porteur a été suggéré. Créez le nouveau porteur et ajouter le en tant que porteur d’aides via le champ approprié.')
+            ->setHelp(
+                'Ce porteur a été suggéré. '
+                . 'Créez le nouveau porteur et ajouter le en tant que porteur d’aides via le champ approprié.'
+            )
             ->hideOnIndex()
             ->setColumns(12);
 
@@ -666,7 +703,10 @@ class AidCrudController extends AtCrudController implements EventSubscriberInter
 
         yield FormField::addFieldset('Instructeurs suggérés');
         yield TextField::new('instructorSuggestion', 'Instructeurs suggérés')
-            ->setHelp('Cet instructeur a été suggéré. Créez le nouveau porteur et ajouter le en tant qu’instructeur via le champ approprié.')
+            ->setHelp(
+                'Cet instructeur a été suggéré. '
+                . 'Créez le nouveau porteur et ajouter le en tant qu’instructeur via le champ approprié.'
+            )
             ->hideOnIndex()
             ->setColumns(12);
 
@@ -694,7 +734,10 @@ class AidCrudController extends AtCrudController implements EventSubscriberInter
             ->setColumns(12);
 
         yield BooleanField::new('isCharged', 'Aide Payante')
-            ->setHelp('Ne pas cocher pour les aides sous adhésion et ajouter la mention « *sous adhésion » dans les critères d’éligibilité.')
+            ->setHelp(
+                'Ne pas cocher pour les aides sous adhésion et ajouter la mention '
+                    . ' « *sous adhésion » dans les critères d’éligibilité.'
+            )
             ->hideOnIndex()
             ->setColumns(12);
 
@@ -873,7 +916,6 @@ class AidCrudController extends AtCrudController implements EventSubscriberInter
                 $extension = $fileService->getExtension($form->get('file')->getData()->getClientOriginalName());
                 switch ($extension) {
                     case 'csv':
-
                         $options = new OptionsCsv();
                         $options->FIELD_DELIMITER = ';';
                         $options->FIELD_ENCLOSURE = '"';
@@ -974,7 +1016,8 @@ class AidCrudController extends AtCrudController implements EventSubscriberInter
                             }
                             $audienceNames = explode(',', $cells[5]->getValue());
                             foreach ($audienceNames as $audienceName) {
-                                $organizationType = $organizationTypeRepository->findOneBy(['name' => trim($audienceName)]);
+                                $organizationType = $organizationTypeRepository
+                                    ->findOneBy(['name' => trim($audienceName)]);
                                 if ($organizationType instanceof OrganizationType) {
                                     $aid->addAidAudience($organizationType);
                                 }
@@ -989,11 +1032,16 @@ class AidCrudController extends AtCrudController implements EventSubscriberInter
                             $subventionsRates = explode(',', $cells[7]->getValue());
                             $aid->setSubventionRateMin(isset($subventionsRates[0]) ? (int) $subventionsRates[0] : null);
                             $aid->setSubventionRateMax(isset($subventionsRates[1]) ? (int) $subventionsRates[1] : null);
-                            $aid->setSubventionComment(trim($cells[8]->getValue()) !== '' ? trim($cells[8]->getValue()) : null);
+                            $aid->setSubventionComment(trim($cells[8]->getValue()) !== ''
+                            ? trim($cells[8]->getValue()) : null);
 
-                            $aid->setIsCallForProject(trim(strtolower($cells[9]->getValue())) == 'oui' ? true : false);
-                            $aid->setDescription(trim($cells[10]->getValue()) !== '' ? nl2br(trim($cells[10]->getValue())) : null);
-                            $aid->setProjectExamples(trim($cells[11]->getValue()) !== '' ? nl2br(trim($cells[11]->getValue())) : null);
+                            $aid->setIsCallForProject(
+                                trim(strtolower($cells[9]->getValue())) == 'oui' ? true : false
+                            );
+                            $aid->setDescription(trim($cells[10]->getValue()) !== ''
+                                ? nl2br(trim($cells[10]->getValue())) : null);
+                            $aid->setProjectExamples(trim($cells[11]->getValue()) !== ''
+                                ? nl2br(trim($cells[11]->getValue())) : null);
 
                             $categoryNames = explode(',', $cells[12]->getValue());
                             foreach ($categoryNames as $categoryName) {
@@ -1003,7 +1051,8 @@ class AidCrudController extends AtCrudController implements EventSubscriberInter
                                 }
                             }
 
-                            $recurrenceName = (trim($cells[13]->getValue()) !== '' ? trim($cells[13]->getValue()) : null);
+                            $recurrenceName = (trim($cells[13]->getValue()) !== ''
+                                ? trim($cells[13]->getValue()) : null);
                             if ($recurrenceName) {
                                 $recurrence = $aidRecurrenceRepository->findOneBy(['name' => $recurrenceName]);
                                 if ($recurrence instanceof AidRecurrence) {
@@ -1013,20 +1062,24 @@ class AidCrudController extends AtCrudController implements EventSubscriberInter
 
                             $dateStartFromCell = $cells[14]->getValue();
                             if (!$dateStartFromCell instanceof DateTimeImmutable) {
-                                $dateStartFromCell = trim($cells[14]->getValue() !== '') ? new \DateTime($cells[14]->getValue()) : null;
+                                $dateStartFromCell = trim($cells[14]->getValue() !== '')
+                                    ? new \DateTime($cells[14]->getValue()) : null;
                             }
                             $aid->setDateStart($dateStartFromCell);
                             $dateSubmissionDeadlineFromCell = $cells[15]->getValue();
                             if (!$dateSubmissionDeadlineFromCell instanceof DateTimeImmutable) {
-                                $dateSubmissionDeadlineFromCell = trim($cells[15]->getValue() !== '') ? new \DateTime($cells[15]->getValue()) : null;
+                                $dateSubmissionDeadlineFromCell = trim($cells[15]->getValue() !== '')
+                                    ? new \DateTime($cells[15]->getValue()) : null;
                             }
                             $aid->setDateSubmissionDeadline($dateSubmissionDeadlineFromCell);
 
-                            $aid->setEligibility(trim($cells[16]->getValue()) !== '' ? nl2br(trim($cells[16]->getValue())) : null);
+                            $aid->setEligibility(trim($cells[16]->getValue()) !== ''
+                                ? nl2br(trim($cells[16]->getValue())) : null);
 
                             $aidStepNames = explode(',', $cells[17]->getValue());
                             foreach ($aidStepNames as $aidStepName) {
-                                $aidStep = $aidStepRepository->findOneBy(['name' => trim($aidStepName)]);
+                                $aidStep = $aidStepRepository
+                                    ->findOneBy(['name' => trim($aidStepName)]);
                                 if ($aidStep instanceof AidStep) {
                                     $aid->addAidStep($aidStep);
                                 }
@@ -1034,7 +1087,8 @@ class AidCrudController extends AtCrudController implements EventSubscriberInter
 
                             $aidDestinationNames = explode(',', $cells[18]->getValue());
                             foreach ($aidDestinationNames as $aidDestinationName) {
-                                $aidDestination = $aidDestinationRepository->findOneBy(['name' => trim($aidDestinationName)]);
+                                $aidDestination = $aidDestinationRepository
+                                    ->findOneBy(['name' => trim($aidDestinationName)]);
                                 if ($aidDestination instanceof AidDestination) {
                                     $aid->addAidDestination($aidDestination);
                                 }
@@ -1048,10 +1102,13 @@ class AidCrudController extends AtCrudController implements EventSubscriberInter
                                 }
                             }
 
-                            $aid->setOriginUrl(trim($cells[20]->getValue()) !== '' ? trim($cells[20]->getValue()) : null);
-                            $aid->setApplicationUrl(trim($cells[21]->getValue()) !== '' ? trim($cells[21]->getValue()) : null);
+                            $aid->setOriginUrl(trim($cells[20]->getValue()) !== ''
+                                ? trim($cells[20]->getValue()) : null);
+                            $aid->setApplicationUrl(trim($cells[21]->getValue()) !== ''
+                                ? trim($cells[21]->getValue()) : null);
 
-                            $aid->setContact(trim($cells[22]->getValue()) !== '' ? nl2br(trim($cells[22]->getValue())) : null);
+                            $aid->setContact(trim($cells[22]->getValue()) !== ''
+                                ? nl2br(trim($cells[22]->getValue())) : null);
 
                             $userEmail = trim($cells[23]->getValue());
                             if ($userEmail !== '') {
@@ -1061,7 +1118,8 @@ class AidCrudController extends AtCrudController implements EventSubscriberInter
                                 }
                             }
 
-                            $aid->setImportDataUrl(trim($cells[24]->getValue()) !== '' ? trim($cells[24]->getValue()) : null);
+                            $aid->setImportDataUrl(trim($cells[24]->getValue()) !== ''
+                                ? trim($cells[24]->getValue()) : null);
 
                             $organizationId = (int) trim($cells[25]->getValue());
                             if ($organizationId) {
@@ -1073,7 +1131,8 @@ class AidCrudController extends AtCrudController implements EventSubscriberInter
 
                             $projectReferenceNames = explode(',', $cells[26]->getValue());
                             foreach ($projectReferenceNames as $projectReferenceName) {
-                                $projectReference = $projectReferenceRepository->findOneBy(['name' => trim($projectReferenceName)]);
+                                $projectReference = $projectReferenceRepository
+                                ->findOneBy(['name' => trim($projectReferenceName)]);
                                 if ($projectReference instanceof ProjectReference) {
                                     $aid->addProjectReference($projectReference);
                                 }
@@ -1134,13 +1193,19 @@ class AidCrudController extends AtCrudController implements EventSubscriberInter
         ]);
     }
 
-    public function exportXlsx(AdminContext $context, SpreadsheetExporterService $spreadsheetExporterService, string $filename = 'aides')
-    {
+    public function exportXlsx(
+        AdminContext $context,
+        SpreadsheetExporterService $spreadsheetExporterService,
+        string $filename = 'aides'
+    ) {
         return $this->exportSpreadsheet($context, $spreadsheetExporterService, $filename, 'xlsx');
     }
 
-    public function exportCsv(AdminContext $context, SpreadsheetExporterService $spreadsheetExporterService, string $filename = 'aides')
-    {
+    public function exportCsv(
+        AdminContext $context,
+        SpreadsheetExporterService $spreadsheetExporterService,
+        string $filename = 'aides'
+    ) {
         return $this->exportSpreadsheet($context, $spreadsheetExporterService, $filename, 'csv');
     }
 
@@ -1220,7 +1285,9 @@ class AidCrudController extends AtCrudController implements EventSubscriberInter
             // si l'id est null
             if (!$projectReferenceMissing->getId()) {
                 // on vérifie que ce projet n'existe pas déjà par le nom
-                $projectReferenceMissingTest = $this->managerRegistry->getRepository(ProjectReferenceMissing::class)->findOneBy(['name' => $projectReferenceMissing->getName()]);
+                $projectReferenceMissingTest = $this->managerRegistry
+                    ->getRepository(ProjectReferenceMissing::class)
+                    ->findOneBy(['name' => $projectReferenceMissing->getName()]);
                 // si il existe déjà
                 if ($projectReferenceMissingTest instanceof ProjectReferenceMissing) {
                     // on ajoute à l'entité

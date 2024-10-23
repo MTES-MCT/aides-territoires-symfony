@@ -94,7 +94,11 @@ class SitemapController extends AbstractController
 
         foreach ($aids as $aid) {
             $urls[] = [
-                'loc' => $this->generateUrl('app_aid_aid_details', ['slug' => $aid['slug']], UrlGeneratorInterface::ABSOLUTE_URL),
+                'loc' => $this->generateUrl(
+                    'app_aid_aid_details',
+                    ['slug' => $aid['slug']],
+                    UrlGeneratorInterface::ABSOLUTE_URL
+                ),
             ];
         }
         unset($aids);
@@ -190,7 +194,11 @@ class SitemapController extends AbstractController
         $pages = $managerRegistry->getRepository(Page::class)->findAll();
         foreach ($pages as $page) {
             $urls[] = [
-                'loc' => $this->generateUrl('app_home', [], UrlGeneratorInterface::ABSOLUTE_URL) . trim($page->getUrl(), '/') . '/',
+                'loc' => $this->generateUrl(
+                    'app_home',
+                    [],
+                    UrlGeneratorInterface::ABSOLUTE_URL
+                ) . trim($page->getUrl(), '/') . '/',
             ];
         }
         unset($pages);

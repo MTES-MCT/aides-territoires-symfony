@@ -11,8 +11,15 @@ use Symfony\Component\PropertyInfo\Type;
 
 final class PerimeterTextFilter extends AbstractFilter
 {
-    protected function filterProperty(string $property, $value, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, Operation $operation = null, array $context = []): void
-    {
+    protected function filterProperty(
+        string $property,
+        $value,
+        QueryBuilder $queryBuilder,
+        QueryNameGeneratorInterface $queryNameGenerator,
+        string $resourceClass,
+        Operation $operation = null,
+        array $context = []
+    ): void {
         // ajouté pour être conforme à l'extends
     }
 
@@ -23,7 +30,11 @@ final class PerimeterTextFilter extends AbstractFilter
                 'property' => 'q',
                 'type' => Type::BUILTIN_TYPE_STRING,
                 'required' => false,
-                'description' => '<div class="renderedMarkdown"><p>Rechercher par nom.<br><br>Note : il est possible d\'avoir des résultats pertinents avec seulement le début du nom,     ou un nom légerement erroné.</p></div>',
+                'description' => '<div class="renderedMarkdown"><p>'
+                                    . 'Rechercher par nom.<br><br>'
+                                    . 'Note : il est possible d\'avoir des résultats pertinents '
+                                    . 'avec seulement le début du nom, '
+                                    . 'ou un nom légerement erroné.</p></div>',
                 'openapi' => [
                     'examples' => [
                         new Example('lyon', null, 'lyon'),

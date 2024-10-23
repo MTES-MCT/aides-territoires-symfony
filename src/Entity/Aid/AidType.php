@@ -31,21 +31,21 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Entity(repositoryClass: AidTypeRepository::class)]
 class AidType
 {
-    const API_GROUP_LIST = 'aid_type:list';
-    const API_DESCRIPTION = 'Lister tous les choix de types d\'aides';
+    public const API_GROUP_LIST = 'aid_type:list';
+    public const API_DESCRIPTION = 'Lister tous les choix de types d\'aides';
 
-    const TYPE_FINANCIAL_SLUGS = ['grant', 'loan', 'recoverable-advance', 'other', 'cee'];
-    const TYPE_TECHNICAL_SLUG = ['technical-engineering', 'financial-engineering', 'legal-engineering'];
+    public const TYPE_FINANCIAL_SLUGS = ['grant', 'loan', 'recoverable-advance', 'other', 'cee'];
+    public const TYPE_TECHNICAL_SLUG = ['technical-engineering', 'financial-engineering', 'legal-engineering'];
 
-    const SLUG_GRANT = 'grant';
-    const SLUG_LOAN = 'loan';
-    const SLUG_RECOVERABLE_ADVANCE = 'recoverable-advance';
-    const SLUG_CEE = 'cee';
-    const SLUG_OTHER = 'other';
+    public const SLUG_GRANT = 'grant';
+    public const SLUG_LOAN = 'loan';
+    public const SLUG_RECOVERABLE_ADVANCE = 'recoverable-advance';
+    public const SLUG_CEE = 'cee';
+    public const SLUG_OTHER = 'other';
 
-    const SLUG_TECHNICAL_ENGINEERING = 'technical-engineering';
-    const SLUG_FINANCIAL_ENGINEERING = 'financial-engineering';
-    const SLUG_LEGAL_ENGINEERING = 'legal-engineering';
+    public const SLUG_TECHNICAL_ENGINEERING = 'technical-engineering';
+    public const SLUG_FINANCIAL_ENGINEERING = 'financial-engineering';
+    public const SLUG_LEGAL_ENGINEERING = 'legal-engineering';
 
 
 

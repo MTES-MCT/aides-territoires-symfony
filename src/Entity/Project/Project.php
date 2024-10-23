@@ -28,45 +28,50 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Entity(repositoryClass: ProjectRepository::class)]
 class Project // NOSONAR too much methods
 {
-    const FOLDER = 'projects';
+    public const FOLDER = 'projects';
 
-    const STATUS = [
+    public const STATUS = [
         ['slug' => 'draft', 'name' => 'Brouillon'],
         ['slug' => 'reviewable', 'name' => 'En revue'],
         ['slug' => 'published', 'name' => 'Publié'],
         ['slug' => 'deleted', 'name' => 'Supprimé']
     ];
 
-    const STATUS_DRAFT = 'draft';
-    const STATUS_REVIEWABLE = 'reviewable';
-    const STATUS_PUBLISHED = 'published';
-    const STATUS_DELETED = 'deleted';
+    public const STATUS_DRAFT = 'draft';
+    public const STATUS_REVIEWABLE = 'reviewable';
+    public const STATUS_PUBLISHED = 'published';
+    public const STATUS_DELETED = 'deleted';
 
-    const CONTRACT_LINK = [
+    public const CONTRACT_LINK = [
         ['slug' => 'ACV1', 'name' => 'Action Coeur de Ville 1'],
         ['slug' => 'ACV2', 'name' => 'Action Coeur de Ville 2'],
-        ['slug' => 'AMI', 'name' => 'Expérimentations et bonnes pratiques locales des collectivités en faveur de l\'emploi des femmes en zone rurale'],
+        [
+            'slug' => 'AMI',
+            'name' => 'Expérimentations et bonnes pratiques locales des collectivités en '
+                . 'faveur de l\'emploi des femmes en zone rurale'
+        ],
         ['slug' => 'CRTE', 'name' => 'CRTE'],
         ['slug' => 'PCAET', 'name' => 'PCAET'],
         ['slug' => 'PVD', 'name' => 'Petites Villes de Demain']
     ];
 
-    const CONTRACT_LINK_BY_SLUG = [
+    public const CONTRACT_LINK_BY_SLUG = [
         'ACV1' => 'Action Coeur de Ville 1',
         'ACV2' => 'Action Coeur de Ville 2',
-        'AMI' => 'Expérimentations et bonnes pratiques locales des collectivités en faveur de l\'emploi des femmes en zone rurale',
+        'AMI' => 'Expérimentations et bonnes pratiques locales des collectivités '
+            . 'en faveur de l\'emploi des femmes en zone rurale',
         'CRTE' => 'CRTE',
         'PCAET' => 'PCAET',
         'PVD' => 'Petites Villes de Demain'
     ];
 
-    const PROJECT_STEPS = [
+    public const PROJECT_STEPS = [
         ['slug' => 'considered', 'name' => 'En réflexion'],
         ['slug' => 'ongoing', 'name' => 'En cours'],
         ['slug' => 'finished', 'name' => 'Réalisé']
     ];
     // donne une facon de recuperer les donnees de la constantes
-    const PROJECT_STEPS_BY_SLUG = [
+    public const PROJECT_STEPS_BY_SLUG = [
         'considered' => 'En réflexion',
         'ongoing' => 'En cours',
         'finished' => 'Réalisé'
@@ -539,7 +544,10 @@ class Project // NOSONAR too much methods
 
     public function removeAidSuggestedAidProject(AidSuggestedAidProject $aidSuggestedAidProject): static
     {
-        if ($this->aidSuggestedAidProjects->removeElement($aidSuggestedAidProject) && $aidSuggestedAidProject->getProject() === $this) {
+        if (
+            $this->aidSuggestedAidProjects->removeElement($aidSuggestedAidProject)
+            && $aidSuggestedAidProject->getProject() === $this
+        ) {
             $aidSuggestedAidProject->setProject(null);
         }
 
@@ -566,7 +574,10 @@ class Project // NOSONAR too much methods
 
     public function removeLogPublicProjectView(LogPublicProjectView $logPublicProjectView): static
     {
-        if ($this->logPublicProjectViews->removeElement($logPublicProjectView) && $logPublicProjectView->getProject() === $this) {
+        if (
+            $this->logPublicProjectViews->removeElement($logPublicProjectView)
+            && $logPublicProjectView->getProject() === $this
+        ) {
             $logPublicProjectView->setProject(null);
         }
 

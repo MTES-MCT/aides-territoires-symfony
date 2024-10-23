@@ -33,10 +33,30 @@ class KeywordReferenceRepository extends ServiceEntityRepository
 
     public function findFromSynonyms(array $synonyms): array
     {
-        $originalName = (isset($synonyms['original_name']) && trim($synonyms['original_name']) !== '')  ? $synonyms['original_name'] : null;
-        $intentionsString = (isset($synonyms['intentions_string']) && trim($synonyms['intentions_string']) !== '')  ? $synonyms['intentions_string'] : null;
-        $objectsString = (isset($synonyms['objects_string']) && trim($synonyms['objects_string']) !== '')  ? $synonyms['objects_string'] : null;
-        $simpleWordsString = (isset($synonyms['simple_words_string']) && trim($synonyms['simple_words_string']) !== '')  ? $synonyms['simple_words_string'] : null;
+        $originalName =
+            (isset($synonyms['original_name'])
+            && trim($synonyms['original_name']) !== '')
+                ? $synonyms['original_name']
+                : null
+        ;
+        $intentionsString =
+            (isset($synonyms['intentions_string'])
+            && trim($synonyms['intentions_string']) !== '')
+                ? $synonyms['intentions_string']
+                : null
+        ;
+        $objectsString =
+            (isset($synonyms['objects_string'])
+            && trim($synonyms['objects_string']) !== '')
+                ? $synonyms['objects_string']
+                : null
+        ;
+        $simpleWordsString =
+            (isset($synonyms['simple_words_string'])
+            && trim($synonyms['simple_words_string']) !== '')
+                ? $synonyms['simple_words_string']
+                : null
+        ;
 
         // on va faire un tableau de mots à rechercher à partir des synonymes
         $words = [$originalName];
@@ -76,7 +96,13 @@ class KeywordReferenceRepository extends ServiceEntityRepository
         $words = $params['words'] ?? null;
         $nameLike = $params['nameLike'] ?? null;
         $onlyParent = $params['onlyParent'] ?? false;
-        $orderBy = (isset($params['orderBy']) && isset($params['orderBy']['sort']) && isset($params['orderBy']['order'])) ? $params['orderBy'] : null;
+        $orderBy =
+            (isset($params['orderBy'])
+            && isset($params['orderBy']['sort'])
+            && isset($params['orderBy']['order']))
+                ? $params['orderBy']
+                : null
+        ;
         $noIntention = $params['noIntention'] ?? null;
 
         $qb = $this->createQueryBuilder('kr');

@@ -40,7 +40,9 @@ class DeleteType extends AbstractType
             ])
             ->add('accept', CheckboxType::class, [
                 'required' => true,
-                'label' => 'Je confirme la suppression <strong>définitive</strong> de <strong>toutes</strong> mes données. <strong>Elle ne seront pas récupérables.</strong>',
+                'label' => 'Je confirme la suppression <strong>définitive</strong> '
+                                . 'de <strong>toutes</strong> mes données. '
+                                . '<strong>Elle ne seront pas récupérables.</strong>',
                 'label_html' => true,
                 'constraints' => [
                     new Assert\IsTrue([
@@ -59,8 +61,14 @@ class DeleteType extends AbstractType
     public function onSubmit(FormEvent $event): void
     {
         $user = $this->userService->getUserLogged();
-        if (!$this->userPasswordHasherInterface->isPasswordValid($user, $event->getForm()->get('password')->getData())) {
-            $event->getForm()->get('password')->addError(new FormError('Le mot de passe est invalide'));
+        if (
+            !$this->userPasswordHasherInterface->isPasswordValid(
+                $user,
+                $event->getForm()->get('password')->getData()
+            )
+        ) {
+            $event->getForm()->get('password')
+                ->addError(new FormError('Le mot de passe est invalide'));
         }
     }
 

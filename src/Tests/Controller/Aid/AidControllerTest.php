@@ -28,7 +28,7 @@ class AidControllerTest extends AtWebTestCase
         $option = $domSelect->ownerDocument->createElement('option', 'perimeterTest (Ad-hoc)');
         $option->setAttribute('value', '1');
         $domSelect->appendChild($option);
-        
+
         $form = $crawler->selectButton('Rechercher')->form([
             'organizationType' => 'commune',
             'searchPerimeter' => 1,
@@ -40,7 +40,11 @@ class AidControllerTest extends AtWebTestCase
         $this->assertResponseIsSuccessful();
 
         // Vérifier que la route de succès est atteinte
-        $this->assertStringContainsString($routeSuccess, $this->client->getRequest()->getUri(), "La requête n'a pas atteint la route attendue.");
+        $this->assertStringContainsString(
+            $routeSuccess,
+            $this->client->getRequest()->getUri(),
+            "La requête n'a pas atteint la route attendue."
+        );
     }
 
     // test la création d'alerte
@@ -93,7 +97,7 @@ class AidControllerTest extends AtWebTestCase
         /** @var AidRepository $aidRepository */
         $aidRepository = $this->managerRegistry->getRepository(Aid::class);
         $aid = $aidRepository->find(1);
-        
+
         $route = $this->router->generate('app_aid_generic_to_local', ['slug' => $aid->getSlug()]);
 
         // Effectue la requête

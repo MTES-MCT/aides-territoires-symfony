@@ -12,9 +12,16 @@ use Symfony\Component\PropertyInfo\Type;
 
 final class AidCategoriesFilter extends AbstractFilter
 {
-    protected function filterProperty(string $property, $value, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, Operation $operation = null, array $context = []): void
-    {
-        // pour extends AbstractFilter, on doit implémenter cette méthode
+    protected function filterProperty(
+        string $property,
+        $value,
+        QueryBuilder $queryBuilder,
+        QueryNameGeneratorInterface $queryNameGenerator,
+        string $resourceClass,
+        Operation $operation = null,
+        array $context = []
+    ): void {
+        // ajouté pour être conforme à l'extends
     }
 
     public function getDescription(string $resourceClass): array
@@ -32,7 +39,12 @@ final class AidCategoriesFilter extends AbstractFilter
                 'property' => 'categories',
                 'type' => Type::BUILTIN_TYPE_STRING,
                 'required' => false,
-                'description' => '<div class="renderedMarkdown"><p>Les thématiques pour lesquelles vous recherchez des aides. Vous pouvez passer plusieurs fois ce paramètre pour rechercher sur plusieurs thématiques, ex : ...&categories=eau-potable&categories=eau-souterraine...<br><br>Voir aussi <code>/api/aids/themes/</code> pour la liste complète.</p></div>',
+                'description' => '<div class="renderedMarkdown"><p>'
+                                    . 'Les thématiques pour lesquelles vous recherchez des aides. '
+                                    . 'Vous pouvez passer plusieurs fois ce paramètre pour rechercher '
+                                    . 'sur plusieurs thématiques, ex : '
+                                    . '...&categories=eau-potable&categories=eau-souterraine...<br><br>'
+                                    . 'Voir aussi <code>/api/aids/themes/</code> pour la liste complète.</p></div>',
                 'openapi' => [
                     'examples' => $examples,
                 ],

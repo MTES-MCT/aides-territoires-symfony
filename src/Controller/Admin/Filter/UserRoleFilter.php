@@ -23,14 +23,24 @@ class UserRoleFilter implements FilterInterface
             ->setFormType(UserRoleFilterType::class);
     }
 
-    public function apply(QueryBuilder $queryBuilder, FilterDataDto $filterDataDto, ?FieldDto $fieldDto, EntityDto $entityDto): void
-    {
+    public function apply(
+        QueryBuilder $queryBuilder,
+        FilterDataDto $filterDataDto,
+        ?FieldDto $fieldDto,
+        EntityDto $entityDto
+    ): void {
         if (!$filterDataDto->getValue()) {
             return;
         }
 
         $queryBuilder
-            ->andWhere(sprintf('%s.%s LIKE :valueLikeChoice', $filterDataDto->getEntityAlias(), $filterDataDto->getProperty()))
+            ->andWhere(
+                sprintf(
+                    '%s.%s LIKE :valueLikeChoice',
+                    $filterDataDto->getEntityAlias(),
+                    $filterDataDto->getProperty()
+                )
+            )
             ->setParameter('valueLikeChoice', '%' . $filterDataDto->getValue() . '%');
         ;
 

@@ -34,7 +34,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Entity(repositoryClass: CategoryThemeRepository::class)]
 class CategoryTheme
 {
-    const API_GROUP_LIST = 'category_theme:list';
+    public const API_GROUP_LIST = 'category_theme:list';
 
     #[ORM\Id]
     #[ORM\GeneratedValue]

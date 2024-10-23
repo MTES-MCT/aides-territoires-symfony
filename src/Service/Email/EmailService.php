@@ -78,10 +78,10 @@ class EmailService
         ?array $tags = null
     ): bool {
         // Configure API key authorization: api-key
-        $config = Configuration::getDefaultConfiguration()->setApiKey('api-key', $this->paramService->get('sib_api_key'));
-
-        // Uncomment below line to configure authorization using: partner-key
-        // $config = SendinBlue\Client\Configuration::getDefaultConfiguration()->setApiKey('partner-key', 'YOUR_API_KEY');
+        $config = Configuration::getDefaultConfiguration()->setApiKey(
+            'api-key',
+            $this->paramService->get('sib_api_key')
+        );
 
         $apiInstance = new TransactionalEmailsApi(
             // If you want use custom http client, pass your client which implements `GuzzleHttp\ClientInterface`.
@@ -89,7 +89,7 @@ class EmailService
             new Client(),
             $config
         );
-        $sendSmtpEmail = new SendSmtpEmail(); // \SendinBlue\Client\Model\SendSmtpEmail | Values to send a transactional email
+        $sendSmtpEmail = new SendSmtpEmail();
         $sendSmtpEmail['sender'] = [
             'name' => $this->paramService->get('email_from_name'),
             'email' => $this->paramService->get('email_from')
@@ -141,7 +141,10 @@ class EmailService
         User $user
     ): bool {
         // Configure API key authorization: api-key
-        $config = Configuration::getDefaultConfiguration()->setApiKey('api-key', $this->paramService->get('sib_api_key'));
+        $config = Configuration::getDefaultConfiguration()->setApiKey(
+            'api-key',
+            $this->paramService->get('sib_api_key')
+        );
 
 
         $apiInstance = new ContactsApi(
@@ -170,7 +173,10 @@ class EmailService
     public function subscribeUser(User $user): bool
     {
         // Configure API key authorization: api-key
-        $config = Configuration::getDefaultConfiguration()->setApiKey('api-key', $this->paramService->get('sib_api_key'));
+        $config = Configuration::getDefaultConfiguration()->setApiKey(
+            'api-key',
+            $this->paramService->get('sib_api_key')
+        );
 
 
         $apiInstance = new ContactsApi(
@@ -192,7 +198,11 @@ class EmailService
         $doubleOptin['includeListIds'] = $newsletterListIds;
         $doubleOptin['email'] = $user->getEmail();
         $doubleOptin['templateId'] = (int) $this->paramService->get('sib_newsletter_confirm_template_id');
-        $doubleOptin['redirectionUrl'] = $this->routerInterface->generate('app_newsletter_register_success', [], UrlGeneratorInterface::ABSOLUTE_URL);
+        $doubleOptin['redirectionUrl'] = $this->routerInterface->generate(
+            'app_newsletter_register_success',
+            [],
+            UrlGeneratorInterface::ABSOLUTE_URL
+        );
 
         try {
             $apiInstance->createDoiContact($doubleOptin);
@@ -205,7 +215,10 @@ class EmailService
     public function updateUser(User $user, array $datas): bool
     {
         // Configure API key authorization: api-key
-        $config = Configuration::getDefaultConfiguration()->setApiKey('api-key', $this->paramService->get('sib_api_key'));
+        $config = Configuration::getDefaultConfiguration()->setApiKey(
+            'api-key',
+            $this->paramService->get('sib_api_key')
+        );
 
 
         $apiInstance = new ContactsApi(
@@ -240,7 +253,10 @@ class EmailService
     public function isUserMlConsent($user): bool
     {
         // Configure API key authorization: api-key
-        $config = Configuration::getDefaultConfiguration()->setApiKey('api-key', $this->paramService->get('sib_api_key'));
+        $config = Configuration::getDefaultConfiguration()->setApiKey(
+            'api-key',
+            $this->paramService->get('sib_api_key')
+        );
 
         $apiInstance = new ContactsApi(
             // If you want use custom http client, pass your client which implements `GuzzleHttp\ClientInterface`.

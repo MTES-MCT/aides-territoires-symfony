@@ -27,11 +27,15 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 
 class ParameterController extends FrontController
 {
-    const NB_HISTORY_LOG_BY_PAGE = 20;
+    public const NB_HISTORY_LOG_BY_PAGE = 20;
 
     #[Route('/comptes/monprofil/', name: 'app_user_parameter_profil')]
-    public function profil(UserPasswordHasherInterface $userPasswordHasher, UserService $userService, ManagerRegistry $managerRegistry, RequestStack $requestStack): Response
-    {
+    public function profil(
+        UserPasswordHasherInterface $userPasswordHasher,
+        UserService $userService,
+        ManagerRegistry $managerRegistry,
+        RequestStack $requestStack
+    ): Response {
         $this->breadcrumb->add("Mon compte", $this->generateUrl('app_user_dashboard'));
         $this->breadcrumb->add("Mon profil");
         $user = $userService->getUserLogged();
@@ -39,7 +43,6 @@ class ParameterController extends FrontController
         $form = $this->createForm(UserProfilType::class, $user);
         $form->handleRequest($requestStack->getCurrentRequest());
         if ($form->isSubmitted()) {
-
             if ($form->isValid()) {
                 // sauvegarder le user
                 $newPassword = $form->get('newPassword')->getData();
@@ -129,8 +132,12 @@ class ParameterController extends FrontController
     }
 
     #[Route('/comptes/journal-de-connexion/', name: 'app_user_parameter_history_log')]
-    public function historyLog(UserService $userService, ManagerRegistry $managerRegistry, RequestStack $requestStack, LogUserLoginRepository $logUserLoginRepository): Response
-    {
+    public function historyLog(
+        UserService $userService,
+        ManagerRegistry $managerRegistry,
+        RequestStack $requestStack,
+        LogUserLoginRepository $logUserLoginRepository
+    ): Response {
         $this->breadcrumb->add('Mon compte', $this->generateUrl('app_user_dashboard'));
         $this->breadcrumb->add('Mon journal de connexion');
 
@@ -187,12 +194,16 @@ class ParameterController extends FrontController
         $formTransfertProjects = [];
         $formTransfertAids = [];
         foreach ($user->getOrganizations() as $organization) {
-            $formTransfertProjects['project-' . $organization->getId()] = $this->createForm(TransfertProjectType::class, null, [
-                'attr' => [
-                    'id' => 'formTransfertProject-' . $organization->getSlug(),
-                ],
-                'organization' => $organization
-            ]);
+            $formTransfertProjects['project-' . $organization->getId()] = $this->createForm(
+                TransfertProjectType::class,
+                null,
+                [
+                    'attr' => [
+                        'id' => 'formTransfertProject-' . $organization->getSlug(),
+                    ],
+                    'organization' => $organization
+                ]
+            );
 
             $formTransfertAids['aid-' . $organization->getId()] = $this->createForm(TransfertAidType::class, null, [
                 'attr' => [
@@ -209,7 +220,11 @@ class ParameterController extends FrontController
                 if ($formTransfertProject->isValid()) {
                     $userProjects = $managerRegistry->getRepository(Project::class)->findBy(['author' => $user]);
                     foreach ($userProjects as $project) {
-                        if (!$project->getOrganization() || $project->getOrganization()->getId() !== (int) $formTransfertProject->get('idOrganization')->getData()) {
+                        $currentIdOrganization = (int) $formTransfertProject->get('idOrganization')->getData();
+                        if (
+                            !$project->getOrganization()
+                            || $project->getOrganization()->getId() !== $currentIdOrganization
+                        ) {
                             continue;
                         }
                         $project->setAuthor($formTransfertProject->get('user')->getData());
@@ -219,7 +234,9 @@ class ParameterController extends FrontController
                     // message
                     $this->addFlash(
                         FrontController::FLASH_SUCCESS,
-                        'Votre / Vos projet(s) de l\'organization ' . $organization->getName() . ' ont été transférés avec succès.'
+                        'Votre / Vos projet(s) de l\'organization '
+                        . $organization->getName()
+                        . ' ont été transférés avec succès.'
                     );
 
                     // redirection
@@ -228,7 +245,9 @@ class ParameterController extends FrontController
                     // message
                     $this->addFlash(
                         FrontController::FLASH_ERROR,
-                        'Impossible de transférer votre / vos projet(s) de l\'organization ' . $organization->getName() . ' à cet utilisateur'
+                        'Impossible de transférer votre / vos projet(s) de l\'organization '
+                        . $organization->getName()
+                        . ' à cet utilisateur'
                     );
                 }
             }
@@ -240,7 +259,11 @@ class ParameterController extends FrontController
             if ($formTransfertAid->isSubmitted()) {
                 if ($formTransfertAid->isValid()) {
                     foreach ($user->getAids() as $aid) {
-                        if (!$aid->getOrganization() || $aid->getOrganization()->getId() !== (int) $formTransfertAid->get('idOrganization')->getData()) {
+                        $currentIdOrganization = (int) $formTransfertAid->get('idOrganization')->getData();
+                        if (
+                            !$aid->getOrganization()
+                            || $aid->getOrganization()->getId() !== $currentIdOrganization
+                        ) {
                             continue;
                         }
                         $aid->setAuthor($formTransfertAid->get('user')->getData());
@@ -251,7 +274,9 @@ class ParameterController extends FrontController
                     // message
                     $this->addFlash(
                         FrontController::FLASH_SUCCESS,
-                        'Votre / Vos aide(s) de l\'organization ' . $organization->getName() . ' ont été transférés avec succès.'
+                        'Votre / Vos aide(s) de l\'organization '
+                        . $organization->getName()
+                        . ' ont été transférés avec succès.'
                     );
 
                     // redirection
@@ -260,7 +285,9 @@ class ParameterController extends FrontController
                     // message
                     $this->addFlash(
                         FrontController::FLASH_ERROR,
-                        'Impossible de transférer votre / vos aide(s) de l\'organization ' . $organization->getName() . ' à cet utilisateur'
+                        'Impossible de transférer votre / vos aide(s) de l\'organization '
+                        . $organization->getName()
+                        . ' à cet utilisateur'
                     );
                 }
             }

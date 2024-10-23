@@ -55,7 +55,10 @@ class AidExportPdfHandler
 
             // nom de fichier
             $today = new \DateTime(date('Y-m-d H:i:s'));
-            $organizationName = $user->getDefaultOrganization() ? $this->stringService->getSLug($user->getDefaultOrganization()->getName()) : '';
+            $organizationName = $user->getDefaultOrganization()
+                ? $this->stringService->getSLug($user->getDefaultOrganization()->getName())
+                : ''
+            ;
             $filename = 'Aides-territoires-' . $today->format('d_m_Y') . '-' . $organizationName;
 
             // créer le PDF
@@ -112,7 +115,8 @@ class AidExportPdfHandler
             @unlink($fileTarget);
 
             // notif admin ok
-            $admin = $this->managerRegistry->getRepository(User::class)->findOneBy(['email' => $this->paramService->get('email_super_admin')]);
+            $admin = $this->managerRegistry->getRepository(User::class)
+            ->findOneBy(['email' => $this->paramService->get('email_super_admin')]);
             $this->notificationService->addNotification(
                 $admin,
                 'Export PDF des aides par ' . $user->getEmail() . ' de ' . $organizationName,
@@ -120,7 +124,8 @@ class AidExportPdfHandler
             );
         } catch (\Exception $e) {
             // notif admin erreur
-            $admin = $this->managerRegistry->getRepository(User::class)->findOneBy(['email' => $this->paramService->get('email_super_admin')]);
+            $admin = $this->managerRegistry->getRepository(User::class)
+            ->findOneBy(['email' => $this->paramService->get('email_super_admin')]);
             $this->notificationService->addNotification(
                 $admin,
                 'Erreur lors de l\'export PDF des aides par ' . $user->getEmail() . ' de ' . $organizationName,

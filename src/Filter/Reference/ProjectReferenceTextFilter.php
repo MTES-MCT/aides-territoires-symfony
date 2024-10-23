@@ -11,8 +11,16 @@ use Symfony\Component\PropertyInfo\Type;
 
 final class ProjectReferenceTextFilter extends AbstractFilter
 {
-    protected function filterProperty(string $property, $value, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, Operation $operation = null, array $context = []): void
-    {
+    protected function filterProperty(
+        string $property,
+        $value,
+        QueryBuilder $queryBuilder,
+        QueryNameGeneratorInterface $queryNameGenerator,
+        string $resourceClass,
+        Operation $operation = null,
+        array $context = []
+    ): void {
+        // ajouté pour être conforme à l'extends
     }
 
     public function getDescription(string $resourceClass): array
@@ -22,11 +30,22 @@ final class ProjectReferenceTextFilter extends AbstractFilter
                 'property' => 'q',
                 'type' => Type::BUILTIN_TYPE_STRING,
                 'required' => false,
-                'description' => '<div class="renderedMarkdown"><p>Rechercher par nom.<br><br>Note : il est possible d\'avoir des résultats pertinents avec seulement une partie du nom.</p></div>',
+                'description' => '<div class="renderedMarkdown"><p>'
+                                    . 'Rechercher par nom.<br><br>'
+                                    . 'Note : il est possible d\'avoir des résultats pertinents avec '
+                                    . 'seulement une partie du nom.</p></div>',
                 'openapi' => [
                     'examples' => [
-                        new Example('Développer les infrastructures de covoiturage', null, 'Développer les infrastructures de covoiturage'),
-                        new Example('covoiturage', null, 'coivoiturage'),
+                        new Example(
+                            'Développer les infrastructures de covoiturage',
+                            null,
+                            'Développer les infrastructures de covoiturage'
+                        ),
+                        new Example(
+                            'covoiturage',
+                            null,
+                            'coivoiturage'
+                        ),
                     ],
                 ],
             ],

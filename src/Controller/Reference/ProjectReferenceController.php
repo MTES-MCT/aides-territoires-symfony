@@ -29,9 +29,8 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 #[Route(priority: 5)]
 class ProjectReferenceController extends FrontController
 {
-
-    const NB_PAID_BY_PAGE = 30;
-    const NB_PROJECT_BY_PAGE = 18;
+    public const NB_PAID_BY_PAGE = 30;
+    public const NB_PROJECT_BY_PAGE = 18;
 
 
     #[Route('/projets-references/', name: 'app_project_reference')]
@@ -52,12 +51,22 @@ class ProjectReferenceController extends FrontController
                 'slug' => $prSlug
             ]);
             if ($projectReferenceForce instanceof ProjectReference) {
-                $requestStack->getCurrentRequest()->getSession()->set('reference_name', $projectReferenceForce->getName());
+                $requestStack
+                    ->getCurrentRequest()
+                    ->getSession()
+                    ->set(
+                        'reference_name',
+                        $projectReferenceForce->getName()
+                    )
+                ;
             }
         }
 
         // paramètres en session
-        $organizationType = $requestStack->getCurrentRequest()->getSession()->get('reference_organizationType', null);
+        $organizationType = $requestStack
+            ->getCurrentRequest()
+            ->getSession()
+            ->get('reference_organizationType', null);
         $name = $requestStack->getCurrentRequest()->getSession()->get('reference_name', null);
         $perimeter = $requestStack->getCurrentRequest()->getSession()->get('reference_perimeter', null);
 
@@ -76,15 +85,36 @@ class ProjectReferenceController extends FrontController
             if ($formProjectReferenceSearch->isValid()) {
                 // créer la session avec les valeurs du formulaire
                 if ($formProjectReferenceSearch->has('organizationType')) {
-                    $requestStack->getCurrentRequest()->getSession()->set('reference_organizationType', $formProjectReferenceSearch->get('organizationType')->getData());
+                    $requestStack
+                        ->getCurrentRequest()
+                        ->getSession()
+                        ->set(
+                            'reference_organizationType',
+                            $formProjectReferenceSearch->get('organizationType')->getData()
+                        )
+                    ;
                     $organizationType = $formProjectReferenceSearch->get('organizationType')->getData();
                 }
                 if ($formProjectReferenceSearch->has('perimeter')) {
-                    $requestStack->getCurrentRequest()->getSession()->set('reference_perimeter', $formProjectReferenceSearch->get('perimeter')->getData());
+                    $requestStack
+                        ->getCurrentRequest()
+                        ->getSession()
+                        ->set(
+                            'reference_perimeter',
+                            $formProjectReferenceSearch->get('perimeter')->getData()
+                        )
+                    ;
                     $perimeter = $formProjectReferenceSearch->get('perimeter')->getData();
                 }
                 if ($formProjectReferenceSearch->has('name')) {
-                    $requestStack->getCurrentRequest()->getSession()->set('reference_name', $formProjectReferenceSearch->get('name')->getData());
+                    $requestStack
+                        ->getCurrentRequest()
+                        ->getSession()
+                        ->set(
+                            'reference_name',
+                            $formProjectReferenceSearch->get('name')->getData()
+                        )
+                    ;
                     $name = $formProjectReferenceSearch->get('name')->getData();
                 }
             }
@@ -118,7 +148,11 @@ class ProjectReferenceController extends FrontController
                 FrontController::FLASH_ERROR,
                 'Le numéro de page demandé n\'existe pas'
             );
-            $newUrl = preg_replace('/(page=)[^\&]+/', 'page=' . $pagerfanta->getNbPages(), $requestStack->getCurrentRequest()->getRequestUri());
+            $newUrl = preg_replace(
+                '/(page=)[^\&]+/',
+                'page=' . $pagerfanta->getNbPages(),
+                $requestStack->getCurrentRequest()->getRequestUri()
+            );
             return new RedirectResponse($newUrl);
         }
 
@@ -143,7 +177,15 @@ class ProjectReferenceController extends FrontController
         ProjectValidatedRepository $projectValidatedRepository
     ): Response {
         // paramètres en session
-        $organizationType = $requestStack->getCurrentRequest()->getSession()->get('reference_organizationType', $managerRegistry->getRepository(OrganizationType::class)->findOneBy(['slug' => OrganizationType::SLUG_COMMUNE]));
+        $organizationType = $requestStack
+            ->getCurrentRequest()
+            ->getSession()
+            ->get(
+                'reference_organizationType',
+                $managerRegistry->getRepository(OrganizationType::class)
+                    ->findOneBy(['slug' => OrganizationType::SLUG_COMMUNE])
+            )
+        ;
         $name = $requestStack->getCurrentRequest()->getSession()->get('reference_name', null);
         $perimeter = $requestStack->getCurrentRequest()->getSession()->get('reference_perimeter', null);
 
@@ -163,15 +205,36 @@ class ProjectReferenceController extends FrontController
             if ($formProjectReferenceSearch->isValid()) {
                 // créer la session avec les valeurs du formulaire
                 if ($formProjectReferenceSearch->has('organizationType')) {
-                    $requestStack->getCurrentRequest()->getSession()->set('reference_organizationType', $formProjectReferenceSearch->get('organizationType')->getData());
+                    $requestStack
+                        ->getCurrentRequest()
+                        ->getSession()
+                        ->set(
+                            'reference_organizationType',
+                            $formProjectReferenceSearch->get('organizationType')->getData()
+                        )
+                    ;
                     $organizationType = $formProjectReferenceSearch->get('organizationType')->getData();
                 }
                 if ($formProjectReferenceSearch->has('perimeter')) {
-                    $requestStack->getCurrentRequest()->getSession()->set('reference_perimeter', $formProjectReferenceSearch->get('perimeter')->getData());
+                    $requestStack
+                        ->getCurrentRequest()
+                        ->getSession()
+                        ->set(
+                            'reference_perimeter',
+                            $formProjectReferenceSearch->get('perimeter')->getData()
+                        )
+                    ;
                     $perimeter = $formProjectReferenceSearch->get('perimeter')->getData();
                 }
                 if ($formProjectReferenceSearch->has('name')) {
-                    $requestStack->getCurrentRequest()->getSession()->set('reference_name', $formProjectReferenceSearch->get('name')->getData());
+                    $requestStack
+                        ->getCurrentRequest()
+                        ->getSession()
+                        ->set(
+                            'reference_name',
+                            $formProjectReferenceSearch->get('name')->getData()
+                        )
+                    ;
                     $name = $formProjectReferenceSearch->get('name')->getData();
                 }
             }
@@ -237,15 +300,36 @@ class ProjectReferenceController extends FrontController
             if ($formProjectReferenceSearch->isValid()) {
                 // créer la session avec les valeurs du formulaire
                 if ($formProjectReferenceSearch->has('organizationType')) {
-                    $requestStack->getCurrentRequest()->getSession()->set('reference_organizationType', $formProjectReferenceSearch->get('organizationType')->getData());
+                    $requestStack
+                        ->getCurrentRequest()
+                        ->getSession()
+                        ->set(
+                            'reference_organizationType',
+                            $formProjectReferenceSearch->get('organizationType')->getData()
+                        )
+                    ;
                     $organizationType = $formProjectReferenceSearch->get('organizationType')->getData();
                 }
                 if ($formProjectReferenceSearch->has('perimeter')) {
-                    $requestStack->getCurrentRequest()->getSession()->set('reference_perimeter', $formProjectReferenceSearch->get('perimeter')->getData());
+                    $requestStack
+                        ->getCurrentRequest()
+                        ->getSession()
+                        ->set(
+                            'reference_perimeter',
+                            $formProjectReferenceSearch->get('perimeter')->getData()
+                        )
+                    ;
                     $perimeter = $formProjectReferenceSearch->get('perimeter')->getData();
                 }
                 if ($formProjectReferenceSearch->has('name')) {
-                    $requestStack->getCurrentRequest()->getSession()->set('reference_name', $formProjectReferenceSearch->get('name')->getData());
+                    $requestStack
+                        ->getCurrentRequest()
+                        ->getSession()
+                        ->set(
+                            'reference_name',
+                            $formProjectReferenceSearch->get('name')->getData()
+                        )
+                    ;
                     $name = $formProjectReferenceSearch->get('name')->getData();
                 }
             }
@@ -314,15 +398,32 @@ class ProjectReferenceController extends FrontController
             if ($formProjectReferenceSearch->isValid()) {
                 // créer la session avec les valeurs du formulaire
                 if ($formProjectReferenceSearch->has('organizationType')) {
-                    $requestStack->getCurrentRequest()->getSession()->set('reference_organizationType', $formProjectReferenceSearch->get('organizationType')->getData());
+                    $requestStack
+                        ->getCurrentRequest()
+                        ->getSession()
+                        ->set(
+                            'reference_organizationType',
+                            $formProjectReferenceSearch->get('organizationType')->getData()
+                        )
+                    ;
                     $organizationType = $formProjectReferenceSearch->get('organizationType')->getData();
                 }
                 if ($formProjectReferenceSearch->has('perimeter')) {
-                    $requestStack->getCurrentRequest()->getSession()->set('reference_perimeter', $formProjectReferenceSearch->get('perimeter')->getData());
+                    $requestStack
+                        ->getCurrentRequest()
+                        ->getSession()
+                        ->set(
+                            'reference_perimeter',
+                            $formProjectReferenceSearch->get('perimeter')->getData()
+                        )
+                    ;
                     $perimeter = $formProjectReferenceSearch->get('perimeter')->getData();
                 }
                 if ($formProjectReferenceSearch->has('name')) {
-                    $requestStack->getCurrentRequest()->getSession()->set('reference_name', $formProjectReferenceSearch->get('name')->getData());
+                    $requestStack->getCurrentRequest()->getSession()->set(
+                        'reference_name',
+                        $formProjectReferenceSearch->get('name')->getData()
+                    );
                     $name = $formProjectReferenceSearch->get('name')->getData();
                 }
             }
@@ -356,7 +457,8 @@ class ProjectReferenceController extends FrontController
         foreach ($projectReferences as $projectReferenceCurrent) {
             if (
                 $projectReference instanceof ProjectReference
-                && $projectReference->getProjectReferenceCategory()->getId() == $projectReferenceCurrent->getProjectReferenceCategory()->getId()
+                && $projectReference->getProjectReferenceCategory()->getId()
+                    == $projectReferenceCurrent->getProjectReferenceCategory()->getId()
             ) {
                 $closes[] = $projectReferenceCurrent;
             } else {

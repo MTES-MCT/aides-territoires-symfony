@@ -55,7 +55,13 @@ class AidStepRepository extends ServiceEntityRepository
     public function getQueryBuilder(array $params = null): QueryBuilder
     {
         $slugs = $params['slugs'] ?? null;
-        $orderBy = (isset($params['orderBy']) && isset($params['orderBy']['sort']) && isset($params['orderBy']['order'])) ? $params['orderBy'] : null;
+        $orderBy =
+            (isset($params['orderBy'])
+            && isset($params['orderBy']['sort'])
+            && isset($params['orderBy']['order']))
+                ? $params['orderBy']
+                : null
+        ;
 
         $qb = $this->createQueryBuilder('ast');
 

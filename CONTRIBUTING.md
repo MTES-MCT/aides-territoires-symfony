@@ -13,59 +13,56 @@ cd aides-territoires
 
 Pour faire tourner les tests :
 
-```
-cd src && make test
-```
-
-Note : certains tests utilisent [Selenium](https://selenium-python.readthedocs.io/index.html)
-qui dépend de [geckodriver](https://firefox-source-docs.mozilla.org/testing/geckodriver/geckodriver/).
-
-Pour les faire tourner, il conviendra donc d'en télécharger
-[la dernière version](https://github.com/mozilla/geckodriver/releases) pour
-l'intégrer dans son `$PATH`.
-
-GeckoDriver s'attend à trouver Firefox installé.
-
-    # Firefox on debian
-    apt-get update
-    apt-get purge firefox-esr
-
-Si geckodriver n'est pas trouvé automatiquement par pytest, il est possible de spécifier directement
-son emplacement en ajoutant une ligne comme
+Charger les fixtures si besoin
 
 ```
-GECKODRIVER_PATH="/snap/bin/geckodriver"
+php bin/console doctrine:fixtures:load --env=test
 ```
-au fichier `.env.local`
+
+Ne pas oublier le --env=test
+
+Puis lancer les tests avec : 
+
+```
+php bin/phpunit src/Tests/
+```
 
 ## Définition du fini
 
 Avant chaque mise en production, les intervenant·es sont prié·es de [passer
 cette liste en revue](./DOD.md).
 
-## Gestion des dépendances avec Pipenv
+## Gestion des dépendances PHP
 
-Le projet utilise [Pipenv pour gérer les dépendances de paquets
-Python](https://pipenv.readthedocs.io/en/latest/) et produire des *builds*
-déterministes.
+Pour installer les dépendances PHP du projet :
 
-Pour installer les dépendances du projet :
+    composer install
 
-    pipenv install --dev
+Pour installer un nouveau paquet PHP et l'ajouter aux dépendances :
 
-Pour installer un nouveau paquet et l'ajouter aux dépendances :
-
-    pipenv install <paquet>
+   composer require <paquet>
 
 Pour un paquet ne servant que pour le développement, e.g *debug-toolbar* :
 
-    pipenv install --dev <paquet>
+    composer require --dev <paquet>
+
+## Gestion des dépendances assets (JS, CSS)
+
+Pour installer les dépendances assets du projet :
+
+    yarn install
+
+Pour installer un nouveau paquet et l'ajouter aux dépendances :
+
+   yarn add <paquet>
+
+Pour un paquet ne servant que pour le développement, e.g *debug-toolbar* :
+
+    yarn add --dev <paquet>
 
 ## Configuration locale, production
 
-Le projet utilise [django-environ](http://django-environ.readthedocs.io/) pour
-gérer les settings des différents environnements ne pouvant être embarquées
-dans le dépôt git.
+Les variables d'environnement sont à mettre dans un fichier .env.local, à dupliquer à partir du .env
 
 Typiquement :
 
@@ -73,10 +70,9 @@ Typiquement :
    paramètres de connexion à la base de données ;
  * configuration de production.
 
-Pour surcharger la configuration locale de développement, il est possible de
-créer un fichier `.env.local` à la racine du projet Django. Cf. [le fichier
-.env.example](./src/.env.example) pour l'exemple. Ce fichier est facultatif car
-des paramètres par défaut sont définis.
+Vous pouvez ensuite le compiler en php avec la commande
+
+    composer dump-env local
 
 En staging et en production, les variables d'environments sont spécifiées directement sur Scalingo.
 
@@ -84,92 +80,46 @@ En staging et en production, les variables d'environments sont spécifiées dire
 
 ### Maintenir le code HTML propre
 
-Le projet utilise [Le Système de Design de l'Etat](https://gouvfr.atlassian.net/wiki/spaces/DB/overview) pour faciliter le développement, proposer un rendu homogène. 
+Le projet utilise [Le Système de Design de l'Etat](https://github.com/GouvernementFR/dsfr) pour faciliter le développement, proposer un rendu homogène. 
 
 Les intervenant·es sur le code sont donc *prié·es d'utiliser autant que possible les classes
 spécifiques au Système de Design de l'Etat dans le HTML.
 
-### Utilisation de django-compressor
+### Utilisation de webpack encore
 
-Le projet utilise
-[django-compressor](https://django-compressor.readthedocs.io/), une application
-qui permet de gérer la `pipeline` de compression des fichiers statiques.
+Le projet utilise webpack encore.
 
-[Django-compressor propose plusieurs modes de
-déploiement](https://django-compressor.readthedocs.io/en/latest/scenarios/) :
+Pour compiler les assets en développement
 
- 1) la compilation / compression se fait manuellement une fois pour toute ;
- 2) la compilation / compression se fait automatiquement à chaque requête.
+    yarn encore dev
 
-Le premier mode de fonctionnement est adapté à un déploiement en production. Le
-second dans un environnement de développement.
+Pour compiler les assets en production
 
-Il faut noter que le second mode peut significativement dégrader les
-performances et ralentir le travail. Pour améliorer les performances, deux
-possibilités :
-
- * Installer [la version native de Sassc](https://github.com/sass/sassc) et pas
-   la version en pure js (sous Ubuntu: `sudo apt-get install sassc`);
- * Désactiver en local la compression par requête dans le fichier `.env.local`.
-
-```
-COMPRESS_OFFLINE=False
-```
-
-Il faudra alors manuellement lancer la compression en cas de besoin.
-
-    python manage.py compress
+    yarn encore production
 
 ## Utilisation de Redis
 
-Nous utilisons Redis en production :
+Nous utilisons Redis en production pour stocker les sessions.
 
-- Comme backend de cache pour Django
-- Comme backend pour Django-Defender
-- Comme broker pour Celery
+Ceci permet de ne pas déconnecter les utilisateurs lors d'un deploy.
 
-En locale et pour les Review Apps, il n'y a généralement pas besoin
-d'utiliser Redis.
+En local vous pouvez laisser cette configuration dans votre .env
 
-Il est cependant possible de le faire, avec la commande
-`sudo apt-get install redis-server` sous Ubuntu)
-
-Il faut alors également ajouter les valeurs suivantes dans le `.env.local` :
-
-    CACHE_BACKEND="django_redis.cache.RedisCache"
-    CACHE_LOCATION="redis://localhost:6379/0"
-
-## Traduction : À propos des fichiers `.po` et `.mo`
-
-_Note : les traductions ont été abandonnées et sont progressivement supprimées._
-
-Ce project utilise le système de traduction de Django :
-Le texte dans le code est en anglais et la traduction qui
-s'affiche sur le site en Français, se trouve dans le fichier
-`.po` du dossier `locales`.
-
-https://docs.djangoproject.com/en/dev/topics/i18n/translation/
-
-Pour générer la traduction dans le fichier `.po` :
-
-    make makemessages
-
-Django utilise une version compilée du fichier `.po`, c'est le
-fichier `.mo` que l'on obtient avec :
-
-    python manage.py compilemessages
-
-En production, ce fichier est généré automatiquement lors du
-déploiement. Il n'est donc pas inclus dans le code github.
+    REDIS_URL=redis://localhost
 
 ## Linter de code / Code Style
 
-Nous utilisons `pep8`, `ruff` et `black`
+Nous utilisons `squizlabs/php_codesniffer` et `phpstan/phpstan`
 
-Pour vérifier son code, on peut intégrer le linter adapté à
-son IDE et aussi faire ceci :
+Exécuter les commandes suivantes pour vérifier le code :
 
-    make checkstyle
+    vendor/bin/phpcs src
+
+    vendor/bin/phpstan analyse src
+
+
+Pour vérifier son code, on peut intégrer le linter adapté à son IDE, par exemple SonarLint
+
 
 ## Déploiement
 
@@ -187,22 +137,13 @@ Nous utilisons un service d'« Object Storage » compatible avec l'API S3 pour
 
 ### Double authentification
 
-Pour mettre en place la double authentification, il faut mettre ceci dans le
-fichier `.env` ou dans les variables d'environnement Scalingo :
+La partie administration est protégée par une double authentification (TOTP)
 
-    ADMIN_OTP_ENABLED=True
-
-Ceci va activer une double authentification pour l'accès au site d'admin :
-mot de passe et jeton d'authentification.
 Le jeton d'authentification peut-être obtenu via une application mobile comme
 Google Authenticator ou Authy.
 
 Lors de la première utilisation et avant d'activer la double authentification,
 il faudra faire en sorte qu'un premier utilisateur admin puisse se connecter.
-Pour cela, il faudra penser à créer un `Device` pour cet utilisateur initial,
-avec le QR code associé qu'il faudra scanner avec l'application mobile.
-
-Pour plus de détail : https://django-otp-official.readthedocs.io/en/stable/overview.html
 
 ### Mise en production
 

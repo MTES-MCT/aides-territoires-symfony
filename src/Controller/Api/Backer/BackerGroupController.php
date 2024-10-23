@@ -28,7 +28,11 @@ class BackerGroupController extends ApiController
         $results = $backerGroupRepository->findCustom($params);
 
         // on serialize pour ne garder que les champs voulus
-        $results = $this->serializerInterface->serialize($results, static::SERIALIZE_FORMAT, ['groups' => BackerGroup::API_GROUP_LIST]);
+        $results = $this->serializerInterface->serialize(
+            $results,
+            static::SERIALIZE_FORMAT,
+            ['groups' => BackerGroup::API_GROUP_LIST]
+        );
 
         // le retour
         $data = [

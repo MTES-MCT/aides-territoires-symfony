@@ -29,10 +29,11 @@ class UserService
     ) {
     }
 
-    public function  getDefaultOrganizationByEmail(string $email) : ?Organization {
+    public function getDefaultOrganizationByEmail(string $email): ?Organization
+    {
         try {
             /** @var UserRepository $userRepository */
-            $userRepository = $this->entityManagerInterface->getRepository(User::class);    
+            $userRepository = $this->entityManagerInterface->getRepository(User::class);
 
             /** @var OrganizationRepository $organizationRepository */
             $organizationRepository = $this->entityManagerInterface->getRepository(Organization::class);
@@ -43,7 +44,6 @@ class UserService
         } catch (\Exception) {
             return null;
         }
-
     }
 
     public function isMemberOfOrganization(?Organization $organization, User $user): bool
@@ -120,7 +120,8 @@ class UserService
     {
         $action = $params['action'] ?? null;
         $log = match ($action) {
-            LogUserLogin::ACTION_LOGOUT, LogUserLogin::ACTION_LOST_PASSWORD, LogUserLogin::ACTION_LOGIN => new LogUserLogin(),
+            LogUserLogin::ACTION_LOGOUT, LogUserLogin::ACTION_LOST_PASSWORD, LogUserLogin::ACTION_LOGIN
+                => new LogUserLogin(),
             default => new LogUserAction(),
         };
 

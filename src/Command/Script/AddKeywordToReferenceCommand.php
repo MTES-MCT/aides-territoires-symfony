@@ -16,7 +16,6 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 #[AsCommand(name: 'at:script:keywords_to_reference', description: 'Keywords vers keywordReferencets')]
 class AddKeywordToReferenceCommand extends Command
 {
-
     protected InputInterface $input;
     protected OutputInterface $output;
     protected string $commandTextStart = '<Keywords vers keywordReference';

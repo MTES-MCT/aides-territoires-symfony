@@ -187,7 +187,10 @@ class EligibilityTest // NOSONAR too much methods
 
     public function removeEligibilityTestQuestion(EligibilityTestQuestion $eligibilityTestQuestion): static
     {
-        if ($this->eligibilityTestQuestions->removeElement($eligibilityTestQuestion) && $eligibilityTestQuestion->getEligibilityTest() === $this) {
+        if (
+            $this->eligibilityTestQuestions->removeElement($eligibilityTestQuestion)
+            && $eligibilityTestQuestion->getEligibilityTest() === $this
+        ) {
             $eligibilityTestQuestion->setEligibilityTest(null);
         }
 
@@ -241,7 +244,10 @@ class EligibilityTest // NOSONAR too much methods
 
     public function removeLogAidEligibilityTest(LogAidEligibilityTest $logAidEligibilityTest): static
     {
-        if ($this->logAidEligibilityTests->removeElement($logAidEligibilityTest) && $logAidEligibilityTest->getEligibilityTest() === $this) {
+        if (
+            $this->logAidEligibilityTests->removeElement($logAidEligibilityTest)
+            && $logAidEligibilityTest->getEligibilityTest() === $this
+        ) {
             $logAidEligibilityTest->setEligibilityTest(null);
         }
 

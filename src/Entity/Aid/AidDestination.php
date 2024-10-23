@@ -31,11 +31,11 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Entity(repositoryClass: AidDestinationRepository::class)]
 class AidDestination
 {
-    const API_GROUP_LIST = 'aid_destination:list';
-    const API_DESCRIPTION = 'Lister tous les choix de types de dépenses';
+    public const API_GROUP_LIST = 'aid_destination:list';
+    public const API_DESCRIPTION = 'Lister tous les choix de types de dépenses';
 
-    const SLUG_SUPPLY = 'supply';
-    const SLUG_INVESTMENT = 'investment';
+    public const SLUG_SUPPLY = 'supply';
+    public const SLUG_INVESTMENT = 'investment';
 
     #[ORM\Id]
     #[ORM\GeneratedValue]

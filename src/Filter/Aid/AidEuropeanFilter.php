@@ -12,18 +12,41 @@ use Symfony\Component\PropertyInfo\Type;
 
 final class AidEuropeanFilter extends AbstractFilter
 {
-    protected function filterProperty(string $property, $value, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, Operation $operation = null, array $context = []): void
-    {
-        // method pour extends
+    protected function filterProperty(
+        string $property,
+        $value,
+        QueryBuilder $queryBuilder,
+        QueryNameGeneratorInterface $queryNameGenerator,
+        string $resourceClass,
+        Operation $operation = null,
+        array $context = []
+    ): void {
+        // ajouté pour être conforme à l'extends
     }
 
     public function getDescription(string $resourceClass): array
     {
         $examples = [
-            new Example('...', null, null),
-            new Example(Aid::LABELS_EUROPEAN[Aid::SLUG_EUROPEAN], null, Aid::SLUG_EUROPEAN),
-            new Example(Aid::LABELS_EUROPEAN[Aid::SLUG_EUROPEAN_SECTORIAL], null, Aid::SLUG_EUROPEAN_SECTORIAL),
-            new Example(Aid::LABELS_EUROPEAN[Aid::SLUG_EUROPEAN_ORGANIZATIONAL], null, Aid::SLUG_EUROPEAN_ORGANIZATIONAL),
+            new Example(
+                '...',
+                null,
+                null
+            ),
+            new Example(
+                Aid::LABELS_EUROPEAN[Aid::SLUG_EUROPEAN],
+                null,
+                Aid::SLUG_EUROPEAN
+            ),
+            new Example(
+                Aid::LABELS_EUROPEAN[Aid::SLUG_EUROPEAN_SECTORIAL],
+                null,
+                Aid::SLUG_EUROPEAN_SECTORIAL
+            ),
+            new Example(
+                Aid::LABELS_EUROPEAN[Aid::SLUG_EUROPEAN_ORGANIZATIONAL],
+                null,
+                Aid::SLUG_EUROPEAN_ORGANIZATIONAL
+            ),
         ];
 
         return [

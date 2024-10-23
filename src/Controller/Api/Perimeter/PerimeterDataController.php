@@ -24,7 +24,7 @@ class PerimeterDataController extends ApiController
         $params = [];
 
         $perimeterId = $this->requestStack->getCurrentRequest()->get('perimeter_id', null);
-        
+
         if (!empty($perimeterId)) {
             $params['perimeter'] = $this->managerRegistry->getRepository(Perimeter::class)->find($perimeterId);
             if (!$params['perimeter'] instanceof Perimeter) {
@@ -52,7 +52,9 @@ class PerimeterDataController extends ApiController
         foreach ($results as $result) {
             $resultsSpe[] = [
                 'id' => $result->getId(),
-                'perimeter' => $result->getPerimeter() ? $perimeterService->getSmartName($result->getPerimeter()) : null,
+                'perimeter' => $result->getPerimeter()
+                    ? $perimeterService->getSmartName($result->getPerimeter())
+                    : null,
                 'prop' => $result->getProp(),
                 'value' => $result->getValue()
             ];

@@ -37,12 +37,12 @@ class MyCustomLoginListener
 
         // la requete
         $request = $this->requestStack->getCurrentRequest();
-        
+
         // Pour éviter d'être appellé par liip-imagine
         if ($request && preg_match('/\/media\/cache/', $request->getPathInfo())) {
             return;
         }
-        
+
         // events login
         if ($user instanceof User) {
             // check autologin

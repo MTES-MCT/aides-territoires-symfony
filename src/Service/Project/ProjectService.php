@@ -80,7 +80,10 @@ class ProjectService
             $this->managerRegistry->getManager()->persist($projectLock);
             $this->managerRegistry->getManager()->flush();
         } else {
-            $projectLock = (isset($project->getProjectLocks()[0]) && $project->getProjectLocks()[0] instanceof ProjectLock)
+            $projectLock = (
+                isset($project->getProjectLocks()[0])
+                && $project->getProjectLocks()[0] instanceof ProjectLock
+            )
                 ? $project->getProjectLocks()[0]
                 : null;
             // on met à jour le lock si le user et l'aide sont bien les mêmes
@@ -113,7 +116,9 @@ class ProjectService
         $dompdf->loadHtml(
             $this->twig->render('user/project/aids_list_export_pdf.html.twig', [
                 'project' => $project,
-                'organization' => ($project->getAuthor() && $project->getAuthor()->getDefaultOrganization()) ? $project->getAuthor()->getDefaultOrganization() : null,
+                'organization' => ($project->getAuthor() && $project->getAuthor()->getDefaultOrganization())
+                    ? $project->getAuthor()->getDefaultOrganization()
+                    : null,
                 'today' => new \DateTime(date('Y-m-d H:i:s'))
             ])
         );
@@ -124,7 +129,7 @@ class ProjectService
         // Render the HTML as PDF
         $dompdf->render();
 
-        
+
         return $dompdf->output();
     }
 }

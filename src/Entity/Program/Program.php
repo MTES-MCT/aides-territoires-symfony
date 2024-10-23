@@ -39,9 +39,9 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Entity(repositoryClass: ProgramRepository::class)]
 class Program // NOSONAR too much methods
 {
-    const FOLDER = 'programs';
+    public const FOLDER = 'programs';
 
-    const API_GROUP_LIST = 'program:list';
+    public const API_GROUP_LIST = 'program:list';
 
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -341,7 +341,10 @@ class Program // NOSONAR too much methods
 
     public function removeFaqQuestionAnswser(FaqQuestionAnswser $faqQuestionAnswser): static
     {
-        if ($this->faqQuestionAnswsers->removeElement($faqQuestionAnswser) && $faqQuestionAnswser->getProgram() === $this) {
+        if (
+            $this->faqQuestionAnswsers->removeElement($faqQuestionAnswser)
+            && $faqQuestionAnswser->getProgram() === $this
+        ) {
             $faqQuestionAnswser->setProgram(null);
         }
 

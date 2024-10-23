@@ -45,7 +45,13 @@ class NotificationRepository extends ServiceEntityRepository
         $user = $params['user'] ?? null;
         $notRead = $params['notRead'] ?? null;
         $notSend = $params['notSend'] ?? null;
-        $orderBy = (isset($params['orderBy']) && isset($params['orderBy']['sort']) && isset($params['orderBy']['order'])) ? $params['orderBy'] : null;
+        $orderBy =
+            (isset($params['orderBy'])
+            && isset($params['orderBy']['sort'])
+            && isset($params['orderBy']['order']))
+                ? $params['orderBy']
+                : null
+        ;
 
         $qb = $this->createQueryBuilder('n');
 

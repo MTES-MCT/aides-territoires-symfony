@@ -13,8 +13,16 @@ use Symfony\Component\PropertyInfo\Type;
 
 final class AidDestinationFilter extends AbstractFilter
 {
-    protected function filterProperty(string $property, $value, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, Operation $operation = null, array $context = []): void
-    {
+    protected function filterProperty(
+        string $property,
+        $value,
+        QueryBuilder $queryBuilder,
+        QueryNameGeneratorInterface $queryNameGenerator,
+        string $resourceClass,
+        Operation $operation = null,
+        array $context = []
+    ): void {
+        // ajouté pour être conforme à l'extends
     }
 
     public function getDescription(string $resourceClass): array
@@ -32,7 +40,10 @@ final class AidDestinationFilter extends AbstractFilter
                 'property' => 'destinations',
                 'type' => Type::BUILTIN_TYPE_STRING,
                 'required' => false,
-                'description' => '<div class="renderedMarkdown"><p>Actions concernées.<br><br>Voir aussi <code>/api/aids/destinations/</code> pour la liste complète.</p></div>',
+                'description' => '<div class="renderedMarkdown"><p>'
+                                    . 'Actions concernées.<br><br>'
+                                    . 'Voir aussi <code>/api/aids/destinations/</code> '
+                                    . 'pour la liste complète.</p></div>',
                 'openapi' => [
                     'examples' => $examples,
                 ],

@@ -66,7 +66,13 @@ class LogEventRepository extends ServiceEntityRepository
         $category = $params['category'] ?? null;
         $event = $params['event'] ?? null;
         $source = $params['source'] ?? null;
-        $orderBy = (isset($params['orderBy']) && isset($params['orderBy']['sort']) && isset($params['orderBy']['order'])) ? $params['orderBy'] : null;
+        $orderBy =
+            (isset($params['orderBy'])
+            && isset($params['orderBy']['sort'])
+            && isset($params['orderBy']['order']))
+                ? $params['orderBy']
+                : null
+        ;
         $maxResults = $params['maxResults'] ?? null;
 
         $qb = $this->createQueryBuilder('le');

@@ -28,7 +28,11 @@ class BannedUserSubscriber implements EventSubscriberInterface
         $currentRoute = $event->getRequest()->attributes->get('_route');
         $allowedRoutes = ['app_user_banned', 'app_static_terms'];
         // si utilisateur banni on redirige vers la page (sauf si déjà dessus)
-        if ($user instanceof User && in_array(User::ROLE_BANNED, $user->getRoles()) && !in_array($currentRoute, $allowedRoutes)) {
+        if (
+            $user instanceof User
+            && in_array(User::ROLE_BANNED, $user->getRoles())
+            && !in_array($currentRoute, $allowedRoutes)
+        ) {
             $response = new RedirectResponse($this->urlGenerator->generate('app_user_banned'));
             $event->setResponse($response);
         }

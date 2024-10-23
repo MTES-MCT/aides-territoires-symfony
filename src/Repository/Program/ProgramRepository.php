@@ -71,7 +71,13 @@ class ProgramRepository extends ServiceEntityRepository
     {
         $hasLogo = $params['hasLogo'] ?? null;
         $isSpotlighted = $params['isSpotlighted'] ?? null;
-        $orderBy = (isset($params['orderBy']) && isset($params['orderBy']['sort']) && isset($params['orderBy']['order'])) ? $params['orderBy'] : null;
+        $orderBy =
+            (isset($params['orderBy'])
+            && isset($params['orderBy']['sort'])
+            && isset($params['orderBy']['order']))
+                ? $params['orderBy']
+                : null
+        ;
         $limit = $params['limit'] ?? null;
 
         $qb = $this->createQueryBuilder('p');

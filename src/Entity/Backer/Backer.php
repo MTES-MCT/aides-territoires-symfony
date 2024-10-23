@@ -60,7 +60,8 @@ use App\Filter\Backer\HasPublishedFinancedAidsFilter;
     arguments: [
         'swaggerDescription' => [
             'name' => 'q',
-            'description' => '<p>Rechercher par nom.</p><p>Note : il est possible d\'avoir des résultats pertinents avec seulement le début du nom.</p>',
+            'description' => '<p>Rechercher par nom.</p><p>'
+                . 'Note : il est possible d\'avoir des résultats pertinents avec seulement le début du nom.</p>',
             'openapi' => [
                 'examples' => [
                     ['value' => 'ademe', 'summary' => 'ademe'],
@@ -78,9 +79,9 @@ use App\Filter\Backer\HasPublishedFinancedAidsFilter;
 #[ORM\Entity(repositoryClass: BackerRepository::class)]
 class Backer // NOSONAR too much methods
 {
-    const API_DESCRIPTION = 'Lister tous les porteurs d\'aides';
-    const API_GROUP_LIST = 'backer:list';
-    const FOLDER = 'backers';
+    public const API_DESCRIPTION = 'Lister tous les porteurs d\'aides';
+    public const API_GROUP_LIST = 'backer:list';
+    public const FOLDER = 'backers';
 
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -566,7 +567,10 @@ class Backer // NOSONAR too much methods
         $aidsFinancial = new ArrayCollection();
         foreach ($this->getAidsLive() as $aid) {
             foreach ($aid->getAidTypes() as $aidType) {
-                if ($aidType->getAidTypeGroup()->getSlug() == AidTypeGroup::SLUG_FINANCIAL && !$aidsFinancial->contains($aid)) {
+                if (
+                    $aidType->getAidTypeGroup()->getSlug() == AidTypeGroup::SLUG_FINANCIAL
+                    && !$aidsFinancial->contains($aid)
+                ) {
                     $aidsFinancial->add($aid);
                 }
             }
@@ -612,7 +616,10 @@ class Backer // NOSONAR too much methods
         $aidsTechnical = new ArrayCollection();
         foreach ($this->getAidsLive() as $aid) {
             foreach ($aid->getAidTypes() as $aidType) {
-                if ($aidType->getAidTypeGroup()->getSlug() == AidTypeGroup::SLUG_TECHNICAL && !$aidsTechnical->contains($aid)) {
+                if (
+                    $aidType->getAidTypeGroup()->getSlug() == AidTypeGroup::SLUG_TECHNICAL
+                    && !$aidsTechnical->contains($aid)
+                ) {
                     $aidsTechnical->add($aid);
                 }
             }

@@ -79,7 +79,8 @@ class ImportFluxNouvelleAquitaineCommand extends ImportFluxCommand
         $europeanAid = $isEuropean ? Aid::SLUG_EUROPEAN_ORGANIZATIONAL : null;
 
         $return = [
-            'importDataMention' => 'Ces données sont mises à disposition par le Conseil régional de Nouvelle-Aquitaine .',
+            'importDataMention' => 'Ces données sont mises à disposition par '
+                . 'le Conseil régional de Nouvelle-Aquitaine .',
             'name' => isset($aidToImport['Nom']) ? $this->cleanName($aidToImport['Nom']) : null,
             'nameInitial' => isset($aidToImport['Nom']) ? $this->cleanName($aidToImport['Nom']) : null,
             'description' => $description,
@@ -120,7 +121,7 @@ class ImportFluxNouvelleAquitaineCommand extends ImportFluxCommand
             'Tiers-lieux' => 45,
             'Transports' => 85,
             'Vie associative' => 37,
-            
+
             'Cinéma et audiovisuel' => 99,
             'Disque et livre' => 104,
             'Éducation artistique et culturelle' => 8,
@@ -128,7 +129,7 @@ class ImportFluxNouvelleAquitaineCommand extends ImportFluxCommand
             'Langues et cultures régionales' => 8,
             'Manifestations culturelles' => 8,
             'Patrimoine et inventaire' => 7,
-            
+
             'Agriculture' => 48,
             'Agroalimentaire' => 48,
             'Artisanat' => 83,
@@ -157,7 +158,7 @@ class ImportFluxNouvelleAquitaineCommand extends ImportFluxCommand
             'Start-up' => 53,
             'Tourisme' => 12,
             'Transmission et mutation d\'activité' => 51,
-            
+
             'Accompagnement scolaire' => 40,
             'Apprentissage' => 40,
             'Collèges' => 40,
@@ -169,7 +170,7 @@ class ImportFluxNouvelleAquitaineCommand extends ImportFluxCommand
             'Mobilité internationale' => 40,
             'Orientation' => 40,
             'Sanitaire et social' => 40,
-        
+
             'Biodiversité' => 67,
             'Climat' => 23,
             'Déchets' => 28,
@@ -269,7 +270,9 @@ class ImportFluxNouvelleAquitaineCommand extends ImportFluxCommand
 
     protected function setInternalAidRecurrences(): void
     {
-        $this->aidRecurrenceOneOff = $this->managerRegistry->getRepository(AidRecurrence::class)->findOneBy(['slug' => AidRecurrence::SLUG_ONEOFF]);
-        $this->aidRecurrenceRecurring = $this->managerRegistry->getRepository(AidRecurrence::class)->findOneBy(['slug' => AidRecurrence::SLUG_RECURRING]);
+        $this->aidRecurrenceOneOff = $this->managerRegistry->getRepository(AidRecurrence::class)
+            ->findOneBy(['slug' => AidRecurrence::SLUG_ONEOFF]);
+        $this->aidRecurrenceRecurring = $this->managerRegistry->getRepository(AidRecurrence::class)
+            ->findOneBy(['slug' => AidRecurrence::SLUG_RECURRING]);
     }
 }

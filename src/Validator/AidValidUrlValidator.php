@@ -13,7 +13,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class AidValidUrlValidator extends ConstraintValidator
 {
-    protected string $message = 'Cette URL ne correspond pas à une aide actuellement publiée. Merci de saisir une URL correcte. ';
+    protected string $message =
+        'Cette URL ne correspond pas à une aide actuellement publiée. Merci de saisir une URL correcte. ';
     public function __construct(
         protected TranslatorInterface $translator,
         protected ManagerRegistry $managerRegistry,

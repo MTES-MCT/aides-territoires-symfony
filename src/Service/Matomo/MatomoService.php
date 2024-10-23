@@ -8,12 +8,12 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class MatomoService
 {
-    const MATOMO_GET_PAGE_URLS_API_METHOD = "Actions.getPageUrls";
-    const MATOMO_GET_PAGE_TITLES_API_METHOD = "Actions.getPageTitles";
-    const MATOMO_GET_PAGE_TITLE_API_METHOD = "Actions.getPageTitle";
-    const GOAL_KEY = "_analytics_goal";
+    public const MATOMO_GET_PAGE_URLS_API_METHOD = "Actions.getPageUrls";
+    public const MATOMO_GET_PAGE_TITLES_API_METHOD = "Actions.getPageTitles";
+    public const MATOMO_GET_PAGE_TITLE_API_METHOD = "Actions.getPageTitle";
+    public const GOAL_KEY = "_analytics_goal";
 
-    const REGEXP_AID_URL = 'aides/(.+)';
+    public const REGEXP_AID_URL = 'aides/(.+)';
 
     public function __construct(
         protected RequestStack $requestStack,
@@ -68,7 +68,11 @@ class MatomoService
      *   - 'pageTitle==Aides-territoires | Recherche avancée'
      *
      *   Usage example:
-     *   get_matomo_stats_from_page_title('Actions.getPageUrls', from_date_string='2020-01-01', to_date_string='2020-12-31')
+     *   get_matomo_stats_from_page_title(
+     *      'Actions.getPageUrls',
+     *      from_date_string='2020-01-01',
+     *      to_date_string='2020-12-31'
+     *  )
      *
      * @param [type] $api_method
      * @param string $custom_segment

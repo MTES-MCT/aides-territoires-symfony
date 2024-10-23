@@ -18,7 +18,6 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 #[AsCommand(name: 'at:script:mime_type_blog_post_fix', description: 'Fix des mimes types sur s3')]
 class MimeTypeBlogPostCommand extends Command
 {
-
     protected InputInterface $input;
     protected OutputInterface $output;
     protected string $commandTextStart = '<Fix des mimes types sur s3';
@@ -61,7 +60,10 @@ class MimeTypeBlogPostCommand extends Command
         $io = new SymfonyStyle($input, $output);
 
         // Créer un objet Credentials en utilisant les clés d'accès AWS
-        $credentials = new Credentials($this->paramService->get('aws_access_key_id'), $this->paramService->get('aws_secret_access_key'));
+        $credentials = new Credentials(
+            $this->paramService->get('aws_access_key_id'),
+            $this->paramService->get('aws_secret_access_key')
+        );
 
         // Créer un client S3
         $s3 = new S3Client([
@@ -90,7 +92,20 @@ class MimeTypeBlogPostCommand extends Command
                 // le mimeType actuel
                 $mimeType = $result['ContentType'];
 
-                if (!in_array($mimeType, ['image/jpeg', 'image/png', 'image/gif', 'image/svg+xml', 'application/pdf', 'text/csv', 'application/json'])) {
+                if (
+                    !in_array(
+                        $mimeType,
+                        [
+                        'image/jpeg',
+                        'image/png',
+                        'image/gif',
+                        'image/svg+xml',
+                        'application/pdf',
+                        'text/csv',
+                        'application/json'
+                        ]
+                    )
+                ) {
                     // Vérifiez si l'objet est une image, un PDF, un CSV ou un JSON en fonction de son extension
                     $extension = pathinfo($blogPost->getLogo(), PATHINFO_EXTENSION);
                     if (in_array($extension, ['jpg', 'jpeg', 'png', 'gif', 'svg', 'pdf', 'csv', 'json'])) {
