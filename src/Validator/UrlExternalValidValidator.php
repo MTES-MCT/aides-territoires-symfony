@@ -4,8 +4,6 @@ namespace App\Validator;
 
 use App\Exception\CustomValidatorException;
 use App\Service\Various\ParamService;
-use Doctrine\Persistence\ManagerRegistry;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
@@ -18,13 +16,11 @@ class UrlExternalValidValidator extends ConstraintValidator
 
     public function __construct(
         private TranslatorInterface $translator,
-        private ManagerRegistry $managerRegistry,
-        private RequestStack $requestStack,
         private ParamService $paramService,
     ) {
     }
 
-    public function validate($value, Constraint $constraint): void
+    public function validate(mixed $value, Constraint $constraint): void
     {
         try {
             if (null === $value || '' === $value) {
@@ -67,7 +63,7 @@ class UrlExternalValidValidator extends ConstraintValidator
             // vérifie que l'hote n'est pas une short ip
             if (
                 filter_var($host, FILTER_VALIDATE_REGEXP, [
-                'options' => ['regexp' => '/^127\./'],
+                    'options' => ['regexp' => '/^127\./'],
                 ])
             ) {
                 $this->context->buildViolation($this->message)->addViolation();

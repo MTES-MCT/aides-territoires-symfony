@@ -15,7 +15,7 @@ class Breadcrumb
     /**
      * @return array
      */
-    public function getItems()
+    public function getItems(): array
     {
         return $this->items;
     }
@@ -23,7 +23,7 @@ class Breadcrumb
     /**
      * @param array $items
      */
-    public function setItems($items)
+    public function setItems($items): void
     {
         $this->items = $items;
     }

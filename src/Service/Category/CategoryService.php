@@ -30,6 +30,10 @@ class CategoryService
         return $categoryThemesById;
     }
 
+    /**
+     * @param ArrayCollection<int, Category>
+     * @return array<array{categoryTheme: CategoryTheme, categories: Category[]}>
+     */
     public function categoriesToMetas(ArrayCollection|array $categories): array
     {
         $categoryThemesById = [];
