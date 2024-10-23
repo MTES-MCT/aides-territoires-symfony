@@ -36,7 +36,8 @@ class BlogPromotionPostService
                 && (
                     !isset($aidParams['categories'])
                     || $aidParams['categories'] === null
-                    || count($aidParams['categories']) == 0)
+                    || count($aidParams['categories']) == 0
+                )
             ) {
                 unset($blogPromotionPosts[$key]);
                 continue;

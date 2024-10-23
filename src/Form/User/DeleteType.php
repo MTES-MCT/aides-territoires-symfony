@@ -63,7 +63,8 @@ class DeleteType extends AbstractType
         $user = $this->userService->getUserLogged();
         if (!$this->userPasswordHasherInterface->isPasswordValid(
             $user,
-            $event->getForm()->get('password')->getData())
+            $event->getForm()->get('password')->getData()
+        )
         ) {
             $event->getForm()->get('password')
                 ->addError(new FormError('Le mot de passe est invalide'));

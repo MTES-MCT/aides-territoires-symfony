@@ -74,13 +74,13 @@ class PerimeterImportCrudController extends AtCrudController
             ->setFormTypeOption(
                 'upload_new',
                 function (UploadedFile $file, string $uploadDir, string $fileName) use ($entity) {
-                // créer dossier temporaire si besoin
+                    // créer dossier temporaire si besoin
                     $tmpFolder = $this->fileService->getUploadTmpDir();
                     if (!is_dir($tmpFolder)) {
                         mkdir($tmpFolder, 0777, true);
                     }
 
-                // déplace le fichier dans le dossier temporaire
+                    // déplace le fichier dans le dossier temporaire
                     $file->move(
                         $tmpFolder,
                         $fileName
@@ -97,10 +97,10 @@ class PerimeterImportCrudController extends AtCrudController
                         }
                     }
 
-                // suppression fichier temporaire
+                    // suppression fichier temporaire
                     unlink($tmpFolder . $fileName);
 
-                // retour vide
+                    // retour vide
                     return;
                 }
             );

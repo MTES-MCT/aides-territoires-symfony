@@ -17,7 +17,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 class ContactType extends AbstractType
 {
-    const SUBJECTS = [
+    public const SUBJECTS = [
         'contact_add' => 'Je souhaite communiquer sur Aides-territoires',
         'contact_com' => 'J’ai une question sur mon compte utilisateur',
         'contact_blog' => 'J’ai une question concernant le blog',

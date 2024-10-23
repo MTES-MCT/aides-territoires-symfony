@@ -119,8 +119,12 @@ class ImportFluxCommand extends Command // NOSONAR too much methods
         $timeEnd = microtime(true);
         $time = $timeEnd - $timeStart;
 
-        $io->success('Import flux terminé : ' . gmdate("H:i:s", $timeEnd) . ' (' . gmdate("H:i:s", intval($time)) . ')');
-        $io->success('Mémoire maximale utilisée : ' . intval(round(memory_get_peak_usage() / 1024 / 1024)) . ' MB');
+        $io->success(
+            'Import flux terminé : ' . gmdate("H:i:s", $timeEnd) . ' (' . gmdate("H:i:s", intval($time)) . ')'
+        );
+        $io->success(
+            'Mémoire maximale utilisée : ' . intval(round(memory_get_peak_usage() / 1024 / 1024)) . ' MB'
+        );
 
         $io->title($this->commandTextEnd);
         return Command::SUCCESS;
@@ -322,7 +326,14 @@ class ImportFluxCommand extends Command // NOSONAR too much methods
                 unset($newValues['importDatas']['name']);
             }
             // liste des champs qu'on met à jour automatiquement, les autres sont soumis à validation manuelle
-            $keepValues = ['dateStart', 'dateSubmissionDeadline', 'nameInitial', 'originUrl', 'applicationUrl', 'importDataMention'];
+            $keepValues = [
+                'dateStart',
+                'dateSubmissionDeadline',
+                'nameInitial',
+                'originUrl',
+                'applicationUrl',
+                'importDataMention'
+            ];
 
             // parcours les nouvelles valeurs
             $entityUpdated = false;
@@ -425,57 +436,68 @@ class ImportFluxCommand extends Command // NOSONAR too much methods
         ];
     }
 
+    // methode generique pour surcharge
     protected function getImportUniqueid($aidToImport): ?string
     {
         return null;
     }
 
+    // methode generique pour surcharge
     protected function getFieldsMapping(array $aidToImport, array $params = null): array
     {
         return [];
     }
 
+    // methode generique pour surcharge
     protected function setCategories(array $aidToImport, Aid $aid): Aid
     {
         return $aid;
     }
 
-    protected function setAidTypes(array $aidToImport, Aid $aid): Aid // NOSONAR methode generique pour surcharge
+    // methode generique pour surcharge
+    protected function setAidTypes(array $aidToImport, Aid $aid): Aid // NOSONAR
     {
         return $aid;
     }
 
-    protected function setAidRecurrence(array $aidToImport, Aid $aid): Aid // NOSONAR methode generique pour surcharge
+    // methode generique pour surcharge
+    protected function setAidRecurrence(array $aidToImport, Aid $aid): Aid // NOSONAR
     {
         return $aid;
     }
 
-    protected function setAidSteps(array $aidToImport, Aid $aid): Aid // NOSONAR methode generique pour surcharge
+    // methode generique pour surcharge
+    protected function setAidSteps(array $aidToImport, Aid $aid): Aid // NOSONAR
     {
         return $aid;
     }
 
-    protected function setAidAudiences(array $aidToImport, Aid $aid): Aid // NOSONAR methode generique pour surcharge
+    // methode generique pour surcharge
+    protected function setAidAudiences(array $aidToImport, Aid $aid): Aid // NOSONAR
     {
         return $aid;
     }
 
-    protected function setKeywords(array $aidToImport, Aid $aid): Aid // NOSONAR methode generique pour surcharge
+    // methode generique pour surcharge
+    protected function setKeywords(array $aidToImport, Aid $aid): Aid // NOSONAR
     {
         return $aid;
     }
 
-    protected function setAidDestinations(array $aidToImport, Aid $aid): Aid // NOSONAR methode generique pour surcharge
+    // methode generique pour surcharge
+    protected function setAidDestinations(array $aidToImport, Aid $aid): Aid // NOSONAR
     {
         return $aid;
     }
 
-    protected function setPerimeter(array $aidToImport, Aid $aid): Aid // NOSONAR methode generique pour surcharge
+    // methode generique pour surcharge
+    protected function setPerimeter(array $aidToImport, Aid $aid): Aid // NOSONAR
     {
         return $aid;
     }
 
-    protected function setIsCallForProject(array $aidToImport, Aid $aid): Aid // NOSONAR methode generique pour surcharge
+    // methode generique pour surcharge
+    protected function setIsCallForProject(array $aidToImport, Aid $aid): Aid // NOSONAR
     {
         return $aid;
     }

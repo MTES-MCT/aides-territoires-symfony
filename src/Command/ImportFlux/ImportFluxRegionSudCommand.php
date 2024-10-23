@@ -86,14 +86,23 @@ class ImportFluxRegionSudCommand extends ImportFluxCommand
 
     protected function getFieldsMapping(array $aidToImport, array $params = null): array
     {
-        $dateStart = (isset($aidToImport['Date d’ouverture']) && $aidToImport['Date d’ouverture'] !== '' && $aidToImport['Date d’ouverture'] !== null) ? new \DateTime($aidToImport['Date d’ouverture']) : null;
+        $dateStart = (
+            isset($aidToImport['Date d’ouverture'])
+            && $aidToImport['Date d’ouverture'] !== ''
+            && $aidToImport['Date d’ouverture'] !== null
+        ) ? new \DateTime($aidToImport['Date d’ouverture']) : null;
         if ($dateStart instanceof \DateTime) {
             // Force pour éviter les différence sur le fuseau horaire
             $dateStart = new \DateTime(date($dateStart->format('Y-m-d')));
             // Force les heures, minutes, et secondes à 00:00:00
             $dateStart->setTime(0, 0, 0);
         }
-        $dateSubmissionDeadline = (isset($aidToImport['Date de clôture']) && $aidToImport['Date de clôture'] !== '' && $aidToImport['Date de clôture'] !== null) ? new \DateTime($aidToImport['Date de clôture']) : null;
+        $dateSubmissionDeadline = (
+            isset($aidToImport['Date de clôture'])
+            && $aidToImport['Date de clôture'] !== ''
+            && $aidToImport['Date de clôture'] !== null
+        ) ? new \DateTime($aidToImport['Date de clôture']) : null;
+
         if ($dateSubmissionDeadline instanceof \DateTime) {
             // Force pour éviter les différence sur le fuseau horaire
             $dateSubmissionDeadline = new \DateTime(date($dateSubmissionDeadline->format('Y-m-d')));
@@ -103,12 +112,22 @@ class ImportFluxRegionSudCommand extends ImportFluxCommand
 
         $return = [
             'importDataMention' => 'Ces données sont mises à disposition par le Conseil Régional PACA.',
-            'name' => isset($aidToImport['Nom de l’aide']) ? strip_tags((string) $aidToImport['Nom de l’aide']) : null,
-            'nameInitial' => isset($aidToImport['Nom de l’aide']) ? strip_tags((string) $aidToImport['Nom de l’aide']) : null,
-            'description' => $this->concatHtmlFields($aidToImport, ['Chapo', 'Pour qui', 'Pourquoi candidater', 'Quelle est la nature de l’aide (type d’aide)', 'Plus d’infos']),
-            'eligibility' => $this->concatHtmlFields($aidToImport, ['Quelles sont les critères d’éligibilité', 'Comment en bénéficier ']),
-            'originUrl' => isset($aidToImport['Lien vers le descriptif complet']) ? $aidToImport['Lien vers le descriptif complet'] : null,
-            'applicationUrl' => isset($aidToImport['Lien Je fais ma demande']) ? $aidToImport['Lien Je fais ma demande'] : null,
+            'name' => isset($aidToImport['Nom de l’aide'])
+                ? strip_tags((string) $aidToImport['Nom de l’aide']) : null,
+            'nameInitial' => isset($aidToImport['Nom de l’aide'])
+                ? strip_tags((string) $aidToImport['Nom de l’aide']) : null,
+            'description' => $this->concatHtmlFields(
+                $aidToImport,
+                ['Chapo', 'Pour qui', 'Pourquoi candidater', 'Quelle est la nature de l’aide (type d’aide)', 'Plus d’infos']
+            ),
+            'eligibility' => $this->concatHtmlFields(
+                $aidToImport,
+                ['Quelles sont les critères d’éligibilité', 'Comment en bénéficier ']
+            ),
+            'originUrl' => isset($aidToImport['Lien vers le descriptif complet'])
+                ? $aidToImport['Lien vers le descriptif complet'] : null,
+            'applicationUrl' => isset($aidToImport['Lien Je fais ma demande'])
+                ? $aidToImport['Lien Je fais ma demande'] : null,
             'contact' => isset($aidToImport['Contact']) ? $this->getHtmlOrNull($aidToImport['Contact']) : null,
             'dateStart' => $dateStart,
             'dateSubmissionDeadline' => $dateSubmissionDeadline,
@@ -325,9 +344,11 @@ class ImportFluxRegionSudCommand extends ImportFluxCommand
             isset($aidToImport['Date d’ouverture']) && trim($aidToImport['Date d’ouverture']) !== ''
             && isset($aidToImport['Date de clôture']) && trim($aidToImport['Date de clôture']) !== ''
         ) {
-            $aidRecurrence = $this->managerRegistry->getRepository(AidRecurrence::class)->findOneBy(['slug' => AidRecurrence::SLUG_ONEOFF]);
+            $aidRecurrence = $this->managerRegistry->getRepository(AidRecurrence::class)
+                ->findOneBy(['slug' => AidRecurrence::SLUG_ONEOFF]);
         } else {
-            $aidRecurrence = $this->managerRegistry->getRepository(AidRecurrence::class)->findOneBy(['slug' => AidRecurrence::SLUG_ONGOING]);
+            $aidRecurrence = $this->managerRegistry->getRepository(AidRecurrence::class)
+                ->findOneBy(['slug' => AidRecurrence::SLUG_ONGOING]);
         }
         if ($aidRecurrence instanceof AidRecurrence) {
             $aid->setAidRecurrence($aidRecurrence);

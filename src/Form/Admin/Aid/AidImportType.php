@@ -17,7 +17,8 @@ class AidImportType extends AbstractType
                 'label' => 'Liste des aides (format csv ou xlsx) :',
                 'required' => true,
                 'attr' => [
-                    'accept' => '.csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel',
+                    'accept' => '.csv, application/vnd.ms-excel, '
+                        . 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
                 ],
                 'constraints' => [
                     new File([

@@ -51,7 +51,11 @@ class ProjectReferenceSearchType extends AbstractType
         if ($options['forceOrganizationType'] !== false) {
             $organizationTypeParams['data'] = $options['forceOrganizationType'];
         } else {
-            $organizationTypeParams['data'] = ($user && $user->getDefaultOrganization() && $user->getDefaultOrganization()->getOrganizationType()) ? $user->getDefaultOrganization()->getOrganizationType() : null;
+            $organizationTypeParams['data'] = ($user
+                && $user->getDefaultOrganization()
+                && $user->getDefaultOrganization()->getOrganizationType())
+                ? $user->getDefaultOrganization()->getOrganizationType()
+                : null;
         }
 
         // Perimeter params

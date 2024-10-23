@@ -79,7 +79,8 @@ class ImportFluxNouvelleAquitaineCommand extends ImportFluxCommand
         $europeanAid = $isEuropean ? Aid::SLUG_EUROPEAN_ORGANIZATIONAL : null;
 
         $return = [
-            'importDataMention' => 'Ces données sont mises à disposition par le Conseil régional de Nouvelle-Aquitaine .',
+            'importDataMention' => 'Ces données sont mises à disposition par '
+                . 'le Conseil régional de Nouvelle-Aquitaine .',
             'name' => isset($aidToImport['Nom']) ? $this->cleanName($aidToImport['Nom']) : null,
             'nameInitial' => isset($aidToImport['Nom']) ? $this->cleanName($aidToImport['Nom']) : null,
             'description' => $description,
@@ -269,7 +270,9 @@ class ImportFluxNouvelleAquitaineCommand extends ImportFluxCommand
 
     protected function setInternalAidRecurrences(): void
     {
-        $this->aidRecurrenceOneOff = $this->managerRegistry->getRepository(AidRecurrence::class)->findOneBy(['slug' => AidRecurrence::SLUG_ONEOFF]);
-        $this->aidRecurrenceRecurring = $this->managerRegistry->getRepository(AidRecurrence::class)->findOneBy(['slug' => AidRecurrence::SLUG_RECURRING]);
+        $this->aidRecurrenceOneOff = $this->managerRegistry->getRepository(AidRecurrence::class)
+            ->findOneBy(['slug' => AidRecurrence::SLUG_ONEOFF]);
+        $this->aidRecurrenceRecurring = $this->managerRegistry->getRepository(AidRecurrence::class)
+            ->findOneBy(['slug' => AidRecurrence::SLUG_RECURRING]);
     }
 }

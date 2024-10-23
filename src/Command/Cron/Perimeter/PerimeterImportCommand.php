@@ -60,7 +60,12 @@ class PerimeterImportCommand extends Command
             $this->managerRegistry->getManager()->persist($perimeterImport);
             $this->managerRegistry->getManager()->flush();
 
-            $io->info('Import de périmètre adhoc : ' . $perimeterImport->getAdhocPerimeter()->getName() . ', auteur : ' . $perimeterImport->getAuthor()->getEmail());
+            $io->info(
+                'Import de périmètre adhoc : '
+                    . $perimeterImport->getAdhocPerimeter()->getName()
+                    . ', auteur : '
+                    . $perimeterImport->getAuthor()->getEmail()
+            );
 
             // Pour économiser la mémoire
             $this->managerRegistry->getConnection()->getConfiguration()->setSQLLogger(null);
@@ -81,7 +86,8 @@ class PerimeterImportCommand extends Command
                 $perimeterImport->getAdhocPerimeter()->addPerimetersFrom($perimeterToAdd);
 
                 // va recuperer tous les parents du périmètre à ajouter et met le perimètre adhoc dedans,
-                // ex: si perimetreToAdd = commune, alors on ajoute le perimetre adhoc dans le departement, la region, etc.
+                // ex: si perimetreToAdd = commune, 
+                // alors on ajoute le perimetre adhoc dans le departement, la region, etc.
                 foreach ($perimeterToAdd->getPerimetersTo() as $parentToAdd) {
                     if (
                         $parentToAdd->getId() !== $perimeterImport->getAdhocPerimeter()->getId()

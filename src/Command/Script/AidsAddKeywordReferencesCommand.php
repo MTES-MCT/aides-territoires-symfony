@@ -61,7 +61,8 @@ class AidsAddKeywordReferencesCommand extends Command
         foreach ($aids as $aid) {
             $keywords = $aid->getKeywords();
             foreach ($keywords as $keyword) {
-                $keywordReference = $this->managerRegistry->getRepository(KeywordReference::class)->findOneBy(['name' => $keyword->getName()]);
+                $keywordReference = $this->managerRegistry->getRepository(KeywordReference::class)
+                    ->findOneBy(['name' => $keyword->getName()]);
                 if ($keywordReference instanceof KeywordReference) {
                     $aid->addKeywordReference($keywordReference);
                     $this->managerRegistry->getManager()->persist($aid);

@@ -13,7 +13,10 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
-#[AsCommand(name: 'at:script:project_reference:keywords', description: 'Exclusion de certains mots clés pour certains projets')]
+#[AsCommand(
+    name: 'at:script:project_reference:keywords',
+    description: 'Exclusion de certains mots clés pour certains projets'
+)]
 class ProjectReferenceKeywordsCommand extends Command
 {
     protected InputInterface $input;

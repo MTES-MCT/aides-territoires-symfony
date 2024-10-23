@@ -82,7 +82,7 @@ class AidSearchFormService
 
     public function convertAidSearchClassToQueryString(AidSearchClass $aidSearchClass): string
     {
- // NOSONAR too complex
+        // NOSONAR too complex
         $params = [];
 
         if ($aidSearchClass->getOrganizationType()) {
@@ -1075,7 +1075,7 @@ class AidSearchFormService
      */
     public function completeAidParams(Form $formAidSearch): array
     {
- // NOSONAR too complex
+        // NOSONAR too complex
         $aidParams = [];
         if ($formAidSearch->get('organizationType')->getData()) {
             $aidParams['organizationType'] = $formAidSearch->get('organizationType')->getData();
