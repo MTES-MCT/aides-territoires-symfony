@@ -111,16 +111,15 @@ En local vous pouvez laisser cette configuration dans votre .env
 
 Nous utilisons `squizlabs/php_codesniffer` et `phpstan/phpstan`
 
+Exécuter les commandes suivantes pour vérifier le code :
+
     vendor/bin/phpcs src
 
     vendor/bin/phpstan analyse src
 
-    vendor/bin/php-cs-fixer fix src
 
-Pour vérifier son code, on peut intégrer le linter adapté à
-son IDE et aussi faire ceci :
+Pour vérifier son code, on peut intégrer le linter adapté à son IDE, par exemple SonarLint
 
-    make checkstyle
 
 ## Déploiement
 
@@ -138,22 +137,13 @@ Nous utilisons un service d'« Object Storage » compatible avec l'API S3 pour
 
 ### Double authentification
 
-Pour mettre en place la double authentification, il faut mettre ceci dans le
-fichier `.env` ou dans les variables d'environnement Scalingo :
+La partie administration est protégée par une double authentification (TOTP)
 
-    ADMIN_OTP_ENABLED=True
-
-Ceci va activer une double authentification pour l'accès au site d'admin :
-mot de passe et jeton d'authentification.
 Le jeton d'authentification peut-être obtenu via une application mobile comme
 Google Authenticator ou Authy.
 
 Lors de la première utilisation et avant d'activer la double authentification,
 il faudra faire en sorte qu'un premier utilisateur admin puisse se connecter.
-Pour cela, il faudra penser à créer un `Device` pour cet utilisateur initial,
-avec le QR code associé qu'il faudra scanner avec l'application mobile.
-
-Pour plus de détail : https://django-otp-official.readthedocs.io/en/stable/overview.html
 
 ### Mise en production
 
