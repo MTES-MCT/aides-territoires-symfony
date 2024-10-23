@@ -112,3 +112,5 @@ services:
 
     Symfony\Component\HttpFoundation\Session\Storage\Handler\RedisSessionHandler:
         arguments: ['@snc_redis.session']
+
+    'Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter': ~

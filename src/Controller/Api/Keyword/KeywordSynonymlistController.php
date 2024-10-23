@@ -4,9 +4,7 @@ namespace App\Controller\Api\Keyword;
 
 use App\Controller\Api\ApiController;
 use App\Entity\Keyword\KeywordSynonymlist;
-use App\Entity\Program\Program;
 use App\Repository\Keyword\KeywordSynonymlistRepository;
-use App\Repository\Program\ProgramRepository;
 use App\Service\Keyword\KeywordSynonymlistService;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Attribute\AsController;

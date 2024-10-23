@@ -40,22 +40,28 @@ use ApiPlatform\Metadata\ApiProperty;
 use App\Controller\Api\Aid\AidController as AidAidController;
 use App\Filter\Aid\AidApplyBeforeFilter;
 use App\Filter\Aid\AidCallForProjectOnlyFilter;
-use App\Filter\Aid\AidCategoriesFilter;
-use App\Filter\Aid\AidDestinationFilter;
-use App\Filter\Aid\AidEuropeanFilter;
-use App\Filter\Aid\AidFinancialAidFilter;
+use App\Filter\Aid\AidCategorySlugsFilter;
+use App\Filter\Aid\AidCategoryIdsFilter;
+use App\Filter\Aid\AidDestinationIdsFilter;
+use App\Filter\Aid\AidDestinationSlugsFilter;
+use App\Filter\Aid\AidEuropeanSlugFilter;
 use App\Filter\Aid\AidIsChargedFilter;
-use App\Filter\Aid\AidMobilizationStepFilter;
-use App\Filter\Aid\AidPerimeterFilter;
+use App\Filter\Aid\AidOrganizationTypeIdsFilter;
 use App\Filter\Aid\AidProjectReferenceFilter;
 use App\Filter\Aid\AidPublishedAfterFilter;
-use App\Filter\Aid\AidRecurrenceFilter;
-use App\Filter\Aid\AidTargetedAudiencesFilter;
-use App\Filter\Aid\AidTechnicalAidFilter;
+use App\Filter\Aid\AidRecurrenceIdFilter;
+use App\Filter\Aid\AidRecurrenceSlugFilter;
+use App\Filter\Aid\AidStepIdsFilter;
+use App\Filter\Aid\AidStepSlugsFilter;
+use App\Filter\Aid\AidOrganizationTypeSlugsFilter;
+use App\Filter\Aid\AidPerimeterIdFilter;
 use App\Filter\Aid\AidTextFilter;
-use App\Filter\Aid\AidTypeGroupFilter;
-use App\Filter\Backer\BackerFilter;
-use App\Filter\Backer\BackerGroupFilter;
+use App\Filter\Aid\AidTypeSlugsFilter;
+use App\Filter\Aid\AidTypeGroupSlugFilter;
+use App\Filter\Aid\AidTypeGroupIdFilter;
+use App\Filter\Aid\AidTypeIdsFilter;
+use App\Filter\Backer\BackerIdsFilter;
+use App\Filter\Backer\BackerGroupIdFilter;
 use App\Service\Doctrine\DoctrineConstants;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -75,16 +81,8 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Index(columns: ['description'], name: 'description_aid_fulltext', flags: ['fulltext'])]
 #[ORM\Index(columns: ['eligibility'], name: 'eligibility_aid_fulltext', flags: ['fulltext'])]
 #[ORM\Index(columns: ['name', 'description', 'eligibility'], name: 'synonym_aid_nde_fulltext', flags: ['fulltext'])]
-#[ORM\Index(
-    columns: ['description', 'eligibility', 'project_examples'],
-    name: 'synonym_aid_fulltext',
-    flags: ['fulltext']
-)]
-#[ORM\Index(
-    columns: ['name', 'name_initial', 'description', 'eligibility', 'project_examples'],
-    name: 'synonym_aid_all_fulltext',
-    flags: ['fulltext']
-)]
+#[ORM\Index(columns: ['description', 'eligibility', 'project_examples'], name: 'synonym_aid_fulltext', flags: ['fulltext'])]
+#[ORM\Index(columns: ['name', 'name_initial', 'description', 'eligibility', 'project_examples'], name: 'synonym_aid_all_fulltext', flags: ['fulltext'])]
 #[ApiResource(
     operations: [
         new GetCollection(
@@ -118,40 +116,46 @@ use Symfony\Component\Validator\Constraints as Assert;
 )]
 
 #[ApiFilter(AidTextFilter::class)]
-#[ApiFilter(AidTargetedAudiencesFilter::class)]
-#[ApiFilter(AidCategoriesFilter::class)]
+#[ApiFilter(AidOrganizationTypeSlugsFilter::class)]
+#[ApiFilter(AidOrganizationTypeIdsFilter::class)]
+#[ApiFilter(AidCategorySlugsFilter::class)]
+#[ApiFilter(AidCategoryIdsFilter::class)]
 #[ApiFilter(AidApplyBeforeFilter::class)]
 #[ApiFilter(AidPublishedAfterFilter::class)]
-#[ApiFilter(AidTypeGroupFilter::class)]
-#[ApiFilter(AidFinancialAidFilter::class)]
-#[ApiFilter(AidTechnicalAidFilter::class)]
-#[ApiFilter(AidMobilizationStepFilter::class)]
-#[ApiFilter(AidDestinationFilter::class)]
-#[ApiFilter(AidRecurrenceFilter::class)]
+#[ApiFilter(AidTypeGroupSlugFilter::class)]
+#[ApiFilter(AidTypeGroupIdFilter::class)]
+#[ApiFilter(AidTypeSlugsFilter::class)]
+#[ApiFilter(AidTypeIdsFilter::class)]
+#[ApiFilter(AidStepSlugsFilter::class)]
+#[ApiFilter(AidStepIdsFilter::class)]
+#[ApiFilter(AidDestinationSlugsFilter::class)]
+#[ApiFilter(AidDestinationIdsFilter::class)]
+#[ApiFilter(AidRecurrenceSlugFilter::class)]
+#[ApiFilter(AidRecurrenceIdFilter::class)]
 #[ApiFilter(AidCallForProjectOnlyFilter::class)]
 #[ApiFilter(AidIsChargedFilter::class)]
-#[ApiFilter(AidPerimeterFilter::class)]
+#[ApiFilter(AidPerimeterIdFilter::class)]
 #[ApiFilter(AidProjectReferenceFilter::class)]
-#[ApiFilter(AidEuropeanFilter::class)]
-#[ApiFilter(BackerFilter::class)]
-#[ApiFilter(BackerGroupFilter::class)]
+#[ApiFilter(AidEuropeanSlugFilter::class)]
+#[ApiFilter(BackerIdsFilter::class)]
+#[ApiFilter(BackerGroupIdFilter::class)]
 class Aid // NOSONAR too much methods
 {
-    public const API_OPERATION_GET_BY_ID = 'api_aid_get_by_id';
-    public const API_OPERATION_GET_BY_SLUG = 'api_aid_get_by_slug';
-    public const API_OPERATION_GET_COLLECTION_PUBLISHED = 'api_aids_published';
-    public const API_OPERATION_GET_COLLECTION_ALL = 'api_aids_all';
+    const API_OPERATION_GET_BY_ID = 'api_aid_get_by_id';
+    const API_OPERATION_GET_BY_SLUG = 'api_aid_get_by_slug';
+    const API_OPERATION_GET_COLLECTION_PUBLISHED = 'api_aids_published';
+    const API_OPERATION_GET_COLLECTION_ALL = 'api_aids_all';
 
-    public const API_GROUP_LIST = 'aid:list';
-    public const API_GROUP_ITEM = 'aid:item';
+    const API_GROUP_LIST = 'aid:list';
+    const API_GROUP_ITEM = 'aid:item';
 
-    public const STATUS_PUBLISHED = 'published';
-    public const STATUS_DELETED = 'deleted';
-    public const STATUS_DRAFT = 'draft';
-    public const STATUS_MERGED = 'merged';
-    public const STATUS_REVIEWABLE = 'reviewable';
+    const STATUS_PUBLISHED = 'published';
+    const STATUS_DELETED = 'deleted';
+    const STATUS_DRAFT = 'draft';
+    const STATUS_MERGED = 'merged';
+    const STATUS_REVIEWABLE = 'reviewable';
 
-    public const STATUSES = [
+    const STATUSES = [
         ['slug' => self::STATUS_PUBLISHED, 'name' => 'Publiée'],
         ['slug' => self::STATUS_DELETED, 'name' => 'Supprimée'],
         ['slug' => self::STATUS_DRAFT, 'name' => 'Brouillon'],
@@ -159,18 +163,18 @@ class Aid // NOSONAR too much methods
         ['slug' => self::STATUS_REVIEWABLE, 'name' => 'En revue'],
     ];
 
-    public const APPROACHING_DEADLINE_DELTA = 30;  # days
+    const APPROACHING_DEADLINE_DELTA = 30;  # days
 
-    public const SLUG_EUROPEAN = 'european';
-    public const SLUG_EUROPEAN_SECTORIAL = 'sectorial';
-    public const SLUG_EUROPEAN_ORGANIZATIONAL = 'organizational';
-    public const LABELS_EUROPEAN = [
+    const SLUG_EUROPEAN = 'european';
+    const SLUG_EUROPEAN_SECTORIAL = 'sectorial';
+    const SLUG_EUROPEAN_ORGANIZATIONAL = 'organizational';
+    const LABELS_EUROPEAN = [
         self::SLUG_EUROPEAN => 'Aides européennes',
         self::SLUG_EUROPEAN_SECTORIAL => 'Aides européennes sectorielles',
         self::SLUG_EUROPEAN_ORGANIZATIONAL => 'Aides européennes structurelles',
     ];
 
-    public const MAX_NB_EXPORT_PDF = 20;
+    const MAX_NB_EXPORT_PDF = 20;
 
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -449,8 +453,7 @@ class Aid // NOSONAR too much methods
 
     #[ApiProperty(
         openapiContext: [
-            'description' => 'Aides France Relance concernant le MTFP. '
-                . 'Pour les aides du Plan de relance, utiliser le paramètre programs.slug',
+            'description' => 'Aides France Relance concernant le MTFP. Pour les aides du Plan de relance, utiliser le paramètre programs.slug',
             'enum' => [true, false],
             'example' => true
         ]
@@ -616,7 +619,7 @@ class Aid // NOSONAR too much methods
     #[ORM\OneToMany(mappedBy: 'aid', targetEntity: AidProject::class, orphanRemoval: true)]
     private Collection $aidProjects;
 
-    #[ORM\OneToMany(mappedBy: 'aid', targetEntity: AidSuggestedAidProject::class, orphanRemoval: true)]
+    #[ORM\OneToMany(mappedBy: 'aid', targetEntity: AidSuggestedAidProject::class)]
     private Collection $aidSuggestedAidProjects;
 
     #[ORM\ManyToMany(targetEntity: Bundle::class, mappedBy: 'aids', cascade: ['persist'])]
@@ -1936,10 +1939,7 @@ class Aid // NOSONAR too much methods
 
     public function removeAidSuggestedAidProject(AidSuggestedAidProject $aidSuggestedAidProject): static
     {
-        if (
-            $this->aidSuggestedAidProjects->removeElement($aidSuggestedAidProject)
-            && $aidSuggestedAidProject->getAid() === $this
-        ) {
+        if ($this->aidSuggestedAidProjects->removeElement($aidSuggestedAidProject) && $aidSuggestedAidProject->getAid() === $this) {
             $aidSuggestedAidProject->setAid(null);
         }
 
@@ -2061,18 +2061,18 @@ class Aid // NOSONAR too much methods
 
     public function isApproachingDeadline(): bool
     {
+        $result = false;
+
         if ($this->getDateSubmissionDeadline()) {
             $today = new \DateTime(date('Y-m-d'));
-            $interval = $today->diff($this->getDateSubmissionDeadline());
+            $interval = $this->getDateSubmissionDeadline()->diff($today);
 
-            // Vérifiez si le nombre de jours est inférieur ou égal à APPROACHING_DEADLINE_DELTA
-            // et si la date limite de soumission est dans le futur
-            if ($interval->days <= self::APPROACHING_DEADLINE_DELTA && $interval->invert == 0) {
-                return true;
+            if ($interval->days <= self::APPROACHING_DEADLINE_DELTA) {
+                $result = true;
             }
         }
 
-        return false;
+        return $result;
     }
 
     public function getDaysBeforeDeadline(): int
@@ -2139,10 +2139,7 @@ class Aid // NOSONAR too much methods
         if (
             $this->status == self::STATUS_PUBLISHED
             && (($this->dateStart && $this->dateStart <= $today) || !$this->dateStart)
-            && (
-                ($this->dateSubmissionDeadline && $this->dateSubmissionDeadline >= $today)
-                || !$this->dateSubmissionDeadline
-            )
+            && (($this->dateSubmissionDeadline && $this->dateSubmissionDeadline >= $today) || !$this->dateSubmissionDeadline)
         ) {
             return true;
         }
@@ -2316,10 +2313,7 @@ class Aid // NOSONAR too much methods
 
     public function removeLogAidApplicationUrlClick(LogAidApplicationUrlClick $logAidApplicationUrlClick): static
     {
-        if (
-            $this->logAidApplicationUrlClicks->removeElement($logAidApplicationUrlClick)
-            && $logAidApplicationUrlClick->getAid() === $this
-        ) {
+        if ($this->logAidApplicationUrlClicks->removeElement($logAidApplicationUrlClick) && $logAidApplicationUrlClick->getAid() === $this) {
             $logAidApplicationUrlClick->setAid(null);
         }
 
@@ -2346,10 +2340,7 @@ class Aid // NOSONAR too much methods
 
     public function removeLogAidOriginUrlClick(LogAidOriginUrlClick $logAidOriginUrlClick): static
     {
-        if (
-            $this->logAidOriginUrlClicks->removeElement($logAidOriginUrlClick)
-            && $logAidOriginUrlClick->getAid() === $this
-        ) {
+        if ($this->logAidOriginUrlClicks->removeElement($logAidOriginUrlClick) && $logAidOriginUrlClick->getAid() === $this) {
             $logAidOriginUrlClick->setAid(null);
         }
 
@@ -2403,10 +2394,7 @@ class Aid // NOSONAR too much methods
 
     public function removeLogAidCreatedsFolder(LogAidCreatedsFolder $logAidCreatedsFolder): static
     {
-        if (
-            $this->logAidCreatedsFolders->removeElement($logAidCreatedsFolder)
-            && $logAidCreatedsFolder->getAid() === $this
-        ) {
+        if ($this->logAidCreatedsFolders->removeElement($logAidCreatedsFolder) && $logAidCreatedsFolder->getAid() === $this) {
             $logAidCreatedsFolder->setAid(null);
         }
 
@@ -2433,10 +2421,7 @@ class Aid // NOSONAR too much methods
 
     public function removeLogAidEligibilityTest(LogAidEligibilityTest $logAidEligibilityTest): static
     {
-        if (
-            $this->logAidEligibilityTests->removeElement($logAidEligibilityTest)
-            && $logAidEligibilityTest->getAid() === $this
-        ) {
+        if ($this->logAidEligibilityTests->removeElement($logAidEligibilityTest) && $logAidEligibilityTest->getAid() === $this) {
             $logAidEligibilityTest->setAid(null);
         }
 

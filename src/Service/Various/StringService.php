@@ -7,18 +7,18 @@ class StringService
     /**
      * Nettoie une chaine de caractères
      *
-     * @param string $string
+     * @param [type] $string
      * @return string
      */
-    public function cleanString(string $string): string
+    public function cleanString($string): string
     {
-        return trim(strip_tags((string) $string));
+        return trim(strip_tags($string));
     }
 
     /**
      * @param $text
      * @param $length
-     * @return string
+     * @return null|string|string[]
      */
     public function truncate(string $text, int $length): string
     {
@@ -28,15 +28,15 @@ class StringService
         $lengthCalcul = 0;
         $last_part = 0;
         for (; $last_part < $parts_count; ++$last_part) {
-            $lengthCalcul += mb_strlen($parts[$last_part], 'UTF-8');
+            $lengthCalcul += strlen($parts[$last_part]);
             if ($lengthCalcul > $length) {
                 break;
             }
         }
 
         $return = implode(array_slice($parts, 0, $last_part));
-        if (mb_strlen($text, 'UTF-8') > $length) {
-            $return = mb_substr($return, 0, $length - 3, 'UTF-8') . '...';
+        if (strlen($text) > $length) {
+            $return = substr($return, 0, $length - 3) . '...';
         }
 
         return $return;
@@ -46,7 +46,7 @@ class StringService
      * Fonction qui retourne un nom nettoyé (sans accent, espace, etc...)
      * @param $string
      * @param string $replacement
-     * @return string
+     * @return mixed
      */
     public function getSlug(string $string, string $replacement = '-'): string
     {
@@ -552,5 +552,52 @@ class StringService
         $string = preg_replace('/[^a-z0-9]/', '', $string);
 
         return $string;
+    }
+
+    /**
+     * Parcourt un tableau et filtre les éléments invalides ou vides.
+     * Force les éléments à être des entiers et retire les éléments égaux à 0.
+     *
+     * @param array $array Le tableau à traiter
+     * @return array Le tableau filtré et forcé à être des entiers
+     */
+    public function forceElementsToInt(array $array): array
+    {
+        return array_filter(array_map(function($value) {
+            // Extraire l'entier de la chaîne de caractères
+            if (preg_match('/\d+/', $value, $matches)) {
+                $id = filter_var($matches[0], FILTER_VALIDATE_INT);
+            } else {
+                $id = filter_var($value, FILTER_VALIDATE_INT);
+            }
+
+            // Retirer les éléments invalides ou égaux à 0
+            return $id !== false && $id !== 0 ? $id : null;
+        }, $array));
+    }
+
+    /**
+     * Parcourt un tableau et force les éléments en chaîne de caractères.
+     * Retire les éléments invalides ou vides.
+     *
+     * @param array $array Le tableau à traiter
+     * @return array Le tableau avec les éléments forcés en chaîne de caractères
+     */
+    public function forceElementsToString(array $array): array
+    {
+        $result = [];
+
+        foreach ($array as $element) {
+            // Vérifier si l'élément est valide et non vide
+            if (!empty($element)) {
+                // Forcer l'élément à être une chaîne de caractères
+                $stringElement = (string) $element;
+
+                // Ajouter l'élément converti au résultat
+                $result[] = $stringElement;
+            }
+        }
+
+        return $result;
     }
 }

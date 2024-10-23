@@ -37,6 +37,7 @@ use App\Entity\Project\ProjectLock;
 use App\Entity\Search\SearchPage;
 use App\Entity\Search\SearchPageLock;
 use App\Repository\User\UserRepository;
+use App\Service\Aid\AidSearchFormService;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
@@ -63,15 +64,15 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Index(columns: ['api_token'], name: 'api_token_u')]
 class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFactorInterface // NOSONAR too much methods
 {
-    public const ROLE_ADMIN = 'ROLE_ADMIN';
-    public const ROLE_USER = 'ROLE_USER';
-    public const ROLE_BANNED = 'ROLE_BANNED';
+    const ROLE_ADMIN = 'ROLE_ADMIN';
+    const ROLE_USER = 'ROLE_USER';
+    const ROLE_BANNED = 'ROLE_BANNED';
 
-    public const NOTIFICATION_DAILY = 'daily';
-    public const NOTIFICATION_WEEKLY = 'weekly';
-    public const NOTIFICATION_NEVER = 'never';
+    const NOTIFICATION_DAILY = 'daily';
+    const NOTIFICATION_WEEKLY = 'weekly';
+    const NOTIFICATION_NEVER = 'never';
 
-    public const FUNCTION_TYPES = [
+    const FUNCTION_TYPES = [
         ['slug' => "mayor", 'name' => "Maire"],
         ['slug' => "deputy_mayor", 'name' => "Adjoint au maire"],
         ['slug' => "municipal_councilor", 'name' => "Conseiller municipal"],
@@ -81,7 +82,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
         ['slug' => "other", 'name' => "Autre"],
     ];
 
-    public const ACQUISITION_CHANNEL_CHOICES = [
+    const ACQUISITION_CHANNEL_CHOICES = [
         ['slug' => "webinar", 'name' => "Webinaire"],
         ['slug' => "animator", 'name' => "Animateur local"],
         ['slug' => "trade_press", 'name' => "Presse spécialisée"],
@@ -89,8 +90,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
         ['slug' => "invited", 'name' => "Invitation à collaborer"],
         ['slug' => "other", 'name' => "Autre"],
     ];
-    public const ACQUISITION_CHANNEL_ANIMATOR = 'animator';
-
+    const ACQUISITION_CHANNEL_ANIMATOR = 'animator';
     // Propriétés scalaires
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -342,12 +342,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: LogBackerEdit::class)]
     private Collection $logBackerEdits;
 
-    /**
-     * @var Collection<int, SearchPage>
-     */
-    #[ORM\ManyToMany(targetEntity: SearchPage::class, mappedBy: 'editors')]
-    private Collection $editorSearchPages;
-
     public function __construct()
     {
         $this->logUserLogins = new ArrayCollection();
@@ -390,7 +384,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
         $this->searchPageLocks = new ArrayCollection();
         $this->backerAskAssociates = new ArrayCollection();
         $this->logBackerEdits = new ArrayCollection();
-        $this->editorSearchPages = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -975,10 +968,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
 
     public function removeEligibilityQuestion(EligibilityQuestion $eligibilityQuestion): static
     {
-        if (
-            $this->eligibilityQuestions->removeElement($eligibilityQuestion)
-            && $eligibilityQuestion->getAuthor() === $this
-        ) {
+        if ($this->eligibilityQuestions->removeElement($eligibilityQuestion) && $eligibilityQuestion->getAuthor() === $this) {
             $eligibilityQuestion->setAuthor(null);
         }
 
@@ -1005,10 +995,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
 
     public function removeDataSourceContactTeam(DataSource $dataSourceContactTeam): static
     {
-        if (
-            $this->dataSourceContactTeams->removeElement($dataSourceContactTeam)
-            && $dataSourceContactTeam->getContactTeam() === $this
-        ) {
+        if ($this->dataSourceContactTeams->removeElement($dataSourceContactTeam) && $dataSourceContactTeam->getContactTeam() === $this) {
             $dataSourceContactTeam->setContactTeam(null);
         }
 
@@ -1035,10 +1022,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
 
     public function removeDataSourceAidAuthor(DataSource $dataSourceAidAuthor): static
     {
-        if (
-            $this->dataSourceAidAuthors->removeElement($dataSourceAidAuthor)
-            && $dataSourceAidAuthor->getAidAuthor() === $this
-        ) {
+        if ($this->dataSourceAidAuthors->removeElement($dataSourceAidAuthor) && $dataSourceAidAuthor->getAidAuthor() === $this) {
             $dataSourceAidAuthor->setAidAuthor(null);
         }
 
@@ -1143,15 +1127,21 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
 
     public function removeAidSuggestedAidProject(AidSuggestedAidProject $aidSuggestedAidProject): static
     {
-        if (
-            $this->aidSuggestedAidProjects->removeElement($aidSuggestedAidProject)
-            && $aidSuggestedAidProject->getCreator() === $this
-        ) {
+        if ($this->aidSuggestedAidProjects->removeElement($aidSuggestedAidProject) && $aidSuggestedAidProject->getCreator() === $this) {
             $aidSuggestedAidProject->setCreator(null);
         }
 
         return $this;
     }
+
+    // public function upgradePassword(UserInterface $user, string $newHashedPassword): void
+    // {
+    //     dump($user);
+    //     // set the new hashed password on the User object
+    //     $user->setPassword($newHashedPassword);
+
+    //     // ... store the new password
+    // }
 
     /**
      * @return Collection<int, Bundle>
@@ -1391,11 +1381,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
 
         if ($this->getDefaultOrganization()) {
             if ($this->getDefaultOrganization()->getOrganizationType()) {
-                $preferences['organizationType'] = $this->getDefaultOrganization()->getOrganizationType()->getSlug();
+                $preferences[AidSearchFormService::QUERYSTRING_KEY_AID_TYPE_SLUGS] = [$this->getDefaultOrganization()->getOrganizationType()->getSlug()];
             }
 
             if ($this->getDefaultOrganization()->getPerimeter()) {
-                $preferences['searchPerimeter'] = $this->getDefaultOrganization()->getPerimeter()->getId();
+                $preferences[AidSearchFormService::QUERYSTRING_KEY_SEARCH_PERIMETER] = $this->getDefaultOrganization()->getPerimeter()->getId();
             }
         }
 
@@ -1422,10 +1412,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
 
     public function removeUserRegisterConfirmation(UserRegisterConfirmation $userRegisterConfirmation): static
     {
-        if (
-            $this->userRegisterConfirmations->removeElement($userRegisterConfirmation)
-            && $userRegisterConfirmation->getUser() === $this
-        ) {
+        if ($this->userRegisterConfirmations->removeElement($userRegisterConfirmation) && $userRegisterConfirmation->getUser() === $this) {
             $userRegisterConfirmation->setUser(null);
         }
 
@@ -1479,10 +1466,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
 
     public function removeLogAidCreatedsFolder(LogAidCreatedsFolder $logAidCreatedsFolder): static
     {
-        if (
-            $this->logAidCreatedsFolders->removeElement($logAidCreatedsFolder) &&
-            $logAidCreatedsFolder->getUser() === $this
-        ) {
+        if ($this->logAidCreatedsFolders->removeElement($logAidCreatedsFolder) && $logAidCreatedsFolder->getUser() === $this) {
             $logAidCreatedsFolder->setUser(null);
         }
 
@@ -1617,10 +1601,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
 
     public function removeLogPublicProjectSearch(LogPublicProjectSearch $logPublicProjectSearch): static
     {
-        if (
-            $this->logPublicProjectSearches->removeElement($logPublicProjectSearch)
-            && $logPublicProjectSearch->getUser() === $this
-        ) {
+        if ($this->logPublicProjectSearches->removeElement($logPublicProjectSearch) && $logPublicProjectSearch->getUser() === $this) {
             $logPublicProjectSearch->setUser(null);
         }
 
@@ -1647,10 +1628,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
 
     public function removeLogPublicProjectView(LogPublicProjectView $logPublicProjectView): static
     {
-        if (
-            $this->logPublicProjectViews->removeElement($logPublicProjectView)
-            && $logPublicProjectView->getUser() === $this
-        ) {
+        if ($this->logPublicProjectViews->removeElement($logPublicProjectView) && $logPublicProjectView->getUser() === $this) {
             $logPublicProjectView->setUser(null);
         }
 
@@ -1677,10 +1655,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
 
     public function removeLogProjectValidatedSearch(LogProjectValidatedSearch $logProjectValidatedSearch): static
     {
-        if (
-            $this->logProjectValidatedSearches->removeElement($logProjectValidatedSearch)
-            && $logProjectValidatedSearch->getUser() === $this
-        ) {
+        if ($this->logProjectValidatedSearches->removeElement($logProjectValidatedSearch) && $logProjectValidatedSearch->getUser() === $this) {
             $logProjectValidatedSearch->setUser(null);
         }
 
@@ -1778,10 +1753,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
 
     public function removeOrganizationInvitation(OrganizationInvitation $organizationInvitation): static
     {
-        if (
-            $this->organizationInvitations->removeElement($organizationInvitation)
-            && $organizationInvitation->getAuthor() === $this
-        ) {
+        if ($this->organizationInvitations->removeElement($organizationInvitation) && $organizationInvitation->getAuthor() === $this) {
             $organizationInvitation->setAuthor(null);
         }
 
@@ -1892,10 +1864,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
 
     public function removeCronExportSpreadsheet(CronExportSpreadsheet $cronExportSpreadsheet): static
     {
-        if (
-            $this->cronExportSpreadsheets->removeElement($cronExportSpreadsheet)
-            && $cronExportSpreadsheet->getUser() === $this
-        ) {
+        if ($this->cronExportSpreadsheets->removeElement($cronExportSpreadsheet) && $cronExportSpreadsheet->getUser() === $this) {
             $cronExportSpreadsheet->setUser(null);
         }
 
@@ -2087,33 +2056,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
             if ($logBackerEdit->getUser() === $this) {
                 $logBackerEdit->setUser(null);
             }
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, SearchPage>
-     */
-    public function getEditorSearchPages(): Collection
-    {
-        return $this->editorSearchPages;
-    }
-
-    public function addEditorSearchPage(SearchPage $editorSearchPage): static
-    {
-        if (!$this->editorSearchPages->contains($editorSearchPage)) {
-            $this->editorSearchPages->add($editorSearchPage);
-            $editorSearchPage->addEditor($this);
-        }
-
-        return $this;
-    }
-
-    public function removeEditorSearchPage(SearchPage $editorSearchPage): static
-    {
-        if ($this->editorSearchPages->removeElement($editorSearchPage)) {
-            $editorSearchPage->removeEditor($this);
         }
 
         return $this;

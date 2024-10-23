@@ -1,19 +1,19 @@
 {% if formAidSearch is defined %}
 	<div class="search-meta fr-mb-2w">
-		{% if formAidSearch.organizationType.vars.data %}
+		{% if formAidSearch.organization_type_slug.vars.data %}
 			<div class="fr-tags-group">
 				<p title="Bénéficiaires de l’aide" class="fr-tag">
 					<span class="ri-home-8-line ri-xl fr-mr-1w at-icon-align--sub" aria-hidden="true"></span>
-					{{ formAidSearch.organizationType.vars.data.name }}
+					{{ formAidSearch.organization_type_slug.vars.data.name }}
 				</p>
 			</div>
 		{% endif %}
-		{% if formAidSearch.searchPerimeter.vars.data %}
-			{% set scale = getPerimeterScale(formAidSearch.searchPerimeter.vars.data.scale) %}
+		{% if formAidSearch.perimeter_id.vars.data %}
+			{% set scale = getPerimeterScale(formAidSearch.perimeter_id.vars.data.scale) %}
 			<div class="fr-tags-group">
 				<p title="Périmètre" class="fr-tag">
 					<span class="ri-map-pin-fill ri-xl fr-mr-1w at-icon-align--sub" aria-hidden="true"></span>
-					{{ formAidSearch.searchPerimeter.vars.data.name }}
+					{{ formAidSearch.perimeter_id.vars.data.name }}
 					({{ scale.name }})
 				</p>
 			</div>
@@ -26,9 +26,9 @@
 				</p>
 			</div>
 		{% endif %}
-		{% if formAidSearch.categorysearch is defined and formAidSearch.categorysearch.vars.data %}
+		{% if formAidSearch.category_ids is defined and formAidSearch.category_ids.vars.data %}
 			<div class="fr-tags-group categories">
-				{% set categoriesMetas = categoriesToMetas(formAidSearch.categorysearch.vars.data) %}
+				{% set categoriesMetas = categoriesToMetas(formAidSearch.category_ids.vars.data) %}
 				{% for categoryMeta in categoriesMetas %}
 					<div class="theme fr-tag">
 						<div>
@@ -52,11 +52,11 @@
 			</div>
 		{% endif %}
 
-		{% if formAidSearch.aidTypes.vars.data and formAidSearch.aidTypes.vars.data|length > 0 %}
+		{% if formAidSearch.aid_type_ids.vars.data and formAidSearch.aid_type_ids.vars.data|length > 0 %}
 			<div class="fr-tags-group">
 				<p title="Nature de l’aide" class="fr-tag">
 					<span class="ri-money-euro-circle-line ri-xl fr-mr-1w at-icon-align--sub" aria-hidden="true"></span>
-					{% for aidType in formAidSearch.aidTypes.vars.data %}
+					{% for aidType in formAidSearch.aid_type_ids.vars.data %}
 						{{ aidType.name }}
 						{% if not loop.last %},
 						{% endif %}
@@ -65,11 +65,11 @@
 			</div>
 		{% endif %}
 
-		{% if formAidSearch.backerschoice is defined and formAidSearch.backerschoice.vars.data and formAidSearch.backerschoice.vars.data|length > 0 %}
+		{% if formAidSearch.backer_ids is defined and formAidSearch.backer_ids.vars.data and formAidSearch.backer_ids.vars.data|length > 0 %}
 			<div class="fr-tags-group">
 				<p title="Porteurs d’aides" class="fr-tag">
 					<span class="ri-hand-coin-line ri-xl fr-mr-1w at-icon-align--sub" aria-hidden="true"></span>
-					{% for backer in formAidSearch.backerschoice.vars.data %}
+					{% for backer in formAidSearch.backer_ids.vars.data %}
 						{{ backer.name }}
 						{% if not loop.last %},
 						{% endif %}
@@ -78,11 +78,11 @@
 			</div>
 		{% endif %}
 
-		{% if formAidSearch.backerGroup.vars.data %}
+		{% if formAidSearch.backer_group_id.vars.data %}
 			<div class="fr-tags-group">
 				<p title="Groupe de porteurs d’aides" class="fr-tag">
 					<span class="ri-hand-coin-line ri-xl fr-mr-1w at-icon-align--sub" aria-hidden="true"></span>
-					{{ formAidSearch.backerGroup.vars.data.name }}
+					{{ formAidSearch.backer_group_id.vars.data.name }}
 				</p>
 			</div>
 		{% endif %}
@@ -98,10 +98,10 @@
 				</p>
 			</div>
 		{% endif %}
-		{% if formAidSearch.aidSteps.vars.data and formAidSearch.aidSteps.vars.data|length > 0 %}
+		{% if formAidSearch.aid_step_ids.vars.data and formAidSearch.aid_step_ids.vars.data|length > 0 %}
 			<div class="fr-tags-group">
 				<p title="Avancement du projet" class="fr-tag fr-icon-arrow-right-line fr-tag--icon-left">
-					{% for aidStep in formAidSearch.aidSteps.vars.data %}
+					{% for aidStep in formAidSearch.aid_step_ids.vars.data %}
 						{{ aidStep.name}}
 						{% if not loop.last %},
 						{% endif %}
@@ -109,10 +109,10 @@
 				</p>
 			</div>
 		{% endif %}
-		{% if formAidSearch.aidDestinations.vars.data and formAidSearch.aidDestinations.vars.data|length > 0 %}
+		{% if formAidSearch.aid_destination_ids.vars.data and formAidSearch.aid_destination_ids.vars.data|length > 0 %}
 			<div class="fr-tags-group">
 				<p title="Actions concernées" class="fr-tag fr-icon-arrow-right-line fr-tag--icon-left">
-					{% for aidDestinations in formAidSearch.aidDestinations.vars.data %}
+					{% for aidDestinations in formAidSearch.aid_destination_ids.vars.data %}
 						{{ aidDestinations.name}}
 						{% if not loop.last %},
 						{% endif %}
@@ -121,30 +121,38 @@
 			</div>
 		{% endif %}
 
-		{% if formAidSearch.isCharged.vars.data is not null and formAidSearch.isCharged.vars.data != '' %}
+		{% if formAidSearch.is_charged.vars.data is defined and formAidSearch.is_charged.vars.data is not null %}
 			<div class="fr-tags-group">
 				<p title="aides gratuites ou payantes" class="fr-tag fr-icon-arrow-right-line fr-tag--icon-left">
-					{% if formAidSearch.isCharged.vars.data %}Aides payantes{% else %}Aides gratuites
+					{% if formAidSearch.is_charged.vars.data %}Aides payantes{% else %}Aides gratuites
 					{% endif %}
 				</p>
 			</div>
 		{% endif %}
 
-		{% if formAidSearch.europeanAid is defined and formAidSearch.europeanAid.vars.data is not null and formAidSearch.europeanAid.vars.data  != '' and formAidSearch.europeanAid.vars.data  != 'all' %}
+		{% if formAidSearch.european_aid_slug is defined and formAidSearch.european_aid_slug.vars.data is not null and formAidSearch.european_aid_slug.vars.data  != '' and formAidSearch.european_aid_slug.vars.data  != 'all' %}
 			<div class="fr-tags-group">
 				<p title="aides gratuites ou payantes" class="fr-tag fr-icon-arrow-right-line fr-tag--icon-left">
-					{{ constant('App\\Entity\\Aid\\Aid::LABELS_EUROPEAN')[formAidSearch.europeanAid.vars.data] }}
+					{{ constant('App\\Entity\\Aid\\Aid::LABELS_EUROPEAN')[formAidSearch.european_aid_slug.vars.data] }}
 				</p>
 			</div>
 		{% endif %}
 
-		{% if formAidSearch.isCallForProject is defined and formAidSearch.isCallForProject.vars.data %}
+		{% if formAidSearch.call_for_projects_only is defined and formAidSearch.call_for_projects_only.vars.data %}
 			<div class="fr-tags-group">
 				<p title="Appels à projets / Appels à manifestation d’intérêt uniquement" class="fr-tag fr-icon-arrow-right-line fr-tag--icon-left">
 					Appels à projets / Appels à manifestation d’intérêt uniquement
 				</p>
 			</div>
 		{% endif %}
+
+		{% if formAidSearch.apply_before is defined and formAidSearch.apply_before.vars.data %}
+			<div class="fr-tags-group">
+				<p title="Candidater avant :" class="fr-tag fr-icon-arrow-right-line fr-tag--icon-left">
+					Candidater avant : {{ formAidSearch.apply_before.vars.data|date('d/m/Y') }}
+				</p>
+			</div>
+		{% endif %}		
 
 	</div>
 {% endif %}

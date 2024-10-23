@@ -60,6 +60,7 @@ class BackerController extends ApiController
         foreach ($results as $result) {
             $resultsSpe[] = [
                 'id' => $result->getId() . '-' . $result->getSlug(),
+                'slug' => $result->getSlug(),
                 'text' => $result->getName(),
                 'perimeter' => $result->getPerimeter() ? $result->getPerimeter()->getName() : null,
                 'logo' => $result->getLogo() ? $paramService->get('cloud_image_url') . $result->getLogo() : null,
