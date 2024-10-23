@@ -64,9 +64,11 @@ class AddKeywordListToReferenceCommand extends Command
                 $synonyms[$key] = trim($synonym);
             }
             // on regarde si déjà présent
-            $keywodReference = $this->managerRegistry->getRepository(KeywordReference::class)->findOneBy(['name' => $keywordSynonym->getName()]);
+            $keywodReference = $this->managerRegistry->getRepository(KeywordReference::class)
+                ->findOneBy(['name' => $keywordSynonym->getName()]);
             // si on a pas trouvé on regarde avec les synonymes
-            $keywodReference = $keywodReference ?? $this->managerRegistry->getRepository(KeywordReference::class)->findCustom(['names' => $synonyms]);
+            $keywodReference = $keywodReference ?? $this->managerRegistry->getRepository(KeywordReference::class)
+                ->findCustom(['names' => $synonyms]);
 
             // gestion intention
             $intention = false;

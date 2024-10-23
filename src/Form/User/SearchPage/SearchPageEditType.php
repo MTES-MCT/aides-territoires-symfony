@@ -44,7 +44,7 @@ class SearchPageEditType extends AbstractType
                     'required' => true,
                     'label' => 'Éditeur(s) de la page',
                     'help' => 'Vous pouvez ajouter plusieurs éditeurs à la page. '
-                                    .' Les éditeurs peuvent modifier le contenu de la page, '
+                                    . ' Les éditeurs peuvent modifier le contenu de la page, '
                                     . 'ils doivent faire parti de vos structures.',
                     'class' => User::class,
                     'choice_label' => 'email',

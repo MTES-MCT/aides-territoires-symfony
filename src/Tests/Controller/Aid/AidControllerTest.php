@@ -40,7 +40,11 @@ class AidControllerTest extends AtWebTestCase
         $this->assertResponseIsSuccessful();
 
         // Vérifier que la route de succès est atteinte
-        $this->assertStringContainsString($routeSuccess, $this->client->getRequest()->getUri(), "La requête n'a pas atteint la route attendue.");
+        $this->assertStringContainsString(
+            $routeSuccess,
+            $this->client->getRequest()->getUri(),
+            "La requête n'a pas atteint la route attendue."
+        );
     }
 
     // test la création d'alerte

@@ -86,7 +86,7 @@ class PerimeterImportCommand extends Command
                 $perimeterImport->getAdhocPerimeter()->addPerimetersFrom($perimeterToAdd);
 
                 // va recuperer tous les parents du périmètre à ajouter et met le perimètre adhoc dedans,
-                // ex: si perimetreToAdd = commune, 
+                // ex: si perimetreToAdd = commune,
                 // alors on ajoute le perimetre adhoc dans le departement, la region, etc.
                 foreach ($perimeterToAdd->getPerimetersTo() as $parentToAdd) {
                     if (

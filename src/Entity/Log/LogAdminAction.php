@@ -12,13 +12,13 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Entity(repositoryClass: LogAdminActionRepository::class)]
 class LogAdminAction
 {
-    const ACTION_FLAG_INSERT = 1;
-    const ACTION_FLAG_UPDATE = 2;
-    const ACITON_FLAG_DELETE = 3;
+    public const ACTION_FLAG_INSERT = 1;
+    public const ACTION_FLAG_UPDATE = 2;
+    public const ACITON_FLAG_DELETE = 3;
 
-    const FIREWALL_ADMIN_NAME = 'admin';
+    public const FIREWALL_ADMIN_NAME = 'admin';
 
-    const NOT_ADMIN_LOGGED_FIELDS = [
+    public const NOT_ADMIN_LOGGED_FIELDS = [
         'timeUpdate'
     ];
     #[ORM\Id]

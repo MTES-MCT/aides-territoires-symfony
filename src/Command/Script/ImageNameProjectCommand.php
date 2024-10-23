@@ -61,7 +61,10 @@ class ImageNameProjectCommand extends Command
         $io = new SymfonyStyle($input, $output);
 
         // Créer un objet Credentials en utilisant les clés d'accès AWS
-        $credentials = new Credentials($this->paramService->get('aws_access_key_id'), $this->paramService->get('aws_secret_access_key'));
+        $credentials = new Credentials(
+            $this->paramService->get('aws_access_key_id'),
+            $this->paramService->get('aws_secret_access_key')
+        );
 
         // Créer un client S3
         $s3 = new S3Client([

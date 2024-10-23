@@ -61,10 +61,11 @@ class DeleteType extends AbstractType
     public function onSubmit(FormEvent $event): void
     {
         $user = $this->userService->getUserLogged();
-        if (!$this->userPasswordHasherInterface->isPasswordValid(
-            $user,
-            $event->getForm()->get('password')->getData()
-        )
+        if (
+            !$this->userPasswordHasherInterface->isPasswordValid(
+                $user,
+                $event->getForm()->get('password')->getData()
+            )
         ) {
             $event->getForm()->get('password')
                 ->addError(new FormError('Le mot de passe est invalide'));

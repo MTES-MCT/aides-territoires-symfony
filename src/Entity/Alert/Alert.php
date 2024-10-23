@@ -16,14 +16,14 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Entity(repositoryClass: AlertRepository::class)]
 class Alert // NOSONAR too much methods
 {
-    const FREQUENCIES = [
+    public const FREQUENCIES = [
         ['slug' => 'daily', 'name' => 'Quotidiennement'],
         ['slug' => 'weekly', 'name' => 'Hebdomadairement'],
     ];
-    const FREQUENCY_DAILY_SLUG = 'daily';
-    const FREQUENCY_WEEKLY_SLUG = 'weekly';
+    public const FREQUENCY_DAILY_SLUG = 'daily';
+    public const FREQUENCY_WEEKLY_SLUG = 'weekly';
 
-    const SOURCE_AIDES_TERRITOIRES = 'aides-territoires';
+    public const SOURCE_AIDES_TERRITOIRES = 'aides-territoires';
 
     #[ORM\Id]
     #[ORM\Column(type: UuidType::NAME, unique: true)]

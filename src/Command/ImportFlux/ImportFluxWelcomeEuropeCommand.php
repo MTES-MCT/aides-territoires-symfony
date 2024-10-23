@@ -230,7 +230,11 @@ class ImportFluxWelcomeEuropeCommand extends ImportFluxCommand
     {
         /*
             Exemple of string to process:
-            "Centres de recherche,Autorités locales et régionales,Grandes entreprises,ONG de Développement,PME,Universités,Organisations Internationales,ONG,Association & ONG,Collectivité Territoriale & Entité Affiliée,Centre de recherche & université,Grande Entreprise (> 250 Salaries),Organisation UE & Internationale,Pme & Start-Up (< 249 Salaries)"
+            "Centres de recherche,Autorités locales et régionales,Grandes entreprises,
+            ONG de Développement,PME,Universités,Organisations Internationales,ONG,
+            Association & ONG,Collectivité Territoriale & Entité Affiliée,
+            Centre de recherche & université,Grande Entreprise (> 250 Salaries),
+            Organisation UE & Internationale,Pme & Start-Up (< 249 Salaries)"
             Split the string, loop on the values and match to our AUDIENCES
          */
         if (!isset($aidToImport['filtres_beneficiaries'])) {

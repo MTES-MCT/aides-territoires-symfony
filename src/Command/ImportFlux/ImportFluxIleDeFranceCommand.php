@@ -96,8 +96,8 @@ class ImportFluxIleDeFranceCommand extends ImportFluxCommand
                 $this->stringService->getSlug(str_replace(
                     ["'", "’", 'à'],
                     [''],
-                    preg_replace('/(\d{2,4})[-.](\d{2})[-.](\d{2,4})/', '$1$2$3', $aidName))
-            );
+                    preg_replace('/(\d{2,4})[-.](\d{2})[-.](\d{2,4})/', '$1$2$3', $aidName)
+                ));
             $applicationUrl = $originUrl;
 
 
@@ -151,7 +151,8 @@ class ImportFluxIleDeFranceCommand extends ImportFluxCommand
                 'contact' => isset($aidToImport['contact']) ? $this->getHtmlOrNull($aidToImport['contact']) : null,
                 'eligibility' => $this->concatHtmlFields(
                     $aidToImport,
-                    ['publicsBeneficiairePrecision', 'modalite', 'objectif', 'demarches'], '<br/>'
+                    ['publicsBeneficiairePrecision', 'modalite', 'objectif', 'demarches'],
+                    '<br/>'
                 ),
                 'dateStart' => $dateStart,
                 'dateSubmissionDeadline' => $dateSubmissionDeadline,

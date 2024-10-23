@@ -36,8 +36,8 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Entity(repositoryClass: BackerGroupRepository::class)]
 class BackerGroup
 {
-    const API_DESCRIPTION = 'Lister tous les groupes de porteurs d\'aides';
-    const API_GROUP_LIST = 'backer_group:list';
+    public const API_DESCRIPTION = 'Lister tous les groupes de porteurs d\'aides';
+    public const API_GROUP_LIST = 'backer_group:list';
 
     #[Groups([self::API_GROUP_LIST])]
     #[ORM\Id]

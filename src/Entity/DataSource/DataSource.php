@@ -17,9 +17,9 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Entity(repositoryClass: DataSourceRepository::class)]
 class DataSource // NOSONAR too much methods
 {
-    const SLUG_LICENCE_UNKNOWN = 'unknown';
-    const SLUG_LICENCE_OPENLICENCE20 = 'openlicence20';
-    const LICENCES = [
+    public const SLUG_LICENCE_UNKNOWN = 'unknown';
+    public const SLUG_LICENCE_OPENLICENCE20 = 'openlicence20';
+    public const LICENCES = [
         ['slug' => self::SLUG_LICENCE_UNKNOWN, 'name' => 'Inconnue'],
         ['slug' => self::SLUG_LICENCE_OPENLICENCE20, 'name' => 'Licence ouverte 2.0']
     ];

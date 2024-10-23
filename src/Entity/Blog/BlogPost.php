@@ -17,13 +17,13 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Index(columns: ['slug'], name: 'slug_blog')]
 class BlogPost // NOSONAR too much methods
 {
-    const FOLDER = 'blog';
+    public const FOLDER = 'blog';
 
-    const STATUS_DRAFT = 'draft';
-    const STATUS_REVIEWABLE = 'reviewable';
-    const STATUS_PUBLISHED = 'published';
-    const STATUS_DELETED = 'deleted';
-    const STATUSES = [
+    public const STATUS_DRAFT = 'draft';
+    public const STATUS_REVIEWABLE = 'reviewable';
+    public const STATUS_PUBLISHED = 'published';
+    public const STATUS_DELETED = 'deleted';
+    public const STATUSES = [
         ['slug' => self::STATUS_DRAFT, 'name' => 'Brouillon'],
         ['slug' => self::STATUS_REVIEWABLE, 'name' => 'En revue'],
         ['slug' => self::STATUS_PUBLISHED, 'name' => 'Publié'],

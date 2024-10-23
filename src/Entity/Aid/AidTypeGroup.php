@@ -15,11 +15,11 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Index(columns: ['slug'], name: 'slug_aid_type_group')]
 class AidTypeGroup
 {
-    const API_GROUP_LIST = 'aid_type_group:list';
+    public const API_GROUP_LIST = 'aid_type_group:list';
 
 
-    const SLUG_FINANCIAL = 'financial-group';
-    const SLUG_TECHNICAL = 'technical-group';
+    public const SLUG_FINANCIAL = 'financial-group';
+    public const SLUG_TECHNICAL = 'technical-group';
 
     #[ORM\Id]
     #[ORM\GeneratedValue]

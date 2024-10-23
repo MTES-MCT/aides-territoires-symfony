@@ -118,7 +118,10 @@ class ImportFluxRegionSudCommand extends ImportFluxCommand
                 ? strip_tags((string) $aidToImport['Nom de l’aide']) : null,
             'description' => $this->concatHtmlFields(
                 $aidToImport,
-                ['Chapo', 'Pour qui', 'Pourquoi candidater', 'Quelle est la nature de l’aide (type d’aide)', 'Plus d’infos']
+                [
+                    'Chapo', 'Pour qui', 'Pourquoi candidater',
+                    'Quelle est la nature de l’aide (type d’aide)', 'Plus d’infos'
+                ]
             ),
             'eligibility' => $this->concatHtmlFields(
                 $aidToImport,
