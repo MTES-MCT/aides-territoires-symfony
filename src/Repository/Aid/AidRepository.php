@@ -336,7 +336,6 @@ class AidRepository extends ServiceEntityRepository
 
     public function getQueryBuilder(array $params = null): QueryBuilder
     {
-        dump($params);
         $id = $params['id'] ?? null;
         $author = $params['author'] ?? null;
         $isLive = $params['isLive'] ?? null;

@@ -313,7 +313,7 @@ class AidSearchFormService
         // transforme en tableau
         $queryParams = $this->unduplicateSpecificKeys($this->normalizeQueryParams($this->parseQueryString($query)));
         // > les paramètres en query
-dump('AidSearchFormService', $queryParams);
+
         // < le user
         $user = $this->userService->getUserLogged();
         // > le user
