@@ -64,10 +64,7 @@ class UserService
         return bin2hex(random_bytes(32));
     }
 
-    /**
-     * @return UserInterface|null
-     */
-    public function getUserLogged(): ?UserInterface
+    public function getUserLogged(): ?User
     {
         try {
             return $this->security->getUser();

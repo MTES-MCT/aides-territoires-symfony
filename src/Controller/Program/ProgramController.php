@@ -109,7 +109,6 @@ class ProgramController extends FrontController
             $aidSearchClass,
             $formAidSearchParams
         );
-        $formAidSearch->handleRequest($requestStack->getCurrentRequest());
 
         // parametres pour requetes aides
         $aidParams = [
@@ -117,7 +116,7 @@ class ProgramController extends FrontController
             'programs' => [$program],
         ];
         $aidParams = array_merge($aidParams, $aidSearchFormService->convertAidSearchClassToAidParams($aidSearchClass));
-        $showExtended = $aidSearchFormService->setShowExtendedV2($aidSearchClass);
+        $showExtended = $aidSearchFormService->setShowExtended($aidSearchClass);
 
         // le paginateur
         $aids = $aidService->searchAids($aidParams);

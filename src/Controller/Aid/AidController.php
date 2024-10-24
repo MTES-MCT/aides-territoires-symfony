@@ -96,7 +96,6 @@ class AidController extends FrontController
             $aidSearchClass,
             $formAidSearchParams
         );
-        $formAidSearch->handleRequest($requestStack->getCurrentRequest());
 
         // parametres pour requetes aides
         $aidParams = [

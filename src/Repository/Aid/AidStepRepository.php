@@ -54,6 +54,7 @@ class AidStepRepository extends ServiceEntityRepository
 
     public function getQueryBuilder(array $params = null): QueryBuilder
     {
+        $ids = $params['ids'] ?? null;
         $slugs = $params['slugs'] ?? null;
         $orderBy =
             (isset($params['orderBy'])
@@ -65,6 +66,11 @@ class AidStepRepository extends ServiceEntityRepository
 
         $qb = $this->createQueryBuilder('ast');
 
+        if (is_array($ids) && !empty($ids)) {
+            $qb->andWhere('ast.id IN (:ids)')
+                ->setParameter('ids', $ids);
+        }
+        
         if (is_array($slugs) && count($slugs) > 0) {
             $qb->andWhere('ast.slug IN (:slugs)')
                 ->setParameter('slugs', $slugs);

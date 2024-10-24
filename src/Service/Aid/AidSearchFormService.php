@@ -313,7 +313,7 @@ class AidSearchFormService
         // transforme en tableau
         $queryParams = $this->unduplicateSpecificKeys($this->normalizeQueryParams($this->parseQueryString($query)));
         // > les paramètres en query
-
+dump('AidSearchFormService', $queryParams);
         // < le user
         $user = $this->userService->getUserLogged();
         // > le user
@@ -665,6 +665,7 @@ class AidSearchFormService
         if (isset($queryParams[self::QUERYSTRING_KEY_AID_STEP_SLUGS])) {
             $aidStepSlugs = is_array($queryParams[self::QUERYSTRING_KEY_AID_STEP_SLUGS]) ? $queryParams[self::QUERYSTRING_KEY_AID_STEP_SLUGS] : [$queryParams[self::QUERYSTRING_KEY_AID_STEP_SLUGS]];
             $aidStepSlugs = $this->stringService->forceElementsToString($aidStepSlugs);
+
             if (!empty($aidStepSlugs)) {
                 /** @var AidStepRepository $aidStepRepository */
                 $aidStepRepository = $this->managerRegistry->getRepository(AidStep::class);
