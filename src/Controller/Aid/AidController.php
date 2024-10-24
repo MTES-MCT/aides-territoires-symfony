@@ -279,7 +279,7 @@ class AidController extends FrontController
                         }
                     }
                 }
-                if (isset($synonyms['simple_words_string']) && !isset($synonyms['objects_string'])) {
+                if (isset($synonyms['simple_words_string']) && (!isset($synonyms['objects_string']) || $synonyms['objects_string'] == '')) {
                     $keywords = str_getcsv($synonyms['simple_words_string'], ' ', '"');
                     foreach ($keywords as $keyword) {
                         if ($keyword && trim($keyword) !== '') {

@@ -201,6 +201,18 @@ class ReferenceService
         $objects_string = $this->arrayToStringWithQuotes($objects);
         $simple_words_string = $this->enleverArticles($project_name, $this->articles);
 
+        // recupere le tableau de toutes les intentions
+        $intentionNames = $this->keywordReferenceRepository->findIntentionNames();
+        
+        // on retire les intentions de $simple_words_string
+        foreach ($intentionNames as $intentionName) {
+            $pattern = '/(?<=\s|^)' . preg_quote($intentionName, '/') . '(?=\s|$)/';
+            $simple_words_string = preg_replace($pattern, ' ', $simple_words_string);
+        }
+        
+        // Supprimer les espaces supplémentaires
+        $simple_words_string = preg_replace('/\s+/', ' ', trim($simple_words_string));
+        
         // retour
         return [
             'intentions_string' => $intentions_string,

@@ -4,6 +4,7 @@ namespace App\Repository\Reference;
 
 use App\Entity\Reference\KeywordReference;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\Query\Expr\Func;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -22,6 +23,17 @@ class KeywordReferenceRepository extends ServiceEntityRepository
         parent::__construct($registry, KeywordReference::class);
     }
 
+    public function findIntentionNames(): array
+    {
+        $qb = $this->createQueryBuilder('kr');
+        $qb->select('kr.name');
+        $qb->where('kr.intention = 1');
+        $qb->orderBy('kr.name', 'ASC');
+
+        $result = $qb->getQuery()->getResult();
+        // on le tableau à plat pour ne retourner qu'un tableau de string
+        return array_map(fn($item) => $item['name'], $result);
+    }
     public function findArrayOfAllSynonyms(?array $params): array
     {
         $qb = $this->getQueryBuilder($params);
