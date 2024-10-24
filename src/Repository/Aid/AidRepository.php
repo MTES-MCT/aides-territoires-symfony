@@ -546,10 +546,11 @@ class AidRepository extends ServiceEntityRepository
             }
 
             $sqlObjects = '';
-            if (isset($sqlProjectReference)) {
-                $sqlObjects .= $sqlProjectReference;
-            }
             if ($objectsString) {
+                if (isset($sqlProjectReference)) {
+                    $sqlObjects .= $sqlProjectReference;
+                }
+                
                 if (trim($sqlObjects) !== '') {
                     $sqlObjects .= ' + ';
                 }
