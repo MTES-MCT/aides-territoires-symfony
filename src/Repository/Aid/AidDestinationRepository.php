@@ -77,7 +77,7 @@ class AidDestinationRepository extends ServiceEntityRepository
                 ->andWhere('ad.slug IN (:slugs)')
                 ->setParameter('slugs', $slugs);
         }
-        
+
         if ($orderBy !== null) {
             $qb
                 ->addOrderBy($orderBy['sort'], $orderBy['order']);

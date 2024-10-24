@@ -14,9 +14,16 @@ use Symfony\Component\PropertyInfo\Type;
 
 final class BackerIdsFilter extends AbstractFilter
 {
-    protected function filterProperty(string $property, $value, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, Operation $operation = null, array $context = []): void
-    {
-        // pour extends AbstractFilter
+    protected function filterProperty(
+        string $property,
+        $value,
+        QueryBuilder $queryBuilder,
+        QueryNameGeneratorInterface $queryNameGenerator,
+        string $resourceClass,
+        Operation $operation = null,
+        array $context = []
+    ): void {
+        // ajouté pour être conforme à l'extends
     }
 
     public function getDescription(string $resourceClass): array
@@ -41,7 +48,11 @@ final class BackerIdsFilter extends AbstractFilter
                 'property' => AidSearchFormService::QUERYSTRING_KEY_BACKER_IDS,
                 'type' => Type::BUILTIN_TYPE_ARRAY,
                 'required' => false,
-                'description' => '<div class="renderedMarkdown"><p>Porteurs d\'aides.<br><br>Voir aussi <code>/api/backers/</code> pour la liste complète. Vous pouvez passez plusieurs fois le paramètres ..&'.AidSearchFormService::QUERYSTRING_KEY_BACKER_IDS.'=1&'.AidSearchFormService::QUERYSTRING_KEY_BACKER_IDS.'=2</p></div>',
+                'description' => '<div class="renderedMarkdown"><p>Porteurs d\'aides.<br><br>'
+                    . 'Voir aussi <code>/api/backers/</code> pour la liste complète. '
+                    . 'Vous pouvez passez plusieurs fois le paramètres ..&'
+                    . AidSearchFormService::QUERYSTRING_KEY_BACKER_IDS . '=1&'
+                    . AidSearchFormService::QUERYSTRING_KEY_BACKER_IDS . '=2</p></div>',
                 'openapi' => [
                     'type' => Type::BUILTIN_TYPE_ARRAY,
                     'items' => [

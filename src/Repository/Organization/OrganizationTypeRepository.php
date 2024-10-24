@@ -77,7 +77,7 @@ class OrganizationTypeRepository extends ServiceEntityRepository
                 ->andWhere('ot.slug IN (:slugs)')
                 ->setParameter('slugs', $slugs);
         }
-        
+
         if ($orderBy !== null) {
             $qb
                 ->addOrderBy($orderBy['sort'], $orderBy['order']);

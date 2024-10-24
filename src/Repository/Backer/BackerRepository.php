@@ -311,7 +311,7 @@ class BackerRepository extends ServiceEntityRepository
                 ->andWhere('b.id IN (:ids)')
                 ->setParameter('ids', $ids);
         }
-        
+
         if ($active === true) {
             $qb
                 ->addCriteria(BackerRepository::activeCriteria());

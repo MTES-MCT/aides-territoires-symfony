@@ -76,7 +76,10 @@ class AidSearchTypeV2 extends AbstractType
                 'query_builder' => function (EntityRepository $er) use ($options) {
                     $qb = $er->createQueryBuilder('ot');
 
-                    if ($options['searchPage'] instanceof SearchPage && !$options['searchPage']->getOrganizationTypes()->isEmpty()) {
+                    if (
+                        $options['searchPage'] instanceof SearchPage
+                        && !$options['searchPage']->getOrganizationTypes()->isEmpty()
+                    ) {
                         $qb->andWhere('ot IN (:organizationTypes)')
                             ->setParameter('organizationTypes', $options['searchPage']->getOrganizationTypes());
                     }
@@ -117,7 +120,6 @@ class AidSearchTypeV2 extends AbstractType
                 'required' => false,
                 'label' => 'Thématiques de l\'aide',
                 'placeholder' => 'Toutes les sous-thématiques',
-                // 'help' => 'Sélectionnez la ou les thématiques associées à votre aide. N’hésitez pas à en choisir plusieurs.',
                 'class' => Category::class,
                 'choice_label' => 'name',
                 'group_by' => function (Category $category) {
@@ -128,7 +130,10 @@ class AidSearchTypeV2 extends AbstractType
                         ->innerJoin('c.categoryTheme', 'categoryTheme')
                         ->orderBy('categoryTheme.name', 'ASC')
                         ->addOrderBy('c.name', 'ASC');
-                    if ($options['searchPage'] instanceof SearchPage && !$options['searchPage']->getCategories()->isEmpty()) {
+                    if (
+                        $options['searchPage'] instanceof SearchPage
+                        && !$options['searchPage']->getCategories()->isEmpty()
+                    ) {
                         $qb->andWhere('c IN (:categories)')
                             ->setParameter('categories', $options['searchPage']->getCategories());
                     }

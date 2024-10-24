@@ -563,7 +563,7 @@ class StringService
      */
     public function forceElementsToInt(array $array): array
     {
-        return array_filter(array_map(function($value) {
+        return array_filter(array_map(function ($value) {
             // Extraire l'entier de la chaîne de caractères
             if (preg_match('/\d+/', $value, $matches)) {
                 $id = filter_var($matches[0], FILTER_VALIDATE_INT);

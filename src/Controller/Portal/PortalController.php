@@ -36,7 +36,7 @@ use Symfony\UX\Chartjs\Model\Chart;
 
 class PortalController extends FrontController
 {
-    const DATE_START_MATOMO = '2024-02-19';
+    public const DATE_START_MATOMO = '2024-02-19';
 
     // c'est une page custom
     #[Route('/portails/', name: 'app_portal_portal')]
@@ -77,7 +77,10 @@ class PortalController extends FrontController
 
         // redirection vers un autre portail
         if ($search_page->getSearchPageRedirect()) {
-            return $this->redirectToRoute('app_portal_portal_details', ['slug' => $search_page->getSearchPageRedirect()->getSlug()]);
+            return $this->redirectToRoute(
+                'app_portal_portal_details',
+                ['slug' => $search_page->getSearchPageRedirect()->getSlug()]
+            );
         }
 
         // converti la querystring en parametres
@@ -120,7 +123,7 @@ class PortalController extends FrontController
             'extended' => true,
             'searchPage' => $search_page
         ];
-        
+
         // formulaire recherche aides
         $formAidSearch = $this->createForm(
             AidSearchTypeV2::class,
@@ -147,7 +150,11 @@ class PortalController extends FrontController
                 FrontController::FLASH_ERROR,
                 'Le numéro de page demandé n\'existe pas'
             );
-            $newUrl = preg_replace('/(page=)[^\&]+/', 'page=' . $pagerfanta->getNbPages(), $requestStack->getCurrentRequest()->getRequestUri());
+            $newUrl = preg_replace(
+                '/(page=)[^\&]+/',
+                'page=' . $pagerfanta->getNbPages(),
+                $requestStack->getCurrentRequest()->getRequestUri()
+            );
             return new RedirectResponse($newUrl);
         }
 
@@ -159,7 +166,8 @@ class PortalController extends FrontController
             'host' => $requestStack->getCurrentRequest()->getHost(),
             'perimeter' => $aidParams['perimeterFrom'] ?? null,
             'search' => $aidParams['keyword'] ?? null,
-            'organization' => ($user instanceof User && $user->getDefaultOrganization()) ? $user->getDefaultOrganization() : null,
+            'organization' => ($user instanceof User && $user->getDefaultOrganization())
+                ? $user->getDefaultOrganization() : null,
             'backers' => $aidParams['backers'] ?? null,
             'categories' => $aidParams['categories'] ?? null,
             'programs' => $aidParams['programs'] ?? null,
@@ -287,7 +295,10 @@ class PortalController extends FrontController
             'showExtended' => $showExtended,
             'formAlertCreate' => $formAlertCreate,
             'querystring' => $queryString,
-            'perimeterName' => (isset($aidParams['perimeterFrom']) && $aidParams['perimeterFrom'] instanceof Perimeter) ? $aidParams['perimeterFrom']->getName() : '',
+            'perimeterName' => (
+                isset($aidParams['perimeterFrom'])
+                && $aidParams['perimeterFrom'] instanceof Perimeter
+            ) ? $aidParams['perimeterFrom']->getName() : '',
             'categoriesName' => $categoriesName,
             'highlightedWords' => $highlightedWords,
             'showAudienceField' => $search_page->isShowAudienceField(),
@@ -327,7 +338,10 @@ class PortalController extends FrontController
 
         // redirection vers un autre portail
         if ($search_page->getSearchPageRedirect()) {
-            return $this->redirectToRoute('app_portal_portal_stats', ['slug' => $search_page->getSearchPageRedirect()->getSlug()]);
+            return $this->redirectToRoute(
+                'app_portal_portal_stats',
+                ['slug' => $search_page->getSearchPageRedirect()->getSlug()]
+            );
         }
 
         // converti la querystring en parametres
@@ -404,7 +418,11 @@ class PortalController extends FrontController
         ]);
     }
 
-    #[Route('/portails/stats/ajax-top-aids/', name: 'app_portal_portal_stats_ajax_top_aids', options: ['expose' => true])]
+    #[Route(
+        '/portails/stats/ajax-top-aids/',
+        name: 'app_portal_portal_stats_ajax_top_aids',
+        options: ['expose' => true]
+    )]
     public function ajaxTopAids(
         RequestStack $requestStack,
         LogAidViewRepository $logAidViewRepository
@@ -428,7 +446,11 @@ class PortalController extends FrontController
                 'dateMax' => $dateMax
             ]);
             foreach ($topAidsViews as $key => $topAidsView) {
-                $topAidsViews[$key]['url'] = $this->generateUrl('app_aid_aid_details', ['slug' => $topAidsView['slug']], UrlGeneratorInterface::ABSOLUTE_URL);
+                $topAidsViews[$key]['url'] = $this->generateUrl(
+                    'app_aid_aid_details',
+                    ['slug' => $topAidsView['slug']],
+                    UrlGeneratorInterface::ABSOLUTE_URL
+                );
             }
         }
         // rendu template
@@ -437,7 +459,11 @@ class PortalController extends FrontController
         ]);
     }
 
-    #[Route('/portails/stats/ajax-aids-view-by-month/', name: 'app_portal_portal_stats_ajax_aids_view_by_month', options: ['expose' => true])]
+    #[Route(
+        '/portails/stats/ajax-aids-view-by-month/',
+        name: 'app_portal_portal_stats_ajax_aids_view_by_month',
+        options: ['expose' => true]
+    )]
     public function ajaxAidViewsByMonth(
         RequestStack $requestStack,
         LogAidViewRepository $logAidViewRepository,
@@ -484,7 +510,11 @@ class PortalController extends FrontController
         ]);
     }
 
-    #[Route('/portails/stats/ajax-aids-view-by-organization-type/', name: 'app_portal_portal_stats_ajax_aids_view_by_organization_type', options: ['expose' => true])]
+    #[Route(
+        '/portails/stats/ajax-aids-view-by-organization-type/',
+        name: 'app_portal_portal_stats_ajax_aids_view_by_organization_type',
+        options: ['expose' => true]
+    )]
     public function ajaxAidViewsByOrganizationType(
         RequestStack $requestStack,
         LogAidViewRepository $logAidViewRepository,
@@ -514,7 +544,9 @@ class PortalController extends FrontController
                 $total += $organizationType['nb'];
             }
             foreach ($organizationTypes as $key => $organizationType) {
-                $organizationTypes[$key]['percentage'] = $total == 0 ? 0 : number_format(($organizationType['nb'] * 100 / $total), 2);
+                $organizationTypes[$key]['percentage'] = $total == 0
+                    ? 0
+                    : number_format(($organizationType['nb'] * 100 / $total), 2);
             }
 
             // datas pour le graphique
@@ -556,7 +588,11 @@ class PortalController extends FrontController
         ]);
     }
 
-    #[Route('/portails/stats/ajax-aids-visits-by-month/', name: 'app_portal_portal_stats_ajax_visits_by_month', options: ['expose' => true])]
+    #[Route(
+        '/portails/stats/ajax-aids-visits-by-month/',
+        name: 'app_portal_portal_stats_ajax_visits_by_month',
+        options: ['expose' => true]
+    )]
     public function ajaxVisitsByMonth(
         RequestStack $requestStack,
         SearchPageRepository $searchPageRepository,
@@ -581,11 +617,16 @@ class PortalController extends FrontController
         }
         // // défini la date de début pour les stats
         $dateStartMatomoto = new \DateTime(date(self::DATE_START_MATOMO));
-        $dateStartStats = $dateStartMatomoto > $search_page->getTimeCreate() ? $dateStartMatomoto : $search_page->getTimeCreate();
+        $dateStartStats = $dateStartMatomoto > $search_page->getTimeCreate()
+            ? $dateStartMatomoto : $search_page->getTimeCreate();
 
         // nombre de visites du portail par mois
         $today = new \DateTime(date('Y-m-d'));
-        $url = urlencode($this->generateUrl('app_portal_portal_details', ['slug' => $search_page->getSlug()], UrlGeneratorInterface::ABSOLUTE_URL));
+        $url = urlencode($this->generateUrl(
+            'app_portal_portal_details',
+            ['slug' => $search_page->getSlug()],
+            UrlGeneratorInterface::ABSOLUTE_URL
+        ));
         $visitsByMonth = $matomoService->getMatomoStats(
             'VisitsSummary.get',
             'pageUrl==' . $url,

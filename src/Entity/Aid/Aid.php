@@ -81,8 +81,16 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Index(columns: ['description'], name: 'description_aid_fulltext', flags: ['fulltext'])]
 #[ORM\Index(columns: ['eligibility'], name: 'eligibility_aid_fulltext', flags: ['fulltext'])]
 #[ORM\Index(columns: ['name', 'description', 'eligibility'], name: 'synonym_aid_nde_fulltext', flags: ['fulltext'])]
-#[ORM\Index(columns: ['description', 'eligibility', 'project_examples'], name: 'synonym_aid_fulltext', flags: ['fulltext'])]
-#[ORM\Index(columns: ['name', 'name_initial', 'description', 'eligibility', 'project_examples'], name: 'synonym_aid_all_fulltext', flags: ['fulltext'])]
+#[ORM\Index(
+    columns: ['description', 'eligibility', 'project_examples'],
+    name: 'synonym_aid_fulltext',
+    flags: ['fulltext']
+)]
+#[ORM\Index(
+    columns: ['name', 'name_initial', 'description', 'eligibility', 'project_examples'],
+    name: 'synonym_aid_all_fulltext',
+    flags: ['fulltext']
+)]
 #[ApiResource(
     operations: [
         new GetCollection(
@@ -141,21 +149,21 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ApiFilter(BackerGroupIdFilter::class)]
 class Aid // NOSONAR too much methods
 {
-    const API_OPERATION_GET_BY_ID = 'api_aid_get_by_id';
-    const API_OPERATION_GET_BY_SLUG = 'api_aid_get_by_slug';
-    const API_OPERATION_GET_COLLECTION_PUBLISHED = 'api_aids_published';
-    const API_OPERATION_GET_COLLECTION_ALL = 'api_aids_all';
+    public const API_OPERATION_GET_BY_ID = 'api_aid_get_by_id';
+    public const API_OPERATION_GET_BY_SLUG = 'api_aid_get_by_slug';
+    public const API_OPERATION_GET_COLLECTION_PUBLISHED = 'api_aids_published';
+    public const API_OPERATION_GET_COLLECTION_ALL = 'api_aids_all';
 
-    const API_GROUP_LIST = 'aid:list';
-    const API_GROUP_ITEM = 'aid:item';
+    public const API_GROUP_LIST = 'aid:list';
+    public const API_GROUP_ITEM = 'aid:item';
 
-    const STATUS_PUBLISHED = 'published';
-    const STATUS_DELETED = 'deleted';
-    const STATUS_DRAFT = 'draft';
-    const STATUS_MERGED = 'merged';
-    const STATUS_REVIEWABLE = 'reviewable';
+    public const STATUS_PUBLISHED = 'published';
+    public const STATUS_DELETED = 'deleted';
+    public const STATUS_DRAFT = 'draft';
+    public const STATUS_MERGED = 'merged';
+    public const STATUS_REVIEWABLE = 'reviewable';
 
-    const STATUSES = [
+    public const STATUSES = [
         ['slug' => self::STATUS_PUBLISHED, 'name' => 'Publiée'],
         ['slug' => self::STATUS_DELETED, 'name' => 'Supprimée'],
         ['slug' => self::STATUS_DRAFT, 'name' => 'Brouillon'],
@@ -163,18 +171,18 @@ class Aid // NOSONAR too much methods
         ['slug' => self::STATUS_REVIEWABLE, 'name' => 'En revue'],
     ];
 
-    const APPROACHING_DEADLINE_DELTA = 30;  # days
+    public const APPROACHING_DEADLINE_DELTA = 30;  # days
 
-    const SLUG_EUROPEAN = 'european';
-    const SLUG_EUROPEAN_SECTORIAL = 'sectorial';
-    const SLUG_EUROPEAN_ORGANIZATIONAL = 'organizational';
-    const LABELS_EUROPEAN = [
+    public const SLUG_EUROPEAN = 'european';
+    public const SLUG_EUROPEAN_SECTORIAL = 'sectorial';
+    public const SLUG_EUROPEAN_ORGANIZATIONAL = 'organizational';
+    public const LABELS_EUROPEAN = [
         self::SLUG_EUROPEAN => 'Aides européennes',
         self::SLUG_EUROPEAN_SECTORIAL => 'Aides européennes sectorielles',
         self::SLUG_EUROPEAN_ORGANIZATIONAL => 'Aides européennes structurelles',
     ];
 
-    const MAX_NB_EXPORT_PDF = 20;
+    public const MAX_NB_EXPORT_PDF = 20;
 
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -453,7 +461,8 @@ class Aid // NOSONAR too much methods
 
     #[ApiProperty(
         openapiContext: [
-            'description' => 'Aides France Relance concernant le MTFP. Pour les aides du Plan de relance, utiliser le paramètre programs.slug',
+            'description' => 'Aides France Relance concernant le MTFP. '
+                . 'Pour les aides du Plan de relance, utiliser le paramètre programs.slug',
             'enum' => [true, false],
             'example' => true
         ]
@@ -1939,7 +1948,10 @@ class Aid // NOSONAR too much methods
 
     public function removeAidSuggestedAidProject(AidSuggestedAidProject $aidSuggestedAidProject): static
     {
-        if ($this->aidSuggestedAidProjects->removeElement($aidSuggestedAidProject) && $aidSuggestedAidProject->getAid() === $this) {
+        if (
+            $this->aidSuggestedAidProjects->removeElement($aidSuggestedAidProject)
+            && $aidSuggestedAidProject->getAid() === $this
+        ) {
             $aidSuggestedAidProject->setAid(null);
         }
 
@@ -2139,7 +2151,10 @@ class Aid // NOSONAR too much methods
         if (
             $this->status == self::STATUS_PUBLISHED
             && (($this->dateStart && $this->dateStart <= $today) || !$this->dateStart)
-            && (($this->dateSubmissionDeadline && $this->dateSubmissionDeadline >= $today) || !$this->dateSubmissionDeadline)
+            && (
+                ($this->dateSubmissionDeadline && $this->dateSubmissionDeadline >= $today)
+                || !$this->dateSubmissionDeadline
+                )
         ) {
             return true;
         }
@@ -2313,7 +2328,10 @@ class Aid // NOSONAR too much methods
 
     public function removeLogAidApplicationUrlClick(LogAidApplicationUrlClick $logAidApplicationUrlClick): static
     {
-        if ($this->logAidApplicationUrlClicks->removeElement($logAidApplicationUrlClick) && $logAidApplicationUrlClick->getAid() === $this) {
+        if (
+            $this->logAidApplicationUrlClicks->removeElement($logAidApplicationUrlClick)
+            && $logAidApplicationUrlClick->getAid() === $this
+        ) {
             $logAidApplicationUrlClick->setAid(null);
         }
 
@@ -2340,7 +2358,10 @@ class Aid // NOSONAR too much methods
 
     public function removeLogAidOriginUrlClick(LogAidOriginUrlClick $logAidOriginUrlClick): static
     {
-        if ($this->logAidOriginUrlClicks->removeElement($logAidOriginUrlClick) && $logAidOriginUrlClick->getAid() === $this) {
+        if (
+            $this->logAidOriginUrlClicks->removeElement($logAidOriginUrlClick)
+            && $logAidOriginUrlClick->getAid() === $this
+        ) {
             $logAidOriginUrlClick->setAid(null);
         }
 
@@ -2367,7 +2388,10 @@ class Aid // NOSONAR too much methods
 
     public function removeLogAidContactClick(LogAidContactClick $logAidContactClick): static
     {
-        if ($this->logAidContactClicks->removeElement($logAidContactClick) && $logAidContactClick->getAid() === $this) {
+        if (
+            $this->logAidContactClicks->removeElement($logAidContactClick)
+            && $logAidContactClick->getAid() === $this
+        ) {
             $logAidContactClick->setAid(null);
         }
 
@@ -2394,7 +2418,10 @@ class Aid // NOSONAR too much methods
 
     public function removeLogAidCreatedsFolder(LogAidCreatedsFolder $logAidCreatedsFolder): static
     {
-        if ($this->logAidCreatedsFolders->removeElement($logAidCreatedsFolder) && $logAidCreatedsFolder->getAid() === $this) {
+        if (
+            $this->logAidCreatedsFolders->removeElement($logAidCreatedsFolder)
+            && $logAidCreatedsFolder->getAid() === $this
+        ) {
             $logAidCreatedsFolder->setAid(null);
         }
 
@@ -2421,7 +2448,10 @@ class Aid // NOSONAR too much methods
 
     public function removeLogAidEligibilityTest(LogAidEligibilityTest $logAidEligibilityTest): static
     {
-        if ($this->logAidEligibilityTests->removeElement($logAidEligibilityTest) && $logAidEligibilityTest->getAid() === $this) {
+        if (
+            $this->logAidEligibilityTests->removeElement($logAidEligibilityTest)
+            && $logAidEligibilityTest->getAid() === $this
+        ) {
             $logAidEligibilityTest->setAid(null);
         }
 

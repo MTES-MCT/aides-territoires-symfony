@@ -201,7 +201,7 @@ class AidSearchClass // NOSONAR too much methods
     {
         return $this->backer_ids;
     }
-    
+
     public function setBackerIds(?ArrayCollection $backerIds): void
     {
         $this->backer_ids = $backerIds;

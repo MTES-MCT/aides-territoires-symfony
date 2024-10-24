@@ -13,8 +13,16 @@ use Symfony\Component\PropertyInfo\Type;
 
 final class AidTypeSlugsFilter extends AbstractFilter
 {
-    protected function filterProperty(string $property, $value, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, Operation $operation = null, array $context = []): void
-    {
+    protected function filterProperty(
+        string $property,
+        $value,
+        QueryBuilder $queryBuilder,
+        QueryNameGeneratorInterface $queryNameGenerator,
+        string $resourceClass,
+        Operation $operation = null,
+        array $context = []
+    ): void {
+        // ajouté pour être conforme à l'extends
     }
 
     public function getDescription(string $resourceClass): array
@@ -33,7 +41,14 @@ final class AidTypeSlugsFilter extends AbstractFilter
                 'property' => AidSearchFormService::QUERYSTRING_KEY_AID_TYPE_SLUGS,
                 'type' => Type::BUILTIN_TYPE_ARRAY,
                 'required' => false,
-                'description' => '<div class="renderedMarkdown"><p>Type d\'aides financières ou en ingénierie. Vous pouvez passer plusieurs fois ce paramètre pour rechercher sur plusieurs types, ex : ...&'.AidSearchFormService::QUERYSTRING_KEY_AID_TYPE_SLUGS.'=recoverable-advance&'.AidSearchFormService::QUERYSTRING_KEY_AID_TYPE_SLUGS.'=legal-engineering...<br><br><br><br>Voir aussi <code>/api/aids/types/</code> pour la liste complète.</p></div>',
+                'description' => '<div class="renderedMarkdown"><p>'
+                    . 'Type d\'aides financières ou en ingénierie. '
+                    . 'Vous pouvez passer plusieurs fois ce paramètre pour rechercher sur plusieurs types, ex : ...&'
+                    . AidSearchFormService::QUERYSTRING_KEY_AID_TYPE_SLUGS
+                    . '=recoverable-advance&'
+                    . AidSearchFormService::QUERYSTRING_KEY_AID_TYPE_SLUGS
+                    . '=legal-engineering...<br><br>'
+                    . 'Voir aussi <code>/api/aids/types/</code> pour la liste complète.</p></div>',
                 'openapi' => [
                     'type' => Type::BUILTIN_TYPE_ARRAY,
                     'items' => [

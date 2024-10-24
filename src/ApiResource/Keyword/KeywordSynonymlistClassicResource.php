@@ -19,6 +19,6 @@ use App\Controller\Api\Keyword\KeywordSynonymlistController;
 )]
 class KeywordSynonymlistClassicResource
 {
-    const API_OPERATION_NAME = 'keywordsynonymlist:list_classic';
-    const API_GROUP_LIST = 'keywordsynonymlist:list_classic';
+    public const API_OPERATION_NAME = 'keywordsynonymlist:list_classic';
+    public const API_GROUP_LIST = 'keywordsynonymlist:list_classic';
 }

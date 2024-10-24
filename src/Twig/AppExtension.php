@@ -238,7 +238,7 @@ class AppExtension extends AbstractExtension // NOSONAR too much methods
             // Vérifie si le href est une adresse e-mail
             if (preg_match('/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/', $href)) {
                 // Ajoute mailto: au début du href
-                $node->setAttribute('href', 'mailto:'.$href);
+                $node->setAttribute('href', 'mailto:' . $href);
             }
         }
 
@@ -280,7 +280,7 @@ class AppExtension extends AbstractExtension // NOSONAR too much methods
             // Ajouter les nouvelles classes
             $classesToAdd = implode(' ', $classesToAdd);
             if ('' !== $currentClass) {
-                $newClass = $currentClass.' '.$classesToAdd;
+                $newClass = $currentClass . ' ' . $classesToAdd;
             } else {
                 $newClass = $classesToAdd;
             }
@@ -449,7 +449,7 @@ class AppExtension extends AbstractExtension // NOSONAR too much methods
     {
         $aidInstructors = $aidInstructors->toArray();
 
-        
+
         usort($aidInstructors, function (AidInstructor $a, AidInstructor $b) {
             $nameA = $this->stringService->normalizeString($a->getBacker()->getName());
             $nameB = $this->stringService->normalizeString($b->getBacker()->getName());

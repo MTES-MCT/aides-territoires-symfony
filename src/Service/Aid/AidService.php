@@ -232,7 +232,8 @@ class AidService // NOSONAR too complex
         $aidRepo = $this->managerRegistry->getRepository(Aid::class);
         $aids = $aidRepo->findCustom($aidParams);
 
-        // Si on a le score total et le score objects on tri par le cumul des deux (pas possible directement dans la requête sans trop l'alourdir)
+        // Si on a le score total et le score objects on tri par le cumul des deux
+        // (pas possible directement dans la requête sans trop l'alourdir)
         if (isset($aids[0]) && $aids[0]->getScoreTotal() && $aids[0]->getScoreObjects()) {
             usort($aids, function ($a, $b) {
                 return ($b->getScoreTotal() + $b->getScoreObjects()) <=> ($a->getScoreTotal() + $a->getScoreObjects());
@@ -367,7 +368,8 @@ class AidService // NOSONAR too complex
                     $aids->removeElement($aid->getGenericAid());
                 }
             } elseif ($searchWider) {
-                // Si c'est une aide locale et que la liste contiens l'aide générique, on retire l'aide locale de la liste
+                // Si c'est une aide locale et que la liste contiens l'aide générique,
+                // on retire l'aide locale de la liste
                 if ($aid->getGenericAid() && $aids->contains($aid->getGenericAid())) {
                     $aids->removeElement($aid);
                 }
@@ -391,7 +393,10 @@ class AidService // NOSONAR too complex
         if (!$user) {
             return false;
         }
-        if ($user->getId() == $aid->getAuthor()->getId() || $this->userService->isUserGranted($user, User::ROLE_ADMIN)) {
+        if (
+            $user->getId() == $aid->getAuthor()->getId()
+            || $this->userService->isUserGranted($user, User::ROLE_ADMIN)
+        ) {
             return true;
         }
         return false;
@@ -402,7 +407,12 @@ class AidService // NOSONAR too complex
         if (!$aid->isPublished()) {
             if ($user && $aid->getAuthor() && ($user->getId() == $aid->getAuthor()->getId())) { // c'est l'auteur
                 return true;
-            } elseif ($user && $aid->getOrganization() && $aid->getOrganization()->getBeneficiairies() && $aid->getOrganization()->getBeneficiairies()->contains($user)) { // le user fait parti de l'organization de l'aide
+            } elseif (
+                $user
+                && $aid->getOrganization()
+                && $aid->getOrganization()->getBeneficiairies()
+                && $aid->getOrganization()->getBeneficiairies()->contains($user)
+            ) { // le user fait parti de l'organization de l'aide
                 return true;
             } elseif ($user && $this->userService->isUserGranted($user, User::ROLE_ADMIN)) { // c'est un admin
                 return true;
@@ -461,8 +471,12 @@ class AidService // NOSONAR too complex
             return $datas;
         }
 
-        $organizationType = ($user->getDefaultOrganization() && $user->getDefaultOrganization()->getOrganizationType()) ? $user->getDefaultOrganization()->getOrganizationType() : null;
-        if ($organizationType && in_array($organizationType->getSlug(), [OrganizationType::SLUG_COMMUNE, OrganizationType::SLUG_EPCI])) {
+        $organizationType = ($user->getDefaultOrganization() && $user->getDefaultOrganization()->getOrganizationType())
+            ? $user->getDefaultOrganization()->getOrganizationType() : null;
+        if (
+            $organizationType
+            && in_array($organizationType->getSlug(), [OrganizationType::SLUG_COMMUNE, OrganizationType::SLUG_EPCI])
+        ) {
             try {
                 $response = $this->postPrepopulateData($aid->getDsId(), $aid->getDsMapping(), $user, $organization);
                 $content = json_decode((string) $response->getContent());
@@ -491,8 +505,12 @@ class AidService // NOSONAR too complex
      * @param UserInterface|null $user
      * @param Organization|null $organization
      */
-    public function postPrepopulateData(int $dsId, array $dsMapping, ?UserInterface $user, ?Organization $organization): mixed
-    {
+    public function postPrepopulateData(
+        int $dsId,
+        array $dsMapping,
+        ?UserInterface $user,
+        ?Organization $organization
+    ): mixed {
         $datas = $this->prepopulateDsFolder($dsMapping, $user, $organization);
 
         return $this->httpClientInterface->request(
@@ -791,7 +809,11 @@ class AidService // NOSONAR too complex
                 'name' => $item,
                 'intention' => false
             ]);
-            if ($keyword instanceof KeywordReference && $keyword->getParent() && !$keywords->contains($keyword->getParent())) {
+            if (
+                $keyword instanceof KeywordReference
+                && $keyword->getParent()
+                && !$keywords->contains($keyword->getParent())
+            ) {
                 $keywords->add($keyword->getParent());
                 $keywordsReturn[] = [
                     'keyword' => $keyword->getParent(),
@@ -841,7 +863,7 @@ class AidService // NOSONAR too complex
             }
 
             // met le nom à la feuille
-            $sheet->setTitle($stringService->truncate($aid->getId() . '_' . $aid->getName(), 31)); // Définir le nom de la feuille
+            $sheet->setTitle($stringService->truncate($aid->getId() . '_' . $aid->getName(), 31));
 
             // Infos aides
             $sheet->setCellValue('A1', 'Nom de l’aide');

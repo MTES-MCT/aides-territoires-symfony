@@ -169,10 +169,15 @@ class AidController extends FrontController
         }
         $pageTitle .= ' de recherche : ';
         if ($formAidSearch->get(AidSearchFormService::QUERYSTRING_KEY_ORGANIZATION_TYPE_SLUG)->getData()) {
-            $pageTitle .= ' Structure : ' . $formAidSearch->get(AidSearchFormService::QUERYSTRING_KEY_ORGANIZATION_TYPE_SLUG)->getData()->getName() . ' ';
+            $pageTitle .= ' Structure : '
+                . $formAidSearch->get(AidSearchFormService::QUERYSTRING_KEY_ORGANIZATION_TYPE_SLUG)
+                    ->getData()->getName()
+                . ' ';
         }
         if ($formAidSearch->get(AidSearchFormService::QUERYSTRING_KEY_SEARCH_PERIMETER)->getData()) {
-            $pageTitle .= ' - Périmètre : ' . $formAidSearch->get(AidSearchFormService::QUERYSTRING_KEY_SEARCH_PERIMETER)->getData()->getName() . ' ';
+            $pageTitle .= ' - Périmètre : '
+                . $formAidSearch->get(AidSearchFormService::QUERYSTRING_KEY_SEARCH_PERIMETER)->getData()->getName()
+                . ' ';
         }
 
         /** @var AidSearchClass $data */

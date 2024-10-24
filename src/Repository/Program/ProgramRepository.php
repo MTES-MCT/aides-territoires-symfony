@@ -95,7 +95,7 @@ class ProgramRepository extends ServiceEntityRepository
                 ->andWhere('p.slug IN (:slugs)')
                 ->setParameter('slugs', $slugs);
         }
-        
+
         if ($hasLogo === true) {
             $qb
                 ->andWhere('p.logo IS NOT NULL');

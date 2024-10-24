@@ -13,8 +13,16 @@ use Symfony\Component\PropertyInfo\Type;
 
 final class AidStepSlugsFilter extends AbstractFilter
 {
-    protected function filterProperty(string $property, $value, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, Operation $operation = null, array $context = []): void
-    {
+    protected function filterProperty(
+        string $property,
+        $value,
+        QueryBuilder $queryBuilder,
+        QueryNameGeneratorInterface $queryNameGenerator,
+        string $resourceClass,
+        Operation $operation = null,
+        array $context = []
+    ): void {
+        // ajouté pour être conforme à l'extends
     }
 
     public function getDescription(string $resourceClass): array
@@ -33,7 +41,11 @@ final class AidStepSlugsFilter extends AbstractFilter
                 'property' => AidSearchFormService::QUERYSTRING_KEY_AID_STEP_SLUGS,
                 'type' => Type::BUILTIN_TYPE_ARRAY,
                 'required' => false,
-                'description' => '<div class="renderedMarkdown"><p>Avancement du projet.<br><br>Vous pouvez passer plusieurs fois ce paramètre pour rechercher sur plusieurs types, ex : ...&'.AidSearchFormService::QUERYSTRING_KEY_AID_STEP_SLUGS.'=preop&'.AidSearchFormService::QUERYSTRING_KEY_AID_STEP_SLUGS.'=postop...<br><br>Voir aussi <code>/api/aids/steps/</code> pour la liste complète.</p></div>',
+                'description' => '<div class="renderedMarkdown"><p>Avancement du projet.<br><br>'
+                    . 'Vous pouvez passer plusieurs fois ce paramètre pour rechercher sur plusieurs types, ex : ...&'
+                    . AidSearchFormService::QUERYSTRING_KEY_AID_STEP_SLUGS . '=preop&'
+                    . AidSearchFormService::QUERYSTRING_KEY_AID_STEP_SLUGS . '=postop...<br><br>'
+                    . 'Voir aussi <code>/api/aids/steps/</code> pour la liste complète.</p></div>',
                 'openapi' => [
                     'type' => Type::BUILTIN_TYPE_ARRAY,
                     'items' => [

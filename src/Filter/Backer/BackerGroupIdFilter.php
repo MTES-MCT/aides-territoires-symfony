@@ -13,9 +13,16 @@ use Symfony\Component\PropertyInfo\Type;
 
 final class BackerGroupIdFilter extends AbstractFilter
 {
-    protected function filterProperty(string $property, $value, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, Operation $operation = null, array $context = []): void
-    {
-        // pour extends AbstractFilter
+    protected function filterProperty(
+        string $property,
+        $value,
+        QueryBuilder $queryBuilder,
+        QueryNameGeneratorInterface $queryNameGenerator,
+        string $resourceClass,
+        Operation $operation = null,
+        array $context = []
+    ): void {
+        // ajouté pour être conforme à l'extends
     }
 
     public function getDescription(string $resourceClass): array
@@ -34,7 +41,8 @@ final class BackerGroupIdFilter extends AbstractFilter
                 'property' => AidSearchFormService::QUERYSTRING_KEY_BACKER_GROUP_ID,
                 'type' => Type::BUILTIN_TYPE_INT,
                 'required' => false,
-                'description' => '<div class="renderedMarkdown"><p>Groupe de porteurs d\'aides.<br><br>Voir aussi <code>/api/backer-groups/</code> pour la liste complète.</p></div>',
+                'description' => '<div class="renderedMarkdown"><p>Groupe de porteurs d\'aides.<br><br>'
+                    . 'Voir aussi <code>/api/backer-groups/</code> pour la liste complète.</p></div>',
                 'openapi' => [
                     'examples' => $examples,
                 ],

@@ -70,7 +70,7 @@ class AidStepRepository extends ServiceEntityRepository
             $qb->andWhere('ast.id IN (:ids)')
                 ->setParameter('ids', $ids);
         }
-        
+
         if (is_array($slugs) && count($slugs) > 0) {
             $qb->andWhere('ast.slug IN (:slugs)')
                 ->setParameter('slugs', $slugs);

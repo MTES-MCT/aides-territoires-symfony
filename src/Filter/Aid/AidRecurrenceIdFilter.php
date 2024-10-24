@@ -13,8 +13,16 @@ use Symfony\Component\PropertyInfo\Type;
 
 final class AidRecurrenceIdFilter extends AbstractFilter
 {
-    protected function filterProperty(string $property, $value, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, Operation $operation = null, array $context = []): void
-    {
+    protected function filterProperty(
+        string $property,
+        $value,
+        QueryBuilder $queryBuilder,
+        QueryNameGeneratorInterface $queryNameGenerator,
+        string $resourceClass,
+        Operation $operation = null,
+        array $context = []
+    ): void {
+        // ajouté pour être conforme à l'extends
     }
 
     public function getDescription(string $resourceClass): array
@@ -33,7 +41,8 @@ final class AidRecurrenceIdFilter extends AbstractFilter
                 'property' => AidSearchFormService::QUERYSTRING_KEY_AID_RECURRENCE_ID,
                 'type' => Type::BUILTIN_TYPE_INT,
                 'required' => false,
-                'description' => '<div class="renderedMarkdown"><p>Récurrence par id.<br><br>Voir aussi <code>/api/aids/recurrences/</code> pour la liste complète.</p></div>',
+                'description' => '<div class="renderedMarkdown"><p>Récurrence par id.<br><br>'
+                    . 'Voir aussi <code>/api/aids/recurrences/</code> pour la liste complète.</p></div>',
                 'openapi' => [
                     'examples' => $examples,
                 ],
