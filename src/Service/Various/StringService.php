@@ -7,19 +7,14 @@ class StringService
     /**
      * Nettoie une chaine de caractères
      *
-     * @param [type] $string
+     * @param string $string
      * @return string
      */
-    public function cleanString($string): string
+    public function cleanString(string $string): string
     {
         return trim(strip_tags($string));
     }
 
-    /**
-     * @param $text
-     * @param $length
-     * @return null|string|string[]
-     */
     public function truncate(string $text, int $length): string
     {
         $parts = preg_split('/(\s+)/u', $text, -1, PREG_SPLIT_DELIM_CAPTURE);
@@ -44,9 +39,6 @@ class StringService
 
     /**
      * Fonction qui retourne un nom nettoyé (sans accent, espace, etc...)
-     * @param $string
-     * @param string $replacement
-     * @return mixed
      */
     public function getSlug(string $string, string $replacement = '-'): string
     {
@@ -558,8 +550,8 @@ class StringService
      * Parcourt un tableau et filtre les éléments invalides ou vides.
      * Force les éléments à être des entiers et retire les éléments égaux à 0.
      *
-     * @param array $array Le tableau à traiter
-     * @return array Le tableau filtré et forcé à être des entiers
+     * @param array<int|string> $array Le tableau à traiter
+     * @return array<int> Le tableau filtré et forcé à être des entiers
      */
     public function forceElementsToInt(array $array): array
     {
@@ -580,8 +572,8 @@ class StringService
      * Parcourt un tableau et force les éléments en chaîne de caractères.
      * Retire les éléments invalides ou vides.
      *
-     * @param array $array Le tableau à traiter
-     * @return array Le tableau avec les éléments forcés en chaîne de caractères
+     * @param array<int|string> $array Le tableau à traiter
+     * @return array<string> Le tableau avec les éléments forcés en chaîne de caractères
      */
     public function forceElementsToString(array $array): array
     {

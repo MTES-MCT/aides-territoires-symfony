@@ -43,6 +43,13 @@ class KeywordReferenceService
         return join(', ', $return);
     }
 
+    /**
+     * @return array{
+     *     intentions: string[],
+     *     objects: string[],
+     *     keyword: string
+     * }
+     */
     public function getKeywordReferenceAndSynonymsPlit(?string $keyword): array
     {
         $intentions = [];

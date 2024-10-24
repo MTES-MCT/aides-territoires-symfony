@@ -12,9 +12,17 @@ class LogAidViewService
     ) {
     }
 
+    /**
+     * Undocumented function
+     *
+     * @param Aid $aid
+     * @param \DateTime $dateMin
+     * @param \DateTime $dateMax
+     * @return array<string, int>
+     */
     public function getCountByDay(Aid $aid, \DateTime $dateMin, \DateTime $dateMax): array
     {
-        $NbEntriesByDay = [];
+        $nbEntriesByDay = [];
         $nbEntries = $this->logAidViewRepository->countByDay(
             [
                 'aid' => $aid,
@@ -23,9 +31,9 @@ class LogAidViewService
             ]
         );
         foreach ($nbEntries as $nbEntry) {
-            $NbEntriesByDay[$nbEntry['dateDay']] = $nbEntry['nb'];
+            $nbEntriesByDay[$nbEntry['dateDay']] = $nbEntry['nb'];
         }
 
-        return $NbEntriesByDay;
+        return $nbEntriesByDay;
     }
 }

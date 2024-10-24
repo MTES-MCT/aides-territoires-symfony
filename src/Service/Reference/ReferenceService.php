@@ -29,55 +29,61 @@ class ReferenceService
         return false;
     }
 
+    /**
+     * @var string[]
+     */
     protected array $articles = [
-      "le",
-      "la",
-      "l'",
-      "les",
-      "l’",
-      "l' ",
-      "l’ ",
-      "l’",
-      "l'",
-      "un",
-      "une",
-      "des",
-      "de",
-      "au",
-      "aux",
-      "ce",
-      "du",
-      "des",
-      "d’une",
-      "d'une",
-      "d’un",
-      "d'un",
-      "d’ ",
-      "d' ",
-      "d’",
-      "d'",
-      "de la",
-      "de l'",
-      "je",
-      "on",
-      "nous",
-      "à la",
-      "à l'",
-      "à",
-      "et",
-      "en",
-      "pour",
-      "sur",
-      "dans"
+        "le",
+        "la",
+        "l'",
+        "les",
+        "l’",
+        "l' ",
+        "l’ ",
+        "l’",
+        "l'",
+        "un",
+        "une",
+        "des",
+        "de",
+        "au",
+        "aux",
+        "ce",
+        "du",
+        "des",
+        "d’une",
+        "d'une",
+        "d’un",
+        "d'un",
+        "d’ ",
+        "d' ",
+        "d’",
+        "d'",
+        "de la",
+        "de l'",
+        "je",
+        "on",
+        "nous",
+        "à la",
+        "à l'",
+        "à",
+        "et",
+        "en",
+        "pour",
+        "sur",
+        "dans"
     ];
 
+    /**
+     * @return array<string, string>
+     */
     public function getSynonymes(string $project_name): ?array
     {
         $original_name = $project_name;
 
         // regarde si c'est un projet référent
         $projectReference = $this->projectReferenceRepository->findOneBy([
-          'name' => $project_name
+            'name' => $project_name
         ]);
 
         // nettoie la string
@@ -116,7 +122,7 @@ class ReferenceService
 
         // on regarde si ça corresponds à des mots clés de la base de données
         $keywordReferences = $this->keywordReferenceRepository->findCustom([
-          'names' => $keywords
+            'names' => $keywords
         ]);
         // parcours les mots clés restant
         foreach ($keywordReferences as $key => $result) {
@@ -197,13 +203,16 @@ class ReferenceService
 
         // retour
         return [
-          'intentions_string' => $intentions_string,
-          'objects_string' => $objects_string,
-          'simple_words_string' => $simple_words_string,
-          'original_name' => $original_name,
+            'intentions_string' => $intentions_string,
+            'objects_string' => $objects_string,
+            'simple_words_string' => $simple_words_string,
+            'original_name' => $original_name,
         ];
     }
 
+    /**
+     * @return string[]
+     */
     public function getHighlightedWords(?string $keyword): array
     {
         $highlightedWords = [];
@@ -221,6 +230,10 @@ class ReferenceService
         return $highlightedWords;
     }
 
+    /**
+     * @param string[] $array
+     * @return string[]
+     */
     private function enleverArticlesFromArray(array $array): array
     {
         foreach ($array as $key => $value) {
@@ -235,7 +248,12 @@ class ReferenceService
         return $array;
     }
 
-    private function enleverArticles($content, $articles)
+    /**
+     * @param string $content
+     * @param string[] $articles
+     * @return string
+     */
+    private function enleverArticles(string $content, array $articles): string
     {
         $content = str_replace(["/", "(", ")", ",", ":", "–"], " ", strtolower($content));
         foreach ($articles as $article) {
@@ -244,27 +262,12 @@ class ReferenceService
         return trim(preg_replace('/\s+/', ' ', $content));
     }
 
-    private function removeArticle($text, $articles)
-    {
-        // Normaliser les apostrophes et passer en minuscules
-        $text = str_replace(["/", "(", ")", ",", ":", "–"], " ", strtolower($text));
-        $text = str_replace(["‘", "’"], "'", strtolower($text));
-
-        $words = explode(" ", $text);
-
-        // Vérifier si le premier mot est un article et le supprimer
-        if (!empty($words) && in_array($words[0], $articles)) {
-            array_shift($words);
-        }
-        // Vérifier si le dernier mot est un article et le supprimer
-        if (!empty($words) && in_array(end($words), $articles)) {
-            array_pop($words);
-        }
-        return implode(" ", $words);
-    }
-
-    // combinaisons de 2 mots
-    private function genererToutesCombinaisons($keywords)
+    /**
+     * combinaisons de mots
+     * @param string[] $keywords
+     * @return string[]
+     */
+    private function genererToutesCombinaisons(array $keywords): array
     {
         sort($keywords);
         $combinaisons = [];
@@ -287,29 +290,11 @@ class ReferenceService
         return $combinaisons;
     }
 
-
-    private function genererCombinaisons($texte, $articles)
-    {
-        // Séparer le texte en mots
-        $mots = explode(" ", $texte);
-        $nombreDeMots = count($mots);
-        $combinaisons = [];
-        // Générer toutes les combinaisons possibles sans mélanger les mots
-        for ($i = 0; $i < $nombreDeMots; $i++) {
-            for ($j = $i; $j < $nombreDeMots; $j++) {
-                $combinaison = implode(" ", array_slice($mots, $i, $j - $i + 1));
-                $combinaison = trim($this->removeArticle($combinaison, $articles));
-                if ($combinaison) {
-                    $combinaisons[] = trim($combinaison);
-                }
-            }
-        }
-
-        return array_unique($combinaisons);
-    }
-
-
-    private function arrayToStringWithQuotes($array)
+    /**
+     * @param string[] $array
+     * @return string
+     */
+    private function arrayToStringWithQuotes(array $array): string
     {
         $transformed = array_map(function ($item) {
             if (strpos($item, ' ') !== false) {
@@ -318,10 +303,5 @@ class ReferenceService
             return $item;
         }, $array);
         return implode(' ', $transformed);
-    }
-
-    private function compareLength($a, $b)
-    {
-        return strlen($b) - strlen($a);
     }
 }

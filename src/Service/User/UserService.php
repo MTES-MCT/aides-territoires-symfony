@@ -67,7 +67,13 @@ class UserService
     public function getUserLogged(): ?User
     {
         try {
-            return $this->security->getUser();
+            $user =  $this->security->getUser();
+
+            if ($user instanceof User) {
+                return $user;
+            } else {
+                throw new \Exception('User not found');
+            }
         } catch (\Exception $e) {
             return null;
         }

@@ -25,10 +25,10 @@ class MatomoService
     /**
      * Set an analytics goal to be tracked.
      *
-     * @param [type] $goalId
+     * @param int $goalId
      * @return void
      */
-    public function trackGoal($goalId): void
+    public function trackGoal(int $goalId): void
     {
         $this->requestStack->getSession()->set(self::GOAL_KEY, $goalId);
     }
@@ -39,9 +39,9 @@ class MatomoService
      * Also, clears the session, so we only track a specific goal using
      * the js api once.
      *
-     * @return string
+     * @return int|null
      */
-    public function getGoal(): ?string
+    public function getGoal(): ?int
     {
         try {
             $value = $this->requestStack->getSession()->get(self::GOAL_KEY);
@@ -53,35 +53,37 @@ class MatomoService
         }
     }
 
-    /**
-     *   Get stats of all Page Urls from Matomo.
-     *   from_date_string & to_date_string must have YYYY-MM-DD format.
-     *
-     *   API Method examples:
-     *   - 'Actions.getPageUrls' (views per page url)
-     *   - 'Actions.getPageTitles' (views per page title)
-     *   - 'Actions.getSiteSearchKeywords' (keywords searched in the the application)
-     *
-     *   Custom segments examples:
-     *   https://developer.matomo.org/api-reference/reporting-api-segmentation
-     *   - 'pageUrl=@actioncoeurdeville.aides-territoires.beta.gouv.fr' (url must contain string)
-     *   - 'pageTitle==Aides-territoires | Recherche avancée'
-     *
-     *   Usage example:
-     *   get_matomo_stats_from_page_title(
-     *      'Actions.getPageUrls',
-     *      from_date_string='2020-01-01',
-     *      to_date_string='2020-12-31'
-     *  )
-     *
-     * @param [type] $api_method
-     * @param string $custom_segment
-     * @param string $from_date_string
-     * @param [type] $to_date_string
-     * @return array|null
-     */
+        /**
+        *   Get stats of all Page Urls from Matomo.
+        *   from_date_string & to_date_string must have YYYY-MM-DD format.
+        *
+        *   API Method examples:
+        *   - 'Actions.getPageUrls' (views per page url)
+        *   - 'Actions.getPageTitles' (views per page title)
+        *   - 'Actions.getSiteSearchKeywords' (keywords searched in the the application)
+        *
+        *   Custom segments examples:
+        *   https://developer.matomo.org/api-reference/reporting-api-segmentation
+        *   - 'pageUrl=@actioncoeurdeville.aides-territoires.beta.gouv.fr' (url must contain string)
+        *   - 'pageTitle==Aides-territoires | Recherche avancée'
+        *
+        *   Usage example:
+        *   get_matomo_stats_from_page_title(
+        *      'Actions.getPageUrls',
+        *      from_date_string='2020-01-01',
+        *      to_date_string='2020-12-31'
+        *  )
+        *
+        * @param string $apiMethod
+        * @param string|null $customSegment
+        * @param string $fromDateString
+        * @param string|null $toDateString
+        * @param string|null $period
+        * @param array<string, mixed>|null $options
+        * @return mixed
+    */
     public function getMatomoStats(
-        $apiMethod,
+        string $apiMethod,
         ?string $customSegment = "",
         string $fromDateString = "2023-01-01",
         string $toDateString = null,

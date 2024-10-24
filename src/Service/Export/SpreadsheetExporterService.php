@@ -61,24 +61,23 @@ class SpreadsheetExporterService
 
         // si trop de résultats, on va traiter par le worker
         if ($count > 1000) {
-            $params = $queryBuilder->getQuery()->getParameters() ?? null;
+            $params = $queryBuilder->getQuery()->getParameters();
             $sqlParams = [];
-            if ($params) {
-                foreach ($params as $param) {
-                    // si ArrayCollection
-                    if ($param->getValue() instanceof ArrayCollection) {
-                        $values = [];
-                        foreach ($param->getValue() as $value) {
-                            $values[] = $value->getId();
-                        }
-                        $sqlParams[] = ['name' => $param->getName(), 'value' => $values];
-                        // Si object
-                    } elseif (is_object($param->getValue())) {
-                        $sqlParams[] = ['name' => $param->getName(), 'value' => $param->getValue()->getId()];
-                        // Si string
-                    } else {
-                        $sqlParams[] = ['name' => $param->getName(), 'value' => $param->getValue()];
+
+            foreach ($params as $param) {
+                // si ArrayCollection
+                if ($param->getValue() instanceof ArrayCollection) {
+                    $values = [];
+                    foreach ($param->getValue() as $value) {
+                        $values[] = $value->getId();
                     }
+                    $sqlParams[] = ['name' => $param->getName(), 'value' => $values];
+                    // Si object
+                } elseif (is_object($param->getValue())) {
+                    $sqlParams[] = ['name' => $param->getName(), 'value' => $param->getValue()->getId()];
+                    // Si string
+                } else {
+                    $sqlParams[] = ['name' => $param->getName(), 'value' => $param->getValue()];
                 }
             }
 
@@ -125,7 +124,7 @@ class SpreadsheetExporterService
             $now = new \DateTime(date(self::TODAY_DATE_FORMAT));
             $writer->openToBrowser('export_' . $filename . '_at_' . $now->format('d_m_Y') . '.' . $format);
 
-            if ($format == FileService::FORMAT_XLSX) {
+            if ($format == FileService::FORMAT_XLSX && isset($sheetView)) {
                 $writer->getCurrentSheet()->setSheetView($sheetView);
             }
             $headers = [];
@@ -157,6 +156,12 @@ class SpreadsheetExporterService
         return $response;
     }
 
+    /**
+     *
+     * @param mixed $entity
+     * @param mixed $results
+     * @return array<string, mixed>
+     */
     public function getDatasFromEntityType(mixed $entity, mixed $results): array // NOSONAR too complex
     {
         $datas = [];
