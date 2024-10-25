@@ -6,6 +6,7 @@ use App\Entity\Reference\KeywordReference;
 use App\Entity\Reference\ProjectReference;
 use App\Repository\Reference\KeywordReferenceRepository;
 use App\Repository\Reference\ProjectReferenceRepository;
+use Symfony\Component\HttpFoundation\Session\Session;
 
 class ReferenceService
 {
@@ -120,7 +121,10 @@ class ReferenceService
                 foreach ($excludedKeywordReference->getKeywordReferences() as $subKeyword) {
                     $excludedKeywordReferenceNames[] = $subKeyword->getName();
                 }
-                if ($excludedKeywordReference->getParent() && $excludedKeywordReference->getParent()->getId() !== $excludedKeywordReference->getId()) {
+                if (
+                    $excludedKeywordReference->getParent()
+                    && $excludedKeywordReference->getParent()->getId() !== $excludedKeywordReference->getId()
+                ) {
                     $excludedKeywordReferenceNames[] = $excludedKeywordReference->getParent()->getName();
                     foreach ($excludedKeywordReference->getParent()->getKeywordReferences() as $subKeyword) {
                         $excludedKeywordReferenceNames[] = $subKeyword->getName();
@@ -218,7 +222,7 @@ class ReferenceService
 
         // on retire les intentions de $simple_words_string
         foreach ($intentionNames as $intentionName) {
-            $pattern = '/(?<=\s|^)'.preg_quote($intentionName, '/').'(?=\s|$)/';
+            $pattern = '/(?<=\s|^)' . preg_quote($intentionName, '/') . '(?=\s|$)/';
             $simple_words_string = preg_replace($pattern, ' ', $simple_words_string);
         }
 
@@ -234,20 +238,63 @@ class ReferenceService
         ];
     }
 
+    public function setHighlightedWords(?array $synonyms, ?string $currentKeyword): array
+    {
+        $highlightedWords = $this->getHighlightedWords($synonyms, $currentKeyword);
+
+        $session = new Session();
+        $session->set('highlightedWords', $highlightedWords);
+
+        return $highlightedWords;
+    }
+
     /**
      * @return string[]
      */
-    public function getHighlightedWords(?string $keyword): array
+    public function getHighlightedWords(?array $synonyms, ?string $currentKeyword): array
     {
-        $highlightedWords = [];
-        if (!$keyword) {
-            return $highlightedWords;
+        $session = new Session();
+        $highlightedWords = $session->get('highlightedWords', []);
+
+        if (isset($synonyms['intentions_string']) && isset($synonyms['objects_string'])) {
+            $keywords = str_getcsv($synonyms['intentions_string'], ' ', '"');
+            foreach ($keywords as $keyword) {
+                if ($keyword && '' !== trim($keyword)) {
+                    $highlightedWords[] = $keyword;
+                }
+            }
         }
-        $synonyms = $this->getSynonymes($keyword);
-        if (isset($synonyms['simple_words_string'])) {
-            $objects = explode(' ', $synonyms['simple_words_string']);
-            foreach ($objects as $object) {
-                $highlightedWords[] = str_replace(['"'], '', $object);
+        if (isset($synonyms['objects_string'])) {
+            $keywords = str_getcsv($synonyms['objects_string'], ' ', '"');
+            foreach ($keywords as $keyword) {
+                if ($keyword && '' !== trim($keyword)) {
+                    $highlightedWords[] = $keyword;
+                }
+            }
+        }
+        if (
+            isset($synonyms['simple_words_string'])
+            && (
+                !isset($synonyms['objects_string'])
+                || '' == $synonyms['objects_string']
+            )
+        ) {
+            $keywords = str_getcsv($synonyms['simple_words_string'], ' ', '"');
+            foreach ($keywords as $keyword) {
+                if ($keyword && '' !== trim($keyword)) {
+                    $highlightedWords[] = $keyword;
+                }
+            }
+        }
+
+        // si la gestion des synonymes n'a pas fonctionné, on met directement la recherche
+        if (empty($highlightedWords) && $currentKeyword) {
+            // on met la recherche dans les highlights
+            $keywords = explode(' ', $currentKeyword);
+            foreach ($keywords as $keyword) {
+                if ($keyword && '' !== trim($keyword) && strlen($keyword) > 2) {
+                    $highlightedWords[] = $keyword;
+                }
             }
         }
 
@@ -280,7 +327,7 @@ class ReferenceService
     {
         $content = str_replace(['/', '(', ')', ',', ':', '–'], ' ', strtolower($content));
         foreach ($articles as $article) {
-            $content = preg_replace('/\b'.preg_quote($article, '/').'\b/u', '', $content);
+            $content = preg_replace('/\b' . preg_quote($article, '/') . '\b/u', '', $content);
         }
 
         return trim(preg_replace('/\s+/', ' ', $content));
@@ -308,7 +355,7 @@ class ReferenceService
             for ($j = 0; $j < $nombreDeMots; ++$j) {
                 if ($i != $j) {
                     // Ajoute la combinaison du mot actuel avec chaque autre mot.
-                    $combinaisons[] = $keywords[$i].' '.$keywords[$j];
+                    $combinaisons[] = $keywords[$i] . ' ' . $keywords[$j];
                 }
             }
         }
@@ -323,7 +370,7 @@ class ReferenceService
     {
         $transformed = array_map(function ($item) {
             if (false !== strpos($item, ' ')) {
-                return '"'.$item.'"';
+                return '"' . $item . '"';
             }
 
             return $item;

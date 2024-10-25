@@ -514,7 +514,10 @@ class AidRepository extends ServiceEntityRepository
                         foreach ($keywordReference->getKeywordReferences() as $subKeyword) {
                             $requiredKeywordReferencesName[] = $subKeyword->getName();
                         }
-                        if ($keywordReference->getParent() && $keywordReference->getParent()->getId() !== $keywordReference->getId()) {
+                        if (
+                            $keywordReference->getParent()
+                            && $keywordReference->getParent()->getId() !== $keywordReference->getId()
+                        ) {
                             $requiredKeywordReferencesName[] = $keywordReference->getParent()->getName();
                             foreach ($keywordReference->getParent()->getKeywordReferences() as $subKeyword) {
                                 $requiredKeywordReferencesName[] = $subKeyword->getName();

@@ -36,16 +36,15 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Persistence\ManagerRegistry;
 use Pagerfanta\Adapter\ArrayAdapter;
 use Pagerfanta\Exception\OutOfRangeCurrentPageException;
+use Pagerfanta\Pagerfanta;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
-use Pagerfanta\Pagerfanta;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Contracts\Translation\TranslatorInterface;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class AidController extends FrontController
 {
@@ -54,7 +53,7 @@ class AidController extends FrontController
     public function __construct(
         public Breadcrumb $breadcrumb,
         public TranslatorInterface $translatorInterface,
-        public ManagerRegistry $managerRegistry
+        public ManagerRegistry $managerRegistry,
     ) {
         parent::__construct($breadcrumb, $translatorInterface);
     }
@@ -68,7 +67,7 @@ class AidController extends FrontController
         AidService $aidService,
         LogService $logService,
         ReferenceService $referenceService,
-        BlogPromotionPostService $blogPromotionPostService
+        BlogPromotionPostService $blogPromotionPostService,
     ): Response {
         $requestStack
             ->getCurrentRequest()
@@ -122,6 +121,7 @@ class AidController extends FrontController
                 'page=' . $pagerfanta->getNbPages(),
                 $requestStack->getCurrentRequest()->getRequestUri()
             );
+
             return new RedirectResponse($newUrl);
         }
 
@@ -141,7 +141,7 @@ class AidController extends FrontController
             'backers' => $aidParams['backers'] ?? null,
             'categories' => $aidParams['categories'] ?? null,
             'programs' => $aidParams['programs'] ?? null,
-            'user' => $user ?? null
+            'user' => $user ?? null,
         ];
         $themes = new ArrayCollection();
         if (isset($aidParams['categories']) && is_array($aidParams['categories'])) {
@@ -209,7 +209,7 @@ class AidController extends FrontController
                 if ($user) {
                     try {
                         $queryString = trim($aidSearchFormService->convertAidSearchClassToQueryString($aidSearchClass));
-                        if ($queryString == '') {
+                        if ('' == $queryString) {
                             throw new \Exception('Veuillez sélectionner au moins un critère de recherche');
                         }
                         $alert->setEmail($user->getEmail());
@@ -224,8 +224,8 @@ class AidController extends FrontController
                             'Votre alerte a bien été créée'
                         );
                     } catch (\Exception $e) {
-                        $message = $e->getMessage() ==
-                            'Veuillez sélectionner au moins un critère de recherche'
+                        $message = 'Veuillez sélectionner au moins un critère de recherche' ==
+                            $e->getMessage()
                             ? 'Veuillez sélectionner au moins un critère de recherche'
                             : 'Une erreur est survenue lors de la création de votre alerte';
                         $this->addFlash(
@@ -256,56 +256,11 @@ class AidController extends FrontController
         }
 
         // pour avoir la recherche surlignée
-        $highlightedWords = $requestStack->getCurrentRequest()->getSession()->get('highlightedWords', []);
-
-        if (isset($aidSearchClass) && $aidSearchClass instanceof AidSearchClass) {
-            $highlightedWords = [];
-            if ($aidSearchClass->getKeyword()) {
-                // on va chercher les synonymes
-                $synonyms = $referenceService->getSynonymes($aidSearchClass->getKeyword());
-                if (isset($synonyms['intentions_string']) && isset($synonyms['objects_string'])) {
-                    $keywords = str_getcsv($synonyms['intentions_string'], ' ', '"');
-                    foreach ($keywords as $keyword) {
-                        if ($keyword && trim($keyword) !== '') {
-                            $highlightedWords[] = $keyword;
-                        }
-                    }
-                }
-                if (isset($synonyms['objects_string'])) {
-                    $keywords = str_getcsv($synonyms['objects_string'], ' ', '"');
-                    foreach ($keywords as $keyword) {
-                        if ($keyword && trim($keyword) !== '') {
-                            $highlightedWords[] = $keyword;
-                        }
-                    }
-                }
-                if (isset($synonyms['simple_words_string']) && (!isset($synonyms['objects_string']) || $synonyms['objects_string'] == '')) {
-                    $keywords = str_getcsv($synonyms['simple_words_string'], ' ', '"');
-                    foreach ($keywords as $keyword) {
-                        if ($keyword && trim($keyword) !== '') {
-                            $highlightedWords[] = $keyword;
-                        }
-                    }
-                }
-
-                // si la gestion des synonymes n'a pas fonctionné, on met directement la recherche
-                if (empty($highlightedWords)) {
-                    // on met la recherche dans les highlights
-                    $keywords = explode(' ', $aidSearchClass->getKeyword());
-                    foreach ($keywords as $keyword) {
-                        if ($keyword && trim($keyword) !== '' && strlen($keyword) > 2) {
-                            $highlightedWords[] = $keyword;
-                        }
-                    }
-                }
-            }
-        }
-
-        $requestStack->getCurrentRequest()->getSession()->set('highlightedWords', $highlightedWords);
-
         $synonyms = null;
+        $highlightedWords = [];
         if ($aidSearchClass->getKeyword()) {
             $synonyms = $referenceService->getSynonymes($aidSearchClass->getKeyword());
+            $highlightedWords = $referenceService->setHighlightedWords($synonyms, $aidSearchClass->getKeyword());
         }
 
         // rendu template
@@ -317,13 +272,12 @@ class AidController extends FrontController
             'showExtended' => $showExtended,
             'formAlertCreate' => $formAlertCreate->createView(),
             'querystring' => $query,
-            'perimeterName' =>
-                (isset($aidParams['perimeterFrom']) && $aidParams['perimeterFrom'] instanceof Perimeter)
+            'perimeterName' => (isset($aidParams['perimeterFrom']) && $aidParams['perimeterFrom'] instanceof Perimeter)
                     ? $aidParams['perimeterFrom']->getName()
                     : '',
             'categoriesName' => $categoriesName,
             'highlightedWords' => $highlightedWords,
-            'synonyms' => $synonyms
+            'synonyms' => $synonyms,
         ]);
     }
 
@@ -332,13 +286,13 @@ class AidController extends FrontController
         $slug,
         AidRepository $aidRepository,
         UserService $userService,
-        AidService $aidService
+        AidService $aidService,
     ): Response {
         // charge l'aide et verifie qu'elle soit générique
         $aid = $aidRepository->findOneBy(
             [
                 'slug' => $slug,
-                'isGeneric' => true
+                'isGeneric' => true,
             ]
         );
         if (!$aid instanceof Aid) {
@@ -385,7 +339,7 @@ class AidController extends FrontController
         MatomoService $matomoService,
         ProjectRepository $projectRepository,
         LogService $logService,
-        NotificationService $notificationService
+        NotificationService $notificationService,
     ): Response {
         // le user si dispo
         $user = $userService->getUserLogged();
@@ -404,7 +358,7 @@ class AidController extends FrontController
         // charge l'aide
         $aid = $aidRepository->findOneBy(
             [
-                'slug' => $slug
+                'slug' => $slug,
             ]
         );
         if (!$aid) {
@@ -416,23 +370,20 @@ class AidController extends FrontController
         }
 
         // log seulement si l'aide à le statut publiée
-        if ($aid->getStatus() == Aid::STATUS_PUBLISHED) {
+        if (Aid::STATUS_PUBLISHED == $aid->getStatus()) {
             $logService->log(
                 type: LogService::AID_VIEW,
                 params: [
-                    'querystring' =>
-                        parse_url(
-                            $requestStack->getCurrentRequest()->getRequestUri(),
-                            PHP_URL_QUERY
-                        )
+                    'querystring' => parse_url(
+                        $requestStack->getCurrentRequest()->getRequestUri(),
+                        PHP_URL_QUERY
+                    )
                         ?? null,
                     'host' => $requestStack->getCurrentRequest()->getHost(),
                     'aid' => $aid,
-                    'organization' =>
-                        ($user instanceof User && $user->getDefaultOrganization())
+                    'organization' => ($user instanceof User && $user->getDefaultOrganization())
                             ? $user->getDefaultOrganization()
-                            : null
-                    ,
+                            : null,
                     'user' => ($user instanceof User) ? $user : null,
                 ]
             );
@@ -440,7 +391,7 @@ class AidController extends FrontController
 
         // formulaire ajouter aux projets
         $formAddToProject = $this->createForm(AddAidToProjectType::class, null, [
-            'currentAid' => $aid
+            'currentAid' => $aid,
         ]);
         $formAddToProject->handleRequest($requestStack->getCurrentRequest());
         if ($formAddToProject->isSubmitted()) {
@@ -511,7 +462,7 @@ class AidController extends FrontController
                     ) {
                         $projectReferent = $this->managerRegistry->getRepository(ProjectReference::class)->findOneBy(
                             [
-                                'name' => $aidSearchClass->getKeyword()
+                                'name' => $aidSearchClass->getKeyword(),
                             ]
                         );
                         if ($projectReferent instanceof ProjectReference) {
@@ -537,7 +488,6 @@ class AidController extends FrontController
                         . '">' . $project->getName() . '</a>.'
                     );
                 }
-
 
                 // redirection page mes projets
                 return $this->redirect($requestStack->getCurrentRequest()->getUri());
@@ -566,8 +516,6 @@ class AidController extends FrontController
                     $aidSuggestedAidProject->setCreator($user);
                     $this->managerRegistry->getManager()->persist($aidSuggestedAidProject);
                     $message = $stringService->cleanString((string) $formSuggestToProject->get('message')->getData());
-
-
 
                     // notification
                     $message = '<p>' . $message . '</p>
@@ -622,7 +570,7 @@ class AidController extends FrontController
                                 'app_project_project_public_details',
                                 ['id' => $project->getId(), 'slug' => $project->getSlug()],
                                 UrlGeneratorInterface::ABSOLUTE_URL
-                            )
+                            ),
                         ],
                         [],
                         ['aide suggérée', $this->getParameter('kernel.environment')],
@@ -665,13 +613,13 @@ class AidController extends FrontController
         return $this->render('aid/aid/details.html.twig', [
             'aid' => $aid,
             'open_modal' => $request->query->get('open_modal', null),
-            'dsDatas' => $aidService->getDatasFromDs($aid, $user, ($user ? $user->getDefaultOrganization() : null)),
+            'dsDatas' => $aidService->getDatasFromDs($aid, $user, $user ? $user->getDefaultOrganization() : null),
             'formAddToProject' => $formAddToProject->createView(),
             'formSuggestToProject' => $formSuggestToProject->createView(),
             'aidDetailPage' => true,
             'openModalSuggest' => $openModalSuggest ?? false,
             'highlightedWords' => $requestStack->getCurrentRequest()->getSession()->get('highlightedWords', []),
-            'adminEditUrl' => $adminEditUrl
+            'adminEditUrl' => $adminEditUrl,
         ]);
     }
 }
