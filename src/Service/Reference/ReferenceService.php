@@ -6,13 +6,12 @@ use App\Entity\Reference\KeywordReference;
 use App\Entity\Reference\ProjectReference;
 use App\Repository\Reference\KeywordReferenceRepository;
 use App\Repository\Reference\ProjectReferenceRepository;
-use Doctrine\Inflector\InflectorFactory;
 
 class ReferenceService
 {
     public function __construct(
         private KeywordReferenceRepository $keywordReferenceRepository,
-        private ProjectReferenceRepository $projectReferenceRepository
+        private ProjectReferenceRepository $projectReferenceRepository,
     ) {
     }
 
@@ -26,6 +25,7 @@ class ReferenceService
                 return true;
             }
         }
+
         return false;
     }
 
@@ -33,45 +33,45 @@ class ReferenceService
      * @var string[]
      */
     protected array $articles = [
-        "le",
-        "la",
+        'le',
+        'la',
         "l'",
-        "les",
-        "l’",
+        'les',
+        'l’',
         "l' ",
-        "l’ ",
-        "l’",
+        'l’ ',
+        'l’',
         "l'",
-        "un",
-        "une",
-        "des",
-        "de",
-        "au",
-        "aux",
-        "ce",
-        "du",
-        "des",
-        "d’une",
+        'un',
+        'une',
+        'des',
+        'de',
+        'au',
+        'aux',
+        'ce',
+        'du',
+        'des',
+        'd’une',
         "d'une",
-        "d’un",
+        'd’un',
         "d'un",
-        "d’ ",
+        'd’ ',
         "d' ",
-        "d’",
+        'd’',
         "d'",
-        "de la",
+        'de la',
         "de l'",
-        "je",
-        "on",
-        "nous",
-        "à la",
+        'je',
+        'on',
+        'nous',
+        'à la',
         "à l'",
-        "à",
-        "et",
-        "en",
-        "pour",
-        "sur",
-        "dans"
+        'à',
+        'et',
+        'en',
+        'pour',
+        'sur',
+        'dans',
     ];
 
     /**
@@ -83,11 +83,11 @@ class ReferenceService
 
         // regarde si c'est un projet référent
         $projectReference = $this->projectReferenceRepository->findOneBy([
-            'name' => $project_name
+            'name' => $project_name,
         ]);
 
         // nettoie la string
-        $project_name = str_replace(["/", "(", ")", ",", ":", "–", "-"], " ", strtolower($project_name));
+        $project_name = str_replace(['/', '(', ')', ',', ':', '–', '-'], ' ', strtolower($project_name));
 
         // sépare sur les espaces
         $keywords = explode(' ', $project_name);
@@ -117,13 +117,25 @@ class ReferenceService
         if ($projectReference instanceof ProjectReference) {
             foreach ($projectReference->getExcludedKeywordReferences() as $excludedKeywordReference) {
                 $excludedKeywordReferenceNames[] = $excludedKeywordReference->getName();
+                foreach ($excludedKeywordReference->getKeywordReferences() as $subKeyword) {
+                    $excludedKeywordReferenceNames[] = $subKeyword->getName();
+                }
+                if ($excludedKeywordReference->getParent() && $excludedKeywordReference->getParent()->getId() !== $excludedKeywordReference->getId()) {
+                    $excludedKeywordReferenceNames[] = $excludedKeywordReference->getParent()->getName();
+                    foreach ($excludedKeywordReference->getParent()->getKeywordReferences() as $subKeyword) {
+                        $excludedKeywordReferenceNames[] = $subKeyword->getName();
+                    }
+                }
             }
         }
+        $excludedKeywordReferenceNames = array_unique($excludedKeywordReferenceNames);
 
         // on regarde si ça corresponds à des mots clés de la base de données
-        $keywordReferences = $this->keywordReferenceRepository->findCustom([
-            'names' => $keywords
-        ]);
+        $keywordReferences = $this->keywordReferenceRepository->findFromKewyordsOrOriginalName(
+            $keywords,
+            $original_name
+        );
+
         // parcours les mots clés restant
         foreach ($keywordReferences as $key => $result) {
             // si dans la liste d'exclusion
@@ -203,16 +215,16 @@ class ReferenceService
 
         // recupere le tableau de toutes les intentions
         $intentionNames = $this->keywordReferenceRepository->findIntentionNames();
-        
+
         // on retire les intentions de $simple_words_string
         foreach ($intentionNames as $intentionName) {
-            $pattern = '/(?<=\s|^)' . preg_quote($intentionName, '/') . '(?=\s|$)/';
+            $pattern = '/(?<=\s|^)'.preg_quote($intentionName, '/').'(?=\s|$)/';
             $simple_words_string = preg_replace($pattern, ' ', $simple_words_string);
         }
-        
+
         // Supprimer les espaces supplémentaires
         $simple_words_string = preg_replace('/\s+/', ' ', trim($simple_words_string));
-        
+
         // retour
         return [
             'intentions_string' => $intentions_string,
@@ -244,12 +256,13 @@ class ReferenceService
 
     /**
      * @param string[] $array
+     *
      * @return string[]
      */
     private function enleverArticlesFromArray(array $array): array
     {
         foreach ($array as $key => $value) {
-            $value = str_replace(["/", "(", ")", ",", ":", "–"], " ", strtolower($value));
+            $value = str_replace(['/', '(', ')', ',', ':', '–'], ' ', strtolower($value));
             if (in_array($value, $this->articles)) {
                 unset($array[$key]);
             } else {
@@ -261,22 +274,23 @@ class ReferenceService
     }
 
     /**
-     * @param string $content
      * @param string[] $articles
-     * @return string
      */
     private function enleverArticles(string $content, array $articles): string
     {
-        $content = str_replace(["/", "(", ")", ",", ":", "–"], " ", strtolower($content));
+        $content = str_replace(['/', '(', ')', ',', ':', '–'], ' ', strtolower($content));
         foreach ($articles as $article) {
-            $content = preg_replace('/\b' . preg_quote($article, '/') . '\b/u', '', $content);
+            $content = preg_replace('/\b'.preg_quote($article, '/').'\b/u', '', $content);
         }
+
         return trim(preg_replace('/\s+/', ' ', $content));
     }
 
     /**
-     * combinaisons de mots
+     * combinaisons de mots.
+     *
      * @param string[] $keywords
+     *
      * @return string[]
      */
     private function genererToutesCombinaisons(array $keywords): array
@@ -290,11 +304,11 @@ class ReferenceService
             return $keywords;
         }
 
-        for ($i = 0; $i < $nombreDeMots; $i++) {
-            for ($j = 0; $j < $nombreDeMots; $j++) {
+        for ($i = 0; $i < $nombreDeMots; ++$i) {
+            for ($j = 0; $j < $nombreDeMots; ++$j) {
                 if ($i != $j) {
                     // Ajoute la combinaison du mot actuel avec chaque autre mot.
-                    $combinaisons[] = $keywords[$i] . ' ' . $keywords[$j];
+                    $combinaisons[] = $keywords[$i].' '.$keywords[$j];
                 }
             }
         }
@@ -304,16 +318,17 @@ class ReferenceService
 
     /**
      * @param string[] $array
-     * @return string
      */
     private function arrayToStringWithQuotes(array $array): string
     {
         $transformed = array_map(function ($item) {
-            if (strpos($item, ' ') !== false) {
-                return '"' . $item . '"';
+            if (false !== strpos($item, ' ')) {
+                return '"'.$item.'"';
             }
+
             return $item;
         }, $array);
+
         return implode(' ', $transformed);
     }
 }

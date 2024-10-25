@@ -23,6 +23,17 @@ class KeywordReferenceRepository extends ServiceEntityRepository
         parent::__construct($registry, KeywordReference::class);
     }
 
+    public function findFromKewyordsOrOriginalName(array $keywords, string $originalName) : array {
+        $qb = $this->createQueryBuilder('kr');
+        $qb->orderBy('kr.name', 'ASC');
+        $qb->andWhere('kr.name IN (:keywords) OR MATCH_AGAINST(kr.name) AGAINST(:originalName IN BOOLEAN MODE) > 10')
+            ->setParameter('keywords', $keywords)
+            ->setParameter('originalName', $originalName)
+        ;
+
+        return $qb->getQuery()->getResult();
+    }
+
     public function findIntentionNames(): array
     {
         $qb = $this->createQueryBuilder('kr');
