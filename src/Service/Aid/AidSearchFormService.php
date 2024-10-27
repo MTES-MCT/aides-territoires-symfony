@@ -924,6 +924,18 @@ class AidSearchFormService
          */
 
 
+        /**
+         * < OrderBy
+        */
+        if (isset($queryParams[self::QUERYSTRING_KEY_ORDER_BY])) {
+            $aidSearchClass->setOrderBy($queryParams[self::QUERYSTRING_KEY_ORDER_BY]);
+        }
+
+        /**
+         * > OrderBy
+        */
+
+
         return $aidSearchClass;
     }
     /**
@@ -937,10 +949,12 @@ class AidSearchFormService
         if (isset($aidParams['orderBy'])) {
             switch ($aidParams['orderBy']) {
                 case 'submission_deadline':
+                case 'submission-deadline':
                     $aidParams['orderByDateSubmissionDeadline'] = true;
                     unset($aidParams['orderBy']);
                     break;
                 case 'publication_date':
+                case 'publication-date':
                     $aidParams['orderBy'] = ['sort' => 'a.timePublished', 'order' => 'DESC'];
                     break;
 

@@ -167,13 +167,13 @@ class AidSearchTypeV2 extends AbstractType
 
             // le builder
             $builder
-                ->add('orderBy', ChoiceType::class, [
+                ->add(AidSearchFormService::QUERYSTRING_KEY_ORDER_BY, ChoiceType::class, [
                     'required' => true,
                     'label' => false,
                     'choices' => [
                         'Tri : pertinence' => 'relevance',
-                        'Tri : date de publication (plus récentes en premier)' => 'publication_date',
-                        'Tri : date de clôture (plus proches en premier)' => 'submission_deadline'
+                        'Tri : date de publication (plus récentes en premier)' => 'publication-date',
+                        'Tri : date de clôture (plus proches en premier)' => 'submission-deadline'
                     ],
                     'attr' => [
                         'title' => 'Choisissez un ordre de tri – La sélection recharge la page'
