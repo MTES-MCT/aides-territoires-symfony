@@ -507,7 +507,7 @@ class AidService // NOSONAR too complex
 
         return $this->httpClientInterface->request(
             'POST',
-            'https://www.demarches-simplifiees.fr/api/public/v1/demarches/'.$dsId.'/dossiers',
+            'https://www.demarches-simplifiees.fr/api/public/v1/demarches/' . $dsId . '/dossiers',
             [
                 'headers' => [
                     'Content-Type' => 'application/json',
@@ -620,7 +620,7 @@ class AidService // NOSONAR too complex
         $minutesMax = 5;
         foreach ($aid->getAidLocks() as $aidLock) {
             // si le lock a plus de 5 min, on le supprime
-            if ($aidLock->getTimeStart() < $now->sub(new \DateInterval('PT'.$minutesMax.'M'))) {
+            if ($aidLock->getTimeStart() < $now->sub(new \DateInterval('PT' . $minutesMax . 'M'))) {
                 $this->managerRegistry->getManager()->remove($aidLock);
                 $this->managerRegistry->getManager()->flush();
                 continue;
@@ -674,10 +674,10 @@ class AidService // NOSONAR too complex
     public function extractKeywords(Aid $aid): array
     {
         // concatene les textes bruts
-        $text = $aid->getName().' '
-            .strip_tags((string) $aid->getDescription()).' '
-            .strip_tags((string) $aid->getEligibility()).' '
-            .strip_tags((string) $aid->getContact());
+        $text = $aid->getName() . ' '
+            . strip_tags((string) $aid->getDescription()) . ' '
+            . strip_tags((string) $aid->getEligibility()) . ' '
+            . strip_tags((string) $aid->getContact());
 
         $commonWords = [
             'pour',
@@ -772,7 +772,7 @@ class AidService // NOSONAR too complex
         $text = preg_replace('/\b\w{1,2}\b/u', '', $text);
 
         // Retirer les mots communs
-        $commonWordsPattern = '/\b('.implode('|', $commonWords).')\b/ui';
+        $commonWordsPattern = '/\b(' . implode('|', $commonWords) . ')\b/ui';
         $text = preg_replace($commonWordsPattern, '', $text);
 
         /** @var KeywordReferenceRepository $keywordReferenceRepository */
@@ -848,7 +848,7 @@ class AidService // NOSONAR too complex
             }
 
             // met le nom à la feuille
-            $sheet->setTitle($stringService->truncate($aid->getId().'_'.$aid->getName(), 31));
+            $sheet->setTitle($stringService->truncate($aid->getId() . '_' . $aid->getName(), 31));
 
             // Infos aides
             $sheet->setCellValue('A1', 'Nom de l’aide');
@@ -897,7 +897,7 @@ class AidService // NOSONAR too complex
                     $nbProjectPublicsByDay[$currentDay->format('Y-m-d')] ?? '0',
                     $nbProjectPrivatesByDay[$currentDay->format('Y-m-d')] ?? '0',
                 ];
-                $sheet->fromArray($dataRow, null, 'A'.$rowIndex);
+                $sheet->fromArray($dataRow, null, 'A' . $rowIndex);
                 ++$rowIndex;
                 $currentDay->add(new \DateInterval('P1D'));
             }

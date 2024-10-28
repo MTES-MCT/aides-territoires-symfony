@@ -62,8 +62,6 @@ class ImportFluxCommand extends Command // NOSONAR too much methods
         protected StringService $stringService,
         protected FileService $fileService
     ) {
-        ini_set('max_execution_time', 60 * 60);
-        ini_set('memory_limit', '1G');
         parent::__construct();
         $this->dateImportStart = new \DateTime(date('Y-m-d H:i:s'));
         $this->setInternalAidRecurrences();

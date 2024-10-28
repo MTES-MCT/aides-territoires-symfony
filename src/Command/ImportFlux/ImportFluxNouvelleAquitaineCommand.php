@@ -78,6 +78,13 @@ class ImportFluxNouvelleAquitaineCommand extends ImportFluxCommand
         $isEuropean = $this->getBooleanOrNull($aidToImport, 'Fond Européen ?');
         $europeanAid = $isEuropean ? Aid::SLUG_EUROPEAN_ORGANIZATIONAL : null;
 
+        // les champs wysiwg contiennent parfois ", gda_editeur_de_texte", à supprimer
+        $stringToDelete = ', gda_editeur_de_texte';
+        $description = str_replace($stringToDelete, '', $description);
+        $examples = str_replace($stringToDelete, '', $examples);
+        $eligibility = str_replace($stringToDelete, '', $eligibility);
+        $contact = str_replace($stringToDelete, '', $contact);
+
         $return = [
             'importDataMention' => 'Ces données sont mises à disposition par '
                 . 'le Conseil régional de Nouvelle-Aquitaine .',
@@ -85,6 +92,7 @@ class ImportFluxNouvelleAquitaineCommand extends ImportFluxCommand
             'nameInitial' => isset($aidToImport['Nom']) ? $this->cleanName($aidToImport['Nom']) : null,
             'description' => $description,
             'originUrl' => isset($aidToImport['Lien']) ? $aidToImport['Lien'] : null,
+            'applicationUrl' => isset($aidToImport['Lien']) ? $aidToImport['Lien'] : null,
             'dateStart' => $dateStart,
             'dateSubmissionDeadline' => $dateSubmissionDeadline,
             'eligibility' => $eligibility,
