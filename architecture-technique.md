@@ -51,8 +51,8 @@ Le javascript du projet est principalement du jQuery, un peu de Vanilla JS). Cot
 |------------------|-------------------|-----------|------|-------------------|---------------------|
 | Navigateur       | App Symfony         | HTTPS     | 443  | osc-fr1 | Externe             |
 | Clients API JSON | App RaiSymfonyls         | HTTPS     | 443  | osc-fr1 | Externe             |          |
-| App Rails        | MySQL Scalingo | TCP       | 5432 | osc-fr1 | Interne             |
-| App Rails        | Redis Scalingo    | TCP       | 6379 | osc-fr1 | Interne             |
+| App Symfony        | MySQL Scalingo | TCP       | 5432 | osc-fr1 | Interne             |
+| App Symfony        | Redis Scalingo    | TCP       | 6379 | osc-fr1 | Interne             |
 
 #### Tooling (error monitoring, APM)
 
