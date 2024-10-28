@@ -60,7 +60,7 @@ class MyCustomLoginListener
 
             // si première connexion
             if (!$user->getTimeLastLogin()) {
-                $this->matomoService->trackGoal($this->paramService->get('goal_first_login'));
+                $this->matomoService->trackGoal($this->paramService->get('goal_first_login_id'));
             }
 
             // met à jour date dernier login
