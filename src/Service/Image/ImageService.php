@@ -107,9 +107,9 @@ class ImageService
 
     public function deleteImageFromCloud(
         string $fileName
-    ) {
+    ): void {
         if (!$fileName || trim($fileName) == '') {
-            return false;
+            return;
         }
 
         // Créer un objet Credentials en utilisant les clés d'accès AWS
@@ -148,9 +148,6 @@ class ImageService
         string $uploadDir,
         string $fileName
     ): bool {
-        if (!$file) {
-            return false;
-        }
         // Upload a publicly accessible file. The file size and type are determined by the SDK.
         try {
             // verification image

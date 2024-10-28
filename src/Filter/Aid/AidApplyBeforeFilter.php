@@ -6,6 +6,7 @@ use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Doctrine\Orm\Filter\AbstractFilter;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\OpenApi\Model\Example;
+use App\Service\Aid\AidSearchFormService;
 use Doctrine\ORM\QueryBuilder;
 
 final class AidApplyBeforeFilter extends AbstractFilter
@@ -25,11 +26,11 @@ final class AidApplyBeforeFilter extends AbstractFilter
     public function getDescription(string $resourceClass): array
     {
         return [
-            'apply_before' => [
-                'property' => 'apply_before',
+            AidSearchFormService::QUERYSTRING_KEY_APPLY_BEFORE => [
+                'property' => AidSearchFormService::QUERYSTRING_KEY_APPLY_BEFORE,
                 'type' => 'date',
                 'required' => false,
-                'description' => 'Candidater avant...',
+                'description' => 'Candidater avant... (format YYYY-MM-DD)',
                 'openapi' => [
                     'examples' => [
                         new Example('2021-09-01', null, '2021-09-01'),

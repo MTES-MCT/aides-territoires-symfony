@@ -511,6 +511,18 @@ class AidRepository extends ServiceEntityRepository
                     $requiredKeywordReferencesName = [];
                     foreach ($projectReference->getRequiredKeywordReferences() as $keywordReference) {
                         $requiredKeywordReferencesName[] = $keywordReference->getName();
+                        foreach ($keywordReference->getKeywordReferences() as $subKeyword) {
+                            $requiredKeywordReferencesName[] = $subKeyword->getName();
+                        }
+                        if (
+                            $keywordReference->getParent()
+                            && $keywordReference->getParent()->getId() !== $keywordReference->getId()
+                        ) {
+                            $requiredKeywordReferencesName[] = $keywordReference->getParent()->getName();
+                            foreach ($keywordReference->getParent()->getKeywordReferences() as $subKeyword) {
+                                $requiredKeywordReferencesName[] = $subKeyword->getName();
+                            }
+                        }
                     }
                     $requiredKeywordReferencesName = array_unique($requiredKeywordReferencesName);
                     $requiredKeywordReferencesNameString = implode('|', $requiredKeywordReferencesName);
@@ -546,10 +558,14 @@ class AidRepository extends ServiceEntityRepository
             }
 
             $sqlObjects = '';
-            if (isset($sqlProjectReference)) {
-                $sqlObjects .= $sqlProjectReference;
-            }
             if ($objectsString) {
+                if (isset($sqlProjectReference)) {
+                    $sqlObjects .= $sqlProjectReference;
+                }
+                if (isset($sqlKeywordReferences)) {
+                    $sqlObjects .= ' + ' . $sqlKeywordReferences;
+                }
+
                 if (trim($sqlObjects) !== '') {
                     $sqlObjects .= ' + ';
                 }

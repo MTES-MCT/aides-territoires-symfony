@@ -37,6 +37,7 @@ use App\Entity\Project\ProjectLock;
 use App\Entity\Search\SearchPage;
 use App\Entity\Search\SearchPageLock;
 use App\Repository\User\UserRepository;
+use App\Service\Aid\AidSearchFormService;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
@@ -1391,11 +1392,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
 
         if ($this->getDefaultOrganization()) {
             if ($this->getDefaultOrganization()->getOrganizationType()) {
-                $preferences['organizationType'] = $this->getDefaultOrganization()->getOrganizationType()->getSlug();
+                $preferences[AidSearchFormService::QUERYSTRING_KEY_AID_TYPE_SLUGS] =
+                    [$this->getDefaultOrganization()->getOrganizationType()->getSlug()];
             }
 
             if ($this->getDefaultOrganization()->getPerimeter()) {
-                $preferences['searchPerimeter'] = $this->getDefaultOrganization()->getPerimeter()->getId();
+                $preferences[AidSearchFormService::QUERYSTRING_KEY_SEARCH_PERIMETER] =
+                    $this->getDefaultOrganization()->getPerimeter()->getId();
             }
         }
 
@@ -1480,8 +1483,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
     public function removeLogAidCreatedsFolder(LogAidCreatedsFolder $logAidCreatedsFolder): static
     {
         if (
-            $this->logAidCreatedsFolders->removeElement($logAidCreatedsFolder) &&
-            $logAidCreatedsFolder->getUser() === $this
+            $this->logAidCreatedsFolders->removeElement($logAidCreatedsFolder)
+            && $logAidCreatedsFolder->getUser() === $this
         ) {
             $logAidCreatedsFolder->setUser(null);
         }

@@ -109,7 +109,6 @@ class ProgramController extends FrontController
             $aidSearchClass,
             $formAidSearchParams
         );
-        $formAidSearch->handleRequest($requestStack->getCurrentRequest());
 
         // parametres pour requetes aides
         $aidParams = [
@@ -117,7 +116,7 @@ class ProgramController extends FrontController
             'programs' => [$program],
         ];
         $aidParams = array_merge($aidParams, $aidSearchFormService->convertAidSearchClassToAidParams($aidSearchClass));
-        $showExtended = $aidSearchFormService->setShowExtendedV2($aidSearchClass);
+        $showExtended = $aidSearchFormService->setShowExtended($aidSearchClass);
 
         // le paginateur
         $aids = $aidService->searchAids($aidParams);
@@ -203,53 +202,13 @@ class ProgramController extends FrontController
             }
         }
 
-        // pour avoir la recherche surlignée
-        $highlightedWords = $requestStack->getCurrentRequest()->getSession()->get('highlightedWords', []);
-
-        if (isset($aidSearchClass) && $aidSearchClass instanceof AidSearchClass) {
-            $highlightedWords = [];
-            if ($aidSearchClass->getKeyword()) {
-                // on va chercher les synonymes
-                $synonyms = $referenceService->getSynonymes($aidSearchClass->getKeyword());
-                if (isset($synonyms['intentions_string'])) {
-                    $keywords = str_getcsv($synonyms['intentions_string'], ' ', '"');
-                    foreach ($keywords as $keyword) {
-                        if ($keyword && trim($keyword) !== '') {
-                            $highlightedWords[] = $keyword;
-                        }
-                    }
-                }
-                if (isset($synonyms['objects_string'])) {
-                    $keywords = str_getcsv($synonyms['objects_string'], ' ', '"');
-                    foreach ($keywords as $keyword) {
-                        if ($keyword && trim($keyword) !== '') {
-                            $highlightedWords[] = $keyword;
-                        }
-                    }
-                }
-                if (isset($synonyms['simple_words_string'])) {
-                    $keywords = str_getcsv($synonyms['simple_words_string'], ' ', '"');
-                    foreach ($keywords as $keyword) {
-                        if ($keyword && trim($keyword) !== '') {
-                            $highlightedWords[] = $keyword;
-                        }
-                    }
-                }
-
-                // si la gestion des synonymes n'a pas fonctionné, on met directement la recherche
-                if (!empty($highlightedWords)) {
-                    // on met la recherche dans les highlights
-                    $keywords = explode(' ', $aidSearchClass->getKeyword());
-                    foreach ($keywords as $keyword) {
-                        if ($keyword && trim($keyword) !== '' && strlen($keyword) > 2) {
-                            $highlightedWords[] = $keyword;
-                        }
-                    }
-                }
-            }
+       // pour avoir la recherche surlignée
+        $synonyms = null;
+        $highlightedWords = [];
+        if ($aidSearchClass->getKeyword()) {
+            $synonyms = $referenceService->getSynonymes($aidSearchClass->getKeyword());
+            $highlightedWords = $referenceService->setHighlightedWords($synonyms, $aidSearchClass->getKeyword());
         }
-
-        $requestStack->getCurrentRequest()->getSession()->set('highlightedWords', $highlightedWords);
 
         // date de dernière mise à jour des FAQ
         foreach ($program->getPageTabs() as $pageTab) {

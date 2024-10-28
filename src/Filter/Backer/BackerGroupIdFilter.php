@@ -1,17 +1,17 @@
 <?php
 
-namespace App\Filter\Aid;
+namespace App\Filter\Backer;
 
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Doctrine\Orm\Filter\AbstractFilter;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\OpenApi\Model\Example;
-use App\Entity\Aid\AidDestination;
-use App\Entity\Aid\AidStep;
+use App\Entity\Backer\BackerGroup;
+use App\Service\Aid\AidSearchFormService;
 use Doctrine\ORM\QueryBuilder;
 use Symfony\Component\PropertyInfo\Type;
 
-final class AidDestinationFilter extends AbstractFilter
+final class BackerGroupIdFilter extends AbstractFilter
 {
     protected function filterProperty(
         string $property,
@@ -27,23 +27,22 @@ final class AidDestinationFilter extends AbstractFilter
 
     public function getDescription(string $resourceClass): array
     {
-        $aidDestinations = $this->managerRegistry->getRepository(AidDestination::class)->findBy(
+        $backerGroups = $this->managerRegistry->getRepository(BackerGroup::class)->findBy(
             [],
             ['name' => 'ASC']
         );
         $examples = [];
-        foreach ($aidDestinations as $aidDestination) {
-            $examples[] = new Example($aidDestination->getName(), null, $aidDestination->getSlug());
+        $examples[] = new Example('Choisir un groupe de porteurs d\'aides', null, null);
+        foreach ($backerGroups as $backerGroup) {
+            $examples[] = new Example($backerGroup->getName(), null, $backerGroup->getId());
         }
         return [
-            'destinations' => [
-                'property' => 'destinations',
-                'type' => Type::BUILTIN_TYPE_STRING,
+            AidSearchFormService::QUERYSTRING_KEY_BACKER_GROUP_ID => [
+                'property' => AidSearchFormService::QUERYSTRING_KEY_BACKER_GROUP_ID,
+                'type' => Type::BUILTIN_TYPE_INT,
                 'required' => false,
-                'description' => '<div class="renderedMarkdown"><p>'
-                                    . 'Actions concernées.<br><br>'
-                                    . 'Voir aussi <code>/api/aids/destinations/</code> '
-                                    . 'pour la liste complète.</p></div>',
+                'description' => '<div class="renderedMarkdown"><p>Groupe de porteurs d\'aides.<br><br>'
+                    . 'Voir aussi <code>/api/backer-groups/</code> pour la liste complète.</p></div>',
                 'openapi' => [
                     'examples' => $examples,
                 ],

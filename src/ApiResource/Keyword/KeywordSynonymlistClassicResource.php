@@ -11,7 +11,7 @@ use App\Controller\Api\Keyword\KeywordSynonymlistController;
     operations: [
         new GetCollection(
             name: self::API_OPERATION_NAME,
-            uriTemplate: '/api/synonymlists/classic-list/',
+            uriTemplate: '/synonymlists/classic-list/',
             controller: KeywordSynonymlistController::class,
             normalizationContext: ['groups' => self::API_GROUP_LIST]
         ),

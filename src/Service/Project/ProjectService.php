@@ -20,7 +20,11 @@ class ProjectService
     ) {
     }
 
-    public function searchProjects(?array $projectParams = null)
+    /**
+     * @param array<string, mixed>|null $projectParams
+     * @return Project[]
+     */
+    public function searchProjects(?array $projectParams = null): array
     {
         return $this->projectRepository->findCustom($projectParams);
     }
@@ -105,7 +109,7 @@ class ProjectService
         $this->managerRegistry->getManager()->flush();
     }
 
-    public function getProjectAidsExportPdfContent($project)
+    public function getProjectAidsExportPdfContent(Project $project): string
     {
         $pdfOptions = new Options();
         $pdfOptions->setIsRemoteEnabled(true);

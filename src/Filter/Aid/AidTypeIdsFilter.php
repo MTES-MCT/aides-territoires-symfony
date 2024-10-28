@@ -7,11 +7,11 @@ use ApiPlatform\Doctrine\Orm\Filter\AbstractFilter;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\OpenApi\Model\Example;
 use App\Entity\Aid\AidType;
-use App\Entity\Aid\AidTypeGroup;
+use App\Service\Aid\AidSearchFormService;
 use Doctrine\ORM\QueryBuilder;
 use Symfony\Component\PropertyInfo\Type;
 
-final class AidFinancialAidFilter extends AbstractFilter
+final class AidTypeIdsFilter extends AbstractFilter
 {
     protected function filterProperty(
         string $property,
@@ -28,26 +28,32 @@ final class AidFinancialAidFilter extends AbstractFilter
     public function getDescription(string $resourceClass): array
     {
         $aidTypes = $this->managerRegistry->getRepository(AidType::class)->findBy(
-            [
-                'aidTypeGroup' => $this->managerRegistry->getRepository(AidTypeGroup::class)
-                    ->findOneBy(['slug' => AidTypeGroup::SLUG_FINANCIAL])
-            ],
+            [],
             ['name' => 'ASC']
         );
         $examples = [];
+        $examples[] = new Example('Choisir un exemple', null, null);
         foreach ($aidTypes as $aidType) {
-            $examples[] = new Example($aidType->getName(), null, $aidType->getSlug());
+            $examples[] = new Example($aidType->getName(), null, $aidType->getId());
         }
         return [
-            'financial_aids' => [
-                'property' => 'financial_aids',
-                'type' => Type::BUILTIN_TYPE_STRING,
+            AidSearchFormService::QUERYSTRING_KEY_AID_TYPE_IDS => [
+                'property' => AidSearchFormService::QUERYSTRING_KEY_AID_TYPE_IDS,
+                'type' => Type::BUILTIN_TYPE_ARRAY,
                 'required' => false,
                 'description' => '<div class="renderedMarkdown"><p>'
-                                    . 'Type d\'aides financières.<br><br>'
-                                    . 'Voir aussi <code>/api/aids/types/</code> '
-                                    . 'pour la liste complète.</p></div>',
+                    . 'Type d\'aides financières ou en ingénierie par ids. '
+                    . 'Vous pouvez passer plusieurs fois ce paramètre pour rechercher sur plusieurs types, ex : ...&'
+                    . AidSearchFormService::QUERYSTRING_KEY_AID_TYPE_IDS
+                    . '=3&'
+                    . AidSearchFormService::QUERYSTRING_KEY_AID_TYPE_IDS
+                    . '=8...<br><br><br><br>'
+                    . 'Voir aussi <code>/api/aids/types/</code> pour la liste complète.</p></div>',
                 'openapi' => [
+                    'type' => Type::BUILTIN_TYPE_ARRAY,
+                    'items' => [
+                        'type' => Type::BUILTIN_TYPE_INT,
+                    ],
                     'examples' => $examples,
                 ],
             ],

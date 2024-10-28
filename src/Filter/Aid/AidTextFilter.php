@@ -26,16 +26,17 @@ final class AidTextFilter extends AbstractFilter
     public function getDescription(string $resourceClass): array
     {
         return [
-            'text' => [
-                'property' => 'text',
+            'keyword' => [
+                'property' => 'keyword',
                 'type' => Type::BUILTIN_TYPE_STRING,
                 'required' => false,
                 'description' => 'Recherche textuelle.',
                 'openapi' => [
                     'examples' => [
-                        new Example('velo', null, 'velo'),
-                        new Example('piste OU velo', null, 'piste, velo'),
-                        new Example('piste ET velo', null, 'piste velo')
+                        new Example('vélo', null, 'vélo'),
+                        new Example('piscine', null, 'piscine'),
+                        new Example('piscine, bassin municipal', null, 'piscine, bassin municipal'),
+                        new Example('Construction d\'une piscine', null, 'Construction d\'une piscine')
                     ],
                 ],
             ],

@@ -30,7 +30,10 @@ class AidController extends ApiController
         RequestStack $requestStack,
         UserService $userService
     ): JsonResponse {
-        $aidSearchClass = $aidSearchFormService->getAidSearchClass();
+        $aidSearchClass = $aidSearchFormService->getAidSearchClass(null, [
+            'dontUseUserOrganizationType' => true,
+            'dontUseUserPerimeter' => true
+        ]);
 
         // parametres pour requetes aides
         $aidParams = [
@@ -70,8 +73,7 @@ class AidController extends ApiController
             'perimeter' => $aidParams['perimeterFrom'] ?? null,
             'search' => $aidParams['keyword'] ?? null,
             'organization' => ($user instanceof User && $user->getDefaultOrganization())
-                ? $user->getDefaultOrganization()
-                : null,
+                ? $user->getDefaultOrganization() : null,
             'backers' => $aidParams['backers'] ?? null,
             'categories' => $aidParams['categories'] ?? null,
             'programs' => $aidParams['programs'] ?? null,
@@ -142,7 +144,12 @@ class AidController extends ApiController
         UserService $userService
     ): JsonResponse {
         $params = [];
-        $params['id'] = (int) $id;
+        // $id peu être un slug ou un id
+        if (is_numeric($id)) {
+            $params['id'] = (int) $id;
+        } else {
+            $params['slug'] = $id;
+        }
         $codeStatus = 200;
         $aid = $aidRepository->findOneCustom($params);
         if ($aid instanceof Aid) {
@@ -170,8 +177,7 @@ class AidController extends ApiController
                 'host' => $requestStack->getCurrentRequest()->getHost(),
                 'aid' => $aid,
                 'organization' => ($user instanceof User && $user->getDefaultOrganization())
-                    ? $user->getDefaultOrganization()
-                    : null,
+                    ? $user->getDefaultOrganization() : null,
                 'user' => ($user instanceof User) ? $user : null,
                 'source' => LogAidSearch::SOURCE_API,
             ]
@@ -222,8 +228,7 @@ class AidController extends ApiController
                 'host' => $requestStack->getCurrentRequest()->getHost(),
                 'aid' => $aid,
                 'organization' => ($user instanceof User && $user->getDefaultOrganization())
-                    ? $user->getDefaultOrganization()
-                    : null,
+                    ? $user->getDefaultOrganization() : null,
                 'user' => ($user instanceof User) ? $user : null,
                 'source' => LogAidSearch::SOURCE_API,
             ]
@@ -258,8 +263,7 @@ class AidController extends ApiController
                     'id' => $aidFinancer->getBacker()->getId(),
                     'name' => $aidFinancer->getBacker()->getName(),
                     'logo' => $aidFinancer->getBacker()->getLogo()
-                        ? $this->paramService->get('cloud_image_url')
-                            . $aidFinancer->getBacker()->getLogo()
+                        ? $this->paramService->get('cloud_image_url') . $aidFinancer->getBacker()->getLogo()
                         : null
                 ];
             }
@@ -278,8 +282,7 @@ class AidController extends ApiController
                     'id' => $aidInstructor->getBacker()->getId(),
                     'name' => $aidInstructor->getBacker()->getName(),
                     'logo' => $aidInstructor->getBacker()->getLogo()
-                        ? $this->paramService->get('cloud_image_url')
-                            . $aidInstructor->getBacker()->getLogo()
+                        ? $this->paramService->get('cloud_image_url') . $aidInstructor->getBacker()->getLogo()
                         : null
                 ];
             }
@@ -349,9 +352,7 @@ class AidController extends ApiController
                     $result->getPerimeter()
                     && $result->getPerimeter()->getScale()
                     && isset(Perimeter::SCALES_FOR_SEARCH[$result->getPerimeter()->getScale()])
-                )
-                    ? Perimeter::SCALES_FOR_SEARCH[$result->getPerimeter()->getScale()]['name']
-                    : null,
+                ) ? Perimeter::SCALES_FOR_SEARCH[$result->getPerimeter()->getScale()]['name'] : null,
                 'mobilization_steps' => $steps,
                 'origin_url' => $result->getOriginUrl(),
                 'categories' => $categories,
@@ -362,13 +363,12 @@ class AidController extends ApiController
                 'aid_types_full' => $typesFull,
                 'is_charged' => $result->isIsCharged(),
                 'destinations' => $destinations,
-                'start_date' => $result->getDateStart() ? $result->getDateStart()->format('Y-m-d') : null,
+                'start_date' => $result->getDateStart()
+                    ? $result->getDateStart()->format('Y-m-d') : null,
                 'predeposit_date' => $result->getDatePredeposit()
-                    ? $result->getDatePredeposit()->format('Y-m-d')
-                    : null,
+                    ? $result->getDatePredeposit()->format('Y-m-d') : null,
                 'submission_deadline' => $result->getDateSubmissionDeadline()
-                    ? $result->getDateSubmissionDeadline()->format('Y-m-d')
-                    : null,
+                    ? $result->getDateSubmissionDeadline()->format('Y-m-d') : null,
                 'subvention_rate_lower_bound' => $result->getSubventionRateMin(),
                 'subvention_rate_upper_bound' => $result->getSubventionRateMax(),
                 'subvention_comment' => $result->getSubventionComment(),

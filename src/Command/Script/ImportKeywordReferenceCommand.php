@@ -674,7 +674,6 @@ class ImportKeywordReferenceCommand extends Command
                 "dispenser", "distribuer", "émettre", "étendre", "extension", "extensions", "propager", "répandre",
                 "transmettre"
             ],
-            "éclairage" => ["éclairages", "eclairer"],
             "embauche" => [
                 "embaucher", "embauches", "emploi", "emplois", "employer", "engagement", "engagements", "engager",
                 "enrôlement", "enrôlements", "enrôler", "recrutement", "recrutements", "recruter", "utilisation",

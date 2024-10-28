@@ -24,15 +24,15 @@ class AidControllerTest extends AtWebTestCase
         $crawler = $this->client->request('GET', $route);
 
         // Ajouter dynamiquement une option au champ <select>
-        $select = $crawler->filter('select[name="searchPerimeter"]')->first();
+        $select = $crawler->filter('select[name="perimeter_id"]')->first();
         $domSelect = $select->getNode(0);
         $option = $domSelect->ownerDocument->createElement('option', 'perimeterTest (Ad-hoc)');
         $option->setAttribute('value', '1');
         $domSelect->appendChild($option);
 
         $form = $crawler->selectButton('Rechercher')->form([
-            'organizationType' => 'commune',
-            'searchPerimeter' => 1,
+            'organization_type_slug' => 'commune',
+            'perimeter_id' => 1,
         ]);
 
         $this->client->submit($form);
@@ -59,7 +59,7 @@ class AidControllerTest extends AtWebTestCase
         $this->client->loginUser($user);
 
         // on appel la route avec un paramètre (obligatoire pour créer une alerte)
-        $route = $this->router->generate('app_aid_aid', ['organizationType' => 'commune']);
+        $route = $this->router->generate('app_aid_aid', ['organization_type_slug' => 'commune']);
         $crawler = $this->client->request('GET', $route);
 
         // selectionne le bouton submit du form[name="alert_create"]

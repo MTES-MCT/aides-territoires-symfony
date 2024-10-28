@@ -42,6 +42,12 @@ class LogService
     ) {
     }
 
+    /**
+     *
+     * @param string|null $type
+     * @param array<mixed>|null $params
+     * @return void
+     */
     public function log(// NOSONAR too complex
         ?string $type,
         ?array $params,
@@ -249,8 +255,10 @@ class LogService
                     break;
             }
 
-            $this->managerRegistry->getManager()->persist($log);
-            $this->managerRegistry->getManager()->flush();
+            if (isset($log)) {
+                $this->managerRegistry->getManager()->persist($log);
+                $this->managerRegistry->getManager()->flush();
+            }
         } catch (\Exception $exception) {
             $this->loggerInterface->error('Erreur log', [
                 'exception' => $exception,
@@ -258,7 +266,7 @@ class LogService
         }
     }
 
-    public function getSiteFromHost($host)
+    public function getSiteFromHost(string $host): string
     {
         /**
          * Return the string bit that identify a site.

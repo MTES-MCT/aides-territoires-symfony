@@ -91,6 +91,8 @@ class CategoryRepository extends ServiceEntityRepository
         $groupBy = $params['groupBy'] ?? null;
         $ids = $params['ids'] ?? null;
         $words = $params['words'] ?? null;
+        $slugs = $params['slugs'] ?? null;
+
         $orderBy =
             (isset($params['orderBy'])
             && isset($params['orderBy']['sort'])
@@ -101,14 +103,20 @@ class CategoryRepository extends ServiceEntityRepository
 
         $qb = $this->createQueryBuilder('c');
 
-        if (is_array($ids)) {
+        if (is_array($ids) && !empty($ids)) {
             $qb->andWhere('c.id IN (:ids)')
                 ->setParameter('ids', $ids);
         }
 
-        if (is_array($words) && count($words) > 0) {
+        if (is_array($words) && !empty($words)) {
             $qb->andWhere('c.name IN (:words)')
                 ->setParameter('words', $words)
+            ;
+        }
+
+        if (is_array($slugs) && !empty($slugs)) {
+            $qb->andWhere('c.slug IN (:slugs)')
+                ->setParameter('slugs', $slugs)
             ;
         }
 

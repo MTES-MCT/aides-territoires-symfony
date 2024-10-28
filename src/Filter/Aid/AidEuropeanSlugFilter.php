@@ -7,10 +7,11 @@ use ApiPlatform\Doctrine\Orm\Filter\AbstractFilter;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\OpenApi\Model\Example;
 use App\Entity\Aid\Aid;
+use App\Service\Aid\AidSearchFormService;
 use Doctrine\ORM\QueryBuilder;
 use Symfony\Component\PropertyInfo\Type;
 
-final class AidEuropeanFilter extends AbstractFilter
+final class AidEuropeanSlugFilter extends AbstractFilter
 {
     protected function filterProperty(
         string $property,
@@ -27,21 +28,9 @@ final class AidEuropeanFilter extends AbstractFilter
     public function getDescription(string $resourceClass): array
     {
         $examples = [
-            new Example(
-                '...',
-                null,
-                null
-            ),
-            new Example(
-                Aid::LABELS_EUROPEAN[Aid::SLUG_EUROPEAN],
-                null,
-                Aid::SLUG_EUROPEAN
-            ),
-            new Example(
-                Aid::LABELS_EUROPEAN[Aid::SLUG_EUROPEAN_SECTORIAL],
-                null,
-                Aid::SLUG_EUROPEAN_SECTORIAL
-            ),
+            new Example('...', null, null),
+            new Example(Aid::LABELS_EUROPEAN[Aid::SLUG_EUROPEAN], null, Aid::SLUG_EUROPEAN),
+            new Example(Aid::LABELS_EUROPEAN[Aid::SLUG_EUROPEAN_SECTORIAL], null, Aid::SLUG_EUROPEAN_SECTORIAL),
             new Example(
                 Aid::LABELS_EUROPEAN[Aid::SLUG_EUROPEAN_ORGANIZATIONAL],
                 null,
@@ -50,8 +39,8 @@ final class AidEuropeanFilter extends AbstractFilter
         ];
 
         return [
-            'european_aid' => [
-                'property' => 'european_aid',
+            AidSearchFormService::QUERYSTRING_KEY_EUROPEAN_AID_SLUG => [
+                'property' => AidSearchFormService::QUERYSTRING_KEY_EUROPEAN_AID_SLUG,
                 'type' => Type::BUILTIN_TYPE_STRING,
                 'required' => false,
                 'description' => '<div class="renderedMarkdown"><p>Aide européennes.</p></div>',

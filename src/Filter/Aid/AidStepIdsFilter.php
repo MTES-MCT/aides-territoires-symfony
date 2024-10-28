@@ -7,11 +7,11 @@ use ApiPlatform\Doctrine\Orm\Filter\AbstractFilter;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\OpenApi\Model\Example;
 use App\Entity\Aid\AidStep;
-use App\Entity\Aid\AidTypeGroup;
+use App\Service\Aid\AidSearchFormService;
 use Doctrine\ORM\QueryBuilder;
 use Symfony\Component\PropertyInfo\Type;
 
-final class AidMobilizationStepFilter extends AbstractFilter
+final class AidStepIdsFilter extends AbstractFilter
 {
     protected function filterProperty(
         string $property,
@@ -32,19 +32,27 @@ final class AidMobilizationStepFilter extends AbstractFilter
             ['name' => 'ASC']
         );
         $examples = [];
+        $examples[] = new Example('Choisir un exemple', null, null);
         foreach ($aidSteps as $aidStep) {
-            $examples[] = new Example($aidStep->getName(), null, $aidStep->getSlug());
+            $examples[] = new Example($aidStep->getName(), null, $aidStep->getId());
         }
         return [
-            'mobilization_step' => [
-                'property' => 'mobilization_step',
-                'type' => Type::BUILTIN_TYPE_STRING,
+            AidSearchFormService::QUERYSTRING_KEY_AID_STEP_IDS => [
+                'property' => AidSearchFormService::QUERYSTRING_KEY_AID_STEP_IDS,
+                'type' => Type::BUILTIN_TYPE_ARRAY,
                 'required' => false,
                 'description' => '<div class="renderedMarkdown"><p>'
-                                    . 'Avancement du projet.<br><br>'
-                                    . 'Voir aussi <code>/api/aids/steps/</code> '
-                                    . 'pour la liste complète.</p></div>',
+                    . 'Avancement du projet.<br><br>'
+                    . 'Vous pouvez passer plusieurs fois ce paramètre pour rechercher sur plusieurs types, ex : ...&'
+                    . AidSearchFormService::QUERYSTRING_KEY_AID_STEP_IDS
+                    . '=1&'
+                    . AidSearchFormService::QUERYSTRING_KEY_AID_STEP_SLUGS
+                    . '=3...<br><br>Voir aussi <code>/api/aids/steps/</code> pour la liste complète.</p></div>',
                 'openapi' => [
+                    'type' => Type::BUILTIN_TYPE_ARRAY,
+                    'items' => [
+                        'type' => Type::BUILTIN_TYPE_INT,
+                    ],
                     'examples' => $examples,
                 ],
             ],

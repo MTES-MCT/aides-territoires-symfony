@@ -6,12 +6,12 @@ use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Doctrine\Orm\Filter\AbstractFilter;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\OpenApi\Model\Example;
-use App\Entity\Aid\AidType;
 use App\Entity\Aid\AidTypeGroup;
+use App\Service\Aid\AidSearchFormService;
 use Doctrine\ORM\QueryBuilder;
 use Symfony\Component\PropertyInfo\Type;
 
-final class AidTechnicalAidFilter extends AbstractFilter
+final class AidTypeGroupIdFilter extends AbstractFilter
 {
     protected function filterProperty(
         string $property,
@@ -27,26 +27,21 @@ final class AidTechnicalAidFilter extends AbstractFilter
 
     public function getDescription(string $resourceClass): array
     {
-        $aidTypes = $this->managerRegistry->getRepository(AidType::class)->findBy(
-            [
-                'aidTypeGroup' => $this->managerRegistry->getRepository(AidTypeGroup::class)
-                    ->findOneBy(['slug' => AidTypeGroup::SLUG_TECHNICAL])
-            ],
+        $aidTypeGroups = $this->managerRegistry->getRepository(AidTypeGroup::class)->findBy(
+            [],
             ['name' => 'ASC']
         );
         $examples = [];
-        foreach ($aidTypes as $aidType) {
-            $examples[] = new Example($aidType->getName(), null, $aidType->getSlug());
+        $examples[] = new Example('Choisir un exemple', null, null);
+        foreach ($aidTypeGroups as $aidTypeGroup) {
+            $examples[] = new Example($aidTypeGroup->getName(), null, $aidTypeGroup->getId());
         }
         return [
-            'technical_aids' => [
-                'property' => 'technical_aids',
-                'type' => Type::BUILTIN_TYPE_STRING,
+            AidSearchFormService::QUERYSTRING_KEY_AID_TYPE_GROUP_ID => [
+                'property' => AidSearchFormService::QUERYSTRING_KEY_AID_TYPE_GROUP_ID,
+                'type' => Type::BUILTIN_TYPE_INT,
                 'required' => false,
-                'description' => '<div class="renderedMarkdown"><p>'
-                                    . 'Type d\'aides en ingénierie.<br><br>'
-                                    . 'Voir aussi <code>/api/aids/types/</code> '
-                                    . 'pour la liste complète.</p></div>',
+                'description' => 'Id du groupe de la nature de l\'aide.',
                 'openapi' => [
                     'examples' => $examples,
                 ],

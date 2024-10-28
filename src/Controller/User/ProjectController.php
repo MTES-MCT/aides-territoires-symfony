@@ -422,10 +422,7 @@ class ProjectController extends FrontController
 
             $aidsSuggested = $aidService->searchAids($aidParams);
             if (count($aidsSuggested) > 0) {
-                $requestStack->getCurrentRequest()->getSession()->set(
-                    'highlightedWords',
-                    $referenceService->getHighlightedWords($aidParams['keyword'])
-                );
+                $referenceService->setHighlightedWords(null, $aidParams['keyword']);
             }
         }
 

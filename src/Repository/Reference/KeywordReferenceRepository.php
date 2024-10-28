@@ -4,6 +4,7 @@ namespace App\Repository\Reference;
 
 use App\Entity\Reference\KeywordReference;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\Query\Expr\Func;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -22,6 +23,29 @@ class KeywordReferenceRepository extends ServiceEntityRepository
         parent::__construct($registry, KeywordReference::class);
     }
 
+    public function findFromKewyordsOrOriginalName(array $keywords, string $originalName): array
+    {
+        $qb = $this->createQueryBuilder('kr');
+        $qb->orderBy('kr.name', 'ASC');
+        $qb->andWhere('kr.name IN (:keywords) OR MATCH_AGAINST(kr.name) AGAINST(:originalName IN BOOLEAN MODE) > 10')
+            ->setParameter('keywords', $keywords)
+            ->setParameter('originalName', $originalName)
+        ;
+
+        return $qb->getQuery()->getResult();
+    }
+
+    public function findIntentionNames(): array
+    {
+        $qb = $this->createQueryBuilder('kr');
+        $qb->select('kr.name');
+        $qb->where('kr.intention = 1');
+        $qb->orderBy('kr.name', 'ASC');
+
+        $result = $qb->getQuery()->getResult();
+        // on le tableau à plat pour ne retourner qu'un tableau de string
+        return array_map(fn($item) => $item['name'], $result);
+    }
     public function findArrayOfAllSynonyms(?array $params): array
     {
         $qb = $this->getQueryBuilder($params);

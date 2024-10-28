@@ -6,6 +6,7 @@ use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Doctrine\Orm\Filter\AbstractFilter;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\OpenApi\Model\Example;
+use App\Service\Aid\AidSearchFormService;
 use Doctrine\ORM\QueryBuilder;
 
 final class AidPublishedAfterFilter extends AbstractFilter
@@ -25,11 +26,11 @@ final class AidPublishedAfterFilter extends AbstractFilter
     public function getDescription(string $resourceClass): array
     {
         return [
-            'published_after' => [
-                'property' => 'published_after',
+            AidSearchFormService::QUERYSTRING_KEY_PUBLISHED_AFTER => [
+                'property' => AidSearchFormService::QUERYSTRING_KEY_PUBLISHED_AFTER,
                 'type' => 'date',
                 'required' => false,
-                'description' => 'Publiée après...',
+                'description' => 'Publiée après... (format YYYY-MM-DD)',
                 'openapi' => [
                     'examples' => [
                         new Example('2021-09-01', null, '2021-09-01'),

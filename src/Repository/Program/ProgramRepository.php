@@ -69,6 +69,8 @@ class ProgramRepository extends ServiceEntityRepository
 
     public function getQueryBuilder(array $params = null): QueryBuilder
     {
+        $ids = $params['ids'] ?? null;
+        $slugs = $params['slugs'] ?? null;
         $hasLogo = $params['hasLogo'] ?? null;
         $isSpotlighted = $params['isSpotlighted'] ?? null;
         $orderBy =
@@ -81,6 +83,18 @@ class ProgramRepository extends ServiceEntityRepository
         $limit = $params['limit'] ?? null;
 
         $qb = $this->createQueryBuilder('p');
+
+        if (is_array($ids) && !empty($ids)) {
+            $qb
+                ->andWhere('p.id IN (:ids)')
+                ->setParameter('ids', $ids);
+        }
+
+        if (is_array($slugs) && !empty($slugs)) {
+            $qb
+                ->andWhere('p.slug IN (:slugs)')
+                ->setParameter('slugs', $slugs);
+        }
 
         if ($hasLogo === true) {
             $qb

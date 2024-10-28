@@ -40,22 +40,28 @@ use ApiPlatform\Metadata\ApiProperty;
 use App\Controller\Api\Aid\AidController as AidAidController;
 use App\Filter\Aid\AidApplyBeforeFilter;
 use App\Filter\Aid\AidCallForProjectOnlyFilter;
-use App\Filter\Aid\AidCategoriesFilter;
-use App\Filter\Aid\AidDestinationFilter;
-use App\Filter\Aid\AidEuropeanFilter;
-use App\Filter\Aid\AidFinancialAidFilter;
+use App\Filter\Aid\AidCategorySlugsFilter;
+use App\Filter\Aid\AidCategoryIdsFilter;
+use App\Filter\Aid\AidDestinationIdsFilter;
+use App\Filter\Aid\AidDestinationSlugsFilter;
+use App\Filter\Aid\AidEuropeanSlugFilter;
 use App\Filter\Aid\AidIsChargedFilter;
-use App\Filter\Aid\AidMobilizationStepFilter;
-use App\Filter\Aid\AidPerimeterFilter;
+use App\Filter\Aid\AidOrganizationTypeIdsFilter;
 use App\Filter\Aid\AidProjectReferenceFilter;
 use App\Filter\Aid\AidPublishedAfterFilter;
-use App\Filter\Aid\AidRecurrenceFilter;
-use App\Filter\Aid\AidTargetedAudiencesFilter;
-use App\Filter\Aid\AidTechnicalAidFilter;
+use App\Filter\Aid\AidRecurrenceIdFilter;
+use App\Filter\Aid\AidRecurrenceSlugFilter;
+use App\Filter\Aid\AidStepIdsFilter;
+use App\Filter\Aid\AidStepSlugsFilter;
+use App\Filter\Aid\AidOrganizationTypeSlugsFilter;
+use App\Filter\Aid\AidPerimeterIdFilter;
 use App\Filter\Aid\AidTextFilter;
-use App\Filter\Aid\AidTypeGroupFilter;
-use App\Filter\Backer\BackerFilter;
-use App\Filter\Backer\BackerGroupFilter;
+use App\Filter\Aid\AidTypeSlugsFilter;
+use App\Filter\Aid\AidTypeGroupSlugFilter;
+use App\Filter\Aid\AidTypeGroupIdFilter;
+use App\Filter\Aid\AidTypeIdsFilter;
+use App\Filter\Backer\BackerIdsFilter;
+use App\Filter\Backer\BackerGroupIdFilter;
 use App\Service\Doctrine\DoctrineConstants;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -118,23 +124,29 @@ use Symfony\Component\Validator\Constraints as Assert;
 )]
 
 #[ApiFilter(AidTextFilter::class)]
-#[ApiFilter(AidTargetedAudiencesFilter::class)]
-#[ApiFilter(AidCategoriesFilter::class)]
+#[ApiFilter(AidOrganizationTypeSlugsFilter::class)]
+#[ApiFilter(AidOrganizationTypeIdsFilter::class)]
+#[ApiFilter(AidCategorySlugsFilter::class)]
+#[ApiFilter(AidCategoryIdsFilter::class)]
 #[ApiFilter(AidApplyBeforeFilter::class)]
 #[ApiFilter(AidPublishedAfterFilter::class)]
-#[ApiFilter(AidTypeGroupFilter::class)]
-#[ApiFilter(AidFinancialAidFilter::class)]
-#[ApiFilter(AidTechnicalAidFilter::class)]
-#[ApiFilter(AidMobilizationStepFilter::class)]
-#[ApiFilter(AidDestinationFilter::class)]
-#[ApiFilter(AidRecurrenceFilter::class)]
+#[ApiFilter(AidTypeGroupSlugFilter::class)]
+#[ApiFilter(AidTypeGroupIdFilter::class)]
+#[ApiFilter(AidTypeSlugsFilter::class)]
+#[ApiFilter(AidTypeIdsFilter::class)]
+#[ApiFilter(AidStepSlugsFilter::class)]
+#[ApiFilter(AidStepIdsFilter::class)]
+#[ApiFilter(AidDestinationSlugsFilter::class)]
+#[ApiFilter(AidDestinationIdsFilter::class)]
+#[ApiFilter(AidRecurrenceSlugFilter::class)]
+#[ApiFilter(AidRecurrenceIdFilter::class)]
 #[ApiFilter(AidCallForProjectOnlyFilter::class)]
 #[ApiFilter(AidIsChargedFilter::class)]
-#[ApiFilter(AidPerimeterFilter::class)]
+#[ApiFilter(AidPerimeterIdFilter::class)]
 #[ApiFilter(AidProjectReferenceFilter::class)]
-#[ApiFilter(AidEuropeanFilter::class)]
-#[ApiFilter(BackerFilter::class)]
-#[ApiFilter(BackerGroupFilter::class)]
+#[ApiFilter(AidEuropeanSlugFilter::class)]
+#[ApiFilter(BackerIdsFilter::class)]
+#[ApiFilter(BackerGroupIdFilter::class)]
 class Aid // NOSONAR too much methods
 {
     public const API_OPERATION_GET_BY_ID = 'api_aid_get_by_id';
@@ -616,7 +628,7 @@ class Aid // NOSONAR too much methods
     #[ORM\OneToMany(mappedBy: 'aid', targetEntity: AidProject::class, orphanRemoval: true)]
     private Collection $aidProjects;
 
-    #[ORM\OneToMany(mappedBy: 'aid', targetEntity: AidSuggestedAidProject::class, orphanRemoval: true)]
+    #[ORM\OneToMany(mappedBy: 'aid', targetEntity: AidSuggestedAidProject::class)]
     private Collection $aidSuggestedAidProjects;
 
     #[ORM\ManyToMany(targetEntity: Bundle::class, mappedBy: 'aids', cascade: ['persist'])]
@@ -2061,18 +2073,18 @@ class Aid // NOSONAR too much methods
 
     public function isApproachingDeadline(): bool
     {
+        $result = false;
+
         if ($this->getDateSubmissionDeadline()) {
             $today = new \DateTime(date('Y-m-d'));
-            $interval = $today->diff($this->getDateSubmissionDeadline());
+            $interval = $this->getDateSubmissionDeadline()->diff($today);
 
-            // Vérifiez si le nombre de jours est inférieur ou égal à APPROACHING_DEADLINE_DELTA
-            // et si la date limite de soumission est dans le futur
-            if ($interval->days <= self::APPROACHING_DEADLINE_DELTA && $interval->invert == 0) {
-                return true;
+            if ($interval->days <= self::APPROACHING_DEADLINE_DELTA) {
+                $result = true;
             }
         }
 
-        return false;
+        return $result;
     }
 
     public function getDaysBeforeDeadline(): int
@@ -2142,7 +2154,7 @@ class Aid // NOSONAR too much methods
             && (
                 ($this->dateSubmissionDeadline && $this->dateSubmissionDeadline >= $today)
                 || !$this->dateSubmissionDeadline
-            )
+                )
         ) {
             return true;
         }
@@ -2376,7 +2388,10 @@ class Aid // NOSONAR too much methods
 
     public function removeLogAidContactClick(LogAidContactClick $logAidContactClick): static
     {
-        if ($this->logAidContactClicks->removeElement($logAidContactClick) && $logAidContactClick->getAid() === $this) {
+        if (
+            $this->logAidContactClicks->removeElement($logAidContactClick)
+            && $logAidContactClick->getAid() === $this
+        ) {
             $logAidContactClick->setAid(null);
         }
 
