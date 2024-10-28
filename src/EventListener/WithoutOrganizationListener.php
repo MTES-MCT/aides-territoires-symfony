@@ -8,7 +8,7 @@ use App\Repository\Page\PageRepository;
 use App\Service\User\UserService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\Routing\RouterInterface;
 
@@ -19,6 +19,7 @@ final class WithoutOrganizationListener
         private PageRepository $pageRepository,
         private UserService $userService,
         private RouterInterface $routerInterface,
+        private RequestStack $requestStack,
     ) {
     }
 
@@ -43,7 +44,8 @@ final class WithoutOrganizationListener
 
             // utilisateur connecté sans organization
             if ($user && !$user->getDefaultOrganization()) {
-                $session =  new Session();
+                /** @var Session $session */
+                $session = $this->requestStack->getSession();
                 $session->getFlashBag()->add(
                     FrontController::FLASH_ERROR,
                     'Vous devez renseigner les informations de votre structure ou accepter '

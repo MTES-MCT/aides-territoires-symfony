@@ -290,10 +290,8 @@ class PortalController extends FrontController
             return $this->redirectToRoute('app_portal_portal');
         }
 
-        // démarre session
-        $session = new Session();
-
         // met id portal en session
+        $session = $requestStack->getSession();
         $session->set('searchPageId', $search_page->getId());
 
         // redirection vers un autre portail
@@ -392,7 +390,7 @@ class PortalController extends FrontController
             return new Response();
         }
 
-        $session = new Session();
+        $session = $requestStack->getSession();
         $aidIds = $session->get('aidIds', []);
         $dateMin = $session->get('dateMin', new \DateTime('-1 month'));
         $dateMax = $session->get('dateMax', new \DateTime(date('Y-m-d')));
@@ -434,7 +432,7 @@ class PortalController extends FrontController
             return new Response();
         }
 
-        $session = new Session();
+        $session = $requestStack->getSession();
         $aidIds = $session->get('aidIds', []);
 
         if (count($aidIds) > 0) {
@@ -485,7 +483,7 @@ class PortalController extends FrontController
             return new Response();
         }
 
-        $session = new Session();
+        $session = $requestStack->getSession();
         $aidIds = $session->get('aidIds', []);
         $dateMin = $session->get('dateMin', new \DateTime('-1 month'));
         $dateMax = $session->get('dateMax', new \DateTime(date('Y-m-d')));
@@ -564,7 +562,7 @@ class PortalController extends FrontController
             return new Response();
         }
 
-        $session = new Session();
+        $session = $requestStack->getSession();
         $searchPageId = $session->get('searchPageId', null);
 
         if (!$searchPageId) {
