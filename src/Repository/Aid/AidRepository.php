@@ -508,6 +508,7 @@ class AidRepository extends ServiceEntityRepository
                     ->setParameter('projectReference', $projectReference);
 
                 if (!$projectReference->getRequiredKeywordReferences()->isEmpty()) {
+                    // fait un tableau unique des mots clés requis et de ses synonymes
                     $requiredKeywordReferencesName = [];
                     foreach ($projectReference->getRequiredKeywordReferences() as $keywordReference) {
                         $requiredKeywordReferencesName[] = $keywordReference->getName();
@@ -525,22 +526,21 @@ class AidRepository extends ServiceEntityRepository
                         }
                     }
                     $requiredKeywordReferencesName = array_unique($requiredKeywordReferencesName);
-                    $requiredKeywordReferencesNameString = implode('|', $requiredKeywordReferencesName);
+                    
+                    // on ajoute des guillemets si le mot clé contient un espace, ex: "batiment scolaire"
+                    $transformedTerms = array_map(function($term) {
+                        return strpos($term, ' ') !== false ? '"' . $term . '"' : $term;
+                    }, $requiredKeywordReferencesName);
+                    
 
-                    $qb->andWhere(
-                        '
-                        REGEXP(a.name, :requireKeywordReferencesString) = 1
-                        OR REGEXP(a.nameInitial, :requireKeywordReferencesString) = 1
-                        OR REGEXP(a.description, :requireKeywordReferencesString) = 1
-                        OR REGEXP(a.eligibility, :requireKeywordReferencesString) = 1
-                        OR REGEXP(a.projectExamples, :requireKeywordReferencesString) = 1
+                    // on transforme le tableau en string pour la recherche fulltext
+                    $requiredKeywordReferencesNameString = implode(' ', $transformedTerms);
+
+                    $qb->andWhere('
+                        MATCH_AGAINST(a.name, a.nameInitial, a.description, a.eligibility, a.projectExamples) AGAINST (:requireKeywordReferencesString IN BOOLEAN MODE) > 0
                         OR :projectReference MEMBER OF a.projectReferences
-                        '
-                    );
-                    $qb->setParameter(
-                        'requireKeywordReferencesString',
-                        '\\b' . $requiredKeywordReferencesNameString . '\\b'
-                    );
+                    ');
+                    $qb->setParameter('requireKeywordReferencesString', $requiredKeywordReferencesNameString);
                 }
             }
 
