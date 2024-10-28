@@ -6,13 +6,14 @@ use App\Entity\Reference\KeywordReference;
 use App\Entity\Reference\ProjectReference;
 use App\Repository\Reference\KeywordReferenceRepository;
 use App\Repository\Reference\ProjectReferenceRepository;
-use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 class ReferenceService
 {
     public function __construct(
         private KeywordReferenceRepository $keywordReferenceRepository,
         private ProjectReferenceRepository $projectReferenceRepository,
+        private RequestStack $requestStack
     ) {
     }
 
@@ -242,7 +243,7 @@ class ReferenceService
     {
         $highlightedWords = $this->getHighlightedWords($synonyms, $currentKeyword);
 
-        $session = new Session();
+        $session = $this->requestStack->getSession();
         $session->set('highlightedWords', $highlightedWords);
 
         return $highlightedWords;
@@ -253,7 +254,7 @@ class ReferenceService
      */
     public function getHighlightedWords(?array $synonyms, ?string $currentKeyword): array
     {
-        $session = new Session();
+        $session = $this->requestStack->getSession();
         $highlightedWords = $session->get('highlightedWords', []);
 
         if (isset($synonyms['intentions_string']) && isset($synonyms['objects_string'])) {
