@@ -25,7 +25,12 @@ class ImportFluxOccitanieCommand extends ImportFluxCommand
         return new CurlHttpClient($this->getApiOptions());
     }
 
-    protected function callApi()
+    /**
+     * appel le flux
+     *
+     * @return array<int, mixed>
+     */
+    protected function callApi(): array
     {
         $aidsFromImport = [];
         $client = $this->getClient();
@@ -60,7 +65,12 @@ class ImportFluxOccitanieCommand extends ImportFluxCommand
         return $aidsFromImport;
     }
 
-    protected function findAid($aidToImport): ?Aid
+    /**
+     *
+     * @param array<mixed, mixed> $aidToImport
+     * @return ?Aid
+     */
+    protected function findAid(array $aidToImport): ?Aid
     {
         try {
             // on recherche d'abprd par importUniqueid
@@ -101,7 +111,13 @@ class ImportFluxOccitanieCommand extends ImportFluxCommand
         return null;
     }
 
-    protected function getImportUniqueid($aidToImport): ?string
+    /**
+     * retourne un identifiant unique pour l'import
+     *
+     * @param array<mixed, mixed> $aidToImport
+     * @return string|null
+     */
+    protected function getImportUniqueid(array $aidToImport): ?string
     {
         if (!isset($aidToImport['id_article'])) {
             return null;
@@ -110,7 +126,12 @@ class ImportFluxOccitanieCommand extends ImportFluxCommand
         return substr($importUniqueid, 0, 200);
     }
 
-
+    /**
+     *
+     * @param array<mixed, mixed> $aidToImport
+     * @param array<mixed, mixed> $params
+     * @return array<mixed, mixed>
+     */
     protected function getFieldsMapping(array $aidToImport, array $params = null): array
     {
         $timePublished = $this->getDateTimeOrNull($aidToImport['date_publication'] ?? null, ['keepTime' => true]);
@@ -141,6 +162,12 @@ class ImportFluxOccitanieCommand extends ImportFluxCommand
         return $this->mergeImportDatas($return);
     }
 
+    /**
+     *
+     * @param array<mixed, mixed> $aidToImport
+     * @param Aid $aid
+     * @return Aid
+     */
     protected function setCategories(array $aidToImport, Aid $aid): Aid
     {
         $categories = (isset($aidToImport['thematiques']) && $aidToImport['thematiques'])

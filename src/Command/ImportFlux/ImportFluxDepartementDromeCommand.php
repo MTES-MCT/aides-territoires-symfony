@@ -21,7 +21,13 @@ class ImportFluxDepartementDromeCommand extends ImportFluxCommand
     protected ?string $importUniqueidPrefix = 'CDDr_';
     protected ?int $idDataSource = 9;
 
-    protected function getImportUniqueid($aidToImport): ?string
+    /**
+     * retourne un identifiant unique pour l'import
+     *
+     * @param array<mixed, mixed> $aidToImport
+     * @return string|null
+     */
+    protected function getImportUniqueid(array $aidToImport): ?string
     {
         if (!isset($aidToImport['id'])) {
             return null;
@@ -29,6 +35,12 @@ class ImportFluxDepartementDromeCommand extends ImportFluxCommand
         return $this->importUniqueidPrefix . $aidToImport['id'];
     }
 
+    /**
+     *
+     * @param array<mixed, mixed> $aidToImport
+     * @param array<mixed, mixed> $params
+     * @return array<mixed, mixed>
+     */
     protected function getFieldsMapping(array $aidToImport, array $params = null): array // NOSONAR too complex
     {
         $description = isset($aidToImport['description']) ? $aidToImport['description'] : null;
@@ -90,6 +102,12 @@ class ImportFluxDepartementDromeCommand extends ImportFluxCommand
         return $this->mergeImportDatas($return);
     }
 
+    /**
+     *
+     * @param array<mixed, mixed> $aidToImport
+     * @param Aid $aid
+     * @return Aid
+     */
     protected function setAidRecurrence(array $aidToImport, Aid $aid): Aid
     {
         if (!isset($aidToImport['recurrence'])) {
@@ -103,6 +121,12 @@ class ImportFluxDepartementDromeCommand extends ImportFluxCommand
         return $aid;
     }
 
+    /**
+     *
+     * @param array<mixed, mixed> $aidToImport
+     * @param Aid $aid
+     * @return Aid
+     */
     protected function setAidTypes(array $aidToImport, Aid $aid): Aid
     {
         // converti en tableau
@@ -120,6 +144,12 @@ class ImportFluxDepartementDromeCommand extends ImportFluxCommand
         return $aid;
     }
 
+    /**
+     *
+     * @param array<mixed, mixed> $aidToImport
+     * @param Aid $aid
+     * @return Aid
+     */
     protected function setAidAudiences(array $aidToImport, Aid $aid): Aid
     {
         if (!isset($aidToImport['targeted_audiences']) || !is_array($aidToImport['targeted_audiences'])) {
@@ -142,6 +172,12 @@ class ImportFluxDepartementDromeCommand extends ImportFluxCommand
         return $aid;
     }
 
+    /**
+     *
+     * @param array<mixed, mixed> $aidToImport
+     * @param Aid $aid
+     * @return Aid
+     */
     protected function setCategories(array $aidToImport, Aid $aid): Aid
     {
         if (!isset($aidToImport['categories']) || !is_array($aidToImport['categories'])) {
@@ -156,6 +192,12 @@ class ImportFluxDepartementDromeCommand extends ImportFluxCommand
         return $aid;
     }
 
+    /**
+     *
+     * @param array<mixed, mixed> $aidToImport
+     * @param Aid $aid
+     * @return Aid
+     */
     protected function setAidSteps(array $aidToImport, Aid $aid): Aid
     {
         /** @var AidStepRepository $aidStepRepo */

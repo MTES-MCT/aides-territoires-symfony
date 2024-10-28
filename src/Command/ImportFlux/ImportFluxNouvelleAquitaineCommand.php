@@ -18,7 +18,13 @@ class ImportFluxNouvelleAquitaineCommand extends ImportFluxCommand
     protected ?string $importUniqueidPrefix = 'NOUVELLE_AQUITAINE_';
     protected ?int $idDataSource = 1;
 
-    protected function getImportUniqueid($aidToImport): ?string
+    /**
+     * retourne un identifiant unique pour l'import
+     *
+     * @param array<mixed, mixed> $aidToImport
+     * @return string|null
+     */
+    protected function getImportUniqueid(array $aidToImport): ?string
     {
         if (!isset($aidToImport['Lien'])) {
             return null;
@@ -28,7 +34,12 @@ class ImportFluxNouvelleAquitaineCommand extends ImportFluxCommand
         return $this->importUniqueidPrefix . md5($aidToImport['Lien']);
     }
 
-    protected function callApi()
+    /**
+     * appel le flux
+     *
+     * @return array<int, mixed>
+     */
+    protected function callApi(): array
     {
         try {
             $data = [];
@@ -57,6 +68,10 @@ class ImportFluxNouvelleAquitaineCommand extends ImportFluxCommand
     }
 
 
+    /**
+     *
+     * @return array<mixed, mixed> $aidToImport
+     */
     protected function getApiOptions(): array
     {
         return [
@@ -66,6 +81,12 @@ class ImportFluxNouvelleAquitaineCommand extends ImportFluxCommand
         ];
     }
 
+    /**
+     *
+     * @param array<mixed, mixed> $aidToImport
+     * @param array<mixed, mixed> $params
+     * @return array<mixed, mixed>
+     */
     protected function getFieldsMapping(array $aidToImport, array $params = null): array
     {
         $dateStart = $this->getDateTimeOrNull($aidToImport['Date de début']);
@@ -105,6 +126,12 @@ class ImportFluxNouvelleAquitaineCommand extends ImportFluxCommand
         return $this->mergeImportDatas($return);
     }
 
+    /**
+     *
+     * @param array<mixed, mixed> $aidToImport
+     * @param Aid $aid
+     * @return Aid
+     */
     protected function setCategories(array $aidToImport, Aid $aid): Aid
     {
         // les categories du flux
@@ -211,6 +238,12 @@ class ImportFluxNouvelleAquitaineCommand extends ImportFluxCommand
         return $aid;
     }
 
+    /**
+     *
+     * @param array<mixed, mixed> $aidToImport
+     * @param Aid $aid
+     * @return Aid
+     */
     protected function setAidAudiences(array $aidToImport, Aid $aid): Aid
     {
         if (!isset($aidToImport['Profils'])) {
@@ -262,6 +295,12 @@ class ImportFluxNouvelleAquitaineCommand extends ImportFluxCommand
         return $aid;
     }
 
+    /**
+     *
+     * @param array<mixed, mixed> $aidToImport
+     * @param Aid $aid
+     * @return Aid
+     */
     protected function setAidRecurrence(array $aidToImport, Aid $aid): Aid
     {
         $dateStart = $this->getDateTimeOrNull($aidToImport['Date de début']);
