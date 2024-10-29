@@ -50,7 +50,7 @@ Le javascript du projet est principalement du jQuery, un peu de Vanilla JS). Cot
 | Source           | Destination       | Protocole | Port | Localisation      | Interne/URL Externe |
 |------------------|-------------------|-----------|------|-------------------|---------------------|
 | Navigateur       | App Symfony         | HTTPS     | 443  | osc-fr1 | Externe             |
-| Clients API JSON | App RaiSymfonyls         | HTTPS     | 443  | osc-fr1 | Externe             |          |
+| Clients API JSON | App Symfony         | HTTPS     | 443  | osc-fr1 | Externe             |          |
 | App Symfony        | MySQL Scalingo | TCP       | 5432 | osc-fr1 | Interne             |
 | App Symfony        | Redis Scalingo    | TCP       | 6379 | osc-fr1 | Interne             |
 
@@ -79,12 +79,12 @@ Le javascript du projet est principalement du jQuery, un peu de Vanilla JS). Cot
 | Nom de l’applicatif | Service          | Version   | Commentaires                                                    |
 |---------------------|------------------|-----------|-----------------------------------------------------------------|
 | Serveur web         | Symfony @ Scalingo | Symfony 6.4   | Voir ci-dessous pour le détail des librairies                   |
-| BDD métier          | MySQL       | ` 	8.0.35` | Stockage des données métier, voir [db/schema.rb](/db/schema.rb) |
+| BDD métier          | MySQL       | `8.0.35` | Stockage des données métier, voir [db/schema.rb](/db/schema.rb) |
 | Session       | Redis            | `7.2.5`   | Stockage des sessions                                |
 
 La liste des librairies Php est disponible dans :
 - [composer.json](/composer.json) pour la liste des dépendances directes et la description de la fonctionnalité de chacune des gems
-- [composer.lock](/composer.lock) pour la liste complète des gems utilisées directement et indirectement (dépendances
+- [composer.lock](/composer.lock) pour la liste complète des librairies utilisées directement et indirectement (dépendances
   indirectes), et leurs versions précises
 
 La liste des librairies JS utilisée est disponible dans :
@@ -102,8 +102,6 @@ Notre application est accessible sous  :
 `https://aides-territoires.beta.gouv.fr/` est notre instance de production actuelle. 
 
 Chaque schémas ci-dessous représente une seule instance (une seule app Scalingo), qu'elle soit de prod ou de démo.
-À noter que les instances `demo-rdv-solidarites` et `production-rdv-mairie` n'utilisent que `netsize` comme
-fournisseur de SMS, les autres fournisseurs étant spécifiques à des départements du médico-social.
 
 #### Architecture interne à Scalingo
 
@@ -220,7 +218,7 @@ GitGuardian, qui fait de la détection automatisée de fuites de secrets est aus
 L'application a 2 types d'utilisateurs :
 - usager⋅e
 - admin
-L'utilisateur peu ajouter / consulter des aides, des projets.
+L'utilisateur peut ajouter / consulter des aides, des projets.
 
 Les comptes utilisateurs ont une contrainte d'unicité sur les emails.
 
@@ -248,7 +246,7 @@ Les agents ont accès à diverses fonctionnalités touchants à :
 - les périmètres
 
 La connexion à un profil agent est faite par email + mot de passe. Les mots de passes sont stockés salés et chiffrés.
-Suivi d'une identificaiton à double facteur avec un jeton TOTP.
+Suivi d'une identification à double facteur avec un jeton TOTP.
 
 ### Traçabilité des erreurs et des actions utilisateurs
 
