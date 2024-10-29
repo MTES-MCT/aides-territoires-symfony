@@ -20,7 +20,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Entity(repositoryClass: CategoryRepository::class)]
 class Category // NOSONAR too much methods
 {
-    const API_GROUP_LIST = 'category:list';
+    public const API_GROUP_LIST = 'category:list';
 
     #[ORM\Id]
     #[ORM\GeneratedValue]

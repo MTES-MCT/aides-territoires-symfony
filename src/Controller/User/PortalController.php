@@ -22,7 +22,12 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class PortalController extends FrontController
 {
-    #[Route('/comptes/portails/{id}/', name: 'app_user_portal_edit', requirements: ['id' => '[0-9]+'], methods: ['GET', 'POST'])]
+    #[Route(
+        '/comptes/portails/{id}/',
+        name: 'app_user_portal_edit',
+        requirements: ['id' => '[0-9]+'],
+        methods: ['GET', 'POST']
+    )]
     public function edit(
         $id,
         SearchPageRepository $searchPageRepository,
@@ -96,7 +101,10 @@ class PortalController extends FrontController
 
         // fil arianne
         $this->breadcrumb->add('Comptes', $this->generateUrl('app_user_dashboard'));
-        $this->breadcrumb->add('Portail ' . $searchPage->getName(), $this->generateUrl('app_user_portal_edit', ['id' => $id]));
+        $this->breadcrumb->add(
+            'Portail ' . $searchPage->getName(),
+            $this->generateUrl('app_user_portal_edit', ['id' => $id])
+        );
 
         // rendu template
         return $this->render('user/searchpage/edit.html.twig', [

@@ -13,7 +13,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Entity(repositoryClass: OrganizationTypeGroupRepository::class)]
 class OrganizationTypeGroup
 {
-    const ID_COLLECTIVITES = 1;
+    public const ID_COLLECTIVITES = 1;
 
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -38,7 +38,12 @@ class OrganizationTypeGroup
     #[Gedmo\Timestampable(on: 'update')]
     private ?\DateTimeInterface $timeUpdate = null;
 
-    #[ORM\OneToMany(mappedBy: 'organizationTypeGroup', targetEntity: OrganizationType::class, orphanRemoval: true, cascade: ['persist'])]
+    #[ORM\OneToMany(
+        mappedBy: 'organizationTypeGroup',
+        targetEntity: OrganizationType::class,
+        orphanRemoval: true,
+        cascade: ['persist']
+    )]
     private Collection $organizationTypes;
 
     public function __construct()
@@ -119,7 +124,10 @@ class OrganizationTypeGroup
 
     public function removeOrganizationType(OrganizationType $organizationType): static
     {
-        if ($this->organizationTypes->removeElement($organizationType) && $organizationType->getOrganizationTypeGroup() === $this) {
+        if (
+            $this->organizationTypes->removeElement($organizationType)
+            && $organizationType->getOrganizationTypeGroup() === $this
+        ) {
             $organizationType->setOrganizationTypeGroup(null);
         }
 

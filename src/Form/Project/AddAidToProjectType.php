@@ -27,7 +27,8 @@ class AddAidToProjectType extends AbstractType
         $currentAid = $options['currentAid'] ?? null;
         $organizationProjects = [];
         if ($user instanceof User && $user->getDefaultOrganization()) {
-            $organizationProjects = $this->managerRegistry->getRepository(Project::class)->findBy(['organization' => $user->getDefaultOrganization()]);
+            $organizationProjects = $this->managerRegistry->getRepository(Project::class)
+                ->findBy(['organization' => $user->getDefaultOrganization()]);
         }
 
         if (count($organizationProjects) > 0) {

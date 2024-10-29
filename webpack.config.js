@@ -145,7 +145,9 @@ Encore
     })
 
     // enables Sass/SCSS support
-    .enableSassLoader()
+    .enableSassLoader(options => {
+        options.implementation = require('sass');
+    })
 
     // uncomment if you use TypeScript
     //.enableTypeScriptLoader()

@@ -37,9 +37,9 @@ use Symfony\UX\Chartjs\Model\Chart;
 
 class StatisticsController extends DashboardController
 {
-    const NB_USER_BY_PAGE = 50;
-    const NB_ORGANIZATION_BY_PAGE = 50;
-    const NB_PROJECT_BY_PAGE = 50;
+    public const NB_USER_BY_PAGE = 50;
+    public const NB_ORGANIZATION_BY_PAGE = 50;
+    public const NB_PROJECT_BY_PAGE = 50;
 
     public function __construct(
         protected UserService $userService,
@@ -117,8 +117,10 @@ class StatisticsController extends DashboardController
     private function getStatsGlobal(): array
     {
         $stats = [
-            'nbUsers' => $this->managerRegistry->getRepository(User::class)->count(['isBeneficiary' => true]),
-            'nbOrganizations' => $this->managerRegistry->getRepository(Organization::class)->count(['isImported' => false]),
+            'nbUsers' => $this->managerRegistry->getRepository(User::class)
+                ->count(['isBeneficiary' => true]),
+            'nbOrganizations' => $this->managerRegistry->getRepository(Organization::class)
+                ->count(['isImported' => false]),
             'nbInterco' => $this->managerRegistry->getRepository(Organization::class)->countInterco([]),
             'nbProjects' => $this->managerRegistry->getRepository(Project::class)->count([]),
             'nbAidProjects' => $this->managerRegistry->getRepository(AidProject::class)->countDistinctAids([]),
@@ -144,8 +146,16 @@ class StatisticsController extends DashboardController
         MatomoService $matomoService
     ): Response {
         $statsGlobal = $this->getStatsGlobal();
-        $chartCommune = $this->getChartObjectif($statsGlobal['nbCommune'], $statsGlobal['nbCommuneTotal'], $statsGlobal['nbCommuneObjectif']);
-        $chartEpci = $this->getChartObjectif($statsGlobal['nbEpci'], $statsGlobal['nbEpciTotal'], $statsGlobal['nbEpciObjectif']);
+        $chartCommune = $this->getChartObjectif(
+            $statsGlobal['nbCommune'],
+            $statsGlobal['nbCommuneTotal'],
+            $statsGlobal['nbCommuneObjectif']
+        );
+        $chartEpci = $this->getChartObjectif(
+            $statsGlobal['nbEpci'],
+            $statsGlobal['nbEpciTotal'],
+            $statsGlobal['nbEpciObjectif']
+        );
 
         // dates par défaut
         $dateMin = new \DateTime('-1 month');
@@ -171,18 +181,45 @@ class StatisticsController extends DashboardController
             fromDateString: $dateMin->format('Y-m-d'),
             toDateString: $dateMax->format('Y-m-d')
         );
+
         $statsMatomoActions = $matomoService->getMatomoStats(
             apiMethod: 'Actions.get',
             customSegment: null,
             fromDateString: $dateMin->format('Y-m-d'),
             toDateString: $dateMax->format('Y-m-d')
         );
+
         $statsMatomoLast10Weeks = $matomoService->getMatomoStats(
             apiMethod: 'VisitsSummary.get',
             period: 'week',
             fromDateString: 'last10',
             toDateString: null
         );
+
+        // vues des aides (totales et distinces)
+        // on filtre sur le label pour récupérer le groupement aides / autres de matomo
+        $statsAidsViews = $matomoService->getMatomoStats(
+            apiMethod: MatomoService::MATOMO_GET_PAGE_URLS_API_METHOD,
+            fromDateString: $dateMin->format('Y-m-d'),
+            toDateString: $dateMax->format('Y-m-d'),
+            options: [
+                'flat' => 1,
+                'filter_column' => 'label',
+                'filter_pattern' => 'aides'
+            ],
+        );
+
+        $nbAidVisits = 0;
+        $nbAidViews = 0;
+        $nbAids = 0;
+        foreach ($statsAidsViews as $statsAidsView) {
+            if ($statsAidsView->label == '/aides/') {
+                continue;
+            }
+            $nbAidVisits += $statsAidsView->nb_visits;
+            $nbAidViews += $statsAidsView->nb_hits;
+            $nbAids++;
+        }
 
         $labels = [];
         $visitsUnique = [];
@@ -193,11 +230,13 @@ class StatisticsController extends DashboardController
             $dates = explode(',', $key);
             $dateStart = new \DateTime($dates[0]);
             $dateEnd = new \DateTime($dates[1]);
-            // dd($registersByWeek, $dateStart->format('Y-W'));
+
             $labels[] = $dateStart->format('d/m/Y') . ' au ' . $dateEnd->format('d/m/Y');
             $visitsUnique[] = $stats[0]->nb_uniq_visitors ?? 0;
-            $registers[] = $this->managerRegistry->getRepository(User::class)->countRegisters(['dateCreateMin' => $dateStart, 'dateCreateMax' => $dateMax]);
-            $alerts[] = $this->managerRegistry->getRepository(Alert::class)->countCustom(['dateCreateMin' => $dateStart, 'dateCreateMax' => $dateMax]);
+            $registers[] = $this->managerRegistry->getRepository(User::class)
+                ->countRegisters(['dateCreateMin' => $dateStart, 'dateCreateMax' => $dateMax]);
+            $alerts[] = $this->managerRegistry->getRepository(Alert::class)
+                ->countCustom(['dateCreateMin' => $dateStart, 'dateCreateMax' => $dateMax]);
         }
         $chartLast10Weeks = $this->chartBuilderInterface->createChart(Chart::TYPE_LINE);
         $chartLast10Weeks->setData([
@@ -242,7 +281,9 @@ class StatisticsController extends DashboardController
             'statsMatomoActions' => $statsMatomoActions[0] ?? [],
             'statsMatomoLast10Weeks' => $statsMatomoLast10Weeks,
             'chartLast10Weeks' => $chartLast10Weeks,
-
+            'nbAidVisits' => $nbAidVisits,
+            'nbAidViews' => $nbAidViews,
+            'nbAids' => count($statsAidsViews),
             'consultationSelected' => true,
         ]);
     }
@@ -253,8 +294,16 @@ class StatisticsController extends DashboardController
         MatomoService $matomoService
     ): Response {
         $statsGlobal = $this->getStatsGlobal();
-        $chartCommune = $this->getChartObjectif($statsGlobal['nbCommune'], $statsGlobal['nbCommuneTotal'], $statsGlobal['nbCommuneObjectif']);
-        $chartEpci = $this->getChartObjectif($statsGlobal['nbEpci'], $statsGlobal['nbEpciTotal'], $statsGlobal['nbEpciObjectif']);
+        $chartCommune = $this->getChartObjectif(
+            $statsGlobal['nbCommune'],
+            $statsGlobal['nbCommuneTotal'],
+            $statsGlobal['nbCommuneObjectif']
+        );
+        $chartEpci = $this->getChartObjectif(
+            $statsGlobal['nbEpci'],
+            $statsGlobal['nbEpciTotal'],
+            $statsGlobal['nbEpciObjectif']
+        );
 
         // dates par défaut
         $dateMin = new \DateTime('-1 month');
@@ -388,8 +437,16 @@ class StatisticsController extends DashboardController
         MatomoService $matomoService
     ): Response {
         $statsGlobal = $this->getStatsGlobal();
-        $chartCommune = $this->getChartObjectif($statsGlobal['nbCommune'], $statsGlobal['nbCommuneTotal'], $statsGlobal['nbCommuneObjectif']);
-        $chartEpci = $this->getChartObjectif($statsGlobal['nbEpci'], $statsGlobal['nbEpciTotal'], $statsGlobal['nbEpciObjectif']);
+        $chartCommune = $this->getChartObjectif(
+            $statsGlobal['nbCommune'],
+            $statsGlobal['nbCommuneTotal'],
+            $statsGlobal['nbCommuneObjectif']
+        );
+        $chartEpci = $this->getChartObjectif(
+            $statsGlobal['nbEpci'],
+            $statsGlobal['nbEpciTotal'],
+            $statsGlobal['nbEpciObjectif']
+        );
 
         // dates par défaut
         $dateMin = new \DateTime('-1 month');
@@ -422,15 +479,13 @@ class StatisticsController extends DashboardController
             'dateCreateMin' => $dateMin,
             'dateCreateMax' => $dateMax,
         ]);
-        $nbContactClicks = $this->managerRegistry->getRepository(LogAidContactClick::class)->countCustom([
+
+        $nbInformationsTotal = $this->managerRegistry->getRepository(LogAidOriginUrlClick::class)->countCustom([
             'dateMin' => $dateMin,
             'dateMax' => $dateMax,
         ]);
-        $nbInformations = $this->managerRegistry->getRepository(LogAidOriginUrlClick::class)->countCustom([
-            'dateMin' => $dateMin,
-            'dateMax' => $dateMax,
-        ]);
-        $nbApplications = $this->managerRegistry->getRepository(LogAidApplicationUrlClick::class)->countCustom([
+
+        $nbApplicationsTotal = $this->managerRegistry->getRepository(LogAidApplicationUrlClick::class)->countCustom([
             'dateMin' => $dateMin,
             'dateMax' => $dateMax,
         ]);
@@ -504,12 +559,12 @@ class StatisticsController extends DashboardController
             toDateString: $dateMax->format('Y-m-d'),
             options: [
                 'flat' => 1,
-                'filter_column' => 'label',
+                'filter_column' => 'url',
                 'filter_limit' => 100 * 1.3,
-                'filter_pattern' => '^/(aides/)?([a-z0-9]){4}-'
+                'filter_pattern' => MatomoService::REGEXP_AID_URL
             ]
         );
-        // dd($statsMatomoTopAids);
+
         $topAids = [];
         foreach ($statsMatomoTopAids as $stats) {
             preg_match('/^\/(aides\/)?(.*)\/$/', $stats->label, $matches);
@@ -634,9 +689,8 @@ class StatisticsController extends DashboardController
             'nbLogins' => $nbLogins,
             'nbAidSearch' => $nbAidSearch,
             'nbAlerts' => $nbAlerts,
-            'nbContactClicks' => $nbContactClicks,
-            'nbInformations' => $nbInformations,
-            'nbApplications' => $nbApplications,
+            'nbInformationsTotal' => $nbInformationsTotal,
+            'nbApplicationsTotal' => $nbApplicationsTotal,
             'chartRegisters' => $chartRegisters,
             'topAids' => $topAids,
             'chartActivity' => $chartActivity,
@@ -650,8 +704,16 @@ class StatisticsController extends DashboardController
         AdminContext $adminContext
     ): Response {
         $statsGlobal = $this->getStatsGlobal();
-        $chartCommune = $this->getChartObjectif($statsGlobal['nbCommune'], $statsGlobal['nbCommuneTotal'], $statsGlobal['nbCommuneObjectif']);
-        $chartEpci = $this->getChartObjectif($statsGlobal['nbEpci'], $statsGlobal['nbEpciTotal'], $statsGlobal['nbEpciObjectif']);
+        $chartCommune = $this->getChartObjectif(
+            $statsGlobal['nbCommune'],
+            $statsGlobal['nbCommuneTotal'],
+            $statsGlobal['nbCommuneObjectif']
+        );
+        $chartEpci = $this->getChartObjectif(
+            $statsGlobal['nbEpci'],
+            $statsGlobal['nbEpciTotal'],
+            $statsGlobal['nbEpciObjectif']
+        );
 
         // dates par défaut
         $dateMin = new \DateTime('-1 month');
@@ -674,7 +736,8 @@ class StatisticsController extends DashboardController
             'dateCreateMin' => $dateMin,
             'dateCreateMax' => $dateMax,
         ]);
-        $nbOrganizationWithBeneficiary = $this->managerRegistry->getRepository(Organization::class)->countWithUserBeneficiary([
+        $nbOrganizationWithBeneficiary = $this->managerRegistry->getRepository(Organization::class)
+        ->countWithUserBeneficiary([
             'dateCreateMin' => $dateMin,
             'dateCreateMax' => $dateMax,
             'isImported' => false,
@@ -692,7 +755,8 @@ class StatisticsController extends DashboardController
             'dateCreateMin' => $dateMin,
             'dateCreateMax' => $dateMax,
         ]);
-        $nbOrganizationWithContributor = $this->managerRegistry->getRepository(Organization::class)->countWithUserContributor([
+        $nbOrganizationWithContributor = $this->managerRegistry->getRepository(Organization::class)
+        ->countWithUserContributor([
             'dateCreateMin' => $dateMin,
             'dateCreateMax' => $dateMax,
             'isImported' => false,
@@ -875,7 +939,9 @@ class StatisticsController extends DashboardController
         ]);
         $nbBeneficiariesPercent = $nbUsers == 0 ? 0 : round($nbBeneficiaries / $nbUsers * 100, 2);
         $nbContributorsPercent = $nbUsers == 0 ? 0 : round($nbContributors / $nbUsers * 100, 2);
-        $nbBeneficiariesAndContributorsPercent = $nbUsers == 0 ? 0 : round($nbBeneficiariesAndContributors / $nbUsers * 100, 2);
+        $nbBeneficiariesAndContributorsPercent = $nbUsers == 0
+            ? 0
+            : round($nbBeneficiariesAndContributors / $nbUsers * 100, 2);
 
         // dates par défaut
         $dateMin = new \DateTime('-1 month');
@@ -947,7 +1013,9 @@ class StatisticsController extends DashboardController
             'hasPerimeter' => true
         ]);
         foreach ($nbOrganizationsByType as $key => $organizationType) {
-            $nbOrganizationsByType[$key]['percent'] = $nbOrganizations == 0 ? 0 : round($organizationType['nb'] / $nbOrganizations * 100, 2);
+            $nbOrganizationsByType[$key]['percent'] = $nbOrganizations == 0
+                ? 0
+                : round($organizationType['nb'] / $nbOrganizations * 100, 2);
         }
 
         // dates par défaut
@@ -1370,7 +1438,6 @@ class StatisticsController extends DashboardController
         $charts = [];
 
         foreach ($interco_types as $interco_type) {
-
             $chart = $this->getChartObjectif($interco_type['current_chart'], $interco_type['total'], null);
 
             $charts[$interco_type['code']] = $chart;
@@ -1455,11 +1522,14 @@ class StatisticsController extends DashboardController
         ]);
     }
 
-    #[Route('/admin/statistics/consultation/ajax/aid-nb-views', name: 'admin_statistics_consultation_ajax_aid_nb_views', options: ['expose' => true])]
+    #[Route(
+        '/admin/statistics/consultation/ajax/aid-nb-views',
+        name: 'admin_statistics_consultation_ajax_aid_nb_views',
+        options: ['expose' => true]
+    )]
     public function ajaxAidNbViews(
         RequestStack $requestStack
-    ): Response
-    {
+    ): Response {
         try {
             $dateCreateMin = $requestStack->getCurrentRequest()->get('dateCreateMin');
             $dateCreateMax = $requestStack->getCurrentRequest()->get('dateCreateMax');
@@ -1479,14 +1549,16 @@ class StatisticsController extends DashboardController
         } catch (\Exception) {
             return $this->json(['error' => true, 'nbAidViews' => 0], Response::HTTP_BAD_REQUEST);
         }
-
     }
 
-    #[Route('/admin/statistics/consultation/ajax/aid-nb-views-distinct', name: 'admin_statistics_consultation_ajax_aid_nb_views_distinct', options: ['expose' => true])]
+    #[Route(
+        '/admin/statistics/consultation/ajax/aid-nb-views-distinct',
+        name: 'admin_statistics_consultation_ajax_aid_nb_views_distinct',
+        options: ['expose' => true]
+    )]
     public function ajaxAidNbViewsDistinct(
         RequestStack $requestStack
-    ): Response
-    {
+    ): Response {
         try {
             $dateCreateMin = $requestStack->getCurrentRequest()->get('dateCreateMin');
             $dateCreateMax = $requestStack->getCurrentRequest()->get('dateCreateMax');
@@ -1507,6 +1579,5 @@ class StatisticsController extends DashboardController
         } catch (\Exception) {
             return $this->json(['error' => true, 'nbAidViewsDistinct' => 0], Response::HTTP_BAD_REQUEST);
         }
-
     }
 }

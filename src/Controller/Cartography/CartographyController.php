@@ -86,7 +86,11 @@ class CartographyController extends FrontController
         ]);
     }
 
-    #[Route('/cartographie/{code}-{slug}/porteurs/', name: 'app_cartography_detail', requirements: ['code' => '[0-9A-Za-z]+', 'slug' => '[a-zA-Z0-9\-_]+'])]
+    #[Route(
+        '/cartographie/{code}-{slug}/porteurs/',
+        name: 'app_cartography_detail',
+        requirements: ['code' => '[0-9A-Za-z]+', 'slug' => '[a-zA-Z0-9\-_]+']
+    )]
     public function detail(
         $code,
         $slug,
@@ -99,7 +103,6 @@ class CartographyController extends FrontController
         CategoryThemeRepository $categoryThemeRepository,
         AidService $aidService,
         AidRepository $aidRepository,
-        AidTypeRepository $aidTypeRepository,
         AidTypeGroupRepository $aidTypeGroupRepository
     ): Response {
         // departement courant
@@ -120,7 +123,13 @@ class CartographyController extends FrontController
             CartographySearchType::class,
             null,
             [
-                'action' => $this->generateUrl('app_cartography_detail', ['code' => $current_dep->getCode(), 'slug' => $stringService->getSlug($current_dep->getName())]),
+                'action' => $this->generateUrl(
+                    'app_cartography_detail',
+                    [
+                        'code' => $current_dep->getCode(),
+                        'slug' => $stringService->getSlug($current_dep->getName())
+                    ]
+                ),
                 'method' => 'GET',
                 'forceDepartement' => $current_dep
             ]
@@ -143,12 +152,19 @@ class CartographyController extends FrontController
             $backerParams['aidTypeGroup'] = $formBackerSearch->get('aidTypeGroup')->getData();
         }
         if ($formBackerSearch->get('categorysearch')->getData()) {
-            if (isset($formBackerSearch->get('categorysearch')->getData()['customChoices']) && count($formBackerSearch->get('categorysearch')->getData()['customChoices']) > 0) {
-                $backerParams['categoryIds'] = $formBackerSearch->get('categorysearch')->getData()['customChoices'];
+            if (
+                isset($formBackerSearch->get('categorysearch')->getData()['customChoices'])
+                && count($formBackerSearch->get('categorysearch')->getData()['customChoices']) > 0
+            ) {
+                $backerParams['categoryIds'] =
+                    $formBackerSearch->get('categorysearch')->getData()['customChoices'];
             }
         }
         if ($formBackerSearch->get('scaleGroup')->getData()) {
-            $backerParams['perimeterScales'] = $perimeterService->getScalesFromGroup($formBackerSearch->get('scaleGroup')->getData());
+            $backerParams['perimeterScales'] =
+                $perimeterService->getScalesFromGroup(
+                    $formBackerSearch->get('scaleGroup')->getData()
+                );
         }
         if ($formBackerSearch->get('backerCategory')->getData()) {
             $backerParams['backerCategory'] = $formBackerSearch->get('backerCategory')->getData();
@@ -200,7 +216,10 @@ class CartographyController extends FrontController
                 'ids' => $backerParams['categoryIds']
             ]);
             foreach ($categories as $category) {
-                if ($category->getCategoryTheme() !== null && !$categoryThemesSelected->contains($category->getCategoryTheme())) {
+                if (
+                    $category->getCategoryTheme() !== null
+                    && !$categoryThemesSelected->contains($category->getCategoryTheme())
+                ) {
                     $categoryThemesSelected->add($category->getCategoryTheme());
                 }
             }
@@ -246,8 +265,14 @@ class CartographyController extends FrontController
 
             // on récupère les groupes de types d'aides des aides
             $backer->setNbAidsByTypeGroupSlug([
-                AidTypeGroup::SLUG_FINANCIAL => $aidRepository->countAidsFromIds($aidsLiveIds, ['aidTypeGroup' => $aidTypeGroupFinancial]),
-                AidTypeGroup::SLUG_TECHNICAL => $aidRepository->countAidsFromIds($aidsLiveIds, ['aidTypeGroup' => $aidTypeGroupTechnical]),
+                AidTypeGroup::SLUG_FINANCIAL => $aidRepository->countAidsFromIds(
+                    $aidsLiveIds,
+                    ['aidTypeGroup' => $aidTypeGroupFinancial]
+                ),
+                AidTypeGroup::SLUG_TECHNICAL => $aidRepository->countAidsFromIds(
+                    $aidsLiveIds,
+                    ['aidTypeGroup' => $aidTypeGroupTechnical]
+                ),
             ]);
         }
 

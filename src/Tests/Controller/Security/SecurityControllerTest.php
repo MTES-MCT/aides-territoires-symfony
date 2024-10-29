@@ -67,7 +67,8 @@ class SecurityControllerTest extends AtWebTestCase
     public function testApiLogin(): void
     {
         // Récupérer l'utilisateur des fixtures
-        $user = $this->managerRegistry->getRepository(User::class)->findOneBy(['email' => 'user@aides-territoires.beta.gouv.fr']);
+        $user = $this->managerRegistry->getRepository(User::class)
+            ->findOneBy(['email' => 'user@aides-territoires.beta.gouv.fr']);
 
         // Vérifier que l'utilisateur existe et a un apiToken
         $this->assertNotNull($user);

@@ -34,7 +34,7 @@ class MsgLogAidSearchTempTransfertHandler
         try {
             /** @var LogAidSearchTempRepository $logaidSearchTempRepository */
             $logAidSearchTempRepository = $this->managerRegistry->getRepository(LogAidSearchTemp::class);
-            
+
             $logAidSearchTemps = $logAidSearchTempRepository->findBy(
                 ['dateCreate' => new \DateTime('yesterday')],
                 null,
@@ -74,7 +74,7 @@ class MsgLogAidSearchTempTransfertHandler
 
                 $entityManager->persist($logAidSearch);
                 $entityManager->remove($logAidSearchTemp);
-                
+
                 if (++$batchCount % self::BATCH_SIZE === 0) {
                     $entityManager->flush();
                 }
@@ -92,10 +92,10 @@ class MsgLogAidSearchTempTransfertHandler
             if ($nbLogAidSearchTemps > 0) {
                 $this->bus->dispatch(new MsgLogAidSearchTempTransfert());
             }
-
         } catch (ProcessFailedException $exception) {
             // notif admin
-            $admin = $this->managerRegistry->getRepository(User::class)->findOneBy(['email' => $this->paramService->get('email_super_admin')]);
+            $admin = $this->managerRegistry->getRepository(User::class)
+            ->findOneBy(['email' => $this->paramService->get('email_super_admin')]);
             $this->notificationService->addNotification(
                 $admin,
                 'Erreur MsgLogAidViewTempTransfert',

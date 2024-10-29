@@ -55,7 +55,8 @@ class ImportFluxDepartementDromeCommand extends ImportFluxCommand
         $dateStart = $this->getDateTimeOrNull($aidToImport['start_date'] ?? null);
         $dateSubmissionDeadline = $this->getDateTimeOrNull($aidToImport['submission_deadline'] ?? null);
 
-        $contact = isset($aidToImport['contact']) ? $this->htmlSanitizerInterface->sanitize($aidToImport['contact']) : null;
+        $contact = isset($aidToImport['contact'])
+            ? $this->htmlSanitizerInterface->sanitize($aidToImport['contact']) : null;
         if (!$contact) {
             $contact = isset($aidToImport['description']) ? $aidToImport['description'] : null;
             if ($contact) {
@@ -74,9 +75,12 @@ class ImportFluxDepartementDromeCommand extends ImportFluxCommand
             'nameInitial' => isset($aidToImport['name']) ? strip_tags((string) $aidToImport['name']) : null,
             'description' => $description,
             'eligibility' => $eligibility,
-            'originUrl' => isset($aidToImport['origin_url']) ? $aidToImport['origin_url'] : null,
-            'applicationUrl' => isset($aidToImport['application_url']) ? $aidToImport['application_url'] : null,
-            'isCallForProject' => isset($aidToImport['is_call_for_project']) ? $aidToImport['is_call_for_project'] : false,
+            'originUrl' => isset($aidToImport['origin_url'])
+                ? $aidToImport['origin_url'] : null,
+            'applicationUrl' => isset($aidToImport['application_url'])
+                ? $aidToImport['application_url'] : null,
+            'isCallForProject' => isset($aidToImport['is_call_for_project'])
+                ? $aidToImport['is_call_for_project'] : false,
             'dateStart' => $dateStart,
             'dateSubmissionDeadline' => $dateSubmissionDeadline,
             'contact' => $contact
@@ -91,7 +95,8 @@ class ImportFluxDepartementDromeCommand extends ImportFluxCommand
         if (!isset($aidToImport['recurrence'])) {
             return $aid;
         }
-        $aidRecurrence = $this->managerRegistry->getRepository(AidRecurrence::class)->findOneBy(['name' => $aidToImport['recurrence']]);
+        $aidRecurrence = $this->managerRegistry->getRepository(AidRecurrence::class)
+            ->findOneBy(['name' => $aidToImport['recurrence']]);
         if ($aidRecurrence instanceof AidRecurrence) {
             $aid->setAidRecurrence($aidRecurrence);
         }
@@ -128,7 +133,8 @@ class ImportFluxDepartementDromeCommand extends ImportFluxCommand
             } elseif ($targetedAudienceName == 'EPCI à fiscalité propre') {
                 $targetedAudienceName = 'Intercommunalité / Pays';
             }
-            $targetedAudience = $this->managerRegistry->getRepository(OrganizationType::class)->findOneBy(['name' => $targetedAudienceName]);
+            $targetedAudience = $this->managerRegistry->getRepository(OrganizationType::class)
+                ->findOneBy(['name' => $targetedAudienceName]);
             if ($targetedAudience instanceof OrganizationType) {
                 $aid->addAidAudience($targetedAudience);
             }

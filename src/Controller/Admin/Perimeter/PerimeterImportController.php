@@ -40,7 +40,9 @@ class PerimeterImportController extends DashboardController
                 'message' => 'Paramètre manquant'
             ]);
         }
-        $perimeterImport = $managerRegistry->getRepository(PerimeterImport::class)->find($requestStack->getCurrentRequest()->request->get('idPerimeterImport'));
+        $perimeterImport = $managerRegistry
+            ->getRepository(PerimeterImport::class)
+            ->find($requestStack->getCurrentRequest()->request->get('idPerimeterImport'));
         if (!$perimeterImport instanceof PerimeterImport) {
             return new JsonResponse([
                 'status' => 'error',

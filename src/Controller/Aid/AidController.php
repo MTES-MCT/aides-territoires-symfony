@@ -36,27 +36,27 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Persistence\ManagerRegistry;
 use Pagerfanta\Adapter\ArrayAdapter;
 use Pagerfanta\Exception\OutOfRangeCurrentPageException;
+use Pagerfanta\Pagerfanta;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
-use Pagerfanta\Pagerfanta;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Contracts\Translation\TranslatorInterface;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class AidController extends FrontController
 {
+    public const NB_AID_BY_PAGE = 18;
+
     public function __construct(
         public Breadcrumb $breadcrumb,
         public TranslatorInterface $translatorInterface,
-        public ManagerRegistry $managerRegistry
+        public ManagerRegistry $managerRegistry,
     ) {
         parent::__construct($breadcrumb, $translatorInterface);
     }
-    const NB_AID_BY_PAGE = 18;
 
     #[Route('/aides/', name: 'app_aid_aid')]
     public function index(
@@ -67,9 +67,16 @@ class AidController extends FrontController
         AidService $aidService,
         LogService $logService,
         ReferenceService $referenceService,
-        BlogPromotionPostService $blogPromotionPostService
+        BlogPromotionPostService $blogPromotionPostService,
     ): Response {
-        $requestStack->getCurrentRequest()->getSession()->set('_security.main.target_path', $requestStack->getCurrentRequest()->getRequestUri());
+        $requestStack
+            ->getCurrentRequest()
+            ->getSession()
+            ->set(
+                '_security.main.target_path',
+                $requestStack->getCurrentRequest()->getRequestUri()
+            )
+        ;
         $user = $userService->getUserLogged();
 
         // gestion pagination
@@ -88,7 +95,6 @@ class AidController extends FrontController
             $aidSearchClass,
             $formAidSearchParams
         );
-        $formAidSearch->handleRequest($requestStack->getCurrentRequest());
 
         // parametres pour requetes aides
         $aidParams = [
@@ -110,23 +116,32 @@ class AidController extends FrontController
                 FrontController::FLASH_ERROR,
                 'Le numéro de page demandé n\'existe pas'
             );
-            $newUrl = preg_replace('/(page=)[^\&]+/', 'page=' . $pagerfanta->getNbPages(), $requestStack->getCurrentRequest()->getRequestUri());
+            $newUrl = preg_replace(
+                '/(page=)[^\&]+/',
+                'page=' . $pagerfanta->getNbPages(),
+                $requestStack->getCurrentRequest()->getRequestUri()
+            );
+
             return new RedirectResponse($newUrl);
         }
 
         // Log recherche
         $logParams = [
-            'organizationTypes' => (isset($aidParams['organizationType'])) ? [$aidParams['organizationType']] : null,
+            'organizationTypes' => (isset($aidParams['organizationType']))
+                ? [$aidParams['organizationType']]
+                : null,
             'querystring' => $query ?? null,
             'resultsCount' => $pagerfanta->getNbResults(),
             'host' => $requestStack->getCurrentRequest()->getHost(),
             'perimeter' => $aidParams['perimeterFrom'] ?? null,
             'search' => $aidParams['keyword'] ?? null,
-            'organization' => ($user instanceof User && $user->getDefaultOrganization()) ? $user->getDefaultOrganization() : null,
+            'organization' => ($user instanceof User && $user->getDefaultOrganization())
+                ? $user->getDefaultOrganization()
+                : null,
             'backers' => $aidParams['backers'] ?? null,
             'categories' => $aidParams['categories'] ?? null,
             'programs' => $aidParams['programs'] ?? null,
-            'user' => $user ?? null
+            'user' => $user ?? null,
         ];
         $themes = new ArrayCollection();
         if (isset($aidParams['categories']) && is_array($aidParams['categories'])) {
@@ -137,6 +152,7 @@ class AidController extends FrontController
             }
         }
         $logParams['themes'] = $themes->toArray();
+
         $logService->log(
             type: LogService::AID_SEARCH,
             params: $logParams,
@@ -152,11 +168,16 @@ class AidController extends FrontController
             $pageTitle .= 's';
         }
         $pageTitle .= ' de recherche : ';
-        if ($formAidSearch->get('organizationType')->getData()) {
-            $pageTitle .= ' Structure : ' . $formAidSearch->get('organizationType')->getData()->getName() . ' ';
+        if ($formAidSearch->get(AidSearchFormService::QUERYSTRING_KEY_ORGANIZATION_TYPE_SLUG)->getData()) {
+            $pageTitle .= ' Structure : '
+                . $formAidSearch->get(AidSearchFormService::QUERYSTRING_KEY_ORGANIZATION_TYPE_SLUG)
+                    ->getData()->getName()
+                . ' ';
         }
-        if ($formAidSearch->get('searchPerimeter')->getData()) {
-            $pageTitle .= ' - Périmètre : ' . $formAidSearch->get('searchPerimeter')->getData()->getName() . ' ';
+        if ($formAidSearch->get(AidSearchFormService::QUERYSTRING_KEY_SEARCH_PERIMETER)->getData()) {
+            $pageTitle .= ' - Périmètre : '
+                . $formAidSearch->get(AidSearchFormService::QUERYSTRING_KEY_SEARCH_PERIMETER)->getData()->getName()
+                . ' ';
         }
 
         /** @var AidSearchClass $data */
@@ -175,7 +196,7 @@ class AidController extends FrontController
         }
 
         // check si on affiche ou pas le formulaire étendu
-        $showExtended = $aidSearchFormService->setShowExtendedV2($aidSearchClass);
+        $showExtended = $aidSearchFormService->setShowExtended($aidSearchClass);
 
         // formulaire creer alerte
         $alert = new Alert();
@@ -183,11 +204,12 @@ class AidController extends FrontController
         $formAlertCreate->handleRequest($requestStack->getCurrentRequest());
         if ($formAlertCreate->isSubmitted()) {
             if ($formAlertCreate->isValid()) {
+                /** @var User $user */
                 $user = $userService->getUserLogged();
                 if ($user) {
                     try {
                         $queryString = trim($aidSearchFormService->convertAidSearchClassToQueryString($aidSearchClass));
-                        if ($queryString == '') {
+                        if ('' == $queryString) {
                             throw new \Exception('Veuillez sélectionner au moins un critère de recherche');
                         }
                         $alert->setEmail($user->getEmail());
@@ -202,8 +224,8 @@ class AidController extends FrontController
                             'Votre alerte a bien été créée'
                         );
                     } catch (\Exception $e) {
-                        $message = $e->getMessage() ==
-                            'Veuillez sélectionner au moins un critère de recherche'
+                        $message = 'Veuillez sélectionner au moins un critère de recherche' ==
+                            $e->getMessage()
                             ? 'Veuillez sélectionner au moins un critère de recherche'
                             : 'Une erreur est survenue lors de la création de votre alerte';
                         $this->addFlash(
@@ -234,56 +256,11 @@ class AidController extends FrontController
         }
 
         // pour avoir la recherche surlignée
-        $highlightedWords = $requestStack->getCurrentRequest()->getSession()->get('highlightedWords', []);
-
-        if (isset($aidSearchClass) && $aidSearchClass instanceof AidSearchClass) {
-            $highlightedWords = [];
-            if ($aidSearchClass->getKeyword()) {
-                // on va chercher les synonymes
-                $synonyms = $referenceService->getSynonymes($aidSearchClass->getKeyword());
-                if (isset($synonyms['intentions_string']) && isset($synonyms['objects_string'])) {
-                    $keywords = str_getcsv($synonyms['intentions_string'], ' ', '"');
-                    foreach ($keywords as $keyword) {
-                        if ($keyword && trim($keyword) !== '') {
-                            $highlightedWords[] = $keyword;
-                        }
-                    }
-                }
-                if (isset($synonyms['objects_string'])) {
-                    $keywords = str_getcsv($synonyms['objects_string'], ' ', '"');
-                    foreach ($keywords as $keyword) {
-                        if ($keyword && trim($keyword) !== '') {
-                            $highlightedWords[] = $keyword;
-                        }
-                    }
-                }
-                if (isset($synonyms['simple_words_string']) && !isset($synonyms['objects_string'])) {
-                    $keywords = str_getcsv($synonyms['simple_words_string'], ' ', '"');
-                    foreach ($keywords as $keyword) {
-                        if ($keyword && trim($keyword) !== '') {
-                            $highlightedWords[] = $keyword;
-                        }
-                    }
-                }
-
-                // si la gestion des synonymes n'a pas fonctionné, on met directement la recherche
-                if (empty($highlightedWords)) {
-                    // on met la recherche dans les highlights
-                    $keywords = explode(' ', $aidSearchClass->getKeyword());
-                    foreach ($keywords as $keyword) {
-                        if ($keyword && trim($keyword) !== '' && strlen($keyword) > 2) {
-                            $highlightedWords[] = $keyword;
-                        }
-                    }
-                }
-            }
-        }
-
-        $requestStack->getCurrentRequest()->getSession()->set('highlightedWords', $highlightedWords);
-
         $synonyms = null;
+        $highlightedWords = [];
         if ($aidSearchClass->getKeyword()) {
             $synonyms = $referenceService->getSynonymes($aidSearchClass->getKeyword());
+            $highlightedWords = $referenceService->setHighlightedWords($synonyms, $aidSearchClass->getKeyword());
         }
 
         // rendu template
@@ -295,10 +272,12 @@ class AidController extends FrontController
             'showExtended' => $showExtended,
             'formAlertCreate' => $formAlertCreate->createView(),
             'querystring' => $query,
-            'perimeterName' => (isset($aidParams['perimeterFrom']) && $aidParams['perimeterFrom'] instanceof Perimeter) ? $aidParams['perimeterFrom']->getName() : '',
+            'perimeterName' => (isset($aidParams['perimeterFrom']) && $aidParams['perimeterFrom'] instanceof Perimeter)
+                    ? $aidParams['perimeterFrom']->getName()
+                    : '',
             'categoriesName' => $categoriesName,
             'highlightedWords' => $highlightedWords,
-            'synonyms' => $synonyms
+            'synonyms' => $synonyms,
         ]);
     }
 
@@ -307,13 +286,13 @@ class AidController extends FrontController
         $slug,
         AidRepository $aidRepository,
         UserService $userService,
-        AidService $aidService
+        AidService $aidService,
     ): Response {
         // charge l'aide et verifie qu'elle soit générique
         $aid = $aidRepository->findOneBy(
             [
                 'slug' => $slug,
-                'isGeneric' => true
+                'isGeneric' => true,
             ]
         );
         if (!$aid instanceof Aid) {
@@ -360,19 +339,26 @@ class AidController extends FrontController
         MatomoService $matomoService,
         ProjectRepository $projectRepository,
         LogService $logService,
-        NotificationService $notificationService
+        NotificationService $notificationService,
     ): Response {
         // le user si dispo
         $user = $userService->getUserLogged();
 
         if (!$user) {
-            $requestStack->getCurrentRequest()->getSession()->set('_security.main.target_path', $requestStack->getCurrentRequest()->getRequestUri());
+            $requestStack
+                ->getCurrentRequest()
+                ->getSession()
+                ->set(
+                    '_security.main.target_path',
+                    $requestStack->getCurrentRequest()->getRequestUri()
+                )
+            ;
         }
 
         // charge l'aide
         $aid = $aidRepository->findOneBy(
             [
-                'slug' => $slug
+                'slug' => $slug,
             ]
         );
         if (!$aid) {
@@ -384,14 +370,20 @@ class AidController extends FrontController
         }
 
         // log seulement si l'aide à le statut publiée
-        if ($aid->getStatus() == Aid::STATUS_PUBLISHED) {
+        if (Aid::STATUS_PUBLISHED == $aid->getStatus()) {
             $logService->log(
                 type: LogService::AID_VIEW,
                 params: [
-                    'querystring' => parse_url($requestStack->getCurrentRequest()->getRequestUri(), PHP_URL_QUERY) ?? null,
+                    'querystring' => parse_url(
+                        $requestStack->getCurrentRequest()->getRequestUri(),
+                        PHP_URL_QUERY
+                    )
+                        ?? null,
                     'host' => $requestStack->getCurrentRequest()->getHost(),
                     'aid' => $aid,
-                    'organization' => ($user instanceof User && $user->getDefaultOrganization()) ? $user->getDefaultOrganization() : null,
+                    'organization' => ($user instanceof User && $user->getDefaultOrganization())
+                            ? $user->getDefaultOrganization()
+                            : null,
                     'user' => ($user instanceof User) ? $user : null,
                 ]
             );
@@ -399,7 +391,7 @@ class AidController extends FrontController
 
         // formulaire ajouter aux projets
         $formAddToProject = $this->createForm(AddAidToProjectType::class, null, [
-            'currentAid' => $aid
+            'currentAid' => $aid,
         ]);
         $formAddToProject->handleRequest($requestStack->getCurrentRequest());
         if ($formAddToProject->isSubmitted()) {
@@ -425,8 +417,17 @@ class AidController extends FrontController
                                     $beneficiary,
                                     'Nouvelle aide ajoutée à un projet',
                                     '<p>
-                                    ' . $user->getFirstname() . ' ' . $user->getLastname() . ' a ajouté une aide au projet
-                                    <a href="' . $this->generateUrl('app_user_project_details_fiche_projet', ['id' => $project->getId(), 'slug' => $project->getSlug()], UrlGeneratorInterface::ABSOLUTE_URL) . '">' . $project->getName() . '</a>.
+                                    ' . $user->getFirstname()
+                                    . ' '
+                                    . $user->getLastname()
+                                    . ' a ajouté une aide au projet
+                                    <a href="'
+                                    . $this->generateUrl(
+                                        'app_user_project_details_fiche_projet',
+                                        ['id' => $project->getId(), 'slug' => $project->getSlug()],
+                                        UrlGeneratorInterface::ABSOLUTE_URL
+                                    )
+                                        . '">' . $project->getName() . '</a>.
                                     </p>'
                                 );
                             }
@@ -434,7 +435,12 @@ class AidController extends FrontController
                         // message
                         $this->addFlash(
                             FrontController::FLASH_SUCCESS,
-                            'L’aide a bien été associée au projet <a href="' . $this->generateUrl('app_user_project_details_fiche_projet', ['id' => $project->getId(), 'slug' => $project->getSlug()]) . '">' . $project->getName() . '</a>.'
+                            'L’aide a bien été associée au projet <a href="'
+                            . $this->generateUrl(
+                                'app_user_project_details_fiche_projet',
+                                ['id' => $project->getId(), 'slug' => $project->getSlug()]
+                            )
+                            . '">' . $project->getName() . '</a>.'
                         );
                     }
 
@@ -450,10 +456,13 @@ class AidController extends FrontController
                     $project->setOrganization($user->getDefaultOrganization());
 
                     // on va voir si on peu associer un projet référent
-                    if (isset($aidSearchClass) && $aidSearchClass instanceof AidSearchClass && $aidSearchClass->getKeyword()) {
+                    if (
+                        isset($aidSearchClass)
+                        && $aidSearchClass instanceof AidSearchClass && $aidSearchClass->getKeyword()
+                    ) {
                         $projectReferent = $this->managerRegistry->getRepository(ProjectReference::class)->findOneBy(
                             [
-                                'name' => $aidSearchClass->getKeyword()
+                                'name' => $aidSearchClass->getKeyword(),
                             ]
                         );
                         if ($projectReferent instanceof ProjectReference) {
@@ -471,10 +480,14 @@ class AidController extends FrontController
 
                     $this->addFlash(
                         FrontController::FLASH_SUCCESS,
-                        'L’aide a bien été associée au nouveau projet <a href="' . $this->generateUrl('app_user_project_details_fiche_projet', ['id' => $project->getId(), 'slug' => $project->getSlug()]) . '">' . $project->getName() . '</a>.'
+                        'L’aide a bien été associée au nouveau projet <a href="'
+                        . $this->generateUrl(
+                            'app_user_project_details_fiche_projet',
+                            ['id' => $project->getId(), 'slug' => $project->getSlug()]
+                        )
+                        . '">' . $project->getName() . '</a>.'
                     );
                 }
-
 
                 // redirection page mes projets
                 return $this->redirect($requestStack->getCurrentRequest()->getUri());
@@ -504,8 +517,6 @@ class AidController extends FrontController
                     $this->managerRegistry->getManager()->persist($aidSuggestedAidProject);
                     $message = $stringService->cleanString((string) $formSuggestToProject->get('message')->getData());
 
-
-
                     // notification
                     $message = '<p>' . $message . '</p>
                     <ul>
@@ -513,7 +524,13 @@ class AidController extends FrontController
                     </ul>
                     <p>' . $user->getNotificationSignature() . '</p>
                     <p>
-                        <a class="fr-btn" href="' . $this->generateUrl('app_project_project_public_details', ['id' => $project->getId(), 'slug' => $project->getSlug()], UrlGeneratorInterface::ABSOLUTE_URL) . '">
+                        <a class="fr-btn" href="'
+                            . $this->generateUrl(
+                                'app_project_project_public_details',
+                                ['id' => $project->getId(), 'slug' => $project->getSlug()],
+                                UrlGeneratorInterface::ABSOLUTE_URL
+                            )
+                            . '">
                             Accepter ou rejeter cette recommandation
                         </a>
                     </p>';
@@ -535,13 +552,25 @@ class AidController extends FrontController
                         [
                             'PROJECT_AUTHOR_NAME' => $project->getAuthor()->getFullName(),
                             'SUGGESTER_USER_NAME' => $user->getFullName(),
-                            'SUGGESTER_ORGANIZATION_NAME' => $user->getDefaultOrganization() ? $user->getDefaultOrganization()->getName() : '',
+                            'SUGGESTER_ORGANIZATION_NAME' => $user->getDefaultOrganization() ?
+                                $user->getDefaultOrganization()->getName()
+                                : '',
                             'PROJECT_NAME' => $project->getName(),
                             'SUGGESTED_AID_NAME' => $aid->getName(),
                             'SUGGESTED_AID_FINANCER_NAME' => $suggestedAidFinancerName,
-                            'SUGGESTED_AID_RECURRENCE' => $aid->getAidRecurrence() ? $aid->getAidRecurrence()->getName() : '',
-                            'FULL_ACCOUNT_URL' => $this->generateUrl('app_user_dashboard', [], UrlGeneratorInterface::ABSOLUTE_URL),
-                            'FULL_PROJECT_URL' => $this->generateUrl('app_project_project_public_details', ['id' => $project->getId(), 'slug' => $project->getSlug()], UrlGeneratorInterface::ABSOLUTE_URL)
+                            'SUGGESTED_AID_RECURRENCE' => $aid->getAidRecurrence()
+                                ? $aid->getAidRecurrence()->getName()
+                                : '',
+                            'FULL_ACCOUNT_URL' => $this->generateUrl(
+                                'app_user_dashboard',
+                                [],
+                                UrlGeneratorInterface::ABSOLUTE_URL
+                            ),
+                            'FULL_PROJECT_URL' => $this->generateUrl(
+                                'app_project_project_public_details',
+                                ['id' => $project->getId(), 'slug' => $project->getSlug()],
+                                UrlGeneratorInterface::ABSOLUTE_URL
+                            ),
                         ],
                         [],
                         ['aide suggérée', $this->getParameter('kernel.environment')],
@@ -573,18 +602,24 @@ class AidController extends FrontController
             null,
         );
 
-        $adminEditUrl = $this->generateUrl('admin', [], UrlGeneratorInterface::ABSOLUTE_URL) . '?crudAction=edit&crudControllerFqcn=App%5CController%5CAdmin%5CAid%5CAidCrudController&entityId=' . $aid->getId();
+        $adminEditUrl = $this->generateUrl(
+            'admin',
+            [],
+            UrlGeneratorInterface::ABSOLUTE_URL
+        )
+        . '?crudAction=edit&crudControllerFqcn=App%5CController%5CAdmin%5CAid%5CAidCrudController&entityId='
+        . $aid->getId();
 
         return $this->render('aid/aid/details.html.twig', [
             'aid' => $aid,
             'open_modal' => $request->query->get('open_modal', null),
-            'dsDatas' => $aidService->getDatasFromDs($aid, $user, ($user ? $user->getDefaultOrganization() : null)),
+            'dsDatas' => $aidService->getDatasFromDs($aid, $user, $user ? $user->getDefaultOrganization() : null),
             'formAddToProject' => $formAddToProject->createView(),
             'formSuggestToProject' => $formSuggestToProject->createView(),
             'aidDetailPage' => true,
             'openModalSuggest' => $openModalSuggest ?? false,
             'highlightedWords' => $requestStack->getCurrentRequest()->getSession()->get('highlightedWords', []),
-            'adminEditUrl' => $adminEditUrl
+            'adminEditUrl' => $adminEditUrl,
         ]);
     }
 }

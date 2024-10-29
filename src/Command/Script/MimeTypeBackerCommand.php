@@ -18,7 +18,6 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 #[AsCommand(name: 'at:script:mime_type_backer_fix', description: 'Fix des mimes types sur s3')]
 class MimeTypeBackerCommand extends Command
 {
-
     protected InputInterface $input;
     protected OutputInterface $output;
     protected string $commandTextStart = '<Fix des mimes types sur s3';
@@ -61,7 +60,10 @@ class MimeTypeBackerCommand extends Command
         $io = new SymfonyStyle($input, $output);
 
         // Créer un objet Credentials en utilisant les clés d'accès AWS
-        $credentials = new Credentials($this->paramService->get('aws_access_key_id'), $this->paramService->get('aws_secret_access_key'));
+        $credentials = new Credentials(
+            $this->paramService->get('aws_access_key_id'),
+            $this->paramService->get('aws_secret_access_key')
+        );
 
         // Créer un client S3
         $s3 = new S3Client([

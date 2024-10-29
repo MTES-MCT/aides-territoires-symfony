@@ -35,7 +35,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Index(columns: ['intercommunality_type'], name: 'intercommunality_type_organization')]
 class Organization // NOSONAR too much methods
 {
-    const INTERCOMMUNALITY_TYPES = [
+    public const INTERCOMMUNALITY_TYPES = [
         ['slug' => 'CC', 'name' => 'Communauté de communes (CC)'],
         ['slug' => 'CA', 'name' => 'Communauté d’agglomération (CA)'],
         ['slug' => 'CU', 'name' => 'Communauté urbaine (CU)'],
@@ -46,7 +46,7 @@ class Organization // NOSONAR too much methods
         ['slug' => 'SM', 'name' => 'Syndicat mixte et syndicat de commune'],
     ];
 
-    const TOTAL_BY_INTERCOMMUNALITY_TYPE = [
+    public const TOTAL_BY_INTERCOMMUNALITY_TYPE = [
         "CC" => 1019,
         "CA" => 219,
         "CU" => 14,
@@ -1051,7 +1051,10 @@ class Organization // NOSONAR too much methods
 
     public function removeProjectValidated(ProjectValidated $projectValidated): static
     {
-        if ($this->projectValidateds->removeElement($projectValidated) && $projectValidated->getOrganization() === $this) {
+        if (
+            $this->projectValidateds->removeElement($projectValidated)
+            && $projectValidated->getOrganization() === $this
+        ) {
             $projectValidated->setOrganization(null);
         }
 
@@ -1156,7 +1159,10 @@ class Organization // NOSONAR too much methods
 
     public function removeLogAidCreatedsFolder(LogAidCreatedsFolder $logAidCreatedsFolder): static
     {
-        if ($this->logAidCreatedsFolders->removeElement($logAidCreatedsFolder) && $logAidCreatedsFolder->getOrganization() === $this) {
+        if (
+            $this->logAidCreatedsFolders->removeElement($logAidCreatedsFolder)
+            && $logAidCreatedsFolder->getOrganization() === $this
+        ) {
             $logAidCreatedsFolder->setOrganization(null);
         }
 
@@ -1291,7 +1297,10 @@ class Organization // NOSONAR too much methods
 
     public function removeLogPublicProjectSearch(LogPublicProjectSearch $logPublicProjectSearch): static
     {
-        if ($this->logPublicProjectSearches->removeElement($logPublicProjectSearch) && $logPublicProjectSearch->getOrganization() === $this) {
+        if (
+            $this->logPublicProjectSearches->removeElement($logPublicProjectSearch)
+            && $logPublicProjectSearch->getOrganization() === $this
+        ) {
             $logPublicProjectSearch->setOrganization(null);
         }
 
@@ -1318,7 +1327,10 @@ class Organization // NOSONAR too much methods
 
     public function removeLogPublicProjectView(LogPublicProjectView $logPublicProjectView): static
     {
-        if ($this->logPublicProjectViews->removeElement($logPublicProjectView) && $logPublicProjectView->getOrganization() === $this) {
+        if (
+            $this->logPublicProjectViews->removeElement($logPublicProjectView)
+            && $logPublicProjectView->getOrganization() === $this
+        ) {
             $logPublicProjectView->setOrganization(null);
         }
 
@@ -1345,7 +1357,10 @@ class Organization // NOSONAR too much methods
 
     public function removeLogProjectValidatedSearch(LogProjectValidatedSearch $logProjectValidatedSearch): static
     {
-        if ($this->logProjectValidatedSearches->removeElement($logProjectValidatedSearch) && $logProjectValidatedSearch->getOrganization() === $this) {
+        if (
+            $this->logProjectValidatedSearches->removeElement($logProjectValidatedSearch)
+            && $logProjectValidatedSearch->getOrganization() === $this
+        ) {
             $logProjectValidatedSearch->setOrganization(null);
         }
 
@@ -1385,7 +1400,10 @@ class Organization // NOSONAR too much methods
 
     public function removeOrganizationInvitation(OrganizationInvitation $organizationInvitation): static
     {
-        if ($this->organizationInvitations->removeElement($organizationInvitation) && $organizationInvitation->getOrganization() === $this) {
+        if (
+            $this->organizationInvitations->removeElement($organizationInvitation)
+            && $organizationInvitation->getOrganization() === $this
+        ) {
             $organizationInvitation->setOrganization(null);
         }
 

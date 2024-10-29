@@ -36,7 +36,8 @@ class LogController extends DashboardController
 
         // Logs candidater aides
         // récupération des données
-        $logAidApplicationUrlClicks = $this->managerRegistry->getRepository(LogAidApplicationUrlClick::class)->countByDay([
+        $logAidApplicationUrlClicks = $this->managerRegistry->getRepository(LogAidApplicationUrlClick::class)
+        ->countByDay([
             'dateMin' => $dateMin,
             'dateMax' => $dateMax,
         ]);
@@ -48,14 +49,16 @@ class LogController extends DashboardController
         $chartApplication = $this->createChart($allDates, 'Clics candidater aides');
 
         // Top 10 aides candidater
-        $topAidApplicationsUrlClicks = $this->managerRegistry->getRepository(LogAidApplicationUrlClick::class)->countTopAidOnPeriod([
+        $topAidApplicationsUrlClicks = $this->managerRegistry->getRepository(LogAidApplicationUrlClick::class)
+        ->countTopAidOnPeriod([
             'dateMin' => $dateMin,
             'dateMax' => $dateMax,
             'maxResults' => 10
         ]);
 
         // Logs en savoir plus aides
-        $logAidOriginUrlClicks = $this->managerRegistry->getRepository(LogAidOriginUrlClick::class)->countByDay([
+        $logAidOriginUrlClicks = $this->managerRegistry->getRepository(LogAidOriginUrlClick::class)
+        ->countByDay([
             'dateMin' => $dateMin,
             'dateMax' => $dateMax,
         ]);
@@ -67,7 +70,8 @@ class LogController extends DashboardController
         $chartOrigin = $this->createChart($allDates, 'Clics en savoir plus aides');
 
         // Top 10 aides en savoir plus
-        $topAidOriginUrlClicks = $this->managerRegistry->getRepository(LogAidOriginUrlClick::class)->countTopAidOnPeriod([
+        $topAidOriginUrlClicks = $this->managerRegistry->getRepository(LogAidOriginUrlClick::class)
+        ->countTopAidOnPeriod([
             'dateMin' => $dateMin,
             'dateMax' => $dateMax,
             'maxResults' => 10
@@ -90,25 +94,20 @@ class LogController extends DashboardController
 
         $allDates = [];
 
+        // transforme en tableau de nb par dateDay
+        $keys = array_column($data, 'dateDay');
+        $values = array_column($data, 'nb');
+        $final = array_combine($keys, $values);
+
         while ($dateMin <= $dateMax) {
             $allDates[$dateMin->format('Y-m-d')] = [
                 'dateCreate' => $dateMin->format('Y-m-d'),
-                'nb' => $this->getDateValueInArray($data, $dateMin)
+                'nb' => isset($final[$dateMin->format('Y-m-d')]) ? $final[$dateMin->format('Y-m-d')] : 0
             ];
             $dateMin->modify('+1 day');
         }
 
         return $allDates;
-    }
-
-    public function getDateValueInArray(array $data, \DateTime $date): int
-    {
-        foreach ($data as $item) {
-            if ($item['dateCreate']->format('Y-m-d') == $date->format('Y-m-d')) {
-                return $item['nb'];
-            }
-        }
-        return 0;
     }
 
     public function createChart(array $datas, string $chartLabel): Chart

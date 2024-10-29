@@ -13,26 +13,24 @@ use App\Repository\Organization\OrganizationRepository;
 use App\Repository\User\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface;
-use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 class UserService
 {
     public function __construct(
         private EntityManagerInterface $entityManagerInterface,
         private AccessDecisionManagerInterface $accessDecisionManager,
-        private AuthorizationCheckerInterface $authorizationCheckerInterface,
-        private TokenStorageInterface $tokenStorageInterface,
         private Security $security
     ) {
     }
 
-    public function  getDefaultOrganizationByEmail(string $email) : ?Organization {
+    public function getDefaultOrganizationByEmail(string $email): ?Organization
+    {
         try {
             /** @var UserRepository $userRepository */
-            $userRepository = $this->entityManagerInterface->getRepository(User::class);    
+            $userRepository = $this->entityManagerInterface->getRepository(User::class);
 
             /** @var OrganizationRepository $organizationRepository */
             $organizationRepository = $this->entityManagerInterface->getRepository(Organization::class);
@@ -43,7 +41,6 @@ class UserService
         } catch (\Exception) {
             return null;
         }
-
     }
 
     public function isMemberOfOrganization(?Organization $organization, User $user): bool
@@ -64,16 +61,19 @@ class UserService
 
     public function generateApiToken(): string
     {
-        return sha1(uniqid(rand(), true));
+        return bin2hex(random_bytes(32));
     }
 
-    /**
-     * @return User|null
-     */
     public function getUserLogged(): ?User
     {
         try {
-            return $this->security->getUser();
+            $user =  $this->security->getUser();
+
+            if ($user instanceof User) {
+                return $user;
+            } else {
+                throw new \Exception('User not found');
+            }
         } catch (\Exception $e) {
             return null;
         }
@@ -112,15 +112,14 @@ class UserService
     }
 
     /**
-     *
-     * @param array $params
-     * @return void
+     * @param array<string, mixed> $params
      */
     public function setLogUser(array $params = null): void
     {
         $action = $params['action'] ?? null;
         $log = match ($action) {
-            LogUserLogin::ACTION_LOGOUT, LogUserLogin::ACTION_LOST_PASSWORD, LogUserLogin::ACTION_LOGIN => new LogUserLogin(),
+            LogUserLogin::ACTION_LOGOUT, LogUserLogin::ACTION_LOST_PASSWORD, LogUserLogin::ACTION_LOGIN
+                => new LogUserLogin(),
             default => new LogUserAction(),
         };
 

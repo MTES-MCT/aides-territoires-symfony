@@ -53,11 +53,11 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
     public function countProjectWithAids(?array $params = null)
     {
         $qb = $this->getQueryBuilder($params);
-        $qb 
+        $qb
             ->select('COUNT(DISTINCT(projects))')
             ->innerJoin('u.projects', 'projects')
             ->innerJoin('projects.aidProjects', 'aidProjects');
-            ;
+        ;
         return (int) $qb->getQuery()->getSingleScalarResult();
     }
 
@@ -195,7 +195,13 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         $organizationHasAid = $params['organizationHasAid'] ?? null;
         $organizationHasProject = $params['organizationHasProject'] ?? null;
         $email = $params['email'] ?? null;
-        $orderBy = (isset($params['orderBy']) && isset($params['orderBy']['sort']) && isset($params['orderBy']['order'])) ? $params['orderBy'] : null;
+        $orderBy =
+            (isset($params['orderBy'])
+            && isset($params['orderBy']['sort'])
+            && isset($params['orderBy']['order']))
+                ? $params['orderBy']
+                : null
+        ;
 
         $qb = $this->createQueryBuilder('u');
 

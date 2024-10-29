@@ -49,15 +49,22 @@ class ImportFluxCdmCommand extends ImportFluxCommand
 
         $return = [
             'importDataMention' => 'Ces données sont mises à disposition par le Conseil départemental de la Manche.',
-            'name' => isset($aidToImport['name']) ? strip_tags((string) $aidToImport['name']) : null,
-            'nameInitial' => isset($aidToImport['name']) ? strip_tags((string) $aidToImport['name']) : null,
-            'description' => isset($aidToImport['description']) ? $this->getCleanHtml($aidToImport['description']) : null,
-            'originUrl' => isset($aidToImport['origin_url']) ? $aidToImport['origin_url'] : null,
-            'applicationUrl' => isset($aidToImport['application_url']) ? $aidToImport['application_url'] : null,
-            'isCallForProject' => isset($aidToImport['is_call_for_project']) ? $aidToImport['is_call_for_project'] : null,
+            'name' => isset($aidToImport['name'])
+                ? strip_tags((string) $aidToImport['name']) : null,
+            'nameInitial' => isset($aidToImport['name'])
+                ? strip_tags((string) $aidToImport['name']) : null,
+            'description' => isset($aidToImport['description'])
+                ? $this->getCleanHtml($aidToImport['description']) : null,
+            'originUrl' => isset($aidToImport['origin_url'])
+                ? $aidToImport['origin_url'] : null,
+            'applicationUrl' => isset($aidToImport['application_url'])
+                ? $aidToImport['application_url'] : null,
+            'isCallForProject' => isset($aidToImport['is_call_for_project'])
+                ? $aidToImport['is_call_for_project'] : null,
             'dateStart' => $dateStart,
             'dateSubmissionDeadline' => $dateSubmissionDeadline,
-            'eligibility' => isset($aidToImport['eligibility']) ? $this->getCleanHtml($aidToImport['eligibility']) : null,
+            'eligibility' => isset($aidToImport['eligibility'])
+                ? $this->getCleanHtml($aidToImport['eligibility']) : null,
             'contact' => $contact,
         ];
 
@@ -73,7 +80,8 @@ class ImportFluxCdmCommand extends ImportFluxCommand
         }
 
         foreach ($aidToImport['aid_types'] as $aidTypeName) {
-            $aidType = $this->managerRegistry->getRepository(AidType::class)->findOneBy(['name' => $aidTypeName]);
+            $aidType = $this->managerRegistry->getRepository(AidType::class)
+                ->findOneBy(['name' => $aidTypeName]);
             if ($aidType instanceof AidType) {
                 $aid->addAidType($aidType);
             }
@@ -87,7 +95,8 @@ class ImportFluxCdmCommand extends ImportFluxCommand
         if (!isset($aidToImport['recurrence'])) {
             return $aid;
         }
-        $aidRecurrence = $this->managerRegistry->getRepository(AidRecurrence::class)->findOneBy(['name' => $aidToImport['recurrence']]);
+        $aidRecurrence = $this->managerRegistry->getRepository(AidRecurrence::class)
+            ->findOneBy(['name' => $aidToImport['recurrence']]);
         if ($aidRecurrence instanceof AidRecurrence) {
             $aid->setAidRecurrence($aidRecurrence);
         }
@@ -125,7 +134,8 @@ class ImportFluxCdmCommand extends ImportFluxCommand
             } elseif ($targetedAudienceName == 'EPCI à fiscalité propre') {
                 $targetedAudienceName = 'Intercommunalité / Pays';
             }
-            $targetedAudience = $this->managerRegistry->getRepository(OrganizationType::class)->findOneBy(['name' => $targetedAudienceName]);
+            $targetedAudience = $this->managerRegistry->getRepository(OrganizationType::class)
+                ->findOneBy(['name' => $targetedAudienceName]);
             if ($targetedAudience instanceof OrganizationType) {
                 $aid->addAidAudience($targetedAudience);
             }
@@ -139,7 +149,8 @@ class ImportFluxCdmCommand extends ImportFluxCommand
             return $aid;
         }
         foreach ($aidToImport['categories'] as $categoryName) {
-            $category = $this->managerRegistry->getRepository(Category::class)->findOneBy(['name' => $categoryName]);
+            $category = $this->managerRegistry->getRepository(Category::class)
+                ->findOneBy(['name' => $categoryName]);
             if ($category instanceof Category) {
                 $aid->addCategory($category);
             }
@@ -153,7 +164,8 @@ class ImportFluxCdmCommand extends ImportFluxCommand
             return $aid;
         }
         foreach ($aidToImport['categories'] as $categoryName) {
-            $keyword = $this->managerRegistry->getRepository(KeywordReference::class)->findOneBy(['name' => $categoryName]);
+            $keyword = $this->managerRegistry->getRepository(KeywordReference::class)
+                ->findOneBy(['name' => $categoryName]);
             if ($keyword instanceof KeywordReference) {
                 $aid->addKeywordReference($keyword);
             }
@@ -169,7 +181,8 @@ class ImportFluxCdmCommand extends ImportFluxCommand
         foreach ($aidToImport['destinations'] as $destinationName) {
             // on a un problème avec les apostrophes
             $destinationName = str_replace("'", "’", $destinationName);
-            $destination = $this->managerRegistry->getRepository(OrganizationType::class)->findOneBy(['name' => $destinationName]);
+            $destination = $this->managerRegistry->getRepository(OrganizationType::class)
+                ->findOneBy(['name' => $destinationName]);
             if ($destination instanceof AidDestination) {
                 $aid->addAidDestination($destination);
             }

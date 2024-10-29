@@ -30,6 +30,7 @@ class AidRecurrenceController extends ApiController
         foreach ($results as $result) {
             $resultsSpe[] = [
                 'id' => $result->getSlug(),
+                'slug' => $result->getSlug(),
                 'name' => $result->getName()
             ];
         }

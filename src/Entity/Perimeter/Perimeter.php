@@ -69,22 +69,22 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Index(columns: ['name'], name: 'name_peri_fulltext', flags: ['fulltext'])]
 class Perimeter // NOSONAR too much methods
 {
-    const API_GROUP_LIST = 'perimeter:list';
-    const API_GROUP_ITEM = 'perimeter:item';
-    const API_DESCRIPTION = 'Lister tous les périmètres';
+    public const API_GROUP_LIST = 'perimeter:list';
+    public const API_GROUP_ITEM = 'perimeter:item';
+    public const API_DESCRIPTION = 'Lister tous les périmètres';
 
-    const SCALE_COMMUNE_NAME = 'commune';
-    const SCALE_EPCI_NAME = 'epci';
-    const SCALE_BASIN_NAME = 'Bassin hydrographique';
-    const SCALE_DEPARTMENT_NAME = 'Département';
-    const SCALE_REGION_NAME = 'Région';
-    const SCALE_OVERSEAS_NAME = 'Outre-mer';
-    const SCALE_MAINLAND_NAME = 'Métropole';
-    const SCALE_ADHOC_NAME = 'Ad-hoc';
-    const SCALE_COUNTRY_NAME = 'Pays';
-    const SCALE_CONTINENT_NAME = 'Continent';
+    public const SCALE_COMMUNE_NAME = 'commune';
+    public const SCALE_EPCI_NAME = 'epci';
+    public const SCALE_BASIN_NAME = 'Bassin hydrographique';
+    public const SCALE_DEPARTMENT_NAME = 'Département';
+    public const SCALE_REGION_NAME = 'Région';
+    public const SCALE_OVERSEAS_NAME = 'Outre-mer';
+    public const SCALE_MAINLAND_NAME = 'Métropole';
+    public const SCALE_ADHOC_NAME = 'Ad-hoc';
+    public const SCALE_COUNTRY_NAME = 'Pays';
+    public const SCALE_CONTINENT_NAME = 'Continent';
 
-    const SCALES_TUPLE = [
+    public const SCALES_TUPLE = [
         ['scale' => 1, 'slug' => 'commune', 'name' => self::SCALE_COMMUNE_NAME],
         ['scale' => 5, 'slug' => 'epci', 'name' => self::SCALE_EPCI_NAME],
         ['scale' => 8, 'slug' => 'basin', 'name' => self::SCALE_BASIN_NAME],
@@ -98,7 +98,7 @@ class Perimeter // NOSONAR too much methods
     ];
 
 
-    const SCALES_FOR_SEARCH = [
+    public const SCALES_FOR_SEARCH = [
         1 => ['slug' => 'commune', 'name' => self::SCALE_COMMUNE_NAME],
         5 => ['slug' => 'epci', 'name' => self::SCALE_EPCI_NAME],
         8 => ['slug' => 'basin', 'name' => self::SCALE_BASIN_NAME],
@@ -111,16 +111,16 @@ class Perimeter // NOSONAR too much methods
         25 => ['slug' => 'continent', 'name' => self::SCALE_CONTINENT_NAME]
     ];
 
-    const SCALE_COUNTY = 10;
-    const SCALE_COMMUNE = 1;
-    const SCALE_EPCI = 5;
-    const SCALE_DEPARTEMENT = 10;
-    const SCALE_REGION = 15;
-    const SCALE_ADHOC = 18;
-    const SCALE_CONTINENT = 25;
+    public const SCALE_COUNTY = 10;
+    public const SCALE_COMMUNE = 1;
+    public const SCALE_EPCI = 5;
+    public const SCALE_DEPARTEMENT = 10;
+    public const SCALE_REGION = 15;
+    public const SCALE_ADHOC = 18;
+    public const SCALE_CONTINENT = 25;
 
-    const SLUG_LOCAL_GROUP = 'local_group';
-    const SCALES_LOCAL_GROUP = [
+    public const SLUG_LOCAL_GROUP = 'local_group';
+    public const SCALES_LOCAL_GROUP = [
         ['scale' => 1, 'slug' => 'commune', 'name' => self::SCALE_COMMUNE_NAME],
         ['scale' => 5, 'slug' => 'epci', 'name' => self::SCALE_EPCI_NAME],
         ['scale' => 8, 'slug' => 'basin', 'name' => self::SCALE_BASIN_NAME],
@@ -130,17 +130,17 @@ class Perimeter // NOSONAR too much methods
         ['scale' => 18, 'slug' => 'adhoc', 'name' => self::SCALE_ADHOC_NAME],
     ];
 
-    const SLUG_NATIONAL_GROUP = 'national_group';
-    const SCALES_NATIONAL_GROUP = [
+    public const SLUG_NATIONAL_GROUP = 'national_group';
+    public const SCALES_NATIONAL_GROUP = [
         ['scale' => 17, 'slug' => 'mainland', 'name' => self::SCALE_MAINLAND_NAME],
         ['scale' => 20, 'slug' => 'country', 'name' => self::SCALE_COUNTRY_NAME],
         ['scale' => 25, 'slug' => 'continent', 'name' => self::SCALE_CONTINENT_NAME]
     ];
 
-    const SLUG_CONTINENT_DEFAULT = 'EU';
-    const CODE_EUROPE = 'EU';
-    const SLUG_COUNTRY_DEFAULT = 'FRA';
-    const CODE_FRANCE = 'FRA';
+    public const SLUG_CONTINENT_DEFAULT = 'EU';
+    public const CODE_EUROPE = 'EU';
+    public const SLUG_COUNTRY_DEFAULT = 'FRA';
+    public const CODE_FRANCE = 'FRA';
 
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -271,10 +271,20 @@ class Perimeter // NOSONAR too much methods
     #[ORM\OneToMany(mappedBy: 'perimeter', targetEntity: Backer::class)]
     private Collection $backers;
 
-    #[ORM\OneToMany(mappedBy: 'perimeter', targetEntity: PerimeterData::class, orphanRemoval: true, cascade: ['persist'])]
+    #[ORM\OneToMany(
+        mappedBy: 'perimeter',
+        targetEntity: PerimeterData::class,
+        orphanRemoval: true,
+        cascade: ['persist']
+    )]
     private Collection $perimeterDatas;
 
-    #[ORM\OneToMany(mappedBy: 'adhocPerimeter', targetEntity: PerimeterImport::class, orphanRemoval: true, cascade: ['persist'])]
+    #[ORM\OneToMany(
+        mappedBy: 'adhocPerimeter',
+        targetEntity: PerimeterImport::class,
+        orphanRemoval: true,
+        cascade: ['persist']
+    )]
     private Collection $perimeterImports;
 
     /*
@@ -472,7 +482,10 @@ class Perimeter // NOSONAR too much methods
 
     public function removeOrganizationDepartment(Organization $organizationDepartment): static
     {
-        if ($this->organizationDepartments->removeElement($organizationDepartment) && $organizationDepartment->getPerimeterDepartment() === $this) {
+        if (
+            $this->organizationDepartments->removeElement($organizationDepartment)
+            && $organizationDepartment->getPerimeterDepartment() === $this
+        ) {
             $organizationDepartment->setPerimeterDepartment(null);
         }
 
@@ -499,7 +512,10 @@ class Perimeter // NOSONAR too much methods
 
     public function removeOrganizationRegion(Organization $organizationRegion): static
     {
-        if ($this->organizationRegions->removeElement($organizationRegion) && $organizationRegion->getPerimeterRegion() === $this) {
+        if (
+            $this->organizationRegions->removeElement($organizationRegion)
+            && $organizationRegion->getPerimeterRegion() === $this
+        ) {
             $organizationRegion->setPerimeterRegion(null);
         }
 
@@ -916,7 +932,10 @@ class Perimeter // NOSONAR too much methods
 
     public function removePerimeterImport(PerimeterImport $perimeterImport): static
     {
-        if ($this->perimeterImports->removeElement($perimeterImport) && $perimeterImport->getAdhocPerimeter() === $this) {
+        if (
+            $this->perimeterImports->removeElement($perimeterImport)
+            && $perimeterImport->getAdhocPerimeter() === $this
+        ) {
             $perimeterImport->setAdhocPerimeter(null);
         }
 
@@ -1075,7 +1094,10 @@ class Perimeter // NOSONAR too much methods
 
     public function removeBlogPromotionPost(BlogPromotionPost $blogPromotionPost): static
     {
-        if ($this->blogPromotionPosts->removeElement($blogPromotionPost) && $blogPromotionPost->getPerimeter() === $this) {
+        if (
+            $this->blogPromotionPosts->removeElement($blogPromotionPost)
+            && $blogPromotionPost->getPerimeter() === $this
+        ) {
             $blogPromotionPost->setPerimeter(null);
         }
 
@@ -1191,7 +1213,10 @@ class Perimeter // NOSONAR too much methods
 
     public function removeLogPublicProjectSearch(LogPublicProjectSearch $logPublicProjectSearch): static
     {
-        if ($this->logPublicProjectSearches->removeElement($logPublicProjectSearch) && $logPublicProjectSearch->getPerimeter() === $this) {
+        if (
+            $this->logPublicProjectSearches->removeElement($logPublicProjectSearch)
+            && $logPublicProjectSearch->getPerimeter() === $this
+        ) {
             $logPublicProjectSearch->setPerimeter(null);
         }
 
@@ -1218,7 +1243,10 @@ class Perimeter // NOSONAR too much methods
 
     public function removeLogProjectValidatedSearch(LogProjectValidatedSearch $logProjectValidatedSearch): static
     {
-        if ($this->logProjectValidatedSearches->removeElement($logProjectValidatedSearch) && $logProjectValidatedSearch->getPerimeter() === $this) {
+        if (
+            $this->logProjectValidatedSearches->removeElement($logProjectValidatedSearch)
+            && $logProjectValidatedSearch->getPerimeter() === $this
+        ) {
             $logProjectValidatedSearch->setPerimeter(null);
         }
 

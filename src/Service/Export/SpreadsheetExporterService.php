@@ -32,8 +32,8 @@ use Twig\Environment;
 
 class SpreadsheetExporterService
 {
-    const EXCEPTION_FORMAT_NOT_SUPPORTED_MESSAGE = 'Format non supporté';
-    const TODAY_DATE_FORMAT = 'Y-m-d H:i:s';
+    public const EXCEPTION_FORMAT_NOT_SUPPORTED_MESSAGE = 'Format non supporté';
+    public const TODAY_DATE_FORMAT = 'Y-m-d H:i:s';
 
     public function __construct(
         private Environment $twig,
@@ -61,24 +61,23 @@ class SpreadsheetExporterService
 
         // si trop de résultats, on va traiter par le worker
         if ($count > 1000) {
-            $params = $queryBuilder->getQuery()->getParameters() ?? null;
+            $params = $queryBuilder->getQuery()->getParameters();
             $sqlParams = [];
-            if ($params) {
-                foreach ($params as $param) {
-                    // si ArrayCollection
-                    if ($param->getValue() instanceof ArrayCollection) {
-                        $values = [];
-                        foreach ($param->getValue() as $value) {
-                            $values[] = $value->getId();
-                        }
-                        $sqlParams[] = ['name' => $param->getName(), 'value' => $values];
-                    // Si object
-                    } elseif (is_object($param->getValue())) {
-                        $sqlParams[] = ['name' => $param->getName(), 'value' => $param->getValue()->getId()];
-                    // Si string
-                    } else {
-                        $sqlParams[] = ['name' => $param->getName(), 'value' => $param->getValue()];
+
+            foreach ($params as $param) {
+                // si ArrayCollection
+                if ($param->getValue() instanceof ArrayCollection) {
+                    $values = [];
+                    foreach ($param->getValue() as $value) {
+                        $values[] = $value->getId();
                     }
+                    $sqlParams[] = ['name' => $param->getName(), 'value' => $values];
+                    // Si object
+                } elseif (is_object($param->getValue())) {
+                    $sqlParams[] = ['name' => $param->getName(), 'value' => $param->getValue()->getId()];
+                    // Si string
+                } else {
+                    $sqlParams[] = ['name' => $param->getName(), 'value' => $param->getValue()];
                 }
             }
 
@@ -125,7 +124,7 @@ class SpreadsheetExporterService
             $now = new \DateTime(date(self::TODAY_DATE_FORMAT));
             $writer->openToBrowser('export_' . $filename . '_at_' . $now->format('d_m_Y') . '.' . $format);
 
-            if ($format == FileService::FORMAT_XLSX) {
+            if ($format == FileService::FORMAT_XLSX && isset($sheetView)) {
                 $writer->getCurrentSheet()->setSheetView($sheetView);
             }
             $headers = [];
@@ -157,6 +156,12 @@ class SpreadsheetExporterService
         return $response;
     }
 
+    /**
+     *
+     * @param mixed $entity
+     * @param mixed $results
+     * @return array<string, mixed>
+     */
     public function getDatasFromEntityType(mixed $entity, mixed $results): array // NOSONAR too complex
     {
         $datas = [];
@@ -218,18 +223,20 @@ class SpreadsheetExporterService
                         'Taux de subvention, min. et max. (en %, nombre entier)' => $rate,
                         'Taux de subvention (commentaire optionnel)' => $result->getSubventionComment(),
                         'Appel à projet / Manifestation d’intérêt' => $result->isIsCallForProject() ? 'Oui' : 'Non',
-
                         'Description' => $this->truncateHtml($result->getDescription()),
                         'Exemples d\'applications' => $this->truncateHtml($result->getProjectExamples()),
                         'Sous thématiques' => join("\n", $categories),
                         'Récurrence' => $result->getAidRecurrence() ? $result->getAidRecurrence()->getName() : '',
                         'Date d\'ouverture' => $result->getDateStart() ? $result->getDateStart()->format('d/m/Y') : '',
-                        'Date de clôture' => $result->getDateSubmissionDeadline() ? $result->getDateSubmissionDeadline()->format('d/m/Y') : '',
-
+                        'Date de clôture' => $result->getDateSubmissionDeadline()
+                            ? $result->getDateSubmissionDeadline()->format('d/m/Y')
+                            : '',
                         'Conditions d\'éligibilité' => $this->truncateHtml($result->getEligibility()),
                         'État d\'avancement du projet pour bénéficier du dispositif' => join("\n", $aidSteps),
                         'Types de dépenses / actions couvertes' => join("\n", $destinations),
-                        'Zone géographique couverte par l\'aide*' => $result->getPerimeter() ? $result->getPerimeter()->getName() : '',
+                        'Zone géographique couverte par l\'aide*' => $result->getPerimeter()
+                            ? $result->getPerimeter()->getName()
+                            : '',
 
                         'Lien vers le descriptif complet' => $result->getOriginUrl(),
                         'Lien vers la démarche en ligne' => $result->getApplicationUrl(),
@@ -246,7 +253,7 @@ class SpreadsheetExporterService
             case User::class:
                 /** @var UserRepository $userRepository */
                 $userRepository = $this->managerRegistry->getRepository(User::class);
-                
+
                 /** @var User $result */
                 foreach ($results as $key => $result) {
                     $projectsHaveAids = false;
@@ -263,25 +270,46 @@ class SpreadsheetExporterService
                         'Nom' => $result->getLastname(),
                         'Adresse e-mail' => $result->getEmail(),
                         'Numéro de téléphone' => $result->getContributorContactPhone(),
-                        'Périmètre de l\'organization' => ($defaultOrganization && $defaultOrganization->getPerimeter()) ? $defaultOrganization->getPerimeter()->getName() : '',
-                        'Périmètre (region)' => ($defaultOrganization && $defaultOrganization->getPerimeterRegion()) ? $defaultOrganization->getPerimeterRegion()->getName() : '',
-                        'Périmètre (Département)' => ($defaultOrganization && $defaultOrganization->getPerimeterDepartment()) ? $defaultOrganization->getPerimeterDepartment()->getName() : '',
-                        'Périmètre (Population)' => ($defaultOrganization && $defaultOrganization->getPerimeter()) ? $defaultOrganization->getPerimeter()->getPopulation() : '',
+                        'Périmètre de l\'organization' => ($defaultOrganization && $defaultOrganization->getPerimeter())
+                            ? $defaultOrganization->getPerimeter()->getName()
+                            : '',
+                        'Périmètre (region)' => ($defaultOrganization && $defaultOrganization->getPerimeterRegion())
+                            ? $defaultOrganization->getPerimeterRegion()->getName()
+                            : '',
+                        'Périmètre (Département)' =>
+                            ($defaultOrganization && $defaultOrganization->getPerimeterDepartment())
+                                ? $defaultOrganization->getPerimeterDepartment()->getName()
+                                : '',
+                        'Périmètre (Population)' =>
+                            ($defaultOrganization && $defaultOrganization->getPerimeter())
+                                ? $defaultOrganization->getPerimeter()->getPopulation()
+                                : '',
                         'Contributeur ?' => $result->isIsContributor() ? 'Oui' : 'Non',
                         'Bénéficiaire ?' => $result->isIsBeneficiary() ? 'Oui' : 'Non',
                         'Nombre d\'aides' => $result->getAids() ? count($result->getAids()) : 0,
                         'Structure du bénéficiaire' => $defaultOrganization ? $defaultOrganization->getName() : '',
                         'ID de l\'organisation' => $defaultOrganization ? $defaultOrganization->getId() : '',
-                        'Nombre de projets de l\'organisation' => ($defaultOrganization && $defaultOrganization->getProjects()) ? count($defaultOrganization->getProjects()) : 0,
+                        'Nombre de projets de l\'organisation' =>
+                            ($defaultOrganization && $defaultOrganization->getProjects())
+                                ? count($defaultOrganization->getProjects())
+                                : 0,
                         'Présence d\'aides associées à un projet' => $projectsHaveAids ? 'VRAI' : '',
                         'Organisme (ancien champ)' => $result->getContributorOrganization(),
                         'Fonction du bénéficiaire' => $result->getBeneficiaryFunction(),
                         'Rôle (ancien champ)' => $result->getContributorRole(),
                         'Rôle du bénéficiaire' => $result->getBeneficiaryRole(),
-                        'Date de création' => $result->getTimeCreate() ? $result->getTimeCreate()->format(self::TODAY_DATE_FORMAT) : '',
-                        'Date de mise à jour' => $result->getTimeUpdate() ? $result->getTimeUpdate()->format(self::TODAY_DATE_FORMAT) : '',
-                        'dernière connexion' => $result->getTimeLastLogin() ? $result->getTimeLastLogin()->format(self::TODAY_DATE_FORMAT) : '',
-                        'Type de structure' => ($defaultOrganization && $defaultOrganization->getOrganizationType()) ? $defaultOrganization->getOrganizationType()->getName() : '',
+                        'Date de création' => $result->getTimeCreate()
+                            ? $result->getTimeCreate()->format(self::TODAY_DATE_FORMAT)
+                            : '',
+                        'Date de mise à jour' => $result->getTimeUpdate()
+                            ? $result->getTimeUpdate()->format(self::TODAY_DATE_FORMAT)
+                            : '',
+                        'dernière connexion' => $result->getTimeLastLogin()
+                            ? $result->getTimeLastLogin()->format(self::TODAY_DATE_FORMAT)
+                            : '',
+                        'Type de structure' => ($defaultOrganization && $defaultOrganization->getOrganizationType())
+                            ? $defaultOrganization->getOrganizationType()->getName()
+                            : '',
                         'Code postal de la structure' => $defaultOrganization ? $defaultOrganization->getZipCode() : '',
                     ];
                     unset($results[$key]);
@@ -293,11 +321,15 @@ class SpreadsheetExporterService
             case Project::class:
                 /** @var Project $result */
                 foreach ($results as $key => $result) {
-                    $regions = ($result->getOrganization() && $result->getOrganization()->getPerimeter()) ? $result->getOrganization()->getPerimeter()->getRegions() : '';
+                    $regions = ($result->getOrganization() && $result->getOrganization()->getPerimeter())
+                        ? $result->getOrganization()->getPerimeter()->getRegions()
+                        : '';
                     if (is_array($regions)) {
                         $regions = implode(',', $regions);
                     }
-                    $counties = ($result->getOrganization() && $result->getOrganization()->getPerimeter()) ? $result->getOrganization()->getPerimeter()->getDepartments() : '';
+                    $counties = ($result->getOrganization() && $result->getOrganization()->getPerimeter())
+                        ? $result->getOrganization()->getPerimeter()->getDepartments()
+                        : '';
                     if (is_array($counties)) {
                         $counties = implode(',', $counties);
                     }
@@ -311,12 +343,19 @@ class SpreadsheetExporterService
                         'Nom' => $result->getName(),
                         'Organisation' => $result->getOrganization() ? $result->getOrganization()->getName() : '',
                         'Description' => $result->getDescription(),
-                        'Périmètre du porteur de projet' => ($result->getOrganization() && $result->getOrganization()->getPerimeter()) ? $result->getOrganization()->getPerimeter()->getName() : '',
+                        'Périmètre du porteur de projet' =>
+                            ($result->getOrganization() && $result->getOrganization()->getPerimeter())
+                                ? $result->getOrganization()->getPerimeter()->getName()
+                                : '',
                         'Périmètre (Région)' => $regions,
                         'Périmètre (Département)' => $counties,
                         'Est public' => $result->isIsPublic() ? 'Oui' : 'Non',
-                        'Date création' => $result->getTimeCreate() ? $result->getTimeCreate()->format('d/m/Y H:i:s') : '',
-                        'Projet référent' => $result->getProjectReference() ? $result->getProjectReference()->getName() : '',
+                        'Date création' => $result->getTimeCreate()
+                            ? $result->getTimeCreate()->format('d/m/Y H:i:s')
+                            : '',
+                        'Projet référent' => $result->getProjectReference()
+                            ? $result->getProjectReference()->getName()
+                            : '',
                         'Types de projet (ancien système)' => join(',', $projectTypes),
                     ];
                     unset($results[$key]);
@@ -384,7 +423,7 @@ class SpreadsheetExporterService
             }
 
             $now = new \DateTime(date(self::TODAY_DATE_FORMAT));
-            $filename = 'Aides-territoires_-_' . $now->format('Y-m-d') . '_-_' . $project->getSlug().'.'.$format;
+            $filename = 'Aides-territoires_-_' . $now->format('Y-m-d') . '_-_' . $project->getSlug() . '.' . $format;
             $writer->openToBrowser($filename);
 
             if ($format == FileService::FORMAT_XLSX) {
@@ -436,8 +475,12 @@ class SpreadsheetExporterService
                 foreach ($aidProject->getAid()->getAidDestinations() as $aidDestination) {
                     $aidDestinations[] = $aidDestination->getName();
                 }
-                $dateStart = $aidProject->getAid()->getDateStart() ? $aidProject->getAid()->getDateStart()->format('Y-m-d') : '';
-                $dateSubmissionDeadline = $aidProject->getAid()->getDateSubmissionDeadline() ? $aidProject->getAid()->getDateSubmissionDeadline()->format('Y-m-d') : '';
+                $dateStart = $aidProject->getAid()->getDateStart()
+                    ? $aidProject->getAid()->getDateStart()->format('Y-m-d')
+                    : '';
+                $dateSubmissionDeadline = $aidProject->getAid()->getDateSubmissionDeadline()
+                    ? $aidProject->getAid()->getDateSubmissionDeadline()->format('Y-m-d')
+                    : '';
                 $rates = '';
                 if ($aidProject->getAid()->getSubventionRateMin()) {
                     $rates .= ' Min : ' . $aidProject->getAid()->getSubventionRateMin();
@@ -449,7 +492,9 @@ class SpreadsheetExporterService
                 foreach ($aidProject->getAid()->getCategories() as $aidCategory) {
                     $categories[] = $aidCategory->getName();
                 }
-                $aidRecurrence = $aidProject->getAid()->getAidRecurrence() ? $aidProject->getAid()->getAidRecurrence()->getName() : '';
+                $aidRecurrence = $aidProject->getAid()->getAidRecurrence()
+                    ? $aidProject->getAid()->getAidRecurrence()->getName()
+                    : '';
                 $financers = [];
                 foreach ($aidProject->getAid()->getAidFinancers() as $aidFinancer) {
                     $financers[] = $aidFinancer->getBacker()->getName();
@@ -501,8 +546,7 @@ class SpreadsheetExporterService
         }
     }
 
-    public function exportProjectAids(Project $project, string $format = 'csv')
-    : Response
+    public function exportProjectAids(Project $project, string $format = 'csv'): Response
     {
         try {
             // Création du tableur
@@ -523,10 +567,10 @@ class SpreadsheetExporterService
             }
 
             $now = new \DateTime(date(self::TODAY_DATE_FORMAT));
-            $filename = 'Aides-territoires_-_' . $now->format('Y-m-d') . '_-_' . $project->getSlug().'.'.$format;
+            $filename = 'Aides-territoires_-_' . $now->format('Y-m-d') . '_-_' . $project->getSlug() . '.' . $format;
 
             // StreamedResponse pour le téléchargement
-            $response = new StreamedResponse(function() use ($writer) {
+            $response = new StreamedResponse(function () use ($writer) {
                 $writer->save('php://output');
             });
 
@@ -542,7 +586,10 @@ class SpreadsheetExporterService
             ]);
 
             // Retour erreur
-            return new Response('Erreur lors de l\'exportation des aides du projet', Response::HTTP_INTERNAL_SERVER_ERROR);
+            return new Response(
+                'Erreur lors de l\'exportation des aides du projet',
+                Response::HTTP_INTERNAL_SERVER_ERROR
+            );
         }
     }
 
@@ -569,8 +616,7 @@ class SpreadsheetExporterService
     private function headersProjectAidsSpreadSheetExport(
         Spreadsheet $spreadsheet,
         int $row = 1
-    ): Spreadsheet
-    {
+    ): Spreadsheet {
         $headers = [
             'Adresse de la fiche aide',
             'Nom',
@@ -596,7 +642,7 @@ class SpreadsheetExporterService
         ];
 
         $sheet = $spreadsheet->getActiveSheet();
-        $sheet->fromArray($headers, null, 'A'.$row);
+        $sheet->fromArray($headers, null, 'A' . $row);
 
         return $spreadsheet;
     }
@@ -605,8 +651,7 @@ class SpreadsheetExporterService
         Spreadsheet $spreadsheet,
         Project $project,
         int $startRow = 2
-    ): Spreadsheet
-    {
+    ): Spreadsheet {
         $row = $startRow;
 
         foreach ($project->getAidProjects() as $aidProject) {
@@ -626,8 +671,12 @@ class SpreadsheetExporterService
             foreach ($aidProject->getAid()->getAidDestinations() as $aidDestination) {
                 $aidDestinations[] = $aidDestination->getName();
             }
-            $dateStart = $aidProject->getAid()->getDateStart() ? $aidProject->getAid()->getDateStart()->format('Y-m-d') : '';
-            $dateSubmissionDeadline = $aidProject->getAid()->getDateSubmissionDeadline() ? $aidProject->getAid()->getDateSubmissionDeadline()->format('Y-m-d') : '';
+            $dateStart = $aidProject->getAid()->getDateStart()
+                ? $aidProject->getAid()->getDateStart()->format('Y-m-d')
+                : '';
+            $dateSubmissionDeadline = $aidProject->getAid()->getDateSubmissionDeadline()
+                ? $aidProject->getAid()->getDateSubmissionDeadline()->format('Y-m-d')
+                : '';
             $rates = '';
             if ($aidProject->getAid()->getSubventionRateMin()) {
                 $rates .= ' Min : ' . $aidProject->getAid()->getSubventionRateMin();
@@ -639,7 +688,9 @@ class SpreadsheetExporterService
             foreach ($aidProject->getAid()->getCategories() as $aidCategory) {
                 $categories[] = $aidCategory->getName();
             }
-            $aidRecurrence = $aidProject->getAid()->getAidRecurrence() ? $aidProject->getAid()->getAidRecurrence()->getName() : '';
+            $aidRecurrence = $aidProject->getAid()->getAidRecurrence()
+                ? $aidProject->getAid()->getAidRecurrence()->getName()
+                : '';
             $financers = [];
             foreach ($aidProject->getAid()->getAidFinancers() as $aidFinancer) {
                 $financers[] = $aidFinancer->getBacker()->getName();
@@ -652,7 +703,7 @@ class SpreadsheetExporterService
             foreach ($aidProject->getAid()->getPrograms() as $aidProgram) {
                 $programs[] = $aidProgram->getName();
             }
-            
+
             $aid = $aidProject->getAid();
 
             // Nettoyer le HTML et conserver les sauts de ligne
@@ -688,15 +739,19 @@ class SpreadsheetExporterService
 
             // Ajoute les datas à la feuille
             $sheet = $spreadsheet->getActiveSheet();
-            $sheet->fromArray($cells, null, 'A'.$row);
+            $sheet->fromArray($cells, null, 'A' . $row);
             $row++;
         }
 
         return $spreadsheet;
     }
 
-    public function exportToFile(array $results, string $entityFqcn, string $filename, string $format = FileService::FORMAT_CSV)
-    {
+    public function exportToFile(
+        array $results,
+        string $entityFqcn,
+        string $filename,
+        string $format = FileService::FORMAT_CSV
+    ) {
         try {
             $entity = new $entityFqcn();
             $datas = $this->getDatasFromEntityType($entity, $results);
@@ -705,7 +760,11 @@ class SpreadsheetExporterService
             if (!is_dir($tmpFolder)) {
                 mkdir($tmpFolder, 0777, true);
             }
-            $fileTarget = $tmpFolder . '/export_' . pathinfo($filename, PATHINFO_FILENAME) . '_at_' . $now->format('d_m_Y_H_i_s');
+            $fileTarget = $tmpFolder
+                . '/export_'
+                . pathinfo($filename, PATHINFO_FILENAME)
+                . '_at_'
+                . $now->format('d_m_Y_H_i_s');
             if ($format == FileService::FORMAT_CSV) {
                 $options = new \OpenSpout\Writer\CSV\Options();
                 $options->FIELD_DELIMITER = ';';

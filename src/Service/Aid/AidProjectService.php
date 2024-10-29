@@ -9,8 +9,7 @@ class AidProjectService
 {
     public function __construct(
         private AidProjectRepository $aidProjectRepository
-    )
-    {
+    ) {
     }
 
     public function getCountByDay(Aid $aid, \DateTime $dateMin, \DateTime $dateMax, ?bool $projectPublic = null): array
@@ -25,7 +24,7 @@ class AidProjectService
             $criterias['projectPublic'] = $projectPublic;
         }
         $nbEntries = $this->aidProjectRepository->countProjectByAidByDay(
-            $aid, 
+            $aid,
             $criterias
         );
         foreach ($nbEntries as $nbEntry) {

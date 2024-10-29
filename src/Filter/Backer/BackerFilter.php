@@ -12,9 +12,16 @@ use Symfony\Component\PropertyInfo\Type;
 
 final class BackerFilter extends AbstractFilter
 {
-    protected function filterProperty(string $property, $value, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, Operation $operation = null, array $context = []): void
-    {
-        // pour extends AbstractFilter
+    protected function filterProperty(
+        string $property,
+        $value,
+        QueryBuilder $queryBuilder,
+        QueryNameGeneratorInterface $queryNameGenerator,
+        string $resourceClass,
+        Operation $operation = null,
+        array $context = []
+    ): void {
+        // ajouté pour être conforme à l'extends
     }
 
     public function getDescription(string $resourceClass): array
@@ -37,7 +44,11 @@ final class BackerFilter extends AbstractFilter
                 'property' => 'backerschoice[]',
                 'type' => Type::BUILTIN_TYPE_STRING,
                 'required' => false,
-                'description' => '<div class="renderedMarkdown"><p>Porteurs d\'aides.<br><br>Voir aussi <code>/api/backers/</code> pour la liste complète. Vous pouvez passez plusieurs fois le paramètres ..&backerschoice[]=1&backerschoice[]=2</p></div>',
+                'description' => '<div class="renderedMarkdown"><p>'
+                                    . 'Porteurs d\'aides.<br><br>'
+                                    . 'Voir aussi <code>/api/backers/</code> pour la liste complète. '
+                                    . 'Vous pouvez passez plusieurs fois le paramètres '
+                                    . '..&backerschoice[]=1&backerschoice[]=2</p></div>',
                 'openapi' => [
                     'examples' => $examples,
                 ],

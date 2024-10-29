@@ -43,7 +43,8 @@ class SearchPageOngletType extends AbstractType
             ->add('delete', ButtonType::class, [
                 'label' => 'Supprimer onglet',
                 'attr' => [
-                    'class' => 'btn-delete-collection-generic fr-btn fr-btn--secondary fr-btn--icon-left fr-icon-delete-line'
+                    'class' => 'btn-delete-collection-generic fr-btn '
+                                    . 'fr-btn--secondary fr-btn--icon-left fr-icon-delete-line'
                 ]
             ])
         ;

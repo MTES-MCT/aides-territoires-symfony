@@ -23,12 +23,12 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Index(columns: ['slug'], name: 'slug_blog_promotion_post')]
 class BlogPromotionPost // NOSONAR too much methods
 {
-    const FOLDER = 'promotion';
-    const STATUS_DRAFT = 'draft';
-    const STATUS_REVIEWABLE = 'reviewable';
-    const STATUS_PUBLISHED = 'published';
-    const STATUS_DELETED = 'deleted';
-    const STATUSES = [
+    public const FOLDER = 'promotion';
+    public const STATUS_DRAFT = 'draft';
+    public const STATUS_REVIEWABLE = 'reviewable';
+    public const STATUS_PUBLISHED = 'published';
+    public const STATUS_DELETED = 'deleted';
+    public const STATUSES = [
         ['slug' => self::STATUS_DRAFT, 'name' => 'Brouillon'],
         ['slug' => self::STATUS_REVIEWABLE, 'name' => 'En revue'],
         ['slug' => self::STATUS_PUBLISHED, 'name' => 'Publié'],
@@ -405,7 +405,10 @@ class BlogPromotionPost // NOSONAR too much methods
 
     public function removeLogBlogPromotionPostClick(LogBlogPromotionPostClick $logBlogPromotionPostClick): static
     {
-        if ($this->logBlogPromotionPostClicks->removeElement($logBlogPromotionPostClick) && $logBlogPromotionPostClick->getBlogPromotionPost() === $this) {
+        if (
+            $this->logBlogPromotionPostClicks->removeElement($logBlogPromotionPostClick)
+            && $logBlogPromotionPostClick->getBlogPromotionPost() === $this
+        ) {
             $logBlogPromotionPostClick->setBlogPromotionPost(null);
         }
 
@@ -432,7 +435,10 @@ class BlogPromotionPost // NOSONAR too much methods
 
     public function removeLogBlogPromotionPostDisplay(LogBlogPromotionPostDisplay $logBlogPromotionPostDisplay): static
     {
-        if ($this->logBlogPromotionPostDisplays->removeElement($logBlogPromotionPostDisplay) && $logBlogPromotionPostDisplay->getBlogPromotionPost() === $this) {
+        if (
+            $this->logBlogPromotionPostDisplays->removeElement($logBlogPromotionPostDisplay)
+            && $logBlogPromotionPostDisplay->getBlogPromotionPost() === $this
+        ) {
             $logBlogPromotionPostDisplay->setBlogPromotionPost(null);
         }
 

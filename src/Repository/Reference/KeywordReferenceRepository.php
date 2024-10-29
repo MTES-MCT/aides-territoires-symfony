@@ -4,6 +4,7 @@ namespace App\Repository\Reference;
 
 use App\Entity\Reference\KeywordReference;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\Query\Expr\Func;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -22,6 +23,29 @@ class KeywordReferenceRepository extends ServiceEntityRepository
         parent::__construct($registry, KeywordReference::class);
     }
 
+    public function findFromKewyordsOrOriginalName(array $keywords, string $originalName): array
+    {
+        $qb = $this->createQueryBuilder('kr');
+        $qb->orderBy('kr.name', 'ASC');
+        $qb->andWhere('kr.name IN (:keywords) OR MATCH_AGAINST(kr.name) AGAINST(:originalName IN BOOLEAN MODE) > 10')
+            ->setParameter('keywords', $keywords)
+            ->setParameter('originalName', $originalName)
+        ;
+
+        return $qb->getQuery()->getResult();
+    }
+
+    public function findIntentionNames(): array
+    {
+        $qb = $this->createQueryBuilder('kr');
+        $qb->select('kr.name');
+        $qb->where('kr.intention = 1');
+        $qb->orderBy('kr.name', 'ASC');
+
+        $result = $qb->getQuery()->getResult();
+        // on le tableau à plat pour ne retourner qu'un tableau de string
+        return array_map(fn($item) => $item['name'], $result);
+    }
     public function findArrayOfAllSynonyms(?array $params): array
     {
         $qb = $this->getQueryBuilder($params);
@@ -33,10 +57,30 @@ class KeywordReferenceRepository extends ServiceEntityRepository
 
     public function findFromSynonyms(array $synonyms): array
     {
-        $originalName = (isset($synonyms['original_name']) && trim($synonyms['original_name']) !== '')  ? $synonyms['original_name'] : null;
-        $intentionsString = (isset($synonyms['intentions_string']) && trim($synonyms['intentions_string']) !== '')  ? $synonyms['intentions_string'] : null;
-        $objectsString = (isset($synonyms['objects_string']) && trim($synonyms['objects_string']) !== '')  ? $synonyms['objects_string'] : null;
-        $simpleWordsString = (isset($synonyms['simple_words_string']) && trim($synonyms['simple_words_string']) !== '')  ? $synonyms['simple_words_string'] : null;
+        $originalName =
+            (isset($synonyms['original_name'])
+            && trim($synonyms['original_name']) !== '')
+                ? $synonyms['original_name']
+                : null
+        ;
+        $intentionsString =
+            (isset($synonyms['intentions_string'])
+            && trim($synonyms['intentions_string']) !== '')
+                ? $synonyms['intentions_string']
+                : null
+        ;
+        $objectsString =
+            (isset($synonyms['objects_string'])
+            && trim($synonyms['objects_string']) !== '')
+                ? $synonyms['objects_string']
+                : null
+        ;
+        $simpleWordsString =
+            (isset($synonyms['simple_words_string'])
+            && trim($synonyms['simple_words_string']) !== '')
+                ? $synonyms['simple_words_string']
+                : null
+        ;
 
         // on va faire un tableau de mots à rechercher à partir des synonymes
         $words = [$originalName];
@@ -76,7 +120,13 @@ class KeywordReferenceRepository extends ServiceEntityRepository
         $words = $params['words'] ?? null;
         $nameLike = $params['nameLike'] ?? null;
         $onlyParent = $params['onlyParent'] ?? false;
-        $orderBy = (isset($params['orderBy']) && isset($params['orderBy']['sort']) && isset($params['orderBy']['order'])) ? $params['orderBy'] : null;
+        $orderBy =
+            (isset($params['orderBy'])
+            && isset($params['orderBy']['sort'])
+            && isset($params['orderBy']['order']))
+                ? $params['orderBy']
+                : null
+        ;
         $noIntention = $params['noIntention'] ?? null;
 
         $qb = $this->createQueryBuilder('kr');

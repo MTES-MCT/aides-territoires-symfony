@@ -44,9 +44,9 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Entity(repositoryClass: ProjectReferenceRepository::class)]
 class ProjectReference
 {
-    const API_GROUP_LIST = 'project_reference:list';
-    const API_GROUP_ITEM = 'project_reference:item';
-    const API_DESCRIPTION = 'Lister tous les projets référents';
+    public const API_GROUP_LIST = 'project_reference:list';
+    public const API_GROUP_ITEM = 'project_reference:item';
+    public const API_DESCRIPTION = 'Lister tous les projets référents';
 
     #[Groups([self::API_GROUP_LIST, self::API_GROUP_ITEM, Aid::API_GROUP_LIST, Aid::API_GROUP_ITEM])]
     #[ORM\Id]

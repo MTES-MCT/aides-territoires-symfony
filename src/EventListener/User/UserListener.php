@@ -54,11 +54,23 @@ class UserListener
             </p>
             <p>
                 Si ce n’est pas le cas, n’hésitez pas à
-                <a href="' . $this->urlGeneratorInterface->generate('app_contact_contact', [], UrlGeneratorInterface::ABS_URL) . '">nous contacter</a>.
+                <a href="'
+                . $this->urlGeneratorInterface->generate(
+                    'app_contact_contact',
+                    [],
+                    UrlGeneratorInterface::ABS_URL
+                )
+                . '">nous contacter</a>.
             </p>
             <p>
                 Vous pouvez paramétrer les notifications que vous souhaitez recevoir
-                via <a href="' . $this->urlGeneratorInterface->generate('app_user_user_notification_settings', [], UrlGeneratorInterface::ABS_URL) . '">
+                via <a href="'
+                . $this->urlGeneratorInterface->generate(
+                    'app_user_user_notification_settings',
+                    [],
+                    UrlGeneratorInterface::ABS_URL
+                )
+                . '">
                 vos préférences
                 </a>.
             </p>
@@ -119,7 +131,8 @@ class UserListener
             if ($entity->getEmail()) {
                 $message .= 'Pour le user ' . $entity->getEmail();
             }
-            $admin = $this->managerRegistry->getRepository(User::class)->findOneBy(['email' => $this->paramService->get('email_super_admin')]);
+            $admin = $this->managerRegistry->getRepository(User::class)
+                ->findOneBy(['email' => $this->paramService->get('email_super_admin')]);
             if ($admin instanceof User) {
                 $this->notificationService->addNotification($admin, 'Erreur postPersist User', $message);
             }

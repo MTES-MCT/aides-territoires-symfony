@@ -16,7 +16,7 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class BlogController extends FrontController
 {
-    const NB_POST_BY_PAGE = 18;
+    public const NB_POST_BY_PAGE = 18;
 
     #[Route('/blog/', name: 'app_blog_blog')]
     public function index(
@@ -36,7 +36,12 @@ class BlogController extends FrontController
         $formCategories->handleRequest($requestStack->getCurrentRequest());
         if ($formCategories->isSubmitted()) {
             if ($formCategories->isValid()) {
-                return $this->redirectToRoute('app_blog_blog_category', ['slug' => $formCategories->get('blogPostCategory')->getData()->getSlug()]);
+                return $this->redirectToRoute(
+                    'app_blog_blog_category',
+                    [
+                        'slug' => $formCategories->get('blogPostCategory')->getData()->getSlug()
+                    ]
+                );
             }
         }
 

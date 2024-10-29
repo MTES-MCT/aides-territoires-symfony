@@ -11,7 +11,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Entity(repositoryClass: DataExportRepository::class)]
 class DataExport
 {
-    const FOLDER = 'data-export';
+    public const FOLDER = 'data-export';
 
     #[ORM\Id]
     #[ORM\GeneratedValue]

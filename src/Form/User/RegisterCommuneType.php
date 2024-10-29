@@ -74,7 +74,8 @@ class RegisterCommuneType extends AbstractType
             ->add('email', EmailType::class, [
                 'required' => true,
                 'label' => 'Votre adresse e-mail',
-                'help' => 'Par exemple : prenom.nom@domaine.fr<br />Nous enverrons un e-mail de confirmation à cette adresse avant de valider le compte.',
+                'help' => 'Par exemple : prenom.nom@domaine.fr<br />'
+                            . 'Nous enverrons un e-mail de confirmation à cette adresse avant de valider le compte.',
                 'help_html' => true,
                 'attr' => [
                     'placeholder' => 'Merci de bien vérifier l\'adresse saisie',
@@ -96,7 +97,8 @@ class RegisterCommuneType extends AbstractType
                 'first_options'  => [
                     'label' => 'Mot de passe',
                     'help' => '<ul>
-                                <li>Votre mot de passe ne peut pas trop ressembler à vos autres informations personnelles.</li>
+                                <li>Votre mot de passe ne peut pas trop ressembler '
+                                    . 'à vos autres informations personnelles.</li>
                                 <li>Votre mot de passe doit contenir au minimum 9 caractères.</li>
                                 <li>Votre mot de passe ne peut pas être un mot de passe couramment utilisé.</li>
                                 <li>Votre mot de passe ne peut pas être entièrement numérique.</li>

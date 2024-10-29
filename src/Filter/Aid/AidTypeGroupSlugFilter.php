@@ -7,14 +7,22 @@ use ApiPlatform\Doctrine\Orm\Filter\AbstractFilter;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\OpenApi\Model\Example;
 use App\Entity\Aid\AidTypeGroup;
+use App\Service\Aid\AidSearchFormService;
 use Doctrine\ORM\QueryBuilder;
 use Symfony\Component\PropertyInfo\Type;
 
-final class AidPerimeterFilter extends AbstractFilter
+final class AidTypeGroupSlugFilter extends AbstractFilter
 {
-    // empty method
-    protected function filterProperty(string $property, $value, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, Operation $operation = null, array $context = []): void
-    {
+    protected function filterProperty(
+        string $property,
+        $value,
+        QueryBuilder $queryBuilder,
+        QueryNameGeneratorInterface $queryNameGenerator,
+        string $resourceClass,
+        Operation $operation = null,
+        array $context = []
+    ): void {
+        // ajouté pour être conforme à l'extends
     }
 
     public function getDescription(string $resourceClass): array
@@ -24,21 +32,18 @@ final class AidPerimeterFilter extends AbstractFilter
             ['name' => 'ASC']
         );
         $examples = [];
+        $examples[] = new Example('Choisir un exemple', null, null);
         foreach ($aidTypeGroups as $aidTypeGroup) {
             $examples[] = new Example($aidTypeGroup->getName(), null, $aidTypeGroup->getSlug());
         }
         return [
-            'perimeter' => [
-                'property' => 'perimeter',
+            AidSearchFormService::QUERYSTRING_KEY_AID_TYPE_GROUP_SLUG => [
+                'property' => AidSearchFormService::QUERYSTRING_KEY_AID_TYPE_GROUP_SLUG,
                 'type' => Type::BUILTIN_TYPE_STRING,
                 'required' => false,
-                'description' => '<div class="renderedMarkdown"><p>Le territoire.<br><br>Voir <code>/api/perimeters/</code> pour la liste complète.<br><br>Note : passer seulement l\'id du périmètre suffit (perimeter=70973).</p></div>',
+                'description' => 'Groupe de la nature de l\'aide.',
                 'openapi' => [
-                    'examples' => [
-                        new Example('...', null, null),
-                        new Example('Auvergnes-Rhônes-Alpes', null, 70973),
-                        new Example('Clermont-Ferrand', null, 95861),
-                    ]
+                    'examples' => $examples,
                 ],
             ],
         ];

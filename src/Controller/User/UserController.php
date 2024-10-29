@@ -55,7 +55,12 @@ class UserController extends FrontController
                     $formRegister->get('email')->addError(new FormError('Cet email n\'est pas disponible.'));
                 } else {
                     $user->addRole(User::ROLE_USER);
-                    $user->setPassword($userPasswordHasherInterface->hashPassword($user, $formRegister->get('password')->getData()));
+                    $user->setPassword(
+                        $userPasswordHasherInterface->hashPassword(
+                            $user,
+                            $formRegister->get('password')->getData()
+                        )
+                    );
 
                     // si abonné newsletter
                     if ($user->isMlConsent()) {
@@ -77,12 +82,18 @@ class UserController extends FrontController
                     }
 
                     // si infos organization
-                    if ($formRegister->get('organizationName')->getData() && $formRegister->get('organizationType')->getData()) {
+                    if (
+                        $formRegister->get('organizationName')->getData()
+                        && $formRegister->get('organizationType')->getData()
+                    ) {
                         $organization = new Organization();
                         $organization->setName($formRegister->get('organizationName')->getData());
                         $organization->setOrganizationType($formRegister->get('organizationType')->getData());
                         $organization->setPerimeter($user->getPerimeter());
-                        $departementsCode = ($organization->getPerimeter()) ? $organization->getPerimeter()->getDepartments() : null;
+                        $departementsCode = ($organization->getPerimeter())
+                            ? $organization->getPerimeter()->getDepartments()
+                            : null
+                        ;
                         $departementCode = $departementsCode[0] ?? null;
                         if ($departementCode) {
                             $departement = $perimeterRepository->findOneBy([
@@ -94,7 +105,10 @@ class UserController extends FrontController
                             }
                         }
 
-                        $regionsCode = ($organization->getPerimeter()) ? $organization->getPerimeter()->getRegions() : null;
+                        $regionsCode = ($organization->getPerimeter())
+                            ? $organization->getPerimeter()->getRegions()
+                            : null
+                        ;
                         $regionCode = $regionsCode[0] ?? null;
                         if ($regionCode) {
                             $region = $perimeterRepository->findOneBy([
@@ -187,7 +201,9 @@ class UserController extends FrontController
 
         // nouvelle organization commune
         $organization = new Organization();
-        $organization->setOrganizationType($organizationTypeRepository->findOneBy(['slug' => OrganizationType::SLUG_COMMUNE]));
+        $organization->setOrganizationType(
+            $organizationTypeRepository->findOneBy(['slug' => OrganizationType::SLUG_COMMUNE])
+        );
         $user->addOrganization($organization);
 
         // formulaire inscription
@@ -201,7 +217,12 @@ class UserController extends FrontController
                     $formRegisterCommune->get('email')->addError(new FormError('Cet email n\'est pas disponible.'));
                 } else {
                     // encode le password
-                    $user->setPassword($userPasswordHasherInterface->hashPassword($user, $formRegisterCommune->get('password')->getData()));
+                    $user->setPassword(
+                        $userPasswordHasherInterface->hashPassword(
+                            $user,
+                            $formRegisterCommune->get('password')->getData()
+                        )
+                    );
 
                     // assigne le perimetre à l'organisation
                     $organization->setPerimeter($user->getPerimeter());
@@ -210,7 +231,10 @@ class UserController extends FrontController
                     $organization->setName('Mairie de ' . $organization->getPerimeter()->getName());
 
                     // defini le departement de l'organisation
-                    $departementsCode = ($organization->getPerimeter()) ? $organization->getPerimeter()->getDepartments() : null;
+                    $departementsCode = ($organization->getPerimeter())
+                        ? $organization->getPerimeter()->getDepartments()
+                        : null
+                    ;
                     $departementCode = $departementsCode[0] ?? null;
                     if ($departementCode) {
                         $departement = $perimeterRepository->findOneBy([

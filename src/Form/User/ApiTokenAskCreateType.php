@@ -22,7 +22,8 @@ class ApiTokenAskCreateType extends AbstractType
                 'attr' => [
                     'cols' => 40,
                     'rows' => 10,
-                    'placeholder' => 'Merci de décrire précisément l’usage que vous allez avoir de l’API Aides-territoires.'
+                    'placeholder' => 'Merci de décrire précisément l’usage que vous '
+                                        . 'allez avoir de l’API Aides-territoires.'
                 ],
                 'constraints' => [
                     new Assert\NotBlank([

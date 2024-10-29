@@ -26,9 +26,8 @@ class FondVert2023StatsCommand extends Command
         private EntityManagerInterface $managerRegistry,
         private FileService $fileService,
         private EmailService $emailService
-    )
-    {
-        ini_set('max_execution_time', 60*60);
+    ) {
+        ini_set('max_execution_time', 60 * 60);
         ini_set('memory_limit', '1G');
         parent::__construct();
     }
@@ -39,7 +38,7 @@ class FondVert2023StatsCommand extends Command
         $this->output = $output;
 
         // le fichier
-        $filePath = $this->kernelInterface->getProjectDir().'/datas/fonds-vert-2023-export.csv';
+        $filePath = $this->kernelInterface->getProjectDir() . '/datas/fonds-vert-2023-export.csv';
 
         // les tableaux pour stocké les données
         $cities = [];
@@ -91,13 +90,13 @@ class FondVert2023StatsCommand extends Command
 
         $row = 2;
         foreach ($organizationsFinal as $organization) {
-            $sheet->setCellValue('A'.$row, $organization['id_organization']);
-            $sheet->setCellValue('B'.$row, $organization['name_organization']);
-            $sheet->setCellValue('C'.$row, $organization['city_name']);
-            $sheet->setCellValue('D'.$row, $organization['city_name_fv']);
-            $sheet->setCellValue('E'.$row, $organization['organization_type']);
-            $sheet->setCellValue('F'.$row, $organization['city_found'] ? 'Oui' : 'Non');
-            $sheet->setCellValue('G'.$row, $organization['organization_found'] ? 'Oui' : 'Non');
+            $sheet->setCellValue('A' . $row, $organization['id_organization']);
+            $sheet->setCellValue('B' . $row, $organization['name_organization']);
+            $sheet->setCellValue('C' . $row, $organization['city_name']);
+            $sheet->setCellValue('D' . $row, $organization['city_name_fv']);
+            $sheet->setCellValue('E' . $row, $organization['organization_type']);
+            $sheet->setCellValue('F' . $row, $organization['city_found'] ? 'Oui' : 'Non');
+            $sheet->setCellValue('G' . $row, $organization['organization_found'] ? 'Oui' : 'Non');
             $row++;
         }
 

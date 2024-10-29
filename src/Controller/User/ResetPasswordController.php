@@ -7,6 +7,7 @@ use App\Exception\NotFoundException\ResetPasswordNotFoundException;
 use App\Form\User\ChangePasswordFormType;
 use App\Form\User\ResetPasswordRequestFormType;
 use App\Service\Email\EmailService;
+use App\Service\File\FileService;
 use App\Service\Various\ParamService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -35,9 +36,16 @@ class ResetPasswordController extends AbstractController
     /**
      * Display & process form to request a password reset.
      */
-    #[Route('/comptes/demande-nouveau-mot-de-passe/', name: 'app_forgot_password_request')]
-    public function request(Request $request, EmailService $emailService, TranslatorInterface $translator, RouterInterface $routerInterface): Response
-    {
+    #[Route(
+        '/comptes/demande-nouveau-mot-de-passe/',
+        name: 'app_forgot_password_request'
+    )]
+    public function request(
+        Request $request,
+        EmailService $emailService,
+        TranslatorInterface $translator,
+        RouterInterface $routerInterface
+    ): Response {
         $form = $this->createForm(ResetPasswordRequestFormType::class);
         $form->handleRequest($request);
 
@@ -77,9 +85,16 @@ class ResetPasswordController extends AbstractController
     /**
      * Validates and process the reset URL that the user clicked in their email.
      */
-    #[Route('/comptes/demande-nouveau-mot-de-passe/reinitialisation/{token}', name: 'app_reset_password')]
-    public function reset(Request $request, UserPasswordHasherInterface $passwordHasher, TranslatorInterface $translator, string $token = null): Response
-    {
+    #[Route(
+        '/comptes/demande-nouveau-mot-de-passe/reinitialisation/{token}',
+        name: 'app_reset_password'
+    )]
+    public function reset(
+        Request $request,
+        UserPasswordHasherInterface $passwordHasher,
+        TranslatorInterface $translator,
+        string $token = null
+    ): Response {
         if ($token) {
             // We store the token in session and remove it from the URL, to avoid the URL being
             // loaded in a browser and potentially leaking the token to 3rd party JavaScript.
@@ -99,7 +114,11 @@ class ResetPasswordController extends AbstractController
         } catch (ResetPasswordExceptionInterface $e) {
             $this->addFlash('reset_password_error', sprintf(
                 '%s - %s',
-                $translator->trans(ResetPasswordExceptionInterface::MESSAGE_PROBLEM_VALIDATE, [], 'ResetPasswordBundle'),
+                $translator->trans(
+                    ResetPasswordExceptionInterface::MESSAGE_PROBLEM_VALIDATE,
+                    [],
+                    'ResetPasswordBundle'
+                ),
                 $translator->trans($e->getReason(), [], 'ResetPasswordBundle')
             ));
 
@@ -152,21 +171,14 @@ class ResetPasswordController extends AbstractController
         try {
             $resetToken = $this->resetPasswordHelper->generateResetToken($user);
         } catch (ResetPasswordExceptionInterface $e) {
-            // If you want to tell the user why a reset email was not sent, uncomment
-            // the lines below and change the redirect to 'app_forgot_password_request'.
-            // Caution: This may reveal if a user is registered or not.
-            //
-            // $this->addFlash('reset_password_error', sprintf(
-            //     '%s - %s',
-            //     $translator->trans(ResetPasswordExceptionInterface::MESSAGE_PROBLEM_HANDLE, [], 'ResetPasswordBundle'),
-            //     $translator->trans($e->getReason(), [], 'ResetPasswordBundle')
-            // ));
-
             return $this->redirectToRoute('app_check_email');
         }
 
         // donne le contexte au router pour generer l'url beta ou prod
-        $host = $_ENV["APP_ENV"] == 'dev' ? 'aides-terr-php.osc-fr1.scalingo.io' : 'aides-territoires.beta.gouv.fr';
+        $host = $_ENV["APP_ENV"] == FileService::ENV_DEV
+            ? 'aides-terr-php.osc-fr1.scalingo.io'
+            : 'aides-territoires.beta.gouv.fr'
+        ;
         $context = $routerInterface->getContext();
         $context->setHost($host);
         $context->setScheme('https');

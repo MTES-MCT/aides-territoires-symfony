@@ -32,8 +32,8 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Entity(repositoryClass: PerimeterDataRepository::class)]
 class PerimeterData
 {
-    const API_GROUP_LIST = 'perimeter_data:list';
-    const API_OPERATION_NAME = 'perimeter_data';
+    public const API_GROUP_LIST = 'perimeter_data:list';
+    public const API_OPERATION_NAME = 'perimeter_data';
 
     #[ORM\Id]
     #[ORM\GeneratedValue]

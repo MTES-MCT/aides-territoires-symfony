@@ -24,21 +24,31 @@ class AidGenericFilter implements FilterInterface
             ->setFormType(AidGenericFilterType::class);
     }
 
-    public function apply(QueryBuilder $queryBuilder, FilterDataDto $filterDataDto, ?FieldDto $fieldDto, EntityDto $entityDto): void
-    {
+    public function apply(
+        QueryBuilder $queryBuilder,
+        FilterDataDto $filterDataDto,
+        ?FieldDto $fieldDto,
+        EntityDto $entityDto
+    ): void {
         if (!$filterDataDto->getValue()) {
             return;
         }
         $state = $filterDataDto->getValue();
         switch ($state) {
             case 'generic':
-                $queryBuilder->addCriteria(AidRepository::genericCriteria($filterDataDto->getEntityAlias() . '.'));
+                $queryBuilder->addCriteria(
+                    AidRepository::genericCriteria($filterDataDto->getEntityAlias() . '.')
+                );
                 break;
             case 'local':
-                $queryBuilder->addCriteria(AidRepository::localCriteria($filterDataDto->getEntityAlias() . '.'));
+                $queryBuilder->addCriteria(
+                    AidRepository::localCriteria($filterDataDto->getEntityAlias() . '.')
+                );
                 break;
             case 'standard':
-                $queryBuilder->addCriteria(AidRepository::decliStandardCriteria($filterDataDto->getEntityAlias() . '.'));
+                $queryBuilder->addCriteria(
+                    AidRepository::decliStandardCriteria($filterDataDto->getEntityAlias() . '.')
+                );
                 break;
         }
 

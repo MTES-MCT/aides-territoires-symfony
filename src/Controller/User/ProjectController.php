@@ -40,7 +40,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class ProjectController extends FrontController
 {
-    const NB_PROJECT_BY_PAGE = 30;
+    public const NB_PROJECT_BY_PAGE = 30;
 
     #[Route('/projets/vos-projets/', name: 'old_app_user_project_structure')]
     public function oldIndex(): RedirectResponse
@@ -73,16 +73,22 @@ class ProjectController extends FrontController
                             $notificationService->addNotification(
                                 $beneficiary,
                                 'Un projet a été supprimé',
-                                '<p>
-                                ' . $user->getFirstname() . ' ' . $user->getLastname() . ' a supprimé le projet ' . $project->getName() . '.
-                                </p>'
+                                '<p>'
+                                . $user->getFirstname()
+                                . ' '
+                                . $user->getLastname()
+                                . ' a supprimé le projet '
+                                . $project->getName()
+                                . '.</p>'
                             );
                         }
                     }
                 }
 
                 // suppression
-                $managerRegistry->getManager()->remove($projectRepository->find($formDeleteProject->get('idProject')->getData()));
+                $managerRegistry->getManager()->remove(
+                    $projectRepository->find($formDeleteProject->get('idProject')->getData())
+                );
                 $managerRegistry->getManager()->flush();
 
                 // message
@@ -135,7 +141,11 @@ class ProjectController extends FrontController
     }
 
 
-    #[Route('/comptes/projets/details/{id}-{slug}/', name: 'app_user_project_details_fiche_projet', requirements: ['id' => '[0-9]+', 'slug' => '[a-zA-Z0-9\-_]+'])]
+    #[Route(
+        '/comptes/projets/details/{id}-{slug}/',
+        name: 'app_user_project_details_fiche_projet',
+        requirements: ['id' => '[0-9]+', 'slug' => '[a-zA-Z0-9\-_]+']
+    )]
     public function details(
         $id,
         $slug,
@@ -154,7 +164,10 @@ class ProjectController extends FrontController
         );
         $user = $userService->getUserLogged();
 
-        if (!$project instanceof Project || !$userService->isMemberOfOrganization($project->getOrganization(), $user)) {
+        if (
+            !$project instanceof Project
+            || !$userService->isMemberOfOrganization($project->getOrganization(), $user)
+        ) {
             return $this->redirectToRoute('app_user_project_structure');
         }
 
@@ -166,7 +179,9 @@ class ProjectController extends FrontController
                 // traitement image
                 $imageFile = $form->get('imageUploadedFile')->getData();
                 if ($imageFile instanceof UploadedFile) {
-                    $project->setImage(Project::FOLDER . '/' . $imageService->getSafeFileName($imageFile->getClientOriginalName()));
+                    $project->setImage(
+                        Project::FOLDER . '/' . $imageService->getSafeFileName($imageFile->getClientOriginalName())
+                    );
                     $imageService->sendUploadedImageToCloud($imageFile, Project::FOLDER, $project->getImage());
                 }
 
@@ -192,8 +207,20 @@ class ProjectController extends FrontController
                                 $beneficiary,
                                 'Un projet a été mis à jour',
                                 '<p>
-                                ' . $user->getFirstname() . ' ' . $user->getLastname() . ' a modifié les informations du projet
-                                <a href="' . $this->generateUrl('app_user_project_details_fiche_projet', ['id' => $project->getId(), 'slug' => $project->getSlug()], UrlGeneratorInterface::ABSOLUTE_URL) . '">' . $project->getName() . '</a>.
+                                ' . $user->getFirstname()
+                                . ' '
+                                . $user->getLastname()
+                                . ' a modifié les informations du projet
+                                <a href="'
+                                . $this->generateUrl(
+                                    'app_user_project_details_fiche_projet',
+                                    [
+                                        'id' => $project->getId(),
+                                        'slug' => $project->getSlug()
+                                    ],
+                                    UrlGeneratorInterface::ABSOLUTE_URL
+                                )
+                                . '">' . $project->getName() . '</a>.
                                 </p>'
                             );
                         }
@@ -248,7 +275,11 @@ class ProjectController extends FrontController
                 // traitement image
                 $imageFile = $form->get('imageUploadedFile')->getData();
                 if ($imageFile instanceof UploadedFile) {
-                    $project->setImage(Project::FOLDER . '/' . $imageService->getSafeFileName($imageFile->getClientOriginalName()));
+                    $project->setImage(
+                        Project::FOLDER
+                        . '/'
+                        . $imageService->getSafeFileName($imageFile->getClientOriginalName())
+                    );
                     $imageService->sendUploadedImageToCloud($imageFile, Project::FOLDER, $project->getImage());
                 }
 
@@ -276,7 +307,16 @@ class ProjectController extends FrontController
                             'Un projet a été créé',
                             '<p>
                             ' . $user->getFirstname() . ' ' . $user->getLastname() . ' a créé le projet
-                            <a href="' . $this->generateUrl('app_user_project_details_fiche_projet', ['id' => $project->getId(), 'slug' => $project->getSlug()], UrlGeneratorInterface::ABSOLUTE_URL) . '">' . $project->getName() . '</a>.
+                            <a href="'
+                            . $this->generateUrl(
+                                'app_user_project_details_fiche_projet',
+                                [
+                                    'id' => $project->getId(),
+                                    'slug' => $project->getSlug()
+                                ],
+                                UrlGeneratorInterface::ABSOLUTE_URL
+                            )
+                            . '">' . $project->getName() . '</a>.
                             </p>'
                         );
                     }
@@ -313,7 +353,11 @@ class ProjectController extends FrontController
     }
 
 
-    #[Route('/comptes/projets/aides/{id}-{slug}/', name: 'app_user_project_aides', requirements: ['id' => '[0-9]+', 'slug' => '[a-zA-Z0-9\-_]+'])]
+    #[Route(
+        '/comptes/projets/aides/{id}-{slug}/',
+        name: 'app_user_project_aides',
+        requirements: ['id' => '[0-9]+', 'slug' => '[a-zA-Z0-9\-_]+']
+    )]
     public function aides(
         $id,
         ProjectRepository $ProjectRepository,
@@ -337,7 +381,10 @@ class ProjectController extends FrontController
         );
         $user = $userService->getUserLogged();
 
-        if (!$project instanceof Project || !$userService->isMemberOfOrganization($project->getOrganization(), $user)) {
+        if (
+            !$project instanceof Project
+            || !$userService->isMemberOfOrganization($project->getOrganization(), $user)
+        ) {
             return $this->redirectToRoute('app_user_project_structure');
         }
 
@@ -364,7 +411,10 @@ class ProjectController extends FrontController
             $searchParams['keyword'] = $aidParams['keyword'];
 
             // regarde si le projet à un projet référent associé pour écraser la recherche
-            if ($project->getProjectReference() instanceof ProjectReference && $project->getProjectReference()->getName()) {
+            if (
+                $project->getProjectReference() instanceof ProjectReference
+                && $project->getProjectReference()->getName()
+            ) {
                 $aidParams['keyword'] = $project->getProjectReference()->getName();
                 $aidParams['projectReference'] = $project->getProjectReference();
                 $searchParams['keyword'] = $aidParams['keyword'];
@@ -372,7 +422,7 @@ class ProjectController extends FrontController
 
             $aidsSuggested = $aidService->searchAids($aidParams);
             if (count($aidsSuggested) > 0) {
-                $requestStack->getCurrentRequest()->getSession()->set('highlightedWords', $referenceService->getHighlightedWords($aidParams['keyword']));
+                $referenceService->setHighlightedWords(null, $aidParams['keyword']);
             }
         }
 
@@ -383,7 +433,11 @@ class ProjectController extends FrontController
             if ($formAidProjectDelete->isValid()) {
                 // suppression
                 $aidProject = $aidProjectRepository->find($formAidProjectDelete->get('idAidProject')->getData());
-                if ($aidProject instanceof AidProject && $aidProject->getProject() && $aidProject->getProject()->getId() == $project->getId()) {
+                if (
+                    $aidProject instanceof AidProject
+                    && $aidProject->getProject()
+                    && $aidProject->getProject()->getId() == $project->getId()
+                ) {
                     $managerRegistry->getManager()->remove($aidProject);
                     $managerRegistry->getManager()->flush();
                 }
@@ -396,7 +450,16 @@ class ProjectController extends FrontController
                                 'Une aide a été supprimée d’un projet',
                                 '<p>
                                 ' . $user->getFirstname() . ' ' . $user->getLastname() . ' a supprimé une aide du projet
-                                <a href="' . $this->generateUrl('app_user_project_details_fiche_projet', ['id' => $project->getId(), 'slug' => $project->getSlug()], UrlGeneratorInterface::ABSOLUTE_URL) . '">' . $project->getName() . '</a>.
+                                <a href="'
+                                . $this->generateUrl(
+                                    'app_user_project_details_fiche_projet',
+                                    [
+                                        'id' => $project->getId(),
+                                        'slug' => $project->getSlug()
+                                    ],
+                                    UrlGeneratorInterface::ABSOLUTE_URL
+                                )
+                                . '">' . $project->getName() . '</a>.
                                 </p>'
                             );
                         }
@@ -468,8 +531,17 @@ class ProjectController extends FrontController
             if ($formExportProject->isValid()) {
                 // Si plus de 10 aides, on passe par le worker
                 if (count($project->getAidProjects()) > $nbMaxAids) {
-                    $bus->dispatch(new MsgProjectExportAids($user->getId(), $project->getId(), $formExportProject->get('format')->getData()));
-                    $this->addFlash(FrontController::FLASH_SUCCESS, 'Votre export est en cours de traitement, vous recevrez un email dès qu\'il sera prêt.');
+                    $bus->dispatch(
+                        new MsgProjectExportAids(
+                            $user->getId(),
+                            $project->getId(),
+                            $formExportProject->get('format')->getData()
+                        )
+                    );
+                    $this->addFlash(
+                        FrontController::FLASH_SUCCESS,
+                        'Votre export est en cours de traitement, vous recevrez un email dès qu\'il sera prêt.'
+                    );
                 } else {
                     switch ($formExportProject->get('format')->getData()) {
                         case FileService::FORMAT_CSV:
@@ -530,7 +602,11 @@ class ProjectController extends FrontController
         return $response;
     }
 
-    #[Route('/comptes/projets/similaires/{id}-{slug}/', name: 'app_user_project_similaires', requirements: ['id' => '[0-9]+', 'slug' => '[a-zA-Z0-9\-_]+'])]
+    #[Route(
+        '/comptes/projets/similaires/{id}-{slug}/',
+        name: 'app_user_project_similaires',
+        requirements: ['id' => '[0-9]+', 'slug' => '[a-zA-Z0-9\-_]+']
+    )]
     public function similaires(
         $id,
         $slug,
@@ -716,7 +792,10 @@ class ProjectController extends FrontController
             $this->addFlash(FrontController::FLASH_ERROR, 'Impossible de débloquer le projet');
 
             // retour
-            return $this->redirectToRoute('app_user_project_details_fiche_projet', ['id' => $project->getId(), 'slug' => $project->getSlug()]);
+            return $this->redirectToRoute(
+                'app_user_project_details_fiche_projet',
+                ['id' => $project->getId(), 'slug' => $project->getSlug()]
+            );
         }
     }
 

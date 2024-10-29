@@ -42,7 +42,9 @@ class PerimeterController extends DashboardController
                 $perimetersToAdd = $formCombine->get('perimetersToAdd')->getData();
                 /** @var Perimeter $perimeterToAdd */
                 foreach ($perimetersToAdd as $perimeterToAdd) {
-                    $this->messageBusInterface->dispatch(new MsgPerimeterCombine($perimeter->getId(), $perimeterToAdd->getId()));
+                    $this->messageBusInterface->dispatch(
+                        new MsgPerimeterCombine($perimeter->getId(), $perimeterToAdd->getId())
+                    );
                 }
 
                 $perimetersToAddStrict = $formCombine->get('perimetersToAddStrict')->getData();
@@ -85,7 +87,11 @@ class PerimeterController extends DashboardController
     }
 
 
-    #[Route('/admin/perimeter/{id}/import-insee', name: 'admin_perimeter_import_insee', requirements: ['id' => '[0-9]+'])]
+    #[Route(
+        '/admin/perimeter/{id}/import-insee',
+        name: 'admin_perimeter_import_insee',
+        requirements: ['id' => '[0-9]+']
+    )]
     public function importInsee(
         $id,
         ManagerRegistry $managerRegistry,

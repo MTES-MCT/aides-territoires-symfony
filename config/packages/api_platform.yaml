@@ -1,7 +1,100 @@
 api_platform:
     title: Api - Aides Territoires
-    description: "<h2><strong>Pour l'autorisation sur cet outil, vous devez remplir le champ de la manière suivante : Bearer [token]</strong></h2>"
-    version: 1.7.5
+    description: "
+            <h2><strong>Pour l'autorisation sur cet outil, vous devez remplir le champ de la manière suivante : Bearer [token]</strong></h2>
+            <table>
+                <thead>
+                    <tr><th>Version</th><th>Description des changements</th></tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1.8 (actuelle)</td>
+                        <td>
+                            <h3>Normalization :</h3>
+                            <p><strong>Tous les filtres de recherche ainsi que les champs de données d'API sont maintenant en <strong>snake_case</strong>, ex: category_slugs, zip_code...</strong></p>
+                            <p>Pour les données, seuls les endpoints <code>/api/backer-groups/</code> et <code>/api/project-references/</code> sont concernés.</p>
+                            <p>Il est prévu que vos filtres actuels continuent de fonctionner mais <strong>nous vous invitons fortement à les mettre à jour</strong>.</p>
+                            <code>/api/aids/</code>
+                            <h4>Modifications filtres :</h4>
+                            <ul>
+                                <li><em>text</em> => <code>keyword</code></li>
+                                <li><em>targeted_audiences</em> => <code>organization_type_slugs</code></li>
+                                <li><em>categories</em> => <code>category_slugs</code></li>
+                                <li><em>aid_type</em> => <code>aid_type_group_slug</code></li>
+                                <li>
+                                    <p><em>financial_aids</em> && <em>technical_aids</em> => <code>aid_type_slugs</code></p>
+                                    <p>Ces deux champs ont fusionnés en un seul champ <code>aid_type_slugs</code> qui prend en compte les deux types d'aides.</p>
+                                    <p>Vous pouvez également rechercher sur plusieurs types en ajoutant plusieurs fois le même paramètre, ex: aid_type_slugs=recoverable-advance&aid_type_slugs=legal-engineering.</p>
+                                </li>
+                                <li><em>mobilization_step</em> => <code>aid_step_slugs</code>. Vous pouvez maintenant passer plusieurs fois le même paramètre avec des valeurs différentes.</li>
+                                <li><em>destinations</em> => <code>aid_destination_slugs</code>. Vous pouvez maintenant passer plusieurs fois le même paramètre avec des valeurs différentes.</li>
+                                <li><em>recurrence</em> => <code>aid_recurrence_slug</code>.</li>
+                                <li><em>perimeter</em> => <code>perimeter_id</code>.</li>
+                                <li><em>european_aid</em> => <code>european_aid_slug</code>.</li>
+                                <li><em>backerschoice[]</em> => <code>backer_ids</code>.</li>
+                                <li><em>backerGroup</em> => <code>backer_group_id</code>.</li>
+                            </ul>
+                            <h4>Ajouts filtres :</h4>
+                            <ul>
+                                <li><code>organization_type_ids</code> : Recherche sur les types de structure par ids, ex: organizationTypeIds=1&organizationTypeIds=2</li>
+                                <li><code>category_ids</code> : Recherche sur les thématiques par ids, ex: category_ids=1&category_ids=2</li>
+                                <li><code>aid_type_group_id</code> : Recherche sur le groupe de la nature de l'aide par id.</li>
+                                <li><code>aid_type_slugs</code> : Recherche sur les natures de l'aide, ex: aid_type_slugs=recoverable-advance&aid_type_slugs=legal-engineering.</li>
+                                <li><code>aid_type_ids</code> : Recherche sur les natures de l'aide par ids, ex: aid_type_ids=3&aid_type_ids=8.</li>
+                                <li><code>aid_step_ids</code>. Recherche sur l'avancement du projet par ids, ex: aid_step_ids=1&aid_step_ids=2.</li>
+                                <li><code>aid_destination_ids</code>. Recherche sur les actions concernées par ids, ex: aid_destination_ids=1&aid_destination_ids=2.</li>
+                                <li><code>aid_recurrence_id</code>. Recherche sur la récurrence par id, ex: aid_recurrence_id=1.</li>
+                            </ul>
+                            <code>/api/aids/audiences/</code>
+                            <ul>
+                                <li><code>id</code> non changé, il retourne actuellement le slug. La valeur sera remplacé par l'identifiant lors d'une prochaine mise à jour.</li>
+                                <li><code>slug</code> retourne un identifiant au format string.</li>
+                                <li>ajout de <code>type_full</code> qui retourne le type complet de la structure.</li>
+                            </ul>
+                            <code>/api/aids/destinations/</code>
+                            <ul>
+                                <li><code>id</code> non changé, il retourne actuellement le slug. La valeur sera remplacé par l'identifiant lors d'une prochaine mise à jour.</li>
+                                <li><code>slug</code> retourne un identifiant au format string.</li>
+                            </ul>
+                            <code>/api/aids/recurrences/</code>
+                            <ul>
+                                <li><code>id</code> non changé, il retourne actuellement le slug. La valeur sera remplacé par l'identifiant lors d'une prochaine mise à jour.</li>
+                                <li><code>slug</code> retourne un identifiant au format string.</li>
+                            </ul>
+                            <code>/api/aids/steps/</code>
+                            <ul>
+                                <li><code>id</code> non changé, il retourne actuellement le slug. La valeur sera remplacé par l'identifiant lors d'une prochaine mise à jour.</li>
+                                <li><code>slug</code> retourne un identifiant au format string.</li>
+                            </ul>
+                            <code>/api/aids/types/</code>
+                            <ul>
+                                <li><code>id</code> non changé, il retourne actuellement le slug. La valeur sera remplacé par l'identifiant lors d'une prochaine mise à jour.</li>
+                                <li><code>slug</code> retourne un identifiant au format string.</li>
+                                <li>ajout de <code>type_full</code> qui retourne le type complet de l'aide.</li>
+                            </ul>
+                            <code>/api/backers/</code>
+                            <ul>
+                                <li><code>id</code> non changé, il retourne actuellement une combinaison de l'identifiant et du slug. La valeur sera remplacé par l'identifiant lors d'une prochaine mise à jour.</li>
+                                <li><code>slug</code> retourne un identifiant au format string.</li>
+                                <li><em>backerGroup</em> => <code>backer_group_id</code>.</li>
+                            </ul>
+                            <code>/api/perimeters/</code>
+                            <ul>
+                                <li><code>id</code> non changé, il retourne actuellement une combinaison de l'identifiant et du slug. La valeur sera remplacé par l'identifiant lors d'une prochaine mise à jour.</li>
+                            </ul> 
+                        </td>
+                    </tr>
+                    <tr><td>1.6</td><td><strong>Périmètres</strong> ajout du point d’entrée <code>perimeters/data</code></td></tr>
+                    <tr><td>1.5</td><td><strong>Aides</strong> : ajout des champs <code>name_initial</code>, <code>import_data_url</code>, <code>import_data_mention</code> et <code>import_share_licence</code></td></tr>
+                    <tr><td>1.4</td><td><strong>Aides</strong> : ajout du champ <code>is_call_for_project</code><br>Ajout de nouveaux points d'entrée : <strong>Programmes</strong>, <strong>Thématiques</strong> et <strong>Périmètres</strong><br>Documentation de l'API au format OpenAPI 3</td></tr>
+                    <tr><td>1.3</td><td><strong>Aides</strong> : ajout des champs <code>loan_amount</code> and <code>recoverable_advance_amount</code><br><strong>Aides</strong> : suppression du champ <code>tags</code></td></tr>
+                    <tr><td>1.2</td><td><strong>Aides</strong> : ajout du champ <code>categories</code></td></tr>
+                    <tr><td>1.1</td><td><strong>Aides</strong> : ajout du champ <code>programs</code></td></tr>
+                    <tr><td>1.0</td><td>Première version de l'API 🎉<br> Points d'entrée : <strong>Aides</strong> et <strong>Porteurs d'aides</strong></td></tr>
+                </tbody>
+            </table>
+            "
+    version: 1.8
     formats:
         jsonld: ['application/ld+json']
         json: ['application/json']
@@ -26,4 +119,4 @@ api_platform:
             JWT:
                 name: Authorization
                 type: header
-        
+    name_converter: 'Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter'

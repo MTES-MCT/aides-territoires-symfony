@@ -14,7 +14,6 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 #[AsCommand(name: 'at:script:keyword_global', description: 'Import des mots-clés')]
 class KeywordsGlobalCommand extends Command
 {
-
     protected InputInterface $input;
     protected OutputInterface $output;
     protected string $commandTextStart = '<Import des mots-clés';
@@ -41,11 +40,16 @@ class KeywordsGlobalCommand extends Command
 
 
         $commands = [
-            'at:script:keyword_import_references', // les nouveaux mots clés référent
-            'at:script:keyword_synonyms_to_reference', // on recupere les keywordsynonyms pour les ajouter aux keyword references
-            'at:script:import_keyword_aid', // on associe les mots clés aux aides
-            'at:script:keywords_to_reference', // ancien keywords en kewordReference
-            'at:script:project_reference:keywords' // on gestion mots clés / projets référents
+            // les nouveaux mots clés référent
+            'at:script:keyword_import_references',
+            // on recupere les keywordsynonyms pour les ajouter aux keyword references
+            'at:script:keyword_synonyms_to_reference',
+            // on associe les mots clés aux aides
+            'at:script:import_keyword_aid',
+            // ancien keywords en kewordReference
+            'at:script:keywords_to_reference',
+            // on gestion mots clés / projets référents
+            'at:script:project_reference:keywords'
         ];
 
         $timeStart = microtime(true);
@@ -64,7 +68,16 @@ class KeywordsGlobalCommand extends Command
                 $timeOperation = $timeEnd - $timeStartOperation;
                 $timeGlobal = $timeEnd - $timeStart;
 
-                $io->success('Fin ' . $command->getName() . ' : ' . gmdate("H:i:s", $timeEnd) . ' | ope : ' . gmdate("H:i:s", $timeOperation) . ' | global : ' . gmdate("H:i:s", $timeGlobal));
+                $io->success(
+                    'Fin '
+                        . $command->getName()
+                        . ' : '
+                        . gmdate("H:i:s", $timeEnd)
+                        . ' | ope : '
+                        . gmdate("H:i:s", $timeOperation)
+                        . ' | global : '
+                        . gmdate("H:i:s", $timeGlobal)
+                );
 
                 // nettoyage memoire
                 gc_collect_cycles();

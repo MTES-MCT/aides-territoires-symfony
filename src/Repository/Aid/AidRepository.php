@@ -73,7 +73,7 @@ class AidRepository extends ServiceEntityRepository
             ->innerJoin('category.categoryTheme', 'categoryTheme')
             ->andWhere('a.id IN (:ids)')
             ->setParameter('ids', $ids)
-            ;
+        ;
 
         $results = $qb->getQuery()->getResult();
 
@@ -372,7 +372,13 @@ class AidRepository extends ServiceEntityRepository
         }
 
         $applyBefore = $params['applyBefore'] ?? null;
-        $orderBy = (isset($params['orderBy']) && isset($params['orderBy']['sort']) && isset($params['orderBy']['order'])) ? $params['orderBy'] : null;
+        $orderBy =
+            (isset($params['orderBy'])
+            && isset($params['orderBy']['sort'])
+            && isset($params['orderBy']['order']))
+                ? $params['orderBy']
+                : null
+        ;
         $orderByDateSubmissionDeadline = $params['orderByDateSubmissionDeadline'] ?? null;
         $aidStepIds = $params['aidStepIds'] ?? null;
         $aidSteps = $params['aidSteps'] ?? null;
@@ -398,7 +404,6 @@ class AidRepository extends ServiceEntityRepository
         $publishedAfter = $params['publishedAfter'] ?? null;
         $publishedBefore = $params['publishedBefore'] ?? null;
         $aidRecurrence = $params['aidRecurrence'] ?? null;
-        $inAdmin = $params['inAdmin'] ?? null;
         $hasBrokenLink = $params['hasBrokenLink'] ?? null;
         $scoreTotalMin = $params['scoreTotalMin'] ?? 60;
         $scoreObjectsMin = $params['scoreObjectsMin'] ?? 30;
@@ -457,10 +462,30 @@ class AidRepository extends ServiceEntityRepository
 
         if (isset($synonyms)) {
             $forbiddenChars = ['@', '+', '-'];
-            $originalName = (isset($synonyms['original_name']) && str_replace($forbiddenChars, [''], trim($synonyms['original_name'])) !== '')  ? str_replace($forbiddenChars, [''], trim($synonyms['original_name'])) : null;
-            $intentionsString = (isset($synonyms['intentions_string']) && str_replace($forbiddenChars, [''], trim($synonyms['intentions_string'])) !== '')  ? str_replace($forbiddenChars, [''], trim($synonyms['intentions_string'])) : null;
-            $objectsString = (isset($synonyms['objects_string']) && str_replace($forbiddenChars, [''], trim($synonyms['objects_string'])) !== '')  ? str_replace($forbiddenChars, [''], trim($synonyms['objects_string'])) : null;
-            $simpleWordsString = (isset($synonyms['simple_words_string']) && str_replace($forbiddenChars, [''], trim($synonyms['simple_words_string'])) !== '')  ? str_replace($forbiddenChars, [''], trim($synonyms['simple_words_string'])) : null;
+            $originalName =
+                (isset($synonyms['original_name'])
+                && str_replace($forbiddenChars, [''], trim($synonyms['original_name'])) !== '')
+                    ? str_replace($forbiddenChars, [''], trim($synonyms['original_name']))
+                    : null
+            ;
+            $intentionsString =
+                (isset($synonyms['intentions_string'])
+                && str_replace($forbiddenChars, [''], trim($synonyms['intentions_string'])) !== '')
+                ? str_replace($forbiddenChars, [''], trim($synonyms['intentions_string']))
+                : null
+            ;
+            $objectsString =
+                (isset($synonyms['objects_string'])
+                && str_replace($forbiddenChars, [''], trim($synonyms['objects_string'])) !== '')
+                    ? str_replace($forbiddenChars, [''], trim($synonyms['objects_string']))
+                    : null
+            ;
+            $simpleWordsString =
+                (isset($synonyms['simple_words_string'])
+                && str_replace($forbiddenChars, [''], trim($synonyms['simple_words_string'])) !== '')
+                    ? str_replace($forbiddenChars, [''], trim($synonyms['simple_words_string']))
+                    : null
+            ;
 
             if ($originalName) {
                 $sqlOriginalName = '
@@ -483,29 +508,45 @@ class AidRepository extends ServiceEntityRepository
                     ->setParameter('projectReference', $projectReference);
 
                 if (!$projectReference->getRequiredKeywordReferences()->isEmpty()) {
+                    // fait un tableau unique des mots clés requis et de ses synonymes
                     $requiredKeywordReferencesName = [];
                     foreach ($projectReference->getRequiredKeywordReferences() as $keywordReference) {
                         $requiredKeywordReferencesName[] = $keywordReference->getName();
+                        foreach ($keywordReference->getKeywordReferences() as $subKeyword) {
+                            $requiredKeywordReferencesName[] = $subKeyword->getName();
+                        }
+                        if (
+                            $keywordReference->getParent()
+                            && $keywordReference->getParent()->getId() !== $keywordReference->getId()
+                        ) {
+                            $requiredKeywordReferencesName[] = $keywordReference->getParent()->getName();
+                            foreach ($keywordReference->getParent()->getKeywordReferences() as $subKeyword) {
+                                $requiredKeywordReferencesName[] = $subKeyword->getName();
+                            }
+                        }
                     }
                     $requiredKeywordReferencesName = array_unique($requiredKeywordReferencesName);
-                    $requiredKeywordReferencesNameString = implode('|', $requiredKeywordReferencesName);
+                    
+                    // on ajoute des guillemets si le mot clé contient un espace, ex: "batiment scolaire"
+                    $transformedTerms = array_map(function($term) {
+                        return strpos($term, ' ') !== false ? '"' . $term . '"' : $term;
+                    }, $requiredKeywordReferencesName);
+                    
 
-                    $qb->andWhere(
-                        '
-                        REGEXP(a.name, :requireKeywordReferencesString) = 1
-                        OR REGEXP(a.nameInitial, :requireKeywordReferencesString) = 1
-                        OR REGEXP(a.description, :requireKeywordReferencesString) = 1
-                        OR REGEXP(a.eligibility, :requireKeywordReferencesString) = 1
-                        OR REGEXP(a.projectExamples, :requireKeywordReferencesString) = 1
+                    // on transforme le tableau en string pour la recherche fulltext
+                    $requiredKeywordReferencesNameString = implode(' ', $transformedTerms);
+
+                    $qb->andWhere('
+                        MATCH_AGAINST(a.name, a.nameInitial, a.description, a.eligibility, a.projectExamples) AGAINST (:requireKeywordReferencesString IN BOOLEAN MODE) > 0
                         OR :projectReference MEMBER OF a.projectReferences
-                        '
-                    );
-                    $qb->setParameter('requireKeywordReferencesString', '\\b' . $requiredKeywordReferencesNameString . '\\b');
+                    ');
+                    $qb->setParameter('requireKeywordReferencesString', $requiredKeywordReferencesNameString);
                 }
             }
 
             // les keywordReferences
-            $keywordReferencesSynonyms = $this->getEntityManager()->getRepository(KeywordReference::class)->findFromSynonyms($synonyms);
+            $keywordReferencesSynonyms =
+                $this->getEntityManager()->getRepository(KeywordReference::class)->findFromSynonyms($synonyms);
             if (!empty($keywordReferencesSynonyms)) {
                 $sqlKeywordReferences = '
                 CASE
@@ -517,17 +558,25 @@ class AidRepository extends ServiceEntityRepository
             }
 
             $sqlObjects = '';
-            if (isset($sqlProjectReference)) {
-                $sqlObjects .= $sqlProjectReference;
-            }
             if ($objectsString) {
+                if (isset($sqlProjectReference)) {
+                    $sqlObjects .= $sqlProjectReference;
+                }
+                if (isset($sqlKeywordReferences)) {
+                    $sqlObjects .= ' + ' . $sqlKeywordReferences;
+                }
+
                 if (trim($sqlObjects) !== '') {
                     $sqlObjects .= ' + ';
                 }
                 $sqlObjects .= '
-                CASE WHEN (MATCH_AGAINST(a.name) AGAINST(:objects_string IN BOOLEAN MODE) > 1) THEN 60 ELSE 0 END +
-                CASE WHEN (MATCH_AGAINST(a.nameInitial) AGAINST(:objects_string IN BOOLEAN MODE) > 1) THEN 60 ELSE 0 END +
-                CASE WHEN (MATCH_AGAINST(a.description, a.eligibility, a.projectExamples) AGAINST(:objects_string IN BOOLEAN MODE) > 1) THEN 10 ELSE 0 END 
+                CASE WHEN (MATCH_AGAINST(a.name) AGAINST(:objects_string IN BOOLEAN MODE) > 1)
+                THEN 60 ELSE 0 END +
+                CASE WHEN (MATCH_AGAINST(a.nameInitial) AGAINST(:objects_string IN BOOLEAN MODE) > 1)
+                THEN 60 ELSE 0 END +
+                CASE WHEN (MATCH_AGAINST(a.description, a.eligibility, a.projectExamples)
+                AGAINST(:objects_string IN BOOLEAN MODE) > 1)
+                THEN 10 ELSE 0 END
                 ';
 
                 $objects = str_getcsv($objectsString, ' ', '"');
@@ -572,7 +621,9 @@ class AidRepository extends ServiceEntityRepository
 
             if ($intentionsString && $objectsString) {
                 $sqlIntentions = '
-                CASE WHEN (MATCH_AGAINST(a.name, a.nameInitial, a.description, a.eligibility, a.projectExamples) AGAINST(:intentions_string IN BOOLEAN MODE) > 0.8) THEN 1 ELSE 0 END
+                CASE WHEN (MATCH_AGAINST(a.name, a.nameInitial, a.description, a.eligibility, a.projectExamples)
+                AGAINST(:intentions_string IN BOOLEAN MODE) > 0.8)
+                THEN 1 ELSE 0 END
                 ';
                 if (isset($sqlProjectReference) && $sqlProjectReference !== '') {
                     $sqlIntentions .= ' + ' . $sqlProjectReference;
@@ -585,9 +636,13 @@ class AidRepository extends ServiceEntityRepository
 
             if ($simpleWordsString && !$objectsString) {
                 $sqlSimpleWords = '
-                CASE WHEN (MATCH_AGAINST(a.name) AGAINST(:simple_words_string IN BOOLEAN MODE) > 1) THEN 120 ELSE 0 END +
-                CASE WHEN (MATCH_AGAINST(a.nameInitial) AGAINST(:simple_words_string IN BOOLEAN MODE) > 1) THEN 120 ELSE 0 END +
-                CASE WHEN (MATCH_AGAINST(a.description, a.eligibility, a.projectExamples) AGAINST(:simple_words_string IN BOOLEAN MODE) > 1) THEN 60 ELSE 0 END
+                CASE WHEN (MATCH_AGAINST(a.name) AGAINST(:simple_words_string IN BOOLEAN MODE) > 1)
+                THEN 120 ELSE 0 END +
+                CASE WHEN (MATCH_AGAINST(a.nameInitial) AGAINST(:simple_words_string IN BOOLEAN MODE) > 1)
+                THEN 120 ELSE 0 END +
+                CASE WHEN (MATCH_AGAINST(a.description, a.eligibility, a.projectExamples)
+                AGAINST(:simple_words_string IN BOOLEAN MODE) > 1)
+                THEN 60 ELSE 0 END
                 ';
                 $qb->setParameter('simple_words_string', $simpleWordsString);
             }
@@ -597,34 +652,59 @@ class AidRepository extends ServiceEntityRepository
                 $sqlTotal .= $sqlOriginalName;
             }
             if ($intentionsString && $objectsString) {
-                if ($originalName || $objectsString) {
+                if (
+                    $originalName
+                    || $objectsString
+                ) {
                     $sqlTotal .= ' + ';
                 }
                 $sqlTotal .= $sqlIntentions;
             }
             if (isset($sqlSimpleWords)) {
-                if ($originalName || $objectsString || $intentionsString) {
+                if (
+                    $originalName
+                    || $objectsString
+                    || $intentionsString
+                ) {
                     $sqlTotal .= ' + ';
                 }
                 $sqlTotal .= $sqlSimpleWords;
             }
 
             if (isset($sqlCategories)) {
-                if ($originalName || $objectsString || $intentionsString || isset($sqlSimpleWords)) {
+                if (
+                    $originalName
+                    || $objectsString
+                    || $intentionsString
+                    || isset($sqlSimpleWords)
+                ) {
                     $sqlTotal .= ' + ';
                 }
                 $sqlTotal .= $sqlCategories;
             }
 
             if (isset($sqlKeywordReferences)) {
-                if ($originalName || $objectsString || $intentionsString || isset($sqlSimpleWords) || isset($sqlCategories)) {
+                if (
+                    $originalName
+                    || $objectsString
+                    || $intentionsString
+                    || isset($sqlSimpleWords)
+                    || isset($sqlCategories)
+                ) {
                     $sqlTotal .= ' + ';
                 }
                 $sqlTotal .= $sqlKeywordReferences;
             }
 
             if (isset($sqlProjectReference)) {
-                if ($originalName || $objectsString || $intentionsString || isset($sqlSimpleWords) || isset($sqlCategories) || isset($sqlKeywordReferences)) {
+                if (
+                    $originalName
+                    || $objectsString
+                    || $intentionsString
+                    || isset($sqlSimpleWords)
+                    || isset($sqlCategories)
+                    || isset($sqlKeywordReferences)
+                ) {
                     $sqlTotal .= ' + ';
                 }
                 $sqlTotal .= $sqlProjectReference;
@@ -732,7 +812,7 @@ class AidRepository extends ServiceEntityRepository
                 ->andWhere(':organizationTypes MEMBER OF a.aidAudiences')
                 ->setParameter('organizationTypes', $organizationTypes);
         }
-        
+
 
         if (is_array($organizationTypeSlugs) && count($organizationTypeSlugs) > 0) {
             $qb
@@ -751,7 +831,9 @@ class AidRepository extends ServiceEntityRepository
         }
 
         if ($perimeterFrom instanceof Perimeter && $perimeterFrom->getId()) {
-            $ids = $this->getEntityManager()->getRepository(Perimeter::class)->getIdPerimetersContainedIn(['perimeter' => $perimeterFrom]);
+            $ids = $this->getEntityManager()->getRepository(Perimeter::class)->getIdPerimetersContainedIn(
+                ['perimeter' => $perimeterFrom]
+            );
             $ids[] = $perimeterFrom->getId();
 
             $qb
@@ -875,13 +957,18 @@ class AidRepository extends ServiceEntityRepository
             ;
         }
 
-        if (is_array($keywords) && count($keywords) > 0) {
+        if (is_array($keywords) && !empty($keywords)) {
             $queryKeywords = '(';
             for ($i = 0; $i < count($keywords); $i++) {
                 if ($i > 0) {
                     $queryKeywords .= ' OR ';
                 }
-                $queryKeywords .= 'keywords.name LIKE :keyword' . $i . ' OR a.name LIKE :keyword' . $i . ' OR categoriesKeyword.name LIKE :keyword' . $i . ' OR a.description LIKE :keyword' . $i . ' ';
+                $queryKeywords .= '
+                    keywords.name LIKE :keyword' . $i . '
+                    OR a.name LIKE :keyword' . $i . '
+                    OR categoriesKeyword.name LIKE :keyword' . $i . '
+                    OR a.description LIKE :keyword' . $i . ' '
+                ;
                 $qb->setParameter("keyword$i", '%' . $keywords[$i] . '%');
             }
             $queryKeywords .= ')';
@@ -962,7 +1049,12 @@ class AidRepository extends ServiceEntityRepository
         }
 
         // si aucun tri mais qu'on a le score total
-        if ($orderBy == null && $orderByDateSubmissionDeadline == null && isset($scoreTotalAvailable) && $scoreTotalAvailable === true) {
+        if (
+            $orderBy == null
+            && $orderByDateSubmissionDeadline == null
+            && isset($scoreTotalAvailable)
+            && $scoreTotalAvailable === true
+        ) {
             $qb
                 ->addOrderBy('score_total', 'DESC');
             if ($sqlObjects !== '') {
@@ -1026,7 +1118,10 @@ class AidRepository extends ServiceEntityRepository
             ;
         }
 
-        if (($aidDestinations instanceof ArrayCollection || is_array($aidDestinations)) && count($aidDestinations) > 0) {
+        if (
+            ($aidDestinations instanceof ArrayCollection || is_array($aidDestinations))
+            && count($aidDestinations) > 0
+        ) {
             $qb
                 ->innerJoin('a.aidDestinations', 'aidDestinations')
                 ->andWhere('aidDestinations IN (:aidDestinations)')

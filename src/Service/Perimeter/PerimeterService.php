@@ -12,10 +12,16 @@ class PerimeterService
     ) {
     }
 
-    public function getAdhocNameFromInseeCodes($inseeCodes): string
+    /**
+     *
+     * @param array<string> $inseeCodes
+     * @return string
+     */
+    public function getAdhocNameFromInseeCodes(array $inseeCodes): string
     {
         $regionCodes = [];
-        $perimeters = $this->perimeterRepository->findCustom(['scale' => Perimeter::SCALE_COMMUNE, 'codes' => $inseeCodes]);
+        $perimeters = $this->perimeterRepository
+            ->findCustom(['scale' => Perimeter::SCALE_COMMUNE, 'codes' => $inseeCodes]);
 
         foreach ($perimeters as $key => $perimeter) {
             if ($perimeter->getRegions()) {
@@ -30,6 +36,11 @@ class PerimeterService
         return 'regions_' . join('_', $regionCodes);
     }
 
+    /**
+     *
+     * @param array<string> $regionCodes
+     * @return string
+     */
     public function getAdhocNameFromRegionCodes(array $regionCodes): string
     {
         sort($regionCodes);
@@ -49,7 +60,10 @@ class PerimeterService
             }
         } else {
             if (isset(Perimeter::SCALES_FOR_SEARCH[$perimeter->getScale()]['name'])) {
-                return $perimeter->getName() . ' (' . Perimeter::SCALES_FOR_SEARCH[$perimeter->getScale()]['name'] . ')';
+                return $perimeter->getName()
+                    . ' ('
+                    . Perimeter::SCALES_FOR_SEARCH[$perimeter->getScale()]['name']
+                    . ')';
             } else {
                 return $perimeter->getName();
             }
@@ -92,7 +106,7 @@ class PerimeterService
      * Retourne les scales d'un group
      *
      * @param string $scaleGroup
-     * @return array
+     * @return array<int>
      */
     public function getScalesFromGroup(string $scaleGroup): array
     {
@@ -115,7 +129,7 @@ class PerimeterService
      * Retourne les infos d'une scale en fonction de son identifiant
      *
      * @param string $scale
-     * @return array|null
+     * @return array{scale: int, slug: string, name: string}|null
      */
     public function getScale(string $scale): ?array
     {
@@ -139,7 +153,7 @@ class PerimeterService
      * Retourne les infos d'une scale en fonction de son identifiant
      *
      * @param string $scale
-     * @return array|null
+     * @return array{scale: int, slug: string, name: string}|null
      */
     public function getScaleFromSlug(string $scale): ?array
     {

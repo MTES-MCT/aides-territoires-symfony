@@ -17,7 +17,7 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class NotificationController extends FrontController
 {
-    const NB_NOTIFICATION_BY_PAGE = 20;
+    public const NB_NOTIFICATION_BY_PAGE = 20;
 
     #[Route('/comptes/notifications/', name: 'app_user_user_notification')]
     public function notification(
@@ -53,7 +53,8 @@ class NotificationController extends FrontController
         if ($formDelete->isSubmitted()) {
             if ($formDelete->isValid()) {
                 // suppression
-                $managerRegistry->getManager()->remove($notificationRepository->find($formDelete->get('idNotification')->getData()));
+                $managerRegistry->getManager()->remove($notificationRepository
+                ->find($formDelete->get('idNotification')->getData()));
 
                 // décrémente le compteur user
                 $user->setNotificationCounter($user->getNotificationCounter() - 1);

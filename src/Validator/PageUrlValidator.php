@@ -9,14 +9,14 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class PageUrlValidator extends ConstraintValidator
 {
-    protected $translator;
+    protected TranslatorInterface $translator;
 
     public function __construct(TranslatorInterface $translator)
     {
         $this->translator = $translator;
     }
 
-    public function validate($value, Constraint $constraint): void
+    public function validate(mixed $value, Constraint $constraint): void
     {
         try {
             // Replace tab characters with spaces

@@ -1,7 +1,7 @@
-@import 'datatables/media/css/jquery.dataTables.min.css';
-@import '../../_variables';
-@import '../../_mixins';
-@import '../../override/dataTable';
+@use 'datatables/media/css/jquery.dataTables.min';
+@use '../../_variables';
+@use '../../_mixins';
+@use '../../override/dataTable';
 
 a.fr-icon-download-line{
     &::after{

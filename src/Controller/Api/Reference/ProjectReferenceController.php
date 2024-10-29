@@ -25,7 +25,8 @@ class ProjectReferenceController extends ApiController
         if ($q) {
             $params['nameLike'] = $q;
         }
-        $projectReferenceCategoryId = $this->requestStack->getCurrentRequest()->get('project_reference_category_id', null);
+        $projectReferenceCategoryId =
+            $this->requestStack->getCurrentRequest()->get('project_reference_category_id', null);
         if ($projectReferenceCategoryId) {
             try {
                 $projectReferenceCategory = $projectReferenceCategoryRepository->find($projectReferenceCategoryId);
@@ -46,7 +47,11 @@ class ProjectReferenceController extends ApiController
         $results = $projectReferenceRepository->findCustom($params);
 
         // on serialize pour ne garder que les champs voulus
-        $results = $this->serializerInterface->serialize($results, static::SERIALIZE_FORMAT, ['groups' => ProjectReference::API_GROUP_LIST]);
+        $results = $this->serializerInterface->serialize(
+            $results,
+            static::SERIALIZE_FORMAT,
+            ['groups' => ProjectReference::API_GROUP_LIST]
+        );
 
         // le retour
         $data = [

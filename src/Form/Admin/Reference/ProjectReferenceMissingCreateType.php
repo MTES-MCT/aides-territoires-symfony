@@ -22,7 +22,9 @@ class ProjectReferenceMissingCreateType extends AbstractType
             ->add('name', TextType::class, [
                 'label' => 'Nom du projet référent manquant',
                 'autocomplete' => true,
-                'autocomplete_url' => $this->routerInterface->generate('app_admin_project_reference_missing_ajax_ux_autocomplete'),
+                'autocomplete_url' => $this->routerInterface->generate(
+                    'app_admin_project_reference_missing_ajax_ux_autocomplete'
+                ),
                 'required' => false,
                 'attr' => [
                     'data-controller' => 'custom-autocomplete',

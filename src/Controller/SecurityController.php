@@ -97,7 +97,8 @@ class SecurityController extends FrontController
             // log le user
             if ($userRegisterConfirmation->getUser()) {
                 $flashMessage = $userRegisterConfirmation->getUser()->getTimeLastLogin()
-                    ? 'Vous êtes maintenant connecté. Bienvenue ! Pourriez-vous prendre quelques secondes pour mettre à jour votre profil ?'
+                    ? 'Vous êtes maintenant connecté. Bienvenue ! '
+                        . 'Pourriez-vous prendre quelques secondes pour mettre à jour votre profil ?'
                     : 'Vous êtes maintenant connecté. Bienvenue !';
                 $security->login($userRegisterConfirmation->getUser(), 'form_login', 'main');
                 // message success
@@ -157,6 +158,8 @@ class SecurityController extends FrontController
     #[Route(path: '/logout', name: 'app_logout')]
     public function logout(): void
     {
-        throw new \LogicException('This method can be blank - it will be intercepted by the logout key on your firewall.');
+        throw new \LogicException(
+            'This method can be blank - it will be intercepted by the logout key on your firewall.'
+        );
     }
 }

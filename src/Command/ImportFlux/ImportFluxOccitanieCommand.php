@@ -128,8 +128,12 @@ class ImportFluxOccitanieCommand extends ImportFluxCommand
             'description' => $this->concatHtmlFields($aidToImport, ['chapo', 'introduction']),
             'timeUpdate' => $timeUpdate,
             'originUrl' => $aidToImport['url'] ?? null,
-            'isCallForProject' => (isset($aidToImport['aides_appels_a_projets']) && $aidToImport['aides_appels_a_projets'] == 'Appels à projets') ? true : false,
-            'contact' => "Pour contacter la Région Occitanie ou candidater à l'offre, veuillez cliquer sur le bouton 'Plus d'informations' ou sur le bouton 'Candidater à l'aide'.",
+            'isCallForProject' => (
+                isset($aidToImport['aides_appels_a_projets'])
+                && $aidToImport['aides_appels_a_projets'] == 'Appels à projets'
+            ) ? true : false,
+            'contact' => "Pour contacter la Région Occitanie ou candidater à l'offre, '
+                . 'veuillez cliquer sur le bouton 'Plus d'informations' ou sur le bouton 'Candidater à l'aide'.",
             'importDataMention' => 'Ces données sont mises à disposition par la Région Occitanie.',
         ];
 

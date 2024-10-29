@@ -25,7 +25,11 @@ class BackerController extends FrontController
         return $this->redirectToRoute('app_cartography_cartography');
     }
 
-    #[Route('/partenaires/{id}-{slug}/', name: 'app_backer_details', requirements: ['id' => '[0-9]+', 'slug' => '[a-zA-Z0-9\-_]+'])]
+    #[Route(
+        '/partenaires/{id}-{slug}/',
+        name: 'app_backer_details',
+        requirements: ['id' => '[0-9]+', 'slug' => '[a-zA-Z0-9\-_]+']
+    )]
     public function details(
         $id,
         $slug,
@@ -68,7 +72,9 @@ class BackerController extends FrontController
             params: [
                 'host' => $requestStack->getCurrentRequest()->getHost(),
                 'backer' => $backer,
-                'organization' => $userService->getUserLogged() ? $userService->getUserLogged()->getDefaultOrganization() : null,
+                'organization' => $userService->getUserLogged()
+                    ? $userService->getUserLogged()->getDefaultOrganization()
+                    : null,
                 'user' => $userService->getUserLogged(),
             ]
         );
@@ -77,10 +83,7 @@ class BackerController extends FrontController
         $categories_by_theme = [];
         $programs_list = [];
         foreach ($backer->getAidsLive() as $aid) {
-
-
             foreach ($aid->getCategories() as $category) {
-
                 if (!isset($categories_by_theme[$category->getCategoryTheme()->getId()])) {
                     $categories_by_theme[$category->getCategoryTheme()->getId()] = [
                         'categoryTheme' => $category->getCategoryTheme(),
@@ -93,7 +96,6 @@ class BackerController extends FrontController
             }
 
             foreach ($aid->getPrograms() as $program) {
-
                 if (!isset($programs_list[$program->getId()])) {
                     $programs_list[$program->getId()] = [
                         'program' => $program,

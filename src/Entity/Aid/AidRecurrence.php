@@ -31,12 +31,12 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Entity(repositoryClass: AidRecurrenceRepository::class)]
 class AidRecurrence
 {
-    const API_GROUP_LIST = 'aid_recurrence:list';
-    const API_DESCRIPTION = 'Lister tous les choix de récurrences';
+    public const API_GROUP_LIST = 'aid_recurrence:list';
+    public const API_DESCRIPTION = 'Lister tous les choix de récurrences';
 
-    const SLUG_ONEOFF = 'oneoff';
-    const SLUG_ONGOING = 'ongoing';
-    const SLUG_RECURRING = 'recurring';
+    public const SLUG_ONEOFF = 'oneoff';
+    public const SLUG_ONGOING = 'ongoing';
+    public const SLUG_RECURRING = 'recurring';
 
     #[ORM\Id]
     #[ORM\GeneratedValue]

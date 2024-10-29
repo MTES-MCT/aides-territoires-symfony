@@ -54,7 +54,9 @@ class OrganizationEditType extends AbstractType
             ->add('perimeter', PerimeterAutocompleteType::class, [
                 'required' => true,
                 'label' => 'Territoire de la structure',
-                'help' => 'Tous les périmètres géographiques sont disponibles : CA, CU, CC, pays, parc, etc. Contactez-nous si vous ne trouvez pas le vôtre.',
+                'help' => 'Tous les périmètres géographiques sont disponibles : '
+                                . 'CA, CU, CC, pays, parc, etc. '
+                                . 'Contactez-nous si vous ne trouvez pas le vôtre.',
                 'placeholder' => 'Tapez les premiers caractères',
                 'constraints' => [
                     new Assert\NotBlank([
@@ -65,7 +67,9 @@ class OrganizationEditType extends AbstractType
             ->add('name', TextType::class, [
                 'required' => true,
                 'label' => 'Nom de la structure',
-                'help' => 'En fonction des informations saisies précédemment, nous pouvons, parfois pré-remplir ce champ automatiquement. Vous pouvez cependant corriger le nom proposé si besoin.',
+                'help' => 'En fonction des informations saisies précédemment, '
+                            . 'nous pouvons, parfois pré-remplir ce champ automatiquement. '
+                            . 'Vous pouvez cependant corriger le nom proposé si besoin.',
                 'constraints' => [
                     new Assert\NotBlank([
                         'message' => 'Veuillez saisir le nom de la structure.',
@@ -130,10 +134,15 @@ class OrganizationEditType extends AbstractType
         // si on a le type d'organization
         if ($event->getForm()->has('organizationType') && $event->getForm()->get('organizationType')->getData()) {
             // si c'est une collectivité
-            if ($event->getForm()->get('organizationType')->getData()->getOrganizationTypeGroup() && $event->getForm()->get('organizationType')->getData()->getOrganizationTypeGroup()->getId() == OrganizationTypeGroup::ID_COLLECTIVITES) {
+            if (
+                $event->getForm()->get('organizationType')->getData()->getOrganizationTypeGroup()
+                && $event->getForm()->get('organizationType')->getData()->getOrganizationTypeGroup()->getId() ==
+                    OrganizationTypeGroup::ID_COLLECTIVITES
+            ) {
                 //  le code insee est alors obligatoire
                 if ($event->getForm()->has('inseeCode') && !$event->getForm()->get('inseeCode')->getData()) {
-                    $event->getForm()->get('inseeCode')->addError(new FormError('Le code INSEE est obligatoire pour les collectivités'));
+                    $event->getForm()->get('inseeCode')
+                        ->addError(new FormError('Le code INSEE est obligatoire pour les collectivités'));
                 }
             }
         }

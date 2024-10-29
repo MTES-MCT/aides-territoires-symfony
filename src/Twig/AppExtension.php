@@ -4,6 +4,8 @@ namespace App\Twig;
 
 use App\Entity\Aid\Aid;
 use App\Entity\Aid\AidDestination;
+use App\Entity\Aid\AidFinancer;
+use App\Entity\Aid\AidInstructor;
 use App\Entity\Aid\AidRecurrence;
 use App\Entity\Aid\AidStep;
 use App\Entity\Aid\AidType;
@@ -38,7 +40,7 @@ use Doctrine\Persistence\ManagerRegistry;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;
 use Twig\TwigFunction;
-use Nelmio\SecurityBundle\EventListener\ContentSecurityPolicyListener;
+use App\Service\Category\CategoryTheme;
 
 class AppExtension extends AbstractExtension // NOSONAR too much methods
 {
@@ -51,8 +53,7 @@ class AppExtension extends AbstractExtension // NOSONAR too much methods
         private ManagerRegistry $managerRegistry,
         private StringService $stringService,
         private MatomoService $matomoService,
-        private ContentSecurityPolicyListener $contentSecurityPolicyListener,
-        private KeywordReferenceService $keywordReferenceService
+        private KeywordReferenceService $keywordReferenceService,
     ) {
     }
 
@@ -70,10 +71,11 @@ class AppExtension extends AbstractExtension // NOSONAR too much methods
             new TwigFilter('aidStatusDisplay', [$this, 'aidStatusDisplay']),
             new TwigFilter('alertFrequencyDisplay', [$this, 'alertFrequencyDisplay']),
             new TwigFilter('projectStepDisplay', [$this, 'projectStepDisplay']),
+            new TwigFilter('secondsToMinutes', [$this, 'secondsToMinutes']),
         ];
     }
 
-    public function htmlDecode($string)
+    public function htmlDecode(string $string): string
     {
         return html_entity_decode($string, ENT_QUOTES, 'UTF-8');
     }
@@ -93,6 +95,7 @@ class AppExtension extends AbstractExtension // NOSONAR too much methods
         if (!$perimeter instanceof Perimeter) {
             return '';
         }
+
         return $this->perimeterService->getSmartName($perimeter);
     }
 
@@ -101,44 +104,31 @@ class AppExtension extends AbstractExtension // NOSONAR too much methods
         if (!$perimeter instanceof Perimeter) {
             return '';
         }
+
         return $this->perimeterService->getSmartRegionNames($perimeter);
     }
 
     public function aidStatusDisplay(string $slug): string
     {
-        switch ($slug) {
-            case Aid::STATUS_DRAFT:
-                return 'Brouillon';
-                break;
+        $statusDisplay = [
+            Aid::STATUS_DRAFT => 'Brouillon',
+            Aid::STATUS_REVIEWABLE => 'En revue',
+            Aid::STATUS_PUBLISHED => 'Publiée',
+            Aid::STATUS_DELETED => 'Supprimée',
+            Aid::STATUS_MERGED => 'Fusionnée',
+        ];
 
-            case Aid::STATUS_REVIEWABLE:
-                return 'En revue';
-                break;
-
-            case Aid::STATUS_PUBLISHED:
-                return 'Publiée';
-                break;
-
-            case Aid::STATUS_DELETED:
-                return 'Supprimée';
-                break;
-
-            case Aid::STATUS_MERGED:
-                return 'Fusionnée';
-                break;
-
-            default:
-                return '';
-        }
+        return $statusDisplay[$slug] ?? '';
     }
 
     public function alertFrequencyDisplay(string $slug): string
     {
         foreach (Alert::FREQUENCIES as $frequency) {
             if ($frequency['slug'] == $slug) {
-                return $frequency['name'] ?? '';
+                return $frequency['name'];
             }
         }
+
         return '';
     }
 
@@ -149,7 +139,16 @@ class AppExtension extends AbstractExtension // NOSONAR too much methods
                 return $step['name'];
             }
         }
+
         return '';
+    }
+
+    public function secondsToMinutes(int $seconds): string
+    {
+        $minutes = floor($seconds / 60);
+        $remainingSeconds = $seconds % 60;
+
+        return sprintf('%d min %d sec', $minutes, $remainingSeconds);
     }
 
     /**
@@ -178,7 +177,10 @@ class AppExtension extends AbstractExtension // NOSONAR too much methods
         ];
     }
 
-    public function getBreadcrumbItems()
+    /**
+     * @return array<array{text: string, url: ?string}>
+     */
+    public function getBreadcrumbItems(): array
     {
         return $this->breadcrumb->getItems();
     }
@@ -192,8 +194,7 @@ class AppExtension extends AbstractExtension // NOSONAR too much methods
         }
     }
 
-
-    public function isUserGranted($user, $role): bool
+    public function isUserGranted(?User $user, string $role): bool
     {
         return $this->userService->isUserGranted($user, $role);
     }
@@ -203,13 +204,14 @@ class AppExtension extends AbstractExtension // NOSONAR too much methods
         try {
             $html = $this->addLazyToImg($html);
             $html = $this->addNonceToInlineCss($html);
+
             return $html;
         } catch (\Exception $e) {
             return $html;
         }
     }
 
-    public function addMailtoToEmailLinks($html)
+    public function addMailtoToEmailLinks(string $html): string
     {
         // Utiliser tidy pour nettoyer le HTML
         if (extension_loaded('tidy')) {
@@ -230,7 +232,8 @@ class AppExtension extends AbstractExtension // NOSONAR too much methods
         @$dom->loadHTML(mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8'), LIBXML_HTML_NODEFDTD);
         $x = new \DOMXPath($dom);
 
-        foreach ($x->query("//a") as $node) {
+        /** @var \DOMElement $node */
+        foreach ($x->query('//a') as $node) {
             $href = $node->getAttribute('href');
             // Vérifie si le href est une adresse e-mail
             if (preg_match('/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/', $href)) {
@@ -249,23 +252,24 @@ class AppExtension extends AbstractExtension // NOSONAR too much methods
         return $newHtml;
     }
 
-    public function addNonceToInlineCss($html)
+    public function addNonceToInlineCss(string $html): string
     {
         $dom = new \DOMDocument();
         // pour garder le utf-8
         $dom->loadHTML(mb_encode_numericentity($html, [0x80, 0x10FFFF, 0, ~0], 'UTF-8'), LIBXML_HTML_NODEFDTD);
         $x = new \DOMXPath($dom);
 
-        foreach ($x->query("//*[@style]") as $node) {
+        /** @var \DOMElement $node */
+        foreach ($x->query('//*[@style]') as $node) {
             $styles = explode(';', $node->getAttribute('style'));
 
             $classesToAdd = [];
             foreach ($styles as $style) {
-                if ($style == 'text-align: left') {
+                if ('text-align: left' == $style) {
                     $classesToAdd[] = 'text-left';
-                } elseif ($style == 'text-align: right') {
+                } elseif ('text-align: right' == $style) {
                     $classesToAdd[] = 'text-right';
-                } elseif ($style == 'text-align: center') {
+                } elseif ('text-align: center' == $style) {
                     $classesToAdd[] = 'text-center';
                 }
             }
@@ -275,7 +279,7 @@ class AppExtension extends AbstractExtension // NOSONAR too much methods
 
             // Ajouter les nouvelles classes
             $classesToAdd = implode(' ', $classesToAdd);
-            if ($currentClass !== '') {
+            if ('' !== $currentClass) {
                 $newClass = $currentClass . ' ' . $classesToAdd;
             } else {
                 $newClass = $classesToAdd;
@@ -295,37 +299,36 @@ class AppExtension extends AbstractExtension // NOSONAR too much methods
         return $newHtml;
     }
 
-
-    public function addLazyToImg($html)
+    public function addLazyToImg(string $html): string
     {
         $dom = new \DOMDocument();
         // pour garder le utf-8
         $dom->loadHTML(mb_encode_numericentity($html, [0x80, 0x10FFFF, 0, ~0], 'UTF-8'), LIBXML_HTML_NODEFDTD);
         $x = new \DOMXPath($dom);
 
-        foreach ($x->query("//img") as $node) {
-            $node->setAttribute("loading", "lazy");
+        /** @var \DOMElement $node */
+        foreach ($x->query('//img') as $node) {
+            $node->setAttribute('loading', 'lazy');
         }
+
         return substr($dom->saveHTML(), 12, -15);
     }
 
-    public function getPerimeterScale($scale): ?array
+    /**
+     * @return array{scale: int, slug: string, name: string}|null
+     */
+    public function getPerimeterScale(string $scale): ?array
     {
         return $this->perimeterService->getScale($scale);
     }
 
+    /**
+     * @param ArrayCollection<int, Category>|Category[] $categories
+     * @return array<array{categoryTheme: CategoryTheme, categories: Category[]}>
+     */
     public function categoriesToMetas(ArrayCollection|array $categories): array
     {
         return $this->categoryService->categoriesToMetas($categories);
-    }
-
-    public function getEntityById(string $entityName, int $id): mixed
-    {
-        try {
-            return $this->managerRegistry->getRepository('App\Entity\\' . $entityName)->find($id);
-        } catch (\Exception $e) {
-            return null;
-        }
     }
 
     public function getUserSibEmailId(?User $user): string
@@ -352,9 +355,22 @@ class AppExtension extends AbstractExtension // NOSONAR too much methods
         if (!$user || !$project) {
             return null;
         }
+
         return $this->userService->getPublicProjectLatestView($user, $project);
     }
 
+    /**
+     * @return array{
+     *     programs: string[],
+     *     organizationTypes: string[],
+     *     aidTypes: string[],
+     *     categories: string[],
+     *     aidRecurrences: string[],
+     *     aidSteps: string[],
+     *     aidDestinations: string[],
+     *     projectReferences: string[]
+     * }
+     */
     public function getImportAidManualDatas(): array
     {
         $datas = [];
@@ -375,8 +391,8 @@ class AppExtension extends AbstractExtension // NOSONAR too much methods
         $datas['aidTypes'] = $aidTypeNames;
 
         /** @var CategoryRepository $categoryRepository */
-        $categoryRepositoy = $this->managerRegistry->getRepository(Category::class);
-        $categoryNames = $categoryRepositoy->getNames();
+        $categoryRepository = $this->managerRegistry->getRepository(Category::class);
+        $categoryNames = $categoryRepository->getNames();
         $datas['categories'] = $categoryNames;
 
         /** @var AidRecurrenceRepository $aidRecurrenceRepository */
@@ -402,26 +418,45 @@ class AppExtension extends AbstractExtension // NOSONAR too much methods
         return $datas;
     }
 
-    public function isDateTime($date): bool
+    public function isDateTime(mixed $date): bool
     {
         return $date instanceof \DateTime;
     }
 
+    /**
+     * @param Collection<int, AidFinancer> $aidFinancers
+     * @return Collection<int, AidFinancer>
+     */
     public function orderAidFinancerByBackerName(Collection $aidFinancers): Collection
     {
         $aidFinancers = $aidFinancers->toArray();
 
-        usort($aidFinancers, function ($a, $b) {
+        usort($aidFinancers, function (AidFinancer $a, AidFinancer $b) {
             $nameA = $this->stringService->normalizeString($a->getBacker()->getName());
             $nameB = $this->stringService->normalizeString($b->getBacker()->getName());
+
             return strcmp($nameA, $nameB);
         });
 
         return new ArrayCollection($aidFinancers);
     }
 
+    /**
+     * @param Collection<int, AidInstructor> $aidInstructors
+     * @return Collection<int, AidInstructor>
+     */
     public function orderAidInstructorByBackerName(Collection $aidInstructors): Collection
     {
-        return $this->orderAidFinancerByBackerName($aidInstructors);
+        $aidInstructors = $aidInstructors->toArray();
+
+
+        usort($aidInstructors, function (AidInstructor $a, AidInstructor $b) {
+            $nameA = $this->stringService->normalizeString($a->getBacker()->getName());
+            $nameB = $this->stringService->normalizeString($b->getBacker()->getName());
+
+            return strcmp($nameA, $nameB);
+        });
+
+        return new ArrayCollection($aidInstructors);
     }
 }

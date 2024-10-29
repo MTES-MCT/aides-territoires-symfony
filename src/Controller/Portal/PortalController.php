@@ -36,7 +36,7 @@ use Symfony\UX\Chartjs\Model\Chart;
 
 class PortalController extends FrontController
 {
-    const DATE_START_MATOMO = '2024-02-19';
+    public const DATE_START_MATOMO = '2024-02-19';
 
     // c'est une page custom
     #[Route('/portails/', name: 'app_portal_portal')]
@@ -77,7 +77,10 @@ class PortalController extends FrontController
 
         // redirection vers un autre portail
         if ($search_page->getSearchPageRedirect()) {
-            return $this->redirectToRoute('app_portal_portal_details', ['slug' => $search_page->getSearchPageRedirect()->getSlug()]);
+            return $this->redirectToRoute(
+                'app_portal_portal_details',
+                ['slug' => $search_page->getSearchPageRedirect()->getSlug()]
+            );
         }
 
         // converti la querystring en parametres
@@ -106,9 +109,10 @@ class PortalController extends FrontController
                 'dontUseUserPerimeter' => true
             ]
         );
+
         if (isset($aidParams['categories']) && is_iterable($aidParams['categories'])) {
             foreach ($aidParams['categories'] as $category) {
-                $aidSearchClass->addCategorySearch($category);
+                $aidSearchClass->addCategoryId($category);
             }
         }
 
@@ -126,7 +130,6 @@ class PortalController extends FrontController
             $aidSearchClass,
             $formAidSearchParams
         );
-        $formAidSearch->handleRequest($requestStack->getCurrentRequest());
 
         // on force le formulaire étendu
         $showExtended = true;
@@ -147,7 +150,11 @@ class PortalController extends FrontController
                 FrontController::FLASH_ERROR,
                 'Le numéro de page demandé n\'existe pas'
             );
-            $newUrl = preg_replace('/(page=)[^\&]+/', 'page=' . $pagerfanta->getNbPages(), $requestStack->getCurrentRequest()->getRequestUri());
+            $newUrl = preg_replace(
+                '/(page=)[^\&]+/',
+                'page=' . $pagerfanta->getNbPages(),
+                $requestStack->getCurrentRequest()->getRequestUri()
+            );
             return new RedirectResponse($newUrl);
         }
 
@@ -159,7 +166,8 @@ class PortalController extends FrontController
             'host' => $requestStack->getCurrentRequest()->getHost(),
             'perimeter' => $aidParams['perimeterFrom'] ?? null,
             'search' => $aidParams['keyword'] ?? null,
-            'organization' => ($user instanceof User && $user->getDefaultOrganization()) ? $user->getDefaultOrganization() : null,
+            'organization' => ($user instanceof User && $user->getDefaultOrganization())
+                ? $user->getDefaultOrganization() : null,
             'backers' => $aidParams['backers'] ?? null,
             'categories' => $aidParams['categories'] ?? null,
             'programs' => $aidParams['programs'] ?? null,
@@ -233,52 +241,12 @@ class PortalController extends FrontController
         }
 
         // pour avoir la recherche surlignée
-        $highlightedWords = $requestStack->getCurrentRequest()->getSession()->get('highlightedWords', []);
-
-        if (isset($aidSearchClass) && $aidSearchClass instanceof AidSearchClass) {
-            $highlightedWords = [];
-            if ($aidSearchClass->getKeyword()) {
-                // on va chercher les synonymes
-                $synonyms = $referenceService->getSynonymes($aidSearchClass->getKeyword());
-                if (isset($synonyms['intentions_string'])) {
-                    $keywords = str_getcsv($synonyms['intentions_string'], ' ', '"');
-                    foreach ($keywords as $keyword) {
-                        if ($keyword && trim($keyword) !== '') {
-                            $highlightedWords[] = $keyword;
-                        }
-                    }
-                }
-                if (isset($synonyms['objects_string'])) {
-                    $keywords = str_getcsv($synonyms['objects_string'], ' ', '"');
-                    foreach ($keywords as $keyword) {
-                        if ($keyword && trim($keyword) !== '') {
-                            $highlightedWords[] = $keyword;
-                        }
-                    }
-                }
-                if (isset($synonyms['simple_words_string'])) {
-                    $keywords = str_getcsv($synonyms['simple_words_string'], ' ', '"');
-                    foreach ($keywords as $keyword) {
-                        if ($keyword && trim($keyword) !== '') {
-                            $highlightedWords[] = $keyword;
-                        }
-                    }
-                }
-
-                // si la gestion des synonymes n'a pas fonctionné, on met directement la recherche
-                if (count($highlightedWords) == 0) {
-                    // on met la recherche dans les highlights
-                    $keywords = explode(' ', $aidSearchClass->getKeyword());
-                    foreach ($keywords as $keyword) {
-                        if ($keyword && trim($keyword) !== '' && strlen($keyword) > 2) {
-                            $highlightedWords[] = $keyword;
-                        }
-                    }
-                }
-            }
+        $synonyms = null;
+        $highlightedWords = [];
+        if ($aidSearchClass->getKeyword()) {
+            $synonyms = $referenceService->getSynonymes($aidSearchClass->getKeyword());
+            $highlightedWords = $referenceService->setHighlightedWords($synonyms, $aidSearchClass->getKeyword());
         }
-
-        $requestStack->getCurrentRequest()->getSession()->set('highlightedWords', $highlightedWords);
 
         return $this->render('portal/portal/details.html.twig', [
             'search_page' => $search_page,
@@ -287,7 +255,10 @@ class PortalController extends FrontController
             'showExtended' => $showExtended,
             'formAlertCreate' => $formAlertCreate,
             'querystring' => $queryString,
-            'perimeterName' => (isset($aidParams['perimeterFrom']) && $aidParams['perimeterFrom'] instanceof Perimeter) ? $aidParams['perimeterFrom']->getName() : '',
+            'perimeterName' => (
+                isset($aidParams['perimeterFrom'])
+                && $aidParams['perimeterFrom'] instanceof Perimeter
+            ) ? $aidParams['perimeterFrom']->getName() : '',
             'categoriesName' => $categoriesName,
             'highlightedWords' => $highlightedWords,
             'showAudienceField' => $search_page->isShowAudienceField(),
@@ -319,15 +290,16 @@ class PortalController extends FrontController
             return $this->redirectToRoute('app_portal_portal');
         }
 
-        // démarre session
-        $session = new Session();
-
         // met id portal en session
+        $session = $requestStack->getSession();
         $session->set('searchPageId', $search_page->getId());
 
         // redirection vers un autre portail
         if ($search_page->getSearchPageRedirect()) {
-            return $this->redirectToRoute('app_portal_portal_stats', ['slug' => $search_page->getSearchPageRedirect()->getSlug()]);
+            return $this->redirectToRoute(
+                'app_portal_portal_stats',
+                ['slug' => $search_page->getSearchPageRedirect()->getSlug()]
+            );
         }
 
         // converti la querystring en parametres
@@ -404,7 +376,11 @@ class PortalController extends FrontController
         ]);
     }
 
-    #[Route('/portails/stats/ajax-top-aids/', name: 'app_portal_portal_stats_ajax_top_aids', options: ['expose' => true])]
+    #[Route(
+        '/portails/stats/ajax-top-aids/',
+        name: 'app_portal_portal_stats_ajax_top_aids',
+        options: ['expose' => true]
+    )]
     public function ajaxTopAids(
         RequestStack $requestStack,
         LogAidViewRepository $logAidViewRepository
@@ -414,7 +390,7 @@ class PortalController extends FrontController
             return new Response();
         }
 
-        $session = new Session();
+        $session = $requestStack->getSession();
         $aidIds = $session->get('aidIds', []);
         $dateMin = $session->get('dateMin', new \DateTime('-1 month'));
         $dateMax = $session->get('dateMax', new \DateTime(date('Y-m-d')));
@@ -428,7 +404,11 @@ class PortalController extends FrontController
                 'dateMax' => $dateMax
             ]);
             foreach ($topAidsViews as $key => $topAidsView) {
-                $topAidsViews[$key]['url'] = $this->generateUrl('app_aid_aid_details', ['slug' => $topAidsView['slug']], UrlGeneratorInterface::ABSOLUTE_URL);
+                $topAidsViews[$key]['url'] = $this->generateUrl(
+                    'app_aid_aid_details',
+                    ['slug' => $topAidsView['slug']],
+                    UrlGeneratorInterface::ABSOLUTE_URL
+                );
             }
         }
         // rendu template
@@ -437,7 +417,11 @@ class PortalController extends FrontController
         ]);
     }
 
-    #[Route('/portails/stats/ajax-aids-view-by-month/', name: 'app_portal_portal_stats_ajax_aids_view_by_month', options: ['expose' => true])]
+    #[Route(
+        '/portails/stats/ajax-aids-view-by-month/',
+        name: 'app_portal_portal_stats_ajax_aids_view_by_month',
+        options: ['expose' => true]
+    )]
     public function ajaxAidViewsByMonth(
         RequestStack $requestStack,
         LogAidViewRepository $logAidViewRepository,
@@ -448,7 +432,7 @@ class PortalController extends FrontController
             return new Response();
         }
 
-        $session = new Session();
+        $session = $requestStack->getSession();
         $aidIds = $session->get('aidIds', []);
 
         if (count($aidIds) > 0) {
@@ -484,7 +468,11 @@ class PortalController extends FrontController
         ]);
     }
 
-    #[Route('/portails/stats/ajax-aids-view-by-organization-type/', name: 'app_portal_portal_stats_ajax_aids_view_by_organization_type', options: ['expose' => true])]
+    #[Route(
+        '/portails/stats/ajax-aids-view-by-organization-type/',
+        name: 'app_portal_portal_stats_ajax_aids_view_by_organization_type',
+        options: ['expose' => true]
+    )]
     public function ajaxAidViewsByOrganizationType(
         RequestStack $requestStack,
         LogAidViewRepository $logAidViewRepository,
@@ -495,7 +483,7 @@ class PortalController extends FrontController
             return new Response();
         }
 
-        $session = new Session();
+        $session = $requestStack->getSession();
         $aidIds = $session->get('aidIds', []);
         $dateMin = $session->get('dateMin', new \DateTime('-1 month'));
         $dateMax = $session->get('dateMax', new \DateTime(date('Y-m-d')));
@@ -514,7 +502,9 @@ class PortalController extends FrontController
                 $total += $organizationType['nb'];
             }
             foreach ($organizationTypes as $key => $organizationType) {
-                $organizationTypes[$key]['percentage'] = $total == 0 ? 0 : number_format(($organizationType['nb'] * 100 / $total), 2);
+                $organizationTypes[$key]['percentage'] = $total == 0
+                    ? 0
+                    : number_format(($organizationType['nb'] * 100 / $total), 2);
             }
 
             // datas pour le graphique
@@ -556,7 +546,11 @@ class PortalController extends FrontController
         ]);
     }
 
-    #[Route('/portails/stats/ajax-aids-visits-by-month/', name: 'app_portal_portal_stats_ajax_visits_by_month', options: ['expose' => true])]
+    #[Route(
+        '/portails/stats/ajax-aids-visits-by-month/',
+        name: 'app_portal_portal_stats_ajax_visits_by_month',
+        options: ['expose' => true]
+    )]
     public function ajaxVisitsByMonth(
         RequestStack $requestStack,
         SearchPageRepository $searchPageRepository,
@@ -568,7 +562,7 @@ class PortalController extends FrontController
             return new Response();
         }
 
-        $session = new Session();
+        $session = $requestStack->getSession();
         $searchPageId = $session->get('searchPageId', null);
 
         if (!$searchPageId) {
@@ -581,11 +575,16 @@ class PortalController extends FrontController
         }
         // // défini la date de début pour les stats
         $dateStartMatomoto = new \DateTime(date(self::DATE_START_MATOMO));
-        $dateStartStats = $dateStartMatomoto > $search_page->getTimeCreate() ? $dateStartMatomoto : $search_page->getTimeCreate();
+        $dateStartStats = $dateStartMatomoto > $search_page->getTimeCreate()
+            ? $dateStartMatomoto : $search_page->getTimeCreate();
 
         // nombre de visites du portail par mois
         $today = new \DateTime(date('Y-m-d'));
-        $url = urlencode($this->generateUrl('app_portal_portal_details', ['slug' => $search_page->getSlug()], UrlGeneratorInterface::ABSOLUTE_URL));
+        $url = urlencode($this->generateUrl(
+            'app_portal_portal_details',
+            ['slug' => $search_page->getSlug()],
+            UrlGeneratorInterface::ABSOLUTE_URL
+        ));
         $visitsByMonth = $matomoService->getMatomoStats(
             'VisitsSummary.get',
             'pageUrl==' . $url,

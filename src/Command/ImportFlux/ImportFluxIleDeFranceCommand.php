@@ -92,7 +92,12 @@ class ImportFluxIleDeFranceCommand extends ImportFluxCommand
                 $aidName = isset($aidToImport['title']) ? strip_tags((string) $aidToImport['title']) : '';
             }
 
-            $originUrl = 'https://www.iledefrance.fr/aides-et-appels-a-projets/' . $this->stringService->getSlug(str_replace(["'", "’", 'à'], [''], preg_replace('/(\d{2,4})[-.](\d{2})[-.](\d{2,4})/', '$1$2$3', $aidName)));
+            $originUrl = 'https://www.iledefrance.fr/aides-et-appels-a-projets/' .
+                $this->stringService->getSlug(str_replace(
+                    ["'", "’", 'à'],
+                    [''],
+                    preg_replace('/(\d{2,4})[-.](\d{2})[-.](\d{2,4})/', '$1$2$3', $aidName)
+                ));
             $applicationUrl = $originUrl;
 
 
@@ -116,9 +121,15 @@ class ImportFluxIleDeFranceCommand extends ImportFluxCommand
             $dateSubmissionDeadline = null;
             if (isset($aidToImport["dateFinCampagne"])) {
                 try {
-                    $dateSubmissionDeadline = \DateTime::createFromFormat("Y-m-d\TH:i:s.u\Z", $aidToImport["dateFinCampagne"]);
+                    $dateSubmissionDeadline = \DateTime::createFromFormat(
+                        "Y-m-d\TH:i:s.u\Z",
+                        $aidToImport["dateFinCampagne"]
+                    );
                 } catch (\Exception $e) {
-                    $dateSubmissionDeadline = \DateTime::createFromFormat("Y-m-d\TH:i:s\Z", $aidToImport["dateFinCampagne"]);
+                    $dateSubmissionDeadline = \DateTime::createFromFormat(
+                        "Y-m-d\TH:i:s\Z",
+                        $aidToImport["dateFinCampagne"]
+                    );
                 }
             }
             if (!$dateSubmissionDeadline instanceof \DateTime) {
@@ -138,7 +149,11 @@ class ImportFluxIleDeFranceCommand extends ImportFluxCommand
                 'originUrl' => $originUrl,
                 'applicationUrl' => $applicationUrl,
                 'contact' => isset($aidToImport['contact']) ? $this->getHtmlOrNull($aidToImport['contact']) : null,
-                'eligibility' => $this->concatHtmlFields($aidToImport, ['publicsBeneficiairePrecision', 'modalite', 'objectif', 'demarches'], '<br/>'),
+                'eligibility' => $this->concatHtmlFields(
+                    $aidToImport,
+                    ['publicsBeneficiairePrecision', 'modalite', 'objectif', 'demarches'],
+                    '<br/>'
+                ),
                 'dateStart' => $dateStart,
                 'dateSubmissionDeadline' => $dateSubmissionDeadline,
                 'isCallForProject' => isset($aidToImport['AAP']) && $aidToImport['AAP'] == '1' ? true : false,
@@ -358,12 +373,18 @@ class ImportFluxIleDeFranceCommand extends ImportFluxCommand
     protected function setAidRecurrence(array $aidToImport, Aid $aid): Aid
     {
         $aidRecurrence = null;
-        if (!isset($aidToImport['dateDebutFuturCampagne']) || trim($aidToImport['dateDebutFuturCampagne']) == '') {
-            $aidRecurrence = $this->managerRegistry->getRepository(AidRecurrence::class)->findOneBy(['slug' => AidRecurrence::SLUG_RECURRING]);
+        if (
+            !isset($aidToImport['dateDebutFuturCampagne'])
+            || trim($aidToImport['dateDebutFuturCampagne']) == ''
+        ) {
+            $aidRecurrence = $this->managerRegistry->getRepository(AidRecurrence::class)
+            ->findOneBy(['slug' => AidRecurrence::SLUG_RECURRING]);
         } elseif (!isset($aidToImport['dateFinCampagne']) || trim($aidToImport['dateFinCampagne']) == '') {
-            $aidRecurrence = $this->managerRegistry->getRepository(AidRecurrence::class)->findOneBy(['slug' => AidRecurrence::SLUG_ONEOFF]);
+            $aidRecurrence = $this->managerRegistry->getRepository(AidRecurrence::class)
+            ->findOneBy(['slug' => AidRecurrence::SLUG_ONEOFF]);
         } else {
-            $aidRecurrence = $this->managerRegistry->getRepository(AidRecurrence::class)->findOneBy(['slug' => AidRecurrence::SLUG_ONGOING]);
+            $aidRecurrence = $this->managerRegistry->getRepository(AidRecurrence::class)
+            ->findOneBy(['slug' => AidRecurrence::SLUG_ONGOING]);
         }
 
         if ($aidRecurrence instanceof AidRecurrence) {

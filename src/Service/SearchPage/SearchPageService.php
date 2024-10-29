@@ -5,7 +5,6 @@ namespace App\Service\SearchPage;
 use App\Entity\Search\SearchPage;
 use App\Entity\Search\SearchPageLock;
 use App\Entity\User\User;
-use App\Service\Organization\OrganizationService;
 use App\Service\User\UserService;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -13,12 +12,11 @@ class SearchPageService
 {
     public function __construct(
         private UserService $userService,
-        private OrganizationService $organizationService,
         private ManagerRegistry $managerRegistry
     ) {
     }
 
-    public function userCanViewEdit(SearchPage $searchPage, User $user)
+    public function userCanViewEdit(SearchPage $searchPage, User $user): bool
     {
         // si c'est l'auteur ou un admin
         if ($searchPage->getAdministrator() == $user || $this->userService->isUserGranted($user, User::ROLE_ADMIN)) {
@@ -76,11 +74,17 @@ class SearchPageService
             $this->managerRegistry->getManager()->persist($searchPageLock);
             $this->managerRegistry->getManager()->flush();
         } else {
-            $searchPageLock = (isset($searchPage->getSearchPageLocks()[0]) && $searchPage->getSearchPageLocks()[0] instanceof SearchPageLock)
+            $searchPageLock = (
+                isset($searchPage->getSearchPageLocks()[0])
+                && $searchPage->getSearchPageLocks()[0] instanceof SearchPageLock
+            )
                 ? $searchPage->getSearchPageLocks()[0]
                 : null;
             // on met à jour le lock si le user et l'aide sont bien les mêmes
-            if ($searchPageLock && $searchPageLock->getUser() == $user && $searchPageLock->getSearchPage() == $searchPage) {
+            if (
+                $searchPageLock && $searchPageLock->getUser() == $user
+                && $searchPageLock->getSearchPage() == $searchPage
+            ) {
                 $searchPageLock->setTimeStart(new \DateTime(date('Y-m-d H:i:s')));
                 $searchPageLock->setSearchPage($searchPage);
                 $searchPageLock->setUser($user);

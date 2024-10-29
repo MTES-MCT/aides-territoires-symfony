@@ -37,7 +37,8 @@ class ProjectEditType extends AbstractType
             ->add('name', TextType::class, [
                 'label' => 'Nom du projet :',
                 'required' => true,
-                'help' => 'Donnez un nom explicite : préférez \'végétalisation du quartier des coteaux\' à \'quartier des coteaux\'',
+                'help' => 'Donnez un nom explicite : '
+                        . 'préférez \'végétalisation du quartier des coteaux\' à \'quartier des coteaux\'',
                 'sanitize_html' => true,
                 'constraints' => [
                     new Assert\NotBlank([
@@ -109,9 +110,13 @@ class ProjectEditType extends AbstractType
             ->add('description', TextareaType::class, [
                 'required' => true,
                 'label' => 'Description du projet :',
-                'help' => 'Cette description sera utilisée dans l\'export du projet mais aussi dans le cas où vous le rendiez public',
+                'help' => 'Cette description sera utilisée dans l\'export du projet '
+                            . 'mais aussi dans le cas où vous le rendiez public',
                 'attr' => [
-                    'placeholder' => 'Si vous avez un descriptif, n’hésitez pas à le copier ici. Essayez de compléter le descriptif avec le maximum d’informations. Si l’on vous contacte régulièrement pour vous demander les mêmes informations, essayez de donner des éléments de réponses dans cet espace.',
+                    'placeholder' => 'Si vous avez un descriptif, n’hésitez pas à le copier ici. '
+                                    . 'Essayez de compléter le descriptif avec le maximum d’informations. '
+                                    . 'Si l’on vous contacte régulièrement pour vous demander les mêmes informations, '
+                                    . 'essayez de donner des éléments de réponses dans cet espace.',
                     'class' => 'trumbowyg',
                     'cols' => 40,
                     'rows' => 10
@@ -126,7 +131,8 @@ class ProjectEditType extends AbstractType
             ->add('private_description', TextareaType::class, [
                 'required' => false,
                 'label' => 'Notes internes de votre projet',
-                'help' => 'Ces informations restent internes à votre organisation même si vous rendez votre projet public.',
+                'help' => 'Ces informations restent internes à votre organisation '
+                            . 'même si vous rendez votre projet public.',
                 'attr' => [
                     'placeholder' => 'Information réservée à vos collaborateurs et à vous-même.',
                     'class' => 'trumbowyg',
@@ -165,7 +171,13 @@ class ProjectEditType extends AbstractType
         $referentNotFound = $event->getForm()->get('referentNotFound')->getData();
 
         if (!$projectReference && !$referentNotFound) {
-            $event->getForm()->get('projectReference')->addError(new FormError('Veuillez choisir un projet référent ou cocher la case "Je n\'ai pas trouvé de projet référent dans la liste"'));
+            $event->getForm()->get('projectReference')
+                ->addError(
+                    new FormError(
+                        'Veuillez choisir un projet référent ou cocher la case '
+                        . '"Je n\'ai pas trouvé de projet référent dans la liste"'
+                    )
+                );
         }
     }
 

@@ -195,7 +195,10 @@ class EligibilityQuestion // NOSONAR too much methods
 
     public function removeEligibilityTestQuestion(EligibilityTestQuestion $eligibilityTestQuestion): static
     {
-        if ($this->eligibilityTestQuestions->removeElement($eligibilityTestQuestion) && $eligibilityTestQuestion->getEligibilityQuestion() === $this) {
+        if (
+            $this->eligibilityTestQuestions->removeElement($eligibilityTestQuestion)
+            && $eligibilityTestQuestion->getEligibilityQuestion() === $this
+        ) {
             $eligibilityTestQuestion->setEligibilityQuestion(null);
         }
 

@@ -32,5 +32,6 @@ $(function(){
     $('#backers-by-departement table').DataTable({
         info: false,
         "language": datatables_fr_strings,
+        order: [[ 4, 'desc' ]]
     });
 });
