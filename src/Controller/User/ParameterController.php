@@ -5,6 +5,8 @@ namespace App\Controller\User;
 use App\Controller\FrontController;
 use App\Entity\Project\Project;
 use App\Entity\User\ApiTokenAsk;
+use App\Entity\User\User;
+use App\Exception\Security\ProConnectException;
 use App\Form\User\ApiTokenAskCreateType;
 use App\Form\User\DeleteType;
 use App\Form\User\TransfertAidType;
@@ -12,7 +14,10 @@ use App\Form\User\TransfertProjectType;
 use App\Form\User\UserProfilType;
 use App\Repository\Log\LogUserLoginRepository;
 use App\Repository\User\ApiTokenAskRepository;
+use App\Repository\User\UserRepository;
 use App\Service\Email\EmailService;
+use App\Service\Security\ProConnectService;
+use App\Service\Security\SecurityService;
 use App\Service\User\UserService;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
@@ -21,6 +26,8 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Pagerfanta\Doctrine\ORM\QueryAdapter;
 use Pagerfanta\Pagerfanta;
+use Psr\Log\LoggerInterface;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
@@ -29,6 +36,71 @@ class ParameterController extends FrontController
 {
     public const NB_HISTORY_LOG_BY_PAGE = 20;
 
+    #[Route('/comptes/proconnect/', name: 'app_user_proconnect')]
+    public function loginWithProconnect(
+        RequestStack $requestStack,
+        ProConnectService $proConnectService,
+        UserRepository $userRepository,
+        ManagerRegistry $managerRegistry,
+        UserPasswordHasherInterface $userPasswordHasher,
+        Security $security,
+        LoggerInterface $loggerInterface
+    ): Response
+    {
+        try {
+            // tous les paramètres get dans un tableau
+            $params = $requestStack->getCurrentRequest()->query->all();
+            
+            // on recupère les infos de ProConnect
+            $userInfos = $proConnectService->getDataFromProconnect($params);
+            // on vérifie que $userInfos contient bien les 4 clés attendues
+            if (!isset($userInfos['uid'], $userInfos['email'], $userInfos['given_name'], $userInfos['usual_name'])) {
+                throw new ProConnectException('Les informations de ProConnect sont incomplètes');
+            }
+
+            $user = $userRepository->findWithProConnectInfo($userInfos);
+            if (!$user) {
+                // Nouvel utilisateur
+                $user = new User();
+                $user->setProConnectUid($userInfos['uid']);
+                $user->setEmail($userInfos['email']);
+                $user->setFirstname($userInfos['given_name']);
+                $user->setLastname($userInfos['usual_name']);
+                $user->addRole(User::ROLE_USER);
+                // On met un password random
+                $user->setPassword($userPasswordHasher->hashPassword($user, bin2hex(random_bytes(10))));
+
+                $managerRegistry->getManager()->persist($user);
+                $managerRegistry->getManager()->flush();
+            } else {
+                // Utilisateur existant
+
+                // On met à jour sont uid si nécessaire
+                if ($user->getProConnectUid() !== $userInfos['uid']) {
+                    $user->setProConnectUid($userInfos['uid']);
+                    $managerRegistry->getManager()->persist($user);
+                    $managerRegistry->getManager()->flush();
+                }
+            }
+
+            // On le connecte
+            $security->login($user, SecurityService::DEFAULT_AUTHENTICATOR_NAME, SecurityService::DEFAULT_FIREWALL_NAME);
+
+            // on le redirige
+            return $this->redirectToRoute('app_user_dashboard');
+        } catch (\Exception $e) {
+            $loggerInterface->error('Erreur ProConnect', [
+                'exception' => $e
+            ]);
+
+            $this->tAddFlash(
+                FrontController::FLASH_ERROR,
+                'Une erreur est survenue lors de la connexion à ProConnect'
+            );
+            return $this->redirectToRoute('app_login');
+        }
+    }
+    
     #[Route('/comptes/monprofil/', name: 'app_user_parameter_profil')]
     public function profil(
         UserPasswordHasherInterface $userPasswordHasher,

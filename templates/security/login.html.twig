@@ -5,6 +5,11 @@
 {% block meta_description %}🔍 Trouvez des aides pour financer et accompagner les projets de votre collectivité en France métropolitaine et en Outre-mer
 {% endblock %}
 
+{% block stylesheets %}
+	{{ parent() }}
+	{{ encore_entry_link_tags('import-scss/security/login') }}
+{% endblock %}
+
 {% block body %}
 	<main role="main" class="fr-container-fluid" id="at-main">
 		<div id="login-form" class="main-content">
@@ -18,6 +23,8 @@
 								Connexion à votre compte
 							{% endif %}
 						</h1>
+
+						{% include "include/security/_form_pro_connect.html.twig" %}
 
 						<div class="fr-mt-2w at-align-end">
 							<a href="{{ path('app_user_user_register') }}" class="fr-tag">

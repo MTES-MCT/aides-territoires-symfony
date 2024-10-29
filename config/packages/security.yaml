@@ -132,6 +132,8 @@ security:
         - { path: ^/admin/user/[0-9]+/qrcode/, roles: ROLE_ADMIN}
         - { path: ^/admin, roles: ROLE_ADMIN }
         - { path: ^/comptes/connexion/, roles: PUBLIC_ACCESS }
+        - { path: ^/comptes/connexion/proconnect/, roles: PUBLIC_ACCESS }
+        - { path: ^/comptes/proconnect/, roles: PUBLIC_ACCESS }
         - { path: ^/comptes/demande-nouveau-mot-de-passe/, roles: PUBLIC_ACCESS }
         - { path: ^/comptes/demande-nouveau-mot-de-passe/verification-email/, roles: PUBLIC_ACCESS }
         - { path: ^/comptes/inscription/, roles: PUBLIC_ACCESS }

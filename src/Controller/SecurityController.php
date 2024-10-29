@@ -4,10 +4,14 @@ namespace App\Controller;
 
 use App\Exception\NotFoundException\UserRegisterConfirmationNotFoundException;
 use App\Form\Security\LoginType;
+use App\Form\Security\ProConnectType;
 use App\Repository\User\UserRegisterConfirmationRepository;
+use App\Service\Security\ProConnectService;
 use Doctrine\Persistence\ManagerRegistry;
+use Psr\Log\LoggerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -30,15 +34,40 @@ class SecurityController extends FrontController
         // last username entered by the user
         $lastUsername = $authenticationUtils->getLastUsername();
 
+        // formulaire login classique
         $formLogin = $this->createForm(LoginType::class);
         if ($lastUsername) {
             $formLogin->get('_username')->setData($lastUsername);
         }
 
+        // formulaire proConnnect
+        $formProConnect = $this->createForm(ProConnectType::class, null, ['action' => $this->generateUrl('app_login_proconnect')]);
+
         return $this->render('security/login.html.twig', [
-            'formLogin' => $formLogin->createView(),
+            'formLogin' => $formLogin,
+            'formProConnect' => $formProConnect,
             'error' => $error
         ]);
+    }
+
+    #[Route('/comptes/connexion/proconnect/', name: 'app_login_proconnect')]
+    public function loginByPronnect(
+        ProConnectService $proConnectService,
+        LoggerInterface $loggerInterface
+    ) : Response {
+        try {
+            return new RedirectResponse($proConnectService->getAuthorizationEndpoint());
+        } catch (\Exception $e) {
+            $loggerInterface->error('Erreur ProConnect getAuthorizationEndpoint', [
+                'exception' => $e
+            ]);
+
+            $this->tAddFlash(
+                FrontController::FLASH_ERROR,
+                'Une erreur est survenue lors de la connexion à ProConnect'
+            );
+            return $this->redirectToRoute('app_login');
+        }
     }
 
     #[Route('/comptes/connexion/{token}', name: 'app_user_user_register_confirmation')]

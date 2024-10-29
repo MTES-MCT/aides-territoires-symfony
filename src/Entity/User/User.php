@@ -62,6 +62,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Index(columns: ['date_create'], name: 'date_create_u')]
 #[ORM\Index(columns: ['date_last_login'], name: 'date_last_login_u')]
 #[ORM\Index(columns: ['api_token'], name: 'api_token_u')]
+#[ORM\Index(columns: ['pro_connect_uid'], name: 'pro_connect_uid_u')]
 class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFactorInterface // NOSONAR too much methods
 {
     public const ROLE_ADMIN = 'ROLE_ADMIN';
@@ -348,6 +349,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
      */
     #[ORM\ManyToMany(targetEntity: SearchPage::class, mappedBy: 'editors')]
     private Collection $editorSearchPages;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $proConnectUid = null;
 
     public function __construct()
     {
@@ -2118,6 +2122,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
         if ($this->editorSearchPages->removeElement($editorSearchPage)) {
             $editorSearchPage->removeEditor($this);
         }
+
+        return $this;
+    }
+
+    public function getProConnectUid(): ?string
+    {
+        return $this->proConnectUid;
+    }
+
+    public function setProConnectUid(?string $proConnectUid): static
+    {
+        $this->proConnectUid = $proConnectUid;
 
         return $this;
     }
