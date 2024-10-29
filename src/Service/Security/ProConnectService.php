@@ -6,19 +6,20 @@ use App\Exception\Security\ProConnectException;
 use App\Service\File\FileService;
 use App\Service\Various\ParamService;
 use CoderCat\JWKToPEM\JWKConverter;
-use Symfony\Component\HttpFoundation\Session\Session;
-use Symfony\Component\Routing\RouterInterface;
-use Symfony\Contracts\HttpClient\HttpClientInterface;
-use Lcobucci\JWT\Validation\Constraint\SignedWith;
-use Lcobucci\JWT\Validation\RequiredConstraintsViolated;
-use Lcobucci\JWT\Validation\Validator;
-use Lcobucci\JWT\Signer\Key\InMemory;
 use Lcobucci\JWT\Encoding\JoseEncoder;
+use Lcobucci\JWT\Signer\Key\InMemory;
 use Lcobucci\JWT\Signer\Rsa\Sha256;
 use Lcobucci\JWT\Token\Parser;
 use Lcobucci\JWT\Validation\Constraint\HasClaimWithValue;
+use Lcobucci\JWT\Validation\Constraint\SignedWith;
+use Lcobucci\JWT\Validation\RequiredConstraintsViolated;
+use Lcobucci\JWT\Validation\Validator;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Routing\RequestContext;
+use Symfony\Component\Routing\RouterInterface;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class ProConnectService
 {
@@ -39,22 +40,22 @@ class ProConnectService
     private string $accessToken = '';
     private string $idToken = '';
 
-    const SESSION_KEY_STATE = 'pr_state';
-    const SESSION_KEY_NONCE = 'pr_nonce';
-    const SESSION_KEY_CODE_TOKEN = 'pr_code_token';
-    const SESSION_KEY_ID_TOKEN = 'pr_id_token';
+    public const SESSION_KEY_STATE = 'pr_state';
+    public const SESSION_KEY_NONCE = 'pr_nonce';
+    public const SESSION_KEY_CODE_TOKEN = 'pr_code_token';
+    public const SESSION_KEY_ID_TOKEN = 'pr_id_token';
 
     public function __construct(
         private ParamService $paramService,
         private HttpClientInterface $client,
         private RouterInterface $routerInterface,
         private RequestContext $context,
-        private FileService $fileService
-    )
-    {
-        $this->proconnectClientId =  $this->paramService->get('proconnect_client_id');
-        $this->proconnectClientSecret =  $this->paramService->get('proconnect_client_secret');
-        $this->proconnectDomain =  $this->paramService->get('proconnect_domain');
+        private FileService $fileService,
+        private RequestStack $requestStack,
+    ) {
+        $this->proconnectClientId = $this->paramService->get('proconnect_client_id');
+        $this->proconnectClientSecret = $this->paramService->get('proconnect_client_secret');
+        $this->proconnectDomain = $this->paramService->get('proconnect_domain');
 
         // Forcer le schéma HTTPS
         if (!in_array($this->fileService->getEnvironment(), [FileService::ENV_DEV, FileService::ENV_TEST])) {
@@ -67,9 +68,7 @@ class ProConnectService
 
     /**
      * Pour récupérer le authorization endpoint en lui donnant les paramètres nécessaires
-     * C'est l'url sur laquelle on envoit l'utilisateur lorsqu'il clique sur le bouton ProConnect
-     *
-     * @return string
+     * C'est l'url sur laquelle on envoit l'utilisateur lorsqu'il clique sur le bouton ProConnect.
      */
     public function getAuthorizationEndpoint(): string
     {
@@ -87,15 +86,17 @@ class ProConnectService
             'nonce' => $this->getNonce(),
         ];
         $query = http_build_query($params);
-        return $this->authorizationEndpoint . '?' . $query;
+
+        return $this->authorizationEndpoint.'?'.$query;
     }
 
     /**
-     * Redirige l'utilisateur sur l'url de déconnexion de ProConnect si besoin
+     * Redirige l'utilisateur sur l'url de déconnexion de ProConnect si besoin.
      *
      * @return RedirectResponse|null
      */
-    public function getLogoutUrl() : ?string {
+    public function getLogoutUrl(): ?string
+    {
         // On vérifie qu'il y a bien un idToken en session
         $idToken = $this->getIdToken();
         if (empty($idToken)) {
@@ -103,7 +104,7 @@ class ProConnectService
         }
 
         // On supprime le token de la session
-        $session = new Session();
+        $session = $this->requestStack->getSession();
         $session->remove(self::SESSION_KEY_ID_TOKEN);
 
         // on appelle le end_session_endpoint
@@ -121,16 +122,14 @@ class ProConnectService
         $query = http_build_query($params);
 
         // on redirige
-        return $this->endSessionEndpoint . '?' . $query;
+        return $this->endSessionEndpoint.'?'.$query;
     }
-        
+
     /**
-     * Recupère les données de l'utilisateur depuis ProConnect
-     *
-     * @param array $params
-     * @return array
+     * Recupère les données de l'utilisateur depuis ProConnect.
      */
-    public function getDataFromProconnect(array $params) : array {
+    public function getDataFromProconnect(array $params): array
+    {
         $state = $params['state'] ?? null;
 
         // si le state est null ou non valide
@@ -150,9 +149,7 @@ class ProConnectService
     }
 
     /**
-     * Pour récupérer les différentes urls de base à utiliser lors du process
-     *
-     * @return void
+     * Pour récupérer les différentes urls de base à utiliser lors du process.
      */
     private function getDiscovery(): void
     {
@@ -164,7 +161,7 @@ class ProConnectService
         ]);
 
         $content = $response->toArray();
-        
+
         $this->authorizationEndpoint = $content['authorization_endpoint'] ?? '';
         $this->tokenEndpoint = $content['token_endpoint'] ?? '';
         $this->userInfoEndpoint = $content['userinfo_endpoint'] ?? '';
@@ -173,7 +170,7 @@ class ProConnectService
     }
 
     /**
-     * Stocke les tokens liés à l'utilisateur dans la session
+     * Stocke les tokens liés à l'utilisateur dans la session.
      *
      * @return array
      */
@@ -213,20 +210,18 @@ class ProConnectService
         if (!$this->verifyIdToken($idToken)) {
             throw new ProConnectException('Erreur lors de la vérification du token');
         }
-        
+
         // On assigne à l'objet
         $this->accessToken = $accessToken;
         $this->idToken = $idToken;
 
         // stockage du id_token dans la session
-        $session = new Session();
+        $session = $this->requestStack->getSession();
         $session->set(self::SESSION_KEY_ID_TOKEN, $this->idToken);
     }
 
     /**
-     * Pour récupérer les infos de l'utilisateurs (email, etc..)
-     *
-     * @return array
+     * Pour récupérer les infos de l'utilisateurs (email, etc..).
      */
     private function getUserInfo(): array
     {
@@ -239,7 +234,7 @@ class ProConnectService
 
         $response = $this->client->request('GET', $this->userInfoEndpoint, [
             'headers' => [
-                'Authorization' => 'Bearer ' . $this->accessToken,
+                'Authorization' => 'Bearer '.$this->accessToken,
             ],
         ]);
 
@@ -252,12 +247,13 @@ class ProConnectService
         if (!$this->verifyIdToken($this->idToken)) {
             throw new ProConnectException('Erreur lors de la vérification du token');
         }
+
         // les infos utilisateurs sont dans claims
         return $token->claims()->all();
     }
 
     /**
-     * Vérifie que le token est bien signé par ProConnect
+     * Vérifie que le token est bien signé par ProConnect.
      *
      * @return void
      */
@@ -268,18 +264,18 @@ class ProConnectService
                 'Accept' => 'application/json',
             ],
         ]);
-    
+
         $jwksData = json_decode($response->getContent(), true);
-    
+
         // Extraire la clé publique pour RS256
         $publicKeyData = null;
         foreach ($jwksData['keys'] as $key) {
-            if ($key['alg'] === 'RS256' && $key['kty'] === 'RSA') {
+            if ('RS256' === $key['alg'] && 'RSA' === $key['kty']) {
                 $publicKeyData = $key;
                 break;
             }
         }
-    
+
         if (!$publicKeyData) {
             throw new ProConnectException('Clé publique RS256 non trouvée');
         }
@@ -305,40 +301,37 @@ class ProConnectService
         } catch (RequiredConstraintsViolated $e) {
             return false;
         }
-        
+
         return true;
     }
 
     /**
-     * Convertir la cle JWK en cle PEM pour la validation
-     *
-     * @param array $jwk
-     * @return string
+     * Convertir la cle JWK en cle PEM pour la validation.
      */
     private function convertJwkToPem(array $jwk): string
     {
         $jwkConverter = new JWKConverter();
+
         return $jwkConverter->toPEM($jwk);
     }
-    
+
     /**
-     * Récupère le id_token
-     *
-     * @return string
+     * Récupère le id_token.
      */
     public function getIdToken(): string
     {
         // Si il est déjà assigné
-        if ($this->idToken !== '') {
+        if ('' !== $this->idToken) {
             return $this->idToken;
         }
 
         // On vérifie si le codeToken est en session
-        $session = new Session();
+        $session = $this->requestStack->getSession();
         $idToken = $session->get(self::SESSION_KEY_ID_TOKEN);
 
         if ($idToken) {
             $this->idToken = $idToken;
+
             return $idToken;
         }
 
@@ -346,54 +339,47 @@ class ProConnectService
     }
 
     /**
-     * Récupère le code token
-     *
-     * @return string
+     * Récupère le code token.
      */
     public function getCodeToken(): string
     {
         // Si il est déjà assigné
-        if ($this->codeToken !== '') {
+        if ('' !== $this->codeToken) {
             return $this->codeToken;
         }
 
         // On vérifie si le codeToken est en session
-        $session = new Session();
+        $session = $this->requestStack->getSession();
         $codeToken = $session->get(self::SESSION_KEY_CODE_TOKEN);
 
         if ($codeToken) {
             $this->codeToken = $codeToken;
+
             return $codeToken;
         }
 
         return '';
     }
 
-
     /**
-     * Stocke le code token
-     *
-     * @param string $codeToken
-     * @return void
+     * Stocke le code token.
      */
     public function setCodeToken(string $codeToken): void
     {
         $this->codeToken = $codeToken;
 
         // le met également en session
-        $session = new Session();
+        $session = $this->requestStack->getSession();
         $session->set(self::SESSION_KEY_STATE, $codeToken);
     }
 
     /**
-     * Génère un state
-     *
-     * @return string
+     * Génère un state.
      */
     private function getState(): string
     {
         // On vérifie si le state est déjà en session
-        $session = new Session();
+        $session = $this->requestStack->getSession();
         $state = $session->get(self::SESSION_KEY_STATE);
         if ($state) {
             return $state;
@@ -407,14 +393,12 @@ class ProConnectService
     }
 
     /**
-     * Génère un nonce
-     *
-     * @return string
+     * Génère un nonce.
      */
     private function getNonce(): string
     {
         // On vérifie si le nonce est déjà en session
-        $session = new Session();
+        $session = $this->requestStack->getSession();
         $nonce = $session->get(self::SESSION_KEY_NONCE);
         if ($nonce) {
             return $nonce;
@@ -428,14 +412,11 @@ class ProConnectService
     }
 
     /**
-     * Vérifie si le state est valide
-     *
-     * @param string $state
-     * @return boolean
+     * Vérifie si le state est valide.
      */
     public function isValidState(string $state): bool
     {
-        $session = new Session();
+        $session = $this->requestStack->getSession();
         $stateSession = $session->get(self::SESSION_KEY_STATE);
 
         return $stateSession === $state;
