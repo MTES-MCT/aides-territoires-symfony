@@ -4,6 +4,6 @@ namespace App\Service\Security;
 
 class SecurityService
 {
-    const DEFAULT_AUTHENTICATOR_NAME = 'form_login';
-    const DEFAULT_FIREWALL_NAME = 'main';
+    public const DEFAULT_AUTHENTICATOR_NAME = 'form_login';
+    public const DEFAULT_FIREWALL_NAME = 'main';
 }

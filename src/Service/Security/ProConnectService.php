@@ -62,8 +62,16 @@ class ProConnectService
             $this->context->setScheme('https');
         }
 
-        $this->urlRedirectLogin = $this->routerInterface->generate('app_user_proconnect', [], RouterInterface::ABSOLUTE_URL);
-        $this->urlRedirectLogout = $this->routerInterface->generate('app_logout', [], RouterInterface::ABSOLUTE_URL).'/';
+        $this->urlRedirectLogin = $this->routerInterface->generate(
+            'app_user_proconnect',
+            [],
+            RouterInterface::ABSOLUTE_URL
+        );
+        $this->urlRedirectLogout = $this->routerInterface->generate(
+            'app_logout',
+            [],
+            RouterInterface::ABSOLUTE_URL
+        ) . '/';
     }
 
     /**
@@ -87,7 +95,7 @@ class ProConnectService
         ];
         $query = http_build_query($params);
 
-        return $this->authorizationEndpoint.'?'.$query;
+        return $this->authorizationEndpoint . '?' . $query;
     }
 
     /**
@@ -122,7 +130,7 @@ class ProConnectService
         $query = http_build_query($params);
 
         // on redirige
-        return $this->endSessionEndpoint.'?'.$query;
+        return $this->endSessionEndpoint . '?' . $query;
     }
 
     /**
@@ -153,7 +161,7 @@ class ProConnectService
      */
     private function getDiscovery(): void
     {
-        $url = 'https://'.$this->proconnectDomain.'/api/v2/.well-known/openid-configuration';
+        $url = 'https://' . $this->proconnectDomain . '/api/v2/.well-known/openid-configuration';
         $response = $this->client->request('GET', $url, [
             'headers' => [
                 'Accept' => 'application/json',
@@ -234,7 +242,7 @@ class ProConnectService
 
         $response = $this->client->request('GET', $this->userInfoEndpoint, [
             'headers' => [
-                'Authorization' => 'Bearer '.$this->accessToken,
+                'Authorization' => 'Bearer ' . $this->accessToken,
             ],
         ]);
 
