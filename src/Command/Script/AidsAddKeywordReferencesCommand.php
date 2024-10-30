@@ -50,7 +50,7 @@ class AidsAddKeywordReferencesCommand extends Command
         return Command::SUCCESS;
     }
 
-    protected function importKeyword($input, $output): void
+    protected function importKeyword(InputInterface $input, OutputInterface $output): void
     {
         /** @var AidRepository $aidRepo */
         $aidRepo = $this->managerRegistry->getRepository(Aid::class);

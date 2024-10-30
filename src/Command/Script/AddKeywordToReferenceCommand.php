@@ -51,7 +51,7 @@ class AddKeywordToReferenceCommand extends Command
         return Command::SUCCESS;
     }
 
-    protected function importKeyword($input, $output): void
+    protected function importKeyword(InputInterface $input, OutputInterface $output): void
     {
         /** @var KeywordReferenceRepository $keywordReferenceRepository */
         $keywordReferenceRepository = $this->managerRegistry->getRepository(KeywordReference::class);

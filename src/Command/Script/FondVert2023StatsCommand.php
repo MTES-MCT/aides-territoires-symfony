@@ -2,6 +2,7 @@
 
 namespace App\Command\Script;
 
+use App\Entity\Organization\Organization;
 use App\Service\Email\EmailService;
 use App\Service\File\FileService;
 use Doctrine\ORM\EntityManagerInterface;
@@ -132,6 +133,10 @@ class FondVert2023StatsCommand extends Command
         return Command::SUCCESS;
     }
 
+    /**
+     *
+     * @return array<int, array<string, mixed>>
+     */
     private function getOrganizationsFromDb(): array
     {
         // requete pour récupérer toutes nos structures qui ont associé un projet avec le programme fond vert (36)
@@ -154,6 +159,13 @@ class FondVert2023StatsCommand extends Command
         return $result->fetchAllAssociative();
     }
 
+    /**
+     *
+     * @param array<int, array<string, mixed>> $organizations
+     * @param string[] $cities
+     * @param string[] $organizationNames
+     * @return array<int<0, max>, array<string, mixed>>
+     */
     private function getOrganizationsFinal(array $organizations, array $cities, array $organizationNames): array
     {
         $organizationsFinal = [];

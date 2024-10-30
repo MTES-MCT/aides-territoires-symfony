@@ -4,6 +4,7 @@ namespace App\Command\Script;
 
 use App\Entity\Keyword\KeywordSynonymlist;
 use App\Entity\Reference\KeywordReference;
+use App\Repository\Reference\KeywordReferenceRepository;
 use App\Service\Reference\ReferenceService;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -51,11 +52,13 @@ class AddKeywordListToReferenceCommand extends Command
         return Command::SUCCESS;
     }
 
-    protected function importKeyword($input, $output): void
+    protected function importKeyword(InputInterface $input, OutputInterface $output): void
     {
         $keywordSynonyms = $this->managerRegistry->getRepository(KeywordSynonymlist::class)->findAll();
 
         $intentions = ['Désimperméabilisation', 'Construction d\'un bâtiment'];
+        /** @var KeywordReferenceRepository $keywordReferenceRepository */
+        $keywordReferenceRepository = $this->managerRegistry->getRepository(KeywordReference::class);
 
         /** @var KeywordSynonymlist $keywordSynonym */
         foreach ($keywordSynonyms as $keywordSynonym) {
@@ -64,11 +67,9 @@ class AddKeywordListToReferenceCommand extends Command
                 $synonyms[$key] = trim($synonym);
             }
             // on regarde si déjà présent
-            $keywodReference = $this->managerRegistry->getRepository(KeywordReference::class)
-                ->findOneBy(['name' => $keywordSynonym->getName()]);
+            $keywodReference = $keywordReferenceRepository->findOneBy(['name' => $keywordSynonym->getName()]);
             // si on a pas trouvé on regarde avec les synonymes
-            $keywodReference = $keywodReference ?? $this->managerRegistry->getRepository(KeywordReference::class)
-                ->findCustom(['names' => $synonyms]);
+            $keywodReference = $keywodReference ?? $keywordReferenceRepository->findCustom(['names' => $synonyms]);
 
             // gestion intention
             $intention = false;

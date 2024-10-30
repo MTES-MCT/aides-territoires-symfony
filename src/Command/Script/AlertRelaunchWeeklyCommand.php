@@ -65,7 +65,7 @@ class AlertRelaunchWeeklyCommand extends Command
         return Command::SUCCESS;
     }
 
-    protected function cronTask($input, $output)
+    protected function cronTask(InputInterface $input, OutputInterface $output): void
     {
         $io = new SymfonyStyle($input, $output);
 
@@ -91,7 +91,7 @@ class AlertRelaunchWeeklyCommand extends Command
         $year = $today->format('o');
 
         $startOfWeek = new \DateTime();
-        $startOfWeek->setISODate($year, $weekNumber, 1);
+        $startOfWeek->setISODate((int) $year, (int) $weekNumber, 1);
 
         $publishedAfter = clone $startOfWeek;
         $publishedAfter->modify('-7 days');

@@ -8,7 +8,6 @@ use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Messenger\MessageBusInterface;
 
 #[AsCommand(name: 'at:script:debug_worker_memory', description: 'Debug worker memory')]
@@ -20,7 +19,6 @@ class DebugWorkerMemoryCommand extends Command
     protected string $commandTextEnd = '>Debug worker memory';
 
     public function __construct(
-        private ManagerRegistry $managerRegistry,
         private MessageBusInterface $bus
     ) {
         parent::__construct();

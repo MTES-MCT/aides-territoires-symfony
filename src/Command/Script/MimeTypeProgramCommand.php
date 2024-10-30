@@ -4,15 +4,15 @@ namespace App\Command\Script;
 
 use App\Entity\Program\Program;
 use App\Service\File\FileService;
+use App\Service\Various\ParamService;
+use Aws\Credentials\Credentials;
+use Aws\S3\S3Client;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Aws\S3\S3Client;
-use App\Service\Various\ParamService;
-use Aws\Credentials\Credentials;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 #[AsCommand(name: 'at:script:mime_type_program_fix', description: 'Fix des mimes types sur s3')]
@@ -23,12 +23,10 @@ class MimeTypeProgramCommand extends Command
     protected string $commandTextStart = '<Fix des mimes types sur s3';
     protected string $commandTextEnd = '>Fix des mimes types sur s3';
 
-
-
     public function __construct(
         protected ManagerRegistry $managerRegistry,
         protected ParamService $paramService,
-        protected FileService $fileService
+        protected FileService $fileService,
     ) {
         ini_set('max_execution_time', 60 * 60);
         ini_set('memory_limit', '1G');
@@ -48,14 +46,16 @@ class MimeTypeProgramCommand extends Command
             $this->fixMimesTypes($input, $output);
         } catch (\Exception $exception) {
             $io->error($exception->getMessage());
+
             return Command::FAILURE;
         }
 
         $io->title($this->commandTextEnd);
+
         return Command::SUCCESS;
     }
 
-    protected function fixMimesTypes($input, $output): void
+    protected function fixMimesTypes(InputInterface $input, OutputInterface $output): void
     {
         $io = new SymfonyStyle($input, $output);
 
@@ -68,10 +68,10 @@ class MimeTypeProgramCommand extends Command
         // Créer un client S3
         $s3 = new S3Client([
             'version' => 'latest',
-            'region'  => $this->paramService->get('aws_s3_region_name'),
+            'region' => $this->paramService->get('aws_s3_region_name'),
             'endpoint' => $this->paramService->get('aws_s3_endpoint_url'),
             'credentials' => $credentials,
-            'use_path_style_endpoint' => true
+            'use_path_style_endpoint' => true,
         ]);
 
         // recupere tous les programs
@@ -86,7 +86,7 @@ class MimeTypeProgramCommand extends Command
             try {
                 $result = $s3->getObject([
                     'Bucket' => $this->paramService->get('aws_storage_bucket_name'),
-                    'Key'    => $program->getLogo(),
+                    'Key' => $program->getLogo(),
                 ]);
 
                 // le mimeType actuel
@@ -98,13 +98,13 @@ class MimeTypeProgramCommand extends Command
                     if (in_array($extension, ['jpg', 'jpeg', 'png', 'gif', 'svg', 'webp'])) {
                         // Déterminez le type MIME en fonction de l'extension
                         $mimeType = 'image/jpeg';
-                        if ($extension == 'png') {
+                        if ('png' == $extension) {
                             $mimeType = 'image/png';
-                        } elseif ($extension == 'gif') {
+                        } elseif ('gif' == $extension) {
                             $mimeType = 'image/gif';
-                        } elseif ($extension == 'svg') {
+                        } elseif ('svg' == $extension) {
                             $mimeType = 'image/svg+xml';
-                        } elseif ($extension == 'webp') {
+                        } elseif ('webp' == $extension) {
                             $mimeType = 'image/webp';
                         }
 
@@ -118,22 +118,21 @@ class MimeTypeProgramCommand extends Command
                         // Nom original du fichier tel que fourni par le client
                         $originalName = basename($program->getLogo());
 
-
                         // Taille du fichier en octets
                         $size = null;
 
                         // Code d'erreur, utilisez UPLOAD_ERR_OK pour indiquer qu'il n'y a pas d'erreur
-                        $error = UPLOAD_ERR_OK;
+                        $error = (bool) UPLOAD_ERR_OK;
 
                         $file = new UploadedFile($tempPath, $originalName, $mimeType, $size, $error);
 
                         // re-upload l'objet sur lui même
                         $s3->putObject([
                             'Bucket' => $this->paramService->get('aws_storage_bucket_name'),
-                            'Key'    => $program->getLogo(),
+                            'Key' => $program->getLogo(),
                             'SourceFile' => $file,
-                            'ACL'    => 'public-read',
-                            'ContentType' => $mimeType
+                            'ACL' => 'public-read',
+                            'ContentType' => $mimeType,
                         ]);
 
                         $io->success("Fixed MIME type for {$program->getLogo()}");

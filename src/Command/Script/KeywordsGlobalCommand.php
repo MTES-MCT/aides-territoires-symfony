@@ -72,11 +72,11 @@ class KeywordsGlobalCommand extends Command
                     'Fin '
                         . $command->getName()
                         . ' : '
-                        . gmdate("H:i:s", $timeEnd)
+                        . gmdate("H:i:s", intval($timeEnd))
                         . ' | ope : '
-                        . gmdate("H:i:s", $timeOperation)
+                        . gmdate("H:i:s", intval($timeOperation))
                         . ' | global : '
-                        . gmdate("H:i:s", $timeGlobal)
+                        . gmdate("H:i:s", intval($timeGlobal))
                 );
 
                 // nettoyage memoire
@@ -91,7 +91,13 @@ class KeywordsGlobalCommand extends Command
         $timeEnd = microtime(true);
         $time = $timeEnd - $timeStart;
 
-        $io->success('Fin des opérations : ' . gmdate("H:i:s", $timeEnd) . ' (' . gmdate("H:i:s", $time) . ')');
+        $io->success(
+            'Fin des opérations : '
+            . gmdate("H:i:s", intval($timeEnd))
+            . ' ('
+            . gmdate("H:i:s", intval($time))
+            . ')'
+        );
 
         $io->title($this->commandTextEnd);
         return Command::SUCCESS;

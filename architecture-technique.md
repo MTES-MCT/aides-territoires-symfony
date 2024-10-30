@@ -71,7 +71,7 @@ Le javascript du projet est principalement du jQuery, un peu de Vanilla JS). Cot
 
 | Source     | Destination      | Protocole     | Port | Localisation        | Interne/URL Externe            |
 |------------|------------------|---------------|------|---------------------|--------------------------------|
-| Navigateur | ProConnect (bientôt)    | HTTPS (OAuth) | 443  | Paris, France       | https://www.proconnect.gouv.fr/      |
+| Navigateur | ProConnect    | HTTPS (OAuth) | 443  | Paris, France       | https://www.proconnect.gouv.fr/      |
 | Navigateur | App Symfony | HTTPS | 443  | France              | https://aides-territoires.beta.gouv.fr/comptes/connexion/ |                 |
 
 ### Inventaire des dépendances
