@@ -55,7 +55,7 @@ class MimeTypeBlogPostCommand extends Command
         return Command::SUCCESS;
     }
 
-    protected function fixMimesTypes($input, $output): void
+    protected function fixMimesTypes(InputInterface $input, OutputInterface $output): void
     {
         $io = new SymfonyStyle($input, $output);
 
@@ -140,7 +140,7 @@ class MimeTypeBlogPostCommand extends Command
                         $size = null;
 
                         // Code d'erreur, utilisez UPLOAD_ERR_OK pour indiquer qu'il n'y a pas d'erreur
-                        $error = UPLOAD_ERR_OK;
+                        $error = (bool) UPLOAD_ERR_OK;
 
                         $file = new UploadedFile($tempPath, $originalName, $mimeType, $size, $error);
 

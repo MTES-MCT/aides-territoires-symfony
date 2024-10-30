@@ -48,7 +48,7 @@ class ImportKeywordReferenceCommand extends Command
         return Command::SUCCESS;
     }
 
-    protected function importKeyword($input, $output): void
+    protected function importKeyword(InputInterface $input, OutputInterface $output): void
     {
         $object_projects = [
             "accessibilité" => [
@@ -300,103 +300,50 @@ class ImportKeywordReferenceCommand extends Command
             ],
             "acceptation" => [
                 "acceptations", "accepter", "accueil", "accueillir", "accueils", "admettre",
-                "admission", "admissions",
-                "entertain", "hébergement", "hébergements", "héberger", "réception", "réceptions",
-                "recevoir"
-            ],
-            "acceptation" => [
-                "acceptations", "accepter", "acquérir", "acquisition", "acquisitions", "adopter",
-                "adoption", "adoptions",
-                "assomption", "assomptions", "assumer", "attraper", "capture", "captures",
-                "embrassement", "embrassements",
-                "embrasser", "prendre", "prise", "prises", "saisie", "saisies", "saisir"
-            ],
-            "acceptation" => [
-                "acceptations", "accepter", "admettre", "admission", "admissions", "assomption",
-                "assomptions", "assumer",
-                "embauche", "embaucher", "embauches", "emploi", "emplois", "employer", "engagement",
-                "engagements",
-                "engager", "enrôlement", "enrôlements", "enrôler", "recrutement", "recrutements",
-                "recruter"
+                "admission", "admissions", "entertain", "hébergement", "hébergements", "héberger",
+                "réception", "réceptions", "recevoir", "acquérir", "acquisition", "acquisitions",
+                "adopter", "adoption", "adoptions", "assomption", "assomptions", "assumer", "attraper",
+                "capture", "captures", "embrassement", "embrassements", "embrasser", "prendre", "prise",
+                "prises", "saisie", "saisies", "saisir", "embauche", "embaucher", "embauches", "emploi",
+                "emplois", "employer", "engagement", "engagements", "engager", "enrôlement", "enrôlements",
+                "enrôler", "recrutement", "recrutements", "recruter"
             ],
             "accompagnement" => [
                 "accompagnements", "accompagner", "aide", "aider", "aides", "appui", "appuis",
-                "appuyer", "assistance",
-                "assistances", "assister", "encouragement", "encouragements", "encourager",
-                "épaulement", "épaulements",
-                "épauler", "faveur", "faveurs", "favoriser", "promotion", "promotions",
-                "promouvoir", "renforcement",
-                "renforcements", "renforcer", "soutenir", "soutien", "soutiens"
-            ],
-            "accompagnement" => [
-                "accompagnements", "accompagner", "aide", "aider", "aides", "appui", "appuis",
-                "appuyer", "assistance",
-                "assistances", "assister", "participation", "participations", "participer",
-                "secourir", "secours",
-                "secourss", "service", "services", "servir", "soutenir", "soutien", "soutiens"
+                "appuyer", "assistance", "assistances", "assister", "encouragement", "encouragements",
+                "encourager", "épaulement", "épaulements", "épauler", "faveur", "faveurs", "favoriser",
+                "promotion", "promotions", "promouvoir", "renforcement", "renforcements", "renforcer",
+                "soutenir", "soutien", "soutiens", "participation", "participations", "participer",
+                "secourir", "secours", "secourss", "service", "services", "servir"
             ],
             "accomplir" => [
                 "accomplissement", "accomplissements", "activation", "activations", "activer",
-                "effectuer", "effet",
-                "effets", "exécuter", "exécution", "exécutions", "faire", "fait", "faits", "menée",
-                "menées", "mener",
-                "procéder", "procédure", "procédures", "production", "productions", "produire",
-                "réalisation",
-                "réalisations", "réaliser", "rénovation", "rénovations", "rénover", "réussir",
-                "réussite", "réussites"
-            ],
-            "accomplir" => [
-                "accomplissement", "accomplissements", "effectuer", "effet", "effets",
-                "exécuter", "exécution",
-                "exécutions", "faire", "fait", "faits", "menée", "menées", "mener",
-                "opération", "opérations",
-                "opérer", "procéder", "procédure", "procédures", "réalisation",
-                "réalisations", "réaliser"
+                "effectuer", "effet", "effets", "exécuter", "exécution", "exécutions", "faire", "fait", "faits",
+                "menée", "menées", "mener", "procéder", "procédure", "procédures", "production", "productions",
+                "produire", "réalisation", "réalisations", "réaliser", "rénovation", "rénovations", "rénover",
+                "réussir", "réussite", "réussites", "opération", "opérations", "opérer"
             ],
             "accord" => [
                 "accorder", "accords", "autorisation", "autorisations", "autoriser",
-                "consentement", "consentements",
-                "consentir", "laisser", "laissez-passer", "laissez-passers", "offre", "offres",
-                "offrir", "permettre",
-                "permission", "permissions"
-            ],
-            "accord" => [
-                "accorder", "accords", "don", "donner", "dons", "fournir", "fourniture",
-                "fournitures", "offre",
-                "offres", "offrir", "présentation", "présentations", "présenter", "procurance",
-                "procurances",
-                "procurer", "proposer", "proposition", "propositions"
-            ],
-            "accord" => [
-                "accorder", "accords", "allocation", "allocations", "allouer", "attribuer", "don",
-                "donner", "dons",
-                "fournir", "fourniture", "fournitures", "offre", "offres", "offrir", "présentation",
-                "présentations",
-                "présenter", "rendre"
+                "consentement", "consentements", "consentir", "laisser", "laissez-passer", "laissez-passers",
+                "offre", "offres", "offrir", "permettre", "permission", "permissions", "don", "donner", "dons",
+                "fournir", "fourniture", "fournitures", "présentation", "présentations", "présenter",
+                "procurance", "procurances", "procurer", "proposer", "proposition", "propositions",
+                "allocation", "allocations", "allouer", "attribuer", "rendre"
             ],
             "accroissement" => [
                 "accroissements", "accroître", "amélioration", "améliorations", "améliorer",
-                "augmentation",
-                "augmentations", "augmenter", "booster", "dynamisation", "dynamisations", "dynamiser",
-                "étendre",
-                "études", "extension", "extensions", "optimisation", "optimisations", "optimiser"
-            ],
-            "accroissement" => [
-                "accroissements", "accroître", "amplification", "amplifications", "amplifier", "augmentation",
-                "augmentations", "augmenter", "développement", "développements", "développer", "élévation",
-                "élévations", "élever", "étendre", "extension", "extensions", "renforcement", "renforcements",
-                "renforcer"
+                "augmentation", "augmentations", "augmenter", "booster", "dynamisation", "dynamisations", "dynamiser",
+                "étendre", "études", "extension", "extensions", "optimisation", "optimisations", "optimiser",
+                "amplification", "amplifications", "amplifier", "développement", "développements", "développer",
+                "élévation", "élévations", "élever", "renforcement", "renforcements", "renforcer"
             ],
             "achat" => ["achats", "acheter", "équipement", "équipements", "équiper"],
             "acquérir" => [
                 "acquisition", "acquisitions", "atteindre", "atteinte", "atteintes", "gagner", "gain", "gains",
                 "obtenir", "obtention", "obtentions", "réception", "réceptions", "recevoir", "remportement",
-                "remportements", "remporter"
-            ],
-            "acquérir" => [
-                "acquisition", "acquisitions", "approvisionnement", "approvisionnements", "avoir", "choisir", "choix",
-                "choixs", "gagner", "gain", "gains", "obtenir", "obtention", "obtentions", "procurance", "procurances",
-                "réception", "réceptions", "recevoir", "s'approvisionner", "se procurer"
+                "remportements", "remporter", "approvisionnement", "approvisionnements", "avoir", "choisir", "choix",
+                "choixs", "procurance", "procurances", "s'approvisionner", "se procurer"
             ],
             "action" => [
                 "actions", "agir", "exécuter", "exécution", "exécutions", "faire", "fait", "faits", "fonctionnement",
@@ -408,27 +355,13 @@ class ImportKeywordReferenceCommand extends Command
                 "arranger", "équipement", "équipements", "équiper", "étendre", "extension", "extensions",
                 "installation", "installations", "installer", "organisation", "organisations", "organiser",
                 "réaménagement", "réaménagements", "réaménager", "restructuration", "restructurations", "restructurer",
-                "soutenir", "soutien", "soutiens", "structuration", "structurations", "structurer"
-            ],
-            "adaptation" => [
-                "adaptations", "adapter", "ajustement", "ajustements", "ajuster", "changement", "changements",
-                "changer", "conversion", "conversions", "convertir", "équipement", "équipements", "équiper",
-                "modification", "modifications", "modifier", "transformation", "transformations", "transformer"
-            ],
-            "adaptation" => [
-                "adaptations", "adapter", "changement", "changements", "changer", "conversion", "conversions",
-                "convertir", "modification", "modifications", "modifier", "réforme", "réformer", "réformes", "réviser",
-                "révision", "révisions", "transformation", "transformations", "transformer"
-            ],
-            "adaptation" => [
-                "adaptations", "adapter", "changement", "changements", "changer", "conversion", "conversions",
-                "convertir", "modification", "modifications", "modifier", "réforme", "réformer", "réformes",
-                "requalifier", "réviser", "révision", "révisions", "transformation", "transformations", "transformer"
-            ],
-            "adaptation" => [
-                "adaptations", "ajustement", "ajustements", "ajuster", "changement", "changements", "changer",
-                "évoluer", "modification", "modifications", "modifier", "s'adapter", "se conformer", "se modifier",
-                "transformation", "transformations", "transformer"
+                "soutenir", "soutien", "soutiens", "structuration", "structurations", "structurer", "ajustement",
+                "ajustements",
+                "ajuster", "changement", "changements", "changer", "conversion", "conversions", "convertir",
+                "modification",
+                "modifications", "modifier", "transformation", "transformations", "transformer", "réforme", "réformer",
+                "réformes",
+                "réviser", "révision", "révisions", "requalifier", "évoluer", "s'adapter", "se conformer", "se modifier"
             ],
             "adhérer" => [
                 "adhésion", "adhésions", "collaboration", "collaborations", "collaborer", "contribuer", "contribution",
@@ -446,10 +379,8 @@ class ImportKeywordReferenceCommand extends Command
                 "administrations", "administrer", "contrôle", "contrôler", "contrôles", "coordination", "coordinations",
                 "coordonner", "direction", "directions", "diriger", "gérer", "gestion", "gestions", "gouvernance",
                 "gouvernances", "gouverner", "organisation", "organisations", "organiser", "régulation", "régulations",
-                "réguler", "superviser", "supervision", "supervisions"
-            ],
-            "administration" => [
-                "administrations", "administrer", "appliquer", "emploi", "emplois", "employer", "exécuter", "exécution",
+                "réguler", "superviser", "supervision", "supervisions",
+                "appliquer", "emploi", "emplois", "employer", "exécuter", "exécution",
                 "exécutions", "imposer", "instauration", "instaurations", "instaurer", "mettre en œuvre", "mise",
                 "mise en place", "mises", "utilisation", "utilisations", "utiliser"
             ],
@@ -484,19 +415,15 @@ class ImportKeywordReferenceCommand extends Command
                 "développements", "développer", "érection", "érections", "ériger", "établir", "financement",
                 "financements", "financer", "fondation", "fondations", "fonder", "génération", "générations", "générer",
                 "innovation", "innovations", "innover", "installation", "installations", "installer", "instituer",
-                "institution", "institutions"
-            ],
-            "aménagement" => [
-                "aménagements", "aménager", "étendre", "extension", "extensions", "isolation", "isoler",
-                "modernisation",
-                "modernisations", "moderniser", "réalisation", "réalisations", "réaliser des travaux",
-                "réaménagement",
-                "réaménagements", "réaménager", "reclycler", "reconstruction", "reconstructions",
-                "reconstruire", "refaire",
-                "réfection", "refonte", "refontes", "remettre", "remise", "remises", "rénovation",
-                "rénovations", "rénover",
-                "réparation", "réparations", "réparer", "restauration", "restaurations", "restaurer", "restructuration",
-                "restructurations", "restructurer", "revalorisation", "revalorisations", "revaloriser", "travaux",
+                "institution", "institutions", "étendre", "extension", "extensions", "isolation", "isoler",
+                "modernisation", "modernisations", "moderniser", "réalisation", "réalisations", "réaliser des travaux",
+                "réaménagement", "réaménagements", "réaménager", "reclycler", "reconstruction", "reconstructions",
+                "reconstruire", "refaire", "réfection", "refonte", "refontes", "remettre", "remise", "remises",
+                "rénovation",
+                "rénovations", "rénover", "réparation", "réparations", "réparer", "restauration", "restaurations",
+                "restaurer",
+                "restructuration", "restructurations", "restructurer", "revalorisation", "revalorisations", "revaloriser",
+                "travaux",
                 "travaux de réparation", "travauxs", "changer", "changement"
             ],
             "amplification" => [
@@ -506,27 +433,20 @@ class ImportKeywordReferenceCommand extends Command
             "analyse" => [
                 "analyser", "analyses", "appréciation", "appréciations", "apprécier", "calcul", "calculer", "calculs",
                 "estimation", "estimations", "estimer", "évaluation", "évaluations", "évaluer", "examen", "examens",
-                "examiner", "jugement", "jugements", "juger", "mesure", "mesurer", "mesures"
-            ],
-            "analyse" => [
-                "analyser", "analyses", "consultation", "consultations", "consulter", "étude", "études", "étudess",
-                "étudier", "examen", "examens", "examiner", "exploration", "explorations", "explorer", "observation",
-                "observations", "observer", "recherche", "rechercher", "recherches"
-            ],
-            "analyse" => [
-                "analyser", "analyses", "étude", "études", "étudess", "étudier", "évaluation", "évaluations", "évaluer",
-                "examen", "examens", "examiner", "exploration", "explorations", "explorer", "inspecter", "inspection",
-                "inspections", "investiguer", "scruter"
+                "examiner", "jugement", "jugements", "juger", "mesure", "mesurer", "mesures", "consultation",
+                "consultations",
+                "consulter", "étude", "études", "étudess", "étudier", "exploration", "explorations", "explorer",
+                "observation",
+                "observations", "observer", "recherche", "rechercher", "recherches", "inspecter", "inspection",
+                "inspections",
+                "investiguer", "scruter"
             ],
             "anticipation" => [
                 "anticipations", "anticiper", "avertir", "avertissement", "avertissements", "évitement", "évitements",
                 "éviter", "information", "informations", "informer", "préparation", "préparations", "préparer",
                 "prévenir", "prévention", "préventions", "prévision", "prévisions", "prévoir", "traitement",
-                "traitements", "traiter"
-            ],
-            "anticipation" => [
-                "anticipations", "anticiper", "attendre", "planification", "planifications", "planifier", "préparation",
-                "préparations", "préparer", "prévision", "prévisions", "prévoir", "projeter", "s'attendre"
+                "traitements", "traiter", "attendre", "planification", "planifications", "planifier", "projeter",
+                "s'attendre"
             ],
             "appliquer" => [
                 "emploi", "emplois", "employer", "manipuler", "opération", "opérations", "opérer", "recourir à",
@@ -599,25 +519,14 @@ class ImportKeywordReferenceCommand extends Command
             "commencement" => [
                 "commencements", "commencer", "début", "débuter", "débuts", "établir", "initiation", "initiations",
                 "initier", "instauration", "instaurations", "instaurer", "introduction", "introductions", "introduire",
-                "lancement", "lancements", "lancer"
-            ],
-            "commencement" => [
-                "commencements", "commencer", "démarrer", "établir", "inaugurer", "initiation", "initiations",
-                "initier", "instauration", "instaurations", "instaurer", "lancement", "lancements", "lancer",
-                "ouverture", "ouvertures", "ouvrir"
-            ],
-            "commencement" => [
-                "commencements", "commencer", "début", "débuter", "débuts", "démarrer", "entreprendre", "établir",
-                "inaugurer", "initiation", "initiations", "initier", "lancement", "lancements", "lancer"
+                "lancement", "lancements", "lancer", "démarrer", "inaugurer", "ouverture", "ouvertures", "ouvrir",
+                "entreprendre"
             ],
             "communication" => [
                 "communications", "communiquer", "conseil", "conseiller", "conseils", "éducation", "éducations",
                 "éduquer", "guidage", "guidages", "guider", "information", "informations", "informer",
-                "sensibilisation", "sensibilisations", "sensibiliser"
-            ],
-            "communication" => [
-                "communications", "communiquer", "conveyer", "diffuser", "émettre", "passer", "propager", "répandre",
-                "transmettre"
+                "sensibilisation", "sensibilisations", "sensibiliser", "conveyer", "diffuser", "émettre", "passer",
+                "propager", "répandre", "transmettre"
             ],
             "comporter" => [
                 "engagement", "engagements", "engager", "entraîner", "implication", "implications", "impliquer",
@@ -631,12 +540,9 @@ class ImportKeywordReferenceCommand extends Command
             "conservation" => [
                 "conservations", "conserver", "garde", "garder", "gardes", "maintenir", "maintien", "maintiens",
                 "préservation", "préservations", "préserver", "protection", "protections", "protéger", "sauvegarde",
-                "sauvegarder", "sauvegardes", "sécurisation", "sécurisations", "sécuriser"
-            ],
-            "conservation" => [
-                "conservations", "conserver", "entretenir", "entretien", "entretiens", "maintenir", "maintien",
-                "maintiens", "préservation", "préservations", "préserver", "rénovation", "rénovations", "rénover",
-                "réparation", "réparations", "réparer", "soutenir", "soutien", "soutiens"
+                "sauvegarder", "sauvegardes", "sécurisation", "sécurisations", "sécuriser", "entretenir", "entretien",
+                "entretiens", "rénovation", "rénovations", "rénover", "réparation", "réparations", "réparer",
+                "soutenir", "soutien", "soutiens"
             ],
             "contestation" => [
                 "contestations", "contester", "réplique", "répliquer", "répliques", "répondre", "réponse", "réponses",
