@@ -3,6 +3,7 @@
 namespace App\Service\Category;
 
 use App\Entity\Category\Category;
+use App\Entity\Category\CategoryTheme;
 use App\Repository\Category\CategoryRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 
@@ -13,28 +14,11 @@ class CategoryService
     ) {
     }
 
-    public function groupCategoriesByTheme(ArrayCollection $categories): array
-    {
-        $categoryThemesById = [];
-        foreach ($categories as $category) {
-            if (!isset($categoryThemesById[$category->getCategoryTheme()->getId()])) {
-                $categoryThemesById[$category->getCategoryTheme()->getId()] = [
-                    'categoryTheme' => $category->getCategoryTheme(),
-                    'categories' => []
-                ];
-            }
-
-            $categoryThemesById[$category->getCategoryTheme()->getId()]['categories'][] = $category;
-        }
-
-        return $categoryThemesById;
-    }
-
     /**
-     * @param ArrayCollection<int, Category>
-     * @return array<array{categoryTheme: CategoryTheme, categories: Category[]}>
+     * @param ArrayCollection<int, Category>|Category[] $categories
+     * @return array<int, array{categoryTheme: CategoryTheme, categories: Category[]}>
      */
-    public function categoriesToMetas(ArrayCollection|array $categories): array
+    public function categoriesToMetas(ArrayCollection $categories): array
     {
         $categoryThemesById = [];
 

@@ -33,8 +33,6 @@ class ExportToSibCommand extends Command
         protected ParamService $paramService,
         protected EmailService $emailService
     ) {
-        ini_set('max_execution_time', 60 * 60);
-        ini_set('memory_limit', '1G');
         parent::__construct();
     }
 
@@ -51,7 +49,7 @@ class ExportToSibCommand extends Command
                 $io->info('Uniquement en prod');
                 return Command::FAILURE;
             }
-            // generate menu
+            // lance la tache
             $this->cronTask($input, $output);
         } catch (\Exception $exception) {
             $io->error($exception->getMessage());
@@ -70,7 +68,6 @@ class ExportToSibCommand extends Command
 
         // charge les utilisateurs connectés au moins 1 fois
         $users = $userRepo->findUsersConnectedSinceYesterday();
-
         $nbOk = 0;
         $nbError = 0;
         $errors = [];

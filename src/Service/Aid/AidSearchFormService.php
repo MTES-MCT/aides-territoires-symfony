@@ -82,9 +82,16 @@ class AidSearchFormService
     ) {
     }
 
+    /**
+     * Compte le nombre de critères de recherche
+     *
+     * @param AidSearchClass $aidSearchClass
+     * @param string[] $ignoreProperties
+     * @return integer
+     */
     public function countNbCriteriaFromAidSearchClass(
         AidSearchClass $aidSearchClass,
-        $ignoreProperties = ['organizationType', 'searchPerimeter', 'orderBy']
+        array $ignoreProperties = ['organizationType', 'searchPerimeter', 'orderBy']
     ): int {
         $nbCriteria = 0;
 
@@ -203,6 +210,12 @@ class AidSearchFormService
         return http_build_query($params);
     }
 
+    /**
+     * Converti la classe AidSearchClass en tableau de paramètres pour le repository AidRepository
+     *
+     * @param AidSearchClass $aidSearchClass
+     * @return array<string, mixed>
+     */
     public function convertAidSearchClassToAidParams(AidSearchClass $aidSearchClass): array // NOSONAR too complex
     {
         $aidParams = [];
@@ -293,6 +306,13 @@ class AidSearchFormService
         return $aidParams;
     }
 
+    /**
+     * Retourne la AidSearchClass en fonction de l'url
+     *
+     * @param AidSearchClass|null $aidSearchClass
+     * @param array<string, mixed>|null $params
+     * @return AidSearchClass
+     */
     public function getAidSearchClass(
         ?AidSearchClass $aidSearchClass = null,
         ?array $params = null
@@ -639,12 +659,13 @@ class AidSearchFormService
          * < Programs
          */
         if (isset($queryParams[self::QUERYSTRING_KEY_PROGRAM_IDS])) {
+            /** @var ProgramRepository $programRepository */
+            $programRepository = $this->managerRegistry->getRepository(Program::class);
+
             $programIds = is_array($queryParams[self::QUERYSTRING_KEY_PROGRAM_IDS])
                 ? $queryParams[self::QUERYSTRING_KEY_PROGRAM_IDS]
                 : [$queryParams[self::QUERYSTRING_KEY_PROGRAM_IDS]];
             if (!empty($programIds)) {
-                /** @var ProgramRepository $programRepository */
-                $programRepository = $this->managerRegistry->getRepository(Program::class);
                 $programs = $programRepository->findCustom(
                     [
                         'ids' => $programIds
@@ -941,10 +962,10 @@ class AidSearchFormService
     /**
      * Gestion du tri des aides selon le choix du formulaire
      *
-     * @param [type] $aidParams
-     * @return array
+     * @param array<string, mixed> $aidParams
+     * @return array<string, mixed>
      */
-    public function handleOrderBy($aidParams): array
+    public function handleOrderBy(array $aidParams): array
     {
         if (isset($aidParams['orderBy'])) {
             switch ($aidParams['orderBy']) {
@@ -972,8 +993,6 @@ class AidSearchFormService
     /**
      * Détermine si le formulaire doit être affiché en entier ou non, selon si un des champs de la liste à été rempli.
      *
-     * @param Form $formAidSearch
-     * @return boolean
      */
     public function setShowExtended(AidSearchClass $aidSearchClass): bool
     {
@@ -989,8 +1008,13 @@ class AidSearchFormService
             $aidSearchClass->getBackerGroupId();
     }
 
-    // Transforme la querystring en array, en prenant en compte les doublons
-    private function parseQueryString($query): array
+    /**
+     * Transforme la querystring en array, en prenant en compte les doublons
+     *
+     * @param string $query
+     * @return array<string, mixed>
+     */
+    private function parseQueryString(string $query): array
     {
         $queryParams = [];
         $queryItems = explode('&', (string) $query);
@@ -1018,7 +1042,12 @@ class AidSearchFormService
         return $queryParams;
     }
 
-    // transforme les clés anciens format en clés actuels
+    /**
+     * transforme les clés anciens format en clés actuels
+     *
+     * @param array<string, mixed> $queryParams
+     * @return array<string, mixed>
+     */
     private function normalizeQueryParams(array $queryParams): array
     {
         $transitionKeys = [
@@ -1100,8 +1129,8 @@ class AidSearchFormService
      * Pour être de ne pas avoir de tableau sur certaines clés
      * On prends la dernière valeur si c'est un tableau
      *
-     * @param array $queryParams
-     * @return array
+     * @param array<string, mixed> $queryParams
+     * @return array<string, mixed>
      */
     public function unduplicateSpecificKeys(array $queryParams): array
     {

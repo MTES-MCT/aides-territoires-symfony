@@ -5,6 +5,7 @@ namespace App\Service\Export;
 use App\Entity\Aid\Aid;
 use App\Entity\Backer\Backer;
 use App\Entity\Cron\CronExportSpreadsheet;
+use App\Entity\Organization\Organization;
 use App\Entity\Project\Project;
 use App\Entity\User\User;
 use App\Exception\InvalidFileFormatException as ExceptionInvalidFileFormatException;
@@ -160,7 +161,7 @@ class SpreadsheetExporterService
      *
      * @param mixed $entity
      * @param mixed $results
-     * @return array<string, mixed>
+     * @return array<int, array<string, mixed>>
      */
     public function getDatasFromEntityType(mixed $entity, mixed $results): array // NOSONAR too complex
     {
@@ -262,6 +263,7 @@ class SpreadsheetExporterService
                     ]);
                     $projectsHaveAids = $nbProjectWithAids > 0;
 
+                    /** @var ?Organization $defaultOrganization */
                     $defaultOrganization = $this->userService->getDefaultOrganizationByEmail($result->getEmail());
 
                     $datas[] = [
@@ -286,11 +288,11 @@ class SpreadsheetExporterService
                                 : '',
                         'Contributeur ?' => $result->isIsContributor() ? 'Oui' : 'Non',
                         'Bénéficiaire ?' => $result->isIsBeneficiary() ? 'Oui' : 'Non',
-                        'Nombre d\'aides' => $result->getAids() ? count($result->getAids()) : 0,
+                        'Nombre d\'aides' => count($result->getAids()),
                         'Structure du bénéficiaire' => $defaultOrganization ? $defaultOrganization->getName() : '',
                         'ID de l\'organisation' => $defaultOrganization ? $defaultOrganization->getId() : '',
                         'Nombre de projets de l\'organisation' =>
-                            ($defaultOrganization && $defaultOrganization->getProjects())
+                            ($defaultOrganization)
                                 ? count($defaultOrganization->getProjects())
                                 : 0,
                         'Présence d\'aides associées à un projet' => $projectsHaveAids ? 'VRAI' : '',
@@ -406,146 +408,6 @@ class SpreadsheetExporterService
         return $datas;
     }
 
-    public function exportProjectAidsBck(Project $project, string $format = 'csv') // NOSONAR too complex
-    {
-        try {
-            if ($format == FileService::FORMAT_CSV) {
-                $options = new \OpenSpout\Writer\CSV\Options();
-                $options->FIELD_DELIMITER = ';';
-                $options->FIELD_ENCLOSURE = '"';
-
-                $writer = new \OpenSpout\Writer\CSV\Writer($options);
-            } elseif ($format == FileService::FORMAT_XLSX) {
-                $sheetView = new SheetView();
-                $writer = new \OpenSpout\Writer\XLSX\Writer();
-            } else {
-                throw new ExceptionInvalidFileFormatException(self::EXCEPTION_FORMAT_NOT_SUPPORTED_MESSAGE);
-            }
-
-            $now = new \DateTime(date(self::TODAY_DATE_FORMAT));
-            $filename = 'Aides-territoires_-_' . $now->format('Y-m-d') . '_-_' . $project->getSlug() . '.' . $format;
-            $writer->openToBrowser($filename);
-
-            if ($format == FileService::FORMAT_XLSX) {
-                $writer->getCurrentSheet()->setSheetView($sheetView);
-            }
-
-            $cells = [
-                Cell::fromValue('Adresse de la fiche aide'),
-                Cell::fromValue('Nom'),
-                Cell::fromValue('Description complète de l’aide et de ses objectifs'),
-                Cell::fromValue('Exemples de projets réalisables'),
-                Cell::fromValue('État d’avancement du projet pour bénéficier du dispositif'),
-                Cell::fromValue('Types d’aide'),
-                Cell::fromValue('Types de dépenses / actions couvertes'),
-                Cell::fromValue('Date d’ouverture'),
-                Cell::fromValue('Date de clôture'),
-                Cell::fromValue('Taux de subvention, min. et max. (en %, nombre entier)'),
-                Cell::fromValue('Taux de subvention (commentaire optionnel)'),
-                Cell::fromValue('Montant de l’avance récupérable'),
-                Cell::fromValue('Montant du prêt maximum'),
-                Cell::fromValue('Autre aide financière (commentaire optionnel)'),
-                Cell::fromValue('Contact'),
-                Cell::fromValue('Récurrence'),
-                Cell::fromValue('Appel à projet / Manifestation d’intérêt'),
-                Cell::fromValue('Sous-thématiques'),
-                Cell::fromValue('Porteurs d’aides'),
-                Cell::fromValue('Instructeurs'),
-                Cell::fromValue('Programmes'),
-            ];
-
-            /** add a row at a time */
-            $singleRow = new Row($cells);
-            $writer->addRow($singleRow);
-
-            foreach ($project->getAidProjects() as $aidProject) {
-                if (!$aidProject->getAid() instanceof Aid) {
-                    continue;
-                }
-
-                $aidSteps = [];
-                foreach ($aidProject->getAid()->getAidSteps() as $aidStep) {
-                    $aidSteps[] = $aidStep->getName();
-                }
-                $aidTypes = [];
-                foreach ($aidProject->getAid()->getAidTypes() as $aidType) {
-                    $aidTypes[] = $aidType->getName();
-                }
-                $aidDestinations = [];
-                foreach ($aidProject->getAid()->getAidDestinations() as $aidDestination) {
-                    $aidDestinations[] = $aidDestination->getName();
-                }
-                $dateStart = $aidProject->getAid()->getDateStart()
-                    ? $aidProject->getAid()->getDateStart()->format('Y-m-d')
-                    : '';
-                $dateSubmissionDeadline = $aidProject->getAid()->getDateSubmissionDeadline()
-                    ? $aidProject->getAid()->getDateSubmissionDeadline()->format('Y-m-d')
-                    : '';
-                $rates = '';
-                if ($aidProject->getAid()->getSubventionRateMin()) {
-                    $rates .= ' Min : ' . $aidProject->getAid()->getSubventionRateMin();
-                }
-                if ($aidProject->getAid()->getSubventionRateMax()) {
-                    $rates .= ' Max : ' . $aidProject->getAid()->getSubventionRateMax();
-                }
-                $categories = [];
-                foreach ($aidProject->getAid()->getCategories() as $aidCategory) {
-                    $categories[] = $aidCategory->getName();
-                }
-                $aidRecurrence = $aidProject->getAid()->getAidRecurrence()
-                    ? $aidProject->getAid()->getAidRecurrence()->getName()
-                    : '';
-                $financers = [];
-                foreach ($aidProject->getAid()->getAidFinancers() as $aidFinancer) {
-                    $financers[] = $aidFinancer->getBacker()->getName();
-                }
-                $instructors = [];
-                foreach ($aidProject->getAid()->getAidInstructors() as $aidInstructor) {
-                    $instructors[] = $aidInstructor->getBacker()->getName();
-                }
-                $programs = [];
-                foreach ($aidProject->getAid()->getPrograms() as $aidProgram) {
-                    $programs[] = $aidProgram->getName();
-                }
-                $cells = [
-                    Cell::fromValue($aidProject->getAid()->getUrl()),
-                    Cell::fromValue($aidProject->getAid()->getName()),
-                    Cell::fromValue($aidProject->getAid()->getDescription()),
-                    Cell::fromValue($aidProject->getAid()->getProjectExamples()),
-                    Cell::fromValue(implode(',', $aidSteps)),
-                    Cell::fromValue(implode(',', $aidTypes)),
-                    Cell::fromValue(implode(',', $aidDestinations)),
-                    Cell::fromValue($dateStart),
-                    Cell::fromValue($dateSubmissionDeadline),
-                    Cell::fromValue($rates),
-                    Cell::fromValue($aidProject->getAid()->getSubventionComment() ?? ''),
-                    Cell::fromValue($aidProject->getAid()->getRecoverableAdvanceAmount() ?? ''),
-                    Cell::fromValue($aidProject->getAid()->getLoanAmount() ?? ''),
-                    Cell::fromValue($aidProject->getAid()->getOtherFinancialAidComment() ?? ''),
-                    Cell::fromValue($aidProject->getAid()->getContact() ?? ''),
-                    Cell::fromValue($aidRecurrence),
-                    Cell::fromValue($aidProject->getAid()->isIsCallForProject() ? 'Oui' : 'Non'),
-                    Cell::fromValue(implode(',', $categories)),
-                    Cell::fromValue(implode(',', $financers)),
-                    Cell::fromValue(implode(',', $instructors)),
-                    Cell::fromValue(implode(',', $programs)),
-                ];
-
-                /** add a row at a time */
-                $singleRow = new Row($cells);
-                $writer->addRow($singleRow);
-            }
-
-            $writer->close();
-            exit;
-        } catch (\Exception $e) {
-            $this->loggerInterface->error('Erreur exportProjectAids', [
-                'exception' => $e,
-                'idProject' => $project->getId(),
-            ]);
-        }
-    }
-
     public function exportProjectAids(Project $project, string $format = 'csv'): Response
     {
         try {
@@ -639,6 +501,7 @@ class SpreadsheetExporterService
             'Porteurs d’aides',
             'Instructeurs',
             'Programmes',
+            'Périmètre de l\'aide'
         ];
 
         $sheet = $spreadsheet->getActiveSheet();
@@ -735,6 +598,7 @@ class SpreadsheetExporterService
                 implode(',', $financers),
                 implode(',', $instructors),
                 implode(',', $programs),
+                $aid->getPerimeter() ? $aid->getPerimeter()->getName() : ''
             ];
 
             // Ajoute les datas à la feuille
@@ -746,12 +610,21 @@ class SpreadsheetExporterService
         return $spreadsheet;
     }
 
+    /**
+     * Exporter dans un fichier
+     *
+     * @param array<int, mixed> $results
+     * @param string $entityFqcn
+     * @param string $filename
+     * @param string $format
+     * @return string|null
+     */
     public function exportToFile(
         array $results,
         string $entityFqcn,
         string $filename,
         string $format = FileService::FORMAT_CSV
-    ) {
+    ): ?string {
         try {
             $entity = new $entityFqcn();
             $datas = $this->getDatasFromEntityType($entity, $results);
@@ -782,7 +655,7 @@ class SpreadsheetExporterService
 
             $writer->openToFile($fileTarget);
 
-            if ($format == FileService::FORMAT_XLSX) {
+            if ($format == FileService::FORMAT_XLSX && isset($sheetView)) {
                 $writer->getCurrentSheet()->setSheetView($sheetView);
             }
             $headers = [];

@@ -9,6 +9,8 @@ use Brevo\Client\Api\TransactionalEmailsApi;
 use Brevo\Client\Configuration;
 use Brevo\Client\Model\CreateDoiContact;
 use Brevo\Client\Model\SendSmtpEmail;
+use Brevo\Client\Model\SendSmtpEmailSender;
+use Brevo\Client\Model\SendSmtpEmailTo;
 use Brevo\Client\Model\UpdateContact;
 use GuzzleHttp\Client;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
@@ -33,8 +35,8 @@ class EmailService
      * @param string $email
      * @param string $subject
      * @param string $template
-     * @param array|null $datas
-     * @param array|null $options
+     * @param array<string, mixed>|null $datas
+     * @param array<string, mixed>|null $options
      * @return boolean
      */
     public function sendEmail(
@@ -69,6 +71,17 @@ class EmailService
         }
     }
 
+    /**
+     * Undocumented function
+     *
+     * @param string $emailTo
+     * @param string|null $nameTo
+     * @param integer|null $templateId
+     * @param array<string, mixed>|null $params
+     * @param array<string, mixed>|null $headers
+     * @param array<string, mixed>|null $tags
+     * @return boolean
+     */
     public function sendEmailViaApi(
         string $emailTo,
         ?string $nameTo = null,
@@ -90,10 +103,12 @@ class EmailService
             $config
         );
         $sendSmtpEmail = new SendSmtpEmail();
-        $sendSmtpEmail['sender'] = [
+        $sendSmtpEmailSender = new SendSmtpEmailSender([
             'name' => $this->paramService->get('email_from_name'),
             'email' => $this->paramService->get('email_from')
-        ];
+        ]);
+        $sendSmtpEmail->setSender($sendSmtpEmailSender);
+
         // gestion du destinataire
         $to = [
             'email' => $emailTo
@@ -101,26 +116,24 @@ class EmailService
         if ($nameTo) {
             $to['name'] = $nameTo;
         }
-        $sendSmtpEmail['to'] = [
-            $to
-        ];
+        $sendSmtpEmail->setTo([new SendSmtpEmailTo($to)]);
 
         // si template
         if ($templateId) {
-            $sendSmtpEmail['templateId'] = $templateId;
+            $sendSmtpEmail->setTemplateId($templateId);
         }
 
         // si parametres
         if (is_array($params) && !empty($params)) {
-            $sendSmtpEmail['params'] = $params;
+            $sendSmtpEmail->setParams((object) $params);
         }
 
         if (is_array($headers) && !empty($headers)) {
-            $sendSmtpEmail['headers'] = $headers;
+            $sendSmtpEmail->setHeaders((object) $headers);
         }
 
         if (is_array($tags) && !empty($tags)) {
-            $sendSmtpEmail['tags'] = $tags;
+            $sendSmtpEmail->setTags($tags);
         }
 
         try {
@@ -159,7 +172,7 @@ class EmailService
         foreach ($newsletterListIds as $key => $value) {
             $newsletterListIds[$key] = (int) $value;
         }
-        $updateContact['unlinkListIds'] = $newsletterListIds;
+        $updateContact->setUnlinkListIds($newsletterListIds);
 
 
         try {
@@ -192,17 +205,21 @@ class EmailService
         }
 
         $doubleOptin = new CreateDoiContact();
-        $doubleOptin['attributes'] = [
+        $attributes = [
             'DOUBLE_OPT_IN' => 1
         ];
-        $doubleOptin['includeListIds'] = $newsletterListIds;
-        $doubleOptin['email'] = $user->getEmail();
-        $doubleOptin['templateId'] = (int) $this->paramService->get('sib_newsletter_confirm_template_id');
-        $doubleOptin['redirectionUrl'] = $this->routerInterface->generate(
+        $doubleOptin->setAttributes((object) $attributes);
+
+        $doubleOptin->setIncludeListIds($newsletterListIds);
+
+        $doubleOptin->setEmail($user->getEmail());
+        $doubleOptin->setTemplateId((int) $this->paramService->get('sib_newsletter_confirm_template_id'));
+
+        $doubleOptin->setRedirectionUrl($this->routerInterface->generate(
             'app_newsletter_register_success',
             [],
             UrlGeneratorInterface::ABSOLUTE_URL
-        );
+        ));
 
         try {
             $apiInstance->createDoiContact($doubleOptin);
@@ -212,6 +229,13 @@ class EmailService
         }
     }
 
+    /**
+     * Met à jour l'utilisateur sur Brevo
+     *
+     * @param User $user
+     * @param array<string, mixed> $datas
+     * @return boolean
+     */
     public function updateUser(User $user, array $datas): bool
     {
         // Configure API key authorization: api-key
@@ -236,10 +260,10 @@ class EmailService
         $identifier = $user->getEmail();
         $updateContact = new UpdateContact();
         if (isset($datas['attributes']) && is_array($datas['attributes']) && count($datas['attributes']) > 0) {
-            $updateContact['attributes'] = $datas['attributes'];
+            $updateContact->setAttributes((object) $datas['attributes']);
         }
         if (isset($datas['listIds']) && is_array($datas['listIds']) && count($datas['listIds']) > 0) {
-            $updateContact['listIds'] = $datas['listIds'];
+            $updateContact->setListIds($datas['listIds']);
         }
 
         try {
@@ -250,7 +274,7 @@ class EmailService
         }
     }
 
-    public function isUserMlConsent($user): bool
+    public function isUserMlConsent(User $user): bool
     {
         // Configure API key authorization: api-key
         $config = Configuration::getDefaultConfiguration()->setApiKey(
@@ -267,7 +291,7 @@ class EmailService
 
         try {
             $result = $apiInstance->getContactInfo($user->getEmail());
-            foreach ($result['listIds'] as $listId) {
+            foreach ($result->getListIds() as $listId) {
                 if (in_array($listId, explode(',', $this->paramService->get('sib_newsletter_list_ids')))) {
                     return true;
                 }

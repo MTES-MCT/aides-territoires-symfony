@@ -239,6 +239,13 @@ class ReferenceService
         ];
     }
 
+    /**
+     * Met les mots clés à surligner dans la session.
+     *
+     * @param array<string, mixed>|null $synonyms
+     * @param string|null $currentKeyword
+     * @return array<string>
+     */
     public function setHighlightedWords(?array $synonyms, ?string $currentKeyword): array
     {
         $highlightedWords = $this->getHighlightedWords($synonyms, $currentKeyword);
@@ -250,6 +257,10 @@ class ReferenceService
     }
 
     /**
+     * Undocumented function
+     *
+     * @param array<string, mixed>|null $synonyms
+     * @param string|null $currentKeyword
      * @return string[]
      */
     public function getHighlightedWords(?array $synonyms, ?string $currentKeyword): array

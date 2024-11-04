@@ -4,6 +4,7 @@ namespace App\Controller\User;
 
 use App\Controller\FrontController;
 use App\Entity\Aid\AidProject;
+use App\Entity\Aid\AidSuggestedAidProject;
 use App\Entity\Perimeter\Perimeter;
 use App\Entity\Project\Project;
 use App\Entity\Reference\ProjectReference;
@@ -15,6 +16,7 @@ use App\Form\User\Project\ProjectDeleteType;
 use App\Form\User\Project\ProjectExportType;
 use App\Message\User\MsgProjectExportAids;
 use App\Repository\Aid\AidProjectRepository;
+use App\Repository\Aid\AidSuggestedAidProjectRepository;
 use App\Repository\Project\ProjectRepository;
 use App\Repository\Project\ProjectValidatedRepository;
 use App\Security\Voter\InternalRequestVoter;
@@ -600,6 +602,199 @@ class ProjectController extends FrontController
         $response->headers->set('Content-Disposition', 'inline; filename="' . $filename . '.pdf"');
 
         return $response;
+    }
+
+
+    #[Route(
+        '/comptes/projets/accepter-aide-suggeree/{id}-{slug}/{idSuggested}',
+        name: 'app_user_project_accept_suggested_aid',
+        requirements: [
+            'id' => '[0-9]+',
+            'slug' => '[a-zA-Z0-9\-_]+',
+            'idSuggested' => '[0-9]+',
+        ]
+    )]
+    public function acceptAidSuggested(
+        int $id,
+        string $slug,
+        int $idSuggested,
+        ProjectRepository $projectRepository,
+        AidSuggestedAidProjectRepository $aidSuggestedAidProjectRepository,
+        UserService $userService,
+        NotificationService $notificationService,
+        ManagerRegistry $managerRegistry
+    ) : RedirectResponse
+    {
+        // vérifie projet et appartenance
+        $project = $projectRepository->findOneBy(
+            [
+                'id' => $id
+            ]
+        );
+        $user = $userService->getUserLogged();
+
+        if (
+            !$project instanceof Project
+            || !$userService->isMemberOfOrganization($project->getOrganization(), $user)
+        ) {
+            $this->addFlash(FrontController::FLASH_ERROR, 'Vous n\'avez pas accès à ce projet.');
+
+            return $this->redirectToRoute('app_user_project_structure');
+        }
+
+        // charge la suggestion
+        $aidSuggestedAidProject = $aidSuggestedAidProjectRepository->findOneBy(
+            [
+                'id' => $idSuggested
+            ]
+        );
+        if (!$aidSuggestedAidProject instanceof AidSuggestedAidProject
+            || $aidSuggestedAidProject->getProject() != $project) {
+            $this->addFlash(FrontController::FLASH_ERROR, 'Vous n\'avez pas accès à cette suggestion.');
+
+            return $this->redirectToRoute(
+                'app_user_project_aides',
+                [
+                    'id' => $project->getId(),
+                    'slug' => $project->getSlug()
+                ]
+            );
+        }
+
+        // Accepte la suggestion et ajoute l'aide au projet
+        $aidSuggestedAidProject->setIsAssociated(true);
+        $aidSuggestedAidProject->setTimeAssociated(new \DateTime());
+        $aidSuggestedAidProject->setIsRejected(false);
+        $aidSuggestedAidProject->setTimeRejected(null);
+        $managerRegistry->getManager()->persist($aidSuggestedAidProject);
+
+        // ajoute au projet
+        $aidProject = new AidProject();
+        $aidProject->setAid($aidSuggestedAidProject->getAid());
+        $aidProject->setCreator($user);
+        $project->addAidProject($aidProject);
+        $managerRegistry->getManager()->persist($project);
+
+        // sauvegarde
+        $managerRegistry->getManager()->flush();
+
+        // envoi notification à tous les autres membres de l'oganisation
+        if ($project->getOrganization()) {
+            foreach ($project->getOrganization()->getBeneficiairies() as $beneficiary) {
+                if ($beneficiary->getId() == $user->getId()) {
+                    continue;
+                }
+                $notificationService->addNotification(
+                    $beneficiary,
+                    'Nouvelle aide ajoutée à un projet',
+                    '<p>
+                    ' . $user->getFirstname()
+                    . ' '
+                    . $user->getLastname()
+                    . ' a ajouté une aide au projet
+                    <a href="'
+                    . $this->generateUrl(
+                        'app_user_project_details_fiche_projet',
+                        ['id' => $project->getId(), 'slug' => $project->getSlug()],
+                        UrlGeneratorInterface::ABSOLUTE_URL
+                    )
+                        . '">' . $project->getName() . '</a>.
+                    </p>'
+                );
+            }
+        }
+
+        // message flash
+        $this->addFlash(FrontController::FLASH_SUCCESS, 'L\'aide a bien été ajoutée.');
+
+        return $this->redirectToRoute(
+            'app_user_project_aides',
+            [
+                'id' => $project->getId(),
+                'slug' => $project->getSlug()
+            ]
+        );
+    }
+
+    #[Route(
+        '/comptes/projets/refuser-aide-suggeree/{id}-{slug}/{idSuggested}',
+        name: 'app_user_project_refuse_suggested_aid',
+        requirements: [
+            'id' => '[0-9]+',
+            'slug' => '[a-zA-Z0-9\-_]+',
+            'idSuggested' => '[0-9]+',
+        ]
+    )]
+    public function refuseAidSuggested(
+        int $id,
+        string $slug,
+        int $idSuggested,
+        ProjectRepository $projectRepository,
+        AidSuggestedAidProjectRepository $aidSuggestedAidProjectRepository,
+        UserService $userService,
+        ManagerRegistry $managerRegistry
+    ) : RedirectResponse
+    {
+        // vérifie projet et appartenance
+        $project = $projectRepository->findOneBy(
+            [
+                'id' => $id
+            ]
+        );
+        $user = $userService->getUserLogged();
+
+        if (
+            !$project instanceof Project
+            || !$userService->isMemberOfOrganization($project->getOrganization(), $user)
+        ) {
+            $this->addFlash(FrontController::FLASH_ERROR, 'Vous n\'avez pas accès à ce projet.');
+
+            return $this->redirectToRoute(
+                'app_user_project_aides',
+                [
+                    'id' => $project->getId(),
+                    'slug' => $project->getSlug()
+                ]
+            );
+        }
+
+        // charge la suggestion
+        $aidSuggestedAidProject = $aidSuggestedAidProjectRepository->findOneBy(
+            [
+                'id' => $idSuggested
+            ]
+        );
+        if (!$aidSuggestedAidProject instanceof AidSuggestedAidProject
+            || $aidSuggestedAidProject->getProject() != $project) {
+                $this->addFlash(FrontController::FLASH_ERROR, 'Vous n\'avez pas accès à cette association.');
+                return $this->redirectToRoute(
+                    'app_user_project_aides',
+                    [
+                        'id' => $project->getId(),
+                        'slug' => $project->getSlug()
+                    ]
+                );
+        }
+
+        // refuse la suggestion
+        $aidSuggestedAidProject->setIsRejected(true);
+        $aidSuggestedAidProject->setTimeRejected(new \DateTime());
+        $aidSuggestedAidProject->setIsAssociated(false);
+        $aidSuggestedAidProject->setTimeAssociated(null);
+        $managerRegistry->getManager()->persist($aidSuggestedAidProject);
+        $managerRegistry->getManager()->flush();
+
+        // message flash
+        $this->addFlash(FrontController::FLASH_SUCCESS, 'L\'aide a bien été refusée.');
+        
+        return $this->redirectToRoute(
+            'app_user_project_aides',
+            [
+                'id' => $project->getId(),
+                'slug' => $project->getSlug()
+            ]
+        );
+        
     }
 
     #[Route(
