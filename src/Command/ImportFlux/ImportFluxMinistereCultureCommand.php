@@ -23,7 +23,13 @@ class ImportFluxMinistereCultureCommand extends ImportFluxCommand
     protected ?int $idDataSource = 8;
     protected bool $paginationEnabled = true;
 
-    protected function getImportUniqueid($aidToImport): ?string
+    /**
+     * retourne un identifiant unique pour l'import
+     *
+     * @param array<mixed, mixed> $aidToImport
+     * @return string|null
+     */
+    protected function getImportUniqueid(array $aidToImport): ?string
     {
         if (!isset($aidToImport['id'])) {
             return null;
@@ -31,6 +37,12 @@ class ImportFluxMinistereCultureCommand extends ImportFluxCommand
         return $this->importUniqueidPrefix . $aidToImport['id'];
     }
 
+    /**
+     *
+     * @param array<mixed, mixed> $aidToImport
+     * @param array<mixed, mixed> $params
+     * @return array<mixed, mixed>
+     */
     protected function getFieldsMapping(array $aidToImport, array $params = null): array // NOSONAR too complex
     {
         try {
@@ -103,6 +115,12 @@ class ImportFluxMinistereCultureCommand extends ImportFluxCommand
         }
     }
 
+    /**
+     *
+     * @param array<mixed, mixed> $aidToImport
+     * @param Aid $aid
+     * @return Aid
+     */
     protected function setAidSteps(array $aidToImport, Aid $aid): Aid
     {
         /** @var AidStepRepository $aidStepRepo */
@@ -216,9 +234,6 @@ class ImportFluxMinistereCultureCommand extends ImportFluxCommand
             'Syndicats mixtes' => [
                 'epci'
             ],
-            'Associations' => [
-                'association'
-            ],
             'Organismes de recherche' => [
                 'researcher'
             ],
@@ -239,6 +254,12 @@ class ImportFluxMinistereCultureCommand extends ImportFluxCommand
         return $aid;
     }
 
+    /**
+     *
+     * @param array<mixed, mixed> $aidToImport
+     * @param Aid $aid
+     * @return Aid
+     */
     protected function setCategories(array $aidToImport, Aid $aid): Aid
     {
         if (!isset($aidToImport['eztag_theme']) || !is_array($aidToImport['eztag_theme'])) {
@@ -247,7 +268,7 @@ class ImportFluxMinistereCultureCommand extends ImportFluxCommand
         $mapping = $this->getMappingCategories();
 
         foreach ($aidToImport['eztag_theme'] as $thematique) {
-            if (isset($mapping[$thematique]) && is_array($mapping[$thematique])) {
+            if (isset($mapping[$thematique])) {
                 foreach ($mapping[$thematique] as $category) {
                     $category = $this->managerRegistry->getRepository(Category::class)->findOneBy([
                         'slug' => $category
@@ -262,6 +283,12 @@ class ImportFluxMinistereCultureCommand extends ImportFluxCommand
         return $aid;
     }
 
+    /**
+     *
+     * @param array<mixed, mixed> $aidToImport
+     * @param Aid $aid
+     * @return Aid
+     */
     protected function setKeywords(array $aidToImport, Aid $aid): Aid
     {
         if (!isset($aidToImport['eztag_theme']) || !is_array($aidToImport['eztag_theme'])) {
@@ -283,6 +310,11 @@ class ImportFluxMinistereCultureCommand extends ImportFluxCommand
         return $aid;
     }
 
+    /**
+     * Mapping des catégories du ministère de la culture
+     *
+     * @return array<string, string[]>
+     */
     private function getMappingCategories(): array // NOSONAR too complex
     {
         return [
@@ -495,6 +527,12 @@ class ImportFluxMinistereCultureCommand extends ImportFluxCommand
         ];
     }
 
+    /**
+     *
+     * @param array<mixed, mixed> $aidToImport
+     * @param Aid $aid
+     * @return Aid
+     */
     protected function setAidRecurrence(array $aidToImport, Aid $aid): Aid
     {
         if (!isset($aidToImport['deadline']) || !$aidToImport['deadline']) {
@@ -511,6 +549,12 @@ class ImportFluxMinistereCultureCommand extends ImportFluxCommand
         return $aid;
     }
 
+    /**
+     *
+     * @param array<mixed, mixed> $aidToImport
+     * @param Aid $aid
+     * @return Aid
+     */
     protected function setAidTypes(array $aidToImport, Aid $aid): Aid
     {
         if (!isset($aidToImport['type']) || !$aidToImport['type']) {

@@ -22,7 +22,13 @@ class ImportFluxWelcomeEuropeCommand extends ImportFluxCommand
     protected ?string $importUniqueidPrefix = 'WE_';
     protected ?int $idDataSource = 7;
 
-    protected function getImportUniqueid($aidToImport): ?string
+    /**
+     * retourne un identifiant unique pour l'import
+     *
+     * @param array<mixed, mixed> $aidToImport
+     * @return string|null
+     */
+    protected function getImportUniqueid(array $aidToImport): ?string
     {
         if (!isset($aidToImport['ID'])) {
             return null;
@@ -30,7 +36,12 @@ class ImportFluxWelcomeEuropeCommand extends ImportFluxCommand
         return $this->importUniqueidPrefix . $aidToImport['ID'];
     }
 
-    protected function callApi()
+    /**
+     * appel le flux
+     *
+     * @return array<int, mixed>
+     */
+    protected function callApi(): array
     {
         $aidsFromImport = [];
         $client = $this->getClient();
@@ -66,6 +77,12 @@ class ImportFluxWelcomeEuropeCommand extends ImportFluxCommand
 
 
 
+    /**
+     *
+     * @param array<mixed, mixed> $aidToImport
+     * @param array<mixed, mixed> $params
+     * @return array<mixed, mixed>
+     */
     protected function getFieldsMapping(array $aidToImport, array $params = null): array // NOSONAR too complex
     {
         $description = '';
@@ -192,6 +209,12 @@ class ImportFluxWelcomeEuropeCommand extends ImportFluxCommand
         return $this->mergeImportDatas($return);
     }
 
+    /**
+     *
+     * @param array<mixed, mixed> $aidToImport
+     * @param Aid $aid
+     * @return Aid
+     */
     protected function setKeywords(array $aidToImport, Aid $aid): Aid
     {
         if (!isset($aidToImport['filtres_sectors'])) {
@@ -211,6 +234,12 @@ class ImportFluxWelcomeEuropeCommand extends ImportFluxCommand
         return $aid;
     }
 
+    /**
+     *
+     * @param array<mixed, mixed> $aidToImport
+     * @param Aid $aid
+     * @return Aid
+     */
     protected function setAidRecurrence(array $aidToImport, Aid $aid): Aid
     {
         if (!isset($aidToImport['dates_deadline-2']) || !isset($aidToImport['dates_open-2'])) {
@@ -226,6 +255,12 @@ class ImportFluxWelcomeEuropeCommand extends ImportFluxCommand
         return $aid;
     }
 
+    /**
+     *
+     * @param array<mixed, mixed> $aidToImport
+     * @param Aid $aid
+     * @return Aid
+     */
     protected function setAidAudiences(array $aidToImport, Aid $aid): Aid // NOSONAR too complex
     {
         /*
@@ -405,6 +440,12 @@ class ImportFluxWelcomeEuropeCommand extends ImportFluxCommand
         return $aid;
     }
 
+    /**
+     *
+     * @param array<mixed, mixed> $aidToImport
+     * @param Aid $aid
+     * @return Aid
+     */
     protected function setAidTypes(array $aidToImport, Aid $aid): Aid // NOSONAR too complex
     {
         /*
@@ -447,6 +488,12 @@ class ImportFluxWelcomeEuropeCommand extends ImportFluxCommand
         return $aid;
     }
 
+    /**
+     *
+     * @param array<mixed, mixed> $aidToImport
+     * @param Aid $aid
+     * @return Aid
+     */
     protected function setCategories(array $aidToImport, Aid $aid): Aid // NOSONAR too complex
     {
         /*
@@ -582,6 +629,12 @@ class ImportFluxWelcomeEuropeCommand extends ImportFluxCommand
         return $aid;
     }
 
+    /**
+     *
+     * @param array<mixed, mixed> $aidToImport
+     * @param Aid $aid
+     * @return Aid
+     */
     protected function setAidSteps(array $aidToImport, Aid $aid): Aid
     {
         /** @var AidStepRepository $aidStepRepo */

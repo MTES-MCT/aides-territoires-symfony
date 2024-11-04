@@ -12,6 +12,7 @@ use App\Entity\Aid\AidType;
 use App\Entity\Category\Category;
 use App\Entity\Organization\OrganizationType;
 use App\Entity\Reference\KeywordReference;
+use App\Repository\Aid\AidDestinationRepository;
 use App\Repository\Aid\AidStepRepository;
 
 #[AsCommand(name: 'at:import_flux:cdm', description: 'Import de flux conseil départemental de la manche')]
@@ -23,7 +24,13 @@ class ImportFluxCdmCommand extends ImportFluxCommand
     protected ?string $importUniqueidPrefix = 'CDManche_';
     protected ?int $idDataSource = 12;
 
-    protected function getImportUniqueid($aidToImport): ?string
+    /**
+     * retourne un identifiant unique pour l'import
+     *
+     * @param array<mixed, mixed> $aidToImport
+     * @return string|null
+     */
+    protected function getImportUniqueid(array $aidToImport): ?string
     {
         if (!isset($aidToImport['id'])) {
             return null;
@@ -31,6 +38,13 @@ class ImportFluxCdmCommand extends ImportFluxCommand
         return $this->importUniqueidPrefix . $aidToImport['id'];
     }
 
+    /**
+     * methode generique pour surcharge
+     *
+     * @param array<mixed, mixed> $aidToImport
+     * @param array<mixed, mixed> $params
+     * @return array<mixed, mixed>
+     */
     protected function getFieldsMapping(array $aidToImport, array $params = null): array
     {
         $dateStart = $this->getDateTimeOrNull($aidToImport['start_date'] ?? null);
@@ -72,6 +86,12 @@ class ImportFluxCdmCommand extends ImportFluxCommand
         return $this->mergeImportDatas($return);
     }
 
+    /**
+     *
+     * @param array<mixed, mixed> $aidToImport
+     * @param Aid $aid
+     * @return Aid
+     */
     protected function setAidTypes(array $aidToImport, Aid $aid): Aid
     {
         // converti en tableau
@@ -90,6 +110,12 @@ class ImportFluxCdmCommand extends ImportFluxCommand
         return $aid;
     }
 
+    /**
+     *
+     * @param array<mixed, mixed> $aidToImport
+     * @param Aid $aid
+     * @return Aid
+     */
     protected function setAidRecurrence(array $aidToImport, Aid $aid): Aid
     {
         if (!isset($aidToImport['recurrence'])) {
@@ -121,6 +147,12 @@ class ImportFluxCdmCommand extends ImportFluxCommand
         return $aid;
     }
 
+    /**
+     *
+     * @param array<mixed, mixed> $aidToImport
+     * @param Aid $aid
+     * @return Aid
+     */
     protected function setAidAudiences(array $aidToImport, Aid $aid): Aid
     {
         if (!isset($aidToImport['targeted_audiences']) || !is_array($aidToImport['targeted_audiences'])) {
@@ -158,6 +190,12 @@ class ImportFluxCdmCommand extends ImportFluxCommand
         return $aid;
     }
 
+    /**
+     *
+     * @param array<mixed, mixed> $aidToImport
+     * @param Aid $aid
+     * @return Aid
+     */
     protected function setKeywords(array $aidToImport, Aid $aid): Aid
     {
         if (!isset($aidToImport['categories']) || !is_array($aidToImport['categories'])) {
@@ -173,6 +211,12 @@ class ImportFluxCdmCommand extends ImportFluxCommand
         return $aid;
     }
 
+    /**
+     *
+     * @param array<mixed, mixed> $aidToImport
+     * @param Aid $aid
+     * @return Aid
+     */
     protected function setAidDestinations(array $aidToImport, Aid $aid): Aid
     {
         if (!isset($aidToImport['destinations']) || !is_array($aidToImport['destinations'])) {
@@ -181,8 +225,9 @@ class ImportFluxCdmCommand extends ImportFluxCommand
         foreach ($aidToImport['destinations'] as $destinationName) {
             // on a un problème avec les apostrophes
             $destinationName = str_replace("'", "’", $destinationName);
-            $destination = $this->managerRegistry->getRepository(OrganizationType::class)
-                ->findOneBy(['name' => $destinationName]);
+            /** @var AidDestinationRepository $destinationRepository */
+            $destinationRepository = $this->managerRegistry->getRepository(AidDestination::class);
+            $destination = $destinationRepository->findOneBy(['name' => $destinationName]);
             if ($destination instanceof AidDestination) {
                 $aid->addAidDestination($destination);
             }

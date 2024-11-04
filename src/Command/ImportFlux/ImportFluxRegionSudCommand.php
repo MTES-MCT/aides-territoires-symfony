@@ -23,7 +23,13 @@ class ImportFluxRegionSudCommand extends ImportFluxCommand
     protected ?string $importUniqueidPrefix = 'RSud_';
     protected ?int $idDataSource = 13;
 
-    protected function getImportUniqueid($aidToImport): ?string
+    /**
+     * retourne un identifiant unique pour l'import
+     *
+     * @param array<mixed, mixed> $aidToImport
+     * @return string|null
+     */
+    protected function getImportUniqueid(array $aidToImport): ?string
     {
         if (!isset($aidToImport['Uid'])) {
             return null;
@@ -31,7 +37,12 @@ class ImportFluxRegionSudCommand extends ImportFluxCommand
         return $this->importUniqueidPrefix . $aidToImport['Uid'];
     }
 
-    protected function callApi()
+    /**
+     * appel le flux
+     *
+     * @return array<int, mixed>
+     */
+    protected function callApi(): array
     {
         $aidsFromImport = [];
         $client = $this->getClient();
@@ -83,7 +94,12 @@ class ImportFluxRegionSudCommand extends ImportFluxCommand
     //     return new CurlHttpClient($apiOptions);
     // }
 
-
+    /**
+     *
+     * @param array<mixed, mixed> $aidToImport
+     * @param array<mixed, mixed> $params
+     * @return array<mixed, mixed>
+     */
     protected function getFieldsMapping(array $aidToImport, array $params = null): array
     {
         $dateStart = (
@@ -141,6 +157,12 @@ class ImportFluxRegionSudCommand extends ImportFluxCommand
         return $this->mergeImportDatas($return);
     }
 
+    /**
+     *
+     * @param array<mixed, mixed> $aidToImport
+     * @param Aid $aid
+     * @return Aid
+     */
     protected function setCategories(array $aidToImport, Aid $aid): Aid // NOSONAR too complex
     {
         if (!isset($aidToImport['Les thématiques'])) {
@@ -255,6 +277,12 @@ class ImportFluxRegionSudCommand extends ImportFluxCommand
         return $aid;
     }
 
+    /**
+     *
+     * @param array<mixed, mixed> $aidToImport
+     * @param Aid $aid
+     * @return Aid
+     */
     protected function setAidAudiences(array $aidToImport, Aid $aid): Aid // NOSONAR too complex
     {
         if (!isset($aidToImport['Pour qui'])) {
@@ -325,6 +353,12 @@ class ImportFluxRegionSudCommand extends ImportFluxCommand
         return $aid;
     }
 
+    /**
+     *
+     * @param array<mixed, mixed> $aidToImport
+     * @param Aid $aid
+     * @return Aid
+     */
     protected function setAidTypes(array $aidToImport, Aid $aid): Aid
     {
         /** @var AidTypeRepository $aidTypeRepo */
@@ -341,6 +375,12 @@ class ImportFluxRegionSudCommand extends ImportFluxCommand
         return $aid;
     }
 
+    /**
+     *
+     * @param array<mixed, mixed> $aidToImport
+     * @param Aid $aid
+     * @return Aid
+     */
     protected function setAidRecurrence(array $aidToImport, Aid $aid): Aid
     {
         if (
@@ -359,6 +399,12 @@ class ImportFluxRegionSudCommand extends ImportFluxCommand
         return $aid;
     }
 
+    /**
+     *
+     * @param array<mixed, mixed> $aidToImport
+     * @param Aid $aid
+     * @return Aid
+     */
     protected function setAidSteps(array $aidToImport, Aid $aid): Aid
     {
         /** @var AidStepRepository $aidStepRepo */
