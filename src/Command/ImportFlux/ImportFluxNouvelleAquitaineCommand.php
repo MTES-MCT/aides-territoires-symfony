@@ -24,7 +24,7 @@ class ImportFluxNouvelleAquitaineCommand extends ImportFluxCommand
         }
 
         // Utilisation de md5 pour des raisons historiques. Les données ne sont pas sensibles.
-        return $this->importUniqueidPrefix.md5($aidToImport['Lien']);
+        return $this->importUniqueidPrefix . md5($aidToImport['Lien']);
     }
 
     protected function callApi()
@@ -46,7 +46,7 @@ class ImportFluxNouvelleAquitaineCommand extends ImportFluxCommand
             $data = json_decode($content, true);
 
             if (JSON_ERROR_NONE !== json_last_error()) {
-                throw new \Exception('Erreur lors du décodage du JSON : '.json_last_error_msg());
+                throw new \Exception('Erreur lors du décodage du JSON : ' . json_last_error_msg());
             }
         } catch (\Exception $e) {
             throw new \Exception($e->getMessage());
@@ -85,7 +85,7 @@ class ImportFluxNouvelleAquitaineCommand extends ImportFluxCommand
 
         $return = [
             'importDataMention' => 'Ces données sont mises à disposition par '
-                .'le Conseil régional de Nouvelle-Aquitaine .',
+                . 'le Conseil régional de Nouvelle-Aquitaine .',
             'name' => isset($aidToImport['Nom']) ? $this->cleanName($aidToImport['Nom']) : null,
             'nameInitial' => isset($aidToImport['Nom']) ? $this->cleanName($aidToImport['Nom']) : null,
             'description' => $description,
