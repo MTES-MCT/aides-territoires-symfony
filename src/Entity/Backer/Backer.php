@@ -1091,5 +1091,5 @@ class Backer // NOSONAR too much methods
     {
         $this->nbAidsByTypeSlug = $nbAidsByTypeSlug;
         return $this;
-    }    
+    }
 }

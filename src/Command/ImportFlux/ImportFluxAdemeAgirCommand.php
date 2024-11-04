@@ -24,7 +24,13 @@ class ImportFluxAdemeAgirCommand extends ImportFluxCommand
     protected ?string $importUniqueidPrefix = 'AGIR_';
     protected ?int $idDataSource = 10;
 
-    protected function getImportUniqueid($aidToImport): ?string
+    /**
+     * retourne un identifiant unique pour l'import
+     *
+     * @param array<mixed, mixed> $aidToImport
+     * @return string|null
+     */
+    protected function getImportUniqueid(array $aidToImport): ?string
     {
         if (!isset($aidToImport['id'])) {
             return null;
@@ -32,6 +38,13 @@ class ImportFluxAdemeAgirCommand extends ImportFluxCommand
         return $this->importUniqueidPrefix . $aidToImport['id'];
     }
 
+    /**
+     * methode generique pour surcharge
+     *
+     * @param array<mixed, mixed> $aidToImport
+     * @param array<mixed, mixed> $params
+     * @return array<mixed, mixed>
+     */
     protected function getFieldsMapping(array $aidToImport, array $params = null): array // NOSONAR too complex
     {
         $isCallForProject = false;
@@ -83,6 +96,10 @@ class ImportFluxAdemeAgirCommand extends ImportFluxCommand
         return $this->mergeImportDatas($return);
     }
 
+    /**
+     *
+     * @return array<mixed, mixed> $aidToImport
+     */
     protected function getApiOptions(): array
     {
         $apiOptions = parent::getApiOptions();
@@ -91,6 +108,12 @@ class ImportFluxAdemeAgirCommand extends ImportFluxCommand
         return $apiOptions;
     }
 
+    /**
+     *
+     * @param array<mixed, mixed> $aidToImport
+     * @param Aid $aid
+     * @return Aid
+     */
     protected function setAidTypes(array $aidToImport, Aid $aid): Aid
     {
         /** @var AidTypeRepository $aidTypeRepo */
@@ -108,6 +131,12 @@ class ImportFluxAdemeAgirCommand extends ImportFluxCommand
         return $aid;
     }
 
+    /**
+     *
+     * @param array<mixed, mixed> $aidToImport
+     * @param Aid $aid
+     * @return Aid
+     */
     protected function setAidRecurrence(array $aidToImport, Aid $aid): Aid
     {
         if (isset($aidToImport['date_debut']) && isset($aidToImport['date_fin'])) {
@@ -147,6 +176,7 @@ class ImportFluxAdemeAgirCommand extends ImportFluxCommand
             ? $aidToImport['couverture_geo']['code']
             : null;
 
+        $perimeter = null;
         if ((int) $couvertureGeo == 1) {
             $perimeter = $this->managerRegistry->getRepository(Perimeter::class)
                 ->findOneBy(['code' => Perimeter::CODE_FRANCE]);
@@ -191,8 +221,6 @@ class ImportFluxAdemeAgirCommand extends ImportFluxCommand
                     $this->managerRegistry->getManager()->persist($perimeter);
                 }
             }
-        } else {
-            $perimeter = null;
         }
 
         if ($perimeter instanceof Perimeter) {
@@ -202,6 +230,12 @@ class ImportFluxAdemeAgirCommand extends ImportFluxCommand
         return $aid;
     }
 
+    /**
+     *
+     * @param array<mixed, mixed> $aidToImport
+     * @param Aid $aid
+     * @return Aid
+     */
     protected function setAidAudiences(array $aidToImport, Aid $aid): Aid
     {
         if (!isset($aidToImport['cible_projet']) || !is_array($aidToImport['cible_projet'])) {
@@ -244,6 +278,12 @@ class ImportFluxAdemeAgirCommand extends ImportFluxCommand
         return $aid;
     }
 
+    /**
+     *
+     * @param array<mixed, mixed> $aidToImport
+     * @param Aid $aid
+     * @return Aid
+     */
     protected function setCategories(array $aidToImport, Aid $aid): Aid
     {
         if (!isset($aidToImport['thematiques']) || !is_array($aidToImport['thematiques'])) {
@@ -268,6 +308,12 @@ class ImportFluxAdemeAgirCommand extends ImportFluxCommand
         return $aid;
     }
 
+    /**
+     *
+     * @param array<mixed, mixed> $aidToImport
+     * @param Aid $aid
+     * @return Aid
+     */
     protected function setKeywords(array $aidToImport, Aid $aid): Aid
     {
         if (!isset($aidToImport['thematiques']) || !is_array($aidToImport['thematiques'])) {
@@ -293,6 +339,10 @@ class ImportFluxAdemeAgirCommand extends ImportFluxCommand
         return $aid;
     }
 
+    /**
+     *
+     * @return array<string, array<string[]>>
+     */
     private function getCategoriesMapping(): array // NOSONAR too complex
     {
         return [

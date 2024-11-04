@@ -11,6 +11,7 @@ use App\Entity\Aid\AidType;
 use App\Entity\Category\Category;
 use App\Entity\Organization\OrganizationType;
 use App\Entity\Reference\KeywordReference;
+use App\Repository\Aid\AidStepRepository;
 use Symfony\Component\HttpClient\CurlHttpClient;
 
 #[AsCommand(name: 'at:import_flux:ile_de_france', description: 'Import de flux ile de france')]
@@ -22,7 +23,13 @@ class ImportFluxIleDeFranceCommand extends ImportFluxCommand
     protected ?string $importUniqueidPrefix = 'IDF_';
     protected ?int $idDataSource = 4;
 
-    protected function getImportUniqueid($aidToImport): ?string
+    /**
+     * retourne un identifiant unique pour l'import
+     *
+     * @param array<mixed, mixed> $aidToImport
+     * @return string|null
+     */
+    protected function getImportUniqueid(array $aidToImport): ?string
     {
         if (!isset($aidToImport['referenceAdministrative'])) {
             return null;
@@ -30,7 +37,12 @@ class ImportFluxIleDeFranceCommand extends ImportFluxCommand
         return $this->importUniqueidPrefix . $aidToImport['referenceAdministrative'];
     }
 
-    protected function callApi()
+    /**
+     * appel le flux
+     *
+     * @return array<int, mixed>
+     */
+    protected function callApi(): array
     {
         $aidsFromImport = [];
         $client = $this->getClient();
@@ -83,7 +95,12 @@ class ImportFluxIleDeFranceCommand extends ImportFluxCommand
         return new CurlHttpClient($apiOptions);
     }
 
-
+    /**
+     *
+     * @param array<mixed, mixed> $aidToImport
+     * @param array<mixed, mixed> $params
+     * @return array<mixed, mixed>
+     */
     protected function getFieldsMapping(array $aidToImport, array $params = null): array
     {
         try {
@@ -166,6 +183,12 @@ class ImportFluxIleDeFranceCommand extends ImportFluxCommand
         }
     }
 
+    /**
+     *
+     * @param array<mixed, mixed> $aidToImport
+     * @param Aid $aid
+     * @return Aid
+     */
     protected function setAidSteps(array $aidToImport, Aid $aid): Aid
     {
         /** @var AidStepRepository $aidStepRepo */
@@ -183,6 +206,12 @@ class ImportFluxIleDeFranceCommand extends ImportFluxCommand
         return $aid;
     }
 
+    /**
+     *
+     * @param array<mixed, mixed> $aidToImport
+     * @param Aid $aid
+     * @return Aid
+     */
     protected function setAidAudiences(array $aidToImport, Aid $aid): Aid // NOSONAR too complex
     {
         if (!isset($aidToImport['publicsBeneficiaire']) || !is_array($aidToImport['publicsBeneficiaire'])) {
@@ -268,6 +297,12 @@ class ImportFluxIleDeFranceCommand extends ImportFluxCommand
         return $aid;
     }
 
+    /**
+     *
+     * @param array<mixed, mixed> $aidToImport
+     * @param Aid $aid
+     * @return Aid
+     */
     protected function setCategories(array $aidToImport, Aid $aid): Aid // NOSONAR too complex
     {
         if (!isset($aidToImport['competences']) || !is_array($aidToImport['competences'])) {
@@ -370,6 +405,12 @@ class ImportFluxIleDeFranceCommand extends ImportFluxCommand
         return $aid;
     }
 
+    /**
+     *
+     * @param array<mixed, mixed> $aidToImport
+     * @param Aid $aid
+     * @return Aid
+     */
     protected function setAidRecurrence(array $aidToImport, Aid $aid): Aid
     {
         $aidRecurrence = null;
@@ -393,6 +434,12 @@ class ImportFluxIleDeFranceCommand extends ImportFluxCommand
         return $aid;
     }
 
+    /**
+     *
+     * @param array<mixed, mixed> $aidToImport
+     * @param Aid $aid
+     * @return Aid
+     */
     protected function setAidTypes(array $aidToImport, Aid $aid): Aid
     {
         $aidType = $this->managerRegistry->getRepository(AidType::class)->findOneBy([
@@ -406,6 +453,12 @@ class ImportFluxIleDeFranceCommand extends ImportFluxCommand
         return $aid;
     }
 
+    /**
+     *
+     * @param array<mixed, mixed> $aidToImport
+     * @param Aid $aid
+     * @return Aid
+     */
     protected function setKeywords(array $aidToImport, Aid $aid): Aid
     {
         $categories = $aidToImport['competences'] ?? [];
