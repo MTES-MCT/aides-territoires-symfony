@@ -14,6 +14,8 @@ use App\Message\Log\MsgLogAidViewTempTransfert;
 use App\Message\Perimeter\CountyCountBacker;
 use App\Message\Reference\ProjectReferenceCountAids;
 use App\Message\SearchPage\SearchPageCountAid;
+use App\Repository\Aid\AidRepository;
+use App\Repository\Perimeter\PerimeterRepository;
 use App\Repository\Reference\ProjectReferenceRepository;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -59,7 +61,7 @@ class SiteDatasCommand extends Command
         return Command::SUCCESS;
     }
 
-    protected function cronTask($input, $output)
+    protected function cronTask(InputInterface $input, OutputInterface $output): void
     {
         $timeStart = microtime(true);
 
@@ -85,12 +87,18 @@ class SiteDatasCommand extends Command
         $time = $timeEnd - $timeStart;
 
         // success
-        $io->success('Temps écoulé : ' . gmdate("H:i:s", $timeEnd) . ' (' . gmdate("H:i:s", intval($time)) . ')');
+        $io->success(
+            'Temps écoulé : '
+            . gmdate("H:i:s", intval($timeEnd))
+            . ' ('
+            . gmdate("H:i:s", intval($time))
+            . ')'
+        );
         $io->success('Mémoire maximale utilisée : ' . round(memory_get_peak_usage() / 1024 / 1024) . ' MB');
     }
 
     // envoi les projets référents pour compter le nombre de résultats de recherche
-    private function projectReferences()
+    private function projectReferences(): void
     {
         /** @var ProjectReferenceRepository $projectReferenceRepository */
         $projectReferenceRepository = $this->managerRegistry->getRepository(ProjectReference::class);
@@ -103,7 +111,7 @@ class SiteDatasCommand extends Command
         }
     }
 
-    private function countyCountBacker()
+    private function countyCountBacker(): void
     {
         /** @var PerimeterRepository $perimeterRepo */
         $perimeterRepo = $this->managerRegistry->getRepository(Perimeter::class);
@@ -117,7 +125,7 @@ class SiteDatasCommand extends Command
         }
     }
 
-    private function backerCountAid()
+    private function backerCountAid(): void
     {
         // charge les porteurs d'aides
         $backers = $this->managerRegistry->getRepository(Backer::class)->findAll();
@@ -129,7 +137,7 @@ class SiteDatasCommand extends Command
         }
     }
 
-    private function countAidsLive()
+    private function countAidsLive(): void
     {
         /** @var AidRepository $aidRepo */
         $aidRepo = $this->managerRegistry->getRepository(Aid::class);
@@ -152,7 +160,7 @@ class SiteDatasCommand extends Command
         }
     }
 
-    private function transfertLogs()
+    private function transfertLogs(): void
     {
         $this->bus->dispatch(new MsgLogAidSearchTempTransfert());
         $this->bus->dispatch(new MsgLogAidViewTempTransfert());

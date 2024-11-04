@@ -761,7 +761,7 @@ class ImportFluxCommand extends Command // NOSONAR too much methods
         // on vérifie d'abord que l'url est valide
         $constraint = new UrlExternalValid();
         $violations = $this->validator->validate($url, $constraint);
-        if (!empty($violations)) {
+        if (count($violations) > 0) {
             return null;
         }
 

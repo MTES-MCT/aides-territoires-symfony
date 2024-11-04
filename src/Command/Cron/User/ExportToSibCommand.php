@@ -61,7 +61,7 @@ class ExportToSibCommand extends Command
         return Command::SUCCESS;
     }
 
-    protected function cronTask($input, $output) // NOSONAR too complex
+    protected function cronTask(InputInterface $input, OutputInterface $output): void // NOSONAR too complex
     {
         $io = new SymfonyStyle($input, $output);
 

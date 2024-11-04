@@ -14,13 +14,9 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Doctrine\Persistence\ManagerRegistry;
-use App\Service\Aid\AidSearchFormService;
-use App\Service\Aid\AidService;
-use App\Service\Email\EmailService;
 use App\Service\Notification\NotificationService;
 use App\Service\Various\ParamService;
 use Symfony\Component\Messenger\MessageBusInterface;
-use Symfony\Component\Routing\RouterInterface;
 
 #[AsCommand(name: 'at:cron:alert:send_weekly', description: 'Envoi des alertes hedbomadaires')]
 class AlertSendWeeklyCommand extends Command
@@ -33,11 +29,7 @@ class AlertSendWeeklyCommand extends Command
     public function __construct(
         private KernelInterface $kernelInterface,
         private ManagerRegistry $managerRegistry,
-        private AidService $aidService,
-        private AidSearchFormService $aidSearchFormService,
-        private EmailService $emailService,
         private ParamService $paramService,
-        private RouterInterface $routerInterface,
         private NotificationService $notificationService,
         private MessageBusInterface $bus
     ) {
@@ -69,7 +61,7 @@ class AlertSendWeeklyCommand extends Command
         return Command::SUCCESS;
     }
 
-    protected function cronTask($input, $output)
+    protected function cronTask(InputInterface $input, OutputInterface $output): void
     {
         $timeStart = microtime(true);
 
@@ -90,7 +82,7 @@ class AlertSendWeeklyCommand extends Command
         $year = $today->format('o');
 
         $startOfWeek = new \DateTime();
-        $startOfWeek->setISODate($year, $weekNumber, 1);
+        $startOfWeek->setISODate(intval($year), intval($weekNumber), 1);
 
         $publishedAfter = clone $startOfWeek;
         $publishedAfter->modify('-7 days');
@@ -121,7 +113,13 @@ class AlertSendWeeklyCommand extends Command
         $time = $timeEnd - $timeStart;
 
         // success
-        $io->success('Temps écoulé : ' . gmdate("H:i:s", $timeEnd) . ' (' . gmdate("H:i:s", intval($time)) . ')');
+        $io->success(
+            'Temps écoulé : '
+            . gmdate("H:i:s", intval($timeEnd))
+            . ' ('
+            . gmdate("H:i:s", intval($time))
+            . ')'
+        );
         $io->success('Mémoire maximale utilisée : ' . round(memory_get_peak_usage() / 1024 / 1024) . ' MB');
     }
 }
