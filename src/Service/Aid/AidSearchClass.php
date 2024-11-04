@@ -19,24 +19,24 @@ class AidSearchClass // NOSONAR too much methods
 {
     private ?OrganizationType $organization_type_slug;
     /**
-     * @var ?ArrayCollection|OrganizationType[]
+     * @var ?ArrayCollection<int, OrganizationType>
      */
     private ?ArrayCollection $audiences;
     private ?Perimeter $perimeter_id;
     private ?string $keyword;
     /**
-     * @var ?ArrayCollection|Category[]
+     * @var ?ArrayCollection<int, Category>
      */
     private $category_ids;
     private ?bool $newIntegration;
     private ?string $orderBy;
     /**
-     * @var ?ArrayCollection|AidType[]
+     * @var ?ArrayCollection<int, AidType>
      */
     private $aid_type_ids;
 
     /**
-     * @var ?ArrayCollection|Backer[]
+     * @var ?ArrayCollection<int, Backer>
      */
     private $backer_ids;
     private ?BackerGroup $backer_group_id;
@@ -45,15 +45,15 @@ class AidSearchClass // NOSONAR too much methods
     private ?\DateTime $published_after;
 
     /**
-     * @var ?ArrayCollection|Program[]
+     * @var ?ArrayCollection<int, Program>
      */
     private $programs;
     /**
-     * @var ?ArrayCollection|AidStep[]
+     * @var ?ArrayCollection<int, AidStep>
      */
     private $aid_step_ids;
     /**
-     * @var ?ArrayCollection|AidDestination[]
+     * @var ?ArrayCollection<int, AidDestination>
      */
     private $aid_destination_ids;
     private ?bool $is_charged;
@@ -97,11 +97,20 @@ class AidSearchClass // NOSONAR too much methods
         $this->organization_type_slug = $organizationType;
     }
 
+    /**
+     *
+     * @return ArrayCollection<int, OrganizationType>|null
+     */
     public function getAudiences(): ?ArrayCollection
     {
         return $this->audiences;
     }
 
+    /**
+     *
+     * @param ArrayCollection<int, OrganizationType>|null $audiences
+     * @return void
+     */
     public function setAudiences(?ArrayCollection $audiences): void
     {
         $this->audiences = $audiences;
@@ -137,11 +146,20 @@ class AidSearchClass // NOSONAR too much methods
         $this->keyword = $keyword;
     }
 
+    /**
+     *
+     * @return ArrayCollection<int, Category>|null
+     */
     public function getCategoryIds(): ?ArrayCollection
     {
         return $this->category_ids;
     }
 
+    /**
+     *
+     * @param ArrayCollection<int, Category>|null $categoryIds
+     * @return void
+     */
     public function setCategoryIds(?ArrayCollection $categoryIds): void
     {
         $this->category_ids = $categoryIds;
@@ -177,11 +195,20 @@ class AidSearchClass // NOSONAR too much methods
         $this->orderBy = $orderBy;
     }
 
+    /**
+     *
+     * @return ArrayCollection<int, AidType>|null
+     */
     public function getAidTypeIds(): ?ArrayCollection
     {
         return $this->aid_type_ids;
     }
 
+    /**
+     *
+     * @param ArrayCollection<int, AidType>|null $aidTypeIds
+     * @return void
+     */
     public function setAidTypeIds(?ArrayCollection $aidTypeIds): void
     {
         $this->aid_type_ids = $aidTypeIds;
@@ -197,11 +224,20 @@ class AidSearchClass // NOSONAR too much methods
         }
     }
 
+    /**
+     *
+     * @return ArrayCollection<int, Backer>|null
+     */
     public function getBackerIds(): ?ArrayCollection
     {
         return $this->backer_ids;
     }
 
+    /**
+     *
+     * @param ArrayCollection<int, Backer>|null $backerIds
+     * @return void
+     */
     public function setBackerIds(?ArrayCollection $backerIds): void
     {
         $this->backer_ids = $backerIds;
@@ -247,11 +283,20 @@ class AidSearchClass // NOSONAR too much methods
         $this->published_after = $publishedAfter;
     }
 
+    /**
+     *
+     * @return ArrayCollection<int, Program>|null
+     */
     public function getPrograms(): ?ArrayCollection
     {
         return $this->programs;
     }
 
+    /**
+     *
+     * @param ArrayCollection<int, Program>|null $programs
+     * @return void
+     */
     public function setPrograms(?ArrayCollection $programs): void
     {
         $this->programs = $programs;
@@ -267,11 +312,20 @@ class AidSearchClass // NOSONAR too much methods
         }
     }
 
+    /**
+     *
+     * @return ArrayCollection<int, AidStep>|null
+     */
     public function getAidStepIds(): ?ArrayCollection
     {
         return $this->aid_step_ids;
     }
 
+    /**
+     *
+     * @param ArrayCollection<int, AidStep>|null $aidStepIds
+     * @return void
+     */
     public function setAidStepIds(?ArrayCollection $aidStepIds): void
     {
         $this->aid_step_ids = $aidStepIds;
@@ -287,11 +341,20 @@ class AidSearchClass // NOSONAR too much methods
         }
     }
 
+    /**
+     *
+     * @return ArrayCollection<int, AidDestination>|null
+     */
     public function getAidDestinationIds(): ?ArrayCollection
     {
         return $this->aid_destination_ids;
     }
 
+    /**
+     *
+     * @param ArrayCollection<int, AidDestination>|null $aidDestinationIds
+     * @return void
+     */
     public function setAidDestinationIds(?ArrayCollection $aidDestinationIds): void
     {
         $this->aid_destination_ids = $aidDestinationIds;

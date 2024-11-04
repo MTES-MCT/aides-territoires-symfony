@@ -12,6 +12,15 @@ class AidProjectService
     ) {
     }
 
+    /**
+     * Compte le nombre d'entrées par jour
+     *
+     * @param Aid $aid
+     * @param \DateTime $dateMin
+     * @param \DateTime $dateMax
+     * @param boolean|null $projectPublic
+     * @return array<string, int>
+     */
     public function getCountByDay(Aid $aid, \DateTime $dateMin, \DateTime $dateMax, ?bool $projectPublic = null): array
     {
         $NbEntriesByDay = [];

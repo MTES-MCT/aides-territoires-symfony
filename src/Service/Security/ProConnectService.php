@@ -281,9 +281,9 @@ class ProConnectService
                     'Accept' => 'application/json',
                 ],
             ]);
-    
+
             $jwksData = json_decode($response->getContent(), true);
-    
+
             // Extraire la clé publique pour RS256
             $publicKeyData = null;
             foreach ($jwksData['keys'] as $key) {
@@ -292,16 +292,16 @@ class ProConnectService
                     break;
                 }
             }
-    
+
             if (!$publicKeyData) {
                 throw new ProConnectException('Clé publique RS256 non trouvée');
             }
-    
+
             $publicKey = $this->convertJwkToPem($publicKeyData);
-    
+
             $parser = new Parser(new JoseEncoder());
             $token = $parser->parse($idToken);
-    
+
             $validator = new Validator();
 
             // Valide que le token est bien signé en Sha256 avec la clé publique récupérée

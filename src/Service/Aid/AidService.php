@@ -14,14 +14,15 @@ use App\Entity\Reference\ProjectReference;
 use App\Entity\Search\SearchPage;
 use App\Entity\User\User;
 use App\Repository\Aid\AidRepository;
+use App\Repository\Reference\KeywordReferenceRepository;
 use App\Service\Log\LogAidApplicationUrlClickService;
 use App\Service\Log\LogAidOriginUrlClickService;
 use App\Service\Log\LogAidViewService;
-use App\Service\Reference\ReferenceService;
 use App\Service\User\UserService;
 use App\Service\Various\StringService;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Persistence\ManagerRegistry;
+use DOMElement;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -35,12 +36,17 @@ class AidService // NOSONAR too complex
         private HttpClientInterface $httpClientInterface,
         private UserService $userService,
         private RouterInterface $routerInterface,
-        private ReferenceService $referenceService,
         private ManagerRegistry $managerRegistry,
         private LoggerInterface $loggerInterface,
     ) {
     }
 
+    /**
+     * Retourne des projets référents suggérés pour une aide
+     *
+     * @param Aid $aid
+     * @return array<int, ProjectReference>
+     */
     public function getSuggestedProjectReferences(Aid $aid): array
     {
         $projectReferencesSuggestions = [];
@@ -66,12 +72,19 @@ class AidService // NOSONAR too complex
         return $projectReferencesSuggestions;
     }
 
+    /**
+     * Recherche des aides qui semble dupliquées
+     *
+     * @param Aid $aid
+     * @return array<int, Aid>
+     */
     public function getAidDuplicates(Aid $aid): array
     {
         if (!$aid->getOriginUrl()) {
             return [];
         }
 
+        /** @var AidRepository $aidRepository */
         $aidRepository = $this->managerRegistry->getRepository(Aid::class);
 
         return $aidRepository->findCustom(
@@ -228,6 +241,12 @@ class AidService // NOSONAR too complex
         return $access;
     }
 
+    /**
+     * Fonction de recherche des aides
+     *
+     * @param array<string, mixed> $aidParams
+     * @return array<int, Aid>
+     */
     public function searchAids(array $aidParams): array
     {
         /** @var AidRepository $aidRepo */
@@ -266,8 +285,9 @@ class AidService // NOSONAR too complex
 
         $xpath = new \DOMXPath($dom);
         $nodes = $xpath->query('//*[@style]');
+        /** @var DOMElement $node */
         foreach ($nodes as $node) {
-            $itemId = $node->getAttribute('id') ?? '';
+            $itemId = $node->getAttribute('id');
             if ('' == $itemId) {
                 $itemId = uniqid('style-');
                 $node->setAttribute('id', $itemId);
@@ -287,6 +307,13 @@ class AidService // NOSONAR too complex
         return $aid;
     }
 
+    /**
+     * Traitement du tableau d'aides après la recherche
+     *
+     * @param array<int, Aid> $aids
+     * @param array<string, mixed>|null $params
+     * @return array<int, Aid>
+     */
     public function postPopulateAids(array $aids, ?array $params): array
     {
         // on déduplique les génériques
@@ -298,8 +325,14 @@ class AidService // NOSONAR too complex
         return $aids;
     }
 
-    // pour les portails il y a des aides mises en avant et des aides à exclures
-    public function handleSearchPageRules(array $aids, $params): array // NOSONAR too complex
+    /**
+     * pour les portails il y a des aides mises en avant et des aides à exclures
+     *
+     * @param array<int, Aid> $aids
+     * @param array<string, mixed>|null $params
+     * @return array<int, Aid>
+     */
+    public function handleSearchPageRules(array $aids, ?array $params): array // NOSONAR too complex
     {
         if (isset($params['searchPage']) && $params['searchPage'] instanceof SearchPage) {
             // aides à exclures
@@ -341,6 +374,12 @@ class AidService // NOSONAR too complex
         Lorsque la recherche porte sur une zone plus petite que le périmètre de l'aide locale,
             nous affichons la version locale.
     */
+    /**
+     *
+     * @param array<int, Aid> $aids
+     * @param Perimeter|null $perimeter
+     * @return array<int, Aid>
+     */
     public function unDuplicateGenerics(array $aids, ?Perimeter $perimeter): array // NOSONAR too complex
     {
         // Si on n'a pas de périmètre de recherche
@@ -354,6 +393,10 @@ class AidService // NOSONAR too complex
         // les aides que l'on va exclude
         $perimeterSearch = $perimeter instanceof Perimeter;
         $perimeterScale = ($perimeter instanceof Perimeter) ? $perimeter->getScale() : 0;
+
+        $searchSmaller = false;
+        $searchWider = false;
+
         // Parcours la liste des aides actuelles
         /** @var Aid $aid */
         foreach ($aids as $aid) {
@@ -380,7 +423,7 @@ class AidService // NOSONAR too complex
         return $aids->toArray();
     }
 
-    public function getUrl(Aid $aid, $interface = UrlGeneratorInterface::ABSOLUTE_URL): ?string
+    public function getUrl(Aid $aid, int $interface = UrlGeneratorInterface::ABSOLUTE_URL): ?string
     {
         try {
             return $this->routerInterface->generate('app_aid_aid_details', ['slug' => $aid->getSlug()], $interface);
@@ -406,24 +449,27 @@ class AidService // NOSONAR too complex
 
     public function userCanSee(Aid $aid, ?User $user): bool
     {
+        $return = true;
+
         if (!$aid->isPublished()) {
             if ($user && $aid->getAuthor() && ($user->getId() == $aid->getAuthor()->getId())) { // c'est l'auteur
-                return true;
+                $return = true;
             } elseif (
                 $user
                 && $aid->getOrganization()
-                && $aid->getOrganization()->getBeneficiairies()
                 && $aid->getOrganization()->getBeneficiairies()->contains($user)
             ) { // le user fait parti de l'organization de l'aide
-                return true;
+                $return = true;
             } elseif ($user && $this->userService->isUserGranted($user, User::ROLE_ADMIN)) { // c'est un admin
-                return true;
+                $return = true;
             } else {
-                return false;
+                $return = false;
             }
         } else {
-            return true;
+            $return = true;
         }
+
+        return $return;
     }
 
     public function userCanEdit(Aid $aid, ?User $user): bool
@@ -447,6 +493,11 @@ class AidService // NOSONAR too complex
 
     /**
      * Recupère les données chez Démarche Simplifiée (DS).
+     *
+     * @param Aid $aid
+     * @param User|null $user
+     * @param Organization|null $organization
+     * @return array<string, mixed>
      */
     public function getDatasFromDs(Aid $aid, ?User $user, ?Organization $organization): array
     {
@@ -495,7 +546,14 @@ class AidService // NOSONAR too complex
     }
 
     /**
-     * Aoppel l'API Démarche Simplifiée (DS).
+     * Appel l'API Démarche Simplifiée (DS).
+     *
+     * @param int $dsId
+     * @param array<string, mixed> $dsMapping
+     * @param UserInterface|null $user
+     * @param Organization|null $organization
+     *
+     * @return mixed
      */
     public function postPrepopulateData(
         int $dsId,
@@ -519,6 +577,11 @@ class AidService // NOSONAR too complex
 
     /**
      * Fait le tableau de données à envoyer à Démarche Simplifiée (DS).
+     *
+     * @param array<string, mixed> $dsMapping
+     * @param UserInterface|null $user
+     * @param Organization|null $organization
+     * @return array<string, mixed>
      */
     public function prepopulateDsFolder(array $dsMapping, ?UserInterface $user, ?Organization $organization): array
     {
@@ -544,7 +607,7 @@ class AidService // NOSONAR too complex
                         default:
                             break;
                     }
-                    if ($value) {
+                    if (isset($value) && $value) {
                         $datas[$field['ds_field_id']] = $value;
                     }
                 }
@@ -570,15 +633,12 @@ class AidService // NOSONAR too complex
             switch ($oldField) {
                 case 'last_name':
                     return $entity->getLastname();
-                    break;
 
                 case 'first_name':
                     return $entity->getFirstname();
-                    break;
 
                 case 'email':
                     return $entity->getEmail();
-                    break;
 
                 default:
                     break;
@@ -671,6 +731,12 @@ class AidService // NOSONAR too complex
         $this->managerRegistry->getManager()->flush();
     }
 
+    /**
+     * Extraits les mots clés
+     *
+     * @param Aid $aid
+     * @return array<int, array<string, mixed>>
+     */
     public function extractKeywords(Aid $aid): array
     {
         // concatene les textes bruts
@@ -782,6 +848,7 @@ class AidService // NOSONAR too complex
         $tokens = tokenize($text);
 
         // rempli un tableau avec les mots importants
+        /** @var ArrayCollection<int, KeywordReference> */
         $keywords = new ArrayCollection();
         $keywordsReturn = [];
         $freqDist = freq_dist($tokens);
@@ -796,7 +863,7 @@ class AidService // NOSONAR too complex
             ]);
             if (
                 $keyword instanceof KeywordReference
-                && $keyword->getParent()
+                && $keyword->getParent() instanceof KeywordReference
                 && !$keywords->contains($keyword->getParent())
             ) {
                 $keywords->add($keyword->getParent());

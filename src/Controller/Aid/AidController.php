@@ -432,6 +432,7 @@ class AidController extends FrontController
                                 );
                             }
                         }
+                        
                         // message
                         $this->addFlash(
                             FrontController::FLASH_SUCCESS,
