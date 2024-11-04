@@ -11,8 +11,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Doctrine\Persistence\ManagerRegistry;
-use App\Service\Aid\AidSearchFormService;
-use App\Service\Aid\AidService;
 use App\Service\Email\EmailService;
 use App\Service\Various\ParamService;
 use App\Validator\UrlExternalValid;
@@ -32,8 +30,6 @@ class FindBrokenLinksCommand extends Command
     public function __construct(
         private KernelInterface $kernelInterface,
         private ManagerRegistry $managerRegistry,
-        private AidService $aidService,
-        private AidSearchFormService $aidSearchFormService,
         private EmailService $emailService,
         private ParamService $paramService,
         private ValidatorInterface $validator
@@ -66,7 +62,7 @@ class FindBrokenLinksCommand extends Command
         return Command::SUCCESS;
     }
 
-    protected function cronTask($input, $output) // NOSONAR too complex
+    protected function cronTask(InputInterface $input, OutputInterface $output): void // NOSONAR too complex
     {
         $io = new SymfonyStyle($input, $output);
         $timeStart = microtime(true);
@@ -150,17 +146,23 @@ class FindBrokenLinksCommand extends Command
         $time = $timeEnd - $timeStart;
 
         // success
-        $io->success('Temps écoulé : ' . gmdate("H:i:s", $timeEnd) . ' (' . gmdate("H:i:s", intval($time)) . ')');
+        $io->success(
+            'Temps écoulé : '
+            . gmdate("H:i:s", intval($timeEnd))
+            . ' ('
+            . gmdate("H:i:s", intval($time))
+            . ')'
+        );
         $io->success('Nombre d\'aides avec lien cassé : ' . $nbBrokenLinks);
         $io->success('Mémoire maximale utilisée : ' . round(memory_get_peak_usage() / 1024 / 1024) . ' MB');
     }
 
-    private function checkUrl($url): bool
+    private function checkUrl(string $url): bool
     {
         // on vérifie d'abord que l'url est valide
         $constraint = new UrlExternalValid();
         $violations = $this->validator->validate($url, $constraint);
-        if (!empty($violations)) {
+        if (count($violations) > 0) {
             return false;
         }
 

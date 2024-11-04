@@ -11,6 +11,7 @@ use Symfony\Component\HttpKernel\KernelInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use App\Entity\User\Notification;
 use App\Entity\User\User;
+use App\Repository\User\NotificationRepository;
 use App\Repository\User\UserRepository;
 use App\Service\Aid\AidSearchFormService;
 use App\Service\Aid\AidService;
@@ -63,7 +64,7 @@ class NotificationSendWeeklyCommand extends Command
         return Command::SUCCESS;
     }
 
-    protected function cronTask($input, $output)
+    protected function cronTask(InputInterface $input, OutputInterface $output): void
     {
         $io = new SymfonyStyle($input, $output);
 

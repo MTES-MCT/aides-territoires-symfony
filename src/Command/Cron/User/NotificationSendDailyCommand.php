@@ -64,7 +64,7 @@ class NotificationSendDailyCommand extends Command
         return Command::SUCCESS;
     }
 
-    protected function cronTask($input, $output)
+    protected function cronTask(InputInterface $input, OutputInterface $output): void
     {
         $io = new SymfonyStyle($input, $output);
 
