@@ -93,7 +93,8 @@ class ImportFluxMinistereCultureCommand extends ImportFluxCommand
                 'name' => isset($aidToImport['title']) ? strip_tags((string) $aidToImport['title']) : null,
                 'nameInitial' => isset($aidToImport['title']) ? strip_tags((string) $aidToImport['title']) : null,
                 'description' => $description,
-                'originUrl' => isset($aidToImport['url']) ? $aidToImport['url'] : null,
+                'originUrl' => isset($aidToImport['url'])
+                    ? $this->getValidExternalUrlOrNull($aidToImport['url']) : null,
                 'contact' => isset($aidToImport['contact'])
                     ? $this->htmlSanitizerInterface->sanitize($aidToImport['contact']) : null,
                 'eligibility' => $eligility,

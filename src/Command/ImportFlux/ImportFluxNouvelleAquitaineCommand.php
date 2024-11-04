@@ -2,12 +2,11 @@
 
 namespace App\Command\ImportFlux;
 
-use Symfony\Component\Console\Attribute\AsCommand;
-use App\Command\ImportFlux\ImportFluxCommand;
 use App\Entity\Aid\Aid;
 use App\Entity\Aid\AidRecurrence;
 use App\Entity\Category\Category;
 use App\Entity\Organization\OrganizationType;
+use Symfony\Component\Console\Attribute\AsCommand;
 
 #[AsCommand(name: 'at:import_flux:nouvelle_aquitaine', description: 'Import de flux région nouvelle aquitaine')]
 class ImportFluxNouvelleAquitaineCommand extends ImportFluxCommand
@@ -50,14 +49,14 @@ class ImportFluxNouvelleAquitaineCommand extends ImportFluxCommand
                 $importUrl,
                 $this->getApiOptions()
             );
-            if ($response->getStatusCode() !== 200) {
+            if (200 !== $response->getStatusCode()) {
                 throw new \Exception('Erreur lors de la récupération du flux');
             }
 
             $content = $response->getContent();
             $data = json_decode($content, true);
 
-            if (json_last_error() !== JSON_ERROR_NONE) {
+            if (JSON_ERROR_NONE !== json_last_error()) {
                 throw new \Exception('Erreur lors du décodage du JSON : ' . json_last_error_msg());
             }
         } catch (\Exception $e) {
@@ -66,7 +65,6 @@ class ImportFluxNouvelleAquitaineCommand extends ImportFluxCommand
 
         return $data;
     }
-
 
     /**
      *
@@ -112,14 +110,16 @@ class ImportFluxNouvelleAquitaineCommand extends ImportFluxCommand
             'name' => isset($aidToImport['Nom']) ? $this->cleanName($aidToImport['Nom']) : null,
             'nameInitial' => isset($aidToImport['Nom']) ? $this->cleanName($aidToImport['Nom']) : null,
             'description' => $description,
-            'originUrl' => isset($aidToImport['Lien']) ? $aidToImport['Lien'] : null,
-            'applicationUrl' => isset($aidToImport['Lien']) ? $aidToImport['Lien'] : null,
+            'originUrl' => isset($aidToImport['Lien'])
+                ? $this->getValidExternalUrlOrNull($aidToImport['Lien']) : null,
+            'applicationUrl' => isset($aidToImport['Lien'])
+                ? $this->getValidExternalUrlOrNull($aidToImport['Lien']) : null,
             'dateStart' => $dateStart,
             'dateSubmissionDeadline' => $dateSubmissionDeadline,
             'eligibility' => $eligibility,
             'projectExamples' => $examples,
             'contact' => $contact,
-            'europeanAid' => $europeanAid
+            'europeanAid' => $europeanAid,
         ];
 
         // on ajoute les données brut d'import pour comparer avec les données actuelles
@@ -218,7 +218,7 @@ class ImportFluxNouvelleAquitaineCommand extends ImportFluxCommand
 
         // Les catégories en base par id
         $categories = $this->managerRegistry->getRepository(Category::class)->findBy([
-            'id' => array_unique(array_values($mapping))
+            'id' => array_unique(array_values($mapping)),
         ]);
         $categoriesById = [];
         foreach ($categories as $category) {
@@ -274,7 +274,7 @@ class ImportFluxNouvelleAquitaineCommand extends ImportFluxCommand
         $flattenedMapping = array_unique(array_merge(...array_values($mapping)));
 
         $organizationTypes = $this->managerRegistry->getRepository(OrganizationType::class)->findBy([
-            'id' => $flattenedMapping
+            'id' => $flattenedMapping,
         ]);
         $organizationTypesById = [];
         foreach ($organizationTypes as $organizationType) {

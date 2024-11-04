@@ -11,6 +11,7 @@ use App\Service\File\FileService;
 use App\Service\Perimeter\PerimeterService;
 use App\Service\Various\ParamService;
 use App\Service\Various\StringService;
+use App\Validator\UrlExternalValid;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -19,6 +20,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\HtmlSanitizer\HtmlSanitizerInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 #[AsCommand(name: 'at:import_flux:generic', description: 'Import de flux générique, à étendre à chaque nouveau flux')]
@@ -72,7 +74,8 @@ class ImportFluxCommand extends Command // NOSONAR too much methods
         protected HtmlSanitizerInterface $htmlSanitizerInterface,
         protected PerimeterService $perimeterService,
         protected StringService $stringService,
-        protected FileService $fileService
+        protected FileService $fileService,
+        protected ValidatorInterface $validator,
     ) {
         parent::__construct();
         $this->dateImportStart = new \DateTime(date('Y-m-d H:i:s'));
@@ -89,8 +92,9 @@ class ImportFluxCommand extends Command // NOSONAR too much methods
         $io = new SymfonyStyle($input, $output);
         $io->title($this->commandTextStart);
 
-        if ($this->kernelInterface->getEnvironment() != 'prod') {
+        if ('prod' != $this->kernelInterface->getEnvironment()) {
             $io->info('Uniquement en prod');
+
             return Command::FAILURE;
         }
 
@@ -114,6 +118,7 @@ class ImportFluxCommand extends Command // NOSONAR too much methods
                 ]
             );
             $io->error($exception->getMessage());
+
             return Command::FAILURE;
         }
 
@@ -137,6 +142,7 @@ class ImportFluxCommand extends Command // NOSONAR too much methods
         );
 
         $io->title($this->commandTextEnd);
+
         return Command::SUCCESS;
     }
 
@@ -151,7 +157,7 @@ class ImportFluxCommand extends Command // NOSONAR too much methods
         // vérifie les paramètres requis
         $requiredParams = [
             'importUniqueidPrefix',
-            'idDataSource'
+            'idDataSource',
         ];
 
         foreach ($requiredParams as $requiredParam) {
@@ -233,7 +239,7 @@ class ImportFluxCommand extends Command // NOSONAR too much methods
         $aidsFromImport = [];
         $client = $this->getClient();
 
-        for ($i = 0; $i < $this->nbPages; $i++) {
+        for ($i = 0; $i < $this->nbPages; ++$i) {
             $this->currentPage = $i;
             $importUrl = $this->dataSource->getImportApiUrl();
             if ($this->paginationEnabled) {
@@ -262,7 +268,6 @@ class ImportFluxCommand extends Command // NOSONAR too much methods
             }
         }
 
-
         return $aidsFromImport;
     }
 
@@ -277,7 +282,7 @@ class ImportFluxCommand extends Command // NOSONAR too much methods
             // on recherche par importUniqueid
             $aid = $this->managerRegistry->getRepository(Aid::class)->findOneBy(
                 [
-                    'importUniqueid' => trim($this->getImportUniqueid($aidToImport))
+                    'importUniqueid' => trim($this->getImportUniqueid($aidToImport)),
                 ]
             );
             if ($aid instanceof Aid) {
@@ -335,7 +340,7 @@ class ImportFluxCommand extends Command // NOSONAR too much methods
             $this->managerRegistry->getManager()->persist($this->dataSource);
 
             // incrémente le compteur
-            $this->create++;
+            ++$this->create;
 
             // retour
             return true;
@@ -368,7 +373,7 @@ class ImportFluxCommand extends Command // NOSONAR too much methods
                 'nameInitial',
                 'originUrl',
                 'applicationUrl',
-                'importDataMention'
+                'importDataMention',
             ];
 
             // parcours les nouvelles valeurs
@@ -376,7 +381,7 @@ class ImportFluxCommand extends Command // NOSONAR too much methods
             $needManualValidation = false;
             foreach ($newValues as $field => $value) {
                 // on ne regarde pas le champ qui stocke l'update
-                if ($field == 'importDatas') {
+                if ('importDatas' == $field) {
                     continue;
                 }
                 // gestion des booleéns
@@ -422,8 +427,7 @@ class ImportFluxCommand extends Command // NOSONAR too much methods
             if (!empty($diff)) {
                 $entityUpdated = true;
             }
-            //-----------------------------------------------------
-
+            // -----------------------------------------------------
 
             // on regarde si modification des categories, update en auto
             $oldArray = $aid->getCategories()->toArray();
@@ -434,7 +438,7 @@ class ImportFluxCommand extends Command // NOSONAR too much methods
             if (!empty($diff)) {
                 $entityUpdated = true;
             }
-            //-----------------------------------------------------
+            // -----------------------------------------------------
 
             if ($entityUpdated) {
                 // on ne notifie que si l'aide est en ligne et a besoin d'une validation manuelle
@@ -448,7 +452,7 @@ class ImportFluxCommand extends Command // NOSONAR too much methods
                 $this->managerRegistry->getManager()->persist($aid);
 
                 // incrémente le compteur
-                $this->update++;
+                ++$this->update;
             }
 
             return true;
@@ -614,7 +618,7 @@ class ImportFluxCommand extends Command // NOSONAR too much methods
     protected function mergeImportDatas(array $return): array
     {
         return array_merge($return, [
-            'importDatas' => $return
+            'importDatas' => $return,
         ]);
     }
 
@@ -637,6 +641,7 @@ class ImportFluxCommand extends Command // NOSONAR too much methods
                 return true;
             }
         }
+
         return false;
     }
 
@@ -657,12 +662,12 @@ class ImportFluxCommand extends Command // NOSONAR too much methods
 
         foreach ($formats as $format) {
             $dateTemp = \DateTime::createFromFormat($format, $date);
-            if ($dateTemp !== false) {
+            if (false !== $dateTemp) {
                 break;
             }
         }
 
-        if ($dateTemp === false) {
+        if (false === $dateTemp) {
             return null;
         }
 
@@ -690,7 +695,8 @@ class ImportFluxCommand extends Command // NOSONAR too much methods
             return null;
         }
         $value = trim(strtolower($aidToImport[$key]));
-        return $value == '1' || $value == 'true' || $value == 'oui';
+
+        return '1' == $value || 'true' == $value || 'oui' == $value;
     }
 
     protected function cleanName(string $name): string
@@ -699,12 +705,13 @@ class ImportFluxCommand extends Command // NOSONAR too much methods
         if (strlen($name) > 255) {
             $name = $this->stringService->truncate($name, 255);
         }
+
         return $name;
     }
 
     protected function getHtmlOrNull(string $html): ?string
     {
-        return $this->getCleanHtml($html) == '' ? null : $this->getCleanHtml($html);
+        return '' == $this->getCleanHtml($html) ? null : $this->getCleanHtml($html);
     }
 
     protected function getCleanHtml(string $html): string
@@ -726,7 +733,7 @@ class ImportFluxCommand extends Command // NOSONAR too much methods
     {
         $html = '';
         foreach ($fields as $field) {
-            if (isset($aidToImport[$field]) && trim($aidToImport[$field]) != '') {
+            if (isset($aidToImport[$field]) && '' != trim($aidToImport[$field])) {
                 $html .= ' ' . $this->getCleanHtml($aidToImport[$field]);
                 if ($separator) {
                     $html .= $separator;
@@ -736,10 +743,28 @@ class ImportFluxCommand extends Command // NOSONAR too much methods
 
         $html = trim($html);
 
-        return $html !== '' ? $html : null;
+        return '' !== $html ? $html : null;
     }
 
     protected function setInternalAidRecurrences(): void // NOSONAR methode generique pour surcharge
     {
+    }
+
+    protected function getValidExternalUrlOrNull(?string $url): ?string
+    {
+        if (empty($url)) {
+            return null;
+        }
+
+        $url = trim($url);
+
+        // on vérifie d'abord que l'url est valide
+        $constraint = new UrlExternalValid();
+        $violations = $this->validator->validate($url, $constraint);
+        if (!empty($violations)) {
+            return null;
+        }
+
+        return $url;
     }
 }

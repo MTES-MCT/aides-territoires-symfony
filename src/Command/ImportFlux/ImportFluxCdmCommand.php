@@ -70,9 +70,9 @@ class ImportFluxCdmCommand extends ImportFluxCommand
             'description' => isset($aidToImport['description'])
                 ? $this->getCleanHtml($aidToImport['description']) : null,
             'originUrl' => isset($aidToImport['origin_url'])
-                ? $aidToImport['origin_url'] : null,
+                ? $this->getValidExternalUrlOrNull($aidToImport['origin_url']) : null,
             'applicationUrl' => isset($aidToImport['application_url'])
-                ? $aidToImport['application_url'] : null,
+                ? $this->getValidExternalUrlOrNull($aidToImport['application_url']) : null,
             'isCallForProject' => isset($aidToImport['is_call_for_project'])
                 ? $aidToImport['is_call_for_project'] : null,
             'dateStart' => $dateStart,

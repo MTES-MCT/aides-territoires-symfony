@@ -422,7 +422,8 @@ class ImportKeywordReferenceCommand extends Command
                 "rénovation",
                 "rénovations", "rénover", "réparation", "réparations", "réparer", "restauration", "restaurations",
                 "restaurer",
-                "restructuration", "restructurations", "restructurer", "revalorisation", "revalorisations", "revaloriser",
+                "restructuration", "restructurations", "restructurer", "revalorisation", "revalorisations",
+                "revaloriser",
                 "travaux",
                 "travaux de réparation", "travauxs", "changer", "changement"
             ],

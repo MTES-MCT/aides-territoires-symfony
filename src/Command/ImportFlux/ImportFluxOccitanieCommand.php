@@ -148,7 +148,8 @@ class ImportFluxOccitanieCommand extends ImportFluxCommand
             'datePublished' => $datePublished,
             'description' => $this->concatHtmlFields($aidToImport, ['chapo', 'introduction']),
             'timeUpdate' => $timeUpdate,
-            'originUrl' => $aidToImport['url'] ?? null,
+            'originUrl' => isset($aidToImport['url'])
+                ? $this->getValidExternalUrlOrNull($aidToImport['url']) : null,
             'isCallForProject' => (
                 isset($aidToImport['aides_appels_a_projets'])
                 && $aidToImport['aides_appels_a_projets'] == 'Appels à projets'

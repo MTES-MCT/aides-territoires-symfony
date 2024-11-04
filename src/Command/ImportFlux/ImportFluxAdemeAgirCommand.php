@@ -81,9 +81,9 @@ class ImportFluxAdemeAgirCommand extends ImportFluxCommand
             'description' => isset($aidToImport['description_longue'])
                 ? $this->htmlSanitizerInterface->sanitize($aidToImport['description_longue']) : null,
             'originUrl' => isset($aidToImport['url_agir'])
-                ? $aidToImport['url_agir'] : null,
+                ? $this->getValidExternalUrlOrNull($aidToImport['url_agir']) : null,
             'applicationUrl' => isset($aidToImport['url_agir'])
-                ? $aidToImport['url_agir'] : null,
+                ? $this->getValidExternalUrlOrNull($aidToImport['url_agir']) : null,
             'isCallForProject' => $isCallForProject,
             'dateStart' => $dateStart,
             'dateSubmissionDeadline' => $dateSubmissionDeadline,

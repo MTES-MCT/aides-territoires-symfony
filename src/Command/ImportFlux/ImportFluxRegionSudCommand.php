@@ -144,9 +144,11 @@ class ImportFluxRegionSudCommand extends ImportFluxCommand
                 ['Quelles sont les critères d’éligibilité', 'Comment en bénéficier ']
             ),
             'originUrl' => isset($aidToImport['Lien vers le descriptif complet'])
-                ? $aidToImport['Lien vers le descriptif complet'] : null,
+                ? $this->getValidExternalUrlOrNull($aidToImport['Lien vers le descriptif complet'])
+                : null,
             'applicationUrl' => isset($aidToImport['Lien Je fais ma demande'])
-                ? $aidToImport['Lien Je fais ma demande'] : null,
+                ? $this->getValidExternalUrlOrNull($aidToImport['Lien Je fais ma demande'])
+                : null,
             'contact' => isset($aidToImport['Contact']) ? $this->getHtmlOrNull($aidToImport['Contact']) : null,
             'dateStart' => $dateStart,
             'dateSubmissionDeadline' => $dateSubmissionDeadline,
