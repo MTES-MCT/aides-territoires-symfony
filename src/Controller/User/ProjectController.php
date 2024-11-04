@@ -149,8 +149,8 @@ class ProjectController extends FrontController
         requirements: ['id' => '[0-9]+', 'slug' => '[a-zA-Z0-9\-_]+']
     )]
     public function details(
-        $id,
-        $slug,
+        int $id,
+        string $slug,
         ProjectRepository $ProjectRepository,
         RequestStack $requestStack,
         UserService $userService,
@@ -361,7 +361,7 @@ class ProjectController extends FrontController
         requirements: ['id' => '[0-9]+', 'slug' => '[a-zA-Z0-9\-_]+']
     )]
     public function aides(
-        $id,
+        int $id,
         ProjectRepository $ProjectRepository,
         UserService $userService,
         RequestStack $requestStack,
@@ -548,13 +548,10 @@ class ProjectController extends FrontController
                     switch ($formExportProject->get('format')->getData()) {
                         case FileService::FORMAT_CSV:
                             return $spreadsheetExporterService->exportProjectAids($project, FileService::FORMAT_CSV);
-                            break;
                         case FileService::FORMAT_XLSX:
                             return $spreadsheetExporterService->exportProjectAids($project, FileService::FORMAT_XLSX);
-                            break;
                         case FileService::FORMAT_PDF:
                             return $this->exportAidsToPdf($project, $projectService);
-                            break;
                         default:
                             $this->addFlash(FrontController::FLASH_ERROR, 'Format non supporté');
                     }
@@ -803,8 +800,8 @@ class ProjectController extends FrontController
         requirements: ['id' => '[0-9]+', 'slug' => '[a-zA-Z0-9\-_]+']
     )]
     public function similaires(
-        $id,
-        $slug,
+        int $id,
+        string $slug,
         UserService $userService,
         ProjectValidatedRepository $projectValidatedRepository,
         ProjectRepository $projectRepository,
@@ -950,7 +947,7 @@ class ProjectController extends FrontController
 
     #[Route('/comptes/projets/{id}/unlock/', name: 'app_user_project_unlock', requirements: ['id' => '\d+'])]
     public function unlock(
-        $id,
+        int $id,
         ProjectRepository $projectRepository,
         UserService $userService,
         ProjectService $projectService
@@ -987,10 +984,14 @@ class ProjectController extends FrontController
             $this->addFlash(FrontController::FLASH_ERROR, 'Impossible de débloquer le projet');
 
             // retour
-            return $this->redirectToRoute(
-                'app_user_project_details_fiche_projet',
-                ['id' => $project->getId(), 'slug' => $project->getSlug()]
-            );
+            if (isset($project) && $project instanceof Project) {
+                return $this->redirectToRoute(
+                    'app_user_project_details_fiche_projet',
+                    ['id' => $project->getId(), 'slug' => $project->getSlug()]
+                );
+            } else {
+                return $this->redirectToRoute('app_user_project_structure');
+            }
         }
     }
 

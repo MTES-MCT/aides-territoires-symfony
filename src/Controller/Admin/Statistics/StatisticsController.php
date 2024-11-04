@@ -19,7 +19,21 @@ use App\Entity\Project\Project;
 use App\Entity\Search\SearchPage;
 use App\Entity\User\User;
 use App\Form\Admin\Filter\DateRangeType;
+use App\Repository\Aid\AidProjectRepository;
+use App\Repository\Aid\AidRepository;
+use App\Repository\Alert\AlertRepository;
+use App\Repository\Backer\BackerRepository;
+use App\Repository\Log\LogAidApplicationUrlClickRepository;
+use App\Repository\Log\LogAidContactClickRepository;
+use App\Repository\Log\LogAidOriginUrlClickRepository;
+use App\Repository\Log\LogAidSearchRepository;
 use App\Repository\Log\LogAidViewRepository;
+use App\Repository\Log\LogUserLoginRepository;
+use App\Repository\Organization\OrganizationRepository;
+use App\Repository\Perimeter\PerimeterRepository;
+use App\Repository\Project\ProjectRepository;
+use App\Repository\Search\SearchPageRepository;
+use App\Repository\User\UserRepository;
 use App\Service\Matomo\MatomoService;
 use App\Service\User\UserService;
 use App\Service\Various\Breadcrumb;
@@ -114,23 +128,41 @@ class StatisticsController extends DashboardController
         return $chart;
     }
 
+    /**
+     * Undocumented function
+     *
+     * @return array<string, mixed>
+     */
     private function getStatsGlobal(): array
     {
+        /** @var UserRepository $userRepository */
+        $userRepository = $this->managerRegistry->getRepository(User::class);
+        /** @var OrganizationRepository $organizationRepository */
+        $organizationRepository = $this->managerRegistry->getRepository(Organization::class);
+        /** @var ProjectRepository $projectRepository */
+        $projectRepository = $this->managerRegistry->getRepository(Project::class);
+        /** @var AidProjectRepository $aidProjectRepository */
+        $aidProjectRepository = $this->managerRegistry->getRepository(AidProject::class);
+        /** @var AidRepository $aidRepository */
+        $aidRepository = $this->managerRegistry->getRepository(Aid::class);
+        /** @var BackerRepository $backerRepository */
+        $backerRepository = $this->managerRegistry->getRepository(Backer::class);
+        /** @var SearchPageRepository $searchPageRepository */
+        $searchPageRepository = $this->managerRegistry->getRepository(SearchPage::class);
+
         $stats = [
-            'nbUsers' => $this->managerRegistry->getRepository(User::class)
-                ->count(['isBeneficiary' => true]),
-            'nbOrganizations' => $this->managerRegistry->getRepository(Organization::class)
-                ->count(['isImported' => false]),
-            'nbInterco' => $this->managerRegistry->getRepository(Organization::class)->countInterco([]),
-            'nbProjects' => $this->managerRegistry->getRepository(Project::class)->count([]),
-            'nbAidProjects' => $this->managerRegistry->getRepository(AidProject::class)->countDistinctAids([]),
-            'nbAidsLive' => $this->managerRegistry->getRepository(Aid::class)->countLives([]),
-            'nbBackers' => $this->managerRegistry->getRepository(Backer::class)->countWithAids([]),
-            'nbSearchPages' => $this->managerRegistry->getRepository(SearchPage::class)->count([]),
-            'nbCommune' => $this->managerRegistry->getRepository(Organization::class)->countCommune([]),
+            'nbUsers' => $userRepository->count(['isBeneficiary' => true]),
+            'nbOrganizations' => $organizationRepository->count(['isImported' => false]),
+            'nbInterco' => $organizationRepository->countInterco([]),
+            'nbProjects' => $projectRepository->count([]),
+            'nbAidProjects' => $aidProjectRepository->countDistinctAids([]),
+            'nbAidsLive' => $aidRepository->countLives([]),
+            'nbBackers' => $backerRepository->countWithAids([]),
+            'nbSearchPages' => $searchPageRepository->count([]),
+            'nbCommune' => $organizationRepository->countCommune([]),
             'nbCommuneTotal' => 35039,
             'nbCommuneObjectif' => 15000,
-            'nbEpci' => $this->managerRegistry->getRepository(Organization::class)->countEpci([]),
+            'nbEpci' => $organizationRepository->countEpci([]),
             'nbEpciTotal' => 1256,
             'nbEpciObjectif' => (int) 1256 * 0.75,
             'nbEpciObjectifPercentage' => round((1256 * 0.75 / 1256) * 100, 1),
@@ -226,6 +258,11 @@ class StatisticsController extends DashboardController
         $registers = [];
         $alerts = [];
 
+        /** @var UserRepository $userRepository */
+        $userRepository = $this->managerRegistry->getRepository(User::class);
+        /** @var AlertRepository $alertRepository */
+        $alertRepository = $this->managerRegistry->getRepository(Alert::class);
+
         foreach ($statsMatomoLast10Weeks as $key => $stats) {
             $dates = explode(',', $key);
             $dateStart = new \DateTime($dates[0]);
@@ -233,9 +270,9 @@ class StatisticsController extends DashboardController
 
             $labels[] = $dateStart->format('d/m/Y') . ' au ' . $dateEnd->format('d/m/Y');
             $visitsUnique[] = $stats[0]->nb_uniq_visitors ?? 0;
-            $registers[] = $this->managerRegistry->getRepository(User::class)
+            $registers[] = $userRepository
                 ->countRegisters(['dateCreateMin' => $dateStart, 'dateCreateMax' => $dateMax]);
-            $alerts[] = $this->managerRegistry->getRepository(Alert::class)
+            $alerts[] = $alertRepository
                 ->countCustom(['dateCreateMin' => $dateStart, 'dateCreateMax' => $dateMax]);
         }
         $chartLast10Weeks = $this->chartBuilderInterface->createChart(Chart::TYPE_LINE);
@@ -373,7 +410,10 @@ class StatisticsController extends DashboardController
         }
         $referrers = array_slice($referrers, 0, 10, true);
 
-        $userRegisters = $this->managerRegistry->getRepository(User::class)->findCustom([
+        /** @var UserRepository $userRepository */
+        $userRepository = $this->managerRegistry->getRepository(User::class);
+
+        $userRegisters = $userRepository->findCustom([
             'dateCreateMin' => $dateMin,
             'dateCreateMax' => $dateMax,
             'orderBy' => [
@@ -465,27 +505,38 @@ class StatisticsController extends DashboardController
             $formDateRange->get('dateMax')->setData($dateMax);
         }
 
+        /** @var LogUserLoginRepository $logUserLoginRepository */
+        $logUserLoginRepository = $this->managerRegistry->getRepository(LogUserLogin::class);
+        /** @var LogAidSearchRepository $logAidSearchRepository */
+        $logAidSearchRepository = $this->managerRegistry->getRepository(LogAidSearch::class);
+        /** @var AlertRepository $alertRepository */
+        $alertRepository = $this->managerRegistry->getRepository(Alert::class);
+
         // nb connexions
-        $nbLogins = $this->managerRegistry->getRepository(LogUserLogin::class)->countCustom([
+        $nbLogins = $logUserLoginRepository->countCustom([
             'dateCreateMin' => $dateMin,
             'dateCreateMax' => $dateMax,
             'distinctUser' => true
         ]);
-        $nbAidSearch = $this->managerRegistry->getRepository(LogAidSearch::class)->countCustom([
+        $nbAidSearch = $logAidSearchRepository->countCustom([
             'dateCreateMin' => $dateMin,
             'dateCreateMax' => $dateMax,
         ]);
-        $nbAlerts = $this->managerRegistry->getRepository(Alert::class)->countCustom([
+        $nbAlerts = $alertRepository->countCustom([
             'dateCreateMin' => $dateMin,
             'dateCreateMax' => $dateMax,
         ]);
 
-        $nbInformationsTotal = $this->managerRegistry->getRepository(LogAidOriginUrlClick::class)->countCustom([
+        /** @var LogAidOriginUrlClickRepository $logAidOriginUrlClickRepository */
+        $logAidOriginUrlClickRepository = $this->managerRegistry->getRepository(LogAidOriginUrlClick::class);
+        $nbInformationsTotal = $logAidOriginUrlClickRepository->countCustom([
             'dateMin' => $dateMin,
             'dateMax' => $dateMax,
         ]);
 
-        $nbApplicationsTotal = $this->managerRegistry->getRepository(LogAidApplicationUrlClick::class)->countCustom([
+        /** @var LogAidApplicationUrlClickRepository $logAidApplicationUrlClickRepository */
+        $logAidApplicationUrlClickRepository = $this->managerRegistry->getRepository(LogAidApplicationUrlClick::class);
+        $nbApplicationsTotal = $logAidApplicationUrlClickRepository->countCustom([
             'dateMin' => $dateMin,
             'dateMax' => $dateMax,
         ]);
@@ -501,23 +552,26 @@ class StatisticsController extends DashboardController
         $registers = [];
         $registersWithAid = [];
         $registersWithProject = [];
+        /** @var UserRepository $userRepository */
+        $userRepository = $this->managerRegistry->getRepository(User::class);
+
         foreach ($statsMatomoLast10Weeks as $key => $stats) {
             $dates = explode(',', $key);
             $dateStart = new \DateTime($dates[0]);
             $dateEnd = new \DateTime($dates[1]);
 
             $labels[] = $dateStart->format('d/m/Y') . ' au ' . $dateEnd->format('d/m/Y');
-            $registers[] = $this->managerRegistry->getRepository(User::class)->countRegisters([
+            $registers[] = $userRepository->countRegisters([
                 'dateCreateMin' => $dateStart,
                 'dateCreateMax' => $dateMax,
 
             ]);
-            $registersWithAid[] = $this->managerRegistry->getRepository(User::class)->countRegistersWithAid([
+            $registersWithAid[] = $userRepository->countRegistersWithAid([
                 'dateCreateMin' => $dateStart,
                 'dateCreateMax' => $dateMax,
 
             ]);
-            $registersWithProject[] = $this->managerRegistry->getRepository(User::class)->countRegistersWithProject([
+            $registersWithProject[] = $userRepository->countRegistersWithProject([
                 'dateCreateMin' => $dateStart,
                 'dateCreateMax' => $dateMax,
             ]);
@@ -566,6 +620,13 @@ class StatisticsController extends DashboardController
         );
 
         $topAids = [];
+        /** @var LogAidContactClickRepository $logAidContactClickRepository */
+        $logAidContactClickRepository = $this->managerRegistry->getRepository(LogAidContactClick::class);
+        /** @var LogAidOriginUrlClickRepository $logAidOriginUrlClickRepository */
+        $logAidOriginUrlClickRepository = $this->managerRegistry->getRepository(LogAidOriginUrlClick::class);
+        /** @var LogAidApplicationUrlClickRepository $logAidApplicationUrlCLickRepository */
+        $logAidApplicationUrlCLickRepository = $this->managerRegistry->getRepository(LogAidApplicationUrlClick::class);
+
         foreach ($statsMatomoTopAids as $stats) {
             preg_match('/^\/(aides\/)?(.*)\/$/', $stats->label, $matches);
             $slug = $matches[2] ?? null;
@@ -577,17 +638,17 @@ class StatisticsController extends DashboardController
             $nbContactClicks = $nbInformations = $nbApplications = 0;
             $allClicks = 0; // aid.contact_clicks_count + aid.origin_clicks_count + aid.application_clicks_count
             if ($aid instanceof Aid) {
-                $nbContactClicks = $this->managerRegistry->getRepository(LogAidContactClick::class)->countCustom([
+                $nbContactClicks = $logAidContactClickRepository->countCustom([
                     'dateMin' => $dateMin,
                     'dateMax' => $dateMax,
                     'aid' => $aid
                 ]);
-                $nbInformations = $this->managerRegistry->getRepository(LogAidOriginUrlClick::class)->countCustom([
+                $nbInformations = $logAidOriginUrlClickRepository->countCustom([
                     'dateMin' => $dateMin,
                     'dateMax' => $dateMax,
                     'aid' => $aid
                 ]);
-                $nbApplications = $this->managerRegistry->getRepository(LogAidApplicationUrlClick::class)->countCustom([
+                $nbApplications = $logAidApplicationUrlCLickRepository->countCustom([
                     'dateMin' => $dateMin,
                     'dateMax' => $dateMax,
                     'aid' => $aid
@@ -617,20 +678,22 @@ class StatisticsController extends DashboardController
         $usersConnected = [];
         $communesConnected = [];
         $epcisConnected = [];
+        /** @var LogUserLoginRepository $logUserLoginRepository */
+        $logUserLoginRepository = $this->managerRegistry->getRepository(LogUserLogin::class);
         while ($currentDate > $dateEnd) {
             // user connectés
-            $nbUsersConnected = $this->managerRegistry->getRepository(LogUserLogin::class)->countCustom([
+            $nbUsersConnected = $logUserLoginRepository->countCustom([
                 'month' => $currentDate,
                 'distinctUser' => true,
                 'excludeAdmins' => true
             ]);
-            $nbCommunesConnected = $this->managerRegistry->getRepository(LogUserLogin::class)->countCustom([
+            $nbCommunesConnected = $logUserLoginRepository->countCustom([
                 'month' => $currentDate,
                 'distinctUser' => true,
                 'isCommune' => true,
                 'excludeAdmins' => true
             ]);
-            $nbEpcisConnected = $this->managerRegistry->getRepository(LogUserLogin::class)->countCustom([
+            $nbEpcisConnected = $logUserLoginRepository->countCustom([
                 'month' => $currentDate,
                 'distinctUser' => true,
                 'isEpci' => true,
@@ -732,40 +795,49 @@ class StatisticsController extends DashboardController
             $formDateRange->get('dateMax')->setData($dateMax);
         }
 
-        $nbBeneficiaries = $this->managerRegistry->getRepository(User::class)->countBeneficiaries([
+        /** @var UserRepository $userRepository */
+        $userRepository = $this->managerRegistry->getRepository(User::class);
+        /** @var OrganizationRepository $organizationRepository */
+        $organizationRepository = $this->managerRegistry->getRepository(Organization::class);
+        /** @var ProjectRepository $projectRepository */
+        $projectRepository = $this->managerRegistry->getRepository(Project::class);
+        /** @var AidProjectRepository $aidProjectRepository */
+        $aidProjectRepository = $this->managerRegistry->getRepository(AidProject::class);
+        /** @var AidRepository $aidRepository */
+        $aidRepository = $this->managerRegistry->getRepository(Aid::class);
+
+        $nbBeneficiaries = $userRepository->countBeneficiaries([
             'dateCreateMin' => $dateMin,
             'dateCreateMax' => $dateMax,
         ]);
-        $nbOrganizationWithBeneficiary = $this->managerRegistry->getRepository(Organization::class)
-        ->countWithUserBeneficiary([
+        $nbOrganizationWithBeneficiary = $organizationRepository->countWithUserBeneficiary([
             'dateCreateMin' => $dateMin,
             'dateCreateMax' => $dateMax,
             'isImported' => false,
         ]);
-        $nbProjects = $this->managerRegistry->getRepository(Project::class)->countCustom([
+        $nbProjects = $projectRepository->countCustom([
             'dateCreateMin' => $dateMin,
             'dateCreateMax' => $dateMax,
         ]);
-        $nbAidProjects = $this->managerRegistry->getRepository(AidProject::class)->countCustom([
+        $nbAidProjects = $aidProjectRepository->countCustom([
             'dateMin' => $dateMin,
             'dateMax' => $dateMax,
         ]);
 
-        $nbContributors = $this->managerRegistry->getRepository(User::class)->countContributors([
+        $nbContributors = $userRepository->countContributors([
             'dateCreateMin' => $dateMin,
             'dateCreateMax' => $dateMax,
         ]);
-        $nbOrganizationWithContributor = $this->managerRegistry->getRepository(Organization::class)
-        ->countWithUserContributor([
+        $nbOrganizationWithContributor = $organizationRepository->countWithUserContributor([
             'dateCreateMin' => $dateMin,
             'dateCreateMax' => $dateMax,
             'isImported' => false,
         ]);
-        $nbAidsLive = $this->managerRegistry->getRepository(Aid::class)->countLives([
+        $nbAidsLive = $aidRepository->countLives([
             'dateCreateMin' => $dateMin,
             'dateCreateMax' => $dateMax,
         ]);
-        $nbBeneficiariesAndContributors = $this->managerRegistry->getRepository(User::class)->countCustom([
+        $nbBeneficiariesAndContributors = $userRepository->countCustom([
             'isBeneficary' => true,
             'isContributor' => true,
             'dateCreateMin' => $dateMin,
@@ -784,19 +856,22 @@ class StatisticsController extends DashboardController
         $epcisWithAid = [];
         $epcisWithProject = [];
 
+        /** @var UserRepository $userRepository */
+        $userRepository = $this->managerRegistry->getRepository(User::class);
+
         while ($currentDate < $dateEnd) {
-            $startOfWeek = (clone $currentDate)->setISODate($currentDate->format('Y'), $currentDate->format('W'), 1);
-            $endOfWeek = (clone $currentDate)->setISODate($currentDate->format('Y'), $currentDate->format('W'), 7);
+            $startOfWeek = (clone $currentDate)->setISODate((int) $currentDate->format('Y'), (int) $currentDate->format('W'), 1);
+            $endOfWeek = (clone $currentDate)->setISODate((int) $currentDate->format('Y'), (int) $currentDate->format('W'), 7);
 
             // inscriptions communes
-            $nbCommunes = $this->managerRegistry->getRepository(User::class)->countRegisters([
+            $nbCommunes = $userRepository->countRegisters([
                 'dateCreateMin' => $startOfWeek,
                 'dateCreateMax' => $endOfWeek,
                 'organizationIsCommune' => true,
             ]);
 
             // inscription communes avec une aide publiée
-            $nbCommunesWithAid = $this->managerRegistry->getRepository(User::class)->countRegisters([
+            $nbCommunesWithAid = $userRepository->countRegisters([
                 'dateCreateMin' => $startOfWeek,
                 'dateCreateMax' => $endOfWeek,
                 'organizationIsCommune' => true,
@@ -804,7 +879,7 @@ class StatisticsController extends DashboardController
             ]);
 
             // inscription communes avec un projet
-            $nbCommunesWithProject = $this->managerRegistry->getRepository(User::class)->countRegisters([
+            $nbCommunesWithProject = $userRepository->countRegisters([
                 'dateCreateMin' => $startOfWeek,
                 'dateCreateMax' => $endOfWeek,
                 'organizationIsCommune' => true,
@@ -812,14 +887,14 @@ class StatisticsController extends DashboardController
             ]);
 
             // inscriptions epci
-            $nbEpcis = $this->managerRegistry->getRepository(User::class)->countRegisters([
+            $nbEpcis = $userRepository->countRegisters([
                 'dateCreateMin' => $startOfWeek,
                 'dateCreateMax' => $endOfWeek,
                 'organizationIsEpci' => true,
             ]);
 
             // inscription epci avec une aide publiée
-            $nbEpcisWithAid = $this->managerRegistry->getRepository(User::class)->countRegisters([
+            $nbEpcisWithAid = $userRepository->countRegisters([
                 'dateCreateMin' => $startOfWeek,
                 'dateCreateMax' => $endOfWeek,
                 'organizationIsEpci' => true,
@@ -827,7 +902,7 @@ class StatisticsController extends DashboardController
             ]);
 
             // inscription epci avec un projet
-            $nbEpcisWithProject = $this->managerRegistry->getRepository(User::class)->countRegisters([
+            $nbEpcisWithProject = $userRepository->countRegisters([
                 'dateCreateMin' => $startOfWeek,
                 'dateCreateMax' => $endOfWeek,
                 'organizationIsEpci' => true,
@@ -930,10 +1005,12 @@ class StatisticsController extends DashboardController
     public function statsUsers(
         AdminContext $adminContext
     ): Response {
-        $nbUsers = $this->managerRegistry->getRepository(User::class)->countCustom();
-        $nbBeneficiaries = $this->managerRegistry->getRepository(User::class)->countBeneficiaries();
-        $nbContributors = $this->managerRegistry->getRepository(User::class)->countContributors();
-        $nbBeneficiariesAndContributors = $this->managerRegistry->getRepository(User::class)->countCustom([
+        /** @var UserRepository $userRepository */
+        $userRepository = $this->managerRegistry->getRepository(User::class);
+        $nbUsers = $userRepository->countCustom();
+        $nbBeneficiaries = $userRepository->countBeneficiaries();
+        $nbContributors = $userRepository->countContributors();
+        $nbBeneficiariesAndContributors = $userRepository->countCustom([
             'isBeneficary' => true,
             'isContributor' => true,
         ]);
@@ -964,7 +1041,7 @@ class StatisticsController extends DashboardController
         $currentPage = (int) $adminContext->getRequest()->get('page', 1);
 
         // le paginateur
-        $users = $this->managerRegistry->getRepository(User::class)->getQueryBuilder([
+        $users = $userRepository->getQueryBuilder([
             'dateCreateMin' => $dateMin,
             'dateCreateMax' => $dateMax,
             'orderBy' => [
@@ -1004,11 +1081,13 @@ class StatisticsController extends DashboardController
     public function statsOrganizations(
         AdminContext $adminContext
     ): Response {
-        $nbOrganizations = $this->managerRegistry->getRepository(Organization::class)->countCustom([
+        /** @var OrganizationRepository $organizationRepository */
+        $organizationRepository = $this->managerRegistry->getRepository(Organization::class);
+        $nbOrganizations = $organizationRepository->countCustom([
             'isImported' => false,
             'hasPerimeter' => true
         ]);
-        $nbOrganizationsByType = $this->managerRegistry->getRepository(Organization::class)->countByType([
+        $nbOrganizationsByType = $organizationRepository->countByType([
             'isImported' => false,
             'hasPerimeter' => true
         ]);
@@ -1039,7 +1118,7 @@ class StatisticsController extends DashboardController
         $currentPage = (int) $adminContext->getRequest()->get('page', 1);
 
         // le paginateur
-        $organizations = $this->managerRegistry->getRepository(Organization::class)->getQueryBuilder([
+        $organizations = $organizationRepository->getQueryBuilder([
             'dateCreateMin' => $dateMin,
             'dateCreateMax' => $dateMax,
             'orderBy' => [
@@ -1078,14 +1157,20 @@ class StatisticsController extends DashboardController
         // fichier geojson des régions pour la carte
         $regionsGeojson = file_get_contents($kernelInterface->getProjectDir() . '/datas/geojson/regions-1000m.geojson');
 
+        /** @var PerimeterRepository $perimeterRepository */
+        $perimeterRepository = $this->managerRegistry->getRepository(Perimeter::class);
+
         // on recupère toutes les régions
-        $regions = $this->managerRegistry->getRepository(Perimeter::class)->findCustom([
+        $regions = $perimeterRepository->findCustom([
             'scale' => Perimeter::SCALE_REGION,
             'isObsolete' => false
         ]);
 
         $regionsOrgCounts = [];
         $regionsOrgCommunesMax = 0;
+
+        /** @var OrganizationRepository $organizationRepository */
+        $organizationRepository = $this->managerRegistry->getRepository(Organization::class);
 
         // on parcours les régions
         /** @var Perimeter $region */
@@ -1095,7 +1180,7 @@ class StatisticsController extends DashboardController
             }
 
             // on va recupérer les organisations communes de cette région
-            $nbCommune = $this->managerRegistry->getRepository(Organization::class)->countCommune([
+            $nbCommune = $organizationRepository->countCommune([
                 'perimeterRegion' => $region
             ]);
 
@@ -1103,7 +1188,7 @@ class StatisticsController extends DashboardController
             $regionsOrgCommunesMax = $nbCommune > $regionsOrgCommunesMax ? $nbCommune : $regionsOrgCommunesMax;
 
             // on va recupérer les organisations epci de cette région
-            $nbEpci = $this->managerRegistry->getRepository(Organization::class)->countEpci([
+            $nbEpci = $organizationRepository->countEpci([
                 'perimeterRegion' => $region
             ]);
 
@@ -1119,7 +1204,7 @@ class StatisticsController extends DashboardController
 
 
         # Les départements
-        $counties = $this->managerRegistry->getRepository(Perimeter::class)->findCustom([
+        $counties = $perimeterRepository->findCustom([
             'scale' => Perimeter::SCALE_COUNTY,
             'isObsolete' => false
         ]);
@@ -1128,7 +1213,7 @@ class StatisticsController extends DashboardController
         $countiesOrgCommunesMax = 0;
         $countiesCode = [];
         // on parcours les départements
-        /** @var Perimeter $region */
+        /** @var Perimeter $county */
         foreach ($counties as $county) {
             if (!$county->getCode()) {
                 continue;
@@ -1138,7 +1223,7 @@ class StatisticsController extends DashboardController
             $countiesCode[] = $county->getCode();
 
             // on va recupérer les organisations communes de cette région
-            $nbCommune = $this->managerRegistry->getRepository(Organization::class)->countCommune([
+            $nbCommune = $organizationRepository->countCommune([
                 'perimeterDepartment' => $county
             ]);
 
@@ -1146,7 +1231,7 @@ class StatisticsController extends DashboardController
             $countiesOrgCommunesMax = $nbCommune > $countiesOrgCommunesMax ? $nbCommune : $countiesOrgCommunesMax;
 
             // on va recupérer les organisations epci de cette région
-            $nbEpci = $this->managerRegistry->getRepository(Organization::class)->countEpci([
+            $nbEpci = $organizationRepository->countEpci([
                 'perimeterDepartment' => $county
             ]);
 
@@ -1167,7 +1252,7 @@ class StatisticsController extends DashboardController
         unset($counties);
 
         // recuperes toutes les organizations de type communes
-        $organizationCommunes = $this->managerRegistry->getRepository(Organization::class)->findCommunes([]);
+        $organizationCommunes = $organizationRepository->findCommunes([]);
 
         $communes_with_org = [];
         /** @var Organization $organization */
@@ -1201,7 +1286,7 @@ class StatisticsController extends DashboardController
         unset($organizationCommunes);
 
         // recuperes toutes les organizations de type Epci
-        $organizations_epcis = $this->managerRegistry->getRepository(Organization::class)->findEpcis([]);
+        $organizations_epcis = $organizationRepository->findEpcis([]);
 
         $epcis_with_org = [];
         $communes_perimeters = [];
@@ -1212,7 +1297,7 @@ class StatisticsController extends DashboardController
             if (array_key_exists($perimeter_id, $communes_perimeters)) {
                 $perimeters = $communes_perimeters[$perimeter_id];
             } else {
-                $perimeters = $this->managerRegistry->getRepository(Perimeter::class)->findCommunesContained([
+                $perimeters = $perimeterRepository->findCommunesContained([
                     'idParent' => $perimeter_id,
                     'scale' => Perimeter::SCALE_COMMUNE
                 ]);
@@ -1415,6 +1500,7 @@ class StatisticsController extends DashboardController
             ];
 
             $interco_type_dict["total"] = Organization::TOTAL_BY_INTERCOMMUNALITY_TYPE[$key];
+            /** @var OrganizationRepository $organizationRepository */
             $organizationRepository = $this->managerRegistry->getRepository(Organization::class);
             $interco_type_dict["current"] = $organizationRepository->countInterco([
                 'intercommunalityType' => $key,
@@ -1490,9 +1576,11 @@ class StatisticsController extends DashboardController
         // gestion pagination
         $currentPage = (int) $adminContext->getRequest()->get('page', 1);
 
+        /** @var ProjectRepository $projectRepository */
+        $projectRepository = $this->managerRegistry->getRepository(Project::class);
 
         // les projets
-        $projects = $this->managerRegistry->getRepository(Project::class)->getQueryBuilder([
+        $projects = $projectRepository->getQueryBuilder([
             'dateCreateMin' => $dateMin,
             'dateCreateMax' => $dateMax,
             'orderBy' => [

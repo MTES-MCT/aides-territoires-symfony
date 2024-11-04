@@ -4,6 +4,7 @@ namespace App\Controller\Backer;
 
 use App\Controller\FrontController;
 use App\Entity\Backer\Backer;
+use App\Entity\Category\Category;
 use App\Repository\Aid\AidRepository;
 use App\Repository\Backer\BackerRepository;
 use App\Security\Voter\InternalRequestVoter;
@@ -31,8 +32,8 @@ class BackerController extends FrontController
         requirements: ['id' => '[0-9]+', 'slug' => '[a-zA-Z0-9\-_]+']
     )]
     public function details(
-        $id,
-        $slug,
+        int $id,
+        string $slug,
         BackerRepository $backerRepository,
         AidRepository $aidRepository,
         LogService $logService,
@@ -80,6 +81,7 @@ class BackerController extends FrontController
         );
 
         //foreach $backer->getAidsLive()
+        /** @var array<string, mixed>  */
         $categories_by_theme = [];
         $programs_list = [];
         foreach ($backer->getAidsLive() as $aid) {

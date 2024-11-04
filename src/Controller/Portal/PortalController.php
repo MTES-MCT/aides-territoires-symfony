@@ -5,6 +5,7 @@ namespace App\Controller\Portal;
 use App\Controller\Aid\AidController;
 use App\Controller\FrontController;
 use App\Entity\Alert\Alert;
+use App\Entity\Category\CategoryTheme;
 use App\Entity\Perimeter\Perimeter;
 use App\Entity\Search\SearchPage;
 use App\Entity\User\User;
@@ -49,7 +50,7 @@ class PortalController extends FrontController
 
     #[Route('/portails/{slug}/', name: 'app_portal_portal_details')]
     public function details(
-        $slug,
+        string $slug,
         SearchPageRepository $searchPageRepository,
         AidSearchFormService $aidSearchFormService,
         AidService $aidService,
@@ -110,7 +111,7 @@ class PortalController extends FrontController
             ]
         );
 
-        if (isset($aidParams['categories']) && is_iterable($aidParams['categories'])) {
+        if (isset($aidParams['categories'])) {
             foreach ($aidParams['categories'] as $category) {
                 $aidSearchClass->addCategoryId($category);
             }
@@ -161,7 +162,7 @@ class PortalController extends FrontController
         // Log recherche
         $logParams = [
             'organizationTypes' => (isset($aidParams['organizationType'])) ? [$aidParams['organizationType']] : null,
-            'querystring' => $querystring ?? null,
+            'querystring' => $queryString ?? null,
             'resultsCount' => $pagerfanta->getNbResults(),
             'host' => $requestStack->getCurrentRequest()->getHost(),
             'perimeter' => $aidParams['perimeterFrom'] ?? null,
@@ -174,6 +175,7 @@ class PortalController extends FrontController
             'source' => $search_page->getSlug(),
             'user' => $user ?? null
         ];
+        /** @var ArrayCollection<int, CategoryTheme> $themes */
         $themes = new ArrayCollection();
         if (isset($aidParams['categories']) && is_array($aidParams['categories'])) {
             foreach ($aidParams['categories'] as $category) {
@@ -274,7 +276,7 @@ class PortalController extends FrontController
 
     #[Route('/portails/{slug}/stats/', name: 'app_portal_portal_stats')]
     public function stats(
-        $slug,
+        string $slug,
         SearchPageRepository $searchPageRepository,
         AidSearchFormService $aidSearchFormService,
         AidService $aidService,
@@ -515,6 +517,7 @@ class PortalController extends FrontController
                 ;
                 $datas[] = $organizationType['nb'];
             }
+
             $colors = $this->getPieColors($organizationTypes);
             $chartOrganizationTypes = $chartBuilderInterface->createChart(Chart::TYPE_PIE);
             $chartOrganizationTypes->setData([
@@ -613,10 +616,15 @@ class PortalController extends FrontController
 
         // rendu template
         return $this->render('portal/portal/_visits_by_month.html.twig', [
-            'chartVisitsByMonth' => $chartVisitsByMonth ?? null,
+            'chartVisitsByMonth' => $chartVisitsByMonth,
         ]);
     }
 
+    /**
+     *
+     * @param array<int, mixed> $array
+     * @return string[]
+     */
     private function getPieColors(array $array): array
     {
         $colorsBySlug = [

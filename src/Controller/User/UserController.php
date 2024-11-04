@@ -138,7 +138,7 @@ class UserController extends FrontController
                     );
 
                     // track goal
-                    $matomoService->trackGoal($paramService->get('goal_register_id'));
+                    $matomoService->trackGoal((int) $paramService->get('goal_register_id'));
 
                     // regarde si il y a des invitations sur ce compte
                     $organizationInvitations = $managerRegistry->getRepository(OrganizationInvitation::class)->findBy([
@@ -273,7 +273,7 @@ class UserController extends FrontController
                     );
 
                     // track goal
-                    $matomoService->trackGoal($paramService->get('goal_register_id'));
+                    $matomoService->trackGoal((int) $paramService->get('goal_register_id'));
 
                     // redirection
                     return $this->redirectToRoute('app_user_dashboard');

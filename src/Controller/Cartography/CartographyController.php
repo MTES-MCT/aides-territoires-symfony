@@ -5,6 +5,7 @@ namespace App\Controller\Cartography;
 use App\Controller\FrontController;
 use App\Entity\Aid\Aid;
 use App\Entity\Aid\AidTypeGroup;
+use App\Entity\Category\CategoryTheme;
 use App\Entity\Perimeter\Perimeter;
 use App\Form\Cartography\CartographySearchType;
 use App\Form\Program\CountySelectType;
@@ -92,8 +93,8 @@ class CartographyController extends FrontController
         requirements: ['code' => '[0-9A-Za-z]+', 'slug' => '[a-zA-Z0-9\-_]+']
     )]
     public function detail(
-        $code,
-        $slug,
+        string $code,
+        string $slug,
         PerimeterRepository $perimeterRepository,
         BackerRepository $backerRepository,
         RequestStack $requestStack,
@@ -210,6 +211,7 @@ class CartographyController extends FrontController
         }
 
         // Si il y a un filtre sur les categoryTheme
+        /** @var ArrayCollection<int, CategoryTheme> */
         $categoryThemesSelected = new ArrayCollection();
         if (isset($backerParams['categoryIds'])) {
             $categories = $categoryRepository->findCustom([

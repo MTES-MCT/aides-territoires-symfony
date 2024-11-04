@@ -222,7 +222,7 @@ class UserCrudController extends AtCrudController
         AdminContext $context,
         SpreadsheetExporterService $spreadsheetExporterService,
         string $filename = 'utilisateur'
-    ) {
+    ): Response {
         return $this->exportSpreadsheet($context, $spreadsheetExporterService, $filename, 'xlsx');
     }
 
@@ -230,7 +230,7 @@ class UserCrudController extends AtCrudController
         AdminContext $context,
         SpreadsheetExporterService $spreadsheetExporterService,
         string $filename = 'utilisateur'
-    ) {
+    ): Response {
         return $this->exportSpreadsheet($context, $spreadsheetExporterService, $filename, 'csv');
     }
 }

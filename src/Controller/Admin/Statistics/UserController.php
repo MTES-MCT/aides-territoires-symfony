@@ -88,6 +88,13 @@ class UserController extends AbstractController
     }
 
 
+    /**
+     *
+     * @param array<int, mixed> $labels
+     * @param array<int, mixed> $datas
+     * @param string $title
+     * @return Chart
+     */
     private function getLineChart(array $labels, array $datas, string $title): Chart
     {
         $chart = $this->chartBuilderInterface->createChart(Chart::TYPE_LINE);

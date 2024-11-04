@@ -5,6 +5,7 @@ namespace App\Controller\Reference;
 use App\Controller\FrontController;
 use App\Entity\Perimeter\Perimeter;
 use App\Entity\Organization\OrganizationType;
+use App\Entity\Reference\KeywordReference;
 use App\Entity\Reference\ProjectReference;
 use App\Form\Reference\ProjectReferenceSearchType;
 use App\Repository\Aid\AidRepository;
@@ -506,6 +507,7 @@ class ProjectReferenceController extends FrontController
         }
 
         // recherche les mots clés référents correspondants
+        /** @var ArrayCollection<int, KeywordReference> $keywordReferences */
         $keywordReferences = $keywordReferenceRepository->findCustom([
             'name' => $query,
             'orderBy' => [
@@ -514,14 +516,19 @@ class ProjectReferenceController extends FrontController
             ]
         ]);
 
+        /** @var ArrayCollection<int, KeywordReference> $parents */
         $parents = new ArrayCollection();
+        /** @var KeywordReference $keywordReference */
         foreach ($keywordReferences as $keywordReference) {
-            if (!$parents->contains($keywordReference->getParent())) {
+            if (
+                $keywordReference->getParent() instanceof KeywordReference
+                && !$parents->contains($keywordReference->getParent())
+            ) {
                 $parents->add($keywordReference->getParent());
             }
         }
         foreach ($parents as $parent) {
-            if ($parent) {
+            if ($parent instanceof KeywordReference) {
                 if ($parent->getName() != $query) {
                     $text = $parent->getName() . ', ' . $query . ' et synonymes';
                 } else {

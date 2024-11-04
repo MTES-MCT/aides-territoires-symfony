@@ -159,27 +159,6 @@ class OrganizationController extends FrontController
     ): Response {
         // page obsolète
         return $this->redirectToRoute('app_user_dashboard');
-
-        $this->breadcrumb->add('Mon compte', $this->generateUrl('app_user_dashboard'));
-        $this->breadcrumb->add('Ma structure', $this->generateUrl('app_organization_structure_information'));
-        $this->breadcrumb->add('Données clés');
-
-        $formOrganizationChoice = $this->createForm(OrganizationChoiceType::class);
-        $formOrganizationChoice->handleRequest($requestStack->getCurrentRequest());
-        if ($formOrganizationChoice->isSubmitted()) {
-            if ($formOrganizationChoice->isValid()) {
-                $organization = $formOrganizationChoice->get('organization')->getData();
-                return $this->redirectToRoute(
-                    'app_organization_donnees_cles_details',
-                    ['id' => $organization->getId()
-                    ]
-                );
-            }
-        }
-
-        return $this->render('organization/organization/donnees_cles.html.twig', [
-            'formOrganizationChoice' => $formOrganizationChoice,
-        ]);
     }
 
     #[Route(
@@ -241,7 +220,7 @@ class OrganizationController extends FrontController
         requirements: ['id' => '[0-9]+']
     )]
     public function collaborateurs(
-        $id,
+        int $id,
         UserService $userService,
         ManagerRegistry $managerRegistry,
         RequestStack $requestStack,
@@ -334,7 +313,7 @@ class OrganizationController extends FrontController
         $collaborators = [];
         $collaboratorsEmails = [];
         // les personnes déjà dans l'organization
-        if ($organization) {
+        if ($organization instanceof Organization) {
             foreach ($organization->getBeneficiairies() as $beneficiary) {
                 $invitationId = null;
                 $userInvitation = $organizationInvitationRepository->findOneBy([
@@ -385,12 +364,12 @@ class OrganizationController extends FrontController
             $excludable = false;
             $status = '';
             if ($organizationInvitation->getGuest()) {
-                if ($organizationInvitation && $organizationInvitation->getTimeExclude()) {
+                if ($organizationInvitation->getTimeExclude()) {
                     $status = 'Exclu le ' . $organizationInvitation->getTimeExclude()->format('d/m/Y');
-                } elseif ($organizationInvitation && $organizationInvitation->getTimeAccept()) {
+                } elseif ($organizationInvitation->getTimeAccept()) {
                     $status = 'Accepté le ' . $organizationInvitation->getTimeAccept()->format('d/m/Y');
                     $excludable = true;
-                } elseif ($organizationInvitation && $organizationInvitation->getTimeRefuse()) {
+                } elseif ($organizationInvitation->getTimeRefuse()) {
                     $status = 'Refusé le ' . $organizationInvitation->getTimeRefuse()->format('d/m/Y');
                 }
             } else {
@@ -442,7 +421,7 @@ class OrganizationController extends FrontController
 
     #[Route('/comptes/structure/invitations/{id}/accepter/', name: 'app_organization_invitations_accept')]
     public function acceptInvitation(
-        $id,
+        int $id,
         UserService $userService,
         OrganizationInvitationRepository $organizationInvitationRepository,
         ManagerRegistry $managerRegistry,
@@ -513,7 +492,7 @@ class OrganizationController extends FrontController
 
     #[Route('/comptes/structure/invitations/{id}/refuser/', name: 'app_organization_invitations_refuse')]
     public function refuseInvitation(
-        $id,
+        int $id,
         UserService $userService,
         OrganizationInvitationRepository $organizationInvitationRepository,
         ManagerRegistry $managerRegistry,
@@ -556,7 +535,7 @@ class OrganizationController extends FrontController
 
     #[Route('/comptes/structure/invitations/{id}/exclure/', name: 'app_organization_invitations_exclude')]
     public function excludeInvitation(
-        $id,
+        int $id,
         UserService $userService,
         OrganizationInvitationRepository $organizationInvitationRepository,
         ManagerRegistry $managerRegistry,
@@ -639,7 +618,7 @@ class OrganizationController extends FrontController
         OrganizationService $organizationService,
         NotificationService $notificationService,
         BackerService $backerService
-    ) {
+    ): Response {
         // le user
         $user = $userService->getUserLogged();
 
@@ -823,7 +802,7 @@ class OrganizationController extends FrontController
             'backer' => $backer,
             'form' => $form,
             'user_backer' => true,
-            'user_backer_id' => $backer instanceof Backer ? $backer->getId() : null,
+            'user_backer_id' => $backer->getId() ?? null,
             'formAskAssociate' => $formAskAssociate ?? null,
             'backerAskAssociatePending' => $backerAskAssociatePending,
             'backerAskAssociatesRefused' => $backerAskAssociatesRefused
@@ -898,8 +877,8 @@ class OrganizationController extends FrontController
         requirements: ['id' => '\d+', 'idBacker' => '\d+']
     )]
     public function unlock(
-        $id,
-        $idBacker,
+        int $id,
+        int $idBacker,
         OrganizationRepository $organizationRepository,
         BackerRepository $backerRepository,
         OrganizationService $organizationService,
@@ -944,10 +923,14 @@ class OrganizationController extends FrontController
             $this->addFlash(FrontController::FLASH_ERROR, 'Impossible de débloquer la fiche porteur d\'aides');
 
             // retour
-            return $this->redirectToRoute(
-                'app_organization_backer_edit',
-                ['id' => $organization->getId(), 'idBacker' => $backer->getId()]
-            );
+            if (isset($backer) && isset($organization)) {
+                return $this->redirectToRoute(
+                    'app_organization_backer_edit',
+                    ['id' => $organization->getId(), 'idBacker' => $backer->getId()]
+                );
+            } else {
+                return $this->redirectToRoute('app_user_dashboard');
+            }
         }
     }
 

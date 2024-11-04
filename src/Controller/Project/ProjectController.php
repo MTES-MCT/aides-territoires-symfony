@@ -142,8 +142,8 @@ class ProjectController extends FrontController
         requirements: ['id' => '[0-9]+', 'slug' => '[a-zA-Z0-9\-_]+']
     )]
     public function publicDetails(
-        $id,
-        $slug,
+        int $id,
+        string $slug,
         ProjectRepository $projectRepository,
         RequestStack $requestStack,
         UserService $userService,
@@ -399,13 +399,15 @@ class ProjectController extends FrontController
                     $keyword = $formProjectSearch->get('text')->getData();
                 }
 
-                $projects = $projectValidatedRepository->findProjectInRadius(
-                    [
-                        'perimeter' => $project_perimeter,
-                        'search' => $keyword,
-                        'radius' => 30
-                    ]
-                );
+                if (isset($project_perimeter)) {
+                    $projects = $projectValidatedRepository->findProjectInRadius(
+                        [
+                            'perimeter' => $project_perimeter,
+                            'search' => $keyword,
+                            'radius' => 30
+                        ]
+                    );
+                }
 
                 $commune_search = true;
             }
@@ -460,7 +462,7 @@ class ProjectController extends FrontController
             params: [
                 'search' => (isset($keyword)) ? $keyword : null,
                 'querystring' => parse_url($requestStack->getCurrentRequest()->getRequestUri(), PHP_URL_QUERY) ?? null,
-                'resultsCount' => (isset($projects) && is_array($projects)) ? count($projects) : 0,
+                'resultsCount' => count($projects),
                 'perimeter' => (isset($project_perimeter) && $project_perimeter instanceof Perimeter)
                     ? $project_perimeter
                     : null

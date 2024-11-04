@@ -79,7 +79,7 @@ class EmailService
      * @param integer|null $templateId
      * @param array<string, mixed>|null $params
      * @param array<string, mixed>|null $headers
-     * @param array<string, mixed>|null $tags
+     * @param string[]|null $tags
      * @return boolean
      */
     public function sendEmailViaApi(

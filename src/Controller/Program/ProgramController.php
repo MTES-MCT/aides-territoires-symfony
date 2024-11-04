@@ -3,6 +3,7 @@
 namespace App\Controller\Program;
 
 use App\Controller\FrontController;
+use App\Entity\Category\CategoryTheme;
 use App\Entity\Perimeter\Perimeter;
 use App\Entity\Program\Program;
 use App\Entity\Search\SearchPage;
@@ -53,7 +54,7 @@ class ProgramController extends FrontController
 
     #[Route('/programmes/{slug}/', name: 'app_program_details', requirements: ['slug' => '[a-zA-Z0-9\-_]+'])]
     public function details(
-        $slug,
+        string $slug,
         ProgramRepository $programRepository,
         SearchPageRepository $searchPageRepository,
         RequestStack $requestStack,
@@ -156,6 +157,7 @@ class ProgramController extends FrontController
             'source' => $program->getSlug(),
             'user' => $user ?? null
         ];
+        /** @var ArrayCollection<int, CategoryTheme> $themes */
         $themes = new ArrayCollection();
         if (isset($aidParams['categories']) && is_array($aidParams['categories'])) {
             foreach ($aidParams['categories'] as $category) {
@@ -213,7 +215,11 @@ class ProgramController extends FrontController
         // date de dernière mise à jour des FAQ
         foreach ($program->getPageTabs() as $pageTab) {
             foreach ($pageTab->getFaqs() as $faq) {
-                $faq->setLatestUpdateTime($faqService->getLatestUpdateTime($faq));
+                $latestUpdateTime = $faqService->getLatestUpdateTime($faq);
+                if ($latestUpdateTime instanceof \DateTimeInterface) {
+                    $latestUpdateTime = \DateTime::createFromInterface($latestUpdateTime);
+                }
+                $faq->setLatestUpdateTime($latestUpdateTime);
             }
         }
 
@@ -236,13 +242,5 @@ class ProgramController extends FrontController
             'tabSelected' => $tabSelected,
             'highlightedWords' => $highlightedWords
         ]);
-    }
-
-    private function compareByPosition($a, $b)
-    {
-        if ($a['position'] == $b['position']) {
-            return 0;
-        }
-        return ($a['position'] < $b['position']) ? -1 : 1;
     }
 }

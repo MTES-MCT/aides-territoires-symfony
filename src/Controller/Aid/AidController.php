@@ -7,6 +7,7 @@ use App\Entity\Aid\Aid;
 use App\Entity\Aid\AidProject;
 use App\Entity\Aid\AidSuggestedAidProject;
 use App\Entity\Alert\Alert;
+use App\Entity\Category\CategoryTheme;
 use App\Entity\Perimeter\Perimeter;
 use App\Entity\Project\Project;
 use App\Entity\Reference\ProjectReference;
@@ -143,6 +144,7 @@ class AidController extends FrontController
             'programs' => $aidParams['programs'] ?? null,
             'user' => $user ?? null,
         ];
+        /** @var ArrayCollection<int, CategoryTheme> */
         $themes = new ArrayCollection();
         if (isset($aidParams['categories']) && is_array($aidParams['categories'])) {
             foreach ($aidParams['categories'] as $category) {
@@ -206,7 +208,7 @@ class AidController extends FrontController
             if ($formAlertCreate->isValid()) {
                 /** @var User $user */
                 $user = $userService->getUserLogged();
-                if ($user) {
+                if ($user instanceof User && $user->getId()) {
                     try {
                         $queryString = trim($aidSearchFormService->convertAidSearchClassToQueryString($aidSearchClass));
                         if ('' == $queryString) {
@@ -283,7 +285,7 @@ class AidController extends FrontController
 
     #[Route('/aides/dupliquer/{slug}/', name: 'app_aid_generic_to_local', requirements: ['slug' => '[a-zA-Z0-9\-_]+'])]
     public function genericToLocal(
-        $slug,
+        string $slug,
         AidRepository $aidRepository,
         UserService $userService,
         AidService $aidService,
@@ -327,7 +329,7 @@ class AidController extends FrontController
 
     #[Route('/aides/{slug}/', name: 'app_aid_aid_details', requirements: ['slug' => '[a-zA-Z0-9\-_]+'])]
     public function details(
-        $slug,
+        string $slug,
         AidRepository $aidRepository,
         Request $request,
         AidService $aidService,
@@ -456,21 +458,6 @@ class AidController extends FrontController
                     $project->setStatus(Project::STATUS_DRAFT);
                     $project->setOrganization($user->getDefaultOrganization());
 
-                    // on va voir si on peu associer un projet référent
-                    if (
-                        isset($aidSearchClass)
-                        && $aidSearchClass instanceof AidSearchClass && $aidSearchClass->getKeyword()
-                    ) {
-                        $projectReferent = $this->managerRegistry->getRepository(ProjectReference::class)->findOneBy(
-                            [
-                                'name' => $aidSearchClass->getKeyword(),
-                            ]
-                        );
-                        if ($projectReferent instanceof ProjectReference) {
-                            $project->setProjectReference($projectReferent);
-                        }
-                    }
-
                     $aidProject = new AidProject();
                     $aidProject->setAid($aid);
                     $aidProject->setCreator($user);
@@ -543,13 +530,13 @@ class AidController extends FrontController
 
                     // envoi mail
                     $suggestedAidFinancerName = '';
-                    if ($aid->getAidFinancers()) {
+                    if (!$aid->getAidFinancers()->isEmpty()) {
                         $suggestedAidFinancerName = $aid->getAidFinancers()[0]->getBacker()->getName() ?? '';
                     }
                     $emailService->sendEmailViaApi(
                         $project->getAuthor()->getEmail(),
                         'Suggestion d’une aide pour votre projet « ' . $project->getName() . ' »',
-                        $paramService->get('sib_new_suggested_aid_template_id'),
+                        (int) $paramService->get('sib_new_suggested_aid_template_id'),
                         [
                             'PROJECT_AUTHOR_NAME' => $project->getAuthor()->getFullName(),
                             'SUGGESTER_USER_NAME' => $user->getFullName(),
@@ -578,7 +565,7 @@ class AidController extends FrontController
                     );
 
                     // track goal
-                    $matomoService->trackGoal($paramService->get('goal_register_id'));
+                    $matomoService->trackGoal((int) $paramService->get('goal_register_id'));
                 }
                 $this->managerRegistry->getManager()->flush();
 

@@ -57,7 +57,7 @@ class ChangePasswordCrudController extends AbstractCrudController implements Eve
         ];
     }
 
-    public function passwordPersistEvent(BeforeEntityPersistedEvent $event)
+    public function passwordPersistEvent(BeforeEntityPersistedEvent $event): void
     {
         $newPassword = $this->requestStack->getCurrentRequest()->get('User')['newPassword'] ?? null;
 
@@ -67,7 +67,7 @@ class ChangePasswordCrudController extends AbstractCrudController implements Eve
         );
     }
 
-    public function passwordUpdateEvent(BeforeEntityUpdatedEvent $event)
+    public function passwordUpdateEvent(BeforeEntityUpdatedEvent $event): void
     {
         $newPassword = $this->requestStack->getCurrentRequest()->get('User')['newPassword'] ?? null;
 
@@ -77,7 +77,7 @@ class ChangePasswordCrudController extends AbstractCrudController implements Eve
         );
     }
 
-    public function hashPassword($entity, $newPassword)
+    public function hashPassword(mixed $entity, mixed $newPassword): void
     {
         if (!$entity instanceof User || !$newPassword) {
             return;

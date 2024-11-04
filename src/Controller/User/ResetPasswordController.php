@@ -8,7 +8,6 @@ use App\Form\User\ChangePasswordFormType;
 use App\Form\User\ResetPasswordRequestFormType;
 use App\Service\Email\EmailService;
 use App\Service\File\FileService;
-use App\Service\Various\ParamService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -29,7 +28,6 @@ class ResetPasswordController extends AbstractController
     public function __construct(
         private ResetPasswordHelperInterface $resetPasswordHelper,
         private EntityManagerInterface $entityManager,
-        private ParamService $paramService
     ) {
     }
 
