@@ -6,6 +6,7 @@ use App\Form\Admin\Filter\DateRangeType;
 use App\Repository\Log\LogUrlRedirectRepository;
 use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
 class LogUrlRedirectController extends AbstractController
@@ -14,7 +15,7 @@ class LogUrlRedirectController extends AbstractController
     public function index(
         AdminContext $adminContext,
         LogUrlRedirectRepository $logUrlRedirectRepository
-    ) {
+    ): Response {
         // dates par défaut
         $dateMin = new \DateTime('-1 week');
         $dateMax = new \DateTime();

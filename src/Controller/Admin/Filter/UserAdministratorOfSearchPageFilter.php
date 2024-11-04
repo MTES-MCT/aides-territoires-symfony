@@ -14,7 +14,7 @@ class UserAdministratorOfSearchPageFilter implements FilterInterface
 {
     use FilterTrait;
 
-    public static function new(string $propertyName, $label = null): self
+    public static function new(string $propertyName, mixed $label = null): self
     {
         return (new self())
             ->setFilterFqcn(__CLASS__)
@@ -40,7 +40,7 @@ class UserAdministratorOfSearchPageFilter implements FilterInterface
                     'searchPages'
                 );
             return;
-        } elseif ($filterDataDto->getValue() === 0) {
+        } elseif ($filterDataDto->getValue() == 0) {
             $queryBuilder
                 ->leftJoin(sprintf('%s.searchPages', 'searchPages'), $filterDataDto->getEntityAlias())
                 ->andWhere('searchPages.id IS NULL')

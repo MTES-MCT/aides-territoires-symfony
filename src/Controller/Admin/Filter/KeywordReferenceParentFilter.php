@@ -14,7 +14,7 @@ class KeywordReferenceParentFilter implements FilterInterface
 {
     use FilterTrait;
 
-    public static function new(string $propertyName, $label = null): self
+    public static function new(string $propertyName, mixed $label = null): self
     {
         return (new self())
             ->setFilterFqcn(__CLASS__)
@@ -34,8 +34,6 @@ class KeywordReferenceParentFilter implements FilterInterface
                 sprintf(
                     '%s.parent = entity',
                     $filterDataDto->getEntityAlias(),
-                    $filterDataDto->getProperty(),
-                    $filterDataDto->getEntityAlias()
                 )
             );
         } else {
@@ -43,8 +41,6 @@ class KeywordReferenceParentFilter implements FilterInterface
                 sprintf(
                     '%s.parent != entity',
                     $filterDataDto->getEntityAlias(),
-                    $filterDataDto->getProperty(),
-                    $filterDataDto->getEntityAlias()
                 )
             );
         }

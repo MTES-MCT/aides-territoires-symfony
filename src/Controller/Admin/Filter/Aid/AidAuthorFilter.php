@@ -14,7 +14,7 @@ class AidAuthorFilter implements FilterInterface
 {
     use FilterTrait;
 
-    public static function new(string $propertyName, $label = null): self
+    public static function new(string $propertyName, mixed $label = null): self
     {
         return (new self())
             ->setFilterFqcn(__CLASS__)

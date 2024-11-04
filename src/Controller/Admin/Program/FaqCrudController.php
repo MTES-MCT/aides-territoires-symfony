@@ -15,6 +15,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\CollectionField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
+use Symfony\Component\HttpFoundation\Response;
 
 class FaqCrudController extends AtCrudController
 {
@@ -48,7 +49,7 @@ class FaqCrudController extends AtCrudController
     }
     public function order(
         AdminContext $adminContext
-    ) {
+    ): Response {
         // la faq choisie
         $faq = $adminContext->getEntity()->getInstance();
 

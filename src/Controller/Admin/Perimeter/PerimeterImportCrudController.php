@@ -5,6 +5,7 @@ namespace App\Controller\Admin\Perimeter;
 use App\Controller\Admin\AtCrudController;
 use App\Entity\Perimeter\PerimeterImport;
 use App\Message\Perimeter\MsgPerimeterImport;
+use App\Repository\Perimeter\PerimeterImportRepository;
 use App\Repository\User\UserRepository;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
@@ -172,8 +173,11 @@ class PerimeterImportCrudController extends AtCrudController
         $this->managerRegistry->getManager()->persist($entity);
         $this->managerRegistry->getManager()->flush();
 
+        /** @var PerimeterImportRepository $perimeterImportRepository */
+        $perimeterImportRepository = $this->managerRegistry->getRepository(PerimeterImport::class);
+
         // compte le nombre d'import en attente
-        $nbImport = $this->managerRegistry->getRepository(PerimeterImport::class)->countCustom([
+        $nbImport = $perimeterImportRepository->countCustom([
             'askProcessing' => true,
             'exclude' => $entity
         ]);

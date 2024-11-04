@@ -51,7 +51,7 @@ class BackerCrudController extends AtCrudController
         yield BooleanField::new('active', 'Actif')
             ->setHelp('Un porteur d’aides actif est visible sur le site');
         yield AssociationField::new('organizations', 'Organizations')
-            ->autocomplete(true)
+            ->autocomplete()
             ->formatValue(function ($value, $entity) {
                 $return = '';
                 foreach ($entity->getOrganizations() as $organization) {
