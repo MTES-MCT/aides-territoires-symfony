@@ -30,7 +30,6 @@
 					{% include "user/project/_menu_project.html.twig" with { aides: true, project_id: project.id, project_slug: project.slug } %}
 					<div
 						id="tabpanel_liste_des_aides" class="fr-tabs__panel" role="tabpanel" aria-labelledby="tabpanel_liste_des_aides" tabindex="0">
-						{# <h2 class="fr-h6 _fr-mt-1w">Liste des aides que vous avez sélectionnées</h2> #}
 						<div class="fr-table fr-table--no-scroll fr-table--sm">
 							<div class="fr-table__wrapper">
 								<div class="fr-table__container">
@@ -146,6 +145,104 @@
 									Exporter ce projet
 								</button>
 							</p>
+						{% endif %}
+
+						{% if project.aidSuggestedAidProjects|length > 0 %}
+						<div class="fr-table fr-table--sm">
+							<div class="fr-table__wrapper">
+								<div class="fr-table__container">
+									<div class="fr-table__content">
+										<table class="data-table at-table--xl">
+											<caption>
+												Liste des aides suggérées par d'autres utilisateurs :
+											</caption>
+											<thead>
+												<tr>
+													<th scope="col" class="fr-text">Nom</th>
+													<th scope="col" class="fr-text">Echéance</th>
+													<th scope="col" class="fr-text">Type d’aide</th>
+													<th scope="col" class="fr-text">Porteur d’aides</th>
+													<th scope="col" class="fr-text">Suggérée le</th>
+													<th scope="col" class="fr-text">Par</th>
+													<th scope="col" class="fr-text">Statut</th>
+													<th scope="col" class="fr-text">Action</th>
+												</tr>
+											</thead>
+											<tbody>
+												{% for aidSuggestedAidProject in project.aidSuggestedAidProjects %}
+													<tr id="aidProject-{{ aidSuggestedAidProject.id }}">
+														<td class="fr-text">
+															<a href="{{ path('app_aid_aid_details', {'slug': aidSuggestedAidProject.aid.slug}) }}" target="_blank" rel="noopener" id="aid-{{ aidSuggestedAidProject.aid.id }}">
+																{{ aidSuggestedAidProject.aid.name }}
+																<span class="fr-sr-only">Ouvre une nouvelle fenêtre</span>
+															</a>
+														</td>
+														<td class="fr-text">
+															<span>{{ aidSuggestedAidProject.aid.dateSubmissionDeadline|date('d/m/Y') }}</span>
+															{% if aidSuggestedAidProject.aid.isOnGoing() %}
+																<p class="fr-badge fr-badge--info fr-badge--sm">Permanente</p>
+															{% elseif  aidSuggestedAidProject.aid.isRecurring() %}
+																<p class="fr-badge fr-badge--info fr-badge--sm">Récurrente</p>
+															{% elseif  aidSuggestedAidProject.aid.isApproachingDeadline() %}
+																<p class="fr-badge fr-badge--new fr-badge--sm">Échéance proche</p>
+															{% elseif  aidSuggestedAidProject.aid.hasExpired() %}
+																<p class="fr-badge fr-badge--warning fr-badge--sm">Expirée</p>
+															{% endif %}
+														</td>
+														<td class="fr-text">
+															{% for aidType in aidSuggestedAidProject.aid.aidTypes %}
+																{{ aidType.name }}
+															{% endfor %}
+														</td>
+														<td class="fr-text">
+															<ul>
+																{% for financer in aidSuggestedAidProject.aid.aidFinancers %}
+																	<li>
+																		<a href="{{ path('app_backer_details', {'id': financer.backer.id, 'slug': financer.backer.slug}) }}" target="_blank" rel="noopener">
+																			{{ financer.backer.name }}
+																			<span class="fr-sr-only">Ouvre une nouvelle fenêtre</span>
+																		</a>
+																	</li>
+																{% endfor %}
+															</ul>
+														</td>
+														<td class="fr-text">
+															{{ aidSuggestedAidProject.dateCreate|date('d/m/Y') }}
+														</td>
+														<td class="fr-text">
+															{% if aidSuggestedAidProject.creator %}
+																{{ aidSuggestedAidProject.creator.email }}
+															{% endif %}
+														</td>
+														<td>
+															{% if aidSuggestedAidProject.isRejected %}
+																<span class="fr-mb-1w fr-badge fr-badge--error">Rejetée</span>
+															{% elseif aidSuggestedAidProject.isAssociated %}
+																<span class="fr-mb-1w fr-badge fr-badge--success">Acceptée</span>
+															{% else %}
+																<span class="fr-mb-1w fr-badge fr-badge--info">En attente</span>
+															{% endif %}
+														</td>
+														<td class="fr-text">
+															{% if not aidSuggestedAidProject.isAssociated %}
+															<a href="{{ path('app_user_project_accept_suggested_aid', {'id': project.id, 'slug': project.slug, 'idSuggested': aidSuggestedAidProject.id}) }}" class="fr-btn fr-btn--secondary fr-btn--sm">
+																✅ Accepter 
+															</a>
+															{% endif %}
+															{% if not aidSuggestedAidProject.isRejected %}
+															<a href="{{ path('app_user_project_refuse_suggested_aid', {'id': project.id, 'slug': project.slug, 'idSuggested': aidSuggestedAidProject.id}) }}" class="fr-btn fr-btn--secondary fr-btn--sm">
+																❌ Refuser
+															</a>
+															{% endif %}
+														</td>
+													</tr>
+												{% endfor %}
+											</tbody>
+										</table>
+									</div>
+								</div>
+							</div>
+						</div>
 						{% endif %}
 
 						<div class="fr-alert fr-alert--info fr-alert--sm fr-mt-5w">

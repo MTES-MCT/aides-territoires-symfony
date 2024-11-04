@@ -9,6 +9,8 @@ use Brevo\Client\Api\TransactionalEmailsApi;
 use Brevo\Client\Configuration;
 use Brevo\Client\Model\CreateDoiContact;
 use Brevo\Client\Model\SendSmtpEmail;
+use Brevo\Client\Model\SendSmtpEmailSender;
+use Brevo\Client\Model\SendSmtpEmailTo;
 use Brevo\Client\Model\UpdateContact;
 use GuzzleHttp\Client;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
@@ -33,8 +35,8 @@ class EmailService
      * @param string $email
      * @param string $subject
      * @param string $template
-     * @param array|null $datas
-     * @param array|null $options
+     * @param array<string, mixed>|null $datas
+     * @param array<string, mixed>|null $options
      * @return boolean
      */
     public function sendEmail(
@@ -69,6 +71,17 @@ class EmailService
         }
     }
 
+    /**
+     * Undocumented function
+     *
+     * @param string $emailTo
+     * @param string|null $nameTo
+     * @param integer|null $templateId
+     * @param array<string, mixed>|null $params
+     * @param array<string, mixed>|null $headers
+     * @param array<string, mixed>|null $tags
+     * @return boolean
+     */
     public function sendEmailViaApi(
         string $emailTo,
         ?string $nameTo = null,
@@ -90,10 +103,12 @@ class EmailService
             $config
         );
         $sendSmtpEmail = new SendSmtpEmail();
-        $sendSmtpEmail['sender'] = [
+        $sendSmtpEmailSender = new SendSmtpEmailSender([
             'name' => $this->paramService->get('email_from_name'),
             'email' => $this->paramService->get('email_from')
-        ];
+        ]);
+        $sendSmtpEmail->setSender($sendSmtpEmailSender);
+
         // gestion du destinataire
         $to = [
             'email' => $emailTo
@@ -101,26 +116,24 @@ class EmailService
         if ($nameTo) {
             $to['name'] = $nameTo;
         }
-        $sendSmtpEmail['to'] = [
-            $to
-        ];
+        $sendSmtpEmail->setTo([new SendSmtpEmailTo($to)]);
 
         // si template
         if ($templateId) {
-            $sendSmtpEmail['templateId'] = $templateId;
+            $sendSmtpEmail->setTemplateId($templateId);
         }
 
         // si parametres
         if (is_array($params) && !empty($params)) {
-            $sendSmtpEmail['params'] = $params;
+            $sendSmtpEmail->setParams((object) $params);
         }
 
         if (is_array($headers) && !empty($headers)) {
-            $sendSmtpEmail['headers'] = $headers;
+            $sendSmtpEmail->setHeaders((object) $headers);
         }
 
         if (is_array($tags) && !empty($tags)) {
-            $sendSmtpEmail['tags'] = $tags;
+            $sendSmtpEmail->setTags($tags);
         }
 
         try {

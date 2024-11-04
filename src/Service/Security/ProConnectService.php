@@ -9,7 +9,9 @@ use CoderCat\JWKToPEM\JWKConverter;
 use Lcobucci\JWT\Encoding\JoseEncoder;
 use Lcobucci\JWT\Signer\Key\InMemory;
 use Lcobucci\JWT\Signer\Rsa\Sha256;
+use Lcobucci\JWT\Token\DataSet;
 use Lcobucci\JWT\Token\Parser;
+use Lcobucci\JWT\Token\Plain;
 use Lcobucci\JWT\Validation\Constraint\HasClaimWithValue;
 use Lcobucci\JWT\Validation\Constraint\SignedWith;
 use Lcobucci\JWT\Validation\RequiredConstraintsViolated;
@@ -101,7 +103,7 @@ class ProConnectService
     /**
      * Redirige l'utilisateur sur l'url de déconnexion de ProConnect si besoin.
      *
-     * @return RedirectResponse|null
+     * @return string|null
      */
     public function getLogoutUrl(): ?string
     {
@@ -135,6 +137,8 @@ class ProConnectService
 
     /**
      * Recupère les données de l'utilisateur depuis ProConnect.
+     * @param array<string, mixed> $params
+     * @return array<string, mixed>
      */
     public function getDataFromProconnect(array $params): array
     {
@@ -180,7 +184,7 @@ class ProConnectService
     /**
      * Stocke les tokens liés à l'utilisateur dans la session.
      *
-     * @return array
+     * @return void
      */
     public function storeUserTokens(): void
     {
@@ -230,6 +234,7 @@ class ProConnectService
 
     /**
      * Pour récupérer les infos de l'utilisateurs (email, etc..).
+     * @return array<string, mixed>
      */
     private function getUserInfo(): array
     {
@@ -250,6 +255,7 @@ class ProConnectService
         $userToken = $response->getContent();
 
         $parser = new Parser(new JoseEncoder());
+        /** @var Plain $token */
         $token = $parser->parse($userToken);
 
         if (!$this->verifyIdToken($this->idToken)) {
@@ -257,45 +263,47 @@ class ProConnectService
         }
 
         // les infos utilisateurs sont dans claims
-        return $token->claims()->all();
+        /** @var DataSet $claims */
+        $claims = $token->claims();
+        return $claims->all();
     }
 
     /**
      * Vérifie que le token est bien signé par ProConnect.
      *
-     * @return void
+     * @return bool
      */
-    private function verifyIdToken(string $idToken)
+    private function verifyIdToken(string $idToken): bool
     {
-        $response = $this->client->request('GET', $this->jwksUri, [
-            'headers' => [
-                'Accept' => 'application/json',
-            ],
-        ]);
-
-        $jwksData = json_decode($response->getContent(), true);
-
-        // Extraire la clé publique pour RS256
-        $publicKeyData = null;
-        foreach ($jwksData['keys'] as $key) {
-            if ('RS256' === $key['alg'] && 'RSA' === $key['kty']) {
-                $publicKeyData = $key;
-                break;
-            }
-        }
-
-        if (!$publicKeyData) {
-            throw new ProConnectException('Clé publique RS256 non trouvée');
-        }
-
-        $publicKey = $this->convertJwkToPem($publicKeyData);
-
-        $parser = new Parser(new JoseEncoder());
-        $token = $parser->parse($idToken);
-
-        $validator = new Validator();
-
         try {
+            $response = $this->client->request('GET', $this->jwksUri, [
+                'headers' => [
+                    'Accept' => 'application/json',
+                ],
+            ]);
+    
+            $jwksData = json_decode($response->getContent(), true);
+    
+            // Extraire la clé publique pour RS256
+            $publicKeyData = null;
+            foreach ($jwksData['keys'] as $key) {
+                if ('RS256' === $key['alg'] && 'RSA' === $key['kty']) {
+                    $publicKeyData = $key;
+                    break;
+                }
+            }
+    
+            if (!$publicKeyData) {
+                throw new ProConnectException('Clé publique RS256 non trouvée');
+            }
+    
+            $publicKey = $this->convertJwkToPem($publicKeyData);
+    
+            $parser = new Parser(new JoseEncoder());
+            $token = $parser->parse($idToken);
+    
+            $validator = new Validator();
+
             // Valide que le token est bien signé en Sha256 avec la clé publique récupérée
             $validator->assert(
                 $token,
@@ -315,6 +323,7 @@ class ProConnectService
 
     /**
      * Convertir la cle JWK en cle PEM pour la validation.
+     * @param array<string, mixed> $jwk
      */
     private function convertJwkToPem(array $jwk): string
     {
