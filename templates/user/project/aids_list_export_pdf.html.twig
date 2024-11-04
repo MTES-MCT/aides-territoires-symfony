@@ -99,6 +99,7 @@
 						<th>Porteur</th>
 						<th>Nature</th>
 						<th>Récurrence et date d’échéance</th>
+						<th>Périmètre de l'aide</th>
 					</tr>
 
 					{% for aidProject in project.aidProjects %}
@@ -128,6 +129,11 @@
 									{% if aidProject.aid.dateSubmissionDeadline %}
 										<br/>Échéance :
 										{{ aidProject.aid.dateSubmissionDeadline|format_datetime('long', 'none', locale='fr') }}
+									{% endif %}
+								</td>
+								<td>
+									{% if aidProject.aid.perimeter %}
+										{{ aidProject.aid.perimeter.name }}
 									{% endif %}
 								</td>
 							</tr>

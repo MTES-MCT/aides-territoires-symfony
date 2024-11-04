@@ -639,6 +639,7 @@ class SpreadsheetExporterService
             'Porteurs d’aides',
             'Instructeurs',
             'Programmes',
+            'Périmètre de l\'aide'
         ];
 
         $sheet = $spreadsheet->getActiveSheet();
@@ -735,6 +736,7 @@ class SpreadsheetExporterService
                 implode(',', $financers),
                 implode(',', $instructors),
                 implode(',', $programs),
+                $aid->getPerimeter() ? $aid->getPerimeter()->getName() : ''
             ];
 
             // Ajoute les datas à la feuille
