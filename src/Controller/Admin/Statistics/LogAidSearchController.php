@@ -31,7 +31,7 @@ class LogAidSearchController extends AbstractController
         AdminContext $adminContext,
         LogAidSearchRepository $logAidSearchRepository,
         ProjectReferenceRepository $projectReferenceRepository
-    ) {
+    ): Response {
         // dates par défaut
         $dateMin = new \DateTime('-1 week');
         $dateMax = new \DateTime();
@@ -197,9 +197,9 @@ class LogAidSearchController extends AbstractController
             'dateMin' => $dateMin,
             'dateMax' => $dateMax,
             'logAidSearchsByDept' => $logAidSearchsByDept,
-            'first' => $first,
-            'medium' => $medium,
-            'last' => $last
+            'first' => $first ?? 0,
+            'medium' => $medium ?? 0,
+            'last' => $last ?? 0
         ]);
     }
 

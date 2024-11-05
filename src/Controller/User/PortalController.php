@@ -29,7 +29,7 @@ class PortalController extends FrontController
         methods: ['GET', 'POST']
     )]
     public function edit(
-        $id,
+        int $id,
         SearchPageRepository $searchPageRepository,
         RequestStack $requestStack,
         UserService $userService,
@@ -172,7 +172,7 @@ class PortalController extends FrontController
 
     #[Route('/comptes/portails/{id}/unlock/', name: 'app_user_portal_unlock', requirements: ['id' => '\d+'])]
     public function unlock(
-        $id,
+        int $id,
         SearchPageRepository $searchPageRepository,
         UserService $userService,
         SearchPageService $searchPageService
@@ -209,7 +209,11 @@ class PortalController extends FrontController
             $this->addFlash(FrontController::FLASH_ERROR, 'Impossible de débloquer le portail');
 
             // retour
-            return $this->redirectToRoute('app_user_portal_edit', ['id' => $searchPage->getId()]);
+            if (isset($searchPage) && $searchPage instanceof SearchPage) {
+                return $this->redirectToRoute('app_user_portal_edit', ['id' => $searchPage->getId()]);
+            } else {
+                return $this->redirectToRoute('app_user_dashboard');
+            }
         }
     }
 

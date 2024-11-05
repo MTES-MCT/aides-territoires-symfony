@@ -20,7 +20,7 @@ class PerimeterController extends DashboardController
 {
     #[Route('/admin/perimeter/{id}/combiner', name: 'admin_perimeter_combine', requirements: ['id' => '[0-9]+'])]
     public function combine(
-        $id,
+        int $id,
         ManagerRegistry $managerRegistry,
         RequestStack $requestStack
     ): Response {
@@ -93,7 +93,7 @@ class PerimeterController extends DashboardController
         requirements: ['id' => '[0-9]+']
     )]
     public function importInsee(
-        $id,
+        int $id,
         ManagerRegistry $managerRegistry,
         RequestStack $requestStack,
         UserService $userService,

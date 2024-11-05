@@ -129,7 +129,11 @@ class UserController extends FrontController
                     $managerRegistry->getManager()->flush();
 
                     // authentifie le user
-                    $security->login($user, SecurityService::DEFAULT_AUTHENTICATOR_NAME, SecurityService::DEFAULT_FIREWALL_NAME);
+                    $security->login(
+                        $user,
+                        SecurityService::DEFAULT_AUTHENTICATOR_NAME,
+                        SecurityService::DEFAULT_FIREWALL_NAME
+                    );
 
                     // message success
                     $this->tAddFlash(
@@ -138,7 +142,7 @@ class UserController extends FrontController
                     );
 
                     // track goal
-                    $matomoService->trackGoal($paramService->get('goal_register_id'));
+                    $matomoService->trackGoal((int) $paramService->get('goal_register_id'));
 
                     // regarde si il y a des invitations sur ce compte
                     $organizationInvitations = $managerRegistry->getRepository(OrganizationInvitation::class)->findBy([
@@ -161,7 +165,11 @@ class UserController extends FrontController
         }
 
         // formulaire proConnnect
-        $formProConnect = $this->createForm(ProConnectType::class, null, ['action' => $this->generateUrl('app_login_proconnect')]);
+        $formProConnect = $this->createForm(
+            ProConnectType::class,
+            null,
+            ['action' => $this->generateUrl('app_login_proconnect')]
+        );
 
         // rendu template
         return $this->render('user/user/register.html.twig', [
@@ -273,7 +281,7 @@ class UserController extends FrontController
                     );
 
                     // track goal
-                    $matomoService->trackGoal($paramService->get('goal_register_id'));
+                    $matomoService->trackGoal((int) $paramService->get('goal_register_id'));
 
                     // redirection
                     return $this->redirectToRoute('app_user_dashboard');
@@ -287,7 +295,11 @@ class UserController extends FrontController
         }
 
         // formulaire proConnnect
-        $formProConnect = $this->createForm(ProConnectType::class, null, ['action' => $this->generateUrl('app_login_proconnect')]);
+        $formProConnect = $this->createForm(
+            ProConnectType::class,
+            null,
+            ['action' => $this->generateUrl('app_login_proconnect')]
+        );
 
 
         // rendu template

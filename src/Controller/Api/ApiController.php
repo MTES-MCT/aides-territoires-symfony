@@ -44,12 +44,12 @@ class ApiController extends AbstractController
         return (int) $itemsPerPage > self::MAX_ITEMS_PER_PAGE ? self::MAX_ITEMS_PER_PAGE : (int) $itemsPerPage;
     }
 
-    protected function getNbPages($nbItems = 0): int
+    protected function getNbPages(int $nbItems = 0): int
     {
         if ($nbItems == 0) {
             return 1;
         }
-        return ceil($nbItems / $this->getItemsPerPage());
+        return intval(ceil($nbItems / $this->getItemsPerPage()));
     }
 
     protected function getPrevious(): ?string
@@ -70,7 +70,7 @@ class ApiController extends AbstractController
                 . $this->requestStack->getCurrentRequest()->getRequestUri());
     }
 
-    protected function getNext($nbItems = 0): ?string
+    protected function getNext(int $nbItems = 0): ?string
     {
         // on est sur la dernière page
         if ($this->getPage() >= $this->getNbPages($nbItems)) {

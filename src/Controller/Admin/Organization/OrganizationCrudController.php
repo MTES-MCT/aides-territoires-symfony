@@ -53,7 +53,7 @@ class OrganizationCrudController extends AtCrudController
     public function configureFilters(Filters $filters): Filters
     {
         return $filters
-            ->add('backer', 'Porteur d\'aide')
+            ->add('backer')
             ->add(HasNoBackerFilter::new('hasNoBacker', 'Pas de porteur associé'))
             ->add(EmailDomainFilter::new('emailDomainFilter', 'Domaine email utilisateur'))
             ->add(HasUserContributorFilter::new('hasUserContributor', 'Contributeurs'))

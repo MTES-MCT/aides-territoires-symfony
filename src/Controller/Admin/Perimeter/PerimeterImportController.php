@@ -9,14 +9,15 @@ use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Response;
 
 class PerimeterImportController extends DashboardController
 {
     #[Route('/admin/perimeter/import/{id}', name: 'admin_perimeter_import', requirements: ['id' => '[0-9]+'])]
     public function importPerimeters(
-        $id,
+        int $id,
         ManagerRegistry $managerRegistry
-    ) {
+    ): Response {
         $perimeterImport = $managerRegistry->getRepository(PerimeterImport::class)->find($id);
 
         return $this->render('admin/perimeter/import.html.twig', [
@@ -28,7 +29,7 @@ class PerimeterImportController extends DashboardController
     public function ajaxImportPerimeterItem(
         RequestStack $requestStack,
         ManagerRegistry $managerRegistry
-    ) {
+    ): JsonResponse {
         ini_set('max_execution_time', 60 * 60);
         ini_set('memory_limit', '8G');
         $nbToDo = 1;

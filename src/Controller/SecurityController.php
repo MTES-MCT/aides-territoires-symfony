@@ -8,6 +8,7 @@ use App\Form\Security\ProConnectType;
 use App\Repository\User\UserRegisterConfirmationRepository;
 use App\Service\Security\ProConnectService;
 use Doctrine\Persistence\ManagerRegistry;
+use PHPUnit\Util\Json;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -41,7 +42,11 @@ class SecurityController extends FrontController
         }
 
         // formulaire proConnnect
-        $formProConnect = $this->createForm(ProConnectType::class, null, ['action' => $this->generateUrl('app_login_proconnect')]);
+        $formProConnect = $this->createForm(
+            ProConnectType::class,
+            null,
+            ['action' => $this->generateUrl('app_login_proconnect')]
+        );
 
         return $this->render('security/login.html.twig', [
             'formLogin' => $formLogin,
@@ -54,7 +59,7 @@ class SecurityController extends FrontController
     public function loginByPronnect(
         ProConnectService $proConnectService,
         LoggerInterface $loggerInterface
-    ) : Response {
+    ): Response {
         try {
             return new RedirectResponse($proConnectService->getAuthorizationEndpoint());
         } catch (\Exception $e) {
@@ -72,7 +77,7 @@ class SecurityController extends FrontController
 
     #[Route('/comptes/connexion/{token}', name: 'app_user_user_register_confirmation')]
     public function registerConfirmation(
-        $token,
+        string $token,
         UserRegisterConfirmationRepository $userRegisterConfirmationRepository,
         ManagerRegistry $managerRegistry,
         Security $security
@@ -153,6 +158,8 @@ class SecurityController extends FrontController
         if (!$requestStack->getMainRequest()->headers->get('X-AUTH-TOKEN')) {
             return new JsonResponse('Veuillez ajouter votre X-AUTH-TOKEN dans les HEADERS', 401);
         }
+
+        return new JsonResponse('Vous êtes connecté', 200);
     }
 
     #[Route(path: '/logout', name: 'app_logout')]

@@ -13,6 +13,7 @@ use App\Form\User\TransfertAidType;
 use App\Form\User\TransfertProjectType;
 use App\Form\User\UserProfilType;
 use App\Repository\Log\LogUserLoginRepository;
+use App\Repository\Organization\OrganizationRepository;
 use App\Repository\User\ApiTokenAskRepository;
 use App\Repository\User\UserRepository;
 use App\Service\Email\EmailService;
@@ -45,12 +46,11 @@ class ParameterController extends FrontController
         UserPasswordHasherInterface $userPasswordHasher,
         Security $security,
         LoggerInterface $loggerInterface
-    ): Response
-    {
+    ): Response {
         try {
             // tous les paramètres get dans un tableau
             $params = $requestStack->getCurrentRequest()->query->all();
-            
+
             // on recupère les infos de ProConnect
             $userInfos = $proConnectService->getDataFromProconnect($params);
             // on vérifie que $userInfos contient bien les 4 clés attendues
@@ -84,7 +84,11 @@ class ParameterController extends FrontController
             }
 
             // On le connecte
-            $security->login($user, SecurityService::DEFAULT_AUTHENTICATOR_NAME, SecurityService::DEFAULT_FIREWALL_NAME);
+            $security->login(
+                $user,
+                SecurityService::DEFAULT_AUTHENTICATOR_NAME,
+                SecurityService::DEFAULT_FIREWALL_NAME
+            );
 
             // on le redirige
             return $this->redirectToRoute('app_user_dashboard');
@@ -100,7 +104,7 @@ class ParameterController extends FrontController
             return $this->redirectToRoute('app_login');
         }
     }
-    
+
     #[Route('/comptes/monprofil/', name: 'app_user_parameter_profil')]
     public function profil(
         UserPasswordHasherInterface $userPasswordHasher,
@@ -236,7 +240,6 @@ class ParameterController extends FrontController
         $logsParams = [];
         $logsParams['user'] = $user;
         $logsParams['action'] = 'login';
-        $logsParams['limit'] = $params['limit'] ?? 3;
 
         // le paginateur
         $adapter = new QueryAdapter($logUserLoginRepository->getQuerybuilder($logsParams));
@@ -258,7 +261,8 @@ class ParameterController extends FrontController
         RequestStack $requestStack,
         TokenStorageInterface $tokenStorageInterface,
         Session $session,
-        EmailService $emailService
+        EmailService $emailService,
+        OrganizationRepository $organizationRepository
     ): Response {
         // le user
         $user = $userService->getUserLogged();
@@ -303,12 +307,10 @@ class ParameterController extends FrontController
                         $managerRegistry->getManager()->persist($project);
                     }
                     $managerRegistry->getManager()->flush();
-                    // message
+
                     $this->addFlash(
                         FrontController::FLASH_SUCCESS,
-                        'Votre / Vos projet(s) de l\'organization '
-                        . $organization->getName()
-                        . ' ont été transférés avec succès.'
+                        'Votre / Vos projet(s) ont été transférés avec succès.'
                     );
 
                     // redirection
@@ -317,9 +319,7 @@ class ParameterController extends FrontController
                     // message
                     $this->addFlash(
                         FrontController::FLASH_ERROR,
-                        'Impossible de transférer votre / vos projet(s) de l\'organization '
-                        . $organization->getName()
-                        . ' à cet utilisateur'
+                        'Impossible de transférer votre / vos projet(s) à cet utilisateur'
                     );
                 }
             }
@@ -346,9 +346,7 @@ class ParameterController extends FrontController
                     // message
                     $this->addFlash(
                         FrontController::FLASH_SUCCESS,
-                        'Votre / Vos aide(s) de l\'organization '
-                        . $organization->getName()
-                        . ' ont été transférés avec succès.'
+                        'Votre / Vos aide(s) ont été transférés avec succès.'
                     );
 
                     // redirection
@@ -357,9 +355,7 @@ class ParameterController extends FrontController
                     // message
                     $this->addFlash(
                         FrontController::FLASH_ERROR,
-                        'Impossible de transférer votre / vos aide(s) de l\'organization '
-                        . $organization->getName()
-                        . ' à cet utilisateur'
+                        'Impossible de transférer votre / vos aide(s) à cet utilisateur'
                     );
                 }
             }

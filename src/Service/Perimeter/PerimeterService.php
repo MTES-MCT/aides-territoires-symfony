@@ -128,10 +128,10 @@ class PerimeterService
     /**
      * Retourne les infos d'une scale en fonction de son identifiant
      *
-     * @param string $scale
+     * @param int $scale
      * @return array{scale: int, slug: string, name: string}|null
      */
-    public function getScale(string $scale): ?array
+    public function getScale(int $scale): ?array
     {
         $scales = [
             1 => ['scale' => 1, 'slug' => 'commune', 'name' => 'Commune'],

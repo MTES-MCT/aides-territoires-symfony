@@ -6,6 +6,8 @@ use App\Controller\Admin\DashboardController;
 use App\Entity\Log\LogAidApplicationUrlClick;
 use App\Entity\Log\LogAidOriginUrlClick;
 use App\Form\Admin\Filter\DateRangeType;
+use App\Repository\Log\LogAidApplicationUrlClickRepository;
+use App\Repository\Log\LogAidOriginUrlClickRepository;
 use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -34,10 +36,11 @@ class LogController extends DashboardController
             $formDateRange->get('dateMax')->setData($dateMax);
         }
 
+        /** @var LogAidApplicationUrlClickRepository $logAidApplicationUrlClickRepository */
+        $logAidApplicationUrlClickRepository = $this->managerRegistry->getRepository(LogAidApplicationUrlClick::class);
         // Logs candidater aides
         // récupération des données
-        $logAidApplicationUrlClicks = $this->managerRegistry->getRepository(LogAidApplicationUrlClick::class)
-        ->countByDay([
+        $logAidApplicationUrlClicks = $logAidApplicationUrlClickRepository->countByDay([
             'dateMin' => $dateMin,
             'dateMax' => $dateMax,
         ]);
@@ -49,16 +52,17 @@ class LogController extends DashboardController
         $chartApplication = $this->createChart($allDates, 'Clics candidater aides');
 
         // Top 10 aides candidater
-        $topAidApplicationsUrlClicks = $this->managerRegistry->getRepository(LogAidApplicationUrlClick::class)
-        ->countTopAidOnPeriod([
+        $topAidApplicationsUrlClicks = $logAidApplicationUrlClickRepository->countTopAidOnPeriod([
             'dateMin' => $dateMin,
             'dateMax' => $dateMax,
             'maxResults' => 10
         ]);
 
+        /** @var LogAidOriginUrlClickRepository $logAidOriginUrlClickRepository */
+        $logAidOriginUrlClickRepository = $this->managerRegistry->getRepository(LogAidOriginUrlClick::class);
+
         // Logs en savoir plus aides
-        $logAidOriginUrlClicks = $this->managerRegistry->getRepository(LogAidOriginUrlClick::class)
-        ->countByDay([
+        $logAidOriginUrlClicks = $logAidOriginUrlClickRepository->countByDay([
             'dateMin' => $dateMin,
             'dateMax' => $dateMax,
         ]);
@@ -70,8 +74,7 @@ class LogController extends DashboardController
         $chartOrigin = $this->createChart($allDates, 'Clics en savoir plus aides');
 
         // Top 10 aides en savoir plus
-        $topAidOriginUrlClicks = $this->managerRegistry->getRepository(LogAidOriginUrlClick::class)
-        ->countTopAidOnPeriod([
+        $topAidOriginUrlClicks = $logAidOriginUrlClickRepository->countTopAidOnPeriod([
             'dateMin' => $dateMin,
             'dateMax' => $dateMax,
             'maxResults' => 10
@@ -87,6 +90,13 @@ class LogController extends DashboardController
         ]);
     }
 
+    /**
+     *
+     * @param array<int, array<string, int>> $data
+     * @param \DateTime $dateMin
+     * @param \DateTime $dateMax
+     * @return array<string, array<string, mixed>> $data
+     */
     public function fillAllDate(array $data, \DateTime $dateMin, \DateTime $dateMax): array
     {
         $dateMin = clone $dateMin;
@@ -110,6 +120,12 @@ class LogController extends DashboardController
         return $allDates;
     }
 
+    /**
+     *
+     * @param array<string, array<string, mixed>> $datas
+     * @param string $chartLabel
+     * @return Chart
+     */
     public function createChart(array $datas, string $chartLabel): Chart
     {
         // création du graphique

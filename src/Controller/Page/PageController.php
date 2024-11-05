@@ -14,7 +14,7 @@ class PageController extends FrontController
 {
     #[Route('/{url}/', name: 'app_page_custom')]
     public function index(
-        $url,
+        string $url,
         PageRepository $pageRepository
     ): Response {
 

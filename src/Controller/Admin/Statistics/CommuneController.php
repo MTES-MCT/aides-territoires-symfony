@@ -7,6 +7,7 @@ use App\Entity\Aid\AidProject;
 use App\Entity\Organization\Organization;
 use App\Entity\Organization\OrganizationType;
 use App\Entity\Perimeter\Perimeter;
+use App\Repository\Aid\AidProjectRepository;
 use App\Repository\Aid\AidRepository;
 use App\Repository\Organization\OrganizationRepository;
 use App\Repository\Perimeter\PerimeterRepository;
@@ -31,36 +32,24 @@ class CommuneController extends AbstractController
 
     #[Route('/admin/statistics/commune/population', name: 'admin_statistics_commune_population')]
     public function mapPopulation(
-        AidRepository $aidRepository,
-        PerimeterRepository $perimeterRepository,
         OrganizationRepository $organizationRepository
     ): Response {
         $cities = $organizationRepository->getScaleCovered(scale: Perimeter::SCALE_COMMUNE);
-        // dd($cities);
-        // $epcis = $aidRepository->getScaleCovered(scale: Perimeter::SCALE_EPCI);
-        // foreach ($epcis as $key => $epci) {
-        //     if (!$epci['latitude'] || !$epci['longitude']) {
-        //         $biggestCity = $perimeterRepository->getBiggestCity($epci['id']);
-        //         if ($biggestCity instanceof Perimeter) {
-        //             $epcis[$key]['latitude'] = $biggestCity->getLatitude();
-        //             $epcis[$key]['longitude'] = $biggestCity->getLongitude();
-        //         }
-        //     }
-        // }
 
         // rendu template
         return $this->render('admin/statistics/commune/population.html.twig', [
             'cities' => $cities,
-            // 'epcis' => $epcis,
         ]);
     }
 
     #[Route('/admin/statistics/commune/dashboard', name: 'admin_statistics_commune_dashboard')]
-    public function communeDashboard(): Response
-    {
+    public function communeDashboard(
+        OrganizationRepository $organizationRepository,
+        PerimeterRepository $perimeterRepository,
+        AidProjectRepository $aidProjectRepository
+    ): Response {
         // compte les inscriptions de commune mois par mois
-        $communeRegistrationsByMonth = $this->managerRegistry->getRepository(Organization::class)
-        ->countRegistrationsByMonth([
+        $communeRegistrationsByMonth = $organizationRepository->countRegistrationsByMonth([
             'typeSlug' =>  OrganizationType::SLUG_COMMUNE,
             'perimeterScale' => Perimeter::SCALE_COMMUNE,
         ]);
@@ -103,10 +92,9 @@ class CommuneController extends AbstractController
         ]);
 
         // le nombre de commune (périmètre) ayant X organizations (par nb organiztion)
-        $nbPerimeterByNbOrganization = $this->managerRegistry->getRepository(Perimeter::class)->countNbByOrganization(
+        $nbPerimeterByNbOrganization = $perimeterRepository->countNbByOrganization(
             [
                 'scalePerimeter' => Perimeter::SCALE_COMMUNE,
-                // 'organizationTypeSlug' => OrganizationType::SLUG_COMMUNE,
             ]
         );
         $reducedArray = [];
@@ -180,7 +168,7 @@ class CommuneController extends AbstractController
         ]);
 
         // Nombre d'aides associés à des projets par des communes (par mois)
-        $nbApCreatedByMonth = $this->managerRegistry->getRepository(AidProject::class)->countCreatedByMonth(
+        $nbApCreatedByMonth = $aidProjectRepository->countCreatedByMonth(
             [
                 'organizationTypeSlug' => OrganizationType::SLUG_COMMUNE
             ]
@@ -235,13 +223,14 @@ class CommuneController extends AbstractController
         '/admin/statistics/commune/export/registration-by-month',
         name: 'admin_statistics_commune_export_registration_by_month'
     )]
-    public function exportRegistrationByMonth(): StreamedResponse
-    {
+    public function exportRegistrationByMonth(
+        OrganizationRepository $organizationRepository
+    ): StreamedResponse {
         ini_set('max_execution_time', 60 * 60);
         ini_set('memory_limit', '1G');
 
         $response = new StreamedResponse();
-        $response->setCallback(function () {
+        $response->setCallback(function () use ($organizationRepository) {
             // options CSV
             $options = new \OpenSpout\Writer\CSV\Options();
             $options->FIELD_DELIMITER = ';';
@@ -263,8 +252,7 @@ class CommuneController extends AbstractController
             $writer->addRow($singleRow);
 
             // les inscriptions
-            $communeRegistrationsByMonth = $this->managerRegistry->getRepository(Organization::class)
-            ->countRegistrationsByMonth([
+            $communeRegistrationsByMonth = $organizationRepository->countRegistrationsByMonth([
                 'typeSlug' =>  OrganizationType::SLUG_COMMUNE,
                 'perimeterScale' => Perimeter::SCALE_COMMUNE,
             ]);
@@ -287,13 +275,14 @@ class CommuneController extends AbstractController
     }
 
     #[Route('/admin/statistics/commune/export/nb-ap-by-month', name: 'admin_statistics_commune_export_nb_ap_by_month')]
-    public function exportNbApByMonth(): StreamedResponse
-    {
+    public function exportNbApByMonth(
+        AidProjectRepository $aidProjectRepository
+    ): StreamedResponse {
         ini_set('max_execution_time', 60 * 60);
         ini_set('memory_limit', '1G');
 
         $response = new StreamedResponse();
-        $response->setCallback(function () {
+        $response->setCallback(function () use ($aidProjectRepository) {
             // options CSV
             $options = new \OpenSpout\Writer\CSV\Options();
             $options->FIELD_DELIMITER = ';';
@@ -315,7 +304,7 @@ class CommuneController extends AbstractController
             $writer->addRow($singleRow);
 
             // les inscriptions
-            $nbApCreatedByMonth = $this->managerRegistry->getRepository(AidProject::class)->countCreatedByMonth(
+            $nbApCreatedByMonth = $aidProjectRepository->countCreatedByMonth(
                 [
                     'organizationTypeSlug' => OrganizationType::SLUG_COMMUNE
                 ]

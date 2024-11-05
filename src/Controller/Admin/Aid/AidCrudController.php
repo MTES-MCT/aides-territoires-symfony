@@ -43,10 +43,13 @@ use App\Form\Admin\Reference\ProjectReferenceMissingCreateType;
 use App\Repository\Aid\AidDestinationRepository;
 use App\Repository\Aid\AidRecurrenceRepository;
 use App\Repository\Aid\AidRepository;
+use App\Repository\Aid\AidStepRepository;
 use App\Repository\Aid\AidTypeRepository;
 use App\Repository\Backer\BackerRepository;
 use App\Repository\Category\CategoryRepository;
 use App\Repository\Organization\OrganizationRepository;
+use App\Repository\Organization\OrganizationTypeRepository;
+use App\Repository\Perimeter\PerimeterRepository;
 use App\Repository\Program\ProgramRepository;
 use App\Repository\Reference\ProjectReferenceRepository;
 use App\Repository\User\UserRepository;
@@ -88,7 +91,7 @@ use TypeError;
 
 class AidCrudController extends AtCrudController implements EventSubscriberInterface
 {
-    private $symbolWarning = '&#9888;';
+    private string $symbolWarning = '&#9888;';
     public static function getEntityFqcn(): string
     {
         return Aid::class;
@@ -489,8 +492,7 @@ class AidCrudController extends AtCrudController implements EventSubscriberInter
             ->autocomplete()
             ->setColumns(12)
             ->formatValue(function ($value) {
-                /** @var Perimeter $value */
-                if ($value) {
+                if ($value instanceof Perimeter) {
                     $name = $value->getName();
                     if ($value->getScale() == Perimeter::SCALE_COUNTY) {
                         $name .= ' (Département)';
@@ -1062,13 +1064,13 @@ class AidCrudController extends AtCrudController implements EventSubscriberInter
 
                             $dateStartFromCell = $cells[14]->getValue();
                             if (!$dateStartFromCell instanceof DateTimeImmutable) {
-                                $dateStartFromCell = trim($cells[14]->getValue() !== '')
+                                $dateStartFromCell = trim($cells[14]->getValue()) !== ''
                                     ? new \DateTime($cells[14]->getValue()) : null;
                             }
                             $aid->setDateStart($dateStartFromCell);
                             $dateSubmissionDeadlineFromCell = $cells[15]->getValue();
                             if (!$dateSubmissionDeadlineFromCell instanceof DateTimeImmutable) {
-                                $dateSubmissionDeadlineFromCell = trim($cells[15]->getValue() !== '')
+                                $dateSubmissionDeadlineFromCell = trim($cells[15]->getValue()) !== ''
                                     ? new \DateTime($cells[15]->getValue()) : null;
                             }
                             $aid->setDateSubmissionDeadline($dateSubmissionDeadlineFromCell);
@@ -1197,7 +1199,7 @@ class AidCrudController extends AtCrudController implements EventSubscriberInter
         AdminContext $context,
         SpreadsheetExporterService $spreadsheetExporterService,
         string $filename = 'aides'
-    ) {
+    ): Response {
         return $this->exportSpreadsheet($context, $spreadsheetExporterService, $filename, 'xlsx');
     }
 
@@ -1205,7 +1207,7 @@ class AidCrudController extends AtCrudController implements EventSubscriberInter
         AdminContext $context,
         SpreadsheetExporterService $spreadsheetExporterService,
         string $filename = 'aides'
-    ) {
+    ): Response {
         return $this->exportSpreadsheet($context, $spreadsheetExporterService, $filename, 'csv');
     }
 
@@ -1264,14 +1266,14 @@ class AidCrudController extends AtCrudController implements EventSubscriberInter
         ];
     }
 
-    public function handleProjectReferenceMissingPersistEvent(BeforeEntityPersistedEvent $event)
+    public function handleProjectReferenceMissingPersistEvent(BeforeEntityPersistedEvent $event): void
     {
         if ($event->getEntityInstance() instanceof Aid) {
             $this->handleProjectReferenceMissingDuplicates($event->getEntityInstance());
         }
     }
 
-    public function handleProjectReferenceMissingUpdateEvent(BeforeEntityUpdatedEvent $event)
+    public function handleProjectReferenceMissingUpdateEvent(BeforeEntityUpdatedEvent $event): void
     {
         if ($event->getEntityInstance() instanceof Aid) {
             $this->handleProjectReferenceMissingDuplicates($event->getEntityInstance());

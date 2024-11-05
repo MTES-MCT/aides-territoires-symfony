@@ -34,11 +34,11 @@ class BackerAskAssociateCrudController extends AtCrudController
                 return html_entity_decode($value);
             });
         yield AssociationField::new('organization', 'Structure')
-            ->autocomplete(true);
+            ->autocomplete();
         yield AssociationField::new('backer', 'Porteur d\'aide')
-            ->autocomplete(true);
+            ->autocomplete();
         yield AssociationField::new('user', 'Utilisateur')
-            ->autocomplete(true);
+            ->autocomplete();
         yield DateTimeField::new('timeCreate', 'Date de création');
         yield BooleanField::new('accepted', 'Est accepté');
         yield BooleanField::new('refused', 'Est refusé');

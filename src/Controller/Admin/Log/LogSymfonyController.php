@@ -12,7 +12,7 @@ class LogSymfonyController extends DashboardController
     #[Route('/admin/log/symfony/download', name: 'admin_log_symfony_download')]
     public function download(
         KernelInterface $kernelInterface
-    ) {
+    ): Response {
         $logsDir = $kernelInterface->getLogDir();
         $logFilename = $kernelInterface->getEnvironment() . '.log';
         $logFile = $logsDir . '/' . $logFilename;

@@ -11,6 +11,8 @@ use App\Service\Image\ImageService;
 use App\Service\User\UserService;
 use App\Service\Various\ParamService;
 use App\Service\Various\StringService;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\EntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use EasyCorp\Bundle\EasyAdminBundle\Collection\FieldCollection;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
@@ -94,8 +96,9 @@ class AtCrudController extends AbstractCrudController
         $entityTest = new (static::getEntityFqcn());
 
         if (method_exists($entityTest, 'getPosition')) {
-            $entityCount = $this->managerRegistry->getManager()
-                ->getRepository(static::getEntityFqcn())->count([]);
+            /** @var ServiceEntityRepository<object> $repository */
+            $repository = $this->managerRegistry->getRepository(static::getEntityFqcn());
+            $entityCount = $repository->count([]);
 
             // les actions pour monter / descendre
             $moveTop = Action::new('moveTop', false, 'fa fa-arrow-up')
@@ -177,6 +180,11 @@ class AtCrudController extends AbstractCrudController
         return $this->redirect($context->getReferrer());
     }
 
+    /**
+     *
+     * @param array<string, mixed>|null $params
+     * @return void
+     */
     public function updatePositions(array $params = null): void
     {
         $exclude = $params['exclude'] ?? null;
@@ -185,7 +193,9 @@ class AtCrudController extends AbstractCrudController
 
         $direction = $newPosition < $oldPosition ? 'down' : 'up';
 
-        $qb = $this->managerRegistry->getRepository(static::getEntityFqcn())->createQueryBuilder('p');
+        /** @var ServiceEntityRepository $serviceEntityRepository */
+        $serviceEntityRepository = $this->managerRegistry->getRepository(static::getEntityFqcn());
+        $qb = $serviceEntityRepository->createQueryBuilder('p');
         $qb->update(static::getEntityFqcn(), 'pt');
         if ($direction == 'down') {
             $qb->set('pt.position', 'pt.position + 1');
@@ -224,7 +234,7 @@ class AtCrudController extends AbstractCrudController
         SpreadsheetExporterService $spreadsheetExporterService,
         string $filename,
         string $format = 'csv'
-    ) {
+    ): Response {
         ini_set('max_execution_time', 60 * 60);
         ini_set('memory_limit', '1G');
 
@@ -248,7 +258,7 @@ class AtCrudController extends AbstractCrudController
         AdminContext $context,
         SpreadsheetExporterService $spreadsheetExporterService,
         string $filename = ''
-    ) {
+    ): Response {
         return $this->exportSpreadsheet($context, $spreadsheetExporterService, $filename, 'xlsx');
     }
 
@@ -256,11 +266,11 @@ class AtCrudController extends AbstractCrudController
         AdminContext $context,
         SpreadsheetExporterService $spreadsheetExporterService,
         string $filename = ''
-    ) {
+    ): Response {
         return $this->exportSpreadsheet($context, $spreadsheetExporterService, $filename, 'csv');
     }
 
-    public function getExportXlsxAction()
+    public function getExportXlsxAction(): Action
     {
         return Action::new('exportXlsx')
             ->linkToUrl(function () {
@@ -274,7 +284,7 @@ class AtCrudController extends AbstractCrudController
             ->createAsGlobalAction();
     }
 
-    public function getExportCsvAction()
+    public function getExportCsvAction(): Action
     {
         return Action::new('exportCsv')
             ->linkToUrl(function () {

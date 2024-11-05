@@ -28,7 +28,7 @@ class PerimeterCrudController extends AtCrudController
         return Perimeter::class;
     }
 
-    public function createEntity(string $entityFqcn)
+    public function createEntity(string $entityFqcn): Perimeter
     {
         $perimeter = new Perimeter();
         $perimeter->setCountry(Perimeter::SLUG_COUNTRY_DEFAULT);

@@ -4,6 +4,7 @@ namespace App\Controller\Admin\Filter\Aid;
 
 use App\Entity\Reference\KeywordReference;
 use App\Form\Admin\Filter\Aid\AidReferenceSearchFilterType;
+use App\Repository\Reference\KeywordReferenceRepository;
 use Doctrine\ORM\QueryBuilder;
 use EasyCorp\Bundle\EasyAdminBundle\Contracts\Filter\FilterInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\EntityDto;
@@ -15,7 +16,7 @@ class AidReferenceSearchFilter implements FilterInterface
 {
     use FilterTrait;
 
-    public static function new(string $propertyName, $label = null): self
+    public static function new(string $propertyName, mixed $label = null): self
     {
         return (new self())
             ->setFilterFqcn(__CLASS__)
@@ -34,8 +35,13 @@ class AidReferenceSearchFilter implements FilterInterface
             return;
         }
         $search = $filterDataDto->getValue()->getName();
-        $synonyms = $queryBuilder->getEntityManager()->getRepository(KeywordReference::class)
-            ->findCustom(['string' => $search, 'noIntention' => true]);
+
+        /** @var KeywordReferenceRepository $keywordReferenceRepository */
+        $keywordReferenceRepository = $queryBuilder->getEntityManager()->getRepository(KeywordReference::class);
+
+        $synonyms = $keywordReferenceRepository->findCustom(
+            ['string' => $search, 'noIntention' => true]
+        );
 
         $objectsString = '';
         foreach ($synonyms as $synonym) {

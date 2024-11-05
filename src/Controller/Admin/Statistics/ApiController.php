@@ -97,16 +97,9 @@ class ApiController extends AbstractController
         ];
         foreach ($days as $day => $dayData) {
             $labels[] = $day;
-            if (isset($dayData['types']['logAidSearchs'])) {
-                $datasets['logAidSearchs']['data'][] = $dayData['types']['logAidSearchs']['total'];
-            } else {
-                $datasets['logAidSearchs']['data'][] = 0;
-            }
-            if (isset($dayData['types']['logAidViews'])) {
-                $datasets['logAidViews']['data'][] = $dayData['types']['logAidViews']['total'];
-            } else {
-                $datasets['logAidViews']['data'][] = 0;
-            }
+
+            $datasets['logAidSearchs']['data'][] = $dayData['types']['logAidSearchs']['total'];
+            $datasets['logAidViews']['data'][] = $dayData['types']['logAidViews']['total'];
         }
 
         // sort pour transformer les clés

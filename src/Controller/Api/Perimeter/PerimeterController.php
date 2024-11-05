@@ -98,7 +98,7 @@ class PerimeterController extends ApiController
                 'id' => $result->getId() . '-' . $this->stringService->getSlug($result->getName()),
                 'text' => $perimeterService->getSmartName($result),
                 'name' => $result->getName(),
-                'scale' => $perimeterService->getScale($result->getScale())['name'] ?? null,
+                'scale' => $perimeterService->getScale((int) $result->getScale())['name'] ?? null,
                 'zipcodes' => $result->getZipcodes() ?? [],
                 'code' => $result->getCode()
             ];

@@ -46,7 +46,7 @@ class UserCrudController extends AtCrudController
         )
         ->add(NullFilter::new('apiToken', 'Token API')->setChoiceLabels('Pas de token', 'A un token'))
         ->add('isCertified')
-        ->add('mlConsent', 'Consentement newsletter')
+        ->add('mlConsent')
         ->add('userGroups')
         ->add(UserCountyFilter::new('perimeter', 'Département'))
         ->add(UserOganizationTypeFilter::new('organizationType', 'Type de structure'))
@@ -222,7 +222,7 @@ class UserCrudController extends AtCrudController
         AdminContext $context,
         SpreadsheetExporterService $spreadsheetExporterService,
         string $filename = 'utilisateur'
-    ) {
+    ): Response {
         return $this->exportSpreadsheet($context, $spreadsheetExporterService, $filename, 'xlsx');
     }
 
@@ -230,7 +230,7 @@ class UserCrudController extends AtCrudController
         AdminContext $context,
         SpreadsheetExporterService $spreadsheetExporterService,
         string $filename = 'utilisateur'
-    ) {
+    ): Response {
         return $this->exportSpreadsheet($context, $spreadsheetExporterService, $filename, 'csv');
     }
 }

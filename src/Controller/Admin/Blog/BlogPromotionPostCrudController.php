@@ -81,7 +81,7 @@ class BlogPromotionPostCrudController extends AtCrudController
             ->hideOnIndex();
         yield AssociationField::new('perimeter', 'Périmètre')
             ->hideOnIndex()
-            ->autocomplete(true);
+            ->autocomplete();
         yield AssociationField::new('categories', 'Sous-thématiques')
             ->setFormTypeOption('choice_label', 'name')
             ->hideOnIndex();

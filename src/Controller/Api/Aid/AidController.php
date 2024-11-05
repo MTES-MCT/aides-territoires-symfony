@@ -4,6 +4,7 @@ namespace App\Controller\Api\Aid;
 
 use App\Controller\Api\ApiController;
 use App\Entity\Aid\Aid;
+use App\Entity\Category\CategoryTheme;
 use App\Entity\Log\LogAidSearch;
 use App\Entity\Perimeter\Perimeter;
 use App\Entity\User\User;
@@ -66,7 +67,7 @@ class AidController extends ApiController
         $user = $userService->getUserLogged();
         $logParams = [
             'organizationTypes' => (isset($aidParams['organizationType'])) ? [$aidParams['organizationType']] : null,
-            'querystring' => $query ?? null,
+            'querystring' => $query,
             'resultsCount' => $count,
             'host' => $requestStack->getCurrentRequest()->getHost(),
             'source' => LogAidSearch::SOURCE_API,
@@ -80,6 +81,7 @@ class AidController extends ApiController
             'projectReference' => $aidParams['projectReference'] ?? null,
             'user' => $user ?? null
         ];
+        /** @var ArrayCollection<int, CategoryTheme> $themes */
         $themes = new ArrayCollection();
         if (isset($aidParams['categories']) && is_array($aidParams['categories'])) {
             foreach ($aidParams['categories'] as $category) {
@@ -136,7 +138,7 @@ class AidController extends ApiController
 
     #[Route('/api/aids/by-id/{id}/', name: 'api_aid_by_id', priority: 4)]
     public function byId(
-        $id,
+        mixed $id,
         AidRepository $aidRepository,
         AidService $aidService,
         LogService $logService,
@@ -192,7 +194,7 @@ class AidController extends ApiController
 
     #[Route('/api/aids/{slug}/', name: 'api_aid_by_slug', priority: 4)]
     public function bySlug(
-        $slug,
+        string $slug,
         AidRepository $aidRepository,
         AidService $aidService,
         LogService $logService,
@@ -242,6 +244,13 @@ class AidController extends ApiController
     }
 
 
+    /**
+     * Formatage du retour
+     *
+     * @param array<int, Aid> $results
+     * @param AidService $aidService
+     * @return array<int, array<string, mixed>>
+     */
     private function getResultsSpe(array $results, AidService $aidService): array
     {
         $resultsSpe = [];

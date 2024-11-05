@@ -4,6 +4,7 @@ namespace App\Controller\Admin\Statistics;
 
 use App\Controller\Admin\DashboardController;
 use App\Entity\Blog\BlogPost;
+use App\Entity\Blog\BlogPostCategory;
 use App\Form\Admin\Filter\DateRangeType;
 use App\Repository\Log\LogBlogPostViewRepository;
 use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
@@ -22,7 +23,7 @@ class BlogController extends DashboardController
         LogBlogPostViewRepository $logBlogPostViewRepository,
         FormFactoryInterface $formFactoryInterface,
         ChartBuilderInterface $chartBuilderInterface
-    ) {
+    ): Response {
         // dates par défaut
         $dateMin = new \DateTime('-1 month');
         $dateMax = new \DateTime();
@@ -98,7 +99,8 @@ class BlogController extends DashboardController
             DateRangeType::class,
             null,
             [
-                'action' => $this->adminUrlGenerator->generateUrl('admin_statistics_blog_dashboard') . '#evolution',
+                'action' => $this->adminUrlGenerator->setRoute('admin_statistics_blog_dashboard')->generateUrl()
+                . '#evolution',
             ]
         );
         $formDateRangeEvolution->add('blogPost', EntityType::class, [
@@ -194,7 +196,12 @@ class BlogController extends DashboardController
         ]);
     }
 
-    private function getCategoriesBackgroundColor(array $array)
+    /**
+     *
+     * @param array<int, BlogPostCategory> $array
+     * @return string[]
+     */
+    private function getCategoriesBackgroundColor(array $array): array
     {
         $colorsBySlug = [
             'webinaires' => 'rgb(255, 99, 132)',

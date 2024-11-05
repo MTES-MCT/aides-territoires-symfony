@@ -4,6 +4,7 @@ namespace App\Controller\Admin\DataSource;
 
 use App\Controller\Admin\AtCrudController;
 use App\Entity\DataSource\DataSource;
+use App\Repository\DataSource\DataSourceRepository;
 use App\Repository\User\UserRepository;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
@@ -65,6 +66,7 @@ class DataSourceCrudController extends AtCrudController
         yield NumberField::new('nbAids', 'Nombre d\'aides')
             ->onlyOnIndex()
             ->formatValue(function ($value, $entity) {
+                /** @var DataSourceRepository $dataSourceRepository */
                 $dataSourceRepository = $this->managerRegistry->getRepository(DataSource::class);
                 return $dataSourceRepository->countAids(['id' => $entity->getId()]);
             });
