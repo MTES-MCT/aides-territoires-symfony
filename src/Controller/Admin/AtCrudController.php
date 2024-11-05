@@ -12,6 +12,7 @@ use App\Service\User\UserService;
 use App\Service\Various\ParamService;
 use App\Service\Various\StringService;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\EntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use EasyCorp\Bundle\EasyAdminBundle\Collection\FieldCollection;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
@@ -95,8 +96,9 @@ class AtCrudController extends AbstractCrudController
         $entityTest = new (static::getEntityFqcn());
 
         if (method_exists($entityTest, 'getPosition')) {
-            $entityCount = $this->managerRegistry->getManager()
-                ->getRepository(static::getEntityFqcn())->count([]);
+            /** @var ServiceEntityRepository<object> $repository */
+            $repository = $this->managerRegistry->getRepository(static::getEntityFqcn());
+            $entityCount = $repository->count([]);
 
             // les actions pour monter / descendre
             $moveTop = Action::new('moveTop', false, 'fa fa-arrow-up')

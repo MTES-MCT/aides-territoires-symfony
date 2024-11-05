@@ -46,7 +46,7 @@ class UserCrudController extends AtCrudController
         )
         ->add(NullFilter::new('apiToken', 'Token API')->setChoiceLabels('Pas de token', 'A un token'))
         ->add('isCertified')
-        ->add('mlConsent', 'Consentement newsletter')
+        ->add('mlConsent')
         ->add('userGroups')
         ->add(UserCountyFilter::new('perimeter', 'Département'))
         ->add(UserOganizationTypeFilter::new('organizationType', 'Type de structure'))
