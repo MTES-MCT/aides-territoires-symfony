@@ -129,7 +129,11 @@ class UserController extends FrontController
                     $managerRegistry->getManager()->flush();
 
                     // authentifie le user
-                    $security->login($user, SecurityService::DEFAULT_AUTHENTICATOR_NAME, SecurityService::DEFAULT_FIREWALL_NAME);
+                    $security->login(
+                        $user,
+                        SecurityService::DEFAULT_AUTHENTICATOR_NAME,
+                        SecurityService::DEFAULT_FIREWALL_NAME
+                    );
 
                     // message success
                     $this->tAddFlash(
@@ -161,7 +165,11 @@ class UserController extends FrontController
         }
 
         // formulaire proConnnect
-        $formProConnect = $this->createForm(ProConnectType::class, null, ['action' => $this->generateUrl('app_login_proconnect')]);
+        $formProConnect = $this->createForm(
+            ProConnectType::class,
+            null,
+            ['action' => $this->generateUrl('app_login_proconnect')]
+        );
 
         // rendu template
         return $this->render('user/user/register.html.twig', [
@@ -287,7 +295,11 @@ class UserController extends FrontController
         }
 
         // formulaire proConnnect
-        $formProConnect = $this->createForm(ProConnectType::class, null, ['action' => $this->generateUrl('app_login_proconnect')]);
+        $formProConnect = $this->createForm(
+            ProConnectType::class,
+            null,
+            ['action' => $this->generateUrl('app_login_proconnect')]
+        );
 
 
         // rendu template

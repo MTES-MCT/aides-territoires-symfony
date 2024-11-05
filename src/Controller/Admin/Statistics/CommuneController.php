@@ -47,8 +47,7 @@ class CommuneController extends AbstractController
         OrganizationRepository $organizationRepository,
         PerimeterRepository $perimeterRepository,
         AidProjectRepository $aidProjectRepository
-    ): Response
-    {
+    ): Response {
         // compte les inscriptions de commune mois par mois
         $communeRegistrationsByMonth = $organizationRepository->countRegistrationsByMonth([
             'typeSlug' =>  OrganizationType::SLUG_COMMUNE,
@@ -226,8 +225,7 @@ class CommuneController extends AbstractController
     )]
     public function exportRegistrationByMonth(
         OrganizationRepository $organizationRepository
-    ): StreamedResponse
-    {
+    ): StreamedResponse {
         ini_set('max_execution_time', 60 * 60);
         ini_set('memory_limit', '1G');
 
@@ -279,8 +277,7 @@ class CommuneController extends AbstractController
     #[Route('/admin/statistics/commune/export/nb-ap-by-month', name: 'admin_statistics_commune_export_nb_ap_by_month')]
     public function exportNbApByMonth(
         AidProjectRepository $aidProjectRepository
-    ): StreamedResponse
-    {
+    ): StreamedResponse {
         ini_set('max_execution_time', 60 * 60);
         ini_set('memory_limit', '1G');
 

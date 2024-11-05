@@ -42,7 +42,11 @@ class SecurityController extends FrontController
         }
 
         // formulaire proConnnect
-        $formProConnect = $this->createForm(ProConnectType::class, null, ['action' => $this->generateUrl('app_login_proconnect')]);
+        $formProConnect = $this->createForm(
+            ProConnectType::class,
+            null,
+            ['action' => $this->generateUrl('app_login_proconnect')]
+        );
 
         return $this->render('security/login.html.twig', [
             'formLogin' => $formLogin,
@@ -55,7 +59,7 @@ class SecurityController extends FrontController
     public function loginByPronnect(
         ProConnectService $proConnectService,
         LoggerInterface $loggerInterface
-    ) : Response {
+    ): Response {
         try {
             return new RedirectResponse($proConnectService->getAuthorizationEndpoint());
         } catch (\Exception $e) {

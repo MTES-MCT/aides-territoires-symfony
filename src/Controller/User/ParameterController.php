@@ -46,12 +46,11 @@ class ParameterController extends FrontController
         UserPasswordHasherInterface $userPasswordHasher,
         Security $security,
         LoggerInterface $loggerInterface
-    ): Response
-    {
+    ): Response {
         try {
             // tous les paramètres get dans un tableau
             $params = $requestStack->getCurrentRequest()->query->all();
-            
+
             // on recupère les infos de ProConnect
             $userInfos = $proConnectService->getDataFromProconnect($params);
             // on vérifie que $userInfos contient bien les 4 clés attendues
@@ -85,7 +84,11 @@ class ParameterController extends FrontController
             }
 
             // On le connecte
-            $security->login($user, SecurityService::DEFAULT_AUTHENTICATOR_NAME, SecurityService::DEFAULT_FIREWALL_NAME);
+            $security->login(
+                $user,
+                SecurityService::DEFAULT_AUTHENTICATOR_NAME,
+                SecurityService::DEFAULT_FIREWALL_NAME
+            );
 
             // on le redirige
             return $this->redirectToRoute('app_user_dashboard');
@@ -101,7 +104,7 @@ class ParameterController extends FrontController
             return $this->redirectToRoute('app_login');
         }
     }
-    
+
     #[Route('/comptes/monprofil/', name: 'app_user_parameter_profil')]
     public function profil(
         UserPasswordHasherInterface $userPasswordHasher,

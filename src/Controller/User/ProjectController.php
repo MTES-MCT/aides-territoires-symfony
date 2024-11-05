@@ -620,8 +620,7 @@ class ProjectController extends FrontController
         UserService $userService,
         NotificationService $notificationService,
         ManagerRegistry $managerRegistry
-    ) : RedirectResponse
-    {
+    ): RedirectResponse {
         // vérifie projet et appartenance
         $project = $projectRepository->findOneBy(
             [
@@ -645,8 +644,10 @@ class ProjectController extends FrontController
                 'id' => $idSuggested
             ]
         );
-        if (!$aidSuggestedAidProject instanceof AidSuggestedAidProject
-            || $aidSuggestedAidProject->getProject() != $project) {
+        if (
+            !$aidSuggestedAidProject instanceof AidSuggestedAidProject
+            || $aidSuggestedAidProject->getProject() != $project
+        ) {
             $this->addFlash(FrontController::FLASH_ERROR, 'Vous n\'avez pas accès à cette suggestion.');
 
             return $this->redirectToRoute(
@@ -730,8 +731,7 @@ class ProjectController extends FrontController
         AidSuggestedAidProjectRepository $aidSuggestedAidProjectRepository,
         UserService $userService,
         ManagerRegistry $managerRegistry
-    ) : RedirectResponse
-    {
+    ): RedirectResponse {
         // vérifie projet et appartenance
         $project = $projectRepository->findOneBy(
             [
@@ -761,8 +761,10 @@ class ProjectController extends FrontController
                 'id' => $idSuggested
             ]
         );
-        if (!$aidSuggestedAidProject instanceof AidSuggestedAidProject
-            || $aidSuggestedAidProject->getProject() != $project) {
+        if (
+            !$aidSuggestedAidProject instanceof AidSuggestedAidProject
+            || $aidSuggestedAidProject->getProject() != $project
+        ) {
                 $this->addFlash(FrontController::FLASH_ERROR, 'Vous n\'avez pas accès à cette association.');
                 return $this->redirectToRoute(
                     'app_user_project_aides',
@@ -783,7 +785,7 @@ class ProjectController extends FrontController
 
         // message flash
         $this->addFlash(FrontController::FLASH_SUCCESS, 'L\'aide a bien été refusée.');
-        
+
         return $this->redirectToRoute(
             'app_user_project_aides',
             [
@@ -791,7 +793,6 @@ class ProjectController extends FrontController
                 'slug' => $project->getSlug()
             ]
         );
-        
     }
 
     #[Route(

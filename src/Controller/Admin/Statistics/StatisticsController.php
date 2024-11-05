@@ -860,8 +860,16 @@ class StatisticsController extends DashboardController
         $userRepository = $this->managerRegistry->getRepository(User::class);
 
         while ($currentDate < $dateEnd) {
-            $startOfWeek = (clone $currentDate)->setISODate((int) $currentDate->format('Y'), (int) $currentDate->format('W'), 1);
-            $endOfWeek = (clone $currentDate)->setISODate((int) $currentDate->format('Y'), (int) $currentDate->format('W'), 7);
+            $startOfWeek = (clone $currentDate)->setISODate(
+                (int) $currentDate->format('Y'),
+                (int) $currentDate->format('W'),
+                1
+            );
+            $endOfWeek = (clone $currentDate)->setISODate(
+                (int) $currentDate->format('Y'),
+                (int) $currentDate->format('W'),
+                7
+            );
 
             // inscriptions communes
             $nbCommunes = $userRepository->countRegisters([

@@ -99,7 +99,8 @@ class BlogController extends DashboardController
             DateRangeType::class,
             null,
             [
-                'action' => $this->adminUrlGenerator->setRoute('admin_statistics_blog_dashboard')->generateUrl() . '#evolution',
+                'action' => $this->adminUrlGenerator->setRoute('admin_statistics_blog_dashboard')->generateUrl()
+                . '#evolution',
             ]
         );
         $formDateRangeEvolution->add('blogPost', EntityType::class, [
