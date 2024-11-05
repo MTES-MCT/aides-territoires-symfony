@@ -13,10 +13,15 @@ use Symfony\Bundle\SecurityBundle\Security;
 
 final class AidExtension implements QueryCollectionExtensionInterface, QueryItemExtensionInterface
 {
-    public function __construct(private readonly Security $security)
-    {
-    }
-
+    /**
+     *
+     * @param QueryBuilder $queryBuilder
+     * @param QueryNameGeneratorInterface $queryNameGenerator
+     * @param string $resourceClass
+     * @param Operation|null $operation
+     * @param array<mixed> $context
+     * @return void
+     */
     public function applyToCollection(
         QueryBuilder $queryBuilder,
         QueryNameGeneratorInterface $queryNameGenerator,
@@ -29,6 +34,16 @@ final class AidExtension implements QueryCollectionExtensionInterface, QueryItem
         }
     }
 
+    /**
+     *
+     * @param QueryBuilder $queryBuilder
+     * @param QueryNameGeneratorInterface $queryNameGenerator
+     * @param string $resourceClass
+     * @param array<mixed> $identifiers
+     * @param Operation|null $operation
+     * @param array<mixed> $context
+     * @return void
+     */
     public function applyToItem(
         QueryBuilder $queryBuilder,
         QueryNameGeneratorInterface $queryNameGenerator,
