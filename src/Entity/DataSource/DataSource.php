@@ -79,6 +79,9 @@ class DataSource // NOSONAR too much methods
     #[ORM\JoinColumn(onDelete: 'SET NULL')]
     private ?User $aidAuthor = null;
 
+    /**
+     * @var Collection<int, Aid>
+     */
     #[ORM\OneToMany(mappedBy: 'importDataSource', targetEntity: Aid::class)]
     private Collection $aids;
 

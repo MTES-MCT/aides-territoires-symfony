@@ -67,6 +67,9 @@ class AidStep
     #[Gedmo\Timestampable(on: 'update')]
     private ?\DateTimeInterface $timeUpdate = null;
 
+    /**
+     * @var Collection<int, Aid>
+     */
     #[ORM\ManyToMany(targetEntity: Aid::class, mappedBy: 'aidSteps')]
     private Collection $aids;
 

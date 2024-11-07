@@ -32,6 +32,9 @@ class Bundle
     #[ORM\JoinColumn(nullable: false)]
     private ?User $owner = null;
 
+    /**
+     * @var Collection<int, Aid>
+     */
     #[ORM\ManyToMany(targetEntity: Aid::class, inversedBy: 'bundles')]
     private Collection $aids;
 

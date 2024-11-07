@@ -65,6 +65,9 @@ class ProjectReferenceCategory
     #[ORM\Column(length: 150)]
     private ?string $name = null;
 
+    /**
+     * @var Collection<int, ProjectReference>
+     */
     #[ORM\OneToMany(mappedBy: 'projectReferenceCategory', targetEntity: ProjectReference::class)]
     private Collection $projectReferences;
 

@@ -37,6 +37,9 @@ class BackerCategory
     #[Gedmo\Timestampable(on: 'create')]
     private ?\DateTimeInterface $timeCreate = null;
 
+    /**
+     * @var Collection<int, BackerSubcategory>
+     */
     #[ORM\OneToMany(mappedBy: 'backerCategory', targetEntity: BackerSubcategory::class)]
     private Collection $backerSubcategories;
 

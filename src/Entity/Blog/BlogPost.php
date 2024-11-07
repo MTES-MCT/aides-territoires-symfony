@@ -56,7 +56,7 @@ class BlogPost // NOSONAR too much methods
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $logo = null;
 
-    private $logoFile = null;
+    private ?string $logoFile = null;
 
     private bool $deleteLogo = false;
 
@@ -91,6 +91,9 @@ class BlogPost // NOSONAR too much methods
     #[ORM\Column(nullable: true)]
     private ?int $oldId = null;
 
+    /**
+     * @var Collection<int, LogBlogPostView>
+     */
     #[ORM\OneToMany(mappedBy: 'blogPost', targetEntity: LogBlogPostView::class)]
     #[ORM\JoinColumn(onDelete: 'SET NULL')]
     private Collection $logBlogPostViews;
@@ -165,7 +168,7 @@ class BlogPost // NOSONAR too much methods
         return $this;
     }
 
-    public function setLogoFile($logoFile = null): void
+    public function setLogoFile(?string $logoFile = null): void
     {
         $this->logoFile = $logoFile;
 
@@ -174,7 +177,7 @@ class BlogPost // NOSONAR too much methods
         }
     }
 
-    public function getLogoFile()
+    public function getLogoFile(): ?string
     {
         return $this->logoFile;
     }

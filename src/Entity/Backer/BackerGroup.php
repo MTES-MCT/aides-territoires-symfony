@@ -65,6 +65,9 @@ class BackerGroup
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $timeCreate = null;
 
+    /**
+     * @var Collection<int, Backer>
+     */
     #[ORM\OneToMany(mappedBy: 'backerGroup', targetEntity: Backer::class)]
     private Collection $backers;
 

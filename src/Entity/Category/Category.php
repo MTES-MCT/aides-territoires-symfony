@@ -48,15 +48,27 @@ class Category // NOSONAR too much methods
     #[ORM\JoinColumn(nullable: false)]
     private ?CategoryTheme $categoryTheme = null;
 
+    /**
+     * @var Collection<int, Aid>
+     */
     #[ORM\ManyToMany(targetEntity: Aid::class, mappedBy: 'categories')]
     private Collection $aids;
 
+    /**
+     * @var Collection<int, BlogPromotionPost>
+     */
     #[ORM\ManyToMany(targetEntity: BlogPromotionPost::class, mappedBy: 'categories')]
     private Collection $blogPromotionPosts;
 
+    /**
+     * @var Collection<int, SearchPage>
+     */
     #[ORM\ManyToMany(targetEntity: SearchPage::class, mappedBy: 'categories')]
     private Collection $searchPages;
 
+    /**
+     * @var Collection<int, LogAidSearch>
+     */
     #[ORM\ManyToMany(targetEntity: LogAidSearch::class, mappedBy: 'categories')]
     private Collection $logAidSearches;
 
@@ -202,7 +214,7 @@ class Category // NOSONAR too much methods
         return $this;
     }
 
-    public function getCategoryThemeName()
+    public function getCategoryThemeName(): string
     {
         return $this->getCategoryTheme()->getName();
     }

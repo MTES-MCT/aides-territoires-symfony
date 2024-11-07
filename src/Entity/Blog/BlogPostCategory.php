@@ -35,6 +35,9 @@ class BlogPostCategory
     #[ORM\Column(nullable: true)]
     private ?int $oldId = null;
 
+    /**
+     * @var Collection<int, BlogPost>
+     */
     #[ORM\OneToMany(mappedBy: 'blogPostCategory', targetEntity: BlogPost::class)]
     private Collection $blogPosts;
 

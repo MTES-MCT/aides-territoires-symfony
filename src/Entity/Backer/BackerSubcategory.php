@@ -37,6 +37,9 @@ class BackerSubcategory
     #[ORM\JoinColumn(nullable: false)]
     private ?BackerCategory $backerCategory = null;
 
+    /**
+     * @var Collection<int, BackerGroup>
+     */
     #[ORM\OneToMany(mappedBy: 'backerSubCategory', targetEntity: BackerGroup::class)]
     private Collection $backerGroups;
 

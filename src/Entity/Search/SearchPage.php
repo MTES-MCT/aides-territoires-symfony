@@ -14,6 +14,7 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 use Gedmo\Mapping\Annotation as Gedmo;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 #[ORM\Index(columns: ['slug'], name: 'slug_search_page')]
 #[ORM\Entity(repositoryClass: SearchPageRepository::class)]
@@ -66,7 +67,7 @@ class SearchPage // NOSONAR too much methods
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $logo = null;
 
-    private $logoFile = null;
+    private ?string $logoFile = null;
 
     private bool $deleteLogo = false;
 
@@ -89,7 +90,7 @@ class SearchPage // NOSONAR too much methods
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $metaImage = null;
 
-    private $metaImageFile = null;
+    private ?string $metaImageFile = null;
 
     private bool $deleteMetaImage = false;
 
@@ -105,6 +106,9 @@ class SearchPage // NOSONAR too much methods
     #[ORM\Column]
     private ?bool $showMobilizationStepField = null;
 
+    /**
+     * @var Collection<int, OrganizationType>
+     */
     #[ORM\ManyToMany(targetEntity: OrganizationType::class, inversedBy: 'searchPages')]
     private Collection $organizationTypes;
 
@@ -147,13 +151,22 @@ class SearchPage // NOSONAR too much methods
     #[ORM\Column]
     private ?bool $subdomainEnabled = null;
 
+    /**
+     * @var Collection<int, Category>
+     */
     #[ORM\ManyToMany(targetEntity: Category::class, inversedBy: 'searchPages')]
     private Collection $categories;
 
+    /**
+     * @var Collection<int, Aid>
+     */
     #[ORM\ManyToMany(targetEntity: Aid::class, inversedBy: 'excludedSearchPages')]
     #[ORM\JoinTable(name: 'search_aid_excluded')]
     private Collection $excludedAids;
 
+    /**
+     * @var Collection<int, Aid>
+     */
     #[Assert\Count(
         max: 9
     )]
@@ -161,6 +174,9 @@ class SearchPage // NOSONAR too much methods
     #[ORM\JoinTable(name: 'search_aid_highlighted')]
     private Collection $highlightedAids;
 
+    /**
+     * @var Collection<int, Page>
+     */
     #[ORM\OneToMany(mappedBy: 'searchPage', targetEntity: Page::class, cascade: ['persist'])]
     private Collection $pages;
 
@@ -172,6 +188,9 @@ class SearchPage // NOSONAR too much methods
     #[ORM\JoinColumn(onDelete: 'SET NULL')]
     private ?self $searchPageRedirect = null;
 
+    /**
+     * @var Collection<int, SearchPageLock>
+     */
     #[ORM\OneToMany(mappedBy: 'searchPage', targetEntity: SearchPageLock::class, orphanRemoval: true)]
     private Collection $searchPageLocks;
 
@@ -316,7 +335,7 @@ class SearchPage // NOSONAR too much methods
         return $this;
     }
 
-    public function setLogoFile($logoFile = null): void
+    public function setLogoFile(?string $logoFile = null): void
     {
         $this->logoFile = $logoFile;
 
@@ -325,7 +344,7 @@ class SearchPage // NOSONAR too much methods
         }
     }
 
-    public function getLogoFile()
+    public function getLogoFile(): ?string
     {
         return $this->logoFile;
     }
@@ -389,7 +408,7 @@ class SearchPage // NOSONAR too much methods
         return $this;
     }
 
-    public function setMetaImageFile($metaImageFile = null): void
+    public function setMetaImageFile(?string $metaImageFile = null): void
     {
         $this->metaImageFile = $metaImageFile;
 
@@ -398,7 +417,7 @@ class SearchPage // NOSONAR too much methods
         }
     }
 
-    public function getMetaImageFile()
+    public function getMetaImageFile(): ?string
     {
         return $this->metaImageFile;
     }

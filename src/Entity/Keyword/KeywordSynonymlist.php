@@ -57,9 +57,15 @@ class KeywordSynonymlist
     #[ORM\Column(nullable: true)]
     private ?int $oldId = null;
 
+    /**
+     * @var Collection<int, Project>
+     */
     #[ORM\ManyToMany(targetEntity: Project::class, mappedBy: 'keywordSynonymlists')]
     private Collection $projects;
 
+    /**
+     * @var Collection<int, LogPublicProjectSearch>
+     */
     #[ORM\ManyToMany(targetEntity: LogPublicProjectSearch::class, mappedBy: 'keywordSynonymlists')]
     private Collection $logPublicProjectSearches;
 

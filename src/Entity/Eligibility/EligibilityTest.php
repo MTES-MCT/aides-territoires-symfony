@@ -49,12 +49,21 @@ class EligibilityTest // NOSONAR too much methods
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $conclusionSuccess = null;
 
+    /**
+     * @var Collection<int, EligibilityTestQuestion>
+     */
     #[ORM\OneToMany(mappedBy: 'eligibilityTest', targetEntity: EligibilityTestQuestion::class, orphanRemoval: true)]
     private Collection $eligibilityTestQuestions;
 
+    /**
+     * @var Collection<int, Aid>
+     */
     #[ORM\OneToMany(mappedBy: 'eligibilityTest', targetEntity: Aid::class)]
     private Collection $aids;
 
+    /**
+     * @var Collection<int, LogAidEligibilityTest>
+     */
     #[ORM\OneToMany(mappedBy: 'eligibilityTest', targetEntity: LogAidEligibilityTest::class)]
     #[ORM\JoinColumn(onDelete: 'SET NULL')]
     private Collection $logAidEligibilityTests;
