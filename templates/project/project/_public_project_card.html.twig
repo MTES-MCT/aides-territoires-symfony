@@ -43,12 +43,8 @@
 					{% if project.aidProjects and project.aidProjects|length > 0 %}
 						<p class="fr-mb-1w fr-mt-0 fr-text--sm at-color--blue">
 							{{ project.aidProjects|length }}
-							aide
-							{% if project.aidProjects|length > 1 %}s
-							{% endif %}
-							sélectionnée
-							{% if project.aidProjects|length > 1 %}s
-							{% endif %}
+							aide{% if project.aidProjects|length > 1 %}s{% endif %}
+							sélectionnée{% if project.aidProjects|length > 1 %}s{% endif %}
 						</p>
 					{% endif %}
 
