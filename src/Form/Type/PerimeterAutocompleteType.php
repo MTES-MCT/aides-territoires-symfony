@@ -49,13 +49,22 @@ class PerimeterAutocompleteType extends AbstractType
                         ->setParameter('zipcodes', '%' . $query . '%');
                     ;
                 } else { // c'est une string
-                    $query = str_replace('-', ' ', $query);
+                    $query = str_replace(' ', '-', $query);
                     $qb
                     ->addSelect('MATCH_AGAINST(p.name) AGAINST(:name) AS HIDDEN relevance_score')
                     ->andWhere('MATCH_AGAINST(p.name) AGAINST(:name) > 0')
-                    ->setParameter('name', $query)
-                    ->orderBy('relevance_score', 'DESC');
-                }
+                    ->setParameter('name', $query);
+            
+                    // Pondérer les résultats avec une priorité pour les correspondances exactes
+                    // On applique un boost aux résultats qui commencent par la recherche (comme 'saint affrique')
+                    $qb->addSelect('CASE WHEN p.name LIKE :startMatch THEN 1 ELSE 0 END AS HIDDEN start_match')
+                        ->setParameter('startMatch', $query . '%');
+                
+                    // Trier d'abord par les correspondances exactes (démarrant par la recherche)
+                    // Ensuite, trier par score de pertinence
+                    $qb->orderBy('start_match', 'DESC') // Les correspondances exactes en premier
+                        ->addOrderBy('relevance_score', 'DESC'); // Puis, trier par score de pertinence
+                    }
             },
         ]);
     }
