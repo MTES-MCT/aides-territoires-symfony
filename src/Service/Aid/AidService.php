@@ -386,6 +386,9 @@ class AidService // NOSONAR too complex
         if (!$perimeter instanceof Perimeter) {
             $searchSmaller = false;
             $searchWider = true;
+        } else {
+            $searchSmaller = false;
+            $searchWider = false;
         }
         // converti le array en ArrayCollection
         $aids = new ArrayCollection($aids);
@@ -393,9 +396,6 @@ class AidService // NOSONAR too complex
         // les aides que l'on va exclude
         $perimeterSearch = $perimeter instanceof Perimeter;
         $perimeterScale = ($perimeter instanceof Perimeter) ? $perimeter->getScale() : 0;
-
-        $searchSmaller = false;
-        $searchWider = false;
 
         // Parcours la liste des aides actuelles
         /** @var Aid $aid */
