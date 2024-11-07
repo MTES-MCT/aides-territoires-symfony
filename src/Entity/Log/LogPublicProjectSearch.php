@@ -49,6 +49,9 @@ class LogPublicProjectSearch
     #[ORM\JoinColumn(onDelete: DoctrineConstants::SET_NULL)]
     private ?User $user = null;
 
+    /**
+     * @var Collection<int, KeywordSynonymlist>
+     */
     #[ORM\ManyToMany(targetEntity: KeywordSynonymlist::class, inversedBy: 'logPublicProjectSearches')]
     private Collection $keywordSynonymlists;
 

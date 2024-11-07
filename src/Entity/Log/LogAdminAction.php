@@ -48,6 +48,9 @@ class LogAdminAction
     #[Gedmo\Timestampable(on: 'create')]
     private ?\DateTimeInterface $timeCreate = null;
 
+    /**
+     * @var string[]|null
+     */
     #[ORM\Column(nullable: true)]
     private ?array $changeMessage = null;
 
@@ -129,11 +132,18 @@ class LogAdminAction
         return $this;
     }
 
+    /**
+     * @return string[]|null
+     */
     public function getChangeMessage(): ?array
     {
         return $this->changeMessage;
     }
 
+    /**
+     * @param string[]|null $changeMessage
+     * @return static
+     */
     public function setChangeMessage(?array $changeMessage): static
     {
         $this->changeMessage = $changeMessage;

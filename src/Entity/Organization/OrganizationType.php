@@ -91,22 +91,40 @@ class OrganizationType // NOSONAR too much methods
     #[ORM\JoinColumn(nullable: false)]
     private ?OrganizationTypeGroup $organizationTypeGroup = null;
 
+    /**
+     * @var Collection<int, Organization>
+     */
     #[ORM\OneToMany(mappedBy: 'organizationType', targetEntity: Organization::class)]
     private Collection $organizations;
 
+    /**
+     * @var Collection<int, Aid>
+     */
     #[ORM\ManyToMany(targetEntity: Aid::class, mappedBy: 'aidAudiences')]
     private Collection $aids;
 
+    /**
+     * @var Collection<int, BlogPromotionPost>
+     */
     #[ORM\ManyToMany(targetEntity: BlogPromotionPost::class, mappedBy: 'organizationTypes')]
     private Collection $blogPromotionPosts;
 
+    /**
+     * @var Collection<int, SearchPage>
+     */
     #[ORM\ManyToMany(targetEntity: SearchPage::class, mappedBy: 'organizationTypes')]
     private Collection $searchPages;
 
+    /**
+     * @var Collection<int, LogAidView>
+     */
     #[ORM\ManyToMany(targetEntity: LogAidView::class, mappedBy: 'organizationTypes')]
     #[ORM\JoinColumn(onDelete: 'SET NULL')]
     private Collection $logAidViews;
 
+    /**
+     * @var Collection<int, LogAidSearch>
+     */
     #[ORM\ManyToMany(targetEntity: LogAidSearch::class, mappedBy: 'organizationTypes')]
     private Collection $logAidSearches;
 

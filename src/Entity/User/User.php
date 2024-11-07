@@ -119,6 +119,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
     #[ORM\Column]
     private ?bool $isContributor = false;
 
+    /**
+     * @var string[]
+     */
     #[ORM\Column]
     private array $roles = [];
 
@@ -214,107 +217,206 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
     #[ORM\JoinColumn(onDelete: 'SET NULL')]
     private ?self $invitationAuthor = null;
 
+    /**
+     * @var Collection<int, User>
+     */
     #[ORM\OneToMany(mappedBy: 'invitationAuthor', targetEntity: self::class)]
     private Collection $guests;
 
+    /**
+     * @var Collection<int, LogUserLogin>
+     */
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: LogUserLogin::class, orphanRemoval: true)]
     private Collection $logUserLogins;
 
+    /**
+     * @var Collection<int, LogUserAction>
+     */
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: LogUserAction::class, orphanRemoval: true)]
     private Collection $logUserActions;
 
+    /**
+     * @var Collection<int, UserGroup>
+     */
     #[ORM\ManyToMany(targetEntity: UserGroup::class, mappedBy: 'users')]
     private Collection $userGroups;
 
+    /**
+     * @var Collection<int, PerimeterImport>
+     */
     #[ORM\OneToMany(mappedBy: 'author', targetEntity: PerimeterImport::class, orphanRemoval: true)]
     private Collection $perimeterImports;
 
     #[ORM\ManyToOne]
     private ?Organization $proposedOrganization = null;
 
+    /**
+     * @var Collection<int, EligibilityTest>
+     */
     #[ORM\OneToMany(mappedBy: 'author', targetEntity: EligibilityTest::class)]
     private Collection $eligibilityTests;
 
+    /**
+     * @var Collection<int, EligibilityQuestion>
+     */
     #[ORM\OneToMany(mappedBy: 'author', targetEntity: EligibilityQuestion::class)]
     private Collection $eligibilityQuestions;
 
+    /**
+     * @var Collection<int, DataSource>
+     */
     #[ORM\OneToMany(mappedBy: 'contactTeam', targetEntity: DataSource::class)]
     private Collection $dataSourceContactTeams;
 
+    /**
+     * @var Collection<int, DataSource>
+     */
     #[ORM\OneToMany(mappedBy: 'aidAuthor', targetEntity: DataSource::class)]
     private Collection $dataSourceAidAuthors;
 
+    /**
+     * @var Collection<int, Aid>
+     */
     #[ORM\OneToMany(mappedBy: 'author', targetEntity: Aid::class)]
     #[OrderBy(['timeCreate' => 'DESC'])]
     private Collection $aids;
 
+    /**
+     * @var Collection<int, Project>
+     */
     #[ORM\OneToMany(mappedBy: 'author', targetEntity: Project::class, orphanRemoval: true)]
     private Collection $projects;
 
+    /**
+     * @var Collection<int, AidProject>
+     */
     #[ORM\OneToMany(mappedBy: 'creator', targetEntity: AidProject::class)]
     private Collection $aidProjects;
 
+    /**
+     * @var Collection<int, AidSuggestedAidProject>
+     */
     #[ORM\OneToMany(mappedBy: 'creator', targetEntity: AidSuggestedAidProject::class)]
     private Collection $aidSuggestedAidProjects;
 
+    /**
+     * @var Collection<int, Bundle>
+     */
     #[ORM\OneToMany(mappedBy: 'owner', targetEntity: Bundle::class, orphanRemoval: true)]
     private Collection $bundles;
 
+    /**
+     * @var Collection<int, DataExport>
+     */
     #[ORM\OneToMany(mappedBy: 'author', targetEntity: DataExport::class)]
     private Collection $dataExports;
 
+    /**
+     * @var Collection<int, Organization>
+     */
     #[ORM\ManyToMany(targetEntity: Organization::class, mappedBy: 'beneficiairies', cascade: ['persist'])]
     private Collection $organizations;
 
+    /**
+     * @var Collection<int, SearchPage>
+     */
     #[ORM\OneToMany(mappedBy: 'administrator', targetEntity: SearchPage::class)]
     private Collection $searchPages;
 
+    /**
+     * @var Collection<int, Notification>
+     */
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: Notification::class, orphanRemoval: true)]
     private Collection $notifications;
 
+    /**
+     * @var Collection<int, \App\Entity\Directory\Directory>
+     */
     #[ORM\OneToMany(mappedBy: 'author', targetEntity: \App\Entity\Directory\Directory::class, orphanRemoval: true)]
     private Collection $directories;
 
+    /**
+     * @var Collection<int, UserRegisterConfirmation>
+     */
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: UserRegisterConfirmation::class, orphanRemoval: true)]
     private Collection $userRegisterConfirmations;
 
+    /**
+     * @var Collection<int, OrganizationInvitation>
+     */
     #[ORM\OneToMany(mappedBy: 'author', targetEntity: OrganizationInvitation::class)]
     private Collection $organizationInvitations;
 
+    /**
+     * @var Collection<int, OrganizationInvitation>
+     */
     #[ORM\OneToMany(mappedBy: 'guest', targetEntity: OrganizationInvitation::class)]
     private Collection $organizationGuests;
 
+    /**
+     * @var Collection<int, LogAdminAction>
+     */
     #[ORM\OneToMany(mappedBy: 'admin', targetEntity: LogAdminAction::class)]
     private Collection $logAdminActions;
 
+    /**
+     * @var Collection<int, LogAidView>
+     */
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: LogAidView::class)]
     private Collection $logAidViews;
 
+    /**
+     * @var Collection<int, LogAidCreatedsFolder>
+     */
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: LogAidCreatedsFolder::class)]
     private Collection $logAidCreatedsFolders;
 
+    /**
+     * @var Collection<int, LogAidSearch>
+     */
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: LogAidSearch::class)]
     private Collection $logAidSearches;
 
+    /**
+     * @var Collection<int, LogBackerView>
+     */
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: LogBackerView::class)]
     private Collection $logBackerViews;
 
+    /**
+     * @var Collection<int, LogBlogPostView>
+     */
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: LogBlogPostView::class)]
     private Collection $logBlogPostViews;
 
+    /**
+     * @var Collection<int, LogProgramView>
+     */
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: LogProgramView::class)]
     private Collection $logProgramViews;
 
+    /**
+     * @var Collection<int, LogPublicProjectSearch>
+     */
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: LogPublicProjectSearch::class)]
     private Collection $logPublicProjectSearches;
 
+    /**
+     * @var Collection<int, LogPublicProjectView>
+     */
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: LogPublicProjectView::class)]
     #[ORM\OrderBy(['timeCreate' => 'DESC'])]
     private Collection $logPublicProjectViews;
 
+    /**
+     * @var Collection<int, LogProjectValidatedSearch>
+     */
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: LogProjectValidatedSearch::class)]
     private Collection $logProjectValidatedSearches;
 
+    /**
+     * @var Collection<int, ApiTokenAsk>
+     */
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: ApiTokenAsk::class)]
     private Collection $apiTokenAsks;
 
@@ -323,24 +425,45 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
     private int $nbAidsLive = 0;
     private string $notificationSignature;
 
+    /**
+     * @var Collection<int, CronExportSpreadsheet>
+     */
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: CronExportSpreadsheet::class)]
     private Collection $cronExportSpreadsheets;
 
+    /**
+     * @var Collection<int, AidLock>
+     */
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: AidLock::class, orphanRemoval: true)]
     private Collection $aidLocks;
 
+    /**
+     * @var Collection<int, BackerLock>
+     */
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: BackerLock::class, orphanRemoval: true)]
     private Collection $backerLocks;
 
+    /**
+     * @var Collection<int, ProjectLock>
+     */
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: ProjectLock::class, orphanRemoval: true)]
     private Collection $projectLocks;
 
+    /**
+     * @var Collection<int, SearchPageLock>
+     */
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: SearchPageLock::class, orphanRemoval: true)]
     private Collection $searchPageLocks;
 
+    /**
+     * @var Collection<int, BackerAskAssociate>
+     */
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: BackerAskAssociate::class, orphanRemoval: true)]
     private Collection $backerAskAssociates;
 
+    /**
+     * @var Collection<int, LogBackerEdit>
+     */
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: LogBackerEdit::class)]
     private Collection $logBackerEdits;
 
@@ -437,12 +560,15 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
         return array_unique($roles);
     }
 
-    public function addRole($role)
+    public function addRole(string $role): void
     {
         $this->roles[] = $role;
         $this->roles = array_unique($this->roles);
     }
 
+    /**
+     * @param string[] $roles
+     */
     public function setRoles(array $roles): static
     {
         $this->roles = $roles;
@@ -1077,6 +1203,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
         return $this;
     }
 
+    /**
+     * @return Collection<int, Project>
+     */
     public function getProjects(): Collection
     {
         return $this->projects;
@@ -1390,6 +1519,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
     }
 
 
+    /**
+     * @return array<string, mixed>
+     */
     public function getSearchPreferences(): array
     {
         $preferences = [];
@@ -1697,11 +1829,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
     public function getNbAids(): int
     {
         try {
-            return count($this->getAids());
+            $this->nbAids = count($this->getAids());
         } catch (\Exception $e) {
-            return 0;
+            $this->nbAids = 0;
         }
+
+        return $this->nbAids;
     }
+
     public function setNbAids(int $nbAids): static
     {
         $this->nbAids = $nbAids;
@@ -1717,10 +1852,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
                     $live++;
                 }
             }
-            return $live;
+            $this->nbAidsLive = $live;
         } catch (\Exception $e) {
-            return 0;
+            $this->nbAidsLive = 0;
         }
+
+        return $this->nbAidsLive;
     }
     public function setNbAidsLive(int $nbAidsLive): static
     {
@@ -1751,7 +1888,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
                 $signature .= ' (' . $this->getDefaultOrganization()->getName() . ')';
             }
         }
-        return $signature;
+
+        $this->notificationSignature = $signature;
+        return $this->notificationSignature;
     }
 
     public function setNotificationSignature(string $notificationSignature): static

@@ -18,6 +18,9 @@ class PerimeterImport // NOSONAR too much methods
     #[ORM\Column]
     private ?int $id = null;
 
+    /**
+     * @var string[]
+     */
     #[ORM\Column]
     private array $cityCodes = [];
 
@@ -58,11 +61,17 @@ class PerimeterImport // NOSONAR too much methods
         return $this->id;
     }
 
+    /**
+     * @return string[]
+     */
     public function getCityCodes(): array
     {
         return $this->cityCodes;
     }
 
+    /**
+     * @param string[] $cityCodes
+     */
     public function setCityCodes(array $cityCodes): static
     {
         $this->cityCodes = $cityCodes;
@@ -152,10 +161,12 @@ class PerimeterImport // NOSONAR too much methods
     public function getNbCities(): ?int
     {
         try {
-            return count($this->cityCodes);
+            $this->nbCities = count($this->cityCodes);
         } catch (\Exception $e) {
-            return null;
+            $this->nbCities = null;
         }
+
+        return $this->nbCities;
     }
 
     public function setNbCities(?int $nbCities): static

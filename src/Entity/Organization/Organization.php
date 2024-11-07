@@ -241,67 +241,121 @@ class Organization // NOSONAR too much methods
     #[ORM\Column(length: 15, nullable: true)]
     private ?string $populationStrata = null;
 
+    /**
+     * @var Collection<int, Project>
+     */
     #[ORM\ManyToMany(targetEntity: Project::class, fetch: 'LAZY')]
     private Collection $favoriteProjects;
 
+    /**
+     * @var Collection<int, Project>
+     */
     #[ORM\OneToMany(mappedBy: 'organization', targetEntity: Project::class)]
     private Collection $projects;
 
+    /**
+     * @var Collection<int, ProjectValidated>
+     */
     #[ORM\OneToMany(mappedBy: 'organization', targetEntity: ProjectValidated::class)]
     private Collection $projectValidateds;
 
+    /**
+     * @var Collection<int, User>
+     */
     #[ORM\ManyToMany(targetEntity: User::class, inversedBy: 'organizations')]
     private Collection $beneficiairies;
 
+    /**
+     * @var Collection<int, Directory>
+     */
     #[ORM\OneToMany(mappedBy: 'organization', targetEntity: Directory::class, orphanRemoval: true)]
     private Collection $directories;
 
+    /**
+     * @var Collection<int, OrganizationInvitation>
+     */
     #[ORM\OneToMany(mappedBy: 'organization', targetEntity: OrganizationInvitation::class, orphanRemoval: true)]
     private Collection $organizationInvitations;
 
+    /**
+     * @var Collection<int, Aid>
+     */
     #[ORM\OneToMany(mappedBy: 'organization', targetEntity: Aid::class)]
     #[ORM\JoinColumn(onDelete: DoctrineConstants::SET_NULL)]
     private Collection $aids;
 
+    /**
+     * @var Collection<int, LogAidView>
+     */
     #[ORM\OneToMany(mappedBy: 'organization', targetEntity: LogAidView::class)]
     #[ORM\JoinColumn(onDelete: DoctrineConstants::SET_NULL)]
     private Collection $logAidViews;
 
+    /**
+     * @var Collection<int, LogAidCreatedsFolder>
+     */
     #[ORM\OneToMany(mappedBy: 'organization', targetEntity: LogAidCreatedsFolder::class)]
     #[ORM\JoinColumn(onDelete: DoctrineConstants::SET_NULL)]
     private Collection $logAidCreatedsFolders;
 
+    /**
+     * @var Collection<int, LogAidSearch>
+     */
     #[ORM\OneToMany(mappedBy: 'organization', targetEntity: LogAidSearch::class)]
     #[ORM\JoinColumn(onDelete: DoctrineConstants::SET_NULL)]
     private Collection $logAidSearches;
 
+    /**
+     * @var Collection<int, LogBackerView>
+     */
     #[ORM\OneToMany(mappedBy: 'organization', targetEntity: LogBackerView::class)]
     #[ORM\JoinColumn(onDelete: DoctrineConstants::SET_NULL)]
     private Collection $logBackerViews;
 
+    /**
+     * @var Collection<int, LogBlogPostView>
+     */
     #[ORM\OneToMany(mappedBy: 'organization', targetEntity: LogBlogPostView::class)]
     #[ORM\JoinColumn(onDelete: DoctrineConstants::SET_NULL)]
     private Collection $logBlogPostViews;
 
+    /**
+     * @var Collection<int, LogProgramView>
+     */
     #[ORM\OneToMany(mappedBy: 'organization', targetEntity: LogProgramView::class)]
     #[ORM\JoinColumn(onDelete: DoctrineConstants::SET_NULL)]
     private Collection $logProgramViews;
 
+    /**
+     * @var Collection<int, LogPublicProjectSearch>
+     */
     #[ORM\OneToMany(mappedBy: 'organization', targetEntity: LogPublicProjectSearch::class)]
     #[ORM\JoinColumn(onDelete: DoctrineConstants::SET_NULL)]
     private Collection $logPublicProjectSearches;
 
+    /**
+     * @var Collection<int, LogPublicProjectView>
+     */
     #[ORM\OneToMany(mappedBy: 'organization', targetEntity: LogPublicProjectView::class)]
     #[ORM\JoinColumn(onDelete: DoctrineConstants::SET_NULL)]
     private Collection $logPublicProjectViews;
 
+    /**
+     * @var Collection<int, LogProjectValidatedSearch>
+     */
     #[ORM\OneToMany(mappedBy: 'organization', targetEntity: LogProjectValidatedSearch::class)]
     #[ORM\JoinColumn(onDelete: DoctrineConstants::SET_NULL)]
     private Collection $logProjectValidatedSearches;
 
+    /**
+     * @var Collection<int, BackerAskAssociate>
+     */
     #[ORM\OneToMany(mappedBy: 'organization', targetEntity: BackerAskAssociate::class, orphanRemoval: true)]
     private Collection $backerAskAssociates;
 
+    /**
+     * @var Collection<int, LogBackerEdit>
+     */
     #[ORM\OneToMany(mappedBy: 'organization', targetEntity: LogBackerEdit::class)]
     private Collection $logBackerEdits;
 
@@ -1437,7 +1491,10 @@ class Organization // NOSONAR too much methods
         return $this;
     }
 
-
+    /**
+     * @param User $user
+     * @return array<int, Project>
+     */
     public function getProjectsOfUser(User $user): array
     {
         $projects = [];
@@ -1449,6 +1506,10 @@ class Organization // NOSONAR too much methods
         return $projects;
     }
 
+    /**
+     * @param User $user
+     * @return array<int, Aid>
+     */
     public function getAidsOfUser(User $user): array
     {
         $aids = [];
@@ -1463,10 +1524,10 @@ class Organization // NOSONAR too much methods
 
     public function getFirstBeneficary(): ?User
     {
-        if (!$this->beneficiairies) {
+        if ($this->beneficiairies->isEmpty()) {
             return null;
         }
-        return $this->beneficiairies->first() ?? null;
+        return $this->beneficiairies->first();
     }
 
     /**

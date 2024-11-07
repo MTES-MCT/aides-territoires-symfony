@@ -163,6 +163,9 @@ class Perimeter // NOSONAR too much methods
     #[ORM\Column(length: 32, nullable: true)]
     private ?string $epci = null;
 
+    /**
+     * @var string[]|null
+     */
     #[ORM\Column(nullable: true)]
     private ?array $zipcodes = null;
 
@@ -176,9 +179,15 @@ class Perimeter // NOSONAR too much methods
     #[ORM\Column]
     private ?bool $isOverseas = false;
 
+    /**
+     * @var string[]|null
+     */
     #[ORM\Column(nullable: true)]
     private ?array $departments = null;
 
+    /**
+     * @var string[]|null
+     */
     #[ORM\Column(nullable: true)]
     private ?array $regions = null;
 
@@ -256,21 +265,39 @@ class Perimeter // NOSONAR too much methods
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2, nullable: true)]
     private ?string $surface = null;
 
+    /**
+     * @var Collection<int, User>
+     */
     #[ORM\OneToMany(mappedBy: 'perimeter', targetEntity: User::class)]
     private Collection $users;
 
+    /**
+     * @var Collection<int, Organization>
+     */
     #[ORM\OneToMany(mappedBy: 'perimeter', targetEntity: Organization::class)]
     private Collection $organizations;
 
+    /**
+     * @var Collection<int, Organization>
+     */
     #[ORM\OneToMany(mappedBy: 'perimeterDepartment', targetEntity: Organization::class)]
     private Collection $organizationDepartments;
 
+    /**
+     * @var Collection<int, Organization>
+     */
     #[ORM\OneToMany(mappedBy: 'perimeterRegion', targetEntity: Organization::class)]
     private Collection $organizationRegions;
 
+    /**
+     * @var Collection<int, Backer>
+     */
     #[ORM\OneToMany(mappedBy: 'perimeter', targetEntity: Backer::class)]
     private Collection $backers;
 
+    /**
+     * @var Collection<int, PerimeterData>
+     */
     #[ORM\OneToMany(
         mappedBy: 'perimeter',
         targetEntity: PerimeterData::class,
@@ -279,6 +306,9 @@ class Perimeter // NOSONAR too much methods
     )]
     private Collection $perimeterDatas;
 
+    /**
+     * @var Collection<int, PerimeterImport>
+     */
     #[ORM\OneToMany(
         mappedBy: 'adhocPerimeter',
         targetEntity: PerimeterImport::class,
@@ -292,6 +322,9 @@ class Perimeter // NOSONAR too much methods
     * ceux qui contiennent ce périmètre
     * ex: si ce périmètre = Essonne, perimetersTo contiendra Ile-de-france, France, ...
     */
+    /**
+     * @var Collection<int, Perimeter>
+     */
     #[ORM\ManyToMany(targetEntity: self::class, inversedBy: 'perimetersFrom')]
     private Collection $perimetersTo;
 
@@ -301,32 +334,59 @@ class Perimeter // NOSONAR too much methods
      * ceux contenu dans ce périmètre
      * ex: si ce périmètre = Esonne, perimetersFrom contiendra Fontenay-les-briis, Evry, ...
      */
+    /**
+     * @var Collection<int, Perimeter>
+     */
     #[ORM\ManyToMany(targetEntity: self::class, mappedBy: 'perimetersTo')]
     private Collection $perimetersFrom;
 
+    /**
+     * @var Collection<int, Program>
+     */
     #[ORM\OneToMany(mappedBy: 'perimeter', targetEntity: Program::class)]
     private Collection $programs;
 
+    /**
+     * @var Collection<int, DataSource>
+     */
     #[ORM\OneToMany(mappedBy: 'perimeter', targetEntity: DataSource::class)]
     private Collection $dataSources;
 
+    /**
+     * @var Collection<int, Aid>
+     */
     #[ORM\OneToMany(mappedBy: 'perimeter', targetEntity: Aid::class)]
     private Collection $aids;
 
+    /**
+     * @var Collection<int, BlogPromotionPost>
+     */
     #[ORM\OneToMany(mappedBy: 'perimeter', targetEntity: BlogPromotionPost::class)]
     private Collection $blogPromotionPosts;
 
+    /**
+     * @var Collection<int, FinancialData>
+     */
     #[ORM\OneToMany(mappedBy: 'perimeter', targetEntity: FinancialData::class)]
     private Collection $financialData;
 
+    /**
+     * @var Collection<int, LogAidSearch>
+     */
     #[ORM\OneToMany(mappedBy: 'perimeter', targetEntity: LogAidSearch::class)]
     #[ORM\JoinColumn(onDelete: DoctrineConstants::SET_NULL)]
     private Collection $logAidSearches;
 
+    /**
+     * @var Collection<int, LogPublicProjectSearch>
+     */
     #[ORM\OneToMany(mappedBy: 'perimeter', targetEntity: LogPublicProjectSearch::class)]
     #[ORM\JoinColumn(onDelete: DoctrineConstants::SET_NULL)]
     private Collection $logPublicProjectSearches;
 
+    /**
+     * @var Collection<int, LogProjectValidatedSearch>
+     */
     #[ORM\OneToMany(mappedBy: 'perimeter', targetEntity: LogProjectValidatedSearch::class)]
     #[ORM\JoinColumn(onDelete: DoctrineConstants::SET_NULL)]
     private Collection $logProjectValidatedSearches;
@@ -585,11 +645,19 @@ class Perimeter // NOSONAR too much methods
         return $this;
     }
 
+    /**
+     * @return string[]|null
+     */
     public function getZipcodes(): ?array
     {
         return $this->zipcodes;
     }
 
+    /**
+     *
+     * @param string[]|null $zipcodes
+     * @return static
+     */
     public function setZipcodes(?array $zipcodes): static
     {
         $this->zipcodes = $zipcodes;
@@ -633,11 +701,19 @@ class Perimeter // NOSONAR too much methods
         return $this;
     }
 
+    /**
+     * @return string[]|null
+     */
     public function getDepartments(): ?array
     {
         return $this->departments;
     }
 
+    /**
+     *
+     * @param string[]|null $departments
+     * @return static
+     */
     public function setDepartments(?array $departments): static
     {
         $this->departments = $departments;
@@ -645,11 +721,19 @@ class Perimeter // NOSONAR too much methods
         return $this;
     }
 
+    /**
+     * @return string[]|null
+     */
     public function getRegions(): ?array
     {
         return $this->regions;
     }
 
+    /**
+     *
+     * @param string[]|null $regions
+     * @return static
+     */
     public function setRegions(?array $regions): static
     {
         $this->regions = $regions;
@@ -1131,6 +1215,10 @@ class Perimeter // NOSONAR too much methods
         return $this;
     }
 
+    /**
+     *
+     * @return int[]
+     */
     public function getPerimetersToIds(): array
     {
         $ids = [];
@@ -1140,6 +1228,10 @@ class Perimeter // NOSONAR too much methods
         return $ids;
     }
 
+    /**
+     *
+     * @return int[]
+     */
     public function getPerimetersFromIds(): array
     {
         $ids = [];
@@ -1257,7 +1349,8 @@ class Perimeter // NOSONAR too much methods
 
     public function getScaleName(): ?string
     {
-        return self::SCALES_FOR_SEARCH[$this->getScale()]['name'] ?? null;
+        $this->scaleName = self::SCALES_FOR_SEARCH[$this->getScale()]['name'] ?? null;
+        return $this->scaleName;
     }
 
     public function setScaleName(?string $scaleName): static

@@ -34,6 +34,9 @@ class Faq
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $timeUpdate = null;
 
+    /**
+     * @var Collection<int, FaqCategory>
+     */
     #[ORM\OneToMany(mappedBy: 'faq', targetEntity: FaqCategory::class, cascade: ['persist'], orphanRemoval: true)]
     #[OrderBy(['position' => 'ASC'])]
     private Collection $faqCategories;

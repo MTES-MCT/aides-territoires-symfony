@@ -66,18 +66,33 @@ class LogAidSearch // NOSONAR too much methods
     #[ORM\JoinColumn(onDelete: DoctrineConstants::SET_NULL)]
     private ?User $user = null;
 
+    /**
+     * @var Collection<int, OrganizationType>
+     */
     #[ORM\ManyToMany(targetEntity: OrganizationType::class, inversedBy: 'logAidSearches')]
     private Collection $organizationTypes;
 
+    /**
+     * @var Collection<int, Backer>
+     */
     #[ORM\ManyToMany(targetEntity: Backer::class, inversedBy: 'logAidSearches')]
     private Collection $backers;
 
+    /**
+     * @var Collection<int, Category>
+     */
     #[ORM\ManyToMany(targetEntity: Category::class, inversedBy: 'logAidSearches')]
     private Collection $categories;
 
+    /**
+     * @var Collection<int, Program>
+     */
     #[ORM\ManyToMany(targetEntity: Program::class, inversedBy: 'logAidSearches')]
     private Collection $programs;
 
+    /**
+     * @var Collection<int, CategoryTheme>
+     */
     #[ORM\ManyToMany(targetEntity: CategoryTheme::class, inversedBy: 'logAidSearches')]
     private Collection $themes;
 

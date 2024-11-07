@@ -147,7 +147,7 @@ class Project // NOSONAR too much methods
     #[ORM\Column(length: 100, nullable: true)]
     private ?string $image = null;
 
-    private $imageFile = null;
+    private ?string $imageFile = null;
 
     private bool $deleteImage = false;
 
@@ -160,18 +160,33 @@ class Project // NOSONAR too much methods
     #[ORM\JoinColumn(onDelete: 'SET NULL')]
     private ?Organization $organization = null;
 
+    /**
+     * @var Collection<int, KeywordSynonymlist>
+     */
     #[ORM\ManyToMany(targetEntity: KeywordSynonymlist::class, inversedBy: 'projects')]
     private Collection $keywordSynonymlists;
 
+    /**
+     * @var Collection<int, ProjectValidated>
+     */
     #[ORM\OneToMany(mappedBy: 'project', targetEntity: ProjectValidated::class)]
     private Collection $projectValidateds;
 
+    /**
+     * @var Collection<int, AidProject>
+     */
     #[ORM\OneToMany(mappedBy: 'project', targetEntity: AidProject::class, cascade: ['persist'], orphanRemoval: true)]
     private Collection $aidProjects;
 
+    /**
+     * @var Collection<int, AidSuggestedAidProject>
+     */
     #[ORM\OneToMany(mappedBy: 'project', targetEntity: AidSuggestedAidProject::class, orphanRemoval: true)]
     private Collection $aidSuggestedAidProjects;
 
+    /**
+     * @var Collection<int, LogPublicProjectView>
+     */
     #[ORM\OneToMany(mappedBy: 'project', targetEntity: LogPublicProjectView::class)]
     private Collection $logPublicProjectViews;
 
@@ -185,6 +200,9 @@ class Project // NOSONAR too much methods
     private ?float $distance = null;
     private ?int $scoreTotal = 0;
 
+    /**
+     * @var Collection<int, ProjectLock>
+     */
     #[ORM\OneToMany(mappedBy: 'project', targetEntity: ProjectLock::class, orphanRemoval: true)]
     private Collection $projectLocks;
 
@@ -407,7 +425,7 @@ class Project // NOSONAR too much methods
     }
 
     #[Ignore]
-    public function setImageFile($imageFile = null): void
+    public function setImageFile(?string $imageFile = null): void
     {
         $this->imageFile = $imageFile;
 
@@ -417,7 +435,7 @@ class Project // NOSONAR too much methods
     }
 
     #[Ignore]
-    public function getImageFile()
+    public function getImageFile(): ?string
     {
         return $this->imageFile;
     }
@@ -616,10 +634,12 @@ class Project // NOSONAR too much methods
     public function getNbAids(): ?int
     {
         try {
-            return count($this->getAidProjects());
+            $this->nbAids = count($this->getAidProjects());
         } catch (\Exception $e) {
-            return null;
+            $this->nbAids = null;
         }
+
+        return $this->nbAids;
     }
 
     public function setNbAids(?int $nbAids): static

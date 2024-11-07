@@ -28,6 +28,9 @@ class UserGroupPermission
     #[ORM\Column(length: 255)]
     private ?string $codename = null;
 
+    /**
+     * @var Collection<int, UserGroup>
+     */
     #[ORM\ManyToMany(targetEntity: UserGroup::class, inversedBy: 'userGroupPermissions')]
     private Collection $userGroups;
 

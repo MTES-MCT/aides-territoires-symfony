@@ -36,6 +36,9 @@ class FaqCategory
     #[Gedmo\Timestampable(on: 'update')]
     private ?\DateTimeInterface $timeUpdate = null;
 
+    /**
+     * @var Collection<int, FaqQuestionAnswser>
+     */
     #[ORM\OneToMany(
         mappedBy: 'faqCategory',
         targetEntity: FaqQuestionAnswser::class,

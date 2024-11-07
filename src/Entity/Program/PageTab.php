@@ -44,6 +44,9 @@ class PageTab
     #[ORM\Column]
     private ?bool $active = false;
 
+    /**
+     * @var Collection<int, Faq>
+     */
     #[ORM\OneToMany(mappedBy: 'pageTab', targetEntity: Faq::class)]
     private Collection $faqs;
 

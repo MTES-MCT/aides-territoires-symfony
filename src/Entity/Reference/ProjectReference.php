@@ -71,14 +71,26 @@ class ProjectReference
     #[ORM\ManyToOne(inversedBy: 'projectReferences')]
     private ?ProjectReferenceCategory $projectReferenceCategory = null;
 
+    /**
+     * @var Collection<int, Project>
+     */
     #[ORM\OneToMany(mappedBy: 'projectReference', targetEntity: Project::class)]
     private Collection $projects;
 
+    /**
+     * @var Collection<int, Aid>
+     */
     #[ORM\ManyToMany(targetEntity: Aid::class, mappedBy: 'projectReferences')]
     private Collection $aids;
 
+    /**
+     * @var Collection<int, Aid>
+     */
     private Collection $aidsLive;
 
+    /**
+     * @var Collection<int, KeywordReference>
+     */
     #[ORM\ManyToMany(targetEntity: KeywordReference::class, inversedBy: 'excludedProjectReferences')]
     #[ORM\JoinTable(name: 'project_reference_excluded_keyword_reference')]
     private Collection $excludedKeywordReferences;
@@ -86,6 +98,9 @@ class ProjectReference
     #[ORM\Column(nullable: true)]
     private ?int $nbSearchResult = null;
 
+    /**
+     * @var Collection<int, KeywordReference>
+     */
     #[ORM\ManyToMany(targetEntity: KeywordReference::class, inversedBy: 'requiredProjectReferences')]
     private Collection $requiredKeywordReferences;
 
@@ -198,6 +213,9 @@ class ProjectReference
         return $this;
     }
 
+    /**
+     * @return Collection<int, Aid>
+     */
     public function getAidsLive(): Collection
     {
         $this->aidsLive = $this->aids->filter(fn (Aid $aid) => $aid->isLive());

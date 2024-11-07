@@ -38,6 +38,9 @@ class OrganizationTypeGroup
     #[Gedmo\Timestampable(on: 'update')]
     private ?\DateTimeInterface $timeUpdate = null;
 
+    /**
+     * @var Collection<int, OrganizationType>
+     */
     #[ORM\OneToMany(
         mappedBy: 'organizationTypeGroup',
         targetEntity: OrganizationType::class,
