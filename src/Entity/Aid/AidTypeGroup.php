@@ -50,6 +50,9 @@ class AidTypeGroup
     #[Gedmo\Timestampable(on: 'update')]
     private ?\DateTimeInterface $timeUpdate = null;
 
+    /**
+     * @var Collection<int, AidType>
+     */
     #[ORM\OneToMany(mappedBy: 'aidTypeGroup', targetEntity: AidType::class)]
     private Collection $aidTypes;
 

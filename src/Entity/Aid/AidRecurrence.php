@@ -67,6 +67,9 @@ class AidRecurrence
     #[Gedmo\Timestampable(on: 'update')]
     private ?\DateTimeInterface $timeUpdate = null;
 
+    /**
+     * @var Collection<int, Aid>
+     */
     #[ORM\OneToMany(mappedBy: 'aidRecurrence', targetEntity: Aid::class)]
     private Collection $aids;
 

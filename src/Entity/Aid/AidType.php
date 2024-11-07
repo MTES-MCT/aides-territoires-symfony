@@ -81,6 +81,9 @@ class AidType
     #[ORM\ManyToOne(inversedBy: 'aidTypes')]
     private ?AidTypeGroup $aidTypeGroup = null;
 
+    /**
+     * @var Collection<int, Aid>
+     */
     #[ORM\ManyToMany(targetEntity: Aid::class, mappedBy: 'aidTypes')]
     private Collection $aids;
 
