@@ -49,24 +49,12 @@ class PerimeterAutocompleteType extends AbstractType
                         ->setParameter('zipcodes', '%' . $query . '%');
                     ;
                 } else { // c'est une string
-                    $strings = [$query];
-                    if (strpos($query, ' ') !== false) {
-                        $strings[] = str_replace(' ', '-', $query);
-                    }
-                    if (strpos($query, '-') !== false) {
-                        $strings[] = str_replace('-', ' ', $query);
-                    }
-
-                    $sqlWhere = '';
-                    for ($i = 0; $i < count($strings); $i++) {
-                        $sqlWhere .= ' p.name LIKE :nameLike' . $i;
-                        if ($i < count($strings) - 1) {
-                            $sqlWhere .= ' OR ';
-                        }
-                        $qb->setParameter('nameLike' . $i, '%' . $strings[$i] . '%');
-                    }
+                    $query = str_replace('-', ' ', $query);
                     $qb
-                        ->andWhere($sqlWhere);
+                    ->addSelect('MATCH_AGAINST(p.name) AGAINST(:name) AS HIDDEN relevance_score')
+                    ->andWhere('MATCH_AGAINST(p.name) AGAINST(:name) > 0')
+                    ->setParameter('name', $query)
+                    ->orderBy('relevance_score', 'DESC');
                 }
             },
         ]);
