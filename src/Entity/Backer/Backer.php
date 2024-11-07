@@ -849,7 +849,8 @@ class Backer // NOSONAR too much methods
     {
         foreach ($this->getAidFinancers() as $aidFinancer) {
             if ($aidFinancer->getAid()) {
-                $this->addCategories($aidFinancer->getAid()->getCategories(), $categories);
+                $aidCategories = new ArrayCollection($aidFinancer->getAid()->getCategories()->toArray());
+                $this->addCategories($aidCategories, $categories);
             }
         }
     }
@@ -862,7 +863,8 @@ class Backer // NOSONAR too much methods
     {
         foreach ($this->getAidInstructors() as $aidInstructor) {
             if ($aidInstructor->getAid()) {
-                $this->addCategories($aidInstructor->getAid()->getCategories(), $categories);
+                $aidCategories = new ArrayCollection($aidInstructor->getAid()->getCategories()->toArray());
+                $this->addCategories($aidCategories, $categories);
             }
         }
     }
@@ -912,7 +914,8 @@ class Backer // NOSONAR too much methods
     {
         foreach ($this->getAidFinancers() as $aidFinancer) {
             if ($aidFinancer->getAid()) {
-                $this->addPrograms($aidFinancer->getAid()->getPrograms(), $programs);
+                $aidFinancerPrograms = new ArrayCollection($aidFinancer->getAid()->getPrograms()->toArray());
+                $this->addPrograms($aidFinancerPrograms, $programs);
             }
         }
     }
@@ -925,7 +928,8 @@ class Backer // NOSONAR too much methods
     {
         foreach ($this->getAidInstructors() as $aidInstructor) {
             if ($aidInstructor->getAid()) {
-                $this->addPrograms($aidInstructor->getAid()->getPrograms(), $programs);
+                $aidInstructorPrograms = new ArrayCollection($aidInstructor->getAid()->getPrograms()->toArray());
+                $this->addPrograms($aidInstructorPrograms, $programs);
             }
         }
     }
