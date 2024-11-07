@@ -54,6 +54,9 @@ class EligibilityQuestion // NOSONAR too much methods
     #[ORM\JoinColumn(onDelete: 'SET NULL')]
     private ?User $author = null;
 
+    /**
+     * @var Collection<int, EligibilityTestQuestion>
+     */
     #[ORM\OneToMany(mappedBy: 'eligibilityQuestion', targetEntity: EligibilityTestQuestion::class, orphanRemoval: true)]
     private Collection $eligibilityTestQuestions;
 

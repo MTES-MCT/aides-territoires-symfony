@@ -82,7 +82,7 @@ class BlogPromotionPost // NOSONAR too much methods
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $image = null;
 
-    private $imageFile = null;
+    private ?string $imageFile = null;
 
     private bool $deleteImage = false;
 
@@ -93,26 +93,47 @@ class BlogPromotionPost // NOSONAR too much methods
     #[ORM\Column]
     private ?bool $externalLink = null;
 
+    /**
+     * @var Collection<int, OrganizationType>
+     */
     #[ORM\ManyToMany(targetEntity: OrganizationType::class, inversedBy: 'blogPromotionPosts')]
     private Collection $organizationTypes;
 
+    /**
+     * @var Collection<int, Backer>
+     */
     #[ORM\ManyToMany(targetEntity: Backer::class, inversedBy: 'blogPromotionPosts')]
     private Collection $backers;
 
+    /**
+     * @var Collection<int, Category>
+     */
     #[ORM\ManyToMany(targetEntity: Category::class, inversedBy: 'blogPromotionPosts')]
     private Collection $categories;
 
+    /**
+     * @var Collection<int, Program>
+     */
     #[ORM\ManyToMany(targetEntity: Program::class, inversedBy: 'blogPromotionPosts')]
     private Collection $programs;
 
+    /**
+     * @var Collection<int, LogBlogPromotionPostClick>
+     */
     #[ORM\OneToMany(mappedBy: 'blogPromotionPost', targetEntity: LogBlogPromotionPostClick::class)]
     #[ORM\JoinColumn(onDelete: 'SET NULL')]
     private Collection $logBlogPromotionPostClicks;
 
+    /**
+     * @var Collection<int, LogBlogPromotionPostDisplay>
+     */
     #[ORM\OneToMany(mappedBy: 'blogPromotionPost', targetEntity: LogBlogPromotionPostDisplay::class)]
     #[ORM\JoinColumn(onDelete: 'SET NULL')]
     private Collection $logBlogPromotionPostDisplays;
 
+    /**
+     * @var Collection<int, KeywordReference>
+     */
     #[ORM\ManyToMany(targetEntity: KeywordReference::class, inversedBy: 'blogPromotionPosts')]
     private Collection $keywordReferences;
 
@@ -251,7 +272,7 @@ class BlogPromotionPost // NOSONAR too much methods
         return $this;
     }
 
-    public function setImageFile($imageFile = null): void
+    public function setImageFile(?string $imageFile = null): void
     {
         $this->imageFile = $imageFile;
 
@@ -260,7 +281,7 @@ class BlogPromotionPost // NOSONAR too much methods
         }
     }
 
-    public function getImageFile()
+    public function getImageFile(): ?string
     {
         return $this->imageFile;
     }

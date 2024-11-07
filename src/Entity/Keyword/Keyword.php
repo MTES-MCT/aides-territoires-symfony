@@ -38,6 +38,9 @@ class Keyword
     #[ORM\Column(nullable: true)]
     private ?int $oldId = null;
 
+    /**
+     * @var Collection<int, Aid>
+     */
     #[ORM\ManyToMany(targetEntity: Aid::class, mappedBy: 'keywords')]
     private Collection $aids;
 

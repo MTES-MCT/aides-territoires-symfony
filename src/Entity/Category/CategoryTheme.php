@@ -57,10 +57,16 @@ class CategoryTheme
     #[ORM\Column(type: Types::TEXT)]
     private ?string $shortDescription = null;
 
+    /**
+     * @var Collection<int, Category>
+     */
     #[ORM\OneToMany(mappedBy: 'categoryTheme', targetEntity: Category::class)]
     #[OrderBy(['name' => 'ASC'])]
     private Collection $categories;
 
+    /**
+     * @var Collection<int, LogAidSearch>
+     */
     #[ORM\ManyToMany(targetEntity: LogAidSearch::class, mappedBy: 'themes')]
     private Collection $logAidSearches;
 
