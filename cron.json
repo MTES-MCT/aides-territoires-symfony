@@ -1,7 +1,7 @@
 {
   "jobs": [
     {
-      "command": "0 1 * * * php bin/console at:cron:site:datas"
+      "command": "0 3 * * * php bin/console at:cron:site:datas"
     },
     {
       "command": "30 04 * * * php bin/console at:cron:alert:send_daily"
