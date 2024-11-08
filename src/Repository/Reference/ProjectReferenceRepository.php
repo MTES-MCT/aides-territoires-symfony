@@ -4,6 +4,7 @@ namespace App\Repository\Reference;
 
 use App\Entity\Reference\ProjectReference;
 use App\Entity\Reference\ProjectReferenceCategory;
+use App\Service\Various\StringService;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
@@ -18,7 +19,10 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class ProjectReferenceRepository extends ServiceEntityRepository
 {
-    public function __construct(ManagerRegistry $registry)
+    public function __construct(
+        ManagerRegistry $registry,
+        private StringService $stringService
+    )
     {
         parent::__construct($registry, ProjectReference::class);
     }
@@ -78,6 +82,7 @@ class ProjectReferenceRepository extends ServiceEntityRepository
         }
 
         if ($nameMatchAgainst !== null) {
+            $nameMatchAgainst = $this->stringService->sanitizeBooleanSearch($nameMatchAgainst);
             $qb
                 ->andWhere('MATCH_AGAINST(pr.name) AGAINST (:nameMatchAgainst IN BOOLEAN MODE) > 5')
                 ->setParameter('nameMatchAgainst', $nameMatchAgainst);

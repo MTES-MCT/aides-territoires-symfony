@@ -266,8 +266,10 @@ class ReferenceService
     public function getHighlightedWords(?array $synonyms, ?string $currentKeyword): array
     {
         $session = $this->requestStack->getSession();
-        $highlightedWords = $session->get('highlightedWords', []);
+        $highlightedWords = [];
+        $session->set('highlightedWords', $highlightedWords);
 
+        // on ne prends les intentions que si on a des objets
         if (isset($synonyms['intentions_string']) && isset($synonyms['objects_string'])) {
             $keywords = str_getcsv($synonyms['intentions_string'], ' ', '"');
             foreach ($keywords as $keyword) {
@@ -276,6 +278,8 @@ class ReferenceService
                 }
             }
         }
+
+        // on prends les objets
         if (isset($synonyms['objects_string'])) {
             $keywords = str_getcsv($synonyms['objects_string'], ' ', '"');
             foreach ($keywords as $keyword) {
@@ -284,6 +288,8 @@ class ReferenceService
                 }
             }
         }
+
+        // on prends les mots simples si pas d'objets
         if (
             isset($synonyms['simple_words_string'])
             && (

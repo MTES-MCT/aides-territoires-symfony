@@ -5,6 +5,17 @@ namespace App\Service\Various;
 class StringService
 {
     /**
+     * Nettoie une chaine de caractères pour une recherche booléenne (MATCH_AGAINST)
+     *
+     * @param string $string
+     * @return string
+     */
+    public function sanitizeBooleanSearch(string $string): string
+    {
+        return trim(preg_replace('/[+\-<>\(\)~*@]/', ' ', $string));
+    }
+
+    /**
      * Nettoie une chaine de caractères
      *
      * @param string $string

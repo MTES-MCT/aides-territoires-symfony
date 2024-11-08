@@ -3,6 +3,7 @@
 namespace App\Repository\Reference;
 
 use App\Entity\Reference\KeywordReference;
+use App\Service\Various\StringService;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\Query\Expr\Func;
 use Doctrine\ORM\QueryBuilder;
@@ -18,13 +19,20 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class KeywordReferenceRepository extends ServiceEntityRepository
 {
-    public function __construct(ManagerRegistry $registry)
-    {
+    public function __construct(
+        ManagerRegistry $registry,
+        private StringService $stringService
+    ) {
         parent::__construct($registry, KeywordReference::class);
     }
 
     public function findFromKewyordsOrOriginalName(array $keywords, string $originalName): array
     {
+        $originalName = $this->stringService->sanitizeBooleanSearch($originalName);
+        foreach ($keywords as $key => $keyword) {
+            $keywords[$key] = $this->stringService->sanitizeBooleanSearch($keyword);
+        }
+
         $qb = $this->createQueryBuilder('kr');
         $qb->orderBy('kr.name', 'ASC');
         $qb->andWhere('kr.name IN (:keywords) OR MATCH_AGAINST(kr.name) AGAINST(:originalName IN BOOLEAN MODE) > 10')
