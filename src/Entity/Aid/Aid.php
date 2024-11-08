@@ -2318,6 +2318,8 @@ class Aid // NOSONAR too much methods
     {
         $today = new \DateTime(date('Y-m-d'));
 
+        $this->live = false;
+
         if (
             $this->status == self::STATUS_PUBLISHED
             && (($this->dateStart && $this->dateStart <= $today) || !$this->dateStart)
@@ -2328,8 +2330,6 @@ class Aid // NOSONAR too much methods
         ) {
             $this->live = true;
         }
-
-        $this->live = false;
 
         return $this->live;
     }
