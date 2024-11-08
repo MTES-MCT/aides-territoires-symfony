@@ -6,6 +6,7 @@ use App\Entity\Organization\OrganizationType;
 use App\Entity\Perimeter\Perimeter;
 use App\Entity\Project\ProjectValidated;
 use App\Service\Reference\ReferenceService;
+use App\Service\Various\StringService;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
@@ -22,7 +23,8 @@ class ProjectValidatedRepository extends ServiceEntityRepository
 {
     public function __construct(
         ManagerRegistry $registry,
-        protected ReferenceService $referenceService
+        private ReferenceService $referenceService,
+        private StringService $stringService
     ) {
         parent::__construct($registry, ProjectValidated::class);
     }
@@ -83,30 +85,20 @@ class ProjectValidatedRepository extends ServiceEntityRepository
 
         if ($search !== null) {
             $synonyms = $this->referenceService->getSynonymes($search);
-            $originalName =
-                (isset($synonyms['original_name'])
-                && trim($synonyms['original_name']) !== '')
-                    ? $synonyms['original_name']
-                    : null
-            ;
-            $intentionsString =
-                (isset($synonyms['intentions_string'])
-                && trim($synonyms['intentions_string']) !== '')
-                    ? $synonyms['intentions_string']
-                    : null
-            ;
-            $objectsString =
-                (isset($synonyms['objects_string'])
-                && trim($synonyms['objects_string']) !== '')
-                    ? $synonyms['objects_string']
-                    : null
-            ;
-            $simpleWordsString =
-                (isset($synonyms['simple_words_string'])
-                && trim($synonyms['simple_words_string']) !== '')
-                    ? $synonyms['simple_words_string']
-                    : null
-            ;
+            $originalName = !empty($synonyms['original_name'])
+                ? $this->stringService->sanitizeBooleanSearch($synonyms['original_name'])
+                : null;
+            $intentionsString = !empty($synonyms['intentions_string'])
+                ? $this->stringService->sanitizeBooleanSearch($synonyms['intentions_string'])
+                : null;
+
+            $objectsString = !empty($synonyms['objects_string'])
+                ? $this->stringService->sanitizeBooleanSearch($synonyms['objects_string'])
+                : null;
+
+            $simpleWordsString = !empty($synonyms['simple_words_string'])
+                ? $this->stringService->sanitizeBooleanSearch($synonyms['simple_words_string'])
+                : null;
 
             if ($originalName) {
                 $sqlOriginalName = '
@@ -261,9 +253,7 @@ class ProjectValidatedRepository extends ServiceEntityRepository
     public function getQueryBuilder(?array $params = null): QueryBuilder
     {
         $keyword = $params['keyword'] ?? null;
-        $intentions_string = $params['intentions_string'] ?? null;
         $objects_string = $params['objects_string'] ?? null;
-        $simple_words_string = $params['simple_words_string'] ?? null;
         $perimeter = $params['perimeter'] ?? null;
         $radius = $params['radius'] ?? null;
         $organizationType = $params['organizationType'] ?? null;
@@ -311,6 +301,7 @@ class ProjectValidatedRepository extends ServiceEntityRepository
         }
 
         if ($objects_string !== null) {
+            $objects_string = $this->stringService->sanitizeBooleanSearch($objects_string);
             $qb
                 ->andWhere('
                 MATCH_AGAINST(p.projectName) AGAINST (:objects_string IN BOOLEAN MODE) > 5

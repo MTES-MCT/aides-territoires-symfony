@@ -4,6 +4,7 @@ namespace App\Repository\Perimeter;
 
 use App\Entity\Aid\Aid;
 use App\Entity\Perimeter\Perimeter;
+use App\Service\Various\StringService;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Criteria;
@@ -21,7 +22,10 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class PerimeterRepository extends ServiceEntityRepository
 {
-    public function __construct(ManagerRegistry $registry)
+    public function __construct(
+        ManagerRegistry $registry,
+        private StringService $stringService
+    )
     {
         parent::__construct($registry, Perimeter::class);
     }
@@ -299,6 +303,7 @@ class PerimeterRepository extends ServiceEntityRepository
                 ->setParameter('isObsolete', $isObsolete);
         }
         if ($nameMatchAgainst !== null) {
+            $nameMatchAgainst = $this->stringService->sanitizeBooleanSearch($nameMatchAgainst);
             $qb
                 ->andWhere('MATCH_AGAINST(p.name) AGAINST (:nameMatchAgainst) > 1')
                 ->setParameter('nameMatchAgainst', $nameMatchAgainst);

@@ -9,6 +9,7 @@ use App\Entity\Project\Project;
 use App\Entity\Reference\ProjectReference;
 use App\Entity\User\User;
 use App\Service\Reference\ReferenceService;
+use App\Service\Various\StringService;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\QueryBuilder;
@@ -26,7 +27,8 @@ class ProjectRepository extends ServiceEntityRepository
 {
     public function __construct(
         ManagerRegistry $registry,
-        protected ReferenceService $referenceService
+        private ReferenceService $referenceService,
+        private StringService $stringService
     ) {
         parent::__construct($registry, Project::class);
     }
@@ -173,30 +175,20 @@ class ProjectRepository extends ServiceEntityRepository
 
         if ($search !== null) {
             $synonyms = $this->referenceService->getSynonymes($search);
-            $originalName =
-                (isset($synonyms['original_name'])
-                && trim($synonyms['original_name']) !== '')
-                    ? $synonyms['original_name']
-                    : null
-            ;
-            $intentionsString =
-                (isset($synonyms['intentions_string'])
-                && trim($synonyms['intentions_string']) !== '')
-                    ? $synonyms['intentions_string']
-                    : null
-            ;
-            $objectsString =
-                (isset($synonyms['objects_string'])
-                && trim($synonyms['objects_string']) !== '')
-                    ? $synonyms['objects_string']
-                    : null
-            ;
-            $simpleWordsString =
-                (isset($synonyms['simple_words_string'])
-                && trim($synonyms['simple_words_string']) !== '')
-                    ? $synonyms['simple_words_string']
-                    : null
-            ;
+            $originalName = !empty($synonyms['original_name'])
+                ? $this->stringService->sanitizeBooleanSearch($synonyms['original_name'])
+                : null;
+            $intentionsString = !empty($synonyms['intentions_string'])
+                ? $this->stringService->sanitizeBooleanSearch($synonyms['intentions_string'])
+                : null;
+
+            $objectsString = !empty($synonyms['objects_string'])
+                ? $this->stringService->sanitizeBooleanSearch($synonyms['objects_string'])
+                : null;
+
+            $simpleWordsString = !empty($synonyms['simple_words_string'])
+                ? $this->stringService->sanitizeBooleanSearch($synonyms['simple_words_string'])
+                : null;
 
             if ($originalName) {
                 $sqlOriginalName = '
