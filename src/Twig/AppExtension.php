@@ -204,11 +204,60 @@ class AppExtension extends AbstractExtension // NOSONAR too much methods
         try {
             $html = $this->addLazyToImg($html);
             $html = $this->addNonceToInlineCss($html);
+            $html = $this->encapsulateTables($html);
 
             return $html;
         } catch (\Exception $e) {
             return $html;
         }
+    }
+
+    /**
+     * on va encapsuler les tables qui ne le sont pas déjà dans
+     * <div class="fr-table fr-table--no-scroll">
+     *      <div class="fr-table__wrapper">
+*              <div class="fr-table__container">
+*                  <div class="fr-table__content">
+*                  </div>
+*              </div>
+     *      </div>
+     * </div>
+     * Pour coller au style DSFR
+     *
+     * @param string $html
+     * @return string
+     */
+    public function encapsulateTables(string $html): string
+    {
+        $dom = new \DOMDocument();
+        // pour garder le utf-8
+        $dom->loadHTML(mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8'), LIBXML_HTML_NODEFDTD);
+        $x = new \DOMXPath($dom);
+
+        /** @var \DOMElement $node */
+        foreach ($x->query('//table') as $node) {
+            $wrapper = $dom->createElement('div');
+            $wrapper->setAttribute('class', 'fr-table');
+
+            $wrapperWrapper = $dom->createElement('div');
+            $wrapperWrapper->setAttribute('class', 'fr-table__wrapper');
+
+            $wrapperContainer = $dom->createElement('div');
+            $wrapperContainer->setAttribute('class', 'fr-table__container');
+
+            $wrapperContent = $dom->createElement('div');
+            $wrapperContent->setAttribute('class', 'fr-table__content');
+
+            $wrapperContainer->appendChild($wrapperContent);
+            $wrapperWrapper->appendChild($wrapperContainer);
+            $wrapper->appendChild($wrapperWrapper);
+
+            $node->parentNode->replaceChild($wrapper, $node);
+            $wrapperContent->appendChild($node);
+
+        }
+
+        return substr($dom->saveHTML(), 12, -15);
     }
 
     public function addMailtoToEmailLinks(string $html): string
