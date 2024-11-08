@@ -49,25 +49,20 @@ class PerimeterAutocompleteType extends AbstractType
                         ->setParameter('zipcodes', '%' . $query . '%');
                     ;
                 } else { // c'est une string
-                    $strings = [$query];
-                    if (strpos($query, ' ') !== false) {
-                        $strings[] = str_replace(' ', '-', $query);
-                    }
-                    if (strpos($query, '-') !== false) {
-                        $strings[] = str_replace('-', ' ', $query);
-                    }
-
-                    $sqlWhere = '';
-                    for ($i = 0; $i < count($strings); $i++) {
-                        $sqlWhere .= ' p.name LIKE :nameLike' . $i;
-                        if ($i < count($strings) - 1) {
-                            $sqlWhere .= ' OR ';
-                        }
-                        $qb->setParameter('nameLike' . $i, '%' . $strings[$i] . '%');
-                    }
+                    $query = str_replace(' ', '-', $query);
                     $qb
-                        ->andWhere($sqlWhere);
-                }
+                    ->addSelect('MATCH_AGAINST(p.name) AGAINST(:name) AS HIDDEN relevance_score')
+                    ->addSelect('CASE WHEN p.name LIKE :startMatch THEN 1 ELSE 0 END AS HIDDEN start_match')
+                    ->andWhere('MATCH_AGAINST(p.name) AGAINST(:name) > 0 OR p.name LIKE :partialMatch')
+                    ->setParameter('name', $query . '*')
+                    ->setParameter('startMatch', $query . '%')
+                    ->setParameter('partialMatch', '%' . $query . '%');
+                
+                    // Trier d'abord par les correspondances qui commencent par la recherche
+                    // Ensuite, trier par score de pertinence pour les résultats de `MATCH_AGAINST`
+                    $qb->orderBy('start_match', 'DESC')
+                        ->addOrderBy('relevance_score', 'DESC');
+                    }
             },
         ]);
     }
