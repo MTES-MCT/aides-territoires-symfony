@@ -51,7 +51,7 @@ class AlertController extends FrontController
 
     #[Route('/alertes/vos-alertes/{id}/suppression', name: 'app_user_alert_delete_public')]
     public function deletePublic(
-        int $id,
+        string $id,
         AlertRepository $alertRepository,
         ManagerRegistry $managerRegistry
     ): RedirectResponse {
@@ -85,7 +85,7 @@ class AlertController extends FrontController
 
     #[Route('/comptes/alertes/vos-alertes/{id}/suppression', name: 'app_user_alert_delete')]
     public function delete(
-        int $id,
+        string $id,
         UserService $userService,
         AlertRepository $alertRepository,
         ManagerRegistry $managerRegistry
