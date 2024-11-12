@@ -5,6 +5,7 @@ namespace App\Form\User;
 use App\Entity\Perimeter\Perimeter;
 use App\Entity\User\User;
 use App\Form\Type\PerimeterCityAutocompleteType;
+use App\Validator\PasswordValidator;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
@@ -99,9 +100,12 @@ class RegisterCommuneType extends AbstractType
                     'help' => '<ul>
                                 <li>Votre mot de passe ne peut pas trop ressembler '
                                     . 'à vos autres informations personnelles.</li>
-                                <li>Votre mot de passe doit contenir au minimum 9 caractères.</li>
+                                <li>Votre mot de passe doit contenir au minimum '.PasswordValidator::PASSWORD_MIN_LENGTH.' caractères.</li>
                                 <li>Votre mot de passe ne peut pas être un mot de passe couramment utilisé.</li>
-                                <li>Votre mot de passe ne peut pas être entièrement numérique.</li>
+                                <li>Votre mot de passe doit contenir au moins une minuscule</li>
+                                <li>Votre mot de passe doit contenir au moins une majuscule</li>
+                                <li>Votre mot de passe doit contenir au moins un chiffre</li>
+                                <li>Votre mot de passe doit contenir au moins un caractère spécial de la liste suivante : #?!@$%^&*-\'+()_[]</li>
                                 </ul>',
                     'help_html' => true,
                     'toggle' => true,

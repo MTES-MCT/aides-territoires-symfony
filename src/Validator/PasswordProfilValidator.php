@@ -9,14 +9,6 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class PasswordProfilValidator extends ConstraintValidator
 {
-    private const PASSWORD_COMMONS = [
-        '1234',
-        '123456789',
-        'azerty',
-        'password',
-        'motdepasse',
-    ];
-
     protected TranslatorInterface $translator;
 
     public function __construct(TranslatorInterface $translator)
@@ -30,7 +22,7 @@ class PasswordProfilValidator extends ConstraintValidator
         if ('' != $value) {
             try {
                 // longueur
-                if (strlen($value) < 9) {
+                if (strlen($value) < PasswordValidator::PASSWORD_MIN_LENGTH) {
                     throw new CustomValidatorException($errorMessage);
                 }
                 // max length allowed by Symfony for security reasons
@@ -45,7 +37,7 @@ class PasswordProfilValidator extends ConstraintValidator
                 if (!preg_match('/[a-zA-Z]+/', $value)) {
                     throw new CustomValidatorException($errorMessage);
                 }
-                if (in_array($value, self::PASSWORD_COMMONS)) {
+                if (in_array($value, PasswordValidator::PASSWORD_COMMONS)) {
                     throw new CustomValidatorException($errorMessage);
                 }
             } catch (CustomValidatorException $exception) {
