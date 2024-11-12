@@ -7,7 +7,6 @@ use App\Entity\Backer\BackerCategory;
 use App\Entity\Category\CategoryTheme;
 use App\Entity\Organization\OrganizationType;
 use App\Entity\Perimeter\Perimeter;
-use App\Service\User\UserService;
 use App\Form\Type\CheckboxMultipleSearchType;
 use App\Repository\Perimeter\PerimeterRepository;
 use Doctrine\ORM\EntityRepository;
@@ -22,7 +21,6 @@ use Symfony\Component\Validator\Constraints as Assert;
 class CartographySearchType extends AbstractType
 {
     public function __construct(
-        private UserService $userService,
         protected ManagerRegistry $managerRegistry
     ) {
     }

@@ -836,8 +836,8 @@ class AidEditType extends AbstractType
         }
 
         if ($aidTypes && $status !== Aid::STATUS_DRAFT) {
-            /** @var AidType $aidType */
             $typeError = false;
+            /** @var AidType $aidType */
             foreach ($aidTypes as $aidType) {
                 // c'est une aide financière, Types de dépenses / actions couvertes est obligatoire
                 if ($aidType->getAidTypeGroup()->getSlug() == AidTypeGroup::SLUG_FINANCIAL) {

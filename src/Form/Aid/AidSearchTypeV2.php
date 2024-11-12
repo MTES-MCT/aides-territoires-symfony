@@ -14,7 +14,6 @@ use App\Entity\Category\CategoryTheme;
 use App\Entity\Organization\OrganizationType;
 use App\Entity\Program\Program;
 use App\Entity\Search\SearchPage;
-use App\Service\User\UserService;
 use App\Form\Type\EntityCheckboxAbsoluteType;
 use App\Form\Type\EntityCheckboxGroupAbsoluteType;
 use App\Form\Type\PerimeterAutocompleteType;
@@ -38,9 +37,8 @@ use Symfony\Component\Routing\RouterInterface;
 class AidSearchTypeV2 extends AbstractType
 {
     public function __construct(
-        private UserService $userService,
-        protected ManagerRegistry $managerRegistry,
-        protected RouterInterface $routerInterface
+        private ManagerRegistry $managerRegistry,
+        private RouterInterface $routerInterface
     ) {
     }
 

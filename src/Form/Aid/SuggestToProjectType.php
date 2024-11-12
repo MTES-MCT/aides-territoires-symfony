@@ -33,7 +33,6 @@ class SuggestToProjectType extends AbstractType
         $builder
             ->add('projectFavorites', ChoiceType::class, [
                 'required' => true,
-                'label' => false,
                 'choices' => $projectFavoriteChoices,
                 'label' => ' Liste des vos projets favoris',
                 'help' => 'Cochez au moins un projet favori dans la liste pour suggérer cette aide.',

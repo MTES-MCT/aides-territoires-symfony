@@ -27,12 +27,14 @@ class RegisterType extends AbstractType
         '<ul>
         <li>Votre mot de passe ne peut pas trop ressembler '
             . 'à vos autres informations personnelles.</li>
-        <li>Votre mot de passe doit contenir au minimum '.PasswordValidator::PASSWORD_MIN_LENGTH.' caractères.</li>
+        <li>Votre mot de passe doit contenir au minimum '
+            . PasswordValidator::PASSWORD_MIN_LENGTH . ' caractères.</li>
         <li>Votre mot de passe ne peut pas être un mot de passe couramment utilisé.</li>
         <li>Votre mot de passe doit contenir au moins une minuscule</li>
         <li>Votre mot de passe doit contenir au moins une majuscule</li>
         <li>Votre mot de passe doit contenir au moins un chiffre</li>
-        <li>Votre mot de passe doit contenir au moins un caractère spécial de la liste suivante : #?!@$%^&*-\'+()_[]</li>
+        <li>Votre mot de passe doit contenir au moins un caractère spécial de la liste suivante : '
+            . '#?!@$%^&*-\'+()_[]</li>
         </ul>';
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {

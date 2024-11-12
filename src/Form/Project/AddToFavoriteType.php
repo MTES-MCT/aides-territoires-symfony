@@ -10,7 +10,7 @@ class AddToFavoriteType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $builder;
+        // extends type de base
     }
 
     public function configureOptions(OptionsResolver $resolver): void
