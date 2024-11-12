@@ -7,6 +7,7 @@ use App\Entity\Organization\OrganizationType;
 use App\Entity\Perimeter\Perimeter;
 use App\Entity\User\User;
 use App\Form\Type\PerimeterAutocompleteType;
+use App\Validator\PasswordValidator;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
@@ -22,6 +23,19 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 class RegisterType extends AbstractType
 {
+    public const PASSWORD_RULES =
+        '<ul>
+        <li>Votre mot de passe ne peut pas trop ressembler '
+            . 'à vos autres informations personnelles.</li>
+        <li>Votre mot de passe doit contenir au minimum '
+            . PasswordValidator::PASSWORD_MIN_LENGTH . ' caractères.</li>
+        <li>Votre mot de passe ne peut pas être un mot de passe couramment utilisé.</li>
+        <li>Votre mot de passe doit contenir au moins une minuscule</li>
+        <li>Votre mot de passe doit contenir au moins une majuscule</li>
+        <li>Votre mot de passe doit contenir au moins un chiffre</li>
+        <li>Votre mot de passe doit contenir au moins un caractère spécial de la liste suivante : '
+            . '#?!@$%^&*-\'+()_[]</li>
+        </ul>';
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         // les choices pour acquisition channel
@@ -85,13 +99,7 @@ class RegisterType extends AbstractType
                 'invalid_message' => 'Les deux mots de passe ne correspondent pas. ',
                 'first_options'  => [
                     'label' => 'Mot de passe',
-                    'help' => '<ul>
-                                <li>Votre mot de passe ne peut pas trop ressembler '
-                                    . 'à vos autres informations personnelles.</li>
-                                <li>Votre mot de passe doit contenir au minimum 9 caractères.</li>
-                                <li>Votre mot de passe ne peut pas être un mot de passe couramment utilisé.</li>
-                                <li>Votre mot de passe ne peut pas être entièrement numérique.</li>
-                                </ul>',
+                    'help' => self::PASSWORD_RULES,
                     'help_html' => true,
                     'toggle' => true,
                     'hidden_label' => 'Cacher',

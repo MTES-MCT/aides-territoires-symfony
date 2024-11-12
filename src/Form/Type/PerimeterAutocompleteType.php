@@ -57,12 +57,12 @@ class PerimeterAutocompleteType extends AbstractType
                     ->setParameter('name', $query . '*')
                     ->setParameter('startMatch', $query . '%')
                     ->setParameter('partialMatch', '%' . $query . '%');
-                
+
                     // Trier d'abord par les correspondances qui commencent par la recherche
                     // Ensuite, trier par score de pertinence pour les résultats de `MATCH_AGAINST`
                     $qb->orderBy('start_match', 'DESC')
                         ->addOrderBy('relevance_score', 'DESC');
-                    }
+                }
             },
         ]);
     }

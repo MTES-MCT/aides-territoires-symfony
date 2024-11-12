@@ -19,14 +19,12 @@ use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Validator\Constraints\Count;
 use Symfony\Component\Validator\Constraints as Assert;
 
 class SearchPageEditType extends AbstractType
 {
     public function __construct(
-        private RouterInterface $routerInterface,
         private UserService $userService
     ) {
     }

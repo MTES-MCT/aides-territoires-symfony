@@ -4,6 +4,7 @@ namespace App\Form\Reference;
 
 use App\Entity\Organization\OrganizationType;
 use App\Entity\Perimeter\Perimeter;
+use App\Entity\User\User;
 use App\Form\Type\PerimeterCityAutocompleteType;
 use App\Service\User\UserService;
 use Doctrine\ORM\EntityRepository;
@@ -25,7 +26,7 @@ class ProjectReferenceSearchType extends AbstractType
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        /** @var User $user */
+        /** @var ?User $user */
         $user = $this->userService->getUserLogged();
 
         // organizationType params

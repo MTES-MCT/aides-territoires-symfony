@@ -5,6 +5,7 @@ namespace App\Form\User;
 use App\Entity\Perimeter\Perimeter;
 use App\Entity\User\User;
 use App\Form\Type\PerimeterCityAutocompleteType;
+use App\Validator\PasswordValidator;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
@@ -96,13 +97,7 @@ class RegisterCommuneType extends AbstractType
                 'invalid_message' => 'Les deux mots de passe ne correspondent pas. ',
                 'first_options'  => [
                     'label' => 'Mot de passe',
-                    'help' => '<ul>
-                                <li>Votre mot de passe ne peut pas trop ressembler '
-                                    . 'à vos autres informations personnelles.</li>
-                                <li>Votre mot de passe doit contenir au minimum 9 caractères.</li>
-                                <li>Votre mot de passe ne peut pas être un mot de passe couramment utilisé.</li>
-                                <li>Votre mot de passe ne peut pas être entièrement numérique.</li>
-                                </ul>',
+                    'help' => RegisterType::PASSWORD_RULES,
                     'help_html' => true,
                     'toggle' => true,
                     'hidden_label' => 'Cacher',

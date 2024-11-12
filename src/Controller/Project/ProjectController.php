@@ -180,9 +180,7 @@ class ProjectController extends FrontController
                         FrontController::FLASH_SUCCESS,
                         'Le projet «'
                         . $project->getName()
-                        . '» a bien été ajouté à <a href="'
-                        . $this->generateUrl('app_user_project_favoris')
-                        . '">vos projets favoris</a>.'
+                        . '» a bien été ajouté à vos projets favoris.'
                     );
                 } else {
                     $this->tAddFlash(
