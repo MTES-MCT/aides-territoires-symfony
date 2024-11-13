@@ -22,8 +22,12 @@
 	<div class="fr-container fr-my-5w" id="base-edit">
 		{% block page_title %}{% endblock page_title %}
 
-		{% block before_section %}{% endblock before_section %}
+		
 
+		{% if isLocked and lock and lock.user and lock.user != app.user %}
+		<p class="fr-alert fr-alert--info fr-mt-4w">L'aide est actuellement en cours d'édition par un autre utilisateur{% if lock.user %} ({{ lock.user.email}}){% endif %}. Vous pourrez éditer l'aide à votre tour au plus tard 5 minutes après qu'il a quitté la page.</p>
+		{% else %}
+		{% block before_section %}{% endblock before_section %}
 		<section id="aid-edit">
 			{% include 'user/aid/_aid_edit_stepper.html.twig' %}
 
@@ -46,8 +50,7 @@
 				</div>
 			{% endif %}
 
-			{{ form_start(formAid, {'attr': {'class': 'form-aid'}}
-			)}}
+			{{ form_start(formAid, {'attr': {'class': 'form-aid'}}) }}
 			{% block form_header %}{% endblock form_header %}
 
 			<p class="fr-mt-4w">Les champs marqués d’un astérisque (*) sont obligatoires.</p>
@@ -252,6 +255,7 @@
 			</div>
 			{{ form_end(formAid)}}
 		</section>
+		{% endif %}
 	</div>
 {% endblock %}
 

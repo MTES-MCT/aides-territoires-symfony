@@ -25,8 +25,7 @@ class PerimeterRepository extends ServiceEntityRepository
     public function __construct(
         ManagerRegistry $registry,
         private StringService $stringService
-    )
-    {
+    ) {
         parent::__construct($registry, Perimeter::class);
     }
 
