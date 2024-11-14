@@ -11,3 +11,4 @@ framework:
                     href: ['a']
                     title: ['a']
                     target: ['a']
+                    class: ['span']

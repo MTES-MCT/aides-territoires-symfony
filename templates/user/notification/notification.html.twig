@@ -45,7 +45,7 @@
 														<div id="notification-{{ notification.id }}">
 															<h3 class="fr-h6 at-title--nomargin">{{ notification.name }}</h3>
 															<div {% if notification.timeRead is null %} class="at-text--bold" {% endif %}>
-																{{ notification.description|sanitize_html|raw }}
+																{{ notification.description|sanitize_html('app.admin_wysiwig_sanitizer')|raw }}
 															</div>
 														</div>
 													</td>
