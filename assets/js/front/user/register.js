@@ -15,7 +15,21 @@ $(function() {
             completeOrganizationName();
         }
     }, '#register_perimeter, #organization_edit_perimeter');
-    
+
+    $(document).on({
+        submit: function (e) {
+            const submitButton = $(this).find('button[type="submit"]');
+
+            submitButton.prop('disabled', true);
+            submitButton.html('<i class="fas fa-spinner fa-spin"></i> En cours...');
+
+            // Réactive le bouton après 2 secondes si le formulaire échoue
+            setTimeout(function () {
+                submitButton.prop('disabled', false);
+                submitButton.html('Je crée mon compte');
+            }, 2000); // 2 secondes
+        }
+    }, 'form[name="register"]');
     
 });
 
