@@ -25,7 +25,7 @@
 		
 
 		{% if isLocked and lock and lock.user and lock.user != app.user %}
-		<p class="fr-alert fr-alert--info fr-mt-4w">L'aide est actuellement en cours d'édition par un autre utilisateur{% if lock.user %} ({{ lock.user.email}}){% endif %}. Vous pourrez éditer l'aide à votre tour au plus tard 5 minutes après qu'il a quitté la page.</p>
+		<p class="fr-alert fr-alert--info fr-mt-4w">L'aide est actuellement en cours d'édition par un autre utilisateur{% if lock.user %} ({{ lock.user.email}}){% endif %}. Vous pourrez éditer l'aide à votre tour 5 minutes après le départ de l'utilisateur de la page. </p>
 		{% else %}
 		{% block before_section %}{% endblock before_section %}
 		<section id="aid-edit">
