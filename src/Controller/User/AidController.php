@@ -143,6 +143,8 @@ class AidController extends FrontController
             'formAid' => $formAid->createView(),
             'aid' => $aid,
             'organizationBackersNotComplete' => $organizationBackersNotComplete,
+            'isLocked' => null,
+            'lock' => null,
         ]);
     }
 
