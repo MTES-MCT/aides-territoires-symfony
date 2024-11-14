@@ -104,10 +104,7 @@ class AidController extends FrontController
                 $this->tAddFlash(
                     FrontController::FLASH_SUCCESS,
                     'Votre aide a été créée. '
-                    . 'Vous pouvez poursuivre l’édition ou <a href="'
-                    . $this->generateUrl('app_aid_aid_details', ['slug' => $aid->getSlug()])
-                    . '" target="_blank">la prévisualiser <span class="fr-sr-only">'
-                    . 'Ouvre une nouvelle fenêtre</span></a>.'
+                    . 'Vous pouvez poursuivre l’édition ou la prévisualiser.'
                 );
 
                 // redirection
