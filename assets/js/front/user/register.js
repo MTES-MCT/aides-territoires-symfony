@@ -15,7 +15,13 @@ $(function() {
             completeOrganizationName();
         }
     }, '#register_perimeter, #organization_edit_perimeter');
-    
+
+    $(document).on({
+        submit: function (e) {
+            $(this).find('button[type="submit"]').prop('disabled', true);
+            $(this).find('button[type="submit"]').html('<i class="fas fa-spinner fa-spin"></i> En cours...');
+        }
+    }, 'form[name="register"]');
     
 });
 
