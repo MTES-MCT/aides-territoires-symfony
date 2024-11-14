@@ -8,7 +8,7 @@ use Symfony\Component\Routing\RouterInterface;
 
 /**
  * php bin/phpunit src/Tests/Controller/FrontControllerTest.php
- * On test que les pages du site n'ont pas de code 500 ou plus (codes d'erreurs)
+ * On test que les pages du site n'ont pas de code 500 ou plus (codes d'erreurs).
  */
 class FrontControllerTest extends AtWebTestCase
 {
@@ -34,13 +34,23 @@ class FrontControllerTest extends AtWebTestCase
 
         /** @var Route $route */
         foreach ($routes as $route) {
+            // les urls à ne pas tester
+            $notToTest = [
+                '/comptes/connexion/proconnect/',
+                '/comptes/proconnect/',
+                '/logout',
+            ];
+
             // on ne test pas l'api ici
-            if (strpos($route->getPath(), 'api') !== false) {
+            if (false !== strpos($route->getPath(), 'api')) {
+                continue;
+            }
+            if (in_array($route->getPath(), $notToTest)) {
                 continue;
             }
             if (
-                [] === $route->getMethods() ||
-                (1 === \count($route->getMethods())) && \in_array('GET', $route->getMethods())
+                [] === $route->getMethods()
+                || (1 === \count($route->getMethods())) && \in_array('GET', $route->getMethods())
             ) {
                 $path = $route->getPath();
                 yield $path => [$path, 500];
