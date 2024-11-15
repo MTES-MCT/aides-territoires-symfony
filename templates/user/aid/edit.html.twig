@@ -76,13 +76,6 @@
 
 {% block javascriptsBottom %}
 	{{ parent() }}
-	{% if aid.id %}
-		{% cspscript %}
-		<script>
-			var idAid = {{ aid.id }};
-		</script>
-		{% endcspscript %}
-	{% endif %}
 	{% cspscript %}
 		<script>
 			var csrfTokenInternal = '{{ csrf_token(constant('App\\Security\\Voter\\InternalRequestVoter::CSRF_TOKEN_NAME')) }}';
