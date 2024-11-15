@@ -257,9 +257,11 @@
 
 {% block javascriptsBottom %}
 	{{ parent() }}
-	{% cspscript %}
-	<script type="text/javascript">
-		let idAid = {{ aid.id }};
-	</script>
-	{% endcspscript %}
+	{% if aid.id %}
+		{% cspscript %}
+		<script>
+			var idAid = {{ aid.id }};
+		</script>
+		{% endcspscript %}
+	{% endif %}
 {% endblock %}
