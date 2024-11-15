@@ -9,8 +9,10 @@ use App\Entity\Aid\AidType;
 use App\Entity\Category\Category;
 use App\Entity\DataSource\DataSource;
 use App\Entity\Organization\OrganizationType;
+use App\Entity\User\User;
 use App\Service\Email\EmailService;
 use App\Service\File\FileService;
+use App\Service\Notification\NotificationService;
 use App\Service\Perimeter\PerimeterService;
 use App\Service\Various\ParamService;
 use App\Service\Various\StringService;
@@ -85,6 +87,7 @@ class ImportFluxCommand extends Command // NOSONAR too much methods
         protected StringService $stringService,
         protected FileService $fileService,
         protected ValidatorInterface $validator,
+        protected NotificationService $notificationService
     ) {
         parent::__construct();
         $this->dateImportStart = new \DateTime(date('Y-m-d H:i:s'));
@@ -104,11 +107,11 @@ class ImportFluxCommand extends Command // NOSONAR too much methods
         $io = new SymfonyStyle($input, $output);
         $io->title($this->commandTextStart);
 
-        if ('prod' != $this->kernelInterface->getEnvironment()) {
-            $io->info('Uniquement en prod');
+        // if ('prod' != $this->kernelInterface->getEnvironment()) {
+        //     $io->info('Uniquement en prod');
 
-            return Command::FAILURE;
-        }
+        //     return Command::FAILURE;
+        // }
 
         try {
             // set la dataSource
@@ -137,6 +140,17 @@ class ImportFluxCommand extends Command // NOSONAR too much methods
         $io->success('Création : ' . $this->create);
         $io->success('Update : ' . $this->update);
         $io->success('Erreur : ' . $this->error);
+
+        // notif admin
+        $admin = $this->managerRegistry->getRepository(User::class)
+            ->findOneBy(['email' => $this->paramService->get('email_super_admin')]);
+        $this->notificationService->addNotification(
+            $admin,
+            'Rapport flux '. $this->dataSource->getName(),
+            'Création : '.$this->create.'<br />'
+            . 'Update : '.$this->update.'<br />'
+            . 'Erreur : '.$this->error
+        );
 
         // met à jour le last access
         $this->dataSource->setTimeLastAccess(new \DateTime(date('Y-m-d H:i:s')));

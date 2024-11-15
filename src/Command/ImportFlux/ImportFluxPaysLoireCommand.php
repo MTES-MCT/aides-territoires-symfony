@@ -299,6 +299,12 @@ class ImportFluxPaysLoireCommand extends ImportFluxCommand
         }
     }
 
+    /**
+     *
+     * @param array<mixed, mixed> $aidToImport
+     * @param Aid $aid
+     * @return Aid
+     */
     protected function setAidAudiences(array $aidToImport, Aid $aid): Aid
     {
         $mapping = [

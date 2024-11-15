@@ -24,6 +24,7 @@ framework:
             'App\Message\SendNotification': async
             'App\Message\Aid\AidExtractKeyword': async
             'App\Message\Aid\AidPropagateUpdate': async
+            'App\Message\Aid\MsgImportFlux': async
             'App\Message\Alert\AlertMessage': async
             'App\Message\Alert\AlertResume': async
             'App\Message\Export\MsgSpreadsheetToExport': async
