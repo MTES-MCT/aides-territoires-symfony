@@ -88,10 +88,15 @@ class ImportFluxMinistereCultureCommand extends ImportFluxCommand
 
             $isCallForProject = (isset($aidToImport['deadline']) && $aidToImport['deadline']) ? true : false;
 
+            $name = !empty($aidToImport['title']) ? $this->cleanName((string) $aidToImport['title']) : null;
+            if (!$name) {
+                throw new \Exception('Name is empty');
+            }
+            
             $return = [
                 'importDataMention' => 'Ces données sont mises à disposition par le Ministère de la Culture.',
-                'name' => isset($aidToImport['title']) ? strip_tags((string) $aidToImport['title']) : null,
-                'nameInitial' => isset($aidToImport['title']) ? strip_tags((string) $aidToImport['title']) : null,
+                'name' => $name,
+                'nameInitial' => $name,
                 'description' => $description,
                 'originUrl' => isset($aidToImport['url'])
                     ? $this->getValidExternalUrlOrNull($aidToImport['url']) : null,

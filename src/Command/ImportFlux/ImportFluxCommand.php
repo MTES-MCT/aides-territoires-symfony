@@ -5,9 +5,14 @@ namespace App\Command\ImportFlux;
 use App\Entity\Aid\Aid;
 use App\Entity\Aid\AidFinancer;
 use App\Entity\Aid\AidRecurrence;
+use App\Entity\Aid\AidType;
+use App\Entity\Category\Category;
 use App\Entity\DataSource\DataSource;
+use App\Entity\Organization\OrganizationType;
+use App\Entity\User\User;
 use App\Service\Email\EmailService;
 use App\Service\File\FileService;
+use App\Service\Notification\NotificationService;
 use App\Service\Perimeter\PerimeterService;
 use App\Service\Various\ParamService;
 use App\Service\Various\StringService;
@@ -44,6 +49,12 @@ class ImportFluxCommand extends Command // NOSONAR too much methods
     protected ?AidRecurrence $aidRecurrenceOnGoing = null;
     protected ?AidRecurrence $aidRecurrenceRecurring = null;
 
+    /** @var array<int, AidType> */
+    protected array $aidTypesById = [];
+    /** @var array<string, array<int, Category>> */
+    protected array $aidCategoriesMapping = [];
+    /** @var array<int, OrganizationType> */
+    protected array $organizationTypesById = [];
     protected bool $paginationEnabled = false;
     protected int $nbPages = 1;
     protected int $nbByPages = 20;
@@ -76,10 +87,14 @@ class ImportFluxCommand extends Command // NOSONAR too much methods
         protected StringService $stringService,
         protected FileService $fileService,
         protected ValidatorInterface $validator,
+        protected NotificationService $notificationService
     ) {
         parent::__construct();
         $this->dateImportStart = new \DateTime(date('Y-m-d H:i:s'));
         $this->setInternalAidRecurrences();
+        $this->setAidTypesById();
+        $this->setOrganizationTypesById();
+        $this->setAidCategoriesMapping();
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -92,11 +107,11 @@ class ImportFluxCommand extends Command // NOSONAR too much methods
         $io = new SymfonyStyle($input, $output);
         $io->title($this->commandTextStart);
 
-        if ('prod' != $this->kernelInterface->getEnvironment()) {
-            $io->info('Uniquement en prod');
+        // if ('prod' != $this->kernelInterface->getEnvironment()) {
+        //     $io->info('Uniquement en prod');
 
-            return Command::FAILURE;
-        }
+        //     return Command::FAILURE;
+        // }
 
         try {
             // set la dataSource
@@ -125,6 +140,17 @@ class ImportFluxCommand extends Command // NOSONAR too much methods
         $io->success('Création : ' . $this->create);
         $io->success('Update : ' . $this->update);
         $io->success('Erreur : ' . $this->error);
+
+        // notif admin
+        $admin = $this->managerRegistry->getRepository(User::class)
+            ->findOneBy(['email' => $this->paramService->get('email_super_admin')]);
+        $this->notificationService->addNotification(
+            $admin,
+            'Rapport flux '. $this->dataSource->getName(),
+            'Création : '.$this->create.'<br />'
+            . 'Update : '.$this->update.'<br />'
+            . 'Erreur : '.$this->error
+        );
 
         // met à jour le last access
         $this->dataSource->setTimeLastAccess(new \DateTime(date('Y-m-d H:i:s')));
@@ -251,6 +277,7 @@ class ImportFluxCommand extends Command // NOSONAR too much methods
                     $importUrl,
                     $this->getApiOptions()
                 );
+
                 $content = $response->getContent();
                 $content = $response->toArray();
 
@@ -746,8 +773,24 @@ class ImportFluxCommand extends Command // NOSONAR too much methods
         return '' !== $html ? $html : null;
     }
 
-    protected function setInternalAidRecurrences(): void // NOSONAR methode generique pour surcharge
+    protected function setInternalAidRecurrences(): void
     {
+        // méthode générique pour surcharge
+    }
+
+    protected function setAidTypesById(): void
+    {
+        // méthode générique pour surcharge
+    }
+
+    protected function setOrganizationTypesById(): void
+    {
+        // méthode générique pour surcharge
+    }
+
+    protected function setAidCategoriesMapping(): void
+    {
+        // méthode générique pour surcharge
     }
 
     protected function getValidExternalUrlOrNull(?string $url): ?string
