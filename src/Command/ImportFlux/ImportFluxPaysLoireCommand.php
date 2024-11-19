@@ -27,7 +27,7 @@ class ImportFluxPaysLoireCommand extends ImportFluxCommand
     }
 
     /**
-     * appel le flux
+     * appel le flux.
      *
      * @return array<int, mixed>
      */
@@ -40,7 +40,7 @@ class ImportFluxPaysLoireCommand extends ImportFluxCommand
             $this->currentPage = $i;
             $importUrl = $this->dataSource->getImportApiUrl();
             if ($this->paginationEnabled) {
-                $importUrl .= '?limit=' . $this->nbByPages . '&offset=' . ($this->currentPage * $this->nbByPages);
+                $importUrl .= '?limit='.$this->nbByPages.'&offset='.($this->currentPage * $this->nbByPages);
             }
             try {
                 $response = $client->request(
@@ -80,7 +80,7 @@ class ImportFluxPaysLoireCommand extends ImportFluxCommand
         }
 
         // Utilisation de md5 pour des raisons historiques. Les données ne sont pas sensibles.
-        return $this->importUniqueidPrefix . $aidToImport['intervention_id'];
+        return $this->importUniqueidPrefix.$aidToImport['intervention_id'];
     }
 
     /**
@@ -106,7 +106,7 @@ class ImportFluxPaysLoireCommand extends ImportFluxCommand
             $contactFullName .= $aidToImport['contact_prenom'];
         }
         if (!empty($aidToImport['contact_nom'])) {
-            $contactFullName .= ' ' . $aidToImport['contact_nom'];
+            $contactFullName .= ' '.$aidToImport['contact_nom'];
         }
         $aidToImport['contact_fullname'] = $contactFullName;
         $contact1 = $this->concatHtmlFields(
@@ -123,10 +123,10 @@ class ImportFluxPaysLoireCommand extends ImportFluxCommand
             ? $this->getHtmlOrNull($aidToImport['informations_contact'])
             : null;
         $contact =
-            (string) $contact1 . '<br /><br />' .
+            (string) $contact1.'<br /><br />'.
             (string) $contact2;
         if (!empty($contactDetails)) {
-            $contact .= '<br /><br />' . (string) $contactDetails;
+            $contact .= '<br /><br />'.(string) $contactDetails;
         }
         $description = $this->concatHtmlFields(
             $aidToImport,
@@ -136,7 +136,7 @@ class ImportFluxPaysLoireCommand extends ImportFluxCommand
 
         $return = [
             'importDataMention' => 'Ces données sont mises à disposition par '
-                . 'le Conseil régional des Pays de la Loire.',
+                .'le Conseil régional des Pays de la Loire.',
             'name' => !empty($aidToImport['aide_nom'])
                 ? $this->cleanName($aidToImport['aide_nom']) : null,
             'nameInitial' => !empty($aidToImport['aide_nom'])
@@ -150,7 +150,6 @@ class ImportFluxPaysLoireCommand extends ImportFluxCommand
                 ? $this->getValidExternalUrlOrNull($aidToImport['source_lien']) : null,
             'dateStart' => $dateStart,
             'dateSubmissionDeadline' => $dateSubmissionDeadline,
-
         ];
 
         // on ajoute les données brut d'import pour comparer avec les données actuelles
@@ -159,8 +158,6 @@ class ImportFluxPaysLoireCommand extends ImportFluxCommand
 
     /**
      * @param array<mixed, mixed> $aidToImport
-     * @param Aid $aid
-     * @return Aid
      */
     protected function setCategories(array $aidToImport, Aid $aid): Aid
     {
@@ -183,17 +180,17 @@ class ImportFluxPaysLoireCommand extends ImportFluxCommand
     {
         $mapping = [];
         $filename = '/src/Command/ImportFlux/datas/pays_de_la_loire_categories_mapping.csv';
-        if (($handle = fopen($this->fileService->getProjectDir() . $filename, 'r')) !== false) {
+        if (($handle = fopen($this->fileService->getProjectDir().$filename, 'r')) !== false) {
             // Lire l'en-tête
-            $header = fgetcsv($handle, 1000, ",");
+            $header = fgetcsv($handle, 1000, ',');
 
             // Trouver les index des colonnes nécessaires
-            $indexPaysLoire = array_search("Sous-thématique Pays de la Loire", $header);
-            $indexAT1 = array_search("Sous-thématique AT 1", $header);
-            $indexAT2 = array_search("Sous-thématique AT 2", $header);
+            $indexPaysLoire = array_search('Sous-thématique Pays de la Loire', $header);
+            $indexAT1 = array_search('Sous-thématique AT 1', $header);
+            $indexAT2 = array_search('Sous-thématique AT 2', $header);
 
             // Lire les lignes suivantes
-            while (($data = fgetcsv($handle, 1000, ",")) !== false) {
+            while (($data = fgetcsv($handle, 1000, ',')) !== false) {
                 $mapping[$data[$indexPaysLoire]] = [];
                 if (!empty($data[$indexAT1])) {
                     $mapping[$data[$indexPaysLoire]][] = $data[$indexAT1];
@@ -230,8 +227,6 @@ class ImportFluxPaysLoireCommand extends ImportFluxCommand
 
     /**
      * @param array<mixed, mixed> $aidToImport
-     * @param Aid $aid
-     * @return Aid
      */
     protected function setAidTypes(array $aidToImport, Aid $aid): Aid
     {
@@ -265,18 +260,17 @@ class ImportFluxPaysLoireCommand extends ImportFluxCommand
     }
 
     /**
-     *
      * @param array<mixed, mixed> $aidToImport
-     * @param Aid $aid
-     * @return Aid
      */
     protected function setAidRecurrence(array $aidToImport, Aid $aid): Aid
     {
         $temporalite = $aidToImport['temporalite'] ?? null;
 
-        if ($temporalite == 'Permanent') {
+        if ($aid->getDateStart() instanceof \DateTime && $aid->getDateSubmissionDeadline() instanceof \DateTime) {
+            $aid->setAidRecurrence($this->aidRecurrenceOneOff);
+        } elseif ('Permanent' == $temporalite) {
             $aid->setAidRecurrence($this->aidRecurrenceOnGoing);
-        } elseif ($temporalite == 'Temporaire') {
+        } elseif ('Temporaire' == $temporalite) {
             $aid->setAidRecurrence($this->aidRecurrenceOneOff);
         }
 
@@ -300,10 +294,7 @@ class ImportFluxPaysLoireCommand extends ImportFluxCommand
     }
 
     /**
-     *
      * @param array<mixed, mixed> $aidToImport
-     * @param Aid $aid
-     * @return Aid
      */
     protected function setAidAudiences(array $aidToImport, Aid $aid): Aid
     {
