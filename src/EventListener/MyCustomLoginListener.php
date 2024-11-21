@@ -20,7 +20,7 @@ class MyCustomLoginListener
         private UserService $userService,
         private MatomoService $matomoService,
         private ParamService $paramService,
-        private RequestStack $requestStack
+        private RequestStack $requestStack,
     ) {
     }
 
@@ -48,7 +48,7 @@ class MyCustomLoginListener
                     'user' => $user,
                     'action' => LogUserLogin::ACTION_LOGIN,
                     'type' => $autoLogin ? LogUserLogin::TYPE_AUTOLOGIN : null,
-                    'noFlush' => true
+                    'noFlush' => true,
                 ]
             );
 

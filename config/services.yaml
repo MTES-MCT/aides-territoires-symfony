@@ -69,21 +69,17 @@ services:
     # Register the LogoutListener service
     App\EventListener\MyCustomLogoutListener:
         tags:
-            - name: 'kernel.event_listener'
-              event: 'Symfony\Component\Security\Http\Event\LogoutEvent'
-              dispatcher: security.event_dispatcher.main
+            - { name: 'kernel.event_listener', event: 'Symfony\Component\Security\Http\Event\LogoutEvent', dispatcher: 'security.event_dispatcher.main' }
+            - { name: 'kernel.event_listener', event: 'Symfony\Component\Security\Http\Event\LogoutEvent', dispatcher: 'security.event_dispatcher.admin' }
 
     # Register the LoginListener service
     App\EventListener\MyCustomLoginListener:
         tags:
-            - name: 'kernel.event_listener'
-              event: 'Symfony\Component\Security\Http\Event\LoginSuccessEvent'
-              dispatcher: security.event_dispatcher.main
-            # - name: 'kernel.event_listener'
-            #   event: 'Symfony\Component\Security\Core\Event\AuthenticationSuccessEvent'
-            #   dispatcher: security.event_dispatcher.main
-            # - event: 'security.authentication.success'
-            #   name: 'kernel.event_listener'    
+            - { name: 'kernel.event_listener', event: 'Symfony\Component\Security\Http\Event\LoginSuccessEvent', dispatcher: 'security.event_dispatcher.main' }
+
+    App\EventListener\TwoFactorAuthenticationListener:
+        tags:
+            - { name: 'kernel.event_listener', event: 'scheb_two_factor.authentication.success', method: 'onTwoFactorAuthenticationSuccess' }
 
     App\EventListener\RouteListener:
         tags:

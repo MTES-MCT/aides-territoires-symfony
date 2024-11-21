@@ -14,8 +14,10 @@ class LogAdminAction
 {
     public const ACTION_FLAG_INSERT = 1;
     public const ACTION_FLAG_UPDATE = 2;
-    public const ACITON_FLAG_DELETE = 3;
-
+    public const ACTION_FLAG_DELETE = 3;
+    public const ACTION_FLAG_LOGIN = 4;
+    public const ACTION_FLAG_LOGOUT = 5;
+    
     public const FIREWALL_ADMIN_NAME = 'admin';
 
     public const NOT_ADMIN_LOGGED_FIELDS = [
