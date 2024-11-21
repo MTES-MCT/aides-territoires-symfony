@@ -17,7 +17,6 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Asset\Packages;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
-use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 
@@ -28,7 +27,6 @@ final class RouteListener
         private PageRepository $pageRepository,
         private SearchPageRepository $searchPageRepository,
         private RouterInterface $routerInterface,
-        private KernelInterface $kernelInterface,
         private ParamService $paramService,
         private Packages $packages,
         private NotificationService $notificationService
@@ -161,7 +159,7 @@ final class RouteListener
     private function handleRedirect(RequestEvent $event): void
     {
         // url demandée
-        $url = urldecode($event->getRequest()->getRequestUri()) ?? null;
+        $url = urldecode($event->getRequest()->getRequestUri());
 
         $urlRedirectRepository = $this->entityManagerInterface->getRepository(UrlRedirect::class);
 
@@ -181,7 +179,11 @@ final class RouteListener
                 $logUrlRedirect->setIp($event->getRequest()->getClientIp() ?? null);
                 $logUrlRedirect->setReferer($event->getRequest()->headers->get('referer') ?? null);
                 $logUrlRedirect->setUserAgent($event->getRequest()->headers->get('user-agent') ?? null);
-                $logUrlRedirect->setRequestUri($event->getRequest()->getRequestUri() ?? null);
+                $logUrlRedirect->setRequestUri(
+                    !empty($event->getRequest()->getRequestUri())
+                        ? $event->getRequest()->getRequestUri()
+                        : null
+                );
                 $this->entityManagerInterface->persist($logUrlRedirect);
                 $this->entityManagerInterface->flush();
 
@@ -200,7 +202,7 @@ final class RouteListener
     private function handlePage(RequestEvent $event): void
     {
         // url demandée
-        $url = urldecode($event->getRequest()->getRequestUri()) ?? null;
+        $url = urldecode($event->getRequest()->getRequestUri());
 
         $page = $this->pageRepository->findOneBy(
             [
@@ -227,7 +229,7 @@ final class RouteListener
 
     private function handleDjangoStatic(RequestEvent $event): void
     {
-        $url = urldecode($event->getRequest()->getRequestUri()) ?? null;
+        $url = urldecode($event->getRequest()->getRequestUri());
 
         $newFaviconSvg = 'build/images/favicon/favicon.svg';
         $known404 = [
@@ -242,7 +244,6 @@ final class RouteListener
             '/static/favicons/favicon.12acb9fc12ee.ico' => $this->packages->getUrl('build/images/favicon/favicon.ico'),
             '/app/public/static/favicons/favicon.12acb9fc12ee.ico' =>
                 $this->packages->getUrl('build/images/favicon/favicon.ico'),
-            '/static/favicons/favicon.12acb9fc12ee.ico' => $this->packages->getUrl('build/images/favicon/favicon.ico'),
             '/static/favicons/favicon.05f90bae01cd.png' => $this->packages->getUrl($newFaviconSvg),
             '/app/public/static/favicons/favicon.05f90bae01cd.png' => $this->packages->getUrl($newFaviconSvg),
             '/favicon.ico' => $this->packages->getUrl('build/images/favicon/favicon.ico'),

@@ -15,7 +15,6 @@ use Doctrine\ORM\Event\PrePersistEventArgs;
 use Doctrine\ORM\Event\PreRemoveEventArgs;
 use Doctrine\Persistence\ManagerRegistry;
 use Psr\Log\LoggerInterface;
-use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class UserListener
 {
@@ -23,7 +22,6 @@ class UserListener
         private ManagerRegistry $managerRegistry,
         private UrlGeneratorInterface $urlGeneratorInterface,
         private ParamService $paramService,
-        private HttpClientInterface $httpClientInterface,
         private EmailService $emailService,
         private MatomoService $matomoService,
         private NotificationService $notificationService,
@@ -117,7 +115,7 @@ class UserListener
             );
 
             // Matomo trackGoal
-            $this->matomoService->trackGoal($this->paramService->get('goal_register_id'));
+            $this->matomoService->trackGoal((int) $this->paramService->get('goal_register_id'));
         } catch (\Exception $e) {
             $this->loggerInterface->error('Erreur dans le postPersist User', [
                 'exception' => $e,

@@ -28,6 +28,7 @@ framework:
             'App\Message\Alert\AlertMessage': async
             'App\Message\Alert\AlertResume': async
             'App\Message\Export\MsgSpreadsheetToExport': async
+            'App\Message\Log\MsgDeleteOldLogAdmin': async
             'App\Message\Log\MsgLogAidSearchTempTransfert': async
             'App\Message\Log\MsgLogAidViewTempTransfert': async
             'App\Message\Reference\ProjectReferenceCountAids': async
