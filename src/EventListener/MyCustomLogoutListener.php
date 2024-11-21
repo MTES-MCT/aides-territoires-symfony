@@ -14,9 +14,6 @@ use Symfony\Component\Security\Http\Event\LogoutEvent;
 
 class MyCustomLogoutListener
 {
-    protected $entityManager;
-    protected $tools;
-
     public function __construct(
         private UserService $userService,
         private ProConnectService $proConnectService,
@@ -36,7 +33,10 @@ class MyCustomLogoutListener
             );
 
             // on regarde si on est sur le firewall admin
-            if ($this->security->getFirewallConfig($logoutEvent->getRequest())->getName() === LogAdminAction::FIREWALL_ADMIN_NAME) {
+            if (
+                $this->security->getFirewallConfig($logoutEvent->getRequest())->getName()
+                === LogAdminAction::FIREWALL_ADMIN_NAME
+            ) {
                 /** @var User $user */
                 $user = $logoutEvent->getToken()->getUser();
 
@@ -47,11 +47,11 @@ class MyCustomLogoutListener
                 $logAdminAction->setObjectRepr($user->getFirstname());
                 $logAdminAction->setActionFlag(LogAdminAction::ACTION_FLAG_LOGOUT);
                 $logAdminAction->setAdmin($user);
-    
+
                 $this->managerRegistry->getManager()->persist($logAdminAction);
                 $this->managerRegistry->getManager()->flush();
             }
-            
+
             // On déconnecte sur ProConnect si besoin
             $proConnectLogoutUrl = $this->proConnectService->getLogoutUrl();
             if ($proConnectLogoutUrl) {

@@ -60,7 +60,7 @@ class AidListener
                     $this->emailService->sendEmailViaApi(
                         $aid->getAuthor()->getEmail(),
                         $aid->getAuthor()->getFirstname() . ' ' . $aid->getAuthor()->getLastname(),
-                        $this->paramService->get('sib_publication_email_template_id'),
+                        (int) $this->paramService->get('sib_publication_email_template_id'),
                         [
                             'PRENOM' => $aid->getAuthor()->getFirstname(),
                             'NOM' => $aid->getAuthor()->getLastname(),
@@ -95,7 +95,7 @@ class AidListener
         }
     }
 
-    private function handleSlugUpdate(PostUpdateEventArgs $args)
+    private function handleSlugUpdate(PostUpdateEventArgs $args): void
     {
         /** @var Aid $aid */
         $aid = $args->getObject();

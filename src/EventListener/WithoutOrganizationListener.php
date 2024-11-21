@@ -4,11 +4,12 @@ namespace App\EventListener;
 
 use App\Controller\FrontController;
 use App\Entity\Organization\OrganizationInvitation;
-use App\Repository\Page\PageRepository;
+use App\Repository\Organization\OrganizationInvitationRepository;
 use App\Service\User\UserService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\Routing\RouterInterface;
 
@@ -16,7 +17,6 @@ final class WithoutOrganizationListener
 {
     public function __construct(
         private EntityManagerInterface $entityManagerInterface,
-        private PageRepository $pageRepository,
         private UserService $userService,
         private RouterInterface $routerInterface,
         private RequestStack $requestStack,
@@ -27,7 +27,7 @@ final class WithoutOrganizationListener
         RequestEvent $event
     ): void {
         // url demandée
-        $url = urldecode($event->getRequest()->getRequestUri()) ?? null;
+        $url = urldecode($event->getRequest()->getRequestUri());
         $urlsAuthorized = [
             '/comptes/structure/information/',
             '/comptes/structure/invitations/',
@@ -53,6 +53,7 @@ final class WithoutOrganizationListener
                 );
 
                 // regarde si cet utilisateur à été invité à rejoindre une structure
+                /** @var OrganizationInvitationRepository $organizationInvitationRepo */
                 $organizationInvitationRepo = $this->entityManagerInterface
                     ->getRepository(OrganizationInvitation::class);
                 $hasPendingInvitations = $organizationInvitationRepo->userHasPendingInvitation($user);

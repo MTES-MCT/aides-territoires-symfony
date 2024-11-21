@@ -143,7 +143,7 @@ class LogAdminAction
     }
 
     /**
-     * @param string[]|null $changeMessage
+     * @param array<mixed>|null $changeMessage
      * @return static
      */
     public function setChangeMessage(?array $changeMessage): static
