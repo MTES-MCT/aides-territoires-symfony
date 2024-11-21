@@ -38,7 +38,7 @@ class EasyAdminSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function beforePerimeterImporterCreate(BeforeEntityPersistedEvent $event)
+    public function beforePerimeterImporterCreate(BeforeEntityPersistedEvent $event): void
     {
         $entity = $event->getEntityInstance();
 
@@ -65,7 +65,7 @@ class EasyAdminSubscriber implements EventSubscriberInterface
     }
 
 
-    public function onBeforeEntityUpdated(BeforeEntityUpdatedEvent $event)
+    public function onBeforeEntityUpdated(BeforeEntityUpdatedEvent $event): void
     {
         // l'entite
         $entity = $event->getEntityInstance();

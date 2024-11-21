@@ -12,16 +12,13 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 
 class BannedUserSubscriber implements EventSubscriberInterface
 {
-    private $urlGenerator;
-    private $tokenStorage;
-
-    public function __construct(UrlGeneratorInterface $urlGenerator, TokenStorageInterface $tokenStorage)
-    {
-        $this->urlGenerator = $urlGenerator;
-        $this->tokenStorage = $tokenStorage;
+    public function __construct(
+        private UrlGeneratorInterface $urlGenerator,
+        private TokenStorageInterface $tokenStorage
+    ) {
     }
 
-    public function onKernelRequest(RequestEvent $event)
+    public function onKernelRequest(RequestEvent $event): void
     {
         $token = $this->tokenStorage->getToken();
         $user = $token ? $token->getUser() : null;
