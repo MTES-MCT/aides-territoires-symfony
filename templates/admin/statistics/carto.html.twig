@@ -63,9 +63,11 @@
 			{% cspscript %}
 			<script data-map-target="departments" data-src="{{ asset('build/datas/geojson/departements-1000m.geojson') }}"></script>
 			{% endcspscript %}
-			{% cspscript %}
-			<script data-map-target="communes" {% for code in departments_codes %} data-src- {{ code }}="{{ asset('build/datas/geojson/communes-1000m-' ~ code ~ '.geojson') }}" {% endfor %}></script>
-			{% endcspscript %}
+			{% for code in departments_codes %}
+				{% cspscript %}
+					<script data-map-target="communes" data-src-{{ code }}="{{ asset('build/datas/geojson/communes-1000m-' ~ code ~ '.geojson') }}" ></script>
+				{% endcspscript %}
+			{% endfor %}
 			<div data-map-target="tables"></div>
 		</div>
 	</section>
