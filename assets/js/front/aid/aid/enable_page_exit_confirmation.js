@@ -1,37 +1,44 @@
 // Only requires exit confirmation if something was changed.
-function enableExitConfirmation (aidEditForm) {
-    var initialData = aidEditForm.serialize();
-    var eventAttached = false;
+function enableExitConfirmation(aidEditForm) {
+    const initialData = aidEditForm.serialize();
+    let eventAttached = false;
 
-    aidEditForm.on('change', function () {
-
-        // Don't bother if the event was already bound
+    function checkForChanges() {
         if (eventAttached) return;
 
-        // Was some form data actually changed?
-        var newData = aidEditForm.serialize();
-        var changed = initialData != newData;
-        if (changed) {
+        const newData = aidEditForm.serialize();
+        const changed = initialData !== newData;
 
-            // If so, bind the "onbeforeunload" event
-            $(window).bind('beforeunload', function () {
-                return "Êtes-vous certain de vouloir quitter cette page ? Vos modifications seront perdues.";
-            });
+        if (changed) {
+            // Attach the "beforeunload" event if something changed
+            $(window).on('beforeunload', handleBeforeUnload);
+            eventAttached = true;
         }
-    });
-};
+    }
+
+    function handleBeforeUnload() {
+        return "Êtes-vous certain de vouloir quitter cette page ? Vos modifications seront perdues.";
+    }
+
+    // Listen for changes in the form
+    aidEditForm.on('change', checkForChanges);
+
+    // Listen for changes in Trumbowyg editors
+    aidEditForm.find('.trumbowyg').on('tbwchange tbwblur', checkForChanges);
+}
 
 // Unbind the exit confirmation
 function disableExitConfirmation() {
-    $(window).unbind('beforeunload');
-};
+    $(window).off('beforeunload');
+}
 
-$(document).ready(function () {
-    // Prevent status update when edit form was modified
-    // to prevent data loss.
-    var aidEditForm = $('form.form-aid');
-    enableExitConfirmation(aidEditForm);
+$(function(){
+    const aidEditForm = $('form.form-aid');
 
-    // Don't ask for a confirmation if the form was submitted
-    aidEditForm.on('submit', disableExitConfirmation);
+    if (aidEditForm.length) {
+        enableExitConfirmation(aidEditForm);
+
+        // Don't ask for confirmation if the form was submitted
+        aidEditForm.on('submit', disableExitConfirmation);
+    }
 });

@@ -37,6 +37,9 @@ class BackerCategory
     #[Gedmo\Timestampable(on: 'create')]
     private ?\DateTimeInterface $timeCreate = null;
 
+    /**
+     * @var Collection<int, BackerSubcategory>
+     */
     #[ORM\OneToMany(mappedBy: 'backerCategory', targetEntity: BackerSubcategory::class)]
     private Collection $backerSubcategories;
 
@@ -118,7 +121,10 @@ class BackerCategory
 
     public function removeBackerSubcategory(BackerSubcategory $backerSubcategory): static
     {
-        if ($this->backerSubcategories->removeElement($backerSubcategory) && $backerSubcategory->getBackerCategory() === $this) {
+        if (
+            $this->backerSubcategories->removeElement($backerSubcategory)
+            && $backerSubcategory->getBackerCategory() === $this
+        ) {
             $backerSubcategory->setBackerCategory(null);
         }
 

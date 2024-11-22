@@ -1,4 +1,5 @@
 <?php
+
 // src/Security/ApiKeyAuthenticator.php
 namespace App\Security;
 

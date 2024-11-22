@@ -4,6 +4,7 @@ namespace App\Controller\User;
 
 use App\Controller\FrontController;
 use App\Entity\Aid\AidProject;
+use App\Entity\Aid\AidSuggestedAidProject;
 use App\Entity\Perimeter\Perimeter;
 use App\Entity\Project\Project;
 use App\Entity\Reference\ProjectReference;
@@ -15,6 +16,7 @@ use App\Form\User\Project\ProjectDeleteType;
 use App\Form\User\Project\ProjectExportType;
 use App\Message\User\MsgProjectExportAids;
 use App\Repository\Aid\AidProjectRepository;
+use App\Repository\Aid\AidSuggestedAidProjectRepository;
 use App\Repository\Project\ProjectRepository;
 use App\Repository\Project\ProjectValidatedRepository;
 use App\Security\Voter\InternalRequestVoter;
@@ -40,7 +42,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class ProjectController extends FrontController
 {
-    const NB_PROJECT_BY_PAGE = 30;
+    public const NB_PROJECT_BY_PAGE = 30;
 
     #[Route('/projets/vos-projets/', name: 'old_app_user_project_structure')]
     public function oldIndex(): RedirectResponse
@@ -73,16 +75,22 @@ class ProjectController extends FrontController
                             $notificationService->addNotification(
                                 $beneficiary,
                                 'Un projet a été supprimé',
-                                '<p>
-                                ' . $user->getFirstname() . ' ' . $user->getLastname() . ' a supprimé le projet ' . $project->getName() . '.
-                                </p>'
+                                '<p>'
+                                . $user->getFirstname()
+                                . ' '
+                                . $user->getLastname()
+                                . ' a supprimé le projet '
+                                . $project->getName()
+                                . '.</p>'
                             );
                         }
                     }
                 }
 
                 // suppression
-                $managerRegistry->getManager()->remove($projectRepository->find($formDeleteProject->get('idProject')->getData()));
+                $managerRegistry->getManager()->remove(
+                    $projectRepository->find($formDeleteProject->get('idProject')->getData())
+                );
                 $managerRegistry->getManager()->flush();
 
                 // message
@@ -135,10 +143,14 @@ class ProjectController extends FrontController
     }
 
 
-    #[Route('/comptes/projets/details/{id}-{slug}/', name: 'app_user_project_details_fiche_projet', requirements: ['id' => '[0-9]+', 'slug' => '[a-zA-Z0-9\-_]+'])]
+    #[Route(
+        '/comptes/projets/details/{id}-{slug}/',
+        name: 'app_user_project_details_fiche_projet',
+        requirements: ['id' => '[0-9]+', 'slug' => '[a-zA-Z0-9\-_]+']
+    )]
     public function details(
-        $id,
-        $slug,
+        int $id,
+        string $slug,
         ProjectRepository $ProjectRepository,
         RequestStack $requestStack,
         UserService $userService,
@@ -154,7 +166,10 @@ class ProjectController extends FrontController
         );
         $user = $userService->getUserLogged();
 
-        if (!$project instanceof Project || !$userService->isMemberOfOrganization($project->getOrganization(), $user)) {
+        if (
+            !$project instanceof Project
+            || !$userService->isMemberOfOrganization($project->getOrganization(), $user)
+        ) {
             return $this->redirectToRoute('app_user_project_structure');
         }
 
@@ -166,7 +181,9 @@ class ProjectController extends FrontController
                 // traitement image
                 $imageFile = $form->get('imageUploadedFile')->getData();
                 if ($imageFile instanceof UploadedFile) {
-                    $project->setImage(Project::FOLDER . '/' . $imageService->getSafeFileName($imageFile->getClientOriginalName()));
+                    $project->setImage(
+                        Project::FOLDER . '/' . $imageService->getSafeFileName($imageFile->getClientOriginalName())
+                    );
                     $imageService->sendUploadedImageToCloud($imageFile, Project::FOLDER, $project->getImage());
                 }
 
@@ -192,8 +209,20 @@ class ProjectController extends FrontController
                                 $beneficiary,
                                 'Un projet a été mis à jour',
                                 '<p>
-                                ' . $user->getFirstname() . ' ' . $user->getLastname() . ' a modifié les informations du projet
-                                <a href="' . $this->generateUrl('app_user_project_details_fiche_projet', ['id' => $project->getId(), 'slug' => $project->getSlug()], UrlGeneratorInterface::ABSOLUTE_URL) . '">' . $project->getName() . '</a>.
+                                ' . $user->getFirstname()
+                                . ' '
+                                . $user->getLastname()
+                                . ' a modifié les informations du projet
+                                <a href="'
+                                . $this->generateUrl(
+                                    'app_user_project_details_fiche_projet',
+                                    [
+                                        'id' => $project->getId(),
+                                        'slug' => $project->getSlug()
+                                    ],
+                                    UrlGeneratorInterface::ABSOLUTE_URL
+                                )
+                                . '">' . $project->getName() . '</a>.
                                 </p>'
                             );
                         }
@@ -248,7 +277,11 @@ class ProjectController extends FrontController
                 // traitement image
                 $imageFile = $form->get('imageUploadedFile')->getData();
                 if ($imageFile instanceof UploadedFile) {
-                    $project->setImage(Project::FOLDER . '/' . $imageService->getSafeFileName($imageFile->getClientOriginalName()));
+                    $project->setImage(
+                        Project::FOLDER
+                        . '/'
+                        . $imageService->getSafeFileName($imageFile->getClientOriginalName())
+                    );
                     $imageService->sendUploadedImageToCloud($imageFile, Project::FOLDER, $project->getImage());
                 }
 
@@ -276,7 +309,16 @@ class ProjectController extends FrontController
                             'Un projet a été créé',
                             '<p>
                             ' . $user->getFirstname() . ' ' . $user->getLastname() . ' a créé le projet
-                            <a href="' . $this->generateUrl('app_user_project_details_fiche_projet', ['id' => $project->getId(), 'slug' => $project->getSlug()], UrlGeneratorInterface::ABSOLUTE_URL) . '">' . $project->getName() . '</a>.
+                            <a href="'
+                            . $this->generateUrl(
+                                'app_user_project_details_fiche_projet',
+                                [
+                                    'id' => $project->getId(),
+                                    'slug' => $project->getSlug()
+                                ],
+                                UrlGeneratorInterface::ABSOLUTE_URL
+                            )
+                            . '">' . $project->getName() . '</a>.
                             </p>'
                         );
                     }
@@ -313,9 +355,13 @@ class ProjectController extends FrontController
     }
 
 
-    #[Route('/comptes/projets/aides/{id}-{slug}/', name: 'app_user_project_aides', requirements: ['id' => '[0-9]+', 'slug' => '[a-zA-Z0-9\-_]+'])]
+    #[Route(
+        '/comptes/projets/aides/{id}-{slug}/',
+        name: 'app_user_project_aides',
+        requirements: ['id' => '[0-9]+', 'slug' => '[a-zA-Z0-9\-_]+']
+    )]
     public function aides(
-        $id,
+        int $id,
         ProjectRepository $ProjectRepository,
         UserService $userService,
         RequestStack $requestStack,
@@ -337,7 +383,10 @@ class ProjectController extends FrontController
         );
         $user = $userService->getUserLogged();
 
-        if (!$project instanceof Project || !$userService->isMemberOfOrganization($project->getOrganization(), $user)) {
+        if (
+            !$project instanceof Project
+            || !$userService->isMemberOfOrganization($project->getOrganization(), $user)
+        ) {
             return $this->redirectToRoute('app_user_project_structure');
         }
 
@@ -364,7 +413,10 @@ class ProjectController extends FrontController
             $searchParams['keyword'] = $aidParams['keyword'];
 
             // regarde si le projet à un projet référent associé pour écraser la recherche
-            if ($project->getProjectReference() instanceof ProjectReference && $project->getProjectReference()->getName()) {
+            if (
+                $project->getProjectReference() instanceof ProjectReference
+                && $project->getProjectReference()->getName()
+            ) {
                 $aidParams['keyword'] = $project->getProjectReference()->getName();
                 $aidParams['projectReference'] = $project->getProjectReference();
                 $searchParams['keyword'] = $aidParams['keyword'];
@@ -372,7 +424,7 @@ class ProjectController extends FrontController
 
             $aidsSuggested = $aidService->searchAids($aidParams);
             if (count($aidsSuggested) > 0) {
-                $requestStack->getCurrentRequest()->getSession()->set('highlightedWords', $referenceService->getHighlightedWords($aidParams['keyword']));
+                $referenceService->setHighlightedWords(null, $aidParams['keyword']);
             }
         }
 
@@ -383,7 +435,11 @@ class ProjectController extends FrontController
             if ($formAidProjectDelete->isValid()) {
                 // suppression
                 $aidProject = $aidProjectRepository->find($formAidProjectDelete->get('idAidProject')->getData());
-                if ($aidProject instanceof AidProject && $aidProject->getProject() && $aidProject->getProject()->getId() == $project->getId()) {
+                if (
+                    $aidProject instanceof AidProject
+                    && $aidProject->getProject()
+                    && $aidProject->getProject()->getId() == $project->getId()
+                ) {
                     $managerRegistry->getManager()->remove($aidProject);
                     $managerRegistry->getManager()->flush();
                 }
@@ -396,7 +452,16 @@ class ProjectController extends FrontController
                                 'Une aide a été supprimée d’un projet',
                                 '<p>
                                 ' . $user->getFirstname() . ' ' . $user->getLastname() . ' a supprimé une aide du projet
-                                <a href="' . $this->generateUrl('app_user_project_details_fiche_projet', ['id' => $project->getId(), 'slug' => $project->getSlug()], UrlGeneratorInterface::ABSOLUTE_URL) . '">' . $project->getName() . '</a>.
+                                <a href="'
+                                . $this->generateUrl(
+                                    'app_user_project_details_fiche_projet',
+                                    [
+                                        'id' => $project->getId(),
+                                        'slug' => $project->getSlug()
+                                    ],
+                                    UrlGeneratorInterface::ABSOLUTE_URL
+                                )
+                                . '">' . $project->getName() . '</a>.
                                 </p>'
                             );
                         }
@@ -468,19 +533,25 @@ class ProjectController extends FrontController
             if ($formExportProject->isValid()) {
                 // Si plus de 10 aides, on passe par le worker
                 if (count($project->getAidProjects()) > $nbMaxAids) {
-                    $bus->dispatch(new MsgProjectExportAids($user->getId(), $project->getId(), $formExportProject->get('format')->getData()));
-                    $this->addFlash(FrontController::FLASH_SUCCESS, 'Votre export est en cours de traitement, vous recevrez un email dès qu\'il sera prêt.');
+                    $bus->dispatch(
+                        new MsgProjectExportAids(
+                            $user->getId(),
+                            $project->getId(),
+                            $formExportProject->get('format')->getData()
+                        )
+                    );
+                    $this->addFlash(
+                        FrontController::FLASH_SUCCESS,
+                        'Votre export est en cours de traitement, vous recevrez un email dès qu\'il sera prêt.'
+                    );
                 } else {
                     switch ($formExportProject->get('format')->getData()) {
                         case FileService::FORMAT_CSV:
                             return $spreadsheetExporterService->exportProjectAids($project, FileService::FORMAT_CSV);
-                            break;
                         case FileService::FORMAT_XLSX:
                             return $spreadsheetExporterService->exportProjectAids($project, FileService::FORMAT_XLSX);
-                            break;
                         case FileService::FORMAT_PDF:
                             return $this->exportAidsToPdf($project, $projectService);
-                            break;
                         default:
                             $this->addFlash(FrontController::FLASH_ERROR, 'Format non supporté');
                     }
@@ -530,10 +601,208 @@ class ProjectController extends FrontController
         return $response;
     }
 
-    #[Route('/comptes/projets/similaires/{id}-{slug}/', name: 'app_user_project_similaires', requirements: ['id' => '[0-9]+', 'slug' => '[a-zA-Z0-9\-_]+'])]
+
+    #[Route(
+        '/comptes/projets/accepter-aide-suggeree/{id}-{slug}/{idSuggested}',
+        name: 'app_user_project_accept_suggested_aid',
+        requirements: [
+            'id' => '[0-9]+',
+            'slug' => '[a-zA-Z0-9\-_]+',
+            'idSuggested' => '[0-9]+',
+        ]
+    )]
+    public function acceptAidSuggested(
+        int $id,
+        string $slug,
+        int $idSuggested,
+        ProjectRepository $projectRepository,
+        AidSuggestedAidProjectRepository $aidSuggestedAidProjectRepository,
+        UserService $userService,
+        NotificationService $notificationService,
+        ManagerRegistry $managerRegistry
+    ): RedirectResponse {
+        // vérifie projet et appartenance
+        $project = $projectRepository->findOneBy(
+            [
+                'id' => $id
+            ]
+        );
+        $user = $userService->getUserLogged();
+
+        if (
+            !$project instanceof Project
+            || !$userService->isMemberOfOrganization($project->getOrganization(), $user)
+        ) {
+            $this->addFlash(FrontController::FLASH_ERROR, 'Vous n\'avez pas accès à ce projet.');
+
+            return $this->redirectToRoute('app_user_project_structure');
+        }
+
+        // charge la suggestion
+        $aidSuggestedAidProject = $aidSuggestedAidProjectRepository->findOneBy(
+            [
+                'id' => $idSuggested
+            ]
+        );
+        if (
+            !$aidSuggestedAidProject instanceof AidSuggestedAidProject
+            || $aidSuggestedAidProject->getProject() != $project
+        ) {
+            $this->addFlash(FrontController::FLASH_ERROR, 'Vous n\'avez pas accès à cette suggestion.');
+
+            return $this->redirectToRoute(
+                'app_user_project_aides',
+                [
+                    'id' => $project->getId(),
+                    'slug' => $project->getSlug()
+                ]
+            );
+        }
+
+        // Accepte la suggestion et ajoute l'aide au projet
+        $aidSuggestedAidProject->setIsAssociated(true);
+        $aidSuggestedAidProject->setTimeAssociated(new \DateTime());
+        $aidSuggestedAidProject->setIsRejected(false);
+        $aidSuggestedAidProject->setTimeRejected(null);
+        $managerRegistry->getManager()->persist($aidSuggestedAidProject);
+
+        // ajoute au projet
+        $aidProject = new AidProject();
+        $aidProject->setAid($aidSuggestedAidProject->getAid());
+        $aidProject->setCreator($user);
+        $project->addAidProject($aidProject);
+        $managerRegistry->getManager()->persist($project);
+
+        // sauvegarde
+        $managerRegistry->getManager()->flush();
+
+        // envoi notification à tous les autres membres de l'oganisation
+        if ($project->getOrganization()) {
+            foreach ($project->getOrganization()->getBeneficiairies() as $beneficiary) {
+                if ($beneficiary->getId() == $user->getId()) {
+                    continue;
+                }
+                $notificationService->addNotification(
+                    $beneficiary,
+                    'Nouvelle aide ajoutée à un projet',
+                    '<p>
+                    ' . $user->getFirstname()
+                    . ' '
+                    . $user->getLastname()
+                    . ' a ajouté une aide au projet
+                    <a href="'
+                    . $this->generateUrl(
+                        'app_user_project_details_fiche_projet',
+                        ['id' => $project->getId(), 'slug' => $project->getSlug()],
+                        UrlGeneratorInterface::ABSOLUTE_URL
+                    )
+                        . '">' . $project->getName() . '</a>.
+                    </p>'
+                );
+            }
+        }
+
+        // message flash
+        $this->addFlash(FrontController::FLASH_SUCCESS, 'L\'aide a bien été ajoutée.');
+
+        return $this->redirectToRoute(
+            'app_user_project_aides',
+            [
+                'id' => $project->getId(),
+                'slug' => $project->getSlug()
+            ]
+        );
+    }
+
+    #[Route(
+        '/comptes/projets/refuser-aide-suggeree/{id}-{slug}/{idSuggested}',
+        name: 'app_user_project_refuse_suggested_aid',
+        requirements: [
+            'id' => '[0-9]+',
+            'slug' => '[a-zA-Z0-9\-_]+',
+            'idSuggested' => '[0-9]+',
+        ]
+    )]
+    public function refuseAidSuggested(
+        int $id,
+        string $slug,
+        int $idSuggested,
+        ProjectRepository $projectRepository,
+        AidSuggestedAidProjectRepository $aidSuggestedAidProjectRepository,
+        UserService $userService,
+        ManagerRegistry $managerRegistry
+    ): RedirectResponse {
+        // vérifie projet et appartenance
+        $project = $projectRepository->findOneBy(
+            [
+                'id' => $id
+            ]
+        );
+        $user = $userService->getUserLogged();
+
+        if (
+            !$project instanceof Project
+            || !$userService->isMemberOfOrganization($project->getOrganization(), $user)
+        ) {
+            $this->addFlash(FrontController::FLASH_ERROR, 'Vous n\'avez pas accès à ce projet.');
+
+            return $this->redirectToRoute(
+                'app_user_project_aides',
+                [
+                    'id' => $project->getId(),
+                    'slug' => $project->getSlug()
+                ]
+            );
+        }
+
+        // charge la suggestion
+        $aidSuggestedAidProject = $aidSuggestedAidProjectRepository->findOneBy(
+            [
+                'id' => $idSuggested
+            ]
+        );
+        if (
+            !$aidSuggestedAidProject instanceof AidSuggestedAidProject
+            || $aidSuggestedAidProject->getProject() != $project
+        ) {
+                $this->addFlash(FrontController::FLASH_ERROR, 'Vous n\'avez pas accès à cette association.');
+                return $this->redirectToRoute(
+                    'app_user_project_aides',
+                    [
+                        'id' => $project->getId(),
+                        'slug' => $project->getSlug()
+                    ]
+                );
+        }
+
+        // refuse la suggestion
+        $aidSuggestedAidProject->setIsRejected(true);
+        $aidSuggestedAidProject->setTimeRejected(new \DateTime());
+        $aidSuggestedAidProject->setIsAssociated(false);
+        $aidSuggestedAidProject->setTimeAssociated(null);
+        $managerRegistry->getManager()->persist($aidSuggestedAidProject);
+        $managerRegistry->getManager()->flush();
+
+        // message flash
+        $this->addFlash(FrontController::FLASH_SUCCESS, 'L\'aide a bien été refusée.');
+
+        return $this->redirectToRoute(
+            'app_user_project_aides',
+            [
+                'id' => $project->getId(),
+                'slug' => $project->getSlug()
+            ]
+        );
+    }
+
+    #[Route(
+        '/comptes/projets/similaires/{id}-{slug}/',
+        name: 'app_user_project_similaires',
+        requirements: ['id' => '[0-9]+', 'slug' => '[a-zA-Z0-9\-_]+']
+    )]
     public function similaires(
-        $id,
-        $slug,
+        int $id,
+        string $slug,
         UserService $userService,
         ProjectValidatedRepository $projectValidatedRepository,
         ProjectRepository $projectRepository,
@@ -679,7 +948,7 @@ class ProjectController extends FrontController
 
     #[Route('/comptes/projets/{id}/unlock/', name: 'app_user_project_unlock', requirements: ['id' => '\d+'])]
     public function unlock(
-        $id,
+        int $id,
         ProjectRepository $projectRepository,
         UserService $userService,
         ProjectService $projectService
@@ -716,7 +985,14 @@ class ProjectController extends FrontController
             $this->addFlash(FrontController::FLASH_ERROR, 'Impossible de débloquer le projet');
 
             // retour
-            return $this->redirectToRoute('app_user_project_details_fiche_projet', ['id' => $project->getId(), 'slug' => $project->getSlug()]);
+            if (isset($project) && $project instanceof Project) {
+                return $this->redirectToRoute(
+                    'app_user_project_details_fiche_projet',
+                    ['id' => $project->getId(), 'slug' => $project->getSlug()]
+                );
+            } else {
+                return $this->redirectToRoute('app_user_project_structure');
+            }
         }
     }
 

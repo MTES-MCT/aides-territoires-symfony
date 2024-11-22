@@ -70,7 +70,8 @@ class AidEditType extends AbstractType
         // l'aide
         $aid = $options['data'] ?? null;
         // est en brouillon ?
-        $isDraft = ($aid instanceof Aid && $aid->getStatus() === Aid::STATUS_DRAFT) || ($aid instanceof Aid && !$aid->getId());
+        $isDraft = ($aid instanceof Aid && $aid->getStatus() === Aid::STATUS_DRAFT)
+            || ($aid instanceof Aid && !$aid->getId());
 
         // si aide déclinaison locale, on vérifie les champs sanctuarisés
         $sanctuarizedFields = [];
@@ -140,7 +141,12 @@ class AidEditType extends AbstractType
             $help = '<div class="fr-alert fr-alert--warning">' . $message;
             foreach ($user->getOrganizations() as $organization) {
                 if (!$organization->getBacker()) {
-                    $help .= '<br />- <a href="' . $this->routerInterface->generate('app_organization_backer_edit', ['id' => $organization->getId(), 'idBacker' => 0]) . '">' . $organization->getName() . '</a>';
+                    $help .= '<br />- <a href="'
+                        . $this->routerInterface->generate(
+                            'app_organization_backer_edit',
+                            ['id' => $organization->getId(), 'idBacker' => 0]
+                        )
+                        . '">' . $organization->getName() . '</a>';
                 }
             }
             $help .= '</div>';
@@ -148,14 +154,17 @@ class AidEditType extends AbstractType
             $organizationParams['help_html'] = true;
         }
 
-        $sanctuarizedFieldHelp = '<p class="fr-alert fr-alert--info fr-alert--sm">Ce champ à été sanctuarisé sur l\'aide originale. Il ne peut pas être modifié sur ses déclinaisons.</p>';
+        $sanctuarizedFieldHelp = '<p class="fr-alert fr-alert--info fr-alert--sm">'
+            . 'Ce champ à été sanctuarisé sur l\'aide originale. '
+            . 'Il ne peut pas être modifié sur ses déclinaisons.</p>';
 
         $builder
             ->add('name', TextType::class, [
                 'required' => true,
                 'label' => 'Nom',
                 'help_html' => true,
-                'help' => 'Le titre doit commencer par un verbe à l’infinitif pour que l’objectif de l’aide soit explicite vis-à-vis de ses bénéficiaires.'
+                'help' => 'Le titre doit commencer par un verbe à l’infinitif pour que l’objectif de l’aide '
+                    . 'soit explicite vis-à-vis de ses bénéficiaires.'
                     . (in_array('name', $sanctuarizedFields) ? $sanctuarizedFieldHelp : ''),
                 'attr' => [
                     'maxlength' => 180,
@@ -388,7 +397,8 @@ class AidEditType extends AbstractType
                 'required' => false,
                 'label' => 'Aide Payante',
                 'help_html' => true,
-                'help' => 'Ne pas cocher pour les aides sous adhésion et ajouter la mention « *sous adhésion » dans les critères d’éligibilité.'
+                'help' => 'Ne pas cocher pour les aides sous adhésion et ajouter la mention « *sous adhésion » '
+                    . 'dans les critères d’éligibilité.'
                     . (in_array('isCharged', $sanctuarizedFields) ? $sanctuarizedFieldHelp : ''),
                 'attr' => [
                     'readonly' => in_array('isCharged', $sanctuarizedFields) ? true : false
@@ -442,7 +452,8 @@ class AidEditType extends AbstractType
                     'required' => false,
                     'label' => 'Exemples d’applications ou de projets réalisés grâce à cette aide',
                     'help_html' => true,
-                    'help' => 'Afin d’aider les territoires à mieux comprendre votre aide, donnez ici quelques exemples concrets de projets réalisables ou réalisés.'
+                    'help' => 'Afin d’aider les territoires à mieux comprendre votre aide, '
+                        . 'donnez ici quelques exemples concrets de projets réalisables ou réalisés.'
                         . $sanctuarizedFieldHelp,
                 ]);
         } else {
@@ -451,9 +462,11 @@ class AidEditType extends AbstractType
                     'required' => false,
                     'label' => 'Exemples d’applications ou de projets réalisés grâce à cette aide',
                     'help_html' => true,
-                    'help' => 'Afin d’aider les territoires à mieux comprendre votre aide, donnez ici quelques exemples concrets de projets réalisables ou réalisés.',
+                    'help' => 'Afin d’aider les territoires à mieux comprendre votre aide, '
+                        . 'donnez ici quelques exemples concrets de projets réalisables ou réalisés.',
                     'attr' => [
-                        'placeholder' => 'Médiathèque, skatepark, accompagner des enfants en classe de neige, financer une usine de traitement des déchets, etc.',
+                        'placeholder' => 'Médiathèque, skatepark, accompagner des enfants en classe de neige, '
+                            . 'financer une usine de traitement des déchets, etc.',
                         'class' => 'trumbowyg',
                         'cols' => 40,
                         'rows' => 10,
@@ -468,7 +481,8 @@ class AidEditType extends AbstractType
                 'label' => 'Thématiques de l\'aide',
                 'placeholder' => 'Toutes les sous-thématiques',
                 'help_html' => true,
-                'help' => 'Sélectionnez la ou les thématiques associées à votre aide. N’hésitez pas à en choisir plusieurs.'
+                'help' => 'Sélectionnez la ou les thématiques associées à votre aide. '
+                    . 'N’hésitez pas à en choisir plusieurs.'
                     . (in_array('categories', $sanctuarizedFields) ? $sanctuarizedFieldHelp : ''),
                 'class' => Category::class,
                 'choice_label' => 'name',
@@ -486,7 +500,8 @@ class AidEditType extends AbstractType
                 'label' => 'Projet référent',
                 'placeholder' => 'Toutes projets référents',
                 'help_html' => true,
-                'help' => 'Si votre aide corresponds à un ou plusieurs de nos projets référents, sélectionnez-les ici. Ceci améliorera leur remontée dans les résultats de recherche.'
+                'help' => 'Si votre aide corresponds à un ou plusieurs de nos projets référents, sélectionnez-les ici. '
+                    . 'Ceci améliorera leur remontée dans les résultats de recherche.'
                     . (in_array('projectReferences', $sanctuarizedFields) ? $sanctuarizedFieldHelp : ''),
                 'class' => ProjectReference::class,
                 'choice_label' => 'name',
@@ -629,7 +644,8 @@ class AidEditType extends AbstractType
                 'required' => false,
                 'label' => 'Vous ne trouvez pas de zone géographique appropriée ?',
                 'help_html' => true,
-                'help' => 'Si vous ne trouvez pas de zone géographique suffisamment précise dans la liste existante, spécifiez « France » et décrivez brièvement ici le périmètre souhaité.'
+                'help' => 'Si vous ne trouvez pas de zone géographique suffisamment précise dans la liste existante, '
+                    . 'spécifiez « France » et décrivez brièvement ici le périmètre souhaité.'
                     . (in_array('perimeterSuggestion', $sanctuarizedFields) ? $sanctuarizedFieldHelp : ''),
                 'constraints' => [
                     new Length(max: 255)
@@ -755,17 +771,27 @@ class AidEditType extends AbstractType
     public function onSubmit(FormEvent $event): void
     {
         // si aide permanente, on force date ouverture et cloture à null
-        if ($event->getForm()->has('aidRecurrence') && $event->getForm()->get('aidRecurrence')->getData() && $event->getForm()->get('aidRecurrence')->getData()->getSlug() == AidRecurrence::SLUG_ONGOING) {
+        if (
+            $event->getForm()->has('aidRecurrence')
+            && $event->getForm()->get('aidRecurrence')->getData()
+            && $event->getForm()->get('aidRecurrence')->getData()->getSlug() == AidRecurrence::SLUG_ONGOING
+        ) {
             $event->getData()->setDateStart(null);
             $event->getData()->setDateSubmissionDeadline(null);
         }
 
         // vérifications subventions
-        $subventionRateMin = $event->getForm()->has('subventionRateMin') ? $event->getForm()->get('subventionRateMin')->getData() : null;
-        $subventionRateMax = $event->getForm()->has('subventionRateMax') ? $event->getForm()->get('subventionRateMax')->getData() : null;
+        $subventionRateMin = $event->getForm()->has('subventionRateMin')
+            ? $event->getForm()->get('subventionRateMin')->getData() : null;
+        $subventionRateMax = $event->getForm()->has('subventionRateMax')
+            ? $event->getForm()->get('subventionRateMax')->getData() : null;
         if ($subventionRateMin && $subventionRateMax && $subventionRateMin > $subventionRateMax) {
-            $event->getForm()->get('subventionRateMin')->addError(new FormError('Doit être inférieur au taux de subvention max'));
-            $event->getForm()->get('subventionRateMax')->addError(new FormError('Doit être supérieur au taux de subvention min'));
+            $event->getForm()->get('subventionRateMin')->addError(
+                new FormError('Doit être inférieur au taux de subvention max')
+            );
+            $event->getForm()->get('subventionRateMax')->addError(
+                new FormError('Doit être supérieur au taux de subvention min')
+            );
         }
 
         $aidTypes = $event->getForm()->has('aidTypes') ? $event->getForm()->get('aidTypes')->getData() : null;
@@ -792,47 +818,81 @@ class AidEditType extends AbstractType
             foreach ($fieldsToSwitch as $field) {
                 if ($event->getForm()->has($field)) {
                     if (!$event->getForm()->get($field)->getData()) {
-                        $event->getForm()->get($field)->addError(new FormError('Ce champ est obligatoire si votre aide n\'est pas en brouillon'));
+                        $event->getForm()->get($field)->addError(
+                            new FormError('Ce champ est obligatoire si votre aide n\'est pas en brouillon')
+                        );
                     }
                 }
             }
             foreach ($fieldsOneMin as $field) {
                 if ($event->getForm()->has($field)) {
                     if (count($event->getForm()->get($field)->getData()) < 1) {
-                        $event->getForm()->get($field)->addError(new FormError('Ce champ est obligatoire si votre aide n\'est pas en brouillon'));
+                        $event->getForm()->get($field)->addError(
+                            new FormError('Ce champ est obligatoire si votre aide n\'est pas en brouillon')
+                        );
                     }
                 }
             }
         }
 
         if ($aidTypes && $status !== Aid::STATUS_DRAFT) {
-            /** @var AidType $aidType */
             $typeError = false;
+            /** @var AidType $aidType */
             foreach ($aidTypes as $aidType) {
                 // c'est une aide financière, Types de dépenses / actions couvertes est obligatoire
                 if ($aidType->getAidTypeGroup()->getSlug() == AidTypeGroup::SLUG_FINANCIAL) {
-                    if ($event->getForm()->has('aidDestinations') && !count($event->getForm()->get('aidDestinations')->getData()) && !$typeError) {
+                    if (
+                        $event->getForm()->has('aidDestinations')
+                        && !count($event->getForm()->get('aidDestinations')->getData())
+                        && !$typeError
+                    ) {
                         $typeError = true; // pour ne pas ajouter plusieurs fois l'erreur
-                        $event->getForm()->get('aidDestinations')->addError(new FormError('Veuillez compléter le champ types de dépenses / actions couvertes '));
+                        $event->getForm()->get('aidDestinations')->addError(
+                            new FormError('Veuillez compléter le champ types de dépenses / actions couvertes ')
+                        );
                     }
                 }
             }
 
             // si récurrence "Ponctuelle" ou "Récurrent" => date de clôture obligatoire
-            if ($event->getForm()->has('aidRecurrence') && $event->getForm()->get('aidRecurrence')->getData() && in_array($event->getForm()->get('aidRecurrence')->getData()->getSlug(), [AidRecurrence::SLUG_ONEOFF, AidRecurrence::SLUG_RECURRING])) {
-                if ($event->getForm()->has('dateSubmissionDeadline') && !$event->getForm()->get('dateSubmissionDeadline')->getData()) {
-                    $event->getForm()->get('dateSubmissionDeadline')->addError(new FormError('Ce champ est obligatoire pour les aides ponctuelles ou récurrentes'));
+            if (
+                $event->getForm()->has('aidRecurrence')
+                && $event->getForm()->get('aidRecurrence')->getData()
+                && in_array(
+                    $event->getForm()->get('aidRecurrence')->getData()->getSlug(),
+                    [AidRecurrence::SLUG_ONEOFF, AidRecurrence::SLUG_RECURRING]
+                )
+            ) {
+                if (
+                    $event->getForm()->has('dateSubmissionDeadline')
+                    && !$event->getForm()->get('dateSubmissionDeadline')->getData()
+                ) {
+                    $event->getForm()->get('dateSubmissionDeadline')->addError(
+                        new FormError('Ce champ est obligatoire pour les aides ponctuelles ou récurrentes')
+                    );
                 }
             }
 
             // porteurs d'aide ou suggesiton porteur d'aide obligatoire
-            if ($event->getForm()->has('financers') && !count($event->getForm()->get('financers')->getData()) && !$event->getForm()->get('financerSuggestion')->getData()) {
-                $event->getForm()->get('financers')->addError(new FormError('Veuillez choisir un porteur d\'aides ou suggérer un nouveau porteur'));
+            if (
+                $event->getForm()->has('financers')
+                && !count($event->getForm()->get('financers')->getData())
+                && !$event->getForm()->get('financerSuggestion')->getData()
+            ) {
+                $event->getForm()->get('financers')->addError(
+                    new FormError('Veuillez choisir un porteur d\'aides ou suggérer un nouveau porteur')
+                );
             }
 
             // perimetre ou suggestion de périmètre obligatoire
-            if ($event->getForm()->has('perimeter') && !$event->getForm()->get('perimeter')->getData() && !$event->getForm()->get('perimeterSuggestion')->getData()) {
-                $event->getForm()->get('perimeter')->addError(new FormError('Veuillez choisir un périmètre ou suggérer un nouveau périmètre'));
+            if (
+                $event->getForm()->has('perimeter')
+                && !$event->getForm()->get('perimeter')->getData()
+                && !$event->getForm()->get('perimeterSuggestion')->getData()
+            ) {
+                $event->getForm()->get('perimeter')->addError(
+                    new FormError('Veuillez choisir un périmètre ou suggérer un nouveau périmètre')
+                );
             }
         }
     }

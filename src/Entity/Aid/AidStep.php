@@ -31,12 +31,12 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Entity(repositoryClass: AidStepRepository::class)]
 class AidStep
 {
-    const API_GROUP_LIST = 'aid_step:list';
-    const API_DESCRIPTION = 'Lister tous les choix d\'états d\'avancement';
+    public const API_GROUP_LIST = 'aid_step:list';
+    public const API_DESCRIPTION = 'Lister tous les choix d\'états d\'avancement';
 
-    const SLUG_PREOP = 'preop';
-    const SLUG_OP = 'op';
-    const SLUG_POSTOP = 'postop';
+    public const SLUG_PREOP = 'preop';
+    public const SLUG_OP = 'op';
+    public const SLUG_POSTOP = 'postop';
 
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -67,6 +67,9 @@ class AidStep
     #[Gedmo\Timestampable(on: 'update')]
     private ?\DateTimeInterface $timeUpdate = null;
 
+    /**
+     * @var Collection<int, Aid>
+     */
     #[ORM\ManyToMany(targetEntity: Aid::class, mappedBy: 'aidSteps')]
     private Collection $aids;
 

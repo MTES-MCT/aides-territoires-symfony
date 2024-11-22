@@ -38,24 +38,31 @@ use Gedmo\Mapping\Annotation as Gedmo;
 use ApiPlatform\OpenApi\Model;
 use ApiPlatform\Metadata\ApiProperty;
 use App\Controller\Api\Aid\AidController as AidAidController;
+use App\Entity\Backer\Backer;
 use App\Filter\Aid\AidApplyBeforeFilter;
 use App\Filter\Aid\AidCallForProjectOnlyFilter;
-use App\Filter\Aid\AidCategoriesFilter;
-use App\Filter\Aid\AidDestinationFilter;
-use App\Filter\Aid\AidEuropeanFilter;
-use App\Filter\Aid\AidFinancialAidFilter;
+use App\Filter\Aid\AidCategorySlugsFilter;
+use App\Filter\Aid\AidCategoryIdsFilter;
+use App\Filter\Aid\AidDestinationIdsFilter;
+use App\Filter\Aid\AidDestinationSlugsFilter;
+use App\Filter\Aid\AidEuropeanSlugFilter;
 use App\Filter\Aid\AidIsChargedFilter;
-use App\Filter\Aid\AidMobilizationStepFilter;
-use App\Filter\Aid\AidPerimeterFilter;
+use App\Filter\Aid\AidOrganizationTypeIdsFilter;
 use App\Filter\Aid\AidProjectReferenceFilter;
 use App\Filter\Aid\AidPublishedAfterFilter;
-use App\Filter\Aid\AidRecurrenceFilter;
-use App\Filter\Aid\AidTargetedAudiencesFilter;
-use App\Filter\Aid\AidTechnicalAidFilter;
+use App\Filter\Aid\AidRecurrenceIdFilter;
+use App\Filter\Aid\AidRecurrenceSlugFilter;
+use App\Filter\Aid\AidStepIdsFilter;
+use App\Filter\Aid\AidStepSlugsFilter;
+use App\Filter\Aid\AidOrganizationTypeSlugsFilter;
+use App\Filter\Aid\AidPerimeterIdFilter;
 use App\Filter\Aid\AidTextFilter;
-use App\Filter\Aid\AidTypeGroupFilter;
-use App\Filter\Backer\BackerFilter;
-use App\Filter\Backer\BackerGroupFilter;
+use App\Filter\Aid\AidTypeSlugsFilter;
+use App\Filter\Aid\AidTypeGroupSlugFilter;
+use App\Filter\Aid\AidTypeGroupIdFilter;
+use App\Filter\Aid\AidTypeIdsFilter;
+use App\Filter\Backer\BackerIdsFilter;
+use App\Filter\Backer\BackerGroupIdFilter;
 use App\Service\Doctrine\DoctrineConstants;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -75,8 +82,16 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Index(columns: ['description'], name: 'description_aid_fulltext', flags: ['fulltext'])]
 #[ORM\Index(columns: ['eligibility'], name: 'eligibility_aid_fulltext', flags: ['fulltext'])]
 #[ORM\Index(columns: ['name', 'description', 'eligibility'], name: 'synonym_aid_nde_fulltext', flags: ['fulltext'])]
-#[ORM\Index(columns: ['description', 'eligibility', 'project_examples'], name: 'synonym_aid_fulltext', flags: ['fulltext'])]
-#[ORM\Index(columns: ['name', 'name_initial', 'description', 'eligibility', 'project_examples'], name: 'synonym_aid_all_fulltext', flags: ['fulltext'])]
+#[ORM\Index(
+    columns: ['description', 'eligibility', 'project_examples'],
+    name: 'synonym_aid_fulltext',
+    flags: ['fulltext']
+)]
+#[ORM\Index(
+    columns: ['name', 'name_initial', 'description', 'eligibility', 'project_examples'],
+    name: 'synonym_aid_all_fulltext',
+    flags: ['fulltext']
+)]
 #[ApiResource(
     operations: [
         new GetCollection(
@@ -110,40 +125,46 @@ use Symfony\Component\Validator\Constraints as Assert;
 )]
 
 #[ApiFilter(AidTextFilter::class)]
-#[ApiFilter(AidTargetedAudiencesFilter::class)]
-#[ApiFilter(AidCategoriesFilter::class)]
+#[ApiFilter(AidOrganizationTypeSlugsFilter::class)]
+#[ApiFilter(AidOrganizationTypeIdsFilter::class)]
+#[ApiFilter(AidCategorySlugsFilter::class)]
+#[ApiFilter(AidCategoryIdsFilter::class)]
 #[ApiFilter(AidApplyBeforeFilter::class)]
 #[ApiFilter(AidPublishedAfterFilter::class)]
-#[ApiFilter(AidTypeGroupFilter::class)]
-#[ApiFilter(AidFinancialAidFilter::class)]
-#[ApiFilter(AidTechnicalAidFilter::class)]
-#[ApiFilter(AidMobilizationStepFilter::class)]
-#[ApiFilter(AidDestinationFilter::class)]
-#[ApiFilter(AidRecurrenceFilter::class)]
+#[ApiFilter(AidTypeGroupSlugFilter::class)]
+#[ApiFilter(AidTypeGroupIdFilter::class)]
+#[ApiFilter(AidTypeSlugsFilter::class)]
+#[ApiFilter(AidTypeIdsFilter::class)]
+#[ApiFilter(AidStepSlugsFilter::class)]
+#[ApiFilter(AidStepIdsFilter::class)]
+#[ApiFilter(AidDestinationSlugsFilter::class)]
+#[ApiFilter(AidDestinationIdsFilter::class)]
+#[ApiFilter(AidRecurrenceSlugFilter::class)]
+#[ApiFilter(AidRecurrenceIdFilter::class)]
 #[ApiFilter(AidCallForProjectOnlyFilter::class)]
 #[ApiFilter(AidIsChargedFilter::class)]
-#[ApiFilter(AidPerimeterFilter::class)]
+#[ApiFilter(AidPerimeterIdFilter::class)]
 #[ApiFilter(AidProjectReferenceFilter::class)]
-#[ApiFilter(AidEuropeanFilter::class)]
-#[ApiFilter(BackerFilter::class)]
-#[ApiFilter(BackerGroupFilter::class)]
+#[ApiFilter(AidEuropeanSlugFilter::class)]
+#[ApiFilter(BackerIdsFilter::class)]
+#[ApiFilter(BackerGroupIdFilter::class)]
 class Aid // NOSONAR too much methods
 {
-    const API_OPERATION_GET_BY_ID = 'api_aid_get_by_id';
-    const API_OPERATION_GET_BY_SLUG = 'api_aid_get_by_slug';
-    const API_OPERATION_GET_COLLECTION_PUBLISHED = 'api_aids_published';
-    const API_OPERATION_GET_COLLECTION_ALL = 'api_aids_all';
+    public const API_OPERATION_GET_BY_ID = 'api_aid_get_by_id';
+    public const API_OPERATION_GET_BY_SLUG = 'api_aid_get_by_slug';
+    public const API_OPERATION_GET_COLLECTION_PUBLISHED = 'api_aids_published';
+    public const API_OPERATION_GET_COLLECTION_ALL = 'api_aids_all';
 
-    const API_GROUP_LIST = 'aid:list';
-    const API_GROUP_ITEM = 'aid:item';
+    public const API_GROUP_LIST = 'aid:list';
+    public const API_GROUP_ITEM = 'aid:item';
 
-    const STATUS_PUBLISHED = 'published';
-    const STATUS_DELETED = 'deleted';
-    const STATUS_DRAFT = 'draft';
-    const STATUS_MERGED = 'merged';
-    const STATUS_REVIEWABLE = 'reviewable';
+    public const STATUS_PUBLISHED = 'published';
+    public const STATUS_DELETED = 'deleted';
+    public const STATUS_DRAFT = 'draft';
+    public const STATUS_MERGED = 'merged';
+    public const STATUS_REVIEWABLE = 'reviewable';
 
-    const STATUSES = [
+    public const STATUSES = [
         ['slug' => self::STATUS_PUBLISHED, 'name' => 'Publiée'],
         ['slug' => self::STATUS_DELETED, 'name' => 'Supprimée'],
         ['slug' => self::STATUS_DRAFT, 'name' => 'Brouillon'],
@@ -151,18 +172,18 @@ class Aid // NOSONAR too much methods
         ['slug' => self::STATUS_REVIEWABLE, 'name' => 'En revue'],
     ];
 
-    const APPROACHING_DEADLINE_DELTA = 30;  # days
+    public const APPROACHING_DEADLINE_DELTA = 30;  # days
 
-    const SLUG_EUROPEAN = 'european';
-    const SLUG_EUROPEAN_SECTORIAL = 'sectorial';
-    const SLUG_EUROPEAN_ORGANIZATIONAL = 'organizational';
-    const LABELS_EUROPEAN = [
+    public const SLUG_EUROPEAN = 'european';
+    public const SLUG_EUROPEAN_SECTORIAL = 'sectorial';
+    public const SLUG_EUROPEAN_ORGANIZATIONAL = 'organizational';
+    public const LABELS_EUROPEAN = [
         self::SLUG_EUROPEAN => 'Aides européennes',
         self::SLUG_EUROPEAN_SECTORIAL => 'Aides européennes sectorielles',
         self::SLUG_EUROPEAN_ORGANIZATIONAL => 'Aides européennes structurelles',
     ];
 
-    const MAX_NB_EXPORT_PDF = 20;
+    public const MAX_NB_EXPORT_PDF = 20;
 
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -198,6 +219,9 @@ class Aid // NOSONAR too much methods
     #[ORM\Column(length: 700, nullable: true)]
     private ?string $originUrl = null;
 
+    /**
+     * @var Collection<int, OrganizationType>
+     */
     #[ApiProperty(
         openapiContext: [
             'description' => 'Les audiences cibles',
@@ -222,6 +246,9 @@ class Aid // NOSONAR too much methods
     #[ORM\ManyToMany(targetEntity: OrganizationType::class, inversedBy: 'aids')]
     private Collection $aidAudiences;
 
+    /**
+     * @var Collection<int, AidType>
+     */
     #[ApiProperty(
         openapiContext: [
             'description' => 'Nature de l\'aide',
@@ -242,6 +269,9 @@ class Aid // NOSONAR too much methods
     #[ORM\ManyToMany(targetEntity: AidType::class, inversedBy: 'aids')]
     private Collection $aidTypes;
 
+    /**
+     * @var Collection<int, AidDestination>
+     */
     #[ApiProperty(
         openapiContext: [
             'description' => 'Actions concernées',
@@ -295,6 +325,9 @@ class Aid // NOSONAR too much methods
     #[ORM\JoinColumn(onDelete: DoctrineConstants::SET_NULL)]
     private ?User $author = null;
 
+    /**
+     * @var Collection<int, AidStep>
+     */
     #[Groups([Aid::API_GROUP_LIST, Aid::API_GROUP_ITEM])]
     #[ORM\ManyToMany(targetEntity: AidStep::class, inversedBy: 'aids')]
     private Collection $aidSteps;
@@ -384,6 +417,9 @@ class Aid // NOSONAR too much methods
     #[ORM\ManyToOne(targetEntity: self::class, inversedBy: 'aidsAmended')]
     private ?self $amendedAid = null;
 
+    /**
+     * @var Collection<int, Aid>
+     */
     #[ORM\OneToMany(mappedBy: 'amendedAid', targetEntity: self::class)]
     private Collection $aidsAmended;
 
@@ -441,7 +477,8 @@ class Aid // NOSONAR too much methods
 
     #[ApiProperty(
         openapiContext: [
-            'description' => 'Aides France Relance concernant le MTFP. Pour les aides du Plan de relance, utiliser le paramètre programs.slug',
+            'description' => 'Aides France Relance concernant le MTFP. '
+                . 'Pour les aides du Plan de relance, utiliser le paramètre programs.slug',
             'enum' => [true, false],
             'example' => true
         ]
@@ -453,6 +490,9 @@ class Aid // NOSONAR too much methods
     #[ORM\ManyToOne(targetEntity: self::class, inversedBy: 'aidsFromGeneric')]
     private ?self $genericAid = null;
 
+    /**
+     * @var Collection<int, Aid>
+     */
     #[ORM\OneToMany(mappedBy: 'genericAid', targetEntity: self::class)]
     private Collection $aidsFromGeneric;
 
@@ -476,6 +516,9 @@ class Aid // NOSONAR too much methods
     #[ORM\Column]
     private ?bool $isGeneric = false;
 
+    /**
+     * @var string[]|null
+     */
     #[ORM\Column(nullable: true)]
     private ?array $importRawObject = null;
 
@@ -499,12 +542,21 @@ class Aid // NOSONAR too much methods
     #[ORM\Column]
     private ?bool $authorNotification = false;
 
+    /**
+     * @var string[]|null
+     */
     #[ORM\Column(nullable: true)]
     private ?array $importRawObjectCalendar = null;
 
+    /**
+     * @var string[]|null
+     */
     #[ORM\Column(nullable: true)]
     private ?array $importRawObjectTemp = null;
 
+    /**
+     * @var string[]|null
+     */
     #[ORM\Column(nullable: true)]
     private ?array $importRawObjectTempCalendar = null;
 
@@ -537,6 +589,9 @@ class Aid // NOSONAR too much methods
     #[ORM\Column(nullable: true)]
     private ?int $dsId = null;
 
+    /**
+     * @var string[]|null
+     */
     #[ORM\Column(nullable: true)]
     private ?array $dsMapping = null;
 
@@ -562,6 +617,9 @@ class Aid // NOSONAR too much methods
     #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $datePublished = null;
 
+    /**
+     * @var Collection<int, Category>
+     */
     #[ApiProperty(
         openapiContext: [
             'description' => 'Catégories d\'aides. Il faut passer le slug du (ou des) catégorie(s)',
@@ -572,9 +630,15 @@ class Aid // NOSONAR too much methods
     #[ORM\ManyToMany(targetEntity: Category::class, inversedBy: 'aids')]
     private Collection $categories;
 
+    /**
+     * @var Collection<int, Keyword>
+     */
     #[ORM\ManyToMany(targetEntity: Keyword::class, inversedBy: 'aids', cascade: ['persist'])]
     private Collection $keywords;
 
+    /**
+     * @var Collection<int, Program>
+     */
     #[ApiProperty(
         openapiContext: [
             'description' => 'Programmes d\'aides. Il faut passer le slug du (ou des) programme(s)',
@@ -585,6 +649,10 @@ class Aid // NOSONAR too much methods
     #[ORM\ManyToMany(targetEntity: Program::class, inversedBy: 'aids')]
     private Collection $programs;
 
+
+    /**
+     * @var Collection<int, AidFinancer>
+     */
     #[ApiProperty(
         openapiContext: [
             'description' => 'Porteurs d\'aides. passer seulement l\'id du (ou des) porteur(s) d\'aides suffit',
@@ -596,49 +664,88 @@ class Aid // NOSONAR too much methods
     #[ORM\OrderBy(['position' => 'ASC'])]
     private Collection $aidFinancers;
 
+    /**
+     * @var Collection<int, AidInstructor>
+     */
     #[Groups([self::API_GROUP_LIST, self::API_GROUP_ITEM])]
     #[ORM\OneToMany(mappedBy: 'aid', targetEntity: AidInstructor::class, orphanRemoval: true, cascade: ['persist'])]
     #[ORM\OrderBy(['position' => 'ASC'])]
     private Collection $aidInstructors;
 
+    /**
+     * @var Collection<int, ProjectValidated>
+     */
     #[ORM\OneToMany(mappedBy: 'aid', targetEntity: ProjectValidated::class)]
     private Collection $projectValidateds;
 
+    /**
+     * @var Collection<int, AidProject>
+     */
     #[ORM\OneToMany(mappedBy: 'aid', targetEntity: AidProject::class, orphanRemoval: true)]
     private Collection $aidProjects;
 
-    #[ORM\OneToMany(mappedBy: 'aid', targetEntity: AidSuggestedAidProject::class, orphanRemoval: true)]
+    /**
+     * @var Collection<int, AidSuggestedAidProject>
+     */
+    #[ORM\OneToMany(mappedBy: 'aid', targetEntity: AidSuggestedAidProject::class)]
     private Collection $aidSuggestedAidProjects;
 
+    /**
+     * @var Collection<int, Bundle>
+     */
     #[ORM\ManyToMany(targetEntity: Bundle::class, mappedBy: 'aids', cascade: ['persist'])]
     private Collection $bundles;
 
+    /**
+     * @var Collection<int, SearchPage>
+     */
     #[ORM\ManyToMany(targetEntity: SearchPage::class, mappedBy: 'excludedAids')]
     private Collection $excludedSearchPages;
 
+    /**
+     * @var Collection<int, SearchPage>
+     */
     #[ORM\ManyToMany(targetEntity: SearchPage::class, mappedBy: 'highlightedAids')]
     private Collection $highlightedSearchPages;
 
+    /**
+     * @var Collection<int, LogAidView>
+     */
     #[ORM\OneToMany(mappedBy: 'aid', targetEntity: LogAidView::class)]
     #[ORM\JoinColumn(onDelete: DoctrineConstants::SET_NULL)]
     private Collection $logAidViews;
 
+    /**
+     * @var Collection<int, LogAidApplicationUrlClick>
+     */
     #[ORM\OneToMany(mappedBy: 'aid', targetEntity: LogAidApplicationUrlClick::class)]
     #[ORM\JoinColumn(onDelete: DoctrineConstants::SET_NULL)]
     private Collection $logAidApplicationUrlClicks;
 
+    /**
+     * @var Collection<int, LogAidOriginUrlClick>
+     */
     #[ORM\OneToMany(mappedBy: 'aid', targetEntity: LogAidOriginUrlClick::class)]
     #[ORM\JoinColumn(onDelete: DoctrineConstants::SET_NULL)]
     private Collection $logAidOriginUrlClicks;
 
+    /**
+     * @var Collection<int, LogAidContactClick>
+     */
     #[ORM\OneToMany(mappedBy: 'aid', targetEntity: LogAidContactClick::class)]
     #[ORM\JoinColumn(onDelete: DoctrineConstants::SET_NULL)]
     private Collection $logAidContactClicks;
 
+    /**
+     * @var Collection<int, LogAidCreatedsFolder>
+     */
     #[ORM\OneToMany(mappedBy: 'aid', targetEntity: LogAidCreatedsFolder::class)]
     #[ORM\JoinColumn(onDelete: DoctrineConstants::SET_NULL)]
     private Collection $logAidCreatedsFolders;
 
+    /**
+     * @var Collection<int, LogAidEligibilityTest>
+     */
     #[ORM\OneToMany(mappedBy: 'aid', targetEntity: LogAidEligibilityTest::class)]
     #[ORM\JoinColumn(onDelete: DoctrineConstants::SET_NULL)]
     private Collection $logAidEligibilityTests;
@@ -649,15 +756,19 @@ class Aid // NOSONAR too much methods
     private int $nbViews = 0;
     private int $scoreTotal = 0;
     private int $scoreObjects = 0;
+    /** @var ArrayCollection<int, ProjectReference>|null */
     private ?ArrayCollection $projectReferencesSearched = null;
 
     #[Groups([self::API_GROUP_LIST, self::API_GROUP_ITEM])]
     private ?string $url = null;
 
+    /** @var ArrayCollection<int, Backer> */
     private ArrayCollection $financers;
 
+    /** @var ArrayCollection<int, Backer> */
     private ArrayCollection $instructors;
 
+    /** @var array<int, ProjectReference> */
     private array $projectReferencesSuggestions = [];
 
     #[ORM\ManyToOne(inversedBy: 'aids')]
@@ -672,9 +783,15 @@ class Aid // NOSONAR too much methods
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $originUrlText = null;
 
+    /**
+     * @var Collection<int, KeywordReference>
+     */
     #[ORM\ManyToMany(targetEntity: KeywordReference::class, inversedBy: 'aids', cascade: ['persist'])]
     private Collection $keywordReferences;
 
+    /**
+     * @var Collection<int, ProjectReference>
+     */
     #[Groups([self::API_GROUP_LIST, self::API_GROUP_ITEM])]
     #[ORM\ManyToMany(targetEntity: ProjectReference::class, inversedBy: 'aids')]
     #[ORM\OrderBy(['name' => 'ASC'])]
@@ -683,17 +800,32 @@ class Aid // NOSONAR too much methods
     #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $dateCheckBrokenLink = null;
 
+    /**
+     * @var ArrayCollection<int, Aid>
+     */
     private ArrayCollection $aidsFromGenericLive;
 
+    /**
+     * @var Collection<int, AidLock>
+     */
     #[ORM\OneToMany(mappedBy: 'aid', targetEntity: AidLock::class, orphanRemoval: true)]
     private Collection $aidLocks;
 
+    /**
+     * @var Collection<int, KeywordReferenceSuggested>
+     */
     #[ORM\OneToMany(mappedBy: 'aid', targetEntity: KeywordReferenceSuggested::class, orphanRemoval: true)]
     private Collection $keywordReferenceSuggesteds;
 
+    /**
+     * @var Collection<int, SanctuarizedField>
+     */
     #[ORM\ManyToMany(targetEntity: SanctuarizedField::class, mappedBy: 'aids')]
     private Collection $sanctuarizedFields;
 
+    /**
+     * @var string[]|null $importDatas
+     */
     #[ORM\Column(type: Types::ARRAY, nullable: true)]
     private ?array $importDatas = null;
 
@@ -823,6 +955,10 @@ class Aid // NOSONAR too much methods
         return $this;
     }
 
+    /**
+     * @param Collection<int, OrganizationType> $aidAudiences
+     * @return static
+     */
     public function setAidAudiences(Collection $aidAudiences): static
     {
         $this->aidAudiences = $aidAudiences;
@@ -854,6 +990,10 @@ class Aid // NOSONAR too much methods
         return $this;
     }
 
+    /**
+     * @param Collection<int, AidType> $aidTypes
+     * @return static
+     */
     public function setAidTypes(Collection $aidTypes): static
     {
         $this->aidTypes = $aidTypes;
@@ -885,6 +1025,10 @@ class Aid // NOSONAR too much methods
         return $this;
     }
 
+    /**
+     * @param Collection<int, AidDestination> $aidDestinations
+     * @return static
+     */
     public function setAidDestinations(Collection $aidDestinations): static
     {
         $this->aidDestinations = $aidDestinations;
@@ -1012,6 +1156,10 @@ class Aid // NOSONAR too much methods
         return $this;
     }
 
+    /**
+     * @param Collection<int, AidStep> $aidSteps
+     * @return static
+     */
     public function setAidSteps(Collection $aidSteps): static
     {
         $this->aidSteps = $aidSteps;
@@ -1188,7 +1336,7 @@ class Aid // NOSONAR too much methods
     }
 
     /**
-     * @return Collection<int, self>
+     * @return Collection<int, Aid>
      */
     public function getAidsAmended(): Collection
     {
@@ -1359,7 +1507,7 @@ class Aid // NOSONAR too much methods
     }
 
     /**
-     * @return Collection<int, self>
+     * @return Collection<int, Aid>
      */
     public function getAidsFromGeneric(): Collection
     {
@@ -1433,11 +1581,18 @@ class Aid // NOSONAR too much methods
         return $this;
     }
 
+    /**
+     * @return string[]|null
+     */
     public function getImportRawObject(): ?array
     {
         return $this->importRawObject;
     }
 
+    /**
+     * @param string[]|null $importRawObject
+     * @return static
+     */
     public function setImportRawObject(?array $importRawObject): static
     {
         $this->importRawObject = $importRawObject;
@@ -1505,11 +1660,18 @@ class Aid // NOSONAR too much methods
         return $this;
     }
 
+    /**
+     * @return string[]|null
+     */
     public function getImportRawObjectCalendar(): ?array
     {
         return $this->importRawObjectCalendar;
     }
 
+    /**
+     * @param string[]|null $importRawObjectCalendar
+     * @return static
+     */
     public function setImportRawObjectCalendar(?array $importRawObjectCalendar): static
     {
         $this->importRawObjectCalendar = $importRawObjectCalendar;
@@ -1517,11 +1679,18 @@ class Aid // NOSONAR too much methods
         return $this;
     }
 
+    /**
+     * @return string[]|null
+     */
     public function getImportRawObjectTemp(): ?array
     {
         return $this->importRawObjectTemp;
     }
 
+    /**
+     * @param string[]|null $importRawObjectTemp
+     * @return static
+     */
     public function setImportRawObjectTemp(?array $importRawObjectTemp): static
     {
         $this->importRawObjectTemp = $importRawObjectTemp;
@@ -1529,11 +1698,18 @@ class Aid // NOSONAR too much methods
         return $this;
     }
 
+    /**
+     * @return string[]|null
+     */
     public function getImportRawObjectTempCalendar(): ?array
     {
         return $this->importRawObjectTempCalendar;
     }
 
+    /**
+     * @param string[]|null $importRawObjectTempCalendar
+     * @return static
+     */
     public function setImportRawObjectTempCalendar(?array $importRawObjectTempCalendar): static
     {
         $this->importRawObjectTempCalendar = $importRawObjectTempCalendar;
@@ -1613,11 +1789,18 @@ class Aid // NOSONAR too much methods
         return $this;
     }
 
+    /**
+     * @return string[]|null
+     */
     public function getDsMapping(): ?array
     {
         return $this->dsMapping;
     }
 
+    /**
+     * @param string[]|null $dsMapping
+     * @return static
+     */
     public function setDsMapping(?array $dsMapping): static
     {
         $this->dsMapping = $dsMapping;
@@ -1726,6 +1909,10 @@ class Aid // NOSONAR too much methods
         return $this;
     }
 
+    /**
+     * @param Collection<int, Category> $categories
+     * @return static
+     */
     public function setCategories(Collection $categories): static
     {
         $this->categories = $categories;
@@ -1772,6 +1959,10 @@ class Aid // NOSONAR too much methods
         return $this->programs;
     }
 
+    /**
+     * @param Collection<int, Program> $programs
+     * @return static
+     */
     public function setPrograms(Collection $programs): static
     {
         $this->programs = $programs;
@@ -1927,7 +2118,10 @@ class Aid // NOSONAR too much methods
 
     public function removeAidSuggestedAidProject(AidSuggestedAidProject $aidSuggestedAidProject): static
     {
-        if ($this->aidSuggestedAidProjects->removeElement($aidSuggestedAidProject) && $aidSuggestedAidProject->getAid() === $this) {
+        if (
+            $this->aidSuggestedAidProjects->removeElement($aidSuggestedAidProject)
+            && $aidSuggestedAidProject->getAid() === $this
+        ) {
             $aidSuggestedAidProject->setAid(null);
         }
 
@@ -2124,15 +2318,20 @@ class Aid // NOSONAR too much methods
     {
         $today = new \DateTime(date('Y-m-d'));
 
+        $this->live = false;
+
         if (
             $this->status == self::STATUS_PUBLISHED
             && (($this->dateStart && $this->dateStart <= $today) || !$this->dateStart)
-            && (($this->dateSubmissionDeadline && $this->dateSubmissionDeadline >= $today) || !$this->dateSubmissionDeadline)
+            && (
+                ($this->dateSubmissionDeadline && $this->dateSubmissionDeadline >= $today)
+                || !$this->dateSubmissionDeadline
+                )
         ) {
-            return true;
+            $this->live = true;
         }
 
-        return false;
+        return $this->live;
     }
 
     public function setLive(bool $live): static
@@ -2200,7 +2399,7 @@ class Aid // NOSONAR too much methods
         return false;
     }
 
-    public function isComingSoon()
+    public function isComingSoon(): bool
     {
         if (!$this->dateStart) {
             return false;
@@ -2210,7 +2409,7 @@ class Aid // NOSONAR too much methods
         return $this->dateStart > $today;
     }
 
-    public function hasExpired()
+    public function hasExpired(): bool
     {
         if (!$this->dateSubmissionDeadline) {
             return false;
@@ -2232,38 +2431,60 @@ class Aid // NOSONAR too much methods
         }
 
         if ($corporate && $public) {
-            return 'PORTEURS D\'AIDE PUBLIC ET PRIVÉ';
-        } elseif ($corporate && !$public) {
-            return 'PORTEUR D\'AIDE PRIVÉ';
-        } elseif (!$corporate && $public) {
-            return 'PORTEUR D\'AIDE PUBLIC';
+            $return = 'PORTEURS D\'AIDE PUBLIC ET PRIVÉ';
+        } elseif ($corporate) {
+            $return = 'PORTEUR D\'AIDE PRIVÉ';
+        } elseif ($public) {
+            $return = 'PORTEUR D\'AIDE PUBLIC';
         } else {
-            return '';
+            $return = '';
         }
+
+        return $return;
     }
 
+    /**
+     * @return ArrayCollection<int, Backer>
+     */
     public function getFinancers(): ArrayCollection
     {
+        /** @var ArrayCollection<int, Backer> */
         $financers = new ArrayCollection();
         foreach ($this->getAidFinancers() as $aidFinancer) {
             $financers->add($aidFinancer->getBacker());
         }
-        return $financers;
+        $this->financers = $financers;
+        return $this->financers;
     }
+
+    /**
+     * @param ArrayCollection<int, Backer> $financers
+     * @return static
+     */
     public function setFinancers(ArrayCollection $financers): static
     {
         $this->financers = $financers;
         return $this;
     }
 
+    /**
+     * @return ArrayCollection<int, Backer>
+     */
     public function getInstructors(): ArrayCollection
     {
+        /** @var ArrayCollection<int, Backer> */
         $instructors = new ArrayCollection();
         foreach ($this->getAidInstructors() as $aidInstructor) {
             $instructors->add($aidInstructor->getBacker());
         }
-        return $instructors;
+        $this->instructors = $instructors;
+        return $this->instructors;
     }
+
+    /**
+     * @param Collection<int, Backer> $instructors
+     * @return static
+     */
     public function setInstructors(Collection $instructors): static
     {
         $this->instructors = $instructors;
@@ -2301,7 +2522,10 @@ class Aid // NOSONAR too much methods
 
     public function removeLogAidApplicationUrlClick(LogAidApplicationUrlClick $logAidApplicationUrlClick): static
     {
-        if ($this->logAidApplicationUrlClicks->removeElement($logAidApplicationUrlClick) && $logAidApplicationUrlClick->getAid() === $this) {
+        if (
+            $this->logAidApplicationUrlClicks->removeElement($logAidApplicationUrlClick)
+            && $logAidApplicationUrlClick->getAid() === $this
+        ) {
             $logAidApplicationUrlClick->setAid(null);
         }
 
@@ -2328,7 +2552,10 @@ class Aid // NOSONAR too much methods
 
     public function removeLogAidOriginUrlClick(LogAidOriginUrlClick $logAidOriginUrlClick): static
     {
-        if ($this->logAidOriginUrlClicks->removeElement($logAidOriginUrlClick) && $logAidOriginUrlClick->getAid() === $this) {
+        if (
+            $this->logAidOriginUrlClicks->removeElement($logAidOriginUrlClick)
+            && $logAidOriginUrlClick->getAid() === $this
+        ) {
             $logAidOriginUrlClick->setAid(null);
         }
 
@@ -2355,7 +2582,10 @@ class Aid // NOSONAR too much methods
 
     public function removeLogAidContactClick(LogAidContactClick $logAidContactClick): static
     {
-        if ($this->logAidContactClicks->removeElement($logAidContactClick) && $logAidContactClick->getAid() === $this) {
+        if (
+            $this->logAidContactClicks->removeElement($logAidContactClick)
+            && $logAidContactClick->getAid() === $this
+        ) {
             $logAidContactClick->setAid(null);
         }
 
@@ -2382,7 +2612,10 @@ class Aid // NOSONAR too much methods
 
     public function removeLogAidCreatedsFolder(LogAidCreatedsFolder $logAidCreatedsFolder): static
     {
-        if ($this->logAidCreatedsFolders->removeElement($logAidCreatedsFolder) && $logAidCreatedsFolder->getAid() === $this) {
+        if (
+            $this->logAidCreatedsFolders->removeElement($logAidCreatedsFolder)
+            && $logAidCreatedsFolder->getAid() === $this
+        ) {
             $logAidCreatedsFolder->setAid(null);
         }
 
@@ -2409,7 +2642,10 @@ class Aid // NOSONAR too much methods
 
     public function removeLogAidEligibilityTest(LogAidEligibilityTest $logAidEligibilityTest): static
     {
-        if ($this->logAidEligibilityTests->removeElement($logAidEligibilityTest) && $logAidEligibilityTest->getAid() === $this) {
+        if (
+            $this->logAidEligibilityTests->removeElement($logAidEligibilityTest)
+            && $logAidEligibilityTest->getAid() === $this
+        ) {
             $logAidEligibilityTest->setAid(null);
         }
 
@@ -2531,6 +2767,10 @@ class Aid // NOSONAR too much methods
         return $this;
     }
 
+    /**
+     * @param Collection<int, ProjectReference> $projectReferences
+     * @return static
+     */
     public function setProjectReferences(Collection $projectReferences): static
     {
         $this->projectReferences = $projectReferences;
@@ -2538,24 +2778,24 @@ class Aid // NOSONAR too much methods
         return $this;
     }
 
-    public function getScoreTotal(): ?float
+    public function getScoreTotal(): int
     {
         return $this->scoreTotal;
     }
 
-    public function setScoreTotal(?float $scoreTotal): static
+    public function setScoreTotal(int $scoreTotal): static
     {
         $this->scoreTotal = $scoreTotal;
 
         return $this;
     }
 
-    public function getScoreObjects(): ?float
+    public function getScoreObjects(): int
     {
         return $this->scoreObjects;
     }
 
-    public function setScoreObjects(?float $scoreObjects): static
+    public function setScoreObjects(int $scoreObjects): static
     {
         $this->scoreObjects = $scoreObjects;
 
@@ -2574,7 +2814,10 @@ class Aid // NOSONAR too much methods
         return $this;
     }
 
-    public function getAidsFromGenericLive()
+    /**
+     * @return ArrayCollection<int, Aid>
+     */
+    public function getAidsFromGenericLive(): ArrayCollection
     {
         $aids = new ArrayCollection();
         foreach ($this->getAidsFromGeneric() as $aid) {
@@ -2582,7 +2825,9 @@ class Aid // NOSONAR too much methods
                 $aids->add($aid);
             }
         }
-        return $aids;
+
+        $this->aidsFromGenericLive = $aids;
+        return $this->aidsFromGenericLive;
     }
 
     /**
@@ -2646,7 +2891,7 @@ class Aid // NOSONAR too much methods
     }
 
     /**
-     * @return Collection|ProjectReferenceSearched[]
+     * @return Collection<int, ProjectReference>
      */
     public function getProjectReferencesSearched(): Collection
     {
@@ -2703,22 +2948,36 @@ class Aid // NOSONAR too much methods
         return $this;
     }
 
+    /**
+     * @return string[]|null
+     */
     public function getImportDatas(): ?array
     {
         return $this->importDatas;
     }
 
+    /**
+     * @param string[]|null $importDatas
+     * @return static
+     */
     public function setImportDatas(?array $importDatas): static
     {
         $this->importDatas = $importDatas;
         return $this;
     }
 
+    /**
+     * @return array<int, ProjectReference>
+     */
     public function getProjectReferencesSuggestions(): array
     {
         return $this->projectReferencesSuggestions;
     }
 
+    /**
+     * @param array<int, ProjectReference> $projectReferenceSuggestions
+     * @return static
+     */
     public function setProjectReferencesSuggestions(array $projectReferenceSuggestions): static
     {
         $this->projectReferencesSuggestions = $projectReferenceSuggestions;

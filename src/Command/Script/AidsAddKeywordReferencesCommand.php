@@ -15,7 +15,6 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 #[AsCommand(name: 'at:script:import_keyword_aid', description: 'Transfert des mots-clés référents')]
 class AidsAddKeywordReferencesCommand extends Command
 {
-
     protected InputInterface $input;
     protected OutputInterface $output;
     protected string $commandTextStart = '<Transfert des mots-clés référents';
@@ -51,7 +50,7 @@ class AidsAddKeywordReferencesCommand extends Command
         return Command::SUCCESS;
     }
 
-    protected function importKeyword($input, $output): void
+    protected function importKeyword(InputInterface $input, OutputInterface $output): void
     {
         /** @var AidRepository $aidRepo */
         $aidRepo = $this->managerRegistry->getRepository(Aid::class);
@@ -62,7 +61,8 @@ class AidsAddKeywordReferencesCommand extends Command
         foreach ($aids as $aid) {
             $keywords = $aid->getKeywords();
             foreach ($keywords as $keyword) {
-                $keywordReference = $this->managerRegistry->getRepository(KeywordReference::class)->findOneBy(['name' => $keyword->getName()]);
+                $keywordReference = $this->managerRegistry->getRepository(KeywordReference::class)
+                    ->findOneBy(['name' => $keyword->getName()]);
                 if ($keywordReference instanceof KeywordReference) {
                     $aid->addKeywordReference($keywordReference);
                     $this->managerRegistry->getManager()->persist($aid);

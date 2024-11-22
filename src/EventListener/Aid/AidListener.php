@@ -2,7 +2,6 @@
 
 namespace App\EventListener\Aid;
 
-use App\Controller\FrontController;
 use App\Entity\Aid\Aid;
 use App\Entity\Site\UrlRedirect;
 use App\Message\Aid\AidPropagateUpdate;
@@ -12,6 +11,7 @@ use App\Service\Various\ParamService;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Event\PostLoadEventArgs;
 use Doctrine\ORM\Event\PostUpdateEventArgs;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -24,7 +24,8 @@ class AidListener
         private EmailService $emailService,
         private ParamService $paramService,
         private RouterInterface $routerInterface,
-        private MessageBusInterface $messageBusInterface
+        private MessageBusInterface $messageBusInterface,
+        private RequestStack $requestStack
     ) {
     }
 
@@ -59,13 +60,17 @@ class AidListener
                     $this->emailService->sendEmailViaApi(
                         $aid->getAuthor()->getEmail(),
                         $aid->getAuthor()->getFirstname() . ' ' . $aid->getAuthor()->getLastname(),
-                        $this->paramService->get('sib_publication_email_template_id'),
+                        (int) $this->paramService->get('sib_publication_email_template_id'),
                         [
                             'PRENOM' => $aid->getAuthor()->getFirstname(),
                             'NOM' => $aid->getAuthor()->getLastname(),
                             'AIDE_NOM' => $aid->getName(),
                             'AIDE_URL' => $this->aidService->getUrl($aid, UrlGeneratorInterface::ABSOLUTE_URL),
-                            'BASE_URL' => $this->routerInterface->generate('app_home', [], UrlGeneratorInterface::ABSOLUTE_URL)
+                            'BASE_URL' => $this->routerInterface->generate(
+                                'app_home',
+                                [],
+                                UrlGeneratorInterface::ABSOLUTE_URL
+                            )
                         ]
                     );
                 }
@@ -90,7 +95,7 @@ class AidListener
         }
     }
 
-    private function handleSlugUpdate(PostUpdateEventArgs $args)
+    private function handleSlugUpdate(PostUpdateEventArgs $args): void
     {
         /** @var Aid $aid */
         $aid = $args->getObject();
@@ -115,10 +120,12 @@ class AidListener
                 $manager->remove($urlRedirectCheck);
                 $manager->flush();
                 // message flash pour indiquer que la redirection a été supprimée
-                $session =  new Session();
+                /** @var Session $session */
+                $session = $this->requestStack->getSession();
                 $session->getFlashBag()->add(
                     'alert alert-info alert-dismissible fade show',
-                    'La nouvelle url était dans les redirection, la redirection à été supprimée pour éviter les redirections en boucle.'
+                    'La nouvelle url était dans les redirection, '
+                        . 'la redirection à été supprimée pour éviter les redirections en boucle.'
                 );
             }
 

@@ -6,7 +6,7 @@ use App\Entity\Page\Faq;
 
 class FaqService
 {
-    public function getLatestUpdateTime(Faq $faq): ?\DateTime
+    public function getLatestUpdateTime(Faq $faq): ?\DateTimeInterface
     {
         $latestUpdateTime = $faq->getTimeUpdate() ?? $faq->getTimeCreate() ?? null;
         foreach ($faq->getFaqCategories() as $category) {

@@ -2,6 +2,7 @@
 
 namespace App\Service\Image;
 
+use App\Exception\InvalidFileFormatException;
 use App\Service\File\FileService;
 use App\Service\Various\ParamService;
 use App\Service\Various\StringService;
@@ -74,7 +75,10 @@ class ImageService
 
 
             // Créer un objet Credentials en utilisant les clés d'accès AWS
-            $credentials = new Credentials($this->paramService->get('aws_access_key_id'), $this->paramService->get('aws_secret_access_key'));
+            $credentials = new Credentials(
+                $this->paramService->get('aws_access_key_id'),
+                $this->paramService->get('aws_secret_access_key')
+            );
 
             // Créer un client S3
             $s3 = new S3Client([
@@ -103,13 +107,16 @@ class ImageService
 
     public function deleteImageFromCloud(
         string $fileName
-    ) {
+    ): void {
         if (!$fileName || trim($fileName) == '') {
-            return false;
+            return;
         }
 
         // Créer un objet Credentials en utilisant les clés d'accès AWS
-        $credentials = new Credentials($this->paramService->get('aws_access_key_id'), $this->paramService->get('aws_secret_access_key'));
+        $credentials = new Credentials(
+            $this->paramService->get('aws_access_key_id'),
+            $this->paramService->get('aws_secret_access_key')
+        );
 
 
         // Créer un client S3
@@ -141,11 +148,13 @@ class ImageService
         string $uploadDir,
         string $fileName
     ): bool {
-        if (!$file) {
-            return false;
-        }
         // Upload a publicly accessible file. The file size and type are determined by the SDK.
         try {
+            // verification image
+            if (!$this->fileService->uploadedFileIsImage($file)) {
+                throw new InvalidFileFormatException('Le fichier n\'est pas une image');
+            }
+
             // créer dossier temporaire si besoin
             $tmpFolder = $this->fileService->getUploadTmpDir();
             if (!is_dir($tmpFolder)) {
@@ -157,7 +166,9 @@ class ImageService
                 $tmpFolder,
                 preg_replace('/' . preg_quote($uploadDir, '/') . '/', '', $fileName)
             );
-            $tmpFile = rtrim($tmpFolder, '/') . '/' . ltrim(preg_replace('/' . preg_quote($uploadDir, '/') . '/', '', $fileName), '/');
+            $tmpFile = rtrim($tmpFolder, '/')
+                . '/'
+                . ltrim(preg_replace('/' . preg_quote($uploadDir, '/') . '/', '', $fileName), '/');
 
             // resize image avec \Imagick
             $imagick = new \Imagick($tmpFile);
@@ -193,7 +204,10 @@ class ImageService
             $imagick->clear();
 
             // Créer un objet Credentials en utilisant les clés d'accès AWS
-            $credentials = new Credentials($this->paramService->get('aws_access_key_id'), $this->paramService->get('aws_secret_access_key'));
+            $credentials = new Credentials(
+                $this->paramService->get('aws_access_key_id'),
+                $this->paramService->get('aws_secret_access_key')
+            );
 
             // Créer un client S3
             $s3 = new S3Client([

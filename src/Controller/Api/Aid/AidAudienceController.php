@@ -28,10 +28,19 @@ class AidAudienceController extends ApiController
         // spécifique
         $resultsSpe = [];
         foreach ($results as $result) {
+            $typeFull = [];
+            if ($result->getOrganizationTypeGroup()) {
+                $typeFull = [
+                    'id' => $result->getOrganizationTypeGroup()->getId(),
+                    'name' => $result->getOrganizationTypeGroup()->getName()
+                ];
+            }
             $resultsSpe[] = [
                 'id' => $result->getSlug(),
+                'slug' => $result->getSlug(),
                 'name' => $result->getName(),
-                'type' => $result->getOrganizationTypeGroup() ? $result->getOrganizationTypeGroup()->getName() : null
+                'type' => $result->getOrganizationTypeGroup() ? $result->getOrganizationTypeGroup()->getName() : null,
+                'type_full' => $typeFull
             ];
         }
 

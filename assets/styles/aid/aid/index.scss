@@ -1,11 +1,11 @@
-@import 'remixicon/fonts/remixicon.css';
-@import '../../_variables';
-@import '../../_mixins';
-@import '../../form/tom-select-override';
-@import '../../form/entity-checkbox-absolute-type';
-@import '../../form/label';
-@import '../../component/at-deadline.scss';
-@import '_aid_metas';
+@use 'remixicon/fonts/remixicon';
+@use '../../_variables';
+@use '../../_mixins';
+@use '../../form/tom-select-override';
+@use '../../form/entity-checkbox-absolute-type';
+@use '../../form/label';
+@use '../../component/at-deadline';
+@use '_aid_metas';
 
 #search-form-extra-fields{
     width: 100%;

@@ -20,12 +20,12 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Index(columns: ['request_uri'], name: 'request_uri_lul')]
 class LogUserLogin
 {
-    const ACTION_LOGOUT = 'logout';
-    const ACTION_LOST_PASSWORD = 'lost-password';
-    const ACTION_REINIT_PASSWORD = 'reinit-password';
-    const ACTION_CHANGE_PASSWORD = 'change-password';
-    const ACTION_LOGIN = 'login';
-    const TYPE_AUTOLOGIN = 'autologin';
+    public const ACTION_LOGOUT = 'logout';
+    public const ACTION_LOST_PASSWORD = 'lost-password';
+    public const ACTION_REINIT_PASSWORD = 'reinit-password';
+    public const ACTION_CHANGE_PASSWORD = 'change-password';
+    public const ACTION_LOGIN = 'login';
+    public const TYPE_AUTOLOGIN = 'autologin';
 
     #[ORM\Id]
     #[ORM\GeneratedValue]

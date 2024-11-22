@@ -30,6 +30,12 @@ class UploadController extends FrontController
         }
 
         $image = $request->files->get('image', null);
+        if (!$image) {
+            return new JsonResponse([
+                'url' => null,
+                'exception' => 'Le fichier n\'est pas une image'
+            ]);
+        }
 
         // verification image
         if (!$fileService->uploadedFileIsImage($image)) {
@@ -40,20 +46,16 @@ class UploadController extends FrontController
         }
 
         // nommage de l'image
-        if ($image) {
-            $originalFilename = pathinfo($image->getClientOriginalName(), PATHINFO_FILENAME);
-            $safeFilename = $slugger->slug($originalFilename);
-            $newFilename = $safeFilename . '-' . uniqid() . '.' . $image->guessExtension();
-        }
+        $originalFilename = pathinfo($image->getClientOriginalName(), PATHINFO_FILENAME);
+        $safeFilename = $slugger->slug($originalFilename);
+        $newFilename = $safeFilename . '-' . uniqid() . '.' . $image->guessExtension();
 
         // si file, on la met dans le dossier temporaire
-        if ($image) {
-            $tmpFolder = $fileService->getUploadTmpDir();
-            $image->move(
-                $tmpFolder,
-                $newFilename
-            );
-        }
+        $tmpFolder = $fileService->getUploadTmpDir();
+        $image->move(
+            $tmpFolder,
+            $newFilename
+        );
 
         // gestion de l'image
         try {

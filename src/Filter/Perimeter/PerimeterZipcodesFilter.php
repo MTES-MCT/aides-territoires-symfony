@@ -11,8 +11,15 @@ use Symfony\Component\PropertyInfo\Type;
 
 final class PerimeterZipcodesFilter extends AbstractFilter
 {
-    protected function filterProperty(string $property, $value, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, Operation $operation = null, array $context = []): void
-    {
+    protected function filterProperty(
+        string $property,
+        $value,
+        QueryBuilder $queryBuilder,
+        QueryNameGeneratorInterface $queryNameGenerator,
+        string $resourceClass,
+        Operation $operation = null,
+        array $context = []
+    ): void {
         // ajouté pour être conforme à l'extends
     }
 
@@ -25,7 +32,10 @@ final class PerimeterZipcodesFilter extends AbstractFilter
                 'property' => 'zipcodes',
                 'type' => Type::BUILTIN_TYPE_STRING,
                 'required' => false,
-                'description' => '<div class="renderedMarkdown"><p>Filtrer par code postaux. Vous pouvez passer plusieurs fois le paramètre pour en rechercher plusieurs, ex: &zipcodes=91400&zipcodes=91640</p></div>',
+                'description' => '<div class="renderedMarkdown"><p>'
+                                    . 'Filtrer par code postaux. '
+                                    . 'Vous pouvez passer plusieurs fois le paramètre pour en rechercher plusieurs, '
+                                    . 'ex: &zipcodes=91400&zipcodes=91640</p></div>',
                 'openapi' => [
                     'examples' => $examples,
                 ],

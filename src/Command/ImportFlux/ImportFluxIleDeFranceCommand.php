@@ -11,6 +11,7 @@ use App\Entity\Aid\AidType;
 use App\Entity\Category\Category;
 use App\Entity\Organization\OrganizationType;
 use App\Entity\Reference\KeywordReference;
+use App\Repository\Aid\AidStepRepository;
 use Symfony\Component\HttpClient\CurlHttpClient;
 
 #[AsCommand(name: 'at:import_flux:ile_de_france', description: 'Import de flux ile de france')]
@@ -22,7 +23,13 @@ class ImportFluxIleDeFranceCommand extends ImportFluxCommand
     protected ?string $importUniqueidPrefix = 'IDF_';
     protected ?int $idDataSource = 4;
 
-    protected function getImportUniqueid($aidToImport): ?string
+    /**
+     * retourne un identifiant unique pour l'import
+     *
+     * @param array<mixed, mixed> $aidToImport
+     * @return string|null
+     */
+    protected function getImportUniqueid(array $aidToImport): ?string
     {
         if (!isset($aidToImport['referenceAdministrative'])) {
             return null;
@@ -30,7 +37,12 @@ class ImportFluxIleDeFranceCommand extends ImportFluxCommand
         return $this->importUniqueidPrefix . $aidToImport['referenceAdministrative'];
     }
 
-    protected function callApi()
+    /**
+     * appel le flux
+     *
+     * @return array<int, mixed>
+     */
+    protected function callApi(): array
     {
         $aidsFromImport = [];
         $client = $this->getClient();
@@ -83,7 +95,12 @@ class ImportFluxIleDeFranceCommand extends ImportFluxCommand
         return new CurlHttpClient($apiOptions);
     }
 
-
+    /**
+     *
+     * @param array<mixed, mixed> $aidToImport
+     * @param array<mixed, mixed> $params
+     * @return array<mixed, mixed>
+     */
     protected function getFieldsMapping(array $aidToImport, array $params = null): array
     {
         try {
@@ -92,7 +109,12 @@ class ImportFluxIleDeFranceCommand extends ImportFluxCommand
                 $aidName = isset($aidToImport['title']) ? strip_tags((string) $aidToImport['title']) : '';
             }
 
-            $originUrl = 'https://www.iledefrance.fr/aides-et-appels-a-projets/' . $this->stringService->getSlug(str_replace(["'", "’", 'à'], [''], preg_replace('/(\d{2,4})[-.](\d{2})[-.](\d{2,4})/', '$1$2$3', $aidName)));
+            $originUrl = 'https://www.iledefrance.fr/aides-et-appels-a-projets/' .
+                $this->stringService->getSlug(str_replace(
+                    ["'", "’", 'à'],
+                    [''],
+                    preg_replace('/(\d{2,4})[-.](\d{2})[-.](\d{2,4})/', '$1$2$3', $aidName)
+                ));
             $applicationUrl = $originUrl;
 
 
@@ -116,9 +138,15 @@ class ImportFluxIleDeFranceCommand extends ImportFluxCommand
             $dateSubmissionDeadline = null;
             if (isset($aidToImport["dateFinCampagne"])) {
                 try {
-                    $dateSubmissionDeadline = \DateTime::createFromFormat("Y-m-d\TH:i:s.u\Z", $aidToImport["dateFinCampagne"]);
+                    $dateSubmissionDeadline = \DateTime::createFromFormat(
+                        "Y-m-d\TH:i:s.u\Z",
+                        $aidToImport["dateFinCampagne"]
+                    );
                 } catch (\Exception $e) {
-                    $dateSubmissionDeadline = \DateTime::createFromFormat("Y-m-d\TH:i:s\Z", $aidToImport["dateFinCampagne"]);
+                    $dateSubmissionDeadline = \DateTime::createFromFormat(
+                        "Y-m-d\TH:i:s\Z",
+                        $aidToImport["dateFinCampagne"]
+                    );
                 }
             }
             if (!$dateSubmissionDeadline instanceof \DateTime) {
@@ -138,7 +166,11 @@ class ImportFluxIleDeFranceCommand extends ImportFluxCommand
                 'originUrl' => $originUrl,
                 'applicationUrl' => $applicationUrl,
                 'contact' => isset($aidToImport['contact']) ? $this->getHtmlOrNull($aidToImport['contact']) : null,
-                'eligibility' => $this->concatHtmlFields($aidToImport, ['publicsBeneficiairePrecision', 'modalite', 'objectif', 'demarches'], '<br/>'),
+                'eligibility' => $this->concatHtmlFields(
+                    $aidToImport,
+                    ['publicsBeneficiairePrecision', 'modalite', 'objectif', 'demarches'],
+                    '<br/>'
+                ),
                 'dateStart' => $dateStart,
                 'dateSubmissionDeadline' => $dateSubmissionDeadline,
                 'isCallForProject' => isset($aidToImport['AAP']) && $aidToImport['AAP'] == '1' ? true : false,
@@ -151,6 +183,12 @@ class ImportFluxIleDeFranceCommand extends ImportFluxCommand
         }
     }
 
+    /**
+     *
+     * @param array<mixed, mixed> $aidToImport
+     * @param Aid $aid
+     * @return Aid
+     */
     protected function setAidSteps(array $aidToImport, Aid $aid): Aid
     {
         /** @var AidStepRepository $aidStepRepo */
@@ -168,6 +206,12 @@ class ImportFluxIleDeFranceCommand extends ImportFluxCommand
         return $aid;
     }
 
+    /**
+     *
+     * @param array<mixed, mixed> $aidToImport
+     * @param Aid $aid
+     * @return Aid
+     */
     protected function setAidAudiences(array $aidToImport, Aid $aid): Aid // NOSONAR too complex
     {
         if (!isset($aidToImport['publicsBeneficiaire']) || !is_array($aidToImport['publicsBeneficiaire'])) {
@@ -253,6 +297,12 @@ class ImportFluxIleDeFranceCommand extends ImportFluxCommand
         return $aid;
     }
 
+    /**
+     *
+     * @param array<mixed, mixed> $aidToImport
+     * @param Aid $aid
+     * @return Aid
+     */
     protected function setCategories(array $aidToImport, Aid $aid): Aid // NOSONAR too complex
     {
         if (!isset($aidToImport['competences']) || !is_array($aidToImport['competences'])) {
@@ -355,15 +405,27 @@ class ImportFluxIleDeFranceCommand extends ImportFluxCommand
         return $aid;
     }
 
+    /**
+     *
+     * @param array<mixed, mixed> $aidToImport
+     * @param Aid $aid
+     * @return Aid
+     */
     protected function setAidRecurrence(array $aidToImport, Aid $aid): Aid
     {
         $aidRecurrence = null;
-        if (!isset($aidToImport['dateDebutFuturCampagne']) || trim($aidToImport['dateDebutFuturCampagne']) == '') {
-            $aidRecurrence = $this->managerRegistry->getRepository(AidRecurrence::class)->findOneBy(['slug' => AidRecurrence::SLUG_RECURRING]);
+        if (
+            !isset($aidToImport['dateDebutFuturCampagne'])
+            || trim($aidToImport['dateDebutFuturCampagne']) == ''
+        ) {
+            $aidRecurrence = $this->managerRegistry->getRepository(AidRecurrence::class)
+            ->findOneBy(['slug' => AidRecurrence::SLUG_RECURRING]);
         } elseif (!isset($aidToImport['dateFinCampagne']) || trim($aidToImport['dateFinCampagne']) == '') {
-            $aidRecurrence = $this->managerRegistry->getRepository(AidRecurrence::class)->findOneBy(['slug' => AidRecurrence::SLUG_ONEOFF]);
+            $aidRecurrence = $this->managerRegistry->getRepository(AidRecurrence::class)
+            ->findOneBy(['slug' => AidRecurrence::SLUG_ONEOFF]);
         } else {
-            $aidRecurrence = $this->managerRegistry->getRepository(AidRecurrence::class)->findOneBy(['slug' => AidRecurrence::SLUG_ONGOING]);
+            $aidRecurrence = $this->managerRegistry->getRepository(AidRecurrence::class)
+            ->findOneBy(['slug' => AidRecurrence::SLUG_ONGOING]);
         }
 
         if ($aidRecurrence instanceof AidRecurrence) {
@@ -372,6 +434,12 @@ class ImportFluxIleDeFranceCommand extends ImportFluxCommand
         return $aid;
     }
 
+    /**
+     *
+     * @param array<mixed, mixed> $aidToImport
+     * @param Aid $aid
+     * @return Aid
+     */
     protected function setAidTypes(array $aidToImport, Aid $aid): Aid
     {
         $aidType = $this->managerRegistry->getRepository(AidType::class)->findOneBy([
@@ -385,6 +453,12 @@ class ImportFluxIleDeFranceCommand extends ImportFluxCommand
         return $aid;
     }
 
+    /**
+     *
+     * @param array<mixed, mixed> $aidToImport
+     * @param Aid $aid
+     * @return Aid
+     */
     protected function setKeywords(array $aidToImport, Aid $aid): Aid
     {
         $categories = $aidToImport['competences'] ?? [];

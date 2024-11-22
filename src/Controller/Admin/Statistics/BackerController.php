@@ -4,8 +4,7 @@ namespace App\Controller\Admin\Statistics;
 
 use App\Controller\Admin\DashboardController;
 use App\Repository\Backer\BackerRepository;
-use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
-use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\UX\Chartjs\Builder\ChartBuilderInterface;
 use Symfony\UX\Chartjs\Model\Chart;
@@ -16,7 +15,7 @@ class BackerController extends DashboardController
     public function backerDashboard(
         BackerRepository $backerRepository,
         ChartBuilderInterface $chartBuilderInterface
-    ) {
+    ): Response {
         // nombre total de porteurs
         $nbBackersTotal = $backerRepository->count([]);
 

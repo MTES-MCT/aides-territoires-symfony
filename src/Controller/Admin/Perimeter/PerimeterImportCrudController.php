@@ -5,6 +5,7 @@ namespace App\Controller\Admin\Perimeter;
 use App\Controller\Admin\AtCrudController;
 use App\Entity\Perimeter\PerimeterImport;
 use App\Message\Perimeter\MsgPerimeterImport;
+use App\Repository\Perimeter\PerimeterImportRepository;
 use App\Repository\User\UserRepository;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
@@ -40,7 +41,10 @@ class PerimeterImportCrudController extends AtCrudController
             ->hideWhenCreating();
         yield TextField::new('adhocPerimeterName', 'Périmètre adhoc')
             ->onlyWhenCreating()
-            ->setHelp('Le nom du périmètre à créer avec cet import. Laissez vide pour auto-remplir avec les données, ex: regions_01_05_06_75_68');
+            ->setHelp(
+                'Le nom du périmètre à créer avec cet import. '
+                . 'Laissez vide pour auto-remplir avec les données, ex: regions_01_05_06_75_68'
+            );
 
         yield AssociationField::new('author', 'Auteur')
             ->setFormTypeOption('attr', ['readonly' => true, 'autocomplete' => 'off'])
@@ -68,36 +72,39 @@ class PerimeterImportCrudController extends AtCrudController
             ->setUploadedFileNamePattern('/[slug]-[timestamp].[extension]')
             ->onlyWhenCreating()
             ->setFormTypeOption('mapped', false)
-            ->setFormTypeOption('upload_new', function (UploadedFile $file, string $uploadDir, string $fileName) use ($entity) {
-                // créer dossier temporaire si besoin
-                $tmpFolder = $this->fileService->getUploadTmpDir();
-                if (!is_dir($tmpFolder)) {
-                    mkdir($tmpFolder, 0777, true);
-                }
-
-                // déplace le fichier dans le dossier temporaire
-                $file->move(
-                    $tmpFolder,
-                    $fileName
-                );
-
-                $rowNumber = 1;
-                if (($handle = fopen($tmpFolder . $fileName, "r")) !== false) {
-                    while (($data = fgetcsv($handle, 4096, ';')) !== false) {
-                        if ($rowNumber == 1) {
-                            $rowNumber++;
-                            continue;
-                        };
-                        $entity->addCityCode(str_pad($data[0], 5, '0', STR_PAD_LEFT));
+            ->setFormTypeOption(
+                'upload_new',
+                function (UploadedFile $file, string $uploadDir, string $fileName) use ($entity) {
+                    // créer dossier temporaire si besoin
+                    $tmpFolder = $this->fileService->getUploadTmpDir();
+                    if (!is_dir($tmpFolder)) {
+                        mkdir($tmpFolder, 0777, true);
                     }
+
+                    // déplace le fichier dans le dossier temporaire
+                    $file->move(
+                        $tmpFolder,
+                        $fileName
+                    );
+
+                    $rowNumber = 1;
+                    if (($handle = fopen($tmpFolder . $fileName, "r")) !== false) {
+                        while (($data = fgetcsv($handle, 4096, ';')) !== false) {
+                            if ($rowNumber == 1) {
+                                $rowNumber++;
+                                continue;
+                            };
+                            $entity->addCityCode(str_pad($data[0], 5, '0', STR_PAD_LEFT));
+                        }
+                    }
+
+                    // suppression fichier temporaire
+                    unlink($tmpFolder . $fileName);
+
+                    // retour vide
+                    return;
                 }
-
-                // suppression fichier temporaire
-                unlink($tmpFolder . $fileName);
-
-                // retour vide
-                return;
-            });
+            );
 
         yield FormField::addFieldset('Import')->hideWhenCreating();
         yield BooleanField::new('isImported', 'Import effectué')
@@ -106,12 +113,18 @@ class PerimeterImportCrudController extends AtCrudController
             ->onlyOnForms()
             ->hideWhenCreating();
         yield BooleanField::new('askProcessing', 'Demande effectuéee')
-            ->setHelp('Vous n\'avez normalement pas à modifier ce champ, il est là pour indiquer si l\'import a été demandé.')
+            ->setHelp(
+                'Vous n\'avez normalement pas à modifier ce champ, '
+                . 'il est là pour indiquer si l\'import a été demandé.'
+            )
             ->hideOnIndex()
             ->hideWhenCreating();
         yield BooleanField::new('importProcessing', 'Importation en cours de traitement')
             ->hideOnIndex()
-            ->setHelp('Vous n\'avez normalement pas à modifier ce champ, il est là pour indiquer si l\'import est en cours.')
+            ->setHelp(
+                'Vous n\'avez normalement pas à modifier ce champ, '
+                . 'il est là pour indiquer si l\'import est en cours.'
+            )
             ->hideWhenCreating();
 
         yield FormField::addFieldset('Métadonnées')->hideWhenCreating();
@@ -160,8 +173,11 @@ class PerimeterImportCrudController extends AtCrudController
         $this->managerRegistry->getManager()->persist($entity);
         $this->managerRegistry->getManager()->flush();
 
+        /** @var PerimeterImportRepository $perimeterImportRepository */
+        $perimeterImportRepository = $this->managerRegistry->getRepository(PerimeterImport::class);
+
         // compte le nombre d'import en attente
-        $nbImport = $this->managerRegistry->getRepository(PerimeterImport::class)->countCustom([
+        $nbImport = $perimeterImportRepository->countCustom([
             'askProcessing' => true,
             'exclude' => $entity
         ]);
@@ -169,7 +185,12 @@ class PerimeterImportCrudController extends AtCrudController
         // envoi au worker
         $this->messageBusInterface->dispatch(new MsgPerimeterImport());
 
-        $this->addFlash('success', 'Import demandé. Vous recevrez un mail lorsque l\'import sera terminé. Il y en a actuellement ' . $nbImport . ' en attente.');
+        $this->addFlash(
+            'success',
+            'Import demandé. '
+                . 'Vous recevrez un mail lorsque l\'import sera terminé. '
+                . 'Il y en a actuellement ' . $nbImport . ' en attente.'
+        );
         $adminUrlGenerator = $this->container->get(AdminUrlGenerator::class);
         return $this->redirect(
             $adminUrlGenerator

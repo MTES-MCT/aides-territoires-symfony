@@ -43,7 +43,13 @@ class CronExportSpreadsheetRepository extends ServiceEntityRepository
         $processing = $params['processing'] ?? null;
         $notEmailed = $params['notEmailed'] ?? null;
         $error = $params['error'] ?? null;
-        $orderBy = (isset($params['orderBy']) && isset($params['orderBy']['sort']) && isset($params['orderBy']['order'])) ? $params['orderBy'] : null;
+        $orderBy =
+            (isset($params['orderBy'])
+            && isset($params['orderBy']['sort'])
+            && isset($params['orderBy']['order']))
+                ? $params['orderBy']
+                : null
+        ;
 
         $qb = $this->createQueryBuilder('ces');
 

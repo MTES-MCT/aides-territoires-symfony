@@ -13,8 +13,8 @@ use Symfony\Component\Serializer\SerializerInterface;
 
 class ApiController extends AbstractController
 {
-    const SERIALIZE_FORMAT = 'json';
-    const MAX_ITEMS_PER_PAGE = 100;
+    public const SERIALIZE_FORMAT = 'json';
+    public const MAX_ITEMS_PER_PAGE = 100;
 
     public function __construct(
         protected RequestStack $requestStack,
@@ -44,12 +44,12 @@ class ApiController extends AbstractController
         return (int) $itemsPerPage > self::MAX_ITEMS_PER_PAGE ? self::MAX_ITEMS_PER_PAGE : (int) $itemsPerPage;
     }
 
-    protected function getNbPages($nbItems = 0): int
+    protected function getNbPages(int $nbItems = 0): int
     {
         if ($nbItems == 0) {
             return 1;
         }
-        return ceil($nbItems / $this->getItemsPerPage());
+        return intval(ceil($nbItems / $this->getItemsPerPage()));
     }
 
     protected function getPrevious(): ?string
@@ -58,10 +58,19 @@ class ApiController extends AbstractController
             ? null
             : preg_replace_callback('/page=' . $this->getPage() . '/', function ($matches) {
                 return 'page=' . ($this->getPage() - 1);
-            }, substr($this->routerInterface->generate('app_home', [], UrlGeneratorInterface::ABSOLUTE_URL), 0, -1) . $this->requestStack->getCurrentRequest()->getRequestUri());
+            }, substr(
+                $this->routerInterface->generate(
+                    'app_home',
+                    [],
+                    UrlGeneratorInterface::ABSOLUTE_URL
+                ),
+                0,
+                -1
+            )
+                . $this->requestStack->getCurrentRequest()->getRequestUri());
     }
 
-    protected function getNext($nbItems = 0): ?string
+    protected function getNext(int $nbItems = 0): ?string
     {
         // on est sur la dernière page
         if ($this->getPage() >= $this->getNbPages($nbItems)) {

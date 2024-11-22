@@ -51,7 +51,7 @@ class BackerCrudController extends AtCrudController
         yield BooleanField::new('active', 'Actif')
             ->setHelp('Un porteur d’aides actif est visible sur le site');
         yield AssociationField::new('organizations', 'Organizations')
-            ->autocomplete(true)
+            ->autocomplete()
             ->formatValue(function ($value, $entity) {
                 $return = '';
                 foreach ($entity->getOrganizations() as $organization) {
@@ -116,7 +116,11 @@ class BackerCrudController extends AtCrudController
 
         yield FormField::addFieldset('SEO');
         yield TextLengthCountField::new('metaTitle', 'Titre (balise meta)')
-            ->setHelp('Le titre qui sera affiché dans les SERPs. Il est recommandé de le garder < 60 caractères. Laissez vide pour réutiliser le nom du porteur d’aides.')
+            ->setHelp(
+                'Le titre qui sera affiché dans les SERPs. '
+                . 'Il est recommandé de le garder < 60 caractères. '
+                . 'Laissez vide pour réutiliser le nom du porteur d’aides.'
+            )
             ->setFormTypeOption('attr', ['maxlength' => 255])
             ->onlyOnForms();
         yield TextLengthCountField::new('metaDescription', 'Description (balise meta)')
@@ -141,7 +145,11 @@ class BackerCrudController extends AtCrudController
 
         //set the link using a string or a callable (function like its being used here)
         $displayOnFront->linkToUrl(function ($entity) {
-            return $this->generateUrl('app_backer_details', ['id' => $entity->getId(), 'slug' => $entity->getSlug()], UrlGeneratorInterface::ABSOLUTE_URL);
+            return $this->generateUrl(
+                'app_backer_details',
+                ['id' => $entity->getId(), 'slug' => $entity->getSlug()],
+                UrlGeneratorInterface::ABSOLUTE_URL
+            );
         });
 
         $exportCsvAction = $this->getExportCsvAction();

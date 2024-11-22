@@ -17,88 +17,100 @@ use Doctrine\Common\Collections\ArrayCollection;
 
 class AidSearchClass // NOSONAR too much methods
 {
-    private ?OrganizationType $organizationType;
+    private ?OrganizationType $organization_type_slug;
     /**
-     * @var ?ArrayCollection|OrganizationType[]
+     * @var ?ArrayCollection<int, OrganizationType>
      */
     private ?ArrayCollection $audiences;
-    private ?Perimeter $searchPerimeter;
+    private ?Perimeter $perimeter_id;
     private ?string $keyword;
     /**
-     * @var ?ArrayCollection|Category[]
+     * @var ?ArrayCollection<int, Category>
      */
-    private $categorysearch;
+    private $category_ids;
     private ?bool $newIntegration;
     private ?string $orderBy;
     /**
-     * @var ?ArrayCollection|AidType[]
+     * @var ?ArrayCollection<int, AidType>
      */
-    private $aidTypes;
+    private $aid_type_ids;
 
     /**
-     * @var ?ArrayCollection|AidType[]
+     * @var ?ArrayCollection<int, Backer>
      */
-    private $backerschoice;
-    private ?BackerGroup $backerGroup;
+    private $backer_ids;
+    private ?BackerGroup $backer_group_id;
 
-    private ?\DateTime $applyBefore;
+    private ?\DateTime $apply_before;
+    private ?\DateTime $published_after;
+
     /**
-     * @var ?ArrayCollection|Program[]
+     * @var ?ArrayCollection<int, Program>
      */
     private $programs;
     /**
-     * @var ?ArrayCollection|AidStep[]
+     * @var ?ArrayCollection<int, AidStep>
      */
-    private $aidSteps;
+    private $aid_step_ids;
     /**
-     * @var ?ArrayCollection|AidDestination[]
+     * @var ?ArrayCollection<int, AidDestination>
      */
-    private $aidDestinations;
-    private ?bool $isCharged;
-    private ?string $europeanAid;
-    private ?bool $isCallForProject;
+    private $aid_destination_ids;
+    private ?bool $is_charged;
+    private ?string $european_aid_slug;
+    private ?bool $call_for_projects_only;
 
     private ?ProjectReference $projectReference;
     private ?AidRecurrence $aidRecurrence;
 
     public function __construct()
     {
-        $this->organizationType = null;
+        $this->organization_type_slug = null;
         $this->audiences = null;
-        $this->searchPerimeter = null;
+        $this->perimeter_id = null;
         $this->keyword = null;
-        $this->categorysearch = null;
+        $this->category_ids = null;
         $this->newIntegration = null;
-        $this->aidTypes = null;
+        $this->aid_type_ids = null;
         $this->orderBy = null;
-        $this->backerschoice = null;
-        $this->backerGroup = null;
-        $this->applyBefore = null;
+        $this->backer_ids = null;
+        $this->backer_group_id = null;
+        $this->apply_before = null;
+        $this->published_after = null;
         $this->programs = null;
-        $this->aidSteps = null;
-        $this->aidDestinations = null;
-        $this->isCharged = null;
-        $this->europeanAid = null;
-        $this->isCallForProject = null;
+        $this->aid_step_ids = null;
+        $this->aid_destination_ids = null;
+        $this->is_charged = null;
+        $this->european_aid_slug = null;
+        $this->call_for_projects_only = null;
         $this->projectReference = null;
         $this->aidRecurrence = null;
     }
 
-    public function getOrganizationType(): ?OrganizationType
+    public function getOrganizationTypeSlug(): ?OrganizationType
     {
-        return $this->organizationType;
+        return $this->organization_type_slug;
     }
 
-    public function setOrganizationType(?OrganizationType $organizationType): void
+    public function setOrganizationTypeSlug(?OrganizationType $organizationType): void
     {
-        $this->organizationType = $organizationType;
+        $this->organization_type_slug = $organizationType;
     }
 
+    /**
+     *
+     * @return ArrayCollection<int, OrganizationType>|null
+     */
     public function getAudiences(): ?ArrayCollection
     {
         return $this->audiences;
     }
 
+    /**
+     *
+     * @param ArrayCollection<int, OrganizationType>|null $audiences
+     * @return void
+     */
     public function setAudiences(?ArrayCollection $audiences): void
     {
         $this->audiences = $audiences;
@@ -114,14 +126,14 @@ class AidSearchClass // NOSONAR too much methods
         }
     }
 
-    public function getSearchPerimeter(): ?Perimeter
+    public function getPerimeterId(): ?Perimeter
     {
-        return $this->searchPerimeter;
+        return $this->perimeter_id;
     }
 
-    public function setSearchPerimeter(?Perimeter $searchPerimeter): void
+    public function setPerimeterId(?Perimeter $perimeter): void
     {
-        $this->searchPerimeter = $searchPerimeter;
+        $this->perimeter_id = $perimeter;
     }
 
     public function getKeyword(): ?string
@@ -134,23 +146,32 @@ class AidSearchClass // NOSONAR too much methods
         $this->keyword = $keyword;
     }
 
-    public function getCategorySearch(): ?ArrayCollection
+    /**
+     *
+     * @return ArrayCollection<int, Category>|null
+     */
+    public function getCategoryIds(): ?ArrayCollection
     {
-        return $this->categorysearch;
+        return $this->category_ids;
     }
 
-    public function setCategorySearch(?ArrayCollection $categories): void
+    /**
+     *
+     * @param ArrayCollection<int, Category>|null $categoryIds
+     * @return void
+     */
+    public function setCategoryIds(?ArrayCollection $categoryIds): void
     {
-        $this->categorysearch = $categories;
+        $this->category_ids = $categoryIds;
     }
 
-    public function addCategorySearch(Category $category): void
+    public function addCategoryId(Category $category): void
     {
-        if (!$this->categorysearch) {
-            $this->categorysearch = new ArrayCollection();
+        if (!$this->category_ids) {
+            $this->category_ids = new ArrayCollection();
         }
-        if (!$this->categorysearch->contains($category)) {
-            $this->categorysearch->add($category);
+        if (!$this->category_ids->contains($category)) {
+            $this->category_ids->add($category);
         }
     }
 
@@ -174,71 +195,108 @@ class AidSearchClass // NOSONAR too much methods
         $this->orderBy = $orderBy;
     }
 
-    public function getAidTypes(): ?ArrayCollection
+    /**
+     *
+     * @return ArrayCollection<int, AidType>|null
+     */
+    public function getAidTypeIds(): ?ArrayCollection
     {
-        return $this->aidTypes;
+        return $this->aid_type_ids;
     }
 
-    public function setAidTypes(?ArrayCollection $aidTypes): void
+    /**
+     *
+     * @param ArrayCollection<int, AidType>|null $aidTypeIds
+     * @return void
+     */
+    public function setAidTypeIds(?ArrayCollection $aidTypeIds): void
     {
-        $this->aidTypes = $aidTypes;
+        $this->aid_type_ids = $aidTypeIds;
     }
 
-    public function addAidType(AidType $aidType): void
+    public function addAidTypeId(AidType $aidType): void
     {
-        if (!$this->aidTypes) {
-            $this->aidTypes = new ArrayCollection();
+        if (!$this->aid_type_ids) {
+            $this->aid_type_ids = new ArrayCollection();
         }
-        if (!$this->aidTypes->contains($aidType)) {
-            $this->aidTypes->add($aidType);
-        }
-    }
-
-    public function getBackerschoice(): ?ArrayCollection
-    {
-        return $this->backerschoice;
-    }
-
-    public function setBackerschoice(?ArrayCollection $backers): void
-    {
-        $this->backerschoice = $backers;
-    }
-
-    public function addBackerchoice(Backer $backer): void
-    {
-        if (!$this->backerschoice) {
-            $this->backerschoice = new ArrayCollection();
-        }
-        if (!$this->backerschoice->contains($backer)) {
-            $this->backerschoice->add($backer);
+        if (!$this->aid_type_ids->contains($aidType)) {
+            $this->aid_type_ids->add($aidType);
         }
     }
 
-    public function getBackerGroup(): ?BackerGroup
+    /**
+     *
+     * @return ArrayCollection<int, Backer>|null
+     */
+    public function getBackerIds(): ?ArrayCollection
     {
-        return $this->backerGroup;
+        return $this->backer_ids;
     }
 
-    public function setBackerGroup(?BackerGroup $backerGroup): void
+    /**
+     *
+     * @param ArrayCollection<int, Backer>|null $backerIds
+     * @return void
+     */
+    public function setBackerIds(?ArrayCollection $backerIds): void
     {
-        $this->backerGroup = $backerGroup;
+        $this->backer_ids = $backerIds;
+    }
+
+    public function addBackerId(Backer $backer): void
+    {
+        if (!$this->backer_ids) {
+            $this->backer_ids = new ArrayCollection();
+        }
+        if (!$this->backer_ids->contains($backer)) {
+            $this->backer_ids->add($backer);
+        }
+    }
+
+    public function getBackerGroupId(): ?BackerGroup
+    {
+        return $this->backer_group_id;
+    }
+
+    public function setBackerGroupId(?BackerGroup $backerGroup): void
+    {
+        $this->backer_group_id = $backerGroup;
     }
 
     public function getApplyBefore(): ?\DateTime
     {
-        return $this->applyBefore;
+        return $this->apply_before;
     }
 
     public function setApplyBefore(?\DateTime $applyBefore): void
     {
-        $this->applyBefore = $applyBefore;
+        $this->apply_before = $applyBefore;
     }
 
+    public function getPublishedAfter(): ?\DateTime
+    {
+        return $this->published_after;
+    }
+
+    public function setPublishedAfter(?\DateTime $publishedAfter): void
+    {
+        $this->published_after = $publishedAfter;
+    }
+
+    /**
+     *
+     * @return ArrayCollection<int, Program>|null
+     */
     public function getPrograms(): ?ArrayCollection
     {
         return $this->programs;
     }
 
+    /**
+     *
+     * @param ArrayCollection<int, Program>|null $programs
+     * @return void
+     */
     public function setPrograms(?ArrayCollection $programs): void
     {
         $this->programs = $programs;
@@ -254,74 +312,92 @@ class AidSearchClass // NOSONAR too much methods
         }
     }
 
-    public function getAidSteps(): ?ArrayCollection
+    /**
+     *
+     * @return ArrayCollection<int, AidStep>|null
+     */
+    public function getAidStepIds(): ?ArrayCollection
     {
-        return $this->aidSteps;
+        return $this->aid_step_ids;
     }
 
-    public function setAidSteps(?ArrayCollection $aidSteps): void
+    /**
+     *
+     * @param ArrayCollection<int, AidStep>|null $aidStepIds
+     * @return void
+     */
+    public function setAidStepIds(?ArrayCollection $aidStepIds): void
     {
-        $this->aidSteps = $aidSteps;
+        $this->aid_step_ids = $aidStepIds;
     }
 
-    public function addAidStep(AidStep $aidStep): void
+    public function addAidStepId(AidStep $aidStep): void
     {
-        if (!$this->aidSteps) {
-            $this->aidSteps = new ArrayCollection();
+        if (!$this->aid_step_ids) {
+            $this->aid_step_ids = new ArrayCollection();
         }
-        if (!$this->aidSteps->contains($aidStep)) {
-            $this->aidSteps->add($aidStep);
+        if (!$this->aid_step_ids->contains($aidStep)) {
+            $this->aid_step_ids->add($aidStep);
         }
     }
 
-    public function getAidDestinations(): ?ArrayCollection
+    /**
+     *
+     * @return ArrayCollection<int, AidDestination>|null
+     */
+    public function getAidDestinationIds(): ?ArrayCollection
     {
-        return $this->aidDestinations;
+        return $this->aid_destination_ids;
     }
 
-    public function setAidDestinations(?ArrayCollection $aidDestinations): void
+    /**
+     *
+     * @param ArrayCollection<int, AidDestination>|null $aidDestinationIds
+     * @return void
+     */
+    public function setAidDestinationIds(?ArrayCollection $aidDestinationIds): void
     {
-        $this->aidDestinations = $aidDestinations;
+        $this->aid_destination_ids = $aidDestinationIds;
     }
 
-    public function addAidDestination($aidDestination): void
+    public function addAidDestinationId(AidDestination $aidDestination): void
     {
-        if (!$this->aidDestinations) {
-            $this->aidDestinations = new ArrayCollection();
+        if (!$this->aid_destination_ids) {
+            $this->aid_destination_ids = new ArrayCollection();
         }
-        if (!$this->aidDestinations->contains($aidDestination)) {
-            $this->aidDestinations->add($aidDestination);
+        if (!$this->aid_destination_ids->contains($aidDestination)) {
+            $this->aid_destination_ids->add($aidDestination);
         }
     }
 
     public function getIsCharged(): ?bool
     {
-        return $this->isCharged;
+        return $this->is_charged;
     }
 
     public function setIsCharged(?bool $isCharged): void
     {
-        $this->isCharged = $isCharged;
+        $this->is_charged = $isCharged;
     }
 
-    public function getEuropeanAid(): ?string
+    public function getEuropeanAidSlug(): ?string
     {
-        return $this->europeanAid;
+        return $this->european_aid_slug;
     }
 
-    public function setEuropeanAid(?string $europeanAid): void
+    public function setEuropeanAidSlug(?string $europeanAidSlug): void
     {
-        $this->europeanAid = $europeanAid;
+        $this->european_aid_slug = $europeanAidSlug;
     }
 
-    public function getIsCallForProject(): ?bool
+    public function getCallForProjectsOnly(): ?bool
     {
-        return $this->isCallForProject;
+        return $this->call_for_projects_only;
     }
 
-    public function setIsCallForProject(?bool $isCallForProject): void
+    public function setCallForProjectsOnly(?bool $callForProjectsOnly): void
     {
-        $this->isCallForProject = $isCallForProject;
+        $this->call_for_projects_only = $callForProjectsOnly;
     }
 
     public function getProjectReference(): ?ProjectReference

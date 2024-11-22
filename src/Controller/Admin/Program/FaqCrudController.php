@@ -15,6 +15,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\CollectionField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
+use Symfony\Component\HttpFoundation\Response;
 
 class FaqCrudController extends AtCrudController
 {
@@ -48,7 +49,7 @@ class FaqCrudController extends AtCrudController
     }
     public function order(
         AdminContext $adminContext
-    ) {
+    ): Response {
         // la faq choisie
         $faq = $adminContext->getEntity()->getInstance();
 
@@ -79,7 +80,8 @@ class FaqCrudController extends AtCrudController
                                 if (isset($faqCategoryItem->children) && is_array($faqCategoryItem->children)) {
                                     $positionQuestion = 0;
                                     foreach ($faqCategoryItem->children as $faqQuestionAnswserItem) {
-                                        $faqQuestionAnswser = $faqQuestionAnswserRepository->find($faqQuestionAnswserItem->id);
+                                        $faqQuestionAnswser = $faqQuestionAnswserRepository
+                                            ->find($faqQuestionAnswserItem->id);
                                         if ($faqQuestionAnswser instanceof FaqQuestionAnswser) {
                                             $faqQuestionAnswser->setPosition($positionQuestion);
                                             $positionQuestion++;

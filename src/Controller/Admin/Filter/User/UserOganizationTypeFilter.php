@@ -14,7 +14,7 @@ class UserOganizationTypeFilter implements FilterInterface
 {
     use FilterTrait;
 
-    public static function new(string $propertyName, $label = null): self
+    public static function new(string $propertyName, mixed $label = null): self
     {
         return (new self())
             ->setFilterFqcn(__CLASS__)
@@ -23,8 +23,12 @@ class UserOganizationTypeFilter implements FilterInterface
             ->setFormType(UserOganizationTypeFilterType::class);
     }
 
-    public function apply(QueryBuilder $queryBuilder, FilterDataDto $filterDataDto, ?FieldDto $fieldDto, EntityDto $entityDto): void
-    {
+    public function apply(
+        QueryBuilder $queryBuilder,
+        FilterDataDto $filterDataDto,
+        ?FieldDto $fieldDto,
+        EntityDto $entityDto
+    ): void {
         if (!$filterDataDto->getValue()) {
             return;
         }
@@ -34,7 +38,7 @@ class UserOganizationTypeFilter implements FilterInterface
             ->innerJoin('organizationsForOt.organizationType', 'organizationTypeForFilter')
             ->andWhere('organizationTypeForFilter.id = :idOrganizationTypeForFilter')
             ->setParameter('idOrganizationTypeForFilter', $filterDataDto->getValue());
-    ;
+        ;
 
 
         return;

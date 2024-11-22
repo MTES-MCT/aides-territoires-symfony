@@ -1,14 +1,42 @@
-@import 'leaflet/dist/leaflet.css';
-// @import '@gouvfr/dsfr/dist/components/table/table.css';
-
-@import '@gouvfr/dsfr/dist/dsfr.min.css';
-
-// @import '../../override/root_dsfr';
-
+@use 'leaflet/dist/leaflet';
+@use '@gouvfr/dsfr/dist/dsfr.min';
 
 :root{
     font-size: 16px;
 }
+
+
+/* Sortable tables. */
+.fr-table[data-controller='table'] {
+  display: block;
+  width: 100%;
+  overflow: auto;
+  height: 500px;
+}
+
+.fr-table[data-controller='table'] thead th[scope='col'] {
+  padding: 2px;
+  position: sticky;
+  top: 0;
+  background-color: var(--background-contrast-grey);
+}
+
+.fr-table[data-controller='table'] thead th[scope='col'] button {
+  text-align: left;
+  width: 100%;
+  padding: .75rem;
+  font-weight: 700;
+}
+
+.fr-table[data-controller='table'] thead th[scope='col'] button:hover,
+.fr-table[data-controller='table'] th[scope='col'][aria-sort] {
+  background-color: var(--background-open-blue-france);
+}
+
+.fr-table[data-fr-js-table="true"] caption {
+  top: -1rem;
+}
+
 /* Map related styles. */
 .leaflet-container {
     width: 1000px;

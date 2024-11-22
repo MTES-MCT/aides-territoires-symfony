@@ -24,6 +24,9 @@ class LogAidEligibilityTest
     #[ORM\Column]
     private ?bool $answerSuccess = null;
 
+    /**
+     * @var string[]|null
+     */
     #[ORM\Column(nullable: true)]
     private ?array $answerDetails = null;
 
@@ -67,11 +70,18 @@ class LogAidEligibilityTest
         return $this;
     }
 
+    /**
+     * @return string[]|null
+     */
     public function getAnswerDetails(): ?array
     {
         return $this->answerDetails;
     }
 
+    /**
+     * @param string[]|null $answerDetails
+     * @return static
+     */
     public function setAnswerDetails(?array $answerDetails): static
     {
         $this->answerDetails = $answerDetails;

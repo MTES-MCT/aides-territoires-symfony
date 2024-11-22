@@ -38,7 +38,7 @@ class EasyAdminSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function beforePerimeterImporterCreate(BeforeEntityPersistedEvent $event)
+    public function beforePerimeterImporterCreate(BeforeEntityPersistedEvent $event): void
     {
         $entity = $event->getEntityInstance();
 
@@ -47,7 +47,9 @@ class EasyAdminSubscriber implements EventSubscriberInterface
         }
 
         if (!$entity->getAdhocPerimeterName()) {
-            $entity->setAdhocPerimeterName($this->perimeterService->getAdhocNameFromInseeCodes($entity->getCityCodes()));
+            $entity->setAdhocPerimeterName(
+                $this->perimeterService->getAdhocNameFromInseeCodes($entity->getCityCodes())
+            );
         }
 
         if (!$entity->getAdhocPerimeter() && $entity->getAdhocPerimeterName()) {
@@ -63,7 +65,7 @@ class EasyAdminSubscriber implements EventSubscriberInterface
     }
 
 
-    public function onBeforeEntityUpdated(BeforeEntityUpdatedEvent $event)
+    public function onBeforeEntityUpdated(BeforeEntityUpdatedEvent $event): void
     {
         // l'entite
         $entity = $event->getEntityInstance();

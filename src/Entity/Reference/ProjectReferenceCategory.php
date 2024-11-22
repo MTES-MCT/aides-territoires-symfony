@@ -34,11 +34,18 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Entity(repositoryClass: ProjectReferenceCategoryRepository::class)]
 class ProjectReferenceCategory
 {
-    const API_GROUP_LIST = 'project_reference_category:list';
-    const API_GROUP_ITEM = 'project_reference_category:item';
-    const API_DESCRIPTION = 'Lister toutes les catégories de projet référent';
+    public const API_GROUP_LIST = 'project_reference_category:list';
+    public const API_GROUP_ITEM = 'project_reference_category:item';
+    public const API_DESCRIPTION = 'Lister toutes les catégories de projet référent';
 
-    #[Groups([self::API_GROUP_LIST, self::API_GROUP_ITEM, ProjectReference::API_GROUP_LIST, ProjectReference::API_GROUP_ITEM])]
+    #[Groups(
+        [
+            self::API_GROUP_LIST,
+            self::API_GROUP_ITEM,
+            ProjectReference::API_GROUP_LIST,
+            ProjectReference::API_GROUP_ITEM
+        ]
+    )]
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -47,10 +54,20 @@ class ProjectReferenceCategory
     #[Assert\NotNull()]
     #[Assert\NotBlank()]
     #[Assert\Length(max: 150)]
-    #[Groups([self::API_GROUP_LIST, self::API_GROUP_ITEM, ProjectReference::API_GROUP_LIST, ProjectReference::API_GROUP_ITEM])]
+    #[Groups(
+        [
+            self::API_GROUP_LIST,
+            self::API_GROUP_ITEM,
+            ProjectReference::API_GROUP_LIST,
+            ProjectReference::API_GROUP_ITEM
+        ]
+    )]
     #[ORM\Column(length: 150)]
     private ?string $name = null;
 
+    /**
+     * @var Collection<int, ProjectReference>
+     */
     #[ORM\OneToMany(mappedBy: 'projectReferenceCategory', targetEntity: ProjectReference::class)]
     private Collection $projectReferences;
 
@@ -96,7 +113,10 @@ class ProjectReferenceCategory
 
     public function removeProjectReference(ProjectReference $projectReference): static
     {
-        if ($this->projectReferences->removeElement($projectReference) && $projectReference->getProjectReferenceCategory() === $this) {
+        if (
+            $this->projectReferences->removeElement($projectReference)
+            && $projectReference->getProjectReferenceCategory() === $this
+        ) {
             $projectReference->setProjectReferenceCategory(null);
         }
 

@@ -30,29 +30,27 @@ use App\Service\Log\LogAidViewService;
 use App\Service\User\UserService;
 use App\Service\Various\StringService;
 use Doctrine\Persistence\ManagerRegistry;
-use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
 use Dompdf\Dompdf;
 use Dompdf\Options;
 use OpenSpout\Common\Entity\Cell;
 use OpenSpout\Common\Entity\Row;
 use OpenSpout\Writer\XLSX\Entity\SheetView;
-use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Messenger\MessageBusInterface;
+use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
-
-use function Symfony\Component\Clock\now;
 
 class AidController extends FrontController
 {
     #[Route('/comptes/aides/manuel-import', name: 'app_user_aid_import_manual')]
-    public function importManual()
+    public function importManual(): Response
     {
         // fil arianne
         $this->breadcrumb->add(
@@ -71,7 +69,7 @@ class AidController extends FrontController
     public function publish(
         RequestStack $requestStack,
         UserService $userService,
-        ManagerRegistry $managerRegistry
+        ManagerRegistry $managerRegistry,
     ): Response {
         // le user
         $user = $userService->getUserLogged();
@@ -105,7 +103,15 @@ class AidController extends FrontController
                 // message
                 $this->tAddFlash(
                     FrontController::FLASH_SUCCESS,
-                    'Votre aide a été créée. Vous pouvez poursuivre l’édition ou <a href="' . $this->generateUrl('app_aid_aid_details', ['slug' => $aid->getSlug()]) . '" target="_blank">la prévisualiser <span class="fr-sr-only">Ouvre une nouvelle fenêtre</span></a>.'
+                    'Votre aide a été créée. '
+                    .'Vous pouvez poursuivre l’édition ou <a href="'
+                    .$this->generateUrl(
+                        'app_aid_aid_details',
+                        ['slug' => $aid->getSlug()],
+                        UrlGeneratorInterface::ABSOLUTE_URL
+                    )
+                    .'" target="_blank">la prévisualiser <span class="fr-sr-only">'
+                    .'Ouvre une nouvelle fenêtre</span></a>.'
                 );
 
                 // redirection
@@ -113,7 +119,9 @@ class AidController extends FrontController
             } else {
                 $this->addFlash(
                     FrontController::FLASH_ERROR,
-                    'Nous n’avons pas pu traiter votre formulaire car les données saisies sont invalides et / ou incomplètes. Merci de bien vouloir vérifier votre saisie et corriger les erreurs avant de réessayer. '
+                    'Nous n’avons pas pu traiter votre formulaire car les données saisies sont invalides '
+                    .'et / ou incomplètes. '
+                    .'Merci de bien vouloir vérifier votre saisie et corriger les erreurs avant de réessayer. '
                 );
             }
         }
@@ -125,7 +133,7 @@ class AidController extends FrontController
                 $organization->getBacker()
                 && (
                     !$organization->getBacker()->getName()
-                    || $organization->getBacker()->isIsCorporate() === null
+                    || null === $organization->getBacker()->isIsCorporate()
                     || !$organization->getBacker()->getDescription()
                 )
             ) {
@@ -138,10 +146,9 @@ class AidController extends FrontController
             'no_breadcrumb' => true,
             'formAid' => $formAid->createView(),
             'aid' => $aid,
-            'organizationBackersNotComplete' => $organizationBackersNotComplete
+            'organizationBackersNotComplete' => $organizationBackersNotComplete,
         ]);
     }
-
 
     #[Route('/comptes/aides/publications/', name: 'app_user_aid_publications')]
     public function publications(
@@ -149,7 +156,7 @@ class AidController extends FrontController
         AidRepository $aidRepository,
         LogAidViewRepository $logAidViewRepository,
         RequestStack $requestStack,
-        MessageBusInterface $bus
+        MessageBusInterface $bus,
     ): Response {
         // le user
         $user = $userService->getUserLogged();
@@ -159,16 +166,16 @@ class AidController extends FrontController
             'author' => $user,
             'orderBy' => [
                 'sort' => 'a.dateCreate',
-                'order' => 'DESC'
-            ]
+                'order' => 'DESC',
+            ],
         ];
 
         // formulaire filtre aides
         $formAidFilter = $this->createForm(AidFilterType::class, null, [
             'action' => '#aids-filters',
             'attr' => [
-                'id' => 'aids-filters'
-            ]
+                'id' => 'aids-filters',
+            ],
         ]);
         $formAidFilter->handleRequest($requestStack->getCurrentRequest());
         if ($formAidFilter->isSubmitted()) {
@@ -186,11 +193,11 @@ class AidController extends FrontController
         $aids = $aidRepository->findCustom($aidsParams);
 
         $formExportParams = [
-            'action' => $this->generateUrl('app_user_aids_export')
+            'action' => $this->generateUrl('app_user_aids_export'),
         ];
         if (count($aids) <= Aid::MAX_NB_EXPORT_PDF) {
             $formExportParams['attr'] = [
-                'target' => '_blank'
+                'target' => '_blank',
             ];
         }
         // formulaire export aide
@@ -200,7 +207,7 @@ class AidController extends FrontController
         $nbAidsLive = $aidRepository->countByUser(
             $user,
             [
-                'showInSearch' => true
+                'showInSearch' => true,
             ]
         );
 
@@ -214,7 +221,7 @@ class AidController extends FrontController
             $aid->setNbViews(
                 $logAidViewRepository->countCustom(
                     [
-                        'aid' => $aid
+                        'aid' => $aid,
                     ]
                 )
             );
@@ -227,7 +234,7 @@ class AidController extends FrontController
         $nbAidsViewsMonth = $logAidViewRepository->countCustom(
             [
                 'author' => $user,
-                'dateMin' => $lastMonth
+                'dateMin' => $lastMonth,
             ]
         );
 
@@ -238,12 +245,9 @@ class AidController extends FrontController
         $dateMax = $dateMaxGet ? new \DateTime(date($dateMaxGet)) : new \DateTime(date('Y-m-d'));
 
         $formAidStatsPeriod = $this->createForm(AidStatsPeriodType::class);
-        if ($dateMin) {
-            $formAidStatsPeriod->get('dateMin')->setData($dateMin);
-        }
-        if ($dateMax) {
-            $formAidStatsPeriod->get('dateMax')->setData($dateMax);
-        }
+        $formAidStatsPeriod->get('dateMin')->setData($dateMin);
+        $formAidStatsPeriod->get('dateMax')->setData($dateMax);
+
         $formAidStatsPeriod->handleRequest($requestStack->getCurrentRequest());
         if ($formAidStatsPeriod->isSubmitted()) {
             if ($formAidStatsPeriod->isValid()) {
@@ -260,19 +264,25 @@ class AidController extends FrontController
 
                     $this->addFlash(
                         FrontController::FLASH_SUCCESS,
-                        'Votre export est trop volumineux, il sera lancé par une tâche automatique et vous recevrez un mail avec le document en pièce jointe.'
+                        'Votre export est trop volumineux, '
+                        .'il sera lancé par une tâche automatique '
+                        .'et vous recevrez un mail avec le document en pièce jointe.'
                     );
                 } else {
                     // Sinon téléchargement direct du fichier
-                    return $this->redirectToRoute('app_user_aid_all_export_stats', ['dateMin' => $dateMin->format('Y-m-d'), 'dateMax' => $dateMax->format('Y-m-d')]);
+                    return $this->redirectToRoute(
+                        'app_user_aid_all_export_stats',
+                        ['dateMin' => $dateMin->format('Y-m-d'), 'dateMax' => $dateMax->format('Y-m-d')]
+                    );
                 }
             } else {
                 $this->addFlash(
                     FrontController::FLASH_ERROR,
-                    'Nous n’avons pas pu traiter votre formulaire car les données saisies sont invalides et / ou incomplètes. Merci de bien vouloir vérifier votre saisie et corriger les erreurs avant de réessayer. '
+                    'Nous n’avons pas pu traiter votre formulaire car les données saisies sont invalides '
+                    .'et / ou incomplètes. '
+                    .'Merci de bien vouloir vérifier votre saisie et corriger les erreurs avant de réessayer. '
                 );
             }
-            
         }
 
         // fil arianne
@@ -292,25 +302,29 @@ class AidController extends FrontController
             'nbAidsViewsMonth' => $nbAidsViewsMonth,
             'formAidFilter' => $formAidFilter->createView(),
             'formExport' => $formExport->createView(),
-            'formAidStatsPeriod' => $formAidStatsPeriod
+            'formAidStatsPeriod' => $formAidStatsPeriod,
         ]);
     }
 
-    #[Route('/comptes/aides/publications/{slug}', name: 'app_user_aid_edit', requirements: ['slug' => '[a-zA-Z0-9\-_]+'])]
+    #[Route(
+        '/comptes/aides/publications/{slug}',
+        name: 'app_user_aid_edit',
+        requirements: ['slug' => '[a-zA-Z0-9\-_]+']
+    )]
     public function edit(
-        $slug,
+        string $slug,
         UserService $userService,
         AidService $aidService,
         RequestStack $requestStack,
         ManagerRegistry $managerRegistry,
-        AidRepository $aidRepository
+        AidRepository $aidRepository,
     ): Response {
         // user
         $user = $userService->getUserLogged();
 
         // charge aide
         $aid = $aidRepository->findOneBy([
-            'slug' => $slug
+            'slug' => $slug,
         ]);
         if (!$aid instanceof Aid) {
             throw new AidNotFoundException('Cette aide n\'existe pas');
@@ -390,7 +404,9 @@ class AidController extends FrontController
                 // message
                 $this->addFlash(
                     FrontController::FLASH_ERROR,
-                    'Nous n’avons pas pu traiter votre formulaire car les données saisies sont invalides et / ou incomplètes. Merci de bien vouloir vérifier votre saisie et corriger les erreurs avant de réessayer. '
+                    'Nous n’avons pas pu traiter votre formulaire car les données saisies sont invalides '
+                    .'et / ou incomplètes. '
+                    .'Merci de bien vouloir vérifier votre saisie et corriger les erreurs avant de réessayer. '
                 );
             }
         }
@@ -402,7 +418,7 @@ class AidController extends FrontController
                 $organization->getBacker()
                 && (
                     !$organization->getBacker()->getName()
-                    || $organization->getBacker()->isIsCorporate() === null
+                    || null === $organization->getBacker()->isIsCorporate()
                     || !$organization->getBacker()->getDescription()
                 )
             ) {
@@ -417,7 +433,7 @@ class AidController extends FrontController
             'formAid' => $formAid->createView(),
             'aid' => $aid,
             'aidDuplicates' => $aidDuplicates,
-            'organizationBackersNotComplete' => $organizationBackersNotComplete
+            'organizationBackersNotComplete' => $organizationBackersNotComplete,
         ]);
     }
 
@@ -428,8 +444,8 @@ class AidController extends FrontController
         AidRepository $aidRepository,
         StringService $stringService,
         RouterInterface $routerInterface,
-        MessageBusInterface $messageBus
-    ) {
+        MessageBusInterface $messageBus,
+    ): RedirectResponse|StreamedResponse {
         // le user
         $user = $userService->getUserLogged();
 
@@ -442,17 +458,25 @@ class AidController extends FrontController
                 $aids = $aidRepository->findCustom(
                     [
                         'author' => $user,
-                        'showInSearch' => true
+                        'showInSearch' => true,
                     ]
                 );
 
                 // si pdf et plus de Aid::MAX_NB_EXPORT_PDF aides
-                if ($formExport->get('format')->getData() == 'pdf' && count($aids) > Aid::MAX_NB_EXPORT_PDF) {
-                    $messageBus->dispatch(new AidsExportPdf($user->getId(), $user->getDefaultOrganization() ? $user->getDefaultOrganization()->getId() : 0));
+                if ('pdf' == $formExport->get('format')->getData() && count($aids) > Aid::MAX_NB_EXPORT_PDF) {
+                    $messageBus->dispatch(
+                        new AidsExportPdf(
+                            $user->getId(),
+                            $user->getDefaultOrganization()
+                                ? $user->getDefaultOrganization()->getId()
+                                : 0
+                        )
+                    );
                     $this->addFlash(
                         FrontController::FLASH_SUCCESS,
                         'Votre export PDF est en cours de génération. Vous recevrez un email avec le fichier.'
                     );
+
                     return $this->redirectToRoute('app_user_aid_publications');
                 } else {
                     // si tableur ou pdf et moins de Aid::MAX_NB_EXPORT_PDF aides
@@ -468,23 +492,29 @@ class AidController extends FrontController
             }
         }
 
-        return $response;
+        return $response ?? $this->redirectToRoute('app_user_aid_publications');
     }
 
+    /**
+     * @param array<int, Aid> $aids
+     */
     private function getExportStreamedResponse(
         string $format,
         array $aids,
         User $user,
         StringService $stringService,
-        RouterInterface $routerInterface
+        RouterInterface $routerInterface,
     ): StreamedResponse {
         // nom de fichier
         $today = new \DateTime(date('Y-m-d'));
-        $organizationName = $user->getDefaultOrganization() ? $stringService->getSLug($user->getDefaultOrganization()->getName()) : '';
-        $filename = 'Aides-territoires-' . $today->format('d_m_Y') . '-' . $organizationName;
+        $organizationName = $user->getDefaultOrganization()
+            ? $stringService->getSLug($user->getDefaultOrganization()->getName())
+            : ''
+        ;
+        $filename = 'Aides-territoires-'.$today->format('d_m_Y').'-'.$organizationName;
 
         // alimente la réponse
-        if ($format == 'pdf') {
+        if ('pdf' == $format) {
             $pdfOptions = new Options();
             $pdfOptions->setIsRemoteEnabled(true);
 
@@ -494,7 +524,7 @@ class AidController extends FrontController
             $dompdf->loadHtml(
                 $this->renderView('user/aid/aids_export_pdf.html.twig', [
                     'aids' => $aids,
-                    'organization' => $user->getDefaultOrganization() ?? null
+                    'organization' => $user->getDefaultOrganization() ?? null,
                 ])
             );
 
@@ -505,27 +535,27 @@ class AidController extends FrontController
             $dompdf->render();
 
             // Output the generated PDF to Browser (inline view)
-            $dompdf->stream($filename . '.pdf', [
-                "Attachment" => false
+            $dompdf->stream($filename.'.pdf', [
+                'Attachment' => false,
             ]);
             // exit pour eviter les erreur sur le retour null
             exit;
         } elseif (in_array($format, [FileService::FORMAT_CSV, FileService::FORMAT_XLSX])) {
             return new StreamedResponse(function () use ($aids, $routerInterface, $format, $filename) {
-                if ($format == FileService::FORMAT_CSV) {
+                if (FileService::FORMAT_CSV == $format) {
                     $options = new \OpenSpout\Writer\CSV\Options();
                     $options->FIELD_DELIMITER = ';';
                     $options->FIELD_ENCLOSURE = '"';
 
                     $writer = new \OpenSpout\Writer\CSV\Writer($options);
-                } elseif ($format == FileService::FORMAT_XLSX) {
+                } elseif (FileService::FORMAT_XLSX == $format) {
                     $sheetView = new SheetView();
                     $writer = new \OpenSpout\Writer\XLSX\Writer();
                 }
 
-                $writer->openToBrowser('export_' . $filename . '.' . $format);
+                $writer->openToBrowser('export_'.$filename.'.'.$format);
 
-                if ($format == FileService::FORMAT_XLSX) {
+                if (FileService::FORMAT_XLSX == $format && isset($sheetView)) {
                     $writer->getCurrentSheet()->setSheetView($sheetView);
                 }
 
@@ -564,99 +594,111 @@ class AidController extends FrontController
                 /** @var Aid $aid */
                 foreach ($aids as $aid) {
                     $aidStepsString = '';
-                    if ($aid->getAidSteps()) {
+                    if (!$aid->getAidSteps()->isEmpty()) {
                         $i = 0;
                         foreach ($aid->getAidSteps() as $aidStep) {
                             $aidStepsString = $aidStep->getName();
                             if ($i < count($aid->getAidSteps()) - 1) {
                                 $aidStepsString .= ', ';
                             }
-                            $i++;
+                            ++$i;
                         }
                     }
 
                     $aidTypesString = '';
-                    if ($aid->getAidTypes()) {
+                    if (!$aid->getAidTypes()->isEmpty()) {
                         $i = 0;
                         foreach ($aid->getAidTypes() as $aidType) {
                             $aidTypesString .= $aidType->getName();
                             if ($i < count($aid->getAidTypes()) - 1) {
                                 $aidTypesString .= ', ';
                             }
-                            $i++;
+                            ++$i;
                         }
                     }
 
                     $aidDestinationsString = '';
-                    if ($aid->getAidDestinations()) {
+                    if (!$aid->getAidDestinations()->isEmpty()) {
                         $i = 0;
                         foreach ($aid->getAidDestinations() as $aidDestination) {
                             $aidDestinationsString .= $aidDestination->getName();
                             if ($i < count($aid->getAidDestinations()) - 1) {
                                 $aidDestinationsString .= ', ';
                             }
-                            $i++;
+                            ++$i;
                         }
                     }
 
                     $subventionRatesString = '';
                     if ($aid->getSubventionRateMin()) {
-                        $subventionRatesString .= 'Min : ' . $aid->getSubventionRateMin() . ' ';
+                        $subventionRatesString .= 'Min : '.$aid->getSubventionRateMin().' ';
                     }
                     if ($aid->getSubventionRateMax()) {
-                        $subventionRatesString .= 'Max : ' . $aid->getSubventionRateMax();
+                        $subventionRatesString .= 'Max : '.$aid->getSubventionRateMax();
                     }
 
                     $categoriesString = '';
-                    if ($aid->getCategories()) {
+                    if (!$aid->getCategories()->isEmpty()) {
                         $i = 0;
                         foreach ($aid->getCategories() as $category) {
                             $categoriesString .= $category->getName();
                             if ($i < count($aid->getCategories()) - 1) {
                                 $categoriesString .= ', ';
                             }
-                            $i++;
+                            ++$i;
                         }
                     }
 
                     $aidFinancersString = '';
-                    if ($aid->getAidFinancers()) {
+                    if (!$aid->getAidFinancers()->isEmpty()) {
                         $i = 0;
                         foreach ($aid->getAidFinancers() as $aidFinancer) {
-                            $aidFinancersString .= $aidFinancer->getBacker() ? $aidFinancer->getBacker()->getName() : '';
+                            $aidFinancersString .=
+                                $aidFinancer->getBacker()
+                                    ? $aidFinancer->getBacker()->getName()
+                                    : ''
+                            ;
                             if ($i < count($aid->getAidFinancers()) - 1) {
                                 $aidFinancersString .= ', ';
                             }
-                            $i++;
+                            ++$i;
                         }
                     }
 
                     $aidInstructorsString = '';
-                    if ($aid->getAidInstructors()) {
+                    if (!$aid->getAidInstructors()->isEmpty()) {
                         $i = 0;
                         foreach ($aid->getAidInstructors() as $aidInstructor) {
-                            $aidInstructorsString .= $aidInstructor->getBacker() ? $aidInstructor->getBacker()->getName() : '';
+                            $aidInstructorsString .=
+                                $aidInstructor->getBacker()
+                                    ? $aidInstructor->getBacker()->getName()
+                                    : ''
+                            ;
                             if ($i < count($aid->getAidInstructors()) - 1) {
                                 $aidInstructorsString .= ', ';
                             }
-                            $i++;
+                            ++$i;
                         }
                     }
 
                     $programsString = '';
-                    if ($aid->getPrograms()) {
+                    if (!$aid->getPrograms()->isEmpty()) {
                         $i = 0;
                         foreach ($aid->getPrograms() as $program) {
                             $programsString .= $program->getName();
                             if ($i < count($aid->getPrograms()) - 1) {
                                 $programsString .= ', ';
                             }
-                            $i++;
+                            ++$i;
                         }
                     }
 
                     $datas = [
-                        $routerInterface->generate('app_aid_aid_details', ['slug' => $aid->getSlug()], UrlGeneratorInterface::ABSOLUTE_URL),
+                        $routerInterface->generate(
+                            'app_aid_aid_details',
+                            ['slug' => $aid->getSlug()],
+                            UrlGeneratorInterface::ABSOLUTE_URL
+                        ),
                         $aid->getName(),
                         $aid->getDescription(),
                         $aid->getProjectExamples(),
@@ -676,7 +718,7 @@ class AidController extends FrontController
                         $categoriesString,
                         $aidFinancersString,
                         $aidInstructorsString,
-                        $programsString
+                        $programsString,
                     ];
 
                     $cells = [];
@@ -698,19 +740,23 @@ class AidController extends FrontController
         }
     }
 
-    #[Route('/comptes/aides/exporter-aide-en-pdf/{slug}/', name: 'app_user_aid_export_pdf', requirements: ['slug' => '[a-zA-Z0-9\-_]+'])]
+    #[Route(
+        '/comptes/aides/exporter-aide-en-pdf/{slug}/',
+        name: 'app_user_aid_export_pdf',
+        requirements: ['slug' => '[a-zA-Z0-9\-_]+']
+    )]
     public function aidExport(
-        $slug,
+        string $slug,
         UserService $userService,
         AidRepository $aidRepository,
-        AidService $aidService
-    ) {
+        AidService $aidService,
+    ): Response {
         // le user
         $user = $userService->getUserLogged();
 
         $aid = $aidRepository->findOneBy(
             [
-                'slug' => $slug
+                'slug' => $slug,
             ]
         );
         if (!$aid instanceof Aid) {
@@ -728,7 +774,7 @@ class AidController extends FrontController
 
         $dompdf->loadHtml(
             $this->renderView('user/aid/aid_export_pdf.html.twig', [
-                'aid' => $aid
+                'aid' => $aid,
             ])
         );
 
@@ -745,26 +791,30 @@ class AidController extends FrontController
 
         // Définissez le type de contenu et le nom du fichier dans les en-têtes HTTP
         $response->headers->set('Content-Type', 'application/pdf');
-        $response->headers->set('Content-Disposition', 'inline; filename="' . $aid->getSlug() . '.pdf"');
+        $response->headers->set('Content-Disposition', 'inline; filename="'.$aid->getSlug().'.pdf"');
 
         return $response;
     }
 
-    #[Route('/comptes/aides/dupliquer/{slug}/', name: 'app_user_aid_duplicate', requirements: ['slug' => '[a-zA-Z0-9\-_]+'])]
+    #[Route(
+        '/comptes/aides/dupliquer/{slug}/',
+        name: 'app_user_aid_duplicate',
+        requirements: ['slug' => '[a-zA-Z0-9\-_]+']
+    )]
     public function duplicateAid(
-        $slug,
+        string $slug,
         AidRepository $aidRepository,
         UserService $userService,
         AidService $aidService,
-        ManagerRegistry $managerRegistry
-    ) {
+        ManagerRegistry $managerRegistry,
+    ): RedirectResponse {
         // le user
         $user = $userService->getUserLogged();
 
         // l'aide
         $aid = $aidRepository->findOneBy([
             'author' => $user,
-            'slug' => $slug
+            'slug' => $slug,
         ]);
         if (!$aid instanceof Aid) {
             throw new NotFoundHttpException('Cette aide n\'exite pas');
@@ -784,16 +834,22 @@ class AidController extends FrontController
         // message
         $this->tAddFlash(
             FrontController::FLASH_SUCCESS,
-            'La nouvelle aide a été créée. Vous pouvez poursuivre l’édition. Et retrouvez l’aide dupliquée sur <a href="' . $this->generateUrl('app_user_aid_publications') . '">votre portefeuille d’aides</a>.'
+            'La nouvelle aide a été créée. '
+            .'Vous pouvez poursuivre l’édition. Et retrouvez l’aide dupliquée sur <a href="'
+            .$this->generateUrl('app_user_aid_publications').'">votre portefeuille d’aides</a>.'
         );
 
         // redirecition
         return $this->redirectToRoute('app_user_aid_edit', ['slug' => $newAid->getSlug()]);
     }
 
-    #[Route('/comptes/aides/statistiques/{slug}/', name: 'app_user_aid_stats', requirements: ['slug' => '[a-zA-Z0-9\-_]+'])]
+    #[Route(
+        '/comptes/aides/statistiques/{slug}/',
+        name: 'app_user_aid_stats',
+        requirements: ['slug' => '[a-zA-Z0-9\-_]+']
+    )]
     public function stats(
-        $slug,
+        string $slug,
         AidRepository $aidRepository,
         UserService $userService,
         RequestStack $requestStack,
@@ -802,24 +858,26 @@ class AidController extends FrontController
         LogAidOriginUrlClickRepository $logAidOriginUrlClickRepository,
         AidProjectRepository $aidProjectRepository,
         AidService $aidService,
-    ) {
+    ): Response {
         // le user
         $user = $userService->getUserLogged();
 
         // l'aide
         $aid = $aidRepository->findOneBy([
-            'slug' => $slug
+            'slug' => $slug,
         ]);
         if (!$aid instanceof Aid) {
             throw new NotFoundHttpException('Cette aide n\'exite pas');
         }
 
-        // verifie que l'utilisateur appartienne à la structure de l'aide, oue que l'utilisateur est l'auteur de l'aide ou que l'utilisateur est un admin
+        // verifie que l'utilisateur appartienne à la structure de l'aide
+        // ou que l'utilisateur est l'auteur de l'aide
+        // ou que l'utilisateur est un admin
         if (!$aidService->canUserAccessStatsPage($user, $aid)) {
             $this->addFlash(FrontController::FLASH_ERROR, 'Vous n\'avez pas accès à cette page');
+
             return $this->redirectToRoute('app_user_aid_publications');
         }
-
 
         // formulaire periode
         $dateMinGet = $requestStack->getCurrentRequest()->get('dateMin', null);
@@ -828,15 +886,12 @@ class AidController extends FrontController
         $dateMax = $dateMaxGet ? new \DateTime(date($dateMaxGet)) : new \DateTime(date('Y-m-d'));
 
         $formAidStatsPeriod = $this->createForm(AidStatsPeriodType::class);
-        if ($dateMin) {
-            $formAidStatsPeriod->get('dateMin')->setData($dateMin);
-        }
-        if ($dateMax) {
-            $formAidStatsPeriod->get('dateMax')->setData($dateMax);
-        }
+        $formAidStatsPeriod->get('dateMin')->setData($dateMin);
+        $formAidStatsPeriod->get('dateMax')->setData($dateMax);
+
         $periodParams = [
             'dateMin' => $dateMin,
-            'dateMax' => $dateMax
+            'dateMax' => $dateMax,
         ];
         $formAidStatsPeriod->handleRequest($requestStack->getCurrentRequest());
         if ($formAidStatsPeriod->isSubmitted()) {
@@ -844,7 +899,7 @@ class AidController extends FrontController
                 return $this->redirectToRoute('app_user_aid_stats', [
                     'slug' => $aid->getSlug(),
                     'dateMin' => $formAidStatsPeriod->get('dateMin')->getData()->format('Y-m-d'),
-                    'dateMax' => $formAidStatsPeriod->get('dateMax')->getData()->format('Y-m-d')
+                    'dateMax' => $formAidStatsPeriod->get('dateMax')->getData()->format('Y-m-d'),
                 ]);
             }
         }
@@ -854,7 +909,7 @@ class AidController extends FrontController
             [
                 'aid' => $aid,
                 'dateMin' => $periodParams['dateMin'],
-                'dateMax' => $periodParams['dateMax']
+                'dateMax' => $periodParams['dateMax'],
             ]
         );
 
@@ -863,7 +918,7 @@ class AidController extends FrontController
             [
                 'aid' => $aid,
                 'dateMin' => $periodParams['dateMin'],
-                'dateMax' => $periodParams['dateMax']
+                'dateMax' => $periodParams['dateMax'],
             ]
         );
 
@@ -872,7 +927,7 @@ class AidController extends FrontController
             [
                 'aid' => $aid,
                 'dateMin' => $periodParams['dateMin'],
-                'dateMax' => $periodParams['dateMax']
+                'dateMax' => $periodParams['dateMax'],
             ]
         );
 
@@ -880,14 +935,14 @@ class AidController extends FrontController
         $nbProjectPublics = $aidProjectRepository->countProjectByAid($aid, [
             'projectPublic' => true,
             'dateMin' => $periodParams['dateMin'],
-            'dateMax' => $periodParams['dateMax']
+            'dateMax' => $periodParams['dateMax'],
         ]);
 
         // nb project prive associés
         $nbProjectPrivates = $aidProjectRepository->countProjectByAid($aid, [
             'projectPublic' => false,
             'dateMin' => $periodParams['dateMin'],
-            'dateMax' => $periodParams['dateMax']
+            'dateMax' => $periodParams['dateMax'],
         ]);
 
         // fil arianne
@@ -900,7 +955,7 @@ class AidController extends FrontController
             $this->generateUrl('app_user_aid_publications')
         );
         $this->breadcrumb->add(
-            'Statistiques de l’aide « ' . $aid->getName() . ' »',
+            'Statistiques de l’aide « '.$aid->getName().' »',
             $this->generateUrl('app_user_aid_publications')
         );
 
@@ -914,7 +969,7 @@ class AidController extends FrontController
             'nbProjectPublics' => $nbProjectPublics,
             'nbProjectPrivates' => $nbProjectPrivates,
             'dateMin' => $periodParams['dateMin'],
-            'dateMax' => $periodParams['dateMax']
+            'dateMax' => $periodParams['dateMax'],
         ]);
     }
 
@@ -928,8 +983,8 @@ class AidController extends FrontController
         LogAidOriginUrlClickService $logAidOriginUrlClickService,
         AidProjectService $aidProjectService,
         StringService $stringService,
-        AidService $aidService
-    ) {
+        AidService $aidService,
+    ): Response {
         // gestion dates
         $dateMinGet = $requestStack->getCurrentRequest()->get('dateMin', null);
         $dateMaxGet = $requestStack->getCurrentRequest()->get('dateMax', null);
@@ -946,8 +1001,14 @@ class AidController extends FrontController
         $response = new StreamedResponse();
         try {
             // nom de fichier
-            $filename = 'AT_statistiques_aides_'.$dateMin->format('d_m_Y').'_au_'.$dateMax->format('d_m_Y').'.xlsx';
-            
+            $filename =
+                'AT_statistiques_aides_'
+                .$dateMin->format('d_m_Y')
+                .'_au_'
+                .$dateMax->format('d_m_Y')
+                .'.xlsx'
+            ;
+
             $response->setCallback(function () use (
                 $aidRepository,
                 $logAidViewService,
@@ -960,7 +1021,6 @@ class AidController extends FrontController
                 $stringService,
                 $aidService
             ) {
-
                 $spreadsheet = $aidService->getAidStatsSpreadSheetOfUser(
                     $user,
                     $dateMin,
@@ -972,15 +1032,18 @@ class AidController extends FrontController
                     $logAidOriginUrlClickService,
                     $aidProjectService,
                 );
-                
+
                 // Génération du fichier Excel
                 $writer = new Xlsx($spreadsheet);
                 $writer->save('php://output');
             });
 
             // Configuration des en-têtes de la réponse
-            $response->headers->set('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-            $response->headers->set('Content-Disposition', 'attachment;filename="' . $filename . '"');
+            $response->headers->set(
+                'Content-Type',
+                'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+            );
+            $response->headers->set('Content-Disposition', 'attachment;filename="'.$filename.'"');
             $response->headers->set('Cache-Control', 'max-age=0');
 
             return $response;
@@ -989,9 +1052,13 @@ class AidController extends FrontController
         }
     }
 
-    #[Route('/comptes/aides/exporter-les-stats/{slug}', name: 'app_user_aid_export_stats', requirements: ['slug' => '[a-zA-Z0-9\-_]+'])]
+    #[Route(
+        '/comptes/aides/exporter-les-stats/{slug}',
+        name: 'app_user_aid_export_stats',
+        requirements: ['slug' => '[a-zA-Z0-9\-_]+']
+    )]
     public function aidsExportStats(
-        $slug,
+        string $slug,
         UserService $userService,
         RequestStack $requestStack,
         AidRepository $aidRepository,
@@ -999,8 +1066,9 @@ class AidController extends FrontController
         LogAidViewService $logAidViewService,
         LogAidApplicationUrlClickService $logAidApplicationUrlClickService,
         LogAidOriginUrlClickService $logAidOriginUrlClickService,
-        AidProjectService $aidProjectService
-    ) {
+        AidProjectService $aidProjectService,
+        StringService $stringService,
+    ): Response {
         $dateMinGet = $requestStack->getCurrentRequest()->get('dateMin', null);
         $dateMaxGet = $requestStack->getCurrentRequest()->get('dateMax', null);
         try {
@@ -1016,15 +1084,18 @@ class AidController extends FrontController
         // l'aide
         $aid = $aidRepository->findOneBy(
             [
-                'slug' => $slug
+                'slug' => $slug,
             ]
         );
         if (!$aid instanceof Aid) {
             throw new NotFoundHttpException('Cette aide n\'existe pas');
         }
-        // verifie que l'utilisateur appartienne à la structure de l'aide, oue que l'utilisateur est l'auteur de l'aide ou que l'utilisateur est un admin
+        // verifie que l'utilisateur appartienne à la structure de l'aide,
+        // ou que l'utilisateur est l'auteur de l'aide
+        // ou que l'utilisateur est un admin
         if (!$aidService->canUserAccessStatsPage($user, $aid)) {
             $this->addFlash(FrontController::FLASH_ERROR, 'Vous n\'avez pas accès à cette page');
+
             return $this->redirectToRoute('app_user_aid_publications');
         }
 
@@ -1037,17 +1108,24 @@ class AidController extends FrontController
                 $aidProjectService,
                 $dateMin,
                 $dateMax,
-                $aid
+                $aid,
+                $stringService
             ) {
                 // nom de fichier
-                $filename = 'AT_statistiques_aide_'.$dateMin->format('d_m_Y').'_au_'.$dateMax->format('d_m_Y').'.xlsx';
+                $filename =
+                    'AT_statistiques_aide_'
+                    .$dateMin->format('d_m_Y')
+                    .'_au_'
+                    .$dateMax->format('d_m_Y')
+                    .'.xlsx'
+                ;
 
                 // Le fichier xslx
                 $writer = new \OpenSpout\Writer\XLSX\Writer();
                 $writer->openToBrowser($filename);
                 $sheet = $writer->getCurrentSheet();
                 // met le nom à la feuille
-                $sheet->setName($aid->getName()); // Définir le nom de la feuille
+                $sheet->setName($stringService->truncate($aid->getName(), 31)); // Définir le nom de la feuille
 
                 // Ajout des en-têtes
                 $headers = [
@@ -1056,7 +1134,7 @@ class AidController extends FrontController
                     'Nombre de clics sur Candidater',
                     'Nombre de clics sur Plus d’informations',
                     'Nombre de projets privés liés',
-                    'Nombre de projets publics liés'
+                    'Nombre de projets publics liés',
                 ];
                 $cells = [];
                 foreach ($headers as $headerItem) {
@@ -1069,7 +1147,11 @@ class AidController extends FrontController
                 $nbViewsByDay = $logAidViewService->getCountByDay($aid, $dateMin, $dateMax);
 
                 // Nombre de clics sur Candidater par jours
-                $nbApplicationUrlClicksByDay = $logAidApplicationUrlClickService->getCountByDay($aid, $dateMin, $dateMax);
+                $nbApplicationUrlClicksByDay = $logAidApplicationUrlClickService->getCountByDay(
+                    $aid,
+                    $dateMin,
+                    $dateMax
+                );
 
                 // Nombre de clics sur Plus d’informations par jours
                 $nbOriginUrlClicksByDay = $logAidOriginUrlClickService->getCountByDay($aid, $dateMin, $dateMax);
@@ -1078,7 +1160,7 @@ class AidController extends FrontController
                 $nbProjectPublicsByDay = $aidProjectService->getCountByDay($aid, $dateMin, $dateMax, true);
 
                 // nb project prive associés
-                $nbProjectPrivatesByDay =  $aidProjectService->getCountByDay($aid, $dateMin, $dateMax, false);
+                $nbProjectPrivatesByDay = $aidProjectService->getCountByDay($aid, $dateMin, $dateMax, false);
 
                 // Parcours les dates
                 $currentDay = clone $dateMin;
@@ -1098,6 +1180,7 @@ class AidController extends FrontController
 
                 $writer->close();
             });
+
             return $response;
         } catch (\Exception $e) {
             throw new NotFoundHttpException('Impossible de générer votre export.');
@@ -1109,7 +1192,7 @@ class AidController extends FrontController
         RequestStack $requestStack,
         AidRepository $aidRepository,
         AidService $aidService,
-        UserService $userService
+        UserService $userService,
     ): JsonResponse {
         try {
             // verification requête interne
@@ -1152,21 +1235,21 @@ class AidController extends FrontController
 
             // retour
             return new JsonResponse([
-                'success' => true
+                'success' => true,
             ]);
         } catch (\Exception $e) {
             return new JsonResponse([
-                'success' => false
+                'success' => false,
             ]);
         }
     }
 
     #[Route('/comptes/aides/{id}/unlock/', name: 'app_user_aid_unlock', requirements: ['id' => '\d+'])]
     public function unlock(
-        $id,
+        int $id,
         AidRepository $aidRepository,
         UserService $userService,
-        AidService $aidService
+        AidService $aidService,
     ): Response {
         try {
             // le user
@@ -1200,7 +1283,11 @@ class AidController extends FrontController
             $this->addFlash(FrontController::FLASH_ERROR, 'Impossible de débloquer l\'aide');
 
             // retour
-            return $this->redirectToRoute('app_user_aid_edit', ['slug' => $aid->getSlug()]);
+            if (isset($aid) && $aid instanceof Aid) {
+                return $this->redirectToRoute('app_user_aid_edit', ['slug' => $aid->getSlug()]);
+            } else {
+                return $this->redirectToRoute('app_user_aid_publications');
+            }
         }
     }
 
@@ -1209,7 +1296,7 @@ class AidController extends FrontController
         RequestStack $requestStack,
         AidRepository $aidRepository,
         AidService $aidService,
-        UserService $userService
+        UserService $userService,
     ): JsonResponse {
         try {
             // verification requête interne
@@ -1248,11 +1335,11 @@ class AidController extends FrontController
 
             // retour
             return new JsonResponse([
-                'success' => true
+                'success' => true,
             ]);
         } catch (\Exception $e) {
             return new JsonResponse([
-                'success' => false
+                'success' => false,
             ]);
         }
     }

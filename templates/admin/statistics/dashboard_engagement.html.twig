@@ -45,23 +45,11 @@
 				<div class="card-body d-flex flex-column justify-content-between">
 					<h5 class="card-title">
 						<a class="card-link" href="#">
-							Nombre de clics (+ de détails)
-						</a>
-					</h5>
-					<p class="card-text fs-2">
-						<strong>{{ nbContactClicks|number_format(0, ',', ' ') }}</strong>
-					</p>
-				</div>
-			</div>
-			<div class="card col">
-				<div class="card-body d-flex flex-column justify-content-between">
-					<h5 class="card-title">
-						<a class="card-link" href="#">
 							Nombre de clics (plus d’informations)
 						</a>
 					</h5>
 					<p class="card-text fs-2">
-						<strong>{{ nbInformations|number_format(0, ',', ' ') }}</strong>
+						<strong>{{ nbInformationsTotal|number_format(0, ',', ' ') }}</strong>
 					</p>
 				</div>
 			</div>
@@ -73,7 +61,7 @@
 						</a>
 					</h5>
 					<p class="card-text fs-2">
-						<strong>{{ nbApplications|number_format(0, ',', ' ') }}</strong>
+						<strong>{{ nbApplicationsTotal|number_format(0, ',', ' ') }}</strong>
 					</p>
 				</div>
 			</div>
@@ -98,7 +86,7 @@
 			<p>Comparaison de la popularité et de la conversion pour les 100 aides les plus populaires sur la période choisie.</p>
 		</div>
 		<div class="table-responsive mt-5">
-			<table class="table table-stripped" id="table-top-aids">
+			<table class="table table-stripped dataTable">
 				<caption>Aides les plus populaires</caption>
 				<thead>
 					<tr>

@@ -58,7 +58,7 @@ class SpreadsheetToExportCommand extends Command
         return Command::SUCCESS;
     }
 
-    protected function cronTask($input, $output)
+    protected function cronTask(InputInterface $input, OutputInterface $output): void
     {
         $io = new SymfonyStyle($input, $output);
 
@@ -68,7 +68,7 @@ class SpreadsheetToExportCommand extends Command
         // charge le dernier export à traiter
         /** @var CronExportSpreadsheet $cronExportSpreadsheet */
         $cronExportSpreadsheet = $cronExportSpreadsheetRepo->findOneToExport();
-        if ($cronExportSpreadsheet === null) {
+        if (!$cronExportSpreadsheet instanceof CronExportSpreadsheet) {
             $io->success('Aucun export à traiter');
             return;
         }
@@ -115,9 +115,6 @@ class SpreadsheetToExportCommand extends Command
                 filename: $cronExportSpreadsheet->getFilename(),
                 format: $cronExportSpreadsheet->getFormat(),
             );
-
-            // libère la mémoire
-            unset($results);
 
             // envoi de l'email
             $this->emailService->sendEmail(

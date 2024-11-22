@@ -1,6 +1,6 @@
-@import 'tom-select/dist/css/tom-select.default.min.css';
-@import '../../_variables';
-@import '../../_mixins';
+@use 'tom-select/dist/css/tom-select.default.min';
+@use '../../_variables';
+@use '../../_mixins';
 
 
 .fr-input-group{

@@ -113,7 +113,9 @@ class BackerEditType extends AbstractType
                     'class' => 'trumbowyg',
                     'cols' => 40,
                     'rows' => 10,
-                    'placeholder' => 'Indiquez la nature juridique de votre structure : collectivité, établissement public (et le cas échéant votre tutelle), association, entreprise …'
+                    'placeholder' => 'Indiquez la nature juridique de votre structure : '
+                        . 'collectivité, établissement public (et le cas échéant votre tutelle), '
+                        . 'association, entreprise …'
                 ],
                 'sanitize_html' => true,
             ])
@@ -134,7 +136,10 @@ class BackerEditType extends AbstractType
                     'class' => 'trumbowyg',
                     'cols' => 40,
                     'rows' => 10,
-                    'placeholder' => 'Donnez ici des explications sur les modalités de saisine de vos équipes, votre fonctionnement (centralisé, déconcentré ou autre), l\'utilisation ou non de plateformes de dépôt de dossier : en bref tous les bons conseils pour une collectivité qui voudrait demander une aide !'
+                    'placeholder' => 'Donnez ici des explications sur les modalités de saisine de vos équipes, '
+                        . 'votre fonctionnement (centralisé, déconcentré ou autre), '
+                        . 'l\'utilisation ou non de plateformes de dépôt de dossier : '
+                        . 'en bref tous les bons conseils pour une collectivité qui voudrait demander une aide !'
                 ],
                 'sanitize_html' => true,
             ])
@@ -145,7 +150,8 @@ class BackerEditType extends AbstractType
                     'class' => 'trumbowyg',
                     'cols' => 40,
                     'rows' => 10,
-                    'placeholder' => 'Indiquez ici des coordonnées de contact, si possible génériques et non nominatives contact@nouvellestructuretest'
+                    'placeholder' => 'Indiquez ici des coordonnées de contact, si possible génériques et '
+                        . 'non nominatives contact@nouvellestructuretest'
                 ],
                 'sanitize_html' => true,
             ])
@@ -156,7 +162,8 @@ class BackerEditType extends AbstractType
                     'class' => 'trumbowyg',
                     'cols' => 40,
                     'rows' => 10,
-                    'placeholder' => 'Les éventuels raccourcis vers des documents disponibles en ligne, sur votre site web ...'
+                    'placeholder' => 'Les éventuels raccourcis vers des documents disponibles en ligne, '
+                        . 'sur votre site web ...'
                 ],
                 'sanitize_html' => true,
             ])

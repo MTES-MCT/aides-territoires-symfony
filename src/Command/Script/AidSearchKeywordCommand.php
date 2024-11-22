@@ -5,7 +5,6 @@ namespace App\Command\Script;
 use App\Entity\Aid\Aid;
 use App\Message\Aid\AidExtractKeyword;
 use App\Repository\Aid\AidRepository;
-use App\Service\Reference\ReferenceService;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -17,7 +16,6 @@ use Symfony\Component\Messenger\MessageBusInterface;
 #[AsCommand(name: 'at:script:aid:search_keywords', description: 'Recherche des mots clés référents dans les aides')]
 class AidSearchKeywordCommand extends Command
 {
-
     protected InputInterface $input;
     protected OutputInterface $output;
     protected string $commandTextStart = '<Recherche des mots clés référents dans les aides';
@@ -27,11 +25,8 @@ class AidSearchKeywordCommand extends Command
 
     public function __construct(
         private ManagerRegistry $managerRegistry,
-        private ReferenceService $referenceService,
         private MessageBusInterface $bus,
     ) {
-        ini_set('max_execution_time', 60 * 60);
-        ini_set('memory_limit', '1G');
         parent::__construct();
     }
 
@@ -55,7 +50,7 @@ class AidSearchKeywordCommand extends Command
         return Command::SUCCESS;
     }
 
-    protected function sendToQueue($input, $output): void
+    protected function sendToQueue(InputInterface $input, OutputInterface $output): void
     {
         $timeStart = microtime(true);
 
@@ -87,7 +82,7 @@ class AidSearchKeywordCommand extends Command
         $time = $timeEnd - $timeStart;
 
         $io->success($nbAids . ' aides envoyées pour analyses');
-        $io->success('Fin : ' . gmdate("H:i:s", $timeEnd) . ' (' . gmdate("H:i:s", intval($time)) . ')');
+        $io->success('Fin : ' . gmdate("H:i:s", (int) $timeEnd) . ' (' . gmdate("H:i:s", (int) $time) . ')');
         $io->success('Mémoire maximale utilisée : ' . intval(round(memory_get_peak_usage() / 1024 / 1024)) . ' MB');
     }
 }

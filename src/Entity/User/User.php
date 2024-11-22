@@ -37,6 +37,7 @@ use App\Entity\Project\ProjectLock;
 use App\Entity\Search\SearchPage;
 use App\Entity\Search\SearchPageLock;
 use App\Repository\User\UserRepository;
+use App\Service\Aid\AidSearchFormService;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
@@ -61,17 +62,18 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Index(columns: ['date_create'], name: 'date_create_u')]
 #[ORM\Index(columns: ['date_last_login'], name: 'date_last_login_u')]
 #[ORM\Index(columns: ['api_token'], name: 'api_token_u')]
+#[ORM\Index(columns: ['pro_connect_uid'], name: 'pro_connect_uid_u')]
 class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFactorInterface // NOSONAR too much methods
 {
-    const ROLE_ADMIN = 'ROLE_ADMIN';
-    const ROLE_USER = 'ROLE_USER';
-    const ROLE_BANNED = 'ROLE_BANNED';
+    public const ROLE_ADMIN = 'ROLE_ADMIN';
+    public const ROLE_USER = 'ROLE_USER';
+    public const ROLE_BANNED = 'ROLE_BANNED';
 
-    const NOTIFICATION_DAILY = 'daily';
-    const NOTIFICATION_WEEKLY = 'weekly';
-    const NOTIFICATION_NEVER = 'never';
+    public const NOTIFICATION_DAILY = 'daily';
+    public const NOTIFICATION_WEEKLY = 'weekly';
+    public const NOTIFICATION_NEVER = 'never';
 
-    const FUNCTION_TYPES = [
+    public const FUNCTION_TYPES = [
         ['slug' => "mayor", 'name' => "Maire"],
         ['slug' => "deputy_mayor", 'name' => "Adjoint au maire"],
         ['slug' => "municipal_councilor", 'name' => "Conseiller municipal"],
@@ -81,7 +83,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
         ['slug' => "other", 'name' => "Autre"],
     ];
 
-    const ACQUISITION_CHANNEL_CHOICES = [
+    public const ACQUISITION_CHANNEL_CHOICES = [
         ['slug' => "webinar", 'name' => "Webinaire"],
         ['slug' => "animator", 'name' => "Animateur local"],
         ['slug' => "trade_press", 'name' => "Presse spécialisée"],
@@ -89,7 +91,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
         ['slug' => "invited", 'name' => "Invitation à collaborer"],
         ['slug' => "other", 'name' => "Autre"],
     ];
-    const ACQUISITION_CHANNEL_ANIMATOR = 'animator';
+    public const ACQUISITION_CHANNEL_ANIMATOR = 'animator';
+
     // Propriétés scalaires
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -116,6 +119,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
     #[ORM\Column]
     private ?bool $isContributor = false;
 
+    /**
+     * @var string[]
+     */
     #[ORM\Column]
     private array $roles = [];
 
@@ -211,107 +217,206 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
     #[ORM\JoinColumn(onDelete: 'SET NULL')]
     private ?self $invitationAuthor = null;
 
+    /**
+     * @var Collection<int, User>
+     */
     #[ORM\OneToMany(mappedBy: 'invitationAuthor', targetEntity: self::class)]
     private Collection $guests;
 
+    /**
+     * @var Collection<int, LogUserLogin>
+     */
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: LogUserLogin::class, orphanRemoval: true)]
     private Collection $logUserLogins;
 
+    /**
+     * @var Collection<int, LogUserAction>
+     */
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: LogUserAction::class, orphanRemoval: true)]
     private Collection $logUserActions;
 
+    /**
+     * @var Collection<int, UserGroup>
+     */
     #[ORM\ManyToMany(targetEntity: UserGroup::class, mappedBy: 'users')]
     private Collection $userGroups;
 
+    /**
+     * @var Collection<int, PerimeterImport>
+     */
     #[ORM\OneToMany(mappedBy: 'author', targetEntity: PerimeterImport::class, orphanRemoval: true)]
     private Collection $perimeterImports;
 
     #[ORM\ManyToOne]
     private ?Organization $proposedOrganization = null;
 
+    /**
+     * @var Collection<int, EligibilityTest>
+     */
     #[ORM\OneToMany(mappedBy: 'author', targetEntity: EligibilityTest::class)]
     private Collection $eligibilityTests;
 
+    /**
+     * @var Collection<int, EligibilityQuestion>
+     */
     #[ORM\OneToMany(mappedBy: 'author', targetEntity: EligibilityQuestion::class)]
     private Collection $eligibilityQuestions;
 
+    /**
+     * @var Collection<int, DataSource>
+     */
     #[ORM\OneToMany(mappedBy: 'contactTeam', targetEntity: DataSource::class)]
     private Collection $dataSourceContactTeams;
 
+    /**
+     * @var Collection<int, DataSource>
+     */
     #[ORM\OneToMany(mappedBy: 'aidAuthor', targetEntity: DataSource::class)]
     private Collection $dataSourceAidAuthors;
 
+    /**
+     * @var Collection<int, Aid>
+     */
     #[ORM\OneToMany(mappedBy: 'author', targetEntity: Aid::class)]
     #[OrderBy(['timeCreate' => 'DESC'])]
     private Collection $aids;
 
+    /**
+     * @var Collection<int, Project>
+     */
     #[ORM\OneToMany(mappedBy: 'author', targetEntity: Project::class, orphanRemoval: true)]
     private Collection $projects;
 
+    /**
+     * @var Collection<int, AidProject>
+     */
     #[ORM\OneToMany(mappedBy: 'creator', targetEntity: AidProject::class)]
     private Collection $aidProjects;
 
+    /**
+     * @var Collection<int, AidSuggestedAidProject>
+     */
     #[ORM\OneToMany(mappedBy: 'creator', targetEntity: AidSuggestedAidProject::class)]
     private Collection $aidSuggestedAidProjects;
 
+    /**
+     * @var Collection<int, Bundle>
+     */
     #[ORM\OneToMany(mappedBy: 'owner', targetEntity: Bundle::class, orphanRemoval: true)]
     private Collection $bundles;
 
+    /**
+     * @var Collection<int, DataExport>
+     */
     #[ORM\OneToMany(mappedBy: 'author', targetEntity: DataExport::class)]
     private Collection $dataExports;
 
+    /**
+     * @var Collection<int, Organization>
+     */
     #[ORM\ManyToMany(targetEntity: Organization::class, mappedBy: 'beneficiairies', cascade: ['persist'])]
     private Collection $organizations;
 
+    /**
+     * @var Collection<int, SearchPage>
+     */
     #[ORM\OneToMany(mappedBy: 'administrator', targetEntity: SearchPage::class)]
     private Collection $searchPages;
 
+    /**
+     * @var Collection<int, Notification>
+     */
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: Notification::class, orphanRemoval: true)]
     private Collection $notifications;
 
+    /**
+     * @var Collection<int, \App\Entity\Directory\Directory>
+     */
     #[ORM\OneToMany(mappedBy: 'author', targetEntity: \App\Entity\Directory\Directory::class, orphanRemoval: true)]
     private Collection $directories;
 
+    /**
+     * @var Collection<int, UserRegisterConfirmation>
+     */
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: UserRegisterConfirmation::class, orphanRemoval: true)]
     private Collection $userRegisterConfirmations;
 
+    /**
+     * @var Collection<int, OrganizationInvitation>
+     */
     #[ORM\OneToMany(mappedBy: 'author', targetEntity: OrganizationInvitation::class)]
     private Collection $organizationInvitations;
 
+    /**
+     * @var Collection<int, OrganizationInvitation>
+     */
     #[ORM\OneToMany(mappedBy: 'guest', targetEntity: OrganizationInvitation::class)]
     private Collection $organizationGuests;
 
+    /**
+     * @var Collection<int, LogAdminAction>
+     */
     #[ORM\OneToMany(mappedBy: 'admin', targetEntity: LogAdminAction::class)]
     private Collection $logAdminActions;
 
+    /**
+     * @var Collection<int, LogAidView>
+     */
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: LogAidView::class)]
     private Collection $logAidViews;
 
+    /**
+     * @var Collection<int, LogAidCreatedsFolder>
+     */
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: LogAidCreatedsFolder::class)]
     private Collection $logAidCreatedsFolders;
 
+    /**
+     * @var Collection<int, LogAidSearch>
+     */
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: LogAidSearch::class)]
     private Collection $logAidSearches;
 
+    /**
+     * @var Collection<int, LogBackerView>
+     */
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: LogBackerView::class)]
     private Collection $logBackerViews;
 
+    /**
+     * @var Collection<int, LogBlogPostView>
+     */
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: LogBlogPostView::class)]
     private Collection $logBlogPostViews;
 
+    /**
+     * @var Collection<int, LogProgramView>
+     */
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: LogProgramView::class)]
     private Collection $logProgramViews;
 
+    /**
+     * @var Collection<int, LogPublicProjectSearch>
+     */
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: LogPublicProjectSearch::class)]
     private Collection $logPublicProjectSearches;
 
+    /**
+     * @var Collection<int, LogPublicProjectView>
+     */
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: LogPublicProjectView::class)]
     #[ORM\OrderBy(['timeCreate' => 'DESC'])]
     private Collection $logPublicProjectViews;
 
+    /**
+     * @var Collection<int, LogProjectValidatedSearch>
+     */
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: LogProjectValidatedSearch::class)]
     private Collection $logProjectValidatedSearches;
 
+    /**
+     * @var Collection<int, ApiTokenAsk>
+     */
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: ApiTokenAsk::class)]
     private Collection $apiTokenAsks;
 
@@ -320,24 +425,45 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
     private int $nbAidsLive = 0;
     private string $notificationSignature;
 
+    /**
+     * @var Collection<int, CronExportSpreadsheet>
+     */
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: CronExportSpreadsheet::class)]
     private Collection $cronExportSpreadsheets;
 
+    /**
+     * @var Collection<int, AidLock>
+     */
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: AidLock::class, orphanRemoval: true)]
     private Collection $aidLocks;
 
+    /**
+     * @var Collection<int, BackerLock>
+     */
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: BackerLock::class, orphanRemoval: true)]
     private Collection $backerLocks;
 
+    /**
+     * @var Collection<int, ProjectLock>
+     */
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: ProjectLock::class, orphanRemoval: true)]
     private Collection $projectLocks;
 
+    /**
+     * @var Collection<int, SearchPageLock>
+     */
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: SearchPageLock::class, orphanRemoval: true)]
     private Collection $searchPageLocks;
 
+    /**
+     * @var Collection<int, BackerAskAssociate>
+     */
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: BackerAskAssociate::class, orphanRemoval: true)]
     private Collection $backerAskAssociates;
 
+    /**
+     * @var Collection<int, LogBackerEdit>
+     */
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: LogBackerEdit::class)]
     private Collection $logBackerEdits;
 
@@ -346,6 +472,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
      */
     #[ORM\ManyToMany(targetEntity: SearchPage::class, mappedBy: 'editors')]
     private Collection $editorSearchPages;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $proConnectUid = null;
 
     public function __construct()
     {
@@ -431,12 +560,15 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
         return array_unique($roles);
     }
 
-    public function addRole($role)
+    public function addRole(string $role): void
     {
         $this->roles[] = $role;
         $this->roles = array_unique($this->roles);
     }
 
+    /**
+     * @param string[] $roles
+     */
     public function setRoles(array $roles): static
     {
         $this->roles = $roles;
@@ -974,7 +1106,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
 
     public function removeEligibilityQuestion(EligibilityQuestion $eligibilityQuestion): static
     {
-        if ($this->eligibilityQuestions->removeElement($eligibilityQuestion) && $eligibilityQuestion->getAuthor() === $this) {
+        if (
+            $this->eligibilityQuestions->removeElement($eligibilityQuestion)
+            && $eligibilityQuestion->getAuthor() === $this
+        ) {
             $eligibilityQuestion->setAuthor(null);
         }
 
@@ -1001,7 +1136,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
 
     public function removeDataSourceContactTeam(DataSource $dataSourceContactTeam): static
     {
-        if ($this->dataSourceContactTeams->removeElement($dataSourceContactTeam) && $dataSourceContactTeam->getContactTeam() === $this) {
+        if (
+            $this->dataSourceContactTeams->removeElement($dataSourceContactTeam)
+            && $dataSourceContactTeam->getContactTeam() === $this
+        ) {
             $dataSourceContactTeam->setContactTeam(null);
         }
 
@@ -1028,7 +1166,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
 
     public function removeDataSourceAidAuthor(DataSource $dataSourceAidAuthor): static
     {
-        if ($this->dataSourceAidAuthors->removeElement($dataSourceAidAuthor) && $dataSourceAidAuthor->getAidAuthor() === $this) {
+        if (
+            $this->dataSourceAidAuthors->removeElement($dataSourceAidAuthor)
+            && $dataSourceAidAuthor->getAidAuthor() === $this
+        ) {
             $dataSourceAidAuthor->setAidAuthor(null);
         }
 
@@ -1062,6 +1203,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
         return $this;
     }
 
+    /**
+     * @return Collection<int, Project>
+     */
     public function getProjects(): Collection
     {
         return $this->projects;
@@ -1133,21 +1277,15 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
 
     public function removeAidSuggestedAidProject(AidSuggestedAidProject $aidSuggestedAidProject): static
     {
-        if ($this->aidSuggestedAidProjects->removeElement($aidSuggestedAidProject) && $aidSuggestedAidProject->getCreator() === $this) {
+        if (
+            $this->aidSuggestedAidProjects->removeElement($aidSuggestedAidProject)
+            && $aidSuggestedAidProject->getCreator() === $this
+        ) {
             $aidSuggestedAidProject->setCreator(null);
         }
 
         return $this;
     }
-
-    // public function upgradePassword(UserInterface $user, string $newHashedPassword): void
-    // {
-    //     dump($user);
-    //     // set the new hashed password on the User object
-    //     $user->setPassword($newHashedPassword);
-
-    //     // ... store the new password
-    // }
 
     /**
      * @return Collection<int, Bundle>
@@ -1381,17 +1519,22 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
     }
 
 
+    /**
+     * @return array<string, mixed>
+     */
     public function getSearchPreferences(): array
     {
         $preferences = [];
 
         if ($this->getDefaultOrganization()) {
             if ($this->getDefaultOrganization()->getOrganizationType()) {
-                $preferences['organizationType'] = $this->getDefaultOrganization()->getOrganizationType()->getSlug();
+                $preferences[AidSearchFormService::QUERYSTRING_KEY_AID_TYPE_SLUGS] =
+                    [$this->getDefaultOrganization()->getOrganizationType()->getSlug()];
             }
 
             if ($this->getDefaultOrganization()->getPerimeter()) {
-                $preferences['searchPerimeter'] = $this->getDefaultOrganization()->getPerimeter()->getId();
+                $preferences[AidSearchFormService::QUERYSTRING_KEY_SEARCH_PERIMETER] =
+                    $this->getDefaultOrganization()->getPerimeter()->getId();
             }
         }
 
@@ -1418,7 +1561,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
 
     public function removeUserRegisterConfirmation(UserRegisterConfirmation $userRegisterConfirmation): static
     {
-        if ($this->userRegisterConfirmations->removeElement($userRegisterConfirmation) && $userRegisterConfirmation->getUser() === $this) {
+        if (
+            $this->userRegisterConfirmations->removeElement($userRegisterConfirmation)
+            && $userRegisterConfirmation->getUser() === $this
+        ) {
             $userRegisterConfirmation->setUser(null);
         }
 
@@ -1472,7 +1618,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
 
     public function removeLogAidCreatedsFolder(LogAidCreatedsFolder $logAidCreatedsFolder): static
     {
-        if ($this->logAidCreatedsFolders->removeElement($logAidCreatedsFolder) && $logAidCreatedsFolder->getUser() === $this) {
+        if (
+            $this->logAidCreatedsFolders->removeElement($logAidCreatedsFolder)
+            && $logAidCreatedsFolder->getUser() === $this
+        ) {
             $logAidCreatedsFolder->setUser(null);
         }
 
@@ -1607,7 +1756,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
 
     public function removeLogPublicProjectSearch(LogPublicProjectSearch $logPublicProjectSearch): static
     {
-        if ($this->logPublicProjectSearches->removeElement($logPublicProjectSearch) && $logPublicProjectSearch->getUser() === $this) {
+        if (
+            $this->logPublicProjectSearches->removeElement($logPublicProjectSearch)
+            && $logPublicProjectSearch->getUser() === $this
+        ) {
             $logPublicProjectSearch->setUser(null);
         }
 
@@ -1634,7 +1786,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
 
     public function removeLogPublicProjectView(LogPublicProjectView $logPublicProjectView): static
     {
-        if ($this->logPublicProjectViews->removeElement($logPublicProjectView) && $logPublicProjectView->getUser() === $this) {
+        if (
+            $this->logPublicProjectViews->removeElement($logPublicProjectView)
+            && $logPublicProjectView->getUser() === $this
+        ) {
             $logPublicProjectView->setUser(null);
         }
 
@@ -1661,7 +1816,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
 
     public function removeLogProjectValidatedSearch(LogProjectValidatedSearch $logProjectValidatedSearch): static
     {
-        if ($this->logProjectValidatedSearches->removeElement($logProjectValidatedSearch) && $logProjectValidatedSearch->getUser() === $this) {
+        if (
+            $this->logProjectValidatedSearches->removeElement($logProjectValidatedSearch)
+            && $logProjectValidatedSearch->getUser() === $this
+        ) {
             $logProjectValidatedSearch->setUser(null);
         }
 
@@ -1671,11 +1829,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
     public function getNbAids(): int
     {
         try {
-            return count($this->getAids());
+            $this->nbAids = count($this->getAids());
         } catch (\Exception $e) {
-            return 0;
+            $this->nbAids = 0;
         }
+
+        return $this->nbAids;
     }
+
     public function setNbAids(int $nbAids): static
     {
         $this->nbAids = $nbAids;
@@ -1691,10 +1852,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
                     $live++;
                 }
             }
-            return $live;
+            $this->nbAidsLive = $live;
         } catch (\Exception $e) {
-            return 0;
+            $this->nbAidsLive = 0;
         }
+
+        return $this->nbAidsLive;
     }
     public function setNbAidsLive(int $nbAidsLive): static
     {
@@ -1725,7 +1888,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
                 $signature .= ' (' . $this->getDefaultOrganization()->getName() . ')';
             }
         }
-        return $signature;
+
+        $this->notificationSignature = $signature;
+        return $this->notificationSignature;
     }
 
     public function setNotificationSignature(string $notificationSignature): static
@@ -1759,7 +1924,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
 
     public function removeOrganizationInvitation(OrganizationInvitation $organizationInvitation): static
     {
-        if ($this->organizationInvitations->removeElement($organizationInvitation) && $organizationInvitation->getAuthor() === $this) {
+        if (
+            $this->organizationInvitations->removeElement($organizationInvitation)
+            && $organizationInvitation->getAuthor() === $this
+        ) {
             $organizationInvitation->setAuthor(null);
         }
 
@@ -1870,7 +2038,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
 
     public function removeCronExportSpreadsheet(CronExportSpreadsheet $cronExportSpreadsheet): static
     {
-        if ($this->cronExportSpreadsheets->removeElement($cronExportSpreadsheet) && $cronExportSpreadsheet->getUser() === $this) {
+        if (
+            $this->cronExportSpreadsheets->removeElement($cronExportSpreadsheet)
+            && $cronExportSpreadsheet->getUser() === $this
+        ) {
             $cronExportSpreadsheet->setUser(null);
         }
 
@@ -2090,6 +2261,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
         if ($this->editorSearchPages->removeElement($editorSearchPage)) {
             $editorSearchPage->removeEditor($this);
         }
+
+        return $this;
+    }
+
+    public function getProConnectUid(): ?string
+    {
+        return $this->proConnectUid;
+    }
+
+    public function setProConnectUid(?string $proConnectUid): static
+    {
+        $this->proConnectUid = $proConnectUid;
 
         return $this;
     }

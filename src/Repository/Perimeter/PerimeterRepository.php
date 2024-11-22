@@ -4,6 +4,7 @@ namespace App\Repository\Perimeter;
 
 use App\Entity\Aid\Aid;
 use App\Entity\Perimeter\Perimeter;
+use App\Service\Various\StringService;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Criteria;
@@ -21,7 +22,10 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class PerimeterRepository extends ServiceEntityRepository
 {
-    public function __construct(ManagerRegistry $registry)
+    public function __construct(
+        ManagerRegistry $registry,
+        private StringService $stringService
+    )
     {
         parent::__construct($registry, Perimeter::class);
     }
@@ -135,7 +139,13 @@ class PerimeterRepository extends ServiceEntityRepository
     {
         $qb = $this->createQueryBuilder('p')
             // ->select('IFNULL(COUNT(DISTINCT(backer.id)), 0) AS nbBacker, p.name, p.code')
-            ->select('backersFrom.id as backersFromId, backersTo.id as backersToId, p.name, p.code, perimetersFrom.name as nameTo')
+            ->select('
+                backersFrom.id as backersFromId,
+                backersTo.id as backersToId,
+                p.name,
+                p.code,
+                perimetersFrom.name as nameTo
+            ')
             ->innerJoin('p.perimetersFrom', 'perimetersFrom')
             ->innerJoin('perimetersFrom.aids', 'aidsFrom')
 
@@ -244,7 +254,13 @@ class PerimeterRepository extends ServiceEntityRepository
     public function getQueryBuilder(array $params = null): QueryBuilder
     {
         $scale = $params['scale'] ?? null;
-        $orderBy = (isset($params['orderBy']) && isset($params['orderBy']['sort']) && isset($params['orderBy']['order'])) ? $params['orderBy'] : null;
+        $orderBy =
+            (isset($params['orderBy'])
+            && isset($params['orderBy']['sort'])
+            && isset($params['orderBy']['order']))
+                ? $params['orderBy']
+                : null
+        ;
         $codes = $params['codes'] ?? null;
         $insees = $params['insees'] ?? null;
         $zipcodes = $params['zipcodes'] ?? null;
@@ -287,6 +303,7 @@ class PerimeterRepository extends ServiceEntityRepository
                 ->setParameter('isObsolete', $isObsolete);
         }
         if ($nameMatchAgainst !== null) {
+            $nameMatchAgainst = $this->stringService->sanitizeBooleanSearch($nameMatchAgainst);
             $qb
                 ->andWhere('MATCH_AGAINST(p.name) AGAINST (:nameMatchAgainst) > 1')
                 ->setParameter('nameMatchAgainst', $nameMatchAgainst);

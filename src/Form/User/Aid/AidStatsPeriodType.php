@@ -47,8 +47,16 @@ class AidStatsPeriodType extends AbstractType
             if ($dateMin && $dateMax) {
                 $interval = $dateMin->diff($dateMax);
                 if ($interval->days > 93) {
-                    $form->get('dateMin')->addError(new FormError('La période entre la date de début et la date de fin ne doit pas dépasser trois mois.'));
-                    $form->get('dateMax')->addError(new FormError('La période entre la date de début et la date de fin ne doit pas dépasser trois mois.'));
+                    $form->get('dateMin')->addError(
+                        new FormError(
+                            'La période entre la date de début et la date de fin ne doit pas dépasser trois mois.'
+                        )
+                    );
+                    $form->get('dateMax')->addError(
+                        new FormError(
+                            'La période entre la date de début et la date de fin ne doit pas dépasser trois mois.'
+                        )
+                    );
                 }
             }
         });

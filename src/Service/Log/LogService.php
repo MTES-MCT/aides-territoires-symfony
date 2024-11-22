@@ -25,23 +25,29 @@ use Psr\Log\LoggerInterface;
 
 class LogService
 {
-    const AID_SEARCH = 'aidSearch';
-    const AID_VIEW = 'aidView';
-    const BACKER_VIEW = 'backerView';
-    const BLOG_POST_VIEW = 'blogPostView';
-    const BLOG_PROMOTION_POST_CLICK = 'blogPromotionPostClick';
-    const BLOG_PROMOTION_POST_DISPLAY = 'blogPromotionPostDisplay';
-    const PROGRAM_VIEW = 'programView';
-    const PROJECT_VALIDATED_SEARCH = 'projectValidatedSearch';
-    const PROJECT_PUBLIC_SEARCH = 'projectPublicSearch';
-    const PROJECT_PUBLIC_VIEW = 'projectPublicView';
+    public const AID_SEARCH = 'aidSearch';
+    public const AID_VIEW = 'aidView';
+    public const BACKER_VIEW = 'backerView';
+    public const BLOG_POST_VIEW = 'blogPostView';
+    public const BLOG_PROMOTION_POST_CLICK = 'blogPromotionPostClick';
+    public const BLOG_PROMOTION_POST_DISPLAY = 'blogPromotionPostDisplay';
+    public const PROGRAM_VIEW = 'programView';
+    public const PROJECT_VALIDATED_SEARCH = 'projectValidatedSearch';
+    public const PROJECT_PUBLIC_SEARCH = 'projectPublicSearch';
+    public const PROJECT_PUBLIC_VIEW = 'projectPublicView';
 
     public function __construct(
         private ManagerRegistry $managerRegistry,
-        private LoggerInterface $loggerInterface
+        private LoggerInterface $loggerInterface,
     ) {
     }
 
+    /**
+     *
+     * @param string|null $type
+     * @param array<mixed>|null $params
+     * @return void
+     */
     public function log(// NOSONAR too complex
         ?string $type,
         ?array $params,
@@ -52,14 +58,14 @@ class LogService
                     $querystring = '';
                     if (is_array($params)) {
                         foreach ($params as $key => $param) {
-                            if ($key == '_token') { // pas besoin de stocker le tocken
+                            if ('_token' == $key) { // pas besoin de stocker le tocken
                                 continue;
                             }
                             $querystring .= $key . '=' . $param . '&';
                         }
                         $querystring = substr($querystring, 0, -1); // on enlève le dernier & (qui est en trop)
                     }
-                    if (trim($querystring) == '') {
+                    if ('' == trim($querystring)) {
                         $querystring = null;
                     }
                     $log = new LogAccountRegisterFromNextPageWarningClickEvent();
@@ -73,7 +79,8 @@ class LogService
                     $log->setSource($this->getSiteFromHost($params['host']));
                     $aid = null;
                     if (isset($params['aidSlug'])) {
-                        $aid = $this->managerRegistry->getRepository(Aid::class)->findOneBy(['slug' => $params['aidSlug']]);
+                        $aid = $this->managerRegistry->getRepository(Aid::class)
+                            ->findOneBy(['slug' => $params['aidSlug']]);
                     }
                     $log->setAid($aid);
                     break;
@@ -84,7 +91,8 @@ class LogService
                     $log->setSource($this->getSiteFromHost($params['host']));
                     $aid = null;
                     if (isset($params['aidSlug'])) {
-                        $aid = $this->managerRegistry->getRepository(Aid::class)->findOneBy(['slug' => $params['aidSlug']]);
+                        $aid = $this->managerRegistry->getRepository(Aid::class)
+                            ->findOneBy(['slug' => $params['aidSlug']]);
                     }
                     $log->setAid($aid);
                     break;
@@ -96,12 +104,14 @@ class LogService
                     $log->setDsFolderNumber($params['dsFolderNumber'] ?? null);
                     $aid = null;
                     if (isset($params['aidSlug'])) {
-                        $aid = $this->managerRegistry->getRepository(Aid::class)->findOneBy(['slug' => (string) $params['aidSlug']]);
+                        $aid = $this->managerRegistry->getRepository(Aid::class)
+                            ->findOneBy(['slug' => (string) $params['aidSlug']]);
                     }
                     $log->setAid($aid);
                     $origanization = null;
                     if (isset($params['organization'])) {
-                        $origanization = $this->managerRegistry->getRepository(Organization::class)->find((int) $params['organization']);
+                        $origanization = $this->managerRegistry->getRepository(Organization::class)
+                            ->find((int) $params['organization']);
                     }
                     $log->setOrganization($origanization);
 
@@ -118,7 +128,7 @@ class LogService
                     $log->setResultsCount($params['resultsCount'] ?? null);
                     $log->setSource($this->getSiteFromHost($params['host'] ?? null));
                     if (isset($params['source'])) {
-                        $log->setSource($params['source']);
+                        $log->setSource(substr($params['source'], 0, 255));
                     }
                     $log->setSearch(isset($params['search']) ? substr($params['search'], 0, 255) : null);
                     $log->setPerimeter($params['perimeter'] ?? null);
@@ -156,7 +166,7 @@ class LogService
                     $log->setQuerystring($params['querystring'] ?? null);
                     $log->setSource($this->getSiteFromHost($params['host'] ?? null));
                     if (isset($params['source'])) {
-                        $log->setSource($params['source']);
+                        $log->setSource(substr($params['source'], 0, 255));
                     }
                     $log->setAid($params['aid'] ?? null);
                     $log->setOrganization($params['organization'] ?? null);
@@ -183,7 +193,8 @@ class LogService
                     $log->setSource($this->getSiteFromHost($params['host'] ?? null));
                     $blogPromotionPost = null;
                     if (isset($params['blogPromotionPostId'])) {
-                        $blogPromotionPost = $this->managerRegistry->getRepository(BlogPromotionPost::class)->find((int) $params['blogPromotionPostId']);
+                        $blogPromotionPost = $this->managerRegistry->getRepository(BlogPromotionPost::class)
+                            ->find((int) $params['blogPromotionPostId']);
                     }
                     $log->setBlogPromotionPost($blogPromotionPost);
                     break;
@@ -194,7 +205,8 @@ class LogService
                     $log->setSource($this->getSiteFromHost($params['host'] ?? null));
                     $blogPromotionPost = null;
                     if (isset($params['blogPromotionPostId'])) {
-                        $blogPromotionPost = $this->managerRegistry->getRepository(BlogPromotionPost::class)->find((int) $params['blogPromotionPostId']);
+                        $blogPromotionPost = $this->managerRegistry->getRepository(BlogPromotionPost::class)
+                            ->find((int) $params['blogPromotionPostId']);
                     }
                     $log->setBlogPromotionPost($blogPromotionPost);
                     break;
@@ -243,16 +255,18 @@ class LogService
                     break;
             }
 
-            $this->managerRegistry->getManager()->persist($log);
-            $this->managerRegistry->getManager()->flush();
+            if (isset($log)) {
+                $this->managerRegistry->getManager()->persist($log);
+                $this->managerRegistry->getManager()->flush();
+            }
         } catch (\Exception $exception) {
             $this->loggerInterface->error('Erreur log', [
-                'exception' => $exception
+                'exception' => $exception,
             ]);
         }
     }
 
-    public function getSiteFromHost($host)
+    public function getSiteFromHost(string $host): string
     {
         /**
          * Return the string bit that identify a site.
@@ -260,7 +274,7 @@ class LogService
          * aides-territoires.beta.gouv.fr --> aides-territoires
          * staging.aides-territoires.beta.gouv.fr --> staging
          * francemobilites.aides-territoires.beta.gouv.fr --> francemobilites
-         * aides.francemobilites.fr --> francemobilites  # Using the mapping
+         * aides.francemobilites.fr --> francemobilites  # Using the mapping.
          */
         $mapDnsToMinisites = [
             ['aides-territoires.beta.gouv.fr', 'aides-territoires'],
@@ -280,15 +294,15 @@ class LogService
             $minisite_slug = $mapping[1];
             // If we detect that a mapping is defined for the incoming
             // DNS host, then we get the minisite slug from that mapping.
-            if (strpos($host, $minisite_host) !== false) {
+            if (false !== strpos($host, $minisite_host)) {
                 return $minisite_slug;
             }
         }
 
-        if (strpos($host, "aides-territoires") !== false) {
-            return explode(".", $host)[0];
+        if (false !== strpos($host, 'aides-territoires')) {
+            return substr(explode('.', $host)[0], 0, 255);
         }
 
-        return $host;
+        return substr($host, 0, 255);
     }
 }

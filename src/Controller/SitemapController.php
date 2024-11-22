@@ -11,6 +11,8 @@ use App\Entity\Perimeter\Perimeter;
 use App\Entity\Program\Program;
 use App\Entity\Project\Project;
 use App\Entity\Search\SearchPage;
+use App\Repository\Aid\AidRepository;
+use App\Repository\Perimeter\PerimeterRepository;
 use App\Service\Various\StringService;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -88,13 +90,19 @@ class SitemapController extends AbstractController
         ];
 
         // détails des aides publiées
-        $aids = $managerRegistry->getRepository(Aid::class)->findForSitemap([
+        /** @var AidRepository $aidRepository */
+        $aidRepository = $managerRegistry->getRepository(Aid::class);
+        $aids = $aidRepository->findForSitemap([
             'showInSearch' => true
         ]);
 
         foreach ($aids as $aid) {
             $urls[] = [
-                'loc' => $this->generateUrl('app_aid_aid_details', ['slug' => $aid['slug']], UrlGeneratorInterface::ABSOLUTE_URL),
+                'loc' => $this->generateUrl(
+                    'app_aid_aid_details',
+                    ['slug' => $aid['slug']],
+                    UrlGeneratorInterface::ABSOLUTE_URL
+                ),
             ];
         }
         unset($aids);
@@ -164,8 +172,14 @@ class SitemapController extends AbstractController
         ];
 
         // pages par départements
-        $counties = $managerRegistry->getRepository(Perimeter::class)->findCounties();
+        /** @var PerimeterRepository $perimeterRepository */
+        $perimeterRepository = $managerRegistry->getRepository(Perimeter::class);
+        $counties = $perimeterRepository->findCounties();
         foreach ($counties as $county) {
+            // Pour éviter les problèmes sur les départements créer artificielement
+            if (!preg_match('/^[0-9A-Za-z]+$/', $county->getCode())) {
+                continue;
+            }
             $urls[] = [
                 'loc' => $this->generateUrl('app_cartography_detail', [
                     'code' => $county->getCode(),
@@ -190,7 +204,11 @@ class SitemapController extends AbstractController
         $pages = $managerRegistry->getRepository(Page::class)->findAll();
         foreach ($pages as $page) {
             $urls[] = [
-                'loc' => $this->generateUrl('app_home', [], UrlGeneratorInterface::ABSOLUTE_URL) . trim($page->getUrl(), '/') . '/',
+                'loc' => $this->generateUrl(
+                    'app_home',
+                    [],
+                    UrlGeneratorInterface::ABSOLUTE_URL
+                ) . trim($page->getUrl(), '/') . '/',
             ];
         }
         unset($pages);

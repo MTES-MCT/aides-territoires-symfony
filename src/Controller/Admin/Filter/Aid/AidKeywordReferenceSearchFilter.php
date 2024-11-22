@@ -4,6 +4,7 @@ namespace App\Controller\Admin\Filter\Aid;
 
 use App\Entity\Reference\KeywordReference;
 use App\Form\Admin\Filter\Aid\AidKeywordReferenceSearchFilterType;
+use App\Repository\Reference\KeywordReferenceRepository;
 use Doctrine\ORM\QueryBuilder;
 use EasyCorp\Bundle\EasyAdminBundle\Contracts\Filter\FilterInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\EntityDto;
@@ -15,7 +16,7 @@ class AidKeywordReferenceSearchFilter implements FilterInterface
 {
     use FilterTrait;
 
-    public static function new(string $propertyName, $label = null): self
+    public static function new(string $propertyName, mixed $label = null): self
     {
         return (new self())
             ->setFilterFqcn(__CLASS__)
@@ -24,13 +25,19 @@ class AidKeywordReferenceSearchFilter implements FilterInterface
             ->setFormType(AidKeywordReferenceSearchFilterType::class);
     }
 
-    public function apply(QueryBuilder $queryBuilder, FilterDataDto $filterDataDto, ?FieldDto $fieldDto, EntityDto $entityDto): void
-    {
+    public function apply(
+        QueryBuilder $queryBuilder,
+        FilterDataDto $filterDataDto,
+        ?FieldDto $fieldDto,
+        EntityDto $entityDto
+    ): void {
         if (!$filterDataDto->getValue()) {
             return;
         }
         $search = $filterDataDto->getValue()->getName();
-        $synonyms = $queryBuilder->getEntityManager()->getRepository(KeywordReference::class)->findCustom(['string' => $search, 'noIntention' => true]);
+        /** @var KeywordReferenceRepository $keywordReferenceRepository */
+        $keywordReferenceRepository = $queryBuilder->getEntityManager()->getRepository(KeywordReference::class);
+        $synonyms = $keywordReferenceRepository->findCustom(['string' => $search, 'noIntention' => true]);
 
         $objectsString = '';
         foreach ($synonyms as $synonym) {
@@ -41,16 +48,32 @@ class AidKeywordReferenceSearchFilter implements FilterInterface
         $select = '(';
         $select .=
             '
-        MATCH_AGAINST(' . $filterDataDto->getEntityAlias() . '.name) AGAINST(:searchKey IN BOOLEAN MODE)
-        + 
-        MATCH_AGAINST(' . $filterDataDto->getEntityAlias() . '.description, ' . $filterDataDto->getEntityAlias() . '.eligibility, ' . $filterDataDto->getEntityAlias() . '.projectExamples) AGAINST(:searchKey IN BOOLEAN MODE)
+        MATCH_AGAINST('
+            . $filterDataDto->getEntityAlias()
+            . '.name) AGAINST(:searchKey IN BOOLEAN MODE)
+        +
+        MATCH_AGAINST('
+            . $filterDataDto->getEntityAlias()
+            . '.description, '
+            . $filterDataDto->getEntityAlias()
+            . '.eligibility, '
+            . $filterDataDto->getEntityAlias()
+            . '.projectExamples) AGAINST(:searchKey IN BOOLEAN MODE)
         ';
         $select .=
             '
         +
-        MATCH_AGAINST(' . $filterDataDto->getEntityAlias() . '.name) AGAINST(:objectsStringKey IN BOOLEAN MODE)
-        + 
-        MATCH_AGAINST(' . $filterDataDto->getEntityAlias() . '.description, ' . $filterDataDto->getEntityAlias() . '.eligibility, ' . $filterDataDto->getEntityAlias() . '.projectExamples) AGAINST(:objectsStringKey IN BOOLEAN MODE)
+        MATCH_AGAINST('
+            . $filterDataDto->getEntityAlias()
+            . '.name) AGAINST(:objectsStringKey IN BOOLEAN MODE)
+        +
+        MATCH_AGAINST('
+            . $filterDataDto->getEntityAlias()
+            . '.description, '
+            . $filterDataDto->getEntityAlias()
+            . '.eligibility, '
+            . $filterDataDto->getEntityAlias()
+            . '.projectExamples) AGAINST(:objectsStringKey IN BOOLEAN MODE)
         ';
 
         $select .= ') as HIDDEN score_key';
@@ -60,7 +83,5 @@ class AidKeywordReferenceSearchFilter implements FilterInterface
             ->setParameter('searchKey', $search)
             ->setParameter('objectsStringKey', $objectsString)
         ;
-
-        return;
     }
 }

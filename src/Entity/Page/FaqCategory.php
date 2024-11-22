@@ -36,7 +36,15 @@ class FaqCategory
     #[Gedmo\Timestampable(on: 'update')]
     private ?\DateTimeInterface $timeUpdate = null;
 
-    #[ORM\OneToMany(mappedBy: 'faqCategory', targetEntity: FaqQuestionAnswser::class, cascade: ['persist'], orphanRemoval: true)]
+    /**
+     * @var Collection<int, FaqQuestionAnswser>
+     */
+    #[ORM\OneToMany(
+        mappedBy: 'faqCategory',
+        targetEntity: FaqQuestionAnswser::class,
+        cascade: ['persist'],
+        orphanRemoval: true
+    )]
     #[OrderBy(['position' => 'ASC'])]
     private Collection $faqQuestionAnswsers;
 
@@ -122,7 +130,10 @@ class FaqCategory
 
     public function removeFaqQuestionAnswser(FaqQuestionAnswser $faqQuestionAnswser): static
     {
-        if ($this->faqQuestionAnswsers->removeElement($faqQuestionAnswser) && $faqQuestionAnswser->getFaqCategory() === $this) {
+        if (
+            $this->faqQuestionAnswsers->removeElement($faqQuestionAnswser)
+            && $faqQuestionAnswser->getFaqCategory() === $this
+        ) {
             $faqQuestionAnswser->setFaqCategory(null);
         }
 

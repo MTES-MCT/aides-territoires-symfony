@@ -25,7 +25,7 @@ class QrCodeController extends AbstractController
         requirements: ['idUser' => '[0-9]+']
     )]
     public function displayTotpQrCode(
-        $idUser,
+        int $idUser,
         TotpAuthenticatorInterface $totpAuthenticator,
         ManagerRegistry $managerRegistry,
         UserRepository $userRepository,

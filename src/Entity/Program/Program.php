@@ -39,9 +39,9 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Entity(repositoryClass: ProgramRepository::class)]
 class Program // NOSONAR too much methods
 {
-    const FOLDER = 'programs';
+    public const FOLDER = 'programs';
 
-    const API_GROUP_LIST = 'program:list';
+    public const API_GROUP_LIST = 'program:list';
 
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -71,7 +71,7 @@ class Program // NOSONAR too much methods
     #[ORM\Column(length: 100, nullable: true)]
     private ?string $logo = null;
 
-    private $logoFile = null;
+    private ?string $logoFile = null;
 
     private bool $deleteLogo = false;
 
@@ -93,22 +93,40 @@ class Program // NOSONAR too much methods
     #[ORM\Column]
     private ?bool $isSpotlighted = null;
 
+    /**
+     * @var Collection<int, Aid>
+     */
     #[ORM\ManyToMany(targetEntity: Aid::class, mappedBy: 'programs')]
     private Collection $aids;
 
+    /**
+     * @var Collection<int, BlogPromotionPost>
+     */
     #[ORM\ManyToMany(targetEntity: BlogPromotionPost::class, mappedBy: 'programs')]
     private Collection $blogPromotionPosts;
 
+    /**
+     * @var Collection<int, FaqQuestionAnswser>
+     */
     #[ORM\OneToMany(mappedBy: 'program', targetEntity: FaqQuestionAnswser::class)]
     #[ORM\OrderBy(["id" => "ASC"])]
     private Collection $faqQuestionAnswsers;
 
+    /**
+     * @var Collection<int, PageTab>
+     */
     #[ORM\OneToMany(mappedBy: 'program', targetEntity: PageTab::class)]
     private Collection $pageTabs;
 
+    /**
+     * @var Collection<int, LogAidSearch>
+     */
     #[ORM\ManyToMany(targetEntity: LogAidSearch::class, mappedBy: 'programs')]
     private Collection $logAidSearches;
 
+    /**
+     * @var Collection<int, LogProgramView>
+     */
     #[ORM\OneToMany(mappedBy: 'program', targetEntity: LogProgramView::class)]
     #[ORM\JoinColumn(onDelete: 'SET NULL')]
     private Collection $logProgramViews;
@@ -193,7 +211,7 @@ class Program // NOSONAR too much methods
         return $this;
     }
 
-    public function setLogoFile($logoFile = null): void
+    public function setLogoFile(?string $logoFile = null): void
     {
         $this->logoFile = $logoFile;
 
@@ -202,7 +220,7 @@ class Program // NOSONAR too much methods
         }
     }
 
-    public function getLogoFile()
+    public function getLogoFile(): ?string
     {
         return $this->logoFile;
     }
@@ -341,7 +359,10 @@ class Program // NOSONAR too much methods
 
     public function removeFaqQuestionAnswser(FaqQuestionAnswser $faqQuestionAnswser): static
     {
-        if ($this->faqQuestionAnswsers->removeElement($faqQuestionAnswser) && $faqQuestionAnswser->getProgram() === $this) {
+        if (
+            $this->faqQuestionAnswsers->removeElement($faqQuestionAnswser)
+            && $faqQuestionAnswser->getProgram() === $this
+        ) {
             $faqQuestionAnswser->setProgram(null);
         }
 
@@ -439,10 +460,12 @@ class Program // NOSONAR too much methods
     public function getNbAids(): ?int
     {
         try {
-            return count($this->aids);
+            $this->nbAids = count($this->aids);
         } catch (\Exception $e) {
-            return null;
+            $this->nbAids = null;
         }
+
+        return $this->nbAids;
     }
 
     public function setNbAids(?int $nbAids): static

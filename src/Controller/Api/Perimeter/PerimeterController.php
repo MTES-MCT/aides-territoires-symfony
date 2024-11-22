@@ -98,7 +98,7 @@ class PerimeterController extends ApiController
                 'id' => $result->getId() . '-' . $this->stringService->getSlug($result->getName()),
                 'text' => $perimeterService->getSmartName($result),
                 'name' => $result->getName(),
-                'scale' => $perimeterService->getScale($result->getScale())['name'] ?? null,
+                'scale' => $perimeterService->getScale((int) $result->getScale())['name'] ?? null,
                 'zipcodes' => $result->getZipcodes() ?? [],
                 'code' => $result->getCode()
             ];
@@ -151,7 +151,12 @@ class PerimeterController extends ApiController
         return $response;
     }
 
-    #[Route('/api/perimeters/{id}/', name: 'api_perimeters_details', priority: 5, requirements: ['id' => '[A-Za-z0-9\-]+'])]
+    #[Route(
+        '/api/perimeters/{id}/',
+        name: 'api_perimeters_details',
+        priority: 5,
+        requirements: ['id' => '[A-Za-z0-9\-]+']
+    )]
     public function details(
         string $id,
         PerimeterRepository $perimeterRepository,

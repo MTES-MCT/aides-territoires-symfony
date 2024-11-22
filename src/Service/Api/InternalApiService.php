@@ -8,7 +8,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class InternalApiService
 {
-    const API_FOLDER = 'api';
+    public const API_FOLDER = 'api';
     private string $bearerToken = '';
 
     public function __construct(
@@ -59,11 +59,19 @@ class InternalApiService
         }
     }
 
+    /**
+     * Undocumented function
+     *
+     * @param string $url
+     * @param array<string, mixed>|null $params
+     * @param string $method
+     * @return string
+     */
     public function callApi(
         string $url,
         ?array $params = null,
         string $method = 'GET'
-    ) {
+    ): string {
         // créer le client pour appeller l'api
         $client = new Client([
             'base_uri' => $this->getAPiBaseUrl(),

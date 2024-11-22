@@ -2,6 +2,7 @@
 
 namespace App\Controller\Admin;
 
+use App\Enum\Direction;
 use App\Service\Aid\AidSearchFormService;
 use App\Service\Aid\AidService;
 use App\Service\Export\SpreadsheetExporterService;
@@ -10,6 +11,8 @@ use App\Service\Image\ImageService;
 use App\Service\User\UserService;
 use App\Service\Various\ParamService;
 use App\Service\Various\StringService;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\EntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use EasyCorp\Bundle\EasyAdminBundle\Collection\FieldCollection;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
@@ -26,16 +29,9 @@ use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
-enum Direction
-{
-    case Top;
-    case Up;
-    case Down;
-    case Bottom;
-}
 class AtCrudController extends AbstractCrudController
 {
-    const UPLOAD_TMP_FOLDER = '/public/uploads/_tmp/';
+    public const UPLOAD_TMP_FOLDER = '/public/uploads/_tmp/';
 
     public function __construct(
         public ManagerRegistry $managerRegistry,
@@ -100,7 +96,9 @@ class AtCrudController extends AbstractCrudController
         $entityTest = new (static::getEntityFqcn());
 
         if (method_exists($entityTest, 'getPosition')) {
-            $entityCount = $this->managerRegistry->getManager()->getRepository(static::getEntityFqcn())->count([]); // compte les entites
+            /** @var ServiceEntityRepository<object> $repository */
+            $repository = $this->managerRegistry->getRepository(static::getEntityFqcn());
+            $entityCount = $repository->count([]);
 
             // les actions pour monter / descendre
             $moveTop = Action::new('moveTop', false, 'fa fa-arrow-up')
@@ -156,7 +154,8 @@ class AtCrudController extends AbstractCrudController
     private function move(AdminContext $context, Direction $direction): Response
     {
         $object = $context->getEntity()->getInstance();
-        $entityCount = $this->managerRegistry->getManager()->getRepository(static::getEntityFqcn())->count([]); // compte les entites
+        $entityCount = $this->managerRegistry->getManager()
+            ->getRepository(static::getEntityFqcn())->count([]);
         $oldPosition = $object->getPosition();
         $newPosition = match ($direction) {
             Direction::Top => 0,
@@ -181,6 +180,11 @@ class AtCrudController extends AbstractCrudController
         return $this->redirect($context->getReferrer());
     }
 
+    /**
+     *
+     * @param array<string, mixed>|null $params
+     * @return void
+     */
     public function updatePositions(array $params = null): void
     {
         $exclude = $params['exclude'] ?? null;
@@ -189,7 +193,9 @@ class AtCrudController extends AbstractCrudController
 
         $direction = $newPosition < $oldPosition ? 'down' : 'up';
 
-        $qb = $this->managerRegistry->getRepository(static::getEntityFqcn())->createQueryBuilder('p');
+        /** @var ServiceEntityRepository $serviceEntityRepository */
+        $serviceEntityRepository = $this->managerRegistry->getRepository(static::getEntityFqcn());
+        $qb = $serviceEntityRepository->createQueryBuilder('p');
         $qb->update(static::getEntityFqcn(), 'pt');
         if ($direction == 'down') {
             $qb->set('pt.position', 'pt.position + 1');
@@ -223,13 +229,21 @@ class AtCrudController extends AbstractCrudController
         $qb->getQuery()->execute();
     }
 
-    public function exportSpreadsheet(AdminContext $context, SpreadsheetExporterService $spreadsheetExporterService, string $filename, string $format = 'csv')
-    {
+    public function exportSpreadsheet(
+        AdminContext $context,
+        SpreadsheetExporterService $spreadsheetExporterService,
+        string $filename,
+        string $format = 'csv'
+    ): Response {
         ini_set('max_execution_time', 60 * 60);
         ini_set('memory_limit', '1G');
 
         $fields = FieldCollection::new($this->configureFields(Crud::PAGE_INDEX));
-        $filters = $this->container->get(FilterFactory::class)->create($context->getCrud()->getFiltersConfig(), $fields, $context->getEntity());
+        $filters = $this->container->get(FilterFactory::class)->create(
+            $context->getCrud()->getFiltersConfig(),
+            $fields,
+            $context->getEntity()
+        );
         $queryBuilder = $this->createIndexQueryBuilder($context->getSearch(), $context->getEntity(), $fields, $filters);
 
         return $spreadsheetExporterService->createResponseFromQueryBuilder(
@@ -240,17 +254,23 @@ class AtCrudController extends AbstractCrudController
         );
     }
 
-    public function exportXlsx(AdminContext $context, SpreadsheetExporterService $spreadsheetExporterService, string $filename = '')
-    {
+    public function exportXlsx(
+        AdminContext $context,
+        SpreadsheetExporterService $spreadsheetExporterService,
+        string $filename = ''
+    ): Response {
         return $this->exportSpreadsheet($context, $spreadsheetExporterService, $filename, 'xlsx');
     }
 
-    public function exportCsv(AdminContext $context, SpreadsheetExporterService $spreadsheetExporterService, string $filename = '')
-    {
+    public function exportCsv(
+        AdminContext $context,
+        SpreadsheetExporterService $spreadsheetExporterService,
+        string $filename = ''
+    ): Response {
         return $this->exportSpreadsheet($context, $spreadsheetExporterService, $filename, 'csv');
     }
 
-    public function getExportXlsxAction()
+    public function getExportXlsxAction(): Action
     {
         return Action::new('exportXlsx')
             ->linkToUrl(function () {
@@ -264,7 +284,7 @@ class AtCrudController extends AbstractCrudController
             ->createAsGlobalAction();
     }
 
-    public function getExportCsvAction()
+    public function getExportCsvAction(): Action
     {
         return Action::new('exportCsv')
             ->linkToUrl(function () {

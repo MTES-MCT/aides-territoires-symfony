@@ -35,7 +35,7 @@ class ChangePasswordCrudController extends AbstractCrudController implements Eve
             return [];
         }
 
-        yield TextField::new('newPassword', 'Nouveau mot de passe pour l\'utilisateur '.$entity->getEmail())
+        yield TextField::new('newPassword', 'Nouveau mot de passe pour l\'utilisateur ' . $entity->getEmail())
             ->setFormType(PasswordType::class)
             ->setFormTypeOptions([
                 'constraints' => [
@@ -57,27 +57,27 @@ class ChangePasswordCrudController extends AbstractCrudController implements Eve
         ];
     }
 
-    public function passwordPersistEvent(BeforeEntityPersistedEvent $event)
+    public function passwordPersistEvent(BeforeEntityPersistedEvent $event): void
     {
         $newPassword = $this->requestStack->getCurrentRequest()->get('User')['newPassword'] ?? null;
-        
+
         $this->hashPassword(
             $event->getEntityInstance(),
             $newPassword
         );
     }
 
-    public function passwordUpdateEvent(BeforeEntityUpdatedEvent $event)
+    public function passwordUpdateEvent(BeforeEntityUpdatedEvent $event): void
     {
         $newPassword = $this->requestStack->getCurrentRequest()->get('User')['newPassword'] ?? null;
-        
+
         $this->hashPassword(
             $event->getEntityInstance(),
             $newPassword
         );
     }
 
-    public function hashPassword($entity, $newPassword)
+    public function hashPassword(mixed $entity, mixed $newPassword): void
     {
         if (!$entity instanceof User || !$newPassword) {
             return;

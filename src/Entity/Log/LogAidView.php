@@ -44,6 +44,9 @@ class LogAidView
     #[ORM\JoinColumn(onDelete: DoctrineConstants::SET_NULL)]
     private ?Aid $aid = null;
 
+    /**
+     * @var Collection<int, OrganizationType>
+     */
     #[ORM\ManyToMany(targetEntity: OrganizationType::class, inversedBy: 'logAidViews')]
     private Collection $organizationTypes;
 

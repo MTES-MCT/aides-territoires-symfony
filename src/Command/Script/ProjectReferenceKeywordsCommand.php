@@ -13,19 +13,19 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
-#[AsCommand(name: 'at:script:project_reference:keywords', description: 'Exclusion de certains mots clés pour certains projets')]
+#[AsCommand(
+    name: 'at:script:project_reference:keywords',
+    description: 'Exclusion de certains mots clés pour certains projets'
+)]
 class ProjectReferenceKeywordsCommand extends Command
 {
-
     protected InputInterface $input;
     protected OutputInterface $output;
     protected string $commandTextStart = '<Exclusion de certains mots clés pour certains projets';
     protected string $commandTextEnd = '>Exclusion de certains mots clés pour certains projets';
 
-
-
     public function __construct(
-        protected ManagerRegistry $managerRegistry
+        protected ManagerRegistry $managerRegistry,
     ) {
         ini_set('max_execution_time', 60 * 60);
         ini_set('memory_limit', '1G');
@@ -45,14 +45,16 @@ class ProjectReferenceKeywordsCommand extends Command
             $this->task($input, $output);
         } catch (\Exception $exception) {
             $io->error($exception->getMessage());
+
             return Command::FAILURE;
         }
 
         $io->title($this->commandTextEnd);
+
         return Command::SUCCESS;
     }
 
-    protected function task($input, $output): void
+    protected function task(InputInterface $input, OutputInterface $output): void
     {
         /** @var ProjectReferenceRepository $projectReferenceRepository */
         $projectReferenceRepository = $this->managerRegistry->getRepository(ProjectReference::class);
@@ -79,24 +81,24 @@ class ProjectReferenceKeywordsCommand extends Command
 
         // on exclus  / requiert certains mots clés
         foreach ($projectReferences as $projectReference) {
-            if (strpos($projectReference->getName(), 'place') !== false) {
+            if (false !== strpos($projectReference->getName(), 'place')) {
                 $projectReference->addExcludedKeywordReference($placeKeyword);
             }
-            if (strpos($projectReference->getName(), 'terrain') !== false) {
+            if (false !== strpos($projectReference->getName(), 'terrain')) {
                 $projectReference->addExcludedKeywordReference($terrainKeyword);
             }
-            if (strpos($projectReference->getName(), 'maison') !== false) {
+            if (false !== strpos($projectReference->getName(), 'maison')) {
                 $projectReference->addExcludedKeywordReference($maisonKeyword);
             }
-            if (strpos($projectReference->getName(), 'patrimoine religieux') !== false) {
+            if (false !== strpos($projectReference->getName(), 'patrimoine religieux')) {
                 $projectReference->addExcludedKeywordReference($patrimoineKeyword);
             }
 
-            if ($projectReference->getName() == 'Création de logements sociaux') {
+            if ('Création de logements sociaux' == $projectReference->getName()) {
                 $projectReference->addRequiredKeywordReference($sociauxKeyword);
             }
 
-            if ($projectReference->getName() == 'Changement des fenêtres/portes d’un bâtiment public') {
+            if ('Changement des fenêtres/portes d’un bâtiment public' == $projectReference->getName()) {
                 $projectReference->addRequiredKeywordReference($fenetreKeyword);
                 $projectReference->addRequiredKeywordReference($porteKeyword);
             }

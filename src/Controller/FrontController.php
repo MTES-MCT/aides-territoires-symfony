@@ -10,8 +10,8 @@ use Symfony\Component\Routing\Annotation\Route;
 #[Route(priority: 1)]
 class FrontController extends AbstractController
 {
-    const FLASH_SUCCESS = 'success';
-    const FLASH_ERROR = 'error';
+    public const FLASH_SUCCESS = 'success';
+    public const FLASH_ERROR = 'error';
 
     public function __construct(
         public Breadcrumb $breadcrumb,
@@ -21,10 +21,10 @@ class FrontController extends AbstractController
 
     /**
      * Pour les addFlash traduits
-     * @param $type
-     * @param $message
+     * @param string $type
+     * @param string $message
      */
-    public function tAddFlash($type, $message)
+    public function tAddFlash(string $type, string $message): void
     {
         $this->addFlash(
             $type,

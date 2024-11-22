@@ -20,4 +20,13 @@ class LogAdminActionRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, LogAdminAction::class);
     }
+
+    public function findOldLogs()
+    {
+        return $this->createQueryBuilder('l')
+            ->where('l.timeCreate < :date')
+            ->setParameter('date', new \DateTime('-2 month'))
+            ->getQuery()
+            ->getResult();
+    }
 }

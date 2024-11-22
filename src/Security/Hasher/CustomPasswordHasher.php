@@ -16,7 +16,7 @@ class CustomPasswordHasher implements PasswordHasherInterface
             throw new InvalidPasswordException();
         }
 
-        return $this->make_password($plainPassword);
+        return $this->makePassword($plainPassword);
     }
 
     public function verify(string $hashedPassword, string $plainPassword): bool
@@ -25,8 +25,7 @@ class CustomPasswordHasher implements PasswordHasherInterface
             return false;
         }
 
-        // return $this->make_password($plainPassword) === $hashedPassword;
-        return $this->verify_Password($hashedPassword, $plainPassword);
+        return $this->verifyPassword($hashedPassword, $plainPassword);
     }
 
     public function needsRehash(string $hashedPassword): bool
@@ -34,7 +33,7 @@ class CustomPasswordHasher implements PasswordHasherInterface
         return false;
     }
 
-    private function make_password($password)
+    private function makePassword($password)
     {
         $algorithm = "pbkdf2_sha256";
         $iterations = 600000;
@@ -43,13 +42,10 @@ class CustomPasswordHasher implements PasswordHasherInterface
         $newSalt = base64_encode($newSalt);
 
         $hash = hash_pbkdf2("SHA256", $password, $newSalt, $iterations, 0, true);
-        $toDBStr = $algorithm . "$" . $iterations . "$" . $newSalt . "$" . base64_encode($hash);
-
-        // This string is to be saved into DB, just like what Django generate.
-        return $toDBStr;
+        return $algorithm . "$" . $iterations . "$" . $newSalt . "$" . base64_encode($hash);
     }
 
-    private function verify_Password($dbString, $password)
+    private function verifyPassword($dbString, $password)
     {
         $pieces = explode("$", $dbString);
         $iterations = (int) $pieces[1];
@@ -62,12 +58,6 @@ class CustomPasswordHasher implements PasswordHasherInterface
         $hash = hash_pbkdf2("SHA256", $password, $salt, $iterations, 0, true);
         $hash = base64_encode($hash);
 
-        if ($hash == $old_hash) {
-            // login ok.
-            return true;
-        } else {
-            //login fail
-            return false;
-        }
+        return $hash == $old_hash;
     }
 }

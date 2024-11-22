@@ -3,6 +3,7 @@
 namespace App\Form\Program;
 
 use App\Entity\Perimeter\Perimeter;
+use App\Repository\Perimeter\PerimeterRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -18,7 +19,9 @@ class CountySelectType extends AbstractType
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $counties = $this->managerRegistry->getRepository(Perimeter::class)->findCounties();
+        /** @var PerimeterRepository $perimeterRepository */
+        $perimeterRepository = $this->managerRegistry->getRepository(Perimeter::class);
+        $counties = $perimeterRepository->findCounties();
         $countyChoices = [];
         foreach ($counties as $county) {
             $countyChoices[$county->getCode() . ' - ' . $county->getName()] = $county->getCode();

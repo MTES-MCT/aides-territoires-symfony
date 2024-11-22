@@ -4,6 +4,7 @@ namespace App\Controller\Api\Aid;
 
 use App\Controller\Api\ApiController;
 use App\Entity\Aid\Aid;
+use App\Entity\Category\CategoryTheme;
 use App\Entity\Log\LogAidSearch;
 use App\Entity\Perimeter\Perimeter;
 use App\Entity\User\User;
@@ -30,7 +31,10 @@ class AidController extends ApiController
         RequestStack $requestStack,
         UserService $userService
     ): JsonResponse {
-        $aidSearchClass = $aidSearchFormService->getAidSearchClass();
+        $aidSearchClass = $aidSearchFormService->getAidSearchClass(null, [
+            'dontUseUserOrganizationType' => true,
+            'dontUseUserPerimeter' => true
+        ]);
 
         // parametres pour requetes aides
         $aidParams = [
@@ -63,19 +67,21 @@ class AidController extends ApiController
         $user = $userService->getUserLogged();
         $logParams = [
             'organizationTypes' => (isset($aidParams['organizationType'])) ? [$aidParams['organizationType']] : null,
-            'querystring' => $query ?? null,
+            'querystring' => $query,
             'resultsCount' => $count,
             'host' => $requestStack->getCurrentRequest()->getHost(),
             'source' => LogAidSearch::SOURCE_API,
             'perimeter' => $aidParams['perimeterFrom'] ?? null,
             'search' => $aidParams['keyword'] ?? null,
-            'organization' => ($user instanceof User && $user->getDefaultOrganization()) ? $user->getDefaultOrganization() : null,
+            'organization' => ($user instanceof User && $user->getDefaultOrganization())
+                ? $user->getDefaultOrganization() : null,
             'backers' => $aidParams['backers'] ?? null,
             'categories' => $aidParams['categories'] ?? null,
             'programs' => $aidParams['programs'] ?? null,
             'projectReference' => $aidParams['projectReference'] ?? null,
             'user' => $user ?? null
         ];
+        /** @var ArrayCollection<int, CategoryTheme> $themes */
         $themes = new ArrayCollection();
         if (isset($aidParams['categories']) && is_array($aidParams['categories'])) {
             foreach ($aidParams['categories'] as $category) {
@@ -132,7 +138,7 @@ class AidController extends ApiController
 
     #[Route('/api/aids/by-id/{id}/', name: 'api_aid_by_id', priority: 4)]
     public function byId(
-        $id,
+        mixed $id,
         AidRepository $aidRepository,
         AidService $aidService,
         LogService $logService,
@@ -140,7 +146,12 @@ class AidController extends ApiController
         UserService $userService
     ): JsonResponse {
         $params = [];
-        $params['id'] = (int) $id;
+        // $id peu être un slug ou un id
+        if (is_numeric($id)) {
+            $params['id'] = (int) $id;
+        } else {
+            $params['slug'] = $id;
+        }
         $codeStatus = 200;
         $aid = $aidRepository->findOneCustom($params);
         if ($aid instanceof Aid) {
@@ -167,7 +178,8 @@ class AidController extends ApiController
                 'querystring' => parse_url($requestStack->getCurrentRequest()->getRequestUri(), PHP_URL_QUERY) ?? null,
                 'host' => $requestStack->getCurrentRequest()->getHost(),
                 'aid' => $aid,
-                'organization' => ($user instanceof User && $user->getDefaultOrganization()) ? $user->getDefaultOrganization() : null,
+                'organization' => ($user instanceof User && $user->getDefaultOrganization())
+                    ? $user->getDefaultOrganization() : null,
                 'user' => ($user instanceof User) ? $user : null,
                 'source' => LogAidSearch::SOURCE_API,
             ]
@@ -182,7 +194,7 @@ class AidController extends ApiController
 
     #[Route('/api/aids/{slug}/', name: 'api_aid_by_slug', priority: 4)]
     public function bySlug(
-        $slug,
+        string $slug,
         AidRepository $aidRepository,
         AidService $aidService,
         LogService $logService,
@@ -217,7 +229,8 @@ class AidController extends ApiController
                 'querystring' => parse_url($requestStack->getCurrentRequest()->getRequestUri(), PHP_URL_QUERY) ?? null,
                 'host' => $requestStack->getCurrentRequest()->getHost(),
                 'aid' => $aid,
-                'organization' => ($user instanceof User && $user->getDefaultOrganization()) ? $user->getDefaultOrganization() : null,
+                'organization' => ($user instanceof User && $user->getDefaultOrganization())
+                    ? $user->getDefaultOrganization() : null,
                 'user' => ($user instanceof User) ? $user : null,
                 'source' => LogAidSearch::SOURCE_API,
             ]
@@ -231,6 +244,13 @@ class AidController extends ApiController
     }
 
 
+    /**
+     * Formatage du retour
+     *
+     * @param array<int, Aid> $results
+     * @param AidService $aidService
+     * @return array<int, array<string, mixed>>
+     */
     private function getResultsSpe(array $results, AidService $aidService): array
     {
         $resultsSpe = [];
@@ -251,7 +271,9 @@ class AidController extends ApiController
                 $financersFull[] = [
                     'id' => $aidFinancer->getBacker()->getId(),
                     'name' => $aidFinancer->getBacker()->getName(),
-                    'logo' => $aidFinancer->getBacker()->getLogo() ? $this->paramService->get('cloud_image_url') . $aidFinancer->getBacker()->getLogo() : null
+                    'logo' => $aidFinancer->getBacker()->getLogo()
+                        ? $this->paramService->get('cloud_image_url') . $aidFinancer->getBacker()->getLogo()
+                        : null
                 ];
             }
             $instructors = [];
@@ -268,7 +290,9 @@ class AidController extends ApiController
                 $instructorsFull[] = [
                     'id' => $aidInstructor->getBacker()->getId(),
                     'name' => $aidInstructor->getBacker()->getName(),
-                    'logo' => $aidInstructor->getBacker()->getLogo() ? $this->paramService->get('cloud_image_url') . $aidInstructor->getBacker()->getLogo() : null
+                    'logo' => $aidInstructor->getBacker()->getLogo()
+                        ? $this->paramService->get('cloud_image_url') . $aidInstructor->getBacker()->getLogo()
+                        : null
                 ];
             }
             $programs = [];
@@ -333,7 +357,11 @@ class AidController extends ApiController
                 'description' => $result->getDescription(),
                 'eligibility' => $result->getEligibility(),
                 'perimeter' => $result->getPerimeter() ? $result->getPerimeter()->getName() : null,
-                'perimeter_scale' => ($result->getPerimeter() && $result->getPerimeter()->getScale() && isset(Perimeter::SCALES_FOR_SEARCH[$result->getPerimeter()->getScale()])) ? Perimeter::SCALES_FOR_SEARCH[$result->getPerimeter()->getScale()]['name'] : null,
+                'perimeter_scale' => (
+                    $result->getPerimeter()
+                    && $result->getPerimeter()->getScale()
+                    && isset(Perimeter::SCALES_FOR_SEARCH[$result->getPerimeter()->getScale()])
+                ) ? Perimeter::SCALES_FOR_SEARCH[$result->getPerimeter()->getScale()]['name'] : null,
                 'mobilization_steps' => $steps,
                 'origin_url' => $result->getOriginUrl(),
                 'categories' => $categories,
@@ -344,9 +372,12 @@ class AidController extends ApiController
                 'aid_types_full' => $typesFull,
                 'is_charged' => $result->isIsCharged(),
                 'destinations' => $destinations,
-                'start_date' => $result->getDateStart() ? $result->getDateStart()->format('Y-m-d') : null,
-                'predeposit_date' => $result->getDatePredeposit() ? $result->getDatePredeposit()->format('Y-m-d') : null,
-                'submission_deadline' => $result->getDateSubmissionDeadline() ? $result->getDateSubmissionDeadline()->format('Y-m-d') : null,
+                'start_date' => $result->getDateStart()
+                    ? $result->getDateStart()->format('Y-m-d') : null,
+                'predeposit_date' => $result->getDatePredeposit()
+                    ? $result->getDatePredeposit()->format('Y-m-d') : null,
+                'submission_deadline' => $result->getDateSubmissionDeadline()
+                    ? $result->getDateSubmissionDeadline()->format('Y-m-d') : null,
                 'subvention_rate_lower_bound' => $result->getSubventionRateMin(),
                 'subvention_rate_upper_bound' => $result->getSubventionRateMax(),
                 'subvention_comment' => $result->getSubventionComment(),

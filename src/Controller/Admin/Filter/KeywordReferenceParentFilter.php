@@ -14,7 +14,7 @@ class KeywordReferenceParentFilter implements FilterInterface
 {
     use FilterTrait;
 
-    public static function new(string $propertyName, $label = null): self
+    public static function new(string $propertyName, mixed $label = null): self
     {
         return (new self())
             ->setFilterFqcn(__CLASS__)
@@ -23,12 +23,26 @@ class KeywordReferenceParentFilter implements FilterInterface
             ->setFormType(KeywordReferenceParentFilterType::class);
     }
 
-    public function apply(QueryBuilder $queryBuilder, FilterDataDto $filterDataDto, ?FieldDto $fieldDto, EntityDto $entityDto): void
-    {
+    public function apply(
+        QueryBuilder $queryBuilder,
+        FilterDataDto $filterDataDto,
+        ?FieldDto $fieldDto,
+        EntityDto $entityDto
+    ): void {
         if ($filterDataDto->getValue()) {
-            $queryBuilder->andWhere(sprintf('%s.parent = entity', $filterDataDto->getEntityAlias(), $filterDataDto->getProperty(), $filterDataDto->getEntityAlias()));
+            $queryBuilder->andWhere(
+                sprintf(
+                    '%s.parent = entity',
+                    $filterDataDto->getEntityAlias(),
+                )
+            );
         } else {
-            $queryBuilder->andWhere(sprintf('%s.parent != entity', $filterDataDto->getEntityAlias(), $filterDataDto->getProperty(), $filterDataDto->getEntityAlias()));
+            $queryBuilder->andWhere(
+                sprintf(
+                    '%s.parent != entity',
+                    $filterDataDto->getEntityAlias(),
+                )
+            );
         }
     }
 }

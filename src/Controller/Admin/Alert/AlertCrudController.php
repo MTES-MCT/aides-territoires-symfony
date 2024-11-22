@@ -25,7 +25,12 @@ class AlertCrudController extends AtCrudController
             ->setHelp('Ne doit PAS contenir de HTML.');
         yield TextField::new('title', 'Titre alerte');
         yield ChoiceField::new('alertFrequency', 'Fréquence alerte')
-            ->setChoices(['Quotidienne' => Alert::FREQUENCY_DAILY_SLUG, 'Hebdomadaire' => Alert::FREQUENCY_WEEKLY_SLUG]);
+            ->setChoices(
+                [
+                    'Quotidienne' => Alert::FREQUENCY_DAILY_SLUG,
+                    'Hebdomadaire' => Alert::FREQUENCY_WEEKLY_SLUG
+                ]
+            );
         yield DateTimeField::new('timeLatestAlert', 'Dernière alerte')
             ->setFormat('dd-MM-yyyy HH:mm:ss')
             ->hideOnForm();

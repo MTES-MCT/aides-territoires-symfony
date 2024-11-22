@@ -14,7 +14,7 @@ class AidAuthorFilter implements FilterInterface
 {
     use FilterTrait;
 
-    public static function new(string $propertyName, $label = null): self
+    public static function new(string $propertyName, mixed $label = null): self
     {
         return (new self())
             ->setFilterFqcn(__CLASS__)
@@ -23,15 +23,25 @@ class AidAuthorFilter implements FilterInterface
             ->setFormType(AidAuthorFilterType::class);
     }
 
-    public function apply(QueryBuilder $queryBuilder, FilterDataDto $filterDataDto, ?FieldDto $fieldDto, EntityDto $entityDto): void
-    {
+    public function apply(
+        QueryBuilder $queryBuilder,
+        FilterDataDto $filterDataDto,
+        ?FieldDto $fieldDto,
+        EntityDto $entityDto
+    ): void {
         if (!$filterDataDto->getValue()) {
             return;
         }
 
         $queryBuilder
             ->innerJoin(sprintf('%s.author', $filterDataDto->getEntityAlias()), 'authorFilter')
-            ->andWhere('(authorFilter.email = :email OR authorFilter.firstname LIKE :nameLike OR authorFilter.lastname LIKE :nameLike)')
+            ->andWhere(
+                '(
+                    authorFilter.email = :email
+                    OR authorFilter.firstname LIKE :nameLike
+                    OR authorFilter.lastname LIKE :nameLike
+                )'
+            )
             ->setParameter('email', $filterDataDto->getValue())
             ->setParameter('nameLike', '%' . $filterDataDto->getValue() . '%')
         ;

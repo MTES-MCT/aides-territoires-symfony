@@ -50,7 +50,13 @@ class ProjectValidatedSearchType extends AbstractType
             $perimeterParams['data'] = $options['forcePerimeter'];
         } else {
             if (!$options['dontUseUserPerimeter']) {
-                $perimeterParams['data'] = ($user && $user->getDefaultOrganization() && $user->getDefaultOrganization()->getPerimeter()) ? $user->getDefaultOrganization()->getPerimeter() : null;
+                $perimeterParams['data'] =
+                    (
+                        $user
+                        && $user->getDefaultOrganization()
+                        && $user->getDefaultOrganization()->getPerimeter()
+                    )
+                        ? $user->getDefaultOrganization()->getPerimeter() : null;
             }
         }
 

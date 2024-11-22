@@ -49,12 +49,21 @@ class EligibilityTest // NOSONAR too much methods
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $conclusionSuccess = null;
 
+    /**
+     * @var Collection<int, EligibilityTestQuestion>
+     */
     #[ORM\OneToMany(mappedBy: 'eligibilityTest', targetEntity: EligibilityTestQuestion::class, orphanRemoval: true)]
     private Collection $eligibilityTestQuestions;
 
+    /**
+     * @var Collection<int, Aid>
+     */
     #[ORM\OneToMany(mappedBy: 'eligibilityTest', targetEntity: Aid::class)]
     private Collection $aids;
 
+    /**
+     * @var Collection<int, LogAidEligibilityTest>
+     */
     #[ORM\OneToMany(mappedBy: 'eligibilityTest', targetEntity: LogAidEligibilityTest::class)]
     #[ORM\JoinColumn(onDelete: 'SET NULL')]
     private Collection $logAidEligibilityTests;
@@ -187,7 +196,10 @@ class EligibilityTest // NOSONAR too much methods
 
     public function removeEligibilityTestQuestion(EligibilityTestQuestion $eligibilityTestQuestion): static
     {
-        if ($this->eligibilityTestQuestions->removeElement($eligibilityTestQuestion) && $eligibilityTestQuestion->getEligibilityTest() === $this) {
+        if (
+            $this->eligibilityTestQuestions->removeElement($eligibilityTestQuestion)
+            && $eligibilityTestQuestion->getEligibilityTest() === $this
+        ) {
             $eligibilityTestQuestion->setEligibilityTest(null);
         }
 
@@ -241,7 +253,10 @@ class EligibilityTest // NOSONAR too much methods
 
     public function removeLogAidEligibilityTest(LogAidEligibilityTest $logAidEligibilityTest): static
     {
-        if ($this->logAidEligibilityTests->removeElement($logAidEligibilityTest) && $logAidEligibilityTest->getEligibilityTest() === $this) {
+        if (
+            $this->logAidEligibilityTests->removeElement($logAidEligibilityTest)
+            && $logAidEligibilityTest->getEligibilityTest() === $this
+        ) {
             $logAidEligibilityTest->setEligibilityTest(null);
         }
 

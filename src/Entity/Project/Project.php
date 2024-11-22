@@ -28,45 +28,50 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Entity(repositoryClass: ProjectRepository::class)]
 class Project // NOSONAR too much methods
 {
-    const FOLDER = 'projects';
+    public const FOLDER = 'projects';
 
-    const STATUS = [
+    public const STATUS = [
         ['slug' => 'draft', 'name' => 'Brouillon'],
         ['slug' => 'reviewable', 'name' => 'En revue'],
         ['slug' => 'published', 'name' => 'Publié'],
         ['slug' => 'deleted', 'name' => 'Supprimé']
     ];
 
-    const STATUS_DRAFT = 'draft';
-    const STATUS_REVIEWABLE = 'reviewable';
-    const STATUS_PUBLISHED = 'published';
-    const STATUS_DELETED = 'deleted';
+    public const STATUS_DRAFT = 'draft';
+    public const STATUS_REVIEWABLE = 'reviewable';
+    public const STATUS_PUBLISHED = 'published';
+    public const STATUS_DELETED = 'deleted';
 
-    const CONTRACT_LINK = [
+    public const CONTRACT_LINK = [
         ['slug' => 'ACV1', 'name' => 'Action Coeur de Ville 1'],
         ['slug' => 'ACV2', 'name' => 'Action Coeur de Ville 2'],
-        ['slug' => 'AMI', 'name' => 'Expérimentations et bonnes pratiques locales des collectivités en faveur de l\'emploi des femmes en zone rurale'],
+        [
+            'slug' => 'AMI',
+            'name' => 'Expérimentations et bonnes pratiques locales des collectivités en '
+                . 'faveur de l\'emploi des femmes en zone rurale'
+        ],
         ['slug' => 'CRTE', 'name' => 'CRTE'],
         ['slug' => 'PCAET', 'name' => 'PCAET'],
         ['slug' => 'PVD', 'name' => 'Petites Villes de Demain']
     ];
 
-    const CONTRACT_LINK_BY_SLUG = [
+    public const CONTRACT_LINK_BY_SLUG = [
         'ACV1' => 'Action Coeur de Ville 1',
         'ACV2' => 'Action Coeur de Ville 2',
-        'AMI' => 'Expérimentations et bonnes pratiques locales des collectivités en faveur de l\'emploi des femmes en zone rurale',
+        'AMI' => 'Expérimentations et bonnes pratiques locales des collectivités '
+            . 'en faveur de l\'emploi des femmes en zone rurale',
         'CRTE' => 'CRTE',
         'PCAET' => 'PCAET',
         'PVD' => 'Petites Villes de Demain'
     ];
 
-    const PROJECT_STEPS = [
+    public const PROJECT_STEPS = [
         ['slug' => 'considered', 'name' => 'En réflexion'],
         ['slug' => 'ongoing', 'name' => 'En cours'],
         ['slug' => 'finished', 'name' => 'Réalisé']
     ];
     // donne une facon de recuperer les donnees de la constantes
-    const PROJECT_STEPS_BY_SLUG = [
+    public const PROJECT_STEPS_BY_SLUG = [
         'considered' => 'En réflexion',
         'ongoing' => 'En cours',
         'finished' => 'Réalisé'
@@ -142,7 +147,7 @@ class Project // NOSONAR too much methods
     #[ORM\Column(length: 100, nullable: true)]
     private ?string $image = null;
 
-    private $imageFile = null;
+    private ?string $imageFile = null;
 
     private bool $deleteImage = false;
 
@@ -155,18 +160,33 @@ class Project // NOSONAR too much methods
     #[ORM\JoinColumn(onDelete: 'SET NULL')]
     private ?Organization $organization = null;
 
+    /**
+     * @var Collection<int, KeywordSynonymlist>
+     */
     #[ORM\ManyToMany(targetEntity: KeywordSynonymlist::class, inversedBy: 'projects')]
     private Collection $keywordSynonymlists;
 
+    /**
+     * @var Collection<int, ProjectValidated>
+     */
     #[ORM\OneToMany(mappedBy: 'project', targetEntity: ProjectValidated::class)]
     private Collection $projectValidateds;
 
+    /**
+     * @var Collection<int, AidProject>
+     */
     #[ORM\OneToMany(mappedBy: 'project', targetEntity: AidProject::class, cascade: ['persist'], orphanRemoval: true)]
     private Collection $aidProjects;
 
+    /**
+     * @var Collection<int, AidSuggestedAidProject>
+     */
     #[ORM\OneToMany(mappedBy: 'project', targetEntity: AidSuggestedAidProject::class, orphanRemoval: true)]
     private Collection $aidSuggestedAidProjects;
 
+    /**
+     * @var Collection<int, LogPublicProjectView>
+     */
     #[ORM\OneToMany(mappedBy: 'project', targetEntity: LogPublicProjectView::class)]
     private Collection $logPublicProjectViews;
 
@@ -180,6 +200,9 @@ class Project // NOSONAR too much methods
     private ?float $distance = null;
     private ?int $scoreTotal = 0;
 
+    /**
+     * @var Collection<int, ProjectLock>
+     */
     #[ORM\OneToMany(mappedBy: 'project', targetEntity: ProjectLock::class, orphanRemoval: true)]
     private Collection $projectLocks;
 
@@ -402,7 +425,7 @@ class Project // NOSONAR too much methods
     }
 
     #[Ignore]
-    public function setImageFile($imageFile = null): void
+    public function setImageFile(?string $imageFile = null): void
     {
         $this->imageFile = $imageFile;
 
@@ -412,7 +435,7 @@ class Project // NOSONAR too much methods
     }
 
     #[Ignore]
-    public function getImageFile()
+    public function getImageFile(): ?string
     {
         return $this->imageFile;
     }
@@ -539,7 +562,10 @@ class Project // NOSONAR too much methods
 
     public function removeAidSuggestedAidProject(AidSuggestedAidProject $aidSuggestedAidProject): static
     {
-        if ($this->aidSuggestedAidProjects->removeElement($aidSuggestedAidProject) && $aidSuggestedAidProject->getProject() === $this) {
+        if (
+            $this->aidSuggestedAidProjects->removeElement($aidSuggestedAidProject)
+            && $aidSuggestedAidProject->getProject() === $this
+        ) {
             $aidSuggestedAidProject->setProject(null);
         }
 
@@ -566,7 +592,10 @@ class Project // NOSONAR too much methods
 
     public function removeLogPublicProjectView(LogPublicProjectView $logPublicProjectView): static
     {
-        if ($this->logPublicProjectViews->removeElement($logPublicProjectView) && $logPublicProjectView->getProject() === $this) {
+        if (
+            $this->logPublicProjectViews->removeElement($logPublicProjectView)
+            && $logPublicProjectView->getProject() === $this
+        ) {
             $logPublicProjectView->setProject(null);
         }
 
@@ -605,10 +634,12 @@ class Project // NOSONAR too much methods
     public function getNbAids(): ?int
     {
         try {
-            return count($this->getAidProjects());
+            $this->nbAids = count($this->getAidProjects());
         } catch (\Exception $e) {
-            return null;
+            $this->nbAids = null;
         }
+
+        return $this->nbAids;
     }
 
     public function setNbAids(?int $nbAids): static

@@ -17,7 +17,6 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Asset\Packages;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
-use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 
@@ -28,7 +27,6 @@ final class RouteListener
         private PageRepository $pageRepository,
         private SearchPageRepository $searchPageRepository,
         private RouterInterface $routerInterface,
-        private KernelInterface $kernelInterface,
         private ParamService $paramService,
         private Packages $packages,
         private NotificationService $notificationService
@@ -52,7 +50,11 @@ final class RouteListener
             $context = $this->routerInterface->getContext();
             $context->setHost($host);
             $context->setScheme('https');
-            $url = $this->routerInterface->generate('app_portal_portal_details', ['slug' => 'francemobilites'], UrlGeneratorInterface::ABSOLUTE_URL);
+            $url = $this->routerInterface->generate(
+                'app_portal_portal_details',
+                ['slug' => 'francemobilites'],
+                UrlGeneratorInterface::ABSOLUTE_URL
+            );
             $response = new RedirectResponse($url);
             $event->setResponse($response);
             return;
@@ -88,7 +90,11 @@ final class RouteListener
                     $context->setHost($host);
                     $context->setScheme('https');
 
-                    $url = $this->routerInterface->generate('app_program_details', ['slug' => $program->getSlug()], UrlGeneratorInterface::ABSOLUTE_URL);
+                    $url = $this->routerInterface->generate(
+                        'app_program_details',
+                        ['slug' => $program->getSlug()],
+                        UrlGeneratorInterface::ABSOLUTE_URL
+                    );
                     $response = new RedirectResponse($url);
                     $event->setResponse($response);
                     return;
@@ -121,13 +127,22 @@ final class RouteListener
             if ($searchPage instanceof SearchPage) {
                 try {
                     // redirige vers le portail
-                    $url = $this->routerInterface->generate('app_portal_portal_details', ['slug' => $subdomain], UrlGeneratorInterface::ABSOLUTE_URL);
+                    $url = $this->routerInterface->generate(
+                        'app_portal_portal_details',
+                        ['slug' => $subdomain],
+                        UrlGeneratorInterface::ABSOLUTE_URL
+                    );
                     $response = new RedirectResponse($url);
                     $event->setResponse($response);
                     return;
                 } catch (\Exception $e) {
-                    $admin = $this->entityManagerInterface->getRepository(User::class)->findOneBy(['email' => $this->paramService->get('email_super_admin')]);
-                    $this->notificationService->addNotification($admin, 'Erreur redirection portail', 'Portail : ' . $searchPage->getName());
+                    $admin = $this->entityManagerInterface->getRepository(User::class)
+                        ->findOneBy(['email' => $this->paramService->get('email_super_admin')]);
+                    $this->notificationService->addNotification(
+                        $admin,
+                        'Erreur redirection portail',
+                        'Portail : ' . $searchPage->getName()
+                    );
                 }
             } else {
                 if ($host != $this->paramService->get('prod_host')) {
@@ -144,7 +159,7 @@ final class RouteListener
     private function handleRedirect(RequestEvent $event): void
     {
         // url demandée
-        $url = urldecode($event->getRequest()->getRequestUri()) ?? null;
+        $url = urldecode($event->getRequest()->getRequestUri());
 
         $urlRedirectRepository = $this->entityManagerInterface->getRepository(UrlRedirect::class);
 
@@ -164,7 +179,11 @@ final class RouteListener
                 $logUrlRedirect->setIp($event->getRequest()->getClientIp() ?? null);
                 $logUrlRedirect->setReferer($event->getRequest()->headers->get('referer') ?? null);
                 $logUrlRedirect->setUserAgent($event->getRequest()->headers->get('user-agent') ?? null);
-                $logUrlRedirect->setRequestUri($event->getRequest()->getRequestUri() ?? null);
+                $logUrlRedirect->setRequestUri(
+                    !empty($event->getRequest()->getRequestUri())
+                        ? $event->getRequest()->getRequestUri()
+                        : null
+                );
                 $this->entityManagerInterface->persist($logUrlRedirect);
                 $this->entityManagerInterface->flush();
 
@@ -173,7 +192,8 @@ final class RouteListener
                 $event->setResponse($response);
                 return;
             } catch (\Exception $e) {
-                $admin = $this->entityManagerInterface->getRepository(User::class)->findOneBy(['email' => $this->paramService->get('email_super_admin')]);
+                $admin = $this->entityManagerInterface->getRepository(User::class)
+                    ->findOneBy(['email' => $this->paramService->get('email_super_admin')]);
                 $this->notificationService->addNotification($admin, 'Erreur redirection url', 'Url : ' . $url);
             }
         }
@@ -182,7 +202,7 @@ final class RouteListener
     private function handlePage(RequestEvent $event): void
     {
         // url demandée
-        $url = urldecode($event->getRequest()->getRequestUri()) ?? null;
+        $url = urldecode($event->getRequest()->getRequestUri());
 
         $page = $this->pageRepository->findOneBy(
             [
@@ -200,7 +220,8 @@ final class RouteListener
                     PageController::class . '::index'
                 );
             } catch (\Exception $e) {
-                $admin = $this->entityManagerInterface->getRepository(User::class)->findOneBy(['email' => $this->paramService->get('email_super_admin')]);
+                $admin = $this->entityManagerInterface->getRepository(User::class)
+                    ->findOneBy(['email' => $this->paramService->get('email_super_admin')]);
                 $this->notificationService->addNotification($admin, 'Erreur redirection page', 'Page : ' . $url);
             }
         }
@@ -208,7 +229,7 @@ final class RouteListener
 
     private function handleDjangoStatic(RequestEvent $event): void
     {
-        $url = urldecode($event->getRequest()->getRequestUri()) ?? null;
+        $url = urldecode($event->getRequest()->getRequestUri());
 
         $newFaviconSvg = 'build/images/favicon/favicon.svg';
         $known404 = [
@@ -216,11 +237,13 @@ final class RouteListener
             '/app/public/static/img/logo_AT_og.png' => $this->packages->getUrl('build/images/logo/logo_AT_og.png'),
             '/static/favicons/favicon.93b88edf055e.svg' => $this->packages->getUrl($newFaviconSvg),
             '/app/public/static/favicons/favicon.93b88edf055e.svg' => $this->packages->getUrl($newFaviconSvg),
-            '/static/favicons/favicon-32x32.05f90bae01cd.png' => $this->packages->getUrl('build/images/favicon/favicon.svg'),
-            '/app/public/static/favicons/favicon-32x32.05f90bae01cd.png' => $this->packages->getUrl('build/images/favicon/favicon.svg'),
+            '/static/favicons/favicon-32x32.05f90bae01cd.png' =>
+                $this->packages->getUrl('build/images/favicon/favicon.svg'),
+            '/app/public/static/favicons/favicon-32x32.05f90bae01cd.png' =>
+                $this->packages->getUrl('build/images/favicon/favicon.svg'),
             '/static/favicons/favicon.12acb9fc12ee.ico' => $this->packages->getUrl('build/images/favicon/favicon.ico'),
-            '/app/public/static/favicons/favicon.12acb9fc12ee.ico' => $this->packages->getUrl('build/images/favicon/favicon.ico'),
-            '/static/favicons/favicon.12acb9fc12ee.ico' => $this->packages->getUrl('build/images/favicon/favicon.ico'),
+            '/app/public/static/favicons/favicon.12acb9fc12ee.ico' =>
+                $this->packages->getUrl('build/images/favicon/favicon.ico'),
             '/static/favicons/favicon.05f90bae01cd.png' => $this->packages->getUrl($newFaviconSvg),
             '/app/public/static/favicons/favicon.05f90bae01cd.png' => $this->packages->getUrl($newFaviconSvg),
             '/favicon.ico' => $this->packages->getUrl('build/images/favicon/favicon.ico'),
@@ -240,8 +263,13 @@ final class RouteListener
                 $event->setResponse($response);
                 return;
             } catch (\Exception $e) {
-                $admin = $this->entityManagerInterface->getRepository(User::class)->findOneBy(['email' => $this->paramService->get('email_super_admin')]);
-                $this->notificationService->addNotification($admin, 'Erreur redirection static django', 'Url : ' . $url);
+                $admin = $this->entityManagerInterface->getRepository(User::class)
+                    ->findOneBy(['email' => $this->paramService->get('email_super_admin')]);
+                $this->notificationService->addNotification(
+                    $admin,
+                    'Erreur redirection static django',
+                    'Url : ' . $url
+                );
             }
         }
     }

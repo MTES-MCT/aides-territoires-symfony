@@ -33,21 +33,39 @@ class KeywordReference
     #[ORM\ManyToOne(targetEntity: self::class, inversedBy: 'keywordReferences')]
     private ?self $parent = null;
 
+    /**
+     * @var Collection<int, KeywordReference>
+     */
     #[ORM\OneToMany(mappedBy: 'parent', targetEntity: self::class, orphanRemoval: true, cascade: ['persist'])]
     private Collection $keywordReferences;
 
+    /**
+     * @var Collection<int, BlogPromotionPost>
+     */
     #[ORM\ManyToMany(targetEntity: BlogPromotionPost::class, mappedBy: 'keywordReferences')]
     private Collection $blogPromotionPosts;
 
+    /**
+     * @var Collection<int, Aid>
+     */
     #[ORM\ManyToMany(targetEntity: Aid::class, mappedBy: 'keywordReferences')]
     private Collection $aids;
 
+    /**
+     * @var Collection<int, KeywordReferenceSuggested>
+     */
     #[ORM\OneToMany(mappedBy: 'keywordReference', targetEntity: KeywordReferenceSuggested::class, orphanRemoval: true)]
     private Collection $keywordReferenceSuggesteds;
 
+    /**
+     * @var Collection<int, ProjectReference>
+     */
     #[ORM\ManyToMany(targetEntity: ProjectReference::class, mappedBy: 'excludedKeywordReferences')]
     private Collection $excludedProjectReferences;
 
+    /**
+     * @var Collection<int, ProjectReference>
+     */
     #[ORM\ManyToMany(targetEntity: ProjectReference::class, mappedBy: 'requiredKeywordReferences')]
     private Collection $requiredProjectReferences;
 

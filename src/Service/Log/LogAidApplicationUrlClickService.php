@@ -9,13 +9,19 @@ class LogAidApplicationUrlClickService
 {
     public function __construct(
         private LogAidApplicationUrlClickRepository $logAidApplicationUrlClickRepository
-    )
-    {
+    ) {
     }
 
+    /**
+     *
+     * @param Aid $aid
+     * @param \DateTime $dateMin
+     * @param \DateTime $dateMax
+     * @return array<string, int>
+     */
     public function getCountByDay(Aid $aid, \DateTime $dateMin, \DateTime $dateMax): array
     {
-        $NbEntriesByDay = [];
+        $nbEntriesByDay = [];
         $nbEntries = $this->logAidApplicationUrlClickRepository->countByDay(
             [
                 'aid' => $aid,
@@ -24,9 +30,9 @@ class LogAidApplicationUrlClickService
             ]
         );
         foreach ($nbEntries as $nbEntry) {
-            $NbEntriesByDay[$nbEntry['dateDay']] = $nbEntry['nb'];
+            $nbEntriesByDay[$nbEntry['dateDay']] = $nbEntry['nb'];
         }
 
-        return $NbEntriesByDay;
+        return $nbEntriesByDay;
     }
 }

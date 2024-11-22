@@ -44,6 +44,9 @@ parameters:
     certificat_region_sud: '%env(CERTIFICAT_REGION_SUD)%'
     certificat_ile_de_france: '%env(CERTIFICAT_ILE_DE_FRANCE)%'
     forbidden_external_urls: '%env(resolve:FORBIDDEN_EXTERNAL_URLS)%'
+    proconnect_domain: '%env(resolve:PROCONNECT_DOMAIN)%'
+    proconnect_client_id: '%env(resolve:PROCONNECT_CLIENT_ID)%'
+    proconnect_client_secret: '%env(resolve:PROCONNECT_CLIENT_SECRET)%'
 
 services:
     # default configuration for services in *this* file
@@ -66,21 +69,17 @@ services:
     # Register the LogoutListener service
     App\EventListener\MyCustomLogoutListener:
         tags:
-            - name: 'kernel.event_listener'
-              event: 'Symfony\Component\Security\Http\Event\LogoutEvent'
-              dispatcher: security.event_dispatcher.main
+            - { name: 'kernel.event_listener', event: 'Symfony\Component\Security\Http\Event\LogoutEvent', dispatcher: 'security.event_dispatcher.main' }
+            - { name: 'kernel.event_listener', event: 'Symfony\Component\Security\Http\Event\LogoutEvent', dispatcher: 'security.event_dispatcher.admin' }
 
     # Register the LoginListener service
     App\EventListener\MyCustomLoginListener:
         tags:
-            - name: 'kernel.event_listener'
-              event: 'Symfony\Component\Security\Http\Event\LoginSuccessEvent'
-              dispatcher: security.event_dispatcher.main
-            # - name: 'kernel.event_listener'
-            #   event: 'Symfony\Component\Security\Core\Event\AuthenticationSuccessEvent'
-            #   dispatcher: security.event_dispatcher.main
-            # - event: 'security.authentication.success'
-            #   name: 'kernel.event_listener'    
+            - { name: 'kernel.event_listener', event: 'Symfony\Component\Security\Http\Event\LoginSuccessEvent', dispatcher: 'security.event_dispatcher.main' }
+
+    App\EventListener\TwoFactorAuthenticationListener:
+        tags:
+            - { name: 'kernel.event_listener', event: 'scheb_two_factor.authentication.success', method: 'onTwoFactorAuthenticationSuccess' }
 
     App\EventListener\RouteListener:
         tags:
@@ -112,3 +111,5 @@ services:
 
     Symfony\Component\HttpFoundation\Session\Storage\Handler\RedisSessionHandler:
         arguments: ['@snc_redis.session']
+
+    'Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter': ~

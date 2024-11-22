@@ -65,7 +65,7 @@ class AlertRelaunchWeeklyCommand extends Command
         return Command::SUCCESS;
     }
 
-    protected function cronTask($input, $output)
+    protected function cronTask(InputInterface $input, OutputInterface $output): void
     {
         $io = new SymfonyStyle($input, $output);
 
@@ -91,7 +91,7 @@ class AlertRelaunchWeeklyCommand extends Command
         $year = $today->format('o');
 
         $startOfWeek = new \DateTime();
-        $startOfWeek->setISODate($year, $weekNumber, 1);
+        $startOfWeek->setISODate((int) $year, (int) $weekNumber, 1);
 
         $publishedAfter = clone $startOfWeek;
         $publishedAfter->modify('-7 days');
@@ -111,7 +111,10 @@ class AlertRelaunchWeeklyCommand extends Command
                 'publishedAfter' => $publishedAfter,
                 'publishedBefore' => $startOfWeek,
             ];
-            $aidParams = array_merge($aidParams, $this->aidSearchFormService->convertAidSearchClassToAidParams($aidSearchClass));
+            $aidParams = array_merge(
+                $aidParams,
+                $this->aidSearchFormService->convertAidSearchClassToAidParams($aidSearchClass)
+            );
 
             // recupere les nouvelles aides qui correspondent à l'alerte
             $aids = $this->aidService->searchAids($aidParams);
@@ -129,7 +132,10 @@ class AlertRelaunchWeeklyCommand extends Command
                 $emailSubjectPrefix = $this->paramService->get('email_subject_prefix');
             }
             $today = new \DateTime(date('Y-m-d H:i:s'));
-            $emailSubject = $emailSubjectPrefix . ' ' . $today->format('d/m/Y') . ' — De nouvelles aides correspondent à vos recherches';
+            $emailSubject = $emailSubjectPrefix
+                . ' '
+                . $today->format('d/m/Y')
+                . ' — De nouvelles aides correspondent à vos recherches';
             $subject = count($aids) . ' résultat' . (count($aids) > 1 ? 's' : '') . ' pour votre alerte';
 
             // Force le tri par date de publication DESC
@@ -166,8 +172,16 @@ class AlertRelaunchWeeklyCommand extends Command
         }
 
         // notif admin
-        $admin = $this->managerRegistry->getRepository(User::class)->findOneBy(['email' => $this->paramService->get('email_super_admin')]);
-        $this->notificationService->addNotification($admin, 'Envoi des alertes hebdomadaires', $nbAlertSend . ' alertes envoyées pour les aides publiées après le ' . $publishedAfter->format('d/m/Y') . ' inclus');
+        $admin = $this->managerRegistry->getRepository(User::class)
+            ->findOneBy(['email' => $this->paramService->get('email_super_admin')]);
+        $this->notificationService->addNotification(
+            $admin,
+            'Envoi des alertes hebdomadaires',
+            $nbAlertSend
+                . ' alertes envoyées pour les aides publiées après le '
+                . $publishedAfter->format('d/m/Y')
+                . ' inclus'
+        );
 
         // success
         $io->success($nbAlertSend . '/' . $nbAlertTotal . ' alertes envoyées');

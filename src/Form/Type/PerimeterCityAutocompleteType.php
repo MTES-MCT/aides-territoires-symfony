@@ -30,7 +30,8 @@ class PerimeterCityAutocompleteType extends AbstractType
                     return $return;
                 } else {
                     if (isset(Perimeter::SCALES_FOR_SEARCH[$entity->getScale()]['name'])) {
-                        return $entity->getName() . ' (' . Perimeter::SCALES_FOR_SEARCH[$entity->getScale()]['name'] . ')';
+                        return $entity->getName()
+                            . ' (' . Perimeter::SCALES_FOR_SEARCH[$entity->getScale()]['name'] . ')';
                     } else {
                         return $entity->getName();
                     }

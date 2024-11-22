@@ -8,12 +8,14 @@ use App\Entity\Organization\OrganizationInvitation;
 use App\Entity\Organization\OrganizationType;
 use App\Entity\Perimeter\Perimeter;
 use App\Entity\User\User;
+use App\Form\Security\ProConnectType;
 use App\Form\User\RegisterCommuneType;
 use App\Form\User\RegisterType;
 use App\Repository\Organization\OrganizationTypeRepository;
 use App\Repository\Perimeter\PerimeterRepository;
 use App\Service\Email\EmailService;
 use App\Service\Matomo\MatomoService;
+use App\Service\Security\SecurityService;
 use App\Service\User\UserService;
 use App\Service\Various\ParamService;
 use Doctrine\Persistence\ManagerRegistry;
@@ -53,7 +55,12 @@ class UserController extends FrontController
                     $formRegister->get('email')->addError(new FormError('Cet email n\'est pas disponible.'));
                 } else {
                     $user->addRole(User::ROLE_USER);
-                    $user->setPassword($userPasswordHasherInterface->hashPassword($user, $formRegister->get('password')->getData()));
+                    $user->setPassword(
+                        $userPasswordHasherInterface->hashPassword(
+                            $user,
+                            $formRegister->get('password')->getData()
+                        )
+                    );
 
                     // si abonné newsletter
                     if ($user->isMlConsent()) {
@@ -75,12 +82,18 @@ class UserController extends FrontController
                     }
 
                     // si infos organization
-                    if ($formRegister->get('organizationName')->getData() && $formRegister->get('organizationType')->getData()) {
+                    if (
+                        $formRegister->get('organizationName')->getData()
+                        && $formRegister->get('organizationType')->getData()
+                    ) {
                         $organization = new Organization();
                         $organization->setName($formRegister->get('organizationName')->getData());
                         $organization->setOrganizationType($formRegister->get('organizationType')->getData());
                         $organization->setPerimeter($user->getPerimeter());
-                        $departementsCode = ($organization->getPerimeter()) ? $organization->getPerimeter()->getDepartments() : null;
+                        $departementsCode = ($organization->getPerimeter())
+                            ? $organization->getPerimeter()->getDepartments()
+                            : null
+                        ;
                         $departementCode = $departementsCode[0] ?? null;
                         if ($departementCode) {
                             $departement = $perimeterRepository->findOneBy([
@@ -92,7 +105,10 @@ class UserController extends FrontController
                             }
                         }
 
-                        $regionsCode = ($organization->getPerimeter()) ? $organization->getPerimeter()->getRegions() : null;
+                        $regionsCode = ($organization->getPerimeter())
+                            ? $organization->getPerimeter()->getRegions()
+                            : null
+                        ;
                         $regionCode = $regionsCode[0] ?? null;
                         if ($regionCode) {
                             $region = $perimeterRepository->findOneBy([
@@ -113,7 +129,11 @@ class UserController extends FrontController
                     $managerRegistry->getManager()->flush();
 
                     // authentifie le user
-                    $security->login($user, 'form_login', 'main');
+                    $security->login(
+                        $user,
+                        SecurityService::DEFAULT_AUTHENTICATOR_NAME,
+                        SecurityService::DEFAULT_FIREWALL_NAME
+                    );
 
                     // message success
                     $this->tAddFlash(
@@ -122,7 +142,7 @@ class UserController extends FrontController
                     );
 
                     // track goal
-                    $matomoService->trackGoal($paramService->get('goal_register_id'));
+                    $matomoService->trackGoal((int) $paramService->get('goal_register_id'));
 
                     // regarde si il y a des invitations sur ce compte
                     $organizationInvitations = $managerRegistry->getRepository(OrganizationInvitation::class)->findBy([
@@ -144,9 +164,17 @@ class UserController extends FrontController
             }
         }
 
+        // formulaire proConnnect
+        $formProConnect = $this->createForm(
+            ProConnectType::class,
+            null,
+            ['action' => $this->generateUrl('app_login_proconnect')]
+        );
+
         // rendu template
         return $this->render('user/user/register.html.twig', [
-            'formRegister' => $formRegister->createView(),
+            'formRegister' => $formRegister,
+            'formProConnect' => $formProConnect,
             'no_breadcrumb' => true,
             'formErrors' => $formErrors
         ]);
@@ -181,7 +209,9 @@ class UserController extends FrontController
 
         // nouvelle organization commune
         $organization = new Organization();
-        $organization->setOrganizationType($organizationTypeRepository->findOneBy(['slug' => OrganizationType::SLUG_COMMUNE]));
+        $organization->setOrganizationType(
+            $organizationTypeRepository->findOneBy(['slug' => OrganizationType::SLUG_COMMUNE])
+        );
         $user->addOrganization($organization);
 
         // formulaire inscription
@@ -195,7 +225,12 @@ class UserController extends FrontController
                     $formRegisterCommune->get('email')->addError(new FormError('Cet email n\'est pas disponible.'));
                 } else {
                     // encode le password
-                    $user->setPassword($userPasswordHasherInterface->hashPassword($user, $formRegisterCommune->get('password')->getData()));
+                    $user->setPassword(
+                        $userPasswordHasherInterface->hashPassword(
+                            $user,
+                            $formRegisterCommune->get('password')->getData()
+                        )
+                    );
 
                     // assigne le perimetre à l'organisation
                     $organization->setPerimeter($user->getPerimeter());
@@ -204,7 +239,10 @@ class UserController extends FrontController
                     $organization->setName('Mairie de ' . $organization->getPerimeter()->getName());
 
                     // defini le departement de l'organisation
-                    $departementsCode = ($organization->getPerimeter()) ? $organization->getPerimeter()->getDepartments() : null;
+                    $departementsCode = ($organization->getPerimeter())
+                        ? $organization->getPerimeter()->getDepartments()
+                        : null
+                    ;
                     $departementCode = $departementsCode[0] ?? null;
                     if ($departementCode) {
                         $departement = $perimeterRepository->findOneBy([
@@ -243,7 +281,7 @@ class UserController extends FrontController
                     );
 
                     // track goal
-                    $matomoService->trackGoal($paramService->get('goal_register_id'));
+                    $matomoService->trackGoal((int) $paramService->get('goal_register_id'));
 
                     // redirection
                     return $this->redirectToRoute('app_user_dashboard');
@@ -256,9 +294,18 @@ class UserController extends FrontController
             }
         }
 
+        // formulaire proConnnect
+        $formProConnect = $this->createForm(
+            ProConnectType::class,
+            null,
+            ['action' => $this->generateUrl('app_login_proconnect')]
+        );
+
+
         // rendu template
         return $this->render('user/user/register_commune.html.twig', [
-            'formRegisterCommune' => $formRegisterCommune
+            'formRegisterCommune' => $formRegisterCommune,
+            'formProConnect' => $formProConnect
         ]);
     }
 }

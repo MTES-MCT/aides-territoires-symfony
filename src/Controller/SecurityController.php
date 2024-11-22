@@ -4,10 +4,15 @@ namespace App\Controller;
 
 use App\Exception\NotFoundException\UserRegisterConfirmationNotFoundException;
 use App\Form\Security\LoginType;
+use App\Form\Security\ProConnectType;
 use App\Repository\User\UserRegisterConfirmationRepository;
+use App\Service\Security\ProConnectService;
 use Doctrine\Persistence\ManagerRegistry;
+use PHPUnit\Util\Json;
+use Psr\Log\LoggerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -30,20 +35,49 @@ class SecurityController extends FrontController
         // last username entered by the user
         $lastUsername = $authenticationUtils->getLastUsername();
 
+        // formulaire login classique
         $formLogin = $this->createForm(LoginType::class);
         if ($lastUsername) {
             $formLogin->get('_username')->setData($lastUsername);
         }
 
+        // formulaire proConnnect
+        $formProConnect = $this->createForm(
+            ProConnectType::class,
+            null,
+            ['action' => $this->generateUrl('app_login_proconnect')]
+        );
+
         return $this->render('security/login.html.twig', [
-            'formLogin' => $formLogin->createView(),
+            'formLogin' => $formLogin,
+            'formProConnect' => $formProConnect,
             'error' => $error
         ]);
     }
 
+    #[Route('/comptes/connexion/proconnect/', name: 'app_login_proconnect')]
+    public function loginByPronnect(
+        ProConnectService $proConnectService,
+        LoggerInterface $loggerInterface
+    ): Response {
+        try {
+            return new RedirectResponse($proConnectService->getAuthorizationEndpoint());
+        } catch (\Exception $e) {
+            $loggerInterface->error('Erreur ProConnect getAuthorizationEndpoint', [
+                'exception' => $e
+            ]);
+
+            $this->tAddFlash(
+                FrontController::FLASH_ERROR,
+                'Une erreur est survenue lors de la connexion à ProConnect'
+            );
+            return $this->redirectToRoute('app_login');
+        }
+    }
+
     #[Route('/comptes/connexion/{token}', name: 'app_user_user_register_confirmation')]
     public function registerConfirmation(
-        $token,
+        string $token,
         UserRegisterConfirmationRepository $userRegisterConfirmationRepository,
         ManagerRegistry $managerRegistry,
         Security $security
@@ -68,7 +102,8 @@ class SecurityController extends FrontController
             // log le user
             if ($userRegisterConfirmation->getUser()) {
                 $flashMessage = $userRegisterConfirmation->getUser()->getTimeLastLogin()
-                    ? 'Vous êtes maintenant connecté. Bienvenue ! Pourriez-vous prendre quelques secondes pour mettre à jour votre profil ?'
+                    ? 'Vous êtes maintenant connecté. Bienvenue ! '
+                        . 'Pourriez-vous prendre quelques secondes pour mettre à jour votre profil ?'
                     : 'Vous êtes maintenant connecté. Bienvenue !';
                 $security->login($userRegisterConfirmation->getUser(), 'form_login', 'main');
                 // message success
@@ -123,11 +158,23 @@ class SecurityController extends FrontController
         if (!$requestStack->getMainRequest()->headers->get('X-AUTH-TOKEN')) {
             return new JsonResponse('Veuillez ajouter votre X-AUTH-TOKEN dans les HEADERS', 401);
         }
+
+        return new JsonResponse('Vous êtes connecté', 200);
     }
 
     #[Route(path: '/logout', name: 'app_logout')]
     public function logout(): void
     {
-        throw new \LogicException('This method can be blank - it will be intercepted by the logout key on your firewall.');
+        throw new \LogicException(
+            'This method can be blank - it will be intercepted by the logout key on your firewall.'
+        );
+    }
+
+    #[Route(path: '/admin/logout', name: 'app_logout_admin')]
+    public function logoutAdmin(): void
+    {
+        throw new \LogicException(
+            'This method can be blank - it will be intercepted by the logout key on your firewall.'
+        );
     }
 }

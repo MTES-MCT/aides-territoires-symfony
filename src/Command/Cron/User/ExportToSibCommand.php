@@ -16,7 +16,10 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\HttpKernel\KernelInterface;
 
-#[AsCommand(name: 'at:cron:user:export_to_sib', description: 'Export les utilisateurs vers le système de mailing (SIB)')]
+#[AsCommand(
+    name: 'at:cron:user:export_to_sib',
+    description: 'Export les utilisateurs vers le système de mailing (SIB)'
+)]
 class ExportToSibCommand extends Command
 {
     protected InputInterface $input;
@@ -30,8 +33,6 @@ class ExportToSibCommand extends Command
         protected ParamService $paramService,
         protected EmailService $emailService
     ) {
-        ini_set('max_execution_time', 60 * 60);
-        ini_set('memory_limit', '1G');
         parent::__construct();
     }
 
@@ -48,7 +49,7 @@ class ExportToSibCommand extends Command
                 $io->info('Uniquement en prod');
                 return Command::FAILURE;
             }
-            // generate menu
+            // lance la tache
             $this->cronTask($input, $output);
         } catch (\Exception $exception) {
             $io->error($exception->getMessage());
@@ -58,7 +59,7 @@ class ExportToSibCommand extends Command
         return Command::SUCCESS;
     }
 
-    protected function cronTask($input, $output) // NOSONAR too complex
+    protected function cronTask(InputInterface $input, OutputInterface $output): void // NOSONAR too complex
     {
         $io = new SymfonyStyle($input, $output);
 
@@ -67,7 +68,6 @@ class ExportToSibCommand extends Command
 
         // charge les utilisateurs connectés au moins 1 fois
         $users = $userRepo->findUsersConnectedSinceYesterday();
-
         $nbOk = 0;
         $nbError = 0;
         $errors = [];
@@ -104,13 +104,16 @@ class ExportToSibCommand extends Command
             ];
 
             if ($user->getLastestAidPublished() instanceof Aid) {
-                $attributes['DATE_DERNIERE_AIDE_PUBLIEE'] = $user->getLastestAidPublished()->getTimePublished()->format(DateTime::ATOM);
+                $attributes['DATE_DERNIERE_AIDE_PUBLIEE'] =
+                    $user->getLastestAidPublished()->getTimePublished()->format(DateTime::ATOM);
             }
             if ($user->getLastestAidDraft() instanceof Aid) {
-                $attributes['DATE_DERNIER_BROUILLON'] = $user->getLastestAidDraft()->getTimeCreate()->format(DateTime::ATOM);
+                $attributes['DATE_DERNIER_BROUILLON'] =
+                    $user->getLastestAidDraft()->getTimeCreate()->format(DateTime::ATOM);
             }
             if ($user->getLatestAidExpired() instanceof Aid) {
-                $attributes['DATE_DERNIERE_EXPIRATION'] = $user->getLatestAidExpired()->getDateSubmissionDeadline()->format(DateTime::ATOM);
+                $attributes['DATE_DERNIERE_EXPIRATION'] =
+                    $user->getLatestAidExpired()->getDateSubmissionDeadline()->format(DateTime::ATOM);
             }
 
             $update = $this->emailService->updateUser(

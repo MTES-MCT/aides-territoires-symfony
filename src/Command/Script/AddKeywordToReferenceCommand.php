@@ -16,7 +16,6 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 #[AsCommand(name: 'at:script:keywords_to_reference', description: 'Keywords vers keywordReferencets')]
 class AddKeywordToReferenceCommand extends Command
 {
-
     protected InputInterface $input;
     protected OutputInterface $output;
     protected string $commandTextStart = '<Keywords vers keywordReference';
@@ -52,7 +51,7 @@ class AddKeywordToReferenceCommand extends Command
         return Command::SUCCESS;
     }
 
-    protected function importKeyword($input, $output): void
+    protected function importKeyword(InputInterface $input, OutputInterface $output): void
     {
         /** @var KeywordReferenceRepository $keywordReferenceRepository */
         $keywordReferenceRepository = $this->managerRegistry->getRepository(KeywordReference::class);

@@ -11,10 +11,10 @@ use App\Service\Matomo\MatomoService;
 use App\Service\Notification\NotificationService;
 use App\Service\Various\ParamService;
 use Doctrine\ORM\Event\PostPersistEventArgs;
+use Doctrine\ORM\Event\PrePersistEventArgs;
 use Doctrine\ORM\Event\PreRemoveEventArgs;
 use Doctrine\Persistence\ManagerRegistry;
 use Psr\Log\LoggerInterface;
-use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class UserListener
 {
@@ -22,12 +22,20 @@ class UserListener
         private ManagerRegistry $managerRegistry,
         private UrlGeneratorInterface $urlGeneratorInterface,
         private ParamService $paramService,
-        private HttpClientInterface $httpClientInterface,
         private EmailService $emailService,
         private MatomoService $matomoService,
         private NotificationService $notificationService,
         private LoggerInterface $loggerInterface
     ) {
+    }
+
+    public function onPrePersist(PrePersistEventArgs $args): void
+    {
+        /** @var User $entity */
+        $entity = $args->getObject();
+
+        // on force les minuscules sur l'email de l'utilisateur
+        $entity->setEmail(strtolower($entity->getEmail()));
     }
 
     public function onPostPersist(PostPersistEventArgs $args): void
@@ -44,11 +52,23 @@ class UserListener
             </p>
             <p>
                 Si ce n’est pas le cas, n’hésitez pas à
-                <a href="' . $this->urlGeneratorInterface->generate('app_contact_contact', [], UrlGeneratorInterface::ABS_URL) . '">nous contacter</a>.
+                <a href="'
+                . $this->urlGeneratorInterface->generate(
+                    'app_contact_contact',
+                    [],
+                    UrlGeneratorInterface::ABS_URL
+                )
+                . '">nous contacter</a>.
             </p>
             <p>
                 Vous pouvez paramétrer les notifications que vous souhaitez recevoir
-                via <a href="' . $this->urlGeneratorInterface->generate('app_user_user_notification_settings', [], UrlGeneratorInterface::ABS_URL) . '">
+                via <a href="'
+                . $this->urlGeneratorInterface->generate(
+                    'app_user_user_notification_settings',
+                    [],
+                    UrlGeneratorInterface::ABS_URL
+                )
+                . '">
                 vos préférences
                 </a>.
             </p>
@@ -95,7 +115,7 @@ class UserListener
             );
 
             // Matomo trackGoal
-            $this->matomoService->trackGoal($this->paramService->get('goal_register_id'));
+            $this->matomoService->trackGoal((int) $this->paramService->get('goal_register_id'));
         } catch (\Exception $e) {
             $this->loggerInterface->error('Erreur dans le postPersist User', [
                 'exception' => $e,
@@ -109,7 +129,8 @@ class UserListener
             if ($entity->getEmail()) {
                 $message .= 'Pour le user ' . $entity->getEmail();
             }
-            $admin = $this->managerRegistry->getRepository(User::class)->findOneBy(['email' => $this->paramService->get('email_super_admin')]);
+            $admin = $this->managerRegistry->getRepository(User::class)
+                ->findOneBy(['email' => $this->paramService->get('email_super_admin')]);
             if ($admin instanceof User) {
                 $this->notificationService->addNotification($admin, 'Erreur postPersist User', $message);
             }

@@ -10,9 +10,9 @@ use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 
 class InternalRequestVoter extends Voter
 {
-    const MESSAGE_ERROR = 'Vous n\'êtes pas autorisé à accéder à cette ressource.';
-    const IDENTIFIER = 'INTERNAL_REQUEST';
-    const CSRF_TOKEN_NAME = 'csrf_internal';
+    public const MESSAGE_ERROR = 'Vous n\'êtes pas autorisé à accéder à cette ressource.';
+    public const IDENTIFIER = 'INTERNAL_REQUEST';
+    public const CSRF_TOKEN_NAME = 'csrf_internal';
 
     private RequestStack $requestStack;
     private CsrfTokenManagerInterface $csrfTokenManager;

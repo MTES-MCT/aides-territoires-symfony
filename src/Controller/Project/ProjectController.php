@@ -32,13 +32,10 @@ use Pagerfanta\Pagerfanta;
 
 class ProjectController extends FrontController
 {
-
-    const NB_PROJECT_BY_PAGE = 18;
-
+    public const NB_PROJECT_BY_PAGE = 18;
 
     #[Route('/projets/projets-publics/', name: 'app_project_project_public')]
     public function public(
-        ProjectRepository $projectRepository,
         ProjectReferenceRepository $projectReferenceRepository,
         RequestStack $requestStack,
         LogService $logService,
@@ -69,14 +66,22 @@ class ProjectController extends FrontController
                 }
                 if ($formProjectSearch->get('name')->getData()) {
                     $projectsParams['search'] = $formProjectSearch->get('name')->getData();
-                    $projectsParams = array_merge($projectsParams, $referenceService->getSynonymes($formProjectSearch->get('name')->getData()));
+                    $projectsParams = array_merge(
+                        $projectsParams,
+                        $referenceService->getSynonymes($formProjectSearch->get('name')->getData())
+                    );
                 }
-                $projectRerence = $projectReferenceRepository->findOneBy(['name' => $formProjectSearch->get('name')->getData()]);
+                $projectRerence = $projectReferenceRepository->findOneBy(
+                    ['name' => $formProjectSearch->get('name')->getData()]
+                );
                 if ($projectRerence instanceof ProjectReference) {
                     $projectsParams['projectReference'] = $projectRerence;
                 }
             } else {
-                $this->addFlash(FrontController::FLASH_ERROR, 'Une erreur est survenue lors de la recherche de projets publics.');
+                $this->addFlash(
+                    FrontController::FLASH_ERROR,
+                    'Une erreur est survenue lors de la recherche de projets publics.'
+                );
             }
         }
 
@@ -101,11 +106,19 @@ class ProjectController extends FrontController
             $logService->log(
                 type: LogService::PROJECT_PUBLIC_SEARCH,
                 params: [
-                    'querystring' => parse_url($requestStack->getCurrentRequest()->getRequestUri(), PHP_URL_QUERY) ?? null,
+                    'querystring' =>
+                        parse_url($requestStack->getCurrentRequest()->getRequestUri(), PHP_URL_QUERY)
+                        ?? null,
                     'resultsCount' => $pagerfanta->getNbResults(),
-                    'perimeter' => (isset($projectsParams['perimeter']) && $projectsParams['perimeter'] instanceof Perimeter) ? $projectsParams['perimeter'] : null,
+                    'perimeter' =>
+                        (isset($projectsParams['perimeter']) && $projectsParams['perimeter'] instanceof Perimeter)
+                            ? $projectsParams['perimeter']
+                            : null
+                    ,
                     'user' => $user,
-                    'organization' => ($user && $user->getDefaultOrganization()) ? $user->getDefaultOrganization() : null
+                    'organization' => ($user && $user->getDefaultOrganization())
+                        ? $user->getDefaultOrganization()
+                        : null
                 ],
             );
         }
@@ -123,10 +136,14 @@ class ProjectController extends FrontController
         ]);
     }
 
-    #[Route('/projets/projets-publics/{id}-{slug}/', name: 'app_project_project_public_details', requirements: ['id' => '[0-9]+', 'slug' => '[a-zA-Z0-9\-_]+'])]
+    #[Route(
+        '/projets/projets-publics/{id}-{slug}/',
+        name: 'app_project_project_public_details',
+        requirements: ['id' => '[0-9]+', 'slug' => '[a-zA-Z0-9\-_]+']
+    )]
     public function publicDetails(
-        $id,
-        $slug,
+        int $id,
+        string $slug,
         ProjectRepository $projectRepository,
         RequestStack $requestStack,
         UserService $userService,
@@ -161,7 +178,9 @@ class ProjectController extends FrontController
 
                     $this->tAddFlash(
                         FrontController::FLASH_SUCCESS,
-                        'Le projet «' . $project->getName() . '» a bien été ajouté à <a href="' . $this->generateUrl('app_user_project_favoris') . '">vos projets favoris</a>.'
+                        'Le projet «'
+                        . $project->getName()
+                        . '» a bien été ajouté à vos projets favoris.'
                     );
                 } else {
                     $this->tAddFlash(
@@ -169,7 +188,10 @@ class ProjectController extends FrontController
                         'Vous devez appartenir à une organisation pour ajouter un projet à vos favoris.'
                     );
 
-                    return $this->redirectToRoute('app_project_project_public_details', ['id' => $project->getId(), 'slug' => $project->getSlug()]);
+                    return $this->redirectToRoute(
+                        'app_project_project_public_details',
+                        ['id' => $project->getId(), 'slug' => $project->getSlug()]
+                    );
                 }
             }
         }
@@ -186,7 +208,11 @@ class ProjectController extends FrontController
 
                     $this->tAddFlash(
                         FrontController::FLASH_SUCCESS,
-                        'Le projet «' . $project->getName() . '» a bien été retiré de <a href="' . $this->generateUrl('app_user_project_favoris') . '">vos projets favoris</a>.'
+                        'Le projet «'
+                        . $project->getName()
+                        . '» a bien été retiré de <a href="'
+                        . $this->generateUrl('app_user_project_favoris')
+                        . '">vos projets favoris</a>.'
                     );
                 }
             }
@@ -239,7 +265,10 @@ class ProjectController extends FrontController
             type: LogService::PROJECT_PUBLIC_VIEW,
             params: [
                 'project' => $project,
-                'organization' => $userService->getUserLogged() ? $userService->getUserLogged()->getDefaultOrganization() : null,
+                'organization' => $userService->getUserLogged()
+                    ? $userService->getUserLogged()->getDefaultOrganization()
+                    : null
+                ,
                 'user' => $userService->getUserLogged(),
             ]
         );
@@ -276,7 +305,6 @@ class ProjectController extends FrontController
     public function subsidized(
         ProjectValidatedRepository $projectValidatedRepository,
         RequestStack $requestStack,
-        StringService $stringService,
         PerimeterRepository $perimeterRepository
     ): Response {
 
@@ -290,8 +318,14 @@ class ProjectController extends FrontController
         $formProjectSearch->handleRequest($requestStack->getCurrentRequest());
 
         // formulaire choix département
-        $formCounties = $this->createForm(CountySelectType::class, null, ['method' => 'GET', 'action' => $this->generateUrl('app_project_project_subsidized_detail')]);
-
+        $formCounties = $this->createForm(
+            CountySelectType::class,
+            null,
+            [
+                'method' => 'GET',
+                'action' => $this->generateUrl('app_project_project_subsidized_detail')
+            ]
+        );
 
         // les infos départements pour la carte
         $counties = $perimeterRepository->findCounties();
@@ -363,13 +397,15 @@ class ProjectController extends FrontController
                     $keyword = $formProjectSearch->get('text')->getData();
                 }
 
-                $projects = $projectValidatedRepository->findProjectInRadius(
-                    [
-                        'perimeter' => $project_perimeter,
-                        'search' => $keyword,
-                        'radius' => 30
-                    ]
-                );
+                if (isset($project_perimeter)) {
+                    $projects = $projectValidatedRepository->findProjectInRadius(
+                        [
+                            'perimeter' => $project_perimeter,
+                            'search' => $keyword,
+                            'radius' => 30
+                        ]
+                    );
+                }
 
                 $commune_search = true;
             }
@@ -386,7 +422,8 @@ class ProjectController extends FrontController
         $formCounties->handleRequest($requestStack->getCurrentRequest());
         if ($formCounties->isSubmitted()) {
             if ($formCounties->isValid()) {
-                $project_perimeter = $perimeterRepository->findOneBy(['code' => $formCounties->get('county')->getData()]);
+                $project_perimeter = $perimeterRepository
+                ->findOneBy(['code' => $formCounties->get('county')->getData()]);
                 if ($project_perimeter instanceof Perimeter) {
                     $projects = $projectValidatedRepository->findProjectInCounty(
                         ['id' => $project_perimeter->getId()]
@@ -423,8 +460,11 @@ class ProjectController extends FrontController
             params: [
                 'search' => (isset($keyword)) ? $keyword : null,
                 'querystring' => parse_url($requestStack->getCurrentRequest()->getRequestUri(), PHP_URL_QUERY) ?? null,
-                'resultsCount' => (isset($projects) && is_array($projects)) ? count($projects) : 0,
-                'perimeter' => (isset($project_perimeter) && $project_perimeter instanceof Perimeter) ? $project_perimeter : null,
+                'resultsCount' => count($projects),
+                'perimeter' => (isset($project_perimeter) && $project_perimeter instanceof Perimeter)
+                    ? $project_perimeter
+                    : null
+                ,
                 'user' => $user,
                 'organization' => ($user && $user->getDefaultOrganization()) ? $user->getDefaultOrganization() : null
             ],

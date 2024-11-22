@@ -39,7 +39,8 @@ class MsgLogAidViewTempTransfertHandler
 
             // Insérer les logs de log_temp dans log_aid_view
             $sqlInsert = '
-            INSERT INTO ' . $logAidViewTableName . ' (aid_id, organization_id, user_id, querystring, source, time_create, date_create)
+            INSERT INTO ' . $logAidViewTableName . '
+            (aid_id, organization_id, user_id, querystring, source, time_create, date_create)
             SELECT aid_id, organization_id, user_id, querystring, source, time_create, date_create
             FROM ' . $logAidViewTempTableName . '
             WHERE date_create = CURDATE() - INTERVAL 1 DAY;
@@ -51,10 +52,10 @@ class MsgLogAidViewTempTransfertHandler
                 DELETE FROM ' . $logAidViewTempTableName . ' WHERE date_create = CURDATE() - INTERVAL 1 DAY;
             ';
             $this->managerRegistry->getConnection()->executeStatement($sqlDelete);
-
         } catch (ProcessFailedException $exception) {
             // notif admin
-            $admin = $this->managerRegistry->getRepository(User::class)->findOneBy(['email' => $this->paramService->get('email_super_admin')]);
+            $admin = $this->managerRegistry->getRepository(User::class)
+            ->findOneBy(['email' => $this->paramService->get('email_super_admin')]);
             $this->notificationService->addNotification(
                 $admin,
                 'Erreur MsgLogAidViewTempTransfert',

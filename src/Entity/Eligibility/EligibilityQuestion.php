@@ -54,6 +54,9 @@ class EligibilityQuestion // NOSONAR too much methods
     #[ORM\JoinColumn(onDelete: 'SET NULL')]
     private ?User $author = null;
 
+    /**
+     * @var Collection<int, EligibilityTestQuestion>
+     */
     #[ORM\OneToMany(mappedBy: 'eligibilityQuestion', targetEntity: EligibilityTestQuestion::class, orphanRemoval: true)]
     private Collection $eligibilityTestQuestions;
 
@@ -195,7 +198,10 @@ class EligibilityQuestion // NOSONAR too much methods
 
     public function removeEligibilityTestQuestion(EligibilityTestQuestion $eligibilityTestQuestion): static
     {
-        if ($this->eligibilityTestQuestions->removeElement($eligibilityTestQuestion) && $eligibilityTestQuestion->getEligibilityQuestion() === $this) {
+        if (
+            $this->eligibilityTestQuestions->removeElement($eligibilityTestQuestion)
+            && $eligibilityTestQuestion->getEligibilityQuestion() === $this
+        ) {
             $eligibilityTestQuestion->setEligibilityQuestion(null);
         }
 

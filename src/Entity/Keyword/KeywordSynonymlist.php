@@ -29,7 +29,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Index(columns: ['name'], name: 'name_keywordsynonymlist')]
 class KeywordSynonymlist
 {
-    const API_GROUP_LIST = 'keywordsynonymlist:list';
+    public const API_GROUP_LIST = 'keywordsynonymlist:list';
 
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -57,9 +57,15 @@ class KeywordSynonymlist
     #[ORM\Column(nullable: true)]
     private ?int $oldId = null;
 
+    /**
+     * @var Collection<int, Project>
+     */
     #[ORM\ManyToMany(targetEntity: Project::class, mappedBy: 'keywordSynonymlists')]
     private Collection $projects;
 
+    /**
+     * @var Collection<int, LogPublicProjectSearch>
+     */
     #[ORM\ManyToMany(targetEntity: LogPublicProjectSearch::class, mappedBy: 'keywordSynonymlists')]
     private Collection $logPublicProjectSearches;
 

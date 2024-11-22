@@ -92,7 +92,10 @@ class UserProfilType extends AbstractType
                     'label' => 'Entrez votre mot de passe actuel',
                     'mapped' => false,
                     'required' => false,
-                    'attr' => ['placeholder' => 'A remplir seulement en cas de changement de mot de passe']
+                    'attr' => ['placeholder' => 'A remplir seulement en cas de changement de mot de passe'],
+                    'toggle' => true,
+                    'hidden_label' => 'Cacher',
+                    'visible_label' => 'Montrer',
                 ]
             )
             ->add('newPassword', RepeatedType::class, [
@@ -103,15 +106,18 @@ class UserProfilType extends AbstractType
                 'options' => ['attr' => ['class' => 'password-field']],
                 'first_options'  => [
                     'label' => 'Choisissez un nouveau mot de passe',
-                    'help' => '<ul>
-                    <li>Votre mot de passe ne peut pas trop ressembler à vos autres informations personnelles</li>
-                    <li>Votre mot de passe doit contenir au minimum 9 caractères</li>
-                    <li>Votre mot de passe ne peut pas être un mot de passe couramment utilisé</li>
-                    <li>Votre mot de passe ne peut pas être entièrement numérique</li>
-                    </ul>',
+                    'help' => RegisterType::PASSWORD_RULES,
                     'help_html' => true,
+                    'toggle' => true,
+                    'hidden_label' => 'Cacher',
+                    'visible_label' => 'Montrer',
                 ],
-                'second_options' => ['label' => 'Saisissez à nouveau le nouveau mot de passe'],
+                'second_options' => [
+                    'label' => 'Saisissez à nouveau le nouveau mot de passe',
+                    'toggle' => true,
+                    'hidden_label' => 'Cacher',
+                    'visible_label' => 'Montrer',
+                ],
                 'constraints' => [
                     new PasswordProfil(),
                 ],
@@ -128,8 +134,14 @@ class UserProfilType extends AbstractType
     {
         if ($event->getForm()->has('oldPassword') && $event->getForm()->get('oldPassword')->getData()) {
             $user = $this->userService->getUserLogged();
-            if (!$this->userPasswordHasherInterface->isPasswordValid($user, $event->getForm()->get('oldPassword')->getData())) {
-                $event->getForm()->get('oldPassword')->addError(new FormError('Le mot de passe actuel est incorrect.'));
+            if (
+                !$this->userPasswordHasherInterface->isPasswordValid(
+                    $user,
+                    $event->getForm()->get('oldPassword')->getData()
+                )
+            ) {
+                $event->getForm()->get('oldPassword')
+                    ->addError(new FormError('Le mot de passe actuel est incorrect.'));
             }
         }
     }

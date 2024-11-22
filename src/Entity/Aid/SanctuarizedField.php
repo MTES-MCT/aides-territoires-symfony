@@ -26,6 +26,9 @@ class SanctuarizedField
     #[ORM\Column(length: 255)]
     private ?string $name = null;
 
+    /**
+     * @var Collection<int, Aid>
+     */
     #[ORM\ManyToMany(targetEntity: Aid::class, inversedBy: 'sanctuarizedFields')]
     private Collection $aids;
 

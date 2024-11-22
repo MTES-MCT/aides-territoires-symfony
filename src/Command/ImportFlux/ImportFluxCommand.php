@@ -4,12 +4,19 @@ namespace App\Command\ImportFlux;
 
 use App\Entity\Aid\Aid;
 use App\Entity\Aid\AidFinancer;
+use App\Entity\Aid\AidRecurrence;
+use App\Entity\Aid\AidType;
+use App\Entity\Category\Category;
 use App\Entity\DataSource\DataSource;
+use App\Entity\Organization\OrganizationType;
+use App\Entity\User\User;
 use App\Service\Email\EmailService;
 use App\Service\File\FileService;
+use App\Service\Notification\NotificationService;
 use App\Service\Perimeter\PerimeterService;
 use App\Service\Various\ParamService;
 use App\Service\Various\StringService;
+use App\Validator\UrlExternalValid;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -18,6 +25,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\HtmlSanitizer\HtmlSanitizerInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 #[AsCommand(name: 'at:import_flux:generic', description: 'Import de flux générique, à étendre à chaque nouveau flux')]
@@ -31,8 +39,21 @@ class ImportFluxCommand extends Command // NOSONAR too much methods
     protected ?string $importUniqueidPrefix = null;
     protected ?int $idDataSource = null;
 
+    /**
+     * @var string[]
+     */
     protected array $aidsLabelSearch = ['result', 'results', 'aides', 'records', 'ListeDispositifs'];
 
+    protected ?AidRecurrence $aidRecurrenceOneOff = null;
+    protected ?AidRecurrence $aidRecurrenceOnGoing = null;
+    protected ?AidRecurrence $aidRecurrenceRecurring = null;
+
+    /** @var array<int, AidType> */
+    protected array $aidTypesById = [];
+    /** @var array<string, array<int, Category>> */
+    protected array $aidCategoriesMapping = [];
+    /** @var array<int, OrganizationType> */
+    protected array $organizationTypesById = [];
     protected bool $paginationEnabled = false;
     protected int $nbPages = 1;
     protected int $nbByPages = 20;
@@ -43,7 +64,13 @@ class ImportFluxCommand extends Command // NOSONAR too much methods
     protected int $error = 0;
     protected \DateTime $dateImportStart;
 
+    /**
+     * @var string[]
+     */
     protected array $thematiquesOk = [];
+    /**
+     * @var string[]
+     */
     protected array $thematiquesKo = [];
 
     public function __construct(
@@ -55,12 +82,16 @@ class ImportFluxCommand extends Command // NOSONAR too much methods
         protected HtmlSanitizerInterface $htmlSanitizerInterface,
         protected PerimeterService $perimeterService,
         protected StringService $stringService,
-        protected FileService $fileService
+        protected FileService $fileService,
+        protected ValidatorInterface $validator,
+        protected NotificationService $notificationService,
     ) {
-        ini_set('max_execution_time', 60 * 60);
-        ini_set('memory_limit', '1G');
         parent::__construct();
         $this->dateImportStart = new \DateTime(date('Y-m-d H:i:s'));
+        $this->setInternalAidRecurrences();
+        $this->setAidTypesById();
+        $this->setOrganizationTypesById();
+        $this->setAidCategoriesMapping();
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -73,8 +104,9 @@ class ImportFluxCommand extends Command // NOSONAR too much methods
         $io = new SymfonyStyle($input, $output);
         $io->title($this->commandTextStart);
 
-        if ($this->kernelInterface->getEnvironment() != 'prod') {
+        if ('prod' != $this->kernelInterface->getEnvironment()) {
             $io->info('Uniquement en prod');
+
             return Command::FAILURE;
         }
 
@@ -82,7 +114,7 @@ class ImportFluxCommand extends Command // NOSONAR too much methods
             // set la dataSource
             $this->dataSource = $this->managerRegistry->getRepository(DataSource::class)->find($this->idDataSource);
             if (!$this->dataSource instanceof DataSource) {
-                throw new \Exception('Impossible de charger la dataSource : ' . $this->idDataSource);
+                throw new \Exception('Impossible de charger la dataSource : '.$this->idDataSource);
             }
 
             // import du flux
@@ -98,12 +130,24 @@ class ImportFluxCommand extends Command // NOSONAR too much methods
                 ]
             );
             $io->error($exception->getMessage());
+
             return Command::FAILURE;
         }
 
-        $io->success('Création : ' . $this->create);
-        $io->success('Update : ' . $this->update);
-        $io->success('Erreur : ' . $this->error);
+        $io->success('Création : '.$this->create);
+        $io->success('Update : '.$this->update);
+        $io->success('Erreur : '.$this->error);
+
+        // notif admin
+        $admin = $this->managerRegistry->getRepository(User::class)
+            ->findOneBy(['email' => $this->paramService->get('email_super_admin')]);
+        $this->notificationService->addNotification(
+            $admin,
+            'Rapport flux '.$this->dataSource->getName(),
+            'Création : '.$this->create.'<br />'
+            .'Update : '.$this->update.'<br />'
+            .'Erreur : '.$this->error
+        );
 
         // met à jour le last access
         $this->dataSource->setTimeLastAccess(new \DateTime(date('Y-m-d H:i:s')));
@@ -113,24 +157,33 @@ class ImportFluxCommand extends Command // NOSONAR too much methods
         $timeEnd = microtime(true);
         $time = $timeEnd - $timeStart;
 
-        $io->success('Import flux terminé : ' . gmdate("H:i:s", $timeEnd) . ' (' . gmdate("H:i:s", intval($time)) . ')');
-        $io->success('Mémoire maximale utilisée : ' . intval(round(memory_get_peak_usage() / 1024 / 1024)) . ' MB');
+        $io->success(
+            'Import flux terminé : '.gmdate('H:i:s', intval($timeEnd)).' ('.gmdate('H:i:s', intval($time)).')'
+        );
+        $io->success(
+            'Mémoire maximale utilisée : '.intval(round(memory_get_peak_usage() / 1024 / 1024)).' MB'
+        );
 
         $io->title($this->commandTextEnd);
+
         return Command::SUCCESS;
     }
 
+    /**
+     * @param InputInterface  $input
+     * @param OutputInterface $output
+     */
     protected function importFlux($input, $output): void
     {
         // vérifie les paramètres requis
         $requiredParams = [
             'importUniqueidPrefix',
-            'idDataSource'
+            'idDataSource',
         ];
 
         foreach ($requiredParams as $requiredParam) {
             if (empty($this->$requiredParam)) {
-                throw new \Exception('Paramètre manquant : ' . $requiredParam);
+                throw new \Exception('Paramètre manquant : '.$requiredParam);
             }
         }
 
@@ -152,7 +205,7 @@ class ImportFluxCommand extends Command // NOSONAR too much methods
             if (!$this->nbByPages) {
                 throw new \Exception('Erreur sur la pagination, this->nbByPages = 0');
             }
-            $this->nbPages = ceil($nbItems / $this->nbByPages);
+            $this->nbPages = (int) ceil($nbItems / $this->nbByPages);
         }
 
         // ouvre le flux pour recuperer les aides
@@ -197,16 +250,21 @@ class ImportFluxCommand extends Command // NOSONAR too much methods
         $this->managerRegistry->getManager()->flush();
     }
 
-    protected function callApi()
+    /**
+     * appel le flux.
+     *
+     * @return array<int, mixed>
+     */
+    protected function callApi(): array
     {
         $aidsFromImport = [];
         $client = $this->getClient();
 
-        for ($i = 0; $i < $this->nbPages; $i++) {
+        for ($i = 0; $i < $this->nbPages; ++$i) {
             $this->currentPage = $i;
             $importUrl = $this->dataSource->getImportApiUrl();
             if ($this->paginationEnabled) {
-                $importUrl .= '?limit=' . $this->nbByPages . '&offset=' . ($this->currentPage * $this->nbByPages);
+                $importUrl .= '?limit='.$this->nbByPages.'&offset='.($this->currentPage * $this->nbByPages);
             }
             try {
                 $response = $client->request(
@@ -214,6 +272,7 @@ class ImportFluxCommand extends Command // NOSONAR too much methods
                     $importUrl,
                     $this->getApiOptions()
                 );
+
                 $content = $response->getContent();
                 $content = $response->toArray();
 
@@ -231,17 +290,19 @@ class ImportFluxCommand extends Command // NOSONAR too much methods
             }
         }
 
-
         return $aidsFromImport;
     }
 
-    protected function findAid($aidToImport): ?Aid
+    /**
+     * @param array<mixed, mixed> $aidToImport
+     */
+    protected function findAid(array $aidToImport): ?Aid
     {
         try {
             // on recherche par importUniqueid
             $aid = $this->managerRegistry->getRepository(Aid::class)->findOneBy(
                 [
-                    'importUniqueid' => trim($this->getImportUniqueid($aidToImport))
+                    'importUniqueid' => trim($this->getImportUniqueid($aidToImport)),
                 ]
             );
             if ($aid instanceof Aid) {
@@ -254,7 +315,11 @@ class ImportFluxCommand extends Command // NOSONAR too much methods
         return null;
     }
 
-    // The aid is actually new, so we just create it.
+    /**
+     * Nouvelle aide à créer.
+     *
+     * @param array<mixed, mixed> $aidToImport
+     */
     protected function createAid($aidToImport): bool
     {
         try {
@@ -283,7 +348,7 @@ class ImportFluxCommand extends Command // NOSONAR too much methods
             $aid = $this->setPerimeter($aidToImport, $aid);
 
             foreach ($this->getFieldsMapping($aidToImport, ['context' => 'create']) as $field => $value) {
-                $aid->{'set' . ucfirst($field)}($value);
+                $aid->{'set'.ucfirst($field)}($value);
             }
 
             // prépare pour sauvegarde
@@ -294,18 +359,22 @@ class ImportFluxCommand extends Command // NOSONAR too much methods
             $this->managerRegistry->getManager()->persist($this->dataSource);
 
             // incrémente le compteur
-            $this->create++;
+            ++$this->create;
 
             // retour
             return true;
         } catch (\Exception $e) {
-            throw new \Exception('Impossible de créer l\'aide : ' . $e->getMessage());
+            throw new \Exception('Impossible de créer l\'aide : '.$e->getMessage());
         }
     }
 
-    # The aid is known from a previous import, in that case,
-    # we just update a few fields but we don't overwrite some
-    # manual modifications that could have been made from our side.
+    /**
+     * Aide à mettre à jour
+     * Certains champs sont mis à jour automatiquement, d'autres sont soumis à validation manuelle.
+     *
+     * @param array<mixed, mixed> $aidToImport
+     * @param Aid                 $aid
+     */
     protected function updateAid($aidToImport, $aid): bool
     {
         try {
@@ -316,20 +385,27 @@ class ImportFluxCommand extends Command // NOSONAR too much methods
                 unset($newValues['importDatas']['name']);
             }
             // liste des champs qu'on met à jour automatiquement, les autres sont soumis à validation manuelle
-            $keepValues = ['dateStart', 'dateSubmissionDeadline', 'nameInitial', 'originUrl', 'applicationUrl', 'importDataMention'];
+            $keepValues = [
+                'dateStart',
+                'dateSubmissionDeadline',
+                'nameInitial',
+                'originUrl',
+                'applicationUrl',
+                'importDataMention',
+            ];
 
             // parcours les nouvelles valeurs
             $entityUpdated = false;
             $needManualValidation = false;
             foreach ($newValues as $field => $value) {
                 // on ne regarde pas le champ qui stocke l'update
-                if ($field == 'importDatas') {
+                if ('importDatas' == $field) {
                     continue;
                 }
                 // gestion des booleéns
                 $methodGet = 'get';
-                if (!method_exists($aid, 'get' . ucfirst($field))) {
-                    if (method_exists($aid, 'is' . ucfirst($field))) {
+                if (!method_exists($aid, 'get'.ucfirst($field))) {
+                    if (method_exists($aid, 'is'.ucfirst($field))) {
                         $methodGet = 'is';
                     } else {
                         continue;
@@ -339,7 +415,7 @@ class ImportFluxCommand extends Command // NOSONAR too much methods
                 // les champs qu'on ne modifie pas automatiquement
                 if (!in_array($field, $keepValues)) {
                     // on regarde si il y a une modification pour mettre un statut "à valider" à l'aide
-                    if ($aid->{$methodGet . ucfirst($field)}() != $value) {
+                    if ($aid->{$methodGet.ucfirst($field)}() != $value) {
                         $entityUpdated = true;
                         $needManualValidation = true;
                     }
@@ -347,9 +423,9 @@ class ImportFluxCommand extends Command // NOSONAR too much methods
                 }
 
                 // les champs qu'on modifie automatiquement
-                if ($aid->{$methodGet . ucfirst($field)}() != $value && method_exists($aid, 'set' . ucfirst($field))) {
+                if ($aid->{$methodGet.ucfirst($field)}() != $value && method_exists($aid, 'set'.ucfirst($field))) {
                     // assigne la nouvelle valeur
-                    $aid->{'set' . ucfirst($field)}($value);
+                    $aid->{'set'.ucfirst($field)}($value);
                     // on retire le champ des valeurs à validées manuellement
                     unset($newValues[$field]);
                     // on note que l'entité à été modifiée
@@ -369,8 +445,7 @@ class ImportFluxCommand extends Command // NOSONAR too much methods
             if (!empty($diff)) {
                 $entityUpdated = true;
             }
-            //-----------------------------------------------------
-
+            // -----------------------------------------------------
 
             // on regarde si modification des categories, update en auto
             $oldArray = $aid->getCategories()->toArray();
@@ -381,7 +456,9 @@ class ImportFluxCommand extends Command // NOSONAR too much methods
             if (!empty($diff)) {
                 $entityUpdated = true;
             }
-            //-----------------------------------------------------
+
+            $aid = $this->setAidRecurrence($aidToImport, $aid);
+            // -----------------------------------------------------
 
             if ($entityUpdated) {
                 // on ne notifie que si l'aide est en ligne et a besoin d'une validation manuelle
@@ -395,12 +472,12 @@ class ImportFluxCommand extends Command // NOSONAR too much methods
                 $this->managerRegistry->getManager()->persist($aid);
 
                 // incrémente le compteur
-                $this->update++;
+                ++$this->update;
             }
 
             return true;
         } catch (\Exception $e) {
-            throw new \Exception('Impossible de mettre à jour l\'aide : ' . $e->getMessage());
+            throw new \Exception('Impossible de mettre à jour l\'aide : '.$e->getMessage());
         }
     }
 
@@ -409,6 +486,9 @@ class ImportFluxCommand extends Command // NOSONAR too much methods
         return $this->httpClientInterface;
     }
 
+    /**
+     * @return array<mixed, mixed> $aidToImport
+     */
     protected function getApiOptions(): array
     {
         return [
@@ -419,103 +499,198 @@ class ImportFluxCommand extends Command // NOSONAR too much methods
         ];
     }
 
-    protected function getImportUniqueid($aidToImport): ?string
+    /**
+     * methode generique pour surcharge.
+     *
+     * @param array<mixed, mixed> $aidToImport
+     */
+    protected function getImportUniqueid(array $aidToImport): ?string
     {
         return null;
     }
 
-    protected function getFieldsMapping(array $aidToImport, array $params = null): array
+    /**
+     * methode generique pour surcharge.
+     *
+     * @param array<mixed, mixed> $aidToImport
+     * @param array<mixed, mixed> $params
+     *
+     * @return array<mixed, mixed>
+     */
+    protected function getFieldsMapping(array $aidToImport, ?array $params = null): array
     {
         return [];
     }
 
+    /**
+     * methode generique pour surcharge.
+     *
+     * @param array<mixed, mixed> $aidToImport
+     */
     protected function setCategories(array $aidToImport, Aid $aid): Aid
     {
         return $aid;
     }
 
-    protected function setAidTypes(array $aidToImport, Aid $aid): Aid // NOSONAR methode generique pour surcharge
+    /**
+     * methode generique pour surcharge.
+     *
+     * @param array<mixed, mixed> $aidToImport
+     */
+    protected function setAidTypes(array $aidToImport, Aid $aid): Aid // NOSONAR
     {
         return $aid;
     }
 
-    protected function setAidRecurrence(array $aidToImport, Aid $aid): Aid // NOSONAR methode generique pour surcharge
+    /**
+     * methode generique pour surcharge.
+     *
+     * @param array<mixed, mixed> $aidToImport
+     */
+    protected function setAidRecurrence(array $aidToImport, Aid $aid): Aid // NOSONAR
     {
         return $aid;
     }
 
-    protected function setAidSteps(array $aidToImport, Aid $aid): Aid // NOSONAR methode generique pour surcharge
+    /**
+     * methode generique pour surcharge.
+     *
+     * @param array<mixed, mixed> $aidToImport
+     */
+    protected function setAidSteps(array $aidToImport, Aid $aid): Aid // NOSONAR
     {
         return $aid;
     }
 
-    protected function setAidAudiences(array $aidToImport, Aid $aid): Aid // NOSONAR methode generique pour surcharge
+    /**
+     * methode generique pour surcharge.
+     *
+     * @param array<mixed, mixed> $aidToImport
+     */
+    protected function setAidAudiences(array $aidToImport, Aid $aid): Aid // NOSONAR
     {
         return $aid;
     }
 
-    protected function setKeywords(array $aidToImport, Aid $aid): Aid // NOSONAR methode generique pour surcharge
+    /**
+     * methode generique pour surcharge.
+     *
+     * @param array<mixed, mixed> $aidToImport
+     */
+    protected function setKeywords(array $aidToImport, Aid $aid): Aid // NOSONAR
     {
         return $aid;
     }
 
-    protected function setAidDestinations(array $aidToImport, Aid $aid): Aid // NOSONAR methode generique pour surcharge
+    /**
+     * methode generique pour surcharge.
+     *
+     * @param array<mixed, mixed> $aidToImport
+     */
+    protected function setAidDestinations(array $aidToImport, Aid $aid): Aid // NOSONAR
     {
         return $aid;
     }
 
-    protected function setPerimeter(array $aidToImport, Aid $aid): Aid // NOSONAR methode generique pour surcharge
+    /**
+     * methode generique pour surcharge.
+     *
+     * @param array<mixed, mixed> $aidToImport
+     */
+    protected function setPerimeter(array $aidToImport, Aid $aid): Aid // NOSONAR
     {
         return $aid;
     }
 
-    protected function setIsCallForProject(array $aidToImport, Aid $aid): Aid // NOSONAR methode generique pour surcharge
+    /**
+     * methode generique pour surcharge.
+     *
+     * @param array<mixed, mixed> $aidToImport
+     */
+    protected function setIsCallForProject(array $aidToImport, Aid $aid): Aid // NOSONAR
     {
         return $aid;
     }
 
+    /**
+     * @param array<mixed, mixed> $return
+     *
+     * @return array<mixed, mixed>
+     */
     protected function mergeImportDatas(array $return): array
     {
         return array_merge($return, [
-            'importDatas' => $return
+            'importDatas' => $return,
         ]);
     }
 
+    /**
+     * Undocumented function.
+     *
+     * @param array<string, string> $newValues
+     */
     protected function isContactUpdated(array $newValues, Aid $aid): bool
     {
         $checkFields = ['contact', 'originUrl', 'applicationUrl'];
         foreach ($checkFields as $field) {
             if (
                 isset($newValues[$field])
-                && method_exists($aid, 'get' . ucfirst($field))
-                && $aid->{'get' . ucfirst($field)}() != $newValues[$field]
+                && method_exists($aid, 'get'.ucfirst($field))
+                && $aid->{'get'.ucfirst($field)}() != $newValues[$field]
             ) {
                 return true;
             }
         }
+
         return false;
     }
 
+    /**
+     * @param array<string, mixed>|null $params
+     */
     protected function getDateTimeOrNull(?string $date, ?array $params = null): ?\DateTime
     {
         if (!$date) {
             return null;
         }
-        try {
-            $dateTemp = new \DateTime($date);
 
-            if (!isset($params['keepTime'])) {
-                // Force pour éviter les différence sur le fuseau horaire
-                $date = new \DateTime($dateTemp->format('Y-m-d'));
-                // Force les heures, minutes, et secondes à 00:00:00
-                $date->setTime(0, 0, 0);
-            } else {
-                $date = new \DateTime($date);
+        $formats = ['Y-m-d', 'd/m/Y'];
+        $dateTemp = null;
+
+        foreach ($formats as $format) {
+            $dateTemp = \DateTime::createFromFormat($format, $date);
+            if (false !== $dateTemp) {
+                break;
             }
-        } catch (\Exception $e) {
-            $date = null;
         }
+
+        if (false === $dateTemp) {
+            return null;
+        }
+
+        if (!isset($params['keepTime'])) {
+            // Force pour éviter les différences sur le fuseau horaire
+            $date = new \DateTime($dateTemp->format('Y-m-d'));
+            // Force les heures, minutes, et secondes à 00:00:00
+            $date->setTime(0, 0, 0);
+        } else {
+            $date = $dateTemp;
+        }
+
         return $date;
+    }
+
+    /**
+     * @param array<mixed, mixed>|null $aidToImport
+     */
+    protected function getBooleanOrNull(?array $aidToImport, ?string $key): ?bool
+    {
+        if (!is_array($aidToImport) || !$key || !isset($aidToImport[$key])) {
+            return null;
+        }
+        $value = trim(strtolower($aidToImport[$key]));
+
+        return '1' == $value || 'true' == $value || 'oui' == $value;
     }
 
     protected function cleanName(string $name): string
@@ -524,12 +699,13 @@ class ImportFluxCommand extends Command // NOSONAR too much methods
         if (strlen($name) > 255) {
             $name = $this->stringService->truncate($name, 255);
         }
+
         return $name;
     }
 
     protected function getHtmlOrNull(string $html): ?string
     {
-        return $this->getCleanHtml($html) == '' ? null : $this->getCleanHtml($html);
+        return '' == $this->getCleanHtml($html) ? null : $this->getCleanHtml($html);
     }
 
     protected function getCleanHtml(string $html): string
@@ -541,12 +717,16 @@ class ImportFluxCommand extends Command // NOSONAR too much methods
         }
     }
 
+    /**
+     * @param array<mixed, mixed> $aidToImport
+     * @param string[]            $fields
+     */
     public function concatHtmlFields(array $aidToImport, array $fields, ?string $separator = null): ?string
     {
         $html = '';
         foreach ($fields as $field) {
-            if (isset($aidToImport[$field]) && trim($aidToImport[$field]) != '') {
-                $html .= ' ' . $this->getCleanHtml($aidToImport[$field]);
+            if (isset($aidToImport[$field]) && '' != trim($aidToImport[$field])) {
+                $html .= ' '.$this->getCleanHtml($aidToImport[$field]);
                 if ($separator) {
                     $html .= $separator;
                 }
@@ -555,6 +735,44 @@ class ImportFluxCommand extends Command // NOSONAR too much methods
 
         $html = trim($html);
 
-        return $html !== '' ? $html : null;
+        return '' !== $html ? $html : null;
+    }
+
+    protected function setInternalAidRecurrences(): void
+    {
+        // méthode générique pour surcharge
+    }
+
+    protected function setAidTypesById(): void
+    {
+        // méthode générique pour surcharge
+    }
+
+    protected function setOrganizationTypesById(): void
+    {
+        // méthode générique pour surcharge
+    }
+
+    protected function setAidCategoriesMapping(): void
+    {
+        // méthode générique pour surcharge
+    }
+
+    protected function getValidExternalUrlOrNull(?string $url): ?string
+    {
+        if (empty($url)) {
+            return null;
+        }
+
+        $url = trim($url);
+
+        // on vérifie d'abord que l'url est valide
+        $constraint = new UrlExternalValid();
+        $violations = $this->validator->validate($url, $constraint);
+        if (count($violations) > 0) {
+            return null;
+        }
+
+        return $url;
     }
 }

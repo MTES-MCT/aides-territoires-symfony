@@ -1,13 +1,5 @@
 <div class="fr-mb-5w">
-	<h2>{{ current_dept.name }}
-		:
-		{{ backers|length }}
-		porteur
-		{% if backers|length > 1 %}s
-		{% endif %}
-		d‘aides en ingénierie présent
-		{% if backers|length > 1 %}s
-		{% endif %}
+	<h2>{{ current_dept.name }} : {{ backers|length }} porteur{% if backers|length > 1 %}s{% endif %} d‘aides en ingénierie présent{% if backers|length > 1 %}s{% endif %}
 	</h2>
 </div>
 <div class="fr-table fr-table--no-scroll">
@@ -38,7 +30,7 @@
 								<td>
 									<a href="{{ path('app_backer_details', {'id': backer.id, 'slug': backer.slug}) }}">{{ backer.name }}</a>
 								</td>
-								<td data-sort="{{ backer.perimeter.scale }}">{{ backer.perimeter.name }}</td>
+								<td data-sort="{% if backer.perimeter %}{{ backer.perimeter.scale }}{% endif %}">{% if backer.perimeter %}{{ backer.perimeter.name }}{% else %}Non renseigné{% endif %}</td>
 								<td>
 									{% for thematic in backer.aidsThematics %}
 										{% if 

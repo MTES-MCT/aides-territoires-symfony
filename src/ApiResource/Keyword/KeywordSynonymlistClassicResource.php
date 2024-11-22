@@ -11,7 +11,7 @@ use App\Controller\Api\Keyword\KeywordSynonymlistController;
     operations: [
         new GetCollection(
             name: self::API_OPERATION_NAME,
-            uriTemplate: '/api/synonymlists/classic-list/',
+            uriTemplate: '/synonymlists/classic-list/',
             controller: KeywordSynonymlistController::class,
             normalizationContext: ['groups' => self::API_GROUP_LIST]
         ),
@@ -19,6 +19,6 @@ use App\Controller\Api\Keyword\KeywordSynonymlistController;
 )]
 class KeywordSynonymlistClassicResource
 {
-    const API_OPERATION_NAME = 'keywordsynonymlist:list_classic';
-    const API_GROUP_LIST = 'keywordsynonymlist:list_classic';
+    public const API_OPERATION_NAME = 'keywordsynonymlist:list_classic';
+    public const API_GROUP_LIST = 'keywordsynonymlist:list_classic';
 }

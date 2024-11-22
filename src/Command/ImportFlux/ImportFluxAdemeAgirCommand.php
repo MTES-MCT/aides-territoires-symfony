@@ -24,7 +24,13 @@ class ImportFluxAdemeAgirCommand extends ImportFluxCommand
     protected ?string $importUniqueidPrefix = 'AGIR_';
     protected ?int $idDataSource = 10;
 
-    protected function getImportUniqueid($aidToImport): ?string
+    /**
+     * retourne un identifiant unique pour l'import
+     *
+     * @param array<mixed, mixed> $aidToImport
+     * @return string|null
+     */
+    protected function getImportUniqueid(array $aidToImport): ?string
     {
         if (!isset($aidToImport['id'])) {
             return null;
@@ -32,6 +38,13 @@ class ImportFluxAdemeAgirCommand extends ImportFluxCommand
         return $this->importUniqueidPrefix . $aidToImport['id'];
     }
 
+    /**
+     * methode generique pour surcharge
+     *
+     * @param array<mixed, mixed> $aidToImport
+     * @param array<mixed, mixed> $params
+     * @return array<mixed, mixed>
+     */
     protected function getFieldsMapping(array $aidToImport, array $params = null): array // NOSONAR too complex
     {
         $isCallForProject = false;
@@ -61,22 +74,32 @@ class ImportFluxAdemeAgirCommand extends ImportFluxCommand
 
         $return = [
             'importDataMention' => 'Ces données sont mises à disposition par l\'ADEME.',
-            'name' => isset($aidToImport['titre']) ? strip_tags((string) $aidToImport['titre']) : null,
-            'nameInitial' => isset($aidToImport['titre']) ? strip_tags((string) $aidToImport['titre']) : null,
-            'description' => isset($aidToImport['description_longue']) ? $this->htmlSanitizerInterface->sanitize($aidToImport['description_longue']) : null,
-            'originUrl' => isset($aidToImport['url_agir']) ? $aidToImport['url_agir'] : null,
-            'applicationUrl' => isset($aidToImport['url_agir']) ? $aidToImport['url_agir'] : null,
+            'name' => isset($aidToImport['titre'])
+                ? strip_tags((string) $aidToImport['titre']) : null,
+            'nameInitial' => isset($aidToImport['titre'])
+                ? strip_tags((string) $aidToImport['titre']) : null,
+            'description' => isset($aidToImport['description_longue'])
+                ? $this->htmlSanitizerInterface->sanitize($aidToImport['description_longue']) : null,
+            'originUrl' => isset($aidToImport['url_agir'])
+                ? $this->getValidExternalUrlOrNull($aidToImport['url_agir']) : null,
+            'applicationUrl' => isset($aidToImport['url_agir'])
+                ? $this->getValidExternalUrlOrNull($aidToImport['url_agir']) : null,
             'isCallForProject' => $isCallForProject,
             'dateStart' => $dateStart,
             'dateSubmissionDeadline' => $dateSubmissionDeadline,
             'eligibility' => $eligibility,
-            'contact' => 'Pour contacter l\'Ademe ou candidater à l\'offre, veuillez cliquer sur le lien vers le descriptif complet.'
+            'contact' => 'Pour contacter l\'Ademe ou candidater à l\'offre, '
+                . 'veuillez cliquer sur le lien vers le descriptif complet.'
         ];
 
         // on ajoute les données brut d'import pour comparer avec les données actuelles
         return $this->mergeImportDatas($return);
     }
 
+    /**
+     *
+     * @return array<mixed, mixed> $aidToImport
+     */
     protected function getApiOptions(): array
     {
         $apiOptions = parent::getApiOptions();
@@ -85,6 +108,12 @@ class ImportFluxAdemeAgirCommand extends ImportFluxCommand
         return $apiOptions;
     }
 
+    /**
+     *
+     * @param array<mixed, mixed> $aidToImport
+     * @param Aid $aid
+     * @return Aid
+     */
     protected function setAidTypes(array $aidToImport, Aid $aid): Aid
     {
         /** @var AidTypeRepository $aidTypeRepo */
@@ -102,12 +131,20 @@ class ImportFluxAdemeAgirCommand extends ImportFluxCommand
         return $aid;
     }
 
+    /**
+     *
+     * @param array<mixed, mixed> $aidToImport
+     * @param Aid $aid
+     * @return Aid
+     */
     protected function setAidRecurrence(array $aidToImport, Aid $aid): Aid
     {
         if (isset($aidToImport['date_debut']) && isset($aidToImport['date_fin'])) {
-            $aidRecurrence = $this->managerRegistry->getRepository(AidRecurrence::class)->findOneBy(['slug' => AidRecurrence::SLUG_ONEOFF]);
+            $aidRecurrence = $this->managerRegistry->getRepository(AidRecurrence::class)
+                ->findOneBy(['slug' => AidRecurrence::SLUG_ONEOFF]);
         } else {
-            $aidRecurrence = $this->managerRegistry->getRepository(AidRecurrence::class)->findOneBy(['slug' => AidRecurrence::SLUG_ONGOING]);
+            $aidRecurrence = $this->managerRegistry->getRepository(AidRecurrence::class)
+                ->findOneBy(['slug' => AidRecurrence::SLUG_ONGOING]);
         }
         if ($aidRecurrence instanceof AidRecurrence) {
             $aid->setAidRecurrence($aidRecurrence);
@@ -139,10 +176,13 @@ class ImportFluxAdemeAgirCommand extends ImportFluxCommand
             ? $aidToImport['couverture_geo']['code']
             : null;
 
+        $perimeter = null;
         if ((int) $couvertureGeo == 1) {
-            $perimeter = $this->managerRegistry->getRepository(Perimeter::class)->findOneBy(['code' => Perimeter::CODE_FRANCE]);
+            $perimeter = $this->managerRegistry->getRepository(Perimeter::class)
+                ->findOneBy(['code' => Perimeter::CODE_FRANCE]);
         } elseif ((int) $couvertureGeo == 2 || (int) $couvertureGeo == 3) {
-            $perimeter = $this->managerRegistry->getRepository(Perimeter::class)->findOneBy(['code' => Perimeter::CODE_EUROPE]);
+            $perimeter = $this->managerRegistry->getRepository(Perimeter::class)
+                ->findOneBy(['code' => Perimeter::CODE_EUROPE]);
         } elseif ((int) $couvertureGeo == 4) {
             $regionCodes = $aidToImport['regions'] ?? [];
             if (count($regionCodes) == 1) {
@@ -181,8 +221,6 @@ class ImportFluxAdemeAgirCommand extends ImportFluxCommand
                     $this->managerRegistry->getManager()->persist($perimeter);
                 }
             }
-        } else {
-            $perimeter = null;
         }
 
         if ($perimeter instanceof Perimeter) {
@@ -192,6 +230,12 @@ class ImportFluxAdemeAgirCommand extends ImportFluxCommand
         return $aid;
     }
 
+    /**
+     *
+     * @param array<mixed, mixed> $aidToImport
+     * @param Aid $aid
+     * @return Aid
+     */
     protected function setAidAudiences(array $aidToImport, Aid $aid): Aid
     {
         if (!isset($aidToImport['cible_projet']) || !is_array($aidToImport['cible_projet'])) {
@@ -234,6 +278,12 @@ class ImportFluxAdemeAgirCommand extends ImportFluxCommand
         return $aid;
     }
 
+    /**
+     *
+     * @param array<mixed, mixed> $aidToImport
+     * @param Aid $aid
+     * @return Aid
+     */
     protected function setCategories(array $aidToImport, Aid $aid): Aid
     {
         if (!isset($aidToImport['thematiques']) || !is_array($aidToImport['thematiques'])) {
@@ -258,6 +308,12 @@ class ImportFluxAdemeAgirCommand extends ImportFluxCommand
         return $aid;
     }
 
+    /**
+     *
+     * @param array<mixed, mixed> $aidToImport
+     * @param Aid $aid
+     * @return Aid
+     */
     protected function setKeywords(array $aidToImport, Aid $aid): Aid
     {
         if (!isset($aidToImport['thematiques']) || !is_array($aidToImport['thematiques'])) {
@@ -283,6 +339,10 @@ class ImportFluxAdemeAgirCommand extends ImportFluxCommand
         return $aid;
     }
 
+    /**
+     *
+     * @return array<string, array<string[]>>
+     */
     private function getCategoriesMapping(): array // NOSONAR too complex
     {
         return [

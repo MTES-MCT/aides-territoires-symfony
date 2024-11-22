@@ -60,7 +60,10 @@ class AlertMessageHandler
                 'noRelaunch' => true,
                 'noPostPopulate' => true
             ];
-            $aidParams = array_merge($aidParams, $this->aidSearchFormService->convertAidSearchClassToAidParams($aidSearchClass));
+            $aidParams = array_merge(
+                $aidParams,
+                $this->aidSearchFormService->convertAidSearchClassToAidParams($aidSearchClass)
+            );
 
             // recupere les nouvelles aides qui correspondent à l'alerte
             $aids = $this->aidService->searchAids($aidParams);
@@ -72,7 +75,12 @@ class AlertMessageHandler
                     $emailSubjectPrefix = $this->paramService->get('email_subject_prefix');
                 }
                 $today = new \DateTime(date('Y-m-d H:i:s'));
-                $emailSubject = $emailSubjectPrefix . ' ' . $today->format('d/m/Y') . ' — De nouvelles aides correspondent à vos recherches';
+                $emailSubject =
+                    $emailSubjectPrefix
+                    . ' '
+                    . $today->format('d/m/Y')
+                    . ' — De nouvelles aides correspondent à vos recherches'
+                ;
                 $subject = count($aids) . ' résultat' . (count($aids) > 1 ? 's' : '') . ' pour votre alerte';
 
                 // Force le tri par date de publication DESC

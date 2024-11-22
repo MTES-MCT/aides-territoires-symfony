@@ -10,7 +10,10 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class ProjectReferenceMissingController extends AbstractController
 {
-    #[Route('/admin/projets-reference-missing/ajax-ux-autocomplete/', name: 'app_admin_project_reference_missing_ajax_ux_autocomplete')]
+    #[Route(
+        '/admin/projets-reference-missing/ajax-ux-autocomplete/',
+        name: 'app_admin_project_reference_missing_ajax_ux_autocomplete'
+    )]
     public function ajaxUxAutocomplete(
         ProjectReferenceMissingRepository $projectReferenceMissingRepository,
         RequestStack $requestStack

@@ -22,9 +22,15 @@ class UserGroup
     #[ORM\Column(length: 255)]
     private ?string $name = null;
 
+    /**
+     * @var Collection<int, User>
+     */
     #[ORM\ManyToMany(targetEntity: User::class, inversedBy: 'userGroups')]
     private Collection $users;
 
+    /**
+     * @var Collection<int, UserGroupPermission>
+     */
     #[ORM\ManyToMany(targetEntity: UserGroupPermission::class, mappedBy: 'userGroups')]
     private Collection $userGroupPermissions;
 

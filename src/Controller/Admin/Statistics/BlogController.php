@@ -4,6 +4,7 @@ namespace App\Controller\Admin\Statistics;
 
 use App\Controller\Admin\DashboardController;
 use App\Entity\Blog\BlogPost;
+use App\Entity\Blog\BlogPostCategory;
 use App\Form\Admin\Filter\DateRangeType;
 use App\Repository\Log\LogBlogPostViewRepository;
 use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
@@ -22,7 +23,7 @@ class BlogController extends DashboardController
         LogBlogPostViewRepository $logBlogPostViewRepository,
         FormFactoryInterface $formFactoryInterface,
         ChartBuilderInterface $chartBuilderInterface
-    ) {
+    ): Response {
         // dates par défaut
         $dateMin = new \DateTime('-1 month');
         $dateMax = new \DateTime();
@@ -60,7 +61,9 @@ class BlogController extends DashboardController
             $total += $category['nb'];
         }
         foreach ($topBlogPostsCategories as $key => $category) {
-            $topBlogPostsCategories[$key]['percentage'] = $total == 0 ? 0 : number_format(($category['nb'] * 100 / $total), 2);
+            $topBlogPostsCategories[$key]['percentage'] = $total == 0
+                ? 0
+                : number_format(($category['nb'] * 100 / $total), 2);
         }
 
         $labels = [];
@@ -91,9 +94,15 @@ class BlogController extends DashboardController
         $dateMaxEvolution = new \DateTime();
 
 
-        $formDateRangeEvolution = $formFactoryInterface->createNamed('date_range_evolution', DateRangeType::class, null, [
-            'action' => $this->adminUrlGenerator->generateUrl('admin_statistics_blog_dashboard') . '#evolution',
-        ]);
+        $formDateRangeEvolution = $formFactoryInterface->createNamed(
+            'date_range_evolution',
+            DateRangeType::class,
+            null,
+            [
+                'action' => $this->adminUrlGenerator->setRoute('admin_statistics_blog_dashboard')->generateUrl()
+                . '#evolution',
+            ]
+        );
         $formDateRangeEvolution->add('blogPost', EntityType::class, [
             'required' => true,
             'class' => BlogPost::class,
@@ -187,7 +196,12 @@ class BlogController extends DashboardController
         ]);
     }
 
-    private function getCategoriesBackgroundColor(array $array)
+    /**
+     *
+     * @param array<int, BlogPostCategory> $array
+     * @return string[]
+     */
+    private function getCategoriesBackgroundColor(array $array): array
     {
         $colorsBySlug = [
             'webinaires' => 'rgb(255, 99, 132)',

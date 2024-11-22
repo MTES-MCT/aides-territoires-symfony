@@ -56,7 +56,12 @@ use App\Entity\Search\SearchPage;
 use App\Entity\Site\UrlRedirect;
 use App\Entity\User\ApiTokenAsk;
 use App\Entity\User\User;
+use App\Repository\Aid\AidRepository;
 use App\Repository\Backer\BackerAskAssociateRepository;
+use App\Repository\Backer\BackerRepository;
+use App\Repository\Project\ProjectRepository;
+use App\Repository\User\ApiTokenAskRepository;
+use App\Repository\User\UserRepository;
 use App\Service\User\UserService;
 use Doctrine\Persistence\ManagerRegistry;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
@@ -86,7 +91,10 @@ class DashboardController extends AbstractDashboardController
     public function index(): Response
     {
         // Aides en attente de revue
-        $nbAidsInReview = $this->managerRegistry->getRepository(Aid::class)->countCustom(['status' => Aid::STATUS_REVIEWABLE]);
+        /** @var AidRepository $aidRepository */
+        $aidRepository = $this->managerRegistry->getRepository(Aid::class);
+
+        $nbAidsInReview = $aidRepository->countCustom(['status' => Aid::STATUS_REVIEWABLE]);
         $urlAidsInReview = $this->adminUrlGenerator
             ->setController(AidCrudController::class)
             ->setAction(Action::INDEX)
@@ -97,7 +105,9 @@ class DashboardController extends AbstractDashboardController
         // aides publiées depuis la semaine dernière
         $lastWeek = new \DateTime();
         $lastWeek->modify('-7 days');
-        $nbAidsPublishedLastWeek = $this->managerRegistry->getRepository(Aid::class)->countCustom(['status' => Aid::STATUS_PUBLISHED, 'publishedAfter' => $lastWeek]);
+        $nbAidsPublishedLastWeek = $aidRepository->countCustom(
+            ['status' => Aid::STATUS_PUBLISHED, 'publishedAfter' => $lastWeek]
+        );
         $urlAidsPublishedLastWeek = $this->adminUrlGenerator
             ->setController(AidCrudController::class)
             ->setAction(Action::INDEX)
@@ -108,7 +118,9 @@ class DashboardController extends AbstractDashboardController
             ->generateUrl();
 
         // Demandes de token API
-        $nbApiTokenAsks = $this->managerRegistry->getRepository(ApiTokenAsk::class)->countPendingAccept();
+        /** @var ApiTokenAskRepository $apiTokenAskRepository */
+        $apiTokenAskRepository = $this->managerRegistry->getRepository(ApiTokenAsk::class);
+        $nbApiTokenAsks = $apiTokenAskRepository->countPendingAccept();
         $urlApiTokenAsk = $this->adminUrlGenerator
             ->setController(ApiTokenAskCrudController::class)
             ->setAction(Action::INDEX)
@@ -117,7 +129,9 @@ class DashboardController extends AbstractDashboardController
         // inscriptions
         $lastMonth = new \DateTime();
         $lastMonth->modify('-1 month');
-        $registerByDay = $this->managerRegistry->getRepository(User::class)->countRegisterByDay(['dateCreateMin' => $lastMonth]);
+        /** @var UserRepository $userRepository */
+        $userRepository = $this->managerRegistry->getRepository(User::class);
+        $registerByDay = $userRepository->countRegisterByDay(['dateCreateMin' => $lastMonth]);
         $labels = [];
         $datas = [];
 
@@ -140,8 +154,10 @@ class DashboardController extends AbstractDashboardController
             ],
         ]);
 
+        /** @var ProjectRepository $projectRepository */
+        $projectRepository = $this->managerRegistry->getRepository(Project::class);
         // Projets en attente de validation
-        $nbProjectsInReview = $this->managerRegistry->getRepository(Project::class)->countReviewable();
+        $nbProjectsInReview = $projectRepository->countReviewable();
         $urlProjectsInReview = $this->adminUrlGenerator
             ->setController(ProjectCrudController::class)
             ->setAction(Action::INDEX)
@@ -149,8 +165,11 @@ class DashboardController extends AbstractDashboardController
             ->set('filters[status][comparison]', '=')
             ->generateUrl();
 
+        /** @var BackerRepository $backerRepository */
+        $backerRepository = $this->managerRegistry->getRepository(Backer::class);
+
         // Fiches porteurs d'aides en attente de validation
-        $nbBackersInReview = $this->managerRegistry->getRepository(Backer::class)->countReviewable();
+        $nbBackersInReview = $backerRepository->countReviewable();
         $urlBackersInReview = $this->adminUrlGenerator
             ->setController(BackerCrudController::class)
             ->setAction(Action::INDEX)
@@ -201,7 +220,12 @@ class DashboardController extends AbstractDashboardController
 
     public function configureMenuItems(): iterable
     {
-        yield MenuItem::linkToRoute('Visiter le site', 'fas fa-external-link-alt', 'app_home', [])->setLinkTarget('_blank');
+        yield MenuItem::linkToRoute(
+            'Visiter le site',
+            'fas fa-external-link-alt',
+            'app_home',
+            []
+        )->setLinkTarget('_blank');
         yield MenuItem::linkToDashboard('Tableau de bord', 'fa fa-home');
 
         yield MenuItem::subMenu('Utilisateurs', 'fas fa-user')->setSubItems([
@@ -303,8 +327,18 @@ class DashboardController extends AbstractDashboardController
             MenuItem::linkToRoute('Communes - Inscriptions', 'fas fa-list', 'admin_statistics_commune_dashboard', []),
             MenuItem::linkToRoute('Commnunes - Carte', 'fas fa-list', 'admin_statistics_commune_population', []),
             MenuItem::linkToRoute('Blog', 'fas fa-list', 'admin_statistics_blog_dashboard', []),
-            MenuItem::linkToRoute('Périmètres manquants', 'fas fa-list', 'admin_statistics_log_aid_search_missing_perimeters', []),
-            MenuItem::linkToRoute('Projets référents', 'fas fa-list', 'admin_statistics_project_reference_dashboard', []),
+            MenuItem::linkToRoute(
+                'Périmètres manquants',
+                'fas fa-list',
+                'admin_statistics_log_aid_search_missing_perimeters',
+                []
+            ),
+            MenuItem::linkToRoute(
+                'Projets référents',
+                'fas fa-list',
+                'admin_statistics_project_reference_dashboard',
+                []
+            ),
             MenuItem::linkToRoute('Porteurs d\'aides', 'fas fa-list', 'admin_statistics_backer_dashboard', []),
             MenuItem::linkToRoute('Recherche', 'fas fa-list', 'admin_statistics_log_aid_search', []),
             MenuItem::linkToRoute('Redirections', 'fas fa-list', 'admin_statistics_log_url_redirect', []),

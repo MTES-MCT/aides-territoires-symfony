@@ -14,13 +14,9 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Doctrine\Persistence\ManagerRegistry;
-use App\Service\Aid\AidSearchFormService;
-use App\Service\Aid\AidService;
-use App\Service\Email\EmailService;
 use App\Service\Notification\NotificationService;
 use App\Service\Various\ParamService;
 use Symfony\Component\Messenger\MessageBusInterface;
-use Symfony\Component\Routing\RouterInterface;
 
 #[AsCommand(name: 'at:cron:alert:send_daily', description: 'Envoi des alertes quotidiennes')]
 class AlertSendDailyCommand extends Command
@@ -33,11 +29,7 @@ class AlertSendDailyCommand extends Command
     public function __construct(
         private KernelInterface $kernelInterface,
         private ManagerRegistry $managerRegistry,
-        private AidService $aidService,
-        private AidSearchFormService $aidSearchFormService,
-        private EmailService $emailService,
         private ParamService $paramService,
-        private RouterInterface $routerInterface,
         private NotificationService $notificationService,
         private MessageBusInterface $bus
     ) {
@@ -69,7 +61,7 @@ class AlertSendDailyCommand extends Command
         return Command::SUCCESS;
     }
 
-    protected function cronTask($input, $output)
+    protected function cronTask(InputInterface $input, OutputInterface $output): void
     {
         $timeStart = microtime(true);
 
@@ -94,8 +86,16 @@ class AlertSendDailyCommand extends Command
         }
 
         // notif admin
-        $admin = $this->managerRegistry->getRepository(User::class)->findOneBy(['email' => $this->paramService->get('email_super_admin')]);
-        $this->notificationService->addNotification($admin, 'Envoi des alertes quotidiennes', $nbAlertTotal . ' alertes envoyées pour vérification des aides publiées après le ' . $publishedAfter->format('d/m/Y') . ' inclus');
+        $admin = $this->managerRegistry->getRepository(User::class)
+            ->findOneBy(['email' => $this->paramService->get('email_super_admin')]);
+        $this->notificationService->addNotification(
+            $admin,
+            'Envoi des alertes quotidiennes',
+            $nbAlertTotal
+                . ' alertes envoyées pour vérification des aides publiées après le '
+                . $publishedAfter->format('d/m/Y')
+                . ' inclus'
+        );
 
         // on ajoute le resume à la file d'attente
         $this->bus->dispatch(new AlertResume(Alert::FREQUENCY_DAILY_SLUG));
@@ -105,7 +105,13 @@ class AlertSendDailyCommand extends Command
         $time = $timeEnd - $timeStart;
 
         // success
-        $io->success('Temps écoulé : ' . gmdate("H:i:s", $timeEnd) . ' (' . gmdate("H:i:s", intval($time)) . ')');
+        $io->success(
+            'Temps écoulé : '
+            . gmdate("H:i:s", intval($timeEnd))
+            . ' ('
+            . gmdate("H:i:s", intval($time))
+            . ')'
+        );
         $io->success('Mémoire maximale utilisée : ' . round(memory_get_peak_usage() / 1024 / 1024) . ' MB');
     }
 }

@@ -17,13 +17,13 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Index(columns: ['slug'], name: 'slug_blog')]
 class BlogPost // NOSONAR too much methods
 {
-    const FOLDER = 'blog';
+    public const FOLDER = 'blog';
 
-    const STATUS_DRAFT = 'draft';
-    const STATUS_REVIEWABLE = 'reviewable';
-    const STATUS_PUBLISHED = 'published';
-    const STATUS_DELETED = 'deleted';
-    const STATUSES = [
+    public const STATUS_DRAFT = 'draft';
+    public const STATUS_REVIEWABLE = 'reviewable';
+    public const STATUS_PUBLISHED = 'published';
+    public const STATUS_DELETED = 'deleted';
+    public const STATUSES = [
         ['slug' => self::STATUS_DRAFT, 'name' => 'Brouillon'],
         ['slug' => self::STATUS_REVIEWABLE, 'name' => 'En revue'],
         ['slug' => self::STATUS_PUBLISHED, 'name' => 'Publié'],
@@ -56,7 +56,7 @@ class BlogPost // NOSONAR too much methods
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $logo = null;
 
-    private $logoFile = null;
+    private ?string $logoFile = null;
 
     private bool $deleteLogo = false;
 
@@ -91,6 +91,9 @@ class BlogPost // NOSONAR too much methods
     #[ORM\Column(nullable: true)]
     private ?int $oldId = null;
 
+    /**
+     * @var Collection<int, LogBlogPostView>
+     */
     #[ORM\OneToMany(mappedBy: 'blogPost', targetEntity: LogBlogPostView::class)]
     #[ORM\JoinColumn(onDelete: 'SET NULL')]
     private Collection $logBlogPostViews;
@@ -165,7 +168,7 @@ class BlogPost // NOSONAR too much methods
         return $this;
     }
 
-    public function setLogoFile($logoFile = null): void
+    public function setLogoFile(?string $logoFile = null): void
     {
         $this->logoFile = $logoFile;
 
@@ -174,7 +177,7 @@ class BlogPost // NOSONAR too much methods
         }
     }
 
-    public function getLogoFile()
+    public function getLogoFile(): ?string
     {
         return $this->logoFile;
     }

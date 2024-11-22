@@ -10,20 +10,20 @@
 					<div class="fr-grid-row fr-grid-row--gutters fr-grid-row--bottom">
 
 						<div class="fr-col-12 fr-col-md-3 {% if showAudienceField is defined and not showAudienceField %}fr-hidden{% endif %}">
-							{{ form_row(formAidSearch.organizationType)}}
+							{{ form_row(formAidSearch.organization_type_slug)}}
 						</div>
 
 						<div class="fr-col-12 fr-col-md-3 {% if showPerimeterField is defined and not showPerimeterField %}fr-hidden{% endif %}">
-							{{ form_row(formAidSearch.searchPerimeter)}}
+							{{ form_row(formAidSearch.perimeter_id)}}
 						</div>
 
 						<div class="fr-col-12 fr-col-md-3 {% if showTextField is defined and not showTextField %}fr-hidden{% endif %}">
 							{{ form_row(formAidSearch.keyword, {'value': formAidSearch.keyword.vars.value|htmlDecode}) }}
 						</div>
 
-						{% if formAidSearch.categorysearch is defined %}
+						{% if formAidSearch.category_ids is defined %}
 						<div class="fr-col-12 fr-col-md-3 {% if showCategoriesField is defined and not showCategoriesField %}fr-hidden{% endif %}">
-							{{ form_row(formAidSearch.categorysearch)}}
+							{{ form_row(formAidSearch.category_ids)}}
 						</div>
 						{% endif %}
 					</div>
@@ -31,17 +31,17 @@
 					<div id="search-form-extra-fields" class="{% if showExtended %}show{% endif %}">
 						<div class="fr-grid-row fr-grid-row--gutters fr-grid-row--bottom fr-mb-2w">
 							<div class="fr-col-12 fr-col-md-3 {% if showAidTypeField is defined and not showAidTypeField %}fr-hidden{% endif %}">
-								{{ form_row(formAidSearch.aidTypes)}}
+								{{ form_row(formAidSearch.aid_type_ids)}}
 							</div>
 
-							{% if formAidSearch.backerschoice is defined %}
+							{% if formAidSearch.backer_ids is defined %}
 								<div class="fr-col-12 fr-col-md-3 {% if showBackersField is defined and not showBackersField %}fr-hidden{% endif %}">
-									{{ form_row(formAidSearch.backerschoice)}}
+									{{ form_row(formAidSearch.backer_ids)}}
 								</div>
 							{% endif %}
 
 							<div class="fr-col-12 fr-col-md-3">
-								{{ form_row(formAidSearch.applyBefore)}}
+								{{ form_row(formAidSearch.apply_before)}}
 							</div>
 							{% if formAidSearch.programs is defined %}
 								<div class="fr-col-12 fr-col-md-3">
@@ -50,28 +50,28 @@
 							{% endif %}
 
 							<div class="fr-col-12 fr-col-md-3 {% if showMobilizationStepField is defined and not showMobilizationStepField %}fr-hidden{% endif %}">
-								{{ form_row(formAidSearch.aidSteps)}}
+								{{ form_row(formAidSearch.aid_step_ids)}}
 							</div>
 
 							<div class="fr-col-12 fr-col-md-3">
-								{{ form_row(formAidSearch.aidDestinations)}}
+								{{ form_row(formAidSearch.aid_destination_ids)}}
 							</div>
 							<div class="fr-col-12 fr-col-md-3">
-								{{ form_row(formAidSearch.isCharged)}}
+								{{ form_row(formAidSearch.is_charged)}}
 							</div>
-							{% if formAidSearch.europeanAid is defined %}
+							{% if formAidSearch.european_aid_slug is defined %}
 								<div class="fr-col-12 fr-col-md-3">
-									{{ form_row(formAidSearch.europeanAid)}}
+									{{ form_row(formAidSearch.european_aid_slug)}}
 								</div>
 							{% endif %}
 						</div>
 
 						<div class="fr-grid-row fr-grid-row--gutters fr-grid-row--bottom fr-mb-2w fr-grid-row--bottom">
 							<div class="fr-col-12 fr-col-md-3">
-								{{ form_row(formAidSearch.backerGroup)}}
+								{{ form_row(formAidSearch.backer_group_id)}}
 							</div>
 							<div class="fr-col-12 fr-col-md-9">
-								{{ form_row(formAidSearch.isCallForProject)}}
+								{{ form_row(formAidSearch.call_for_projects_only)}}
 							</div>
 						</div>
 					</div>

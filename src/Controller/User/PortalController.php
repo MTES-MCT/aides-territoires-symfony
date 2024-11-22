@@ -22,9 +22,14 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class PortalController extends FrontController
 {
-    #[Route('/comptes/portails/{id}/', name: 'app_user_portal_edit', requirements: ['id' => '[0-9]+'], methods: ['GET', 'POST'])]
+    #[Route(
+        '/comptes/portails/{id}/',
+        name: 'app_user_portal_edit',
+        requirements: ['id' => '[0-9]+'],
+        methods: ['GET', 'POST']
+    )]
     public function edit(
-        $id,
+        int $id,
         SearchPageRepository $searchPageRepository,
         RequestStack $requestStack,
         UserService $userService,
@@ -96,7 +101,10 @@ class PortalController extends FrontController
 
         // fil arianne
         $this->breadcrumb->add('Comptes', $this->generateUrl('app_user_dashboard'));
-        $this->breadcrumb->add('Portail ' . $searchPage->getName(), $this->generateUrl('app_user_portal_edit', ['id' => $id]));
+        $this->breadcrumb->add(
+            'Portail ' . $searchPage->getName(),
+            $this->generateUrl('app_user_portal_edit', ['id' => $id])
+        );
 
         // rendu template
         return $this->render('user/searchpage/edit.html.twig', [
@@ -164,7 +172,7 @@ class PortalController extends FrontController
 
     #[Route('/comptes/portails/{id}/unlock/', name: 'app_user_portal_unlock', requirements: ['id' => '\d+'])]
     public function unlock(
-        $id,
+        int $id,
         SearchPageRepository $searchPageRepository,
         UserService $userService,
         SearchPageService $searchPageService
@@ -201,7 +209,11 @@ class PortalController extends FrontController
             $this->addFlash(FrontController::FLASH_ERROR, 'Impossible de débloquer le portail');
 
             // retour
-            return $this->redirectToRoute('app_user_portal_edit', ['id' => $searchPage->getId()]);
+            if (isset($searchPage) && $searchPage instanceof SearchPage) {
+                return $this->redirectToRoute('app_user_portal_edit', ['id' => $searchPage->getId()]);
+            } else {
+                return $this->redirectToRoute('app_user_dashboard');
+            }
         }
     }
 

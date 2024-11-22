@@ -22,7 +22,13 @@ class ImportFluxWelcomeEuropeCommand extends ImportFluxCommand
     protected ?string $importUniqueidPrefix = 'WE_';
     protected ?int $idDataSource = 7;
 
-    protected function getImportUniqueid($aidToImport): ?string
+    /**
+     * retourne un identifiant unique pour l'import
+     *
+     * @param array<mixed, mixed> $aidToImport
+     * @return string|null
+     */
+    protected function getImportUniqueid(array $aidToImport): ?string
     {
         if (!isset($aidToImport['ID'])) {
             return null;
@@ -30,7 +36,12 @@ class ImportFluxWelcomeEuropeCommand extends ImportFluxCommand
         return $this->importUniqueidPrefix . $aidToImport['ID'];
     }
 
-    protected function callApi()
+    /**
+     * appel le flux
+     *
+     * @return array<int, mixed>
+     */
+    protected function callApi(): array
     {
         $aidsFromImport = [];
         $client = $this->getClient();
@@ -66,6 +77,12 @@ class ImportFluxWelcomeEuropeCommand extends ImportFluxCommand
 
 
 
+    /**
+     *
+     * @param array<mixed, mixed> $aidToImport
+     * @param array<mixed, mixed> $params
+     * @return array<mixed, mixed>
+     */
     protected function getFieldsMapping(array $aidToImport, array $params = null): array // NOSONAR too complex
     {
         $description = '';
@@ -174,9 +191,12 @@ class ImportFluxWelcomeEuropeCommand extends ImportFluxCommand
         $return = [
             'importDataMention' => 'Ces données sont mises à disposition par Welcomeurope à titre gracieux.',
             'europeanAid' => Aid::SLUG_EUROPEAN_SECTORIAL,
-            'name' => isset($aidToImport['post_title']) ? $this->cleanName($aidToImport['post_title']) : null,
-            'nameInitial' => isset($aidToImport['post_title']) ? $this->cleanName($aidToImport['post_title']) : null,
-            'shortTitle' => isset($aidToImport['info_references']) ? $this->cleanName($aidToImport['info_references']) : null,
+            'name' => isset($aidToImport['post_title'])
+                ? $this->cleanName($aidToImport['post_title']) : null,
+            'nameInitial' => isset($aidToImport['post_title'])
+                ? $this->cleanName($aidToImport['post_title']) : null,
+            'shortTitle' => isset($aidToImport['info_references'])
+                ? $this->cleanName($aidToImport['info_references']) : null,
             'description' => $description,
             'eligibility' => $this->getCleanHtml($aidToImport['info_info-regions']),
             'isCallForProject' => true,
@@ -189,6 +209,12 @@ class ImportFluxWelcomeEuropeCommand extends ImportFluxCommand
         return $this->mergeImportDatas($return);
     }
 
+    /**
+     *
+     * @param array<mixed, mixed> $aidToImport
+     * @param Aid $aid
+     * @return Aid
+     */
     protected function setKeywords(array $aidToImport, Aid $aid): Aid
     {
         if (!isset($aidToImport['filtres_sectors'])) {
@@ -208,12 +234,20 @@ class ImportFluxWelcomeEuropeCommand extends ImportFluxCommand
         return $aid;
     }
 
+    /**
+     *
+     * @param array<mixed, mixed> $aidToImport
+     * @param Aid $aid
+     * @return Aid
+     */
     protected function setAidRecurrence(array $aidToImport, Aid $aid): Aid
     {
         if (!isset($aidToImport['dates_deadline-2']) || !isset($aidToImport['dates_open-2'])) {
-            $aidRecurrence = $this->managerRegistry->getRepository(AidRecurrence::class)->findOneBy(['slug' => AidRecurrence::SLUG_RECURRING]);
+            $aidRecurrence = $this->managerRegistry->getRepository(AidRecurrence::class)
+                ->findOneBy(['slug' => AidRecurrence::SLUG_RECURRING]);
         } else {
-            $aidRecurrence = $this->managerRegistry->getRepository(AidRecurrence::class)->findOneBy(['slug' => AidRecurrence::SLUG_ONEOFF]);
+            $aidRecurrence = $this->managerRegistry->getRepository(AidRecurrence::class)
+                ->findOneBy(['slug' => AidRecurrence::SLUG_ONEOFF]);
         }
         if ($aidRecurrence instanceof AidRecurrence) {
             $aid->setAidRecurrence($aidRecurrence);
@@ -221,11 +255,21 @@ class ImportFluxWelcomeEuropeCommand extends ImportFluxCommand
         return $aid;
     }
 
+    /**
+     *
+     * @param array<mixed, mixed> $aidToImport
+     * @param Aid $aid
+     * @return Aid
+     */
     protected function setAidAudiences(array $aidToImport, Aid $aid): Aid // NOSONAR too complex
     {
         /*
             Exemple of string to process:
-            "Centres de recherche,Autorités locales et régionales,Grandes entreprises,ONG de Développement,PME,Universités,Organisations Internationales,ONG,Association & ONG,Collectivité Territoriale & Entité Affiliée,Centre de recherche & université,Grande Entreprise (> 250 Salaries),Organisation UE & Internationale,Pme & Start-Up (< 249 Salaries)"
+            "Centres de recherche,Autorités locales et régionales,Grandes entreprises,
+            ONG de Développement,PME,Universités,Organisations Internationales,ONG,
+            Association & ONG,Collectivité Territoriale & Entité Affiliée,
+            Centre de recherche & université,Grande Entreprise (> 250 Salaries),
+            Organisation UE & Internationale,Pme & Start-Up (< 249 Salaries)"
             Split the string, loop on the values and match to our AUDIENCES
          */
         if (!isset($aidToImport['filtres_beneficiaries'])) {
@@ -383,7 +427,8 @@ class ImportFluxWelcomeEuropeCommand extends ImportFluxCommand
             foreach ($audiences as $audience) {
                 if (isset($mapping[$audience])) {
                     foreach ($mapping[$audience] as $slug) {
-                        $organizationType = $this->managerRegistry->getRepository(OrganizationType::class)->findOneBy(['slug' => $slug]);
+                        $organizationType = $this->managerRegistry->getRepository(OrganizationType::class)
+                            ->findOneBy(['slug' => $slug]);
                         if ($organizationType instanceof OrganizationType) {
                             $aid->addAidAudience($organizationType);
                         }
@@ -395,6 +440,12 @@ class ImportFluxWelcomeEuropeCommand extends ImportFluxCommand
         return $aid;
     }
 
+    /**
+     *
+     * @param array<mixed, mixed> $aidToImport
+     * @param Aid $aid
+     * @return Aid
+     */
     protected function setAidTypes(array $aidToImport, Aid $aid): Aid // NOSONAR too complex
     {
         /*
@@ -437,11 +488,18 @@ class ImportFluxWelcomeEuropeCommand extends ImportFluxCommand
         return $aid;
     }
 
+    /**
+     *
+     * @param array<mixed, mixed> $aidToImport
+     * @param Aid $aid
+     * @return Aid
+     */
     protected function setCategories(array $aidToImport, Aid $aid): Aid // NOSONAR too complex
     {
         /*
             Exemple of string to process:
-            "je decouvre les metiers;je choisis mon metier ou ma formation;je rebondis tout au long de la vie;je m'informe sur les metiers"  # noqa
+            "je decouvre les metiers;je choisis mon metier ou ma formation;je rebondis tout au long de la vie;
+            je m'informe sur les metiers"  # noqa
             Split the string, loop on the values and match to our Categories
         */
         if (!isset($aidToImport['filtres_sectors'])) {
@@ -571,6 +629,12 @@ class ImportFluxWelcomeEuropeCommand extends ImportFluxCommand
         return $aid;
     }
 
+    /**
+     *
+     * @param array<mixed, mixed> $aidToImport
+     * @param Aid $aid
+     * @return Aid
+     */
     protected function setAidSteps(array $aidToImport, Aid $aid): Aid
     {
         /** @var AidStepRepository $aidStepRepo */

@@ -108,6 +108,7 @@ Encore
     .addEntry('import-scss/user/backer/edit', './assets/js/import-scss/user/backer/edit.js')
     .addEntry('import-scss/reference/index', './assets/js/import-scss/reference/index.js')
     .addEntry('import-scss/reference/projets_subventionnes', './assets/js/import-scss/reference/projets_subventionnes.js')
+    .addEntry('import-scss/security/login', './assets/js/import-scss/security/login.js')
 
     // When enabled, Webpack "splits" your files into smaller pieces for greater optimization.
     .splitEntryChunks()
@@ -144,7 +145,9 @@ Encore
     })
 
     // enables Sass/SCSS support
-    .enableSassLoader()
+    .enableSassLoader(options => {
+        options.implementation = require('sass');
+    })
 
     // uncomment if you use TypeScript
     //.enableTypeScriptLoader()

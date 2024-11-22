@@ -23,7 +23,13 @@ class ImportFluxMinistereCultureCommand extends ImportFluxCommand
     protected ?int $idDataSource = 8;
     protected bool $paginationEnabled = true;
 
-    protected function getImportUniqueid($aidToImport): ?string
+    /**
+     * retourne un identifiant unique pour l'import
+     *
+     * @param array<mixed, mixed> $aidToImport
+     * @return string|null
+     */
+    protected function getImportUniqueid(array $aidToImport): ?string
     {
         if (!isset($aidToImport['id'])) {
             return null;
@@ -31,11 +37,19 @@ class ImportFluxMinistereCultureCommand extends ImportFluxCommand
         return $this->importUniqueidPrefix . $aidToImport['id'];
     }
 
+    /**
+     *
+     * @param array<mixed, mixed> $aidToImport
+     * @param array<mixed, mixed> $params
+     * @return array<mixed, mixed>
+     */
     protected function getFieldsMapping(array $aidToImport, array $params = null): array // NOSONAR too complex
     {
         try {
-            $description1 = isset($aidToImport['summary']) ? $this->htmlSanitizerInterface->sanitize($aidToImport['summary']) : '';
-            $description2 = isset($aidToImport['body']) ? $this->htmlSanitizerInterface->sanitize($aidToImport['body']) : '';
+            $description1 = isset($aidToImport['summary'])
+                ? $this->htmlSanitizerInterface->sanitize($aidToImport['summary']) : '';
+            $description2 = isset($aidToImport['body'])
+                ? $this->htmlSanitizerInterface->sanitize($aidToImport['body']) : '';
             $type = isset($aidToImport['type']) ? $aidToImport['type'] : '';
             $aidToDelete = '';
             if (in_array($type, ['Demande d\'autorisation', 'Demande de labellisation'])) {
@@ -74,13 +88,20 @@ class ImportFluxMinistereCultureCommand extends ImportFluxCommand
 
             $isCallForProject = (isset($aidToImport['deadline']) && $aidToImport['deadline']) ? true : false;
 
+            $name = !empty($aidToImport['title']) ? $this->cleanName((string) $aidToImport['title']) : null;
+            if (!$name) {
+                throw new \Exception('Name is empty');
+            }
+            
             $return = [
                 'importDataMention' => 'Ces données sont mises à disposition par le Ministère de la Culture.',
-                'name' => isset($aidToImport['title']) ? strip_tags((string) $aidToImport['title']) : null,
-                'nameInitial' => isset($aidToImport['title']) ? strip_tags((string) $aidToImport['title']) : null,
+                'name' => $name,
+                'nameInitial' => $name,
                 'description' => $description,
-                'originUrl' => isset($aidToImport['url']) ? $aidToImport['url'] : null,
-                'contact' => isset($aidToImport['contact']) ? $this->htmlSanitizerInterface->sanitize($aidToImport['contact']) : null,
+                'originUrl' => isset($aidToImport['url'])
+                    ? $this->getValidExternalUrlOrNull($aidToImport['url']) : null,
+                'contact' => isset($aidToImport['contact'])
+                    ? $this->htmlSanitizerInterface->sanitize($aidToImport['contact']) : null,
                 'eligibility' => $eligility,
                 'isCallForProject' => $isCallForProject,
             ];
@@ -100,6 +121,12 @@ class ImportFluxMinistereCultureCommand extends ImportFluxCommand
         }
     }
 
+    /**
+     *
+     * @param array<mixed, mixed> $aidToImport
+     * @param Aid $aid
+     * @return Aid
+     */
     protected function setAidSteps(array $aidToImport, Aid $aid): Aid
     {
         /** @var AidStepRepository $aidStepRepo */
@@ -213,9 +240,6 @@ class ImportFluxMinistereCultureCommand extends ImportFluxCommand
             'Syndicats mixtes' => [
                 'epci'
             ],
-            'Associations' => [
-                'association'
-            ],
             'Organismes de recherche' => [
                 'researcher'
             ],
@@ -236,6 +260,12 @@ class ImportFluxMinistereCultureCommand extends ImportFluxCommand
         return $aid;
     }
 
+    /**
+     *
+     * @param array<mixed, mixed> $aidToImport
+     * @param Aid $aid
+     * @return Aid
+     */
     protected function setCategories(array $aidToImport, Aid $aid): Aid
     {
         if (!isset($aidToImport['eztag_theme']) || !is_array($aidToImport['eztag_theme'])) {
@@ -244,7 +274,7 @@ class ImportFluxMinistereCultureCommand extends ImportFluxCommand
         $mapping = $this->getMappingCategories();
 
         foreach ($aidToImport['eztag_theme'] as $thematique) {
-            if (isset($mapping[$thematique]) && is_array($mapping[$thematique])) {
+            if (isset($mapping[$thematique])) {
                 foreach ($mapping[$thematique] as $category) {
                     $category = $this->managerRegistry->getRepository(Category::class)->findOneBy([
                         'slug' => $category
@@ -259,6 +289,12 @@ class ImportFluxMinistereCultureCommand extends ImportFluxCommand
         return $aid;
     }
 
+    /**
+     *
+     * @param array<mixed, mixed> $aidToImport
+     * @param Aid $aid
+     * @return Aid
+     */
     protected function setKeywords(array $aidToImport, Aid $aid): Aid
     {
         if (!isset($aidToImport['eztag_theme']) || !is_array($aidToImport['eztag_theme'])) {
@@ -280,6 +316,11 @@ class ImportFluxMinistereCultureCommand extends ImportFluxCommand
         return $aid;
     }
 
+    /**
+     * Mapping des catégories du ministère de la culture
+     *
+     * @return array<string, string[]>
+     */
     private function getMappingCategories(): array // NOSONAR too complex
     {
         return [
@@ -492,12 +533,20 @@ class ImportFluxMinistereCultureCommand extends ImportFluxCommand
         ];
     }
 
+    /**
+     *
+     * @param array<mixed, mixed> $aidToImport
+     * @param Aid $aid
+     * @return Aid
+     */
     protected function setAidRecurrence(array $aidToImport, Aid $aid): Aid
     {
         if (!isset($aidToImport['deadline']) || !$aidToImport['deadline']) {
-            $aidRecurrence = $this->managerRegistry->getRepository(AidRecurrence::class)->findOneBy(['slug' => AidRecurrence::SLUG_ONGOING]);
+            $aidRecurrence = $this->managerRegistry->getRepository(AidRecurrence::class)
+                ->findOneBy(['slug' => AidRecurrence::SLUG_ONGOING]);
         } else {
-            $aidRecurrence = $this->managerRegistry->getRepository(AidRecurrence::class)->findOneBy(['slug' => AidRecurrence::SLUG_ONEOFF]);
+            $aidRecurrence = $this->managerRegistry->getRepository(AidRecurrence::class)
+                ->findOneBy(['slug' => AidRecurrence::SLUG_ONEOFF]);
         }
 
         if ($aidRecurrence instanceof AidRecurrence) {
@@ -506,6 +555,12 @@ class ImportFluxMinistereCultureCommand extends ImportFluxCommand
         return $aid;
     }
 
+    /**
+     *
+     * @param array<mixed, mixed> $aidToImport
+     * @param Aid $aid
+     * @return Aid
+     */
     protected function setAidTypes(array $aidToImport, Aid $aid): Aid
     {
         if (!isset($aidToImport['type']) || !$aidToImport['type']) {
@@ -513,7 +568,8 @@ class ImportFluxMinistereCultureCommand extends ImportFluxCommand
         }
 
         if (in_array($aidToImport['type'], ['Subvention', 'Aide', 'Aide & subvention'])) {
-            $aidType = $this->managerRegistry->getRepository(AidType::class)->findOneBy(['slug' => AidType::SLUG_GRANT]);
+            $aidType = $this->managerRegistry->getRepository(AidType::class)
+                ->findOneBy(['slug' => AidType::SLUG_GRANT]);
             if ($aidType instanceof AidType) {
                 $aid->addAidType($aidType);
             }
