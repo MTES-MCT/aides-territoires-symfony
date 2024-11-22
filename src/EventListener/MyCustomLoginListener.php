@@ -20,11 +20,11 @@ class MyCustomLoginListener
         private UserService $userService,
         private MatomoService $matomoService,
         private ParamService $paramService,
-        private RequestStack $requestStack
+        private RequestStack $requestStack,
     ) {
     }
 
-    public function onSymfonyComponentSecurityHttpEventLoginSuccessEvent(LoginSuccessEvent $loginSuccessEvent)
+    public function onSymfonyComponentSecurityHttpEventLoginSuccessEvent(LoginSuccessEvent $loginSuccessEvent): void
     {
         // recupere user
         $user = $loginSuccessEvent->getUser();
@@ -48,13 +48,13 @@ class MyCustomLoginListener
                     'user' => $user,
                     'action' => LogUserLogin::ACTION_LOGIN,
                     'type' => $autoLogin ? LogUserLogin::TYPE_AUTOLOGIN : null,
-                    'noFlush' => true
+                    'noFlush' => true,
                 ]
             );
 
             // si première connexion
             if (!$user->getTimeLastLogin()) {
-                $this->matomoService->trackGoal($this->paramService->get('goal_first_login_id'));
+                $this->matomoService->trackGoal((int) $this->paramService->get('goal_first_login_id'));
             }
 
             // met à jour date dernier login

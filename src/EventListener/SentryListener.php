@@ -8,11 +8,10 @@ use Symfony\Component\HttpKernel\KernelInterface;
 
 class SentryListener
 {
-    private $hub;
-
-    public function __construct(HubInterface $hub, private KernelInterface $kernelInterface)
-    {
-        $this->hub = $hub;
+    public function __construct(
+        private HubInterface $hub,
+        private KernelInterface $kernelInterface
+    ) {
     }
 
     public function onKernelRequest(RequestEvent $event): void

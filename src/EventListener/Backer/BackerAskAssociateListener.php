@@ -4,6 +4,7 @@ namespace App\EventListener\Backer;
 
 use App\Entity\Backer\BackerAskAssociate;
 use App\Service\Notification\NotificationService;
+use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Event\PostUpdateEventArgs;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;

@@ -9,6 +9,7 @@ use App\Entity\Perimeter\Perimeter;
 use App\Entity\Reference\ProjectReference;
 use App\Entity\Search\SearchPage;
 use App\Message\Backer\BackerCountAid;
+use App\Message\Log\MsgDeleteOldLogAdmin;
 use App\Message\Log\MsgLogAidSearchTempTransfert;
 use App\Message\Log\MsgLogAidViewTempTransfert;
 use App\Message\Perimeter\CountyCountBacker;
@@ -37,8 +38,6 @@ class SiteDatasCommand extends Command
         private ManagerRegistry $managerRegistry,
         private MessageBusInterface $bus
     ) {
-        ini_set('max_execution_time', 60 * 60);
-        ini_set('memory_limit', '1G');
         parent::__construct();
     }
 
@@ -81,6 +80,9 @@ class SiteDatasCommand extends Command
 
         // transfert les logs
         $this->transfertLogs();
+
+        // supprime les logs admins trop anciens
+        $this->deleteOldLogAdmins();
 
         // le temps passé
         $timeEnd = microtime(true);
@@ -164,5 +166,10 @@ class SiteDatasCommand extends Command
     {
         $this->bus->dispatch(new MsgLogAidSearchTempTransfert());
         $this->bus->dispatch(new MsgLogAidViewTempTransfert());
+    }
+
+    private function deleteOldLogAdmins(): void
+    {
+        $this->bus->dispatch(new MsgDeleteOldLogAdmin());
     }
 }

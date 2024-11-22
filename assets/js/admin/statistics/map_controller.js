@@ -119,9 +119,9 @@ export default class extends Controller {
     )
     if (!insideLayers.length) return
     const currentDepartmentCode = insideLayers[0].feature.properties.code
-
     if (this.communes[currentDepartmentCode]) {
       this.map.addLayer(this.communes[currentDepartmentCode])
+      
       this.#updateTable(this.communesData[currentDepartmentCode])
     } else {
       this.#getCommunes(currentDepartmentCode).then(({ communes, data }) => {
@@ -181,6 +181,10 @@ export default class extends Controller {
           (incluant les doublons/inscriptions multiples pour un même périmètre).
         </p>
       </div>
+      <div class="fr-table fr-table--layout-fixed fr-table--no-caption fr-table--no-scroll">
+        <div class="fr-table__wrapper">
+          <div class="fr-table__container">
+            <div class="fr-table__content">
       <table
         data-controller="table"
         data-downloadable="true"
@@ -239,6 +243,10 @@ export default class extends Controller {
           </tr>
         </tbody>
       </table>
+      </div>
+      </div>
+      </div>
+      </div>
       <h2>
         EPCI et leurs organisations (département ${department})
       </h2>
@@ -248,6 +256,10 @@ export default class extends Controller {
           (incluant les doublons/inscriptions multiples pour un même périmètre).
         </p>
       </div>
+      <div class="fr-table fr-table--layout-fixed fr-table--no-caption fr-table--no-scroll">
+        <div class="fr-table__wrapper">
+          <div class="fr-table__container">
+            <div class="fr-table__content">
       <table
         data-controller="table"
         data-downloadable="true"
@@ -306,6 +318,10 @@ export default class extends Controller {
           </tr>
         </tbody>
       </table>
+      </div>
+      </div>
+      </div>
+      </div>
     `
   }
 
@@ -496,7 +512,15 @@ export default class extends Controller {
   }
 
   #getCommunes(code) {
-    return fetch(this.communesTarget.getAttribute(`data-src-${code}`))
+    // Sélectionnez la balise <script> avec l'attribut data-src-code correspondant à la variable `code`
+    const scriptElement = document.querySelector(`script[data-dept-code="${code}"]`);
+    let dataSrc = '';
+    // Vérifiez si l'élément existe et récupérez son attribut href
+    if (scriptElement) {
+        dataSrc = scriptElement.getAttribute('data-src');
+    }
+
+    return fetch(dataSrc)
       .then(this.#checkResponse)
       .then((data) => {
         const communes = L.geoJson(data, {

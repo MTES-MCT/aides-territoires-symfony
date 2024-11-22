@@ -7,6 +7,7 @@ use App\Entity\Alert\Alert;
 use App\Entity\User\User;
 use App\Entity\User\UserRegisterConfirmation;
 use App\Service\Email\EmailService;
+use App\Service\File\FileService;
 use App\Service\Matomo\MatomoService;
 use App\Service\Notification\NotificationService;
 use App\Service\Various\ParamService;
@@ -15,7 +16,6 @@ use Doctrine\ORM\Event\PrePersistEventArgs;
 use Doctrine\ORM\Event\PreRemoveEventArgs;
 use Doctrine\Persistence\ManagerRegistry;
 use Psr\Log\LoggerInterface;
-use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class UserListener
 {
@@ -23,11 +23,11 @@ class UserListener
         private ManagerRegistry $managerRegistry,
         private UrlGeneratorInterface $urlGeneratorInterface,
         private ParamService $paramService,
-        private HttpClientInterface $httpClientInterface,
         private EmailService $emailService,
         private MatomoService $matomoService,
         private NotificationService $notificationService,
-        private LoggerInterface $loggerInterface
+        private LoggerInterface $loggerInterface,
+        private FileService $fileService
     ) {
     }
 
@@ -42,6 +42,9 @@ class UserListener
 
     public function onPostPersist(PostPersistEventArgs $args): void
     {
+        if ($this->fileService->getEnvironment() == FileService::ENV_TEST) {
+            return;
+        }
         try {
             /** @var User $entity */
             $entity = $args->getObject();
@@ -117,7 +120,7 @@ class UserListener
             );
 
             // Matomo trackGoal
-            $this->matomoService->trackGoal($this->paramService->get('goal_register_id'));
+            $this->matomoService->trackGoal((int) $this->paramService->get('goal_register_id'));
         } catch (\Exception $e) {
             $this->loggerInterface->error('Erreur dans le postPersist User', [
                 'exception' => $e,

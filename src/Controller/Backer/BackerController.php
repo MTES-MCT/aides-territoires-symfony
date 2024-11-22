@@ -4,9 +4,11 @@ namespace App\Controller\Backer;
 
 use App\Controller\FrontController;
 use App\Entity\Backer\Backer;
+use App\Entity\Perimeter\Perimeter;
 use App\Entity\Category\Category;
 use App\Repository\Aid\AidRepository;
 use App\Repository\Backer\BackerRepository;
+use App\Repository\Perimeter\PerimeterRepository;
 use App\Security\Voter\InternalRequestVoter;
 use App\Service\Api\InternalApiService;
 use App\Service\Backer\BackerService;
@@ -14,6 +16,7 @@ use App\Service\Log\LogService;
 use App\Service\User\UserService;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -162,5 +165,48 @@ class BackerController extends FrontController
                 'message' => $e->getMessage()
             ]);
         }
+    }
+
+    #[Route('/partenaires/autocomplete', name: 'app_backer_autocomplete', options: ['expose' => true])]
+    public function autocomplete(
+        Request $request,
+        BackerRepository $backerRepository,
+        PerimeterRepository $perimeterRepository
+    ): JsonResponse
+    {
+        $idPerimeter = $request->query->get('id_perimeter');
+        $query = $request->query->get('q', '');
+
+        $params = [
+            'nameLike' => $query,
+            'hasFinancedAids' => true,
+            'active' => true,
+            'orderBy' => [
+                'sort' => 'b.name',
+                'order' => 'ASC'
+            ]
+        ];
+        if ($idPerimeter) {
+            $perimeterFrom = $perimeterRepository->findOneBy([
+                'id' => $idPerimeter,
+                'isVisibleToUsers' => true,
+            ]);
+            if ($perimeterFrom instanceof Perimeter) {
+                $params['perimeterFrom'] = $perimeterFrom;
+            }
+        }
+
+        // Filtrer les backers en fonction de searchPerimeter et query
+        $backers = $backerRepository->findCustom($params);
+
+        $results = [];
+        foreach ($backers as $backer) {
+            $results[] = [
+                'value' => $backer->getId(),
+                'text' => $backer->getName(),
+            ];
+        }
+
+        return new JsonResponse($results);
     }
 }
