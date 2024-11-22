@@ -1255,6 +1255,7 @@ class StatisticsController extends DashboardController
                 'epcis_count' => $nbEpci
             ];
         }
+        // dd('Mémoire maximale utilisée : ' . round(memory_get_peak_usage() / 1024 / 1024) . ' MB');
         $countiesOrgCommunesMax = 30; // le chiffre est forcé pour l'affichage
         // libere memoire
         unset($counties);
