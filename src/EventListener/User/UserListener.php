@@ -7,6 +7,7 @@ use App\Entity\Alert\Alert;
 use App\Entity\User\User;
 use App\Entity\User\UserRegisterConfirmation;
 use App\Service\Email\EmailService;
+use App\Service\File\FileService;
 use App\Service\Matomo\MatomoService;
 use App\Service\Notification\NotificationService;
 use App\Service\Various\ParamService;
@@ -25,7 +26,8 @@ class UserListener
         private EmailService $emailService,
         private MatomoService $matomoService,
         private NotificationService $notificationService,
-        private LoggerInterface $loggerInterface
+        private LoggerInterface $loggerInterface,
+        private FileService $fileService
     ) {
     }
 
@@ -40,6 +42,9 @@ class UserListener
 
     public function onPostPersist(PostPersistEventArgs $args): void
     {
+        if ($this->fileService->getEnvironment() == FileService::ENV_TEST) {
+            return;
+        }
         try {
             /** @var User $entity */
             $entity = $args->getObject();
