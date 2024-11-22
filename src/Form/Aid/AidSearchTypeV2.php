@@ -14,6 +14,8 @@ use App\Entity\Category\CategoryTheme;
 use App\Entity\Organization\OrganizationType;
 use App\Entity\Program\Program;
 use App\Entity\Search\SearchPage;
+use App\Form\Type\BackerAutocompleteType;
+use App\Service\User\UserService;
 use App\Form\Type\EntityCheckboxAbsoluteType;
 use App\Form\Type\EntityCheckboxGroupAbsoluteType;
 use App\Form\Type\PerimeterAutocompleteType;
@@ -101,7 +103,6 @@ class AidSearchTypeV2 extends AbstractType
                     'placeholder' => 'Projet référent ou mot-clé'
                 ],
                 'autocomplete' => true,
-                'autocomplete_url' => $this->routerInterface->generate('app_project_reference_ajax_ux_autocomplete'),
                 'tom_select_options' => [
                     'create' => true,
                     'createOnBlur' => true,
@@ -197,26 +198,18 @@ class AidSearchTypeV2 extends AbstractType
                     'multiple' => true,
                     'expanded' => true
                 ])
-                ->add(AidSearchFormService::QUERYSTRING_KEY_BACKER_IDS, EntityType::class, [
+                ->add(AidSearchFormService::QUERYSTRING_KEY_BACKER_IDS, BackerAutocompleteType::class, [
                     'required' => false,
                     'label' => 'Porteurs d\'aides',
+                    'help' => 'Filtré par le champ "Votre territoire"',
                     'class' => Backer::class,
                     'choice_label' => 'name',
                     'attr' => [
+                        'data-controller' => 'backer-autocomplete',
                         'placeholder' => 'Tous les porteurs d\'aides',
                     ],
                     'autocomplete' => true,
                     'multiple' => true,
-                    'query_builder' => function (BackerRepository $backerRepository) {
-                        return $backerRepository->getQueryBuilder([
-                            'hasFinancedAids' => true,
-                            'active' => true,
-                            'orderBy' => [
-                                'sort' => 'b.name',
-                                'order' => 'ASC'
-                            ]
-                        ]);
-                    },
                 ])
                 ->add(AidSearchFormService::QUERYSTRING_KEY_APPLY_BEFORE, DateType::class, [
                     'required' => false,

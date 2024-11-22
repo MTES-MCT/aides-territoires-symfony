@@ -287,7 +287,6 @@ class BackerRepository extends ServiceEntityRepository
         $hasLogo = $params['hasLogo'] ?? null;
         $isSpotlighted = $params['isSpotlighted'] ?? null;
         $orderRand = $params['orderRand'] ?? null;
-        $limit = $params['limit'] ?? null;
         $firstResult = $params['firstResult'] ?? null;
         $maxResults = $params['maxResults'] ?? null;
         $nameLike = $params['nameLike'] ?? null;
@@ -296,6 +295,7 @@ class BackerRepository extends ServiceEntityRepository
         $active = isset($params['active']) ? $params['active'] : null;
         $nbAidsLiveMin = $params['nbAidsLiveMin'] ?? null;
         $backerGroup = $params['backerGroup'] ?? null;
+        $perimeterFrom = $params['perimeterFrom'] ?? null;
         $orderBy =
             (isset($params['orderBy'])
             && isset($params['orderBy']['sort'])
@@ -378,6 +378,17 @@ class BackerRepository extends ServiceEntityRepository
             $qb
                 ->andWhere('b.backerGroup = :backerGroup')
                 ->setParameter('backerGroup', $backerGroup)
+            ;
+        }
+
+        if ($perimeterFrom instanceof Perimeter && $perimeterFrom->getId()) {
+            $ids = $this->getEntityManager()->getRepository(Perimeter::class)->getIdPerimetersContainedIn(['perimeter' => $perimeterFrom]);
+            $ids[] = $perimeterFrom->getId();
+
+            $qb
+                ->innerJoin('b.perimeter', 'perimeter')
+                ->andWhere('perimeter.id IN (:ids)')
+                ->setParameter('ids', $ids)
             ;
         }
 
