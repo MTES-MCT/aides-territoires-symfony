@@ -10,9 +10,7 @@ use App\Entity\Backer\BackerCategory;
 use App\Entity\Backer\BackerGroup;
 use App\Entity\Organization\OrganizationType;
 use App\Entity\Perimeter\Perimeter;
-use App\Entity\User\User;
 use App\Repository\Aid\AidRepository;
-use App\Repository\Perimeter\PerimeterRepository;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\QueryBuilder;
@@ -36,14 +34,14 @@ class BackerRepository extends ServiceEntityRepository
     public static function activeCriteria($alias = 'b.'): Criteria
     {
         return Criteria::create()
-            ->andWhere(Criteria::expr()->eq($alias . 'active', true))
+            ->andWhere(Criteria::expr()->eq($alias.'active', true))
         ;
     }
 
     public static function unactiveCriteria($alias = 'b.'): Criteria
     {
         return Criteria::create()
-            ->andWhere(Criteria::expr()->eq($alias . 'active', false))
+            ->andWhere(Criteria::expr()->eq($alias.'active', false))
         ;
     }
 
@@ -60,9 +58,8 @@ class BackerRepository extends ServiceEntityRepository
         }
     }
 
-    public function countBackerWithAidInCounty(array $params = null)
+    public function countBackerWithAidInCounty(?array $params = null)
     {
-
         $queryBuilder = $this->createQueryBuilder('b');
 
         $perimeterFrom = $this->getEntityManager()->getRepository(Perimeter::class)->find($params['id']);
@@ -84,7 +81,7 @@ class BackerRepository extends ServiceEntityRepository
         return $queryBuilder->getQuery()->getResult()[0]['nb'] ?? 0;
     }
 
-    public function findBackerWithAidInCounty(array $params = null)
+    public function findBackerWithAidInCounty(?array $params = null)
     {
         $perimeterFrom = $params['perimeterFrom'] ?? null;
         $organizationType = $params['organizationType'] ?? null;
@@ -103,10 +100,10 @@ class BackerRepository extends ServiceEntityRepository
 
         $qb = $this->createQueryBuilder('b');
 
-        if ($active === true) {
+        if (true === $active) {
             $qb
                 ->addCriteria(self::activeCriteria());
-        } elseif ($active === false) {
+        } elseif (false === $active) {
             $qb
                 ->addCriteria(self::unactiveCriteria());
         }
@@ -133,7 +130,6 @@ class BackerRepository extends ServiceEntityRepository
 
             $backerGroupAdded = true;
         }
-
 
         if ($organizationType instanceof OrganizationType && $organizationType->getId()) {
             $qb
@@ -180,7 +176,7 @@ class BackerRepository extends ServiceEntityRepository
             ;
         }
 
-        if ($orderBy !== null) {
+        if (null !== $orderBy) {
             $qb
                 ->addOrderBy($orderBy['sort'], $orderBy['order']);
         }
@@ -188,7 +184,7 @@ class BackerRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult();
     }
 
-    public function countWithAids(array $params = null): int
+    public function countWithAids(?array $params = null): int
     {
         $qb = $this->getQueryBuilder($params);
 
@@ -201,16 +197,16 @@ class BackerRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult()[0]['nb'] ?? 0;
     }
 
-
-    public function countCustom(array $params = null): int
+    public function countCustom(?array $params = null): int
     {
         $qb = $this->getQueryBuilder($params);
 
         $qb->select('IFNULL(COUNT(DISTINCT(b.id)), 0) AS nb');
+
         return $qb->getQuery()->getResult()[0]['nb'] ?? 0;
     }
 
-    public function findAidLive(array $params = null): array
+    public function findAidLive(?array $params = null): array
     {
         $perimeter = $params['perimeter'] ?? null;
 
@@ -242,7 +238,7 @@ class BackerRepository extends ServiceEntityRepository
         ;
     }
 
-    public function findAidFinancersFinancial(array $params = null): array
+    public function findAidFinancersFinancial(?array $params = null): array
     {
         return $this->createQueryBuilder('b')
             ->innerJoin('b.aidFinancers', 'aidFinancers')
@@ -262,7 +258,8 @@ class BackerRepository extends ServiceEntityRepository
             ->getResult()
         ;
     }
-    public function findSelectedForHome(array $params = null): array
+
+    public function findSelectedForHome(?array $params = null): array
     {
         $params['hasLogo'] = true;
         $params['isSpotlighted'] = true;
@@ -274,14 +271,14 @@ class BackerRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult();
     }
 
-    public function findCustom(array $params = null): array
+    public function findCustom(?array $params = null): array
     {
         $qb = $this->getQueryBuilder($params);
 
         return $qb->getQuery()->getResult();
     }
 
-    public function getQueryBuilder(array $params = null): QueryBuilder
+    public function getQueryBuilder(?array $params = null): QueryBuilder
     {
         $ids = $params['ids'] ?? null;
         $hasLogo = $params['hasLogo'] ?? null;
@@ -303,6 +300,7 @@ class BackerRepository extends ServiceEntityRepository
                 ? $params['orderBy']
                 : null
         ;
+        $limit = $params['limit'] ?? null;
 
         $qb = $this->createQueryBuilder('b');
 
@@ -312,41 +310,41 @@ class BackerRepository extends ServiceEntityRepository
                 ->setParameter('ids', $ids);
         }
 
-        if ($active === true) {
+        if (true === $active) {
             $qb
                 ->addCriteria(BackerRepository::activeCriteria());
-        } elseif ($active === false) {
+        } elseif (false === $active) {
             $qb
                 ->addCriteria(BackerRepository::unactiveCriteria());
         }
 
-        if ($nbAidsLiveMin !== null) {
+        if (null !== $nbAidsLiveMin) {
             $qb
                 ->andWhere('b.nbAidsLive >= :nbAidsLiveMin')
                 ->setParameter('nbAidsLiveMin', $nbAidsLiveMin)
             ;
         }
 
-        if ($hasLogo === true) {
+        if (true === $hasLogo) {
             $qb
                 ->andWhere('b.logo IS NOT NULL');
         }
 
-        if ($isSpotlighted === true) {
+        if (true === $isSpotlighted) {
             $qb
                 ->andWhere('b.isSpotlighted = :isSpotlighted')
                 ->setParameter('isSpotlighted', true)
             ;
         }
 
-        if ($nameLike !== null) {
+        if (null !== $nameLike) {
             $qb
                 ->andWhere('b.name LIKE :nameLike')
-                ->setParameter('nameLike', '%' . $nameLike . '%')
+                ->setParameter('nameLike', '%'.$nameLike.'%')
             ;
         }
 
-        if ($hasFinancedAids !== null) {
+        if (null !== $hasFinancedAids) {
             if ($hasFinancedAids) {
                 $qb
                     ->innerJoin('b.aidFinancers', 'aidFinancersForHasFinancedAids');
@@ -357,7 +355,7 @@ class BackerRepository extends ServiceEntityRepository
             }
         }
 
-        if ($hasPublishedFinancedAids !== null) {
+        if (null !== $hasPublishedFinancedAids) {
             if ($hasPublishedFinancedAids) {
                 $qb
                     ->innerJoin('b.aidFinancers', 'aidFinancersForHasPublishedFinancedAids')
@@ -392,21 +390,21 @@ class BackerRepository extends ServiceEntityRepository
             ;
         }
 
-        if ($orderRand === true) {
+        if (true === $orderRand) {
             $qb->orderBy('RAND()');
         }
 
-        if ($orderBy !== null) {
+        if (null !== $orderBy) {
             $qb->orderBy($orderBy['sort'], $orderBy['order']);
         }
 
-        if ($firstResult !== null) {
+        if (null !== $firstResult) {
             $qb->setFirstResult($firstResult);
         }
-        if ($maxResults !== null) {
+        if (null !== $maxResults) {
             $qb->setMaxResults($maxResults);
         }
-        if ($limit !== null) {
+        if (null !== $limit) {
             $qb->setMaxResults($limit);
         }
 

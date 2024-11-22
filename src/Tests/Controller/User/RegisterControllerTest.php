@@ -23,7 +23,7 @@ class RegisterControllerTest extends AtWebTestCase
         $form = $crawler->selectButton('Je crée mon compte')->form([
             'register[firstname]' => 'John',
             'register[lastname]' => 'Doe',
-            'register[email]' => 'test@at.com',
+            'register[email]' => 'test'.random_int(0, 500).'@at.com',
             'register[password][first]' => '#123Password',
             'register[password][second]' => '#123Password',
             'register[perimeter]' => 1,

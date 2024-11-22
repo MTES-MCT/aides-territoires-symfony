@@ -25,7 +25,7 @@ export default class extends Controller {
 
         // Récupérer dynamiquement la valeur de #searchPerimeter à chaque appel
         options.load = (query, callback) => {
-            const id_perimeter = document.querySelector('#searchPerimeter').value || ''; // Prendre une valeur vide si le champ est vide
+            const id_perimeter = document.querySelector('#perimeter_id').value || ''; // Prendre une valeur vide si le champ est vide
             const urlFromRoute = Routing.generate('app_backer_autocomplete');
             const url = new URL(urlFromRoute, window.location.origin);
 
