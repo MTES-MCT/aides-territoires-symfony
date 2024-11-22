@@ -25,7 +25,7 @@ class BackerAutocompleteType extends AbstractType
             'placeholder' => 'Tous les porteurs d\'aides',
             'choice_label' => 'name',
             'data_class' => null,
-            'preload' => false,
+            'preload' => true,
             'query_builder' => function (BackerRepository $backerRepository) {
                 return $backerRepository->getQueryBuilder([
                     'hasFinancedAids' => true,
