@@ -408,3 +408,20 @@ p {
     }
   }
 }
+
+table{
+  th{
+    &.sorting_asc{
+      &::after{
+        content: "▲";
+        margin-left: 0.5rem;
+      }
+    }
+    &.sorting_desc{
+      &::after{
+        content: "▼";
+        margin-left: 0.5rem;
+      }
+    }
+  }
+}

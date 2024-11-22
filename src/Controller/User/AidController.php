@@ -364,6 +364,9 @@ class AidController extends FrontController
         $formAid->handleRequest($requestStack->getCurrentRequest());
         if ($formAid->isSubmitted()) {
             if ($formAid->isValid()) {
+                // met à jour le dernier éditeur
+                $aid->setLastEditor($user);
+                
                 // les financers
                 foreach ($aid->getAidFinancers() as $aidFinancer) {
                     $aid->removeAidFinancer($aidFinancer);
