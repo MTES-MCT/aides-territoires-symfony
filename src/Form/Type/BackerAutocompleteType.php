@@ -14,7 +14,7 @@ use Symfony\UX\Autocomplete\Form\BaseEntityAutocompleteType;
 class BackerAutocompleteType extends AbstractType
 {
     public function __construct(
-        protected PerimeterService $perimeterService
+        protected PerimeterService $perimeterService,
     ) {
     }
 
@@ -32,8 +32,8 @@ class BackerAutocompleteType extends AbstractType
                     'active' => true,
                     'orderBy' => [
                         'sort' => 'b.name',
-                        'order' => 'ASC'
-                    ]
+                        'order' => 'ASC',
+                    ],
                 ]);
             },
         ]);
