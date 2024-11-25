@@ -12,6 +12,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\OpenApi\Model;
 use App\Controller\Api\Keyword\KeywordSynonymlistController;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -22,6 +23,10 @@ use Symfony\Component\Validator\Constraints as Assert;
             uriTemplate: '/synonymlists/',
             controller: KeywordSynonymlistController::class,
             normalizationContext: ['groups' => self::API_GROUP_LIST],
+            openapi: new Model\Operation(
+                summary: 'Ancienne liste de mots clés',
+                tags: [self::API_TAG],
+            ),
         ),
     ],
 )]
@@ -30,6 +35,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 class KeywordSynonymlist
 {
     public const API_GROUP_LIST = 'keywordsynonymlist:list';
+    public const API_TAG = 'Mots clés (obsolete)';
 
     #[ORM\Id]
     #[ORM\GeneratedValue]
