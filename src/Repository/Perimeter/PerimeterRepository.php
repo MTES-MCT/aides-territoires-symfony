@@ -29,6 +29,35 @@ class PerimeterRepository extends ServiceEntityRepository
         parent::__construct($registry, Perimeter::class);
     }
 
+    public static function completeQueryBuilderForSearch(QueryBuilder $qb, string $query): QueryBuilder
+    {
+        // c'est un code postal
+        if (preg_match('/^[\d]{5}$/', $query)) {
+            $qb
+                ->andWhere('
+                    p.zipcodes LIKE :zipcodes
+                ')
+                ->setParameter('zipcodes', '%' . $query . '%');
+        } else {
+            $query = trim(preg_replace('/[+\-<>\(\)~*@]/', ' ', $query));
+            $qb
+            ->addSelect('MATCH_AGAINST(p.name) AGAINST(:name) AS HIDDEN relevance_score')
+            ->addSelect('CASE WHEN p.name LIKE :startMatch THEN 1 ELSE 0 END AS HIDDEN start_match')
+            ->andWhere('MATCH_AGAINST(p.name) AGAINST(:name) > 0 OR p.name LIKE :partialMatch')
+            ->setParameter('name', $query . '*')
+            ->setParameter('startMatch', $query . '%')
+            ->setParameter('partialMatch', '%' . $query . '%');
+
+            // Trier d'abord par les correspondances qui commencent par la recherche
+            // Ensuite, trier par score de pertinence pour les résultats de `MATCH_AGAINST`
+            $qb->orderBy('start_match', 'DESC')
+                ->addOrderBy('relevance_score', 'DESC');
+        }
+
+
+        return $qb;
+    }
+
     public function getBiggestCity($idPerimeter, ?array $params = null): ?Perimeter
     {
         $params['scale'] = Perimeter::SCALE_COMMUNE;
@@ -265,7 +294,6 @@ class PerimeterRepository extends ServiceEntityRepository
         $zipcodes = $params['zipcodes'] ?? null;
         $firstResult = $params['firstResult'] ?? null;
         $maxResults = $params['maxResults'] ?? null;
-        $nameMatchAgainst = $params['nameMatchAgainst'] ?? null;
         $isVisibleToUsers = $params['isVisibleToUsers'] ?? null;
         $scaleLowerThan = $params['scaleLowerThan'] ?? null;
         $isObsolete = $params['isObsolete'] ?? null;
@@ -301,42 +329,9 @@ class PerimeterRepository extends ServiceEntityRepository
             $qb->andWhere('p.isObsolete = :isObsolete')
                 ->setParameter('isObsolete', $isObsolete);
         }
-        if ($nameMatchAgainst !== null) {
-            $nameMatchAgainst = $this->stringService->sanitizeBooleanSearch($nameMatchAgainst);
-            $qb
-                ->andWhere('MATCH_AGAINST(p.name) AGAINST (:nameMatchAgainst) > 1')
-                ->setParameter('nameMatchAgainst', $nameMatchAgainst);
-        }
 
         if ($searchLike !== null) {
-            // c'est un code postal
-            if (preg_match('/^[0-9]{5}$/', $searchLike)) {
-                $qb
-                    ->andWhere('
-                    p.zipcodes LIKE :zipcodes
-                ')
-                    ->setParameter('zipcodes', '%' . $searchLike . '%');
-                ;
-            } else { // c'est une string
-                $strings = [$searchLike];
-                if (strpos($searchLike, ' ') !== false) {
-                    $strings[] = str_replace(' ', '-', $searchLike);
-                }
-                if (strpos($searchLike, '-') !== false) {
-                    $strings[] = str_replace('-', ' ', $searchLike);
-                }
-
-                $sqlWhere = '';
-                for ($i = 0; $i < count($strings); $i++) {
-                    $sqlWhere .= ' p.name LIKE :nameLike' . $i;
-                    if ($i < count($strings) - 1) {
-                        $sqlWhere .= ' OR ';
-                    }
-                    $qb->setParameter('nameLike' . $i, '%' . $strings[$i] . '%');
-                }
-                $qb
-                    ->andWhere($sqlWhere);
-            }
+            $qb = self::completeQueryBuilderForSearch($qb, $searchLike);
         }
 
         if (is_array($insees)) {

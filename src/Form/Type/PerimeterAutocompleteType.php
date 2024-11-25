@@ -40,29 +40,7 @@ class PerimeterAutocompleteType extends AbstractType
                     return;
                 }
 
-                // c'est un code postal
-                if (preg_match('/^[0-9]{5}$/', $query)) {
-                    $qb
-                        ->andWhere('
-                        p.zipcodes LIKE :zipcodes
-                    ')
-                        ->setParameter('zipcodes', '%' . $query . '%');
-                    ;
-                } else { // c'est une string
-                    $query = str_replace(' ', '-', $query);
-                    $qb
-                    ->addSelect('MATCH_AGAINST(p.name) AGAINST(:name) AS HIDDEN relevance_score')
-                    ->addSelect('CASE WHEN p.name LIKE :startMatch THEN 1 ELSE 0 END AS HIDDEN start_match')
-                    ->andWhere('MATCH_AGAINST(p.name) AGAINST(:name) > 0 OR p.name LIKE :partialMatch')
-                    ->setParameter('name', $query . '*')
-                    ->setParameter('startMatch', $query . '%')
-                    ->setParameter('partialMatch', '%' . $query . '%');
-
-                    // Trier d'abord par les correspondances qui commencent par la recherche
-                    // Ensuite, trier par score de pertinence pour les résultats de `MATCH_AGAINST`
-                    $qb->orderBy('start_match', 'DESC')
-                        ->addOrderBy('relevance_score', 'DESC');
-                }
+                $qb = PerimeterRepository::completeQueryBuilderForSearch($qb, $query);
             },
         ]);
     }
