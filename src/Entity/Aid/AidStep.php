@@ -16,7 +16,7 @@ use App\Controller\Api\Aid\AidStepController;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ApiResource(
-    shortName: 'Aid',
+    shortName: 'aid_step',
     operations: [
         new GetCollection(
             uriTemplate: '/aids/steps/',
@@ -24,6 +24,7 @@ use Symfony\Component\Validator\Constraints as Assert;
             openapi: new Model\Operation(
                 summary: self::API_DESCRIPTION,
                 description: self::API_DESCRIPTION,
+                tags: [Aid::API_TAG]
             ),
         ),
     ],

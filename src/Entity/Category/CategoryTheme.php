@@ -19,7 +19,7 @@ use Doctrine\ORM\Mapping\OrderBy;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ApiResource(
-    shortName: 'Thématiques',
+    shortName: 'category_theme',
     operations: [
         new GetCollection(
             uriTemplate: '/themes/',
@@ -27,6 +27,7 @@ use Symfony\Component\Validator\Constraints as Assert;
             normalizationContext: ['groups' => self::API_GROUP_LIST],
             openapi: new Model\Operation(
                 summary: 'Lister toutes les thématiques (avec leur liste de sous-thématiques)',
+                tags: [self::API_TAG],
             ),
         ),
     ],
@@ -35,6 +36,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 class CategoryTheme
 {
     public const API_GROUP_LIST = 'category_theme:list';
+    public const API_TAG = 'Thématiques';
 
     #[ORM\Id]
     #[ORM\GeneratedValue]

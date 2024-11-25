@@ -14,7 +14,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ApiResource(
-    shortName: 'Projets référents',
+    shortName: 'project_reference_category',
     operations: [
         new GetCollection(
             uriTemplate: '/project-reference-categories/',
@@ -23,6 +23,7 @@ use Symfony\Component\Validator\Constraints as Assert;
             openapi: new Model\Operation(
                 summary: self::API_DESCRIPTION,
                 description: self::API_DESCRIPTION,
+                tags: [ProjectReference::API_TAG],
             ),
             paginationEnabled: true,
             paginationItemsPerPage: 50,

@@ -33,7 +33,7 @@ use App\Service\Doctrine\DoctrineConstants;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ApiResource(
-    shortName: 'Périmètres',
+    shortName: 'perimeter',
     operations: [
         new GetCollection(
             uriTemplate: '/perimeters/',
@@ -42,6 +42,7 @@ use Symfony\Component\Validator\Constraints as Assert;
             openapi: new Model\Operation(
                 summary: self::API_DESCRIPTION,
                 description: self::API_DESCRIPTION,
+                tags: [self::API_TAG]
             ),
             paginationEnabled: true,
             paginationItemsPerPage: 50,
@@ -52,6 +53,10 @@ use Symfony\Component\Validator\Constraints as Assert;
             normalizationContext: ['groups' => self::API_GROUP_ITEM],
             uriTemplate: '/perimeters/{id}/',
             controller: PerimeterController::class,
+            openapi: new Model\Operation(
+                summary: 'Retrouvez un périmètre par son identifiant',
+                tags: [self::API_TAG]
+            ),
         ),
     ]
 )]
@@ -72,6 +77,7 @@ class Perimeter // NOSONAR too much methods
     public const API_GROUP_LIST = 'perimeter:list';
     public const API_GROUP_ITEM = 'perimeter:item';
     public const API_DESCRIPTION = 'Lister tous les périmètres';
+    public const API_TAG = 'Périmètres';
 
     public const SCALE_COMMUNE_NAME = 'commune';
     public const SCALE_EPCI_NAME = 'epci';

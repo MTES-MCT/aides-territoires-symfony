@@ -40,7 +40,7 @@ use App\Filter\Backer\HasPublishedFinancedAidsFilter;
 #[ORM\Index(columns: ['slug'], name: 'slug_backer')]
 #[ORM\Index(columns: ['is_corporate'], name: 'is_corporate_backer')]
 #[ApiResource(
-    // shortName: 'Porteurs',
+    shortName: 'backer',
     operations: [
         new GetCollection(
             uriTemplate: '/backers/',
@@ -49,6 +49,7 @@ use App\Filter\Backer\HasPublishedFinancedAidsFilter;
             openapi: new Model\Operation(
                 summary: self::API_DESCRIPTION,
                 description: self::API_DESCRIPTION,
+                tags: [self::API_TAG],
             ),
             paginationEnabled: true,
             paginationItemsPerPage: 50,
@@ -82,6 +83,7 @@ use App\Filter\Backer\HasPublishedFinancedAidsFilter;
 #[ORM\Entity(repositoryClass: BackerRepository::class)]
 class Backer // NOSONAR too much methods
 {
+    public const API_TAG = 'Porteurs d\'aides';
     public const API_DESCRIPTION = 'Lister tous les porteurs d\'aides';
     public const API_GROUP_LIST = 'backer:list';
     public const FOLDER = 'backers';

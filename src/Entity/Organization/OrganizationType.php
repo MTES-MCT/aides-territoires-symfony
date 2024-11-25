@@ -25,7 +25,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Index(columns: ['date_create'], name: 'date_create_orgt')]
 #[ORM\Index(columns: ['slug'], name: 'slug_orgt')]
 #[ApiResource(
-    shortName: 'Aid',
+    shortName: 'organization_type',
     operations: [
         new GetCollection(
             priority: 500,
@@ -34,6 +34,7 @@ use Symfony\Component\Validator\Constraints as Assert;
             normalizationContext: ['groups' => self::API_GROUP_LIST],
             openapi: new Model\Operation(
                 summary: self::API_DESCRIPTION,
+                tags: [Aid::API_TAG]
             ),
         ),
     ],

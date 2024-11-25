@@ -25,6 +25,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Index(columns: ['slug'], name: 'slug_program')]
 #[ORM\Index(columns: ['is_spotlighted'], name: 'is_spotlighted_program')]
 #[ApiResource(
+    shortName: 'program',
     operations: [
         new GetCollection(
             uriTemplate: '/programs/',
@@ -32,6 +33,7 @@ use Symfony\Component\Validator\Constraints as Assert;
             normalizationContext: ['groups' => self::API_GROUP_LIST],
             openapi: new Model\Operation(
                 summary: 'Lister tous les programmes d\'aides',
+                tags: [self::API_TAG],
             ),
         ),
     ],
@@ -42,6 +44,7 @@ class Program // NOSONAR too much methods
     public const FOLDER = 'programs';
 
     public const API_GROUP_LIST = 'program:list';
+    public const API_TAG = 'Programmes d\'aide';
 
     #[ORM\Id]
     #[ORM\GeneratedValue]

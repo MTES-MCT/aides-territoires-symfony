@@ -93,6 +93,7 @@ use Symfony\Component\Validator\Constraints as Assert;
     flags: ['fulltext']
 )]
 #[ApiResource(
+    shortName: 'aid',
     operations: [
         new GetCollection(
             name: self::API_OPERATION_GET_COLLECTION_PUBLISHED,
@@ -102,6 +103,7 @@ use Symfony\Component\Validator\Constraints as Assert;
             openapi: new Model\Operation(
                 summary: 'Lister toutes les aides actuellement publiées',
                 description: 'Lister toutes les aides actuellement publiées',
+                tags: [self::API_TAG]
             )
         ),
         new Get(
@@ -109,12 +111,20 @@ use Symfony\Component\Validator\Constraints as Assert;
             normalizationContext: ['groups' => self::API_GROUP_ITEM],
             uriTemplate: '/aids/{slug}/',
             controller: AidAidController::class,
+            openapi: new Model\Operation(
+                summary: 'Retrouver une aide par slug',
+                tags: [self::API_TAG]
+            )
         ),
         new Get(
             name: self::API_OPERATION_GET_BY_ID,
             normalizationContext: ['groups' => self::API_GROUP_ITEM],
             uriTemplate: '/aids/by-id/{id}/',
             controller: AidAidController::class,
+            openapi: new Model\Operation(
+                summary: 'Retrouver une aide par son identifiant',
+                tags: [self::API_TAG]
+            )
         ),
     ],
     order: ['dateStart' => 'DESC', 'id' => 'DESC'],
@@ -154,6 +164,7 @@ class Aid // NOSONAR too much methods
     public const API_OPERATION_GET_BY_SLUG = 'api_aid_get_by_slug';
     public const API_OPERATION_GET_COLLECTION_PUBLISHED = 'api_aids_published';
     public const API_OPERATION_GET_COLLECTION_ALL = 'api_aids_all';
+    public const API_TAG = 'Aides';
 
     public const API_GROUP_LIST = 'aid:list';
     public const API_GROUP_ITEM = 'aid:item';
