@@ -20,7 +20,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ApiResource(
-    shortName: 'Projets référents',
+    shortName: 'project_reference',
     operations: [
         new GetCollection(
             uriTemplate: '/project-references/',
@@ -29,6 +29,7 @@ use Symfony\Component\Validator\Constraints as Assert;
             openapi: new Model\Operation(
                 summary: self::API_DESCRIPTION,
                 description: self::API_DESCRIPTION,
+                tags: [self::API_TAG],
             ),
             paginationEnabled: true,
             paginationItemsPerPage: 50,
@@ -47,6 +48,7 @@ class ProjectReference
     public const API_GROUP_LIST = 'project_reference:list';
     public const API_GROUP_ITEM = 'project_reference:item';
     public const API_DESCRIPTION = 'Lister tous les projets référents';
+    public const API_TAG = 'Projets référents';
 
     #[Groups([self::API_GROUP_LIST, self::API_GROUP_ITEM, Aid::API_GROUP_LIST, Aid::API_GROUP_ITEM])]
     #[ORM\Id]

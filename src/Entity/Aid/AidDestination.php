@@ -16,7 +16,7 @@ use ApiPlatform\OpenApi\Model;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ApiResource(
-    shortName: 'Aid',
+    shortName: 'aid_destination',
     operations: [
         new GetCollection(
             uriTemplate: '/aids/destinations/',
@@ -24,6 +24,7 @@ use Symfony\Component\Validator\Constraints as Assert;
             openapi: new Model\Operation(
                 summary: self::API_DESCRIPTION,
                 description: self::API_DESCRIPTION,
+                tags: [Aid::API_TAG]
             ),
         ),
     ],

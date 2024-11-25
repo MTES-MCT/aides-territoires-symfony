@@ -6,9 +6,10 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\OpenApi\Model;
 use App\Controller\Api\Perimeter\PerimeterController;
+use App\Entity\Perimeter\Perimeter;
 
 #[ApiResource(
-    shortName: 'Périmètres',
+    shortName: 'perimeter_scales',
     operations: [
         new GetCollection(
             name: self::API_OPERATION_NAME,
@@ -17,6 +18,7 @@ use App\Controller\Api\Perimeter\PerimeterController;
             normalizationContext: ['groups' => self::API_GROUP_LIST],
             openapi: new Model\Operation(
                 summary: 'Lister tous les choix d\'échelles',
+                tags: [Perimeter::API_TAG]
             )
         ),
     ],

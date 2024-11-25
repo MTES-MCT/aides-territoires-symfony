@@ -8,7 +8,16 @@ api_platform:
                 </thead>
                 <tbody>
                     <tr>
-                        <td>1.8 (actuelle)</td>
+                        <td>1.8.1 (actuelle)</td>
+                        <td>
+                            <ul>
+                                <li>Mise à jour de la documentation</li>
+                                <li><strong>Thématiques</strong> ajout du point d’entrée <code>/api/categories</code></li>
+                                <li>Les 'Hydra paths' sont maintenant accessibles publiquement <code>/api/contexts/Entrypoint/</code></li>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>1.8</td>
                         <td>
                             <h3>Normalization :</h3>
                             <p><strong>Tous les filtres de recherche ainsi que les champs de données d'API sont maintenant en <strong>snake_case</strong>, ex: category_slugs, zip_code...</strong></p>

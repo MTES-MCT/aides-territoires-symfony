@@ -16,7 +16,7 @@ use Gedmo\Mapping\Annotation as Gedmo;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ApiResource(
-    // shortName: 'Porteurs',
+    shortName: 'backer_group',
     operations: [
         new GetCollection(
             uriTemplate: '/backer-groups/',
@@ -25,6 +25,7 @@ use Symfony\Component\Validator\Constraints as Assert;
             openapi: new Model\Operation(
                 summary: self::API_DESCRIPTION,
                 description: self::API_DESCRIPTION,
+                tags: [Backer::API_TAG],
             ),
             paginationEnabled: true,
             paginationItemsPerPage: 50,

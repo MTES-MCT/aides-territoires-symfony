@@ -46,7 +46,7 @@ class PerimeterController extends ApiController
                 $q = $queryParams['q'];
             }
             $q = trim(strip_tags((string) $q));
-            $params['nameMatchAgainst'] = $q;
+            $params['searchLike'] = $q;
         }
 
         if (isset($queryParams['searchLike'])) {
@@ -82,8 +82,8 @@ class PerimeterController extends ApiController
         }
 
         // requete pour compter sans la pagination
-        $count = $perimeterRepository->countCustom($params);
-
+        $count = count($perimeterRepository->findCustom($params));
+        
         // requete pour les résultats avec la pagination
         $params['firstResult'] = ($this->getPage() - 1) * $this->getItemsPerPage();
         $params['maxResults'] = $this->getItemsPerPage();

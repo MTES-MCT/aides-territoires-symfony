@@ -16,7 +16,7 @@ use App\Controller\Api\Aid\AidTypeController;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ApiResource(
-    shortName: 'Aid',
+    shortName: 'aid_type',
     operations: [
         new GetCollection(
             uriTemplate: '/aids/types/',
@@ -24,6 +24,7 @@ use Symfony\Component\Validator\Constraints as Assert;
             openapi: new Model\Operation(
                 summary: self::API_DESCRIPTION,
                 description: self::API_DESCRIPTION,
+                tags: [Aid::API_TAG]
             ),
         ),
     ],

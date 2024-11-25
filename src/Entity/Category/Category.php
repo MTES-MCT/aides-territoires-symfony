@@ -2,10 +2,17 @@
 
 namespace App\Entity\Category;
 
+use ApiPlatform\Metadata\ApiFilter;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\OpenApi\Model;
+use App\Controller\Api\Category\CategoryController;
 use App\Entity\Aid\Aid;
 use App\Entity\Blog\BlogPromotionPost;
 use App\Entity\Log\LogAidSearch;
 use App\Entity\Search\SearchPage;
+use App\Filter\AtSearchFilter;
+use App\Filter\Category\CategoryThemeIdFilter;
 use App\Repository\Category\CategoryRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -15,6 +22,40 @@ use Gedmo\Mapping\Annotation as Gedmo;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
+#[ApiResource(
+    shortName: 'category_theme',
+    operations: [
+        new GetCollection(
+            uriTemplate: '/categories/',
+            controller: CategoryController::class,
+            normalizationContext: ['groups' => self::API_GROUP_LIST],
+            openapi: new Model\Operation(
+                summary: 'Lister toutes les sous-thématiques',
+                tags: [CategoryTheme::API_TAG],
+            ),
+        ),
+    ],
+)]
+#[ApiFilter(
+    AtSearchFilter::class,
+    properties: ['name' => 'partial'],
+    arguments: [
+        'swaggerDescription' => [
+            'name' => 'q',
+            'description' => '<p>Rechercher par nom.</p><p>Note : il est possible d\'avoir des résultats '
+                . 'pertinents avec seulement le début du nom.</p>',
+            'openapi' => [
+                'examples' => [
+                    ['value' => 'ademe', 'summary' => 'ademe'],
+                    ['value' => 'conseil régional', 'summary' => 'conseil régional'],
+                    ['value' => 'agenc', 'summary' => 'agenc'],
+                ],
+                'example' => 'commune'
+            ]
+        ]
+    ]
+)]
+#[ApiFilter(CategoryThemeIdFilter::class)]
 #[ORM\Index(columns: ['name'], name: 'name_aid')]
 #[ORM\Index(columns: ['name'], name: 'name_category_fulltext', flags: ['fulltext'])]
 #[ORM\Entity(repositoryClass: CategoryRepository::class)]

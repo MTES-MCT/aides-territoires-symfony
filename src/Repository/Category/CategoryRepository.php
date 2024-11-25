@@ -3,6 +3,7 @@
 namespace App\Repository\Category;
 
 use App\Entity\Category\Category;
+use App\Entity\Category\CategoryTheme;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -20,6 +21,16 @@ class CategoryRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Category::class);
     }
+
+    public function countCustom(array $params = null): int
+    {
+        $qb = $this->getQueryBuilder($params);
+
+        $qb->select('IFNULL(COUNT(c.id), 0) AS nb');
+
+        return $qb->getQuery()->getResult()[0]['nb'] ?? 0;
+    }
+
 
     public function getNames(?array $params = null): array
     {
@@ -92,6 +103,8 @@ class CategoryRepository extends ServiceEntityRepository
         $ids = $params['ids'] ?? null;
         $words = $params['words'] ?? null;
         $slugs = $params['slugs'] ?? null;
+        $nameLike = $params['nameLike'] ?? null;
+        $categoryTheme = $params['categoryTheme'] ?? null;
 
         $orderBy =
             (isset($params['orderBy'])
@@ -108,6 +121,12 @@ class CategoryRepository extends ServiceEntityRepository
                 ->setParameter('ids', $ids);
         }
 
+        if ($nameLike !== null) {
+            $qb->andWhere('c.name LIKE :nameLike')
+                ->setParameter('nameLike', $nameLike . '%')
+            ;
+        }
+
         if (is_array($words) && !empty($words)) {
             $qb->andWhere('c.name IN (:words)')
                 ->setParameter('words', $words)
@@ -118,6 +137,11 @@ class CategoryRepository extends ServiceEntityRepository
             $qb->andWhere('c.slug IN (:slugs)')
                 ->setParameter('slugs', $slugs)
             ;
+        }
+
+        if ($categoryTheme instanceof CategoryTheme && $categoryTheme->getId()) {
+            $qb->andWhere('c.categoryTheme = :categoryTheme')
+                ->setParameter('categoryTheme', $categoryTheme);
         }
 
         if ($orderBy !== null) {

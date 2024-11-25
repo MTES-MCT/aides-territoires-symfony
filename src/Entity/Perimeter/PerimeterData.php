@@ -15,7 +15,7 @@ use App\Filter\PerimeterData\PerimeterDataPerimeterIdFilter;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ApiResource(
-    shortName: 'Périmètres',
+    shortName: 'perimeter_data',
     operations: [
         new GetCollection(
             name: self::API_OPERATION_NAME,
@@ -24,6 +24,7 @@ use Symfony\Component\Validator\Constraints as Assert;
             normalizationContext: ['groups' => self::API_GROUP_LIST],
             openapi: new Model\Operation(
                 summary: 'Lister les données supplémentaires sur un périmètre',
+                tags: [Perimeter::API_TAG]
             )
         ),
     ],

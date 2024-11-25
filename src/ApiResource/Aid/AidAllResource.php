@@ -9,7 +9,7 @@ use App\Controller\Api\Aid\AidController;
 use App\Entity\Aid\Aid;
 
 #[ApiResource(
-    shortName: 'Aid',
+    shortName: 'aid_all',
     operations: [
         new GetCollection(
             name: Aid::API_OPERATION_GET_COLLECTION_ALL,
@@ -18,6 +18,7 @@ use App\Entity\Aid\Aid;
             normalizationContext: ['groups' => Aid::API_GROUP_LIST],
             openapi: new Model\Operation(
                 summary: 'Lister toutes les aides',
+                tags: [Aid::API_TAG]
             )
         ),
     ],
