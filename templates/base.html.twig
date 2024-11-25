@@ -101,7 +101,7 @@ production: true
 						{% for label, messages in flashes %}
 							{% for message in messages %}
 								<div class="fr-alert fr-alert--{{ label|default('info') }} fr-alert--sm">
-									<p>{{ message|sanitize_html|raw }}</p>
+									<p>{{ message|sanitize_html('app.admin_wysiwig_sanitizer')|raw }}</p>
 								</div>
 							{% endfor %}
 						{% endfor %}

@@ -147,6 +147,8 @@ class AidController extends FrontController
             'formAid' => $formAid->createView(),
             'aid' => $aid,
             'organizationBackersNotComplete' => $organizationBackersNotComplete,
+            'isLocked' => null,
+            'lock' => null,
         ]);
     }
 
@@ -163,7 +165,7 @@ class AidController extends FrontController
 
         // paramètre filtre aides
         $aidsParams = [
-            'author' => $user,
+            'userWithOrganizations' => $user,
             'orderBy' => [
                 'sort' => 'a.dateCreate',
                 'order' => 'DESC',
@@ -204,7 +206,7 @@ class AidController extends FrontController
         $formExport = $this->createForm(AidExportType::class, null, $formExportParams);
 
         // nb aides publiées
-        $nbAidsLive = $aidRepository->countByUser(
+        $nbAidsLive = $aidRepository->countByUserOrganizations(
             $user,
             [
                 'showInSearch' => true,
@@ -330,8 +332,9 @@ class AidController extends FrontController
             throw new AidNotFoundException('Cette aide n\'existe pas');
         }
 
-        // verifie que l'aide appartienne à l'utilisateur ou que l'utilisateur est un admin
+        // verifie que l'aide soit éditable par l'utilisateur
         if (!$aidService->userCanEdit($aid, $user)) {
+            $this->addFlash(FrontController::FLASH_ERROR, 'Vous n\'avez pas accès à cette page');
             return $this->redirectToRoute('app_user_aid_publications');
         }
 
@@ -365,6 +368,9 @@ class AidController extends FrontController
         $formAid->handleRequest($requestStack->getCurrentRequest());
         if ($formAid->isSubmitted()) {
             if ($formAid->isValid()) {
+                // met à jour le dernier éditeur
+                $aid->setLastEditor($user);
+                
                 // les financers
                 foreach ($aid->getAidFinancers() as $aidFinancer) {
                     $aid->removeAidFinancer($aidFinancer);
@@ -434,6 +440,8 @@ class AidController extends FrontController
             'aid' => $aid,
             'aidDuplicates' => $aidDuplicates,
             'organizationBackersNotComplete' => $organizationBackersNotComplete,
+            'isLocked' => $aidService->isLocked($aid),
+            'lock' => $aidService->getLock($aid)
         ]);
     }
 
@@ -535,7 +543,7 @@ class AidController extends FrontController
             $dompdf->render();
 
             // Output the generated PDF to Browser (inline view)
-            $dompdf->stream($filename.'.pdf', [
+            $dompdf->stream($filename . '.pdf', [
                 'Attachment' => false,
             ]);
             // exit pour eviter les erreur sur le retour null

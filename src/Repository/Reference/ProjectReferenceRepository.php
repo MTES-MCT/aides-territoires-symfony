@@ -22,8 +22,7 @@ class ProjectReferenceRepository extends ServiceEntityRepository
     public function __construct(
         ManagerRegistry $registry,
         private StringService $stringService
-    )
-    {
+    ) {
         parent::__construct($registry, ProjectReference::class);
     }
 

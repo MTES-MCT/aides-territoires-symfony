@@ -47,6 +47,7 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Gedmo\Mapping\Annotation as Gedmo;
 use App\Validator as AtAssert;
+use Doctrine\ORM\Mapping\JoinColumn;
 use Doctrine\ORM\Mapping\OrderBy;
 use Scheb\TwoFactorBundle\Model\Totp\TotpConfiguration;
 use Scheb\TwoFactorBundle\Model\Totp\TotpConfigurationInterface;
@@ -476,6 +477,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $proConnectUid = null;
 
+    /**
+     * @var Collection<int, Aid>
+     */
+    #[ORM\OneToMany(mappedBy: 'lastEditor', targetEntity: Aid::class)]
+    #[JoinColumn(onDelete: 'SET NULL')]
+    private Collection $lastEditedAids;
+
     public function __construct()
     {
         $this->logUserLogins = new ArrayCollection();
@@ -519,6 +527,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
         $this->backerAskAssociates = new ArrayCollection();
         $this->logBackerEdits = new ArrayCollection();
         $this->editorSearchPages = new ArrayCollection();
+        $this->lastEditedAids = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -2273,6 +2282,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
     public function setProConnectUid(?string $proConnectUid): static
     {
         $this->proConnectUid = $proConnectUid;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Aid>
+     */
+    public function getLastEditedAids(): Collection
+    {
+        return $this->lastEditedAids;
+    }
+
+    public function addLastEditedAid(Aid $lastEditedAid): static
+    {
+        if (!$this->lastEditedAids->contains($lastEditedAid)) {
+            $this->lastEditedAids->add($lastEditedAid);
+            $lastEditedAid->setLastEditor($this);
+        }
+
+        return $this;
+    }
+
+    public function removeLastEditedAid(Aid $lastEditedAid): static
+    {
+        if ($this->lastEditedAids->removeElement($lastEditedAid)) {
+            // set the owning side to null (unless already changed)
+            if ($lastEditedAid->getLastEditor() === $this) {
+                $lastEditedAid->setLastEditor(null);
+            }
+        }
 
         return $this;
     }

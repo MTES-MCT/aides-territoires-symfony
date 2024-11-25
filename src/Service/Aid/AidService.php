@@ -474,16 +474,23 @@ class AidService // NOSONAR too complex
 
     public function userCanEdit(Aid $aid, ?User $user): bool
     {
+        $access = false;
+
         if (!$user instanceof User) {
             return false;
         }
 
         // si c'est l'auteur ou un admin
         if ($aid->getAuthor() == $user || $this->userService->isUserGranted($user, User::ROLE_ADMIN)) {
-            return true;
+            $access = true;
+        }
+        
+        // Si l'utilisateur est dans l'organisation de l'aide
+        if ($aid->getOrganization() && $aid->getOrganization()->getBeneficiairies()->contains($user)) {
+            $access = true;
         }
 
-        return false;
+        return $access;
     }
 
     public function userCanDuplicate(Aid $aid, ?User $user): bool

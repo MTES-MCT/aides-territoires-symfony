@@ -838,6 +838,9 @@ class Aid // NOSONAR too much methods
     #[ORM\ManyToMany(targetEntity: ProjectReferenceMissing::class, mappedBy: 'aids', cascade: ['persist'])]
     private Collection $projectReferenceMissings;
 
+    #[ORM\ManyToOne(inversedBy: 'lastEditedAids')]
+    private ?User $lastEditor = null;
+
     /**
      * <Non Database Fields
      */
@@ -3007,6 +3010,18 @@ class Aid // NOSONAR too much methods
         if ($this->projectReferenceMissings->removeElement($projectReferenceMissing)) {
             $projectReferenceMissing->removeAid($this);
         }
+
+        return $this;
+    }
+
+    public function getLastEditor(): ?User
+    {
+        return $this->lastEditor ?? $this->author;
+    }
+
+    public function setLastEditor(?User $lastEditor): static
+    {
+        $this->lastEditor = $lastEditor;
 
         return $this;
     }

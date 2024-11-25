@@ -11,8 +11,6 @@ use App\Entity\Aid\AidTypeGroup;
 use App\Entity\Backer\Backer;
 use App\Entity\Backer\BackerCategory;
 use App\Entity\Backer\BackerGroup;
-use App\Entity\Category\Category;
-use App\Entity\Keyword\Keyword;
 use App\Entity\Organization\OrganizationType;
 use App\Entity\Perimeter\Perimeter;
 use App\Entity\Program\Program;
@@ -25,7 +23,6 @@ use App\Service\Various\StringService;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Criteria;
-use Doctrine\Inflector\InflectorFactory;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -43,7 +40,7 @@ class AidRepository extends ServiceEntityRepository
         ManagerRegistry $registry,
         private ReferenceService $referenceService,
         private KeywordReferenceService $keywordReferenceService,
-        private StringService $stringService
+        private StringService $stringService,
     ) {
         parent::__construct($registry, Aid::class);
     }
@@ -190,7 +187,29 @@ class AidRepository extends ServiceEntityRepository
         ;
     }
 
-    public function countByUser(User $user, array $params = null): int
+    public function countByUserOrganizations(User $user, ?array $params = null): int
+    {
+        $showInSearch = $params['showInSearch'] ?? null;
+        $organizations = $user->getOrganizations() ?? [];
+        $qb = $this->createQueryBuilder('a')
+            ->select('COUNT(a.id) AS nb')
+            ->andWhere('a.author = :author OR a.organization IN (:organizations)')
+            ->setParameter('author', $user)
+            ->setParameter('organizations', $organizations)
+            ->andWhere('a.status != :delete')
+            ->setParameter('delete', Aid::STATUS_DELETED);
+
+        if (null !== $showInSearch) {
+            $qb->addCriteria(AidRepository::showInSearchCriteria('a.'));
+        }
+        $result = $qb
+            ->getQuery()
+            ->getResult();
+
+        return $result[0]['nb'] ?? 0;
+    }
+
+    public function countByUser(User $user, ?array $params = null): int
     {
         $showInSearch = $params['showInSearch'] ?? null;
 
@@ -201,12 +220,13 @@ class AidRepository extends ServiceEntityRepository
             ->setParameter('user', $user)
             ->setParameter('delete', Aid::STATUS_DELETED);
 
-        if ($showInSearch !== null) {
+        if (null !== $showInSearch) {
             $qb->addCriteria(AidRepository::showInSearchCriteria('a.'));
         }
         $result = $qb
             ->getQuery()
             ->getResult();
+
         return $result[0]['nb'] ?? 0;
     }
 
@@ -216,7 +236,7 @@ class AidRepository extends ServiceEntityRepository
         $params['hasBrokenLink'] = false;
         $params['orderBy'] = [
             'sort' => 'a.timeCreate',
-            'order' => 'DESC'
+            'order' => 'DESC',
         ];
         $params['maxResults'] = 200;
         $qb = $this->getQueryBuilder($params);
@@ -224,12 +244,12 @@ class AidRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult();
     }
 
-    public function findRecent(array $params = null): array
+    public function findRecent(?array $params = null): array
     {
         $params['limit'] = $params['limit'] ?? 3;
         $params['orderBy'] = [
             'sort' => 'a.datePublished',
-            'order' => 'DESC'
+            'order' => 'DESC',
         ];
         $params['showInSearch'] = true;
 
@@ -251,10 +271,11 @@ class AidRepository extends ServiceEntityRepository
                 $return[] = $result[0];
             }
         }
+
         return $return;
     }
 
-    public function findOneCustom(array $params = null): ?Aid
+    public function findOneCustom(?array $params = null): ?Aid
     {
         $params = array_merge($params, ['limit' => 1]);
 
@@ -263,14 +284,15 @@ class AidRepository extends ServiceEntityRepository
         return $qb->getQuery()->getOneOrNullResult();
     }
 
-    public function findForSitemap(array $params = null): array
+    public function findForSitemap(?array $params = null): array
     {
         $qb = $this->getQueryBuilder($params);
         $qb->select('a.slug');
+
         return $qb->getQuery()->getResult();
     }
 
-    public function findCustom(array $params = null): array
+    public function findCustom(?array $params = null): array
     {
         $qb = $this->getQueryBuilder($params);
         $qb->addSelect('projectReferences');
@@ -291,6 +313,7 @@ class AidRepository extends ServiceEntityRepository
                 $return[] = $result[0];
             }
         }
+
         return $return;
     }
 
@@ -303,7 +326,7 @@ class AidRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult();
     }
 
-    public function countLives(array $params = null): int
+    public function countLives(?array $params = null): int
     {
         $qb = $this->getQueryBuilder($params);
 
@@ -319,10 +342,11 @@ class AidRepository extends ServiceEntityRepository
     public function countAfterSelect(?array $params = null): int
     {
         $qb = $this->getQueryBuilder($params);
+
         return count($qb->getQuery()->getResult());
     }
 
-    public function countCustom(array $params = null): int
+    public function countCustom(?array $params = null): int
     {
         $qb = $this->getQueryBuilder($params);
 
@@ -336,12 +360,13 @@ class AidRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult()[0]['nb'] ?? 0;
     }
 
-    public function getQueryBuilder(array $params = null): QueryBuilder
+    public function getQueryBuilder(?array $params = null): QueryBuilder
     {
         $id = $params['id'] ?? null;
         $author = $params['author'] ?? null;
         $isLive = $params['isLive'] ?? null;
         $showInSearch = $params['showInSearch'] ?? null;
+        $userWithOrganizations = $params['userWithOrganizations'] ?? null;
         $organizationType = $params['organizationType'] ?? null;
         $organizationTypes = $params['organizationTypes'] ?? null;
         $organizationTypeSlugs = $params['organizationTypeSlugs'] ?? null;
@@ -368,7 +393,7 @@ class AidRepository extends ServiceEntityRepository
         $keywords = $params['keywords'] ?? null;
 
         $keyword = $params['keyword'] ?? null;
-        if ($keyword !== null) {
+        if (null !== $keyword) {
             $keyword = strip_tags((string) $keyword);
             $synonyms = $this->referenceService->getSynonymes($keyword);
         }
@@ -420,13 +445,13 @@ class AidRepository extends ServiceEntityRepository
 
         $qb = $this->createQueryBuilder('a');
 
-        if ($id !== null) {
+        if (null !== $id) {
             $qb
                 ->andWhere('a.id = :id')
                 ->setParameter('id', $id);
         }
 
-        if ($nameLike !== null) {
+        if (null !== $nameLike) {
             $qb
                 ->andWhere('a.name LIKE :nameLike')
                 ->setParameter('nameLike', '%' . $nameLike . '%')
@@ -454,13 +479,12 @@ class AidRepository extends ServiceEntityRepository
                 ->setParameter('dateCreateMax', $dateCreateMax);
         }
 
-        if ($hasBrokenLink !== null) {
+        if (null !== $hasBrokenLink) {
             $qb
                 ->andWhere('a.hasBrokenLink = :hasBrokenLink')
                 ->setParameter('hasBrokenLink', $hasBrokenLink)
             ;
         }
-
 
         if (isset($synonyms)) {
             $originalName = !empty($synonyms['original_name'])
@@ -517,19 +541,19 @@ class AidRepository extends ServiceEntityRepository
                         }
                     }
                     $requiredKeywordReferencesName = array_unique($requiredKeywordReferencesName);
-                    
+
                     // on ajoute des guillemets si le mot clé contient un espace, ex: "batiment scolaire"
-                    $transformedTerms = array_map(function($term) {
-                        return strpos($term, ' ') !== false ? '"' . $term . '"' : $term;
+                    $transformedTerms = array_map(function ($term) {
+                        return false !== strpos($term, ' ') ? '"' . $term . '"' : $term;
                     }, $requiredKeywordReferencesName);
-                    
 
                     // on transforme le tableau en string pour la recherche fulltext
                     $requiredKeywordReferencesNameString = implode(' ', $transformedTerms);
 
                     $qb->andWhere('
-                        MATCH_AGAINST(a.name, a.nameInitial, a.description, a.eligibility, a.projectExamples) AGAINST (:requireKeywordReferencesString IN BOOLEAN MODE) > 0
-                        OR :projectReference MEMBER OF a.projectReferences
+                        MATCH_AGAINST(a.name, a.nameInitial, a.description, a.eligibility, a.projectExamples) '
+                        . 'AGAINST (:requireKeywordReferencesString IN BOOLEAN MODE) > 0 '
+                        . 'OR :projectReference MEMBER OF a.projectReferences
                     ');
                     $qb->setParameter('requireKeywordReferencesString', $requiredKeywordReferencesNameString);
                 }
@@ -557,7 +581,7 @@ class AidRepository extends ServiceEntityRepository
                     $sqlObjects .= ' + ' . $sqlKeywordReferences;
                 }
 
-                if (trim($sqlObjects) !== '') {
+                if ('' !== trim($sqlObjects)) {
                     $sqlObjects .= ' + ';
                 }
                 $sqlObjects .= '
@@ -582,7 +606,7 @@ class AidRepository extends ServiceEntityRepository
                     if (count($objects) > 40) {
                         $objects = array_slice($objects, 0, 40);
                     }
-                    for ($i = 0; $i < count($objects); $i++) {
+                    for ($i = 0; $i < count($objects); ++$i) {
                         $sqlRegexpName .= 'REGEXP(a.name, :objects' . $i . ') = 1';
                         $sqlRegexpNameInitial .= 'REGEXP(a.nameInitial, :objects' . $i . ') = 1';
                         $sqlRegexpDescription .= 'REGEXP(a.description, :objects' . $i . ') = 1';
@@ -605,7 +629,7 @@ class AidRepository extends ServiceEntityRepository
                 $qb->setParameter('objects_string', $objectsString);
             }
 
-            if (trim($sqlObjects) !== '') {
+            if ('' !== trim($sqlObjects)) {
                 $qb->addSelect('(' . $sqlObjects . ') as score_objects');
                 $qb->andHaving('score_objects >= ' . $scoreObjectsMin);
             }
@@ -616,7 +640,7 @@ class AidRepository extends ServiceEntityRepository
                 AGAINST(:intentions_string IN BOOLEAN MODE) > 0.8)
                 THEN 1 ELSE 0 END
                 ';
-                if (isset($sqlProjectReference) && $sqlProjectReference !== '') {
+                if (isset($sqlProjectReference) && '' !== $sqlProjectReference) {
                     $sqlIntentions .= ' + ' . $sqlProjectReference;
                 }
 
@@ -701,10 +725,10 @@ class AidRepository extends ServiceEntityRepository
                 $sqlTotal .= $sqlProjectReference;
             }
 
-            if ($sqlTotal !== '') {
+            if ('' !== $sqlTotal) {
                 $scoreTotalAvailable = true;
 
-                if ($sqlObjects !== '') {
+                if ('' !== $sqlObjects) {
                     $qb->addSelect('(' . $sqlTotal . ') as score_total');
                     $qb->andHaving('(score_total + score_objects) >= ' . $scoreTotalMin);
                 } else {
@@ -749,7 +773,7 @@ class AidRepository extends ServiceEntityRepository
             ;
         }
 
-        if ($textSearch !== null) {
+        if (null !== $textSearch) {
             $texts = explode(',', $textSearch);
             $i = 1;
             foreach ($texts as $text) {
@@ -764,7 +788,7 @@ class AidRepository extends ServiceEntityRepository
                 ")
                     ->setParameter("text$i", '%' . $text . '%')
                 ;
-                $i++;
+                ++$i;
             }
         }
         if ($author instanceof User && $author->getId()) {
@@ -774,17 +798,30 @@ class AidRepository extends ServiceEntityRepository
             ;
         }
 
-        if ($isLive === true) {
+        if (
+            $userWithOrganizations
+            && $userWithOrganizations instanceof User
+        ) {
+            $organizations = $userWithOrganizations->getOrganizations() ?? [];
+            $qb
+                ->andWhere('a.author = :author OR a.organization IN (:organizations)')
+                ->setParameter('author', $userWithOrganizations)
+                ->setParameter('organizations', $organizations)
+            ;
+        }
+
+
+        if (true === $isLive) {
             $qb
                 ->addCriteria(self::liveCriteria());
         }
 
-        if ($showInSearch === true) {
+        if (true === $showInSearch) {
             $qb
                 ->addCriteria(self::showInSearchCriteria());
         }
 
-        if ($slug !== null) {
+        if (null !== $slug) {
             $qb
                 ->andWhere('a.slug = :slug')
                 ->setParameter('slug', $slug)
@@ -804,14 +841,12 @@ class AidRepository extends ServiceEntityRepository
                 ->setParameter('organizationTypes', $organizationTypes);
         }
 
-
         if (is_array($organizationTypeSlugs) && count($organizationTypeSlugs) > 0) {
             $qb
                 ->innerJoin('a.aidAudiences', 'aidAudiencesSlug')
                 ->andWhere('aidAudiencesSlug.slug IN (:organizationTypeSlugs)')
                 ->setParameter('organizationTypeSlugs', $organizationTypeSlugs);
         }
-
 
         if ($perimeter instanceof Perimeter && $perimeter->getId()) {
             $qb
@@ -834,7 +869,7 @@ class AidRepository extends ServiceEntityRepository
             ;
         }
 
-        if ($perimeterFromId !== null) {
+        if (null !== $perimeterFromId) {
             $qb
                 ->innerJoin('a.perimeter', 'perimeter')
                 ->innerJoin('perimeter.perimetersFrom', 'perimetersFrom')
@@ -906,7 +941,7 @@ class AidRepository extends ServiceEntityRepository
             ;
         }
 
-        if ($isFinancial === true) {
+        if (true === $isFinancial) {
             $qb
                 ->innerJoin('a.aidTypes', 'aidTypes')
                 ->innerJoin('aidTypes.aidTypeGroup', 'aidTypeGroup')
@@ -915,7 +950,7 @@ class AidRepository extends ServiceEntityRepository
             ;
         }
 
-        if ($isTechnical === true) {
+        if (true === $isTechnical) {
             $qb
                 ->innerJoin('a.aidTypes', 'aidTypesT')
                 ->innerJoin('aidTypesT.aidTypeGroup', 'aidTypeGroupT')
@@ -932,7 +967,7 @@ class AidRepository extends ServiceEntityRepository
             ;
         }
 
-        if ($categories !== null && count($categories) > 0) {
+        if (null !== $categories && count($categories) > 0) {
             $qb
                 ->innerJoin('a.categories', 'categories')
                 ->andWhere('categories IN (:categories)')
@@ -950,7 +985,7 @@ class AidRepository extends ServiceEntityRepository
 
         if (is_array($keywords) && !empty($keywords)) {
             $queryKeywords = '(';
-            for ($i = 0; $i < count($keywords); $i++) {
+            for ($i = 0; $i < count($keywords); ++$i) {
                 if ($i > 0) {
                     $queryKeywords .= ' OR ';
                 }
@@ -996,7 +1031,7 @@ class AidRepository extends ServiceEntityRepository
             ;
         }
 
-        if ($aidTypes !== null && count($aidTypes) > 0) {
+        if (null !== $aidTypes && count($aidTypes) > 0) {
             $qb
                 ->innerJoin('a.aidTypes', 'aidTypes')
                 ->andWhere('aidTypes IN (:aidTypes)')
@@ -1014,24 +1049,24 @@ class AidRepository extends ServiceEntityRepository
             ;
         }
 
-        if ($limit !== null) {
+        if (null !== $limit) {
             $qb->setMaxResults($limit);
         }
 
-        if ($orderBy !== null) {
-            if ($orderBy['sort'] == 'score_total') {
-                if (isset($scoreTotalAvailable) && $scoreTotalAvailable === true) {
+        if (null !== $orderBy) {
+            if ('score_total' == $orderBy['sort']) {
+                if (isset($scoreTotalAvailable) && true === $scoreTotalAvailable) {
                     $qb->addOrderBy($orderBy['sort'], $orderBy['order']);
-                    if ($sqlObjects !== '') {
+                    if ('' !== $sqlObjects) {
                         $qb->addOrderBy('score_objects', 'DESC');
                     }
                 }
             } else {
                 $qb->addOrderBy($orderBy['sort'], $orderBy['order']);
-            };
+            }
         }
 
-        if ($orderByDateSubmissionDeadline === true) {
+        if (true === $orderByDateSubmissionDeadline) {
             $qb
                 ->addSelect('CASE WHEN a.dateSubmissionDeadline IS NULL THEN 1 ELSE 0 END as HIDDEN priority_is_null')
                 ->addOrderBy('priority_is_null', 'ASC')
@@ -1041,14 +1076,14 @@ class AidRepository extends ServiceEntityRepository
 
         // si aucun tri mais qu'on a le score total
         if (
-            $orderBy == null
-            && $orderByDateSubmissionDeadline == null
+            null == $orderBy
+            && null == $orderByDateSubmissionDeadline
             && isset($scoreTotalAvailable)
-            && $scoreTotalAvailable === true
+            && true === $scoreTotalAvailable
         ) {
             $qb
                 ->addOrderBy('score_total', 'DESC');
-            if ($sqlObjects !== '') {
+            if ('' !== $sqlObjects) {
                 $qb->addOrderBy('score_objects', 'DESC');
             }
         }
@@ -1093,7 +1128,7 @@ class AidRepository extends ServiceEntityRepository
             ;
         }
 
-        if ($programs !== null && count($programs) > 0) {
+        if (null !== $programs && count($programs) > 0) {
             $qb
                 ->innerJoin('a.programs', 'programs')
                 ->andWhere('programs IN (:programs)')
@@ -1128,17 +1163,17 @@ class AidRepository extends ServiceEntityRepository
             ;
         }
 
-        if ($isCharged !== null) {
+        if (null !== $isCharged) {
             $qb
                 ->andWhere('a.isCharged = :isCharged')
                 ->setParameter('isCharged', $isCharged)
             ;
         }
 
-        if ($europeanAid !== null) {
+        if (null !== $europeanAid) {
             // hbéritage django, on ne filtre pas si on veu tout
-            if (strtolower($europeanAid) !== 'all') {
-                if ($europeanAid == Aid::SLUG_EUROPEAN) {
+            if ('all' !== strtolower($europeanAid)) {
+                if (Aid::SLUG_EUROPEAN == $europeanAid) {
                     $qb
                         ->andWhere('a.europeanAid IS NOT NULL');
                 } else {
@@ -1150,14 +1185,14 @@ class AidRepository extends ServiceEntityRepository
             }
         }
 
-        if ($isCallForProject !== null) {
+        if (null !== $isCallForProject) {
             $qb
                 ->andWhere('a.isCallForProject = :isCallForProject')
                 ->setParameter('isCallForProject', $isCallForProject)
             ;
         }
 
-        if ($originUrl !== null) {
+        if (null !== $originUrl) {
             $qb
                 ->andWhere('a.originUrl = :originUrl')
                 ->setParameter('originUrl', $originUrl)
@@ -1171,7 +1206,7 @@ class AidRepository extends ServiceEntityRepository
             ;
         }
 
-        if ($state !== null) {
+        if (null !== $state) {
             switch ($state) {
                 case 'open':
                     $dateLimit = new \DateTime(date('Y-m-d'));
@@ -1202,7 +1237,7 @@ class AidRepository extends ServiceEntityRepository
             }
         }
 
-        if ($statusDisplay !== null) {
+        if (null !== $statusDisplay) {
             switch ($statusDisplay) {
                 case 'hidden':
                     $qb
@@ -1223,15 +1258,15 @@ class AidRepository extends ServiceEntityRepository
             ;
         }
 
-        if ($status !== null) {
+        if (null !== $status) {
             $qb->andWhere('a.status = :status')
                 ->setParameter('status', $status);
         }
 
-        if ($firstResult !== null) {
+        if (null !== $firstResult) {
             $qb->setFirstResult($firstResult);
         }
-        if ($maxResults !== null) {
+        if (null !== $maxResults) {
             $qb->setMaxResults($maxResults);
         }
 
