@@ -51,7 +51,7 @@
 				<div id="tabpanel-home-panel" class="fr-tabs__panel fr-tabs__panel--selected" role="tabpanel" aria-labelledby="tabpanel-home" tabindex="0">
 					{% if search_page.description %}
 						<div class="wysiwyg-wrapper">
-							{{ optimizeHtmlFromWysiwyg(search_page.description)|sanitize_html|raw }}
+							{{ optimizeHtmlFromWysiwyg(search_page.description)|sanitize_html('app.admin_wysiwig_sanitizer')|raw }}
 						</div>
 					{% endif %}
 
@@ -62,7 +62,7 @@
 							</h3>
 							<div id="more-content" class="fr-collapse">
 								<div class="wysiwyg-wrapper">
-									{{ optimizeHtmlFromWysiwyg(search_page.moreContent)|sanitize_html|raw }}
+									{{ optimizeHtmlFromWysiwyg(search_page.moreContent)|sanitize_html('app.admin_wysiwig_sanitizer')|raw }}
 								</div>
 							</div>
 						</section>
@@ -93,7 +93,7 @@
 					<div id="tabpanel-{{ page.url }}-panel" class="fr-tabs__panel" role="tabpanel" aria-labelledby="tabpanel-{{ page.url }}" tabindex="0">
 						{% if page.description %}
 							<div class="wysiwyg-wrapper">
-								{{ addMailtoToEmailLinks(optimizeHtmlFromWysiwyg(page.description|sanitize_html))|raw }}
+								{{ addMailtoToEmailLinks(optimizeHtmlFromWysiwyg(page.description|sanitize_html('app.admin_wysiwig_sanitizer')))|raw }}
 							</div>
 						{% endif %}
 					</div>
