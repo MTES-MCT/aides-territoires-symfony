@@ -15,12 +15,10 @@ use App\Entity\Organization\OrganizationType;
 use App\Entity\Program\Program;
 use App\Entity\Search\SearchPage;
 use App\Form\Type\BackerAutocompleteType;
-use App\Service\User\UserService;
 use App\Form\Type\EntityCheckboxAbsoluteType;
 use App\Form\Type\EntityCheckboxGroupAbsoluteType;
 use App\Form\Type\PerimeterAutocompleteType;
 use App\Repository\Backer\BackerGroupRepository;
-use App\Repository\Backer\BackerRepository;
 use App\Service\Aid\AidSearchClass;
 use App\Service\Aid\AidSearchFormService;
 use Doctrine\ORM\EntityRepository;
@@ -40,7 +38,7 @@ class AidSearchTypeV2 extends AbstractType
 {
     public function __construct(
         private ManagerRegistry $managerRegistry,
-        private RouterInterface $routerInterface
+        private RouterInterface $routerInterface,
     ) {
     }
 
@@ -50,7 +48,7 @@ class AidSearchTypeV2 extends AbstractType
         $categoryThemes = $this->managerRegistry->getRepository(CategoryTheme::class)->findBy(
             [],
             [
-                'name' => 'ASC'
+                'name' => 'ASC',
             ]
         );
         $categoriesByTheme = [];
@@ -83,6 +81,7 @@ class AidSearchTypeV2 extends AbstractType
                         $qb->andWhere('ot IN (:organizationTypes)')
                             ->setParameter('organizationTypes', $options['searchPage']->getOrganizationTypes());
                     }
+
                     return $qb;
                 },
                 'placeholder' => 'Tous types de structures',
@@ -92,17 +91,18 @@ class AidSearchTypeV2 extends AbstractType
                 'label' => 'Votre territoire',
                 'attr' => [
                     'data-controller' => 'custom-autocomplete',
-                    'placeholder' => 'Votre commune, EPCI...'
-                ]
+                    'placeholder' => 'Votre commune, EPCI...',
+                ],
             ])
             ->add(AidSearchFormService::QUERYSTRING_KEY_KEYWORD, TextType::class, [
                 'required' => false,
                 'label' => 'Projet référent ou mot-clé',
                 'attr' => [
                     'data-controller' => 'custom-autocomplete',
-                    'placeholder' => 'Projet référent ou mot-clé'
+                    'placeholder' => 'Projet référent ou mot-clé',
                 ],
                 'autocomplete' => true,
+                'autocomplete_url' => $this->routerInterface->generate('app_project_reference_ajax_ux_autocomplete'),
                 'tom_select_options' => [
                     'create' => true,
                     'createOnBlur' => true,
@@ -110,10 +110,9 @@ class AidSearchTypeV2 extends AbstractType
                     'selectOnTab' => true,
                     'closeAfterSelect' => true,
                     'sanitize_html' => true,
-                    'delimiter' => '$%§'
+                    'delimiter' => '$%§',
                 ],
                 'sanitize_html' => true,
-
             ])
             ->add(AidSearchFormService::QUERYSTRING_KEY_CATEGORY_IDS, EntityCheckboxGroupAbsoluteType::class, [
                 'required' => false,
@@ -140,18 +139,17 @@ class AidSearchTypeV2 extends AbstractType
                     return $qb;
                 },
                 'multiple' => true,
-                'expanded' => true
+                'expanded' => true,
             ])
             ->add('newIntegration', HiddenType::class)
         ;
-
 
         if ($options['extended']) {
             // les types d'aides
             $aidTypeGroups = $this->managerRegistry->getRepository(AidTypeGroup::class)->findBy(
                 [],
                 [
-                    'position' => 'ASC'
+                    'position' => 'ASC',
                 ]
             );
             $aidTypesByGroup = [];
@@ -172,11 +170,11 @@ class AidSearchTypeV2 extends AbstractType
                     'choices' => [
                         'Tri : pertinence' => 'relevance',
                         'Tri : date de publication (plus récentes en premier)' => 'publication-date',
-                        'Tri : date de clôture (plus proches en premier)' => 'submission-deadline'
+                        'Tri : date de clôture (plus proches en premier)' => 'submission-deadline',
                     ],
                     'attr' => [
-                        'title' => 'Choisissez un ordre de tri – La sélection recharge la page'
-                    ]
+                        'title' => 'Choisissez un ordre de tri – La sélection recharge la page',
+                    ],
                 ])
                 ->add(AidSearchFormService::QUERYSTRING_KEY_AID_TYPE_IDS, EntityCheckboxGroupAbsoluteType::class, [
                     'required' => false,
@@ -196,7 +194,7 @@ class AidSearchTypeV2 extends AbstractType
                         ;
                     },
                     'multiple' => true,
-                    'expanded' => true
+                    'expanded' => true,
                 ])
                 ->add(AidSearchFormService::QUERYSTRING_KEY_BACKER_IDS, BackerAutocompleteType::class, [
                     'required' => false,
@@ -214,7 +212,7 @@ class AidSearchTypeV2 extends AbstractType
                 ->add(AidSearchFormService::QUERYSTRING_KEY_APPLY_BEFORE, DateType::class, [
                     'required' => false,
                     'label' => 'Candidater avant...',
-                    'widget' => 'single_text'
+                    'widget' => 'single_text',
                 ])
                 ->add('programs', EntityCheckboxAbsoluteType::class, [
                     'required' => false,
@@ -226,7 +224,7 @@ class AidSearchTypeV2 extends AbstractType
                     'expanded' => true,
                     'query_builder' => function (EntityRepository $entityRepository) {
                         return $entityRepository->createQueryBuilder('b')->orderBy('b.name', 'ASC');
-                    }
+                    },
                 ])
                 ->add(AidSearchFormService::QUERYSTRING_KEY_AID_STEP_IDS, EntityCheckboxAbsoluteType::class, [
                     'required' => false,
@@ -235,7 +233,7 @@ class AidSearchTypeV2 extends AbstractType
                     'class' => AidStep::class,
                     'choice_label' => 'name',
                     'multiple' => true,
-                    'expanded' => true
+                    'expanded' => true,
                 ])
                 ->add(AidSearchFormService::QUERYSTRING_KEY_AID_DESTINATION_IDS, EntityCheckboxAbsoluteType::class, [
                     'required' => false,
@@ -244,7 +242,7 @@ class AidSearchTypeV2 extends AbstractType
                     'class' => AidDestination::class,
                     'choice_label' => 'name',
                     'multiple' => true,
-                    'expanded' => true
+                    'expanded' => true,
                 ])
                 ->add(AidSearchFormService::QUERYSTRING_KEY_IS_CHARGED, ChoiceType::class, [
                     'required' => false,
@@ -252,8 +250,8 @@ class AidSearchTypeV2 extends AbstractType
                     'placeholder' => 'Aides gratuites et payantes',
                     'choices' => [
                         'Aides payantes' => 1,
-                        'Aides gratuites' => 0
-                    ]
+                        'Aides gratuites' => 0,
+                    ],
                 ])
                 ->add(AidSearchFormService::QUERYSTRING_KEY_EUROPEAN_AID_SLUG, ChoiceType::class, [
                     'required' => false,
@@ -263,11 +261,11 @@ class AidSearchTypeV2 extends AbstractType
                         Aid::LABELS_EUROPEAN[Aid::SLUG_EUROPEAN] => Aid::SLUG_EUROPEAN,
                         Aid::LABELS_EUROPEAN[Aid::SLUG_EUROPEAN_SECTORIAL] => Aid::SLUG_EUROPEAN_SECTORIAL,
                         Aid::LABELS_EUROPEAN[Aid::SLUG_EUROPEAN_ORGANIZATIONAL] => Aid::SLUG_EUROPEAN_ORGANIZATIONAL,
-                    ]
+                    ],
                 ])
                 ->add(AidSearchFormService::QUERYSTRING_KEY_IS_CALL_FOR_PROJECT, CheckboxType::class, [
                     'required' => false,
-                    'label' => 'Appels à projets / Appels à manifestation d’intérêt uniquement'
+                    'label' => 'Appels à projets / Appels à manifestation d’intérêt uniquement',
                 ])
                 ->add(AidSearchFormService::QUERYSTRING_KEY_BACKER_GROUP_ID, EntityType::class, [
                     'required' => false,
@@ -283,13 +281,12 @@ class AidSearchTypeV2 extends AbstractType
                         return $backerGroupRepository->getQueryBuilder([
                             'orderBy' => [
                                 'sort' => 'bg.name',
-                                'order' => 'ASC'
-                            ]
+                                'order' => 'ASC',
+                            ],
                         ]);
                     },
                 ])
             ;
-
 
             foreach ($options['removes'] as $remove) {
                 if ($builder->has($remove)) {
@@ -304,13 +301,12 @@ class AidSearchTypeV2 extends AbstractType
         $resolver->setDefaults([
             'data_class' => AidSearchClass::class,
             'attr' => [
-                'data-controller' => 'custom-autocomplete'
+                'data-controller' => 'custom-autocomplete',
             ],
             'allow_extra_fields' => true,
             'extended' => false,
             'removes' => [],
-            'searchPage' => null
-
+            'searchPage' => null,
         ]);
     }
 
