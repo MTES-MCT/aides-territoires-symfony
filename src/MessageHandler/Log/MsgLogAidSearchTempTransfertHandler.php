@@ -11,7 +11,6 @@ use App\Service\Notification\NotificationService;
 use App\Service\Various\ParamService;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
-use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 
@@ -22,7 +21,6 @@ class MsgLogAidSearchTempTransfertHandler
 
     public function __construct(
         private ManagerRegistry $managerRegistry,
-        private KernelInterface $kernelInterface,
         private NotificationService $notificationService,
         private ParamService $paramService,
         private MessageBusInterface $bus
@@ -32,7 +30,7 @@ class MsgLogAidSearchTempTransfertHandler
     public function __invoke(MsgLogAidSearchTempTransfert $message): void
     {
         try {
-            /** @var LogAidSearchTempRepository $logaidSearchTempRepository */
+            /** @var LogAidSearchTempRepository $logAidSearchTempRepository */
             $logAidSearchTempRepository = $this->managerRegistry->getRepository(LogAidSearchTemp::class);
 
             $logAidSearchTemps = $logAidSearchTempRepository->findBy(

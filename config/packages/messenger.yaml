@@ -36,6 +36,7 @@ framework:
             'App\Message\Perimeter\MsgPerimeterCombine': async
             'App\Message\Perimeter\MsgPerimeterImport': async
             'App\Message\Backer\BackerCountAid': async
+            'App\Message\Backer\MsgAidStatsSpreadsheetOfBacker': async
             'App\Message\SearchPage\SearchPageCountAid': async
             'App\Message\Site\MsgDebugMemory': async
             'App\Message\User\AidsExportPdf': async

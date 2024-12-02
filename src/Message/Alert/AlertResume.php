@@ -4,7 +4,7 @@ namespace App\Message\Alert;
 
 class AlertResume
 {
-    private $alertFrequency;
+    private string $alertFrequency;
 
     public function __construct(string $alertFrequency)
     {

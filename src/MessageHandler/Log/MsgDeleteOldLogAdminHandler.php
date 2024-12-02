@@ -10,8 +10,6 @@ use App\Service\Notification\NotificationService;
 use App\Service\Various\ParamService;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
-use Symfony\Component\HttpKernel\KernelInterface;
-use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 
 #[AsMessageHandler()]
@@ -21,10 +19,8 @@ class MsgDeleteOldLogAdminHandler
 
     public function __construct(
         private ManagerRegistry $managerRegistry,
-        private KernelInterface $kernelInterface,
         private NotificationService $notificationService,
         private ParamService $paramService,
-        private MessageBusInterface $bus
     ) {
     }
 
@@ -44,7 +40,6 @@ class MsgDeleteOldLogAdminHandler
                 if (++$batchCount % self::BATCH_SIZE === 0) {
                     $entityManager->flush();
                 }
-
             }
             $entityManager->flush();
         } catch (ProcessFailedException $exception) {

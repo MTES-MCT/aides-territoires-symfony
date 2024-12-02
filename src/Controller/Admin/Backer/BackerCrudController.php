@@ -5,12 +5,16 @@ namespace App\Controller\Admin\Backer;
 use App\Controller\Admin\AtCrudController;
 use App\Controller\Admin\Filter\Backer\HasNoOrganizationFilter;
 use App\Entity\Backer\Backer;
+use App\Entity\User\User;
 use App\Field\TextLengthCountField;
 use App\Field\TrumbowygField;
+use App\Form\Admin\Filter\DateRangeType;
+use App\Message\Backer\MsgAidStatsSpreadsheetOfBacker;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Filters;
+use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\FormField;
@@ -19,6 +23,8 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\ImageField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\UrlField;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class BackerCrudController extends AtCrudController
@@ -152,6 +158,10 @@ class BackerCrudController extends AtCrudController
             );
         });
 
+        $aidStatisticsAction = Action::new('aidStatistics', 'Statistiques des aides', 'fas fa-chart-line')
+            ->linkToCrudAction('aidStatistics')
+        ;
+
         $exportCsvAction = $this->getExportCsvAction();
         $exportXlsxAction = $this->getExportXlsxAction();
 
@@ -160,6 +170,54 @@ class BackerCrudController extends AtCrudController
             ->add(Crud::PAGE_EDIT, $displayOnFront)
             ->add(Crud::PAGE_INDEX, $exportCsvAction)
             ->add(Crud::PAGE_INDEX, $exportXlsxAction)
+            ->add(Crud::PAGE_INDEX, $aidStatisticsAction)
+            ->add(Crud::PAGE_EDIT, $aidStatisticsAction)
         ;
+    }
+
+    public function aidStatistics(
+        AdminContext $context,
+        MessageBusInterface $bus
+    ): Response {
+        $backer = $context->getEntity()->getInstance();
+
+        // dates par défaut
+        $dateMin = new \DateTime('-1 month');
+        $dateMax = new \DateTime();
+
+        // formulaire de filtre
+        $formDateRange = $this->createForm(DateRangeType::class);
+        $formDateRange->handleRequest($context->getRequest());
+        if ($formDateRange->isSubmitted()) {
+            if ($formDateRange->isValid()) {
+                $dateMin = $formDateRange->get('dateMin')->getData();
+                $dateMax = $formDateRange->get('dateMax')->getData();
+
+                // recupere l'admin courant
+                /** @var User $admin */
+                $admin = $this->getUser();
+
+                $bus->dispatch(new MsgAidStatsSpreadsheetOfBacker(
+                    idBacker: $backer->getId(),
+                    dateMin: $dateMin,
+                    dateMax: $dateMax,
+                    targetEmail: $admin->getEmail(),
+                ));
+
+                // message de confirmation
+                $this->addFlash(
+                    'success',
+                    'L\'export des statistiques des aides du porter ' . $backer->getName() . ' est en cours, vous recevrez un mail avec le document en pièce jointe.'
+                );
+            }
+        } else {
+            $formDateRange->get('dateMin')->setData($dateMin);
+            $formDateRange->get('dateMax')->setData($dateMax);
+        }
+
+        return $this->render('admin/backer/aid_statistics.html.twig', [
+            'backer' => $backer,
+            'formDateRange' => $formDateRange,
+        ]);
     }
 }

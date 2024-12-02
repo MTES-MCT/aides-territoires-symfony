@@ -4,7 +4,7 @@ namespace App\Message\Perimeter;
 
 class CountyCountBacker
 {
-    private $idPerimeter;
+    private int $idPerimeter;
 
     public function __construct(int $idPerimeter)
     {

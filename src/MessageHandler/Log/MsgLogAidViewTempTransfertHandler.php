@@ -8,9 +8,9 @@ use App\Entity\User\User;
 use App\Message\Log\MsgLogAidViewTempTransfert;
 use App\Service\Notification\NotificationService;
 use App\Service\Various\ParamService;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
-use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 
 #[AsMessageHandler()]
@@ -18,7 +18,6 @@ class MsgLogAidViewTempTransfertHandler
 {
     public function __construct(
         private ManagerRegistry $managerRegistry,
-        private KernelInterface $kernelInterface,
         private NotificationService $notificationService,
         private ParamService $paramService
     ) {
@@ -27,6 +26,7 @@ class MsgLogAidViewTempTransfertHandler
     public function __invoke(MsgLogAidViewTempTransfert $message): void
     {
         try {
+            /** @var EntityManagerInterface $entityManager */
             $entityManager = $this->managerRegistry->getManager();
 
             // Récupérer les noms des tables via les entités

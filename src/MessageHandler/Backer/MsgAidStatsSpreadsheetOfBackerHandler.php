@@ -1,9 +1,10 @@
 <?php
 
-namespace App\MessageHandler\User;
+namespace App\MessageHandler\Backer;
 
-use App\Message\User\MsgAidStatsSpreadsheetOfUser;
+use App\Message\Backer\MsgAidStatsSpreadsheetOfBacker;
 use App\Repository\Aid\AidRepository;
+use App\Repository\Backer\BackerRepository;
 use App\Repository\User\UserRepository;
 use App\Service\Aid\AidProjectService;
 use App\Service\Aid\AidService;
@@ -19,10 +20,11 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
 #[AsMessageHandler()]
-class MsgAidStatsSpreadsheetOfUserHandler
+class MsgAidStatsSpreadsheetOfBackerHandler
 {
     public function __construct(
         private UserRepository $userRepository,
+        private BackerRepository $backerRepository,
         private AidRepository $aidRepository,
         private AidService $aidService,
         private StringService $stringService,
@@ -37,15 +39,15 @@ class MsgAidStatsSpreadsheetOfUserHandler
     ) {
     }
 
-    public function __invoke(MsgAidStatsSpreadsheetOfUser $message): void
+    public function __invoke(MsgAidStatsSpreadsheetOfBacker $message): void
     {
         try {
-            $user = $this->userRepository->find($message->getIdUser());
+            $backer = $this->backerRepository->find($message->getIdBacker());
             $dateMin = $message->getDateMin();
             $dateMax = $message->getDateMax();
 
-            $spreadsheet = $this->aidService->getAidStatsSpreadSheetOfUser(
-                $user,
+            $spreadsheet = $this->aidService->getAidStatsSpreadSheetOfBacker(
+                $backer,
                 $dateMin,
                 $dateMax,
                 $this->aidRepository,
@@ -80,13 +82,11 @@ class MsgAidStatsSpreadsheetOfUserHandler
 
             // Envoi l'email
             $send = $this->emailService->sendEmail(
-                $message->getForceEmail() ? $message->getForceEmail() : $user->getEmail(),
-                $message->getForceSubject() ? $message->getForceSubject() : 'Export des statistiques de vos aides',
+                $message->getTargetEmail(),
+                'Export des statistiques des aides du porteur ' . $backer->getName(),
                 'emails/base.html.twig',
                 [
-                    'subject' => $message->getForceSubject()
-                        ? $message->getForceSubject()
-                        : 'Export des statistiques de vos aides',
+                    'subject' => 'Export des statistiques des aides du porteur ' . $backer->getName(),
                     'body' => 'Votre export en pièce jointe',
                 ],
                 [
@@ -107,8 +107,8 @@ class MsgAidStatsSpreadsheetOfUserHandler
             $admin = $this->userRepository->findOneBy(['email' => $this->paramService->get('email_super_admin')]);
             $this->notificationService->addNotification(
                 $admin,
-                'Erreur lors de l\'export PDF des statistiques des aides par ' .
-                    (isset($user) ? $user->getEmail() : 'inconnu'),
+                'Erreur lors de l\'export PDF des statistiques des aides du porteur '
+                    . (isset($backer) ? $backer->getName() : 'inconnu'),
                 $e->getMessage()
             );
         }

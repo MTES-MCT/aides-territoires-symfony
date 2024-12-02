@@ -2,12 +2,10 @@
 
 namespace App\MessageHandler\SearchPage;
 
-use App\Entity\Aid\Aid;
-use App\Entity\Backer\Backer;
 use App\Entity\Log\LogEvent;
 use App\Entity\Search\SearchPage;
-use App\Message\Backer\BackerCountAid;
 use App\Message\SearchPage\SearchPageCountAid;
+use App\Repository\Search\SearchPageRepository;
 use App\Service\Aid\AidSearchFormService;
 use App\Service\Aid\AidService;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
@@ -25,7 +23,7 @@ class SearchPageCountAidHandler
 
     public function __invoke(SearchPageCountAid $message): void
     {
-        /** @var BackerRepository $backerRepo */
+        /** @var SearchPageRepository $searchPageRepo */
         $searchPageRepo = $this->managerRegistry->getRepository(SearchPage::class);
 
         // charge le portail

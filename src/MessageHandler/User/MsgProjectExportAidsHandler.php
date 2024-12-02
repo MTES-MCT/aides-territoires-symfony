@@ -11,27 +11,19 @@ use App\Security\Voter\User\UserProjectAidsVoter;
 use App\Service\Email\EmailService;
 use App\Service\Export\SpreadsheetExporterService;
 use App\Service\File\FileService;
-use App\Service\Notification\NotificationService;
 use App\Service\Project\ProjectService;
-use App\Service\Various\ParamService;
-use App\Service\Various\StringService;
 use Doctrine\Persistence\ManagerRegistry;
 use PhpOffice\PhpSpreadsheet\Writer\Csv;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-use Twig\Environment;
 
 #[AsMessageHandler()]
 class MsgProjectExportAidsHandler
 {
     public function __construct(
-        private NotificationService $notificationService,
         private ManagerRegistry $managerRegistry,
-        private ParamService $paramService,
-        private StringService $stringService,
-        private Environment $twig,
         private EmailService $emailService,
         private FileService $fileService,
         private AuthorizationCheckerInterface $authorizationChecker,
@@ -84,12 +76,11 @@ class MsgProjectExportAidsHandler
                     throw new \Exception('Format non géré');
             }
         } catch (\Exception $e) {
-            dd($e->getMessage());
             // notif erreur
             $this->loggerInterface->error('Erreur dans export aides du projet', [
                 'exception' => $e,
-                'idUser' => $user->getId(),
-                'idProject' => $project->getId(),
+                'idUser' => isset($user) ? $user->getId() : 0,
+                'idProject' => isset($project) ? $project->getId() : 0,
             ]);
         }
     }

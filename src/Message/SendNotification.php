@@ -4,8 +4,8 @@ namespace App\Message;
 
 class SendNotification
 {
-    private $title;
-    private $message;
+    private string $title;
+    private string $message;
 
     public function __construct(string $title, string $message)
     {

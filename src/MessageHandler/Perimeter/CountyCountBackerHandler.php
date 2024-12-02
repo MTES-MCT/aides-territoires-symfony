@@ -5,6 +5,8 @@ namespace App\MessageHandler\Perimeter;
 use App\Entity\Backer\Backer;
 use App\Entity\Perimeter\Perimeter;
 use App\Message\Perimeter\CountyCountBacker;
+use App\Repository\Backer\BackerRepository;
+use App\Repository\Perimeter\PerimeterRepository;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Doctrine\Persistence\ManagerRegistry;
 

@@ -4,7 +4,7 @@ namespace App\Message\Backer;
 
 class BackerCountAid
 {
-    private $idBacker;
+    private int $idBacker;
 
     public function __construct(int $idBacker)
     {

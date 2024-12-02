@@ -172,8 +172,7 @@ class BackerController extends FrontController
         Request $request,
         BackerRepository $backerRepository,
         PerimeterRepository $perimeterRepository
-    ): JsonResponse
-    {
+    ): JsonResponse {
         $idPerimeter = $request->query->get('id_perimeter');
         $query = $request->query->get('q', '');
 

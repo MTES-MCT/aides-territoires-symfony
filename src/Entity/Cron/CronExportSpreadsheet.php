@@ -20,7 +20,7 @@ class CronExportSpreadsheet
     private ?string $sqlRequest = null;
 
     /**
-     * @var string[]|null
+     * @var array<int, array<string, mixed>>|null
      */
     #[ORM\Column(nullable: true)]
     private ?array $sqlParams = null;
@@ -128,7 +128,7 @@ class CronExportSpreadsheet
     }
 
     /**
-     * @return string[]|null
+     * @return array<int, array<string, mixed>>|null
      */
     public function getSqlParams(): ?array
     {
@@ -136,8 +136,7 @@ class CronExportSpreadsheet
     }
 
     /**
-     * @param string[]|null $sqlParams
-     * @return static
+     * @param array<int, array<string, mixed>>|null $sqlParams
      */
     public function setSqlParams(?array $sqlParams): static
     {

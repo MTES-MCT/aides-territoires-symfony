@@ -1,0 +1,32 @@
+{% extends "@EasyAdmin/page/content.html.twig" %}
+
+{% block main %}
+	{{ parent() }}
+    
+    <main>
+		<h1>Statistiques des aides de {{ backer.name }}</h1>
+
+        <div class="alert alert-info">
+            <p>
+                Vous pouvez exporter les statistiques des aides associées à ce porteur pour une période donnée.
+            </p>
+        </div>
+		<div class="mb-5">
+			{{ form_start(formDateRange) }}
+			<div class="container">
+				<div class="row justify-content-md-center">
+					<div class="col-md-auto">
+						{{ form_row(formDateRange.dateMin) }}
+					</div>
+					<div class="col-md-auto">
+						{{ form_row(formDateRange.dateMax) }}
+					</div>
+					<div class="col-md-auto">
+						<button type="submit" class="btn btn-primary">Valider</button>
+					</div>
+				</div>
+			</div>
+			{{ form_end(formDateRange) }}
+		</div>
+	</main>
+{% endblock %}

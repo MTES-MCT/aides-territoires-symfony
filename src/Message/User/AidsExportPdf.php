@@ -4,8 +4,8 @@ namespace App\Message\User;
 
 class AidsExportPdf
 {
-    private $idUser;
-    private $idOrganization;
+    private int $idUser;
+    private int $idOrganization;
 
     public function __construct(int $idUser, int $idOrganization)
     {

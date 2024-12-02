@@ -128,7 +128,10 @@ class AidExportPdfHandler
             ->findOneBy(['email' => $this->paramService->get('email_super_admin')]);
             $this->notificationService->addNotification(
                 $admin,
-                'Erreur lors de l\'export PDF des aides par ' . $user->getEmail() . ' de ' . $organizationName,
+                'Erreur lors de l\'export PDF des aides par ' .
+                    (isset($user) ? $user->getEmail() : 'inconnu') .
+                    ' de ' .
+                    (isset($organizationName) ? $organizationName : 'inconnu'),
                 $e->getMessage()
             );
         }
