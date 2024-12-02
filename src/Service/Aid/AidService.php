@@ -897,7 +897,7 @@ class AidService // NOSONAR too complex
     ): Spreadsheet {
         // paramètre filtre aides
         $aidsParams = [
-            'author' => $user,
+            'userWithOrganizations' => $user,
             'orderBy' => [
                 'sort' => 'a.dateCreate',
                 'order' => 'DESC',
@@ -921,11 +921,13 @@ class AidService // NOSONAR too complex
                 $sheet = $spreadsheet->createSheet();
             }
 
-            // met le nom à la feuille
-            $sheet->setTitle($stringService->truncate($aid->getId() . '_' . $aid->getName(), 31));
+            // met le nom à la feuille en retirant les caractères spéciaux
+            $sheetTitle = preg_replace('/[^a-zA-Z0-9_]/', '', $aid->getId() . '_' . $aid->getName());
+            $sheetTitle = $stringService->truncate($sheetTitle, 31);
+            $sheet->setTitle($sheetTitle);
 
             // Infos aides
-            $sheet->setCellValue('A1', 'Nom de l’aide');
+            $sheet->setCellValue('A1', 'Nom de l\'aide');
             $sheet->setCellValue('B1', $aid->getName());
             $sheet->setCellValue('A2', 'Url de l\'aide');
             $sheet->setCellValue('B2', $aid->getUrl());
@@ -938,7 +940,7 @@ class AidService // NOSONAR too complex
                 'Date',
                 'Nombre de vues',
                 'Nombre de clics sur Candidater',
-                'Nombre de clics sur Plus d’informations',
+                'Nombre de clics sur Plus d\'informations',
                 'Nombre de projets privés liés',
                 'Nombre de projets publics liés',
             ];
@@ -950,7 +952,7 @@ class AidService // NOSONAR too complex
             // Nombre de clics sur Candidater par jours
             $nbApplicationUrlClicksByDay = $logAidApplicationUrlClickService->getCountByDay($aid, $dateMin, $dateMax);
 
-            // Nombre de clics sur Plus d’informations par jours
+            // Nombre de clics sur Plus d'informations par jours
             $nbOriginUrlClicksByDay = $logAidOriginUrlClickService->getCountByDay($aid, $dateMin, $dateMax);
 
             // nb project public associés

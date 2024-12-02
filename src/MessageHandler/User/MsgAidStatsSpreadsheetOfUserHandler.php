@@ -80,11 +80,11 @@ class MsgAidStatsSpreadsheetOfUserHandler
 
             // Envoi l'email
             $send = $this->emailService->sendEmail(
-                $user->getEmail(),
-                'Export des statistiques de vos aides',
+                $message->getForceEmail() ? $message->getForceEmail() : $user->getEmail(),
+                $message->getForceSubject() ? $message->getForceSubject() : 'Export des statistiques de vos aides',
                 'emails/base.html.twig',
                 [
-                    'subject' => 'Export des statistiques de vos aides',
+                    'subject' => $message->getForceSubject() ? $message->getForceSubject() : 'Export des statistiques de vos aides',
                     'body' => 'Votre export en pièce jointe',
                 ],
                 [

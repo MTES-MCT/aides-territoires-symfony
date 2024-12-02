@@ -8,6 +8,8 @@ use App\Controller\Admin\Filter\UserAdministratorOfSearchPageFilter;
 use App\Controller\Admin\Filter\UserCountyFilter;
 use App\Controller\Admin\Filter\UserRoleFilter;
 use App\Entity\User\User;
+use App\Form\Admin\Filter\DateRangeType;
+use App\Message\User\MsgAidStatsSpreadsheetOfUser;
 use App\Service\Export\SpreadsheetExporterService;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
@@ -25,6 +27,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use EasyCorp\Bundle\EasyAdminBundle\Filter\ChoiceFilter;
 use EasyCorp\Bundle\EasyAdminBundle\Filter\NullFilter;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Messenger\MessageBusInterface;
 
 class UserCrudController extends AtCrudController
 {
@@ -182,6 +185,10 @@ class UserCrudController extends AtCrudController
             )
         ;
 
+        $aidStatistics = Action::new('aidStatistics', 'Statistiques des aides', 'fas fa-chart-line')
+            ->linkToCrudAction('aidStatistics')
+        ;
+
         $exportCsvAction = $this->getExportCsvAction();
         $exportXlsxAction = $this->getExportXlsxAction();
 
@@ -195,6 +202,8 @@ class UserCrudController extends AtCrudController
             ->add(Crud::PAGE_INDEX, $exportXlsxAction)
             ->add(Crud::PAGE_INDEX, $changePassword)
             ->add(Crud::PAGE_EDIT, $changePassword)
+            ->add(Crud::PAGE_EDIT, $aidStatistics)
+            ->add(Crud::PAGE_INDEX, $aidStatistics)
         ;
     }
 
@@ -209,6 +218,54 @@ class UserCrudController extends AtCrudController
             ->set('idUser', $user->getId())
             ->generateUrl();
         return $this->redirect($url);
+    }
+
+    public function aidStatistics(
+        AdminContext $context,
+        MessageBusInterface $bus
+    ): Response
+    {
+        $user = $context->getEntity()->getInstance();
+
+        // dates par défaut
+        $dateMin = new \DateTime('-1 month');
+        $dateMax = new \DateTime();
+
+        // formulaire de filtre
+        $formDateRange = $this->createForm(DateRangeType::class);
+        $formDateRange->handleRequest($context->getRequest());
+        if ($formDateRange->isSubmitted()) {
+            if ($formDateRange->isValid()) {
+                $dateMin = $formDateRange->get('dateMin')->getData();
+                $dateMax = $formDateRange->get('dateMax')->getData();
+
+                // recupere l'admin courant
+                /** @var User $admin */
+                $admin = $this->getUser();
+
+                $bus->dispatch(new MsgAidStatsSpreadsheetOfUser(
+                    $user->getId(),
+                    $dateMin,
+                    $dateMax,
+                    $admin->getEmail(),
+                    'Export des statistiques des aides de ' . $user->getFullName() . ' (' . $user->getEmail() . ')'
+                ));
+
+                // message de confirmation
+                $this->addFlash(
+                    'success',
+                    'L\'export des statistiques des aides de ' . $user->getFullName() . ' (' . $user->getEmail() . ') est en cours, vous recevrez un mail avec le document en pièce jointe.'
+                );
+            }
+        } else {
+            $formDateRange->get('dateMin')->setData($dateMin);
+            $formDateRange->get('dateMax')->setData($dateMax);
+        }
+        
+        return $this->render('admin/user/aid_statistics.html.twig', [
+            'user' => $user,
+            'formDateRange' => $formDateRange,
+        ]);
     }
 
     public function showQrCode(AdminContext $context): Response
