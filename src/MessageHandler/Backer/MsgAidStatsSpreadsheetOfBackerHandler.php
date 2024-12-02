@@ -18,6 +18,7 @@ use App\Service\Various\ParamService;
 use App\Service\Various\StringService;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
+use Symfony\Component\Routing\RouterInterface;
 
 #[AsMessageHandler()]
 class MsgAidStatsSpreadsheetOfBackerHandler
@@ -35,7 +36,8 @@ class MsgAidStatsSpreadsheetOfBackerHandler
         private EmailService $emailService,
         private FileService $fileService,
         private ParamService $paramService,
-        private NotificationService $notificationService
+        private NotificationService $notificationService,
+        private RouterInterface $routerInterface,
     ) {
     }
 
@@ -46,6 +48,12 @@ class MsgAidStatsSpreadsheetOfBackerHandler
             $dateMin = $message->getDateMin();
             $dateMax = $message->getDateMax();
 
+            // donne le contexte au router pour generer l'url beta ou prod
+            $host = $_ENV["APP_ENV"] == 'dev' ? 'aides-terr-php.osc-fr1.scalingo.io' : 'aides-territoires.beta.gouv.fr';
+            $context = $this->routerInterface->getContext();
+            $context->setHost($host);
+            $context->setScheme('https');
+            
             $spreadsheet = $this->aidService->getAidStatsSpreadSheetOfBacker(
                 $backer,
                 $dateMin,
