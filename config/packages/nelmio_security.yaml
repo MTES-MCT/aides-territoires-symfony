@@ -31,7 +31,6 @@ nelmio_security:
                 - 'self'
                 - 'https://in-automate.brevo.com'
                 - 'https://stats.beta.gouv.fr'
-                - 'http://aides-territoires.beta.gouv.fr'
                 - 'https://aides-territoires.beta.gouv.fr'
             #définit les sources de scripts autorisées
             script-src:
