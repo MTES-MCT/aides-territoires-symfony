@@ -23,14 +23,12 @@ liip_imagine:
             flysystem:
                 filesystem_service: 's3.storage'
                 root_url: '%env(CLOUD_IMAGE_URL)%'
-                cache_prefix: 'imagine'
-                force_https: true
+                cache_prefix: 'media/cache' 
         s3_resolver:
             flysystem:
                 filesystem_service: 's3.storage'
                 root_url: '%env(CLOUD_IMAGE_URL)%'
-                cache_prefix: 'imagine'
-                force_https: true
+                cache_prefix: 'media/cache' 
     filter_sets :
         # cache : ~
         
