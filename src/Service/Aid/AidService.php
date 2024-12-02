@@ -6,6 +6,7 @@ use App\Entity\Aid\Aid;
 use App\Entity\Aid\AidFinancer;
 use App\Entity\Aid\AidInstructor;
 use App\Entity\Aid\AidLock;
+use App\Entity\Backer\Backer;
 use App\Entity\Organization\Organization;
 use App\Entity\Organization\OrganizationType;
 use App\Entity\Perimeter\Perimeter;
@@ -898,6 +899,107 @@ class AidService // NOSONAR too complex
         // paramètre filtre aides
         $aidsParams = [
             'userWithOrganizations' => $user,
+            'orderBy' => [
+                'sort' => 'a.dateCreate',
+                'order' => 'DESC',
+            ],
+        ];
+
+        // les aides du user
+        $aids = $aidRepository->findCustom($aidsParams);
+
+        // Création du fichier Excel
+        $spreadsheet = new Spreadsheet();
+
+        // Parcours les aides
+        $firstAid = true;
+        foreach ($aids as $aid) {
+            // gestion feuille
+            if ($firstAid) {
+                $sheet = $spreadsheet->getActiveSheet();
+                $firstAid = false;
+            } else {
+                $sheet = $spreadsheet->createSheet();
+            }
+
+            // met le nom à la feuille en retirant les caractères spéciaux
+            $sheetTitle = preg_replace('/[^a-zA-Z0-9_]/', '', $aid->getId() . '_' . $aid->getName());
+            $sheetTitle = $stringService->truncate($sheetTitle, 31);
+            $sheet->setTitle($sheetTitle);
+
+            // Infos aides
+            $sheet->setCellValue('A1', 'Nom de l\'aide');
+            $sheet->setCellValue('B1', $aid->getName());
+            $sheet->setCellValue('A2', 'Url de l\'aide');
+            $sheet->setCellValue('B2', $aid->getUrl());
+
+            // saut de ligne
+            $sheet->setCellValue('A3', '');
+
+            // Ajout des en-têtes
+            $headers = [
+                'Date',
+                'Nombre de vues',
+                'Nombre de clics sur Candidater',
+                'Nombre de clics sur Plus d\'informations',
+                'Nombre de projets privés liés',
+                'Nombre de projets publics liés',
+            ];
+            $sheet->fromArray($headers, null, 'A4');
+
+            // Nombre de vues par jours
+            $nbViewsByDay = $logAidViewService->getCountByDay($aid, $dateMin, $dateMax);
+
+            // Nombre de clics sur Candidater par jours
+            $nbApplicationUrlClicksByDay = $logAidApplicationUrlClickService->getCountByDay($aid, $dateMin, $dateMax);
+
+            // Nombre de clics sur Plus d'informations par jours
+            $nbOriginUrlClicksByDay = $logAidOriginUrlClickService->getCountByDay($aid, $dateMin, $dateMax);
+
+            // nb project public associés
+            $nbProjectPublicsByDay = $aidProjectService->getCountByDay($aid, $dateMin, $dateMax, true);
+
+            // nb project prive associés
+            $nbProjectPrivatesByDay = $aidProjectService->getCountByDay($aid, $dateMin, $dateMax, false);
+
+            // Parcours les dates
+            $currentDay = clone $dateMin;
+            $rowIndex = 5; // Ligne de départ pour les données
+            while ($currentDay <= $dateMax) {
+                $dataRow = [
+                    $currentDay->format('d/m/Y'),
+                    $nbViewsByDay[$currentDay->format('Y-m-d')] ?? '0',
+                    $nbApplicationUrlClicksByDay[$currentDay->format('Y-m-d')] ?? '0',
+                    $nbOriginUrlClicksByDay[$currentDay->format('Y-m-d')] ?? '0',
+                    $nbProjectPublicsByDay[$currentDay->format('Y-m-d')] ?? '0',
+                    $nbProjectPrivatesByDay[$currentDay->format('Y-m-d')] ?? '0',
+                ];
+                $sheet->fromArray($dataRow, null, 'A' . $rowIndex);
+                ++$rowIndex;
+                $currentDay->add(new \DateInterval('P1D'));
+            }
+
+            // Ajout des filtres automatiques aux en-têtes
+            $sheet->setAutoFilter('A4:F4');
+        }
+
+        return $spreadsheet;
+    }
+
+    public function getAidStatsSpreadSheetOfBacker(
+        Backer $backer,
+        \DateTime $dateMin,
+        \DateTime $dateMax,
+        AidRepository $aidRepository,
+        StringService $stringService,
+        LogAidViewService $logAidViewService,
+        LogAidApplicationUrlClickService $logAidApplicationUrlClickService,
+        LogAidOriginUrlClickService $logAidOriginUrlClickService,
+        AidProjectService $aidProjectService,
+    ): Spreadsheet {
+        // paramètre filtre aides
+        $aidsParams = [
+            'backer' => $backer,
             'orderBy' => [
                 'sort' => 'a.dateCreate',
                 'order' => 'DESC',
