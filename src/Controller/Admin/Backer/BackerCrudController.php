@@ -5,6 +5,7 @@ namespace App\Controller\Admin\Backer;
 use App\Controller\Admin\AtCrudController;
 use App\Controller\Admin\Filter\Backer\HasNoOrganizationFilter;
 use App\Entity\Backer\Backer;
+use App\Entity\User\User;
 use App\Field\TextLengthCountField;
 use App\Field\TrumbowygField;
 use App\Form\Admin\Filter\DateRangeType;

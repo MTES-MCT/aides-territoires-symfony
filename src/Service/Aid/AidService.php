@@ -885,6 +885,19 @@ class AidService // NOSONAR too complex
         return $keywordsReturn;
     }
 
+    /**
+     * Génère un fichier Excel contenant les statistiques d'une liste d'aides sur une période donnée
+     * 
+     * @param Aid[] $aids Liste des aides à analyser
+     * @param \DateTime $dateMin Date de début de la période
+     * @param \DateTime $dateMax Date de fin de la période
+     * @param StringService $stringService Service de manipulation de chaînes
+     * @param LogAidViewService $logAidViewService Service de statistiques de vues des aides
+     * @param LogAidApplicationUrlClickService $logAidApplicationUrlClickService Service de statistiques des clics sur les boutons "Candidater"
+     * @param LogAidOriginUrlClickService $logAidOriginUrlClickService Service de statistiques des clics sur les boutons "Plus d'informations"
+     * @param AidProjectService $aidProjectService Service de gestion des projets liés aux aides
+     * @return Spreadsheet Fichier Excel contenant les statistiques
+     */
     private function getAidStatsSpreadSheet(
         array $aids,
         \DateTime $dateMin,
@@ -950,6 +963,18 @@ class AidService // NOSONAR too complex
         return $spreadsheet;
     }
 
+    /**
+     * Génère un fichier Excel contenant les statistiques des aides
+     * 
+     * @param User $user Utilisateur dont les aides sont analysées
+     * @param \DateTime $dateMin Date de début de la période d'analyse
+     * @param \DateTime $dateMax Date de fin de la période d'analyse
+     * @param StringService $stringService Service de manipulation de chaînes
+     * @param LogAidViewService $logAidViewService Service de statistiques des vues
+     * @param LogAidApplicationUrlClickService $logAidApplicationUrlClickService Service de statistiques des clics sur le bouton Candidater
+     * @param LogAidOriginUrlClickService $logAidOriginUrlClickService Service de statistiques des clics sur Plus d'informations
+     * @param AidProjectService $aidProjectService Service de statistiques des projets liés
+     */
     public function getAidStatsSpreadSheetOfUser(
         User $user,
         \DateTime $dateMin,
