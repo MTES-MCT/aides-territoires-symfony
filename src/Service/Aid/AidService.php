@@ -485,7 +485,7 @@ class AidService // NOSONAR too complex
         if ($aid->getAuthor() == $user || $this->userService->isUserGranted($user, User::ROLE_ADMIN)) {
             $access = true;
         }
-        
+
         // Si l'utilisateur est dans l'organisation de l'aide
         if ($aid->getOrganization() && $aid->getOrganization()->getBeneficiairies()->contains($user)) {
             $access = true;
@@ -886,17 +886,15 @@ class AidService // NOSONAR too complex
     }
 
     /**
-     * Génère un fichier Excel contenant les statistiques d'une liste d'aides sur une période donnée
-     * 
-     * @param Aid[] $aids Liste des aides à analyser
-     * @param \DateTime $dateMin Date de début de la période
-     * @param \DateTime $dateMax Date de fin de la période
-     * @param StringService $stringService Service de manipulation de chaînes
-     * @param LogAidViewService $logAidViewService Service de statistiques de vues des aides
-     * @param LogAidApplicationUrlClickService $logAidApplicationUrlClickService Service de statistiques des clics sur les boutons "Candidater"
-     * @param LogAidOriginUrlClickService $logAidOriginUrlClickService Service de statistiques des clics sur les boutons "Plus d'informations"
-     * @param AidProjectService $aidProjectService Service de gestion des projets liés aux aides
-     * @return Spreadsheet Fichier Excel contenant les statistiques
+     * @param Aid[] $aids
+     * @param \DateTime $dateMin
+     * @param \DateTime $dateMax
+     * @param StringService $stringService
+     * @param LogAidViewService $logAidViewService
+     * @param LogAidApplicationUrlClickService $logAidApplicationUrlClickService
+     * @param LogAidOriginUrlClickService $logAidOriginUrlClickService
+     * @param AidProjectService $aidProjectService
+     * @return Spreadsheet
      */
     private function getAidStatsSpreadSheet(
         array $aids,
@@ -965,15 +963,15 @@ class AidService // NOSONAR too complex
 
     /**
      * Génère un fichier Excel contenant les statistiques des aides
-     * 
-     * @param User $user Utilisateur dont les aides sont analysées
-     * @param \DateTime $dateMin Date de début de la période d'analyse
-     * @param \DateTime $dateMax Date de fin de la période d'analyse
-     * @param StringService $stringService Service de manipulation de chaînes
-     * @param LogAidViewService $logAidViewService Service de statistiques des vues
-     * @param LogAidApplicationUrlClickService $logAidApplicationUrlClickService Service de statistiques des clics sur le bouton Candidater
-     * @param LogAidOriginUrlClickService $logAidOriginUrlClickService Service de statistiques des clics sur Plus d'informations
-     * @param AidProjectService $aidProjectService Service de statistiques des projets liés
+     *
+     * @param User $user
+     * @param \DateTime $dateMin
+     * @param \DateTime $dateMax
+     * @param StringService $stringService
+     * @param LogAidViewService $logAidViewService
+     * @param LogAidApplicationUrlClickService $logAidApplicationUrlClickService
+     * @param LogAidOriginUrlClickService $logAidOriginUrlClickService
+     * @param AidProjectService $aidProjectService
      */
     public function getAidStatsSpreadSheetOfUser(
         User $user,

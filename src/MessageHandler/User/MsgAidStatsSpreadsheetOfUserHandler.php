@@ -84,7 +84,9 @@ class MsgAidStatsSpreadsheetOfUserHandler
                 $message->getForceSubject() ? $message->getForceSubject() : 'Export des statistiques de vos aides',
                 'emails/base.html.twig',
                 [
-                    'subject' => $message->getForceSubject() ? $message->getForceSubject() : 'Export des statistiques de vos aides',
+                    'subject' => $message->getForceSubject()
+                        ? $message->getForceSubject()
+                        : 'Export des statistiques de vos aides',
                     'body' => 'Votre export en pièce jointe',
                 ],
                 [
@@ -105,7 +107,8 @@ class MsgAidStatsSpreadsheetOfUserHandler
             $admin = $this->userRepository->findOneBy(['email' => $this->paramService->get('email_super_admin')]);
             $this->notificationService->addNotification(
                 $admin,
-                'Erreur lors de l\'export PDF des statistiques des aides par ' . $user->getEmail(),
+                'Erreur lors de l\'export PDF des statistiques des aides par ' .
+                    (isset($user) ? $user->getEmail() : 'inconnu'),
                 $e->getMessage()
             );
         }

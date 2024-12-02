@@ -4,8 +4,8 @@ namespace App\Message\Aid;
 
 class AidPropagateUpdate
 {
-    private $idAidGeneric;
-    private $idAidLocal;
+    private int $idAidGeneric;
+    private int $idAidLocal;
 
     public function __construct(int $idAidGeneric, int $idAidLocal)
     {

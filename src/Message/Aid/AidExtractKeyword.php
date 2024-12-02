@@ -4,7 +4,7 @@ namespace App\Message\Aid;
 
 class AidExtractKeyword
 {
-    private $idAid;
+    private int $idAid;
 
     public function __construct(int $idAid)
     {

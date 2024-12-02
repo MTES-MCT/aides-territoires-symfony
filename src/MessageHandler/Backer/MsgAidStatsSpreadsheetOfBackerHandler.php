@@ -83,10 +83,10 @@ class MsgAidStatsSpreadsheetOfBackerHandler
             // Envoi l'email
             $send = $this->emailService->sendEmail(
                 $message->getTargetEmail(),
-                'Export des statistiques des aides du porteur '.$backer->getName(),
+                'Export des statistiques des aides du porteur ' . $backer->getName(),
                 'emails/base.html.twig',
                 [
-                    'subject' => 'Export des statistiques des aides du porteur '.$backer->getName(),
+                    'subject' => 'Export des statistiques des aides du porteur ' . $backer->getName(),
                     'body' => 'Votre export en pièce jointe',
                 ],
                 [
@@ -107,7 +107,8 @@ class MsgAidStatsSpreadsheetOfBackerHandler
             $admin = $this->userRepository->findOneBy(['email' => $this->paramService->get('email_super_admin')]);
             $this->notificationService->addNotification(
                 $admin,
-                'Erreur lors de l\'export PDF des statistiques des aides du porteur ' . $backer->getName(),
+                'Erreur lors de l\'export PDF des statistiques des aides du porteur '
+                    . (isset($backer) ? $backer->getName() : 'inconnu'),
                 $e->getMessage()
             );
         }

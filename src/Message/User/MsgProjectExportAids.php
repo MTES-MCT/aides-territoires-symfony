@@ -4,9 +4,9 @@ namespace App\Message\User;
 
 class MsgProjectExportAids
 {
-    private $idUser;
-    private $idProject;
-    private $format;
+    private int $idUser;
+    private int $idProject;
+    private string $format;
 
     public function __construct(int $idUser, int $idProject, string $format)
     {

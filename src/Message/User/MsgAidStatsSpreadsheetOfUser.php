@@ -4,9 +4,9 @@ namespace App\Message\User;
 
 class MsgAidStatsSpreadsheetOfUser
 {
-    private $idUser;
-    private $dateMin;
-    private $dateMax;
+    private int $idUser;
+    private \DateTime $dateMin;
+    private \DateTime $dateMax;
     private ?string $forceEmail;
     private ?string $forceSubject;
 

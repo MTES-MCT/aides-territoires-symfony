@@ -4,7 +4,7 @@ namespace App\Message\Alert;
 
 class AlertMessage
 {
-    private $idAlert;
+    private string $idAlert;
 
     // id alert est une string
     public function __construct(string $idAlert)

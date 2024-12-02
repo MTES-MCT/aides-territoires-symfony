@@ -178,8 +178,7 @@ class BackerCrudController extends AtCrudController
     public function aidStatistics(
         AdminContext $context,
         MessageBusInterface $bus
-    ): Response
-    {
+    ): Response {
         $backer = $context->getEntity()->getInstance();
 
         // dates par défaut
@@ -215,7 +214,7 @@ class BackerCrudController extends AtCrudController
             $formDateRange->get('dateMin')->setData($dateMin);
             $formDateRange->get('dateMax')->setData($dateMax);
         }
-        
+
         return $this->render('admin/backer/aid_statistics.html.twig', [
             'backer' => $backer,
             'formDateRange' => $formDateRange,

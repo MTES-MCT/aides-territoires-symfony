@@ -223,8 +223,7 @@ class UserCrudController extends AtCrudController
     public function aidStatistics(
         AdminContext $context,
         MessageBusInterface $bus
-    ): Response
-    {
+    ): Response {
         $user = $context->getEntity()->getInstance();
 
         // dates par défaut
@@ -261,7 +260,7 @@ class UserCrudController extends AtCrudController
             $formDateRange->get('dateMin')->setData($dateMin);
             $formDateRange->get('dateMax')->setData($dateMax);
         }
-        
+
         return $this->render('admin/user/aid_statistics.html.twig', [
             'user' => $user,
             'formDateRange' => $formDateRange,

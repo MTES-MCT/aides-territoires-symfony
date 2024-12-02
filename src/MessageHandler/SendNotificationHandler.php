@@ -19,7 +19,7 @@ class SendNotificationHandler
     ) {
     }
 
-    public function __invoke(SendNotification $message)
+    public function __invoke(SendNotification $message): void
     {
         $admin = $this->managerRegistry->getRepository(User::class)
         ->findOneBy(['email' => $this->paramService->get('email_super_admin')]);

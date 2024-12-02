@@ -4,7 +4,7 @@ namespace App\Message\Reference;
 
 class ProjectReferenceCountAids
 {
-    private $idProjectReference;
+    private int $idProjectReference;
 
     public function __construct(int $idProjectReference)
     {

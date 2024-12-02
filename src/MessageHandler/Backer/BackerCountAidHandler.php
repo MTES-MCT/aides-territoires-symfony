@@ -5,6 +5,8 @@ namespace App\MessageHandler\Backer;
 use App\Entity\Aid\Aid;
 use App\Entity\Backer\Backer;
 use App\Message\Backer\BackerCountAid;
+use App\Repository\Aid\AidRepository;
+use App\Repository\Backer\BackerRepository;
 use App\Service\Aid\AidService;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Doctrine\Persistence\ManagerRegistry;

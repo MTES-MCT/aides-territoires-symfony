@@ -83,7 +83,7 @@ class PerimeterController extends ApiController
 
         // requete pour compter sans la pagination
         $count = count($perimeterRepository->findCustom($params));
-        
+
         // requete pour les résultats avec la pagination
         $params['firstResult'] = ($this->getPage() - 1) * $this->getItemsPerPage();
         $params['maxResults'] = $this->getItemsPerPage();

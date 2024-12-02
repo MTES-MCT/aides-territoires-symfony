@@ -4,7 +4,7 @@ namespace App\Message\SearchPage;
 
 class SearchPageCountAid
 {
-    private $idSearchPage;
+    private int $idSearchPage;
 
     public function __construct(int $idSearchPage)
     {

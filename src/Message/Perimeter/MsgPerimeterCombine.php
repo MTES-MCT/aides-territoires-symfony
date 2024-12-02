@@ -4,8 +4,8 @@ namespace App\Message\Perimeter;
 
 class MsgPerimeterCombine
 {
-    private $idPerimeter;
-    private $idPerimeterToAdd;
+    private int $idPerimeter;
+    private int $idPerimeterToAdd;
 
     public function __construct(int $idPerimeter, int $idPerimeterToAdd)
     {
