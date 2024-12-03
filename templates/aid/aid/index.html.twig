@@ -1,11 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}
-	{{ pageTitle}}
-	|
-	{{ parent() }}
-{% endblock title %}
-
+{% block title %}{{ pageTitle }} | {{ parent() }}{% endblock %}
 
 {% block stylesheets %}
 	{{ parent() }}
