@@ -6,7 +6,7 @@
 			</label>
 		{% endif %}
 		{{ form_help(form) }}
-		<div class="opener">
+		<div class="opener" tabindex="0">
 			{% if form.vars.errors.form.config.attributes['data_collector/passed_options'].placeholder is defined and form.vars.errors.form.config.attributes['data_collector/passed_options'].placeholder %}
 				{{ form.vars.errors.form.config.attributes['data_collector/passed_options'].placeholder }}{% else %}Sélectionnez
 			{% endif %}

@@ -161,6 +161,9 @@
             $(base.el).on({
                 click: function (e) {
                     base.toggleChecbkoxesWrapper();
+                },
+                focusin: function(e) {
+                    base.showCheckboxesWrapper();
                 }
             }, base.opener);
 
