@@ -24,6 +24,14 @@
     font-size: 1rem;
     color: var(--text-default-grey);
 }
+.ts-control input::placeholder {
+    color: var(--text-default-grey);
+    opacity: 1;
+}
+
+.plugin-clear_button .clear-button {
+    opacity: 1;
+}
 
 .ts-wrapper.multi .ts-control{
     flex-direction: column;
