@@ -35,7 +35,7 @@
 					<div class="fr-fieldset__element" aria-selected="{% if field.vars.checked %}true{% else %}false{% endif %}">
 						<div class="fr-checkbox-group">
 							{{- form_errors(field) -}}
-							{{- form_widget(field, widget_attr) -}}
+							{{- form_widget(field, widget_attr|merge({'attr': {'tabindex': '-1'}})) -}}
 							{{- form_label(field) -}}
 						</div>
 					</div>
