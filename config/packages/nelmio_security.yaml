@@ -37,6 +37,7 @@ nelmio_security:
                 - 'self'
                 - 'https://sibautomation.com'
                 - 'https://stats.beta.gouv.fr/'
+                - 'https://cdn.brevo.com/js/sdk-loader.js'
             #définit les sources de feuilles de styles (CSS) autorisées
             style-src:
                 - 'self'

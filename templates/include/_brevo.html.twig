@@ -1,6 +1,8 @@
 {% if app.environment == 'prod' %}
     {% cspscript %}
     <script src="https://cdn.brevo.com/js/sdk-loader.js" async></script>
+	{% endcspscript %}
+	{% cspscript %}
     <script>
         // Version: 2.0
         window.Brevo = window.Brevo || [];
