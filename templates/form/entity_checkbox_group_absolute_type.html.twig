@@ -13,35 +13,37 @@
 		</div>
 
 		<div class="checkboxes-wrapper">
-			<div class="filter"><input type="text" class="fr-input" placeholder="Filtrer" autocomplete="off"/></div>
-			{% for key, choices in form.vars.choices %}
+			<div class="filter"><input type="text" class="fr-input" placeholder="Filtrer" autocomplete="off" tabindex="0" /></div>
+			<div id="checkboxes-list" tabindex="0" role="listbox">
+				{% for key, choices in form.vars.choices %}
 
-				<div class="fr-fieldset__element optgroup">
-					<strong class="select2-results__group">{{ key }}</strong>
-				</div>
-
-				{% for keyChoice, choice in choices %}
-					{% set field = form.children[keyChoice] %}
-					{%- set widget_attr = {} -%}
-					{%- if help is not empty -%}
-						{%- set widget_attr = {attr: {'aria-describedby': id ~"_help"}} -%}
-					{%- endif -%}
-					{% set widget_attr = widget_attr|merge({'attr': {'autocomplete': 'off'}}) %}
-					{% if field.vars.checked %}
-						{% set widget_attr = widget_attr|merge({'attr': {'checked': 'checked'}}) %}
-					{% endif %}
-					{% set row_attr = row_attr|merge({'class': (row_attr.class|default('') ~ ' fr-input-group')|trim}) %}
-
-					<div class="fr-fieldset__element" aria-selected="{% if field.vars.checked %}true{% else %}false{% endif %}">
-						<div class="fr-checkbox-group">
-							{{- form_errors(field) -}}
-							{{- form_widget(field, widget_attr|merge({'attr': {'tabindex': '-1'}})) -}}
-							{{- form_label(field) -}}
-						</div>
+					<div class="fr-fieldset__element optgroup">
+						<strong class="select2-results__group">{{ key }}</strong>
 					</div>
-				{% endfor %}
 
-			{% endfor %}
+					{% for keyChoice, choice in choices %}
+						{% set field = form.children[keyChoice] %}
+						{%- set widget_attr = {} -%}
+						{%- if help is not empty -%}
+							{%- set widget_attr = {attr: {'aria-describedby': id ~"_help"}} -%}
+						{%- endif -%}
+						{% set widget_attr = widget_attr|merge({'attr': {'autocomplete': 'off'}}) %}
+						{% if field.vars.checked %}
+							{% set widget_attr = widget_attr|merge({'attr': {'checked': 'checked'}}) %}
+						{% endif %}
+						{% set row_attr = row_attr|merge({'class': (row_attr.class|default('') ~ ' fr-input-group')|trim}) %}
+
+						<div class="fr-fieldset__element" aria-selected="{% if field.vars.checked %}true{% else %}false{% endif %}" role="option">
+							<div class="fr-checkbox-group">
+								{{- form_errors(field) -}}
+								{{- form_widget(field, widget_attr|merge({'attr': {'tabindex': '-1'}})) -}}
+								{{- form_label(field) -}}
+							</div>
+						</div>
+					{% endfor %}
+
+				{% endfor %}
+			</div>
 		</div>
 	</div>
 

@@ -16,6 +16,7 @@
             base.opener = base.$el.find('.opener');
             base.filter = base.$el.find('.filter');
             base.checboxesWrapper = base.$el.find('.checkboxes-wrapper');
+            base.checkboxesList = base.$el.find('#checkboxes-list');
             base.options = $.extend({},$.entity_checkbox_absolute_type.defaultOptions, options);
             base.placeholder = $(base.opener).text();
             base.setResumeText();
@@ -102,29 +103,16 @@
             $(base.checboxesWrapper).show();
         }
 
+        base.updateAriaSelected = function(checkboxes, index) {
+            checkboxes.each(function(i) {
+                $(this).parents('.fr-fieldset__element').attr('aria-selected', i === index ? 'true' : 'false');
+            });
+        }
         		// Ajout des écouteurs
 		base.addListeners = function()
         {
-            // $(window).on({
-            //     scroll: function (e) {
-            //         base.setAutocompletePositions();
-            //     }
-            // });
-			
-            // $(base.checboxesWrapper).on({
-            //     keyup: function() {
-            //         var thisElt = $(this);
-        
-            //         $('.fr-checkbox-group', thisElt.parents('.autocomplete-list-wrapper').find('.autocomplete-choices')).each(function() {
-            //             if ($('label', this).text().toLowerCase().includes(base.getTextSearched()) || base.getTextSearched() == '' || $('input[type="checkbox"]', this).is(':checked')) {
-            //                 $(this).parents('.fr-fieldset__element').show();
-            //             } else {
-            //                 $(this).parents('.fr-fieldset__element').hide();
-            //             }
-            //             base.handleDisplayOptgroup($(this).parents('.choices-optgroup'));
-            //         })
-            //     }
-            // }, 'input.c-autocomplete');
+            let currentIndex = -1;
+            let foucusInDone = false;
 
             $(base.filter).on({
                 click: function (e) {
@@ -158,12 +146,66 @@
                 }
             }, 'input[type="checkbox"]');
 
+            $(base.checkboxesList).on({
+                focusin: function(e) {
+                    let checkboxes = $(base.checkboxesList)
+                    .find('.fr-fieldset__element:visible input[type="checkbox"]');
+
+                    if (!foucusInDone) {
+                        checkboxes[0].focus();
+                        base.updateAriaSelected(checkboxes, 0);
+                        foucusInDone = true;
+                    }
+                },
+                keydown: function(e) {
+                    let checkboxes = $(base.checkboxesList)
+                    .find('.fr-fieldset__element:visible input[type="checkbox"]');
+
+                    switch (e.key) {
+                        case 'ArrowDown':
+                            e.preventDefault();
+                            currentIndex = (currentIndex + 1 >= checkboxes.length) ? 0 : currentIndex + 1;
+                            checkboxes[currentIndex].focus();
+                            base.updateAriaSelected(checkboxes, currentIndex);
+                            break;
+                        case 'ArrowUp':
+                            e.preventDefault();
+                            currentIndex = (currentIndex - 1 < 0) ? checkboxes.length - 1 : currentIndex - 1;
+                            checkboxes[currentIndex].focus();
+                            base.updateAriaSelected(checkboxes, currentIndex);
+                            break;
+
+                        case 'Enter':
+                            case ' ': // Espace
+                                e.preventDefault();
+                                if (currentIndex >= 0) {
+                                    let currentCheckbox = $(checkboxes[currentIndex]);
+                                    currentCheckbox.prop('checked', !currentCheckbox.prop('checked'));
+                                    // Déclencher l'événement change pour activer d'autres listeners potentiels
+                                    currentCheckbox.trigger('change');
+                                }
+                                break;
+
+                        case 'Tab':
+                            if (!e.shiftKey) {
+                                e.preventDefault();
+                                base.closeCheckboxesWrapper();
+                                foucusInDone = false;
+                            }
+                            break;
+                    }
+                }
+            })
+
             $(base.el).on({
                 click: function (e) {
                     base.toggleChecbkoxesWrapper();
                 },
                 focusin: function(e) {
                     base.showCheckboxesWrapper();
+                },
+                focusout: function(e) {
+                    
                 }
             }, base.opener);
 

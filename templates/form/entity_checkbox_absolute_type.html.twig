@@ -12,21 +12,23 @@
 			{% endif %}
 		</div>
 		<div class="checkboxes-wrapper">
-			{% for child in form.children %}
-				{%- set widget_attr = {} -%}
-				{%- if help is not empty -%}
-					{%- set widget_attr = {attr: {'aria-describedby': id ~"_help"}} -%}
-				{%- endif -%}
-				{% set widget_attr = widget_attr|merge({'attr': {'autocomplete': 'off'}}) %}
-				{% set row_attr = row_attr|merge({'class': (row_attr.class|default('') ~ ' fr-input-group')|trim}) %}
-				<div class="fr-fieldset__element" aria-selected="false">
-					<div class="fr-checkbox-group">
-						{{- form_errors(child) -}}
-						{{- form_widget(child, widget_attr) -}}
-						{{- form_label(child) -}}
+			<div id="checkboxes-list" tabindex="0" role="listbox">
+				{% for child in form.children %}
+					{%- set widget_attr = {} -%}
+					{%- if help is not empty -%}
+						{%- set widget_attr = {attr: {'aria-describedby': id ~"_help"}} -%}
+					{%- endif -%}
+					{% set widget_attr = widget_attr|merge({'attr': {'autocomplete': 'off'}}) %}
+					{% set row_attr = row_attr|merge({'class': (row_attr.class|default('') ~ ' fr-input-group')|trim}) %}
+					<div class="fr-fieldset__element" aria-selected="false">
+						<div class="fr-checkbox-group">
+							{{- form_errors(child) -}}
+							{{- form_widget(child, widget_attr|merge({'attr': {'tabindex': '-1'}})) -}}
+							{{- form_label(child) -}}
+						</div>
 					</div>
-				</div>
-			{% endfor %}
+				{% endfor %}
+			</div>
 		</div>
 	</div>
 
