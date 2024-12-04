@@ -203,6 +203,7 @@ class AppExtension extends AbstractExtension // NOSONAR too much methods
     {
         try {
             $html = $this->addLazyToImg($html);
+            $html = $this->addAltToImg($html);
             $html = $this->addNonceToInlineCss($html);
             $html = $this->encapsulateTables($html);
 
@@ -358,6 +359,24 @@ class AppExtension extends AbstractExtension // NOSONAR too much methods
         /** @var \DOMElement $node */
         foreach ($x->query('//img') as $node) {
             $node->setAttribute('loading', 'lazy');
+        }
+
+        return substr($dom->saveHTML(), 12, -15);
+    }
+
+    public function addAltToImg(string $html): string
+    {
+        $dom = new \DOMDocument();
+        // pour garder le utf-8
+        $dom->loadHTML(mb_encode_numericentity($html, [0x80, 0x10FFFF, 0, ~0], 'UTF-8'), LIBXML_HTML_NODEFDTD);
+        $x = new \DOMXPath($dom);
+
+        /** @var \DOMElement $node */
+        foreach ($x->query('//img') as $node) {
+            // Vérifie si l'attribut alt existe
+            if (!$node->hasAttribute('alt')) {
+                $node->setAttribute('alt', '');
+            }
         }
 
         return substr($dom->saveHTML(), 12, -15);

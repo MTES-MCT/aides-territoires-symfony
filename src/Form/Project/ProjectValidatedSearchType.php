@@ -66,6 +66,12 @@ class ProjectValidatedSearchType extends AbstractType
             ->add('text', TextType::class, [
                 'required' => false,
                 'label' => 'Mot-clés',
+                'label_attr' => [
+                    'id' => 'label-text-search',
+                ],
+                'attr' => [
+                    'aria-labelledby' => 'label-text-search',
+                ],
                 'help' => 'Ex: rénovation énergétique, vélo, tiers lieu, etc.',
                 'autocomplete' => true,
                 'autocomplete_url' => $this->routerInterface->generate('app_keyword_reference_ajax_ux_autocomplete'),

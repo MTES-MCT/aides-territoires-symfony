@@ -85,20 +85,20 @@
 							<h2>Accueil et pages génériques</h2>
 							<ul>
 
-								<li><ahref="{{ path('app_home') }}" title="Accueil">Accueil</a></li>
-								<li><ahref="{{ path('app_contact_contact') }}" title="Contact">Contact</a></li>
-								<li><ahref="{{ path('app_static_legal_notice') }}" title="Mentions légales">Mentions légales</a></li>
-								<li><ahref="{{ path('app_static_privacy_policy')}}" title="Politique de confidentialité">Politique de confidentialité</a></li>
-								<li><ahref="{{ path('app_static_accessibility') }}" title="Déclaration d’accessibilité">Déclaration d’accessibilité</a></li>
-								<li><ahref="{{ path('app_static_terms') }}" title="Conditions générales d'utilisation">Conditions générales d'utilisation</a></li>
+								<li><a href="{{ path('app_home') }}">Accueil</a></li>
+								<li><a href="{{ path('app_contact_contact') }}">Contact</a></li>
+								<li><a href="{{ path('app_static_legal_notice') }}">Mentions légales</a></li>
+								<li><a href="{{ path('app_static_privacy_policy')}}">Politique de confidentialité</a></li>
+								<li><a href="{{ path('app_static_accessibility') }}">Déclaration d'accessibilité</a></li>
+								<li><a href="{{ path('app_static_terms') }}">Conditions générales d'utilisation</a></li>
 
 
-								<li><ahref="{{ path('app_sitemap') }}" title="Plan du site automatisé en XML">Plan du site automatisé en XML</a></li>
+								<li><a href="{{ path('app_sitemap') }}">Plan du site automatisé en XML</a></li>
 
-								<li><ahref="{{ path('app_page_custom', {'url': 'aides-collectivités'}) }}" title="Collectivités et porteurs de projets locaux">Collectivités et porteurs de projets locaux</a></li>
-								<li><ahref="{{ path('app_page_custom', {'url': 'faq'}) }}">Foire aux questions</a></li>
-								<li><ahref="{{ path('app_page_custom', {'url': 'plateforme-aides-territoires'}) }}">La démarche</a></li>
-								<li><a href="/porteurs-aides/">Porteurs d’aides</a></li>
+								<li><a href="{{ path('app_page_custom', {'url': 'aides-collectivités'}) }}">Collectivités et porteurs de projets locaux</a></li>
+								<li><a href="{{ path('app_page_custom', {'url': 'faq'}) }}">Foire aux questions</a></li>
+								<li><a href="{{ path('app_page_custom', {'url': 'plateforme-aides-territoires'}) }}">La démarche</a></li>
+								<li><a href="/porteurs-aides/">Porteurs d'aides</a></li>
 								<li><a href="/webinaires/">Nos webinaires</a></li>
 							</ul>
 						</section>
@@ -108,24 +108,24 @@
 							<ul>
 
 								<li>
-									<a href="{{ path('app_user_user_register') }}" title="Création de compte">Création de compte</a>
+									<a href="{{ path('app_user_user_register') }}">Création de compte</a>
 								</li>
 								<li>
-									<a href="{{ path('app_user_user_register_commune') }}" title="Création de compte (version spéciale municipalités)">Création de compte (version spéciale municipalités)</a>
+									<a href="{{ path('app_user_user_register_commune') }}">Création de compte (version spéciale municipalités)</a>
 								</li>
 								<li>
-									<a href="{{ path('app_login') }}" title="Connexion au compte">Connexion au compte</a>
+									<a href="{{ path('app_login') }}">Connexion au compte</a>
 								</li>
 								<li>
 									<span class="fr-icon-account-line" title="Page réservée aux utilisateurs connectés" aria-hidden="true"></span>
-									<a href="{{ path('app_user_dashboard') }}" title="Tableau de bord utilisateur">
+									<a href="{{ path('app_user_dashboard') }}">
 										Tableau de bord utilisateur
 										<span class="fr-sr-only">(Page réservée aux utilisateurs connectés)</span>
 									</a>
 								</li>
 								<li>
 									<span class="fr-icon-account-line" title="Page réservée aux utilisateurs connectés" aria-hidden="true"></span>
-									<a href="{{ path('app_user_parameter_profil') }}" title="Profil utilisateur">
+									<a href="{{ path('app_user_parameter_profil') }}">
 										Profil utilisateur
 										<span class="fr-sr-only">(Page réservée aux utilisateurs connectés)</span>
 									</a>
@@ -140,7 +140,7 @@
 
 								<li>
 									<span class="fr-icon-account-line" title="Page réservée aux utilisateurs connectés" aria-hidden="true"></span>
-									<a href="{{ path('app_user_alert') }}" title="Gestion des alertes et souscriptions">
+									<a href="{{ path('app_user_alert') }}">
 										Gestion des alertes et souscriptions
 										<span class="fr-sr-only">(Page réservée aux utilisateurs connectés)</span>
 									</a>
@@ -154,7 +154,7 @@
 								</li>
 								<li>
 									<span class="fr-icon-account-line" title="Page réservée aux utilisateurs connectés" aria-hidden="true"></span>
-									<a href="{{ path('app_user_parameter_history_log') }}" title="Journal de connexion">
+									<a href="{{ path('app_user_parameter_history_log') }}">
 										Journal de connexion
 										<span class="fr-sr-only">(Page réservée aux utilisateurs connectés)</span>
 									</a>
@@ -168,7 +168,7 @@
 								</li>
 								<li>
 									<span class="fr-icon-account-line" title="Page réservée aux utilisateurs connectés" aria-hidden="true"></span>
-									<a href="{{ path('app_user_parameter_profil') }}" title="Suppression du compte">
+									<a href="{{ path('app_user_parameter_profil') }}">
 										Suppression du compte
 										<span class="fr-sr-only">(Page réservée aux utilisateurs connectés)</span>
 									</a>
@@ -181,21 +181,21 @@
 							<h2>Aides</h2>
 							<ul>
 								<li>
-									<a href="/aides/">Liste des aides et recherche d’aides</a>
+									<a href="/aides/">Liste des aides et recherche d'aides</a>
 								</li>
 								<li>Espace contributeur
 									<ul>
 										<li>
 											<span class="fr-icon-account-line" title="Page réservée aux utilisateurs connectés" aria-hidden="true"></span>
-											<a href="{{ path('app_user_aid_detail_publish') }}" title="Publication d’une aide">
-												Publication d’une aide
+											<a href="{{ path('app_user_aid_detail_publish') }}">
+												Publication d'une aide
 												<span class="fr-sr-only">(Page réservée aux utilisateurs connectés)</span>
 											</a>
 										</li>
 										<li>
 											<span class="fr-icon-account-line" title="Page réservée aux utilisateurs connectés" aria-hidden="true"></span>
-											<a href="{{ path('app_user_aid_publications') }}" title="Portefeuille d’aides">
-												Portefeuille d’aides
+											<a href="{{ path('app_user_aid_publications') }}">
+												Portefeuille d'aides
 												<span class="fr-sr-only">(Page réservée aux utilisateurs connectés)</span>
 											</a>
 										</li>
@@ -208,7 +208,7 @@
 
 							<h2>Blog</h2>
 							<ul>
-								<li><ahref="{{ path('app_blog_blog') }}" title="Liste des billets">Liste des billets</a></li>
+								<li><a href="{{ path('app_blog_blog') }}">Liste des billets</a></li>
 							</ul>
 						</section>
 
@@ -216,7 +216,7 @@
 
 							<h2>Cartographie</h2>
 							<ul>
-								<li><ahref="{{ path('app_cartography_cartography') }}" title="Cartographie">Cartographie</a></li>
+								<li><a href="{{ path('app_cartography_cartography') }}">Cartographie</a></li>
 							</ul>
 						</section>
 
@@ -224,8 +224,8 @@
 
 							<h2>Portails</h2>
 							<ul>
-								<li><a href="/portails/" title="Les portails">Les portails</a></li>
-								<li><a href="/portails/europe/" title="Les financements européens 2021-2027">Les financements européens 2021-2027</a></li>
+								<li><a href="/portails/">Les portails</a></li>
+								<li><a href="/portails/europe/">Les financements européens 2021-2027</a></li>
 							</ul>
 						</section>
 
@@ -233,7 +233,7 @@
 
 							<h2>Programmes</h2>
 							<ul>
-								<li><ahref="{{ path('app_program_program') }}" title="Liste des programmes">Liste des programmes</a></li>
+								<li><a href="{{ path('app_program_program') }}">Liste des programmes</a></li>
 							</ul>
 						</section>
 
@@ -242,12 +242,12 @@
 							<h2>Projets</h2>
 							<ul>
 								<li>
-									<a href="{{ path('app_project_project_public') }}" title="Liste des projets publics">
+									<a href="{{ path('app_project_project_public') }}">
 										Liste des projets publics
 									</a>
 								</li>
 								<li>
-									<a href="{{ path('app_project_project_subsidized') }}" title="Liste des projets subventionnés">
+									<a href="{{ path('app_project_project_subsidized') }}">
 										Liste des projets subventionnés
 									</a>
 								</li>
@@ -256,21 +256,21 @@
 									<ul>
 										<li>
 											<span class="fr-icon-account-line" title="Page réservée aux utilisateurs connectés" aria-hidden="true"></span>
-											<a href="{{ path('app_user_project_structure') }}" title="Liste des projets de l’utilisateur">
-												Liste des projets de l’utilisateur
+											<a href="{{ path('app_user_project_structure') }}">
+												Liste des projets de l'utilisateur
 												<span class="fr-sr-only">(Page réservée aux utilisateurs connectés)</span>
 											</a>
 										</li>
 										<li>
 											<span class="fr-icon-account-line" title="Page réservée aux utilisateurs connectés" aria-hidden="true"></span>
-											<a href="{{ path('app_user_project_creation_projet') }}" title="Création d’un nouveau projet">
-												Création d’un nouveau projet
+											<a href="{{ path('app_user_project_creation_projet') }}">
+												Création d'un nouveau projet
 												<span class="fr-sr-only">(Page réservée aux utilisateurs connectés)</span>
 											</a>
 										</li>
 										<li>
 											<span class="fr-icon-account-line" title="Page réservée aux utilisateurs connectés" aria-hidden="true"></span>
-											<a href="{{ path('app_user_project_favoris') }}" title="Liste des projets favoris">
+											<a href="{{ path('app_user_project_favoris') }}">
 												Liste des projets favoris
 												<span class="fr-sr-only">(Page réservée aux utilisateurs connectés)</span>
 											</a>
@@ -292,9 +292,9 @@
 						<section id="section-api">
 							<h2>API</h2>
 							<ul>
-								<li><a href="/data/">Introduction au sujet de l’API</a></li>
+								<li><a href="/data/">Introduction au sujet de l'API</a></li>
 								<li><a href="/api">API REST : Liste de toutes les aides actives présentes sur le site</a></li>
-								<li><a href="/api">Documentation de l’API.</a></li>
+								<li><a href="/api">Documentation de l'API.</a></li>
 							</ul>
 						</section>
 
