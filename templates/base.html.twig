@@ -41,8 +41,8 @@
 				{% cspscript %}
 				<script>
 					window.dsfr = {
-production: true
-};
+						production: true
+					};
 				</script>
 				{% endcspscript %}
 			{% endif %}
@@ -55,9 +55,11 @@ production: true
 	</head>
 
 	<body>
+		{% include 'include/skiplinks.html.twig' %}
+		
 		<!-- code de la page -->
 		{% block header %}
-			<header role="banner" class="fr-header">
+			<header role="banner" class="fr-header" id="header">
 				{% block header_not_connected %}
 					{% if not app.user %}
 						<div class="fr-background-alt fr-p-2w">
@@ -108,7 +110,9 @@ production: true
 			{% endblock %}
 		{% endblock %}
 
-		{% block body %}{% endblock %}
+		<div id="contenu">
+			{% block body %}{% endblock %}
+		</div>
 
 		{% block footer %}
 			{% include('include/_footer.html.twig') %}
