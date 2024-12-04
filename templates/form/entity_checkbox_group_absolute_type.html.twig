@@ -1,7 +1,7 @@
 {% block entity_checkbox_group_absolute_type_row %}
 	<div class="entity-checkbox-absolute-type-wrapper fr-input-group">
 		{% if form.vars.label %}
-			<label class="fr-label">
+			<label class="fr-label" for="{{ form.vars.id }}_filter">
 				<span class="at-field-label">{{ form.vars.label }}</span>
 			</label>
 		{% endif %}
@@ -13,7 +13,7 @@
 		</div>
 
 		<div class="checkboxes-wrapper">
-			<div class="filter"><input type="text" class="fr-input" placeholder="Filtrer" autocomplete="off" tabindex="0" /></div>
+			<div class="filter"><input type="text" class="fr-input" placeholder="Filtrer" autocomplete="off" tabindex="0" id="{{ form.vars.id }}_filter" /></div>
 			<div id="checkboxes-list" tabindex="0" role="listbox">
 				{% for key, choices in form.vars.choices %}
 
