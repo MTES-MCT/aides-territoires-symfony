@@ -209,15 +209,19 @@ class AidEditType extends AbstractType
                 'required' => false,
                 'mapped' => false,
                 'label' => 'Porteurs d\'aides',
+                'label_attr' => [
+                    'id' => 'financer-label'
+                ],
                 'help_html' => true,
                 'help' => 'Saisissez quelques caractères et sélectionnez une valeur parmi les suggestions.'
                     . (in_array('aidFinancers', $sanctuarizedFields) ? $sanctuarizedFieldHelp : ''),
                 'class' => Backer::class,
                 'choice_label' => 'name',
                 'attr' => [
-                    'placeholder' => 'Sélectionnez le ou les porteurs 2',
+                    'placeholder' => 'Sélectionnez le ou les porteurs',
                     'readonly' => in_array('aidFinancers', $sanctuarizedFields) ? true : false,
-                    'class' => in_array('aidFinancers', $sanctuarizedFields) ? 'tom-select-readonly' : ''
+                    'class' => in_array('aidFinancers', $sanctuarizedFields) ? 'tom-select-readonly' : '',
+                    'aria-labelledby' => 'financer-label'
                 ],
                 'autocomplete' => true,
                 'multiple' => true,
@@ -248,6 +252,9 @@ class AidEditType extends AbstractType
                 'required' => false,
                 'mapped' => false,
                 'label' => 'Instructeurs',
+                'label_attr' => [
+                    'id' => 'instructor-label'
+                ],
                 'help_html' => true,
                 'help' => 'Saisissez quelques caractères et sélectionnez une valeur parmi les suggestions.'
                     . (in_array('instructors', $sanctuarizedFields) ? $sanctuarizedFieldHelp : ''),
@@ -256,7 +263,8 @@ class AidEditType extends AbstractType
                 'attr' => [
                     'placeholder' => 'Sélectionnez le ou les instructeurs parmis la liste',
                     'readonly' => in_array('instructors', $sanctuarizedFields) ? true : false,
-                    'class' => in_array('instructors', $sanctuarizedFields) ? 'tom-select-readonly' : ''
+                    'class' => in_array('instructors', $sanctuarizedFields) ? 'tom-select-readonly' : '',
+                    'aria-labelledby' => 'instructor-label'
                 ],
                 'autocomplete' => true,
                 'multiple' => true,
@@ -319,6 +327,9 @@ class AidEditType extends AbstractType
             ->add('subventionRateMin', TypeIntegerType::class, [
                 'required' => false,
                 'label' => 'Taux de subvention, min. et max. (en %, nombre entier)',
+                'label_attr' => [
+                    'id' => 'subventionRateMin-label'
+                ],
                 'help_html' => true,
                 'help' => 'Si le taux est fixe, remplissez uniquement le taux max.'
                     . (in_array('subventionRateMin', $sanctuarizedFields) ? $sanctuarizedFieldHelp : ''),
@@ -335,7 +346,8 @@ class AidEditType extends AbstractType
                 'label' => false,
                 'attr' => [
                     'placeholder' => 'Taux de subvention max',
-                    'readonly' => in_array('subventionRateMax', $sanctuarizedFields) ? true : false
+                    'readonly' => in_array('subventionRateMax', $sanctuarizedFields) ? true : false,
+                    'aria-labelledby' => 'subventionRateMin-label'
                 ],
                 'constraints' => [
                     new PositiveOrZero()
@@ -619,6 +631,9 @@ class AidEditType extends AbstractType
             ->add('perimeter', PerimeterAutocompleteType::class, [
                 'required' => false,
                 'label' => 'Zone géographique couverte par l’aide',
+                'label_attr' => [
+                    'id' => 'perimeter-label'
+                ],
                 'help_html' => true,
                 'help' => 'La zone géographique sur laquelle l\'aide est disponible.<br />
                 Exemples de zones valides :
@@ -637,6 +652,7 @@ class AidEditType extends AbstractType
                 'attr' => [
                     'autocomplete' => 'off',
                     'readonly' => in_array('perimeter', $sanctuarizedFields) ? true : false,
+                    'aria-labelledby' => 'perimeter-label',
                     'class' => in_array('perimeter', $sanctuarizedFields) ? 'tom-select-readonly' : ''
                 ],
             ])
