@@ -5,14 +5,21 @@ namespace App\Service\Export;
 use App\Entity\Aid\Aid;
 use App\Entity\Backer\Backer;
 use App\Entity\Cron\CronExportSpreadsheet;
+use App\Entity\Log\LogAidApplicationUrlClick;
+use App\Entity\Log\LogAidOriginUrlClick;
+use App\Entity\Log\LogAidView;
 use App\Entity\Organization\Organization;
 use App\Entity\Project\Project;
 use App\Entity\User\User;
 use App\Exception\InvalidFileFormatException as ExceptionInvalidFileFormatException;
 use App\Message\Export\MsgSpreadsheetToExport;
 use App\Repository\Aid\AidRepository;
+use App\Repository\Log\LogAidApplicationUrlClickRepository;
+use App\Repository\Log\LogAidOriginUrlClickRepository;
+use App\Repository\Log\LogAidViewRepository;
 use App\Repository\User\UserRepository;
 use App\Service\File\FileService;
+use App\Service\Matomo\MatomoService;
 use App\Service\User\UserService;
 use App\Service\Various\StringService;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -44,18 +51,17 @@ class SpreadsheetExporterService
         private HtmlSanitizerInterface $htmlSanitizerInterface,
         private LoggerInterface $loggerInterface,
         private MessageBusInterface $messageBusInterface,
-        private StringService $stringService
+        private StringService $stringService,
+        private MatomoService $matomoService
     ) {
     }
+
     public function createResponseFromQueryBuilder(// NOSONAR too complex
         QueryBuilder $queryBuilder,
         mixed $entityFcqn,
         string $filename,
         string $format = FileService::FORMAT_CSV
     ): StreamedResponse|Response {
-        ini_set('max_execution_time', 60 * 60);
-        ini_set('memory_limit', '1G');
-
         // compte le nombre de résultats
         $queryBuilderCount = clone $queryBuilder;
         $count = $queryBuilderCount->select('COUNT(entity)')->getQuery()->getSingleScalarResult();
@@ -251,6 +257,113 @@ class SpreadsheetExporterService
                     unset($results[$key]);
                 }
                 break;
+
+            case LogAidView::class:
+                /** @var LogAidViewRepository $logAidViewRepository */
+                $logAidViewRepository = $this->managerRegistry->getRepository(LogAidView::class);
+                /** @var LogAidApplicationUrlClickRepository $logAidApplicationUrlClickRepository */
+                $logAidApplicationUrlClickRepository = $this->managerRegistry->getRepository(LogAidApplicationUrlClick::class);
+                /** @var LogAidOriginUrlClickRepository $logAidOriginUrlClickRepository */
+                $logAidOriginUrlClickRepository = $this->managerRegistry->getRepository(LogAidOriginUrlClick::class);
+
+                // on met tous les ids des aides dans un tableau
+                $aidsIds = [];
+                /** @var Aid $result */
+                foreach ($results as $result) {
+                    $aidsIds[] = $result->getId();
+                }
+
+                // les dates
+                $date30DaysAgo = new \DateTime('-30 days'); // la date à 30 jours
+                $date1YearAgo = new \DateTime('-1 year'); // la date à 1 an
+
+                // les logs de vues
+                $logAidViews30Days = $logAidViewRepository->countFormGroup([
+                    'aidIds' => $aidsIds,
+                    'dateMin' => $date30DaysAgo,
+                ]);
+                $logAidViews1Year = $logAidViewRepository->countFormGroup([
+                    'aidIds' => $aidsIds,
+                    'dateMin' => $date1YearAgo,
+                ]);
+
+                // on transformes les résultats de logs en tableau par id d'aide
+                $logAidViews30Days = $this->transformLogsResultsInArray($logAidViews30Days);
+                $logAidViews1Year = $this->transformLogsResultsInArray($logAidViews1Year);
+
+                // on unset les résultats de logs
+                unset($logAidViews30Days);
+                unset($logAidViews1Year);
+
+                // les logs de clics sur l'url d'application
+                $logAidApplicationUrlClicks30Days = $logAidApplicationUrlClickRepository->countFormGroup([
+                    'aidIds' => $aidsIds,
+                    'dateMin' => $date30DaysAgo,
+                ]);
+                $logAidApplicationUrlClicks1Year = $logAidApplicationUrlClickRepository->countFormGroup([
+                    'aidIds' => $aidsIds,
+                    'dateMin' => $date1YearAgo,
+                ]);
+
+                // on transformes les résultats de logs en tableau par id d'aide
+                $logAidApplicationUrlClicks30Days = $this->transformLogsResultsInArray($logAidApplicationUrlClicks30Days);
+                $logAidApplicationUrlClicks1Year = $this->transformLogsResultsInArray($logAidApplicationUrlClicks1Year);
+
+                // on unset les résultats de logs
+                unset($logAidApplicationUrlClicks30Days);
+                unset($logAidApplicationUrlClicks1Year);
+
+                // les logs de clics sur l'url d'origine
+                $logAidOriginUrlClicks30Days = $logAidOriginUrlClickRepository->countFormGroup([
+                    'aidIds' => $aidsIds,
+                    'dateMin' => $date30DaysAgo,
+                ]);
+                $logAidOriginUrlClicks1Year = $logAidOriginUrlClickRepository->countFormGroup([
+                    'aidIds' => $aidsIds,
+                    'dateMin' => $date1YearAgo,
+                ]);
+
+
+                // on transformes les résultats de logs en tableau par id d'aide
+                $logAidOriginUrlClicks30Days = $this->transformLogsResultsInArray($logAidOriginUrlClicks30Days);
+                $logAidOriginUrlClicks6Months = $this->transformLogsResultsInArray($logAidOriginUrlClicks6Months);
+                $logAidOriginUrlClicks1Year = $this->transformLogsResultsInArray($logAidOriginUrlClicks1Year);
+
+                // on unset les résultats de logs
+                unset($logAidOriginUrlClicks30Days);
+                unset($logAidOriginUrlClicks6Months);
+                unset($logAidOriginUrlClicks1Year);
+
+                $stats = $this->matomoService->getAidsStats();
+
+                // Accès aux stats
+                $thirtyDaysStats = $stats['30_days'];
+                $yearStats = $stats['one_year'];
+                // $allTimeStats = $stats['all_time'];
+                
+                // dans ce cas spécifique on a donné l'entité LogAidView mais il s'agit en fait d'un tableau de Aid
+                /** @var Aid $result */
+                foreach ($results as $key => $result) {
+                    $datas[] = [
+                        'Nom de l\'aide' => $result->getName(),
+                        'Actuellement publiée' => $result->isLive() ? 'Oui' : 'Non',
+                        'Zone géographique couverte par l\'aide*' => $result->getPerimeter()
+                            ? $result->getPerimeter()->getName()
+                            : '',
+                        'url' => $result->getUrl(),
+                        'Nombre de vues (30 jours)' => $logAidViews30Days[$result->getId()] ?? 0,
+                        'Nombre de vues (1 an)' => $logAidViews1Year[$result->getId()] ?? 0,
+                        'Nombre de clics sur l\'url d\'application (30 jours)' => $logAidApplicationUrlClicks30Days[$result->getId()] ?? 0,
+                        'Nombre de clics sur l\'url d\'application (1 an)' => $logAidApplicationUrlClicks1Year[$result->getId()] ?? 0,
+                        'Nombre de clics sur l\'url d\'origine (30 jours)' => $logAidOriginUrlClicks30Days[$result->getId()] ?? 0,
+                        'Nombre de clics sur l\'url d\'origine (1 an)' => $logAidOriginUrlClicks1Year[$result->getId()] ?? 0,
+                        'Matomo : Nombre de vues unique (30 jours)' => $thirtyDaysStats[$result->getSlug()]['views'] ?? 0,
+                        'Matomo : Nombre de vues unique (1 an)' => $yearStats[$result->getSlug()]['views'] ?? 0,
+                    ];
+                    unset($results[$key]);
+                }
+                break;
+
             case User::class:
                 /** @var UserRepository $userRepository */
                 $userRepository = $this->managerRegistry->getRepository(User::class);
@@ -453,6 +566,21 @@ class SpreadsheetExporterService
                 Response::HTTP_INTERNAL_SERVER_ERROR
             );
         }
+    }
+
+    /**
+     * Transforme les résultats des logs en tableau par id d'aide
+     *
+     * @param array<int, mixed> $logsResults
+     * @return array<int, int>
+     */
+    private function transformLogsResultsInArray(array $logsResults): array
+    {
+        $logs = [];
+        foreach ($logsResults as $logResult) {
+            $logs[$logResult['aidId']] = $logResult['nb'];
+        }
+        return $logs;
     }
 
     public function getProjectAidsSpreadsheet(Project $project): Spreadsheet

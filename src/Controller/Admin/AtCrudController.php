@@ -235,9 +235,6 @@ class AtCrudController extends AbstractCrudController
         string $filename,
         string $format = 'csv'
     ): Response {
-        ini_set('max_execution_time', 60 * 60);
-        ini_set('memory_limit', '1G');
-
         $fields = FieldCollection::new($this->configureFields(Crud::PAGE_INDEX));
         $filters = $this->container->get(FilterFactory::class)->create(
             $context->getCrud()->getFiltersConfig(),
