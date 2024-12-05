@@ -6,3 +6,7 @@
     content: attr(placeholder);
     color: #999;
 }
+
+.trumbowyg-box.trumbowyg-editor-visible .trumbowyg-textarea {
+    display: none;
+}

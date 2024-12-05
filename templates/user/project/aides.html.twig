@@ -112,12 +112,12 @@
 																{% elseif aidProject.aidRequested %}
 																	<span class="fr-mb-1w fr-badge fr-badge--info">Demandée</span>
 																{% endif %}
-																<button class="fr-btn edit-aid-project" {# id="aidproject-status-modal-btn" #} title="Editer" {% if formAidProjectEditHasError == aidProject.id %} data-fr-opened="true" {% else %} data-fr-opened="false" {% endif %} aria-controls="aidproject-status-modal-{{ aidProject.id }}" aria-describedby="aidproject-status-{{ aidProject.id }}">
+																<button class="fr-btn edit-aid-project" title="Editer" {% if formAidProjectEditHasError == aidProject.id %} data-fr-opened="true" {% else %} data-fr-opened="false" {% endif %} aria-controls="aidproject-status-modal-{{ aidProject.id }}">
 																	Editer
 																</button>
 															</td>
 															<td class="fr-text">
-																<button class="fr-btn fr-icon-delete-line fr-btn--tertiary fr-btn--tertiary-no-outline at-box-shadow--none" {# id="delete-aid-modal-btn" #} title="Supprimer cette aide" data-fr-opened="false" aria-controls="delete-aid-modal" aria-describedby="aidProject-{{ aidProject.id }}" data-id_aid_project="{{ aidProject.id }}">
+																<button class="fr-btn fr-icon-delete-line fr-btn--tertiary fr-btn--tertiary-no-outline at-box-shadow--none" title="Supprimer cette aide" data-fr-opened="false" aria-controls="delete-aid-modal" data-id_aid_project="{{ aidProject.id }}">
 																	Supprimer cette aide
 																</button>
 															</td>
