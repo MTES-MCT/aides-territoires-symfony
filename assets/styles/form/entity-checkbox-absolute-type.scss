@@ -38,9 +38,19 @@
         border-top-style: solid;
         border-top-color: rgb(170, 170, 170);
 
+        #checkboxes-list{
+            &:focus-within {
+                background-color: var(--background-contrast-grey-active);
+            }
+        }
+
         .filter{
             input{
-                background: white;
+                background-color: var(--background-alt-grey-hover);
+                
+                &:focus-within{
+                    background: white;
+                }
             }
         }
 

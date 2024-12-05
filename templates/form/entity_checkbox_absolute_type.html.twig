@@ -1,32 +1,34 @@
 {% block entity_checkbox_absolute_type_row %}
 	<div class="entity-checkbox-absolute-type-wrapper fr-input-group">
 		{% if form.vars.label %}
-			<label class="fr-label">
+			<label class="fr-label" for="{{ form.vars.id }}_opener">
 				<span class="at-field-label">{{ form.vars.label }}</span>
 			</label>
 		{% endif %}
 		{{ form_help(form) }}
-		<div class="opener">
+		<div class="opener" tabindex="0" id="{{ form.vars.id }}_opener">
 			{% if form.vars.errors.form.config.attributes['data_collector/passed_options'].placeholder is defined and form.vars.errors.form.config.attributes['data_collector/passed_options'].placeholder %}
 				{{ form.vars.errors.form.config.attributes['data_collector/passed_options'].placeholder }}{% else %}Sélectionnez
 			{% endif %}
 		</div>
 		<div class="checkboxes-wrapper">
-			{% for child in form.children %}
-				{%- set widget_attr = {} -%}
-				{%- if help is not empty -%}
-					{%- set widget_attr = {attr: {'aria-describedby': id ~"_help"}} -%}
-				{%- endif -%}
-				{% set widget_attr = widget_attr|merge({'attr': {'autocomplete': 'off'}}) %}
-				{% set row_attr = row_attr|merge({'class': (row_attr.class|default('') ~ ' fr-input-group')|trim}) %}
-				<div class="fr-fieldset__element" aria-selected="false">
-					<div class="fr-checkbox-group">
-						{{- form_errors(child) -}}
-						{{- form_widget(child, widget_attr) -}}
-						{{- form_label(child) -}}
+			<div id="checkboxes-list" tabindex="0" role="listbox">
+				{% for child in form.children %}
+					{%- set widget_attr = {} -%}
+					{%- if help is not empty -%}
+						{%- set widget_attr = {attr: {'aria-describedby': id ~"_help"}} -%}
+					{%- endif -%}
+					{% set widget_attr = widget_attr|merge({'attr': {'autocomplete': 'off'}}) %}
+					{% set row_attr = row_attr|merge({'class': (row_attr.class|default('') ~ ' fr-input-group')|trim}) %}
+					<div class="fr-fieldset__element" aria-selected="false">
+						<div class="fr-checkbox-group">
+							{{- form_errors(child) -}}
+							{{- form_widget(child, widget_attr|merge({'attr': {'tabindex': '-1'}})) -}}
+							{{- form_label(child) -}}
+						</div>
 					</div>
-				</div>
-			{% endfor %}
+				{% endfor %}
+			</div>
 		</div>
 	</div>
 

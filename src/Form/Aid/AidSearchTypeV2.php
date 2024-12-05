@@ -89,17 +89,26 @@ class AidSearchTypeV2 extends AbstractType
             ->add(AidSearchFormService::QUERYSTRING_KEY_SEARCH_PERIMETER, PerimeterAutocompleteType::class, [
                 'required' => false,
                 'label' => 'Votre territoire',
+                'label_attr' => [
+                    'id' => 'label-perimeter-search',
+                ],
                 'attr' => [
                     'data-controller' => 'custom-autocomplete',
                     'placeholder' => 'Votre commune, EPCI...',
+                    'aria-hidden' => 'true',
+                    'aria-labelledby' => 'label-perimeter-search',
                 ],
             ])
             ->add(AidSearchFormService::QUERYSTRING_KEY_KEYWORD, TextType::class, [
                 'required' => false,
                 'label' => 'Projet référent ou mot-clé',
+                'label_attr' => [
+                    'id' => 'label-keyword-search',
+                ],
                 'attr' => [
                     'data-controller' => 'custom-autocomplete',
                     'placeholder' => 'Projet référent ou mot-clé',
+                    'aria-labelledby' => 'label-keyword-search',
                 ],
                 'autocomplete' => true,
                 'autocomplete_url' => $this->routerInterface->generate('app_project_reference_ajax_ux_autocomplete'),
@@ -111,6 +120,13 @@ class AidSearchTypeV2 extends AbstractType
                     'closeAfterSelect' => true,
                     'sanitize_html' => true,
                     'delimiter' => '$%§',
+                    'onInitialize' => 'function() { 
+                        var searchInput = this.control_input;
+                        if (searchInput) {
+                            searchInput.setAttribute("aria-labelledby", "label-keyword-search");
+                            searchInput.setAttribute("role", "textbox");
+                        }
+                    }',
                 ],
                 'sanitize_html' => true,
             ])
@@ -199,12 +215,16 @@ class AidSearchTypeV2 extends AbstractType
                 ->add(AidSearchFormService::QUERYSTRING_KEY_BACKER_IDS, BackerAutocompleteType::class, [
                     'required' => false,
                     'label' => 'Porteurs d\'aides',
+                    'label_attr' => [
+                        'id' => 'label-backer-search',
+                    ],
                     'help' => 'Filtré par le champ "Votre territoire"',
                     'class' => Backer::class,
                     'choice_label' => 'name',
                     'attr' => [
                         'data-controller' => 'backer-autocomplete',
                         'placeholder' => 'Tous les porteurs d\'aides',
+                        'aria-labelledby' => 'label-backer-search',
                     ],
                     'autocomplete' => true,
                     'multiple' => true,
@@ -270,10 +290,14 @@ class AidSearchTypeV2 extends AbstractType
                 ->add(AidSearchFormService::QUERYSTRING_KEY_BACKER_GROUP_ID, EntityType::class, [
                     'required' => false,
                     'label' => 'Groupe de porteurs d\'aides',
+                    'label_attr' => [
+                        'id' => 'label-backer-group-search',
+                    ],
                     'class' => BackerGroup::class,
                     'choice_label' => 'name',
                     'attr' => [
                         'placeholder' => 'Tous les groupes de porteurs d\'aides',
+                        'aria-labelledby' => 'label-backer-group-search',
                     ],
                     'autocomplete' => true,
                     'multiple' => false,

@@ -16,10 +16,10 @@ class BlogPostCategoryFilterType extends AbstractType
         $builder
             ->add('blogPostCategory', EntityType::class, [
                 'required' => true,
-                'label' => false,
+                'label' => 'Filtrer les articles par catégorie',
                 'class' => BlogPostCategory::class,
                 'choice_label' => 'name',
-                'placeholder' => 'Filtrer les articles par catégorie',
+                'placeholder' => 'Choisir une catégorie',
                 'attr' => [
                     'title' => 'Filtrer les articles par catégorie - La sélection recharge la page'
                 ],

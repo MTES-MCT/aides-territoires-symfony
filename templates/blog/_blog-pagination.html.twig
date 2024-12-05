@@ -2,12 +2,12 @@
 	<ul class="fr-pagination__list">
 		{% if previousPage > 0 %}
 			<li>
-				<a class="fr-pagination__link fr-pagination__link--first" href="?page=1" title="Première page">
+				<a class="fr-pagination__link fr-pagination__link--first" href="?page=1">
 					Première page
 				</a>
 			</li>
 			<li>
-				<a class="fr-pagination__link fr-pagination__link--prev fr-pagination__link--lg-label" href="?page={{ previousPage }}" title="Page précédente">
+				<a class="fr-pagination__link fr-pagination__link--prev fr-pagination__link--lg-label" href="?page={{ previousPage }}">
 					Page précédente
 				</a>
 			</li>
@@ -22,12 +22,12 @@
 		</li>
 		{% if currentPage < nbPages %}
 			<li>
-				<a class="fr-pagination__link fr-pagination__link--next fr-pagination__link--lg-label" href="?page={{ nextPage }}" title="Page suivante">
+				<a class="fr-pagination__link fr-pagination__link--next fr-pagination__link--lg-label" href="?page={{ nextPage }}">
 					Page suivante
 				</a>
 			</li>
 			<li>
-				<a class="fr-pagination__link fr-pagination__link--last fr-unhidden-lg" href="?page={{ nbPages }}" title="Dernière page">
+				<a class="fr-pagination__link fr-pagination__link--last fr-unhidden-lg" href="?page={{ nbPages }}">
 					Dernière page
 				</a>
 			</li>

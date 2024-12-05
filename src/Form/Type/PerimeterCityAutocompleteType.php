@@ -50,35 +50,7 @@ class PerimeterCityAutocompleteType extends AbstractType
                     return;
                 }
 
-
-                // c'est un code postal
-                if (preg_match('/^[0-9]{5}$/', $query)) {
-                    $qb
-                        ->andWhere('
-                        p.zipcodes LIKE :zipcodes
-                    ')
-                        ->setParameter('zipcodes', '%' . $query . '%');
-                    ;
-                } else { // c'est une string
-                    $strings = [$query];
-                    if (strpos($query, ' ') !== false) {
-                        $strings[] = str_replace(' ', '-', $query);
-                    }
-                    if (strpos($query, '-') !== false) {
-                        $strings[] = str_replace('-', ' ', $query);
-                    }
-
-                    $sqlWhere = '';
-                    for ($i = 0; $i < count($strings); $i++) {
-                        $sqlWhere .= ' p.name LIKE :nameLike' . $i;
-                        if ($i < count($strings) - 1) {
-                            $sqlWhere .= ' OR ';
-                        }
-                        $qb->setParameter('nameLike' . $i, '%' . $strings[$i] . '%');
-                    }
-                    $qb
-                        ->andWhere($sqlWhere);
-                }
+                $qb = PerimeterRepository::completeQueryBuilderForSearch($qb, $query);
             },
         ]);
     }

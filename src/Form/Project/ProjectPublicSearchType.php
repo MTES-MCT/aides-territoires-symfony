@@ -55,6 +55,12 @@ class ProjectPublicSearchType extends AbstractType
         $nameParams = [
             'required' => false,
             'label' => "Types de projet",
+            'label_attr' => [
+                'id' => 'label-type-search',
+            ],
+            'attr' => [
+                'aria-labelledby' => 'label-type-search',
+            ],
             'autocomplete' => true,
             'autocomplete_url' => $this->routerInterface->generate('app_project_reference_ajax_ux_autocomplete'),
             'tom_select_options' => [

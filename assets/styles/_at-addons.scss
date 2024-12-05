@@ -11,6 +11,9 @@
 .wysiwyg-wrapper{
     @include mixins.img-reponsive();
 
+    video{
+        max-width: 100%;
+    }
     .text-left{
         text-align: left;
     }

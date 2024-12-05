@@ -40,6 +40,12 @@ class RegisterCommuneType extends AbstractType
             ->add('perimeter', PerimeterCityAutocompleteType::class, [
                 'required' => true,
                 'label' => 'Votre commune',
+                'label_attr' => [
+                    'id' => 'perimeter-label'
+                ],
+                'attr' => [
+                    'aria-labelledby' => 'perimeter-label'
+                ],
                 'placeholder' => 'Tapez les premiers caractères',
                 'class' => Perimeter::class,
                 'constraints' => [

@@ -19,10 +19,8 @@
 		<!-- Modifier les chemins relatifs des favicons en fonction de la structure du projet -->
 		<!-- Dans le fichier manifest.webmanifest aussi, modifier les chemins vers les images -->
 
-			<title>{% block title %}
-			Aides Territoires
-		{% endblock title %}
-		</title>
+		<title>{% block title %}Aides Territoires{% endblock title %}</title>
+		
 		<meta name="description" content="{% block meta_description %}Aides Territoires{% endblock %}"/> {% block meta_og %}
 			<meta property="og:title" content="Aides-territoires | Toutes les aides pour les acteurs locaux"/>
 			<meta property="og:type" content="website"/>
@@ -43,8 +41,8 @@
 				{% cspscript %}
 				<script>
 					window.dsfr = {
-production: true
-};
+						production: true
+					};
 				</script>
 				{% endcspscript %}
 			{% endif %}
@@ -57,9 +55,11 @@ production: true
 	</head>
 
 	<body>
+		{% include 'include/skiplinks.html.twig' %}
+		
 		<!-- code de la page -->
 		{% block header %}
-			<header role="banner" class="fr-header">
+			<header role="banner" class="fr-header" id="header">
 				{% block header_not_connected %}
 					{% if not app.user %}
 						<div class="fr-background-alt fr-p-2w">
@@ -110,7 +110,9 @@ production: true
 			{% endblock %}
 		{% endblock %}
 
-		{% block body %}{% endblock %}
+		<div id="contenu">
+			{% block body %}{% endblock %}
+		</div>
 
 		{% block footer %}
 			{% include('include/_footer.html.twig') %}

@@ -3,16 +3,6 @@ require('../../form/trumbowyg.js');
 import Routing from 'fos-router';
 
 $(function() {
-    // Gestionnaire d'événement 'submit'
-    $(document).on('submit', 'form[name="form"]', function(e) {
-        e.preventDefault();
-        $("#btn_modal_waiting").attr("data-fr-opened", "true");
-        setTimeout(function() {
-            $(e.target).off('submit');
-            e.target.submit();
-        }, 250);
-    }); 
-
     // quand on arrive sur la page prete, on lock
     lock();
     // toutes les 2 minutes, on update le lock en le relancant

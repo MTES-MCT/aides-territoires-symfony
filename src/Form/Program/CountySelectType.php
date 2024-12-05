@@ -30,7 +30,7 @@ class CountySelectType extends AbstractType
         $builder
             ->add('county', ChoiceType::class, [
                 'required' => false,
-                'label' => false,
+                'label' => 'Choisissez un département',
                 'placeholder' => 'Choisissez un département',
                 'choices' => $countyChoices,
                 'attr' => [

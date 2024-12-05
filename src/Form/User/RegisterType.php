@@ -135,6 +135,12 @@ class RegisterType extends AbstractType
             ->add('perimeter', PerimeterAutocompleteType::class, [
                 'required' => true,
                 'label' => 'Votre territoire',
+                'label_attr' => [
+                    'id' => 'perimeter-label'
+                ],
+                'attr' => [
+                    'aria-labelledby' => 'perimeter-label'
+                ],
                 'help' => 'Tous les périmètres géographiques sont disponibles : '
                                 . 'CA, CU, CC, pays, parc, etc. Contactez-nous si vous ne trouvez pas le vôtre.',
                 'placeholder' => 'Tapez les premiers caractères',

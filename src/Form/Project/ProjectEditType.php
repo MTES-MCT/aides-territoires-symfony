@@ -72,7 +72,10 @@ class ProjectEditType extends AbstractType
 
             ->add('projectReference', EntityType::class, [
                 'required' => false,
-                'label' => false,
+                'label' => 'Saisissez un projet référent',
+                'label_attr' => [
+                    'id' => 'project-reference-label'
+                ],
                 'placeholder' => 'Saisissez un projet référent',
                 'class' => ProjectReference::class,
                 'choice_label' => 'name',
@@ -81,6 +84,9 @@ class ProjectEditType extends AbstractType
                         ->orderBy('o.name', 'ASC');
                 },
                 'autocomplete' => true,
+                'attr' => [
+                    'aria-labelledby' => 'project-reference-label'
+                ],
             ])
             ->add('referentNotFound', CheckboxType::class, [
                 'required' => false,

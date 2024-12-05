@@ -16,7 +16,7 @@
 				</li>
 				{% if isUserGranted(app.user, constant('App\\Entity\\User\\User::ROLE_ADMIN')) %}
 					<li>
-						<a href="{{ path('admin') }}" title="Administration" class="fr-btn fr-icon-lock-line">Administration</a>
+						<a href="{{ path('admin') }}" class="fr-btn fr-icon-lock-line">Administration</a>
 					</li>
 				{% endif %}
 				<li>
@@ -28,18 +28,18 @@
 				</li>
 			{% else %}
 				<li>
-					<a class="fr-btn fr-icon-lock-line" href="{{ path('app_login') }}" title="Se connecter">Se connecter</a>
+					<a class="fr-btn fr-icon-lock-line" href="{{ path('app_login') }}">Se connecter</a>
 				</li>
 				<li>
-					<a class="fr-btn fr-icon-account-line" href="{{ path('app_user_user_register') }}" title="S'inscrire">S’inscrire</a>
+					<a class="fr-btn fr-icon-account-line" href="{{ path('app_user_user_register') }}">S'inscrire</a>
 				</li>
 			{% endif %}
 
 			<li>
-				<a class="fr-btn fr-btn--secondary fr-icon-edit-box-line" href="{{ path('app_user_aid_publications') }}" title="Diffuser une aide">Diffuser une aide</a>
+				<a class="fr-btn fr-btn--secondary fr-icon-edit-box-line" href="{{ path('app_user_aid_publications') }}">Diffuser une aide</a>
 			</li>
 			<li>
-				<a class="fr-btn at-btn--primary fr-icon-search-line" href="{{ path('app_aid_aid') }}" title="Trouver des aides">Trouver des aides</a>
+				<a class="fr-btn at-btn--primary fr-icon-search-line" href="{{ path('app_aid_aid') }}">Trouver des aides</a>
 			</li>
 		</ul>
 	</div>
