@@ -23,6 +23,7 @@ use App\Entity\Aid\AidStep;
 use App\Entity\Aid\AidType;
 use App\Entity\Backer\Backer;
 use App\Entity\Category\Category;
+use App\Entity\Log\LogAidView;
 use App\Entity\Organization\Organization;
 use App\Entity\Organization\OrganizationType;
 use App\Entity\Perimeter\Perimeter;
@@ -57,6 +58,7 @@ use App\Service\Export\SpreadsheetExporterService;
 use App\Service\File\FileService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityRepository;
+use EasyCorp\Bundle\EasyAdminBundle\Collection\FieldCollection;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Assets;
@@ -67,6 +69,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\BatchActionDto;
 use EasyCorp\Bundle\EasyAdminBundle\Event\BeforeEntityPersistedEvent;
 use EasyCorp\Bundle\EasyAdminBundle\Event\BeforeEntityUpdatedEvent;
+use EasyCorp\Bundle\EasyAdminBundle\Factory\FilterFactory;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ArrayField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
@@ -234,6 +237,10 @@ class AidCrudController extends AtCrudController implements EventSubscriberInter
         $exportCsvAction = $this->getExportCsvAction();
         $exportXlsxAction = $this->getExportXlsxAction();
 
+        $statsSpreadsheetAction = Action::new('statsSpreadsheet', 'Consultations', 'fas fa-chart-line')
+            ->setHtmlAttributes(['title' => 'Consultations des aides affichées', 'target' => '_blank']) // titre
+            ->linkToCrudAction('statsSpreadsheet')
+            ->createAsGlobalAction();
 
         $batchAssociate = Action::new('batchAssociate', 'Associé')
             ->linkToCrudAction('batchAssociate');
@@ -248,6 +255,7 @@ class AidCrudController extends AtCrudController implements EventSubscriberInter
             ->add(Crud::PAGE_INDEX, $importSpreadsheetAction)
             ->add(Crud::PAGE_INDEX, $exportCsvAction)
             ->add(Crud::PAGE_INDEX, $exportXlsxAction)
+            ->add(Crud::PAGE_INDEX, $statsSpreadsheetAction)
             ->addBatchAction($batchAssociate)
             ->addBatchAction($batchAssociateKeyword)
         ;
@@ -1256,6 +1264,29 @@ class AidCrudController extends AtCrudController implements EventSubscriberInter
         }
 
         return $this->redirect($batchActionDto->getReferrerUrl());
+    }
+
+    public function statsSpreadsheet(
+        AdminContext $context,
+        SpreadsheetExporterService $spreadsheetExporterService,
+        string $filename = 'consultations-aides',
+        string $format = FileService::FORMAT_XLSX
+    ): Response
+    {
+        $fields = FieldCollection::new($this->configureFields(Crud::PAGE_INDEX));
+        $filters = $this->container->get(FilterFactory::class)->create(
+            $context->getCrud()->getFiltersConfig(),
+            $fields,
+            $context->getEntity()
+        );
+        $queryBuilder = $this->createIndexQueryBuilder($context->getSearch(), $context->getEntity(), $fields, $filters);
+
+        return $spreadsheetExporterService->createResponseFromQueryBuilder(
+            $queryBuilder,
+            get_class(new LogAidView()), // on utilise l'entite logAidView pour l'export
+            $filename,
+            $format
+        );
     }
 
     public static function getSubscribedEvents(): array

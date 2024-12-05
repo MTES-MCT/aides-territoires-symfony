@@ -24,6 +24,17 @@ class LogAidViewRepository extends ServiceEntityRepository
         parent::__construct($registry, LogAidView::class);
     }
 
+    public function countFormGroup(array $params = null)
+    {
+        $qb = $this->getQueryBuilder($params);
+        $qb->select('COUNT(lav.id) as nb');
+        $qb->innerJoin('lav.aid', 'aid');
+        $qb->addSelect('aid.id as aidId');
+        $qb->groupBy('aid.id');
+
+        return $qb->getQuery()->getResult();
+    }
+
     public function countLastWeek(array $params = null)
     {
         $lastWeek = new \DateTime(date('Y-m-d'));
@@ -258,7 +269,7 @@ class LogAidViewRepository extends ServiceEntityRepository
             ;
         }
 
-        if (is_array($aidIds) && count($aidIds) > 0) {
+        if (is_array($aidIds) && !empty($aidIds)) {
             $qb
                 ->andWhere('lav.aid IN (:aidIds)')
                 ->setParameter('aidIds', $aidIds)

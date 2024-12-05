@@ -14,6 +14,7 @@ class MatomoService
     public const GOAL_KEY = "_analytics_goal";
 
     public const REGEXP_AID_URL = 'aides/(.+)';
+    public const REGEXP_AID_SLUG = 'aides/([^/]+)';
 
     public function __construct(
         protected RequestStack $requestStack,
@@ -123,5 +124,49 @@ class MatomoService
         } catch (\Exception $e) {
             return null;
         }
+    }
+
+    /**
+     * Récupère les stats pour plusieurs périodes
+     */
+    public function getAidsStats(): array
+    {
+        $periods = [
+            '30_days' => ['from' => '-30 days', 'to' => 'today'],
+            'one_year' => ['from' => '-1 year', 'to' => 'today'],
+            // 'all_time' => ['from' => '2023-01-01', 'to' => 'today']
+        ];
+
+        $allStats = [];
+        foreach ($periods as $period => $dates) {
+            $stats = $this->getMatomoStats(
+                apiMethod: self::MATOMO_GET_PAGE_URLS_API_METHOD,
+                fromDateString: date('Y-m-d', strtotime($dates['from'])),
+                toDateString: date('Y-m-d', strtotime($dates['to'])),
+                options: [
+                    'flat' => 1,
+                    'filter_column' => 'label',
+                    'filter_pattern' => 'aides'
+                ],
+            );
+            $allStats[$period] = $this->processStats($stats);
+        }
+
+        return $allStats;
+    }
+
+    private function processStats($stats): array
+    {
+        $processed = [];
+        foreach ($stats as $stat) {
+            if (preg_match('~' . self::REGEXP_AID_SLUG . '~', $stat->label, $matches)) {
+                $slug = $matches[1];
+                $processed[$slug] = [
+                    'views' => $stat->nb_visits ?? 0,
+                    'hits' => $stat->nb_hits ?? 0
+                ];
+            }
+        }
+        return $processed;
     }
 }

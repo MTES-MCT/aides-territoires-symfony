@@ -24,6 +24,17 @@ class LogAidOriginUrlClickRepository extends ServiceEntityRepository
         parent::__construct($registry, LogAidOriginUrlClick::class);
     }
 
+    public function countFormGroup(array $params = null)
+    {
+        $qb = $this->getQueryBuilder($params);
+        $qb->select('COUNT(laouc.id) as nb');
+        $qb->innerJoin('laouc.aid', 'aid');
+        $qb->addSelect('aid.id as aidId');
+        $qb->groupBy('aid.id');
+
+        return $qb->getQuery()->getResult();
+    }
+
     public function countTopAidOnPeriod(?array $params = null): array
     {
         $maxResults = $params['maxResults'] ?? null;
@@ -69,7 +80,8 @@ class LogAidOriginUrlClickRepository extends ServiceEntityRepository
         $dateCreate = $params['dateCreate'] ?? null;
         $author = $params['author'] ?? null;
         $aid = $params['aid'] ?? null;
-
+        $aidIds = $params['aidIds'] ?? null;
+        
         $qb = $this->createQueryBuilder('laouc');
 
         if ($author instanceof User && $author->getId()) {
@@ -84,6 +96,13 @@ class LogAidOriginUrlClickRepository extends ServiceEntityRepository
             $qb
                 ->andWhere('laouc.aid = :aid')
                 ->setParameter('aid', $aid)
+            ;
+        }
+
+        if (is_array($aidIds) && !empty($aidIds)) {
+            $qb
+                ->andWhere('laouc.aid IN (:aidIds)')
+                ->setParameter('aidIds', $aidIds)
             ;
         }
 

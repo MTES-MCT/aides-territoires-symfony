@@ -39,11 +39,18 @@ class AidPerimeterFilter implements FilterInterface
         $perimeterRepository = $queryBuilder->getEntityManager()->getRepository(Perimeter::class);
 
         $ids = $perimeterRepository->getIdPerimetersContainedIn(['perimeter' => $filterDataDto->getValue()]);
+        $comparison = $filterDataDto->getComparison() ?? 'eq';
 
         $queryBuilder
             ->innerJoin(sprintf('%s.perimeter', $filterDataDto->getEntityAlias()), 'perimeterFilter')
-            ->andWhere('perimeterFilter.id IN (:ids)')
-            ->setParameter('ids', $ids)
         ;
+
+        if ($comparison === 'eq') {
+            $queryBuilder->andWhere('perimeterFilter.id IN (:ids)')
+                ->setParameter('ids', $ids);
+        } else {
+            $queryBuilder->andWhere('perimeterFilter.id NOT IN (:ids)')
+                ->setParameter('ids', $ids);
+        }
     }
 }

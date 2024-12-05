@@ -4,28 +4,38 @@ namespace App\Form\Admin\Filter\Aid;
 
 use App\Entity\Perimeter\Perimeter;
 use App\Form\Type\PerimeterAutocompleteType;
-use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\UX\Autocomplete\Form\AsEntityAutocompleteField;
-use Symfony\UX\Autocomplete\Form\BaseEntityAutocompleteType;
 
 #[AsEntityAutocompleteField]
 class AidPerimeterFilterType extends AbstractType
 {
+    public function buildForm(FormBuilderInterface $builder, array $options): void
+    {
+        $builder
+            ->add('comparison', ChoiceType::class, [
+                'choices' => [
+                    'est' => 'eq',
+                    'n\'est pas' => 'neq',
+                ],
+                'required' => true,
+            ])
+            ->add('value', PerimeterAutocompleteType::class, [
+                'class' => Perimeter::class,
+                'autocomplete' => true,
+                'attr' => [
+                    'placeholder' => 'Choix périmètre'
+                ]
+            ]);
+    }
+
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'class' => Perimeter::class,
-            'autocomplete' => true,
-            'attr' => [
-                'placeholder' => 'Choix périmètre'
-            ]
+            'data_class' => null,
         ]);
-    }
-
-    public function getParent(): ?string
-    {
-        return PerimeterAutocompleteType::class;
     }
 }
