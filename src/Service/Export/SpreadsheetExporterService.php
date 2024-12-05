@@ -326,12 +326,10 @@ class SpreadsheetExporterService
 
                 // on transformes les résultats de logs en tableau par id d'aide
                 $logAidOriginUrlClicks30Days = $this->transformLogsResultsInArray($logAidOriginUrlClicks30Days);
-                $logAidOriginUrlClicks6Months = $this->transformLogsResultsInArray($logAidOriginUrlClicks6Months);
                 $logAidOriginUrlClicks1Year = $this->transformLogsResultsInArray($logAidOriginUrlClicks1Year);
 
                 // on unset les résultats de logs
                 unset($logAidOriginUrlClicks30Days);
-                unset($logAidOriginUrlClicks6Months);
                 unset($logAidOriginUrlClicks1Year);
 
                 $stats = $this->matomoService->getAidsStats();
