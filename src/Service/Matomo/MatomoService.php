@@ -2,13 +2,16 @@
 
 namespace App\Service\Matomo;
 
+use App\Entity\Aid\Aid;
 use App\Service\Various\ParamService;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class MatomoService
 {
     public const MATOMO_GET_PAGE_URLS_API_METHOD = "Actions.getPageUrls";
+    public const MATOMO_GET_PAGE_URL_API_METHOD = "Actions.getPageUrl";
     public const MATOMO_GET_PAGE_TITLES_API_METHOD = "Actions.getPageTitles";
     public const MATOMO_GET_PAGE_TITLE_API_METHOD = "Actions.getPageTitle";
     public const GOAL_KEY = "_analytics_goal";
@@ -17,9 +20,10 @@ class MatomoService
     public const REGEXP_AID_SLUG = 'aides/([^/]+)';
 
     public function __construct(
-        protected RequestStack $requestStack,
-        protected ParamService $paramService,
-        protected HttpClientInterface $httpClientInterface
+        private RequestStack $requestStack,
+        private ParamService $paramService,
+        private HttpClientInterface $httpClientInterface,
+        private RouterInterface $routerInterface
     ) {
     }
 
@@ -126,6 +130,25 @@ class MatomoService
         }
     }
 
+    public function getAidUniqueVisitors(Aid $aid, \DateTime $dateStart, \DateTime $dateEnd): int
+    {
+        $pageUrl = 'https://aides-territoires.beta.gouv.fr/aides/' . $aid->getSlug();
+        $endDate = new \DateTime('yesterday');
+        if ($dateEnd > $endDate) {
+            $dateEnd = clone $endDate;
+        }
+
+        $results = $this->getMatomoStats(
+            'VisitsSummary.getUniqueVisitors',
+            'pageUrl==' . $pageUrl,
+            $dateStart->format('Y-m-d'),
+            $dateEnd->format('Y-m-d'),
+            'range'
+        );
+
+        return $results[0]->nb_uniq_visitors ?? 0;
+    }
+
     /**
      * Récupère les stats pour plusieurs périodes
      */
@@ -133,22 +156,37 @@ class MatomoService
     {
         $periods = [
             '30_days' => ['from' => '-30 days', 'to' => 'today'],
-            'one_year' => ['from' => '-1 year', 'to' => 'today'],
-            // 'all_time' => ['from' => '2023-01-01', 'to' => 'today']
+            'one_year' => ['from' => '-1 year', 'to' => 'today']
         ];
 
+        $minDate = new \DateTime('2023-12-07');
+        $endDate = new \DateTime('yesterday');
         $allStats = [];
+        
         foreach ($periods as $period => $dates) {
+            $fromDate = new \DateTime($dates['from']);
+            $toDate = new \DateTime($dates['to']);
+
+            // Vérification de la date minimum avec DateTime
+            if ($fromDate < $minDate) {
+                $fromDate = clone $minDate;
+            }
+
+            if ($toDate > $endDate) {
+                $toDate = clone $endDate;
+            }
+
             $stats = $this->getMatomoStats(
                 apiMethod: self::MATOMO_GET_PAGE_URLS_API_METHOD,
-                fromDateString: date('Y-m-d', strtotime($dates['from'])),
-                toDateString: date('Y-m-d', strtotime($dates['to'])),
+                fromDateString: $fromDate->format('Y-m-d'),
+                toDateString: $toDate->format('Y-m-d'),
                 options: [
                     'flat' => 1,
                     'filter_column' => 'label',
                     'filter_pattern' => 'aides'
                 ],
             );
+            
             $allStats[$period] = $this->processStats($stats);
         }
 

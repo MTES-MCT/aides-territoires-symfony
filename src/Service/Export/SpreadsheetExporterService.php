@@ -291,10 +291,6 @@ class SpreadsheetExporterService
                 $logAidViews30Days = $this->transformLogsResultsInArray($logAidViews30Days);
                 $logAidViews1Year = $this->transformLogsResultsInArray($logAidViews1Year);
 
-                // on unset les résultats de logs
-                unset($logAidViews30Days);
-                unset($logAidViews1Year);
-
                 // les logs de clics sur l'url d'application
                 $logAidApplicationUrlClicks30Days = $logAidApplicationUrlClickRepository->countFormGroup([
                     'aidIds' => $aidsIds,
@@ -308,10 +304,6 @@ class SpreadsheetExporterService
                 // on transformes les résultats de logs en tableau par id d'aide
                 $logAidApplicationUrlClicks30Days = $this->transformLogsResultsInArray($logAidApplicationUrlClicks30Days);
                 $logAidApplicationUrlClicks1Year = $this->transformLogsResultsInArray($logAidApplicationUrlClicks1Year);
-
-                // on unset les résultats de logs
-                unset($logAidApplicationUrlClicks30Days);
-                unset($logAidApplicationUrlClicks1Year);
 
                 // les logs de clics sur l'url d'origine
                 $logAidOriginUrlClicks30Days = $logAidOriginUrlClickRepository->countFormGroup([
@@ -328,20 +320,25 @@ class SpreadsheetExporterService
                 $logAidOriginUrlClicks30Days = $this->transformLogsResultsInArray($logAidOriginUrlClicks30Days);
                 $logAidOriginUrlClicks1Year = $this->transformLogsResultsInArray($logAidOriginUrlClicks1Year);
 
-                // on unset les résultats de logs
-                unset($logAidOriginUrlClicks30Days);
-                unset($logAidOriginUrlClicks1Year);
-
                 $stats = $this->matomoService->getAidsStats();
 
                 // Accès aux stats
                 $thirtyDaysStats = $stats['30_days'];
                 $yearStats = $stats['one_year'];
-                // $allTimeStats = $stats['all_time'];
-                
+
                 // dans ce cas spécifique on a donné l'entité LogAidView mais il s'agit en fait d'un tableau de Aid
                 /** @var Aid $result */
                 foreach ($results as $key => $result) {
+                    $matomoViews30Days = $thirtyDaysStats[$result->getSlug()]['views'] ?? 0;
+                    $matomoViews1Year = $yearStats[$result->getSlug()]['views'] ?? 0;
+                    // si les vues 1 an sont inférieures aux vues 30 jours, c'est un bug de Matomo, on redemande à partir de la date de publication
+                    if ($matomoViews1Year < $matomoViews30Days) {
+                        $matomoViews1Year = $this->matomoService->getAidUniqueVisitors(
+                            aid: $result,
+                            dateStart: $result->getDatePublished(),
+                            dateEnd: new \DateTime('today')
+                        );
+                    }
                     $datas[] = [
                         'Nom de l\'aide' => $result->getName(),
                         'Actuellement publiée' => $result->isLive() ? 'Oui' : 'Non',
@@ -355,8 +352,8 @@ class SpreadsheetExporterService
                         'Nombre de clics sur l\'url d\'application (1 an)' => $logAidApplicationUrlClicks1Year[$result->getId()] ?? 0,
                         'Nombre de clics sur l\'url d\'origine (30 jours)' => $logAidOriginUrlClicks30Days[$result->getId()] ?? 0,
                         'Nombre de clics sur l\'url d\'origine (1 an)' => $logAidOriginUrlClicks1Year[$result->getId()] ?? 0,
-                        'Matomo : Nombre de vues unique (30 jours)' => $thirtyDaysStats[$result->getSlug()]['views'] ?? 0,
-                        'Matomo : Nombre de vues unique (1 an)' => $yearStats[$result->getSlug()]['views'] ?? 0,
+                        'Matomo : Nombre de vues unique (30 jours)' => $matomoViews30Days,
+                        'Matomo : Nombre de vues unique (1 an)' => $matomoViews1Year ?? 0,
                     ];
                     unset($results[$key]);
                 }
@@ -578,6 +575,7 @@ class SpreadsheetExporterService
         foreach ($logsResults as $logResult) {
             $logs[$logResult['aidId']] = $logResult['nb'];
         }
+
         return $logs;
     }
 
