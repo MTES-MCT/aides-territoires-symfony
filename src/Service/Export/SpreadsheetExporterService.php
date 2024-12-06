@@ -315,7 +315,6 @@ class SpreadsheetExporterService
                     'dateMin' => $date1YearAgo,
                 ]);
 
-
                 // on transformes les résultats de logs en tableau par id d'aide
                 $logAidOriginUrlClicks30Days = $this->transformLogsResultsInArray($logAidOriginUrlClicks30Days);
                 $logAidOriginUrlClicks1Year = $this->transformLogsResultsInArray($logAidOriginUrlClicks1Year);
@@ -331,17 +330,13 @@ class SpreadsheetExporterService
                 foreach ($results as $key => $result) {
                     $matomoViews30Days = $thirtyDaysStats[$result->getSlug()]['views'] ?? 0;
                     $matomoViews1Year = $yearStats[$result->getSlug()]['views'] ?? 0;
-                    // si les vues 1 an sont inférieures aux vues 30 jours, c'est un bug de Matomo, on redemande à partir de la date de publication
-                    if ($matomoViews1Year < $matomoViews30Days) {
-                        $matomoViews1Year = $this->matomoService->getAidUniqueVisitors(
-                            aid: $result,
-                            dateStart: $result->getDatePublished(),
-                            dateEnd: new \DateTime('today')
-                        );
-                    }
+
                     $datas[] = [
                         'Nom de l\'aide' => $result->getName(),
                         'Actuellement publiée' => $result->isLive() ? 'Oui' : 'Non',
+                        'Date de publication' => $result->getDatePublished()
+                            ? $result->getDatePublished()->format('d/m/Y')
+                            : '',
                         'Zone géographique couverte par l\'aide*' => $result->getPerimeter()
                             ? $result->getPerimeter()->getName()
                             : '',
