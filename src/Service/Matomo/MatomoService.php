@@ -133,6 +133,10 @@ class MatomoService
     public function getAidUniqueVisitors(Aid $aid, \DateTime $dateStart, \DateTime $dateEnd): int
     {
         $pageUrl = 'https://aides-territoires.beta.gouv.fr/aides/' . $aid->getSlug();
+        $endDate = new \DateTime('yesterday');
+        if ($dateEnd > $endDate) {
+            $dateEnd = clone $endDate;
+        }
 
         $results = $this->getMatomoStats(
             'VisitsSummary.getUniqueVisitors',
@@ -156,6 +160,7 @@ class MatomoService
         ];
 
         $minDate = new \DateTime('2023-12-07');
+        $endDate = new \DateTime('yesterday');
         $allStats = [];
         
         foreach ($periods as $period => $dates) {
@@ -165,6 +170,10 @@ class MatomoService
             // Vérification de la date minimum avec DateTime
             if ($fromDate < $minDate) {
                 $fromDate = clone $minDate;
+            }
+
+            if ($toDate > $endDate) {
+                $toDate = clone $endDate;
             }
 
             $stats = $this->getMatomoStats(
