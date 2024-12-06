@@ -130,25 +130,6 @@ class MatomoService
         }
     }
 
-    public function getAidUniqueVisitors(Aid $aid, \DateTime $dateStart, \DateTime $dateEnd): int
-    {
-        $pageUrl = 'https://aides-territoires.beta.gouv.fr/aides/' . $aid->getSlug();
-        $endDate = new \DateTime('yesterday');
-        if ($dateEnd > $endDate) {
-            $dateEnd = clone $endDate;
-        }
-
-        $results = $this->getMatomoStats(
-            'VisitsSummary.getUniqueVisitors',
-            'pageUrl==' . $pageUrl,
-            $dateStart->format('Y-m-d'),
-            $dateEnd->format('Y-m-d'),
-            'range'
-        );
-
-        return $results[0]->nb_uniq_visitors ?? 0;
-    }
-
     /**
      * Récupère les stats pour plusieurs périodes
      */
@@ -183,7 +164,8 @@ class MatomoService
                 options: [
                     'flat' => 1,
                     'filter_column' => 'label',
-                    'filter_pattern' => 'aides'
+                    'filter_pattern' => 'aides',
+                    'filter_limit' => -1,
                 ],
             );
             
@@ -197,12 +179,18 @@ class MatomoService
     {
         $processed = [];
         foreach ($stats as $stat) {
-            if (preg_match('~' . self::REGEXP_AID_SLUG . '~', $stat->label, $matches)) {
+            if (preg_match('#/aides/([^/]+)/?$#', $stat->label, $matches)) {
                 $slug = $matches[1];
-                $processed[$slug] = [
-                    'views' => $stat->nb_visits ?? 0,
-                    'hits' => $stat->nb_hits ?? 0
-                ];
+
+                if (isset($processed[$slug])) {
+                    $processed[$slug]['views'] += $stat->nb_visits ?? 0;
+                    $processed[$slug]['hits'] += $stat->nb_hits ?? 0;
+                } else {
+                    $processed[$slug] = [
+                        'views' => $stat->nb_visits ?? 0,
+                        'hits' => $stat->nb_hits ?? 0
+                    ];
+                }
             }
         }
         return $processed;
