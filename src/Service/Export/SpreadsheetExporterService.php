@@ -80,6 +80,8 @@ class SpreadsheetExporterService
                     }
                     $sqlParams[] = ['name' => $param->getName(), 'value' => $values];
                     // Si object
+                } elseif ($param->getValue() instanceof \DateTime) {
+                    $sqlParams[] = ['name' => $param->getName(), 'value' => $param->getValue()->format('Y-m-d')];
                 } elseif (is_object($param->getValue())) {
                     $sqlParams[] = ['name' => $param->getName(), 'value' => $param->getValue()->getId()];
                     // Si string
