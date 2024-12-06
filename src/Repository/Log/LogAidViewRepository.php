@@ -26,8 +26,14 @@ class LogAidViewRepository extends ServiceEntityRepository
 
     public function countFormGroup(array $params = null)
     {
+        $distinctUser = $params['distinctUser'] ?? false;
         $qb = $this->getQueryBuilder($params);
-        $qb->select('COUNT(lav.id) as nb');
+        if ($distinctUser) {
+            $qb->leftJoin('lav.user', 'user');
+            $qb->select('COUNT(DISTINCT(user.id)) as nb');
+        } else {
+            $qb->select('COUNT(lav.id) as nb');
+        }
         $qb->innerJoin('lav.aid', 'aid');
         $qb->addSelect('aid.id as aidId');
         $qb->groupBy('aid.id');
