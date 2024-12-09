@@ -333,18 +333,9 @@ class SpreadsheetExporterService
                 $logAidOriginUrlClicks30Days = $this->transformLogsResultsInArray($logAidOriginUrlClicks30Days);
                 $logAidOriginUrlClicks1Year = $this->transformLogsResultsInArray($logAidOriginUrlClicks1Year);
 
-                $stats = $this->matomoService->getAidsStats();
-
-                // Accès aux stats
-                $thirtyDaysStats = $stats['30_days'];
-                $yearStats = $stats['one_year'];
-
                 // dans ce cas spécifique on a donné l'entité LogAidView mais il s'agit en fait d'un tableau de Aid
                 /** @var Aid $result */
                 foreach ($results as $key => $result) {
-                    $matomoViews30Days = $thirtyDaysStats[$result->getSlug()]['views'] ?? 0;
-                    $matomoViews1Year = $yearStats[$result->getSlug()]['views'] ?? 0;
-
                     $datas[] = [
                         'Nom de l\'aide' => $result->getName(),
                         'Actuellement publiée' => $result->isLive() ? 'Oui' : 'Non',
@@ -363,8 +354,6 @@ class SpreadsheetExporterService
                         'Nombre de clics sur l\'url d\'application (1 an)' => $logAidApplicationUrlClicks1Year[$result->getId()] ?? 0,
                         'Nombre de clics sur l\'url d\'origine (30 jours)' => $logAidOriginUrlClicks30Days[$result->getId()] ?? 0,
                         'Nombre de clics sur l\'url d\'origine (1 an)' => $logAidOriginUrlClicks1Year[$result->getId()] ?? 0,
-                        'Matomo : Nombre de vues unique (30 jours)' => $matomoViews30Days,
-                        'Matomo : Nombre de vues unique (1 an)' => $matomoViews1Year ?? 0,
                     ];
                     unset($results[$key]);
                 }
