@@ -228,6 +228,10 @@
 				</fieldset>
 			{% endif %}
 
+			{% if formAid.privateEdition is defined %}
+				{{ form_row(formAid.privateEdition) }}
+			{% endif %}
+
 			<div class="fr-background-main fr-pt-2w">
 				<div class="fr-hidden">
 					{{ form_row(formAid.status) }}
