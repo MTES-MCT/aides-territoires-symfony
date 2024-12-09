@@ -435,17 +435,21 @@ class AidService // NOSONAR too complex
 
     public function userCanExportPdf(Aid $aid, ?User $user): bool
     {
-        if (!$user) {
-            return false;
-        }
+        $access = false;
+
         if (
-            $user->getId() == $aid->getAuthor()->getId()
+            $user && $user->getId() == $aid->getAuthor()->getId()
             || $this->userService->isUserGranted($user, User::ROLE_ADMIN)
         ) {
-            return true;
+            $access = true;
         }
 
-        return false;
+        // Si l'utilisateur est dans l'organisation de l'aide et qu'il n'a pas demandé une edition privée
+        if ($user && $aid->getOrganization() && $aid->getOrganization()->getBeneficiairies()->contains($user)) {
+            $access = true;
+        }
+
+        return $access;
     }
 
     public function userCanSee(Aid $aid, ?User $user): bool
@@ -486,8 +490,8 @@ class AidService // NOSONAR too complex
             $access = true;
         }
 
-        // Si l'utilisateur est dans l'organisation de l'aide
-        if ($aid->getOrganization() && $aid->getOrganization()->getBeneficiairies()->contains($user)) {
+        // Si l'utilisateur est dans l'organisation de l'aide et qu'il n'a pas demandé une edition privée
+        if (!$aid->isPrivateEdition() && $aid->getOrganization() && $aid->getOrganization()->getBeneficiairies()->contains($user)) {
             $access = true;
         }
 

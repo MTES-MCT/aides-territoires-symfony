@@ -852,9 +852,8 @@ class Aid // NOSONAR too much methods
     #[ORM\ManyToOne(inversedBy: 'lastEditedAids')]
     private ?User $lastEditor = null;
 
-    /**
-     * <Non Database Fields
-     */
+    #[ORM\Column(type: 'boolean', options: ['default' => false])]
+    private ?bool $privateEdition = false;
 
     public function __construct()
     {
@@ -3033,6 +3032,18 @@ class Aid // NOSONAR too much methods
     public function setLastEditor(?User $lastEditor): static
     {
         $this->lastEditor = $lastEditor;
+
+        return $this;
+    }
+
+    public function isPrivateEdition(): ?bool
+    {
+        return $this->privateEdition;
+    }
+
+    public function setPrivateEdition(bool $privateEdition): static
+    {
+        $this->privateEdition = $privateEdition;
 
         return $this;
     }
