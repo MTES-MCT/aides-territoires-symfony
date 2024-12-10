@@ -56,10 +56,12 @@ class ProjectPublicSearchType extends AbstractType
             'required' => false,
             'label' => "Types de projet",
             'label_attr' => [
-                'id' => 'label-type-search',
+                'id' => 'label-project-type-search',
             ],
             'attr' => [
-                'aria-labelledby' => 'label-type-search',
+                'data-controller' => 'custom-autocomplete',
+                'placeholder' => 'Type de projet',
+                'aria-labelledby' => 'label-project-type-search',
             ],
             'autocomplete' => true,
             'autocomplete_url' => $this->routerInterface->generate('app_project_reference_ajax_ux_autocomplete'),
@@ -68,12 +70,11 @@ class ProjectPublicSearchType extends AbstractType
                 'createOnBlur' => true,
                 'maxItems' => 1,
                 'delimiter' => '$%§'
-            ],
+            ]
         ];
         if ($options['forceName'] !== false) {
             $nameParams['data'] = $options['forceName'];
         }
-
 
         $builder
             ->add('perimeter', PerimeterAutocompleteType::class, $perimeterParams)

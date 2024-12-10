@@ -81,6 +81,14 @@ class ProjectReferenceSearchType extends AbstractType
         $nameParams = [
             'required' => true,
             'label' => "Nom du projet",
+            'label_attr' => [
+                'id' => 'label-project-name-search',
+            ],
+            'attr' => [
+                'data-controller' => 'custom-autocomplete',
+                'placeholder' => 'Nom du projet',
+                'aria-labelledby' => 'label-project-name-search',
+            ],
             'autocomplete' => true,
             'autocomplete_url' => $this->routerInterface->generate('app_project_reference_ajax_ux_autocomplete'),
             'tom_select_options' => [
