@@ -109,6 +109,7 @@ class AidSearchTypeV2 extends AbstractType
                     'data-controller' => 'custom-autocomplete',
                     'placeholder' => 'Projet référent ou mot-clé',
                     'aria-labelledby' => 'label-keyword-search',
+                    'aria-hidden' => 'true',
                 ],
                 'autocomplete' => true,
                 'autocomplete_url' => $this->routerInterface->generate('app_project_reference_ajax_ux_autocomplete'),
@@ -120,13 +121,6 @@ class AidSearchTypeV2 extends AbstractType
                     'closeAfterSelect' => true,
                     'sanitize_html' => true,
                     'delimiter' => '$%§',
-                    'onInitialize' => 'function() { 
-                        var searchInput = this.control_input;
-                        if (searchInput) {
-                            searchInput.setAttribute("aria-labelledby", "label-keyword-search");
-                            searchInput.setAttribute("role", "textbox");
-                        }
-                    }',
                 ],
                 'sanitize_html' => true,
             ])
