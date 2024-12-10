@@ -34,6 +34,7 @@
 					<p><strong>Nouveau</strong></p>
 					<p>Vous avez désormais accès aux aides publiées par les membres de votre/vos structure(s).</p>
 					<p>Vous pouvez les consulter, les modifier et les exporter.</p>
+					<p>En tant qu'auteur d'une aide, vous pouvez restreindre son édition pour être le seul à pouvoir la modifier.</p>
 				</div>
 
 				<div class="fr-alert fr-alert--info fr-alert--sm fr-mb-2w fr-mt-2w">
@@ -43,9 +44,9 @@
 				</div>
 
 				{# <div class="fr-alert fr-alert--info fr-alert--sm fr-mb-2w fr-mt-2w">
-				                <p>Vous souhaitez importer un fichier contenant des aides ?  <a href="{{ path('app_user_aid_import_manual') }}" target="_blank" class="fr-btn">Consultez le manuel d’import</a>.</p>           
-				                <p>Envoyez le modèle rempli à <a href="mailto:aides-territoires@beta.gouv.fr" title="Envoyer par email">aides-territoires@beta.gouv.fr</a></p>
-				            </div> #}
+					<p>Vous souhaitez importer un fichier contenant des aides ?  <a href="{{ path('app_user_aid_import_manual') }}" target="_blank" class="fr-btn">Consultez le manuel d’import</a>.</p>           
+					<p>Envoyez le modèle rempli à <a href="mailto:aides-territoires@beta.gouv.fr" title="Envoyer par email">aides-territoires@beta.gouv.fr</a></p>
+				</div> #}
 
 				<div class="fr-mt-5w">
 					Nombre d'aides publiées en cours :
@@ -89,8 +90,7 @@
 											<th scope="col" title="Trier par Modifiée le">Modifiée le</th>
 											<th scope="col" title="Trier par Echéance">Échéance</th>
 											<th scope="col" title="Visibilité sur le site">Visibilité sur le site</th>
-											<th scope="col" titlte="Statistiques">Statistiques</th>
-											<th scope="col" title="Export PDF">Export PDF</th>
+											<th scope="col" titlte="Actions">Actions</th>
 										</tr>
 									</thead>
 									<tbody>
@@ -98,6 +98,9 @@
 											<tr>
 												<td>
 													<a href="{{ path('app_user_aid_edit', {'slug': aid.slug}) }}">
+														{% if aid.isPrivateEdition %}
+															<span class="fr-badge fr-badge--warning fr-badge--sm" title="L'auteur de l'aide a demandé une édition privée">Edition privée</span>
+														{% endif %}
 														{{ aid.name }}
 													</a>
 													{% if aid.isLive %}
@@ -140,12 +143,8 @@
 													</a>
 												</td>
 												<td>
-													<a href="{{ path('app_user_aid_stats', {'slug': aid.slug, 'dateMin': aid.dateCreate|date('Y-m-d'), 'dateMax': "now"|date('Y-m-d')}) }}">{{ aid.nbViews }}</a>
-												</td>
-												<td>
-													<a href="{{ path('app_user_aid_export_pdf', {'slug': aid.slug}) }}" target="_blank" title="Télécharger la fiche détail de l’aide en PDF - Ouvre une nouvelle fenêtre" class="fr-btn fr-icon-download-line fr-btn--tertiary fr-btn--tertiary-no-outline at-box-shadow--none">
-														<span class="fr-sr-only">Télécharger la fiche détail de l’aide en PDF</span>
-													</a>
+													<p><a href="{{ path('app_user_aid_stats', {'slug': aid.slug, 'dateMin': aid.dateCreate|date('Y-m-d'), 'dateMax': "now"|date('Y-m-d')}) }}" class="fr-icon-line-chart-line" title="Voir les statistiques de l'aide"></a></p>
+													<p><a href="{{ path('app_user_aid_export_pdf', {'slug': aid.slug}) }}" target="_blank" title="Télécharger la fiche détail de l'aide en PDF - Ouvre une nouvelle fenêtre" class="fr-icon-file-pdf-line"></a></p>
 												</td>
 											</tr>
 										{% endfor %}

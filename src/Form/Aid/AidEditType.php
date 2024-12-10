@@ -721,6 +721,16 @@ class AidEditType extends AbstractType
                 ]);
         }
 
+        if ($aid->getAuthor() && $aid->getAuthor()->getId() === $user->getId()) {
+            $builder->add('privateEdition', CheckboxType::class, [
+                'required' => false,
+                'label' => 'Edition privée',
+                'help_html' => true,
+                'help' => 'Si vous souhaitez que votre aide soit éditable uniquement par vous, '
+                    . 'cochez cette case. Les collaborateurs de votre structure ne pourront pas la modifier.',
+            ]);
+        }
+
         $builder
             ->addEventListener(
                 FormEvents::SUBMIT,
