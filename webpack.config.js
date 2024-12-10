@@ -106,6 +106,8 @@ Encore
     .addEntry('import-scss/user/project/fiche_projet', './assets/js/import-scss/user/project/fiche_projet.js')
     .addEntry('import-scss/user/searchpage/edit', './assets/js/import-scss/user/searchpage/edit.js')
     .addEntry('import-scss/user/backer/edit', './assets/js/import-scss/user/backer/edit.js')
+    .addEntry('import-scss/user/parameter/api_token', './assets/js/import-scss/user/parameter/api_token.js')
+    .addEntry('import-scss/user/parameter/profil', './assets/js/import-scss/user/parameter/profil.js')
     .addEntry('import-scss/reference/index', './assets/js/import-scss/reference/index.js')
     .addEntry('import-scss/reference/projets_subventionnes', './assets/js/import-scss/reference/projets_subventionnes.js')
     .addEntry('import-scss/security/login', './assets/js/import-scss/security/login.js')

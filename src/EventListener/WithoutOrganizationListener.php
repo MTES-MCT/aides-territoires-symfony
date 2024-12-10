@@ -42,8 +42,8 @@ final class WithoutOrganizationListener
             // utilisateur
             $user = $this->userService->getUserLogged();
 
-            // utilisateur connecté sans organization
-            if ($user && !$user->getDefaultOrganization()) {
+            // utilisateur connecté sans organization et qui veu publier des aides
+            if ($user && !$user->getDefaultOrganization() && $user->isIsContributor()) {
                 /** @var Session $session */
                 $session = $this->requestStack->getSession();
                 $session->getFlashBag()->add(
