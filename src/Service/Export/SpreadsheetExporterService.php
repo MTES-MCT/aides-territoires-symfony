@@ -342,7 +342,7 @@ class SpreadsheetExporterService
                         'Date de publication' => $result->getDatePublished()
                             ? $result->getDatePublished()->format('d/m/Y')
                             : '',
-                        'Zone géographique couverte par l\'aide*' => $result->getPerimeter()
+                        'Zone géographique couverte par l\'aide' => $result->getPerimeter()
                             ? $result->getPerimeter()->getName()
                             : '',
                         'url' => $result->getUrl(),
@@ -350,10 +350,10 @@ class SpreadsheetExporterService
                         'Utilisateurs connectés uniques (30 jours)' => $logAidViews30DaysDistinct[$result->getId()] ?? 0,
                         'Nombre de vues (1 an)' => $logAidViews1Year[$result->getId()] ?? 0,
                         'Utilisateurs connectés uniques (1 an)' => $logAidViews1YearDistinct[$result->getId()] ?? 0,
-                        'Nombre de clics sur l\'url d\'application (30 jours)' => $logAidApplicationUrlClicks30Days[$result->getId()] ?? 0,
-                        'Nombre de clics sur l\'url d\'application (1 an)' => $logAidApplicationUrlClicks1Year[$result->getId()] ?? 0,
-                        'Nombre de clics sur l\'url d\'origine (30 jours)' => $logAidOriginUrlClicks30Days[$result->getId()] ?? 0,
-                        'Nombre de clics sur l\'url d\'origine (1 an)' => $logAidOriginUrlClicks1Year[$result->getId()] ?? 0,
+                        'Nombre de clics sur candidater (30 jours)' => $logAidApplicationUrlClicks30Days[$result->getId()] ?? 0,
+                        'Nombre de clics sur candidater (1 an)' => $logAidApplicationUrlClicks1Year[$result->getId()] ?? 0,
+                        'Nombre de clics sur plus d\'informations (30 jours)' => $logAidOriginUrlClicks30Days[$result->getId()] ?? 0,
+                        'Nombre de clics sur plus d\'informations(1 an)' => $logAidOriginUrlClicks1Year[$result->getId()] ?? 0,
                     ];
                     unset($results[$key]);
                 }
