@@ -1,7 +1,10 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Mon compte |
+{% block title %}Mon compte | {{ parent() }}{% endblock %}
+
+{% block stylesheets %}
 	{{ parent() }}
+	{{ encore_entry_link_tags('import-scss/user/parameter/api_token') }}
 {% endblock %}
 
 {% block body %}

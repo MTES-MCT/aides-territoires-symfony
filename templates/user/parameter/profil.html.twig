@@ -1,12 +1,13 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Votre profil |
+{% block title %}Votre profil | {{ parent() }}{% endblock %}
+
+{% block stylesheets %}
 	{{ parent() }}
+	{{ encore_entry_link_tags('import-scss/user/parameter/profil') }}
 {% endblock %}
 
 {% block body %}
-
-
 	<div class="fr-container fr-mb-5w fr-mt-0">
 		<div class="fr-grid-row">
 
