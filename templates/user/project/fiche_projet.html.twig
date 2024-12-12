@@ -11,9 +11,7 @@
 {% endblock %}
 
 
-{% block title %}Editer votre projet |
-	{{ parent() }}
-{% endblock %}
+{% block title %}Editer votre projet | {{ parent() }}{% endblock %}
 
 {% block body %}
 
@@ -24,9 +22,7 @@
 			<div class="fr-col-12 fr-col-md-9">
 				<div class="fr-grid-row">
 					<div class="fr-col-12 fr-col-md-9">
-						<h1 class="fr-h3">Mon projet «
-							{{ project.name }}
-							»</h1>
+						<h1 class="fr-h3">Mon projet «{{ project.name }}»</h1>
 					</div>
 					<div class="fr-col-12 fr-col-md-3">
 						<a href="{{ path('app_user_project_structure') }}" class="fr-m-1w fr-tag _fr-tag--md fr-text--md fr-icon-arrow-left-line fr-tag--icon-left">Retour aux projets</a>
@@ -51,7 +47,8 @@
 									<span class="at-field-label at-required--label">Projet référent :*</span>
 									<span class="fr-hint-text">
 										Cette information nous aide à vous faire gagner du temps en vous proposant les meilleures aides pour votre projet.
-										                      Si vous ne trouvez pas le type de projet qui vous correspond, cochez la case "Je n'ai pas trouvé de projet référent".</span>
+										Si vous ne trouvez pas le type de projet qui vous correspond, cochez la case "Je n'ai pas trouvé de projet référent".
+									</span>
 								</label>
 							</div>
 							<div class="fr-col-12 fr-col-md-6">
