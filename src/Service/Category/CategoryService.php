@@ -16,7 +16,10 @@ class CategoryService
 
     /**
      * @param ArrayCollection<int, Category>|Category[] $categories
-     * @return array<int, array{categoryTheme: CategoryTheme, categories: Category[]}>
+     * @return array<int, array{
+     *     categoryTheme: \App\Entity\Category\CategoryTheme,
+     *     categories: array<int, \App\Entity\Category\Category>
+     * }>
      */
     public function categoriesToMetas(ArrayCollection $categories): array
     {

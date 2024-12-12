@@ -5,17 +5,18 @@ namespace App\Security\Voter\User;
 use App\Entity\Project\Project;
 use App\Entity\User\User;
 use App\Service\User\UserService;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 
+/**
+ * @extends Voter<string, array{user?: User|null, project?: Project|null}>
+ */
 class UserProjectAidsVoter extends Voter
 {
     public const MESSAGE_ERROR = 'Vous n\'êtes pas autorisé à accéder à cette ressource.';
     public const IDENTIFIER = 'USER_PROJECT_AIDS';
 
     public function __construct(
-        private RequestStack $requestStack,
         private UserService $userService
     ) {
     }

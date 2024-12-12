@@ -8,6 +8,9 @@ use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 use Symfony\Component\Security\Csrf\CsrfToken;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 
+/**
+ * @extends Voter<string, null>
+ */
 class InternalRequestVoter extends Voter
 {
     public const MESSAGE_ERROR = 'Vous n\'êtes pas autorisé à accéder à cette ressource.';

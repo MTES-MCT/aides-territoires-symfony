@@ -5,7 +5,6 @@ namespace App\Security;
 
 use App\Entity\User\User;
 use App\Repository\User\UserRepository;
-use Lexik\Bundle\JWTAuthenticationBundle\Event\AuthenticationFailureEvent;
 use Lexik\Bundle\JWTAuthenticationBundle\Security\Http\Authentication\AuthenticationSuccessHandler;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -23,7 +22,6 @@ class TokenAuthenticator extends AbstractAuthenticator
     public function __construct(
         private UserRepository $userRepository,
         private ?AuthenticationSuccessHandler $successHandler,
-        private ?AuthenticationFailureEvent $failureHandler
     ) {
     }
 

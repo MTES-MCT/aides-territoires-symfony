@@ -9,6 +9,9 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 
+/**
+ * @extends Voter<string, SearchPage>
+ */
 class UserCanEditSearchPageVoter extends Voter
 {
     public const MESSAGE_ERROR = 'Vous n\'êtes pas autorisé à accéder à cette ressource.';
