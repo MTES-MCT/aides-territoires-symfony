@@ -10,7 +10,6 @@ use App\Entity\Alert\Alert;
 use App\Entity\Category\CategoryTheme;
 use App\Entity\Perimeter\Perimeter;
 use App\Entity\Project\Project;
-use App\Entity\Reference\ProjectReference;
 use App\Entity\User\User;
 use App\Exception\NotFoundException\AidNotFoundException;
 use App\Form\Aid\AidSearchTypeV2;
@@ -397,48 +396,84 @@ class AidController extends FrontController
         ]);
         $formAddToProject->handleRequest($requestStack->getCurrentRequest());
         if ($formAddToProject->isSubmitted()) {
-            if ($formAddToProject->isValid()) {
-                // association projects existants
-                if ($formAddToProject->has('projects')) {
-                    $projects = $formAddToProject->get('projects')->getData();
-                    /** @var Project $project */
-                    foreach ($projects as $project) {
+            if (!$user->getDefaultOrganization()) {
+                $this->addFlash(
+                    FrontController::FLASH_ERROR,
+                    'Vous devez renseigner les informations de votre structure ou accepter une invitation avant de pouvoir accéder à cette page.'
+                );
+            } else {
+                if ($formAddToProject->isValid()) {
+                    // association projects existants
+                    if ($formAddToProject->has('projects')) {
+                        $projects = $formAddToProject->get('projects')->getData();
+                        /** @var Project $project */
+                        foreach ($projects as $project) {
+                            $aidProject = new AidProject();
+                            $aidProject->setAid($aid);
+                            $aidProject->setCreator($user);
+                            $project->addAidProject($aidProject);
+                            $this->managerRegistry->getManager()->persist($aidProject);
+    
+                            // envoi notification à tous les autres membres de l'oganisation
+                            if ($project->getOrganization()) {
+                                foreach ($project->getOrganization()->getBeneficiairies() as $beneficiary) {
+                                    if ($beneficiary->getId() == $user->getId()) {
+                                        continue;
+                                    }
+                                    $notificationService->addNotification(
+                                        $beneficiary,
+                                        'Nouvelle aide ajoutée à un projet',
+                                        '<p>
+                                        ' . $user->getFirstname()
+                                        . ' '
+                                        . $user->getLastname()
+                                        . ' a ajouté une aide au projet
+                                        <a href="'
+                                        . $this->generateUrl(
+                                            'app_user_project_details_fiche_projet',
+                                            ['id' => $project->getId(), 'slug' => $project->getSlug()],
+                                            UrlGeneratorInterface::ABSOLUTE_URL
+                                        )
+                                            . '">' . $project->getName() . '</a>.
+                                        </p>'
+                                    );
+                                }
+                            }
+    
+                            // message
+                            $this->addFlash(
+                                FrontController::FLASH_SUCCESS,
+                                'L’aide a bien été associée au projet <a href="'
+                                . $this->generateUrl(
+                                    'app_user_project_details_fiche_projet',
+                                    ['id' => $project->getId(), 'slug' => $project->getSlug()]
+                                )
+                                . '">' . $project->getName() . '</a>.'
+                            );
+                        }
+    
+                        $this->managerRegistry->getManager()->flush();
+                    }
+    
+                    $newProject = $formAddToProject->get('newProject')->getData();
+                    if ($newProject) {
+                        $project = new Project();
+                        $project->setName($newProject);
+                        $project->setAuthor($user);
+                        $project->setStatus(Project::STATUS_DRAFT);
+                        $project->setOrganization($user->getDefaultOrganization());
+    
                         $aidProject = new AidProject();
                         $aidProject->setAid($aid);
                         $aidProject->setCreator($user);
                         $project->addAidProject($aidProject);
-                        $this->managerRegistry->getManager()->persist($aidProject);
-
-                        // envoi notification à tous les autres membres de l'oganisation
-                        if ($project->getOrganization()) {
-                            foreach ($project->getOrganization()->getBeneficiairies() as $beneficiary) {
-                                if ($beneficiary->getId() == $user->getId()) {
-                                    continue;
-                                }
-                                $notificationService->addNotification(
-                                    $beneficiary,
-                                    'Nouvelle aide ajoutée à un projet',
-                                    '<p>
-                                    ' . $user->getFirstname()
-                                    . ' '
-                                    . $user->getLastname()
-                                    . ' a ajouté une aide au projet
-                                    <a href="'
-                                    . $this->generateUrl(
-                                        'app_user_project_details_fiche_projet',
-                                        ['id' => $project->getId(), 'slug' => $project->getSlug()],
-                                        UrlGeneratorInterface::ABSOLUTE_URL
-                                    )
-                                        . '">' . $project->getName() . '</a>.
-                                    </p>'
-                                );
-                            }
-                        }
-
-                        // message
+    
+                        $this->managerRegistry->getManager()->persist($project);
+                        $this->managerRegistry->getManager()->flush();
+    
                         $this->addFlash(
                             FrontController::FLASH_SUCCESS,
-                            'L’aide a bien été associée au projet <a href="'
+                            'L’aide a bien été associée au nouveau projet <a href="'
                             . $this->generateUrl(
                                 'app_user_project_details_fiche_projet',
                                 ['id' => $project->getId(), 'slug' => $project->getSlug()]
@@ -446,44 +481,15 @@ class AidController extends FrontController
                             . '">' . $project->getName() . '</a>.'
                         );
                     }
-
-                    $this->managerRegistry->getManager()->flush();
-                }
-
-                $newProject = $formAddToProject->get('newProject')->getData();
-                if ($newProject) {
-                    $project = new Project();
-                    $project->setName($newProject);
-                    $project->setAuthor($user);
-                    $project->setStatus(Project::STATUS_DRAFT);
-                    $project->setOrganization($user->getDefaultOrganization());
-
-                    $aidProject = new AidProject();
-                    $aidProject->setAid($aid);
-                    $aidProject->setCreator($user);
-                    $project->addAidProject($aidProject);
-
-                    $this->managerRegistry->getManager()->persist($project);
-                    $this->managerRegistry->getManager()->flush();
-
+    
+                    // redirection page mes projets
+                    return $this->redirect($requestStack->getCurrentRequest()->getUri());
+                } else {
                     $this->addFlash(
-                        FrontController::FLASH_SUCCESS,
-                        'L’aide a bien été associée au nouveau projet <a href="'
-                        . $this->generateUrl(
-                            'app_user_project_details_fiche_projet',
-                            ['id' => $project->getId(), 'slug' => $project->getSlug()]
-                        )
-                        . '">' . $project->getName() . '</a>.'
+                        FrontController::FLASH_ERROR,
+                        'Une erreur est survenue lors de l\'association de l\'aide au projet'
                     );
                 }
-
-                // redirection page mes projets
-                return $this->redirect($requestStack->getCurrentRequest()->getUri());
-            } else {
-                $this->addFlash(
-                    FrontController::FLASH_ERROR,
-                    'Une erreur est survenue lors de l\'association de l\'aide au projet'
-                );
             }
         }
 

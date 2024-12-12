@@ -26,24 +26,18 @@ final class WithoutOrganizationListener
     public function onKernelRequest(
         RequestEvent $event
     ): void {
-        // url demandée
-        $url = urldecode($event->getRequest()->getRequestUri());
-        $urlsAuthorized = [
-            '/comptes/structure/information/',
-            '/comptes/structure/invitations/',
-        ];
-        // on est dans la partie mon compte
-        if (preg_match('/comptes/', $url)) {
-            foreach ($urlsAuthorized as $urlAuthorized) {
-                if (preg_match('$' . $urlAuthorized . '$', $url)) {
-                    return;
-                }
-            }
+        $request = $event->getRequest();
+        $routeName = $request->attributes->get('_route');
+
+        if (
+            strpos($routeName, 'app_user_aid') === 0
+            || strpos($routeName, 'app_user_project') === 0
+        ) {
             // utilisateur
             $user = $this->userService->getUserLogged();
 
-            // utilisateur connecté sans organization et qui veu publier des aides
-            if ($user && !$user->getDefaultOrganization() && $user->isIsContributor()) {
+            // utilisateur connecté sans organization et qui veut publier des aides
+            if ($user && !$user->getDefaultOrganization()) {
                 /** @var Session $session */
                 $session = $this->requestStack->getSession();
                 $session->getFlashBag()->add(
@@ -52,7 +46,7 @@ final class WithoutOrganizationListener
                         . 'une invitation avant de pouvoir accéder à cette page.'
                 );
 
-                // regarde si cet utilisateur à été invité à rejoindre une structure
+                // regarde si cet utilisateur a été invité à rejoindre une structure
                 /** @var OrganizationInvitationRepository $organizationInvitationRepo */
                 $organizationInvitationRepo = $this->entityManagerInterface
                     ->getRepository(OrganizationInvitation::class);
