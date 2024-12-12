@@ -68,6 +68,9 @@ class ApiTokenAskCrudController extends AtCrudController
 
         $this->addFlash('success', 'Token ajouté à l\'utilisateur.');
 
-        return $this->redirect($context->getReferrer());
+        return $this->redirect($this->generateUrl('admin', [
+            'crudAction' => 'index',
+            'crudControllerFqcn' => self::class,
+        ]));
     }
 }

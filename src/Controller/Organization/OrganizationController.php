@@ -22,6 +22,7 @@ use App\Repository\Organization\OrganizationInvitationRepository;
 use App\Repository\Organization\OrganizationRepository;
 use App\Repository\Perimeter\PerimeterDataRepository;
 use App\Repository\Perimeter\PerimeterRepository;
+use App\Repository\User\UserRepository;
 use App\Security\Voter\InternalRequestVoter;
 use App\Service\Backer\BackerService;
 use App\Service\Email\EmailService;
@@ -222,6 +223,7 @@ class OrganizationController extends FrontController
     public function collaborateurs(
         int $id,
         UserService $userService,
+        UserRepository $userRepository,
         ManagerRegistry $managerRegistry,
         RequestStack $requestStack,
         EmailService $emailService,
@@ -277,6 +279,13 @@ class OrganizationController extends FrontController
                     );
                     return $this->redirectToRoute('app_organization_collaborateurs', ['id' => $organization->getId()]);
                 }
+
+                // on charge l'utilisateur si possible
+                $guest = $userRepository->findOneBy(['email' => $organizationInvitation->getEmail()]);
+                if ($guest instanceof User) {
+                    $organizationInvitation->setGuest($guest);
+                }
+
                 // sauvegarde
                 $organizationInvitation->setAuthor($user);
                 $organizationInvitation->setOrganization($organization);

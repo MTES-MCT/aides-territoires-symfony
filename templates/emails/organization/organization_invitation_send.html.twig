@@ -9,9 +9,15 @@
 		{{ organizationInvitation.author.lastname }}
 		vous invite à rejoindre la structure "{{ organizationInvitation.organization.name }}" sur Aides-territoires, plateforme publique qui permet aux collectivités et à leurs partenaires de trouver les aides financières et d'ingénierie pour donner vie à leurs projets.</p>
 
-	<p>En rejoignant sa structure, vous pourrez gérer en commun des projets et des collaborateurs avec
-		{{ organizationInvitation.author.firstname }}
-		{{ organizationInvitation.author.lastname }}.</p>
+	{% if organizationInvitation.guest %}
+		{% if organizationInvitation.guest.isContributor and not organizationInvitation.guest.isBeneficiary %}
+			<p>En rejoignant sa structure, vous pourrez gérer en commun des aides.</p>
+		{% elseif organizationInvitation.guest.isBeneficiary and not organizationInvitation.guest.isContributor %}
+			<p>En rejoignant sa structure, vous pourrez gérer en commun des projets et des collaborateurs.</p>
+		{% elseif organizationInvitation.guest.isBeneficiary and organizationInvitation.guest.isContributor %}
+			<p>En rejoignant sa structure, vous pourrez gérer en commun des projets et les aides de votre structure.</p>
+		{% endif %}
+	{% endif %}
 
 	{% if not organizationInvitation.guest %}
 		<p>Pour ce faire, il vous suffit de vous inscrire puis d'accepter son invitation dans Mon Compte > Ma Structure > Mes invitations :</p>
