@@ -11,9 +11,7 @@
 {% endblock %}
 
 
-{% block title %}Ajouter un projet |
-	{{ parent() }}
-{% endblock %}
+{% block title %}Ajouter un projet | {{ parent() }}{% endblock %}
 
 {% block body %}
 
@@ -28,6 +26,12 @@
 					</div>
 				</div>
 
+				{% if app.user.defaultOrganization is null %}
+					<div class="fr-alert fr-alert--error fr-mb-3w">
+						Vous devez <a href="{{ path('app_organization_structure_information') }}">renseigner votre structure</a> avant de pouvoir créer un projet.
+					</div>
+				{% endif %}
+
 				{% if formErrors %}
 					{% include 'include/_form_has_errors.html.twig' %}
 				{% endif %}
@@ -41,7 +45,8 @@
 							<span class="at-field-label at-required--label">Projet référent :*</span>
 							<span class="fr-hint-text">
 								Cette information nous aide à vous faire gagner du temps en vous proposant les meilleures aides pour votre projet.
-																                      Si vous ne trouvez pas le type de projet qui vous correspond, cochez la case "Je n'ai pas trouvé de projet référent".</span>
+								Si vous ne trouvez pas le type de projet qui vous correspond, cochez la case "Je n'ai pas trouvé de projet référent".
+							</span>
 						</label>
 					</div>
 					<div class="fr-col-12 fr-col-md-6">
