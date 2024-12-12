@@ -21,16 +21,16 @@ use App\Service\Security\ProConnectService;
 use App\Service\Security\SecurityService;
 use App\Service\User\UserService;
 use Doctrine\Persistence\ManagerRegistry;
-use Symfony\Component\Form\Extension\Core\Type\SubmitType;
-use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
 use Pagerfanta\Doctrine\ORM\QueryAdapter;
 use Pagerfanta\Pagerfanta;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 class ParameterController extends FrontController
@@ -45,7 +45,7 @@ class ParameterController extends FrontController
         ManagerRegistry $managerRegistry,
         UserPasswordHasherInterface $userPasswordHasher,
         Security $security,
-        LoggerInterface $loggerInterface
+        LoggerInterface $loggerInterface,
     ): Response {
         try {
             // tous les paramètres get dans un tableau
@@ -58,6 +58,7 @@ class ParameterController extends FrontController
                 throw new ProConnectException('Les informations de ProConnect sont incomplètes');
             }
 
+            $messageSuccess = 'Vous êtes connecté avec succès.';
             $user = $userRepository->findWithProConnectInfo($userInfos);
             if (!$user) {
                 // Nouvel utilisateur
@@ -72,6 +73,8 @@ class ParameterController extends FrontController
 
                 $managerRegistry->getManager()->persist($user);
                 $managerRegistry->getManager()->flush();
+
+                $messageSuccess = 'Votre compte a été créé avec succès.';
             } else {
                 // Utilisateur existant
 
@@ -90,17 +93,23 @@ class ParameterController extends FrontController
                 SecurityService::DEFAULT_FIREWALL_NAME
             );
 
+            $this->addFlash(
+                FrontController::FLASH_SUCCESS,
+                $messageSuccess
+            );
+
             // on le redirige
-            return $this->redirectToRoute('app_user_dashboard');
+            return $this->redirectToRoute('app_user_parameter_profil');
         } catch (\Exception $e) {
             $loggerInterface->error('Erreur ProConnect', [
-                'exception' => $e
+                'exception' => $e,
             ]);
 
             $this->tAddFlash(
                 FrontController::FLASH_ERROR,
                 'Une erreur est survenue lors de la connexion à ProConnect'
             );
+
             return $this->redirectToRoute('app_login');
         }
     }
@@ -110,10 +119,10 @@ class ParameterController extends FrontController
         UserPasswordHasherInterface $userPasswordHasher,
         UserService $userService,
         ManagerRegistry $managerRegistry,
-        RequestStack $requestStack
+        RequestStack $requestStack,
     ): Response {
-        $this->breadcrumb->add("Mon compte", $this->generateUrl('app_user_dashboard'));
-        $this->breadcrumb->add("Mon profil");
+        $this->breadcrumb->add('Mon compte', $this->generateUrl('app_user_dashboard'));
+        $this->breadcrumb->add('Mon profil');
         $user = $userService->getUserLogged();
 
         $form = $this->createForm(UserProfilType::class, $user);
@@ -150,17 +159,17 @@ class ParameterController extends FrontController
         }
 
         return $this->render('user/parameter/profil.html.twig', [
-            'form' => $form->createView()
+            'form' => $form->createView(),
+            'userTypeNotSelected' => (!$user->isIsContributor() && !$user->isIsBeneficiary()) ? true : false,
         ]);
     }
-
 
     #[Route('/comptes/api-token/', name: 'app_user_parameter_api_token')]
     public function apiToken(
         UserService $userService,
         ManagerRegistry $managerRegistry,
         RequestStack $requestStack,
-        ApiTokenAskRepository $apiTokenAskRepository
+        ApiTokenAskRepository $apiTokenAskRepository,
     ): Response {
         // recupere le user
         $user = $userService->getUserLogged();
@@ -203,7 +212,7 @@ class ParameterController extends FrontController
         // rendu template
         return $this->render('user/parameter/api_token.html.twig', [
             'form' => $form,
-            'apiTokenAsk' => $apiTokenAsk
+            'apiTokenAsk' => $apiTokenAsk,
         ]);
     }
 
@@ -212,7 +221,7 @@ class ParameterController extends FrontController
         UserService $userService,
         ManagerRegistry $managerRegistry,
         RequestStack $requestStack,
-        LogUserLoginRepository $logUserLoginRepository
+        LogUserLoginRepository $logUserLoginRepository,
     ): Response {
         $this->breadcrumb->add('Mon compte', $this->generateUrl('app_user_dashboard'));
         $this->breadcrumb->add('Mon journal de connexion');
@@ -234,6 +243,7 @@ class ParameterController extends FrontController
             }
             $entityManager->flush();
             $this->addFlash('success', 'Vos modifications ont été enregistrées avec succès.');
+
             return $this->redirectToRoute('app_user_parameter_history_log');
         }
 
@@ -262,7 +272,7 @@ class ParameterController extends FrontController
         TokenStorageInterface $tokenStorageInterface,
         Session $session,
         EmailService $emailService,
-        OrganizationRepository $organizationRepository
+        OrganizationRepository $organizationRepository,
     ): Response {
         // le user
         $user = $userService->getUserLogged();
@@ -270,22 +280,22 @@ class ParameterController extends FrontController
         $formTransfertProjects = [];
         $formTransfertAids = [];
         foreach ($user->getOrganizations() as $organization) {
-            $formTransfertProjects['project-' . $organization->getId()] = $this->createForm(
+            $formTransfertProjects['project-'.$organization->getId()] = $this->createForm(
                 TransfertProjectType::class,
                 null,
                 [
                     'attr' => [
-                        'id' => 'formTransfertProject-' . $organization->getSlug(),
+                        'id' => 'formTransfertProject-'.$organization->getSlug(),
                     ],
-                    'organization' => $organization
+                    'organization' => $organization,
                 ]
             );
 
-            $formTransfertAids['aid-' . $organization->getId()] = $this->createForm(TransfertAidType::class, null, [
+            $formTransfertAids['aid-'.$organization->getId()] = $this->createForm(TransfertAidType::class, null, [
                 'attr' => [
-                    'id' => 'formTransfertAid-' . $organization->getSlug(),
+                    'id' => 'formTransfertAid-'.$organization->getSlug(),
                 ],
-                'organization' => $organization
+                'organization' => $organization,
             ]);
         }
 

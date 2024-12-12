@@ -16,6 +16,12 @@
 			<div class="fr-col-12 fr-col-md-9">
 				<h1 class="fr-h3">Votre profil</h1>
 
+				{% if userTypeNotSelected %}
+				<div class="fr-alert fr-alert--info fr-mb-2w">
+					<p>Pour profiter pleinement de toutes les fonctionnalités du site, nous vous recommandons de compléter votre profil.</p>
+				</div>
+				{% endif %}
+
 				<p>Les champs marqués d’un astérisque (*) sont obligatoires.</p>
 				{{ form_start(form) }}
 				{{ form_row(form.firstname )}}
