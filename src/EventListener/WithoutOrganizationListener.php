@@ -30,8 +30,8 @@ final class WithoutOrganizationListener
         $routeName = $request->attributes->get('_route');
 
         if (
-            strpos($routeName, 'app_user_aid') === 0
-            || strpos($routeName, 'app_user_project') === 0
+            strpos((string) $routeName, 'app_user_aid') === 0
+            || strpos((string) $routeName, 'app_user_project') === 0
         ) {
             // utilisateur
             $user = $this->userService->getUserLogged();
