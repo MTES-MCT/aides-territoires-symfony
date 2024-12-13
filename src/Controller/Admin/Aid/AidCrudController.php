@@ -267,7 +267,7 @@ class AidCrudController extends AtCrudController implements EventSubscriberInter
         $badgeNoBackerAssociate = '<span class="badge badge-warning">(pas de porteur associé)</span>';
         $badgeNoBackerValid = '<span class="badge badge-warning">(porteur associé non validé)</span>';
         $projectReferencesSuggestions = [];
-        if ($entity instanceof Aid) {
+        if ($entity instanceof Aid && $entity->getId()) {
             $projectReferencesSuggestions = $this->aidService->getSuggestedProjectReferences($entity);
         }
         //-------------------------------------------------------
