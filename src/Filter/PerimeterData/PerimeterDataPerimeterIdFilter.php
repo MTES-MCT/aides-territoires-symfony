@@ -13,7 +13,7 @@ final class PerimeterDataPerimeterIdFilter extends AbstractFilter
 {
     protected function filterProperty(
         string $property,
-        $value,
+        mixed $value,
         QueryBuilder $queryBuilder,
         QueryNameGeneratorInterface $queryNameGenerator,
         string $resourceClass,

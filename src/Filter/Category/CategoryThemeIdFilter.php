@@ -6,9 +6,7 @@ use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Doctrine\Orm\Filter\AbstractFilter;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\OpenApi\Model\Example;
-use App\Entity\Backer\BackerGroup;
 use App\Entity\Category\CategoryTheme;
-use App\Service\Aid\AidSearchFormService;
 use Doctrine\ORM\QueryBuilder;
 use Symfony\Component\PropertyInfo\Type;
 
@@ -16,7 +14,7 @@ final class CategoryThemeIdFilter extends AbstractFilter
 {
     protected function filterProperty(
         string $property,
-        $value,
+        mixed $value,
         QueryBuilder $queryBuilder,
         QueryNameGeneratorInterface $queryNameGenerator,
         string $resourceClass,

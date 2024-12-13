@@ -7,6 +7,7 @@ use ApiPlatform\Doctrine\Orm\Filter\AbstractFilter;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\OpenApi\Model\Example;
 use App\Entity\Backer\Backer;
+use App\Repository\Backer\BackerRepository;
 use Doctrine\ORM\QueryBuilder;
 use Symfony\Component\PropertyInfo\Type;
 
@@ -14,7 +15,7 @@ final class BackerFilter extends AbstractFilter
 {
     protected function filterProperty(
         string $property,
-        $value,
+        mixed $value,
         QueryBuilder $queryBuilder,
         QueryNameGeneratorInterface $queryNameGenerator,
         string $resourceClass,
@@ -26,6 +27,7 @@ final class BackerFilter extends AbstractFilter
 
     public function getDescription(string $resourceClass): array
     {
+        /** @var BackerRepository $backerRepository */
         $backerRepository = $this->managerRegistry->getRepository(Backer::class);
         $backers = $backerRepository->findCustom([
             'hasFinancedAids' => true,

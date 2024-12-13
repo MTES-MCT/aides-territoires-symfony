@@ -13,7 +13,7 @@ final class PerimeterZipcodesFilter extends AbstractFilter
 {
     protected function filterProperty(
         string $property,
-        $value,
+        mixed $value,
         QueryBuilder $queryBuilder,
         QueryNameGeneratorInterface $queryNameGenerator,
         string $resourceClass,
@@ -26,7 +26,7 @@ final class PerimeterZipcodesFilter extends AbstractFilter
     public function getDescription(string $resourceClass): array
     {
         $examples = [];
-        $examples[] = new Example(91640, null, 91640);
+        $examples[] = new Example('91640', null, 91640);
         return [
             'zipcodes' => [
                 'property' => 'zipcodes',
