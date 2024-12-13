@@ -20,30 +20,10 @@
             base.options = $.extend({},$.entity_checkbox_absolute_type.defaultOptions, options);
             base.placeholder = $(base.opener).text();
             base.setResumeText();
-            // Put your initialization code here
-            // placement de la liste en absolute
-            // base.setAutocompletePositions();
 
             // les ecouteurs
             base.addListeners();
         };
-        
-        // Sample Function, Uncomment to use
-        // base.functionName = function(paramaters){
-        // 
-        // };
-
-        // determine placement liste absolute
-        // base.setAutocompletePositions = function()
-        // {
-        //     var autocomplete_top = $('input.c-displayer',  base.el).offset().top - $(window).scrollTop() + $('input.c-displayer',  base.el).outerHeight();
-        //     var autocomplete_left = $('input.c-displayer',  base.el).offset().left ;
-
-        //     $(base.checboxesWrapper).css({
-        //         top: autocomplete_top, 
-        //         left: autocomplete_left, 
-        //     });
-        // }
         
         base.highlightLine = function(elt)
         {
@@ -199,10 +179,14 @@
 
             $(base.el).on({
                 click: function (e) {
-                    base.toggleChecbkoxesWrapper();
+                    if ($(e.target).closest(base.opener).length > 0) {
+                        base.toggleChecbkoxesWrapper();
+                    }
                 },
                 focusin: function(e) {
-                    base.showCheckboxesWrapper();
+                    setTimeout(function() {
+                        base.showCheckboxesWrapper();
+                    }, 100);
                 },
                 focusout: function(e) {
                     

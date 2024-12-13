@@ -42,6 +42,25 @@
             &:focus-within {
                 background-color: var(--background-contrast-grey-active);
             }
+
+            .fr-fieldset__element{
+                padding: 0;
+
+                &.optgroup{
+                    padding: 1rem;
+                }
+                .fr-checkbox-group{
+                    .fr-label{
+                        padding: 0.5rem 1rem 0.5rem 2.5rem;
+                        margin: 0;
+
+                        &::before{
+                            left: 0.5rem;
+                            top: 6px;
+                        }
+                    }
+                }
+            }
         }
 
         .filter{
