@@ -186,9 +186,8 @@
 				</legend>
 
 				<div class="fr-input-group">
-					{{ form_label(formAid.originUrl) }}
-					{{ form_widget(formAid.originUrl) }}
-					{{ form_errors(formAid.originUrl) }}
+					{{ form_row(formAid.originUrl) }}
+					
 					{% if aidDuplicates is defined and aidDuplicates|length > 0 %}
 						<div class="inline-error">
 							<div class="fr-alert fr-alert--error at-duplicate-error fr-mt-2w">
