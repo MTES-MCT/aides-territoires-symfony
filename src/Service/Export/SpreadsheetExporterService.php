@@ -260,11 +260,14 @@ class SpreadsheetExporterService
 
             case LogAidView::class:
                 /** @var LogAidViewRepository $logAidViewRepository */
-                $logAidViewRepository = $this->managerRegistry->getRepository(LogAidView::class);
+                $logAidViewRepository =
+                    $this->managerRegistry->getRepository(LogAidView::class);
                 /** @var LogAidApplicationUrlClickRepository $logAidApplicationUrlClickRepository */
-                $logAidApplicationUrlClickRepository = $this->managerRegistry->getRepository(LogAidApplicationUrlClick::class);
+                $logAidApplicationUrlClickRepository =
+                    $this->managerRegistry->getRepository(LogAidApplicationUrlClick::class);
                 /** @var LogAidOriginUrlClickRepository $logAidOriginUrlClickRepository */
-                $logAidOriginUrlClickRepository = $this->managerRegistry->getRepository(LogAidOriginUrlClick::class);
+                $logAidOriginUrlClickRepository =
+                    $this->managerRegistry->getRepository(LogAidOriginUrlClick::class);
 
                 // on met tous les ids des aides dans un tableau
                 $aidsIds = [];
@@ -314,8 +317,10 @@ class SpreadsheetExporterService
                 ]);
 
                 // on transformes les résultats de logs en tableau par id d'aide
-                $logAidApplicationUrlClicks30Days = $this->transformLogsResultsInArray($logAidApplicationUrlClicks30Days);
-                $logAidApplicationUrlClicks1Year = $this->transformLogsResultsInArray($logAidApplicationUrlClicks1Year);
+                $logAidApplicationUrlClicks30Days =
+                    $this->transformLogsResultsInArray($logAidApplicationUrlClicks30Days);
+                $logAidApplicationUrlClicks1Year =
+                    $this->transformLogsResultsInArray($logAidApplicationUrlClicks1Year);
 
                 // les logs de clics sur l'url d'origine
                 $logAidOriginUrlClicks30Days = $logAidOriginUrlClickRepository->countFormGroup([
@@ -344,14 +349,22 @@ class SpreadsheetExporterService
                             ? $result->getPerimeter()->getName()
                             : '',
                         'url' => $result->getUrl(),
-                        'Nombre de vues (30 jours)' => $logAidViews30Days[$result->getId()] ?? 0,
-                        'Utilisateurs connectés uniques (30 jours)' => $logAidViews30DaysDistinct[$result->getId()] ?? 0,
-                        'Nombre de vues (1 an)' => $logAidViews1Year[$result->getId()] ?? 0,
-                        'Utilisateurs connectés uniques (1 an)' => $logAidViews1YearDistinct[$result->getId()] ?? 0,
-                        'Nombre de clics sur candidater (30 jours)' => $logAidApplicationUrlClicks30Days[$result->getId()] ?? 0,
-                        'Nombre de clics sur candidater (1 an)' => $logAidApplicationUrlClicks1Year[$result->getId()] ?? 0,
-                        'Nombre de clics sur plus d\'informations (30 jours)' => $logAidOriginUrlClicks30Days[$result->getId()] ?? 0,
-                        'Nombre de clics sur plus d\'informations(1 an)' => $logAidOriginUrlClicks1Year[$result->getId()] ?? 0,
+                        'Nombre de vues (30 jours)' =>
+                            $logAidViews30Days[$result->getId()] ?? 0,
+                        'Utilisateurs connectés uniques (30 jours)' =>
+                            $logAidViews30DaysDistinct[$result->getId()] ?? 0,
+                        'Nombre de vues (1 an)' =>
+                            $logAidViews1Year[$result->getId()] ?? 0,
+                        'Utilisateurs connectés uniques (1 an)' =>
+                            $logAidViews1YearDistinct[$result->getId()] ?? 0,
+                        'Nombre de clics sur candidater (30 jours)' =>
+                            $logAidApplicationUrlClicks30Days[$result->getId()] ?? 0,
+                        'Nombre de clics sur candidater (1 an)' =>
+                            $logAidApplicationUrlClicks1Year[$result->getId()] ?? 0,
+                        'Nombre de clics sur plus d\'informations (30 jours)' =>
+                            $logAidOriginUrlClicks30Days[$result->getId()] ?? 0,
+                        'Nombre de clics sur plus d\'informations(1 an)' =>
+                            $logAidOriginUrlClicks1Year[$result->getId()] ?? 0,
                     ];
                     unset($results[$key]);
                 }
