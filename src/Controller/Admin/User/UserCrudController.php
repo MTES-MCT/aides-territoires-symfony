@@ -253,7 +253,9 @@ class UserCrudController extends AtCrudController
                 // message de confirmation
                 $this->addFlash(
                     'success',
-                    'L\'export des statistiques des aides de ' . $user->getFullName() . ' (' . $user->getEmail() . ') est en cours, vous recevrez un mail avec le document en pièce jointe.'
+                    'L\'export des statistiques des aides de '
+                        . $user->getFullName() . ' (' . $user->getEmail()
+                        . ') est en cours, vous recevrez un mail avec le document en pièce jointe.'
                 );
             }
         } else {

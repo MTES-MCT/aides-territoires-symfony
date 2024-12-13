@@ -258,12 +258,11 @@ class CartographyController extends FrontController
                     $backerCategoryThemes->add($categoryThemesById[$categoryThemeId]);
                 }
             }
-            $backer->setAidsThematics($backerCategoryThemes);
-            $iterator = $backer->getAidsThematics()->getIterator();
-            $iterator->uasort(function ($a, $b) {
+            $thematics = $backer->getAidsThematics()->toArray();
+            usort($thematics, function ($a, $b) {
                 return ($a->getSlug() < $b->getSlug()) ? -1 : 1;
             });
-            $backer->setAidsThematics(new ArrayCollection(iterator_to_array($iterator)));
+            $backer->setAidsThematics(new ArrayCollection($thematics));
 
             // on récupère les groupes de types d'aides des aides
             $backer->setNbAidsByTypeGroupSlug([

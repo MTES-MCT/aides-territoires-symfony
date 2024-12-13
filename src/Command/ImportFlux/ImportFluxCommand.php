@@ -114,7 +114,7 @@ class ImportFluxCommand extends Command // NOSONAR too much methods
             // set la dataSource
             $this->dataSource = $this->managerRegistry->getRepository(DataSource::class)->find($this->idDataSource);
             if (!$this->dataSource instanceof DataSource) {
-                throw new \Exception('Impossible de charger la dataSource : '.$this->idDataSource);
+                throw new \Exception('Impossible de charger la dataSource : ' . $this->idDataSource);
             }
 
             // import du flux
@@ -134,19 +134,19 @@ class ImportFluxCommand extends Command // NOSONAR too much methods
             return Command::FAILURE;
         }
 
-        $io->success('Création : '.$this->create);
-        $io->success('Update : '.$this->update);
-        $io->success('Erreur : '.$this->error);
+        $io->success('Création : ' . $this->create);
+        $io->success('Update : ' . $this->update);
+        $io->success('Erreur : ' . $this->error);
 
         // notif admin
         $admin = $this->managerRegistry->getRepository(User::class)
             ->findOneBy(['email' => $this->paramService->get('email_super_admin')]);
         $this->notificationService->addNotification(
             $admin,
-            'Rapport flux '.$this->dataSource->getName(),
-            'Création : '.$this->create.'<br />'
-            .'Update : '.$this->update.'<br />'
-            .'Erreur : '.$this->error
+            'Rapport flux ' . $this->dataSource->getName(),
+            'Création : ' . $this->create . '<br />'
+            . 'Update : ' . $this->update . '<br />'
+            . 'Erreur : ' . $this->error
         );
 
         // met à jour le last access
@@ -158,10 +158,10 @@ class ImportFluxCommand extends Command // NOSONAR too much methods
         $time = $timeEnd - $timeStart;
 
         $io->success(
-            'Import flux terminé : '.gmdate('H:i:s', intval($timeEnd)).' ('.gmdate('H:i:s', intval($time)).')'
+            'Import flux terminé : ' . gmdate('H:i:s', intval($timeEnd)) . ' (' . gmdate('H:i:s', intval($time)) . ')'
         );
         $io->success(
-            'Mémoire maximale utilisée : '.intval(round(memory_get_peak_usage() / 1024 / 1024)).' MB'
+            'Mémoire maximale utilisée : ' . intval(round(memory_get_peak_usage() / 1024 / 1024)) . ' MB'
         );
 
         $io->title($this->commandTextEnd);
@@ -183,7 +183,7 @@ class ImportFluxCommand extends Command // NOSONAR too much methods
 
         foreach ($requiredParams as $requiredParam) {
             if (empty($this->$requiredParam)) {
-                throw new \Exception('Paramètre manquant : '.$requiredParam);
+                throw new \Exception('Paramètre manquant : ' . $requiredParam);
             }
         }
 
@@ -264,7 +264,7 @@ class ImportFluxCommand extends Command // NOSONAR too much methods
             $this->currentPage = $i;
             $importUrl = $this->dataSource->getImportApiUrl();
             if ($this->paginationEnabled) {
-                $importUrl .= '?limit='.$this->nbByPages.'&offset='.($this->currentPage * $this->nbByPages);
+                $importUrl .= '?limit=' . $this->nbByPages . '&offset=' . ($this->currentPage * $this->nbByPages);
             }
             try {
                 $response = $client->request(
@@ -348,7 +348,7 @@ class ImportFluxCommand extends Command // NOSONAR too much methods
             $aid = $this->setPerimeter($aidToImport, $aid);
 
             foreach ($this->getFieldsMapping($aidToImport, ['context' => 'create']) as $field => $value) {
-                $aid->{'set'.ucfirst($field)}($value);
+                $aid->{'set' . ucfirst($field)}($value);
             }
 
             // prépare pour sauvegarde
@@ -364,7 +364,7 @@ class ImportFluxCommand extends Command // NOSONAR too much methods
             // retour
             return true;
         } catch (\Exception $e) {
-            throw new \Exception('Impossible de créer l\'aide : '.$e->getMessage());
+            throw new \Exception('Impossible de créer l\'aide : ' . $e->getMessage());
         }
     }
 
@@ -404,8 +404,8 @@ class ImportFluxCommand extends Command // NOSONAR too much methods
                 }
                 // gestion des booleéns
                 $methodGet = 'get';
-                if (!method_exists($aid, 'get'.ucfirst($field))) {
-                    if (method_exists($aid, 'is'.ucfirst($field))) {
+                if (!method_exists($aid, 'get' . ucfirst($field))) {
+                    if (method_exists($aid, 'is' . ucfirst($field))) {
                         $methodGet = 'is';
                     } else {
                         continue;
@@ -415,7 +415,7 @@ class ImportFluxCommand extends Command // NOSONAR too much methods
                 // les champs qu'on ne modifie pas automatiquement
                 if (!in_array($field, $keepValues)) {
                     // on regarde si il y a une modification pour mettre un statut "à valider" à l'aide
-                    if ($aid->{$methodGet.ucfirst($field)}() != $value) {
+                    if ($aid->{$methodGet . ucfirst($field)}() != $value) {
                         $entityUpdated = true;
                         $needManualValidation = true;
                     }
@@ -423,9 +423,9 @@ class ImportFluxCommand extends Command // NOSONAR too much methods
                 }
 
                 // les champs qu'on modifie automatiquement
-                if ($aid->{$methodGet.ucfirst($field)}() != $value && method_exists($aid, 'set'.ucfirst($field))) {
+                if ($aid->{$methodGet . ucfirst($field)}() != $value && method_exists($aid, 'set' . ucfirst($field))) {
                     // assigne la nouvelle valeur
-                    $aid->{'set'.ucfirst($field)}($value);
+                    $aid->{'set' . ucfirst($field)}($value);
                     // on retire le champ des valeurs à validées manuellement
                     unset($newValues[$field]);
                     // on note que l'entité à été modifiée
@@ -477,7 +477,7 @@ class ImportFluxCommand extends Command // NOSONAR too much methods
 
             return true;
         } catch (\Exception $e) {
-            throw new \Exception('Impossible de mettre à jour l\'aide : '.$e->getMessage());
+            throw new \Exception('Impossible de mettre à jour l\'aide : ' . $e->getMessage());
         }
     }
 
@@ -635,8 +635,8 @@ class ImportFluxCommand extends Command // NOSONAR too much methods
         foreach ($checkFields as $field) {
             if (
                 isset($newValues[$field])
-                && method_exists($aid, 'get'.ucfirst($field))
-                && $aid->{'get'.ucfirst($field)}() != $newValues[$field]
+                && method_exists($aid, 'get' . ucfirst($field))
+                && $aid->{'get' . ucfirst($field)}() != $newValues[$field]
             ) {
                 return true;
             }
@@ -726,7 +726,7 @@ class ImportFluxCommand extends Command // NOSONAR too much methods
         $html = '';
         foreach ($fields as $field) {
             if (isset($aidToImport[$field]) && '' != trim($aidToImport[$field])) {
-                $html .= ' '.$this->getCleanHtml($aidToImport[$field]);
+                $html .= ' ' . $this->getCleanHtml($aidToImport[$field]);
                 if ($separator) {
                     $html .= $separator;
                 }

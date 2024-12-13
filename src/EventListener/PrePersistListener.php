@@ -28,6 +28,7 @@ class PrePersistListener
         // Position
         if (method_exists($entity, 'getPosition') && !$entity->getPosition()) {
             /** @var ServiceEntityRepository<object> $serviceEntityRepository */
+            // @phpstan-ignore-next-line
             $serviceEntityRepository = $this->managerRegistry->getRepository(get_class($entity));
             $entityCount = $serviceEntityRepository->count([]);
             if (method_exists($entity, 'setPosition')) {

@@ -51,7 +51,7 @@ class MsgAidStatsSpreadsheetOfUserHandler
             $context = $this->routerInterface->getContext();
             $context->setHost($host);
             $context->setScheme('https');
-            
+
             $spreadsheet = $this->aidService->getAidStatsSpreadSheetOfUser(
                 $user,
                 $dateMin,

@@ -280,20 +280,20 @@ class ParameterController extends FrontController
         $formTransfertProjects = [];
         $formTransfertAids = [];
         foreach ($user->getOrganizations() as $organization) {
-            $formTransfertProjects['project-'.$organization->getId()] = $this->createForm(
+            $formTransfertProjects['project-' . $organization->getId()] = $this->createForm(
                 TransfertProjectType::class,
                 null,
                 [
                     'attr' => [
-                        'id' => 'formTransfertProject-'.$organization->getSlug(),
+                        'id' => 'formTransfertProject-' . $organization->getSlug(),
                     ],
                     'organization' => $organization,
                 ]
             );
 
-            $formTransfertAids['aid-'.$organization->getId()] = $this->createForm(TransfertAidType::class, null, [
+            $formTransfertAids['aid-' . $organization->getId()] = $this->createForm(TransfertAidType::class, null, [
                 'attr' => [
-                    'id' => 'formTransfertAid-'.$organization->getSlug(),
+                    'id' => 'formTransfertAid-' . $organization->getSlug(),
                 ],
                 'organization' => $organization,
             ]);

@@ -92,6 +92,7 @@ class AtCrudController extends AbstractCrudController
 
         if (method_exists($entityTest, 'getPosition')) {
             /** @var ServiceEntityRepository<object> $repository */
+            // @phpstan-ignore-next-line
             $repository = $this->managerRegistry->getRepository(static::getEntityFqcn());
             $entityCount = $repository->count([]);
 
@@ -150,6 +151,7 @@ class AtCrudController extends AbstractCrudController
     {
         $object = $context->getEntity()->getInstance();
         /** @var ServiceEntityRepository<object> $repository */
+        // @phpstan-ignore-next-line
         $repository = $this->managerRegistry->getRepository(static::getEntityFqcn());
         $entityCount = $repository->count([]);
 
@@ -189,6 +191,7 @@ class AtCrudController extends AbstractCrudController
         $direction = $newPosition < $oldPosition ? 'down' : 'up';
 
         /** @var ServiceEntityRepository<object> $serviceEntityRepository */
+        // @phpstan-ignore-next-line
         $serviceEntityRepository = $this->managerRegistry->getRepository(static::getEntityFqcn());
         $qb = $serviceEntityRepository->createQueryBuilder('p');
         $qb->update(static::getEntityFqcn(), 'pt');
