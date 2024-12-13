@@ -12,7 +12,6 @@ use App\Service\User\UserService;
 use App\Service\Various\ParamService;
 use App\Service\Various\StringService;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Doctrine\ORM\EntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use EasyCorp\Bundle\EasyAdminBundle\Collection\FieldCollection;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
@@ -46,7 +45,7 @@ class AtCrudController extends AbstractCrudController
         public UserService $userService,
         public UserPasswordHasherInterface $userPasswordHasherInterface,
         public MessageBusInterface $messageBusInterface,
-        public StringService $stringService
+        public StringService $stringService,
     ) {
     }
 
@@ -82,10 +81,6 @@ class AtCrudController extends AbstractCrudController
 
         return $crud;
     }
-
-    /**
-     * Tri des entités (sur le champ position)
-     */
 
     public function configureActions(Actions $actions): Actions
     {
@@ -154,8 +149,10 @@ class AtCrudController extends AbstractCrudController
     private function move(AdminContext $context, Direction $direction): Response
     {
         $object = $context->getEntity()->getInstance();
-        $entityCount = $this->managerRegistry->getManager()
-            ->getRepository(static::getEntityFqcn())->count([]);
+        /** @var ServiceEntityRepository<object> $repository */
+        $repository = $this->managerRegistry->getRepository(static::getEntityFqcn());
+        $entityCount = $repository->count([]);
+
         $oldPosition = $object->getPosition();
         $newPosition = match ($direction) {
             Direction::Top => 0,
@@ -171,7 +168,7 @@ class AtCrudController extends AbstractCrudController
             [
                 'oldPosition' => $oldPosition,
                 'newPosition' => $object->getPosition(),
-                'exclude' => $object
+                'exclude' => $object,
             ]
         );
 
@@ -181,11 +178,9 @@ class AtCrudController extends AbstractCrudController
     }
 
     /**
-     *
      * @param array<string, mixed>|null $params
-     * @return void
      */
-    public function updatePositions(array $params = null): void
+    public function updatePositions(?array $params = null): void
     {
         $exclude = $params['exclude'] ?? null;
         $newPosition = $params['newPosition'] ?? null;
@@ -193,28 +188,27 @@ class AtCrudController extends AbstractCrudController
 
         $direction = $newPosition < $oldPosition ? 'down' : 'up';
 
-        /** @var ServiceEntityRepository $serviceEntityRepository */
+        /** @var ServiceEntityRepository<object> $serviceEntityRepository */
         $serviceEntityRepository = $this->managerRegistry->getRepository(static::getEntityFqcn());
         $qb = $serviceEntityRepository->createQueryBuilder('p');
         $qb->update(static::getEntityFqcn(), 'pt');
-        if ($direction == 'down') {
+        if ('down' == $direction) {
             $qb->set('pt.position', 'pt.position + 1');
         } else {
             $qb->set('pt.position', 'pt.position - 1');
         }
-        if ($exclude !== null) {
+        if (null !== $exclude) {
             $qb->andWhere('pt != :exclude')
                 ->setParameter('exclude', $exclude)
             ;
         }
-        if ($newPosition !== null) {
-            if ($direction == 'down') {
+        if (null !== $newPosition) {
+            if ('down' == $direction) {
                 $qb
                     ->andWhere('pt.position >= :newPosition')
                     ->andWhere('pt.position <= :oldPosition')
                     ->setParameter('oldPosition', $oldPosition)
                     ->setParameter('newPosition', $newPosition)
-                ;
                 ;
             } else {
                 $qb
@@ -233,7 +227,7 @@ class AtCrudController extends AbstractCrudController
         AdminContext $context,
         SpreadsheetExporterService $spreadsheetExporterService,
         string $filename,
-        string $format = 'csv'
+        string $format = 'csv',
     ): Response {
         $fields = FieldCollection::new($this->configureFields(Crud::PAGE_INDEX));
         $filters = $this->container->get(FilterFactory::class)->create(
@@ -254,7 +248,7 @@ class AtCrudController extends AbstractCrudController
     public function exportXlsx(
         AdminContext $context,
         SpreadsheetExporterService $spreadsheetExporterService,
-        string $filename = ''
+        string $filename = '',
     ): Response {
         return $this->exportSpreadsheet($context, $spreadsheetExporterService, $filename, 'xlsx');
     }
@@ -262,7 +256,7 @@ class AtCrudController extends AbstractCrudController
     public function exportCsv(
         AdminContext $context,
         SpreadsheetExporterService $spreadsheetExporterService,
-        string $filename = ''
+        string $filename = '',
     ): Response {
         return $this->exportSpreadsheet($context, $spreadsheetExporterService, $filename, 'csv');
     }
@@ -272,6 +266,7 @@ class AtCrudController extends AbstractCrudController
         return Action::new('exportXlsx')
             ->linkToUrl(function () {
                 $request = $this->requestStack->getCurrentRequest();
+
                 return $this->adminUrlGenerator->setAll($request->query->all())
                     ->setAction('exportXlsx')
                     ->generateUrl();
@@ -286,6 +281,7 @@ class AtCrudController extends AbstractCrudController
         return Action::new('exportCsv')
             ->linkToUrl(function () {
                 $request = $this->requestStack->getCurrentRequest();
+
                 return $this->adminUrlGenerator->setAll($request->query->all())
                     ->setAction('exportCsv')
                     ->generateUrl();
