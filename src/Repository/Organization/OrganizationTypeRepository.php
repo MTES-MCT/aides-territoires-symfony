@@ -22,6 +22,10 @@ class OrganizationTypeRepository extends ServiceEntityRepository
         parent::__construct($registry, OrganizationType::class);
     }
 
+    /**
+     * @param array<string, mixed>|null $params
+     * @return int
+     */
     public function countCustom(array $params = null): int
     {
         $qb = $this->getQueryBuilder($params);
@@ -31,6 +35,10 @@ class OrganizationTypeRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult()[0]['nb'] ?? 0;
     }
 
+    /**
+     * @param array<string, mixed>|null $params
+     * @return string[]
+     */
     public function getNames(?array $params = null): array
     {
         $params['orderBy'] = ['sort' => 'ot.name', 'order' => 'ASC'];
@@ -45,6 +53,10 @@ class OrganizationTypeRepository extends ServiceEntityRepository
         return array_column($results, 'name');
     }
 
+    /**
+     * @param array<string, mixed>|null $params
+     * @return array<int, OrganizationType>
+     */
     public function findCustom(array $params = null): array
     {
         $qb = $this->getQueryBuilder($params);
@@ -52,6 +64,10 @@ class OrganizationTypeRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult();
     }
 
+    /**
+     * @param array<string, mixed>|null $params
+     * @return QueryBuilder
+     */
     public function getQueryBuilder(array $params = null): QueryBuilder
     {
         $ids = $params['ids'] ?? null;

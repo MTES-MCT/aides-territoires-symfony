@@ -25,6 +25,10 @@ class LogBlogPostViewRepository extends ServiceEntityRepository
         parent::__construct($registry, LogBlogPostView::class);
     }
 
+    /**
+     * @param array<string, mixed>|null $params
+     * @return array<int, array{dateCreate: \DateTime, nb: integer}>
+     */
     public function countByDate(?array $params = null): array
     {
         $qb = $this->getQueryBuilder($params);
@@ -35,6 +39,10 @@ class LogBlogPostViewRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult();
     }
 
+    /**
+     * @param array<string, mixed>|null $params
+     * @return array<int, array{blogPostCategory: BlogPostCategory, nb: integer}>
+     */
     public function findTopCategoriesOfDateRange(?array $params = null): array
     {
         $params['maxResults'] = $params['maxResults'] ?? 10;
@@ -58,6 +66,10 @@ class LogBlogPostViewRepository extends ServiceEntityRepository
         return $return;
     }
 
+    /**
+     * @param array<string, mixed>|null $params
+     * @return array<int, array{blogPost: BlogPost, nb: integer}>
+     */
     public function findTopOfDateRange(?array $params = null): array
     {
         $params['maxResults'] = $params['maxResults'] ?? 10;
@@ -80,6 +92,10 @@ class LogBlogPostViewRepository extends ServiceEntityRepository
         return $return;
     }
 
+    /**
+     * @param array<string, mixed>|null $params
+     * @return QueryBuilder
+     */
     public function getQueryBuilder(array $params = null): QueryBuilder
     {
         $dateMin = $params['dateMin'] ?? null;

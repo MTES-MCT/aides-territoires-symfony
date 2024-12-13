@@ -22,6 +22,10 @@ class DataSourceRepository extends ServiceEntityRepository
         parent::__construct($registry, DataSource::class);
     }
 
+    /**
+     * @param array<string, mixed>|null $params
+     * @return int
+     */
     public function countAids(?array $params = null): int
     {
         $qb = $this->getQueryBuilder($params);
@@ -32,6 +36,11 @@ class DataSourceRepository extends ServiceEntityRepository
             ->getQuery()
             ->getSingleScalarResult();
     }
+
+    /**
+     * @param array<string, mixed>|null $params
+     * @return QueryBuilder
+     */
     public function getQueryBuilder(?array $params = null): QueryBuilder
     {
         $id = $params['id'] ?? null;

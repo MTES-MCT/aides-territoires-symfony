@@ -17,7 +17,8 @@ use App\Entity\Program\Program;
 use App\Entity\Reference\KeywordReference;
 use App\Entity\Reference\ProjectReference;
 use App\Entity\User\User;
-use App\Service\Reference\KeywordReferenceService;
+use App\Repository\Perimeter\PerimeterRepository;
+use App\Repository\Reference\KeywordReferenceRepository;
 use App\Service\Reference\ReferenceService;
 use App\Service\Various\StringService;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
@@ -39,12 +40,16 @@ class AidRepository extends ServiceEntityRepository
     public function __construct(
         ManagerRegistry $registry,
         private ReferenceService $referenceService,
-        private KeywordReferenceService $keywordReferenceService,
         private StringService $stringService,
     ) {
         parent::__construct($registry, Aid::class);
     }
 
+    /**
+     * @param int[] $ids
+     * @param array<string, mixed>|null $params
+     * @return int
+     */
     public function countAidsFromIds(array $ids, ?array $params = null): int
     {
         $aidTypeGroup = $params['aidTypeGroup'] ?? null;
@@ -64,6 +69,10 @@ class AidRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult()[0]['nb'] ?? 0;
     }
 
+    /**
+     * @param int[] $ids
+     * @return array<int>
+     */
     public function getCategoryThemesIdsFromIds(array $ids): array
     {
         $qb = $this->createQueryBuilder('a')
@@ -79,20 +88,11 @@ class AidRepository extends ServiceEntityRepository
         return array_column($results, 'categoryTheme_id');
     }
 
-    public function getScaleCovered($scale, ?array $params = null): array
-    {
-        $qb = $this->getQueryBuilder($params)
-            ->innerJoin('a.perimeter', 'p')
-            ->select('DISTINCT(p.id) as id, p.name, p.latitude, p.longitude, p.population')
-            ->andWhere('p.scale = :scale')
-            ->andWhere('p.isObsolete = false')
-            ->setParameter('scale', $scale)
-            ->orderBy('p.name', 'ASC');
-
-        return $qb->getQuery()->getResult();
-    }
-
-    public static function liveCriteria($alias = 'a.'): Criteria
+    /**
+     * @param string $alias
+     * @return Criteria
+     */
+    public static function liveCriteria(string $alias = 'a.'): Criteria
     {
         $today = new \DateTime(date('Y-m-d'));
 
@@ -110,7 +110,11 @@ class AidRepository extends ServiceEntityRepository
         ;
     }
 
-    public static function showInSearchCriteria($alias = 'a.'): Criteria
+    /**
+     * @param string $alias
+     * @return Criteria
+     */
+    public static function showInSearchCriteria(string $alias = 'a.'): Criteria
     {
         $today = new \DateTime(date('Y-m-d'));
 
@@ -123,7 +127,11 @@ class AidRepository extends ServiceEntityRepository
         ;
     }
 
-    public static function hiddenCriteria($alias = 'a.'): Criteria
+    /**
+     * @param string $alias
+     * @return Criteria
+     */
+    public static function hiddenCriteria(string $alias = 'a.'): Criteria
     {
         $today = new \DateTime(date('Y-m-d'));
 
@@ -136,7 +144,11 @@ class AidRepository extends ServiceEntityRepository
         ;
     }
 
-    public static function deadlineCriteria($alias = 'a.'): Criteria
+    /**
+     * @param string $alias
+     * @return Criteria
+     */
+    public static function deadlineCriteria(string $alias = 'a.'): Criteria
     {
         $today = new \DateTime(date('Y-m-d'));
         $dateLimit = new \DateTime(date('Y-m-d'));
@@ -149,7 +161,11 @@ class AidRepository extends ServiceEntityRepository
         ;
     }
 
-    public static function expiredCriteria($alias = 'a.'): Criteria
+    /**
+     * @param string $alias
+     * @return Criteria
+     */
+    public static function expiredCriteria(string $alias = 'a.'): Criteria
     {
         $today = new \DateTime(date('Y-m-d'));
 
@@ -158,28 +174,44 @@ class AidRepository extends ServiceEntityRepository
         ;
     }
 
-    public static function grantCriteria($alias = ''): Criteria
+    /**
+     * @param string $alias
+     * @return Criteria
+     */
+    public static function grantCriteria(string $alias = ''): Criteria
     {
         return Criteria::create()
             ->andWhere(Criteria::expr()->eq($alias . 'aidTypes.slug', AidType::SLUG_GRANT))
         ;
     }
 
-    public static function localCriteria($alias = ''): Criteria
+    /**
+     * @param string $alias
+     * @return Criteria
+     */
+    public static function localCriteria(string $alias = ''): Criteria
     {
         return Criteria::create()
             ->andWhere(Criteria::expr()->neq($alias . 'genericAid', null))
         ;
     }
 
-    public static function genericCriteria($alias = ''): Criteria
+    /**
+     * @param string $alias
+     * @return Criteria
+     */
+    public static function genericCriteria(string $alias = ''): Criteria
     {
         return Criteria::create()
             ->andWhere(Criteria::expr()->eq($alias . 'isGeneric', true))
         ;
     }
 
-    public static function decliStandardCriteria($alias = ''): Criteria
+    /**
+     * @param string $alias
+     * @return Criteria
+     */
+    public static function decliStandardCriteria(string $alias = ''): Criteria
     {
         return Criteria::create()
             ->andWhere(Criteria::expr()->eq($alias . 'isGeneric', false))
@@ -187,10 +219,15 @@ class AidRepository extends ServiceEntityRepository
         ;
     }
 
+    /**
+     * @param User $user
+     * @param array<string, mixed>|null $params
+     * @return integer
+     */
     public function countByUserOrganizations(User $user, ?array $params = null): int
     {
         $showInSearch = $params['showInSearch'] ?? null;
-        $organizations = $user->getOrganizations() ?? [];
+        $organizations = $user->getOrganizations();
         $qb = $this->createQueryBuilder('a')
             ->select('COUNT(a.id) AS nb')
             ->andWhere('a.author = :author OR a.organization IN (:organizations)')
@@ -209,6 +246,11 @@ class AidRepository extends ServiceEntityRepository
         return $result[0]['nb'] ?? 0;
     }
 
+    /**
+     * @param User $user
+     * @param array<string, mixed>|null $params
+     * @return int
+     */
     public function countByUser(User $user, ?array $params = null): int
     {
         $showInSearch = $params['showInSearch'] ?? null;
@@ -230,6 +272,10 @@ class AidRepository extends ServiceEntityRepository
         return $result[0]['nb'] ?? 0;
     }
 
+    /**
+     * @param array<string, mixed>|null $params
+     * @return array<int, Aid>
+     */
     public function findPublishedWithNoBrokenLink(?array $params = null): array
     {
         $params['showInSearch'] = true;
@@ -244,6 +290,10 @@ class AidRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult();
     }
 
+    /**
+     * @param array<string, mixed>|null $params
+     * @return array<int, Aid>
+     */
     public function findRecent(?array $params = null): array
     {
         $params['limit'] = $params['limit'] ?? 3;
@@ -275,6 +325,10 @@ class AidRepository extends ServiceEntityRepository
         return $return;
     }
 
+    /**
+     * @param array<string, mixed>|null $params
+     * @return Aid|null
+     */
     public function findOneCustom(?array $params = null): ?Aid
     {
         $params = array_merge($params, ['limit' => 1]);
@@ -284,6 +338,10 @@ class AidRepository extends ServiceEntityRepository
         return $qb->getQuery()->getOneOrNullResult();
     }
 
+    /**
+     * @param array<string, mixed>|null $params
+     * @return array<int, Aid>
+     */
     public function findForSitemap(?array $params = null): array
     {
         $qb = $this->getQueryBuilder($params);
@@ -292,6 +350,10 @@ class AidRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult();
     }
 
+    /**
+     * @param array<string, mixed>|null $params
+     * @return array<int, Aid>
+     */
     public function findCustom(?array $params = null): array
     {
         $qb = $this->getQueryBuilder($params);
@@ -317,6 +379,10 @@ class AidRepository extends ServiceEntityRepository
         return $return;
     }
 
+    /**
+     * @param array<string, mixed>|null $params
+     * @return array<int, Aid>
+     */
     public function findWithKeywords(?array $params = null): array
     {
         $qb = $this->getQueryBuilder($params);
@@ -326,6 +392,10 @@ class AidRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult();
     }
 
+    /**
+     * @param array<string, mixed>|null $params
+     * @return int
+     */
     public function countLives(?array $params = null): int
     {
         $qb = $this->getQueryBuilder($params);
@@ -339,6 +409,10 @@ class AidRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult()[0]['nb'] ?? 0;
     }
 
+    /**
+     * @param array<string, mixed>|null $params
+     * @return int
+     */
     public function countAfterSelect(?array $params = null): int
     {
         $qb = $this->getQueryBuilder($params);
@@ -346,6 +420,10 @@ class AidRepository extends ServiceEntityRepository
         return count($qb->getQuery()->getResult());
     }
 
+    /**
+     * @param array<string, mixed>|null $params
+     * @return int
+     */
     public function countCustom(?array $params = null): int
     {
         $qb = $this->getQueryBuilder($params);
@@ -360,6 +438,10 @@ class AidRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult()[0]['nb'] ?? 0;
     }
 
+    /**
+     * @param array<string, mixed>|null $params
+     * @return QueryBuilder
+     */
     public function getQueryBuilder(?array $params = null): QueryBuilder
     {
         $id = $params['id'] ?? null;
@@ -560,8 +642,9 @@ class AidRepository extends ServiceEntityRepository
             }
 
             // les keywordReferences
-            $keywordReferencesSynonyms =
-                $this->getEntityManager()->getRepository(KeywordReference::class)->findFromSynonyms($synonyms);
+            /** @var KeywordReferenceRepository $keywordReferenceRepository */
+            $keywordReferenceRepository = $this->getEntityManager()->getRepository(KeywordReference::class);
+            $keywordReferencesSynonyms = $keywordReferenceRepository->findFromSynonyms($synonyms);
             if (!empty($keywordReferencesSynonyms)) {
                 $sqlKeywordReferences = '
                 CASE
@@ -595,7 +678,10 @@ class AidRepository extends ServiceEntityRepository
                 ';
 
                 $objects = str_getcsv($objectsString, ' ', '"');
-
+                // on retire tous les éléments vide de $objects
+                $objects = array_filter($objects, function ($value) {
+                    return trim($value) !== '';
+                });
                 if (!empty($objects)) {
                     $sqlObjects .= ' + ';
                     $sqlRegexpName = '';
@@ -666,11 +752,8 @@ class AidRepository extends ServiceEntityRepository
             if ($originalName) {
                 $sqlTotal .= $sqlOriginalName;
             }
-            if ($intentionsString && $objectsString) {
-                if (
-                    $originalName
-                    || $objectsString
-                ) {
+            if ($intentionsString && $objectsString && isset($sqlIntentions)) {
+                if (!empty($sqlTotal)) {
                     $sqlTotal .= ' + ';
                 }
                 $sqlTotal .= $sqlIntentions;
@@ -686,25 +769,12 @@ class AidRepository extends ServiceEntityRepository
                 $sqlTotal .= $sqlSimpleWords;
             }
 
-            if (isset($sqlCategories)) {
-                if (
-                    $originalName
-                    || $objectsString
-                    || $intentionsString
-                    || isset($sqlSimpleWords)
-                ) {
-                    $sqlTotal .= ' + ';
-                }
-                $sqlTotal .= $sqlCategories;
-            }
-
             if (isset($sqlKeywordReferences)) {
                 if (
                     $originalName
                     || $objectsString
                     || $intentionsString
                     || isset($sqlSimpleWords)
-                    || isset($sqlCategories)
                 ) {
                     $sqlTotal .= ' + ';
                 }
@@ -717,7 +787,6 @@ class AidRepository extends ServiceEntityRepository
                     || $objectsString
                     || $intentionsString
                     || isset($sqlSimpleWords)
-                    || isset($sqlCategories)
                     || isset($sqlKeywordReferences)
                 ) {
                     $sqlTotal .= ' + ';
@@ -799,10 +868,10 @@ class AidRepository extends ServiceEntityRepository
         }
 
         if (
-            $userWithOrganizations
-            && $userWithOrganizations instanceof User
+            $userWithOrganizations instanceof User
+            && $userWithOrganizations->getId()
         ) {
-            $organizations = $userWithOrganizations->getOrganizations() ?? [];
+            $organizations = $userWithOrganizations->getOrganizations();
             $qb
                 ->andWhere('a.author = :author OR a.organization IN (:organizations)')
                 ->setParameter('author', $userWithOrganizations)
@@ -857,7 +926,9 @@ class AidRepository extends ServiceEntityRepository
         }
 
         if ($perimeterFrom instanceof Perimeter && $perimeterFrom->getId()) {
-            $ids = $this->getEntityManager()->getRepository(Perimeter::class)->getIdPerimetersContainedIn(
+            /** @var PerimeterRepository $perimeterRepository */
+            $perimeterRepository = $this->getEntityManager()->getRepository(Perimeter::class);
+            $ids = $perimeterRepository->getIdPerimetersContainedIn(
                 ['perimeter' => $perimeterFrom]
             );
             $ids[] = $perimeterFrom->getId();
@@ -1057,7 +1128,7 @@ class AidRepository extends ServiceEntityRepository
             if ('score_total' == $orderBy['sort']) {
                 if (isset($scoreTotalAvailable) && true === $scoreTotalAvailable) {
                     $qb->addOrderBy($orderBy['sort'], $orderBy['order']);
-                    if ('' !== $sqlObjects) {
+                    if (isset($sqlObjects) && '' !== $sqlObjects) {
                         $qb->addOrderBy('score_objects', 'DESC');
                     }
                 }
@@ -1083,7 +1154,7 @@ class AidRepository extends ServiceEntityRepository
         ) {
             $qb
                 ->addOrderBy('score_total', 'DESC');
-            if ('' !== $sqlObjects) {
+            if (isset($sqlObjects) && '' !== $sqlObjects) {
                 $qb->addOrderBy('score_objects', 'DESC');
             }
         }

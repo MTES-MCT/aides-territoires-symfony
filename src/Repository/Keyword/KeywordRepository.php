@@ -22,6 +22,10 @@ class KeywordRepository extends ServiceEntityRepository
         parent::__construct($registry, Keyword::class);
     }
 
+    /**
+     * @param array<string, mixed>|null $params
+     * @return array<int, Keyword>
+     */
     public function findCustom(?array $params = null): array
     {
         $qb = $this->getQueryBuilder($params);
@@ -29,6 +33,10 @@ class KeywordRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult();
     }
 
+    /**
+     * @param array<string, mixed>|null $params
+     * @return QueryBuilder
+     */
     public function getQueryBuilder(?array $params = null): QueryBuilder
     {
         $names = $params['names'] ?? null;
@@ -41,6 +49,10 @@ class KeywordRepository extends ServiceEntityRepository
         return $qb;
     }
 
+    /**
+     * @param array<string, mixed>|null $params
+     * @return bool
+     */
     public function importOldId(array $params = null): bool
     {
         // on recupere l'id max

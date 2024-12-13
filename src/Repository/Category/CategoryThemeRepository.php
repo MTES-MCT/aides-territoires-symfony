@@ -22,6 +22,10 @@ class CategoryThemeRepository extends ServiceEntityRepository
         parent::__construct($registry, CategoryTheme::class);
     }
 
+    /**
+     * @param array<string, mixed>|null $params
+     * @return int
+     */
     public function countCustom(array $params = null): int
     {
         $qb = $this->getQueryBuilder($params);
@@ -31,6 +35,10 @@ class CategoryThemeRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult()[0]['nb'] ?? 0;
     }
 
+    /**
+     * @param array<string, mixed>|null $params
+     * @return array<int, CategoryTheme>
+     */
     public function findCustom(array $params = null): array
     {
         $qb = $this->getQueryBuilder($params);
@@ -38,10 +46,12 @@ class CategoryThemeRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult();
     }
 
+    /**
+     * @param array<string, mixed>|null $params
+     * @return QueryBuilder
+     */
     public function getQueryBuilder(array $params = null): QueryBuilder
     {
-        $qb = $this->createQueryBuilder('ct');
-
-        return $qb;
+        return $this->createQueryBuilder('ct');
     }
 }

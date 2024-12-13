@@ -5,6 +5,7 @@ namespace App\Repository\Blog;
 use App\Entity\Blog\BlogPromotionPost;
 use App\Entity\Organization\OrganizationType;
 use App\Entity\Perimeter\Perimeter;
+use App\Repository\Perimeter\PerimeterRepository;
 use App\Service\Reference\ReferenceService;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -26,6 +27,10 @@ class BlogPromotionPostRepository extends ServiceEntityRepository
         parent::__construct($registry, BlogPromotionPost::class);
     }
 
+    /**
+     * @param array<string, mixed>|null $params
+     * @return array<int, BlogPromotionPost>
+     */
     public function findPublished(array $params = null): array
     {
         $params['status'] = BlogPromotionPost::STATUS_PUBLISHED;
@@ -34,6 +39,10 @@ class BlogPromotionPostRepository extends ServiceEntityRepository
         return $this->getQueryBuilder($params)->getQuery()->getResult();
     }
 
+    /**
+     * @param array<string, mixed>|null $params
+     * @return QueryBuilder
+     */
     public function getQueryBuilder(array $params = null): QueryBuilder
     {
         $organizationType = $params['organizationType'] ?? null;
@@ -88,8 +97,9 @@ class BlogPromotionPostRepository extends ServiceEntityRepository
         }
 
         if ($perimeterFrom instanceof Perimeter && $perimeterFrom->getId()) {
-            $ids = $this->getEntityManager()->getRepository(Perimeter::class)
-                ->getIdPerimetersContainedIn(['perimeter' => $perimeterFrom]);
+            /** @var PerimeterRepository $perimeterRepository */
+            $perimeterRepository = $this->getEntityManager()->getRepository(Perimeter::class);
+            $ids = $perimeterRepository->getIdPerimetersContainedIn(['perimeter' => $perimeterFrom]);
             $ids[] = $perimeterFrom->getId();
             $qb
                 ->leftJoin('bpp.perimeter', 'perimeter')
@@ -121,6 +131,10 @@ class BlogPromotionPostRepository extends ServiceEntityRepository
         return $qb;
     }
 
+    /**
+     * @param array<string, mixed>|null $params
+     * @return bool
+     */
     public function importOldId(array $params = null): bool
     {
         // on recupere l'id max

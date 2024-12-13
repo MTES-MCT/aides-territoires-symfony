@@ -132,9 +132,8 @@ class ProjectValidatedRepository extends ServiceEntityRepository
                 ';
 
                 $objects = str_getcsv($objectsString, ' ', '"');
-                if (!empty($objects)) {
-                    $sqlObjects .= ' + ';
-                }
+                $sqlObjects .= ' + ';
+
                 for ($i = 0; $i < count($objects); $i++) {
                     $sqlObjects .= '
                         CASE WHEN (p.projectName LIKE :objects' . $i . ') THEN 30 ELSE 0 END
@@ -177,8 +176,8 @@ class ProjectValidatedRepository extends ServiceEntityRepository
                 }
                 $sqlTotal .= $sqlObjects;
             }
-            if ($intentionsString && $objectsString) {
-                if ($originalName || $objectsString) {
+            if ($intentionsString && $objectsString && isset($sqlIntentions)) {
+                if ($originalName) {
                     $sqlTotal .= ' + ';
                 }
                 $sqlTotal .= $sqlIntentions;

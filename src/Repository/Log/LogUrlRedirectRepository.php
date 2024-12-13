@@ -17,6 +17,10 @@ class LogUrlRedirectRepository extends ServiceEntityRepository
         parent::__construct($registry, LogUrlRedirect::class);
     }
 
+    /**
+     * @param array<string, mixed>|null $params
+     * @return array<int, array{oldUrl: string, newUrl: string, nb: string}>
+     */
     public function findGroupByUrl(?array $params = null): array
     {
         $qb = $this->getQueryBuilder($params);
@@ -28,7 +32,10 @@ class LogUrlRedirectRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult();
     }
 
-
+    /**
+     * @param array<string, mixed>|null $params
+     * @return QueryBuilder
+     */
     public function getQueryBuilder(?array $params = null): QueryBuilder
     {
         $dateCreateMin = $params['dateCreateMin'] ?? null;

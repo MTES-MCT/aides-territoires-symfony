@@ -23,6 +23,10 @@ class AidProjectRepository extends ServiceEntityRepository
         parent::__construct($registry, AidProject::class);
     }
 
+    /**
+     * @param array<string, mixed>|null $params
+     * @return int
+     */
     public function countDistinctAids(?array $params = null): int
     {
         $qb = $this->getQueryBuilder($params);
@@ -34,6 +38,10 @@ class AidProjectRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult()[0]['nb'] ?? 0;
     }
 
+    /**
+     * @param array<string, mixed>|null $params
+     * @return int
+     */
     public function countProjectByAid(Aid $aid, array $params = null): int
     {
         $params['aid'] = $aid;
@@ -44,6 +52,10 @@ class AidProjectRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult()[0]['nb'] ?? 0;
     }
 
+    /**
+     * @param array<string, mixed>|null $params
+     * @return array<int, array{nb: integer, dateDay: string}>
+     */
     public function countProjectByAidByDay(Aid $aid, array $params = null): array
     {
         $params['aid'] = $aid;
@@ -59,6 +71,10 @@ class AidProjectRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult();
     }
 
+    /**
+     * @param array<string, mixed>|null $params
+     * @return int
+     */
     public function countCustom(array $params = null): int
     {
         $qb = $this->getQueryBuilder($params);
@@ -68,7 +84,11 @@ class AidProjectRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult()[0]['nb'] ?? 0;
     }
 
-    public function countCreatedByMonth(array $params = []): array
+    /**
+     * @param array<string, mixed>|null $params
+     * @return array<int, array{nb: integer, mois: string}>
+     */
+    public function countCreatedByMonth(array $params = null): array
     {
         $organizationTypeSlug = $params['organizationTypeSlug'] ?? null;
 
@@ -92,6 +112,10 @@ class AidProjectRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult();
     }
 
+    /**
+     * @param array<string, mixed>|null $params
+     * @return QueryBuilder
+     */
     public function getQueryBuilder(array $params = null): QueryBuilder
     {
         $aid = $params['aid'] ?? null;

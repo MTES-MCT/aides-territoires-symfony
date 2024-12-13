@@ -22,6 +22,10 @@ class AlertRepository extends ServiceEntityRepository
         parent::__construct($registry, Alert::class);
     }
 
+    /**
+     * @param array<string, mixed>|null $params
+     * @return int
+     */
     public function countCustom(?array $params = null): int
     {
         $qb = $this->getQueryBuilder($params);
@@ -30,6 +34,10 @@ class AlertRepository extends ServiceEntityRepository
         return (int) $qb->getQuery()->getSingleScalarResult();
     }
 
+    /**
+     * @param array<string, mixed>|null $params
+     * @return array<int, Alert>
+     */
     public function findToSend(array $params = null): array
     {
         $yesterday = new \DateTime(date('Y-m-d', strtotime('-1 day')));
@@ -44,6 +52,10 @@ class AlertRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult();
     }
 
+    /**
+     * @param array<string, mixed>|null $params
+     * @return array<int, Alert>
+     */
     public function findToSendDaily(array $params = null): array
     {
         $today = new \DateTime(date('Y-m-d'));
@@ -57,6 +69,10 @@ class AlertRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult();
     }
 
+    /**
+     * @param array<string, mixed>|null $params
+     * @return array<int, Alert>
+     */
     public function findToSendWeekly(array $params = null): array
     {
         $today = new \DateTime(date('Y-m-d'));
@@ -64,7 +80,7 @@ class AlertRepository extends ServiceEntityRepository
         $year = $today->format('o');
 
         $startOfWeek = new \DateTime();
-        $startOfWeek->setISODate($year, $weekNumber, 1);
+        $startOfWeek->setISODate((int) $year, (int) $weekNumber, 1);
         $startOfWeek->setTime(0, 0, 0);
 
         $params['dateLatestAlertMax'] = $startOfWeek;
@@ -76,6 +92,10 @@ class AlertRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult();
     }
 
+    /**
+     * @param array<string, mixed>|null $params
+     * @return QueryBuilder
+     */
     public function getQueryBuilder(array $params = null): QueryBuilder
     {
         $dailyMinDate = $params['dailyMinDate'] ?? null;
