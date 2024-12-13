@@ -255,7 +255,6 @@ class AppExtension extends AbstractExtension // NOSONAR too much methods
 
             $node->parentNode->replaceChild($wrapper, $node);
             $wrapperContent->appendChild($node);
-
         }
 
         return substr($dom->saveHTML(), 12, -15);
