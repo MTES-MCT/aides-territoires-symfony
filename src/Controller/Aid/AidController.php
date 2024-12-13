@@ -399,7 +399,8 @@ class AidController extends FrontController
             if (!$user->getDefaultOrganization()) {
                 $this->addFlash(
                     FrontController::FLASH_ERROR,
-                    'Vous devez renseigner les informations de votre structure ou accepter une invitation avant de pouvoir accéder à cette page.'
+                    'Vous devez renseigner les informations de votre structure ou accepter une invitation '
+                        . 'avant de pouvoir accéder à cette page.'
                 );
             } else {
                 if ($formAddToProject->isValid()) {
@@ -413,7 +414,7 @@ class AidController extends FrontController
                             $aidProject->setCreator($user);
                             $project->addAidProject($aidProject);
                             $this->managerRegistry->getManager()->persist($aidProject);
-    
+
                             // envoi notification à tous les autres membres de l'oganisation
                             if ($project->getOrganization()) {
                                 foreach ($project->getOrganization()->getBeneficiairies() as $beneficiary) {
@@ -439,7 +440,7 @@ class AidController extends FrontController
                                     );
                                 }
                             }
-    
+
                             // message
                             $this->addFlash(
                                 FrontController::FLASH_SUCCESS,
@@ -451,10 +452,10 @@ class AidController extends FrontController
                                 . '">' . $project->getName() . '</a>.'
                             );
                         }
-    
+
                         $this->managerRegistry->getManager()->flush();
                     }
-    
+
                     $newProject = $formAddToProject->get('newProject')->getData();
                     if ($newProject) {
                         $project = new Project();
@@ -462,15 +463,15 @@ class AidController extends FrontController
                         $project->setAuthor($user);
                         $project->setStatus(Project::STATUS_DRAFT);
                         $project->setOrganization($user->getDefaultOrganization());
-    
+
                         $aidProject = new AidProject();
                         $aidProject->setAid($aid);
                         $aidProject->setCreator($user);
                         $project->addAidProject($aidProject);
-    
+
                         $this->managerRegistry->getManager()->persist($project);
                         $this->managerRegistry->getManager()->flush();
-    
+
                         $this->addFlash(
                             FrontController::FLASH_SUCCESS,
                             'L’aide a bien été associée au nouveau projet <a href="'
@@ -481,7 +482,7 @@ class AidController extends FrontController
                             . '">' . $project->getName() . '</a>.'
                         );
                     }
-    
+
                     // redirection page mes projets
                     return $this->redirect($requestStack->getCurrentRequest()->getUri());
                 } else {

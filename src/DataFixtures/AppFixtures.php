@@ -20,13 +20,10 @@ use App\Entity\Reference\ProjectReference;
 use App\Entity\User\User;
 use App\Service\Various\StringService;
 use Doctrine\Bundle\FixturesBundle\Fixture;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\SchemaTool;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\ObjectManager;
-use Symfony\Bundle\FrameworkBundle\Console\Application;
-use Symfony\Component\Console\Input\ArrayInput;
-use Symfony\Component\Console\Output\NullOutput;
-use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 /**
@@ -35,25 +32,16 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
  */
 class AppFixtures extends Fixture
 {
-    private UserPasswordHasherInterface $passwordEncoder;
-    private StringService $stringService;
-    private KernelInterface $kernel;
-    private ManagerRegistry $managerRegistry;
-
     public function __construct(
-        UserPasswordHasherInterface $passwordEncoder,
-        StringService $stringService,
-        KernelInterface $kernel,
-        ManagerRegistry $managerRegistry
+        private UserPasswordHasherInterface $passwordEncoder,
+        private StringService $stringService,
+        private ManagerRegistry $managerRegistry,
+        private EntityManagerInterface $entityManager,
     ) {
-        $this->passwordEncoder = $passwordEncoder;
-        $this->stringService = $stringService;
-        $this->kernel = $kernel;
-        $this->managerRegistry = $managerRegistry;
 
         // Met à jour la structure de la base
-        $this->updateSchema($this->managerRegistry->getManager());
-        
+        $this->updateSchema($this->entityManager);
+
         // recupère la connexion
         $connection = $this->managerRegistry->getConnection();
         if (!$connection->isTransactionActive()) {
@@ -70,7 +58,7 @@ class AppFixtures extends Fixture
         if (!$connection->isTransactionActive()) {
             $connection->beginTransaction();
         }
-        
+
         try {
             // Réactiver les contraintes de clés étrangères
             $connection->executeStatement('SET FOREIGN_KEY_CHECKS = 1;');
@@ -235,11 +223,9 @@ class AppFixtures extends Fixture
         } catch (\Exception $e) {
             dd($e);
         }
-
-
     }
 
-    private function updateSchema(ObjectManager $manager): void
+    private function updateSchema(EntityManagerInterface $manager): void
     {
         $classes = $manager->getMetadataFactory()->getAllMetadata();
 

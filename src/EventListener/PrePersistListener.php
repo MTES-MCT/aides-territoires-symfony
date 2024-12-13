@@ -7,17 +7,18 @@ use App\Entity\User\User;
 use App\EventListener\Organization\OrganizationInvitationListener;
 use App\EventListener\User\UserListener;
 use Doctrine\Bundle\DoctrineBundle\Attribute\AsDoctrineListener;
-use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\Event\PrePersistEventArgs;
 use Doctrine\ORM\Events;
+use Doctrine\Persistence\ManagerRegistry;
 
 #[AsDoctrineListener(event: Events::prePersist, priority: 500, connection: 'default')]
 class PrePersistListener
 {
     public function __construct(
-        protected EntityManagerInterface $em,
         private UserListener $userListener,
-        private OrganizationInvitationListener $organizationInvitationListener
+        private OrganizationInvitationListener $organizationInvitationListener,
+        private ManagerRegistry $managerRegistry
     ) {
     }
 
@@ -26,8 +27,13 @@ class PrePersistListener
         $entity = $args->getObject();
         // Position
         if (method_exists($entity, 'getPosition') && !$entity->getPosition()) {
-            $entityCount = $this->em->getRepository(get_class($entity))->count([]); // compte les entites
-            $entity->setPosition($entityCount);
+            /** @var ServiceEntityRepository<object> $serviceEntityRepository */
+            // @phpstan-ignore-next-line
+            $serviceEntityRepository = $this->managerRegistry->getRepository(get_class($entity));
+            $entityCount = $serviceEntityRepository->count([]);
+            if (method_exists($entity, 'setPosition')) {
+                $entity->setPosition($entityCount);
+            }
         }
 
         if ($entity instanceof User) {

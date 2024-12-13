@@ -15,7 +15,7 @@ final class AidOrganizationTypeSlugsFilter extends AbstractFilter
 {
     protected function filterProperty(
         string $property,
-        $value,
+        mixed $value,
         QueryBuilder $queryBuilder,
         QueryNameGeneratorInterface $queryNameGenerator,
         string $resourceClass,

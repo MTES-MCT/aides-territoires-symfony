@@ -13,7 +13,7 @@ final class PerimeterInseesFilter extends AbstractFilter
 {
     protected function filterProperty(
         string $property,
-        $value,
+        mixed $value,
         QueryBuilder $queryBuilder,
         QueryNameGeneratorInterface $queryNameGenerator,
         string $resourceClass,
@@ -26,7 +26,7 @@ final class PerimeterInseesFilter extends AbstractFilter
     public function getDescription(string $resourceClass): array
     {
         $examples = [];
-        $examples[] = new Example(91111, null, 91111);
+        $examples[] = new Example('91111', null, 91111);
         return [
             'insees' => [
                 'property' => 'insees',

@@ -24,7 +24,11 @@ class LogAidViewRepository extends ServiceEntityRepository
         parent::__construct($registry, LogAidView::class);
     }
 
-    public function countFormGroup(array $params = null)
+    /**
+     * @param array<string, mixed>|null $params
+     * @return array<int, array{nb: integer, aidId: integer}>
+     */
+    public function countFormGroup(array $params = null): array
     {
         $distinctUser = $params['distinctUser'] ?? false;
         $qb = $this->getQueryBuilder($params);
@@ -41,7 +45,11 @@ class LogAidViewRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult();
     }
 
-    public function countLastWeek(array $params = null)
+    /**
+     * @param array<string, mixed>|null $params
+     * @return integer
+     */
+    public function countLastWeek(array $params = null): int
     {
         $lastWeek = new \DateTime(date('Y-m-d'));
         $lastWeek->sub(new \DateInterval('P7D'));
@@ -54,6 +62,10 @@ class LogAidViewRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult()[0]['nb'] ?? 0;
     }
 
+    /**
+     * @param array<string, mixed>|null $params
+     * @return integer
+     */
     public function countCustom(array $params = null): int
     {
         $qb = $this->getQueryBuilder($params);
@@ -63,6 +75,10 @@ class LogAidViewRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult()[0]['nb'] ?? 0;
     }
 
+    /**
+     * @param array<string, mixed>|null $params
+     * @return array<int, array{dateDay: string, nb: integer}>
+     */
     public function countByDay(?array $params = null): array
     {
         $qb = $this->getQueryBuilder($params);
@@ -76,6 +92,10 @@ class LogAidViewRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult();
     }
 
+    /**
+     * @param array<string, mixed>|null $params
+     * @return integer
+     */
     public function countAidsViews(?array $params = null): int
     {
         $distinctAids = $params['distinctAids'] ?? null;
@@ -91,7 +111,11 @@ class LogAidViewRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult()[0]['nb'] ?? 0;
     }
 
-    public function countApiByDay(?array $params = null)
+    /**
+     * @param array<string, mixed>|null $params
+     * @return array<int, array{dateDay: string, nb: integer}>
+     */
+    public function countApiByDay(?array $params = null): array
     {
         $params['source'] = 'api';
         $qb = $this->getQueryBuilder($params);
@@ -101,7 +125,11 @@ class LogAidViewRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult();
     }
 
-    public function countByOrganization(?array $params = null)
+    /**
+     * @param array<string, mixed>|null $params
+     * @return array<int, array{organizationId: integer, organizationName: string, nb: integer}>
+     */
+    public function countByOrganization(?array $params = null): array
     {
         $params['source'] = 'api';
         $qb = $this->getQueryBuilder($params);
@@ -112,6 +140,10 @@ class LogAidViewRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult();
     }
 
+    /**
+     * @param array<string, mixed>|null $params
+     * @return array<int, array{nb: integer, id: integer, name: string, slug: string}>
+     */
     public function countTop(?array $params = null): array
     {
         $maxResults = $params['maxResults'] ?? null;
@@ -154,6 +186,10 @@ class LogAidViewRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult();
     }
 
+    /**
+     * @param array<string, mixed>|null $params
+     * @return array<int, array{nb: integer, id: integer, name: string, slug: string}>
+     */
     public function countOrganizationTypes(?array $params = null): array
     {
         $aidIds = $params['aidIds'] ?? null;
@@ -195,6 +231,10 @@ class LogAidViewRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult();
     }
 
+    /**
+     * @param array<string, mixed>|null $params
+     * @return array<int, array{nb: integer, monthCreate: string}>
+     */
     public function countByMonth(?array $params = null): array
     {
         $aidIds = $params['aidIds'] ?? null;
@@ -231,6 +271,10 @@ class LogAidViewRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult();
     }
 
+    /**
+     * @param array<string, mixed>|null $params
+     * @return QueryBuilder
+     */
     public function getQueryBuilder(array $params = null): QueryBuilder
     {
         $dateMin = $params['dateMin'] ?? null;

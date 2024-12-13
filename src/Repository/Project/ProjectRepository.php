@@ -238,9 +238,8 @@ class ProjectRepository extends ServiceEntityRepository
                 ';
 
                 $objects = str_getcsv($objectsString, ' ', '"');
-                if (!empty($objects)) {
-                    $sqlObjects .= ' + ';
-                }
+                $sqlObjects .= ' + ';
+
                 for ($i = 0; $i < count($objects); $i++) {
                     $sqlObjects .= '
                         CASE WHEN (p.name LIKE :objects' . $i . ') THEN 30 ELSE 0 END
@@ -295,8 +294,8 @@ class ProjectRepository extends ServiceEntityRepository
                 }
                 $sqlTotal .= $sqlObjects;
             }
-            if ($intentionsString && $objectsString) {
-                if ($originalName || $objectsString) {
+            if ($intentionsString && $objectsString && isset($sqlIntentions)) {
+                if ($originalName) {
                     $sqlTotal .= ' + ';
                 }
                 $sqlTotal .= $sqlIntentions;
@@ -314,8 +313,6 @@ class ProjectRepository extends ServiceEntityRepository
                     || $objectsString
                     || $intentionsString
                     || isset($sqlSimpleWords)
-                    || isset($sqlCategories)
-                    || isset($sqlKeywordReferences)
                 ) {
                     $sqlTotal .= ' + ';
                 }

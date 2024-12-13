@@ -29,7 +29,7 @@ class AidPerimeterFilter implements FilterInterface
         QueryBuilder $queryBuilder,
         FilterDataDto $filterDataDto,
         ?FieldDto $fieldDto,
-        EntityDto $entityDto
+        EntityDto $entityDto,
     ): void {
         if (!$filterDataDto->getValue()) {
             return;
@@ -39,13 +39,13 @@ class AidPerimeterFilter implements FilterInterface
         $perimeterRepository = $queryBuilder->getEntityManager()->getRepository(Perimeter::class);
 
         $ids = $perimeterRepository->getIdPerimetersContainedIn(['perimeter' => $filterDataDto->getValue()]);
-        $comparison = $filterDataDto->getComparison() ?? 'eq';
+        $comparison = $filterDataDto->getComparison();
 
         $queryBuilder
             ->innerJoin(sprintf('%s.perimeter', $filterDataDto->getEntityAlias()), 'perimeterFilter')
         ;
 
-        if ($comparison === 'eq') {
+        if ('eq' === $comparison) {
             $queryBuilder->andWhere('perimeterFilter.id IN (:ids)')
                 ->setParameter('ids', $ids);
         } else {

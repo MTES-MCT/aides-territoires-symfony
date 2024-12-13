@@ -4,7 +4,6 @@ namespace App\Repository\Perimeter;
 
 use App\Entity\Aid\Aid;
 use App\Entity\Perimeter\Perimeter;
-use App\Service\Various\StringService;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
@@ -19,10 +18,8 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class PerimeterRepository extends ServiceEntityRepository
 {
-    public function __construct(
-        ManagerRegistry $registry,
-        private StringService $stringService
-    ) {
+    public function __construct(ManagerRegistry $registry)
+    {
         parent::__construct($registry, Perimeter::class);
     }
 
@@ -172,8 +169,7 @@ class PerimeterRepository extends ServiceEntityRepository
             $ids[] = $result['id'];
         }
 
-        array_unique($ids);
-        return $ids;
+        return array_unique($ids);
     }
 
     /**
@@ -352,7 +348,7 @@ class PerimeterRepository extends ServiceEntityRepository
             ;
         }
 
-        if ($regions && is_array($regions) && count($regions) > 0) {
+        if (is_array($regions) && count($regions) > 0) {
             $qb
                 ->andWhere("JSON_CONTAINS(p.regions, :regions, '$') = 1 ")
                 ->setParameter('regions', json_encode($regions))

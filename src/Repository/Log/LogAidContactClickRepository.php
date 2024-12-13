@@ -24,6 +24,10 @@ class LogAidContactClickRepository extends ServiceEntityRepository
         parent::__construct($registry, LogAidContactClick::class);
     }
 
+    /**
+     * @param array<string, mixed>|null $params
+     * @return array<int, array{nb: integer, dateCreate: string}>
+     */
     public function countOnPeriod(?array $params = null): array
     {
         $qb = $this->getQueryBuilder($params);
@@ -34,6 +38,10 @@ class LogAidContactClickRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult();
     }
 
+    /**
+     * @param array<string, mixed>|null $params
+     * @return int
+     */
     public function countCustom(array $params = null): int
     {
         $qb = $this->getQueryBuilder($params);
@@ -43,6 +51,10 @@ class LogAidContactClickRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult()[0]['nb'] ?? 0;
     }
 
+    /**
+     * @param array<string, mixed>|null $params
+     * @return QueryBuilder
+     */
     public function getQueryBuilder(array $params = null): QueryBuilder
     {
         $dateMin = $params['dateMin'] ?? null;

@@ -34,7 +34,7 @@ class CommuneController extends AbstractController
     public function mapPopulation(
         OrganizationRepository $organizationRepository
     ): Response {
-        $cities = $organizationRepository->getScaleCovered(scale: Perimeter::SCALE_COMMUNE);
+        $cities = $organizationRepository->getScaleCovered(scale: (int) Perimeter::SCALE_COMMUNE);
 
         // rendu template
         return $this->render('admin/statistics/commune/population.html.twig', [

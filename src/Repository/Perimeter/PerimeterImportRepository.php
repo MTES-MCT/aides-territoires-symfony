@@ -22,6 +22,10 @@ class PerimeterImportRepository extends ServiceEntityRepository
         parent::__construct($registry, PerimeterImport::class);
     }
 
+    /**
+     * @param array<string, mixed>|null $params
+     * @return PerimeterImport|null
+     */
     public function findNextToImport(array $params = null): ?PerimeterImport
     {
         $params = array_merge($params, [
@@ -35,6 +39,10 @@ class PerimeterImportRepository extends ServiceEntityRepository
         return $this->findOneCustom($params);
     }
 
+    /**
+     * @param array<string, mixed>|null $params
+     * @return int
+     */
     public function countCustom(array $params = null): int
     {
         $qb = $this->getQueryBuilder($params);
@@ -44,6 +52,10 @@ class PerimeterImportRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult()[0]['nb'] ?? 0;
     }
 
+    /**
+     * @param array<string, mixed>|null $params
+     * @return PerimeterImport|null
+     */
     public function findOneCustom(array $params = null): ?PerimeterImport
     {
         $params = array_merge($params, [
@@ -54,6 +66,10 @@ class PerimeterImportRepository extends ServiceEntityRepository
         return $qb->getQuery()->getOneOrNullResult();
     }
 
+    /**
+     * @param array<string, mixed>|null $params
+     * @return QueryBuilder
+     */
     public function getQueryBuilder(array $params = null): QueryBuilder
     {
         $exclude = $params['exclude'] ?? null;

@@ -17,6 +17,10 @@ class LogAidSearchTempRepository extends ServiceEntityRepository
         parent::__construct($registry, LogAidSearchTemp::class);
     }
 
+    /**
+     * @param array<string, mixed>|null $params
+     * @return integer
+     */
     public function countCustom(?array $params = null): int
     {
         $qb = $this->getQueryBuilder($params);
@@ -28,6 +32,10 @@ class LogAidSearchTempRepository extends ServiceEntityRepository
         ;
     }
 
+    /**
+     * @param array<string, mixed>|null $params
+     * @return QueryBuilder
+     */
     public function getQueryBuilder(?array $params = null): QueryBuilder
     {
         $dateCreate = $params['dateCreate'] ?? null;

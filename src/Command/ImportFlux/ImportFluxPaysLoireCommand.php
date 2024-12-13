@@ -40,7 +40,7 @@ class ImportFluxPaysLoireCommand extends ImportFluxCommand
             $this->currentPage = $i;
             $importUrl = $this->dataSource->getImportApiUrl();
             if ($this->paginationEnabled) {
-                $importUrl .= '?limit='.$this->nbByPages.'&offset='.($this->currentPage * $this->nbByPages);
+                $importUrl .= '?limit=' . $this->nbByPages . '&offset=' . ($this->currentPage * $this->nbByPages);
             }
             try {
                 $response = $client->request(
@@ -80,7 +80,7 @@ class ImportFluxPaysLoireCommand extends ImportFluxCommand
         }
 
         // Utilisation de md5 pour des raisons historiques. Les données ne sont pas sensibles.
-        return $this->importUniqueidPrefix.$aidToImport['intervention_id'];
+        return $this->importUniqueidPrefix . $aidToImport['intervention_id'];
     }
 
     /**
@@ -106,7 +106,7 @@ class ImportFluxPaysLoireCommand extends ImportFluxCommand
             $contactFullName .= $aidToImport['contact_prenom'];
         }
         if (!empty($aidToImport['contact_nom'])) {
-            $contactFullName .= ' '.$aidToImport['contact_nom'];
+            $contactFullName .= ' ' . $aidToImport['contact_nom'];
         }
         $aidToImport['contact_fullname'] = $contactFullName;
         $contact1 = $this->concatHtmlFields(
@@ -123,10 +123,10 @@ class ImportFluxPaysLoireCommand extends ImportFluxCommand
             ? $this->getHtmlOrNull($aidToImport['informations_contact'])
             : null;
         $contact =
-            (string) $contact1.'<br /><br />'.
+            (string) $contact1 . '<br /><br />' .
             (string) $contact2;
         if (!empty($contactDetails)) {
-            $contact .= '<br /><br />'.(string) $contactDetails;
+            $contact .= '<br /><br />' . (string) $contactDetails;
         }
         $description = $this->concatHtmlFields(
             $aidToImport,
@@ -136,7 +136,7 @@ class ImportFluxPaysLoireCommand extends ImportFluxCommand
 
         $return = [
             'importDataMention' => 'Ces données sont mises à disposition par '
-                .'le Conseil régional des Pays de la Loire.',
+                . 'le Conseil régional des Pays de la Loire.',
             'name' => !empty($aidToImport['aide_nom'])
                 ? $this->cleanName($aidToImport['aide_nom']) : null,
             'nameInitial' => !empty($aidToImport['aide_nom'])
@@ -180,7 +180,7 @@ class ImportFluxPaysLoireCommand extends ImportFluxCommand
     {
         $mapping = [];
         $filename = '/src/Command/ImportFlux/datas/pays_de_la_loire_categories_mapping.csv';
-        if (($handle = fopen($this->fileService->getProjectDir().$filename, 'r')) !== false) {
+        if (($handle = fopen($this->fileService->getProjectDir() . $filename, 'r')) !== false) {
             // Lire l'en-tête
             $header = fgetcsv($handle, 1000, ',');
 

@@ -23,12 +23,21 @@ class LogAidSearchRepository extends ServiceEntityRepository
         parent::__construct($registry, LogAidSearch::class);
     }
 
+    /**
+     * @param array<string, mixed>|null $params
+     * @return array<int, LogAidSearch>
+     */
     public function findKeywordSearchWithFewResults(?array $params = null): array
     {
         $qb = $this->getQueryBuilder($params);
 
         return $qb->getQuery()->getResult();
     }
+
+    /**
+     * @param array<string, mixed>|null $params
+     * @return integer
+     */
     public function countCustom(?array $params = null): int
     {
         $qb = $this->getQueryBuilder($params);
@@ -38,7 +47,11 @@ class LogAidSearchRepository extends ServiceEntityRepository
         return (int) $qb->getQuery()->getSingleScalarResult();
     }
 
-    public function countApiByDay(?array $params = null)
+    /**
+     * @param array<string, mixed>|null $params
+     * @return array<int, array{dateDay: string, nb: integer}>
+     */
+    public function countApiByDay(?array $params = null): array
     {
         $params['source'] = 'api';
         $qb = $this->getQueryBuilder($params);
@@ -48,7 +61,11 @@ class LogAidSearchRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult();
     }
 
-    public function countByOrganization(?array $params = null)
+    /**
+     * @param array<string, mixed>|null $params
+     * @return array<int, array{organizationId: string, organizationName: string, nb: integer}>
+     */
+    public function countByOrganization(?array $params = null): array
     {
         $params['source'] = 'api';
         $qb = $this->getQueryBuilder($params);
@@ -59,6 +76,10 @@ class LogAidSearchRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult();
     }
 
+    /**
+     * @param array<string, mixed>|null $params
+     * @return array<int, array{id: integer, name: string, insee: string}>
+     */
     public function getSearchOnPerimeterWithoutOrganization($params): array
     {
         $dateCreateMin = $params['dateCreateMin'] ?? null;
@@ -91,6 +112,10 @@ class LogAidSearchRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult();
     }
 
+    /**
+     * @param array<string, mixed>|null $params
+     * @return QueryBuilder
+     */
     public function getQueryBuilder(?array $params = null): QueryBuilder
     {
         $dateCreateMin = $params['dateCreateMin'] ?? null;

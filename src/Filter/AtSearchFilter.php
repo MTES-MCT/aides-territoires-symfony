@@ -32,6 +32,17 @@ final class AtSearchFilter extends AbstractFilter implements SearchFilterInterfa
 
     public const DOCTRINE_INTEGER_TYPE = Types::INTEGER;
 
+    /**
+     *
+     * @param ManagerRegistry $managerRegistry
+     * @param IriConverterInterface|LegacyIriConverterInterface $iriConverter
+     * @param PropertyAccessorInterface|null $propertyAccessor
+     * @param LoggerInterface|null $logger
+     * @param array<mixed, mixed>|null $properties
+     * @param IdentifiersExtractorInterface|LegacyIdentifiersExtractorInterface|null $identifiersExtractor
+     * @param NameConverterInterface|null $nameConverter
+     * @param array<string, mixed> $swaggerDescription
+     */
     public function __construct(
         ManagerRegistry $managerRegistry,
         IriConverterInterface|LegacyIriConverterInterface $iriConverter,
@@ -64,7 +75,7 @@ final class AtSearchFilter extends AbstractFilter implements SearchFilterInterfa
      */
     protected function filterProperty(
         string $property,
-        $value,
+        mixed $value,
         QueryBuilder $queryBuilder,
         QueryNameGeneratorInterface $queryNameGenerator,
         string $resourceClass,
@@ -366,9 +377,8 @@ final class AtSearchFilter extends AbstractFilter implements SearchFilterInterfa
                             $example['value'] ?? null
                         );
                     }
-                    if (count($examples) > 0) {
-                        $description[$this->swaggerDescription['name']]['openapi']['examples'] = $examples;
-                    }
+
+                    $description[$this->swaggerDescription['name']]['openapi']['examples'] = $examples;
                 }
 
                 if (isset($this->swaggerDescription['openapi']['example'])) {

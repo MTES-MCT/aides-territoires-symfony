@@ -13,7 +13,7 @@ final class ProjectReferenceCategoryFilter extends AbstractFilter
 {
     protected function filterProperty(
         string $property,
-        $value,
+        mixed $value,
         QueryBuilder $queryBuilder,
         QueryNameGeneratorInterface $queryNameGenerator,
         string $resourceClass,
@@ -35,8 +35,8 @@ final class ProjectReferenceCategoryFilter extends AbstractFilter
                                     . 'Note : se référer à la liste.</p></div>',
                 'openapi' => [
                     'examples' => [
-                        new Example(1, null, 1),
-                        new Example(2, null, 2),
+                        new Example('1', null, 1),
+                        new Example('2', null, 2),
                     ],
                 ],
             ],

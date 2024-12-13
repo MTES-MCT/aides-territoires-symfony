@@ -23,7 +23,11 @@ class BlogPostRepository extends ServiceEntityRepository
         parent::__construct($registry, BlogPost::class);
     }
 
-    public function getRecents(array $params = null)
+    /**
+     * @param array<string, mixed>|null $params
+     * @return array<int, BlogPost>
+     */
+    public function getRecents(array $params = null): array
     {
         $params['status'] = BlogPost::STATUS_PUBLISHED;
         $params['limit'] = 2;
@@ -34,12 +38,20 @@ class BlogPostRepository extends ServiceEntityRepository
         return $this->findCustom($params);
     }
 
+    /**
+     * @param array<string, mixed>|null $params
+     * @return array<int, BlogPost>
+     */
     public function findCustom(array $params = null)
     {
         $qb = $this->getQueryBuilder($params);
         return $qb->getQuery()->getResult();
     }
 
+    /**
+     * @param array<string, mixed>|null $params
+     * @return int
+     */
     public function countCustom(array $params = null): int
     {
         $qb = $this->getQueryBuilder($params);
@@ -49,6 +61,10 @@ class BlogPostRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult()[0]['nb'] ?? 0;
     }
 
+    /**
+     * @param array<string, mixed>|null $params
+     * @return QueryBuilder
+     */
     public function getQueryBuilder(array $params = null): QueryBuilder
     {
         $blogPostCategory = $params['blogPostCategory'] ?? null;
@@ -94,6 +110,10 @@ class BlogPostRepository extends ServiceEntityRepository
         return $qb;
     }
 
+    /**
+     * @param array<string, mixed>|null $params
+     * @return bool
+     */
     public function importOldId(array $params = null): bool
     {
         // on recupere l'id max

@@ -92,7 +92,7 @@ class ImportFluxMinistereCultureCommand extends ImportFluxCommand
             if (!$name) {
                 throw new \Exception('Name is empty');
             }
-            
+
             $return = [
                 'importDataMention' => 'Ces données sont mises à disposition par le Ministère de la Culture.',
                 'name' => $name,

@@ -8,12 +8,12 @@ use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<CrontExportSpreadsheet>
+ * @extends ServiceEntityRepository<CronExportSpreadsheet>
  *
- * @method CrontExportSpreadsheet|null find($id, $lockMode = null, $lockVersion = null)
- * @method CrontExportSpreadsheet|null findOneBy(array $criteria, array $orderBy = null)
- * @method CrontExportSpreadsheet[]    findAll()
- * @method CrontExportSpreadsheet[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method CronExportSpreadsheet|null find($id, $lockMode = null, $lockVersion = null)
+ * @method CronExportSpreadsheet|null findOneBy(array $criteria, array $orderBy = null)
+ * @method CronExportSpreadsheet[]    findAll()
+ * @method CronExportSpreadsheet[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
 class CronExportSpreadsheetRepository extends ServiceEntityRepository
 {
@@ -22,6 +22,10 @@ class CronExportSpreadsheetRepository extends ServiceEntityRepository
         parent::__construct($registry, CronExportSpreadsheet::class);
     }
 
+    /**
+     * @param array<string, mixed>|null $params
+     * @return CronExportSpreadsheet|null
+     */
     public function findOneToExport(?array $params = null): ?CronExportSpreadsheet
     {
         try {
@@ -38,6 +42,10 @@ class CronExportSpreadsheetRepository extends ServiceEntityRepository
         }
     }
 
+    /**
+     * @param array<string, mixed>|null $params
+     * @return QueryBuilder
+     */
     public function getQueryBuilder(?array $params = null): QueryBuilder
     {
         $processing = $params['processing'] ?? null;

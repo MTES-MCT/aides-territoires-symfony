@@ -23,6 +23,10 @@ class AidTypeRepository extends ServiceEntityRepository
         parent::__construct($registry, AidType::class);
     }
 
+    /**
+     * @param AidTypeGroup $aidTypeGroup
+     * @return array<int>
+     */
     public function getIdsFromAidTypeGroup(AidTypeGroup $aidTypeGroup): array
     {
         $qb = $this->createQueryBuilder('at');
@@ -37,6 +41,10 @@ class AidTypeRepository extends ServiceEntityRepository
         return array_column($results, 'id');
     }
 
+    /**
+     * @param array<string, mixed>|null $params
+     * @return int
+     */
     public function countCustom(array $params = null): int
     {
         $qb = $this->getQueryBuilder($params);
@@ -46,6 +54,10 @@ class AidTypeRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult()[0]['nb'] ?? 0;
     }
 
+    /**
+     * @param array<string, mixed>|null $params
+     * @return string[]
+     */
     public function getNames(?array $params = null): array
     {
         $params['orderBy'] = ['sort' => 'at.name', 'order' => 'ASC'];
@@ -60,6 +72,10 @@ class AidTypeRepository extends ServiceEntityRepository
         return array_column($results, 'name');
     }
 
+    /**
+     * @param array<string, mixed>|null $params
+     * @return array<int, AidType>
+     */
     public function findCustom(array $params = null): array
     {
         $qb = $this->getQueryBuilder($params);
@@ -67,6 +83,10 @@ class AidTypeRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult();
     }
 
+    /**
+     * @param array<string, mixed>|null $params
+     * @return QueryBuilder
+     */
     public function getQueryBuilder(array $params = null): QueryBuilder
     {
         $ids = $params['ids'] ?? null;

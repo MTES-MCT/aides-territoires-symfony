@@ -207,7 +207,8 @@ class BackerCrudController extends AtCrudController
                 // message de confirmation
                 $this->addFlash(
                     'success',
-                    'L\'export des statistiques des aides du porter ' . $backer->getName() . ' est en cours, vous recevrez un mail avec le document en pièce jointe.'
+                    'L\'export des statistiques des aides du porter ' . $backer->getName()
+                        . ' est en cours, vous recevrez un mail avec le document en pièce jointe.'
                 );
             }
         } else {

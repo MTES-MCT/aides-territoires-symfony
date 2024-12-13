@@ -11,6 +11,7 @@ use App\Entity\Backer\BackerGroup;
 use App\Entity\Organization\OrganizationType;
 use App\Entity\Perimeter\Perimeter;
 use App\Repository\Aid\AidRepository;
+use App\Repository\Perimeter\PerimeterRepository;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\QueryBuilder;
@@ -31,20 +32,32 @@ class BackerRepository extends ServiceEntityRepository
         parent::__construct($registry, Backer::class);
     }
 
-    public static function activeCriteria($alias = 'b.'): Criteria
+    /**
+     * @param string $alias
+     * @return Criteria
+     */
+    public static function activeCriteria(string $alias = 'b.'): Criteria
     {
         return Criteria::create()
-            ->andWhere(Criteria::expr()->eq($alias.'active', true))
+            ->andWhere(Criteria::expr()->eq($alias . 'active', true))
         ;
     }
 
-    public static function unactiveCriteria($alias = 'b.'): Criteria
+    /**
+     * @param string $alias
+     * @return Criteria
+     */
+    public static function unactiveCriteria(string $alias = 'b.'): Criteria
     {
         return Criteria::create()
-            ->andWhere(Criteria::expr()->eq($alias.'active', false))
+            ->andWhere(Criteria::expr()->eq($alias . 'active', false))
         ;
     }
 
+    /**
+     * @param array<string, mixed>|null $params
+     * @return int
+     */
     public function countReviewable(?array $params = null): int
     {
         try {
@@ -58,13 +71,18 @@ class BackerRepository extends ServiceEntityRepository
         }
     }
 
-    public function countBackerWithAidInCounty(?array $params = null)
+    /**
+     * @param array<string, mixed>|null $params
+     * @return int
+     */
+    public function countBackerWithAidInCounty(?array $params = null): int
     {
         $queryBuilder = $this->createQueryBuilder('b');
 
-        $perimeterFrom = $this->getEntityManager()->getRepository(Perimeter::class)->find($params['id']);
-        $ids = $this->getEntityManager()->getRepository(Perimeter::class)
-        ->getIdPerimetersContainedIn(['perimeter' => $perimeterFrom]);
+        /** @var PerimeterRepository $perimeterRepository */
+        $perimeterRepository = $this->getEntityManager()->getRepository(Perimeter::class);
+        $perimeterFrom = $perimeterRepository->find($params['id']);
+        $ids = $perimeterRepository->getIdPerimetersContainedIn(['perimeter' => $perimeterFrom]);
         $ids[] = $perimeterFrom->getId();
 
         $queryBuilder
@@ -81,7 +99,11 @@ class BackerRepository extends ServiceEntityRepository
         return $queryBuilder->getQuery()->getResult()[0]['nb'] ?? 0;
     }
 
-    public function findBackerWithAidInCounty(?array $params = null)
+    /**
+     * @param array<string, mixed>|null $params
+     * @return array<int, Backer>
+     */
+    public function findBackerWithAidInCounty(?array $params = null): array
     {
         $perimeterFrom = $params['perimeterFrom'] ?? null;
         $organizationType = $params['organizationType'] ?? null;
@@ -117,8 +139,9 @@ class BackerRepository extends ServiceEntityRepository
             ->addCriteria(AidRepository::showInSearchCriteria('aid.'))
         ;
         if ($perimeterFrom instanceof Perimeter && $perimeterFrom->getId()) {
-            $ids = $this->getEntityManager()->getRepository(Perimeter::class)
-            ->getIdPerimetersContainedIn(['perimeter' => $perimeterFrom]);
+            /** @var PerimeterRepository $perimeterRepository */
+            $perimeterRepository = $this->getEntityManager()->getRepository(Perimeter::class);
+            $ids = $perimeterRepository->getIdPerimetersContainedIn(['perimeter' => $perimeterFrom]);
             $ids[] = $perimeterFrom->getId();
 
             $qb
@@ -184,6 +207,10 @@ class BackerRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult();
     }
 
+    /**
+     * @param array<string, mixed>|null $params
+     * @return int
+     */
     public function countWithAids(?array $params = null): int
     {
         $qb = $this->getQueryBuilder($params);
@@ -197,6 +224,10 @@ class BackerRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult()[0]['nb'] ?? 0;
     }
 
+    /**
+     * @param array<string, mixed>|null $params
+     * @return int
+     */
     public function countCustom(?array $params = null): int
     {
         $qb = $this->getQueryBuilder($params);
@@ -206,6 +237,10 @@ class BackerRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult()[0]['nb'] ?? 0;
     }
 
+    /**
+     * @param array<string, mixed>|null $params
+     * @return array<int, Backer>
+     */
     public function findAidLive(?array $params = null): array
     {
         $perimeter = $params['perimeter'] ?? null;
@@ -238,6 +273,10 @@ class BackerRepository extends ServiceEntityRepository
         ;
     }
 
+    /**
+     * @param array<string, mixed>|null $params
+     * @return array<int, Backer>
+     */
     public function findAidFinancersFinancial(?array $params = null): array
     {
         return $this->createQueryBuilder('b')
@@ -259,6 +298,10 @@ class BackerRepository extends ServiceEntityRepository
         ;
     }
 
+    /**
+     * @param array<string, mixed>|null $params
+     * @return array<int, Backer>
+     */
     public function findSelectedForHome(?array $params = null): array
     {
         $params['hasLogo'] = true;
@@ -271,6 +314,10 @@ class BackerRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult();
     }
 
+    /**
+     * @param array<string, mixed>|null $params
+     * @return array<int, Backer>
+     */
     public function findCustom(?array $params = null): array
     {
         $qb = $this->getQueryBuilder($params);
@@ -278,6 +325,10 @@ class BackerRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult();
     }
 
+    /**
+     * @param array<string, mixed>|null $params
+     * @return QueryBuilder
+     */
     public function getQueryBuilder(?array $params = null): QueryBuilder
     {
         $ids = $params['ids'] ?? null;
@@ -340,7 +391,7 @@ class BackerRepository extends ServiceEntityRepository
         if (null !== $nameLike) {
             $qb
                 ->andWhere('b.name LIKE :nameLike')
-                ->setParameter('nameLike', '%'.$nameLike.'%')
+                ->setParameter('nameLike', '%' . $nameLike . '%')
             ;
         }
 
@@ -380,7 +431,9 @@ class BackerRepository extends ServiceEntityRepository
         }
 
         if ($perimeterFrom instanceof Perimeter && $perimeterFrom->getId()) {
-            $ids = $this->getEntityManager()->getRepository(Perimeter::class)->getIdPerimetersContainedIn(['perimeter' => $perimeterFrom]);
+            /** @var PerimeterRepository $perimeterRepository */
+            $perimeterRepository = $this->getEntityManager()->getRepository(Perimeter::class);
+            $ids = $perimeterRepository->getIdPerimetersContainedIn(['perimeter' => $perimeterFrom]);
             $ids[] = $perimeterFrom->getId();
 
             $qb
@@ -409,13 +462,5 @@ class BackerRepository extends ServiceEntityRepository
         }
 
         return $qb;
-    }
-
-    public function getPrograms(int $backer_id)
-    {
-    }
-
-    public function getCategories(int $backer_id)
-    {
     }
 }

@@ -8,7 +8,7 @@ use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<Event>
+ * @extends ServiceEntityRepository<LogEvent>
  *
  * @method LogEvent|null find($id, $lockMode = null, $lockVersion = null)
  * @method LogEvent|null findOneBy(array $criteria, array $orderBy = null)
@@ -22,6 +22,10 @@ class LogEventRepository extends ServiceEntityRepository
         parent::__construct($registry, LogEvent::class);
     }
 
+    /**
+     *
+     * @return integer
+     */
     public function getLatestSiteCountAidLives(): int
     {
         $params['category'] = 'aid';
@@ -40,7 +44,11 @@ class LogEventRepository extends ServiceEntityRepository
         return $result ? $result->getValue() : 4000;
     }
 
-    public function countAlertSent(array $params = null)
+    /**
+     * @param array<string, mixed>|null $params
+     * @return integer
+     */
+    public function countAlertSent(array $params = null): int
     {
         $params['category'] = 'alert';
         $params['event'] = 'sent';
@@ -52,6 +60,10 @@ class LogEventRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult()[0]['nb'] ?? 0;
     }
 
+    /**
+     * @param array<string, mixed>|null $params
+     * @return integer
+     */
     public function countCustom(array $params = null): int
     {
         $qb = $this->getQueryBuilder($params);
@@ -61,6 +73,10 @@ class LogEventRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult()[0]['nb'] ?? 0;
     }
 
+    /**
+     * @param array<string, mixed>|null $params
+     * @return QueryBuilder
+     */
     public function getQueryBuilder(array $params = null): QueryBuilder
     {
         $category = $params['category'] ?? null;

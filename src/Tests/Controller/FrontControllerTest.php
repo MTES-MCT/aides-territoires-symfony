@@ -42,10 +42,14 @@ class FrontControllerTest extends AtWebTestCase
             ];
 
             // on ne test pas l'api ici
-            if (false !== strpos($route->getPath(), 'api')) {
+            $path = $route->getPath();
+            if (null === $path) {
                 continue;
             }
-            if (in_array($route->getPath(), $notToTest)) {
+            if ($path !== null && str_contains($path, 'api')) {
+                continue;
+            }
+            if ($path !== null && in_array($path, $notToTest)) {
                 continue;
             }
             if (

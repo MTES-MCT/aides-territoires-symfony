@@ -5,6 +5,7 @@ namespace App\Repository\Category;
 use App\Entity\Category\Category;
 use App\Entity\Category\CategoryTheme;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -22,6 +23,10 @@ class CategoryRepository extends ServiceEntityRepository
         parent::__construct($registry, Category::class);
     }
 
+    /**
+     * @param array<string, mixed>|null $params
+     * @return int
+     */
     public function countCustom(array $params = null): int
     {
         $qb = $this->getQueryBuilder($params);
@@ -31,7 +36,10 @@ class CategoryRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult()[0]['nb'] ?? 0;
     }
 
-
+    /**
+     * @param array<string, mixed>|null $params
+     * @return string[]
+     */
     public function getNames(?array $params = null): array
     {
         $params['orderBy'] = ['sort' => 'c.name', 'order' => 'ASC'];
@@ -46,6 +54,10 @@ class CategoryRepository extends ServiceEntityRepository
         return array_column($results, 'name');
     }
 
+    /**
+     * @param array<string, mixed> $synonyms
+     * @return array<int, Category>
+     */
     public function findFromSynonyms(array $synonyms): array
     {
         $originalName =
@@ -90,6 +102,10 @@ class CategoryRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult();
     }
 
+    /**
+     * @param array<string, mixed>|null $params
+     * @return array<int, Category>
+     */
     public function findCustom(?array $params = null): array
     {
         $qb = $this->getQueryBuilder($params);
@@ -97,7 +113,11 @@ class CategoryRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult();
     }
 
-    public function getQueryBuilder(array $params = null)
+    /**
+     * @param array<string, mixed>|null $params
+     * @return QueryBuilder
+     */
+    public function getQueryBuilder(array $params = null): QueryBuilder
     {
         $groupBy = $params['groupBy'] ?? null;
         $ids = $params['ids'] ?? null;

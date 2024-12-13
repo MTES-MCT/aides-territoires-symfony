@@ -1271,8 +1271,7 @@ class AidCrudController extends AtCrudController implements EventSubscriberInter
         SpreadsheetExporterService $spreadsheetExporterService,
         string $filename = 'consultations-aides',
         string $format = FileService::FORMAT_XLSX
-    ): Response
-    {
+    ): Response {
         $fields = FieldCollection::new($this->configureFields(Crud::PAGE_INDEX));
         $filters = $this->container->get(FilterFactory::class)->create(
             $context->getCrud()->getFiltersConfig(),

@@ -24,6 +24,10 @@ class LogUserLoginRepository extends ServiceEntityRepository
         parent::__construct($registry, LogUserLogin::class);
     }
 
+    /**
+     *
+     * @return array<int, array{year: string, unique_users: string}>
+     */
     public function getUniqueLoginsByYear(): array
     {
         return
@@ -39,6 +43,10 @@ class LogUserLoginRepository extends ServiceEntityRepository
         ;
     }
 
+    /**
+     *
+     * @return array<int, array{year: string, quarter: string, unique_users: string}>
+     */
     public function getUniqueLoginsByQuarters(): array
     {
         return
@@ -57,6 +65,10 @@ class LogUserLoginRepository extends ServiceEntityRepository
         ;
     }
 
+    /**
+     *
+     * @return array<int, array{year: string, month: string, unique_users: string}>
+     */
     public function getUniqueLoginsByMonth(): array
     {
         return
@@ -75,6 +87,10 @@ class LogUserLoginRepository extends ServiceEntityRepository
         ;
     }
 
+    /**
+     *
+     * @return array<int, array{year: string, week: string, month: string, unique_users: string}>
+     */
     public function getUniqueLoginsByWeek(): array
     {
         return
@@ -95,6 +111,10 @@ class LogUserLoginRepository extends ServiceEntityRepository
         ;
     }
 
+    /**
+     *
+     * @return int
+     */
     public function countUsersLoggedAtLeastOnce(): int
     {
         return
@@ -104,6 +124,11 @@ class LogUserLoginRepository extends ServiceEntityRepository
             ->getSingleScalarResult()
         ;
     }
+
+    /**
+     *
+     * @return int
+     */
     public function countUsersLoggedOnce(): int
     {
         $sql = '
@@ -126,6 +151,11 @@ class LogUserLoginRepository extends ServiceEntityRepository
         $results = $result->fetchAllAssociative();
         return (isset($results[0]) && isset($results[0]['nb'])) ? $results[0]['nb'] : 0;
     }
+
+    /**
+     * @param array<string, mixed> $params
+     * @return int
+     */
     public function countCustom(?array $params = null): int
     {
         $distinctUser = $params['distinctUser'] ?? null;
@@ -138,6 +168,11 @@ class LogUserLoginRepository extends ServiceEntityRepository
         return (int) $qb->getQuery()->getSingleScalarResult();
     }
 
+
+    /**
+     * @param array<string, mixed> $params
+     * @return QueryBuilder
+     */
     public function getQueryBuilder(array $params = null): QueryBuilder
     {
         $user = $params['user'] ?? null;

@@ -26,7 +26,11 @@ class OrganizationRepository extends ServiceEntityRepository
         parent::__construct($registry, Organization::class);
     }
 
-    public function getScaleCovered($scale, ?array $params = null): array
+    /**
+     * @param array<string, mixed>|null $params
+     * @return array<int, Organization>
+     */
+    public function getScaleCovered(int $scale, ?array $params = null): array
     {
         $qb = $this->getQueryBuilder($params)
             ->innerJoin('o.perimeter', 'p')
@@ -40,18 +44,30 @@ class OrganizationRepository extends ServiceEntityRepository
     }
 
 
+    /**
+     * @param array<string, mixed>|null $params
+     * @return int
+     */
     public function countWithUserBeneficiary(?array $params = null): int
     {
         $params['hasUserBeneficiary'] = true;
         return $this->countCustom($params);
     }
 
+    /**
+     * @param array<string, mixed>|null $params
+     * @return int
+     */
     public function countWithUserContributor(?array $params = null): int
     {
         $params['hasUserContributor'] = true;
         return $this->countCustom($params);
     }
 
+    /**
+     * @param array<string, mixed>|null $params
+     * @return int
+     */
     public function countCommune(?array $params = null): int
     {
         $params['typeSlug'] = OrganizationType::SLUG_COMMUNE;
@@ -63,10 +79,13 @@ class OrganizationRepository extends ServiceEntityRepository
         $qb->select('IFNULL(COUNT(DISTINCT(perimeterForScale.id)), 0) AS nb');
 
         return $qb->getQuery()->getResult()[0]['nb'] ?? 0;
-        // return $this->countCustom($params);
     }
 
-    public function countRegistrationsByMonth(array $params = []): array
+    /**
+     * @param array<string, mixed>|null $params
+     * @return array<int, array<string, mixed>>
+     */
+    public function countRegistrationsByMonth(array $params = null): array
     {
         $params['perimeterIsObsolete'] = false;
         $params['isImported'] = false;
@@ -79,6 +98,10 @@ class OrganizationRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult();
     }
 
+    /**
+     * @param array<string, mixed>|null $params
+     * @return array<int, array<string, mixed>>
+     */
     public function findCommunes(?array $params = null): array
     {
         $params['typeSlug'] = OrganizationType::SLUG_COMMUNE;
@@ -102,6 +125,10 @@ class OrganizationRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult();
     }
 
+    /**
+     * @param array<string, mixed>|null $params
+     * @return int
+     */
     public function countInterco(?array $params = null): int
     {
         $params['typeSlug'] = OrganizationType::SLUG_EPCI;
@@ -114,6 +141,11 @@ class OrganizationRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult()[0]['nb'] ?? 0;
     }
 
+
+    /**
+     * @param array<string, mixed>|null $params
+     * @return int
+     */
     public function countEpci(?array $params = null): int
     {
         $params['typeSlug'] = OrganizationType::SLUG_EPCI;
@@ -128,6 +160,10 @@ class OrganizationRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult()[0]['nb'] ?? 0;
     }
 
+    /**
+     * @param array<string, mixed>|null $params
+     * @return array<int, array<string, mixed>>
+     */
     public function findEpcis(?array $params = null): array
     {
         $params['typeSlug'] = OrganizationType::SLUG_EPCI;
@@ -155,6 +191,10 @@ class OrganizationRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult();
     }
 
+    /**
+     * @param array<string, mixed>|null $params
+     * @return array<int, array<string, mixed>>
+     */
     public function countByType(?array $params = null): array
     {
         $qb = $this->getQueryBuilder($params);
@@ -166,6 +206,10 @@ class OrganizationRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult();
     }
 
+    /**
+     * @param array<string, mixed>|null $params
+     * @return int
+     */
     public function countCustom(array $params = null): int
     {
         $qb = $this->getQueryBuilder($params);
@@ -175,6 +219,10 @@ class OrganizationRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult()[0]['nb'] ?? 0;
     }
 
+    /**
+     * @param User $user
+     * @return int
+     */
     public function countCollaborators(User $user): int
     {
         $result = $this->createQueryBuilder('o')
@@ -189,10 +237,10 @@ class OrganizationRepository extends ServiceEntityRepository
         return $result[0]['nb'] ?? 0;
     }
 
-    public function findCounties(Organization $organization)
-    {
-    }
-
+    /**
+     * @param array<string, mixed>|null $params
+     * @return QueryBuilder
+     */
     public function getQueryBuilder(?array $params = null): QueryBuilder
     {
         $typeSlug = $params['typeSlug'] ?? null;

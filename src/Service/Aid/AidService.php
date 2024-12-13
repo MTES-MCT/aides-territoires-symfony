@@ -491,7 +491,11 @@ class AidService // NOSONAR too complex
         }
 
         // Si l'utilisateur est dans l'organisation de l'aide et qu'il n'a pas demandé une edition privée
-        if (!$aid->isPrivateEdition() && $aid->getOrganization() && $aid->getOrganization()->getBeneficiairies()->contains($user)) {
+        if (
+            !$aid->isPrivateEdition()
+            && $aid->getOrganization()
+            && $aid->getOrganization()->getBeneficiairies()->contains($user)
+        ) {
             $access = true;
         }
 

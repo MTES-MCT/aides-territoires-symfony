@@ -225,7 +225,7 @@ class Backer // NOSONAR too much methods
     /** @var ArrayCollection<int, Program> */
     private ArrayCollection $programs;
     /** @var ArrayCollection<int, CategoryTheme> */
-    private ?ArrayCollection $aidsThematics;
+    private ?ArrayCollection $aidsThematics = null;
     /** @var array<string, int> */
     private array $nbAidsByTypeGroupSlug = [];
     /** @var array<string, int> */

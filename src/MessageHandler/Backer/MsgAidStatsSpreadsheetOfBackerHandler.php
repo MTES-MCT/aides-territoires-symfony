@@ -53,7 +53,7 @@ class MsgAidStatsSpreadsheetOfBackerHandler
             $context = $this->routerInterface->getContext();
             $context->setHost($host);
             $context->setScheme('https');
-            
+
             $spreadsheet = $this->aidService->getAidStatsSpreadSheetOfBacker(
                 $backer,
                 $dateMin,

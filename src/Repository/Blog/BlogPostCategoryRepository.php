@@ -21,6 +21,10 @@ class BlogPostCategoryRepository extends ServiceEntityRepository
         parent::__construct($registry, BlogPostCategory::class);
     }
 
+    /**
+     * @param array<string, mixed>|null $params
+     * @return bool
+     */
     public function importOldId(array $params = null): bool
     {
         // on recupere l'id max

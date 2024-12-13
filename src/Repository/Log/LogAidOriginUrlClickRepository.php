@@ -24,6 +24,10 @@ class LogAidOriginUrlClickRepository extends ServiceEntityRepository
         parent::__construct($registry, LogAidOriginUrlClick::class);
     }
 
+    /**
+     * @param array<string, mixed>|null $params
+     * @return array<int, array{nb: integer, aidId: integer}>
+     */
     public function countFormGroup(array $params = null)
     {
         $qb = $this->getQueryBuilder($params);
@@ -35,6 +39,10 @@ class LogAidOriginUrlClickRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult();
     }
 
+    /**
+     * @param array<string, mixed>|null $params
+     * @return array<int, array{nb: integer, id: integer, name: string}>
+     */
     public function countTopAidOnPeriod(?array $params = null): array
     {
         $maxResults = $params['maxResults'] ?? null;
@@ -53,6 +61,10 @@ class LogAidOriginUrlClickRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult();
     }
 
+    /**
+     * @param array<string, mixed>|null $params
+     * @return array<int, array{nb: integer, dateDay: string}>
+     */
     public function countByDay(?array $params = null): array
     {
         $qb = $this->getQueryBuilder($params);
@@ -64,6 +76,10 @@ class LogAidOriginUrlClickRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult();
     }
 
+    /**
+     * @param array<string, mixed>|null $params
+     * @return integer
+     */
     public function countCustom(array $params = null): int
     {
         $qb = $this->getQueryBuilder($params);
@@ -73,6 +89,10 @@ class LogAidOriginUrlClickRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult()[0]['nb'] ?? 0;
     }
 
+    /**
+     * @param array<string, mixed>|null $params
+     * @return QueryBuilder
+     */
     public function getQueryBuilder(array $params = null): QueryBuilder
     {
         $dateMin = $params['dateMin'] ?? null;
@@ -81,7 +101,7 @@ class LogAidOriginUrlClickRepository extends ServiceEntityRepository
         $author = $params['author'] ?? null;
         $aid = $params['aid'] ?? null;
         $aidIds = $params['aidIds'] ?? null;
-        
+
         $qb = $this->createQueryBuilder('laouc');
 
         if ($author instanceof User && $author->getId()) {

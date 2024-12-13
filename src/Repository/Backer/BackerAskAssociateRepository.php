@@ -23,6 +23,9 @@ class BackerAskAssociateRepository extends ServiceEntityRepository
         parent::__construct($registry, BackerAskAssociate::class);
     }
 
+    /**
+     * @return int
+     */
     public function countPendings(): int
     {
         $qb = $this->getQueryBuilder([
@@ -36,6 +39,10 @@ class BackerAskAssociateRepository extends ServiceEntityRepository
             ->getSingleScalarResult();
     }
 
+    /**
+     * @param Organization $organization
+     * @return array<int, BackerAskAssociate>
+     */
     public function findOrganizationRefused(Organization $organization): array
     {
         $params = [
@@ -49,6 +56,10 @@ class BackerAskAssociateRepository extends ServiceEntityRepository
         ;
     }
 
+    /**
+     * @param Organization $organization
+     * @return BackerAskAssociate|null
+     */
     public function findOrganizationPending(Organization $organization): ?BackerAskAssociate
     {
         $params = [
@@ -63,6 +74,10 @@ class BackerAskAssociateRepository extends ServiceEntityRepository
         ;
     }
 
+    /**
+     * @param array<string, mixed>|null $params
+     * @return QueryBuilder
+     */
     public function getQueryBuilder(?array $params = null): QueryBuilder
     {
         $accepted = $params['accepted'] ?? null;
