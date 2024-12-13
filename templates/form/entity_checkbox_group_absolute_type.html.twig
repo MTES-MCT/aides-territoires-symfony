@@ -1,7 +1,8 @@
 {% block entity_checkbox_group_absolute_type_row %}
+	{% set required = form.vars.required|default(false) %}
 	<div class="entity-checkbox-absolute-type-wrapper fr-input-group">
 		{% if form.vars.label %}
-			<label class="fr-label" for="{{ form.vars.id }}_filter">
+			<label class="fr-label {% if required %}required{% endif %}" for="{{ form.vars.id }}_filter">
 				<span class="at-field-label">{{ form.vars.label }}</span>
 			</label>
 		{% endif %}
