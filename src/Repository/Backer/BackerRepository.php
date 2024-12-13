@@ -39,7 +39,7 @@ class BackerRepository extends ServiceEntityRepository
     public static function activeCriteria(string $alias = 'b.'): Criteria
     {
         return Criteria::create()
-            ->andWhere(Criteria::expr()->eq($alias.'active', true))
+            ->andWhere(Criteria::expr()->eq($alias . 'active', true))
         ;
     }
 
@@ -50,7 +50,7 @@ class BackerRepository extends ServiceEntityRepository
     public static function unactiveCriteria(string $alias = 'b.'): Criteria
     {
         return Criteria::create()
-            ->andWhere(Criteria::expr()->eq($alias.'active', false))
+            ->andWhere(Criteria::expr()->eq($alias . 'active', false))
         ;
     }
 
@@ -391,7 +391,7 @@ class BackerRepository extends ServiceEntityRepository
         if (null !== $nameLike) {
             $qb
                 ->andWhere('b.name LIKE :nameLike')
-                ->setParameter('nameLike', '%'.$nameLike.'%')
+                ->setParameter('nameLike', '%' . $nameLike . '%')
             ;
         }
 

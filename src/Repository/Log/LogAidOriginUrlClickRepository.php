@@ -101,7 +101,7 @@ class LogAidOriginUrlClickRepository extends ServiceEntityRepository
         $author = $params['author'] ?? null;
         $aid = $params['aid'] ?? null;
         $aidIds = $params['aidIds'] ?? null;
-        
+
         $qb = $this->createQueryBuilder('laouc');
 
         if ($author instanceof User && $author->getId()) {

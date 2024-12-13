@@ -64,7 +64,7 @@ class LogAidApplicationUrlClickRepository extends ServiceEntityRepository
     /**
      * @param array<string, mixed>|null $params
      * @return array<int, array{nb: integer, dateDay: string}>
-     */   
+     */
     public function countByDay(?array $params = null): array
     {
         $qb = $this->getQueryBuilder($params);

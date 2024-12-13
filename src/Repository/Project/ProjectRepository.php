@@ -239,7 +239,7 @@ class ProjectRepository extends ServiceEntityRepository
 
                 $objects = str_getcsv($objectsString, ' ', '"');
                 $sqlObjects .= ' + ';
-                
+
                 for ($i = 0; $i < count($objects); $i++) {
                     $sqlObjects .= '
                         CASE WHEN (p.name LIKE :objects' . $i . ') THEN 30 ELSE 0 END
