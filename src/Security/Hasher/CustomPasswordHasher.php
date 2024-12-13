@@ -33,7 +33,7 @@ class CustomPasswordHasher implements PasswordHasherInterface
         return false;
     }
 
-    private function makePassword($password)
+    private function makePassword(string $password): string
     {
         $algorithm = "pbkdf2_sha256";
         $iterations = 600000;
@@ -45,7 +45,7 @@ class CustomPasswordHasher implements PasswordHasherInterface
         return $algorithm . "$" . $iterations . "$" . $newSalt . "$" . base64_encode($hash);
     }
 
-    private function verifyPassword($dbString, $password)
+    private function verifyPassword(string $dbString, string $password): bool
     {
         $pieces = explode("$", $dbString);
         $iterations = (int) $pieces[1];

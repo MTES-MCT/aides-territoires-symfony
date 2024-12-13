@@ -18,6 +18,9 @@ class ProjectReferenceMissingRepository extends ServiceEntityRepository
         parent::__construct($registry, ProjectReferenceMissing::class);
     }
 
+    /**
+     * @return array<int, ProjectReferenceMissing>
+     */
     public function findAllOrderByNbAids(): array
     {
         $qb = $this->getQueryBuilder();
@@ -29,6 +32,10 @@ class ProjectReferenceMissingRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult();
     }
 
+    /**
+     * @param array<string, mixed>|null $params
+     * @return array<int, ProjectReferenceMissing>
+     */
     public function findCustom(?array $params = null): array
     {
         $qb = $this->getQueryBuilder($params);
@@ -36,6 +43,10 @@ class ProjectReferenceMissingRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult();
     }
 
+    /**
+     * @param array<string, mixed>|null $params
+     * @return QueryBuilder
+     */
     public function getQueryBuilder(?array $params = null): QueryBuilder
     {
         $nameLike = $params['nameLike'] ?? null;

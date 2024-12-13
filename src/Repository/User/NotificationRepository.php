@@ -23,6 +23,10 @@ class NotificationRepository extends ServiceEntityRepository
         parent::__construct($registry, Notification::class);
     }
 
+    /**
+     * @param array<string, mixed>|null $params
+     * @return array<int, Notification>
+     */
     public function findCustom(?array $params = null): array
     {
         $qb = $this->getQueryBuilder($params);
@@ -30,6 +34,10 @@ class NotificationRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult();
     }
 
+    /**
+     * @param array<string, mixed>|null $params
+     * @return array<int, Notification>
+     */
     public function findToSend(?array $params = null): array
     {
         $params['notRead'] = true;
@@ -40,6 +48,10 @@ class NotificationRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult();
     }
 
+    /**
+     * @param array<string, mixed>|null $params
+     * @return QueryBuilder
+     */
     public function getQueryBuilder(?array $params = null): QueryBuilder
     {
         $user = $params['user'] ?? null;

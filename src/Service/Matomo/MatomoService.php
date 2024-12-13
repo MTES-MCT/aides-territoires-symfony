@@ -2,10 +2,8 @@
 
 namespace App\Service\Matomo;
 
-use App\Entity\Aid\Aid;
 use App\Service\Various\ParamService;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class MatomoService
@@ -23,7 +21,6 @@ class MatomoService
         private RequestStack $requestStack,
         private ParamService $paramService,
         private HttpClientInterface $httpClientInterface,
-        private RouterInterface $routerInterface
     ) {
     }
 

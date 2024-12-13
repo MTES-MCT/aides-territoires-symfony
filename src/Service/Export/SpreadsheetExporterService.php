@@ -19,7 +19,6 @@ use App\Repository\Log\LogAidOriginUrlClickRepository;
 use App\Repository\Log\LogAidViewRepository;
 use App\Repository\User\UserRepository;
 use App\Service\File\FileService;
-use App\Service\Matomo\MatomoService;
 use App\Service\User\UserService;
 use App\Service\Various\StringService;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -52,7 +51,6 @@ class SpreadsheetExporterService
         private LoggerInterface $loggerInterface,
         private MessageBusInterface $messageBusInterface,
         private StringService $stringService,
-        private MatomoService $matomoService
     ) {
     }
 

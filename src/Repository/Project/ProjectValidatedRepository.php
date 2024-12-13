@@ -29,6 +29,10 @@ class ProjectValidatedRepository extends ServiceEntityRepository
         parent::__construct($registry, ProjectValidated::class);
     }
 
+    /**
+     * @param array<string, mixed>|null $params
+     * @return array<int, array<string, mixed>>
+     */
     public function countProjectInCounties(?array $params = null): array
     {
         $qb = $this->createQueryBuilder('p');
@@ -42,6 +46,10 @@ class ProjectValidatedRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult();
     }
 
+    /**
+     * @param array<string, mixed>|null $params
+     * @return int
+     */
     public function countProjectInCounty(array $params = null): int
     {
         $queryBuilder = $this->createQueryBuilder('p');
@@ -58,6 +66,10 @@ class ProjectValidatedRepository extends ServiceEntityRepository
         return $queryBuilder->getQuery()->getResult()[0]['nb'] ?? 0;
     }
 
+    /**
+     * @param array<string, mixed>|null $params
+     * @return array<int, ProjectValidated>
+     */
     public function findProjectInCounty(array $params = null): array
     {
         $queryBuilder = $this->createQueryBuilder('p');
@@ -73,6 +85,10 @@ class ProjectValidatedRepository extends ServiceEntityRepository
         return $queryBuilder->getQuery()->getResult();
     }
 
+    /**
+     * @param array<string, mixed>|null $params
+     * @return array<int, ProjectValidated>
+     */
     public function findProjectInRadius(array $params = null): array
     {
         $perimeter = $params['perimeter'] ?? null;
@@ -229,6 +245,10 @@ class ProjectValidatedRepository extends ServiceEntityRepository
         return $projects;
     }
 
+    /**
+     * @param array<string, mixed>|null $params
+     * @return array<int, ProjectValidated>
+     */
     public function findCustom(?array $params = null): array
     {
         $qb = $this->getQueryBuilder($params);
@@ -250,6 +270,10 @@ class ProjectValidatedRepository extends ServiceEntityRepository
         return $projects;
     }
 
+    /**
+     * @param array<string, mixed>|null $params
+     * @return QueryBuilder
+     */
     public function getQueryBuilder(?array $params = null): QueryBuilder
     {
         $keyword = $params['keyword'] ?? null;

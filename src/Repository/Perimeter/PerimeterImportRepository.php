@@ -2,7 +2,6 @@
 
 namespace App\Repository\Perimeter;
 
-use App\Entity\Perimeter\Perimeter;
 use App\Entity\Perimeter\PerimeterImport;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\QueryBuilder;

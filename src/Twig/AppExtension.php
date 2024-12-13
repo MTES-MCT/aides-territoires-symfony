@@ -387,12 +387,15 @@ class AppExtension extends AbstractExtension // NOSONAR too much methods
      */
     public function getPerimeterScale(string $scale): ?array
     {
-        return $this->perimeterService->getScale($scale);
+        return $this->perimeterService->getScale((int) $scale);
     }
 
     /**
-     * @param ArrayCollection<int, Category>|Category[] $categories
-     * @return array<array{categoryTheme: CategoryTheme, categories: Category[]}>
+     * @param ArrayCollection<int, Category>|array<int, Category> $categories
+     * @return array<int, array{
+     *     categoryTheme: \App\Entity\Category\CategoryTheme,
+     *     categories: array<int, \App\Entity\Category\Category>
+     * }>
      */
     public function categoriesToMetas(ArrayCollection|array $categories): array
     {
@@ -404,7 +407,7 @@ class AppExtension extends AbstractExtension // NOSONAR too much methods
         return $this->userService->getSibEmailId($user);
     }
 
-    public function getMatomoGoalId(): ?string
+    public function getMatomoGoalId(): ?int
     {
         return $this->matomoService->getGoal();
     }

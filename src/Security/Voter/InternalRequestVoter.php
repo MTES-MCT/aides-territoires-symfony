@@ -2,12 +2,16 @@
 
 namespace App\Security\Voter;
 
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 use Symfony\Component\Security\Csrf\CsrfToken;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 
+/**
+ * @extends Voter<string, null>
+ */
 class InternalRequestVoter extends Voter
 {
     public const MESSAGE_ERROR = 'Vous n\'êtes pas autorisé à accéder à cette ressource.';
@@ -45,7 +49,7 @@ class InternalRequestVoter extends Voter
         return true;
     }
 
-    private function validateCsrfToken($request): bool
+    private function validateCsrfToken(Request $request): bool
     {
         $csrfToken = $request->request->get('_token') ?? $request->query->get('_token');
         if (!$csrfToken) {

@@ -26,6 +26,10 @@ class KeywordReferenceRepository extends ServiceEntityRepository
         parent::__construct($registry, KeywordReference::class);
     }
 
+    /**
+     * @param string[] $keywords
+     * @return array<int, KeywordReference>
+     */
     public function findFromKewyordsOrOriginalName(array $keywords, string $originalName): array
     {
         $originalName = $this->stringService->sanitizeBooleanSearch($originalName);
@@ -43,6 +47,9 @@ class KeywordReferenceRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult();
     }
 
+    /**
+     * @return array<int, KeywordReference>
+     */
     public function findIntentionNames(): array
     {
         $qb = $this->createQueryBuilder('kr');
@@ -54,6 +61,11 @@ class KeywordReferenceRepository extends ServiceEntityRepository
         // on le tableau à plat pour ne retourner qu'un tableau de string
         return array_map(fn($item) => $item['name'], $result);
     }
+
+    /**
+     * @param array<string, mixed>|null $params
+     * @return array<int, KeywordReference>
+     */
     public function findArrayOfAllSynonyms(?array $params): array
     {
         $qb = $this->getQueryBuilder($params);
@@ -63,6 +75,10 @@ class KeywordReferenceRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult();
     }
 
+    /**
+     * @param array<string, mixed> $synonyms
+     * @return array<int, KeywordReference>
+     */
     public function findFromSynonyms(array $synonyms): array
     {
         $originalName =
@@ -107,18 +123,30 @@ class KeywordReferenceRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult();
     }
 
+    /**
+     * @param string $string
+     * @return array<int, KeywordReference>
+     */
     public function findFromString(string $string): array
     {
         $qb = $this->getQueryBuilder(['string' => $string]);
         return $qb->getQuery()->getResult();
     }
 
+    /**
+     * @param array<string, mixed>|null $params
+     * @return array<int, KeywordReference>
+     */
     public function findCustom(?array $params = null): array
     {
         $qb = $this->getQueryBuilder($params);
         return $qb->getQuery()->getResult();
     }
 
+    /**
+     * @param array<string, mixed>|null $params
+     * @return QueryBuilder
+     */
     public function getQueryBuilder(?array $params = null): QueryBuilder
     {
         $string = $params['string'] ?? null;
@@ -180,7 +208,7 @@ class KeywordReferenceRepository extends ServiceEntityRepository
 
         if ($string) {
             $words = str_getcsv($string, ' ', '"');
-            if (is_array($words) && !empty($words)) {
+            if (is_array($words)) {
                 $qb->andWhere('kr.name IN (:words)')
                     ->setParameter('words', $words)
                 ;
@@ -198,7 +226,10 @@ class KeywordReferenceRepository extends ServiceEntityRepository
         return $qb;
     }
 
-    public function getAllSynonyms($searchText)
+    /**
+     * @return array<int, array<string, mixed>>
+     */
+    public function getAllSynonyms(string $searchText)
     {
         $sql = "SELECT distinct(k.name),k.intention
         from keyword_reference k
