@@ -26,6 +26,10 @@ class ProjectReferenceRepository extends ServiceEntityRepository
         parent::__construct($registry, ProjectReference::class);
     }
 
+    /**
+     * @param array<string, mixed>|null $params
+     * @return array<int, string>
+     */
     public function getNames(?array $params = null): array
     {
         $params['orderBy'] = ['sort' => 'pr.name', 'order' => 'ASC'];
@@ -40,7 +44,10 @@ class ProjectReferenceRepository extends ServiceEntityRepository
         return array_column($results, 'name');
     }
 
-
+    /**
+     * @param array<string, mixed>|null $params
+     * @return int
+     */
     public function countCustom(?array $params = null): int
     {
         $qb = $this->getQueryBuilder($params);
@@ -48,6 +55,10 @@ class ProjectReferenceRepository extends ServiceEntityRepository
         return (int) $qb->select('COUNT(pr.id)')->getQuery()->getSingleScalarResult();
     }
 
+    /**
+     * @param array<string, mixed>|null $params
+     * @return array<int, ProjectReference>
+     */
     public function findCustom(?array $params = null): array
     {
         $qb = $this->getQueryBuilder($params);
@@ -55,6 +66,10 @@ class ProjectReferenceRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult();
     }
 
+    /**
+     * @param array<string, mixed>|null $params
+     * @return QueryBuilder
+     */
     public function getQueryBuilder(?array $params = null): QueryBuilder
     {
         $projectReferenceCategory = $params['projectReferenceCategory'] ?? null;

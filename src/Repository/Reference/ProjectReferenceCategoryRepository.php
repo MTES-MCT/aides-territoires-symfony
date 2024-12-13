@@ -22,6 +22,10 @@ class ProjectReferenceCategoryRepository extends ServiceEntityRepository
         parent::__construct($registry, ProjectReferenceCategory::class);
     }
 
+    /**
+     * @param array<string, mixed>|null $params
+     * @return int
+     */
     public function countCustom(?array $params = null): int
     {
         return $this->getQueryBuilder($params)
@@ -30,6 +34,10 @@ class ProjectReferenceCategoryRepository extends ServiceEntityRepository
             ->getSingleScalarResult();
     }
 
+    /**
+     * @param array<string, mixed>|null $params
+     * @return array<int, ProjectReferenceCategory>
+     */
     public function findCustom(?array $params = null): array
     {
         return $this->getQueryBuilder($params)
@@ -37,6 +45,10 @@ class ProjectReferenceCategoryRepository extends ServiceEntityRepository
             ->getResult();
     }
 
+    /**
+     * @param array<string, mixed>|null $params
+     * @return QueryBuilder
+     */
     public function getQueryBuilder(?array $params = null): QueryBuilder
     {
         $nameLike = $params['nameLike'] ?? null;

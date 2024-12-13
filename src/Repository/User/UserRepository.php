@@ -28,6 +28,10 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         parent::__construct($registry, User::class);
     }
 
+    /**
+     * @param array<string, string> $userInfos
+     * @return User|null
+     */
     public function findWithProConnectInfo(array $userInfos): ?User
     {
         $qb = $this->createQueryBuilder('u')
@@ -39,6 +43,10 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         return $qb->getQuery()->getOneOrNullResult();
     }
 
+    /**
+     * @param array<string, mixed>|null $params
+     * @return array<string, mixed>|null
+     */
     public function getDefaultOrganizationId(?array $params = null)
     {
         $qb = $this->getQueryBuilder($params);
@@ -51,17 +59,25 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         return $qb->getQuery()->getOneOrNullResult();
     }
 
+    /**
+    * @param array<string, mixed>|null $params
+    * @return int
+    */
     public function countProjectWithAids(?array $params = null)
     {
         $qb = $this->getQueryBuilder($params);
         $qb
             ->select('COUNT(DISTINCT(projects))')
             ->innerJoin('u.projects', 'projects')
-            ->innerJoin('projects.aidProjects', 'aidProjects');
+            ->innerJoin('projects.aidProjects', 'aidProjects')
         ;
         return (int) $qb->getQuery()->getSingleScalarResult();
     }
 
+    /**
+     * @param array<string, mixed>|null $params
+     * @return int
+     */
     public function countCustom(?array $params = null)
     {
         $qb = $this->getQueryBuilder($params);
@@ -70,6 +86,10 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         return (int) $qb->getQuery()->getSingleScalarResult();
     }
 
+    /**
+     * @param array<string, mixed>|null $params
+     * @return int
+     */
     public function countBeneficiaries(?array $params = null)
     {
         $params['isBeneficiary'] = true;
@@ -81,6 +101,10 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         return (int) $qb->getQuery()->getSingleScalarResult();
     }
 
+    /**
+     * @param array<string, mixed>|null $params
+     * @return int
+     */
     public function countContributors(?array $params = null)
     {
         $params['isBeneficiary'] = false;
@@ -92,6 +116,10 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         return (int) $qb->getQuery()->getSingleScalarResult();
     }
 
+    /**
+    * @param array<string, mixed>|null $params
+    * @return int
+    */
     public function countRegistersWithAid(?array $params = null): int
     {
         $qb = $this->getQueryBuilder($params);
@@ -101,6 +129,10 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         return (int) $qb->getQuery()->getSingleScalarResult();
     }
 
+    /**
+     * @param array<string, mixed>|null $params
+     * @return int
+     */
     public function countRegistersWithProject(?array $params = null): int
     {
         $qb = $this->getQueryBuilder($params);
@@ -110,6 +142,10 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         return (int) $qb->getQuery()->getSingleScalarResult();
     }
 
+    /**
+     * @param array<string, mixed>|null $params
+     * @return int
+     */
     public function countRegisters(?array $params = null): int
     {
         $qb = $this->getQueryBuilder($params);
@@ -118,6 +154,10 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         return (int) $qb->getQuery()->getSingleScalarResult();
     }
 
+    /**
+     * @param array<string, mixed>|null $params
+     * @return array<int, array<string, mixed>>
+     */
     public function countRegistersByWeek(?array $params = null): array
     {
         $dateMin = $params['dateMin'] ?? null;
@@ -137,6 +177,7 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
 
         return $qb->getQuery()->getResult();
     }
+
     /**
      * Used to upgrade (rehash) the user's password automatically over time.
      */
@@ -151,6 +192,10 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         $this->getEntityManager()->flush();
     }
 
+    /**
+     * @param array<string, mixed>|null $params
+     * @return array<int, User>
+     */
     public function findCustom(?array $params = null): array
     {
         $qb = $this->getQueryBuilder($params);
@@ -158,6 +203,10 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         return $qb->getQuery()->getResult();
     }
 
+    /**
+     * @param array<string, mixed>|null $params
+     * @return array<int, User>
+     */
     public function findWithUnsentNotification(?array $params = null): array
     {
         $params['hasUnsentNotification'] = true;
@@ -165,6 +214,11 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
 
         return $qb->getQuery()->getResult();
     }
+
+    /**
+     * @param array<string, mixed>|null $params
+     * @return array<int, User>
+     */
     public function findAdmins(array $params = null): array
     {
         $params['onlyAdmin'] = true;
@@ -173,6 +227,10 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         return $qb->getQuery()->getResult();
     }
 
+    /**
+     * @param array<string, mixed>|null $params
+     * @return array<int, User>
+     */
     public function findUsersConnectedSinceYesterday(?array $params = null): array
     {
         $params['connectedSinceYesterday'] = true;
@@ -181,6 +239,10 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         return $qb->getQuery()->getResult();
     }
 
+    /**
+     * @param array<string, mixed>|null $params
+     * @return QueryBuilder
+     */
     public function getQueryBuilder(array $params = null): QueryBuilder
     {
         $onlyAdmin = $params['onlyAdmin'] ?? null;
@@ -313,6 +375,10 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         return $qb;
     }
 
+    /**
+     * @param array<string, mixed>|null $params
+     * @return array<int, array<string, mixed>>
+     */
     public function countRegisterByDay(?array $params = null): array
     {
         $params['dateCreateMin'] = $params['dateCreateMin'] ?? null;

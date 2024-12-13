@@ -6,9 +6,6 @@ use App\Entity\Aid\Aid;
 use App\Entity\Perimeter\Perimeter;
 use App\Service\Various\StringService;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Criteria;
-use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -58,6 +55,11 @@ class PerimeterRepository extends ServiceEntityRepository
         return $qb;
     }
 
+    /**
+     * @param int $idPerimeter
+     * @param array<string, mixed>|null $params
+     * @return Perimeter|null
+     */
     public function getBiggestCity($idPerimeter, ?array $params = null): ?Perimeter
     {
         $params['scale'] = Perimeter::SCALE_COMMUNE;
@@ -73,6 +75,10 @@ class PerimeterRepository extends ServiceEntityRepository
         return $qb->getQuery()->getOneOrNullResult();
     }
 
+    /**
+     * @param array<string, mixed>|null $params
+     * @return array<int, Perimeter>
+     */
     public function getDepartments(?array $params = null): array
     {
         $params['scale'] = Perimeter::SCALE_DEPARTEMENT;
@@ -83,6 +89,10 @@ class PerimeterRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult();
     }
 
+    /**
+     * @param array<string, mixed> $params
+     * @return array<int, array<string, mixed>>
+     */
     public function countNbByOrganization(array $params = []): array
     {
         $scalePerimeter = $params['scalePerimeter'] ?? null;
@@ -132,6 +142,10 @@ class PerimeterRepository extends ServiceEntityRepository
         return $result->fetchAllAssociative();
     }
 
+    /**
+     * @param array<string, mixed>|null $params
+     * @return array<int, int>
+     */
     public function getIdPerimetersContainedIn(array $params = null): array
     {
         $ids = [];
@@ -162,7 +176,10 @@ class PerimeterRepository extends ServiceEntityRepository
         return $ids;
     }
 
-
+    /**
+     * @param array<string, mixed>|null $params
+     * @return array<int, array<string, mixed>>
+     */
     public function findNbBackersByCounty(array $params = null): array
     {
         $qb = $this->createQueryBuilder('p')
@@ -234,7 +251,10 @@ class PerimeterRepository extends ServiceEntityRepository
         return $resultsByCode;
     }
 
-
+    /**
+     * @param array<string, mixed>|null $params
+     * @return array<int, Perimeter>
+     */
     public function findCounties(array $params = null): array
     {
         $params['scale'] = Perimeter::SCALE_COUNTY;
@@ -248,6 +268,10 @@ class PerimeterRepository extends ServiceEntityRepository
         return $results;
     }
 
+    /**
+     * @param array<string, mixed>|null $params
+     * @return int
+     */
     public function countEpci(?array $params = null): int
     {
         $params['scale'] = Perimeter::SCALE_EPCI;
@@ -255,6 +279,10 @@ class PerimeterRepository extends ServiceEntityRepository
         return $this->countCustom($params);
     }
 
+    /**
+     * @param array<string, mixed>|null $params
+     * @return int
+     */
     public function countCustom(array $params = null): int
     {
         $qb = $this->getQueryBuilder($params);
@@ -264,6 +292,10 @@ class PerimeterRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult()[0]['nb'] ?? 0;
     }
 
+    /**
+     * @param array<string, mixed>|null $params
+     * @return array<int, array<string, mixed>>
+     */
     public function findCommunesContained(?array $params = null): array
     {
 
@@ -272,6 +304,10 @@ class PerimeterRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult();
     }
 
+    /**
+     * @param array<string, mixed>|null $params
+     * @return array<int, Perimeter>
+     */
     public function findCustom(array $params = null): array
     {
         $qb = $this->getQueryBuilder($params);
@@ -279,6 +315,10 @@ class PerimeterRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult();
     }
 
+    /**
+     * @param array<string, mixed>|null $params
+     * @return QueryBuilder
+     */
     public function getQueryBuilder(array $params = null): QueryBuilder
     {
         $scale = $params['scale'] ?? null;

@@ -2,6 +2,7 @@
 
 namespace App\Security\Voter;
 
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
@@ -48,7 +49,7 @@ class InternalRequestVoter extends Voter
         return true;
     }
 
-    private function validateCsrfToken($request): bool
+    private function validateCsrfToken(Request $request): bool
     {
         $csrfToken = $request->request->get('_token') ?? $request->query->get('_token');
         if (!$csrfToken) {

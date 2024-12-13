@@ -33,14 +33,22 @@ class ProjectRepository extends ServiceEntityRepository
         parent::__construct($registry, Project::class);
     }
 
-    public static function publicCriteria($alias = 'p.'): Criteria
+    /**
+     * @param string $alias
+     * @return Criteria
+     */
+    public static function publicCriteria(string $alias = 'p.'): Criteria
     {
         return Criteria::create()
             ->andWhere(Criteria::expr()->eq($alias . 'isPublic', true))
         ;
     }
 
-    public static function privateCriteria($alias = 'p.'): Criteria
+    /**
+     * @param string $alias
+     * @return Criteria
+     */
+    public static function privateCriteria(string $alias = 'p.'): Criteria
     {
         return Criteria::create()
             ->andWhere(Criteria::expr()->eq($alias . 'isPublic', false))
@@ -69,6 +77,10 @@ class ProjectRepository extends ServiceEntityRepository
         return $result[0]['nb'] ?? 0;
     }
 
+    /**
+     * @param array<string, mixed> $params
+     * @return array<int, Project>
+     */
     public function findImageToFix(array $params = []): array
     {
         $qb = $this->createQueryBuilder('p')
@@ -78,6 +90,10 @@ class ProjectRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult();
     }
 
+    /**
+     * @param array<string, mixed>|null $params
+     * @return int
+     */
     public function countReviewable(?array $params = null): int
     {
         $params['status'] = Project::STATUS_REVIEWABLE;
@@ -91,6 +107,10 @@ class ProjectRepository extends ServiceEntityRepository
         }
     }
 
+    /**
+     * @param array<string, mixed>|null $params
+     * @return int
+     */
     public function countCustom(?array $params = null): int
     {
         $qb = $this->getQueryBuilder($params);
@@ -99,6 +119,10 @@ class ProjectRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult()[0]['nb'] ?? 0;
     }
 
+    /**
+     * @param array<string, mixed>|null $params
+     * @return array<int, Project>
+     */
     public function findPublicProjects(array $params = null): array
     {
         $params['isPublic'] = true;
@@ -125,6 +149,10 @@ class ProjectRepository extends ServiceEntityRepository
         return $projects;
     }
 
+    /**
+     * @param array<string, mixed>|null $params
+     * @return array<int, Project>
+     */
     public function findCustom(?array $params = null): array
     {
         $qb = $this->getQueryBuilder($params);
@@ -143,6 +171,10 @@ class ProjectRepository extends ServiceEntityRepository
         return $return;
     }
 
+    /**
+    * @param array<string, mixed>|null $params
+    * @return QueryBuilder
+    */
     public function getQueryBuilder(array $params = null): QueryBuilder // NOSONAR too complex
     {
         $isPublic = $params['isPublic'] ?? null;

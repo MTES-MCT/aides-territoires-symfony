@@ -22,11 +22,19 @@ class ApiTokenAskRepository extends ServiceEntityRepository
         parent::__construct($registry, ApiTokenAsk::class);
     }
 
+    /**
+     * @param array<string, mixed>|null $params
+     * @return int
+     */
     public function countPendingAccept(array $params = null): int
     {
         return $this->countCustom(['pendingAccept' => true]);
     }
 
+    /**
+     * @param array<string, mixed>|null $params
+     * @return int
+     */
     public function countCustom(array $params = null): int
     {
         $qb = $this->getQueryBuilder($params);
@@ -36,6 +44,10 @@ class ApiTokenAskRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult()[0]['nb'] ?? 0;
     }
 
+    /**
+     * @param array<string, mixed>|null $params
+     * @return QueryBuilder
+     */
     public function getQueryBuilder(array $params = null): QueryBuilder
     {
         $pendingAccept = $params['pendingAccept'] ?? false;
