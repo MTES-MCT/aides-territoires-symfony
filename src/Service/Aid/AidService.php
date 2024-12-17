@@ -23,7 +23,6 @@ use App\Service\User\UserService;
 use App\Service\Various\StringService;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Persistence\ManagerRegistry;
-use DOMElement;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -43,9 +42,8 @@ class AidService // NOSONAR too complex
     }
 
     /**
-     * Retourne des projets référents suggérés pour une aide
+     * Retourne des projets référents suggérés pour une aide.
      *
-     * @param Aid $aid
      * @return array<int, ProjectReference>
      */
     public function getSuggestedProjectReferences(Aid $aid): array
@@ -74,9 +72,8 @@ class AidService // NOSONAR too complex
     }
 
     /**
-     * Recherche des aides qui semble dupliquées
+     * Recherche des aides qui semble dupliquées.
      *
-     * @param Aid $aid
      * @return array<int, Aid>
      */
     public function getAidDuplicates(Aid $aid): array
@@ -243,13 +240,15 @@ class AidService // NOSONAR too complex
     }
 
     /**
-     * Fonction de recherche des aides
+     * Fonction de recherche des aides.
      *
      * @param array<string, mixed> $aidParams
+     *
      * @return array<int, Aid>
      */
     public function searchAids(array $aidParams): array
     {
+        // return $this->searchAidsV2($aidParams);
         /** @var AidRepository $aidRepo */
         $aidRepo = $this->managerRegistry->getRepository(Aid::class);
         $aids = $aidRepo->findCustom($aidParams);
@@ -286,7 +285,7 @@ class AidService // NOSONAR too complex
 
         $xpath = new \DOMXPath($dom);
         $nodes = $xpath->query('//*[@style]');
-        /** @var DOMElement $node */
+        /** @var \DOMElement $node */
         foreach ($nodes as $node) {
             $itemId = $node->getAttribute('id');
             if ('' == $itemId) {
@@ -309,10 +308,11 @@ class AidService // NOSONAR too complex
     }
 
     /**
-     * Traitement du tableau d'aides après la recherche
+     * Traitement du tableau d'aides après la recherche.
      *
-     * @param array<int, Aid> $aids
+     * @param array<int, Aid>           $aids
      * @param array<string, mixed>|null $params
+     *
      * @return array<int, Aid>
      */
     public function postPopulateAids(array $aids, ?array $params): array
@@ -327,10 +327,11 @@ class AidService // NOSONAR too complex
     }
 
     /**
-     * pour les portails il y a des aides mises en avant et des aides à exclures
+     * pour les portails il y a des aides mises en avant et des aides à exclures.
      *
-     * @param array<int, Aid> $aids
+     * @param array<int, Aid>           $aids
      * @param array<string, mixed>|null $params
+     *
      * @return array<int, Aid>
      */
     public function handleSearchPageRules(array $aids, ?array $params): array // NOSONAR too complex
@@ -376,9 +377,8 @@ class AidService // NOSONAR too complex
             nous affichons la version locale.
     */
     /**
-     *
      * @param array<int, Aid> $aids
-     * @param Perimeter|null $perimeter
+     *
      * @return array<int, Aid>
      */
     public function unDuplicateGenerics(array $aids, ?Perimeter $perimeter): array // NOSONAR too complex
@@ -510,9 +510,6 @@ class AidService // NOSONAR too complex
     /**
      * Recupère les données chez Démarche Simplifiée (DS).
      *
-     * @param Aid $aid
-     * @param User|null $user
-     * @param Organization|null $organization
      * @return array<string, mixed>
      */
     public function getDatasFromDs(Aid $aid, ?User $user, ?Organization $organization): array
@@ -564,12 +561,7 @@ class AidService // NOSONAR too complex
     /**
      * Appel l'API Démarche Simplifiée (DS).
      *
-     * @param int $dsId
      * @param array<string, mixed> $dsMapping
-     * @param UserInterface|null $user
-     * @param Organization|null $organization
-     *
-     * @return mixed
      */
     public function postPrepopulateData(
         int $dsId,
@@ -581,7 +573,7 @@ class AidService // NOSONAR too complex
 
         return $this->httpClientInterface->request(
             'POST',
-            'https://www.demarches-simplifiees.fr/api/public/v1/demarches/' . $dsId . '/dossiers',
+            'https://www.demarches-simplifiees.fr/api/public/v1/demarches/'.$dsId.'/dossiers',
             [
                 'headers' => [
                     'Content-Type' => 'application/json',
@@ -595,8 +587,7 @@ class AidService // NOSONAR too complex
      * Fait le tableau de données à envoyer à Démarche Simplifiée (DS).
      *
      * @param array<string, mixed> $dsMapping
-     * @param UserInterface|null $user
-     * @param Organization|null $organization
+     *
      * @return array<string, mixed>
      */
     public function prepopulateDsFolder(array $dsMapping, ?UserInterface $user, ?Organization $organization): array
@@ -696,7 +687,7 @@ class AidService // NOSONAR too complex
         $minutesMax = 5;
         foreach ($aid->getAidLocks() as $aidLock) {
             // si le lock a plus de 5 min, on le supprime
-            if ($aidLock->getTimeStart() < $now->sub(new \DateInterval('PT' . $minutesMax . 'M'))) {
+            if ($aidLock->getTimeStart() < $now->sub(new \DateInterval('PT'.$minutesMax.'M'))) {
                 $this->managerRegistry->getManager()->remove($aidLock);
                 $this->managerRegistry->getManager()->flush();
                 continue;
@@ -748,18 +739,17 @@ class AidService // NOSONAR too complex
     }
 
     /**
-     * Extraits les mots clés
+     * Extraits les mots clés.
      *
-     * @param Aid $aid
      * @return array<int, array<string, mixed>>
      */
     public function extractKeywords(Aid $aid): array
     {
         // concatene les textes bruts
-        $text = $aid->getName() . ' '
-            . strip_tags((string) $aid->getDescription()) . ' '
-            . strip_tags((string) $aid->getEligibility()) . ' '
-            . strip_tags((string) $aid->getContact());
+        $text = $aid->getName().' '
+            .strip_tags((string) $aid->getDescription()).' '
+            .strip_tags((string) $aid->getEligibility()).' '
+            .strip_tags((string) $aid->getContact());
 
         $commonWords = [
             'pour',
@@ -854,7 +844,7 @@ class AidService // NOSONAR too complex
         $text = preg_replace('/\b\w{1,2}\b/u', '', $text);
 
         // Retirer les mots communs
-        $commonWordsPattern = '/\b(' . implode('|', $commonWords) . ')\b/ui';
+        $commonWordsPattern = '/\b('.implode('|', $commonWords).')\b/ui';
         $text = preg_replace($commonWordsPattern, '', $text);
 
         /** @var KeywordReferenceRepository $keywordReferenceRepository */
@@ -895,14 +885,6 @@ class AidService // NOSONAR too complex
 
     /**
      * @param Aid[] $aids
-     * @param \DateTime $dateMin
-     * @param \DateTime $dateMax
-     * @param StringService $stringService
-     * @param LogAidViewService $logAidViewService
-     * @param LogAidApplicationUrlClickService $logAidApplicationUrlClickService
-     * @param LogAidOriginUrlClickService $logAidOriginUrlClickService
-     * @param AidProjectService $aidProjectService
-     * @return Spreadsheet
      */
     private function getAidStatsSpreadSheet(
         array $aids,
@@ -912,7 +894,7 @@ class AidService // NOSONAR too complex
         LogAidViewService $logAidViewService,
         LogAidApplicationUrlClickService $logAidApplicationUrlClickService,
         LogAidOriginUrlClickService $logAidOriginUrlClickService,
-        AidProjectService $aidProjectService
+        AidProjectService $aidProjectService,
     ): Spreadsheet {
         $spreadsheet = new Spreadsheet();
         $firstAid = true;
@@ -921,7 +903,7 @@ class AidService // NOSONAR too complex
             $sheet = $firstAid ? $spreadsheet->getActiveSheet() : $spreadsheet->createSheet();
             $firstAid = false;
 
-            $sheetTitle = preg_replace('/[^a-zA-Z0-9_]/', '', $aid->getId() . '_' . $aid->getName());
+            $sheetTitle = preg_replace('/[^a-zA-Z0-9_]/', '', $aid->getId().'_'.$aid->getName());
             $sheetTitle = $stringService->truncate($sheetTitle, 31);
             $sheet->setTitle($sheetTitle);
 
@@ -958,7 +940,7 @@ class AidService // NOSONAR too complex
                     $nbProjectPublicsByDay[$currentDay->format('Y-m-d')] ?? '0',
                     $nbProjectPrivatesByDay[$currentDay->format('Y-m-d')] ?? '0',
                 ];
-                $sheet->fromArray($dataRow, null, 'A' . $rowIndex);
+                $sheet->fromArray($dataRow, null, 'A'.$rowIndex);
                 ++$rowIndex;
                 $currentDay->add(new \DateInterval('P1D'));
             }
@@ -970,16 +952,7 @@ class AidService // NOSONAR too complex
     }
 
     /**
-     * Génère un fichier Excel contenant les statistiques des aides
-     *
-     * @param User $user
-     * @param \DateTime $dateMin
-     * @param \DateTime $dateMax
-     * @param StringService $stringService
-     * @param LogAidViewService $logAidViewService
-     * @param LogAidApplicationUrlClickService $logAidApplicationUrlClickService
-     * @param LogAidOriginUrlClickService $logAidOriginUrlClickService
-     * @param AidProjectService $aidProjectService
+     * Génère un fichier Excel contenant les statistiques des aides.
      */
     public function getAidStatsSpreadSheetOfUser(
         User $user,
@@ -990,7 +963,7 @@ class AidService // NOSONAR too complex
         LogAidViewService $logAidViewService,
         LogAidApplicationUrlClickService $logAidApplicationUrlClickService,
         LogAidOriginUrlClickService $logAidOriginUrlClickService,
-        AidProjectService $aidProjectService
+        AidProjectService $aidProjectService,
     ): Spreadsheet {
         $aidsParams = [
             'userWithOrganizations' => $user,
@@ -1022,7 +995,7 @@ class AidService // NOSONAR too complex
         LogAidViewService $logAidViewService,
         LogAidApplicationUrlClickService $logAidApplicationUrlClickService,
         LogAidOriginUrlClickService $logAidOriginUrlClickService,
-        AidProjectService $aidProjectService
+        AidProjectService $aidProjectService,
     ): Spreadsheet {
         $aidsParams = [
             'backer' => $backer,
@@ -1043,5 +1016,34 @@ class AidService // NOSONAR too complex
             $logAidOriginUrlClickService,
             $aidProjectService
         );
+    }
+
+    /**
+     * Fonction de recherche des aides.
+     *
+     * @param array<string, mixed> $aidParams
+     *
+     * @return array<int, Aid>
+     */
+    public function searchAidsV2(array $aidParams): array
+    {
+        /** @var AidRepository $aidRepository */
+        $aidRepository = $this->managerRegistry->getRepository(Aid::class);
+        $aids = $aidRepository->findForSearch($aidParams);
+
+        if (isset($aidParams['projectReference']) && $aidParams['projectReference'] instanceof ProjectReference) {
+            /** @var Aid $aid */
+            foreach ($aids as $aid) {
+                if ($aid->getProjectReferences()->contains($aidParams['projectReference'])) {
+                    $aid->addProjectReferenceSearched($aidParams['projectReference']);
+                }
+            }
+        }
+
+        if (!isset($aidParams['noPostPopulate'])) {
+            $aids = $this->postPopulateAids($aids, $aidParams);
+        }
+
+        return $aids;
     }
 }
