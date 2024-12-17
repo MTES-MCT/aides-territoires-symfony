@@ -850,6 +850,7 @@ class Aid // NOSONAR too much methods
     private Collection $projectReferenceMissings;
 
     #[ORM\ManyToOne(inversedBy: 'lastEditedAids')]
+    #[ORM\JoinColumn(onDelete: DoctrineConstants::SET_NULL)]
     private ?User $lastEditor = null;
 
     #[ORM\Column(type: 'boolean', options: ['default' => false])]
