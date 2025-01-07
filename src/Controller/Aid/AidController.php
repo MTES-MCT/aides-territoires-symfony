@@ -289,7 +289,7 @@ class AidController extends FrontController
         ]);
     }
 
-    #[Route('/aidesV2/', name: 'app_aid_aid_v2')]
+    #[Route('/testrecherche/', name: 'app_aid_aid_v2')]
     public function indexV2(
         RequestStack $requestStack,
         BlogPromotionPostRepository $blogPromotionPostRepository,
