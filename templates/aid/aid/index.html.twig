@@ -58,29 +58,6 @@
 			{% include 'aid/aid/_blog_post_promotion.html.twig' %}
 		{% endif %}
 
-		<div>
-			{% include 'aid/aid/_aid_result_as_list.html.twig' with {'aids': myPager.currentPageResults} %}
-
-			<div class="fr-grid-row" id="aids-as-card">
-				{% for aid in myPager.currentPageResults %}
-					<div class="fr-col-xs-12 fr-col-md-4 fr-p-3w">
-						{% include 'aid/aid/_aid_result.html.twig' %}
-					</div>
-					{% if loop.index0 == 5 %}
-						<div id="save-alert-block" class="at-background-alt-green fr-p-3w">
-							<p class="fr-h5 at-centered">
-								<span aria-hidden="true">🔔</span>
-								Configurez une alerte email pour rester informé des nouveaux dispositifs disponibles pour votre recherche !</p>
-							<div class="fr-grid-row fr-grid-row--center">
-								<button type="button" class="fr-btn js" id="save-alert-results-block-btn" data-fr-opened="false" aria-controls="alert-search-modal">
-									<span class="ri-notification-2-line ri-lg fr-mr-1w"></span>Créer une alerte
-								</button>
-							</div>
-						</div>
-					{% endif %}
-				{% endfor %}
-			</div>
-		</div>
 	</div>
 
 	{% if not app.user %}
