@@ -113,7 +113,7 @@ class AidRepository extends ServiceEntityRepository
         return Criteria::create()
             ->andWhere(Criteria::expr()->eq($alias.'status', Aid::STATUS_PUBLISHED))
             ->andWhere(Criteria::expr()->orX(
-                Criteria::expr()->gte($alias.'dateSubmissionDeadline', $today),
+                Criteria::expr()->gte($alias.'dateSubmissionDeadline', $today->format('Y-m-d')),
                 Criteria::expr()->isNull($alias.'dateSubmissionDeadline')
             ))
         ;

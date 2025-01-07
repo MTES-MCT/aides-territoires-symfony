@@ -362,6 +362,9 @@ class AidController extends FrontController
 
             return new RedirectResponse($newUrl);
         }
+        $timeEnd = microtime(true);
+        $executionTime = $timeEnd - $timeStart;
+        dd('fin test', $executionTime);
         // dd($finalPagerfanta->getNbPages(), $finalPagerfanta->getNbResults());
         // Log recherche
         $logParams = [
