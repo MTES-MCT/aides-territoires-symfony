@@ -19,10 +19,13 @@
 
 		{% include 'aid/aid/_search_meta.html.twig' %}
 
-		{% if synonyms and app.user and isUserGranted(app.user, constant('App\\Entity\\User\\User::ROLE_ADMIN')) %}
+		{% if app.user and isUserGranted(app.user, constant('App\\Entity\\User\\User::ROLE_ADMIN')) %}
 			<div class="fr-alert fr-alert--info">
 				<h2>A des fins de TESTS :</h2>
 				<p>Recherche v2 : <a href="{{ path('app_aid_aid_v2') }}?{{ querystring }}" target="_blank">Version 2</a></p>
+				{% if executionTime is defined %}<p>Temps d'exécution : {{ executionTime }} ms</p>{% endif %}
+				{% if memoryUsage is defined %}<p>Utilisation mémoire : {{ memoryUsage }} Mb</p>{% endif %}
+				{% if synonyms %}
 				<p>
 					<strong>Intentions</strong>
 					:
@@ -44,6 +47,7 @@
 						{{ synonyms.simple_words_string }}{% else %}Aucune
 					{% endif %}
 				</p>
+				{% endif %}
 			</div>
 		{% endif %}
 		<div class="fr-mb-2w">

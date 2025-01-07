@@ -69,6 +69,8 @@ class AidController extends FrontController
         ReferenceService $referenceService,
         BlogPromotionPostService $blogPromotionPostService,
     ): Response {
+        $timeStart = microtime(true);
+
         $requestStack
             ->getCurrentRequest()
             ->getSession()
@@ -264,6 +266,9 @@ class AidController extends FrontController
             $highlightedWords = $referenceService->setHighlightedWords($synonyms, $aidSearchClass->getKeyword());
         }
 
+        $timeEnd = microtime(true);
+        $executionTime = $timeEnd - $timeStart;
+
         // rendu template
         return $this->render('aid/aid/index.html.twig', [
             'formAidSearch' => $formAidSearch->createView(),
@@ -279,6 +284,8 @@ class AidController extends FrontController
             'categoriesName' => $categoriesName,
             'highlightedWords' => $highlightedWords,
             'synonyms' => $synonyms,
+            'executionTime' => round($executionTime * 1000),
+            'memoryUsage' => round(memory_get_peak_usage() / 1024 / 1024),
         ]);
     }
 
@@ -294,6 +301,8 @@ class AidController extends FrontController
         BlogPromotionPostService $blogPromotionPostService,
         AidRepository $aidRepository,
     ): Response {
+        $timeStart = microtime(true);
+
         $requestStack
             ->getCurrentRequest()
             ->getSession()
@@ -493,6 +502,9 @@ class AidController extends FrontController
             $highlightedWords = $referenceService->setHighlightedWords($synonyms, $aidSearchClass->getKeyword());
         }
 
+        $timeEnd = microtime(true);
+        $executionTime = $timeEnd - $timeStart;
+
         // rendu template
         return $this->render('aid/aid/index.html.twig', [
             'formAidSearch' => $formAidSearch->createView(),
@@ -508,6 +520,8 @@ class AidController extends FrontController
             'categoriesName' => $categoriesName,
             'highlightedWords' => $highlightedWords,
             'synonyms' => $synonyms,
+            'executionTime' => round($executionTime * 1000),
+            'memoryUsage' => round(memory_get_peak_usage() / 1024 / 1024),
         ]);
     }
 
