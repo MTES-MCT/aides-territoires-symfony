@@ -335,7 +335,7 @@ class AidController extends FrontController
             'showInSearch' => true,
         ];
 
-        $aidParams = array_merge($aidParams, $aidSearchFormService->convertAidSearchClassToAidParams($aidSearchClass));
+        // $aidParams = array_merge($aidParams, $aidSearchFormService->convertAidSearchClassToAidParams($aidSearchClass));
         $query = parse_url($requestStack->getCurrentRequest()->getRequestUri(), PHP_URL_QUERY) ?? null;
 
         // le paginateur
@@ -364,7 +364,7 @@ class AidController extends FrontController
         }
         $timeEnd = microtime(true);
         $executionTime = $timeEnd - $timeStart;
-        dd('fin test', $executionTime);
+        // dd('fin test', $executionTime);
         // dd($finalPagerfanta->getNbPages(), $finalPagerfanta->getNbResults());
         // Log recherche
         $logParams = [
