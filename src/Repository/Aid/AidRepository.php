@@ -1378,6 +1378,7 @@ class AidRepository extends ServiceEntityRepository
         $perimeterScales = $params['perimeterScales'] ?? null;
 
         $keywords = $params['keywords'] ?? null;
+        $keywords = null;
         $withOldKeywords = $params['withOldKeywords'] ?? null;
         $keyword = $params['keyword'] ?? null;
         if (null !== $keyword) {
