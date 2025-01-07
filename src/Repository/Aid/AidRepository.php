@@ -1423,8 +1423,8 @@ class AidRepository extends ServiceEntityRepository
         $qb = $this->createQueryBuilder('a');
 
         // les liaisons qu'on précharge
-        // $qb->innerJoin('a.perimeter', 'perimeter');
-        // $qb->innerJoin('a.aidRecurrence', 'aidRecurrence');
+        $qb->innerJoin('a.perimeter', 'perimeter');
+        $qb->innerJoin('a.aidRecurrence', 'aidRecurrence');
         // $qb->leftJoin('a.projectReferences', 'projectReferences');
         // $qb->addSelect('perimeter, aidRecurrence, projectReferences');
 

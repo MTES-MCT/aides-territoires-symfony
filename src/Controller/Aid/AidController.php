@@ -313,11 +313,6 @@ class AidController extends FrontController
         ;
         $user = $userService->getUserLogged();
 
-        $timeEnd = microtime(true);
-        $executionTime = $timeEnd - $timeStart;
-        dump('1', round($executionTime * 1000));
-
-        // dd('fin test', $executionTime);
         // gestion pagination
         $currentPage = (int) $requestStack->getCurrentRequest()->get('page', 1);
 
@@ -342,9 +337,7 @@ class AidController extends FrontController
 
         $aidParams = array_merge($aidParams, $aidSearchFormService->convertAidSearchClassToAidParams($aidSearchClass));
         $query = parse_url($requestStack->getCurrentRequest()->getRequestUri(), PHP_URL_QUERY) ?? null;
-        $timeEnd = microtime(true);
-        $executionTime = $timeEnd - $timeStart;
-        dump('2', round($executionTime * 1000));
+
         // le paginateur
         try {
             $aids = $aidService->searchAidsV2($aidParams);
@@ -354,8 +347,6 @@ class AidController extends FrontController
             $pagerfanta = new Pagerfanta($finalAdapter);
             $pagerfanta->setMaxPerPage(self::NB_AID_BY_PAGE);
             $pagerfanta->setCurrentPage($currentPage);
-
-            // dd($finalPagerfanta->getNbPages(), $finalPagerfanta->getNbResults());
         } catch (OutOfRangeCurrentPageException $e) {
             $this->addFlash(
                 FrontController::FLASH_ERROR,
@@ -369,10 +360,7 @@ class AidController extends FrontController
 
             return new RedirectResponse($newUrl);
         }
-        $timeEnd = microtime(true);
-        $executionTime = $timeEnd - $timeStart;
-        dump('3', round($executionTime * 1000));
-        // dd($finalPagerfanta->getNbPages(), $finalPagerfanta->getNbResults());
+
         // Log recherche
         $logParams = [
             'organizationTypes' => (isset($aidParams['organizationType']))
@@ -407,16 +395,10 @@ class AidController extends FrontController
             params: $logParams,
         );
 
-        $timeEnd = microtime(true);
-        $executionTime = $timeEnd - $timeStart;
-        dump('4', round($executionTime * 1000));
-
         // promotions posts
         $blogPromotionPosts = $blogPromotionPostRepository->findPublished($aidParams);
         $blogPromotionPosts = $blogPromotionPostService->handleRequires($blogPromotionPosts, $aidParams);
-        $timeEnd = microtime(true);
-        $executionTime = $timeEnd - $timeStart;
-        dump('5', round($executionTime * 1000));
+
         // page title
         $pageTitle = $pagerfanta->getNbResults().' résultat';
         if ($pagerfanta->getNbResults() > 1) {
@@ -491,9 +473,7 @@ class AidController extends FrontController
                 }
             }
         }
-        $timeEnd = microtime(true);
-        $executionTime = $timeEnd - $timeStart;
-        dump('6', round($executionTime * 1000));
+
         // fil arianne
         $this->breadcrumb->add(
             'Trouver des aides',
@@ -511,9 +491,7 @@ class AidController extends FrontController
                 $categoriesName[] = $category->getName();
             }
         }
-        $timeEnd = microtime(true);
-        $executionTime = $timeEnd - $timeStart;
-        dump('7', round($executionTime * 1000));
+
         // pour avoir la recherche surlignée
         $synonyms = null;
         $highlightedWords = [];
@@ -524,7 +502,7 @@ class AidController extends FrontController
 
         $timeEnd = microtime(true);
         $executionTime = $timeEnd - $timeStart;
-        dump('8', round($executionTime * 1000));
+
         // rendu template
         return $this->render('aid/aid/index.html.twig', [
             'formAidSearch' => $formAidSearch->createView(),
