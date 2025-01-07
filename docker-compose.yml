@@ -10,6 +10,7 @@ services:
         volumes:
           - .docker/config/vhosts:/etc/apache2/sites-enabled
           - .:/home
+        mem_limit: 1g
         depends_on:
           - php
 
@@ -39,5 +40,6 @@ services:
         container_name: at_php
         volumes:
           - .:/home
+        mem_limit: 1g
         depends_on:
           - mysql

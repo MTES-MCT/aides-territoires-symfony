@@ -1327,6 +1327,7 @@ class AidRepository extends ServiceEntityRepository
 
     public function getQueryBuilderForSearch(?array $params = null): QueryBuilder
     {
+        $params = ['showInSearch' => true];
         // config
         $scoreMin = $params['scoreMin'] ?? 80;
         $limit = $params['limit'] ?? null;
@@ -1423,8 +1424,8 @@ class AidRepository extends ServiceEntityRepository
         $qb = $this->createQueryBuilder('a');
 
         // les liaisons qu'on précharge
-        $qb->innerJoin('a.perimeter', 'perimeter');
-        $qb->innerJoin('a.aidRecurrence', 'aidRecurrence');
+        // $qb->innerJoin('a.perimeter', 'perimeter');
+        // $qb->innerJoin('a.aidRecurrence', 'aidRecurrence');
         // $qb->leftJoin('a.projectReferences', 'projectReferences');
         // $qb->addSelect('perimeter, aidRecurrence, projectReferences');
 

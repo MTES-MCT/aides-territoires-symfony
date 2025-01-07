@@ -402,7 +402,7 @@ class AidService // NOSONAR too complex
         /** @var Aid $aid */
         foreach ($aids as $aid) {
             // Si on a un périmètre de recherche
-            if ($perimeterSearch) {
+            if ($perimeterSearch && $aid->getPerimeter()) {
                 $searchSmaller = $perimeterScale <= $aid->getPerimeter()->getScale();
                 $searchWider = $perimeterScale > $aid->getPerimeter()->getScale();
             }
