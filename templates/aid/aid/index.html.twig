@@ -25,6 +25,7 @@
 				<p>Recherche v2 : <a href="{{ path('app_aid_aid_v2') }}?{{ querystring }}" target="_blank">Version 2</a></p>
 				{% if executionTime is defined %}<p>Temps d'exécution : {{ executionTime }} ms</p>{% endif %}
 				{% if memoryUsage is defined %}<p>Utilisation mémoire : {{ memoryUsage }} Mb</p>{% endif %}
+				{% if executionTimeAid is defined %}<p>Temps requête : {{ executionTimeAid }} ms</p>{% endif %}
 				{% if synonyms %}
 				<p>
 					<strong>Intentions</strong>

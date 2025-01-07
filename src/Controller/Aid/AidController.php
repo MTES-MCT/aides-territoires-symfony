@@ -107,7 +107,10 @@ class AidController extends FrontController
         $query = parse_url($requestStack->getCurrentRequest()->getRequestUri(), PHP_URL_QUERY) ?? null;
 
         // le paginateur
+        $timeAidStart = microtime(true);
         $aids = $aidService->searchAids($aidParams);
+        $timeAidEnd = microtime(true);
+        $executionTimeAid = $timeAidEnd - $timeAidStart;
         try {
             $adapter = new ArrayAdapter($aids);
             $pagerfanta = new Pagerfanta($adapter);
@@ -286,6 +289,7 @@ class AidController extends FrontController
             'synonyms' => $synonyms,
             'executionTime' => round($executionTime * 1000),
             'memoryUsage' => round(memory_get_peak_usage() / 1024 / 1024),
+            'executionTimeAid' => round($executionTimeAid * 1000),
         ]);
     }
 
@@ -340,8 +344,11 @@ class AidController extends FrontController
 
         // le paginateur
         try {
+            $timeAidStart = microtime(true);
             $aids = $aidService->searchAidsV2($aidParams);
 
+            $timeAidEnd = microtime(true);
+            $executionTimeAid = $timeAidEnd - $timeAidStart;
             // Créer un nouvel adaptateur avec les résultats traités
             $finalAdapter = new ArrayAdapter($aids);
             $pagerfanta = new Pagerfanta($finalAdapter);
@@ -520,6 +527,7 @@ class AidController extends FrontController
             'synonyms' => $synonyms,
             'executionTime' => round($executionTime * 1000),
             'memoryUsage' => round(memory_get_peak_usage() / 1024 / 1024),
+            'executionTimeAid' => round($executionTimeAid * 1000),
         ]);
     }
 
