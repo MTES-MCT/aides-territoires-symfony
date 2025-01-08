@@ -8,6 +8,8 @@ doctrine:
                 default_table_options:
                     charset: utf8mb4
                     collate: utf8mb4_unicode_ci
+                logging: false
+                profiling: false
 
     orm:
         auto_generate_proxy_classes: true
