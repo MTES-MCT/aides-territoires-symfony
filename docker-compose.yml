@@ -15,7 +15,7 @@ services:
           - php
 
     mysql:
-        image: mysql:8.0.33
+        image: mysql:8.0.35
         container_name: at_mysql
         volumes:
             - .docker/data/db:/var/lib/mysql
@@ -26,7 +26,7 @@ services:
             --innodb_buffer_pool_size=1073741824
             --innodb_log_file_size=268435456
             --innodb_flush_log_at_trx_commit=1
-            --max_connections=112     
+            --max_connections=112
         environment:
             MYSQL_ROOT_PASSWORD: root
             MYSQL_DATABASE: at
