@@ -1,19 +1,18 @@
 version: '3'
 services:
-    apache:
-        build: .docker/apache
-        container_name: at_apache
-        ports:
-          - "8080:80"
-        expose:
-          - "8080"
-        volumes:
-          - .docker/config/vhosts:/etc/apache2/sites-enabled
-          - .:/home
-        mem_limit: 1g
-        depends_on:
-          - php
-
+    nginx:
+      image: nginx:stable-alpine
+      container_name: at_nginx
+      ports:
+        - '8080:80'
+      volumes:
+        - .:/home
+        - .docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+        - ./paas/server.locations:/etc/nginx/server.locations
+      depends_on:
+        - php
+        - mysql
+        
     mysql:
         image: mysql:8.0.35
         container_name: at_mysql
