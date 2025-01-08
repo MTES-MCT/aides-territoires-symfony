@@ -723,42 +723,42 @@ class Aid // NOSONAR too much methods
     /**
      * @var Collection<int, LogAidView>
      */
-    #[ORM\OneToMany(mappedBy: 'aid', targetEntity: LogAidView::class)]
+    #[ORM\OneToMany(mappedBy: 'aid', targetEntity: LogAidView::class, fetch: 'EXTRA_LAZY')]
     #[ORM\JoinColumn(onDelete: DoctrineConstants::SET_NULL)]
     private Collection $logAidViews;
 
     /**
      * @var Collection<int, LogAidApplicationUrlClick>
      */
-    #[ORM\OneToMany(mappedBy: 'aid', targetEntity: LogAidApplicationUrlClick::class)]
+    #[ORM\OneToMany(mappedBy: 'aid', targetEntity: LogAidApplicationUrlClick::class, fetch: 'EXTRA_LAZY')]
     #[ORM\JoinColumn(onDelete: DoctrineConstants::SET_NULL)]
     private Collection $logAidApplicationUrlClicks;
 
     /**
      * @var Collection<int, LogAidOriginUrlClick>
      */
-    #[ORM\OneToMany(mappedBy: 'aid', targetEntity: LogAidOriginUrlClick::class)]
+    #[ORM\OneToMany(mappedBy: 'aid', targetEntity: LogAidOriginUrlClick::class, fetch: 'EXTRA_LAZY')]
     #[ORM\JoinColumn(onDelete: DoctrineConstants::SET_NULL)]
     private Collection $logAidOriginUrlClicks;
 
     /**
      * @var Collection<int, LogAidContactClick>
      */
-    #[ORM\OneToMany(mappedBy: 'aid', targetEntity: LogAidContactClick::class)]
+    #[ORM\OneToMany(mappedBy: 'aid', targetEntity: LogAidContactClick::class, fetch: 'EXTRA_LAZY')]
     #[ORM\JoinColumn(onDelete: DoctrineConstants::SET_NULL)]
     private Collection $logAidContactClicks;
 
     /**
      * @var Collection<int, LogAidCreatedsFolder>
      */
-    #[ORM\OneToMany(mappedBy: 'aid', targetEntity: LogAidCreatedsFolder::class)]
+    #[ORM\OneToMany(mappedBy: 'aid', targetEntity: LogAidCreatedsFolder::class, fetch: 'EXTRA_LAZY')]
     #[ORM\JoinColumn(onDelete: DoctrineConstants::SET_NULL)]
     private Collection $logAidCreatedsFolders;
 
     /**
      * @var Collection<int, LogAidEligibilityTest>
      */
-    #[ORM\OneToMany(mappedBy: 'aid', targetEntity: LogAidEligibilityTest::class)]
+    #[ORM\OneToMany(mappedBy: 'aid', targetEntity: LogAidEligibilityTest::class, fetch: 'EXTRA_LAZY')]
     #[ORM\JoinColumn(onDelete: DoctrineConstants::SET_NULL)]
     private Collection $logAidEligibilityTests;
 
