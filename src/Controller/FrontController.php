@@ -2,8 +2,11 @@
 
 namespace App\Controller;
 
+use App\Repository\Aid\AidRepository;
 use App\Service\Various\Breadcrumb;
+use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Symfony\Component\Routing\Annotation\Route;
 

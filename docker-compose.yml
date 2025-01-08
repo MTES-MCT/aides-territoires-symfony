@@ -10,16 +10,23 @@ services:
         volumes:
           - .docker/config/vhosts:/etc/apache2/sites-enabled
           - .:/home
+        mem_limit: 1g
         depends_on:
           - php
 
     mysql:
-        image: mysql:8.0.33
+        image: mysql:8.0.35
         container_name: at_mysql
         volumes:
             - .docker/data/db:/var/lib/mysql
+        mem_limit: 2g
         command:
-            --sql-mode=ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION  --thread_stack=196608
+            --sql-mode=ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION
+            --thread_stack=196608
+            --innodb_buffer_pool_size=1073741824
+            --innodb_log_file_size=268435456
+            --innodb_flush_log_at_trx_commit=1
+            --max_connections=112
         environment:
             MYSQL_ROOT_PASSWORD: root
             MYSQL_DATABASE: at
@@ -33,5 +40,6 @@ services:
         container_name: at_php
         volumes:
           - .:/home
+        mem_limit: 1g
         depends_on:
           - mysql
