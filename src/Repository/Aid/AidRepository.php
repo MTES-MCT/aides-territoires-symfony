@@ -1611,9 +1611,9 @@ class AidRepository extends ServiceEntityRepository
         // structure
         if ($organizationType instanceof OrganizationType && $organizationType->getId()) {
             $qb
-                ->innerJoin('a.aidAudiences', 'aidAudiences')
-                ->andWhere('aidAudiences IN (:organizationType)')
-                ->setParameter('organizationType', $organizationType);
+                ->andWhere(':organizationType MEMBER OF a.aidAudiences')
+                ->setParameter('organizationType', $organizationType)
+            ;
         }
 
         if ($organizationTypes) {
