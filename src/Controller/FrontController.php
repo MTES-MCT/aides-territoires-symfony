@@ -34,46 +34,4 @@ class FrontController extends AbstractController
             $this->translatorInterface->trans($message)
         );
     }
-
-    #[Route('/test_request/', name: 'app_test_request')]
-    public function testRequests(
-        AidRepository $aidRepository,
-        ManagerRegistry $managerRegistry
-    ): Response
-    {
-        $response = '';
-
-        $timeStart = microtime(true);
-        $countAids = $aidRepository->countCustom();
-        unset($countAids);
-        $managerRegistry->getManager()->clear();
-        $timeEnd = microtime(true);
-        $executionTime = $timeEnd - $timeStart;
-        $response .= '<p>'.(round($executionTime * 1000)).'</p>';
-
-        $timeStart = microtime(true);
-        $aids = $aidRepository->findCustom([
-            'showInSearch',
-            'maxResults' => 1000
-        ]);
-        unset($aids);
-        $managerRegistry->getManager()->clear();
-        $timeEnd = microtime(true);
-        $executionTime = $timeEnd - $timeStart;
-        $response .= '<p>'.(round($executionTime * 1000)).'</p>';
-
-        $timeStart = microtime(true);
-        $qb = $aidRepository->getQueryBuilderForSearch([
-            'showInSearch' => true
-        ]);
-        $aids = $qb->getQuery()->getResult();
-        unset($aids);
-        $managerRegistry->getManager()->clear();
-        $timeEnd = microtime(true);
-        $executionTime = $timeEnd - $timeStart;
-        $response .= '<p>'.(round($executionTime * 1000)).'</p>';
-
-        
-        return new Response($response);
-    }
 }
