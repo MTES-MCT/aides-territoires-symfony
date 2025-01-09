@@ -1309,7 +1309,10 @@ class AidRepository extends ServiceEntityRepository
     {
         $qb = $this->getQueryBuilderForSearch($params);
 
-        $results = $qb->getQuery()->getResult();
+        $query = $qb->getQuery();
+        $query->enableResultCache(3600, 'search_results_'.md5(serialize($params)));
+    
+        $results = $query->getResult();
         $return = [];
         foreach ($results as $result) {
             if ($result instanceof Aid) {
