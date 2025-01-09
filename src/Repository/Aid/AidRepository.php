@@ -24,7 +24,6 @@ use App\Service\Various\StringService;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Criteria;
-use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -1378,6 +1377,10 @@ class AidRepository extends ServiceEntityRepository
         $perimeterTo = $params['perimeterTo'] ?? null;
         $perimeter = $params['perimeter'] ?? null;
         $perimeterScales = $params['perimeterScales'] ?? null;
+        $needJoinPerimeter = false;
+        if ($perimeter || $perimeterFrom || $perimeterFromId || $perimeterFromIds || $perimeterTo || $perimeterScales) {
+            $needJoinPerimeter = true;
+        }
 
         $keywords = $params['keywords'] ?? null;
         $withOldKeywords = $params['withOldKeywords'] ?? null;
@@ -1390,6 +1393,10 @@ class AidRepository extends ServiceEntityRepository
         $projectReference = $params['projectReference'] ?? null;
         $nameLike = $params['nameLike'] ?? null;
         $hasNoKeywordReference = $params['hasNoKeywordReference'] ?? null;
+        $needJoinProjectReference = false;
+        if ($keywords || $projectReference) {
+            $needJoinProjectReference = true;
+        }
 
         $aidStepIds = $params['aidStepIds'] ?? null;
         $aidSteps = $params['aidSteps'] ?? null;
@@ -1425,18 +1432,28 @@ class AidRepository extends ServiceEntityRepository
         $qb = $this->createQueryBuilder('a');
 
         // les liaisons qu'on précharge
-        $qb
-            // ->select('a, perimeter, aidRecurrence, projectReferences')
-            ->select('PARTIAL a.{id, name, slug}')
-            // ->select('a')
-            ->addSelect('PARTIAL perimeter.{id, name}')  // pour perimeter
-            // ->addSelect('PARTIAL aidRecurrence.{id, name}') // pour aid_recurrence
-            ->addSelect('PARTIAL projectReferences.{id, name}') // pour project_reference
-            ->innerJoin('a.perimeter', 'perimeter')
-            // ->leftJoin('a.aidRecurrence', 'aidRecurrence')
-            ->leftJoin('a.projectReferences', 'projectReferences')
-        ;
-
+        // $qb
+        //     // ->select('a, perimeter, aidRecurrence, projectReferences')
+        //     ->select('PARTIAL a.{id, name, slug}')
+        //     // ->select('a')
+        //     ->addSelect('PARTIAL perimeter.{id, name}')  // pour perimeter
+        //     // ->addSelect('PARTIAL aidRecurrence.{id, name}') // pour aid_recurrence
+        //     ->addSelect('PARTIAL projectReferences.{id, name}') // pour project_reference
+        //     ->innerJoin('a.perimeter', 'perimeter')
+        //     // ->leftJoin('a.aidRecurrence', 'aidRecurrence')
+        //     ->leftJoin('a.projectReferences', 'projectReferences')
+        // ;
+        $qb->select('PARTIAL a.{id, name, slug}');
+        if ($needJoinPerimeter) {
+            $qb
+                ->innerJoin('a.perimeter', 'perimeter')
+            ;
+        }
+        if ($needJoinProjectReference) {
+            $qb
+                ->innerJoin('a.projectReferences', 'projectReferences')
+            ;
+        }
 
         // LES CRITERES
         // aide
@@ -1717,74 +1734,74 @@ class AidRepository extends ServiceEntityRepository
                 $qb->setParameter('originalName', $originalName);
             }
 
-            // if ($projectReference instanceof ProjectReference && $projectReference->getId()) {
-            //     if ('' !== $sqlScore) {
-            //         $sqlScore .= ' + ';
-            //     }
-            //     $sqlScore .= '
-            //         CASE
-            //             WHEN :projectReference MEMBER OF a.projectReferences THEN 2000
-            //             ELSE 0
-            //         END
-            //     ';
+            if ($projectReference instanceof ProjectReference && $projectReference->getId()) {
+                if ('' !== $sqlScore) {
+                    $sqlScore .= ' + ';
+                }
+                $sqlScore .= '
+                    CASE
+                        WHEN :projectReference MEMBER OF a.projectReferences THEN 2000
+                        ELSE 0
+                    END
+                ';
 
-            //     $qb
-            //         ->setParameter('projectReference', $projectReference);
+                $qb
+                    ->setParameter('projectReference', $projectReference);
 
-            //     if (!$projectReference->getRequiredKeywordReferences()->isEmpty()) {
-            //         // fait un tableau unique des mots clés requis et de ses synonymes
-            //         $requiredKeywordReferencesName = [];
-            //         foreach ($projectReference->getRequiredKeywordReferences() as $keywordReference) {
-            //             $requiredKeywordReferencesName[] = $keywordReference->getName();
-            //             foreach ($keywordReference->getKeywordReferences() as $subKeyword) {
-            //                 $requiredKeywordReferencesName[] = $subKeyword->getName();
-            //             }
-            //             if (
-            //                 $keywordReference->getParent()
-            //                 && $keywordReference->getParent()->getId() !== $keywordReference->getId()
-            //             ) {
-            //                 $requiredKeywordReferencesName[] = $keywordReference->getParent()->getName();
-            //                 foreach ($keywordReference->getParent()->getKeywordReferences() as $subKeyword) {
-            //                     $requiredKeywordReferencesName[] = $subKeyword->getName();
-            //                 }
-            //             }
-            //         }
-            //         $requiredKeywordReferencesName = array_unique($requiredKeywordReferencesName);
+                if (!$projectReference->getRequiredKeywordReferences()->isEmpty()) {
+                    // fait un tableau unique des mots clés requis et de ses synonymes
+                    $requiredKeywordReferencesName = [];
+                    foreach ($projectReference->getRequiredKeywordReferences() as $keywordReference) {
+                        $requiredKeywordReferencesName[] = $keywordReference->getName();
+                        foreach ($keywordReference->getKeywordReferences() as $subKeyword) {
+                            $requiredKeywordReferencesName[] = $subKeyword->getName();
+                        }
+                        if (
+                            $keywordReference->getParent()
+                            && $keywordReference->getParent()->getId() !== $keywordReference->getId()
+                        ) {
+                            $requiredKeywordReferencesName[] = $keywordReference->getParent()->getName();
+                            foreach ($keywordReference->getParent()->getKeywordReferences() as $subKeyword) {
+                                $requiredKeywordReferencesName[] = $subKeyword->getName();
+                            }
+                        }
+                    }
+                    $requiredKeywordReferencesName = array_unique($requiredKeywordReferencesName);
 
-            //         // on ajoute des guillemets si le mot clé contient un espace, ex: "batiment scolaire"
-            //         $transformedTerms = array_map(function ($term) {
-            //             return false !== strpos($term, ' ') ? '"'.$term.'"' : $term;
-            //         }, $requiredKeywordReferencesName);
+                    // on ajoute des guillemets si le mot clé contient un espace, ex: "batiment scolaire"
+                    $transformedTerms = array_map(function ($term) {
+                        return false !== strpos($term, ' ') ? '"'.$term.'"' : $term;
+                    }, $requiredKeywordReferencesName);
 
-            //         // on transforme le tableau en string pour la recherche fulltext
-            //         $requiredKeywordReferencesNameString = implode(' ', $transformedTerms);
+                    // on transforme le tableau en string pour la recherche fulltext
+                    $requiredKeywordReferencesNameString = implode(' ', $transformedTerms);
 
-            //         $qb->andWhere('
-            //             MATCH_AGAINST(a.name, a.nameInitial, a.description, a.eligibility, a.projectExamples) '
-            //             .'AGAINST (:requireKeywordReferencesString IN BOOLEAN MODE) > 0 '
-            //             .'OR :projectReference MEMBER OF a.projectReferences
-            //         ');
-            //         $qb->setParameter('requireKeywordReferencesString', $requiredKeywordReferencesNameString);
-            //     }
-            // }
+                    $qb->andWhere('
+                        MATCH_AGAINST(a.name, a.nameInitial, a.description, a.eligibility, a.projectExamples) '
+                        .'AGAINST (:requireKeywordReferencesString IN BOOLEAN MODE) > 0 '
+                        .'OR :projectReference MEMBER OF a.projectReferences
+                    ');
+                    $qb->setParameter('requireKeywordReferencesString', $requiredKeywordReferencesNameString);
+                }
+            }
 
-            // // les keywordReferences
-            // /** @var KeywordReferenceRepository $keywordReferenceRepository */
-            // $keywordReferenceRepository = $this->getEntityManager()->getRepository(KeywordReference::class);
-            // $keywordReferencesSynonyms = $keywordReferenceRepository->findFromSynonyms($synonyms);
-            // if (!empty($keywordReferencesSynonyms)) {
-            //     if ('' !== $sqlScore) {
-            //         $sqlScore .= ' + ';
-            //     }
+            // les keywordReferences
+            /** @var KeywordReferenceRepository $keywordReferenceRepository */
+            $keywordReferenceRepository = $this->getEntityManager()->getRepository(KeywordReference::class);
+            $keywordReferencesSynonyms = $keywordReferenceRepository->findFromSynonyms($synonyms);
+            if (!empty($keywordReferencesSynonyms)) {
+                if ('' !== $sqlScore) {
+                    $sqlScore .= ' + ';
+                }
 
-            //     $sqlScore .= '
-            //     CASE
-            //         WHEN :keywordReferences MEMBER OF a.keywordReferences THEN 80
-            //         ELSE 0
-            //     END
-            //     ';
-            //     $qb->setParameter('keywordReferences', $keywordReferencesSynonyms);
-            // }
+                $sqlScore .= '
+                CASE
+                    WHEN :keywordReferences MEMBER OF a.keywordReferences THEN 80
+                    ELSE 0
+                END
+                ';
+                $qb->setParameter('keywordReferences', $keywordReferencesSynonyms);
+            }
 
             // les objets
             if ($objectsString) {
