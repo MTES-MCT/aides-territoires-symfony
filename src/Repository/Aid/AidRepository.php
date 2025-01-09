@@ -1329,7 +1329,7 @@ class AidRepository extends ServiceEntityRepository
     public function getQueryBuilderForSearch(?array $params = null): QueryBuilder
     {
         // config
-        $scoreMin = $params['scoreMin'] ?? 80;
+        $scoreMin = $params['scoreMin'] ?? 60;
         $limit = $params['limit'] ?? null;
         $firstResult = $params['firstResult'] ?? null;
         $maxResults = $params['maxResults'] ?? null;
@@ -1809,9 +1809,9 @@ class AidRepository extends ServiceEntityRepository
                     $sqlScore .= ' + ';
                 }
                 $sqlScore .= '
-                    CASE WHEN (MATCH_AGAINST(a.name) AGAINST(:objects_string) > 0.8) THEN 30 ELSE 0 END
-                    + CASE WHEN (MATCH_AGAINST(a.nameInitial) AGAINST(:objects_string) > 0.8) THEN 30 ELSE 0 END
-                    + CASE WHEN (MATCH_AGAINST(a.description, a.eligibility, a.projectExamples) AGAINST(:objects_string) > 0.8) THEN 30 ELSE 0 END              ';
+                    CASE WHEN (MATCH_AGAINST(a.name) AGAINST(:objects_string) > 0.8) THEN 60 ELSE 0 END
+                    + CASE WHEN (MATCH_AGAINST(a.nameInitial) AGAINST(:objects_string) > 0.8) THEN 60 ELSE 0 END
+                    + CASE WHEN (MATCH_AGAINST(a.description, a.eligibility, a.projectExamples) AGAINST(:objects_string) > 0.8) THEN 10 ELSE 0 END              ';
                 $qb->setParameter('objects_string', $objectsString);
             }
 
@@ -1821,9 +1821,9 @@ class AidRepository extends ServiceEntityRepository
                     $sqlScore .= ' + ';
                 }
                 $sqlScore .= '
-                    CASE WHEN (MATCH_AGAINST(a.name) AGAINST(:intentions_string) > 0.8) THEN 30 ELSE 0 END
-                    + CASE WHEN (MATCH_AGAINST(a.nameInitial) AGAINST(:intentions_string) > 0.8) THEN 30 ELSE 0 END
-                    + CASE WHEN (MATCH_AGAINST(a.description, a.eligibility, a.projectExamples) AGAINST(:intentions_string) > 0.8) THEN 30 ELSE 0 END
+                    CASE WHEN (MATCH_AGAINST(a.name) AGAINST(:intentions_string) > 0.8) THEN 10 ELSE 0 END
+                    + CASE WHEN (MATCH_AGAINST(a.nameInitial) AGAINST(:intentions_string) > 0.8) THEN 10 ELSE 0 END
+                    + CASE WHEN (MATCH_AGAINST(a.description, a.eligibility, a.projectExamples) AGAINST(:intentions_string) > 0.8) THEN 5 ELSE 0 END
                 ';
                 $qb->setParameter('intentions_string', $intentionsString);
             }
@@ -1834,9 +1834,9 @@ class AidRepository extends ServiceEntityRepository
                     $sqlScore .= ' + ';
                 }
                 $sqlScore .= '
-                    CASE WHEN (MATCH_AGAINST(a.name) AGAINST(:simple_words_string) > 0.8) THEN 30 ELSE 0 END
-                    + CASE WHEN (MATCH_AGAINST(a.nameInitial) AGAINST(:simple_words_string) > 0.8) THEN 30 ELSE 0 END
-                    + CASE WHEN (MATCH_AGAINST(a.description, a.eligibility, a.projectExamples) AGAINST(:simple_words_string) > 0.8) THEN 30 ELSE 0 END
+                    CASE WHEN (MATCH_AGAINST(a.name) AGAINST(:simple_words_string) > 0.8) THEN 60 ELSE 0 END
+                    + CASE WHEN (MATCH_AGAINST(a.nameInitial) AGAINST(:simple_words_string) > 0.8) THEN 60 ELSE 0 END
+                    + CASE WHEN (MATCH_AGAINST(a.description, a.eligibility, a.projectExamples) AGAINST(:simple_words_string) > 0.8) THEN 10 ELSE 0 END
                 ';
                 $qb->setParameter('simple_words_string', $simpleWordsString);
             }
