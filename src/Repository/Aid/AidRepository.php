@@ -24,6 +24,7 @@ use App\Service\Various\StringService;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Criteria;
+use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -1308,7 +1309,8 @@ class AidRepository extends ServiceEntityRepository
     public function findForSearch(?array $params = null): array
     {
         $qb = $this->getQueryBuilderForSearch($params);
-        $results = $qb->getQuery()->getResult();
+        $results = $qb->getQuery()
+        ->getResult();
 
         $return = [];
         foreach ($results as $result) {
@@ -1429,10 +1431,10 @@ class AidRepository extends ServiceEntityRepository
             // ->select('a')
             ->addSelect('PARTIAL perimeter.{id, name}')  // pour perimeter
             // ->addSelect('PARTIAL aidRecurrence.{id, name}') // pour aid_recurrence
-            ->addSelect('PARTIAL projectReferences.{id, name}') // pour project_reference
-            ->leftJoin('a.perimeter', 'perimeter')
+            // ->addSelect('PARTIAL projectReferences.{id, name}') // pour project_reference
+            ->innerJoin('a.perimeter', 'perimeter')
             // ->leftJoin('a.aidRecurrence', 'aidRecurrence')
-            ->leftJoin('a.projectReferences', 'projectReferences')
+            // ->leftJoin('a.projectReferences', 'projectReferences')
         ;
 
 
