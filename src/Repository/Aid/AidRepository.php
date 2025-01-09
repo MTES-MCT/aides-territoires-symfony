@@ -1307,12 +1307,15 @@ class AidRepository extends ServiceEntityRepository
 
     public function findForSearch(?array $params = null): array
     {
+        $timeAidStart = microtime(true);
         $qb = $this->getQueryBuilderForSearch($params);
-
-        $query = $qb->getQuery();
-        $query->enableResultCache(3600, 'search_results_'.md5(serialize($params)));
-    
-        $results = $query->getResult();
+        $timeAidEnd = microtime(true);
+        $executionTimeAid = $timeAidEnd - $timeAidStart;
+        dump(round($executionTimeAid * 1000));
+        $results = $qb->getQuery()->getResult();
+        $timeAidEnd = microtime(true);
+        $executionTimeAid = $timeAidEnd - $timeAidStart;
+        dump(round($executionTimeAid * 1000));
         $return = [];
         foreach ($results as $result) {
             if ($result instanceof Aid) {
@@ -1324,7 +1327,9 @@ class AidRepository extends ServiceEntityRepository
                 $return[] = $result[0];
             }
         }
-
+        $timeAidEnd = microtime(true);
+        $executionTimeAid = $timeAidEnd - $timeAidStart;
+        dump(round($executionTimeAid * 1000));
         return $return;
     }
 
@@ -1427,11 +1432,17 @@ class AidRepository extends ServiceEntityRepository
 
         // les liaisons qu'on précharge
         $qb
-            ->select('a, perimeter, aidRecurrence, projectReferences')
+            // ->select('a, perimeter, aidRecurrence, projectReferences')
+            ->select('PARTIAL a.{id, name, slug, description}')
+            // ->select('a')
+            ->addSelect('PARTIAL perimeter.{id, name}')  // pour perimeter
+            // ->addSelect('PARTIAL aidRecurrence.{id, name}') // pour aid_recurrence
+            ->addSelect('PARTIAL projectReferences.{id, name}') // pour project_reference
             ->leftJoin('a.perimeter', 'perimeter')
-            ->leftJoin('a.aidRecurrence', 'aidRecurrence')
+            // ->leftJoin('a.aidRecurrence', 'aidRecurrence')
             ->leftJoin('a.projectReferences', 'projectReferences')
         ;
+
 
         // LES CRITERES
         // aide
