@@ -1789,13 +1789,10 @@ class AidRepository extends ServiceEntityRepository
                 if ('' !== $sqlScore) {
                     $sqlScore .= ' + ';
                 }
-                // $sqlScore .= '
-                //     (MATCH_AGAINST(a.name) AGAINST(:objects_string)) * 10
-                //     + (MATCH_AGAINST(a.nameInitial) AGAINST(:objects_string)) * 10
-                //     + (MATCH_AGAINST(a.description, a.eligibility, a.projectExamples) AGAINST(:objects_string)) * 5
-                // ';
                 $sqlScore .= '
-                    (MATCH_AGAINST(a.name, a.nameInitial, a.description, a.eligibility, a.projectExamples) AGAINST(:objects_string)) * 10
+                    (MATCH_AGAINST(a.name) AGAINST(:objects_string)) * 10
+                    + (MATCH_AGAINST(a.nameInitial) AGAINST(:objects_string)) * 10
+                    + (MATCH_AGAINST(a.description, a.eligibility, a.projectExamples) AGAINST(:objects_string)) * 5
                 ';
                 $qb->setParameter('objects_string', $objectsString);
             }
@@ -1805,13 +1802,10 @@ class AidRepository extends ServiceEntityRepository
                 if ('' !== $sqlScore) {
                     $sqlScore .= ' + ';
                 }
-                // $sqlScore .= '
-                //     (MATCH_AGAINST(a.name) AGAINST(:intentions_string)) * 1
-                //     + (MATCH_AGAINST(a.nameInitial) AGAINST(:intentions_string)) * 1
-                //     + (MATCH_AGAINST(a.description, a.eligibility, a.projectExamples) AGAINST(:intentions_string)) * 1
-                // ';
                 $sqlScore .= '
-                    (MATCH_AGAINST(a.name, a.nameInitial, a.description, a.eligibility, a.projectExamples) AGAINST(:intentions_string)) * 10
+                    (MATCH_AGAINST(a.name) AGAINST(:intentions_string)) * 1
+                    + (MATCH_AGAINST(a.nameInitial) AGAINST(:intentions_string)) * 1
+                    + (MATCH_AGAINST(a.description, a.eligibility, a.projectExamples) AGAINST(:intentions_string)) * 1
                 ';
                 $qb->setParameter('intentions_string', $intentionsString);
             }
@@ -1821,13 +1815,10 @@ class AidRepository extends ServiceEntityRepository
                 if ('' !== $sqlScore) {
                     $sqlScore .= ' + ';
                 }
-                // $sqlScore .= '
-                //     (MATCH_AGAINST(a.name) AGAINST(:simple_words_string)) * 10
-                //     + (MATCH_AGAINST(a.nameInitial) AGAINST(:simple_words_string)) * 10
-                //     + (MATCH_AGAINST(a.description, a.eligibility, a.projectExamples) AGAINST(:simple_words_string)) * 5
-                // ';
                 $sqlScore .= '
-                    (MATCH_AGAINST(a.name, a.nameInitial, a.description, a.eligibility, a.projectExamples) AGAINST(:simple_words_string)) * 10
+                    (MATCH_AGAINST(a.name) AGAINST(:simple_words_string)) * 10
+                    + (MATCH_AGAINST(a.nameInitial) AGAINST(:simple_words_string)) * 10
+                    + (MATCH_AGAINST(a.description, a.eligibility, a.projectExamples) AGAINST(:simple_words_string)) * 5
                 ';
                 $qb->setParameter('simple_words_string', $simpleWordsString);
             }
