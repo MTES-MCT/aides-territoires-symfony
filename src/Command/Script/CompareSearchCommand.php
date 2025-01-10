@@ -15,6 +15,8 @@ use App\Repository\Aid\AidRepository;
 use App\Service\Aid\AidService;
 use App\Service\Various\ParamService;
 use App\Service\Api\InternalApiService;
+use Symfony\Component\Routing\RouterInterface;
+use App\Service\File\FileService;
 
 #[AsCommand(name: 'at:script:compare_search', description: 'Compare les recherches')]
 class CompareSearchCommand extends Command
@@ -31,7 +33,9 @@ class CompareSearchCommand extends Command
         private AidRepository $aidRepository,
         private AidService $aidService,
         private ParamService $paramService,
-        private InternalApiService $internalApiService
+        private InternalApiService $internalApiService,
+        private RouterInterface $routerInterface,
+        private FileService $fileService
     ) {
         ini_set('max_execution_time', 60 * 60);
         ini_set('memory_limit', '1G');
@@ -51,6 +55,24 @@ class CompareSearchCommand extends Command
         $projectReferences = $this->projectReferenceRepository->findBy(
             [],
             ['name' => 'ASC']
+        );
+
+        $csvExportFolder = $this->fileService->getProjectDir() . '/datas/';
+        $csvExportFile = $csvExportFolder . 'compare_search.csv';
+
+        // création du fichier CSV
+        $file = fopen($csvExportFile, 'w');
+        fputcsv(
+            $file,
+            [
+                'Projet référent',
+                'Ancien comptage',
+                'Nouveau comptage',
+                'Différence',
+                'Ancienne url',
+                'Nouvelle url'
+            ],
+            ';'
         );
 
         $xAuthKey = $this->paramService->get('X_AUTH_KEY');
@@ -73,8 +95,32 @@ class CompareSearchCommand extends Command
 
             $countOld = $response['count'];
             $countNew = count($this->aidService->searchAidsV2($aidParams));
+
+            $aidUrl = $this->routerInterface->generate(
+                'app_aid_aid',
+                [
+                    'keyword' => $projectReference->getName()
+                ],
+                RouterInterface::ABSOLUTE_URL
+            );
+
+            // on écrit le csv
+            fputcsv(
+                $file,
+                [
+                    $projectReference->getName(),
+                    $countOld,
+                    $countNew,
+                    $countNew - $countOld,
+                    str_replace('http://localhost', 'https://aides-territoires.beta.gouv.fr', $aidUrl),
+                    str_replace('http://localhost/aides', 'https://aides-terr-php-staging-pr445.osc-fr1.scalingo.io/testrecherche', $aidUrl),
+                ],
+                ';'
+            );
             $io->comment($projectReference->getName() . ' ' . $countOld . ' ' . $countNew);
         }
+
+        fclose($file);
 
         $timeEnd = microtime(true);
         $time = $timeEnd - $timeStart;
