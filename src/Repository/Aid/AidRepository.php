@@ -1827,16 +1827,16 @@ class AidRepository extends ServiceEntityRepository
                     return $string;
                 }, $objects);
                 $objectsStringwithAsterisk = implode(' ', $objects);
-                $sqlScore .= '
-                    CASE WHEN (MATCH_AGAINST(a.name) AGAINST(:objects_string) > 0.8) THEN 60 ELSE 0 END
-                    + CASE WHEN (MATCH_AGAINST(a.nameInitial) AGAINST(:objects_string) > 0.8) THEN 60 ELSE 0 END
-                    + CASE WHEN (MATCH_AGAINST(a.description, a.eligibility, a.projectExamples) AGAINST(:objects_string_asterisk IN BOOLEAN MODE) > 0.8) THEN 30 ELSE 0 END
-                ';
                 // $sqlScore .= '
                 //     CASE WHEN (MATCH_AGAINST(a.name) AGAINST(:objects_string) > 0.8) THEN 60 ELSE 0 END
                 //     + CASE WHEN (MATCH_AGAINST(a.nameInitial) AGAINST(:objects_string) > 0.8) THEN 60 ELSE 0 END
-                //     + MATCH_AGAINST(a.description, a.eligibility, a.projectExamples) AGAINST(:objects_string_asterisk IN BOOLEAN MODE) * 10
+                //     + CASE WHEN (MATCH_AGAINST(a.description, a.eligibility, a.projectExamples) AGAINST(:objects_string_asterisk IN BOOLEAN MODE) > 0.8) THEN 30 ELSE 0 END
                 // ';
+                $sqlScore .= '
+                    CASE WHEN (MATCH_AGAINST(a.name) AGAINST(:objects_string) > 0.8) THEN 60 ELSE 0 END
+                    + CASE WHEN (MATCH_AGAINST(a.nameInitial) AGAINST(:objects_string) > 0.8) THEN 60 ELSE 0 END
+                    + MATCH_AGAINST(a.description, a.eligibility, a.projectExamples) AGAINST(:objects_string_asterisk IN BOOLEAN MODE) * 10
+                ';
                 $qb->setParameter('objects_string', $objectsString);
                 $qb->setParameter('objects_string_asterisk', $objectsStringwithAsterisk);
             }
