@@ -1,0 +1,65 @@
+action;terme;synonymes
+1;aménagement;urbanisme,infrastructure,équipement,travaux,voirie,cadre de vie
+0;collectivité;commune,intercommunalité,département,région,territoire,EPCI,établissement public
+0;voirie;route,chaussée,circulation,trottoir,infrastructure routière,réseau routier,chemin
+1;rénovation;réhabilitation,restauration,amélioration,travaux,modernisation,restructuration,remise en état
+0;patrimoine;bâtiment historique,monument,culturel,architectural
+0;rénovation énergétique;isolation,performance énergétique,économie énergie,CEE,BBC,travaux isolation,amélioration énergétique,DPE
+0;mobilité;transport,déplacement,circulation,vélo,transport collectif,intermodalité,accessibilité
+1;développement;attractivité,revitalisation,dynamisation,projet territorial,stratégie,croissance
+0;numérique;dématérialisation,digital,informatique,smart city,ville connectée,e-administration
+0;environnement;biodiversité,écologie,développement durable,transition écologique,PCAET,nature
+1;assainissement;eau,réseau,station épuration,pluvial,hydraulique,traitement,eau usée
+0;déchet;recyclage,tri,valorisation,collecte,gestion des déchets,économie circulaire,traitement
+0;scolaire;école,éducation,enseignement,périscolaire,classe,maternelle,primaire,secondaire,collège,lycée
+0;gymnase;salle multisport,équipement sportif,complexe sportif,infrastructure sportive,salle omnisport,terrain multisport,city stade,dojo
+0;bibliothèque;médiathèque,centre documentation,espace lecture,ludothèque,équipement lecture,salle lecture,centre culturel,maison livre
+0;social;action sociale,CCAS,solidarité,cohésion sociale,insertion,accompagnement
+0;économie;développement économique,commerce,entreprise,activité économique,ZAE,artisanat
+0;habitat;logement,logement social,résidence,habitation,programme immobilier
+0;vidéosurveillance;vidéo protection,caméra surveillance,télésurveillance,système surveillance,dispositif sécurité,contrôle accès,monitoring,protection vidéo
+0;police municipale;agent municipal,garde champêtre,sécurité publique,force ordre,brigade municipale,police locale,sécurité municipale,agent territorial
+0;tourisme;office de tourisme,attractivité,hébergement touristique,développement touristique
+0;jeunesse;centre de loisirs,animation,périscolaire,enfance,accueil jeunes,activité jeunesse
+1;accessibilité;PMR,handicap,mise aux normes,ADAP,mobilité réduite,adaptation
+1;construire;bâtir,édifier,réaliser,ériger,implanter,aménager,créer
+1;rénover;restaurer,réhabiliter,améliorer,moderniser,restructurer,refaire,requalifier
+1;installer;mettre en place,implanter,déployer,équiper,aménager,disposer,placer
+1;former;éduquer,enseigner,instruire,préparer,qualifier,apprentissage,développer
+1;accompagner;soutenir,aider,assister,guider,conseiller,suivre,orienter
+0;covoiturage;mobilité partagée,transport partagé,auto-partage,partage véhicule,mutualisation transport
+0;voie douce;piste cyclable,véloroute,chemin piéton,voie verte,circulation douce,mobilité douce
+0;borne électrique;recharge électrique,station recharge,électromobilité,infrastructure électrique
+0;ralentisseur;dos d'âne,coussin berlinois,plateau surélevé,dispositif ralentissement,sécurité routière
+0;pont;ouvrage d'art,viaduc,infrastructure routière,franchissement,ouvrage de franchissement
+0;haie;végétation,bocage,plantation,corridor écologique,biodiversité linéaire
+0;réseau chaleur;chauffage urbain,chaleur collective,distribution chaleur,énergie thermique
+0;commerce proximité;local commercial,boutique,petit commerce,commerce local,commerce rural
+0;city stade;terrain multisports,aire multisports,plateau sportif,équipement sportif urbain
+0;éclairage public;luminaire,candélabre,lampadaire,éclairage urbain,LED public
+0;continuité écologique;trame verte,corridor écologique,biodiversité,passage faune,connectivité écologique
+0;cantine;restauration scolaire,restaurant scolaire,réfectoire,restauration collective
+1;végétaliser;planter,verdir,reverdir,désimperméabiliser,renaturer
+0;bistrot;café,lieu convivialité,commerce rural,lieu social
+0;crèche;garderie,multi-accueil,établissement petite enfance,structure accueil enfants
+0;télémédecine;consultation distance,e-santé,santé numérique,médecine distance
+0;aire jeux;espace ludique,jeux enfants,espace récréatif,square,parc enfants
+0;borne incendie;poteau incendie,hydrant,défense incendie,DECI,protection incendie
+0;inondation;risque inondation,crue,submersion,gestion eau pluviale,prévention inondation
+0;jardin partagé;potager collectif,jardin collectif,jardin communautaire,agriculture urbaine
+1;acquisition;achat,acquisition foncière,préemption,achat public,approvisionnement
+0;véhicule décarboné;VAE,véhicule propre,véhicule électrique,mobilité propre,transport décarboné,mobilité électrique
+0;zone faible émission;ZFE,zone circulation restreinte,zone verte,secteur basse pollution,émission CO2,zone propre,zone environnementale,mobilité durable,zones à faibles émissions
+0;parcelle;terrain communal,foncier public,lot cadastral,terrain municipal,propriété communale,bien foncier,cadastre,emprise foncière
+0;santé;médical,soin,clinique,MSP,dispensaire,hospice,hôpital,polyclinique
+0;piscine;bassin municipal,centre aquatique,parc aquatique,piscine municipale,équipement aquatique,bassin nautique,complexe nautique,espace aquatique
+0;cour école;cour récréation,espace récréatif scolaire,préau,cour établissement,aire récréative
+0;menuiserie;fenêtre,baie vitrée,huisserie,lucarne,châssis,vitrage,porte-fenêtre
+0;bâtiment public;édifice public,bâtiment communal,bâtiment municipal,équipement public,bâtiment administratif,local public,patrimoine communal,immeuble public
+0;terrain football;terrain foot,stade football,terrain sportif,pelouse sportive,aire de jeu football,terrain engazonné,terrain synthétique,équipement football
+1;création;construire,mise en place,implantation,installation,établissement,aménagement,réalisation,développement
+0;miroir routier;miroir circulation,miroir sécurité,miroir voirie,miroir carrefour,miroir intersection,miroir convexe,miroir agglomération,rétroviseur urbain
+0;isolant;laine verre,laine roche,polystyrène,matériau isolant,panneau isolant,mousse isolante,isolant thermique
+0;panneau solaire;photovoltaique,panneau photovoltaique,capteur solaire,cellule solaire,module solaire,champ photovoltaique,energie solaire,installation solaire,centrale solaire
+0;édifice religieux;patrimoine religieux,lieu culte,monument sacré,église,chapelle,cathédrale,basilique,sanctuaire
+0;restauration écologique;réhabilitation environnementale,renaturation,restauration écosystème

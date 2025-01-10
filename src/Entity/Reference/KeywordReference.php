@@ -13,6 +13,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Entity(repositoryClass: KeywordReferenceRepository::class)]
 #[ORM\Index(columns: ['name'], name: 'name_kr')]
 #[ORM\Index(columns: ['intention'], name: 'intention_kr')]
+#[ORM\Index(columns: ['active'], name: 'active_kr')]
 #[ORM\Index(columns: ['name'], name: 'name_kr_fulltext', flags: ['fulltext'])]
 class KeywordReference
 {
@@ -68,6 +69,9 @@ class KeywordReference
      */
     #[ORM\ManyToMany(targetEntity: ProjectReference::class, mappedBy: 'requiredKeywordReferences')]
     private Collection $requiredProjectReferences;
+
+    #[ORM\Column]
+    private ?bool $active = true;
 
     public function __construct()
     {
@@ -149,7 +153,7 @@ class KeywordReference
 
     public function __toString(): string
     {
-        return $this->name;
+        return $this->name ?? '';
     }
 
     /**
@@ -286,6 +290,18 @@ class KeywordReference
         if ($this->requiredProjectReferences->removeElement($requiredProjectReference)) {
             $requiredProjectReference->removeRequiredKeywordReference($this);
         }
+
+        return $this;
+    }
+
+    public function isActive(): ?bool
+    {
+        return $this->active;
+    }
+
+    public function setActive(bool $active): static
+    {
+        $this->active = $active;
 
         return $this;
     }

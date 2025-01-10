@@ -140,7 +140,7 @@ class ReferenceService
             $keywords,
             $original_name
         );
-
+        
         // parcours les mots clés restant
         foreach ($keywordReferences as $key => $result) {
             // si dans la liste d'exclusion
@@ -322,6 +322,16 @@ class ReferenceService
         return $highlightedWords;
     }
 
+    private function removePlural(string $word): string
+    {
+        $lastChar = mb_substr($word, -1);
+        if ($lastChar === 's') {
+            return mb_substr($word, 0, mb_strlen($word) - 1);
+        }
+    
+        return $word;
+    }
+
     /**
      * @param string[] $array
      *
@@ -330,11 +340,11 @@ class ReferenceService
     private function enleverArticlesFromArray(array $array): array
     {
         foreach ($array as $key => $value) {
-            $value = str_replace(['/', '(', ')', ',', ':', '–'], ' ', strtolower($value));
+            $value = str_replace(['/', '(', ')', ',', ':', '–'], ' ', strtolower(trim($value)));
             if (in_array($value, $this->articles)) {
                 unset($array[$key]);
             } else {
-                $array[$key] = $value;
+                $array[$key] = $this->removePlural($this->enleverArticles($value, $this->articles));
             }
         }
 
@@ -363,27 +373,29 @@ class ReferenceService
      */
     private function genererToutesCombinaisons(array $keywords): array
     {
-        sort($keywords);
-        $combinaisons = [];
-        $nombreDeMots = count($keywords);
-
-        // Si aucun mot ou un seul mot est fourni, retourne les mots tels quels.
-        if ($nombreDeMots <= 1) {
-            return $keywords;
-        }
-
-        for ($i = 0; $i < $nombreDeMots; ++$i) {
-            for ($j = 0; $j < $nombreDeMots; ++$j) {
-                if ($i != $j) {
-                    // Ajoute la combinaison du mot actuel avec chaque autre mot.
-                    $combinaisons[] = $keywords[$i] . ' ' . $keywords[$j];
+        $words = array_values(array_filter($keywords, fn($word) => !empty($word)));
+        $combinations = [];
+        
+        // Génère les combinaisons de toutes les tailles possibles
+        $length = count($words);
+        for ($size = 1; $size <= $length; $size++) {
+            // Pour chaque position de départ possible
+            for ($start = 0; $start <= $length - $size; $start++) {
+                // Prend $size mots à partir de la position $start
+                $combination = array_slice($words, $start, $size);
+                $combinationString = implode(' ', $combination);
+                
+                // Vérifie si ce n'est pas un article seul et si la combinaison n'est pas vide
+                if (!empty($combinationString) && !in_array($combinationString, $this->articles)) {
+                    $combinations[] = $combinationString;
                 }
             }
         }
 
-        return $combinaisons;
+        return array_unique($combinations);
     }
 
+    
     /**
      * @param string[] $array
      */

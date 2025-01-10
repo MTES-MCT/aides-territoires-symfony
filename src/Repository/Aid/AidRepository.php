@@ -1723,7 +1723,7 @@ class AidRepository extends ServiceEntityRepository
             $simpleWordsString = !empty($synonyms['simple_words_string'])
                 ? $this->stringService->sanitizeBooleanSearch($synonyms['simple_words_string'])
                 : null;
-
+            
             $sqlScore = '';
 
             if ($originalName) {
@@ -1766,6 +1766,7 @@ class AidRepository extends ServiceEntityRepository
                             }
                         }
                     }
+
                     $requiredKeywordReferencesName = array_unique($requiredKeywordReferencesName);
 
                     // on ajoute des guillemets si le mot clé contient un espace, ex: "batiment scolaire"
@@ -1808,11 +1809,36 @@ class AidRepository extends ServiceEntityRepository
                 if ('' !== $sqlScore) {
                     $sqlScore .= ' + ';
                 }
+                $objects = str_getcsv($objectsString, ' ', '"');
+                // on retire tous les éléments vide de $objects
+                $objects = array_filter($objects, function ($value) {
+                    return '' !== trim($value);
+                });
+                $objects = array_map(function ($object) {
+                    // Découper le terme en mots
+                    $words = explode(' ', $object);
+                    // Ajouter * à la fin de chaque mot
+                    $words = array_map(fn($word) => $word . '*', $words);
+                    // Réassembler les mots en une seule chaîne
+                    $string = implode(' ', $words);
+                    if (count($words) > 1) {
+                        $string = '"'.$string.'"';
+                    }
+                    return $string;
+                }, $objects);
+                $objectsStringwithAsterisk = implode(' ', $objects);
+                // $sqlScore .= '
+                //     CASE WHEN (MATCH_AGAINST(a.name) AGAINST(:objects_string) > 0.8) THEN 60 ELSE 0 END
+                //     + CASE WHEN (MATCH_AGAINST(a.nameInitial) AGAINST(:objects_string) > 0.8) THEN 60 ELSE 0 END
+                //     + CASE WHEN (MATCH_AGAINST(a.description, a.eligibility, a.projectExamples) AGAINST(:objects_string_asterisk IN BOOLEAN MODE) > 0.8) THEN 30 ELSE 0 END
+                // ';
                 $sqlScore .= '
                     CASE WHEN (MATCH_AGAINST(a.name) AGAINST(:objects_string) > 0.8) THEN 60 ELSE 0 END
                     + CASE WHEN (MATCH_AGAINST(a.nameInitial) AGAINST(:objects_string) > 0.8) THEN 60 ELSE 0 END
-                    + CASE WHEN (MATCH_AGAINST(a.description, a.eligibility, a.projectExamples) AGAINST(:objects_string) > 0.8) THEN 10 ELSE 0 END              ';
+                    + MATCH_AGAINST(a.description, a.eligibility, a.projectExamples) AGAINST(:objects_string_asterisk IN BOOLEAN MODE) * 10
+                ';
                 $qb->setParameter('objects_string', $objectsString);
+                $qb->setParameter('objects_string_asterisk', $objectsStringwithAsterisk);
             }
 
             // les intentions
@@ -1836,7 +1862,7 @@ class AidRepository extends ServiceEntityRepository
                 $sqlScore .= '
                     CASE WHEN (MATCH_AGAINST(a.name) AGAINST(:simple_words_string) > 0.8) THEN 60 ELSE 0 END
                     + CASE WHEN (MATCH_AGAINST(a.nameInitial) AGAINST(:simple_words_string) > 0.8) THEN 60 ELSE 0 END
-                    + CASE WHEN (MATCH_AGAINST(a.description, a.eligibility, a.projectExamples) AGAINST(:simple_words_string) > 0.8) THEN 10 ELSE 0 END
+                    + CASE WHEN (MATCH_AGAINST(a.description, a.eligibility, a.projectExamples) AGAINST(:simple_words_string) > 0.8) THEN 60 ELSE 0 END
                 ';
                 $qb->setParameter('simple_words_string', $simpleWordsString);
             }

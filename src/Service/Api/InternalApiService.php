@@ -19,6 +19,7 @@ class InternalApiService
 
     private function getAPiBaseUrl(): string
     {
+        return 'https://aides-territoires.beta.gouv.fr';
         try {
             $request = $this->requestStack->getCurrentRequest();
             $baseUrl =  $request->getSchemeAndHttpHost();
@@ -85,6 +86,7 @@ class InternalApiService
         $response = $client->request($method, '/' . self::API_FOLDER . '' . $url, [
             'query' => $params,
         ]);
+
         if ($response->getStatusCode() == 401) { // token expiré, on relance
             $this->getBearerToken(true);
             return $this->callApi($url, $params, $method);
