@@ -16,7 +16,7 @@ action;terme;synonymes
 0;bibliothèque;médiathèque,centre documentation,espace lecture,ludothèque,équipement lecture,salle lecture,centre culturel,maison livre
 0;social;action sociale,CCAS,solidarité,cohésion sociale,insertion,accompagnement
 0;économie;développement économique,commerce,entreprise,activité économique,ZAE,artisanat
-0;habitat;logement,logement social,résidence,habitation,programme immobilier
+0;habitat;logement,logement social,habitation,programme immobilier
 0;vidéosurveillance;vidéo protection,caméra surveillance,télésurveillance,système surveillance,dispositif sécurité,contrôle accès,monitoring,protection vidéo
 0;police municipale;agent municipal,garde champêtre,sécurité publique,force ordre,brigade municipale,police locale,sécurité municipale,agent territorial
 0;tourisme;office de tourisme,attractivité,hébergement touristique,développement touristique
@@ -48,7 +48,7 @@ action;terme;synonymes
 0;inondation;risque inondation,crue,submersion,gestion eau pluviale,prévention inondation
 0;jardin partagé;potager collectif,jardin collectif,jardin communautaire,agriculture urbaine
 1;acquisition;achat,acquisition foncière,préemption,achat public,approvisionnement
-0;véhicule décarboné;VAE,véhicule propre,véhicule électrique,mobilité propre,transport décarboné,mobilité électrique
+0;véhicule décarboné;assistance électrique,véhicule propre,véhicule électrique,mobilité propre,transport décarboné,mobilité électrique
 0;zone faible émission;ZFE,zone circulation restreinte,zone verte,secteur basse pollution,émission CO2,zone propre,zone environnementale,mobilité durable,zones à faibles émissions
 0;parcelle;terrain communal,foncier public,lot cadastral,terrain municipal,propriété communale,bien foncier,cadastre,emprise foncière
 0;santé;médical,soin,clinique,MSP,dispensaire,hospice,hôpital,polyclinique
@@ -63,3 +63,4 @@ action;terme;synonymes
 0;panneau solaire;photovoltaique,panneau photovoltaique,capteur solaire,cellule solaire,module solaire,champ photovoltaique,energie solaire,installation solaire,centrale solaire
 0;édifice religieux;patrimoine religieux,lieu culte,monument sacré,église,chapelle,cathédrale,basilique,sanctuaire
 0;restauration écologique;réhabilitation environnementale,renaturation,restauration écosystème
+0;cimetière;espace funéraire,lieu sépulture,columbarium,monument funéraire,tombe,pierre tombale,parc funéraire,espace vert cimetière

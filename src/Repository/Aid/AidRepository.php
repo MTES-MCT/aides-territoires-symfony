@@ -1751,7 +1751,7 @@ class AidRepository extends ServiceEntityRepository
                 if (!$projectReference->getRequiredKeywordReferences()->isEmpty()) {
                     // fait un tableau unique des mots clés requis et de ses synonymes
                     $requiredKeywordReferencesName = [];
-                    foreach ($projectReference->getRequiredKeywordReferences() as $keywordReference) {
+                    foreach ($projectReference->getRequiredKeywordReferences() as $key => $keywordReference) {
                         $requiredKeywordReferencesName[] = $keywordReference->getName();
                         foreach ($keywordReference->getKeywordReferences() as $subKeyword) {
                             $requiredKeywordReferencesName[] = $subKeyword->getName();
@@ -1765,24 +1765,24 @@ class AidRepository extends ServiceEntityRepository
                                 $requiredKeywordReferencesName[] = $subKeyword->getName();
                             }
                         }
+
+                        $requiredKeywordReferencesName = array_unique($requiredKeywordReferencesName);
+
+                        // on ajoute des guillemets si le mot clé contient un espace, ex: "batiment scolaire"
+                        $transformedTerms = array_map(function ($term) {
+                            return false !== strpos($term, ' ') ? '"'.$term.'"' : $term;
+                        }, $requiredKeywordReferencesName);
+    
+                        // on transforme le tableau en string pour la recherche fulltext
+                        $requiredKeywordReferencesNameString = implode(' ', $transformedTerms);
+    
+                        $qb->andWhere('
+                            MATCH_AGAINST(a.name, a.nameInitial, a.description, a.eligibility, a.projectExamples) '
+                            .'AGAINST (:requireKeywordReferencesString_'.$key.' IN BOOLEAN MODE) > 0 '
+                            .'OR :projectReference MEMBER OF a.projectReferences
+                        ');
+                        $qb->setParameter('requireKeywordReferencesString_'.$key, $requiredKeywordReferencesNameString);
                     }
-
-                    $requiredKeywordReferencesName = array_unique($requiredKeywordReferencesName);
-
-                    // on ajoute des guillemets si le mot clé contient un espace, ex: "batiment scolaire"
-                    $transformedTerms = array_map(function ($term) {
-                        return false !== strpos($term, ' ') ? '"'.$term.'"' : $term;
-                    }, $requiredKeywordReferencesName);
-
-                    // on transforme le tableau en string pour la recherche fulltext
-                    $requiredKeywordReferencesNameString = implode(' ', $transformedTerms);
-
-                    $qb->andWhere('
-                        MATCH_AGAINST(a.name, a.nameInitial, a.description, a.eligibility, a.projectExamples) '
-                        .'AGAINST (:requireKeywordReferencesString IN BOOLEAN MODE) > 0 '
-                        .'OR :projectReference MEMBER OF a.projectReferences
-                    ');
-                    $qb->setParameter('requireKeywordReferencesString', $requiredKeywordReferencesNameString);
                 }
             }
 
@@ -1830,7 +1830,7 @@ class AidRepository extends ServiceEntityRepository
                 $sqlScore .= '
                     CASE WHEN (MATCH_AGAINST(a.name) AGAINST(:objects_string) > 0.8) THEN 60 ELSE 0 END
                     + CASE WHEN (MATCH_AGAINST(a.nameInitial) AGAINST(:objects_string) > 0.8) THEN 60 ELSE 0 END
-                    + CASE WHEN (MATCH_AGAINST(a.description, a.eligibility, a.projectExamples) AGAINST(:objects_string_asterisk IN BOOLEAN MODE) > 0.8) THEN 30 ELSE 0 END
+                    + CASE WHEN (MATCH_AGAINST(a.description, a.eligibility, a.projectExamples) AGAINST(:objects_string_asterisk IN BOOLEAN MODE) > 6) THEN 60 ELSE 0 END
                 ';
                 // $sqlScore .= '
                 //     CASE WHEN (MATCH_AGAINST(a.name) AGAINST(:objects_string) > 0.8) THEN 60 ELSE 0 END

@@ -153,7 +153,11 @@ class KeywordReference
 
     public function __toString(): string
     {
-        return $this->name ?? '';
+        $return = $this->name ?? '';
+        $return .= ' - ';
+        $return .= $this->id ?? '';
+
+        return $return;
     }
 
     /**
