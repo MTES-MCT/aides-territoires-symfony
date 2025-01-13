@@ -14,6 +14,7 @@ use App\Repository\Perimeter\PerimeterRepository;
 use App\Repository\Program\ProgramRepository;
 use App\Repository\Project\ProjectRepository;
 use App\Service\Aid\AidSearchFormService;
+use App\Service\Various\ParamService;
 use App\Service\Various\StringService;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
@@ -32,14 +33,15 @@ class HomeController extends FrontController
         ProjectRepository $projectRepository,
         StringService $stringService,
         AidSearchFormService $aidSearchFormService,
-        LogEventRepository $logEventRepository
+        LogEventRepository $logEventRepository,
+        ParamService $paramService,
     ): Response {
         $formAidSearch = $this->createForm(
             AidSearchTypeV2::class,
             $aidSearchFormService->getAidSearchClass(),
             [
                 'action' => $this->generateUrl('app_aid_aid'),
-                'method' => 'GET'
+                'method' => 'GET',
             ]
         );
 
@@ -48,14 +50,12 @@ class HomeController extends FrontController
             ProjectReferenceSearchType::class,
             null,
             [
-                'action' => $this->generateUrl('app_project_reference')
+                'action' => $this->generateUrl('app_project_reference'),
             ]
         );
 
-        // Program mis en avant
-        $program = $programRepository->findOneBy([
-            'slug' => 'fonds-vert'
-        ]);
+        // Program fond vert mis en avant, le nom change chaque année mais pas l'id
+        $program = $programRepository->find($paramService->get('id_program_fond_vert'));
 
         // les articles du blog
         $blogPosts = $blogPostRepository->getRecents();
@@ -66,12 +66,12 @@ class HomeController extends FrontController
         if ($formCounties->isSubmitted()) {
             if ($formCounties->isValid()) {
                 $county = $perimeterRepository->findOneBy([
-                    'code' => $formCounties->get('county')->getData()
+                    'code' => $formCounties->get('county')->getData(),
                 ]);
                 if ($county instanceof Perimeter) {
                     return $this->redirectToRoute('app_cartography_detail', [
                         'code' => $county->getCode(),
-                        'slug' => $stringService->getSlug($county->getName())
+                        'slug' => $stringService->getSlug($county->getName()),
                     ]);
                 }
             }
@@ -85,7 +85,7 @@ class HomeController extends FrontController
                 'code' => $county->getCode(),
                 'name' => $county->getName(),
                 'slug' => $stringService->getSlug($county->getName()),
-                'backers_count' => $county->getBackersCount()
+                'backers_count' => $county->getBackersCount(),
             ];
         }
 
@@ -125,7 +125,7 @@ class HomeController extends FrontController
             'nbPrograms' => $nbPrograms,
             'recentAids' => $recentAids,
             'publicProjects' => $publicProjects,
-            'departmentsData' => $departmentsData
+            'departmentsData' => $departmentsData,
         ]);
     }
 }
