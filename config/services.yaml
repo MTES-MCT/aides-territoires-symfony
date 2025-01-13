@@ -47,6 +47,7 @@ parameters:
     proconnect_domain: '%env(resolve:PROCONNECT_DOMAIN)%'
     proconnect_client_id: '%env(resolve:PROCONNECT_CLIENT_ID)%'
     proconnect_client_secret: '%env(resolve:PROCONNECT_CLIENT_SECRET)%'
+    id_program_fond_vert: '%env(resolve:ID_PROGRAM_FOND_VERT)%'
 
 services:
     # default configuration for services in *this* file
