@@ -3,8 +3,8 @@
 namespace App\Controller\Reference;
 
 use App\Controller\FrontController;
-use App\Entity\Perimeter\Perimeter;
 use App\Entity\Organization\OrganizationType;
+use App\Entity\Perimeter\Perimeter;
 use App\Entity\Reference\KeywordReference;
 use App\Entity\Reference\ProjectReference;
 use App\Form\Reference\ProjectReferenceSearchType;
@@ -20,12 +20,12 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Persistence\ManagerRegistry;
 use Pagerfanta\Adapter\ArrayAdapter;
 use Pagerfanta\Exception\OutOfRangeCurrentPageException;
-use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
 use Pagerfanta\Pagerfanta;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Annotation\Route;
 
 #[Route(priority: 5)]
 class ProjectReferenceController extends FrontController
@@ -33,14 +33,13 @@ class ProjectReferenceController extends FrontController
     public const NB_PAID_BY_PAGE = 30;
     public const NB_PROJECT_BY_PAGE = 18;
 
-
     #[Route('/projets-references/', name: 'app_project_reference')]
     public function index(
         AidRepository $aidRepository,
         RequestStack $requestStack,
         ManagerRegistry $managerRegistry,
         ProjectReferenceRepository $projectReferenceRepository,
-        AidService $aidService
+        AidService $aidService,
     ): Response {
         // gestion pagination
         $currentPage = (int) $requestStack->getCurrentRequest()->get('page', 1);
@@ -49,7 +48,7 @@ class ProjectReferenceController extends FrontController
         $prSlug = $requestStack->getCurrentRequest()->get('prSlug', null);
         if ($prSlug) {
             $projectReferenceForce = $projectReferenceRepository->findOneBy([
-                'slug' => $prSlug
+                'slug' => $prSlug,
             ]);
             if ($projectReferenceForce instanceof ProjectReference) {
                 $requestStack
@@ -79,7 +78,7 @@ class ProjectReferenceController extends FrontController
         $formProjectReferenceSearch = $this->createForm(ProjectReferenceSearchType::class, null, [
             'forceOrganizationType' => $organizationType,
             'forcePerimeter' => $perimeter,
-            'forceName' => $name
+            'forceName' => $name,
         ]);
         $formProjectReferenceSearch->handleRequest($requestStack->getCurrentRequest());
         if ($formProjectReferenceSearch->isSubmitted()) {
@@ -151,9 +150,10 @@ class ProjectReferenceController extends FrontController
             );
             $newUrl = preg_replace(
                 '/(page=)[^\&]+/',
-                'page=' . $pagerfanta->getNbPages(),
+                'page='.$pagerfanta->getNbPages(),
                 $requestStack->getCurrentRequest()->getRequestUri()
             );
+
             return new RedirectResponse($newUrl);
         }
 
@@ -166,7 +166,7 @@ class ProjectReferenceController extends FrontController
         return $this->render('reference/index.html.twig', [
             'myPager' => $pagerfanta,
             'formProjectReferenceSearch' => $formProjectReferenceSearch,
-            'forceDisplayAidAsList' => true
+            'forceDisplayAidAsList' => true,
         ]);
     }
 
@@ -175,7 +175,7 @@ class ProjectReferenceController extends FrontController
         RequestStack $requestStack,
         ReferenceService $referenceService,
         ManagerRegistry $managerRegistry,
-        ProjectValidatedRepository $projectValidatedRepository
+        ProjectValidatedRepository $projectValidatedRepository,
     ): Response {
         // paramètres en session
         $organizationType = $requestStack
@@ -199,7 +199,7 @@ class ProjectReferenceController extends FrontController
         $formProjectReferenceSearch = $this->createForm(ProjectReferenceSearchType::class, null, [
             'forceOrganizationType' => $organizationType,
             'forcePerimeter' => $perimeter,
-            'forceName' => $name
+            'forceName' => $name,
         ]);
         $formProjectReferenceSearch->handleRequest($requestStack->getCurrentRequest());
         if ($formProjectReferenceSearch->isSubmitted()) {
@@ -249,7 +249,7 @@ class ProjectReferenceController extends FrontController
         $projectValidatedsParams = array_merge($projectValidatedsParams, [
             'organizationType' => $organizationType,
             'perimeter' => $perimeter,
-            'radius' => 30
+            'radius' => 30,
         ]);
 
         if ($organizationType && $name) {
@@ -257,7 +257,6 @@ class ProjectReferenceController extends FrontController
         } else {
             $projectValidateds = [];
         }
-
 
         // fil arianne
         $this->breadcrumb->add(
@@ -270,7 +269,7 @@ class ProjectReferenceController extends FrontController
             'projectValidateds' => $projectValidateds,
             'formProjectReferenceSearch' => $formProjectReferenceSearch,
             'commune_search' => true,
-            'project_perimeter' => $perimeter
+            'project_perimeter' => $perimeter,
         ]);
     }
 
@@ -279,7 +278,7 @@ class ProjectReferenceController extends FrontController
         RequestStack $requestStack,
         ReferenceService $referenceService,
         ManagerRegistry $managerRegistry,
-        ProjectRepository $projectRepository
+        ProjectRepository $projectRepository,
     ): Response {
         // paramètres en session
         $organizationType = $requestStack->getCurrentRequest()->getSession()->get('reference_organizationType', null);
@@ -294,7 +293,7 @@ class ProjectReferenceController extends FrontController
         $formProjectReferenceSearch = $this->createForm(ProjectReferenceSearchType::class, null, [
             'forceOrganizationType' => $organizationType,
             'forcePerimeter' => $perimeter,
-            'forceName' => $name
+            'forceName' => $name,
         ]);
         $formProjectReferenceSearch->handleRequest($requestStack->getCurrentRequest());
         if ($formProjectReferenceSearch->isSubmitted()) {
@@ -351,8 +350,8 @@ class ProjectReferenceController extends FrontController
             'limit' => null,
             'orderBy' => [
                 'sort' => 'p.timeCreate',
-                'order' => 'DESC'
-            ]
+                'order' => 'DESC',
+            ],
         ]);
 
         $projectsPublics = $projectRepository->findPublicProjects($projectsParams);
@@ -368,7 +367,7 @@ class ProjectReferenceController extends FrontController
             'projectsPublics' => $projectsPublics,
             'formProjectReferenceSearch' => $formProjectReferenceSearch,
             'commune_search' => true,
-            'project_perimeter' => $perimeter
+            'project_perimeter' => $perimeter,
         ]);
     }
 
@@ -377,7 +376,7 @@ class ProjectReferenceController extends FrontController
         ProjectReferenceRepository $projectReferenceRepository,
         RequestStack $requestStack,
         ManagerRegistry $managerRegistry,
-        StringService $stringService
+        StringService $stringService,
     ): Response {
         // paramètres en session
         $organizationType = $requestStack->getCurrentRequest()->getSession()->get('reference_organizationType', null);
@@ -392,7 +391,7 @@ class ProjectReferenceController extends FrontController
         $formProjectReferenceSearch = $this->createForm(ProjectReferenceSearchType::class, null, [
             'forceOrganizationType' => $organizationType,
             'forcePerimeter' => $perimeter,
-            'forceName' => $name
+            'forceName' => $name,
         ]);
         $formProjectReferenceSearch->handleRequest($requestStack->getCurrentRequest());
         if ($formProjectReferenceSearch->isSubmitted()) {
@@ -432,21 +431,21 @@ class ProjectReferenceController extends FrontController
 
         // regarde si la recherche corresponds exacement à un projet référent
         $projectReference = $projectReferenceRepository->findOneBy([
-            'name' => $name
+            'name' => $name,
         ]);
 
         // Tous les projets référents
         $params = [
             'orderBy' => [
                 'sort' => 'projectReferenceCategory.name',
-                'order' => 'ASC'
+                'order' => 'ASC',
             ],
             'addOrderBy' => [
                 [
                     'sort' => 'pr.name',
-                    'order' => 'ASC'
-                ]
-            ]
+                    'order' => 'ASC',
+                ],
+            ],
         ];
         if ($projectReference instanceof ProjectReference) {
             $params['excludes'] = [$projectReference];
@@ -485,7 +484,7 @@ class ProjectReferenceController extends FrontController
     public function ajaxUxAutocomplete(
         ProjectReferenceRepository $projectReferenceRepository,
         KeywordReferenceRepository $keywordReferenceRepository,
-        RequestStack $requestStack
+        RequestStack $requestStack,
     ): JsonResponse {
         $query = $requestStack->getCurrentRequest()->get('query', null);
 
@@ -494,15 +493,15 @@ class ProjectReferenceController extends FrontController
             'nameLike' => $query,
             'orderBy' => [
                 'sort' => 'pr.name',
-                'order' => 'ASC'
-            ]
+                'order' => 'ASC',
+            ],
         ]);
 
         $results = [];
         foreach ($projectReferences as $projectReference) {
             $results[] = [
                 'value' => $projectReference->getName(),
-                'text' => $projectReference->getName()
+                'text' => $projectReference->getName(),
             ];
         }
 
@@ -512,8 +511,9 @@ class ProjectReferenceController extends FrontController
             'name' => $query,
             'orderBy' => [
                 'sort' => 'kr.name',
-                'order' => 'ASC'
-            ]
+                'order' => 'ASC',
+            ],
+            'active' => true,
         ]);
 
         /** @var ArrayCollection<int, KeywordReference> $parents */
@@ -530,19 +530,19 @@ class ProjectReferenceController extends FrontController
         foreach ($parents as $parent) {
             if ($parent instanceof KeywordReference) {
                 if ($parent->getName() != $query) {
-                    $text = $parent->getName() . ', ' . $query . ' et synonymes';
+                    $text = $parent->getName().', '.$query.' et synonymes';
                 } else {
-                    $text = $parent->getName() . ' et synonymes';
+                    $text = $parent->getName().' et synonymes';
                 }
                 $results[] = [
                     'value' => $parent->getName(),
-                    'text' => $text
+                    'text' => $text,
                 ];
             }
         }
 
         $return = [
-            'results' => $results
+            'results' => $results,
         ];
 
         return new JsonResponse($return);
