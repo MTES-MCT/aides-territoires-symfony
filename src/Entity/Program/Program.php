@@ -2,12 +2,15 @@
 
 namespace App\Entity\Program;
 
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\OpenApi\Model;
+use App\Controller\Api\Program\ProgramController;
 use App\Entity\Aid\Aid;
 use App\Entity\Blog\BlogPromotionPost;
 use App\Entity\Log\LogAidSearch;
 use App\Entity\Log\LogProgramView;
 use App\Entity\Page\FaqQuestionAnswser;
-use App\Entity\Program\PageTab;
 use App\Entity\Perimeter\Perimeter;
 use App\Repository\Program\ProgramRepository;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -16,10 +19,6 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Symfony\Component\Serializer\Annotation\Groups;
-use ApiPlatform\Metadata\ApiResource;
-use ApiPlatform\Metadata\GetCollection;
-use ApiPlatform\OpenApi\Model;
-use App\Controller\Api\Program\ProgramController;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Index(columns: ['slug'], name: 'slug_program')]
@@ -61,7 +60,7 @@ class Program // NOSONAR too much methods
     #[Assert\Length(max: 255)]
     #[Groups([Aid::API_GROUP_LIST, Aid::API_GROUP_ITEM, self::API_GROUP_LIST])]
     #[ORM\Column(length: 255)]
-    #[Gedmo\Slug(fields: ['name'])]
+    #[Gedmo\Slug(fields: ['name'], updatable: false)]
     private ?string $slug = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
@@ -112,7 +111,7 @@ class Program // NOSONAR too much methods
      * @var Collection<int, FaqQuestionAnswser>
      */
     #[ORM\OneToMany(mappedBy: 'program', targetEntity: FaqQuestionAnswser::class)]
-    #[ORM\OrderBy(["id" => "ASC"])]
+    #[ORM\OrderBy(['id' => 'ASC'])]
     private Collection $faqQuestionAnswsers;
 
     /**
@@ -133,7 +132,6 @@ class Program // NOSONAR too much methods
     #[ORM\OneToMany(mappedBy: 'program', targetEntity: LogProgramView::class)]
     #[ORM\JoinColumn(onDelete: 'SET NULL')]
     private Collection $logProgramViews;
-
 
     private ?int $nbAids;
 
@@ -211,6 +209,7 @@ class Program // NOSONAR too much methods
     public function setLogo(?string $logo): static
     {
         $this->logo = $logo;
+
         return $this;
     }
 
@@ -453,8 +452,6 @@ class Program // NOSONAR too much methods
         return $this;
     }
 
-
-
     public function __toString(): string
     {
         return $this->name ?? null;
@@ -474,6 +471,7 @@ class Program // NOSONAR too much methods
     public function setNbAids(?int $nbAids): static
     {
         $this->nbAids = $nbAids;
+
         return $this;
     }
 
