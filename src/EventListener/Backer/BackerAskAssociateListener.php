@@ -13,7 +13,7 @@ class BackerAskAssociateListener
 {
     public function __construct(
         private NotificationService $notificationService,
-        private RouterInterface $routerInterface
+        private RouterInterface $routerInterface,
     ) {
     }
 
@@ -28,7 +28,7 @@ class BackerAskAssociateListener
 
         foreach ($changeSet as $field => $change) {
             // Acceptation d'une demande d'association
-            if ($field == 'accepted' && isset($change[1]) && $change[1]) {
+            if ('accepted' == $field && isset($change[1]) && $change[1]) {
                 // on ajoute l'organization au porteur
                 $entity->getBacker()->addOrganization($entity->getOrganization());
                 // sauvegarde
@@ -42,44 +42,42 @@ class BackerAskAssociateListener
                     UrlGeneratorInterface::ABSOLUTE_URL
                 );
 
-                // envoi de la notification à tous les utilisateurs de la structure
+                // envoi de la notification à tous les utilisateurs de toutes les structures du porteur
                 if ($entity->getOrganization()) {
                     foreach ($entity->getBacker()->getOrganizations() as $organization) {
                         foreach ($organization->getBeneficiairies() as $beneficiairy) {
                             $this->notificationService->addNotification(
                                 $beneficiairy,
                                 'Association de la structure '
-                                    . $entity->getOrganization()->getName()
-                                    . ' avec le porteur d\'aides '
-                                    . $entity->getBacker()->getName(),
+                                    .$entity->getOrganization()->getName()
+                                    .' avec le porteur d\'aides '
+                                    .$entity->getBacker()->getName(),
                                 'La fiche du porteur d\'aides '
-                                    . $entity->getBacker()->getName()
-                                    . ' a été associée avec la structure '
-                                    . $entity->getOrganization()->getName()
-                                    . '. Vous pouvez la consulter en cliquant sur <a href="'
-                                    . $backerUrl
-                                    . '" title="Voir la fiche du porteur d\'aides">ce lien</a>.',
+                                    .$entity->getBacker()->getName()
+                                    .' a été associée avec la structure '
+                                    .$entity->getOrganization()->getName()
+                                    .'. Vous pouvez la consulter en cliquant sur <a href="'
+                                    .$backerUrl
+                                    .'" title="Voir la fiche du porteur d\'aides">ce lien</a>.',
                             );
                         }
                     }
                 }
-            } elseif ($field == 'refused' && isset($change[1]) && $change[1]) {
-                // envoi de la notification à tous les utilisateurs de la structure
+            } elseif ('refused' == $field && isset($change[1]) && $change[1]) {
+                // envoi de la notification à tous les utilisateurs de la structure uniquement
                 $messageRefus = $entity->getRefusedDescription()
                     ? $entity->getRefusedDescription()
                     : 'Votre demande à été refusée.';
                 if ($entity->getOrganization()) {
-                    foreach ($entity->getBacker()->getOrganizations() as $organization) {
-                        foreach ($organization->getBeneficiairies() as $beneficiairy) {
-                            $this->notificationService->addNotification(
-                                $beneficiairy,
-                                'Refus de l\'association de la structure '
-                                    . $entity->getOrganization()->getName()
-                                    . ' avec le porteur d\'aides '
-                                    . $entity->getBacker()->getName(),
-                                $messageRefus
-                            );
-                        }
+                    foreach ($entity->getOrganization()->getBeneficiairies() as $beneficiairy) {
+                        $this->notificationService->addNotification(
+                            $beneficiairy,
+                            'Refus de l\'association de la structure '
+                                .$entity->getOrganization()->getName()
+                                .' avec le porteur d\'aides '
+                                .$entity->getBacker()->getName(),
+                            $messageRefus
+                        );
                     }
                 }
             }
