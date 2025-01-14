@@ -249,32 +249,32 @@ class AidService // NOSONAR too complex
     public function searchAids(array $aidParams): array
     {
         return $this->searchAidsV2($aidParams);
-        // /** @var AidRepository $aidRepo */
-        // $aidRepo = $this->managerRegistry->getRepository(Aid::class);
-        // $aids = $aidRepo->findCustom($aidParams);
+        /** @var AidRepository $aidRepo */
+        $aidRepo = $this->managerRegistry->getRepository(Aid::class);
+        $aids = $aidRepo->findCustom($aidParams);
 
-        // // Si on a le score total et le score objects on tri par le cumul des deux
-        // // (pas possible directement dans la requête sans trop l'alourdir)
-        // if (isset($aids[0]) && $aids[0]->getScoreTotal() && $aids[0]->getScoreObjects()) {
-        //     usort($aids, function ($a, $b) {
-        //         return ($b->getScoreTotal() + $b->getScoreObjects()) <=> ($a->getScoreTotal() + $a->getScoreObjects());
-        //     });
-        // }
+        // Si on a le score total et le score objects on tri par le cumul des deux
+        // (pas possible directement dans la requête sans trop l'alourdir)
+        if (isset($aids[0]) && $aids[0]->getScoreTotal() && $aids[0]->getScoreObjects()) {
+            usort($aids, function ($a, $b) {
+                return ($b->getScoreTotal() + $b->getScoreObjects()) <=> ($a->getScoreTotal() + $a->getScoreObjects());
+            });
+        }
 
-        // if (isset($aidParams['projectReference']) && $aidParams['projectReference'] instanceof ProjectReference) {
-        //     /** @var Aid $aid */
-        //     foreach ($aids as $aid) {
-        //         if ($aid->getProjectReferences()->contains($aidParams['projectReference'])) {
-        //             $aid->addProjectReferenceSearched($aidParams['projectReference']);
-        //         }
-        //     }
-        // }
+        if (isset($aidParams['projectReference']) && $aidParams['projectReference'] instanceof ProjectReference) {
+            /** @var Aid $aid */
+            foreach ($aids as $aid) {
+                if ($aid->getProjectReferences()->contains($aidParams['projectReference'])) {
+                    $aid->addProjectReferenceSearched($aidParams['projectReference']);
+                }
+            }
+        }
 
-        // if (!isset($aidParams['noPostPopulate'])) {
-        //     $aids = $this->postPopulateAids($aids, $aidParams);
-        // }
+        if (!isset($aidParams['noPostPopulate'])) {
+            $aids = $this->postPopulateAids($aids, $aidParams);
+        }
 
-        // return $aids;
+        return $aids;
     }
 
     public function extractInlineStyles(Aid $aid): Aid
@@ -319,7 +319,7 @@ class AidService // NOSONAR too complex
     {
         // on déduplique les génériques
         $aids = $this->unDuplicateGenerics($aids, $params['perimeterFrom'] ?? null);
-
+        
         // pour les portails il y a des aides mises en avant et des aides à exclures
         $aids = $this->handleSearchPageRules($aids, $params);
 
@@ -343,14 +343,16 @@ class AidService // NOSONAR too complex
                     unset($aids[$key]);
                 }
             }
-
+        
             // aides à mettre en avant
             $highlightedAids = [];
             foreach ($params['searchPage']->getHighlightedAids() as $aid) {
                 if ($aid->isLive()) {
+                    $ids[] = $aid->getId();
                     $highlightedAids[] = $aid;
                 }
             }
+            
             $normalAids = [];
             foreach ($aids as $key => $aid) {
                 if (!$params['searchPage']->getHighlightedAids()->contains($aid)) {
@@ -358,7 +360,7 @@ class AidService // NOSONAR too complex
                 }
                 unset($aids[$key]);
             }
-
+            
             // on ajoute les normalAids après les highlightAids
             $aids = array_values(array_merge($highlightedAids, $normalAids));
         }
@@ -1030,7 +1032,7 @@ class AidService // NOSONAR too complex
         /** @var AidRepository $aidRepository */
         $aidRepository = $this->managerRegistry->getRepository(Aid::class);
         $aids = $aidRepository->findForSearch($aidParams);
-
+        
         if (isset($aidParams['projectReference']) && $aidParams['projectReference'] instanceof ProjectReference) {
             /** @var Aid $aid */
             foreach ($aids as $aid) {
@@ -1039,11 +1041,11 @@ class AidService // NOSONAR too complex
                 }
             }
         }
-
+        
         if (!isset($aidParams['noPostPopulate'])) {
             $aids = $this->postPopulateAids($aids, $aidParams);
         }
-
+        
         return $aids;
     }
 }

@@ -12,7 +12,7 @@ class StringService
      */
     public function sanitizeBooleanSearch(string $string): string
     {
-        return trim(preg_replace('/[+\-<>\(\)~*@]/', ' ', $string));
+        return trim(preg_replace('/[+<>\(\)~*@]/', ' ', $string));
     }
 
     /**

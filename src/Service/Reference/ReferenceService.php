@@ -77,22 +77,14 @@ class ReferenceService
     ];
 
     /**
-     * @return array<string, string>
+     * @return string[]
      */
-    public function getSynonymes(string $project_name): ?array
+    public function getKeywords(string $project_name): array
     {
-        $original_name = $project_name;
-
-        // regarde si c'est un projet référent
-        $projectReference = $this->projectReferenceRepository->findOneBy([
-            'name' => $project_name,
-        ]);
-
-        // nettoie la string
-        $project_name = str_replace(['/', '(', ')', ',', ':', '–', '-'], ' ', strtolower($project_name));
-
-        // sépare sur les espaces
-        $keywords = explode(' ', $project_name);
+        // $project_name = str_replace(['/', '(', ')', ',', ':', '–', '-'], ' ', strtolower($project_name));
+        $project_name = str_replace(['/', '(', ')', ':', '–'], ' ', strtolower($project_name));
+        $separator = strpos($project_name, ',') ? ',' : ' ';
+        $keywords = explode($separator, $project_name);
         foreach ($keywords as $key => $keyword) {
             $keywords[$key] = trim($keyword);
             if (empty($keywords[$key])) {
@@ -105,11 +97,29 @@ class ReferenceService
 
         // genere les combinaisons possibles avec les termes restants et les ajoutes au tableau
         $keywords = $this->enleverArticlesFromArray($keywords);
+
         $keywords = array_merge($keywords, $this->genererToutesCombinaisons($keywords));
         // retire tous les élements vides
         $keywords = array_filter($keywords);
         $keywords = array_unique($keywords);
 
+        return $keywords;
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public function getSynonymes(string $project_name): ?array
+    {
+        $original_name = $project_name;
+
+        // regarde si c'est un projet référent
+        $projectReference = $this->projectReferenceRepository->findOneBy([
+            'name' => $project_name,
+        ]);
+
+        $keywords = $this->getKeywords($project_name);
+        
         // Prépare deux tableaux pour les intentions et les objets
         $intentions = [];
         $objects = [];

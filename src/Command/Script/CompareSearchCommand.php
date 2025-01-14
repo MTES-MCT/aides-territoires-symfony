@@ -75,8 +75,6 @@ class CompareSearchCommand extends Command
             ';'
         );
 
-        $xAuthKey = $this->paramService->get('X_AUTH_KEY');
-
         foreach ($projectReferences as $projectReference) {
             $aidParams = [
                 'keyword' => $projectReference->getName(),

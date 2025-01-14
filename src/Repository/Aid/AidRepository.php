@@ -1436,7 +1436,7 @@ class AidRepository extends ServiceEntityRepository
         if ($selectComplete) {
             $qb->select('a');
         } else {
-            $qb->select('PARTIAL a.{id, name, slug}');
+            $qb->select('PARTIAL a.{id, name, slug, status, dateStart, dateSubmissionDeadline}');
         }
 
         // les liaisons qu'on précharge
@@ -1806,6 +1806,7 @@ class AidRepository extends ServiceEntityRepository
                     $sqlScore .= ' + ';
                 }
                 $objects = str_getcsv($objectsString, ' ', '"');
+
                 // on retire tous les éléments vide de $objects
                 $objects = array_filter($objects, function ($value) {
                     return '' !== trim($value);
@@ -1822,6 +1823,7 @@ class AidRepository extends ServiceEntityRepository
                     }
                     return $string;
                 }, $objects);
+
                 $objectsStringwithAsterisk = implode(' ', $objects);
                 $sqlScore .= '
                     CASE WHEN (MATCH_AGAINST(a.name) AGAINST(:objects_string) > 0.8) THEN 60 ELSE 0 END

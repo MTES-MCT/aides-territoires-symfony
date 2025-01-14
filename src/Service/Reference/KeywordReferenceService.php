@@ -7,7 +7,8 @@ use App\Repository\Reference\KeywordReferenceRepository;
 class KeywordReferenceService
 {
     public function __construct(
-        private KeywordReferenceRepository $keywordReferenceRepository
+        private KeywordReferenceRepository $keywordReferenceRepository,
+        private ReferenceService $referenceService
     ) {
     }
 
@@ -17,8 +18,15 @@ class KeywordReferenceService
             return '';
         }
 
+        $keywords = $this->referenceService->getKeywords($keyword);
+
         // on recupère tous les mots clés correspondants
-        $keywordReferences = $this->keywordReferenceRepository->findBy(['name' => $keyword]);
+        $keywordReferences = $this->keywordReferenceRepository->findFromKewyordsOrOriginalName(
+            $keywords,
+            $keyword
+        );
+        
+
         // ça ne correspons à aucun mot clé
         if (empty($keywordReferences)) {
             return $keyword;
