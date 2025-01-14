@@ -39,6 +39,7 @@ class AidController extends ApiController
         // parametres pour requetes aides
         $aidParams = [
             'showInSearch' => true,
+            'selectComplete' => true
         ];
 
         $aidParams = array_merge($aidParams, $aidSearchFormService->convertAidSearchClassToAidParams($aidSearchClass));
@@ -107,10 +108,11 @@ class AidController extends ApiController
     public function all(
         AidService $aidService
     ): JsonResponse {
-        $params = [];
-        $params['showInSearch'] = true;
-        $params['orderBy'] = ['sort' => 'a.id', 'order' => 'DESC'];
-
+        $params = [
+            'showInSearch' => true,
+            'selectComplete' => true,
+            'orderBy' => ['sort' => 'a.id', 'order' => 'DESC']
+        ];
         // requete pour compter sans la pagination
         $results = $aidService->searchAids($params);
         $count = count($results);

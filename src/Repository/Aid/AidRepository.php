@@ -1341,6 +1341,7 @@ class AidRepository extends ServiceEntityRepository
                 : null
         ;
         $orderByDateSubmissionDeadline = $params['orderByDateSubmissionDeadline'] ?? null;
+        $selectComplete = $params['selectComplete'] ?? null;
 
         // les paramètres
         $id = $params['id'] ?? null;
@@ -1431,19 +1432,14 @@ class AidRepository extends ServiceEntityRepository
         // le queryBuilder
         $qb = $this->createQueryBuilder('a');
 
+        // les champs des aides sélectionnés
+        if ($selectComplete) {
+            $qb->select('a');
+        } else {
+            $qb->select('PARTIAL a.{id, name, slug}');
+        }
+
         // les liaisons qu'on précharge
-        // $qb
-        //     // ->select('a, perimeter, aidRecurrence, projectReferences')
-        //     ->select('PARTIAL a.{id, name, slug}')
-        //     // ->select('a')
-        //     ->addSelect('PARTIAL perimeter.{id, name}')  // pour perimeter
-        //     // ->addSelect('PARTIAL aidRecurrence.{id, name}') // pour aid_recurrence
-        //     ->addSelect('PARTIAL projectReferences.{id, name}') // pour project_reference
-        //     ->innerJoin('a.perimeter', 'perimeter')
-        //     // ->leftJoin('a.aidRecurrence', 'aidRecurrence')
-        //     ->leftJoin('a.projectReferences', 'projectReferences')
-        // ;
-        $qb->select('PARTIAL a.{id, name, slug}');
         if ($needJoinPerimeter) {
             $qb
                 ->innerJoin('a.perimeter', 'perimeter')
