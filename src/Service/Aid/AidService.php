@@ -248,33 +248,33 @@ class AidService // NOSONAR too complex
      */
     public function searchAids(array $aidParams): array
     {
-        // return $this->searchAidsV2($aidParams);
-        /** @var AidRepository $aidRepo */
-        $aidRepo = $this->managerRegistry->getRepository(Aid::class);
-        $aids = $aidRepo->findCustom($aidParams);
+        return $this->searchAidsV2($aidParams);
+        // /** @var AidRepository $aidRepo */
+        // $aidRepo = $this->managerRegistry->getRepository(Aid::class);
+        // $aids = $aidRepo->findCustom($aidParams);
 
-        // Si on a le score total et le score objects on tri par le cumul des deux
-        // (pas possible directement dans la requête sans trop l'alourdir)
-        if (isset($aids[0]) && $aids[0]->getScoreTotal() && $aids[0]->getScoreObjects()) {
-            usort($aids, function ($a, $b) {
-                return ($b->getScoreTotal() + $b->getScoreObjects()) <=> ($a->getScoreTotal() + $a->getScoreObjects());
-            });
-        }
+        // // Si on a le score total et le score objects on tri par le cumul des deux
+        // // (pas possible directement dans la requête sans trop l'alourdir)
+        // if (isset($aids[0]) && $aids[0]->getScoreTotal() && $aids[0]->getScoreObjects()) {
+        //     usort($aids, function ($a, $b) {
+        //         return ($b->getScoreTotal() + $b->getScoreObjects()) <=> ($a->getScoreTotal() + $a->getScoreObjects());
+        //     });
+        // }
 
-        if (isset($aidParams['projectReference']) && $aidParams['projectReference'] instanceof ProjectReference) {
-            /** @var Aid $aid */
-            foreach ($aids as $aid) {
-                if ($aid->getProjectReferences()->contains($aidParams['projectReference'])) {
-                    $aid->addProjectReferenceSearched($aidParams['projectReference']);
-                }
-            }
-        }
+        // if (isset($aidParams['projectReference']) && $aidParams['projectReference'] instanceof ProjectReference) {
+        //     /** @var Aid $aid */
+        //     foreach ($aids as $aid) {
+        //         if ($aid->getProjectReferences()->contains($aidParams['projectReference'])) {
+        //             $aid->addProjectReferenceSearched($aidParams['projectReference']);
+        //         }
+        //     }
+        // }
 
-        if (!isset($aidParams['noPostPopulate'])) {
-            $aids = $this->postPopulateAids($aids, $aidParams);
-        }
+        // if (!isset($aidParams['noPostPopulate'])) {
+        //     $aids = $this->postPopulateAids($aids, $aidParams);
+        // }
 
-        return $aids;
+        // return $aids;
     }
 
     public function extractInlineStyles(Aid $aid): Aid
