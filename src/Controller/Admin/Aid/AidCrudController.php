@@ -416,10 +416,10 @@ class AidCrudController extends AtCrudController implements EventSubscriberInter
             ->hideOnIndex();
 
 
-        yield ArrayField::new('keywordReferences', 'Mots clés référents')
+            yield ArrayField::new('keywordReferences', 'Mots clés référents')
             ->formatValue(function ($value, $entity) {
                 return implode('', array_map(function ($keywordReference) {
-                    return '- ' . $keywordReference->getName() . '<br>';
+                    return '- '.$keywordReference->getName().'<br>';
                 }, $value->toArray()));
             })
             ->onlyOnIndex();
