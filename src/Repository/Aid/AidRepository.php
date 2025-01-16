@@ -26,6 +26,8 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
+use Symfony\Contracts\Cache\ItemInterface;
+use Symfony\Contracts\Cache\TagAwareCacheInterface;
 
 /**
  * @extends ServiceEntityRepository<Aid>
@@ -41,6 +43,7 @@ class AidRepository extends ServiceEntityRepository
         ManagerRegistry $registry,
         private ReferenceService $referenceService,
         private StringService $stringService,
+        private TagAwareCacheInterface $cache,
     ) {
         parent::__construct($registry, Aid::class);
     }
@@ -1307,9 +1310,43 @@ class AidRepository extends ServiceEntityRepository
 
     public function findForSearch(?array $params = null): array
     {
-        $qb = $this->getQueryBuilderForSearch($params);
-        $results = $qb->getQuery()
-        ->getResult();
+        // Création d'une clé de cache unique basée sur les paramètres
+        $cacheKey = 'aids_search_'.hash('xxh128', serialize([
+            'params' => $params,
+            'date' => (new \DateTime())->format('Y-m-d'),
+        ]));
+
+        $results = $this->cache->get($cacheKey, function (ItemInterface $item) use ($params) {
+            // Expire le lendemain à 4h du matin
+            $tomorrow = new \DateTime('tomorrow 4:00:00');
+            $expiresIn = $tomorrow->getTimestamp() - time();
+
+            $item->expiresAfter($expiresIn);
+
+            // Ajout de tags pour pouvoir invalider des groupes spécifiques
+            $tags = ['aids', 'search_results'];
+
+            // Ajout de tags spécifiques basés sur les paramètres
+            if (isset($params['perimeter'])) {
+                $tags[] = 'perimeter_'.$params['perimeter'];
+            }
+            if (isset($params['categories'])) {
+                foreach ($params['categories'] as $category) {
+                    $tags[] = 'category_'.$category;
+                }
+            }
+
+            $item->tag($tags);
+
+            // Exécution de la requête originale
+            $qb = $this->getQueryBuilderForSearch($params);
+            if ($params['projectReference'] ?? null) {
+                $qb->leftJoin('a.projectReferences', 'pr')
+                    ->addSelect('pr');
+            }
+
+            return $qb->getQuery()->getResult();
+        });
 
         $return = [];
         foreach ($results as $result) {
@@ -1719,7 +1756,7 @@ class AidRepository extends ServiceEntityRepository
             $simpleWordsString = !empty($synonyms['simple_words_string'])
                 ? $this->stringService->sanitizeBooleanSearch($synonyms['simple_words_string'])
                 : null;
-            
+
             $sqlScore = '';
 
             if ($originalName) {
@@ -1768,10 +1805,10 @@ class AidRepository extends ServiceEntityRepository
                         $transformedTerms = array_map(function ($term) {
                             return false !== strpos($term, ' ') ? '"'.$term.'"' : $term;
                         }, $requiredKeywordReferencesName);
-    
+
                         // on transforme le tableau en string pour la recherche fulltext
                         $requiredKeywordReferencesNameString = implode(' ', $transformedTerms);
-    
+
                         $qb->andWhere('
                             MATCH_AGAINST(a.name, a.nameInitial, a.description, a.eligibility, a.projectExamples) '
                             .'AGAINST (:requireKeywordReferencesString_'.$key.' IN BOOLEAN MODE) > 0 '
@@ -1815,12 +1852,13 @@ class AidRepository extends ServiceEntityRepository
                     // Découper le terme en mots
                     $words = explode(' ', $object);
                     // Ajouter * à la fin de chaque mot
-                    $words = array_map(fn($word) => $word . '*', $words);
+                    $words = array_map(fn ($word) => $word.'*', $words);
                     // Réassembler les mots en une seule chaîne
                     $string = implode(' ', $words);
                     if (count($words) > 1) {
                         $string = '"'.$string.'"';
                     }
+
                     return $string;
                 }, $objects);
 

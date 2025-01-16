@@ -1,5 +1,29 @@
 framework:
     cache:
+        # Cache par défaut en filesystem
+        app: cache.adapter.filesystem
+        
+        pools:
+            # Pools Doctrine en Redis
+            doctrine.metadata_cache_pool:
+                adapter: cache.adapter.redis
+                provider: '%env(REDIS_URL)%'
+                default_lifetime: 86400
+            doctrine.query_cache_pool:
+                adapter: cache.adapter.redis
+                provider: '%env(REDIS_URL)%'
+                default_lifetime: 86400
+            doctrine.result_cache_pool:
+                adapter: cache.adapter.redis
+                provider: '%env(REDIS_URL)%'
+                default_lifetime: 86400
+                
+            # Pool Redis disponible pour les repositories
+            cache.redis:
+                adapter: cache.adapter.redis_tag_aware
+                provider: '%env(REDIS_URL)%'
+                default_lifetime: 3600
+                tags: true
         # Unique name of your app: used to compute stable namespaces for cache keys.
         #prefix_seed: your_vendor_name/app_name
 
