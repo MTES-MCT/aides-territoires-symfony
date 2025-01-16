@@ -65,6 +65,17 @@ class Project // NOSONAR too much methods
         'PVD' => 'Petites Villes de Demain'
     ];
 
+    public const CONTRACT_LINK_FOR_FILTER = [
+        'Action Coeur de Ville 1' => 'ACV1',
+        'Action Coeur de Ville 2' => 'ACV2',
+        'Expérimentations et bonnes pratiques locales des collectivités en faveur de '
+            . 'l\'emploi des femmes en zone rurale'
+            => 'AMI',
+        'CRTE' => 'CRTE',
+        'PCAET' => 'PCAET',
+        'Petites Villes de Demain' => 'PVD'
+    ];
+
     public const PROJECT_STEPS = [
         ['slug' => 'considered', 'name' => 'En réflexion'],
         ['slug' => 'ongoing', 'name' => 'En cours'],

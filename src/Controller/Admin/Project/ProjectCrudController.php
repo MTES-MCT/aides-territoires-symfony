@@ -42,7 +42,7 @@ class ProjectCrudController extends AtCrudController
                 'En revue' => Project::STATUS_REVIEWABLE,
                 'Publié' => Project::STATUS_PUBLISHED
             ]))
-            ->add(ChoiceFilter::new('contractLink')->setChoices(Project::CONTRACT_LINK_BY_SLUG))
+            ->add(ChoiceFilter::new('contractLink')->setChoices(Project::CONTRACT_LINK_FOR_FILTER))
         ;
     }
 
