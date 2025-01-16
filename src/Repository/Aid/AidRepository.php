@@ -1356,27 +1356,21 @@ class AidRepository extends ServiceEntityRepository
         // Rechargement des entités avec leurs relations
         if (!empty($results)) {
             $ids = array_column($results, 'id');
+            $scores = array_combine(
+                array_column($results, 'id'),
+                array_column($results, 'score_total')
+            );
+
             $qb = $this->createQueryBuilder('a')
                 ->andWhere('a.id IN (:ids)')
                 ->orderBy(sprintf('FIELD(a.id, %s)', implode(',', $ids)))  // Maintient l'ordre original des IDs
                 ->setParameter('ids', $ids);
 
-            // Ajout des jointures nécessaires si selectComplete
-            if ($params['selectComplete'] ?? false) {
-                $qb->leftJoin('a.projectReferences', 'pr')->addSelect('pr')
-                ->leftJoin('a.aidFinancers', 'af')->addSelect('af');
-            }
-
             $aids = $qb->getQuery()->getResult();
 
             // Restauration des scores
             foreach ($aids as $aid) {
-                foreach ($results as $result) {
-                    if ($result['id'] === $aid->getId()) {
-                        $aid->setScoreTotal($result['score_total']);
-                        break;
-                    }
-                }
+                $aid->setScoreTotal($scores[$aid->getId()] ?? null);
             }
 
             return $aids;
