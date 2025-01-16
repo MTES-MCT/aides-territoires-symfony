@@ -1315,8 +1315,9 @@ class AidRepository extends ServiceEntityRepository
      */
     public function findForSearch(?array $params = null): array
     {
-        // Création d'une clé de cache unique basée sur les paramètres
-        $cacheKey = 'aids_search_' . hash('xxh128', serialize([
+        // Clé de cache différente pour API/front
+        $prefix = ($params['selectComplete'] ?? false) ? 'aids_api_' : 'aids_front_';
+        $cacheKey = $prefix . hash('xxh128', serialize([
             'params' => $params,
             'date' => (new \DateTime())->format('Y-m-d'),
         ]));
