@@ -11,7 +11,6 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 use App\Repository\Reference\ProjectReferenceRepository;
 use App\Repository\Reference\KeywordReferenceRepository;
 
-
 #[AsCommand(name: 'at:script:pr_new_keyword', description: 'Associations mots cles')]
 class PrKeywordCommand extends Command
 {

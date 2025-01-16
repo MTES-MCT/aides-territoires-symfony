@@ -319,7 +319,7 @@ class AidService // NOSONAR too complex
     {
         // on déduplique les génériques
         $aids = $this->unDuplicateGenerics($aids, $params['perimeterFrom'] ?? null);
-        
+
         // pour les portails il y a des aides mises en avant et des aides à exclures
         $aids = $this->handleSearchPageRules($aids, $params);
 
@@ -343,7 +343,7 @@ class AidService // NOSONAR too complex
                     unset($aids[$key]);
                 }
             }
-        
+
             // aides à mettre en avant
             $highlightedAids = [];
             foreach ($params['searchPage']->getHighlightedAids() as $aid) {
@@ -352,7 +352,7 @@ class AidService // NOSONAR too complex
                     $highlightedAids[] = $aid;
                 }
             }
-            
+
             $normalAids = [];
             foreach ($aids as $key => $aid) {
                 if (!$params['searchPage']->getHighlightedAids()->contains($aid)) {
@@ -360,7 +360,7 @@ class AidService // NOSONAR too complex
                 }
                 unset($aids[$key]);
             }
-            
+
             // on ajoute les normalAids après les highlightAids
             $aids = array_values(array_merge($highlightedAids, $normalAids));
         }
@@ -575,7 +575,7 @@ class AidService // NOSONAR too complex
 
         return $this->httpClientInterface->request(
             'POST',
-            'https://www.demarches-simplifiees.fr/api/public/v1/demarches/'.$dsId.'/dossiers',
+            'https://www.demarches-simplifiees.fr/api/public/v1/demarches/' . $dsId . '/dossiers',
             [
                 'headers' => [
                     'Content-Type' => 'application/json',
@@ -689,7 +689,7 @@ class AidService // NOSONAR too complex
         $minutesMax = 5;
         foreach ($aid->getAidLocks() as $aidLock) {
             // si le lock a plus de 5 min, on le supprime
-            if ($aidLock->getTimeStart() < $now->sub(new \DateInterval('PT'.$minutesMax.'M'))) {
+            if ($aidLock->getTimeStart() < $now->sub(new \DateInterval('PT' . $minutesMax . 'M'))) {
                 $this->managerRegistry->getManager()->remove($aidLock);
                 $this->managerRegistry->getManager()->flush();
                 continue;
@@ -748,10 +748,10 @@ class AidService // NOSONAR too complex
     public function extractKeywords(Aid $aid): array
     {
         // concatene les textes bruts
-        $text = $aid->getName().' '
-            .strip_tags((string) $aid->getDescription()).' '
-            .strip_tags((string) $aid->getEligibility()).' '
-            .strip_tags((string) $aid->getContact());
+        $text = $aid->getName() . ' '
+            . strip_tags((string) $aid->getDescription()) . ' '
+            . strip_tags((string) $aid->getEligibility()) . ' '
+            . strip_tags((string) $aid->getContact());
 
         $commonWords = [
             'pour',
@@ -846,7 +846,7 @@ class AidService // NOSONAR too complex
         $text = preg_replace('/\b\w{1,2}\b/u', '', $text);
 
         // Retirer les mots communs
-        $commonWordsPattern = '/\b('.implode('|', $commonWords).')\b/ui';
+        $commonWordsPattern = '/\b(' . implode('|', $commonWords) . ')\b/ui';
         $text = preg_replace($commonWordsPattern, '', $text);
 
         /** @var KeywordReferenceRepository $keywordReferenceRepository */
@@ -905,7 +905,7 @@ class AidService // NOSONAR too complex
             $sheet = $firstAid ? $spreadsheet->getActiveSheet() : $spreadsheet->createSheet();
             $firstAid = false;
 
-            $sheetTitle = preg_replace('/[^a-zA-Z0-9_]/', '', $aid->getId().'_'.$aid->getName());
+            $sheetTitle = preg_replace('/[^a-zA-Z0-9_]/', '', $aid->getId() . '_' . $aid->getName());
             $sheetTitle = $stringService->truncate($sheetTitle, 31);
             $sheet->setTitle($sheetTitle);
 
@@ -942,7 +942,7 @@ class AidService // NOSONAR too complex
                     $nbProjectPublicsByDay[$currentDay->format('Y-m-d')] ?? '0',
                     $nbProjectPrivatesByDay[$currentDay->format('Y-m-d')] ?? '0',
                 ];
-                $sheet->fromArray($dataRow, null, 'A'.$rowIndex);
+                $sheet->fromArray($dataRow, null, 'A' . $rowIndex);
                 ++$rowIndex;
                 $currentDay->add(new \DateInterval('P1D'));
             }
@@ -1036,12 +1036,16 @@ class AidService // NOSONAR too complex
         // on s'assure du tri si les données viennent du cache redis
         if (isset($aidParams['orderByDateSubmissionDeadline'])) {
             $aids = $this->orderAidsByDateSubmissionDeadline($aids);
-        } elseif (isset($aidParams['orderBy']) && isset($aidParams['orderBy']['sort']) && $aidParams['orderBy']['sort'] == 'a.timePublished') {
+        } elseif (
+            isset($aidParams['orderBy'])
+            && isset($aidParams['orderBy']['sort'])
+            && $aidParams['orderBy']['sort'] == 'a.timePublished'
+        ) {
             $aids = $this->orderAidsByDatePublished($aids);
         } else {
             $aids = $this->orderAidsByScoreTotal($aids);
         }
-        
+
         if (isset($aidParams['projectReference']) && $aidParams['projectReference'] instanceof ProjectReference) {
             /** @var Aid $aid */
             foreach ($aids as $aid) {
@@ -1050,61 +1054,73 @@ class AidService // NOSONAR too complex
                 }
             }
         }
-        
+
         if (!isset($aidParams['noPostPopulate'])) {
             $aids = $this->postPopulateAids($aids, $aidParams);
         }
-        
+
         return $aids;
     }
 
+    /**
+     * @param array<int, Aid> $aids
+     * @return array<int, Aid>
+     */
     private function orderAidsByDatePublished(array $aids): array
     {
         usort($aids, function ($a, $b) {
             $dateA = $a->getDatePublished();
             $dateB = $b->getDatePublished();
-            
+
             if ($dateA === null) {
                 return 1;  // null à la fin
             } elseif ($dateB === null) {
                 return -1; // null à la fin
             }
-            
+
             return $dateB <=> $dateA; // ordre décroissant (plus récent en premier)
         });
 
         return $aids;
     }
 
+    /**
+     * @param array<int, Aid> $aids
+     * @return array<int, Aid>
+     */
     private function orderAidsByDateSubmissionDeadline(array $aids): array
     {
         usort($aids, function ($a, $b) {
             $dateA = $a->getDateSubmissionDeadline();
             $dateB = $b->getDateSubmissionDeadline();
-            
+
             // Si les deux sont null, trier par scoreTotal décroissant
             if ($dateA === null && $dateB === null) {
-                return ($b->getScoreTotal() ?? 0) <=> ($a->getScoreTotal() ?? 0);
+                return $b->getScoreTotal() <=> $a->getScoreTotal();
             }
-            
+
             // Si une seule est null, la mettre à la fin
             if ($dateA === null) {
                 return 1;
             } elseif ($dateB === null) {
                 return -1;
             }
-            
+
             // Sinon tri par date croissante
             return $dateA <=> $dateB;
         });
-    
+
         return $aids;
     }
 
+    /**
+     * @param array<int, Aid> $aids
+     * @return array<int, Aid>
+     */
     private function orderAidsByScoreTotal(array $aids): array
     {
         usort($aids, function ($a, $b) {
-            return ($b->getScoreTotal() ?? 0) <=> ($a->getScoreTotal() ?? 0);
+            return $b->getScoreTotal() <=> $a->getScoreTotal();
         });
 
         return $aids;

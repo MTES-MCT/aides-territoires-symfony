@@ -2,7 +2,6 @@
 
 namespace App\Command\Script;
 
-use App\Service\Reference\ReferenceService;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -24,7 +23,6 @@ class NewKeywordReferenceCommand extends Command
 
     public function __construct(
         private ManagerRegistry $managerRegistry,
-        private ReferenceService $referenceService,
         private FileService $fileService
     ) {
         ini_set('max_execution_time', 60 * 60);
@@ -58,7 +56,7 @@ class NewKeywordReferenceCommand extends Command
                 continue;
             }
             $row++;
-            $intention = (int)$data[0];
+            $intention = ((int)$data[0] == 1) ? true : false;
             $name = $data[1];
             $synonyms = explode(',', $data[2]);
 

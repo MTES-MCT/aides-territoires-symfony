@@ -119,7 +119,7 @@ class ReferenceService
         ]);
 
         $keywords = $this->getKeywords($project_name);
-        
+
         // Prépare deux tableaux pour les intentions et les objets
         $intentions = [];
         $objects = [];
@@ -150,7 +150,7 @@ class ReferenceService
             $keywords,
             $original_name
         );
-        
+
         // parcours les mots clés restant
         foreach ($keywordReferences as $key => $result) {
             // si dans la liste d'exclusion
@@ -338,7 +338,7 @@ class ReferenceService
         if ($lastChar === 's') {
             return mb_substr($word, 0, mb_strlen($word) - 1);
         }
-    
+
         return $word;
     }
 
@@ -385,7 +385,7 @@ class ReferenceService
     {
         $words = array_values(array_filter($keywords, fn($word) => !empty($word)));
         $combinations = [];
-        
+
         // Génère les combinaisons de toutes les tailles possibles
         $length = count($words);
         for ($size = 1; $size <= $length; $size++) {
@@ -394,7 +394,7 @@ class ReferenceService
                 // Prend $size mots à partir de la position $start
                 $combination = array_slice($words, $start, $size);
                 $combinationString = implode(' ', $combination);
-                
+
                 // Vérifie si ce n'est pas un article seul et si la combinaison n'est pas vide
                 if (!empty($combinationString) && !in_array($combinationString, $this->articles)) {
                     $combinations[] = $combinationString;
@@ -405,7 +405,7 @@ class ReferenceService
         return array_unique($combinations);
     }
 
-    
+
     /**
      * @param string[] $array
      */

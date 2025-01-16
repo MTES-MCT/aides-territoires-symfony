@@ -19,7 +19,6 @@ class InternalApiService
 
     private function getAPiBaseUrl(): string
     {
-        return 'https://aides-territoires.beta.gouv.fr';
         try {
             $request = $this->requestStack->getCurrentRequest();
             $baseUrl =  $request->getSchemeAndHttpHost();

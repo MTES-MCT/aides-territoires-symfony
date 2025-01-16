@@ -2,20 +2,15 @@
 
 namespace App\Command\Script;
 
-use App\Entity\Reference\ProjectReference;
 use App\Entity\Search\SearchPage;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use App\Repository\Reference\ProjectReferenceRepository;
-use App\Repository\Aid\AidRepository;
 use App\Repository\Search\SearchPageRepository;
 use App\Service\Aid\AidSearchFormService;
 use App\Service\Aid\AidService;
-use App\Service\Various\ParamService;
-use App\Service\Api\InternalApiService;
 use Symfony\Component\Routing\RouterInterface;
 use App\Service\File\FileService;
 use Symfony\Component\DomCrawler\Crawler;
@@ -32,13 +27,9 @@ class ComparePortalCommand extends Command
 
 
     public function __construct(
-        private ProjectReferenceRepository $projectReferenceRepository,
         private SearchPageRepository $searchPageRepository,
-        private AidRepository $aidRepository,
         private AidService $aidService,
         private AidSearchFormService $aidSearchFormService,
-        private ParamService $paramService,
-        private InternalApiService $internalApiService,
         private RouterInterface $routerInterface,
         private FileService $fileService
     ) {
@@ -103,7 +94,7 @@ class ComparePortalCommand extends Command
                     'dontUseUserPerimeter' => true
                 ]
             );
-    
+
             if (isset($aidParams['categories'])) {
                 foreach ($aidParams['categories'] as $category) {
                     $aidSearchClass->addCategoryId($category);
@@ -111,10 +102,15 @@ class ComparePortalCommand extends Command
             }
 
             // parametres pour requetes aides
-            $aidParams = array_merge($aidParams, $this->aidSearchFormService->convertAidSearchClassToAidParams($aidSearchClass));
+            $aidParams = array_merge(
+                $aidParams,
+                $this->aidSearchFormService->convertAidSearchClassToAidParams(
+                    $aidSearchClass
+                )
+            );
 
             $aidParams['searchPage'] = $search_page;
-            
+
             $countOld = $this->getOldCount($search_page);
             $countNew = count($this->aidService->searchAidsV2($aidParams));
 
@@ -135,7 +131,11 @@ class ComparePortalCommand extends Command
                     $countNew,
                     $countNew - $countOld,
                     str_replace('http://localhost', 'https://aides-territoires.beta.gouv.fr', $aidUrl),
-                    str_replace('http://localhost', 'https://aides-terr-php-staging-pr445.osc-fr1.scalingo.io', $aidUrl),
+                    str_replace(
+                        'http://localhost',
+                        'https://aides-terr-php-staging-pr445.osc-fr1.scalingo.io',
+                        $aidUrl
+                    ),
                 ],
                 ';'
             );
@@ -159,7 +159,7 @@ class ComparePortalCommand extends Command
         return Command::SUCCESS;
     }
 
-    private function getOldCount(SearchPage $search_page)
+    private function getOldCount(SearchPage $search_page): int
     {
         $searchPageUrl = $this->routerInterface->generate(
             'app_portal_portal_details',
@@ -169,11 +169,11 @@ class ComparePortalCommand extends Command
             RouterInterface::ABSOLUTE_URL
         );
         $searchPageUrl = str_replace('http://localhost', 'https://aides-territoires.beta.gouv.fr', $searchPageUrl);
-        
+
         $client = HttpClient::create();
         $response = $client->request('GET', $searchPageUrl);
         $content = $response->getContent();
-        
+
         $crawler = new Crawler($content);
         $section = $crawler->filter('#aid-list');
         if ($section->count() > 0) {
@@ -183,7 +183,7 @@ class ComparePortalCommand extends Command
         } else {
             $nb = 0;
         }
-        
+
         return $nb;
     }
 }

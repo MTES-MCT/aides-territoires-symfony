@@ -25,7 +25,7 @@ class KeywordReferenceService
             $keywords,
             $keyword
         );
-        
+
 
         // ça ne correspons à aucun mot clé
         if (empty($keywordReferences)) {

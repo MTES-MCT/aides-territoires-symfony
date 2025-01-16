@@ -2,18 +2,13 @@
 
 namespace App\Command\Script;
 
-use App\Service\Reference\ReferenceService;
-use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use App\Repository\Reference\ProjectReferenceRepository;
-use App\Repository\Aid\AidRepository;
 use App\Service\Aid\AidService;
-use App\Service\Various\ParamService;
 use App\Service\Api\InternalApiService;
 use Symfony\Component\Routing\RouterInterface;
 use App\Service\File\FileService;
@@ -30,9 +25,7 @@ class CompareSearchCommand extends Command
 
     public function __construct(
         private ProjectReferenceRepository $projectReferenceRepository,
-        private AidRepository $aidRepository,
         private AidService $aidService,
-        private ParamService $paramService,
         private InternalApiService $internalApiService,
         private RouterInterface $routerInterface,
         private FileService $fileService
@@ -111,7 +104,11 @@ class CompareSearchCommand extends Command
                     $countNew,
                     $countNew - $countOld,
                     str_replace('http://localhost', 'https://aides-territoires.beta.gouv.fr', $aidUrl),
-                    str_replace('http://localhost/aides', 'https://aides-terr-php-staging-pr445.osc-fr1.scalingo.io/testrecherche', $aidUrl),
+                    str_replace(
+                        'http://localhost/aides',
+                        'https://aides-terr-php-staging-pr445.osc-fr1.scalingo.io/testrecherche',
+                        $aidUrl
+                    ),
                 ],
                 ';'
             );

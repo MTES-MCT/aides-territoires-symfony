@@ -150,7 +150,7 @@ class ProjectReferenceController extends FrontController
             );
             $newUrl = preg_replace(
                 '/(page=)[^\&]+/',
-                'page='.$pagerfanta->getNbPages(),
+                'page=' . $pagerfanta->getNbPages(),
                 $requestStack->getCurrentRequest()->getRequestUri()
             );
 
@@ -530,9 +530,9 @@ class ProjectReferenceController extends FrontController
         foreach ($parents as $parent) {
             if ($parent instanceof KeywordReference) {
                 if ($parent->getName() != $query) {
-                    $text = $parent->getName().', '.$query.' et synonymes';
+                    $text = $parent->getName() . ', ' . $query . ' et synonymes';
                 } else {
-                    $text = $parent->getName().' et synonymes';
+                    $text = $parent->getName() . ' et synonymes';
                 }
                 $results[] = [
                     'value' => $parent->getName(),
