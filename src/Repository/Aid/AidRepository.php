@@ -1316,51 +1316,60 @@ class AidRepository extends ServiceEntityRepository
             'date' => (new \DateTime())->format('Y-m-d'),
         ]));
 
+        // Récupération depuis le cache ou exécution de la requête
         $results = $this->cache->get($cacheKey, function (ItemInterface $item) use ($params) {
-            // Expire le lendemain à 4h du matin
-            $tomorrow = new \DateTime('tomorrow 4:00:00');
-            $expiresIn = $tomorrow->getTimestamp() - time();
-
-            $item->expiresAfter($expiresIn);
-
-            // Ajout de tags pour pouvoir invalider des groupes spécifiques
-            $tags = ['aids', 'search_results'];
-
-            // Ajout de tags spécifiques basés sur les paramètres
-            if (isset($params['perimeter'])) {
-                $tags[] = 'perimeter_'.$params['perimeter'];
-            }
-            if (isset($params['categories'])) {
-                foreach ($params['categories'] as $category) {
-                    $tags[] = 'category_'.$category;
-                }
-            }
-
-            $item->tag($tags);
-
-            // Exécution de la requête originale
             $qb = $this->getQueryBuilderForSearch($params);
-            if ($params['projectReference'] ?? null) {
-                $qb->leftJoin('a.projectReferences', 'pr')
-                    ->addSelect('pr');
-            }
+            $results = $qb->getQuery()->getResult();
+            
+            // On ne stocke que les IDs dans le cache
+            $idsToCache = array_map(function($result) {
+                /** @var Aid $aid */
+                $aid = $result[0];
+                $aid->setScoreTotal($result['score_total'] ?? 0);
+                return [
+                    'id' => $aid->getId(),
+                    'score_total' => $aid instanceof Aid ? $aid->getScoreTotal() : null
+                ];
+            }, $results);
 
-            return $qb->getQuery()->getResult();
+            $tomorrow = new \DateTime('tomorrow');
+            $tomorrow->setTime(0, 0);
+            $item->expiresAfter($tomorrow->getTimestamp() - time());
+            $item->tag(['aids', 'search_results']);
+            
+            return $idsToCache;
         });
 
-        $return = [];
-        foreach ($results as $result) {
-            if ($result instanceof Aid) {
-                $return[] = $result;
-            } elseif (is_array($result) && isset($result[0]) && $result[0] instanceof Aid) {
-                if (isset($result['score_total'])) {
-                    $result[0]->setScoreTotal($result['score_total']);
-                }
-                $return[] = $result[0];
+        // Rechargement des entités avec leurs relations
+        if (!empty($results)) {
+            $ids = array_column($results, 'id');
+            
+            $qb = $this->createQueryBuilder('a')
+                ->andWhere('a.id IN (:ids)')
+                ->setParameter('ids', $ids);
+
+            // Ajout des jointures nécessaires si selectComplete
+            if ($params['selectComplete'] ?? false) {
+                $qb->leftJoin('a.projectReferences', 'pr')->addSelect('pr')
+                ->leftJoin('a.aidFinancers', 'af')->addSelect('af');
             }
+
+            $aids = $qb->getQuery()->getResult();
+
+            // Restauration des scores
+            foreach ($aids as $aid) {
+                foreach ($results as $result) {
+                    if ($result['id'] === $aid->getId()) {
+                        $aid->setScoreTotal($result['score_total']);
+                        break;
+                    }
+                }
+            }
+
+            return $aids;
         }
 
-        return $return;
+        return [];
     }
 
     public function getQueryBuilderForSearch(?array $params = null): QueryBuilder
