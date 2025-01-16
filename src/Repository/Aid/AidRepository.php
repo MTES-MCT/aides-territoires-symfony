@@ -1323,9 +1323,14 @@ class AidRepository extends ServiceEntityRepository
             
             // On ne stocke que les IDs dans le cache
             $idsToCache = array_map(function($result) {
-                /** @var Aid $aid */
-                $aid = $result[0];
-                $aid->setScoreTotal($result['score_total'] ?? 0);
+                if ($result instanceof Aid) {
+                    $aid = $result;
+                } elseif (isset($result[0]) && isset($result['score_total'])) {
+                    /** @var Aid $aid */
+                    $aid = $result[0];
+                    $aid->setScoreTotal($result['score_total'] ?? null);
+                }
+
                 return [
                     'id' => $aid->getId(),
                     'score_total' => $aid instanceof Aid ? $aid->getScoreTotal() : null
@@ -1343,7 +1348,6 @@ class AidRepository extends ServiceEntityRepository
         // Rechargement des entités avec leurs relations
         if (!empty($results)) {
             $ids = array_column($results, 'id');
-            
             $qb = $this->createQueryBuilder('a')
                 ->andWhere('a.id IN (:ids)')
                 ->setParameter('ids', $ids);
@@ -1365,7 +1369,7 @@ class AidRepository extends ServiceEntityRepository
                     }
                 }
             }
-
+            
             return $aids;
         }
 
