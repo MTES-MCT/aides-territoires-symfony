@@ -52,6 +52,7 @@ doctrine:
                 WEEK: DoctrineExtensions\Query\Mysql\Week
                 JSON_CONTAINS: DoctrineExtensions\Query\Mysql\JsonContains
                 EXTRACT: DoctrineExtensions\Query\Mysql\Extract
+                FIELD: DoctrineExtensions\Query\Mysql\Field
 
 when@test:
     doctrine:

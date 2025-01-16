@@ -1352,11 +1352,13 @@ class AidRepository extends ServiceEntityRepository
             return $idsToCache;
         });
 
+
         // Rechargement des entités avec leurs relations
         if (!empty($results)) {
             $ids = array_column($results, 'id');
             $qb = $this->createQueryBuilder('a')
                 ->andWhere('a.id IN (:ids)')
+                ->orderBy(sprintf('FIELD(a.id, %s)', implode(',', $ids)))  // Maintient l'ordre original des IDs
                 ->setParameter('ids', $ids);
 
             // Ajout des jointures nécessaires si selectComplete
@@ -1458,6 +1460,7 @@ class AidRepository extends ServiceEntityRepository
         if ($keywords || $projectReference) {
             $needJoinProjectReference = true;
         }
+        $scoreTotalAvailable = false;
 
         $aidStepIds = $params['aidStepIds'] ?? null;
         $aidSteps = $params['aidSteps'] ?? null;
@@ -1933,7 +1936,8 @@ class AidRepository extends ServiceEntityRepository
             $sqlScore = '(' . $sqlScore . ') as score_total';
             $qb->addSelect($sqlScore);
             $qb->andHaving('score_total >= ' . $scoreMin);
-            $qb->orderBy('score_total', 'DESC');
+            // $qb->orderBy('score_total', 'DESC');
+            $scoreTotalAvailable = true;
         }
 
         if ($withOldKeywords) {
@@ -2212,16 +2216,19 @@ class AidRepository extends ServiceEntityRepository
         }
 
         // TRI
-        if (null !== $orderBy) {
-            $qb->addOrderBy($orderBy['sort'], $orderBy['order']);
-        }
-
         if (true === $orderByDateSubmissionDeadline) {
             $qb
                 ->addSelect('CASE WHEN a.dateSubmissionDeadline IS NULL THEN 1 ELSE 0 END as HIDDEN priority_is_null')
                 ->addOrderBy('priority_is_null', 'ASC')
                 ->addOrderBy('a.dateSubmissionDeadline', 'ASC')
             ;
+            if ($scoreTotalAvailable) {
+                $qb->addOrderBy('score_total', 'DESC');
+            }
+        } else {
+            if (null !== $orderBy) {
+                $qb->addOrderBy($orderBy['sort'], $orderBy['order']);
+            }
         }
 
         // Limite

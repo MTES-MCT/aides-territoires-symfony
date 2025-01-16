@@ -1033,19 +1033,6 @@ class AidService // NOSONAR too complex
         $aidRepository = $this->managerRegistry->getRepository(Aid::class);
         $aids = $aidRepository->findForSearch($aidParams);
 
-        // on s'assure du tri si les données viennent du cache redis
-        if (isset($aidParams['orderByDateSubmissionDeadline'])) {
-            $aids = $this->orderAidsByDateSubmissionDeadline($aids);
-        } elseif (
-            isset($aidParams['orderBy'])
-            && isset($aidParams['orderBy']['sort'])
-            && $aidParams['orderBy']['sort'] == 'a.timePublished'
-        ) {
-            $aids = $this->orderAidsByDatePublished($aids);
-        } else {
-            $aids = $this->orderAidsByScoreTotal($aids);
-        }
-
         if (isset($aidParams['projectReference']) && $aidParams['projectReference'] instanceof ProjectReference) {
             /** @var Aid $aid */
             foreach ($aids as $aid) {
@@ -1058,70 +1045,6 @@ class AidService // NOSONAR too complex
         if (!isset($aidParams['noPostPopulate'])) {
             $aids = $this->postPopulateAids($aids, $aidParams);
         }
-
-        return $aids;
-    }
-
-    /**
-     * @param array<int, Aid> $aids
-     * @return array<int, Aid>
-     */
-    private function orderAidsByDatePublished(array $aids): array
-    {
-        usort($aids, function ($a, $b) {
-            $dateA = $a->getDatePublished();
-            $dateB = $b->getDatePublished();
-
-            if ($dateA === null) {
-                return 1;  // null à la fin
-            } elseif ($dateB === null) {
-                return -1; // null à la fin
-            }
-
-            return $dateB <=> $dateA; // ordre décroissant (plus récent en premier)
-        });
-
-        return $aids;
-    }
-
-    /**
-     * @param array<int, Aid> $aids
-     * @return array<int, Aid>
-     */
-    private function orderAidsByDateSubmissionDeadline(array $aids): array
-    {
-        usort($aids, function ($a, $b) {
-            $dateA = $a->getDateSubmissionDeadline();
-            $dateB = $b->getDateSubmissionDeadline();
-
-            // Si les deux sont null, trier par scoreTotal décroissant
-            if ($dateA === null && $dateB === null) {
-                return $b->getScoreTotal() <=> $a->getScoreTotal();
-            }
-
-            // Si une seule est null, la mettre à la fin
-            if ($dateA === null) {
-                return 1;
-            } elseif ($dateB === null) {
-                return -1;
-            }
-
-            // Sinon tri par date croissante
-            return $dateA <=> $dateB;
-        });
-
-        return $aids;
-    }
-
-    /**
-     * @param array<int, Aid> $aids
-     * @return array<int, Aid>
-     */
-    private function orderAidsByScoreTotal(array $aids): array
-    {
-        usort($aids, function ($a, $b) {
-            return $b->getScoreTotal() <=> $a->getScoreTotal();
-        });
 
         return $aids;
     }
