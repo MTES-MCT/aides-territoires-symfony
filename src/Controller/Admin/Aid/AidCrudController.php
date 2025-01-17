@@ -432,7 +432,7 @@ class AidCrudController extends AtCrudController implements EventSubscriberInter
                 'choice_label' => function ($entity) {
                     $label = $entity->getName();
                     if ($entity->getParent()) {
-                        $label .= ' (' . $entity->getParent()->getName() . ')';
+                        $label .= ' (id: ' . $entity->getId() . ', parent: ' . $entity->getParent()->getName() . ')';
                     }
                     return $label;
                 }
