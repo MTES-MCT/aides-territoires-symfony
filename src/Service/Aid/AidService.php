@@ -1036,8 +1036,10 @@ class AidService // NOSONAR too complex
         if (isset($aidParams['projectReference']) && $aidParams['projectReference'] instanceof ProjectReference) {
             /** @var Aid $aid */
             foreach ($aids as $aid) {
-                if ($aid->getProjectReferences()->contains($aidParams['projectReference'])) {
-                    $aid->addProjectReferenceSearched($aidParams['projectReference']);
+                foreach ($aid->getProjectReferences() as $projectReference) {
+                    if ($projectReference->getId() == $aidParams['projectReference']->getId()) {
+                        $aid->addProjectReferenceSearched($aidParams['projectReference']);
+                    }
                 }
             }
         }
