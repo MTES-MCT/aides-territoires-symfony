@@ -1363,14 +1363,38 @@ class AidRepository extends ServiceEntityRepository
      */
     public function findForSearch(?array $params = null): array
     {
-        $results = $this->findIdsWithCache($params);
+        // Clé de cache différente
+        $prefix = ($params['selectComplete'] ?? false) ? 'aids_complete_' : 'aids_light_';
+        $cacheKey = $prefix . hash('xxh128', serialize([
+            'params' => $params,
+            'date' => (new \DateTime())->format('Y-m-d'),
+        ]));
+        
+        // Récupération depuis le cache ou exécution de la requête
+        return $this->cache->get($cacheKey, function (ItemInterface $item) use ($params) {
+            $qb = $this->getQueryBuilderForSearch($params);
+            $results = $qb->getQuery()->getResult();
 
-        // Rechargement des entités avec leurs relations
-        if (!empty($results)) {
-            return $this->aidService->getAidsFromResults($results);
-        }
+            // On ne stocke que les IDs dans le cache
+            $aids = array_map(function ($result) {
+                if ($result instanceof Aid) {
+                    $aid = $result;
+                } elseif (isset($result[0]) && isset($result['score_total'])) {
+                    /** @var Aid $aid */
+                    $aid = $result[0];
+                    $aid->setScoreTotal($result['score_total'] ?? null);
+                }
 
-        return [];
+                return $aid;
+            }, $results);
+
+            $tomorrow = new \DateTime('tomorrow');
+            $tomorrow->setTime(0, 0);
+            $item->expiresAfter($tomorrow->getTimestamp() - time());
+            $item->tag(['aids', 'search_results']);
+
+            return $aids;
+        });
     }
 
     /**
@@ -1496,11 +1520,12 @@ class AidRepository extends ServiceEntityRepository
                 ->innerJoin('a.perimeter', 'perimeter')
             ;
         }
-        if ($needJoinProjectReference) {
-            $qb
-                ->leftJoin('a.projectReferences', 'projectReferences')
-            ;
-        }
+
+        $qb
+            ->leftJoin('a.projectReferences', 'projectReferences')
+            ->addSelect('projectReferences')
+        ;
+        
 
         // LES CRITERES
         // aide
