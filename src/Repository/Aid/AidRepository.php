@@ -1317,9 +1317,7 @@ class AidRepository extends ServiceEntityRepository
      */
     public function findIdsWithCache(?array $params = null): array
     {
-        // Clé de cache différente
-        $prefix = ($params['selectComplete'] ?? false) ? 'aids_complete_' : 'aids_light_';
-        $cacheKey = $prefix . hash('xxh128', serialize([
+        $cacheKey = 'aids_ids_with_cache' . hash('xxh128', serialize([
             'params' => $params,
             'date' => (new \DateTime())->format('Y-m-d'),
         ]));
@@ -1509,21 +1507,20 @@ class AidRepository extends ServiceEntityRepository
 
         // les champs des aides sélectionnés
         if ($selectComplete) {
-            $qb->select('a');
+            // $qb->select('a');
         } else {
             $qb->select('PARTIAL a.{id, name, slug, status, dateStart, dateSubmissionDeadline}');
         }
 
         // les liaisons qu'on précharge
-        if ($needJoinPerimeter) {
-            $qb
-                ->innerJoin('a.perimeter', 'perimeter')
-            ;
-        }
-
         $qb
             ->leftJoin('a.projectReferences', 'projectReferences')
-            ->addSelect('projectReferences')
+            ->leftJoin('a.aidFinancers', 'aidFinancers')
+            ->leftJoin('aidFinancers.backer', 'backer')
+            ->leftJoin('a.aidRecurrence', 'aidRecurrence')
+            ->leftJoin('a.aidTypes', 'aidTypes')
+            ->innerJoin('a.perimeter', 'perimeter')
+            ->addSelect('projectReferences, aidFinancers, backer, aidRecurrence, aidTypes, perimeter')
         ;
         
 
@@ -1949,7 +1946,6 @@ class AidRepository extends ServiceEntityRepository
             $sqlScore = '(' . $sqlScore . ') as score_total';
             $qb->addSelect($sqlScore);
             $qb->andHaving('score_total >= ' . $scoreMin);
-            // $qb->orderBy('score_total', 'DESC');
             $scoreTotalAvailable = true;
         }
 
@@ -2241,6 +2237,10 @@ class AidRepository extends ServiceEntityRepository
         } else {
             if (null !== $orderBy) {
                 $qb->addOrderBy($orderBy['sort'], $orderBy['order']);
+            } else {
+                if ($scoreTotalAvailable) {
+                    $qb->addOrderBy('score_total', 'DESC');
+                }
             }
         }
 

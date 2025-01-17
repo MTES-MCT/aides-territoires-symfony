@@ -10,6 +10,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Contracts\Cache\TagAwareCacheInterface;
 
 class ApiController extends AbstractController
 {
@@ -22,7 +23,8 @@ class ApiController extends AbstractController
         protected RouterInterface $routerInterface,
         protected ManagerRegistry $managerRegistry,
         protected StringService $stringService,
-        protected ParamService $paramService
+        protected ParamService $paramService,
+        protected TagAwareCacheInterface $cache
     ) {
     }
 
