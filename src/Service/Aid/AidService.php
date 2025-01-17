@@ -1078,13 +1078,16 @@ class AidService // NOSONAR too complex
             array_column($results, 'score_total')
         );
 
-        $qb = $aidRepository->createQueryBuilder('a');
-        if (!empty($ids)) {
-        $qb
+        
+        if (empty($ids)) {
+            return [];
+        }
+
+        $qb = $aidRepository->createQueryBuilder('a')
             ->andWhere('a.id IN (:ids)')
             ->orderBy(sprintf('FIELD(a.id, %s)', implode(',', $ids)))  // Maintient l'ordre original des IDs
             ->setParameter('ids', $ids);
-        }
+        
 
         $aids = $qb->getQuery()->getResult();
 
