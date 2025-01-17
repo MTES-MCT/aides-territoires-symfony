@@ -1450,10 +1450,6 @@ class AidRepository extends ServiceEntityRepository
         $perimeterTo = $params['perimeterTo'] ?? null;
         $perimeter = $params['perimeter'] ?? null;
         $perimeterScales = $params['perimeterScales'] ?? null;
-        $needJoinPerimeter = false;
-        if ($perimeter || $perimeterFrom || $perimeterFromId || $perimeterFromIds || $perimeterTo || $perimeterScales) {
-            $needJoinPerimeter = true;
-        }
 
         $keywords = $params['keywords'] ?? null;
         $withOldKeywords = $params['withOldKeywords'] ?? null;
@@ -1466,10 +1462,6 @@ class AidRepository extends ServiceEntityRepository
         $projectReference = $params['projectReference'] ?? null;
         $nameLike = $params['nameLike'] ?? null;
         $hasNoKeywordReference = $params['hasNoKeywordReference'] ?? null;
-        $needJoinProjectReference = false;
-        if ($keywords || $projectReference) {
-            $needJoinProjectReference = true;
-        }
         $scoreTotalAvailable = false;
 
         $aidStepIds = $params['aidStepIds'] ?? null;
@@ -2104,7 +2096,6 @@ class AidRepository extends ServiceEntityRepository
         }
         if (is_array($aidTypeIds) && count($aidTypeIds) > 0) {
             $qb
-                ->innerJoin('a.aidTypes', 'aidTypes')
                 ->andWhere('aidTypes.id IN (:aidTypeIds)')
                 ->setParameter('aidTypeIds', $aidTypeIds)
             ;
@@ -2112,7 +2103,6 @@ class AidRepository extends ServiceEntityRepository
 
         if (null !== $aidTypes && count($aidTypes) > 0) {
             $qb
-                ->innerJoin('a.aidTypes', 'aidTypes')
                 ->andWhere('aidTypes IN (:aidTypes)')
                 ->setParameter('aidTypes', $aidTypes)
             ;
@@ -2121,7 +2111,6 @@ class AidRepository extends ServiceEntityRepository
         // AidRecurrence
         if ($aidRecurrence instanceof AidRecurrence && $aidRecurrence->getId()) {
             $qb
-                ->innerJoin('a.aidRecurrence', 'aidRecurrence')
                 ->andWhere('aidRecurrence = :aidRecurrence')
                 ->setParameter('aidRecurrence', $aidRecurrence)
             ;
@@ -2163,8 +2152,6 @@ class AidRepository extends ServiceEntityRepository
         // Porteur aide
         if ($backer instanceof Backer && $backer->getId()) {
             $qb
-                ->innerJoin('a.aidFinancers', 'aidFinancers')
-                ->innerJoin('aidFinancers.backer', 'backer')
                 ->andWhere('backer = :backer')
                 ->setParameter('backer', $backer)
             ;
@@ -2235,6 +2222,9 @@ class AidRepository extends ServiceEntityRepository
                 $qb->addOrderBy('score_total', 'DESC');
             }
         } else {
+            if (!$scoreTotalAvailable) {
+                $qb->addSelect('a.id as score_total');
+            }
             if (null !== $orderBy) {
                 $qb->addOrderBy($orderBy['sort'], $orderBy['order']);
             } else {
