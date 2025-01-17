@@ -1031,7 +1031,6 @@ class AidService // NOSONAR too complex
     {
         /** @var AidRepository $aidRepository */
         $aidRepository = $this->managerRegistry->getRepository(Aid::class);
-        dump($aidParams);
         $aids = $aidRepository->findForSearch($aidParams);
 
         if (isset($aidParams['projectReference']) && $aidParams['projectReference'] instanceof ProjectReference) {
