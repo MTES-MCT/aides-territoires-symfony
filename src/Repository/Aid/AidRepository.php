@@ -19,6 +19,7 @@ use App\Entity\Reference\ProjectReference;
 use App\Entity\User\User;
 use App\Repository\Perimeter\PerimeterRepository;
 use App\Repository\Reference\KeywordReferenceRepository;
+use App\Service\Aid\AidService;
 use App\Service\Reference\ReferenceService;
 use App\Service\Various\StringService;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
@@ -44,6 +45,7 @@ class AidRepository extends ServiceEntityRepository
         private ReferenceService $referenceService,
         private StringService $stringService,
         private TagAwareCacheInterface $cache,
+        private AidService $aidService
     ) {
         parent::__construct($registry, Aid::class);
     }
@@ -1311,19 +1313,19 @@ class AidRepository extends ServiceEntityRepository
     /**
      * @param array<string, mixed>|null $params
      *
-     * @return array<int, Aid>
+     * @return array<string, int>
      */
-    public function findForSearch(?array $params = null): array
+    public function findIdsWithCache(?array $params = null): array
     {
-        // Clé de cache différente pour API/front
-        $prefix = ($params['selectComplete'] ?? false) ? 'aids_api_' : 'aids_front_';
+        // Clé de cache différente
+        $prefix = ($params['selectComplete'] ?? false) ? 'aids_complete_' : 'aids_light_';
         $cacheKey = $prefix . hash('xxh128', serialize([
             'params' => $params,
             'date' => (new \DateTime())->format('Y-m-d'),
         ]));
 
         // Récupération depuis le cache ou exécution de la requête
-        $results = $this->cache->get($cacheKey, function (ItemInterface $item) use ($params) {
+        return $this->cache->get($cacheKey, function (ItemInterface $item) use ($params) {
             $qb = $this->getQueryBuilderForSearch($params);
             $results = $qb->getQuery()->getResult();
 
@@ -1352,29 +1354,20 @@ class AidRepository extends ServiceEntityRepository
 
             return $idsToCache;
         });
+    }
 
+    /**
+     * @param array<string, mixed>|null $params
+     *
+     * @return array<int, Aid>
+     */
+    public function findForSearch(?array $params = null): array
+    {
+        $results = $this->findIdsWithCache($params);
 
         // Rechargement des entités avec leurs relations
         if (!empty($results)) {
-            $ids = array_column($results, 'id');
-            $scores = array_combine(
-                array_column($results, 'id'),
-                array_column($results, 'score_total')
-            );
-
-            $qb = $this->createQueryBuilder('a')
-                ->andWhere('a.id IN (:ids)')
-                ->orderBy(sprintf('FIELD(a.id, %s)', implode(',', $ids)))  // Maintient l'ordre original des IDs
-                ->setParameter('ids', $ids);
-
-            $aids = $qb->getQuery()->getResult();
-
-            // Restauration des scores
-            foreach ($aids as $aid) {
-                $aid->setScoreTotal($scores[$aid->getId()] ?? null);
-            }
-
-            return $aids;
+            return $this->aidService->getAidsFromResults($results);
         }
 
         return [];

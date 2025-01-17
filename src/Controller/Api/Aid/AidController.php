@@ -45,11 +45,14 @@ class AidController extends ApiController
         $aidParams = array_merge($aidParams, $aidSearchFormService->convertAidSearchClassToAidParams($aidSearchClass));
 
         // requete pour compter sans la pagination
-        $results = $aidService->searchAids($aidParams);
+        $results = $aidService->searchForApi($aidParams);
         $count = count($results);
 
         // requete pour les résultats avec la pagination
         $results = array_slice($results, ($this->getPage() - 1) * $this->getItemsPerPage(), $this->getItemsPerPage());
+
+        // retransforme les ids à afficher en aide
+        $results = $aidService->getAidsFromResults($results);
 
         // spécifique
         $resultsSpe = $this->getResultsSpe($results, $aidService);
@@ -260,35 +263,29 @@ class AidController extends ApiController
         /** @var Aid $result */
         foreach ($results as $result) {
             $financers = [];
-            foreach ($result->getAidFinancers() as $aidFinancer) {
-                if ($aidFinancer->getBacker()) {
-                    $financers[] = $aidFinancer->getBacker()->getName();
-                }
-            }
             $financersFull = [];
             foreach ($result->getAidFinancers() as $aidFinancer) {
                 if (!$aidFinancer->getBacker()) {
                     continue;
                 }
-                $financersFull[] = [
-                    'id' => $aidFinancer->getBacker()->getId(),
-                    'name' => $aidFinancer->getBacker()->getName(),
-                    'logo' => $aidFinancer->getBacker()->getLogo()
-                        ? $this->paramService->get('cloud_image_url') . $aidFinancer->getBacker()->getLogo()
-                        : null
-                ];
+                    $financers[] = $aidFinancer->getBacker()->getName();
+                    $financersFull[] = [
+                        'id' => $aidFinancer->getBacker()->getId(),
+                        'name' => $aidFinancer->getBacker()->getName(),
+                        'logo' => $aidFinancer->getBacker()->getLogo()
+                            ? $this->paramService->get('cloud_image_url') . $aidFinancer->getBacker()->getLogo()
+                            : null
+                    ];
             }
+
             $instructors = [];
-            foreach ($result->getAidInstructors() as $aidInstructor) {
-                if ($aidInstructor->getBacker()) {
-                    $instructors[] = $aidInstructor->getBacker()->getName();
-                }
-            }
             $instructorsFull = [];
             foreach ($result->getAidInstructors() as $aidInstructor) {
                 if (!$aidInstructor->getBacker()) {
                     continue;
                 }
+
+                $instructors[] = $aidInstructor->getBacker()->getName();
                 $instructorsFull[] = [
                     'id' => $aidInstructor->getBacker()->getId(),
                     'name' => $aidInstructor->getBacker()->getName(),
@@ -297,6 +294,7 @@ class AidController extends ApiController
                         : null
                 ];
             }
+            
             $programs = [];
             foreach ($result->getPrograms() as $program) {
                 $programs[] = $program->getName();
@@ -319,11 +317,12 @@ class AidController extends ApiController
                 $audiences[] = $aidAudience->getName();
             }
             $types = [];
-            foreach ($result->getAidTypes() as $aidType) {
-                $types[] = $aidType->getName();
-            }
             $typesFull = [];
             foreach ($result->getAidTypes() as $aidType) {
+                if (!$aidType->getAidTypeGroup()) {
+                    continue;
+                }
+                $types[] = $aidType->getName();
                 $typesFull[] = [
                     'id' => $aidType->getId(),
                     'name' => $aidType->getName(),
@@ -335,6 +334,8 @@ class AidController extends ApiController
                         : null
                 ];
             }
+            
+
             $destinations = [];
             foreach ($result->getAidDestinations() as $aidDestination) {
                 $destinations[] = $aidDestination->getName();

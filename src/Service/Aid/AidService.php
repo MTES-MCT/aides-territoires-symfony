@@ -1048,4 +1048,44 @@ class AidService // NOSONAR too complex
 
         return $aids;
     }
+
+    /**
+     * Fonction de recherche des aides.
+     *
+     * @param array<string, mixed> $aidParams
+     *
+     * @return array<int, Aid>
+     */
+    public function searchForApi(array $aidParams): array
+    {
+        /** @var AidRepository $aidRepository */
+        $aidRepository = $this->managerRegistry->getRepository(Aid::class);
+        return $aidRepository->findIdsWithCache($aidParams);
+    }
+
+    public function getAidsFromResults(array $results): array
+    {
+        /** @var AidRepository $aidRepository */
+        $aidRepository = $this->managerRegistry->getRepository(Aid::class);
+        
+        $ids = array_column($results, 'id');
+        $scores = array_combine(
+            array_column($results, 'id'),
+            array_column($results, 'score_total')
+        );
+
+        $qb = $aidRepository->createQueryBuilder('a')
+            ->andWhere('a.id IN (:ids)')
+            ->orderBy(sprintf('FIELD(a.id, %s)', implode(',', $ids)))  // Maintient l'ordre original des IDs
+            ->setParameter('ids', $ids);
+
+        $aids = $qb->getQuery()->getResult();
+
+        // Restauration des scores
+        foreach ($aids as $aid) {
+            $aid->setScoreTotal($scores[$aid->getId()] ?? null);
+        }
+
+        return $aids;
+    }
 }
