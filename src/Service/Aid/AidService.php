@@ -1071,15 +1071,20 @@ class AidService // NOSONAR too complex
         $aidRepository = $this->managerRegistry->getRepository(Aid::class);
         
         $ids = array_column($results, 'id');
+        // Nettoyer les IDs en préservant l'ordre
+        $ids = array_values(array_filter($ids, fn($id) => !empty($id)));
         $scores = array_combine(
             array_column($results, 'id'),
             array_column($results, 'score_total')
         );
 
-        $qb = $aidRepository->createQueryBuilder('a')
+        $qb = $aidRepository->createQueryBuilder('a');
+        if (!empty($ids)) {
+        $qb
             ->andWhere('a.id IN (:ids)')
             ->orderBy(sprintf('FIELD(a.id, %s)', implode(',', $ids)))  // Maintient l'ordre original des IDs
             ->setParameter('ids', $ids);
+        }
 
         $aids = $qb->getQuery()->getResult();
 
