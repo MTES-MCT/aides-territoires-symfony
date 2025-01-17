@@ -42,7 +42,18 @@ class KeywordReferenceRepository extends ServiceEntityRepository
         $qb->andWhere('kr.name IN (:keywords) OR MATCH_AGAINST(kr.name) AGAINST(:originalName IN BOOLEAN MODE) > 10')
             ->setParameter('keywords', $keywords)
             ->setParameter('originalName', $originalName)
+            ->andWhere('kr.active = 1')
         ;
+
+        $sqlOr = '';
+        foreach ($keywords as $key => $keyword) {
+            if ($key > 0) {
+                $sqlOr .= ' OR ';
+            }
+            $sqlOr .= 'kr.name LIKE :keyword' . $key;
+            $qb->setParameter('keyword' . $key, '%' . $keyword . '%');
+        }
+        $qb->andWhere($sqlOr);
 
         return $qb->getQuery()->getResult();
     }
@@ -55,6 +66,7 @@ class KeywordReferenceRepository extends ServiceEntityRepository
         $qb = $this->createQueryBuilder('kr');
         $qb->select('kr.name');
         $qb->where('kr.intention = 1');
+        $qb->andWhere('kr.active = 1');
         $qb->orderBy('kr.name', 'ASC');
 
         $result = $qb->getQuery()->getResult();
@@ -70,6 +82,7 @@ class KeywordReferenceRepository extends ServiceEntityRepository
     {
         $qb = $this->getQueryBuilder($params);
         $qb->select('DISTINCT (kr2.id), kr2.name,  kr2.intention');
+        $qb->andWhere('kr2.active = 1');
         $qb->innerJoin(KeywordReference::class, 'kr2', 'WITH', 'kr2 = kr.parent OR kr.parent = kr2.parent');
 
         return $qb->getQuery()->getResult();
@@ -119,7 +132,7 @@ class KeywordReferenceRepository extends ServiceEntityRepository
             $words = array_merge($words, str_getcsv($simpleWordsString, ' ', '"'));
         }
 
-        $qb = $this->getQueryBuilder(['words' => $words]);
+        $qb = $this->getQueryBuilder(['words' => $words, 'active' => true]);
         return $qb->getQuery()->getResult();
     }
 
@@ -164,9 +177,12 @@ class KeywordReferenceRepository extends ServiceEntityRepository
                 : null
         ;
         $noIntention = $params['noIntention'] ?? null;
-
+        $active = $params['active'] ?? null;
         $qb = $this->createQueryBuilder('kr');
 
+        if ($active === true) {
+            $qb->andWhere('kr.active = 1');
+        }
         if ($noIntention === true) {
             $qb
                 ->andWhere('kr.intention = 0');

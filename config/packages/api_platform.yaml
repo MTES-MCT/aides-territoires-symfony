@@ -8,7 +8,14 @@ api_platform:
                 </thead>
                 <tbody>
                     <tr>
-                        <td>1.8.1 (actuelle)</td>
+                        <td>1.8.2 (actuelle)</td>
+                        <td>
+                            <h3>Recherche d'aides par mot-clé optimisée</h3>
+                            <p>Nous avons amélioré la recherche d’aides par mot-clé. Elle est désormais plus précise et offre de meilleures performances, garantissant des résultats plus pertinents.</p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>1.8.1</td>
                         <td>
                             <ul>
                                 <li>Mise à jour de la documentation</li>

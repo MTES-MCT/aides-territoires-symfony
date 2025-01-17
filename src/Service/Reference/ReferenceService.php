@@ -77,22 +77,14 @@ class ReferenceService
     ];
 
     /**
-     * @return array<string, string>
+     * @return string[]
      */
-    public function getSynonymes(string $project_name): ?array
+    public function getKeywords(string $project_name): array
     {
-        $original_name = $project_name;
-
-        // regarde si c'est un projet référent
-        $projectReference = $this->projectReferenceRepository->findOneBy([
-            'name' => $project_name,
-        ]);
-
-        // nettoie la string
-        $project_name = str_replace(['/', '(', ')', ',', ':', '–', '-'], ' ', strtolower($project_name));
-
-        // sépare sur les espaces
-        $keywords = explode(' ', $project_name);
+        // $project_name = str_replace(['/', '(', ')', ',', ':', '–', '-'], ' ', strtolower($project_name));
+        $project_name = str_replace(['/', '(', ')', ':', '–'], ' ', strtolower($project_name));
+        $separator = strpos($project_name, ',') ? ',' : ' ';
+        $keywords = explode($separator, $project_name);
         foreach ($keywords as $key => $keyword) {
             $keywords[$key] = trim($keyword);
             if (empty($keywords[$key])) {
@@ -105,10 +97,28 @@ class ReferenceService
 
         // genere les combinaisons possibles avec les termes restants et les ajoutes au tableau
         $keywords = $this->enleverArticlesFromArray($keywords);
+
         $keywords = array_merge($keywords, $this->genererToutesCombinaisons($keywords));
         // retire tous les élements vides
         $keywords = array_filter($keywords);
         $keywords = array_unique($keywords);
+
+        return $keywords;
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public function getSynonymes(string $project_name): ?array
+    {
+        $original_name = $project_name;
+
+        // regarde si c'est un projet référent
+        $projectReference = $this->projectReferenceRepository->findOneBy([
+            'name' => $project_name,
+        ]);
+
+        $keywords = $this->getKeywords($project_name);
 
         // Prépare deux tableaux pour les intentions et les objets
         $intentions = [];
@@ -322,6 +332,16 @@ class ReferenceService
         return $highlightedWords;
     }
 
+    private function removePlural(string $word): string
+    {
+        $lastChar = mb_substr($word, -1);
+        if ($lastChar === 's') {
+            return mb_substr($word, 0, mb_strlen($word) - 1);
+        }
+
+        return $word;
+    }
+
     /**
      * @param string[] $array
      *
@@ -330,11 +350,11 @@ class ReferenceService
     private function enleverArticlesFromArray(array $array): array
     {
         foreach ($array as $key => $value) {
-            $value = str_replace(['/', '(', ')', ',', ':', '–'], ' ', strtolower($value));
+            $value = str_replace(['/', '(', ')', ',', ':', '–'], ' ', strtolower(trim($value)));
             if (in_array($value, $this->articles)) {
                 unset($array[$key]);
             } else {
-                $array[$key] = $value;
+                $array[$key] = $this->removePlural($this->enleverArticles($value, $this->articles));
             }
         }
 
@@ -363,26 +383,28 @@ class ReferenceService
      */
     private function genererToutesCombinaisons(array $keywords): array
     {
-        sort($keywords);
-        $combinaisons = [];
-        $nombreDeMots = count($keywords);
+        $words = array_values(array_filter($keywords, fn($word) => !empty($word)));
+        $combinations = [];
 
-        // Si aucun mot ou un seul mot est fourni, retourne les mots tels quels.
-        if ($nombreDeMots <= 1) {
-            return $keywords;
-        }
+        // Génère les combinaisons de toutes les tailles possibles
+        $length = count($words);
+        for ($size = 1; $size <= $length; $size++) {
+            // Pour chaque position de départ possible
+            for ($start = 0; $start <= $length - $size; $start++) {
+                // Prend $size mots à partir de la position $start
+                $combination = array_slice($words, $start, $size);
+                $combinationString = implode(' ', $combination);
 
-        for ($i = 0; $i < $nombreDeMots; ++$i) {
-            for ($j = 0; $j < $nombreDeMots; ++$j) {
-                if ($i != $j) {
-                    // Ajoute la combinaison du mot actuel avec chaque autre mot.
-                    $combinaisons[] = $keywords[$i] . ' ' . $keywords[$j];
+                // Vérifie si ce n'est pas un article seul et si la combinaison n'est pas vide
+                if (!empty($combinationString) && !in_array($combinationString, $this->articles)) {
+                    $combinations[] = $combinationString;
                 }
             }
         }
 
-        return $combinaisons;
+        return array_unique($combinations);
     }
+
 
     /**
      * @param string[] $array

@@ -123,7 +123,7 @@ class AidController extends FrontController
             );
             $newUrl = preg_replace(
                 '/(page=)[^\&]+/',
-                'page='.$pagerfanta->getNbPages(),
+                'page=' . $pagerfanta->getNbPages(),
                 $requestStack->getCurrentRequest()->getRequestUri()
             );
 
@@ -169,21 +169,21 @@ class AidController extends FrontController
         $blogPromotionPosts = $blogPromotionPostService->handleRequires($blogPromotionPosts, $aidParams);
 
         // page title
-        $pageTitle = $pagerfanta->getNbResults().' résultat';
+        $pageTitle = $pagerfanta->getNbResults() . ' résultat';
         if ($pagerfanta->getNbResults() > 1) {
             $pageTitle .= 's';
         }
         $pageTitle .= ' de recherche : ';
         if ($formAidSearch->get(AidSearchFormService::QUERYSTRING_KEY_ORGANIZATION_TYPE_SLUG)->getData()) {
             $pageTitle .= ' Structure : '
-                .$formAidSearch->get(AidSearchFormService::QUERYSTRING_KEY_ORGANIZATION_TYPE_SLUG)
+                . $formAidSearch->get(AidSearchFormService::QUERYSTRING_KEY_ORGANIZATION_TYPE_SLUG)
                     ->getData()->getName()
-                .' ';
+                . ' ';
         }
         if ($formAidSearch->get(AidSearchFormService::QUERYSTRING_KEY_SEARCH_PERIMETER)->getData()) {
             $pageTitle .= ' - Périmètre : '
-                .$formAidSearch->get(AidSearchFormService::QUERYSTRING_KEY_SEARCH_PERIMETER)->getData()->getName()
-                .' ';
+                . $formAidSearch->get(AidSearchFormService::QUERYSTRING_KEY_SEARCH_PERIMETER)->getData()->getName()
+                . ' ';
         }
 
         /** @var AidSearchClass $data */
@@ -191,245 +191,7 @@ class AidController extends FrontController
         $nbCriteria = $aidSearchFormService->countNbCriteriaFromAidSearchClass($data);
 
         if ($nbCriteria > 0) {
-            $pageTitle .= ' - '.$nbCriteria.' autre';
-            if ($nbCriteria > 1) {
-                $pageTitle .= 's';
-            }
-            $pageTitle .= ' critère';
-            if ($nbCriteria > 1) {
-                $pageTitle .= 's';
-            }
-        }
-
-        // check si on affiche ou pas le formulaire étendu
-        $showExtended = $aidSearchFormService->setShowExtended($aidSearchClass);
-
-        // formulaire creer alerte
-        $alert = new Alert();
-        $formAlertCreate = $this->createForm(AlertCreateType::class, $alert);
-        $formAlertCreate->handleRequest($requestStack->getCurrentRequest());
-        if ($formAlertCreate->isSubmitted()) {
-            if ($formAlertCreate->isValid()) {
-                /** @var User $user */
-                $user = $userService->getUserLogged();
-                if ($user instanceof User && $user->getId()) {
-                    try {
-                        $queryString = trim($aidSearchFormService->convertAidSearchClassToQueryString($aidSearchClass));
-                        if ('' == $queryString) {
-                            throw new \Exception('Veuillez sélectionner au moins un critère de recherche');
-                        }
-                        $alert->setEmail($user->getEmail());
-                        $alert->setQuerystring($queryString);
-                        $alert->setSource(Alert::SOURCE_AIDES_TERRITOIRES);
-
-                        $this->managerRegistry->getManager()->persist($alert);
-                        $this->managerRegistry->getManager()->flush();
-
-                        $this->addFlash(
-                            FrontController::FLASH_SUCCESS,
-                            'Votre alerte a bien été créée'
-                        );
-                    } catch (\Exception $e) {
-                        $message = 'Veuillez sélectionner au moins un critère de recherche' ==
-                            $e->getMessage()
-                            ? 'Veuillez sélectionner au moins un critère de recherche'
-                            : 'Une erreur est survenue lors de la création de votre alerte';
-                        $this->addFlash(
-                            FrontController::FLASH_ERROR,
-                            $message
-                        );
-                    }
-                }
-            }
-        }
-
-        // fil arianne
-        $this->breadcrumb->add(
-            'Trouver des aides',
-            $requestStack->getCurrentRequest()->getRequestUri()
-        );
-        $this->breadcrumb->add(
-            'Resultats',
-            null
-        );
-
-        // pour les stats
-        $categoriesName = [];
-        if (isset($aidParams['categories']) && is_array($aidParams['categories'])) {
-            foreach ($aidParams['categories'] as $category) {
-                $categoriesName[] = $category->getName();
-            }
-        }
-
-        // pour avoir la recherche surlignée
-        $synonyms = null;
-        $highlightedWords = [];
-        if ($aidSearchClass->getKeyword()) {
-            $synonyms = $referenceService->getSynonymes($aidSearchClass->getKeyword());
-            $highlightedWords = $referenceService->setHighlightedWords($synonyms, $aidSearchClass->getKeyword());
-        }
-
-        $timeEnd = microtime(true);
-        $executionTime = $timeEnd - $timeStart;
-
-        // rendu template
-        return $this->render('aid/aid/index.html.twig', [
-            'formAidSearch' => $formAidSearch->createView(),
-            'myPager' => $pagerfanta,
-            'blogPromotionPosts' => $blogPromotionPosts,
-            'pageTitle' => $pageTitle,
-            'showExtended' => $showExtended,
-            'formAlertCreate' => $formAlertCreate->createView(),
-            'querystring' => $query,
-            'perimeterName' => (isset($aidParams['perimeterFrom']) && $aidParams['perimeterFrom'] instanceof Perimeter)
-                    ? $aidParams['perimeterFrom']->getName()
-                    : '',
-            'categoriesName' => $categoriesName,
-            'highlightedWords' => $highlightedWords,
-            'synonyms' => $synonyms,
-            'executionTime' => round($executionTime * 1000),
-            'memoryUsage' => round(memory_get_peak_usage() / 1024 / 1024),
-            'executionTimeAid' => round($executionTimeAid * 1000),
-        ]);
-    }
-
-    #[Route('/testrecherche/', name: 'app_aid_aid_v2')]
-    public function indexV2(
-        RequestStack $requestStack,
-        BlogPromotionPostRepository $blogPromotionPostRepository,
-        UserService $userService,
-        AidSearchFormService $aidSearchFormService,
-        AidService $aidService,
-        LogService $logService,
-        ReferenceService $referenceService,
-        BlogPromotionPostService $blogPromotionPostService,
-        AidRepository $aidRepository,
-    ): Response {
-        $timeStart = microtime(true);
-
-        $requestStack
-            ->getCurrentRequest()
-            ->getSession()
-            ->set(
-                '_security.main.target_path',
-                $requestStack->getCurrentRequest()->getRequestUri()
-            )
-        ;
-        $user = $userService->getUserLogged();
-
-        // gestion pagination
-        $currentPage = (int) $requestStack->getCurrentRequest()->get('page', 1);
-
-        // paramètres du formulaire
-        $formAidSearchParams = [
-            'method' => 'GET',
-            'extended' => true,
-        ];
-
-        // formulaire recherche aides
-        $aidSearchClass = $aidSearchFormService->getAidSearchClass();
-        $formAidSearch = $this->createForm(
-            AidSearchTypeV2::class,
-            $aidSearchClass,
-            $formAidSearchParams
-        );
-
-        // parametres pour requetes aides
-        $aidParams = [
-            'showInSearch' => true,
-        ];
-
-        $aidParams = array_merge($aidParams, $aidSearchFormService->convertAidSearchClassToAidParams($aidSearchClass));
-        $query = parse_url($requestStack->getCurrentRequest()->getRequestUri(), PHP_URL_QUERY) ?? null;
-
-        // le paginateur
-        try {
-            $timeAidStart = microtime(true);
-            $aids = $aidService->searchAidsV2($aidParams);
-
-            $timeAidEnd = microtime(true);
-            $executionTimeAid = $timeAidEnd - $timeAidStart;
-            // Créer un nouvel adaptateur avec les résultats traités
-            $finalAdapter = new ArrayAdapter($aids);
-            $pagerfanta = new Pagerfanta($finalAdapter);
-            $pagerfanta->setMaxPerPage(self::NB_AID_BY_PAGE);
-            $pagerfanta->setCurrentPage($currentPage);
-        } catch (OutOfRangeCurrentPageException $e) {
-            $this->addFlash(
-                FrontController::FLASH_ERROR,
-                'Le numéro de page demandé n\'existe pas'
-            );
-            $newUrl = preg_replace(
-                '/(page=)[^\&]+/',
-                'page='.$pagerfanta->getNbPages(),
-                $requestStack->getCurrentRequest()->getRequestUri()
-            );
-
-            return new RedirectResponse($newUrl);
-        }
-
-        // Log recherche
-        $logParams = [
-            'organizationTypes' => (isset($aidParams['organizationType']))
-                ? [$aidParams['organizationType']]
-                : null,
-            'querystring' => $query ?? null,
-            'resultsCount' => $pagerfanta->getNbResults(),
-            'host' => $requestStack->getCurrentRequest()->getHost(),
-            'perimeter' => $aidParams['perimeterFrom'] ?? null,
-            'search' => $aidParams['keyword'] ?? null,
-            'organization' => ($user instanceof User && $user->getDefaultOrganization())
-                ? $user->getDefaultOrganization()
-                : null,
-            'backers' => $aidParams['backers'] ?? null,
-            'categories' => $aidParams['categories'] ?? null,
-            'programs' => $aidParams['programs'] ?? null,
-            'user' => $user ?? null,
-        ];
-        /** @var ArrayCollection<int, CategoryTheme> */
-        $themes = new ArrayCollection();
-        if (isset($aidParams['categories']) && is_array($aidParams['categories'])) {
-            foreach ($aidParams['categories'] as $category) {
-                if (!$themes->contains($category->getCategoryTheme())) {
-                    $themes->add($category->getCategoryTheme());
-                }
-            }
-        }
-        $logParams['themes'] = $themes->toArray();
-
-        $logService->log(
-            type: LogService::AID_SEARCH,
-            params: $logParams,
-        );
-
-        // promotions posts
-        $blogPromotionPosts = $blogPromotionPostRepository->findPublished($aidParams);
-        $blogPromotionPosts = $blogPromotionPostService->handleRequires($blogPromotionPosts, $aidParams);
-
-        // page title
-        $pageTitle = $pagerfanta->getNbResults().' résultat';
-        if ($pagerfanta->getNbResults() > 1) {
-            $pageTitle .= 's';
-        }
-        $pageTitle .= ' de recherche : ';
-        if ($formAidSearch->get(AidSearchFormService::QUERYSTRING_KEY_ORGANIZATION_TYPE_SLUG)->getData()) {
-            $pageTitle .= ' Structure : '
-                .$formAidSearch->get(AidSearchFormService::QUERYSTRING_KEY_ORGANIZATION_TYPE_SLUG)
-                    ->getData()->getName()
-                .' ';
-        }
-        if ($formAidSearch->get(AidSearchFormService::QUERYSTRING_KEY_SEARCH_PERIMETER)->getData()) {
-            $pageTitle .= ' - Périmètre : '
-                .$formAidSearch->get(AidSearchFormService::QUERYSTRING_KEY_SEARCH_PERIMETER)->getData()->getName()
-                .' ';
-        }
-
-        /** @var AidSearchClass $data */
-        $data = $formAidSearch->getData();
-        $nbCriteria = $aidSearchFormService->countNbCriteriaFromAidSearchClass($data);
-
-        if ($nbCriteria > 0) {
-            $pageTitle .= ' - '.$nbCriteria.' autre';
+            $pageTitle .= ' - ' . $nbCriteria . ' autre';
             if ($nbCriteria > 1) {
                 $pageTitle .= 's';
             }
@@ -649,7 +411,7 @@ class AidController extends FrontController
                 $this->addFlash(
                     FrontController::FLASH_ERROR,
                     'Vous devez renseigner les informations de votre structure ou accepter une invitation '
-                        .'avant de pouvoir accéder à cette page.'
+                        . 'avant de pouvoir accéder à cette page.'
                 );
             } else {
                 if ($formAddToProject->isValid()) {
@@ -674,17 +436,17 @@ class AidController extends FrontController
                                         $beneficiary,
                                         'Nouvelle aide ajoutée à un projet',
                                         '<p>
-                                        '.$user->getFirstname()
-                                        .' '
-                                        .$user->getLastname()
-                                        .' a ajouté une aide au projet
+                                        ' . $user->getFirstname()
+                                        . ' '
+                                        . $user->getLastname()
+                                        . ' a ajouté une aide au projet
                                         <a href="'
-                                        .$this->generateUrl(
+                                        . $this->generateUrl(
                                             'app_user_project_details_fiche_projet',
                                             ['id' => $project->getId(), 'slug' => $project->getSlug()],
                                             UrlGeneratorInterface::ABSOLUTE_URL
                                         )
-                                            .'">'.$project->getName().'</a>.
+                                            . '">' . $project->getName() . '</a>.
                                         </p>'
                                     );
                                 }
@@ -694,11 +456,11 @@ class AidController extends FrontController
                             $this->addFlash(
                                 FrontController::FLASH_SUCCESS,
                                 'L’aide a bien été associée au projet <a href="'
-                                .$this->generateUrl(
+                                . $this->generateUrl(
                                     'app_user_project_details_fiche_projet',
                                     ['id' => $project->getId(), 'slug' => $project->getSlug()]
                                 )
-                                .'">'.$project->getName().'</a>.'
+                                . '">' . $project->getName() . '</a>.'
                             );
                         }
 
@@ -724,11 +486,11 @@ class AidController extends FrontController
                         $this->addFlash(
                             FrontController::FLASH_SUCCESS,
                             'L’aide a bien été associée au nouveau projet <a href="'
-                            .$this->generateUrl(
+                            . $this->generateUrl(
                                 'app_user_project_details_fiche_projet',
                                 ['id' => $project->getId(), 'slug' => $project->getSlug()]
                             )
-                            .'">'.$project->getName().'</a>.'
+                            . '">' . $project->getName() . '</a>.'
                         );
                     }
 
@@ -762,25 +524,25 @@ class AidController extends FrontController
                     $message = $stringService->cleanString((string) $formSuggestToProject->get('message')->getData());
 
                     // notification
-                    $message = '<p>'.$message.'</p>
+                    $message = '<p>' . $message . '</p>
                     <ul>
-                        <li><a href="'.$aidService->getUrl($aid).'>"'.$aid->getName().'</a></li>
+                        <li><a href="' . $aidService->getUrl($aid) . '>"' . $aid->getName() . '</a></li>
                     </ul>
-                    <p>'.$user->getNotificationSignature().'</p>
+                    <p>' . $user->getNotificationSignature() . '</p>
                     <p>
                         <a class="fr-btn" href="'
-                            .$this->generateUrl(
+                            . $this->generateUrl(
                                 'app_project_project_public_details',
                                 ['id' => $project->getId(), 'slug' => $project->getSlug()],
                                 UrlGeneratorInterface::ABSOLUTE_URL
                             )
-                            .'">
+                            . '">
                             Accepter ou rejeter cette recommandation
                         </a>
                     </p>';
                     $notificationService->addNotification(
                         $project->getAuthor(),
-                        'Suggestion d’une aide pour votre projet « '.$project->getName().' »',
+                        'Suggestion d’une aide pour votre projet « ' . $project->getName() . ' »',
                         $message
                     );
 
@@ -791,7 +553,7 @@ class AidController extends FrontController
                     }
                     $emailService->sendEmailViaApi(
                         $project->getAuthor()->getEmail(),
-                        'Suggestion d’une aide pour votre projet « '.$project->getName().' »',
+                        'Suggestion d’une aide pour votre projet « ' . $project->getName() . ' »',
                         (int) $paramService->get('sib_new_suggested_aid_template_id'),
                         [
                             'PROJECT_AUTHOR_NAME' => $project->getAuthor()->getFullName(),
@@ -851,8 +613,8 @@ class AidController extends FrontController
             [],
             UrlGeneratorInterface::ABSOLUTE_URL
         )
-        .'?crudAction=edit&crudControllerFqcn=App%5CController%5CAdmin%5CAid%5CAidCrudController&entityId='
-        .$aid->getId();
+        . '?crudAction=edit&crudControllerFqcn=App%5CController%5CAdmin%5CAid%5CAidCrudController&entityId='
+        . $aid->getId();
 
         return $this->render('aid/aid/details.html.twig', [
             'aid' => $aid,

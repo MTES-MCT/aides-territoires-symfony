@@ -19,6 +19,7 @@ use App\Entity\Reference\ProjectReference;
 use App\Entity\User\User;
 use App\Repository\Perimeter\PerimeterRepository;
 use App\Repository\Reference\KeywordReferenceRepository;
+use App\Service\Aid\AidService;
 use App\Service\Reference\ReferenceService;
 use App\Service\Various\StringService;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
@@ -26,6 +27,8 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
+use Symfony\Contracts\Cache\ItemInterface;
+use Symfony\Contracts\Cache\TagAwareCacheInterface;
 
 /**
  * @extends ServiceEntityRepository<Aid>
@@ -41,6 +44,8 @@ class AidRepository extends ServiceEntityRepository
         ManagerRegistry $registry,
         private ReferenceService $referenceService,
         private StringService $stringService,
+        private TagAwareCacheInterface $cache,
+        private AidService $aidService
     ) {
         parent::__construct($registry, Aid::class);
     }
@@ -93,14 +98,14 @@ class AidRepository extends ServiceEntityRepository
         $today = new \DateTime(date('Y-m-d'));
 
         return Criteria::create()
-            ->andWhere(Criteria::expr()->eq($alias.'status', Aid::STATUS_PUBLISHED))
+            ->andWhere(Criteria::expr()->eq($alias . 'status', Aid::STATUS_PUBLISHED))
             ->andWhere(Criteria::expr()->orX(
-                Criteria::expr()->lte($alias.'dateStart', $today),
-                Criteria::expr()->isNull($alias.'dateStart')
+                Criteria::expr()->lte($alias . 'dateStart', $today),
+                Criteria::expr()->isNull($alias . 'dateStart')
             ))
             ->andWhere(Criteria::expr()->orX(
-                Criteria::expr()->gte($alias.'dateSubmissionDeadline', $today),
-                Criteria::expr()->isNull($alias.'dateSubmissionDeadline')
+                Criteria::expr()->gte($alias . 'dateSubmissionDeadline', $today),
+                Criteria::expr()->isNull($alias . 'dateSubmissionDeadline')
             ))
             // ->andWhere(Criteria::expr()->isNull($alias.'genericAid'))
         ;
@@ -111,10 +116,10 @@ class AidRepository extends ServiceEntityRepository
         $today = new \DateTime(date('Y-m-d'));
 
         return Criteria::create()
-            ->andWhere(Criteria::expr()->eq($alias.'status', Aid::STATUS_PUBLISHED))
+            ->andWhere(Criteria::expr()->eq($alias . 'status', Aid::STATUS_PUBLISHED))
             ->andWhere(Criteria::expr()->orX(
-                Criteria::expr()->gte($alias.'dateSubmissionDeadline', $today->format('Y-m-d')),
-                Criteria::expr()->isNull($alias.'dateSubmissionDeadline')
+                Criteria::expr()->gte($alias . 'dateSubmissionDeadline', $today->format('Y-m-d')),
+                Criteria::expr()->isNull($alias . 'dateSubmissionDeadline')
             ))
         ;
     }
@@ -125,9 +130,9 @@ class AidRepository extends ServiceEntityRepository
 
         return Criteria::create()
             ->andWhere(Criteria::expr()->orX(
-                Criteria::expr()->neq($alias.'status', Aid::STATUS_PUBLISHED),
-                Criteria::expr()->gte($alias.'dateStart', $today),
-                Criteria::expr()->lte($alias.'dateSubmissionDeadline', $today),
+                Criteria::expr()->neq($alias . 'status', Aid::STATUS_PUBLISHED),
+                Criteria::expr()->gte($alias . 'dateStart', $today),
+                Criteria::expr()->lte($alias . 'dateSubmissionDeadline', $today),
             ))
         ;
     }
@@ -136,12 +141,12 @@ class AidRepository extends ServiceEntityRepository
     {
         $today = new \DateTime(date('Y-m-d'));
         $dateLimit = new \DateTime(date('Y-m-d'));
-        $dateLimit->add(new \DateInterval('P'.Aid::APPROACHING_DEADLINE_DELTA.'D'));
+        $dateLimit->add(new \DateInterval('P' . Aid::APPROACHING_DEADLINE_DELTA . 'D'));
 
         return Criteria::create()
-            ->andWhere(Criteria::expr()->eq($alias.'status', Aid::STATUS_PUBLISHED))
-            ->andWhere(Criteria::expr()->gte($alias.'dateSubmissionDeadline', $today))
-            ->andWhere(Criteria::expr()->lte($alias.'dateSubmissionDeadline', $dateLimit))
+            ->andWhere(Criteria::expr()->eq($alias . 'status', Aid::STATUS_PUBLISHED))
+            ->andWhere(Criteria::expr()->gte($alias . 'dateSubmissionDeadline', $today))
+            ->andWhere(Criteria::expr()->lte($alias . 'dateSubmissionDeadline', $dateLimit))
         ;
     }
 
@@ -150,36 +155,36 @@ class AidRepository extends ServiceEntityRepository
         $today = new \DateTime(date('Y-m-d'));
 
         return Criteria::create()
-            ->andWhere(Criteria::expr()->lt($alias.'dateSubmissionDeadline', $today))
+            ->andWhere(Criteria::expr()->lt($alias . 'dateSubmissionDeadline', $today))
         ;
     }
 
     public static function grantCriteria(string $alias = ''): Criteria
     {
         return Criteria::create()
-            ->andWhere(Criteria::expr()->eq($alias.'aidTypes.slug', AidType::SLUG_GRANT))
+            ->andWhere(Criteria::expr()->eq($alias . 'aidTypes.slug', AidType::SLUG_GRANT))
         ;
     }
 
     public static function localCriteria(string $alias = ''): Criteria
     {
         return Criteria::create()
-            ->andWhere(Criteria::expr()->neq($alias.'genericAid', null))
+            ->andWhere(Criteria::expr()->neq($alias . 'genericAid', null))
         ;
     }
 
     public static function genericCriteria(string $alias = ''): Criteria
     {
         return Criteria::create()
-            ->andWhere(Criteria::expr()->eq($alias.'isGeneric', true))
+            ->andWhere(Criteria::expr()->eq($alias . 'isGeneric', true))
         ;
     }
 
     public static function decliStandardCriteria(string $alias = ''): Criteria
     {
         return Criteria::create()
-            ->andWhere(Criteria::expr()->eq($alias.'isGeneric', false))
-            ->andWhere(Criteria::expr()->eq($alias.'genericAid', null))
+            ->andWhere(Criteria::expr()->eq($alias . 'isGeneric', false))
+            ->andWhere(Criteria::expr()->eq($alias . 'genericAid', null))
         ;
     }
 
@@ -436,7 +441,7 @@ class AidRepository extends ServiceEntityRepository
         $keywords = $params['keywords'] ?? null;
         $keyword = $params['keyword'] ?? null;
         if (null !== $keyword) {
-            $keyword = strip_tags((string) $keyword);
+            $keyword = trim(strip_tags((string) $keyword));
             $synonyms = $this->referenceService->getSynonymes($keyword);
         }
         $applyBefore = $params['applyBefore'] ?? null;
@@ -498,7 +503,7 @@ class AidRepository extends ServiceEntityRepository
         if (null !== $nameLike) {
             $qb
                 ->andWhere('a.name LIKE :nameLike')
-                ->setParameter('nameLike', '%'.$nameLike.'%')
+                ->setParameter('nameLike', '%' . $nameLike . '%')
             ;
         }
 
@@ -588,7 +593,7 @@ class AidRepository extends ServiceEntityRepository
 
                     // on ajoute des guillemets si le mot clé contient un espace, ex: "batiment scolaire"
                     $transformedTerms = array_map(function ($term) {
-                        return false !== strpos($term, ' ') ? '"'.$term.'"' : $term;
+                        return false !== strpos($term, ' ') ? '"' . $term . '"' : $term;
                     }, $requiredKeywordReferencesName);
 
                     // on transforme le tableau en string pour la recherche fulltext
@@ -596,8 +601,8 @@ class AidRepository extends ServiceEntityRepository
 
                     $qb->andWhere('
                         MATCH_AGAINST(a.name, a.nameInitial, a.description, a.eligibility, a.projectExamples) '
-                        .'AGAINST (:requireKeywordReferencesString IN BOOLEAN MODE) > 0 '
-                        .'OR :projectReference MEMBER OF a.projectReferences
+                        . 'AGAINST (:requireKeywordReferencesString IN BOOLEAN MODE) > 0 '
+                        . 'OR :projectReference MEMBER OF a.projectReferences
                     ');
                     $qb->setParameter('requireKeywordReferencesString', $requiredKeywordReferencesNameString);
                 }
@@ -623,7 +628,7 @@ class AidRepository extends ServiceEntityRepository
                     $sqlObjects .= $sqlProjectReference;
                 }
                 if (isset($sqlKeywordReferences)) {
-                    $sqlObjects .= ' + '.$sqlKeywordReferences;
+                    $sqlObjects .= ' + ' . $sqlKeywordReferences;
                 }
 
                 if ('' !== trim($sqlObjects)) {
@@ -655,9 +660,9 @@ class AidRepository extends ServiceEntityRepository
                         $objects = array_slice($objects, 0, 40);
                     }
                     for ($i = 0; $i < count($objects); ++$i) {
-                        $sqlRegexpName .= 'REGEXP(a.name, :objects'.$i.') = 1';
-                        $sqlRegexpNameInitial .= 'REGEXP(a.nameInitial, :objects'.$i.') = 1';
-                        $sqlRegexpDescription .= 'REGEXP(a.description, :objects'.$i.') = 1';
+                        $sqlRegexpName .= 'REGEXP(a.name, :objects' . $i . ') = 1';
+                        $sqlRegexpNameInitial .= 'REGEXP(a.nameInitial, :objects' . $i . ') = 1';
+                        $sqlRegexpDescription .= 'REGEXP(a.description, :objects' . $i . ') = 1';
 
                         if ($i < count($objects) - 1) {
                             $sqlRegexpName .= ' OR ';
@@ -665,21 +670,21 @@ class AidRepository extends ServiceEntityRepository
                             $sqlRegexpDescription .= ' OR ';
                         }
 
-                        $qb->setParameter('objects'.$i, '\\b'.$objects[$i].'\\b');
+                        $qb->setParameter('objects' . $i, '\\b' . $objects[$i] . '\\b');
                     }
 
                     $sqlObjects .=
-                        'CASE WHEN ( '.$sqlRegexpName.' ) THEN 60 ELSE 0 END +'
-                        .'CASE WHEN ( '.$sqlRegexpNameInitial.' ) THEN 60 ELSE 0 END +'
-                        .'CASE WHEN ( '.$sqlRegexpDescription.' ) THEN 60 ELSE 0 END ';
+                        'CASE WHEN ( ' . $sqlRegexpName . ' ) THEN 60 ELSE 0 END +'
+                        . 'CASE WHEN ( ' . $sqlRegexpNameInitial . ' ) THEN 60 ELSE 0 END +'
+                        . 'CASE WHEN ( ' . $sqlRegexpDescription . ' ) THEN 60 ELSE 0 END ';
                 }
 
                 $qb->setParameter('objects_string', $objectsString);
             }
 
             if ('' !== trim($sqlObjects)) {
-                $qb->addSelect('('.$sqlObjects.') as score_objects');
-                $qb->andHaving('score_objects >= '.$scoreObjectsMin);
+                $qb->addSelect('(' . $sqlObjects . ') as score_objects');
+                $qb->andHaving('score_objects >= ' . $scoreObjectsMin);
             }
 
             if ($intentionsString && $objectsString) {
@@ -689,12 +694,12 @@ class AidRepository extends ServiceEntityRepository
                 THEN 1 ELSE 0 END
                 ';
                 if (isset($sqlProjectReference) && '' !== $sqlProjectReference) {
-                    $sqlIntentions .= ' + '.$sqlProjectReference;
+                    $sqlIntentions .= ' + ' . $sqlProjectReference;
                 }
 
-                $qb->addSelect('('.$sqlIntentions.') as score_intentions');
+                $qb->addSelect('(' . $sqlIntentions . ') as score_intentions');
                 $qb->setParameter('intentions_string', $intentionsString);
-                $qb->andHaving('score_intentions >= '.$scoreIntentionMin);
+                $qb->andHaving('score_intentions >= ' . $scoreIntentionMin);
             }
 
             if ($simpleWordsString && !$objectsString) {
@@ -760,11 +765,11 @@ class AidRepository extends ServiceEntityRepository
                 $scoreTotalAvailable = true;
 
                 if ('' !== $sqlObjects) {
-                    $qb->addSelect('('.$sqlTotal.') as score_total');
-                    $qb->andHaving('(score_total + score_objects) >= '.$scoreTotalMin);
+                    $qb->addSelect('(' . $sqlTotal . ') as score_total');
+                    $qb->andHaving('(score_total + score_objects) >= ' . $scoreTotalMin);
                 } else {
-                    $qb->addSelect('('.$sqlTotal.') as score_total');
-                    $qb->andHaving('score_total >= '.$scoreTotalMin);
+                    $qb->addSelect('(' . $sqlTotal . ') as score_total');
+                    $qb->andHaving('score_total >= ' . $scoreTotalMin);
                 }
             }
         }
@@ -817,7 +822,7 @@ class AidRepository extends ServiceEntityRepository
                     OR keywordsForTextSearch.name LIKE :text$i
                     OR categoriesForTextSearch.name LIKE :text$i
                 ")
-                    ->setParameter("text$i", '%'.$text.'%')
+                    ->setParameter("text$i", '%' . $text . '%')
                 ;
                 ++$i;
             }
@@ -1022,12 +1027,12 @@ class AidRepository extends ServiceEntityRepository
                     $queryKeywords .= ' OR ';
                 }
                 $queryKeywords .= '
-                    keywords.name LIKE :keyword'.$i.'
-                    OR a.name LIKE :keyword'.$i.'
-                    OR categoriesKeyword.name LIKE :keyword'.$i.'
-                    OR a.description LIKE :keyword'.$i.' '
+                    keywords.name LIKE :keyword' . $i . '
+                    OR a.name LIKE :keyword' . $i . '
+                    OR categoriesKeyword.name LIKE :keyword' . $i . '
+                    OR a.description LIKE :keyword' . $i . ' '
                 ;
-                $qb->setParameter("keyword$i", '%'.$keywords[$i].'%');
+                $qb->setParameter("keyword$i", '%' . $keywords[$i] . '%');
             }
             $queryKeywords .= ')';
 
@@ -1252,7 +1257,7 @@ class AidRepository extends ServiceEntityRepository
 
                 case 'deadline':
                     $dateLimit = new \DateTime(date('Y-m-d'));
-                    $dateLimit->add(new \DateInterval('P'.Aid::APPROACHING_DEADLINE_DELTA.'D'));
+                    $dateLimit->add(new \DateInterval('P' . Aid::APPROACHING_DEADLINE_DELTA . 'D'));
                     $qb
                         ->andWhere('a.dateSubmissionDeadline <= :dateLimit')
                         ->setParameter('dateLimit', $dateLimit)
@@ -1305,30 +1310,98 @@ class AidRepository extends ServiceEntityRepository
         return $qb;
     }
 
-    public function findForSearch(?array $params = null): array
+    /**
+     * @param array<string, mixed>|null $params
+     *
+     * @return array<string, int>
+     */
+    public function findIdsWithCache(?array $params = null): array
     {
-        $qb = $this->getQueryBuilderForSearch($params);
+        $cacheKey = 'aids_ids_with_cache' . hash('xxh128', serialize([
+            'params' => $params,
+            'date' => (new \DateTime())->format('Y-m-d'),
+        ]));
 
-        $results = $qb->getQuery()->getResult();
-        $return = [];
-        foreach ($results as $result) {
-            if ($result instanceof Aid) {
-                $return[] = $result;
-            } elseif (is_array($result) && isset($result[0]) && $result[0] instanceof Aid) {
-                if (isset($result['score_total'])) {
-                    $result[0]->setScoreTotal($result['score_total']);
+        // Récupération depuis le cache ou exécution de la requête
+        return $this->cache->get($cacheKey, function (ItemInterface $item) use ($params) {
+            $qb = $this->getQueryBuilderForSearch($params);
+            $results = $qb->getQuery()->getResult();
+
+            // On ne stocke que les IDs dans le cache
+            $idsToCache = array_map(function ($result) {
+                if ($result instanceof Aid) {
+                    $aid = $result;
+                } elseif (isset($result[0]) && isset($result['score_total'])) {
+                    /** @var Aid $aid */
+                    $aid = $result[0];
+                    $aid->setScoreTotal($result['score_total'] ?? null);
                 }
-                $return[] = $result[0];
-            }
-        }
 
-        return $return;
+                if (isset($aid) && $aid instanceof Aid) {
+                    return [
+                        'id' => $aid->getId(),
+                        'score_total' => $aid->getScoreTotal()
+                    ];
+                }
+            }, $results);
+
+            $tomorrow = new \DateTime('tomorrow');
+            $tomorrow->setTime(0, 0);
+            $item->expiresAfter($tomorrow->getTimestamp() - time());
+            $item->tag(['aids', 'search_results']);
+
+            return $idsToCache;
+        });
     }
 
+    /**
+     * @param array<string, mixed>|null $params
+     *
+     * @return array<int, Aid>
+     */
+    public function findForSearch(?array $params = null): array
+    {
+        // Clé de cache différente
+        $prefix = ($params['selectComplete'] ?? false) ? 'aids_complete_' : 'aids_light_';
+        $cacheKey = $prefix . hash('xxh128', serialize([
+            'params' => $params,
+            'date' => (new \DateTime())->format('Y-m-d'),
+        ]));
+        
+        // Récupération depuis le cache ou exécution de la requête
+        return $this->cache->get($cacheKey, function (ItemInterface $item) use ($params) {
+            $qb = $this->getQueryBuilderForSearch($params);
+            $results = $qb->getQuery()->getResult();
+
+            // On ne stocke que les IDs dans le cache
+            $aids = array_map(function ($result) {
+                if ($result instanceof Aid) {
+                    $aid = $result;
+                } elseif (isset($result[0]) && isset($result['score_total'])) {
+                    /** @var Aid $aid */
+                    $aid = $result[0];
+                    $aid->setScoreTotal($result['score_total'] ?? null);
+                }
+
+                return $aid;
+            }, $results);
+
+            $tomorrow = new \DateTime('tomorrow');
+            $tomorrow->setTime(0, 0);
+            $item->expiresAfter($tomorrow->getTimestamp() - time());
+            $item->tag(['aids', 'search_results']);
+
+            return $aids;
+        });
+    }
+
+    /**
+     * @param array<string, mixed>|null $params
+     */
     public function getQueryBuilderForSearch(?array $params = null): QueryBuilder
     {
         // config
-        $scoreMin = $params['scoreMin'] ?? 80;
+        $scoreMin = $params['scoreMin'] ?? 60;
         $limit = $params['limit'] ?? null;
         $firstResult = $params['firstResult'] ?? null;
         $maxResults = $params['maxResults'] ?? null;
@@ -1340,6 +1413,7 @@ class AidRepository extends ServiceEntityRepository
                 : null
         ;
         $orderByDateSubmissionDeadline = $params['orderByDateSubmissionDeadline'] ?? null;
+        $selectComplete = $params['selectComplete'] ?? null;
 
         // les paramètres
         $id = $params['id'] ?? null;
@@ -1388,6 +1462,7 @@ class AidRepository extends ServiceEntityRepository
         $projectReference = $params['projectReference'] ?? null;
         $nameLike = $params['nameLike'] ?? null;
         $hasNoKeywordReference = $params['hasNoKeywordReference'] ?? null;
+        $scoreTotalAvailable = false;
 
         $aidStepIds = $params['aidStepIds'] ?? null;
         $aidSteps = $params['aidSteps'] ?? null;
@@ -1422,11 +1497,24 @@ class AidRepository extends ServiceEntityRepository
         // le queryBuilder
         $qb = $this->createQueryBuilder('a');
 
+        // les champs des aides sélectionnés
+        if ($selectComplete) {
+            // $qb->select('a');
+        } else {
+            $qb->select('PARTIAL a.{id, name, slug, status, dateStart, dateSubmissionDeadline}');
+        }
+
         // les liaisons qu'on précharge
-        $qb->innerJoin('a.perimeter', 'perimeter');
-        $qb->innerJoin('a.aidRecurrence', 'aidRecurrence');
-        $qb->leftJoin('a.projectReferences', 'projectReferences');
-        $qb->addSelect('perimeter, aidRecurrence, projectReferences');
+        $qb
+            ->leftJoin('a.projectReferences', 'projectReferences')
+            ->leftJoin('a.aidFinancers', 'aidFinancers')
+            ->leftJoin('aidFinancers.backer', 'backer')
+            ->leftJoin('a.aidRecurrence', 'aidRecurrence')
+            ->leftJoin('a.aidTypes', 'aidTypes')
+            ->innerJoin('a.perimeter', 'perimeter')
+            ->addSelect('projectReferences, aidFinancers, backer, aidRecurrence, aidTypes, perimeter')
+        ;
+        
 
         // LES CRITERES
         // aide
@@ -1550,7 +1638,7 @@ class AidRepository extends ServiceEntityRepository
 
                 case 'deadline':
                     $dateLimit = new \DateTime(date('Y-m-d'));
-                    $dateLimit->add(new \DateInterval('P'.Aid::APPROACHING_DEADLINE_DELTA.'D'));
+                    $dateLimit->add(new \DateInterval('P' . Aid::APPROACHING_DEADLINE_DELTA . 'D'));
                     $qb
                         ->andWhere('a.dateSubmissionDeadline <= :dateLimit')
                         ->setParameter('dateLimit', $dateLimit)
@@ -1609,9 +1697,9 @@ class AidRepository extends ServiceEntityRepository
         // structure
         if ($organizationType instanceof OrganizationType && $organizationType->getId()) {
             $qb
-                ->innerJoin('a.aidAudiences', 'aidAudiences')
-                ->andWhere('aidAudiences IN (:organizationType)')
-                ->setParameter('organizationType', $organizationType);
+                ->andWhere(':organizationType MEMBER OF a.aidAudiences')
+                ->setParameter('organizationType', $organizationType)
+            ;
         }
 
         if ($organizationTypes) {
@@ -1724,7 +1812,7 @@ class AidRepository extends ServiceEntityRepository
                 if (!$projectReference->getRequiredKeywordReferences()->isEmpty()) {
                     // fait un tableau unique des mots clés requis et de ses synonymes
                     $requiredKeywordReferencesName = [];
-                    foreach ($projectReference->getRequiredKeywordReferences() as $keywordReference) {
+                    foreach ($projectReference->getRequiredKeywordReferences() as $key => $keywordReference) {
                         $requiredKeywordReferencesName[] = $keywordReference->getName();
                         foreach ($keywordReference->getKeywordReferences() as $subKeyword) {
                             $requiredKeywordReferencesName[] = $subKeyword->getName();
@@ -1738,23 +1826,27 @@ class AidRepository extends ServiceEntityRepository
                                 $requiredKeywordReferencesName[] = $subKeyword->getName();
                             }
                         }
+
+                        $requiredKeywordReferencesName = array_unique($requiredKeywordReferencesName);
+
+                        // on ajoute des guillemets si le mot clé contient un espace, ex: "batiment scolaire"
+                        $transformedTerms = array_map(function ($term) {
+                            return false !== strpos($term, ' ') ? '"' . $term . '"' : $term;
+                        }, $requiredKeywordReferencesName);
+
+                        // on transforme le tableau en string pour la recherche fulltext
+                        $requiredKeywordReferencesNameString = implode(' ', $transformedTerms);
+
+                        $qb->andWhere('
+                            MATCH_AGAINST(a.name, a.nameInitial, a.description, a.eligibility, a.projectExamples) ' .
+                            'AGAINST (:requireKeywordReferencesString_' . $key . ' IN BOOLEAN MODE) > 0 ' .
+                            'OR :projectReference MEMBER OF a.projectReferences
+                        ');
+                        $qb->setParameter(
+                            'requireKeywordReferencesString_' . $key,
+                            $requiredKeywordReferencesNameString
+                        );
                     }
-                    $requiredKeywordReferencesName = array_unique($requiredKeywordReferencesName);
-
-                    // on ajoute des guillemets si le mot clé contient un espace, ex: "batiment scolaire"
-                    $transformedTerms = array_map(function ($term) {
-                        return false !== strpos($term, ' ') ? '"'.$term.'"' : $term;
-                    }, $requiredKeywordReferencesName);
-
-                    // on transforme le tableau en string pour la recherche fulltext
-                    $requiredKeywordReferencesNameString = implode(' ', $transformedTerms);
-
-                    $qb->andWhere('
-                        MATCH_AGAINST(a.name, a.nameInitial, a.description, a.eligibility, a.projectExamples) '
-                        .'AGAINST (:requireKeywordReferencesString IN BOOLEAN MODE) > 0 '
-                        .'OR :projectReference MEMBER OF a.projectReferences
-                    ');
-                    $qb->setParameter('requireKeywordReferencesString', $requiredKeywordReferencesNameString);
                 }
             }
 
@@ -1781,12 +1873,35 @@ class AidRepository extends ServiceEntityRepository
                 if ('' !== $sqlScore) {
                     $sqlScore .= ' + ';
                 }
+                $objects = str_getcsv($objectsString, ' ', '"');
+
+                // on retire tous les éléments vide de $objects
+                $objects = array_filter($objects, function ($value) {
+                    return '' !== trim($value);
+                });
+                $objects = array_map(function ($object) {
+                    // Découper le terme en mots
+                    $words = explode(' ', $object);
+                    // Ajouter * à la fin de chaque mot
+                    $words = array_map(fn ($word) => $word . '*', $words);
+                    // Réassembler les mots en une seule chaîne
+                    $string = implode(' ', $words);
+                    if (count($words) > 1) {
+                        $string = '"' . $string . '"';
+                    }
+
+                    return $string;
+                }, $objects);
+
+                $objectsStringwithAsterisk = implode(' ', $objects);
                 $sqlScore .= '
-                    (MATCH_AGAINST(a.name) AGAINST(:objects_string)) * 10
-                    + (MATCH_AGAINST(a.nameInitial) AGAINST(:objects_string)) * 10
-                    + (MATCH_AGAINST(a.description, a.eligibility, a.projectExamples) AGAINST(:objects_string)) * 5
+                    CASE WHEN (MATCH_AGAINST(a.name) AGAINST(:objects_string) > 0.8) THEN 60 ELSE 0 END
+                    + CASE WHEN (MATCH_AGAINST(a.nameInitial) AGAINST(:objects_string) > 0.8) THEN 60 ELSE 0 END
+                    + CASE WHEN (MATCH_AGAINST(a.description, a.eligibility, a.projectExamples) 
+                    AGAINST(:objects_string_asterisk IN BOOLEAN MODE) > 6) THEN 60 ELSE 0 END
                 ';
                 $qb->setParameter('objects_string', $objectsString);
+                $qb->setParameter('objects_string_asterisk', $objectsStringwithAsterisk);
             }
 
             // les intentions
@@ -1795,9 +1910,10 @@ class AidRepository extends ServiceEntityRepository
                     $sqlScore .= ' + ';
                 }
                 $sqlScore .= '
-                    (MATCH_AGAINST(a.name) AGAINST(:intentions_string)) * 1
-                    + (MATCH_AGAINST(a.nameInitial) AGAINST(:intentions_string)) * 1
-                    + (MATCH_AGAINST(a.description, a.eligibility, a.projectExamples) AGAINST(:intentions_string)) * 1
+                    CASE WHEN (MATCH_AGAINST(a.name) AGAINST(:intentions_string) > 0.8) THEN 10 ELSE 0 END
+                    + CASE WHEN (MATCH_AGAINST(a.nameInitial) AGAINST(:intentions_string) > 0.8) THEN 10 ELSE 0 END
+                    + CASE WHEN (MATCH_AGAINST(a.description, a.eligibility, a.projectExamples) 
+                    AGAINST(:intentions_string IN BOOLEAN MODE) > 0.8) THEN 5 ELSE 0 END
                 ';
                 $qb->setParameter('intentions_string', $intentionsString);
             }
@@ -1808,17 +1924,21 @@ class AidRepository extends ServiceEntityRepository
                     $sqlScore .= ' + ';
                 }
                 $sqlScore .= '
-                    (MATCH_AGAINST(a.name) AGAINST(:simple_words_string)) * 10
-                    + (MATCH_AGAINST(a.nameInitial) AGAINST(:simple_words_string)) * 10
-                    + (MATCH_AGAINST(a.description, a.eligibility, a.projectExamples) AGAINST(:simple_words_string)) * 5
+                    CASE WHEN (MATCH_AGAINST(a.name) AGAINST(:simple_words_string) > 0.8) 
+                    THEN 60 ELSE 0 END
+                    + CASE WHEN (MATCH_AGAINST(a.nameInitial) AGAINST(:simple_words_string) > 0.8) 
+                    THEN 60 ELSE 0 END
+                    + CASE WHEN (MATCH_AGAINST(a.description, a.eligibility, a.projectExamples) 
+                    AGAINST(:simple_words_string IN BOOLEAN MODE) > 0.8) 
+                    THEN 60 ELSE 0 END
                 ';
                 $qb->setParameter('simple_words_string', $simpleWordsString);
             }
 
-            $sqlScore = '('.$sqlScore.') as score_total';
+            $sqlScore = '(' . $sqlScore . ') as score_total';
             $qb->addSelect($sqlScore);
-            $qb->andHaving('score_total >= '.$scoreMin);
-            $qb->orderBy('score_total', 'DESC');
+            $qb->andHaving('score_total >= ' . $scoreMin);
+            $scoreTotalAvailable = true;
         }
 
         if ($withOldKeywords) {
@@ -1833,12 +1953,12 @@ class AidRepository extends ServiceEntityRepository
                     $queryKeywords .= ' OR ';
                 }
                 $queryKeywords .= '
-                    keywords.name LIKE :keyword'.$i.'
-                    OR a.name LIKE :keyword'.$i.'
-                    OR categoriesKeyword.name LIKE :keyword'.$i.'
-                    OR a.description LIKE :keyword'.$i.' '
+                    keywords.name LIKE :keyword' . $i . '
+                    OR a.name LIKE :keyword' . $i . '
+                    OR categoriesKeyword.name LIKE :keyword' . $i . '
+                    OR a.description LIKE :keyword' . $i . ' '
                 ;
-                $qb->setParameter("keyword$i", '%'.$keywords[$i].'%');
+                $qb->setParameter("keyword$i", '%' . $keywords[$i] . '%');
             }
             $queryKeywords .= ')';
 
@@ -1863,7 +1983,7 @@ class AidRepository extends ServiceEntityRepository
                     OR keywordsForTextSearch.name LIKE :text$i
                     OR categoriesForTextSearch.name LIKE :text$i
                 ")
-                    ->setParameter("text$i", '%'.$text.'%')
+                    ->setParameter("text$i", '%' . $text . '%')
                 ;
                 ++$i;
             }
@@ -1884,7 +2004,7 @@ class AidRepository extends ServiceEntityRepository
         if (null !== $nameLike) {
             $qb
                 ->andWhere('a.name LIKE :nameLike')
-                ->setParameter('nameLike', '%'.$nameLike.'%')
+                ->setParameter('nameLike', '%' . $nameLike . '%')
             ;
         }
 
@@ -1976,7 +2096,6 @@ class AidRepository extends ServiceEntityRepository
         }
         if (is_array($aidTypeIds) && count($aidTypeIds) > 0) {
             $qb
-                ->innerJoin('a.aidTypes', 'aidTypes')
                 ->andWhere('aidTypes.id IN (:aidTypeIds)')
                 ->setParameter('aidTypeIds', $aidTypeIds)
             ;
@@ -1984,7 +2103,6 @@ class AidRepository extends ServiceEntityRepository
 
         if (null !== $aidTypes && count($aidTypes) > 0) {
             $qb
-                ->innerJoin('a.aidTypes', 'aidTypes')
                 ->andWhere('aidTypes IN (:aidTypes)')
                 ->setParameter('aidTypes', $aidTypes)
             ;
@@ -1993,7 +2111,6 @@ class AidRepository extends ServiceEntityRepository
         // AidRecurrence
         if ($aidRecurrence instanceof AidRecurrence && $aidRecurrence->getId()) {
             $qb
-                ->innerJoin('a.aidRecurrence', 'aidRecurrence')
                 ->andWhere('aidRecurrence = :aidRecurrence')
                 ->setParameter('aidRecurrence', $aidRecurrence)
             ;
@@ -2035,8 +2152,6 @@ class AidRepository extends ServiceEntityRepository
         // Porteur aide
         if ($backer instanceof Backer && $backer->getId()) {
             $qb
-                ->innerJoin('a.aidFinancers', 'aidFinancers')
-                ->innerJoin('aidFinancers.backer', 'backer')
                 ->andWhere('backer = :backer')
                 ->setParameter('backer', $backer)
             ;
@@ -2097,38 +2212,25 @@ class AidRepository extends ServiceEntityRepository
         }
 
         // TRI
-        if (null !== $orderBy) {
-            if ('score_total' == $orderBy['sort']) {
-                if (isset($scoreTotalAvailable) && true === $scoreTotalAvailable) {
-                    $qb->addOrderBy($orderBy['sort'], $orderBy['order']);
-                    if (isset($sqlObjects) && '' !== $sqlObjects) {
-                        $qb->addOrderBy('score_objects', 'DESC');
-                    }
-                }
-            } else {
-                $qb->addOrderBy($orderBy['sort'], $orderBy['order']);
-            }
-        }
-
         if (true === $orderByDateSubmissionDeadline) {
             $qb
                 ->addSelect('CASE WHEN a.dateSubmissionDeadline IS NULL THEN 1 ELSE 0 END as HIDDEN priority_is_null')
                 ->addOrderBy('priority_is_null', 'ASC')
                 ->addOrderBy('a.dateSubmissionDeadline', 'ASC')
             ;
-        }
-
-        // si aucun tri mais qu'on a le score total
-        if (
-            null == $orderBy
-            && null == $orderByDateSubmissionDeadline
-            && isset($scoreTotalAvailable)
-            && true === $scoreTotalAvailable
-        ) {
-            $qb
-                ->addOrderBy('score_total', 'DESC');
-            if (isset($sqlObjects) && '' !== $sqlObjects) {
-                $qb->addOrderBy('score_objects', 'DESC');
+            if ($scoreTotalAvailable) {
+                $qb->addOrderBy('score_total', 'DESC');
+            }
+        } else {
+            if (!$scoreTotalAvailable) {
+                $qb->addSelect('a.id as score_total');
+            }
+            if (null !== $orderBy) {
+                $qb->addOrderBy($orderBy['sort'], $orderBy['order']);
+            } else {
+                if ($scoreTotalAvailable) {
+                    $qb->addOrderBy('score_total', 'DESC');
+                }
             }
         }
 

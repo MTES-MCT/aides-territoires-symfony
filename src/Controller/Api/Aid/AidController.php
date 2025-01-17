@@ -19,6 +19,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Attribute\AsController;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Contracts\Cache\ItemInterface;
 
 #[AsController]
 class AidController extends ApiController
@@ -31,6 +32,7 @@ class AidController extends ApiController
         RequestStack $requestStack,
         UserService $userService
     ): JsonResponse {
+        // paramètres de recherche
         $aidSearchClass = $aidSearchFormService->getAidSearchClass(null, [
             'dontUseUserOrganizationType' => true,
             'dontUseUserPerimeter' => true
@@ -39,19 +41,24 @@ class AidController extends ApiController
         // parametres pour requetes aides
         $aidParams = [
             'showInSearch' => true,
+            'selectComplete' => true
         ];
 
         $aidParams = array_merge($aidParams, $aidSearchFormService->convertAidSearchClassToAidParams($aidSearchClass));
 
-        // requete pour compter sans la pagination
-        $results = $aidService->searchAids($aidParams);
+        // Pour l'api on ne recupere que id et score_total
+        $results = $aidService->searchForApi($aidParams);
+        // on compte le nombre de résultats
         $count = count($results);
 
-        // requete pour les résultats avec la pagination
+        // on extrait les résultats pour la pagination
         $results = array_slice($results, ($this->getPage() - 1) * $this->getItemsPerPage(), $this->getItemsPerPage());
 
+        // retransforme les ids à afficher en aide
+        $results = $aidService->getAidsFromResults($results);
+
         // spécifique
-        $resultsSpe = $this->getResultsSpe($results, $aidService);
+        $resultsSpe = $this->getResultsSpeCache($aidParams, $results, $aidService, $this->getPage());
 
         // le retour
         $data = [
@@ -107,10 +114,11 @@ class AidController extends ApiController
     public function all(
         AidService $aidService
     ): JsonResponse {
-        $params = [];
-        $params['showInSearch'] = true;
-        $params['orderBy'] = ['sort' => 'a.id', 'order' => 'DESC'];
-
+        $params = [
+            'showInSearch' => true,
+            'selectComplete' => true,
+            'orderBy' => ['sort' => 'a.id', 'order' => 'DESC']
+        ];
         // requete pour compter sans la pagination
         $results = $aidService->searchAids($params);
         $count = count($results);
@@ -258,35 +266,29 @@ class AidController extends ApiController
         /** @var Aid $result */
         foreach ($results as $result) {
             $financers = [];
-            foreach ($result->getAidFinancers() as $aidFinancer) {
-                if ($aidFinancer->getBacker()) {
-                    $financers[] = $aidFinancer->getBacker()->getName();
-                }
-            }
             $financersFull = [];
             foreach ($result->getAidFinancers() as $aidFinancer) {
                 if (!$aidFinancer->getBacker()) {
                     continue;
                 }
-                $financersFull[] = [
-                    'id' => $aidFinancer->getBacker()->getId(),
-                    'name' => $aidFinancer->getBacker()->getName(),
-                    'logo' => $aidFinancer->getBacker()->getLogo()
-                        ? $this->paramService->get('cloud_image_url') . $aidFinancer->getBacker()->getLogo()
-                        : null
-                ];
+                    $financers[] = $aidFinancer->getBacker()->getName();
+                    $financersFull[] = [
+                        'id' => $aidFinancer->getBacker()->getId(),
+                        'name' => $aidFinancer->getBacker()->getName(),
+                        'logo' => $aidFinancer->getBacker()->getLogo()
+                            ? $this->paramService->get('cloud_image_url') . $aidFinancer->getBacker()->getLogo()
+                            : null
+                    ];
             }
+
             $instructors = [];
-            foreach ($result->getAidInstructors() as $aidInstructor) {
-                if ($aidInstructor->getBacker()) {
-                    $instructors[] = $aidInstructor->getBacker()->getName();
-                }
-            }
             $instructorsFull = [];
             foreach ($result->getAidInstructors() as $aidInstructor) {
                 if (!$aidInstructor->getBacker()) {
                     continue;
                 }
+
+                $instructors[] = $aidInstructor->getBacker()->getName();
                 $instructorsFull[] = [
                     'id' => $aidInstructor->getBacker()->getId(),
                     'name' => $aidInstructor->getBacker()->getName(),
@@ -295,6 +297,7 @@ class AidController extends ApiController
                         : null
                 ];
             }
+            
             $programs = [];
             foreach ($result->getPrograms() as $program) {
                 $programs[] = $program->getName();
@@ -317,11 +320,12 @@ class AidController extends ApiController
                 $audiences[] = $aidAudience->getName();
             }
             $types = [];
-            foreach ($result->getAidTypes() as $aidType) {
-                $types[] = $aidType->getName();
-            }
             $typesFull = [];
             foreach ($result->getAidTypes() as $aidType) {
+                if (!$aidType->getAidTypeGroup()) {
+                    continue;
+                }
+                $types[] = $aidType->getName();
                 $typesFull[] = [
                     'id' => $aidType->getId(),
                     'name' => $aidType->getName(),
@@ -333,6 +337,8 @@ class AidController extends ApiController
                         : null
                 ];
             }
+            
+
             $destinations = [];
             foreach ($result->getAidDestinations() as $aidDestination) {
                 $destinations[] = $aidDestination->getName();
@@ -398,5 +404,174 @@ class AidController extends ApiController
         }
 
         return $resultsSpe;
+    }
+
+        /**
+     * Formatage du retour
+     *
+     * @param array<int, Aid> $results
+     * @param AidService $aidService
+     * @return array<int, array<string, mixed>>
+     */
+    private function getResultsSpeCache(array $aidParams, array $results, AidService $aidService, int $page): array
+    {
+        $cacheKey = 'results_spe_' . hash('xxh128', serialize([
+            'params' => $aidParams,
+            'page' => $page,
+            'date' => (new \DateTime())->format('Y-m-d'),
+        ]));
+
+    
+        // $cacheKey = 'test';
+
+        return $this->cache->get($cacheKey, function (ItemInterface $item) use ($results, $aidService) {
+            $cloudUrl = $this->paramService->get('cloud_image_url');
+            $finalResults = [];
+            /** @var Aid $result */
+            foreach ($results as $result) {
+                $financers = [];
+                $financersFull = [];
+                foreach ($result->getAidFinancers() as $aidFinancer) {
+                    if (!$aidFinancer->getBacker()) {
+                        continue;
+                    }
+                        $financers[] = $aidFinancer->getBacker()->getName();
+                        $financersFull[] = [
+                            'id' => $aidFinancer->getBacker()->getId(),
+                            'name' => $aidFinancer->getBacker()->getName(),
+                            'logo' => $aidFinancer->getBacker()->getLogo()
+                                ? $cloudUrl . $aidFinancer->getBacker()->getLogo()
+                                : null
+                        ];
+                }
+    
+                $instructors = [];
+                $instructorsFull = [];
+                foreach ($result->getAidInstructors() as $aidInstructor) {
+                    if (!$aidInstructor->getBacker()) {
+                        continue;
+                    }
+    
+                    $instructors[] = $aidInstructor->getBacker()->getName();
+                    $instructorsFull[] = [
+                        'id' => $aidInstructor->getBacker()->getId(),
+                        'name' => $aidInstructor->getBacker()->getName(),
+                        'logo' => $aidInstructor->getBacker()->getLogo()
+                            ? $cloudUrl . $aidInstructor->getBacker()->getLogo()
+                            : null
+                    ];
+                }
+                
+                $programs = [];
+                foreach ($result->getPrograms() as $program) {
+                    $programs[] = $program->getName();
+                }
+                $steps = [];
+                foreach ($result->getAidSteps() as $step) {
+                    $steps[] = $step->getName();
+                }
+                $categories = [];
+                foreach ($result->getCategories() as $category) {
+                    $fullname = '';
+                    if ($category->getCategoryTheme()) {
+                        $fullname .= $category->getCategoryTheme()->getName() . ' / ';
+                    }
+                    $fullname .= $category->getName();
+                    $categories[] = $fullname;
+                }
+                $audiences = [];
+                foreach ($result->getAidAudiences() as $aidAudience) {
+                    $audiences[] = $aidAudience->getName();
+                }
+                $types = [];
+                $typesFull = [];
+                foreach ($result->getAidTypes() as $aidType) {
+                    if (!$aidType->getAidTypeGroup()) {
+                        continue;
+                    }
+                    $types[] = $aidType->getName();
+                    $typesFull[] = [
+                        'id' => $aidType->getId(),
+                        'name' => $aidType->getName(),
+                        'group' => $aidType->getAidTypeGroup()
+                            ? [
+                                'id' => $aidType->getAidTypeGroup()->getId(),
+                                'name' => $aidType->getAidTypeGroup()->getName()
+                            ]
+                            : null
+                    ];
+                }
+                
+    
+                $destinations = [];
+                foreach ($result->getAidDestinations() as $aidDestination) {
+                    $destinations[] = $aidDestination->getName();
+                }
+    
+                $projectReferences = [];
+                foreach ($result->getProjectReferences() as $projectReference) {
+                    $projectReferences[] = $projectReference->getName();
+                }
+                $finalResults[] = [
+                    'id' => $result->getId(),
+                    'slug' => $result->getSlug(),
+                    'url' => $aidService->getUrl($result, UrlGeneratorInterface::ABSOLUTE_PATH),
+                    'name' => $result->getName(),
+                    'name_initial' => $result->getNameInitial(),
+                    'short_title' => $result->getShortTitle(),
+                    'financers' => $financers,
+                    'financers_full' => $financersFull,
+                    'instructors' => $instructors,
+                    'instructors_full' => $instructorsFull,
+                    'programs' => $programs,
+                    'description' => $result->getDescription(),
+                    'eligibility' => $result->getEligibility(),
+                    'perimeter' => $result->getPerimeter() ? $result->getPerimeter()->getName() : null,
+                    'perimeter_scale' => (
+                        $result->getPerimeter()
+                        && $result->getPerimeter()->getScale()
+                        && isset(Perimeter::SCALES_FOR_SEARCH[$result->getPerimeter()->getScale()])
+                    ) ? Perimeter::SCALES_FOR_SEARCH[$result->getPerimeter()->getScale()]['name'] : null,
+                    'mobilization_steps' => $steps,
+                    'origin_url' => $result->getOriginUrl(),
+                    'categories' => $categories,
+                    'is_call_for_project' => $result->isIsCallForProject(),
+                    'application_url' => $result->getApplicationUrl(),
+                    'targeted_audiences' => $audiences,
+                    'aid_types' => $types,
+                    'aid_types_full' => $typesFull,
+                    'is_charged' => $result->isIsCharged(),
+                    'destinations' => $destinations,
+                    'start_date' => $result->getDateStart()
+                        ? $result->getDateStart()->format('Y-m-d') : null,
+                    'predeposit_date' => $result->getDatePredeposit()
+                        ? $result->getDatePredeposit()->format('Y-m-d') : null,
+                    'submission_deadline' => $result->getDateSubmissionDeadline()
+                        ? $result->getDateSubmissionDeadline()->format('Y-m-d') : null,
+                    'subvention_rate_lower_bound' => $result->getSubventionRateMin(),
+                    'subvention_rate_upper_bound' => $result->getSubventionRateMax(),
+                    'subvention_comment' => $result->getSubventionComment(),
+                    'loan_amount' => $result->getLoanAmount(),
+                    'recoverable_advance_amount' => $result->getRecoverableAdvanceAmount(),
+                    'contact' => $result->getContact(),
+                    'recurrence' => $result->getAidRecurrence() ? $result->getAidRecurrence()->getName() : null,
+                    'project_examples' => $result->getProjectExamples(),
+                    'import_data_url' => $result->getImportDataUrl(),
+                    'import_data_mention' => $result->getImportDataMention(),
+                    'import_share_licence' => $result->getImportShareLicence(),
+                    'date_created' => $result->getTimeCreate()->format(\DateTime::ATOM),
+                    'date_updated' => $result->getTimeUpdate() ? $result->getTimeUpdate()->format(\DateTime::ATOM) : null,
+                    'project_references' => $projectReferences,
+                    'european_aid' => $result->getEuropeanAid(),
+                    'is_live' => $result->isLive()
+                ];
+            }
+
+            // dd('pas de cache');
+            $item->expiresAfter(86400); // 24h
+            $item->tag(['aids_api', 'resultsSpe']);
+
+            return $finalResults;
+        });
     }
 }

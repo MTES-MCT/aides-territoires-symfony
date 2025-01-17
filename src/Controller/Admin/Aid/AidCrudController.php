@@ -416,7 +416,7 @@ class AidCrudController extends AtCrudController implements EventSubscriberInter
             ->hideOnIndex();
 
 
-        yield ArrayField::new('keywordReferences', 'Mots clés référents')
+            yield ArrayField::new('keywordReferences', 'Mots clés référents')
             ->formatValue(function ($value, $entity) {
                 return implode('', array_map(function ($keywordReference) {
                     return '- ' . $keywordReference->getName() . '<br>';
@@ -432,7 +432,7 @@ class AidCrudController extends AtCrudController implements EventSubscriberInter
                 'choice_label' => function ($entity) {
                     $label = $entity->getName();
                     if ($entity->getParent()) {
-                        $label .= ' (' . $entity->getParent()->getName() . ')';
+                        $label .= ' (id: ' . $entity->getId() . ', parent: ' . $entity->getParent()->getName() . ')';
                     }
                     return $label;
                 }

@@ -67,6 +67,10 @@ services:
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
 
+    cache.redis:
+        class: Symfony\Component\Cache\Adapter\TagAwareAdapter
+        parent: cache.app
+        
     # Register the LogoutListener service
     App\EventListener\MyCustomLogoutListener:
         tags:

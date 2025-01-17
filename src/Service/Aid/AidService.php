@@ -248,7 +248,7 @@ class AidService // NOSONAR too complex
      */
     public function searchAids(array $aidParams): array
     {
-        // return $this->searchAidsV2($aidParams);
+        return $this->searchAidsV2($aidParams);
         /** @var AidRepository $aidRepo */
         $aidRepo = $this->managerRegistry->getRepository(Aid::class);
         $aids = $aidRepo->findCustom($aidParams);
@@ -348,9 +348,11 @@ class AidService // NOSONAR too complex
             $highlightedAids = [];
             foreach ($params['searchPage']->getHighlightedAids() as $aid) {
                 if ($aid->isLive()) {
+                    $ids[] = $aid->getId();
                     $highlightedAids[] = $aid;
                 }
             }
+
             $normalAids = [];
             foreach ($aids as $key => $aid) {
                 if (!$params['searchPage']->getHighlightedAids()->contains($aid)) {
@@ -1034,14 +1036,63 @@ class AidService // NOSONAR too complex
         if (isset($aidParams['projectReference']) && $aidParams['projectReference'] instanceof ProjectReference) {
             /** @var Aid $aid */
             foreach ($aids as $aid) {
-                if ($aid->getProjectReferences()->contains($aidParams['projectReference'])) {
-                    $aid->addProjectReferenceSearched($aidParams['projectReference']);
+                foreach ($aid->getProjectReferences() as $projectReference) {
+                    if ($projectReference->getId() == $aidParams['projectReference']->getId()) {
+                        $aid->addProjectReferenceSearched($aidParams['projectReference']);
+                    }
                 }
             }
         }
 
         if (!isset($aidParams['noPostPopulate'])) {
             $aids = $this->postPopulateAids($aids, $aidParams);
+        }
+
+        return $aids;
+    }
+
+    /**
+     * Fonction de recherche des aides.
+     *
+     * @param array<string, mixed> $aidParams
+     *
+     * @return array<int, Aid>
+     */
+    public function searchForApi(array $aidParams): array
+    {
+        /** @var AidRepository $aidRepository */
+        $aidRepository = $this->managerRegistry->getRepository(Aid::class);
+
+        return $aidRepository->findIdsWithCache($aidParams);
+    }
+
+    public function getAidsFromResults(array $results): array
+    {
+        /** @var AidRepository $aidRepository */
+        $aidRepository = $this->managerRegistry->getRepository(Aid::class);
+
+        $ids = array_column($results, 'id');
+        // Nettoyer les IDs en préservant l'ordre
+        $ids = array_values(array_filter($ids, fn ($id) => !empty($id)));
+        $scores = array_combine(
+            array_column($results, 'id'),
+            array_column($results, 'score_total')
+        );
+
+        if (empty($ids)) {
+            return [];
+        }
+
+        $qb = $aidRepository->createQueryBuilder('a')
+            ->andWhere('a.id IN (:ids)')
+            ->orderBy(sprintf('FIELD(a.id, %s)', implode(',', $ids)))  // Maintient l'ordre original des IDs
+            ->setParameter('ids', $ids);
+
+        $aids = $qb->getQuery()->getResult();
+
+        // Restauration des scores
+        foreach ($aids as $aid) {
+            $aid->setScoreTotal($scores[$aid->getId()] ?? null);
         }
 
         return $aids;
