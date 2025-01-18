@@ -41,14 +41,28 @@
 									{% endfor %}
 								</td>
 
+			
+								{% set aid_params = {
+									'forceOrganizationType': 'null', 
+									'perimeter': current_dept.id, 
+									'backers[]': backer.id,
+									'category_ids[]': categoryIds,
+									'organization_type_slug': organizationTypeSlug
+								} %}
+								{% set aid_params_financial = aid_params|merge({
+									'aid_type_group_slug': constant('App\\Entity\\Aid\\AidTypeGroup::SLUG_FINANCIAL')
+								}) %}
+								{% set aid_params_technical = aid_params|merge({
+									'aid_type_group_slug': constant('App\\Entity\\Aid\\AidTypeGroup::SLUG_TECHNICAL')
+								}) %}
 								<td>
-									<a href="{{ path('app_aid_aid', {'forceOrganizationType': 'null', 'perimeter': current_dept.id, 'backers[]': backer.id}) }}" title="Voir les aides du porteur {{ backer.name }}">{{ backer.aidsLive|length }}</a>
+									<a href="{{ path('app_aid_aid', aid_params) }}" title="Voir les aides du porteur {{ backer.name }}">{{ backer.aidsLive|length }}</a>
 								</td>
 								<td>
-									<a href="{{ path('app_aid_aid', {'forceOrganizationType': 'null', 'perimeter': current_dept.id, 'backers[]': backer.id, 'aidTypeGroup': constant('App\\Entity\\Aid\\AidTypeGroup::SLUG_FINANCIAL')}) }}" title="Voir les aides financières du porteur {{ backer.name }}">{{ backer.nbAidsByTypeGroupSlug[constant('App\\Entity\\Aid\\AidTypeGroup::SLUG_FINANCIAL')] }}</a>
+									<a href="{{ path('app_aid_aid', aid_params_financial) }}" title="Voir les aides financières du porteur {{ backer.name }}">{{ backer.nbAidsByTypeGroupSlug[constant('App\\Entity\\Aid\\AidTypeGroup::SLUG_FINANCIAL')] }}</a>
 								</td>
 								<td>
-									<a href="{{ path('app_aid_aid', {'forceOrganizationType': 'null', 'perimeter': current_dept.id, 'backers[]': backer.id, 'aidTypeGroup': constant('App\\Entity\\Aid\\AidTypeGroup::SLUG_TECHNICAL')}) }}" title="Voir les aides en ingénierie du porteur {{ backer.name }}">{{ backer.nbAidsByTypeGroupSlug[constant('App\\Entity\\Aid\\AidTypeGroup::SLUG_TECHNICAL')] }}</a>
+									<a href="{{ path('app_aid_aid', aid_params_technical) }}" title="Voir les aides en ingénierie du porteur {{ backer.name }}">{{ backer.nbAidsByTypeGroupSlug[constant('App\\Entity\\Aid\\AidTypeGroup::SLUG_TECHNICAL')] }}</a>
 								</td>
 							</tr>
 						{% endfor %}

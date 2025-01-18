@@ -6,6 +6,7 @@ use App\Controller\FrontController;
 use App\Entity\Aid\Aid;
 use App\Entity\Aid\AidTypeGroup;
 use App\Entity\Category\CategoryTheme;
+use App\Entity\Organization\OrganizationType;
 use App\Entity\Perimeter\Perimeter;
 use App\Form\Cartography\CartographySearchType;
 use App\Form\Program\CountySelectType;
@@ -196,6 +197,7 @@ class CartographyController extends FrontController
             'backerCategory' => $backerParams['backerCategory'] ?? null,
             'noPostPopulate' => true,
         ];
+
         switch ($aidTypeGroupSlug) {
             case AidTypeGroup::SLUG_FINANCIAL:
                 $tableTemplate = 'cartography/cartography/_backers_table_financial.html.twig';
@@ -293,7 +295,12 @@ class CartographyController extends FrontController
             'backers' => $backers,
             'formBackerSearch' => $formBackerSearch,
             'tableTemplate' => $tableTemplate,
-            'categoryThemesSelected' => $categoryThemesSelected
+            'categoryThemesSelected' => $categoryThemesSelected,
+            'categoryIds' => $backerParams['categoryIds'] ?? [],
+            'organizationTypeSlug' =>
+                $backerParams['organizationType'] instanceof OrganizationType
+                    ? $backerParams['organizationType']->getSlug()
+                    : null,
         ]);
     }
 }
