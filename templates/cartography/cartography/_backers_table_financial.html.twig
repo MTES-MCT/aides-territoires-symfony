@@ -44,23 +44,56 @@
 										{% endif %}
 									{% endfor %}
 								</td>
+
+								{% set aid_params = {
+									'forceOrganizationType': 'null', 
+									'perimeter': current_dept.id, 
+									'backers[]': backer.id,
+									'category_ids[]': categoryIds,
+									'organization_type_slug': organizationTypeSlug
+								} %}
+
+								{% set aid_params_financial = aid_params|merge({
+									'aid_type_group_slug': constant('App\\Entity\\Aid\\AidTypeGroup::SLUG_FINANCIAL')
+								}) %}
+
+								{% set aid_params_grant = aid_params|merge({
+									'aid_type_slugs': constant('App\\Entity\\Aid\\AidType::SLUG_GRANT')
+								}) %}
+
+								{% set aid_params_loan = aid_params|merge({
+									'aid_type_slugs': constant('App\\Entity\\Aid\\AidType::SLUG_LOAN')
+								}) %}
+
+								{% set aid_params_recoverable_advance = aid_params|merge({
+									'aid_type_slugs': constant('App\\Entity\\Aid\\AidType::SLUG_RECOVERABLE_ADVANCE')
+								}) %}
+
+								{% set aid_params_cee = aid_params|merge({
+									'aid_type_slugs': constant('App\\Entity\\Aid\\AidType::SLUG_CEE')
+								}) %}
+
+								{% set aid_params_other = aid_params|merge({
+									'aid_type_slugs': constant('App\\Entity\\Aid\\AidType::SLUG_OTHER')
+								}) %}
+
 								<td>
-									<a href="{{ path('app_aid_aid', {'forceOrganizationType': 'null', 'perimeter': current_dept.id, 'backers[]': backer.id, 'aidTypeGroupSlug': constant('App\\Entity\\Aid\\AidTypeGroup::SLUG_FINANCIAL')}) }}" title="Voir les aides financières du porteur {{ backer.name }}">{{ backer.aidsFinancial|length }}</a>
+									<a href="{{ path('app_aid_aid', aid_params_financial) }}" title="Voir les aides financières du porteur {{ backer.name }}">{{ backer.aidsFinancial|length }}</a>
 								</td>
 								<td>
-									<a href="{{ path('app_aid_aid', {'forceOrganizationType': 'null', 'perimeter': current_dept.id, 'backers[]': backer.id, 'aidTypeSlug': constant('App\\Entity\\Aid\\AidType::SLUG_GRANT')}) }}" title="Voir les aides financières de type subvention du porteur {{ backer.name }}">{{ backer.aidsByAidTypeSlug(constant('App\\Entity\\Aid\\AidType::SLUG_GRANT'))|length }}</a>
+									<a href="{{ path('app_aid_aid', aid_params_grant) }}" title="Voir les aides financières de type subvention du porteur {{ backer.name }}">{{ backer.aidsByAidTypeSlug(constant('App\\Entity\\Aid\\AidType::SLUG_GRANT'))|length }}</a>
 								</td>
 								<td>
-									<a href="{{ path('app_aid_aid', {'forceOrganizationType': 'null', 'perimeter': current_dept.id, 'backers[]': backer.id, 'aidTypeSlug': constant('App\\Entity\\Aid\\AidType::SLUG_LOAN')}) }}" title="Voir les aides financières de type prêt du porteur {{ backer.name }}">{{ backer.aidsByAidTypeSlug(constant('App\\Entity\\Aid\\AidType::SLUG_LOAN'))|length }}</a>
+									<a href="{{ path('app_aid_aid', aid_params_loan) }}" title="Voir les aides financières de type prêt du porteur {{ backer.name }}">{{ backer.aidsByAidTypeSlug(constant('App\\Entity\\Aid\\AidType::SLUG_LOAN'))|length }}</a>
 								</td>
 								<td>
-									<a href="{{ path('app_aid_aid', {'forceOrganizationType': 'null', 'perimeter': current_dept.id, 'backers[]': backer.id, 'aidTypeSlug': constant('App\\Entity\\Aid\\AidType::SLUG_RECOVERABLE_ADVANCE')}) }}" title="Voir les aides financières de type avance récupérable du porteur {{ backer.name }}">{{ backer.aidsByAidTypeSlug(constant('App\\Entity\\Aid\\AidType::SLUG_RECOVERABLE_ADVANCE'))|length }}</a>
+									<a href="{{ path('app_aid_aid', aid_params_recoverable_advance) }}" title="Voir les aides financières de type avance récupérable du porteur {{ backer.name }}">{{ backer.aidsByAidTypeSlug(constant('App\\Entity\\Aid\\AidType::SLUG_RECOVERABLE_ADVANCE'))|length }}</a>
 								</td>
 								<td>
-									<a href="{{ path('app_aid_aid', {'forceOrganizationType': 'null', 'perimeter': current_dept.id, 'backers[]': backer.id, 'aidTypeSlug': constant('App\\Entity\\Aid\\AidType::SLUG_CEE')}) }}" title="Voir les aides financières de type avance récupérable du porteur {{ backer.name }}">{{ backer.aidsByAidTypeSlug(constant('App\\Entity\\Aid\\AidType::SLUG_CEE'))|length }}</a>
+									<a href="{{ path('app_aid_aid', aid_params_cee) }}" title="Voir les aides financières de type avance récupérable du porteur {{ backer.name }}">{{ backer.aidsByAidTypeSlug(constant('App\\Entity\\Aid\\AidType::SLUG_CEE'))|length }}</a>
 								</td>
 								<td>
-									<a href="{{ path('app_aid_aid', {'forceOrganizationType': 'null', 'perimeter': current_dept.id, 'backers[]': backer.id, 'aidTypeSlug': constant('App\\Entity\\Aid\\AidType::SLUG_OTHER')}) }}" title="Voir les aides financières de type avance récupérable du porteur {{ backer.name }}">{{ backer.aidsByAidTypeSlug(constant('App\\Entity\\Aid\\AidType::SLUG_OTHER'))|length }}</a>
+									<a href="{{ path('app_aid_aid', aid_params_other) }}" title="Voir les aides financières de type avance récupérable du porteur {{ backer.name }}">{{ backer.aidsByAidTypeSlug(constant('App\\Entity\\Aid\\AidType::SLUG_OTHER'))|length }}</a>
 								</td>
 							</tr>
 						{% endfor %}
