@@ -3,12 +3,14 @@ services:
     redis:
       image: redis:alpine
       container_name: at_redis
+      mem_limit: 256m
       ports:
         - "6379:6379"
 
     nginx:
       image: nginx:stable-alpine
       container_name: at_nginx
+      mem_limit: 1g
       ports:
         - '8080:80'
       volumes:
@@ -20,7 +22,7 @@ services:
         - mysql
         
     mysql:
-        image: mysql:8.0.35
+        image: mysql:8.0.40
         container_name: at_mysql
         volumes:
             - .docker/data/db:/var/lib/mysql
