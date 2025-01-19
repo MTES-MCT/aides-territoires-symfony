@@ -298,7 +298,8 @@ class CartographyController extends FrontController
             'categoryThemesSelected' => $categoryThemesSelected,
             'categoryIds' => $backerParams['categoryIds'] ?? [],
             'organizationTypeSlug' =>
-                $backerParams['organizationType'] instanceof OrganizationType
+                isset($backerParams['organizationType'])
+                && $backerParams['organizationType'] instanceof OrganizationType
                     ? $backerParams['organizationType']->getSlug()
                     : null,
         ]);
