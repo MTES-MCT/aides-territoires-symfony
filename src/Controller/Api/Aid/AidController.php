@@ -223,12 +223,12 @@ class AidController extends ApiController
             'orderBy' => ['sort' => 'a.id', 'order' => 'DESC']
         ];
         // requete pour compter sans la pagination
-        $results = $aidService->searchAids($params);
+        $results = $aidService->searchForApi($params);
         $count = count($results);
 
         // requete pour les résultats avec la pagination
         $results = array_slice($results, ($this->getPage() - 1) * $this->getItemsPerPage(), $this->getItemsPerPage());
-
+        $results = $aidService->getAidsFromResults($results);
         // spécifique
         $resultsSpe = $this->getResultsSpe($results, $aidService);
 
