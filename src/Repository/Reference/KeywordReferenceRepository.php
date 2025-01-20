@@ -46,12 +46,14 @@ class KeywordReferenceRepository extends ServiceEntityRepository
         ;
 
         $sqlOr = '';
-        foreach ($keywords as $key => $keyword) {
-            if ($key > 0) {
+        $i = 0;
+        foreach ($keywords as $keyword) {
+            if ($i > 0) {
                 $sqlOr .= ' OR ';
             }
-            $sqlOr .= 'kr.name LIKE :keyword' . $key;
-            $qb->setParameter('keyword' . $key, '%' . $keyword . '%');
+            $sqlOr .= 'kr.name LIKE :keyword' . $i;
+            $qb->setParameter('keyword' . $i, '%' . $keyword . '%');
+            $i++;
         }
         $qb->andWhere($sqlOr);
 

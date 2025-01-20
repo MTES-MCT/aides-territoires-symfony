@@ -1327,8 +1327,7 @@ class AidRepository extends ServiceEntityRepository
             $qb = $this->getQueryBuilderForSearch($params);
             $results = $qb->getQuery()->getResult();
 
-            // On ne stocke que les IDs dans le cache
-            $idsToCache = array_map(function ($result) {
+            $aids = array_map(function($result) {
                 if ($result instanceof Aid) {
                     $aid = $result;
                 } elseif (isset($result[0]) && isset($result['score_total'])) {
@@ -1337,13 +1336,19 @@ class AidRepository extends ServiceEntityRepository
                     $aid->setScoreTotal($result['score_total'] ?? null);
                 }
 
-                if (isset($aid) && $aid instanceof Aid) {
-                    return [
-                        'id' => $aid->getId(),
-                        'score_total' => $aid->getScoreTotal()
-                    ];
-                }
+                return $aid;
             }, $results);
+
+            if (!isset($params['noPostPopulate'])) {
+                $aids = $this->aidService->postPopulateAids($aids, $params);
+            }
+
+            $idsToCache = array_map(function (Aid $aid) {
+                return [
+                    'id' => $aid->getId(),
+                    'score_total' => $aid->getScoreTotal()
+                ];
+            }, $aids);
 
             $tomorrow = new \DateTime('tomorrow');
             $tomorrow->setTime(0, 0);
@@ -1499,7 +1504,7 @@ class AidRepository extends ServiceEntityRepository
 
         // les champs des aides sélectionnés
         if ($selectComplete) {
-            // $qb->select('a');
+            $qb->select('a');
         } else {
             $qb->select('PARTIAL a.{id, name, slug, status, dateStart, dateSubmissionDeadline}');
         }
