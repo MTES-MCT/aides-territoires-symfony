@@ -46,26 +46,42 @@ class AidController extends ApiController
 
         $aidParams = array_merge($aidParams, $aidSearchFormService->convertAidSearchClassToAidParams($aidSearchClass));
 
-        // Pour l'api on ne recupere que id et score_total
-        $results = $aidService->searchForApi($aidParams);
-        // on compte le nombre de résultats
-        $count = count($results);
+        $cacheKey = 'api_aids_' . hash('xxh128', serialize([
+            'params' => $aidParams,
+            'page' => $this->getPage(),
+            'date' => (new \DateTime())->format('Y-m-d'),
+        ]));
 
-        // on extrait les résultats pour la pagination
-        $results = array_slice($results, ($this->getPage() - 1) * $this->getItemsPerPage(), $this->getItemsPerPage());
+        $apiDatas = $this->cache->get(
+            $cacheKey,
+            function (ItemInterface $item) use ($aidParams, $aidService) {
+                // Pour l'api on ne recupere que id et score_total
+                $results = $aidService->searchForApi($aidParams);
+                // on compte le nombre de résultats
+                $count = count($results);
 
-        // retransforme les ids à afficher en aide
-        $results = $aidService->getAidsFromResults($results);
+                // on extrait les résultats pour la pagination
+                $results = array_slice($results, ($this->getPage() - 1) * $this->getItemsPerPage(), $this->getItemsPerPage());
+                
+                // retransforme les ids à afficher en aide
+                $results = $aidService->getAidsFromResults($results);
 
-        // spécifique
-        $resultsSpe = $this->getResultsSpeCache($aidParams, $results, $aidService, $this->getPage());
+                // spécifique
+                return [
+                    'count' => $count,
+                    'resultsSpe' => $this->getResultsSpe($results, $aidService)
+                ];
+            }
+        );
+
+
 
         // le retour
         $data = [
-            'count' => $count,
+            'count' => $apiDatas['count'],
             'previous' => $this->getPrevious(),
-            'next' => $this->getNext($count),
-            'results' => $resultsSpe
+            'next' => $this->getNext($apiDatas['count']),
+            'results' => $apiDatas['resultsSpe']
         ];
 
         // Log recherche
@@ -75,7 +91,7 @@ class AidController extends ApiController
         $logParams = [
             'organizationTypes' => (isset($aidParams['organizationType'])) ? [$aidParams['organizationType']] : null,
             'querystring' => $query,
-            'resultsCount' => $count,
+            'resultsCount' => $apiDatas['count'],
             'host' => $requestStack->getCurrentRequest()->getHost(),
             'source' => LogAidSearch::SOURCE_API,
             'perimeter' => $aidParams['perimeterFrom'] ?? null,
@@ -107,8 +123,95 @@ class AidController extends ApiController
         $response =  new JsonResponse($data, 200, [], false);
         // pour eviter que les urls ne soient ecodées
         $response->setEncodingOptions(JSON_UNESCAPED_SLASHES);
+
         return $response;
     }
+
+    // #[Route('/api/aids/', name: 'api_aid_aids', priority: 5)]
+    // public function index(
+    //     AidService $aidService,
+    //     AidSearchFormService $aidSearchFormService,
+    //     LogService $logService,
+    //     RequestStack $requestStack,
+    //     UserService $userService
+    // ): JsonResponse {
+    //     // paramètres de recherche
+    //     $aidSearchClass = $aidSearchFormService->getAidSearchClass(null, [
+    //         'dontUseUserOrganizationType' => true,
+    //         'dontUseUserPerimeter' => true
+    //     ]);
+
+    //     // parametres pour requetes aides
+    //     $aidParams = [
+    //         'showInSearch' => true,
+    //         'selectComplete' => true
+    //     ];
+
+    //     $aidParams = array_merge($aidParams, $aidSearchFormService->convertAidSearchClassToAidParams($aidSearchClass));
+
+    //     // Pour l'api on ne recupere que id et score_total
+    //     $results = $aidService->searchForApi($aidParams);
+    //     // on compte le nombre de résultats
+    //     $count = count($results);
+
+    //     // on extrait les résultats pour la pagination
+    //     $results = array_slice($results, ($this->getPage() - 1) * $this->getItemsPerPage(), $this->getItemsPerPage());
+
+    //     // retransforme les ids à afficher en aide
+    //     $results = $aidService->getAidsFromResults($results);
+
+    //     // spécifique
+    //     $resultsSpe = $this->getResultsSpeCache($aidParams, $results, $aidService, $this->getPage());
+
+    //     // le retour
+    //     $data = [
+    //         'count' => $count,
+    //         'previous' => $this->getPrevious(),
+    //         'next' => $this->getNext($count),
+    //         'results' => $resultsSpe
+    //     ];
+
+    //     // Log recherche
+    //     $query = $aidSearchFormService->convertAidSearchClassToQueryString($aidSearchClass);
+
+    //     $user = $userService->getUserLogged();
+    //     $logParams = [
+    //         'organizationTypes' => (isset($aidParams['organizationType'])) ? [$aidParams['organizationType']] : null,
+    //         'querystring' => $query,
+    //         'resultsCount' => $count,
+    //         'host' => $requestStack->getCurrentRequest()->getHost(),
+    //         'source' => LogAidSearch::SOURCE_API,
+    //         'perimeter' => $aidParams['perimeterFrom'] ?? null,
+    //         'search' => $aidParams['keyword'] ?? null,
+    //         'organization' => ($user instanceof User && $user->getDefaultOrganization())
+    //             ? $user->getDefaultOrganization() : null,
+    //         'backers' => $aidParams['backers'] ?? null,
+    //         'categories' => $aidParams['categories'] ?? null,
+    //         'programs' => $aidParams['programs'] ?? null,
+    //         'projectReference' => $aidParams['projectReference'] ?? null,
+    //         'user' => $user ?? null
+    //     ];
+    //     /** @var ArrayCollection<int, CategoryTheme> $themes */
+    //     $themes = new ArrayCollection();
+    //     if (isset($aidParams['categories']) && is_array($aidParams['categories'])) {
+    //         foreach ($aidParams['categories'] as $category) {
+    //             if (!$themes->contains($category->getCategoryTheme())) {
+    //                 $themes->add($category->getCategoryTheme());
+    //             }
+    //         }
+    //     }
+    //     $logParams['themes'] = $themes->toArray();
+    //     $logService->log(
+    //         type: LogService::AID_SEARCH,
+    //         params: $logParams,
+    //     );
+
+    //     // la réponse
+    //     $response =  new JsonResponse($data, 200, [], false);
+    //     // pour eviter que les urls ne soient ecodées
+    //     $response->setEncodingOptions(JSON_UNESCAPED_SLASHES);
+    //     return $response;
+    // }
 
     #[Route('/api/aids/all/', name: 'api_aid_all', priority: 5)]
     public function all(
