@@ -27,6 +27,7 @@ use Doctrine\Persistence\ManagerRegistry;
 use OpenSpout\Common\Entity\Cell;
 use OpenSpout\Common\Entity\Row;
 use OpenSpout\Writer\XLSX\Entity\SheetView;
+use OpenSpout\Writer\XLSX\Writer;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Csv;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
@@ -161,6 +162,56 @@ class SpreadsheetExporterService
         });
 
         return $response;
+    }
+
+
+    public function getXlsxFromArray(
+        array $datas,
+        mixed $entityFcqn,
+        string $filename,
+    ): Writer {
+        // le tableur
+        $format = FileService::FORMAT_XLSX;
+        $writer = new \OpenSpout\Writer\XLSX\Writer();
+        $writer->openToBrowser('export_' . $filename . '.' . $format);
+        $sheetView = new SheetView();
+        $writer->getCurrentSheet()->setSheetView($sheetView);
+
+        // les datas
+        $datas = $this->getDatasFromEntityType(new $entityFcqn, $datas);
+
+        // les entêtes
+        $writer->addRow($this->getHeadersRowFromDatas($datas));
+
+        // le contenu
+        $rows = [];
+        foreach ($datas as $data) {
+            $cells = [];
+            foreach ($data as $value) {
+                $cells[] = Cell::fromValue($value);
+            }
+            $rows[] = new Row($cells);
+        }
+        $writer->addRows($rows);
+
+        $writer->close();
+
+        return $writer;
+    }
+
+    private function getHeadersRowFromDatas(
+        array $datas
+    ) {
+        $headers = [];
+        if (isset($datas[0])) {
+            $headers = array_keys($datas[0]);
+        }
+        $cells = [];
+        foreach ($headers as $csvHeader) {
+            $cells[] = Cell::fromValue($csvHeader);
+        }
+        
+        return new Row($cells);
     }
 
     /**
@@ -793,19 +844,9 @@ class SpreadsheetExporterService
             if ($format == FileService::FORMAT_XLSX && isset($sheetView)) {
                 $writer->getCurrentSheet()->setSheetView($sheetView);
             }
-            $headers = [];
-            if (isset($datas[0])) {
-                $headers = array_keys($datas[0]);
-            }
 
-            $cells = [];
-            foreach ($headers as $csvHeader) {
-                $cells[] = Cell::fromValue($csvHeader);
-            }
-
-            /** add a row at a time */
-            $singleRow = new Row($cells);
-            $writer->addRow($singleRow);
+            // les entetes
+            $writer->addRow($this->getHeadersRowFromDatas($datas));
 
             foreach ($datas as $data) {
                 $cells = [];
