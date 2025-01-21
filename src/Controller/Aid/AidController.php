@@ -315,8 +315,9 @@ class AidController extends FrontController
         $aidParams = array_merge($aidParams, $aidSearchFormService->convertAidSearchClassToAidParams($aidSearchClass));
 
         // recupere les aides
-        $aids = $aidService->searchAids($aidParams);
-
+        // $aids = $aidService->searchAids($aidParams);
+        $aids = $aidService->searchForApi($aidParams);
+        $aids = $aidService->getAidsFromResults($aids);
         return new StreamedResponse(function () use ($aids, $spreadsheetExporterService) {
             return $spreadsheetExporterService->getXlsxFromArray(
                 $aids,

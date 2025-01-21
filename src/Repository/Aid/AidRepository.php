@@ -1503,9 +1503,7 @@ class AidRepository extends ServiceEntityRepository
         $qb = $this->createQueryBuilder('a');
 
         // les champs des aides sélectionnés
-        if ($selectComplete) {
-            $qb->select('a');
-        } else {
+        if (!$selectComplete) {
             $qb->select('PARTIAL a.{id, name, slug, status, dateStart, dateSubmissionDeadline}');
         }
 
