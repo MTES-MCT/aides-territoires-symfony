@@ -300,14 +300,16 @@ class AidController extends FrontController
     public function exportList(
         AidService $aidService,
         AidSearchFormService $aidSearchFormService,
-        AidRepository $aidRepository,
         SpreadsheetExporterService $spreadsheetExporterService,
     ): StreamedResponse {
+        ini_set('memory_limit', '1G');
+
         // recupere les parametres de recherche
         $aidSearchClass = $aidSearchFormService->getAidSearchClass();
 
         $aidParams = [
             'showInSearch' => true,
+            'selectComplete' => true,
         ];
 
         $aidParams = array_merge($aidParams, $aidSearchFormService->convertAidSearchClassToAidParams($aidSearchClass));
