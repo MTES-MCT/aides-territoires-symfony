@@ -16,7 +16,7 @@ class RedisCacheResetCommand extends Command
     public function __construct(
         private CacheItemPoolInterface $cache,
         private AidService $aidService,
-        private ProjectReferenceRepository $projectReferenceRepository
+        private ProjectReferenceRepository $projectReferenceRepository,
     ) {
         parent::__construct();
     }
@@ -34,33 +34,44 @@ class RedisCacheResetCommand extends Command
 
         // on parcours les projets référents pour préparer le cache
         foreach ($projectReferences as $projectReference) {
-            $this->aidService->searchAidsV3(
-                array_merge(
-                    $aidParams,
-                    [
-                        'keyword' => $projectReference->getName(),
-                        'orderBy' => [
-                            'sort' => 'score_total',
-                            'order' => 'DESC'
-                        ],
-                        'projectReference' => $projectReference
+            $searchParams = array_merge(
+                $aidParams,
+                [
+                    'keyword' => $projectReference->getName(),
+                    'orderBy' => [
+                        'sort' => 'score_total',
+                        'order' => 'DESC',
                     ],
-                )
+                    'projectReference' => $projectReference,
+                ],
+            );
+            // Trier les paramètres
+            ksort($searchParams);
+            // Trier orderBy
+            ksort($searchParams['orderBy']);
+
+            $this->aidService->searchAidsV3(
+                $searchParams
             );
             $output->writeln('Cache '.$projectReference->getName().' préparé');
         }
 
         // préparation du cache sans filtres
-        $this->aidService->searchAidsV3(
-            array_merge(
-                $aidParams,
-                [
-                    'orderBy' => [
-                        'sort' => 'score_total',
-                        'order' => 'DESC'
-                    ]
+        $searchParams = array_merge(
+            $aidParams,
+            [
+                'orderBy' => [
+                    'sort' => 'score_total',
+                    'order' => 'DESC',
                 ],
-            )
+            ],
+        );
+        // Trier les paramètres
+        ksort($searchParams);
+        // Trier orderBy
+        ksort($searchParams['orderBy']);
+        $this->aidService->searchAidsV3(
+            $searchParams
         );
         $output->writeln('Cache sans params préparé');
 

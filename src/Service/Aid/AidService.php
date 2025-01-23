@@ -995,6 +995,13 @@ class AidService // NOSONAR too complex
      */
     public function searchAidsV3(array $aidParams): array
     {
+        // Trier les paramètres
+        ksort($aidParams);
+        // Trier orderBy
+        if (isset($aidParams['orderBy'])) {
+            ksort($aidParams['orderBy']);
+        }
+
         // la clé du cache selon la recherche
         $cacheKey = 'search_aids_'.hash('xxh128', serialize([
             'params' => $aidParams,
@@ -1041,7 +1048,6 @@ class AidService // NOSONAR too complex
         // récupère les aides
         $aids = $aidRepository->findCompleteAidsByIds($ids);
 
-        
         foreach ($aids as $key => $aid) {
             // on remet les scores
             $aids[$key]->setScoreTotal($scoreTotalById[$aid->getId()]);
