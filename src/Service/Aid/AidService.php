@@ -985,38 +985,6 @@ class AidService // NOSONAR too complex
         );
     }
 
-    public function getAidsFromResults(array $results): array
-    {
-        /** @var AidRepository $aidRepository */
-        $aidRepository = $this->managerRegistry->getRepository(Aid::class);
-
-        $ids = array_column($results, 'id');
-        // Nettoyer les IDs en préservant l'ordre
-        $ids = array_values(array_filter($ids, fn ($id) => !empty($id)));
-        $scores = array_combine(
-            array_column($results, 'id'),
-            array_column($results, 'score_total')
-        );
-
-        if (empty($ids)) {
-            return [];
-        }
-
-        $qb = $aidRepository->createQueryBuilder('a')
-            ->andWhere('a.id IN (:ids)')
-            ->orderBy(sprintf('FIELD(a.id, %s)', implode(',', $ids)))  // Maintient l'ordre original des IDs
-            ->setParameter('ids', $ids);
-
-        $aids = $qb->getQuery()->getResult();
-
-        // Restauration des scores
-        foreach ($aids as $aid) {
-            $aid->setScoreTotal($scores[$aid->getId()] ?? null);
-        }
-
-        return $aids;
-    }
-
     /**
      * Fonction de recherche des aides.
      * On recupère uniquement les ids et le score total qui seront mis en cache.
@@ -1073,10 +1041,12 @@ class AidService // NOSONAR too complex
         // récupère les aides
         $aids = $aidRepository->findCompleteAidsByIds($ids);
 
-        // on remet les scores
+        
         foreach ($aids as $key => $aid) {
+            // on remet les scores
             $aids[$key]->setScoreTotal($scoreTotalById[$aid->getId()]);
 
+            // on met en highlight les projets référents recherchés
             if (isset($aidParams['projectReference']) && $aidParams['projectReference'] instanceof ProjectReference) {
                 foreach ($aid->getProjectReferences() as $projectReference) {
                     if ($projectReference->getId() == $aidParams['projectReference']->getId()) {
