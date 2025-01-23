@@ -25,7 +25,6 @@ use App\Service\Aid\AidService;
 use App\Service\Blog\BlogPromotionPostService;
 use App\Service\Email\EmailService;
 use App\Service\Export\SpreadsheetExporterService;
-use App\Service\File\FileService;
 use App\Service\Log\LogService;
 use App\Service\Matomo\MatomoService;
 use App\Service\Notification\NotificationService;
@@ -111,7 +110,7 @@ class AidController extends FrontController
 
         // le paginateur
         $timeAidStart = microtime(true);
-        $aids = $aidService->searchAids($aidParams);
+        $aids = $aidService->searchAidsV3($aidParams);
         $timeAidEnd = microtime(true);
         $executionTimeAid = $timeAidEnd - $timeAidStart;
         try {
@@ -119,6 +118,12 @@ class AidController extends FrontController
             $pagerfanta = new Pagerfanta($adapter);
             $pagerfanta->setMaxPerPage(self::NB_AID_BY_PAGE);
             $pagerfanta->setCurrentPage($currentPage);
+
+            // Recharger les entités complètes pour la page courante
+            $pageResults = $aidService->hydrateLightAids(
+                lightAids: $pagerfanta->getCurrentPageResults(),
+                aidParams: $aidParams
+            );
         } catch (OutOfRangeCurrentPageException $e) {
             $this->addFlash(
                 FrontController::FLASH_ERROR,
@@ -293,6 +298,7 @@ class AidController extends FrontController
             'executionTime' => round($executionTime * 1000),
             'memoryUsage' => round(memory_get_peak_usage() / 1024 / 1024),
             'executionTimeAid' => round($executionTimeAid * 1000),
+            'pageResults' => $pageResults,
         ]);
     }
 
@@ -315,9 +321,12 @@ class AidController extends FrontController
         $aidParams = array_merge($aidParams, $aidSearchFormService->convertAidSearchClassToAidParams($aidSearchClass));
 
         // recupere les aides
-        // $aids = $aidService->searchAids($aidParams);
-        $aids = $aidService->searchForApi($aidParams);
-        $aids = $aidService->getAidsFromResults($aids);
+        $aids = $aidService->searchAidsV3($aidParams);
+        $aids = $aidService->hydrateLightAids(
+            lightAids: $aids,
+            aidParams: $aidParams
+        );
+        
         return new StreamedResponse(function () use ($aids, $spreadsheetExporterService) {
             return $spreadsheetExporterService->getXlsxFromArray(
                 $aids,

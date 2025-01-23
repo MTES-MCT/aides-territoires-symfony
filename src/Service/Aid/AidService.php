@@ -28,6 +28,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Contracts\Cache\TagAwareCacheInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class AidService // NOSONAR too complex
@@ -38,6 +39,7 @@ class AidService // NOSONAR too complex
         private RouterInterface $routerInterface,
         private ManagerRegistry $managerRegistry,
         private LoggerInterface $loggerInterface,
+        private TagAwareCacheInterface $cache,
     ) {
     }
 
@@ -57,12 +59,13 @@ class AidService // NOSONAR too complex
 
         // Pour chaque projet référent on faire une recherche pour voir si l'aide sort
         foreach ($projectReferences as $projectReference) {
-            $aids = $this->searchAids(
+            $aids = $this->searchAidsV3(
                 [
                     'id' => $aid->getId(),
                     'keyword' => $projectReference->getName(),
                 ]
             );
+
             if (!empty($aids)) {
                 $projectReferencesSuggestions[] = $projectReference;
             }
@@ -237,44 +240,6 @@ class AidService // NOSONAR too complex
         }
 
         return $access;
-    }
-
-    /**
-     * Fonction de recherche des aides.
-     *
-     * @param array<string, mixed> $aidParams
-     *
-     * @return array<int, Aid>
-     */
-    public function searchAids(array $aidParams): array
-    {
-        return $this->searchAidsV2($aidParams);
-        /** @var AidRepository $aidRepo */
-        $aidRepo = $this->managerRegistry->getRepository(Aid::class);
-        $aids = $aidRepo->findCustom($aidParams);
-
-        // Si on a le score total et le score objects on tri par le cumul des deux
-        // (pas possible directement dans la requête sans trop l'alourdir)
-        if (isset($aids[0]) && $aids[0]->getScoreTotal() && $aids[0]->getScoreObjects()) {
-            usort($aids, function ($a, $b) {
-                return ($b->getScoreTotal() + $b->getScoreObjects()) <=> ($a->getScoreTotal() + $a->getScoreObjects());
-            });
-        }
-
-        if (isset($aidParams['projectReference']) && $aidParams['projectReference'] instanceof ProjectReference) {
-            /** @var Aid $aid */
-            foreach ($aids as $aid) {
-                if ($aid->getProjectReferences()->contains($aidParams['projectReference'])) {
-                    $aid->addProjectReferenceSearched($aidParams['projectReference']);
-                }
-            }
-        }
-
-        if (!isset($aidParams['noPostPopulate'])) {
-            $aids = $this->postPopulateAids($aids, $aidParams);
-        }
-
-        return $aids;
     }
 
     public function extractInlineStyles(Aid $aid): Aid
@@ -1027,37 +992,6 @@ class AidService // NOSONAR too complex
      *
      * @return array<int, Aid>
      */
-    public function searchAidsV2(array $aidParams): array
-    {
-        /** @var AidRepository $aidRepository */
-        $aidRepository = $this->managerRegistry->getRepository(Aid::class);
-        $aids = $aidRepository->findForSearch($aidParams);
-
-        if (isset($aidParams['projectReference']) && $aidParams['projectReference'] instanceof ProjectReference) {
-            /** @var Aid $aid */
-            foreach ($aids as $aid) {
-                foreach ($aid->getProjectReferences() as $projectReference) {
-                    if ($projectReference->getId() == $aidParams['projectReference']->getId()) {
-                        $aid->addProjectReferenceSearched($aidParams['projectReference']);
-                    }
-                }
-            }
-        }
-
-        if (!isset($aidParams['noPostPopulate'])) {
-            $aids = $this->postPopulateAids($aids, $aidParams);
-        }
-
-        return $aids;
-    }
-
-    /**
-     * Fonction de recherche des aides.
-     *
-     * @param array<string, mixed> $aidParams
-     *
-     * @return array<int, Aid>
-     */
     public function searchForApi(array $aidParams): array
     {
         /** @var AidRepository $aidRepository */
@@ -1093,6 +1027,78 @@ class AidService // NOSONAR too complex
         // Restauration des scores
         foreach ($aids as $aid) {
             $aid->setScoreTotal($scores[$aid->getId()] ?? null);
+        }
+
+        return $aids;
+    }
+
+    /**
+     * Fonction de recherche des aides.
+     * On recupère uniquement les ids et le score total qui seront mis en cache.
+     *
+     * @param array<string, mixed> $aidParams
+     *
+     * @return array<int, Aid>
+     */
+    public function searchAidsV3(array $aidParams): array
+    {
+        // la clé du cache selon la recherche
+        $cacheKey = 'search_aids_'.hash('xxh128', serialize([
+            'params' => $aidParams,
+            'date' => (new \DateTime())->format('Y-m-d'),
+        ]));
+
+        // on recupère les aides dans le cache si possible, sinon on calcul
+        $aids = $this->cache->get($cacheKey, function () use ($aidParams) {
+            /** @var AidRepository $aidRepository */
+            $aidRepository = $this->managerRegistry->getRepository(Aid::class);
+            $aids = $aidRepository->findForSearchV3($aidParams);
+
+            // déduplication des aides génériques / locales
+            if (!isset($aidParams['noPostPopulate'])) {
+                $aids = $this->postPopulateAids($aids, $aidParams);
+            }
+
+            return $aids;
+        });
+
+        return $aids;
+    }
+
+    /**
+     * Recupère les données des aides à partir des ids et du score total.
+     *
+     * @return array<int, Aid>
+     */
+    public function hydrateLightAids(array $lightAids, array $aidParams): array
+    {
+        if (empty($lightAids)) {
+            return [];
+        }
+        // faits les tableaux d'ids et de scores
+        $ids = array_map(fn ($aid) => $aid->getId(), $lightAids);
+        $scoreTotalById = array_combine(
+            array_map(fn ($aid) => $aid->getId(), $lightAids),
+            array_map(fn ($aid) => $aid->getScoreTotal(), $lightAids)
+        );
+
+        /** @var AidRepository $aidRepository */
+        $aidRepository = $this->managerRegistry->getRepository(Aid::class);
+
+        // récupère les aides
+        $aids = $aidRepository->findCompleteAidsByIds($ids);
+
+        // on remet les scores
+        foreach ($aids as $key => $aid) {
+            $aids[$key]->setScoreTotal($scoreTotalById[$aid->getId()]);
+
+            if (isset($aidParams['projectReference']) && $aidParams['projectReference'] instanceof ProjectReference) {
+                foreach ($aid->getProjectReferences() as $projectReference) {
+                    if ($projectReference->getId() == $aidParams['projectReference']->getId()) {
+                        $aid->addProjectReferenceSearched($aidParams['projectReference']);
+                    }
+                }
+            }
         }
 
         return $aids;

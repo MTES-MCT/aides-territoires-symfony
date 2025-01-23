@@ -32,7 +32,6 @@ class SearchPageCountAidHandler
         // met à jour le nombre de porteurs
         if ($searchPage instanceof SearchPage) {
             $aidParams = [
-                'showInSearch' => true,
                 'searchPage' => $searchPage
             ];
             $aidSearchClass = $this->aidSearchFormService->getAidSearchClass(
@@ -48,7 +47,7 @@ class SearchPageCountAidHandler
                 $this->aidSearchFormService->convertAidSearchClassToAidParams($aidSearchClass)
             );
 
-            $aids = $this->aidService->searchAids($aidParams);
+            $aids = $this->aidService->searchAidsV3($aidParams);
 
             $logEvent = new LogEvent();
             $logEvent->setCategory('aid');

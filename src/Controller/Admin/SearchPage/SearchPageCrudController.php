@@ -151,30 +151,16 @@ class SearchPageCrudController extends AtCrudController
                 $this->aidSearchFormService->convertAidSearchClassToAidParams($aidSearchClass)
             );
             $aidParams['searchPage'] = $entity;
-            $aids = $this->aidService->searchAids($aidParams);
+            $aids = $this->aidService->searchAidsV3($aidParams);
+            $aids = $this->aidService->hydrateLightAids($aids, $aidParams);
             $nbAids = count($aids);
-            $nbLocals = 0;
-            /** @var Aid $aid */
-            foreach ($aids as $aid) {
-                if ($aid->isLocal()) {
-                    $nbLocals++;
-                }
-            }
 
             $this->getContext()->getEntity()->getInstance()->setNbAids(
                 $nbAids
             );
         }
 
-        yield IntegerField::new('nbAids', 'Nombre d\'aides total (querystring)')
-            ->setFormTypeOption('attr', ['readonly' => true])
-            ->hideOnIndex();
-        if ($entity && $entity->getSearchQuerystring() && isset($nbLocals)) {
-            $this->getContext()->getEntity()->getInstance()->setNbAidsLive(
-                $nbLocals
-            );
-        }
-        yield IntegerField::new('nbAidsLive', 'Nombre d\'aides actuellement visible')
+        yield IntegerField::new('nbAids', 'Nombre d\'aides sur le portail')
             ->setFormTypeOption('attr', ['readonly' => true])
             ->hideOnIndex();
 

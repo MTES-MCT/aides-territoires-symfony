@@ -71,15 +71,11 @@ class PortalController extends FrontController
         ];
         $aidParams = array_merge($aidParams, $aidSearchFormService->convertAidSearchClassToAidParams($aidSearchClass));
         $aidParams['searchPage'] = $searchPage;
-        $aids = $aidService->searchAids($aidParams);
+        $aids = $aidService->searchAidsV3($aidParams);
+        $aidsLocal = $aidService->searchAidsV3(array_merge($aidParams, ['isLocal' => true]));
         $nbAids = count($aids);
-        $nbLocals = 0;
-        /** @var Aid $aid */
-        foreach ($aids as $aid) {
-            if ($aid->isLocal()) {
-                $nbLocals++;
-            }
-        }
+        $nbLocals = count($aidsLocal);
+
         // formulaire edition
         $form = $this->createForm(SearchPageEditType::class, $searchPage);
         $form->handleRequest($requestStack->getCurrentRequest());

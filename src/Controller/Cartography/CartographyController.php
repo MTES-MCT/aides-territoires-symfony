@@ -244,7 +244,7 @@ class CartographyController extends FrontController
         foreach ($backers as $backer) {
             $aidsParams['backer'] = $backer;
             // défini les aides lives, à partir de quoi on pourra récupérer les financières, techniques, les thématiques
-            $backer->setAidsLive($aidService->searchAids($aidsParams));
+            $backer->setAidsLive($aidService->searchAidsV3($aidsParams));
 
             /** @var Aid $aid */
             $aidsLiveIds = [];
