@@ -150,7 +150,8 @@
                 "php bin/console lexik:jwt:generate-keypair",
                 "php bin/console lexik:jwt:check-config",
                 "rm docker-compose.yml",
-                "rm -rf .docker"
+                "rm -rf .docker",
+                "php bin/console at:cron:site:redis_cache_reset"
             ],
             "php-config": [
                 "memory_limit=512M",
