@@ -34,44 +34,33 @@ class RedisCacheResetCommand extends Command
 
         // on parcours les projets référents pour préparer le cache
         foreach ($projectReferences as $projectReference) {
-            $searchParams = array_merge(
-                $aidParams,
-                [
-                    'keyword' => $projectReference->getName(),
-                    'orderBy' => [
-                        'sort' => 'score_total',
-                        'order' => 'DESC',
-                    ],
-                    'projectReference' => $projectReference,
-                ],
-            );
-            // Trier les paramètres
-            ksort($searchParams);
-            // Trier orderBy
-            ksort($searchParams['orderBy']);
-
             $this->aidService->searchAidsV3(
-                $searchParams
+                array_merge(
+                    $aidParams,
+                    [
+                        'keyword' => $projectReference->getName(),
+                        'orderBy' => [
+                            'sort' => 'score_total',
+                            'order' => 'DESC',
+                        ],
+                        'projectReference' => $projectReference,
+                    ],
+                )
             );
             $output->writeln('Cache '.$projectReference->getName().' préparé');
         }
 
         // préparation du cache sans filtres
-        $searchParams = array_merge(
-            $aidParams,
-            [
-                'orderBy' => [
-                    'sort' => 'score_total',
-                    'order' => 'DESC',
-                ],
-            ],
-        );
-        // Trier les paramètres
-        ksort($searchParams);
-        // Trier orderBy
-        ksort($searchParams['orderBy']);
         $this->aidService->searchAidsV3(
-            $searchParams
+            array_merge(
+                $aidParams,
+                [
+                    'orderBy' => [
+                        'sort' => 'score_total',
+                        'order' => 'DESC',
+                    ],
+                ],
+            )
         );
         $output->writeln('Cache sans params préparé');
 
