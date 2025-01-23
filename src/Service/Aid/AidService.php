@@ -985,21 +985,6 @@ class AidService // NOSONAR too complex
         );
     }
 
-    /**
-     * Fonction de recherche des aides.
-     *
-     * @param array<string, mixed> $aidParams
-     *
-     * @return array<int, Aid>
-     */
-    public function searchForApi(array $aidParams): array
-    {
-        /** @var AidRepository $aidRepository */
-        $aidRepository = $this->managerRegistry->getRepository(Aid::class);
-
-        return $aidRepository->findIdsWithCache($aidParams);
-    }
-
     public function getAidsFromResults(array $results): array
     {
         /** @var AidRepository $aidRepository */

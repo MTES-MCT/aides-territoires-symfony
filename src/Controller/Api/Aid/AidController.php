@@ -41,7 +41,6 @@ class AidController extends ApiController
         // parametres pour requetes aides
         $aidParams = [
             'showInSearch' => true,
-            'selectComplete' => true
         ];
 
         // on fusionne les paramètres de recherche avec les paramètres de requête
@@ -135,16 +134,15 @@ class AidController extends ApiController
     ): JsonResponse {
         $params = [
             'showInSearch' => true,
-            'selectComplete' => true,
             'orderBy' => ['sort' => 'a.id', 'order' => 'DESC']
         ];
         // requete pour compter sans la pagination
-        $results = $aidService->searchForApi($params);
+        $results = $aidService->searchAidsV3($params);
         $count = count($results);
 
         // requete pour les résultats avec la pagination
         $results = array_slice($results, ($this->getPage() - 1) * $this->getItemsPerPage(), $this->getItemsPerPage());
-        $results = $aidService->getAidsFromResults($results);
+        $results = $aidService->hydrateLightAids($results, $params);
         // spécifique
         $resultsSpe = $this->getResultsSpe($results, $aidService);
 

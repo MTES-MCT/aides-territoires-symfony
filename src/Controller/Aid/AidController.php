@@ -315,7 +315,6 @@ class AidController extends FrontController
 
         $aidParams = [
             'showInSearch' => true,
-            'selectComplete' => true,
         ];
 
         $aidParams = array_merge($aidParams, $aidSearchFormService->convertAidSearchClassToAidParams($aidSearchClass));
