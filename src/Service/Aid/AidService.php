@@ -28,6 +28,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Contracts\Cache\ItemInterface;
 use Symfony\Contracts\Cache\TagAwareCacheInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
@@ -1004,7 +1005,7 @@ class AidService // NOSONAR too complex
         ]));
 
         // on recupère les aides dans le cache si possible, sinon on calcul
-        $aids = $this->cache->get($cacheKey, function () use ($aidParams) {
+        $aids = $this->cache->get($cacheKey, function (ItemInterface $item) use ($aidParams) {
             /** @var AidRepository $aidRepository */
             $aidRepository = $this->managerRegistry->getRepository(Aid::class);
             $aids = $aidRepository->findForSearchV3($aidParams);
@@ -1013,6 +1014,8 @@ class AidService // NOSONAR too complex
             if (!isset($aidParams['noPostPopulate'])) {
                 $aids = $this->postPopulateAids($aids, $aidParams);
             }
+
+            $item->tag('search_aids');
 
             return $aids;
         });

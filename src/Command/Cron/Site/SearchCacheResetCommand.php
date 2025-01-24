@@ -2,23 +2,17 @@
 
 namespace App\Command\Cron\Site;
 
-use App\Repository\Reference\ProjectReferenceRepository;
-use App\Service\Aid\AidService;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
-use Symfony\Contracts\Cache\TagAwareCacheInterface;
 
 #[AsCommand(name: 'at:cron:site:search_cache_reset', description: 'Vide le cache recherche')]
 class SearchCacheResetCommand extends Command
 {
     public function __construct(
-        private TagAwareCacheInterface $cache,
-        private AidService $aidService,
-        private ProjectReferenceRepository $projectReferenceRepository,
         private KernelInterface $kernelInterface
     ) {
         parent::__construct();
@@ -26,54 +20,17 @@ class SearchCacheResetCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $this->cache->clear();
-        $output->writeln('Cache vidé avec succès');
-
+        // gestion du cache symfony
         $arguments = ['--env' => $this->kernelInterface->getEnvironment()];
-
-        // on warmup le cache (tant qu'on est sur le systeme de cache de symfony)
-        $command = $this->getApplication()->find('cache:warmup');
-        $greetInput = new ArrayInput($arguments);
-        $command->run($greetInput, $output);
-
-        $aidParams = [
-            'showInSearch' => true,
+        $commands = [
+            'cache:clear',
+            'cache:warmup',
         ];
-
-        $projectReferences = $this->projectReferenceRepository->findAll();
-
-        // on parcours les projets référents pour préparer le cache
-        foreach ($projectReferences as $projectReference) {
-            $this->aidService->searchAidsV3(
-                array_merge(
-                    $aidParams,
-                    [
-                        'keyword' => $projectReference->getName(),
-                        'orderBy' => [
-                            'sort' => 'score_total',
-                            'order' => 'DESC',
-                        ],
-                        'projectReference' => $projectReference,
-                    ],
-                )
-            );
-            $output->writeln('Cache '.$projectReference->getName());
+        foreach ($commands as $command) {
+            $command = $this->getApplication()->find($command);
+            $greetInput = new ArrayInput($arguments);
+            $command->run($greetInput, $output);
         }
-
-        // préparation du cache sans filtres
-        $this->aidService->searchAidsV3(
-            array_merge(
-                $aidParams,
-                [
-                    'orderBy' => [
-                        'sort' => 'score_total',
-                        'order' => 'DESC',
-                    ],
-                ],
-            )
-        );
-
-        $output->writeln('Cache sans params préparé');
 
         return Command::SUCCESS;
     }
