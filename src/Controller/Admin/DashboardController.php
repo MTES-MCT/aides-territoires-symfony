@@ -318,7 +318,8 @@ class DashboardController extends AbstractDashboardController
             MenuItem::linkToCrud('Urls de redirections', 'fas fa-list', UrlRedirect::class),
             MenuItem::linkToCrud('Exports de données', 'fas fa-list', DataExport::class),
             MenuItem::linkToCrud('Sources de données', 'fas fa-list', DataSource::class),
-            MenuItem::linkToRoute('Logs Symfony', 'fas fa-list', 'admin_log_symfony_download', [])
+            MenuItem::linkToRoute('Logs Symfony', 'fas fa-list', 'admin_log_symfony_download', []),
+            MenuItem::linkToRoute('Vide Cache Symfony', 'fas fa-list', 'admin_configuration_clear_cache', [])
         ]);
 
         yield MenuItem::subMenu('Statistiques', 'fas fa-chart-line')->setSubItems([
