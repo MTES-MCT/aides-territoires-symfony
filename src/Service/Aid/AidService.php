@@ -19,7 +19,9 @@ use App\Repository\Reference\KeywordReferenceRepository;
 use App\Service\Log\LogAidApplicationUrlClickService;
 use App\Service\Log\LogAidOriginUrlClickService;
 use App\Service\Log\LogAidViewService;
+use App\Service\Notification\NotificationService;
 use App\Service\User\UserService;
+use App\Service\Various\ParamService;
 use App\Service\Various\StringService;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Persistence\ManagerRegistry;
@@ -40,6 +42,8 @@ class AidService // NOSONAR too complex
         private ManagerRegistry $managerRegistry,
         private LoggerInterface $loggerInterface,
         private TagAwareCacheInterface $cache,
+        private NotificationService $notificationService,
+        private ParamService $paramService,
     ) {
     }
 
@@ -1000,6 +1004,15 @@ class AidService // NOSONAR too complex
             'params' => $aidParams,
             'date' => (new \DateTime())->format('Y-m-d'),
         ]));
+        if (isset($aidParams['keyword']) && 'Développer les infrastructures de covoiturage' == $aidParams['keyword']) {
+            $admin = $this->managerRegistry->getRepository(User::class)
+            ->findOneBy(['email' => $this->paramService->get('email_super_admin')]);
+            $this->notificationService->addNotification(
+                $admin,
+                'cache key',
+                $cacheKey
+            );
+        }
 
         // on recupère les aides dans le cache si possible, sinon on calcul
         $aids = $this->cache->get($cacheKey, function () use ($aidParams) {

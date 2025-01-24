@@ -47,7 +47,7 @@ class RedisCacheResetCommand extends Command
                     ],
                 )
             );
-            $output->writeln('Cache '.$projectReference->getName().' préparé');
+            $output->writeln('Cache '.$projectReference->getName());
         }
 
         // préparation du cache sans filtres
