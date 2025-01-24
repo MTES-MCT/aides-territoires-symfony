@@ -35,16 +35,19 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class AidService // NOSONAR too complex
 {
+    private TagAwareCacheInterface $redisCache;
+
     public function __construct(
         private HttpClientInterface $httpClientInterface,
         private UserService $userService,
         private RouterInterface $routerInterface,
         private ManagerRegistry $managerRegistry,
         private LoggerInterface $loggerInterface,
-        private TagAwareCacheInterface $cache,
+        TagAwareCacheInterface $cache,  // Enlevez le private
         private NotificationService $notificationService,
         private ParamService $paramService,
     ) {
+        $this->redisCache = $cache;  // Stockez directement l'instance Redis
     }
 
     /**
@@ -1010,13 +1013,13 @@ class AidService // NOSONAR too complex
             ->findOneBy(['email' => $this->paramService->get('email_super_admin')]);
             $this->notificationService->addNotification(
                 $admin,
-                'cache key : '. ($this->cache->hasItem($cacheKey) ? ' oui ' : ' non '),
+                'cache key : '. ($this->redisCache->hasItem($cacheKey) ? ' oui ' : ' non '),
                 $cacheKey. ', '. serialize($aidParams),
             );
         }
 
         // on recupère les aides dans le cache si possible, sinon on calcul
-        $aids = $this->cache->get($cacheKey, function () use ($aidParams) {
+        $aids = $this->redisCache->get($cacheKey, function () use ($aidParams) {
             /** @var AidRepository $aidRepository */
             $aidRepository = $this->managerRegistry->getRepository(Aid::class);
             $aids = $aidRepository->findForSearchV3($aidParams);

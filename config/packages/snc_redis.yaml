@@ -4,6 +4,10 @@ snc_redis:
             type: predis
             alias: session
             dsn: "%env(resolve:REDIS_URL)%"
+        default:
+            type: predis
+            alias: default
+            dsn: "%env(resolve:REDIS_URL)%"
 # snc_redis:
 #     clients:
 
