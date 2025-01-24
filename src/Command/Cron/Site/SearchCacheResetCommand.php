@@ -2,25 +2,24 @@
 
 namespace App\Command\Cron\Site;
 
-use App\Repository\Organization\OrganizationTypeRepository;
 use App\Repository\Reference\ProjectReferenceRepository;
 use App\Service\Aid\AidService;
-use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Contracts\Cache\TagAwareCacheInterface;
 
-#[AsCommand(name: 'at:cron:site:redis_cache_reset', description: 'Vide le cache Redis')]
-class RedisCacheResetCommand extends Command
+#[AsCommand(name: 'at:cron:site:search_cache_reset', description: 'Vide le cache recherche')]
+class SearchCacheResetCommand extends Command
 {
     public function __construct(
         private TagAwareCacheInterface $cache,
         private AidService $aidService,
         private ProjectReferenceRepository $projectReferenceRepository,
-        private OrganizationTypeRepository $organizationTypeRepository
+        private KernelInterface $kernelInterface
     ) {
         parent::__construct();
     }
@@ -30,9 +29,11 @@ class RedisCacheResetCommand extends Command
         $this->cache->clear();
         $output->writeln('Cache vidé avec succès');
 
+        $arguments = ['--env' => $this->kernelInterface->getEnvironment()];
+
         // on warmup le cache (tant qu'on est sur le systeme de cache de symfony)
         $command = $this->getApplication()->find('cache:warmup');
-        $greetInput = new ArrayInput([]);
+        $greetInput = new ArrayInput($arguments);
         $command->run($greetInput, $output);
 
         $aidParams = [
