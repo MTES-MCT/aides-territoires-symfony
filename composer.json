@@ -152,9 +152,6 @@
                 "rm docker-compose.yml",
                 "rm -rf .docker"
             ],
-            "postdeploy": [
-                "php bin/console at:cron:site:redis_cache_reset"
-            ],
             "php-config": [
                 "memory_limit=512M",
                 "opcache.memory_consumption=256",
