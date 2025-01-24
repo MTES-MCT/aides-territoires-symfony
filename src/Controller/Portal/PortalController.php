@@ -140,12 +140,18 @@ class PortalController extends FrontController
 
         // // le paginateur
         $aidParams['searchPage'] = $search_page;
-        $aids = $aidService->searchAids($aidParams);
+        $aids = $aidService->searchAidsV3($aidParams);
         try {
             $adapter = new ArrayAdapter($aids);
             $pagerfanta = new Pagerfanta($adapter);
             $pagerfanta->setMaxPerPage(AidController::NB_AID_BY_PAGE);
             $pagerfanta->setCurrentPage($currentPage);
+
+            // Recharger les entités complètes pour la page courante
+            $pageResults = $aidService->hydrateLightAids(
+                lightAids: $pagerfanta->getCurrentPageResults(),
+                aidParams: $aidParams
+            );
         } catch (OutOfRangeCurrentPageException $e) {
             $this->addFlash(
                 FrontController::FLASH_ERROR,
@@ -253,6 +259,7 @@ class PortalController extends FrontController
         return $this->render('portal/portal/details.html.twig', [
             'search_page' => $search_page,
             'myPager' => $pagerfanta,
+            'pageResults' => $pageResults,
             'formAidSearch' => $formAidSearch->createView(),
             'showExtended' => $showExtended,
             'formAlertCreate' => $formAlertCreate,
@@ -330,7 +337,7 @@ class PortalController extends FrontController
 
         // les aides
         $aidParams['searchPage'] = $search_page;
-        $aids = $aidService->searchAids($aidParams);
+        $aids = $aidService->searchAidsV3($aidParams);
 
 
         // tableau des ids des aides
@@ -397,7 +404,7 @@ class PortalController extends FrontController
         $dateMin = $session->get('dateMin', new \DateTime('-1 month'));
         $dateMax = $session->get('dateMax', new \DateTime(date('Y-m-d')));
 
-        if (count($aidIds) > 0) {
+        if (!empty($aidIds)) {
             // Top 10 aides consulter
             $topAidsViews = $logAidViewRepository->countTop([
                 'aidIds' => $aidIds,
@@ -437,7 +444,7 @@ class PortalController extends FrontController
         $session = $requestStack->getSession();
         $aidIds = $session->get('aidIds', []);
 
-        if (count($aidIds) > 0) {
+        if (!empty($aidIds)) {
             // nombre de vues par mois
             $viewsByMonth = $logAidViewRepository->countByMonth([
                 'aidIds' => $aidIds,
@@ -490,7 +497,7 @@ class PortalController extends FrontController
         $dateMin = $session->get('dateMin', new \DateTime('-1 month'));
         $dateMax = $session->get('dateMax', new \DateTime(date('Y-m-d')));
 
-        if (count($aidIds) > 0) {
+        if (!empty($aidIds)) {
             // les types d'organization les plus demandeurs
             $organizationTypes = $logAidViewRepository->countOrganizationTypes([
                 'aidIds' => $aidIds,

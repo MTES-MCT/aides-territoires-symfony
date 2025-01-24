@@ -1,7 +1,7 @@
 {
   "jobs": [
     {
-      "command": "45 2 * * * php bin/console at:cron:site:cache_clear"
+      "command": "45 2 * * * php bin/console at:cron:site:redis_cache_reset"
     },
     {
       "command": "0 3 * * * php bin/console at:cron:site:datas"

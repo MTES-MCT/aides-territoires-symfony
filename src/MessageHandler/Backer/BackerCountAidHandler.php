@@ -38,7 +38,9 @@ class BackerCountAidHandler
                 'backer' => $backer,
                 'showInSearch' => true
             ];
-            $backer->setAidsLive($this->aidService->searchAids($aidsParams));
+            $aids = $this->aidService->searchAidsV3($aidsParams);
+            $aids = $this->aidService->hydrateLightAids($aids, $aidsParams);
+            $backer->setAidsLive($aids);
             $backer->setNbAidsLive(count($backer->getAidsLive()));
             $backer->setNbAidsLiveFinancial(count($backer->getAidsFinancial()));
             $backer->setNbAidsLiveTechnical(count($backer->getAidsTechnical()));

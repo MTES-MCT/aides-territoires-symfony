@@ -422,8 +422,8 @@ class ProjectController extends FrontController
                 $searchParams['keyword'] = $aidParams['keyword'];
             }
 
-            $aidsSuggested = $aidService->searchAids($aidParams);
-            if (count($aidsSuggested) > 0) {
+            $aidsSuggested = $aidService->searchAidsV3($aidParams);
+            if (!empty($aidsSuggested)) {
                 $referenceService->setHighlightedWords(null, $aidParams['keyword']);
             }
         }

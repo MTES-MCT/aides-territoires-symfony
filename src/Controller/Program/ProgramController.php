@@ -120,12 +120,18 @@ class ProgramController extends FrontController
         $showExtended = $aidSearchFormService->setShowExtended($aidSearchClass);
 
         // le paginateur
-        $aids = $aidService->searchAids($aidParams);
+        $aids = $aidService->searchAidsV3($aidParams);
         try {
             $adapter = new ArrayAdapter($aids);
             $pagerfanta = new Pagerfanta($adapter);
             $pagerfanta->setMaxPerPage(self::NB_AID_BY_PAGE);
             $pagerfanta->setCurrentPage($currentPage);
+
+            // Recharger les entités complètes pour la page courante
+            $pageResults = $aidService->hydrateLightAids(
+                lightAids: $pagerfanta->getCurrentPageResults(),
+                aidParams: $aidParams
+            );
         } catch (OutOfRangeCurrentPageException $e) {
             $this->addFlash(
                 FrontController::FLASH_ERROR,
@@ -227,6 +233,7 @@ class ProgramController extends FrontController
         return $this->render('program/program/details.html.twig', [
             'program' => $program,
             'myPager' => $pagerfanta,
+            'pageResults' => $pageResults,
             'formAidSearch' => $formAidSearch->createView(),
             'formAidSearchNoOrder' => true,
             'showExtended' => $showExtended,

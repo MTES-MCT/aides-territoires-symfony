@@ -33,7 +33,7 @@ class ProjectReferenceCountAidsHandler
                 'projectReference' => $projectReference,
             ];
 
-            $projectReference->setNbSearchResult(count($this->aidService->searchAids($aidParams)));
+            $projectReference->setNbSearchResult(count($this->aidService->searchAidsV3($aidParams)));
             $this->managerRegistry->getManager()->persist($projectReference);
             $this->managerRegistry->getManager()->flush();
         }

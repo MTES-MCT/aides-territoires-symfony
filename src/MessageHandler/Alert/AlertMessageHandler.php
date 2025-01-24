@@ -66,7 +66,9 @@ class AlertMessageHandler
             );
 
             // recupere les nouvelles aides qui correspondent à l'alerte
-            $aids = $this->aidService->searchAids($aidParams);
+            $aids = $this->aidService->searchAidsV3($aidParams);
+            $aids = $this->aidService->hydrateLightAids($aids, $aidParams);
+
             if (!empty($aids)) {
                 // il y a de nouvelles aides
                 if ($alert->getTitle() === $this->paramService->get('addna_alert_title')) {

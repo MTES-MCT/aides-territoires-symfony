@@ -1312,98 +1312,8 @@ class AidRepository extends ServiceEntityRepository
 
     /**
      * @param array<string, mixed>|null $params
-     *
-     * @return array<string, int>
      */
-    public function findIdsWithCache(?array $params = null): array
-    {
-        $cacheKey = 'aids_ids_with_cache' . hash('xxh128', serialize([
-            'params' => $params,
-            'date' => (new \DateTime())->format('Y-m-d'),
-        ]));
-
-        // Récupération depuis le cache ou exécution de la requête
-        return $this->cache->get($cacheKey, function (ItemInterface $item) use ($params) {
-            $qb = $this->getQueryBuilderForSearch($params);
-            $results = $qb->getQuery()->getResult();
-
-            $aids = array_map(function($result) {
-                if ($result instanceof Aid) {
-                    $aid = $result;
-                } elseif (isset($result[0]) && isset($result['score_total'])) {
-                    /** @var Aid $aid */
-                    $aid = $result[0];
-                    $aid->setScoreTotal($result['score_total'] ?? null);
-                }
-
-                return $aid;
-            }, $results);
-
-            if (!isset($params['noPostPopulate'])) {
-                $aids = $this->aidService->postPopulateAids($aids, $params);
-            }
-
-            $idsToCache = array_map(function (Aid $aid) {
-                return [
-                    'id' => $aid->getId(),
-                    'score_total' => $aid->getScoreTotal()
-                ];
-            }, $aids);
-
-            $tomorrow = new \DateTime('tomorrow');
-            $tomorrow->setTime(0, 0);
-            $item->expiresAfter($tomorrow->getTimestamp() - time());
-            $item->tag(['aids', 'search_results']);
-
-            return $idsToCache;
-        });
-    }
-
-    /**
-     * @param array<string, mixed>|null $params
-     *
-     * @return array<int, Aid>
-     */
-    public function findForSearch(?array $params = null): array
-    {
-        // Clé de cache différente
-        $prefix = ($params['selectComplete'] ?? false) ? 'aids_complete_' : 'aids_light_';
-        $cacheKey = $prefix . hash('xxh128', serialize([
-            'params' => $params,
-            'date' => (new \DateTime())->format('Y-m-d'),
-        ]));
-        
-        // Récupération depuis le cache ou exécution de la requête
-        return $this->cache->get($cacheKey, function (ItemInterface $item) use ($params) {
-            $qb = $this->getQueryBuilderForSearch($params);
-            $results = $qb->getQuery()->getResult();
-
-            // On ne stocke que les IDs dans le cache
-            $aids = array_map(function ($result) {
-                if ($result instanceof Aid) {
-                    $aid = $result;
-                } elseif (isset($result[0]) && isset($result['score_total'])) {
-                    /** @var Aid $aid */
-                    $aid = $result[0];
-                    $aid->setScoreTotal($result['score_total'] ?? null);
-                }
-
-                return $aid;
-            }, $results);
-
-            $tomorrow = new \DateTime('tomorrow');
-            $tomorrow->setTime(0, 0);
-            $item->expiresAfter($tomorrow->getTimestamp() - time());
-            $item->tag(['aids', 'search_results']);
-
-            return $aids;
-        });
-    }
-
-    /**
-     * @param array<string, mixed>|null $params
-     */
-    public function getQueryBuilderForSearch(?array $params = null): QueryBuilder
+    public function getQueryBuilderForSearchV3(?array $params = null): QueryBuilder
     {
         // config
         $scoreMin = $params['scoreMin'] ?? 60;
@@ -1418,7 +1328,6 @@ class AidRepository extends ServiceEntityRepository
                 : null
         ;
         $orderByDateSubmissionDeadline = $params['orderByDateSubmissionDeadline'] ?? null;
-        $selectComplete = $params['selectComplete'] ?? null;
 
         // les paramètres
         $id = $params['id'] ?? null;
@@ -1429,6 +1338,8 @@ class AidRepository extends ServiceEntityRepository
         $exclude = $params['exclude'] ?? null;
         $slug = $params['slug'] ?? null;
         $hasBrokenLink = $params['hasBrokenLink'] ?? null;
+        $isLocal = $params['isLocal'] ?? null;
+        $isGeneric = $params['isGeneric'] ?? null;
 
         $applyBefore = $params['applyBefore'] ?? null;
         $publishedAfter = $params['publishedAfter'] ?? null;
@@ -1502,10 +1413,8 @@ class AidRepository extends ServiceEntityRepository
         // le queryBuilder
         $qb = $this->createQueryBuilder('a');
 
-        // les champs des aides sélectionnés
-        if (!$selectComplete) {
-            $qb->select('PARTIAL a.{id, name, slug, status, dateStart, dateSubmissionDeadline}');
-        }
+        // on ne charge que l'id pour les recherches afin d'alléger la requete
+        $qb->select('PARTIAL a.{id}');
 
         // les liaisons qu'on précharge
         $qb
@@ -1515,9 +1424,7 @@ class AidRepository extends ServiceEntityRepository
             ->leftJoin('a.aidRecurrence', 'aidRecurrence')
             ->leftJoin('a.aidTypes', 'aidTypes')
             ->innerJoin('a.perimeter', 'perimeter')
-            ->addSelect('projectReferences, aidFinancers, backer, aidRecurrence, aidTypes, perimeter')
         ;
-        
 
         // LES CRITERES
         // aide
@@ -1579,6 +1486,14 @@ class AidRepository extends ServiceEntityRepository
                 ->andWhere('a.hasBrokenLink = :hasBrokenLink')
                 ->setParameter('hasBrokenLink', $hasBrokenLink)
             ;
+        }
+
+        if ($isLocal) {
+            $qb->addCriteria(self::localCriteria());
+        }
+
+        if ($isGeneric) {
+            $qb->addCriteria(self::genericCriteria());
         }
 
         // Dates
@@ -2249,5 +2164,66 @@ class AidRepository extends ServiceEntityRepository
         }
 
         return $qb;
+    }
+
+    /**
+     * @param array<string, mixed>|null $params
+     *
+     * @return array<int, Aid>
+     */
+    public function findForSearchV3(?array $params = null): array
+    {
+        // Clé de cache différente
+        $cacheKey = 'aids_search_' . hash('xxh128', serialize([
+            'params' => $params,
+            'date' => (new \DateTime())->format('Y-m-d'),
+        ]));
+        
+        // Récupération depuis le cache ou exécution de la requête
+        return $this->cache->get($cacheKey, function (ItemInterface $item) use ($params) {
+            $qb = $this->getQueryBuilderForSearchV3($params);
+            $results = $qb->getQuery()->getResult();
+
+            // On ne stocke que les IDs dans le cache
+            $aids = array_map(function ($result) {
+                if ($result instanceof Aid) {
+                    $aid = $result;
+                } elseif (isset($result[0]) && isset($result['score_total'])) {
+                    /** @var Aid $aid */
+                    $aid = $result[0];
+                    $aid->setScoreTotal($result['score_total'] ?? null);
+                }
+
+                return $aid;
+            }, $results);
+
+            $tomorrow = new \DateTime('tomorrow');
+            $tomorrow->setTime(0, 0);
+            $item->expiresAfter($tomorrow->getTimestamp() - time());
+            $item->tag(['aids', 'search_results']);
+
+            return $aids;
+        });
+    }
+
+    /**
+     * Charge une liste d'aides avec toutes les datas à partir d'un tableau d'ids
+     *
+     * @param array $ids
+     * @return array<int, Aid>
+     */
+    public function findCompleteAidsByIds(array $ids): array
+    {
+        $qb = $this->createQueryBuilder('a')
+        ->where('a.id IN (:ids)')
+        ->orderBy(sprintf('FIELD(a.id, %s)', implode(',', $ids)))
+        ->setParameter('ids', $ids)
+        ;
+
+        // Forcer le chargement complet
+        return $qb
+            ->getQuery()
+            ->setHint(\Doctrine\ORM\Query::HINT_REFRESH, true)
+            ->getResult();
     }
 }
