@@ -84,8 +84,7 @@ services:
 
     App\EventListener\RouteListener:
         tags:
-            # Priority 33 so it runs before routing
-            - {name: kernel.event_listener, event: kernel.request, priority: 33}
+            - {name: kernel.event_listener, event: kernel.exception}
 
     App\EventListener\WithoutOrganizationListener:
         tags:
