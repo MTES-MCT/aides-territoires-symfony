@@ -1004,12 +1004,13 @@ class AidService // NOSONAR too complex
             'params' => $aidParams,
             'date' => (new \DateTime())->format('Y-m-d'),
         ]));
+      
         if (isset($aidParams['keyword']) && 'Développer les infrastructures de covoiturage' == $aidParams['keyword']) {
             $admin = $this->managerRegistry->getRepository(User::class)
             ->findOneBy(['email' => $this->paramService->get('email_super_admin')]);
             $this->notificationService->addNotification(
                 $admin,
-                'cache key',
+                'cache key : '. ($this->cache->hasItem($cacheKey) ? ' oui ' : ' non '),
                 $cacheKey. ', '. serialize($aidParams),
             );
         }
