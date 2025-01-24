@@ -22,7 +22,7 @@ framework:
             cache.redis:
                 adapter: cache.adapter.redis_tag_aware
                 provider: '%env(REDIS_URL)%'
-                default_lifetime: 3600
+                default_lifetime: 86400
                 tags: true
         # Unique name of your app: used to compute stable namespaces for cache keys.
         #prefix_seed: your_vendor_name/app_name

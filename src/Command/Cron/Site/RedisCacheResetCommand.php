@@ -2,6 +2,7 @@
 
 namespace App\Command\Cron\Site;
 
+use App\Repository\Organization\OrganizationTypeRepository;
 use App\Repository\Reference\ProjectReferenceRepository;
 use App\Service\Aid\AidService;
 use Psr\Cache\CacheItemPoolInterface;
@@ -17,6 +18,7 @@ class RedisCacheResetCommand extends Command
         private CacheItemPoolInterface $cache,
         private AidService $aidService,
         private ProjectReferenceRepository $projectReferenceRepository,
+        private OrganizationTypeRepository $organizationTypeRepository
     ) {
         parent::__construct();
     }
@@ -62,6 +64,7 @@ class RedisCacheResetCommand extends Command
                 ],
             )
         );
+
         $output->writeln('Cache sans params préparé');
 
         return Command::SUCCESS;

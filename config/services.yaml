@@ -71,8 +71,8 @@ services:
         class: Symfony\Component\Cache\Adapter\RedisAdapter
         arguments:
             - '@snc_redis.default'  # Votre client Redis
-            - 'your_app_prefix'     # Préfixe pour les clés (optionnel)
-            - 3600                  # TTL par défaut (optionnel)
+            - 'at_prefix'     # Préfixe pour les clés (optionnel)
+            - 86400                  # TTL par défaut (optionnel)
 
     # Configuration du TagAwareAdapter avec Redis
     cache.redis:
@@ -81,13 +81,13 @@ services:
             - '@cache.redis.adapter'
 
     # Configuration de votre service
-    App\Service\Aid\AidService:
-        arguments:
-            $cache: '@cache.redis'
+    # App\Service\Aid\AidService:
+    #     arguments:
+    #         $cache: '@cache.redis'
 
-    App\Command\Cron\Site\RedisCacheResetCommand:
-        arguments:
-            $cache: '@cache.redis'
+    # App\Command\Cron\Site\RedisCacheResetCommand:
+    #     arguments:
+    #         $cache: '@cache.redis'
 
     # Register the LogoutListener service
     App\EventListener\MyCustomLogoutListener:
