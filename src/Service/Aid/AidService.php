@@ -1010,7 +1010,7 @@ class AidService // NOSONAR too complex
             $this->notificationService->addNotification(
                 $admin,
                 'cache key',
-                $cacheKey
+                $cacheKey. ', '. serialize($aidParams),
             );
         }
 
