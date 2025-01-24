@@ -41,9 +41,8 @@ class AidService // NOSONAR too complex
         private RouterInterface $routerInterface,
         private ManagerRegistry $managerRegistry,
         private LoggerInterface $loggerInterface,
-        TagAwareCacheInterface $cache,
+        private TagAwareCacheInterface $cache
     ) {
-        $this->redisCache = $cache;  // Stockez directement l'instance Redis
     }
 
     /**
@@ -1005,7 +1004,7 @@ class AidService // NOSONAR too complex
         ]));
 
         // on recupère les aides dans le cache si possible, sinon on calcul
-        $aids = $this->redisCache->get($cacheKey, function () use ($aidParams) {
+        $aids = $this->cache->get($cacheKey, function () use ($aidParams) {
             /** @var AidRepository $aidRepository */
             $aidRepository = $this->managerRegistry->getRepository(Aid::class);
             $aids = $aidRepository->findForSearchV3($aidParams);

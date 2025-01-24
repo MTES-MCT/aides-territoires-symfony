@@ -8,14 +8,16 @@ use App\Service\Aid\AidService;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Contracts\Cache\TagAwareCacheInterface;
 
 #[AsCommand(name: 'at:cron:site:redis_cache_reset', description: 'Vide le cache Redis')]
 class RedisCacheResetCommand extends Command
 {
     public function __construct(
-        private CacheItemPoolInterface $cache,
+        private TagAwareCacheInterface $cache,
         private AidService $aidService,
         private ProjectReferenceRepository $projectReferenceRepository,
         private OrganizationTypeRepository $organizationTypeRepository
@@ -27,6 +29,11 @@ class RedisCacheResetCommand extends Command
     {
         $this->cache->clear();
         $output->writeln('Cache vidé avec succès');
+
+        // on warmup le cache (tant qu'on est sur le systeme de cache de symfony)
+        $command = $this->getApplication()->find('cache:warmup');
+        $greetInput = new ArrayInput([]);
+        $command->run($greetInput, $output);
 
         $aidParams = [
             'showInSearch' => true,
