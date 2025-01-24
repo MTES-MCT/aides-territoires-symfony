@@ -16,7 +16,9 @@ use App\Service\Various\ParamService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Asset\Packages;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 
@@ -32,9 +34,13 @@ final class RouteListener
         private NotificationService $notificationService
     ) {
     }
-    public function onKernelRequest(
-        RequestEvent $event
-    ): void {
+    public function onKernelException(ExceptionEvent $event): void
+    {
+        // Vérifier si c'est une 404
+        if (!($event->getThrowable() instanceof NotFoundHttpException)) {
+            return;
+        }
+
         // Si ce n'est pas la requête principale, ne fait rien
         if (!$event->isMainRequest()) {
             return;
@@ -67,14 +73,14 @@ final class RouteListener
         $subdomain = $hostParts[0] ?? null;
         $this->handleSubdomain($event, $subdomain);
 
+        // 404 static Django
+        $this->handleDjangoStatic($event);
+        
         // url de redirections
         $this->handleRedirect($event);
 
         // regarde si une page corresponds à l'url demandée
         $this->handlePage($event);
-
-        // 404 static Django
-        $this->handleDjangoStatic($event);
     }
 
     private function handleSubdomain(RequestEvent $event, ?string $subdomain): void
