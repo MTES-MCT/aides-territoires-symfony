@@ -178,6 +178,7 @@ class StatisticsController extends DashboardController
         MatomoService $matomoService
     ): Response {
         $statsGlobal = $this->getStatsGlobal();
+
         $chartCommune = $this->getChartObjectif(
             $statsGlobal['nbCommune'],
             $statsGlobal['nbCommuneTotal'],
@@ -211,21 +212,24 @@ class StatisticsController extends DashboardController
             apiMethod: 'VisitsSummary.get',
             customSegment: null,
             fromDateString: $dateMin->format('Y-m-d'),
-            toDateString: $dateMax->format('Y-m-d')
+            toDateString: $dateMax->format('Y-m-d'),
+            filterLimit: 1
         );
 
         $statsMatomoActions = $matomoService->getMatomoStats(
             apiMethod: 'Actions.get',
             customSegment: null,
             fromDateString: $dateMin->format('Y-m-d'),
-            toDateString: $dateMax->format('Y-m-d')
+            toDateString: $dateMax->format('Y-m-d'),
+            filterLimit: 1
         );
 
         $statsMatomoLast10Weeks = $matomoService->getMatomoStats(
             apiMethod: 'VisitsSummary.get',
             period: 'week',
             fromDateString: 'last10',
-            toDateString: null
+            toDateString: null,
+            filterLimit: 1
         );
 
         // vues des aides (totales et distinces)
@@ -271,10 +275,11 @@ class StatisticsController extends DashboardController
             $labels[] = $dateStart->format('d/m/Y') . ' au ' . $dateEnd->format('d/m/Y');
             $visitsUnique[] = $stats[0]->nb_uniq_visitors ?? 0;
             $registers[] = $userRepository
-                ->countRegisters(['dateCreateMin' => $dateStart, 'dateCreateMax' => $dateMax]);
+                ->countRegisters(['dateCreateMin' => $dateStart, 'dateCreateMax' => $dateEnd]);
             $alerts[] = $alertRepository
-                ->countCustom(['dateCreateMin' => $dateStart, 'dateCreateMax' => $dateMax]);
+                ->countCustom(['dateCreateMin' => $dateStart, 'dateCreateMax' => $dateEnd]);
         }
+
         $chartLast10Weeks = $this->chartBuilderInterface->createChart(Chart::TYPE_LINE);
         $chartLast10Weeks->setData([
             'labels' => $labels,
@@ -303,7 +308,6 @@ class StatisticsController extends DashboardController
             ],
         ]);
 
-
         return $this->render('admin/statistics/dashboard_consultation.html.twig', [
             // globale
             'statsGlobal' => $statsGlobal,
@@ -320,7 +324,7 @@ class StatisticsController extends DashboardController
             'chartLast10Weeks' => $chartLast10Weeks,
             'nbAidVisits' => $nbAidVisits,
             'nbAidViews' => $nbAidViews,
-            'nbAids' => count($statsAidsViews),
+            'nbAids' => is_countable($statsAidsViews) ? count($statsAidsViews) : 0,
             'consultationSelected' => true,
         ]);
     }
