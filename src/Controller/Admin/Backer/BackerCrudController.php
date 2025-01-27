@@ -3,6 +3,7 @@
 namespace App\Controller\Admin\Backer;
 
 use App\Controller\Admin\AtCrudController;
+use App\Controller\Admin\Filter\Backer\BackerPerimeterFilter;
 use App\Controller\Admin\Filter\Backer\HasNoOrganizationFilter;
 use App\Entity\Backer\Backer;
 use App\Entity\User\User;
@@ -40,6 +41,7 @@ class BackerCrudController extends AtCrudController
             ->add('active')
             ->add('isSpotlighted')
             ->add(HasNoOrganizationFilter::new('hasNoOrganization', 'Pas de structure associée'))
+            ->add(BackerPerimeterFilter::new('perimeter', 'Périmètre'))
         ;
     }
 
