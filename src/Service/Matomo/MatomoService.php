@@ -90,7 +90,8 @@ class MatomoService
         string $fromDateString = "2023-01-01",
         string $toDateString = null,
         ?string $period = 'range',
-        ?array $options = null
+        ?array $options = null,
+        int $filterLimit = -1
     ): mixed {
         try {
             $date = $fromDateString;
@@ -105,7 +106,7 @@ class MatomoService
                 "period" => $period,
                 "date" => $date,
                 "flat" => 1,
-                "filter_limit" => -1,
+                "filter_limit" => $filterLimit,
                 "format" => "json",
                 "segment" => $customSegment,
             ];
@@ -113,6 +114,7 @@ class MatomoService
             if (is_array($options)) {
                 $params = array_merge($params, $options);
             }
+
             $response = $this->httpClientInterface->request(
                 'GET',
                 $this->paramService->get('matomo_endpoint'),
@@ -120,7 +122,7 @@ class MatomoService
                     'query' => $params
                 ]
             );
-
+// dd($params, json_decode($response->getContent()));
             return json_decode($response->getContent());
         } catch (\Exception $e) {
             return null;
