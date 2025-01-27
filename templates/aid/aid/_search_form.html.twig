@@ -157,11 +157,11 @@
 				{% endif %}
 				<li>
 					{% if downloadDisabled %}
-						<button type="button" class="fr-btn" disabled aria-disabled="true" title="Limité à 1000 résultats">
+						<button id="btn-download-results" type="button" class="fr-btn" disabled aria-disabled="true" title="Limité à 1000 résultats">
 							<span class="fr-icon-download-line ri-lg fr-mr-1w"></span>Télécharger les résultats
 						</button>
 					{% else %}
-						<a href="{{ path('app_aid_export') ~ '?' ~ querystring }}" class="fr-btn">
+						<a id="btn-download-results" href="{{ path('app_aid_export') ~ '?' ~ querystring }}" class="fr-btn">
 							<span class="fr-icon-download-line ri-lg fr-mr-1w"></span>Télécharger les résultats
 						</a>
 					{% endif %}
