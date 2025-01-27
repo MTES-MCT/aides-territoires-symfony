@@ -173,7 +173,7 @@ class SpreadsheetExporterService
         // le tableur
         $format = FileService::FORMAT_XLSX;
         $writer = new \OpenSpout\Writer\XLSX\Writer();
-        $writer->openToBrowser('export_' . $filename . '.' . $format);
+        $writer->openToBrowser($filename . '.' . $format);
         $sheetView = new SheetView();
         $writer->getCurrentSheet()->setSheetView($sheetView);
 
