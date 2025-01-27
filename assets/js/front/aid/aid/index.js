@@ -3,6 +3,17 @@ import '../../log/log-promotion-blog-post-click.js';
 import '../../log/log-aid-search.js';
 import 'jquery-highlight/jquery.highlight.js';
 
+function escapeHtml(text) {
+    var map = {
+        '&': '&amp;',
+        '<': '&lt;',
+       '>': '&gt;',
+       '"': '&quot;',
+       "'": '&#039;'
+   };
+   return text.replace(/[&<>"']/g, function(m) { return map[m]; });
+}
+
 $(function(){
     $(document).on({
         click: function (e) {
@@ -11,7 +22,7 @@ $(function(){
             var thisOriginalText = thisElt.text();
 
             thisElt.prop('disabled', true);
-            thisElt.html('<i class="fas fa-spinner fa-spin fr-mr-1w""></i> ' + thisOriginalText);
+            thisElt.html('<i class="fas fa-spinner fa-spin fr-mr-1w""></i> ' + escapeHtml(thisOriginalText));
 
             // Réactive le bouton après 2 secondes si le formulaire échoue
             setTimeout(function () {
