@@ -88,12 +88,8 @@
 						</a>
 					</h5>
 					<p class="card-text">
-						{% if nbAidViews is defined %}
-							<strong class="fs-2">{{ nbAidViews|number_format(0, ',', ' ') }}</strong> vues
-						{% endif %}
-						{% if nbAidVisits is defined %}
-							<br /><strong class="fs-2">{{ nbAidVisits|number_format(0, ',', ' ') }}</strong> uniques
-						{% endif %}
+						<strong class="fs-2" id="nb-aid-views">calcul en cours...</strong> vues
+						<br /><strong class="fs-2" id="nb-aid-visits">calcul en cours...</strong> uniques
 					</p>
 				</div>
 			</div>
@@ -106,9 +102,7 @@
 						</a>
 					</h5>
 					<p class="card-text">
-						{% if nbAids is defined %}
-							<strong class="fs-2">{{ nbAids|number_format(0, ',', ' ') }}</strong> aides
-						{% endif %}
+						<strong class="fs-2" id="nb-aids">calcul en cours...</strong> aides
 					</p>
 				</div>
 			</div>

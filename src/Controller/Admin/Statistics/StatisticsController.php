@@ -232,31 +232,6 @@ class StatisticsController extends DashboardController
             filterLimit: 1
         );
 
-        // vues des aides (totales et distinces)
-        // on filtre sur le label pour récupérer le groupement aides / autres de matomo
-        $statsAidsViews = $matomoService->getMatomoStats(
-            apiMethod: MatomoService::MATOMO_GET_PAGE_URLS_API_METHOD,
-            fromDateString: $dateMin->format('Y-m-d'),
-            toDateString: $dateMax->format('Y-m-d'),
-            options: [
-                'flat' => 1,
-                'filter_column' => 'label',
-                'filter_pattern' => 'aides'
-            ],
-        );
-
-        $nbAidVisits = 0;
-        $nbAidViews = 0;
-        $nbAids = 0;
-        foreach ($statsAidsViews as $statsAidsView) {
-            if ($statsAidsView->label == '/aides/') {
-                continue;
-            }
-            $nbAidVisits += $statsAidsView->nb_visits;
-            $nbAidViews += $statsAidsView->nb_hits;
-            $nbAids++;
-        }
-
         $labels = [];
         $visitsUnique = [];
         $registers = [];
@@ -322,10 +297,52 @@ class StatisticsController extends DashboardController
             'statsMatomoActions' => $statsMatomoActions[0] ?? [],
             'statsMatomoLast10Weeks' => $statsMatomoLast10Weeks,
             'chartLast10Weeks' => $chartLast10Weeks,
-            'nbAidVisits' => $nbAidVisits,
-            'nbAidViews' => $nbAidViews,
-            'nbAids' => is_countable($statsAidsViews) ? count($statsAidsViews) : 0,
             'consultationSelected' => true,
+        ]);
+    }
+
+    #[Route(
+        '/admin/statistics/ajax-get-matomo-stats-aid-views',
+        name: 'admin_statistics_ajax_get_matomo_stats_aid_views',
+        options: ['expose' => true]
+    )]
+    public function ajaxGetMatomoStatsAidViews(
+        AdminContext $adminContext,
+        MatomoService $matomoService,
+    ): Response {
+        // on recupere les dates dans la query string, par défaut on prends le dernier mois
+        $dateMin = $adminContext->getRequest()->get('dateMin', new \DateTime('-1 month'));
+        $dateMax = $adminContext->getRequest()->get('dateMax', new \DateTime());
+
+        // vues des aides (totales et distinces)
+        // on filtre sur le label pour récupérer le groupement aides / autres de matomo
+        $statsAidsViews = $matomoService->getMatomoStats(
+            apiMethod: MatomoService::MATOMO_GET_PAGE_URLS_API_METHOD,
+            fromDateString: $dateMin->format('Y-m-d'),
+            toDateString: $dateMax->format('Y-m-d'),
+            options: [
+                'flat' => 1,
+                'filter_column' => 'label',
+                'filter_pattern' => 'aides'
+            ],
+        );
+
+        $nbAidVisits = 0;
+        $nbAidViews = 0;
+        $nbAids = 0;
+        foreach ($statsAidsViews as $statsAidsView) {
+            if ($statsAidsView->label == '/aides/') {
+                continue;
+            }
+            $nbAidVisits += $statsAidsView->nb_visits;
+            $nbAidViews += $statsAidsView->nb_hits;
+            $nbAids++;
+        }
+
+        return $this->json([
+            'nbAidViews' => $nbAidViews,
+            'nbAidVisits' => $nbAidVisits,
+            'nbAids' => $nbAids,
         ]);
     }
 
@@ -1621,64 +1638,5 @@ class StatisticsController extends DashboardController
             'projects' => $projects,
             'myPager' => $pagerfanta,
         ]);
-    }
-
-    #[Route(
-        '/admin/statistics/consultation/ajax/aid-nb-views',
-        name: 'admin_statistics_consultation_ajax_aid_nb_views',
-        options: ['expose' => true]
-    )]
-    public function ajaxAidNbViews(
-        RequestStack $requestStack
-    ): Response {
-        try {
-            $dateCreateMin = $requestStack->getCurrentRequest()->get('dateCreateMin');
-            $dateCreateMax = $requestStack->getCurrentRequest()->get('dateCreateMax');
-
-            $dateCreateMin = new \DateTime(date($dateCreateMin));
-            $dateCreateMax = new \DateTime(date($dateCreateMax));
-
-            /** @var LogAidViewRepository $logAidViewRepository */
-            $logAidViewRepository = $this->managerRegistry->getRepository(LogAidView::class);
-
-            $nbAidViews = $logAidViewRepository->countAidsViews([
-                'dateCreateMin' => $dateCreateMin,
-                'dateCreateMax' => $dateCreateMax,
-                'notSource' => 'api',
-            ]);
-            return $this->json(['nbAidViews' => $nbAidViews]);
-        } catch (\Exception) {
-            return $this->json(['error' => true, 'nbAidViews' => 0], Response::HTTP_BAD_REQUEST);
-        }
-    }
-
-    #[Route(
-        '/admin/statistics/consultation/ajax/aid-nb-views-distinct',
-        name: 'admin_statistics_consultation_ajax_aid_nb_views_distinct',
-        options: ['expose' => true]
-    )]
-    public function ajaxAidNbViewsDistinct(
-        RequestStack $requestStack
-    ): Response {
-        try {
-            $dateCreateMin = $requestStack->getCurrentRequest()->get('dateCreateMin');
-            $dateCreateMax = $requestStack->getCurrentRequest()->get('dateCreateMax');
-
-            $dateCreateMin = new \DateTime(date($dateCreateMin));
-            $dateCreateMax = new \DateTime(date($dateCreateMax));
-
-            /** @var LogAidViewRepository $logAidViewRepository */
-            $logAidViewRepository = $this->managerRegistry->getRepository(LogAidView::class);
-
-            $nbAidViewsDistinct = $logAidViewRepository->countAidsViews([
-                'dateMin' => $dateCreateMin,
-                'dateMax' => $dateCreateMax,
-                'notSource' => 'api',
-                'distinctAids' => true
-            ]);
-            return $this->json(['nbAidViewsDistinct' => $nbAidViewsDistinct]);
-        } catch (\Exception) {
-            return $this->json(['error' => true, 'nbAidViewsDistinct' => 0], Response::HTTP_BAD_REQUEST);
-        }
     }
 }
