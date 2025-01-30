@@ -5,6 +5,7 @@ namespace App\Service\Api;
 use App\Service\Various\ParamService;
 use GuzzleHttp\Client;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Session\Session;
 
 class InternalApiService
 {
@@ -34,6 +35,14 @@ class InternalApiService
 
     private function getBearerToken(bool $force = false): string
     {
+        $session = new Session();
+
+        // vérifie si le token est déjà trouvé en session
+        $sessionBearerToken = $session->get('bearerToken');
+        if ($sessionBearerToken !== null && !$force) {
+            return $sessionBearerToken;
+        }
+        // vérifie si le token est déjà trouvé
         if ($this->bearerToken !== '' && !$force) {
             return $this->bearerToken;
         }
@@ -51,8 +60,11 @@ class InternalApiService
             // fait l'appel
             $response = $client->request('POST', '/' . self::API_FOLDER . '/connexion/', []);
 
-            // retour
+            // stock le bearer token dans l'objet et la session pour réutilisation
             $this->bearerToken = json_decode($response->getBody()->getContents())->token;
+            $session->set('bearerToken', $this->bearerToken);
+
+            // retour
             return $this->bearerToken;
         } catch (\Exception $e) {
             return '';
