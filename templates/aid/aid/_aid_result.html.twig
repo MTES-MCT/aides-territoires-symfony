@@ -4,6 +4,12 @@
 {% endif %}
 
 <div class="fr-card fr-enlarge-link  fr-card--grey">
+	<div class="favorite-button-wrapper">
+        {% include 'aid/aid/_favorite_button_icon.html.twig' with {
+            aid: aid,
+            isFavorite: isAidInUserFavorites(app.user, aid)
+        } %}
+    </div>
 	<div class="fr-card__body">
 		<div class="fr-card__content">
 			<div class="badges-wrapper">

@@ -6,7 +6,9 @@ export default class extends Controller {
     }
 
     async toggle(event) {
+        // Empêcher la propagation vers la carte parent
         event.preventDefault();
+        event.stopPropagation();
         
         try {
             const response = await fetch(this.urlValue, {
