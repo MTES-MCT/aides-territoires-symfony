@@ -2,7 +2,8 @@ import { Controller } from '@hotwired/stimulus';
 
 export default class extends Controller {
     static values = {
-        url: String
+        url: String,
+        authenticated: Boolean,
     }
 
     async toggle(event) {
@@ -10,6 +11,14 @@ export default class extends Controller {
         event.preventDefault();
         event.stopPropagation();
         
+        if (!this.authenticatedValue) {
+            const modal = document.getElementById('modal-auth');
+            if (modal) {
+                modal.showModal();
+            }
+            return;
+        }
+
         try {
             const response = await fetch(this.urlValue, {
                 method: 'POST',
@@ -25,10 +34,14 @@ export default class extends Controller {
 
             // Récupérer la réponse et mettre à jour le bouton
             const html = await response.text();
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(html, 'text/html');
-            const content = doc.querySelector('template').innerHTML;
-            this.element.closest('[id^="favorite-button-"]').outerHTML = content;
+            if (html && html.includes('<template')) {
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+                const template = doc.querySelector('template');
+                if (template) {
+                    this.element.closest('[id^="favorite-button-"]').outerHTML = template.innerHTML;
+                }
+            }
 
         } catch (error) {
             console.error('Error:', error);

@@ -1,0 +1,23 @@
+<dialog id="modal-auth" class="fr-modal" role="dialog" aria-labelledby="fr-modal-title-auth">
+    <div class="fr-container fr-container--fluid fr-container-md">
+        <div class="fr-grid-row fr-grid-row--center">
+            <div class="fr-col-12 fr-col-md-8 fr-col-lg-6">
+                <div class="fr-modal__body">
+                    <div class="fr-modal__header">
+                        <button class="fr-btn--close fr-btn" title="Fermer" aria-controls="modal-auth">Fermer</button>
+                    </div>
+                    <div class="fr-modal__content">
+                        <h1 id="fr-modal-title-auth" class="fr-modal__title">
+                            <span class="fr-icon-warning-line fr-icon--lg"></span>
+                            Connexion requise
+                        </h1>
+                        <p>Vous devez être connecté pour ajouter une aide à vos favoris.</p>
+                        <div class="fr-btns-group">
+                            <a href="{{ path('app_login') }}" class="fr-btn">Se connecter</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</dialog>

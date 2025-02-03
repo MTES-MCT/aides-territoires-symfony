@@ -120,6 +120,10 @@
 
 		{% include('include/_scheme_modal.html.twig') %}
 
+		{% if not app.user %}
+			{% include 'include/_auth_modal.html.twig' %}
+		{% endif %}
+
 		{% block modal %}{% endblock %}
 
 		{% block javascriptsBottom %}{% endblock %}
