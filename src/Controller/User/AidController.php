@@ -1353,7 +1353,8 @@ class AidController extends FrontController
     }
 
     #[Route('/comptes/aides/favorites/', name: 'app_user_aid_favorites')]
-    public function favoriteAids(): Response {
+    public function favoriteAids(): Response
+    {
         // rendu template
         return $this->render('user/aid/favorites.html.twig', [
         ]);

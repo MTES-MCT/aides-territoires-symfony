@@ -46,7 +46,6 @@ class FavoriteAidRepository extends ServiceEntityRepository
             $qb->andWhere('fa.dateCreate <= :dateMax')
                 ->setParameter('dateMax', $dateMax)
             ;
-
         }
 
         return $qb->getQuery()->getResult();

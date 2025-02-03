@@ -2,7 +2,7 @@
 
 namespace App\Controller\User;
 
-use App\Entity\Aid\Aid;
+use App\Entity\User\User;
 use App\Entity\User\FavoriteAid;
 use App\Repository\Aid\AidRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -22,13 +22,14 @@ class FavoriteAidController extends AbstractController
         EntityManagerInterface $entityManager
     ): Response {
         $this->denyAccessUnlessGranted('ROLE_USER');
-        
+
         $aid = $aidRepository->findOneBy(['slug' => $slug]);
-        
+
         if (!$aid) {
             throw $this->createNotFoundException('Aide non trouvée');
         }
-        
+
+        /** @var User $user */
         $user = $this->getUser();
         $favoriteAid = $entityManager->getRepository(FavoriteAid::class)->findOneBy([
             'user' => $user,
@@ -50,7 +51,7 @@ class FavoriteAidController extends AbstractController
         $entityManager->flush();
 
         // Déterminer quel template utiliser
-        $template = $request->query->get('display', 'default') === 'icon' 
+        $template = $request->query->get('display', 'default') === 'icon'
             ? 'aid/aid/_favorite_button_icon.html.twig'
             : 'aid/aid/_favorite_button.html.twig';
 

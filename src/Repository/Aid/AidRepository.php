@@ -2178,7 +2178,7 @@ class AidRepository extends ServiceEntityRepository
             'params' => $params,
             'date' => (new \DateTime())->format('Y-m-d'),
         ]));
-        
+
         // Récupération depuis le cache ou exécution de la requête
         return $this->cache->get($cacheKey, function (ItemInterface $item) use ($params) {
             $qb = $this->getQueryBuilderForSearchV3($params);

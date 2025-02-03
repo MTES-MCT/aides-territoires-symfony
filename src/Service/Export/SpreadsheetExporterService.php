@@ -164,7 +164,12 @@ class SpreadsheetExporterService
         return $response;
     }
 
-
+    /**
+     * @param array<int, mixed> $datas
+     * @param mixed $entityFcqn
+     * @param string $filename
+     * @return Writer
+     */
     public function getXlsxFromArray(
         array $datas,
         mixed $entityFcqn,
@@ -178,7 +183,7 @@ class SpreadsheetExporterService
         $writer->getCurrentSheet()->setSheetView($sheetView);
 
         // les datas
-        $datas = $this->getDatasFromEntityType(new $entityFcqn, $datas);
+        $datas = $this->getDatasFromEntityType(new $entityFcqn(), $datas);
 
         // les entêtes
         $writer->addRow($this->getHeadersRowFromDatas($datas));
@@ -199,9 +204,13 @@ class SpreadsheetExporterService
         return $writer;
     }
 
+    /**
+     * @param array<int, mixed> $datas
+     * @return Row
+     */
     private function getHeadersRowFromDatas(
         array $datas
-    ) {
+    ): Row {
         $headers = [];
         if (isset($datas[0])) {
             $headers = array_keys($datas[0]);
@@ -210,7 +219,7 @@ class SpreadsheetExporterService
         foreach ($headers as $csvHeader) {
             $cells[] = Cell::fromValue($csvHeader);
         }
-        
+
         return new Row($cells);
     }
 
