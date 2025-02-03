@@ -1,0 +1,10 @@
+<div id="favorite-button-{{ aid.slug }}">
+    <button 
+        class="fr-btn fr-btn--secondary fr-btn--icon-left {{ isFavorite ? 'fr-icon-star-fill' : 'fr-icon-star-line' }}"
+        data-controller="favorite"
+        data-action="favorite#toggle"
+        data-favorite-url-value="{{ path('app_aid_toggle_favorite', {'slug': aid.slug}) }}"
+    >
+        {{ isFavorite ? 'Retirer des favoris' : 'Ajouter aux favoris' }}
+    </button>
+</div>

@@ -22,6 +22,7 @@ use App\Service\Log\LogAidViewService;
 use App\Service\User\UserService;
 use App\Service\Various\StringService;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\Persistence\ManagerRegistry;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use Psr\Log\LoggerInterface;
@@ -1061,5 +1062,28 @@ class AidService // NOSONAR too complex
         }
 
         return $aids;
+    }
+
+    public function isAidInUserFavorites(User $user, Aid $aid): bool
+    {
+        try {
+            $favoriteAids = $user->getFavoriteAids();
+            if (!$favoriteAids instanceof Collection || $favoriteAids->isEmpty()) {
+                return false;
+            }
+    
+            foreach ($favoriteAids as $favoriteAid) {
+                if (!$favoriteAid->getAid()) {
+                    continue;
+                }
+                if ($favoriteAid->getAid()->getId() === $aid->getId()) {
+                    return true;
+                }
+            }
+    
+            return false;
+        } catch (\Throwable $e) {
+            return false;
+        }
     }
 }

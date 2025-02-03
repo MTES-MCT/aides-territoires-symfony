@@ -577,6 +577,12 @@
 
 				{% if aid.originUrl or aid.applicationUrl or isUserGranted(app.user, constant('App\\Entity\\User\\User::ROLE_ADMIN')) %}
 					<ul class="fr-btns-group fr-btns-group--icon-left">
+						<li>
+							{% include 'aid/aid/_favorite_button.html.twig' with {
+								aid: aid,
+								isFavorite: isAidInUserFavorites(app.user, aid)
+							} %}
+						</li>
 						{% if isUserGranted(app.user, constant('App\\Entity\\User\\User::ROLE_ADMIN')) %}
 							<li>
 								<a id="admin-edit-page" class="fr-btn fr-btn--secondary fr-btn--icon-left fr-icon-lock-fill" href="{{ adminEditUrl }}">
