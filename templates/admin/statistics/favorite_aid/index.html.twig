@@ -1,0 +1,76 @@
+{% extends 'admin/statistics/_stats_base.html.twig' %}
+
+{% block breadcrumb %}{% endblock %}
+
+{% block stats_content %}
+<section class="container">
+    <h1>Statistiques aides favorites</h1>
+</section>
+
+<section class="container mt-5">
+
+    <div class="mt-5">
+        {{ form_start(formDateRange) }}
+        <div class="d-flex">
+            <div class="d-flex me-3">
+                {{ form_row(formDateRange.dateMin) }}
+            </div>
+            <div class="d-flex me-3">
+                {{ form_row(formDateRange.dateMax) }}
+            </div>
+            <div class="d-flex me-3">
+                <button type="submit" class="btn btn-primary">Valider</button>
+            </div>
+        </div>
+        {{ form_end(formDateRange) }}
+    </div>
+
+    <div class="my-4">
+        <h2>Nombre total d'ajout aux favoris sur la période</h2>
+        <p><strong>{{ totalFavoriteAids }}</strong> aides ont été ajoutées aux favoris sur la période</p>
+    </div>
+
+    <div class="my-4">
+        <h2>Top 10 des aides les plus ajoutées en favoris</h2>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th scope="col">Aide</th>
+                    <th scope="col">Nombre de favoris</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for topFavoriteAid in topFavoriteAids %}
+                    <tr>
+                        <td>
+                            <a href="{{ path('app_aid_aid_details', {'slug': topFavoriteAid.slug}) }}" target="_blank">
+                            {{ topFavoriteAid.name }}
+                        </td>
+                        <td>{{ topFavoriteAid.nb }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="my-4">
+        <h2>Nombre d'ajout aux favoris par jour</h2>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th scope="col">Date</th>
+                    <th scope="col">Nombre d'ajout aux favoris</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for nbFavoriteAidByDay in nbFavoriteAidsByDay %}
+                    <tr>
+                        <td>{{ nbFavoriteAidByDay.date|date('d/m/Y') }}</td>
+                        <td>{{ nbFavoriteAidByDay.nb }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}
