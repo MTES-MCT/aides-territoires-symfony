@@ -484,6 +484,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
     #[JoinColumn(onDelete: 'SET NULL')]
     private Collection $lastEditedAids;
 
+    /**
+     * @var Collection<int, FavoriteAid>
+     */
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: FavoriteAid::class, orphanRemoval: true)]
+    private Collection $favoriteAids;
+
     public function __construct()
     {
         $this->logUserLogins = new ArrayCollection();
@@ -528,6 +534,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
         $this->logBackerEdits = new ArrayCollection();
         $this->editorSearchPages = new ArrayCollection();
         $this->lastEditedAids = new ArrayCollection();
+        $this->favoriteAids = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -2310,6 +2317,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
             // set the owning side to null (unless already changed)
             if ($lastEditedAid->getLastEditor() === $this) {
                 $lastEditedAid->setLastEditor(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, FavoriteAid>
+     */
+    public function getFavoriteAids(): Collection
+    {
+        return $this->favoriteAids;
+    }
+
+    public function addFavoriteAid(FavoriteAid $favoriteAid): static
+    {
+        if (!$this->favoriteAids->contains($favoriteAid)) {
+            $this->favoriteAids->add($favoriteAid);
+            $favoriteAid->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeFavoriteAid(FavoriteAid $favoriteAid): static
+    {
+        if ($this->favoriteAids->removeElement($favoriteAid)) {
+            // set the owning side to null (unless already changed)
+            if ($favoriteAid->getUser() === $this) {
+                $favoriteAid->setUser(null);
             }
         }
 

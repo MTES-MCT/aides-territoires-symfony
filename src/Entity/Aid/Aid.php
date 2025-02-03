@@ -23,6 +23,7 @@ use App\Entity\Reference\KeywordReferenceSuggested;
 use App\Entity\Reference\ProjectReference;
 use App\Entity\Reference\ProjectReferenceMissing;
 use App\Entity\Search\SearchPage;
+use App\Entity\User\FavoriteAid;
 use App\Entity\User\User;
 use App\Repository\Aid\AidRepository;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -857,6 +858,12 @@ class Aid // NOSONAR too much methods
     #[ORM\Column(type: 'boolean', options: ['default' => false])]
     private ?bool $privateEdition = false;
 
+    /**
+     * @var Collection<int, FavoriteAid>
+     */
+    #[ORM\OneToMany(mappedBy: 'aid', targetEntity: FavoriteAid::class, orphanRemoval: true)]
+    private Collection $favoriteAids;
+
     public function __construct()
     {
         $this->aidAudiences = new ArrayCollection();
@@ -891,6 +898,7 @@ class Aid // NOSONAR too much methods
         $this->projectReferencesSearched = new ArrayCollection();
         $this->sanctuarizedFields = new ArrayCollection();
         $this->projectReferenceMissings = new ArrayCollection();
+        $this->favoriteAids = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -3046,6 +3054,36 @@ class Aid // NOSONAR too much methods
     public function setPrivateEdition(bool $privateEdition): static
     {
         $this->privateEdition = $privateEdition;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, FavoriteAid>
+     */
+    public function getFavoriteAids(): Collection
+    {
+        return $this->favoriteAids;
+    }
+
+    public function addFavoriteAid(FavoriteAid $favoriteAid): static
+    {
+        if (!$this->favoriteAids->contains($favoriteAid)) {
+            $this->favoriteAids->add($favoriteAid);
+            $favoriteAid->setAid($this);
+        }
+
+        return $this;
+    }
+
+    public function removeFavoriteAid(FavoriteAid $favoriteAid): static
+    {
+        if ($this->favoriteAids->removeElement($favoriteAid)) {
+            // set the owning side to null (unless already changed)
+            if ($favoriteAid->getAid() === $this) {
+                $favoriteAid->setAid(null);
+            }
+        }
 
         return $this;
     }
