@@ -1064,9 +1064,13 @@ class AidService // NOSONAR too complex
         return $aids;
     }
 
-    public function isAidInUserFavorites(User $user, Aid $aid): bool
+    public function isAidInUserFavorites(?User $user, ?Aid $aid): bool
     {
         try {
+            if (!$user instanceof User || !$aid instanceof Aid) {
+                return false;
+            }
+            
             $favoriteAids = $user->getFavoriteAids();
             if (!$favoriteAids instanceof Collection || $favoriteAids->isEmpty()) {
                 return false;

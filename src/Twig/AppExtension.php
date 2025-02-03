@@ -533,7 +533,7 @@ class AppExtension extends AbstractExtension // NOSONAR too much methods
         return new ArrayCollection($aidInstructors);
     }
 
-    public function isAidInUserFavorites(User $user, Aid $aid): bool
+    public function isAidInUserFavorites(?User $user, ?Aid $aid): bool
     {
         return $this->aidService->isAidInUserFavorites($user, $aid);
     }
