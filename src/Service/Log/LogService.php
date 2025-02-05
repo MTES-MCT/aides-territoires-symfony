@@ -127,7 +127,12 @@ class LogService
 
                 case self::AID_SEARCH:
                     $log = new LogAidSearchTemp();
-                    $log->setQuerystring($params['querystring'] ?? null);
+                    $querystring = $params['querystring'] ?? null;
+                    if ($querystring) {
+                        // on nettoyage la querystring
+                        $querystring = $this->cleanQueryString($querystring);
+                    }
+                    $log->setQuerystring($querystring);
                     $log->setResultsCount($params['resultsCount'] ?? null);
                     $log->setSource($this->getSiteFromHost($params['host'] ?? null));
                     if (isset($params['source'])) {
@@ -263,8 +268,8 @@ class LogService
                 $this->managerRegistry->getManager()->flush();
 
                 if ($type == self::AID_SEARCH) {
-                    // on stock l'id de la recherche dans la session pour le notififer dans l'ajout aux favoris
-                    $this->requestStack->getCurrentRequest()->getSession()->set(self::LAST_LOG_AID_SEARCH_ID, $log->getId());
+                    $this->setLogAidSearchTempIdInSession($log, $querystring);
+
                 }
             }
         } catch (\Exception $exception) {
@@ -272,6 +277,58 @@ class LogService
                 'exception' => $exception,
             ]);
         }
+    }
+
+    private function setLogAidSearchTempIdInSession(LogAidSearchTemp $log, string $querystring = ''): void
+    {
+        dump($log, $querystring);
+        // on regarde si il y a un id en session
+        $lastLogAidSearchId = $this->requestStack->getCurrentRequest()->getSession()->get(self::LAST_LOG_AID_SEARCH_ID, null);
+        if ($lastLogAidSearchId) {
+            // on récupère le dernier log de recherche
+            $lastLog = $this->managerRegistry->getRepository(LogAidSearchTemp::class)->find($lastLogAidSearchId);
+            // on regarde si les paramètres de la requetes ont changés
+            if (
+                $lastLog instanceof LogAidSearchTemp
+                && $this->removePageFromQuerystring($lastLog->getQuerystring())
+                    != $this->removePageFromQuerystring($querystring)
+            ) {
+                // on stock l'id de la recherche dans la session pour le notififer dans l'ajout aux favoris
+                $this->requestStack->getCurrentRequest()->getSession()->set(self::LAST_LOG_AID_SEARCH_ID, $log->getId());
+                dump('nouveaux param', $log->getId());
+            } else {
+                dump('params identiques');
+            }
+        } else {
+            // on stock l'id de la recherche dans la session pour le notififer dans l'ajout aux favoris
+            $this->requestStack->getCurrentRequest()->getSession()->set(self::LAST_LOG_AID_SEARCH_ID, $log->getId());
+            dump('nouvelle recherche', $log->getId());
+        }
+    }
+
+    private function cleanQueryString(string $querystring): string
+    {
+        // Convertir la querystring en tableau de paramètres
+        parse_str($querystring, $params);
+        
+        // Supprimer les paramètres non désirés
+        unset($params['_token']);
+        unset($params['newIntegration']);
+        
+        // Reconstruire la querystring proprement
+        return http_build_query($params);
+    }
+
+    private function removePageFromQuerystring(string $querystring): string
+    {
+        // Convertir la querystring en tableau de paramètres
+        parse_str($querystring, $params);
+        
+        // Supprimer les paramètres non désirés
+        unset($params['page']);
+        
+        // Reconstruire la querystring proprement
+        return http_build_query($params);
     }
 
     public function getSiteFromHost(string $host): string
