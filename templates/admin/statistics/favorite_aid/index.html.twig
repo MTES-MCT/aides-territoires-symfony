@@ -44,9 +44,32 @@
                     <tr>
                         <td>
                             <a href="{{ path('app_aid_aid_details', {'slug': topFavoriteAid.slug}) }}" target="_blank">
-                            {{ topFavoriteAid.name }}
+                                {{ topFavoriteAid.name }}
+                            </a>
                         </td>
                         <td>{{ topFavoriteAid.nb }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="my-4">
+        <h2>Top 10 des sources de favoris</h2>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th scope="col">Source</th>
+                    <th scope="col">Nombre de favoris</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for topSource in topSources %}
+                    <tr>
+                        <td>
+                            {{ topSource.source }}
+                        </td>
+                        <td>{{ topSource.nb }}</td>
                     </tr>
                 {% endfor %}
             </tbody>

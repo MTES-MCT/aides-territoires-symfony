@@ -112,4 +112,32 @@ class FavoriteAidRepository extends ServiceEntityRepository
 
         return $qb->getQuery()->getSingleScalarResult();
     }
+
+    public function countTopSources(?array $params = null): array
+    {
+        $dateMin = $params['dateMin'] ?? null;
+        $dateMax = $params['dateMax'] ?? null;
+
+        $qb = $this->createQueryBuilder('fa')
+            ->select('las.source', 'COUNT(fa.id) as nb')
+            ->innerJoin('fa.logAidSearch', 'las')
+            ->groupBy('las.source')
+            ->orderBy('nb', 'DESC')
+            ->setMaxResults(10)
+        ;
+
+        if ($dateMin instanceof \DateTime) {
+            $qb->andWhere('fa.dateCreate >= :dateMin')
+                ->setParameter('dateMin', $dateMin)
+            ;
+        }
+
+        if ($dateMax instanceof \DateTime) {
+            $qb->andWhere('fa.dateCreate <= :dateMax')
+                ->setParameter('dateMax', $dateMax)
+            ;
+        }
+
+        return $qb->getQuery()->getResult();
+    }
 }
