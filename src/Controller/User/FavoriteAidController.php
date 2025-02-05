@@ -5,6 +5,9 @@ namespace App\Controller\User;
 use App\Entity\User\User;
 use App\Entity\User\FavoriteAid;
 use App\Repository\Aid\AidRepository;
+use App\Repository\Log\LogAidSearchRepository;
+use App\Repository\Log\LogAidSearchTempRepository;
+use App\Service\Log\LogService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -19,6 +22,7 @@ class FavoriteAidController extends AbstractController
         string $slug,
         Request $request,
         AidRepository $aidRepository,
+        LogAidSearchTempRepository $logAidSearchTempRepository,
         EntityManagerInterface $entityManager
     ): Response {
         $this->denyAccessUnlessGranted('ROLE_USER');
@@ -44,6 +48,11 @@ class FavoriteAidController extends AbstractController
             $favoriteAid->setUser($user);
             $favoriteAid->setAid($aid);
             $favoriteAid->setDateCreate(new \DateTime());
+            // on regarde si on a self::LAST_LOG_AID_SEARCH_ID en session
+            $loadLogAidSearchId = $request->getSession()->get(LogService::LAST_LOG_AID_SEARCH_ID, null);
+            if ($loadLogAidSearchId) {
+                $favoriteAid->setLogAidSearchTemp($logAidSearchTempRepository->find($loadLogAidSearchId));
+            }
             $entityManager->persist($favoriteAid);
             $isFavorite = true;
         }

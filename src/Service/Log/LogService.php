@@ -20,8 +20,11 @@ use App\Entity\Log\LogPublicProjectSearch;
 use App\Entity\Log\LogPublicProjectView;
 use App\Entity\Organization\Organization;
 use App\Entity\User\User;
+use App\Service\User\UserService;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Persistence\ManagerRegistry;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 class LogService
 {
@@ -35,18 +38,18 @@ class LogService
     public const PROJECT_VALIDATED_SEARCH = 'projectValidatedSearch';
     public const PROJECT_PUBLIC_SEARCH = 'projectPublicSearch';
     public const PROJECT_PUBLIC_VIEW = 'projectPublicView';
+    public const LAST_LOG_AID_SEARCH_ID = 'last_logAidSearchId';
 
     public function __construct(
         private ManagerRegistry $managerRegistry,
         private LoggerInterface $loggerInterface,
+        private RequestStack $requestStack,
+        private UserService $userService,
     ) {
     }
 
     /**
-     *
-     * @param string|null $type
      * @param array<mixed>|null $params
-     * @return void
      */
     public function log(// NOSONAR too complex
         ?string $type,
@@ -61,7 +64,7 @@ class LogService
                             if ('_token' == $key) { // pas besoin de stocker le tocken
                                 continue;
                             }
-                            $querystring .= $key . '=' . $param . '&';
+                            $querystring .= $key.'='.$param.'&';
                         }
                         $querystring = substr($querystring, 0, -1); // on enlève le dernier & (qui est en trop)
                     }
@@ -258,6 +261,11 @@ class LogService
             if (isset($log)) {
                 $this->managerRegistry->getManager()->persist($log);
                 $this->managerRegistry->getManager()->flush();
+
+                if ($type == self::AID_SEARCH) {
+                    // on stock l'id de la recherche dans la session pour le notififer dans l'ajout aux favoris
+                    $this->requestStack->getCurrentRequest()->getSession()->set(self::LAST_LOG_AID_SEARCH_ID, $log->getId());
+                }
             }
         } catch (\Exception $exception) {
             $this->loggerInterface->error('Erreur log', [
@@ -304,5 +312,50 @@ class LogService
         }
 
         return substr($host, 0, 255);
+    }
+
+    public function getLogAidSearchParams(
+        array $aidParams,
+        int $resultsCount,
+        ?string $source = null,
+        ?string $query = null
+    ): array
+    {
+        // le user actuellement connecté
+        $user = $this->userService->getUserLogged();
+        // la query
+        $queryParsed = parse_url($this->requestStack->getCurrentRequest()->getRequestUri(), PHP_URL_QUERY) ?? null;
+        // Log recherche
+        $logParams = [
+            'organizationTypes' => (isset($aidParams['organizationType'])) ? [$aidParams['organizationType']] : null,
+            'resultsCount' => $resultsCount,
+            'host' => $this->requestStack->getCurrentRequest()->getHost(),
+            'perimeter' => $aidParams['perimeterFrom'] ?? null,
+            'search' => $aidParams['keyword'] ?? null,
+            'organization' => ($user instanceof User && $user->getDefaultOrganization())
+                ? $user->getDefaultOrganization()
+                : null,
+            'backers' => $aidParams['backers'] ?? null,
+            'categories' => $aidParams['categories'] ?? null,
+            'programs' => $aidParams['programs'] ?? null,
+            'user' => $user ?? null,
+        ];
+        if ($source) {
+            $logParams['source'] = $source;
+        }
+        $logParams['querystring'] = $query ?? $queryParsed;
+
+        /** @var ArrayCollection<int, CategoryTheme> $themes */
+        $themes = new ArrayCollection();
+        if (isset($aidParams['categories']) && is_array($aidParams['categories'])) {
+            foreach ($aidParams['categories'] as $category) {
+                if (!$themes->contains($category->getCategoryTheme())) {
+                    $themes->add($category->getCategoryTheme());
+                }
+            }
+        }
+        $logParams['themes'] = $themes->toArray();
+
+        return $logParams;
     }
 }

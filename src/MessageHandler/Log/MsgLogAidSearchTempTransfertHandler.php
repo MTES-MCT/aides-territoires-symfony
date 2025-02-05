@@ -4,9 +4,11 @@ namespace App\MessageHandler\Log;
 
 use App\Entity\Log\LogAidSearch;
 use App\Entity\Log\LogAidSearchTemp;
+use App\Entity\User\FavoriteAid;
 use App\Entity\User\User;
 use App\Message\Log\MsgLogAidSearchTempTransfert;
 use App\Repository\Log\LogAidSearchTempRepository;
+use App\Repository\User\FavoriteAidRepository;
 use App\Service\Notification\NotificationService;
 use App\Service\Various\ParamService;
 use Doctrine\Persistence\ManagerRegistry;
@@ -32,7 +34,9 @@ class MsgLogAidSearchTempTransfertHandler
         try {
             /** @var LogAidSearchTempRepository $logAidSearchTempRepository */
             $logAidSearchTempRepository = $this->managerRegistry->getRepository(LogAidSearchTemp::class);
-
+            /** @var FavoriteAidRepository $favoriteAidRepository */
+            $favoriteAidRepository = $this->managerRegistry->getRepository(FavoriteAid::class);
+            
             $logAidSearchTemps = $logAidSearchTempRepository->findBy(
                 ['dateCreate' => new \DateTime('yesterday')],
                 null,
@@ -68,6 +72,15 @@ class MsgLogAidSearchTempTransfertHandler
                 }
                 foreach ($logAidSearchTemp->getThemes() as $theme) {
                     $logAidSearch->addTheme($theme);
+                }
+
+                // si il y a des liaison savec favoriteAid on met à jour
+                $favoriteAids = $favoriteAidRepository->findBy([
+                    'logAidSearchTemp' => $logAidSearchTemp
+                ]);
+                foreach ($favoriteAids as $favoriteAid) {
+                    $favoriteAid->setLogAidSearch($logAidSearch);
+                    $entityManager->persist($favoriteAid);
                 }
 
                 $entityManager->persist($logAidSearch);

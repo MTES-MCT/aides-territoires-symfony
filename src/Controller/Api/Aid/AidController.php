@@ -90,38 +90,14 @@ class AidController extends ApiController
         ];
 
         // Log recherche
-        $query = $aidSearchFormService->convertAidSearchClassToQueryString($aidSearchClass);
-
-        $user = $userService->getUserLogged();
-        $logParams = [
-            'organizationTypes' => (isset($aidParams['organizationType'])) ? [$aidParams['organizationType']] : null,
-            'querystring' => $query,
-            'resultsCount' => $apiDatas['count'],
-            'host' => $requestStack->getCurrentRequest()->getHost(),
-            'source' => LogAidSearch::SOURCE_API,
-            'perimeter' => $aidParams['perimeterFrom'] ?? null,
-            'search' => $aidParams['keyword'] ?? null,
-            'organization' => ($user instanceof User && $user->getDefaultOrganization())
-                ? $user->getDefaultOrganization() : null,
-            'backers' => $aidParams['backers'] ?? null,
-            'categories' => $aidParams['categories'] ?? null,
-            'programs' => $aidParams['programs'] ?? null,
-            'projectReference' => $aidParams['projectReference'] ?? null,
-            'user' => $user ?? null
-        ];
-        /** @var ArrayCollection<int, CategoryTheme> $themes */
-        $themes = new ArrayCollection();
-        if (isset($aidParams['categories']) && is_array($aidParams['categories'])) {
-            foreach ($aidParams['categories'] as $category) {
-                if (!$themes->contains($category->getCategoryTheme())) {
-                    $themes->add($category->getCategoryTheme());
-                }
-            }
-        }
-        $logParams['themes'] = $themes->toArray();
         $logService->log(
             type: LogService::AID_SEARCH,
-            params: $logParams,
+            params: $logService->getLogAidSearchParams(
+                aidParams: $aidParams,
+                resultsCount: $apiDatas['count'],
+                source: LogAidSearch::SOURCE_API,
+                query: $aidSearchFormService->convertAidSearchClassToQueryString($aidSearchClass)
+            )
         );
 
         // la réponse

@@ -147,35 +147,13 @@ class ProgramController extends FrontController
         $query = parse_url($requestStack->getCurrentRequest()->getRequestUri(), PHP_URL_QUERY) ?? null;
 
         // Log recherche
-        $logParams = [
-            'organizationTypes' => (isset($aidParams['organizationType'])) ? [$aidParams['organizationType']] : null,
-            'querystring' => $query ?? null,
-            'resultsCount' => $pagerfanta->getNbResults(),
-            'host' => $requestStack->getCurrentRequest()->getHost(),
-            'perimeter' => $aidParams['perimeterFrom'] ?? null,
-            'search' => $aidParams['keyword'] ?? null,
-            'organization' => ($user instanceof User && $user->getDefaultOrganization())
-                ? $user->getDefaultOrganization()
-                : null,
-            'backers' => $aidParams['backers'] ?? null,
-            'categories' => $aidParams['categories'] ?? null,
-            'programs' => $aidParams['programs'] ?? null,
-            'source' => $program->getSlug(),
-            'user' => $user ?? null
-        ];
-        /** @var ArrayCollection<int, CategoryTheme> $themes */
-        $themes = new ArrayCollection();
-        if (isset($aidParams['categories']) && is_array($aidParams['categories'])) {
-            foreach ($aidParams['categories'] as $category) {
-                if (!$themes->contains($category->getCategoryTheme())) {
-                    $themes->add($category->getCategoryTheme());
-                }
-            }
-        }
-        $logParams['themes'] = $themes->toArray();
         $logService->log(
             type: LogService::AID_SEARCH,
-            params: $logParams,
+            params: $logService->getLogAidSearchParams(
+                aidParams: $aidParams,
+                resultsCount: $pagerfanta->getNbResults(),
+                source: $program->getSlug(),
+            )
         );
 
         // log vue programme

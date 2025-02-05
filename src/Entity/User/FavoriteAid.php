@@ -3,7 +3,10 @@
 namespace App\Entity\User;
 
 use App\Entity\Aid\Aid;
+use App\Entity\Log\LogAidSearch;
+use App\Entity\Log\LogAidSearchTemp;
 use App\Repository\User\FavoriteAidRepository;
+use App\Service\Doctrine\DoctrineConstants;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -26,6 +29,14 @@ class FavoriteAid
 
     #[ORM\Column(type: Types::DATE_MUTABLE)]
     private ?\DateTimeInterface $dateCreate = null;
+
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(onDelete: DoctrineConstants::SET_NULL)]
+    private ?LogAidSearch $logAidSearch = null;
+
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(onDelete: DoctrineConstants::SET_NULL)]
+    private ?LogAidSearchTemp $logAidSearchTemp = null;
 
     public function getId(): ?int
     {
@@ -64,6 +75,30 @@ class FavoriteAid
     public function setDateCreate(\DateTimeInterface $dateCreate): static
     {
         $this->dateCreate = $dateCreate;
+
+        return $this;
+    }
+
+    public function getLogAidSearch(): ?LogAidSearch
+    {
+        return $this->logAidSearch;
+    }
+
+    public function setLogAidSearch(?LogAidSearch $logAidSearch): static
+    {
+        $this->logAidSearch = $logAidSearch;
+
+        return $this;
+    }
+
+    public function getLogAidSearchTemp(): ?LogAidSearchTemp
+    {
+        return $this->logAidSearchTemp;
+    }
+
+    public function setLogAidSearchTemp(?LogAidSearchTemp $logAidSearchTemp): static
+    {
+        $this->logAidSearchTemp = $logAidSearchTemp;
 
         return $this;
     }

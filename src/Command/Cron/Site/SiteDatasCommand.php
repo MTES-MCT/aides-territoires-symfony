@@ -67,22 +67,22 @@ class SiteDatasCommand extends Command
         $io = new SymfonyStyle($input, $output);
 
         // // Les projets référents
-        $this->projectReferences();
+        // $this->projectReferences();
 
-        // // // comptage des porteurs par département
-        $this->countyCountBacker();
+        // // // // comptage des porteurs par département
+        // $this->countyCountBacker();
 
-        // // comptage d'aide par porteur
-        $this->backerCountAid();
+        // // // comptage d'aide par porteur
+        // $this->backerCountAid();
 
-        // // compte les aides lives totales et par portail
-        $this->countAidsLive();
+        // // // compte les aides lives totales et par portail
+        // $this->countAidsLive();
 
         // transfert les logs
         $this->transfertLogs();
 
         // supprime les logs admins trop anciens
-        $this->deleteOldLogAdmins();
+        // $this->deleteOldLogAdmins();
 
         // le temps passé
         $timeEnd = microtime(true);
