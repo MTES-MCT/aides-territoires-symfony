@@ -279,9 +279,12 @@ class LogService
         }
     }
 
-    private function setLogAidSearchTempIdInSession(LogAidSearchTemp $log, string $querystring = ''): void
+    private function setLogAidSearchTempIdInSession(LogAidSearchTemp $log, ?string $querystring = ''): void
     {
-        dump($log, $querystring);
+        if (!$querystring) {
+            return;
+        }
+
         // on regarde si il y a un id en session
         $lastLogAidSearchId = $this->requestStack->getCurrentRequest()->getSession()->get(self::LAST_LOG_AID_SEARCH_ID, null);
         if ($lastLogAidSearchId) {
@@ -295,14 +298,10 @@ class LogService
             ) {
                 // on stock l'id de la recherche dans la session pour le notififer dans l'ajout aux favoris
                 $this->requestStack->getCurrentRequest()->getSession()->set(self::LAST_LOG_AID_SEARCH_ID, $log->getId());
-                dump('nouveaux param', $log->getId());
-            } else {
-                dump('params identiques');
             }
         } else {
             // on stock l'id de la recherche dans la session pour le notififer dans l'ajout aux favoris
             $this->requestStack->getCurrentRequest()->getSession()->set(self::LAST_LOG_AID_SEARCH_ID, $log->getId());
-            dump('nouvelle recherche', $log->getId());
         }
     }
 
