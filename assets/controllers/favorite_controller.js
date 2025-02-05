@@ -34,7 +34,7 @@ export default class extends Controller {
 
             // Récupérer la réponse et mettre à jour le bouton
             const html = await response.text();
-            if (html && html.includes('<template')) {
+            if (html?.includes('<template')) {
                 const parser = new DOMParser();
                 const doc = parser.parseFromString(html, 'text/html');
                 const template = doc.querySelector('template');
