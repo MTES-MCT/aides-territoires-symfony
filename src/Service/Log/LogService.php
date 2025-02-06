@@ -80,6 +80,10 @@ class LogService
                     $log = new LogAidOriginUrlClick();
                     $log->setQuerystring($params['querystring']);
                     $log->setSource($this->getSiteFromHost($params['host']));
+                    $source = $this->getLogAidSearchSourceInSession();
+                    if ($source) {
+                        $log->setSource($source);
+                    }
                     $aid = null;
                     if (isset($params['aidSlug'])) {
                         $aid = $this->managerRegistry->getRepository(Aid::class)
@@ -92,6 +96,10 @@ class LogService
                     $log = new LogAidApplicationUrlClick();
                     $log->setQuerystring($params['querystring']);
                     $log->setSource($this->getSiteFromHost($params['host']));
+                    $source = $this->getLogAidSearchSourceInSession();
+                    if ($source) {
+                        $log->setSource($source);
+                    }
                     $aid = null;
                     if (isset($params['aidSlug'])) {
                         $aid = $this->managerRegistry->getRepository(Aid::class)
@@ -173,6 +181,10 @@ class LogService
                     $log = new LogAidViewTemp();
                     $log->setQuerystring($params['querystring'] ?? null);
                     $log->setSource($this->getSiteFromHost($params['host'] ?? null));
+                    $source = $this->getLogAidSearchSourceInSession();
+                    if ($source) {
+                        $log->setSource($source);
+                    }
                     if (isset($params['source'])) {
                         $log->setSource(substr($params['source'], 0, 255));
                     }
@@ -277,6 +289,21 @@ class LogService
                 'exception' => $exception,
             ]);
         }
+    }
+
+    private function getLogAidSearchSourceInSession(): ?string
+    {
+        $logAidSearchTempId = $this->requestStack->getCurrentRequest()->getSession()->get(self::LAST_LOG_AID_SEARCH_ID, null);
+        if (!$logAidSearchTempId) {
+            return null;
+        }
+
+        $logAidSearchTemp = $this->managerRegistry->getRepository(LogAidSearchTemp::class)->find($logAidSearchTempId);
+        if (!$logAidSearchTemp) {
+            return null;
+        }
+
+        return $logAidSearchTemp->getSource();
     }
 
     private function setLogAidSearchTempIdInSession(LogAidSearchTemp $log, ?string $querystring = ''): void
