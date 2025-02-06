@@ -35,6 +35,23 @@ class LogAidSearchRepository extends ServiceEntityRepository
     }
 
     /**
+     * Nombre de recherche par source
+     *
+     * @param array<string, mixed>|null $params
+     * @return array<int, array{nb: integer, source: string}>
+     */
+    public function countBySource(?array $params = null): array
+    {
+        $qb = $this->getQueryBuilder($params);
+
+        $qb->select('COUNT(l.id) as nb, l.source');
+        $qb->groupBy('l.source');
+        $qb->orderBy('nb', 'DESC');
+
+        return $qb->getQuery()->getResult();
+    }
+
+    /**
      * @param array<string, mixed>|null $params
      * @return integer
      */

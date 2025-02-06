@@ -22,6 +22,7 @@ use App\Service\Log\LogAidViewService;
 use App\Service\User\UserService;
 use App\Service\Various\StringService;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\Persistence\ManagerRegistry;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use Psr\Log\LoggerInterface;
@@ -34,8 +35,6 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class AidService // NOSONAR too complex
 {
-    private TagAwareCacheInterface $redisCache;
-
     public function __construct(
         private HttpClientInterface $httpClientInterface,
         private UserService $userService,
@@ -543,7 +542,7 @@ class AidService // NOSONAR too complex
 
         return $this->httpClientInterface->request(
             'POST',
-            'https://www.demarches-simplifiees.fr/api/public/v1/demarches/'.$dsId.'/dossiers',
+            'https://www.demarches-simplifiees.fr/api/public/v1/demarches/' . $dsId . '/dossiers',
             [
                 'headers' => [
                     'Content-Type' => 'application/json',
@@ -657,7 +656,7 @@ class AidService // NOSONAR too complex
         $minutesMax = 5;
         foreach ($aid->getAidLocks() as $aidLock) {
             // si le lock a plus de 5 min, on le supprime
-            if ($aidLock->getTimeStart() < $now->sub(new \DateInterval('PT'.$minutesMax.'M'))) {
+            if ($aidLock->getTimeStart() < $now->sub(new \DateInterval('PT' . $minutesMax . 'M'))) {
                 $this->managerRegistry->getManager()->remove($aidLock);
                 $this->managerRegistry->getManager()->flush();
                 continue;
@@ -716,10 +715,10 @@ class AidService // NOSONAR too complex
     public function extractKeywords(Aid $aid): array
     {
         // concatene les textes bruts
-        $text = $aid->getName().' '
-            .strip_tags((string) $aid->getDescription()).' '
-            .strip_tags((string) $aid->getEligibility()).' '
-            .strip_tags((string) $aid->getContact());
+        $text = $aid->getName() . ' '
+            . strip_tags((string) $aid->getDescription()) . ' '
+            . strip_tags((string) $aid->getEligibility()) . ' '
+            . strip_tags((string) $aid->getContact());
 
         $commonWords = [
             'pour',
@@ -814,7 +813,7 @@ class AidService // NOSONAR too complex
         $text = preg_replace('/\b\w{1,2}\b/u', '', $text);
 
         // Retirer les mots communs
-        $commonWordsPattern = '/\b('.implode('|', $commonWords).')\b/ui';
+        $commonWordsPattern = '/\b(' . implode('|', $commonWords) . ')\b/ui';
         $text = preg_replace($commonWordsPattern, '', $text);
 
         /** @var KeywordReferenceRepository $keywordReferenceRepository */
@@ -873,7 +872,7 @@ class AidService // NOSONAR too complex
             $sheet = $firstAid ? $spreadsheet->getActiveSheet() : $spreadsheet->createSheet();
             $firstAid = false;
 
-            $sheetTitle = preg_replace('/[^a-zA-Z0-9_]/', '', $aid->getId().'_'.$aid->getName());
+            $sheetTitle = preg_replace('/[^a-zA-Z0-9_]/', '', $aid->getId() . '_' . $aid->getName());
             $sheetTitle = $stringService->truncate($sheetTitle, 31);
             $sheet->setTitle($sheetTitle);
 
@@ -910,7 +909,7 @@ class AidService // NOSONAR too complex
                     $nbProjectPublicsByDay[$currentDay->format('Y-m-d')] ?? '0',
                     $nbProjectPrivatesByDay[$currentDay->format('Y-m-d')] ?? '0',
                 ];
-                $sheet->fromArray($dataRow, null, 'A'.$rowIndex);
+                $sheet->fromArray($dataRow, null, 'A' . $rowIndex);
                 ++$rowIndex;
                 $currentDay->add(new \DateInterval('P1D'));
             }
@@ -999,7 +998,7 @@ class AidService // NOSONAR too complex
     public function searchAidsV3(array $aidParams): array
     {
         // la clé du cache selon la recherche
-        $cacheKey = 'search_aids_'.hash('xxh128', serialize([
+        $cacheKey = 'search_aids_' . hash('xxh128', serialize([
             'params' => $aidParams,
             'date' => (new \DateTime())->format('Y-m-d'),
         ]));
@@ -1026,6 +1025,8 @@ class AidService // NOSONAR too complex
     /**
      * Recupère les données des aides à partir des ids et du score total.
      *
+     * @param array<int, mixed> $lightAids
+     * @param array<string, mixed> $aidParams
      * @return array<int, Aid>
      */
     public function hydrateLightAids(array $lightAids, array $aidParams): array
@@ -1061,5 +1062,32 @@ class AidService // NOSONAR too complex
         }
 
         return $aids;
+    }
+
+    public function isAidInUserFavorites(?User $user, ?Aid $aid): bool
+    {
+        try {
+            if (!$user instanceof User || !$aid instanceof Aid) {
+                return false;
+            }
+
+            $favoriteAids = $user->getFavoriteAids();
+            if (!$favoriteAids instanceof Collection || $favoriteAids->isEmpty()) {
+                return false;
+            }
+
+            foreach ($favoriteAids as $favoriteAid) {
+                if (!$favoriteAid->getAid()) {
+                    continue;
+                }
+                if ($favoriteAid->getAid()->getId() === $aid->getId()) {
+                    return true;
+                }
+            }
+
+            return false;
+        } catch (\Throwable $e) {
+            return false;
+        }
     }
 }

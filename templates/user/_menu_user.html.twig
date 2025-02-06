@@ -23,6 +23,10 @@
 						</li>
 					{% endif %}
 
+					<li class="fr-sidemenu__item {% if favorite_aids_list is defined %}fr-sidemenu__item--active{% endif %}">
+						<a class="fr-sidemenu__link" href="{{ path('app_user_aid_favorites') }}" target="_self" rel="noopener" {% if favorite_aids_list is defined %} aria-current="page" {% endif %} title="Mes aides favorites">Mes aides favorites</a>
+					</li>
+
 					<li class="fr-sidemenu__item">
 						<button class="fr-sidemenu__btn" {% if user_project is defined %} aria-expanded="true" {% else %} aria-expanded="false" {% endif %} aria-controls="fr-sidemenu-item-projects">Mes projets</button>
 						<div class="fr-collapse" id="fr-sidemenu-item-projects">

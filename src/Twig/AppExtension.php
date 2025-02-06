@@ -26,6 +26,7 @@ use App\Repository\Category\CategoryRepository;
 use App\Repository\Organization\OrganizationTypeRepository;
 use App\Repository\Program\ProgramRepository;
 use App\Repository\Reference\ProjectReferenceRepository;
+use App\Service\Aid\AidService;
 use App\Service\Category\CategoryService;
 use App\Service\Matomo\MatomoService;
 use App\Service\Perimeter\PerimeterService;
@@ -54,6 +55,7 @@ class AppExtension extends AbstractExtension // NOSONAR too much methods
         private StringService $stringService,
         private MatomoService $matomoService,
         private KeywordReferenceService $keywordReferenceService,
+        private AidService $aidService
     ) {
     }
 
@@ -174,6 +176,7 @@ class AppExtension extends AbstractExtension // NOSONAR too much methods
             new TwigFunction('isDateTime', [$this, 'isDateTime']),
             new TwigFunction('orderAidFinancerByBackerName', [$this, 'orderAidFinancerByBackerName']),
             new TwigFunction('orderAidInstructorByBackerName', [$this, 'orderAidInstructorByBackerName']),
+            new TwigFunction('isAidInUserFavorites', [$this, 'isAidInUserFavorites']),
         ];
     }
 
@@ -528,5 +531,10 @@ class AppExtension extends AbstractExtension // NOSONAR too much methods
         });
 
         return new ArrayCollection($aidInstructors);
+    }
+
+    public function isAidInUserFavorites(?User $user, ?Aid $aid): bool
+    {
+        return $this->aidService->isAidInUserFavorites($user, $aid);
     }
 }

@@ -1,0 +1,17 @@
+<div id="favorite-button-{{ aid.slug }}">
+    <button 
+        class="fr-btn fr-btn--tertiary-no-outline fr-btn--icon-only {{ isFavorite ? 'fr-icon-star-fill' : 'fr-icon-star-line' }}"
+        {% if not app.user %}
+        data-fr-opened="false"
+        aria-controls="modal-auth"
+        {% else %}
+        data-controller="favorite"
+        data-action="favorite#toggle"
+        data-favorite-url-value="{{ path('app_aid_toggle_favorite', {'slug': aid.slug, 'display': 'icon'}) }}"
+        data-favorite-authenticated-value="{{ app.user ? 'true' : 'false' }}"
+        {% endif %}
+        title="{{ isFavorite ? 'Retirer des favoris' : 'Ajouter aux favoris' }}"
+        aria-label="{{ isFavorite ? 'Retirer des favoris' : 'Ajouter aux favoris' }}"
+    >
+    </button>
+</div>

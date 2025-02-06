@@ -81,9 +81,10 @@
 					</div>
 				</div>
 
-				<div class="fr-header__menu fr-modal" id="modal-menu-mobile" data-fr-js-modal="true" data-fr-js-header-modal="true">
+				<div class="fr-header__menu fr-modal" id="modal-menu-mobile" role="dialog" aria-labelledby="modal-menu-mobile-title" data-fr-js-modal="true" data-fr-js-header-modal="true">
 					<div class="fr-container">
 						<button class="fr-btn fr-btn--close" aria-controls="modal-menu-mobile" data-fr-js-modal-button="true">Fermer</button>
+						<h2 id="modal-menu-mobile-title" class="sr-only">Menu mobile</h2>
 						{% include 'include/_header_menu_links.html.twig' %}
 						{% include 'include/_header_nav.html.twig' %}
 					</div>
@@ -119,6 +120,10 @@
 		{% endblock %}
 
 		{% include('include/_scheme_modal.html.twig') %}
+
+		{% if not app.user %}
+			{% include 'include/_auth_modal.html.twig' %}
+		{% endif %}
 
 		{% block modal %}{% endblock %}
 

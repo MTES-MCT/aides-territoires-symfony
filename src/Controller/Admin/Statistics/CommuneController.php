@@ -2,17 +2,12 @@
 
 namespace App\Controller\Admin\Statistics;
 
-use App\Controller\Admin\DashboardController;
-use App\Entity\Aid\AidProject;
-use App\Entity\Organization\Organization;
 use App\Entity\Organization\OrganizationType;
 use App\Entity\Perimeter\Perimeter;
 use App\Repository\Aid\AidProjectRepository;
-use App\Repository\Aid\AidRepository;
 use App\Repository\Organization\OrganizationRepository;
 use App\Repository\Perimeter\PerimeterRepository;
 use Doctrine\Persistence\ManagerRegistry;
-use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractDashboardController;
 use OpenSpout\Common\Entity\Cell;
 use OpenSpout\Common\Entity\Row;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;

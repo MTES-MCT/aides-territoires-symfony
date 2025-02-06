@@ -1,0 +1,103 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mes aides favorites | {{ parent() }}{% endblock %}
+
+{% block body %}
+
+	<div class="fr-container fr-mb-5w fr-mt-0">
+		<div class="fr-grid-row">
+
+			{% include "user/_menu_user.html.twig" with { favorite_aids_list:true } %}
+
+			<div class="fr-col-12 fr-col-md-9">
+				<h1 class="fr-h3 fr-mb-5w">Mes aides favorites</h1>
+
+
+				<div class="fr-table fr-table--no-scroll fr-table--sm">
+					<div class="fr-table__wrapper">
+						<div class="fr-table__container">
+							<div class="fr-table__content">
+								<table class="data-table at-table--xl">
+									<caption>
+										Liste des aides ajoutées en favoris :
+									</caption>
+									<thead>
+										<tr>
+											<th scope="col" class="fr-text">Nom</th>
+											<th scope="col" class="fr-text">Echéance</th>
+											<th scope="col" class="fr-text">Type d’aide</th>
+											<th scope="col" class="fr-text">Porteur d’aides</th>
+											<th scope="col" class="fr-text">Ajoutée le</th>
+											<th scope="col" class="fr-text">Action</th>
+										</tr>
+									</thead>
+									<tbody>
+										{% if app.user.favoriteAids|length > 0 %}
+											{% for favoriteAid in app.user.favoriteAids %}
+												<tr>
+													<td class="fr-text">
+														<a href="{{ path('app_aid_aid_details', {'slug': favoriteAid.aid.slug}) }}" target="_blank" rel="noopener">
+															{{ favoriteAid.aid.name }}
+															<span class="fr-sr-only">Ouvre une nouvelle fenêtre</span>
+														</a>
+													</td>
+													<td class="fr-text">
+														<span>{{ favoriteAid.aid.dateSubmissionDeadline|date('d/m/Y') }}</span>
+														{% if favoriteAid.aid.isOnGoing() %}
+															<p class="fr-badge fr-badge--info fr-badge--sm">Permanente</p>
+														{% elseif  favoriteAid.aid.isRecurring() %}
+															<p class="fr-badge fr-badge--info fr-badge--sm">Récurrente</p>
+														{% elseif  favoriteAid.aid.isApproachingDeadline() %}
+															<p class="fr-badge fr-badge--new fr-badge--sm">Échéance proche</p>
+														{% elseif  favoriteAid.aid.hasExpired() %}
+															<p class="fr-badge fr-badge--warning fr-badge--sm">Expirée</p>
+														{% endif %}
+													</td>
+													<td class="fr-text">
+														{% for aidType in favoriteAid.aid.aidTypes %}
+															{{ aidType.name }}
+														{% endfor %}
+													</td>
+													<td class="fr-text">
+														<ul>
+															{% for financer in favoriteAid.aid.aidFinancers %}
+																<li>
+																	<a href="{{ path('app_backer_details', {'id': financer.backer.id, 'slug': financer.backer.slug}) }}" target="_blank" rel="noopener">
+																		{{ financer.backer.name }}
+																		<span class="fr-sr-only">Ouvre une nouvelle fenêtre</span>
+																	</a>
+																</li>
+															{% endfor %}
+														</ul>
+													</td>
+													<td class="fr-text">
+														{{ favoriteAid.dateCreate|date('d/m/Y') }}
+													</td>
+													<td class="fr-text">
+														{% include 'aid/aid/_favorite_button_icon.html.twig' with {
+															aid: favoriteAid.aid,
+															isFavorite: isAidInUserFavorites(app.user, favoriteAid.aid)
+														} %}
+													</td>
+												</tr>
+											{% endfor %}
+										{% else %}
+											<tbody>
+												<tr>
+													<td colspan="6" class="fr-text at-centered-important">
+														Aucune aide ajoutée en favoris.
+													</td>
+												</tr>
+											</tbody>
+										{% endif %}
+									</tbody>
+								</table>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+		</div>
+	</div>
+{% endblock %}

@@ -20,8 +20,11 @@ use App\Entity\Log\LogPublicProjectSearch;
 use App\Entity\Log\LogPublicProjectView;
 use App\Entity\Organization\Organization;
 use App\Entity\User\User;
+use App\Service\User\UserService;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Persistence\ManagerRegistry;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 class LogService
 {
@@ -35,18 +38,18 @@ class LogService
     public const PROJECT_VALIDATED_SEARCH = 'projectValidatedSearch';
     public const PROJECT_PUBLIC_SEARCH = 'projectPublicSearch';
     public const PROJECT_PUBLIC_VIEW = 'projectPublicView';
+    public const LAST_LOG_AID_SEARCH_ID = 'last_logAidSearchId';
 
     public function __construct(
         private ManagerRegistry $managerRegistry,
         private LoggerInterface $loggerInterface,
+        private RequestStack $requestStack,
+        private UserService $userService,
     ) {
     }
 
     /**
-     *
-     * @param string|null $type
      * @param array<mixed>|null $params
-     * @return void
      */
     public function log(// NOSONAR too complex
         ?string $type,
@@ -61,7 +64,7 @@ class LogService
                             if ('_token' == $key) { // pas besoin de stocker le tocken
                                 continue;
                             }
-                            $querystring .= $key . '=' . $param . '&';
+                            $querystring .= $key.'='.$param.'&';
                         }
                         $querystring = substr($querystring, 0, -1); // on enlève le dernier & (qui est en trop)
                     }
@@ -77,6 +80,10 @@ class LogService
                     $log = new LogAidOriginUrlClick();
                     $log->setQuerystring($params['querystring']);
                     $log->setSource($this->getSiteFromHost($params['host']));
+                    $source = $this->getLogAidSearchSourceInSession();
+                    if ($source) {
+                        $log->setSource($source);
+                    }
                     $aid = null;
                     if (isset($params['aidSlug'])) {
                         $aid = $this->managerRegistry->getRepository(Aid::class)
@@ -89,6 +96,10 @@ class LogService
                     $log = new LogAidApplicationUrlClick();
                     $log->setQuerystring($params['querystring']);
                     $log->setSource($this->getSiteFromHost($params['host']));
+                    $source = $this->getLogAidSearchSourceInSession();
+                    if ($source) {
+                        $log->setSource($source);
+                    }
                     $aid = null;
                     if (isset($params['aidSlug'])) {
                         $aid = $this->managerRegistry->getRepository(Aid::class)
@@ -124,7 +135,12 @@ class LogService
 
                 case self::AID_SEARCH:
                     $log = new LogAidSearchTemp();
-                    $log->setQuerystring($params['querystring'] ?? null);
+                    $querystring = $params['querystring'] ?? null;
+                    if ($querystring) {
+                        // on nettoyage la querystring
+                        $querystring = $this->cleanQueryString($querystring);
+                    }
+                    $log->setQuerystring($querystring);
                     $log->setResultsCount($params['resultsCount'] ?? null);
                     $log->setSource($this->getSiteFromHost($params['host'] ?? null));
                     if (isset($params['source'])) {
@@ -165,6 +181,10 @@ class LogService
                     $log = new LogAidViewTemp();
                     $log->setQuerystring($params['querystring'] ?? null);
                     $log->setSource($this->getSiteFromHost($params['host'] ?? null));
+                    $source = $this->getLogAidSearchSourceInSession();
+                    if ($source) {
+                        $log->setSource($source);
+                    }
                     if (isset($params['source'])) {
                         $log->setSource(substr($params['source'], 0, 255));
                     }
@@ -258,12 +278,83 @@ class LogService
             if (isset($log)) {
                 $this->managerRegistry->getManager()->persist($log);
                 $this->managerRegistry->getManager()->flush();
+
+                if ($type == self::AID_SEARCH) {
+                    $this->setLogAidSearchTempIdInSession($log, $querystring);
+
+                }
             }
         } catch (\Exception $exception) {
             $this->loggerInterface->error('Erreur log', [
                 'exception' => $exception,
             ]);
         }
+    }
+
+    private function getLogAidSearchSourceInSession(): ?string
+    {
+        $logAidSearchTempId = $this->requestStack->getCurrentRequest()->getSession()->get(self::LAST_LOG_AID_SEARCH_ID, null);
+        if (!$logAidSearchTempId) {
+            return null;
+        }
+
+        $logAidSearchTemp = $this->managerRegistry->getRepository(LogAidSearchTemp::class)->find($logAidSearchTempId);
+        if (!$logAidSearchTemp) {
+            return null;
+        }
+
+        return $logAidSearchTemp->getSource();
+    }
+
+    private function setLogAidSearchTempIdInSession(LogAidSearchTemp $log, ?string $querystring = ''): void
+    {
+        if (!$querystring) {
+            return;
+        }
+
+        // on regarde si il y a un id en session
+        $lastLogAidSearchId = $this->requestStack->getCurrentRequest()->getSession()->get(self::LAST_LOG_AID_SEARCH_ID, null);
+        if ($lastLogAidSearchId) {
+            // on récupère le dernier log de recherche
+            $lastLog = $this->managerRegistry->getRepository(LogAidSearchTemp::class)->find($lastLogAidSearchId);
+            // on regarde si les paramètres de la requetes ont changés
+            if (
+                $lastLog instanceof LogAidSearchTemp
+                && $this->removePageFromQuerystring($lastLog->getQuerystring())
+                    != $this->removePageFromQuerystring($querystring)
+            ) {
+                // on stock l'id de la recherche dans la session pour le notififer dans l'ajout aux favoris
+                $this->requestStack->getCurrentRequest()->getSession()->set(self::LAST_LOG_AID_SEARCH_ID, $log->getId());
+            }
+        } else {
+            // on stock l'id de la recherche dans la session pour le notififer dans l'ajout aux favoris
+            $this->requestStack->getCurrentRequest()->getSession()->set(self::LAST_LOG_AID_SEARCH_ID, $log->getId());
+        }
+    }
+
+    private function cleanQueryString(string $querystring): string
+    {
+        // Convertir la querystring en tableau de paramètres
+        parse_str($querystring, $params);
+        
+        // Supprimer les paramètres non désirés
+        unset($params['_token']);
+        unset($params['newIntegration']);
+        
+        // Reconstruire la querystring proprement
+        return http_build_query($params);
+    }
+
+    private function removePageFromQuerystring(string $querystring): string
+    {
+        // Convertir la querystring en tableau de paramètres
+        parse_str($querystring, $params);
+        
+        // Supprimer les paramètres non désirés
+        unset($params['page']);
+        
+        // Reconstruire la querystring proprement
+        return http_build_query($params);
     }
 
     public function getSiteFromHost(string $host): string
@@ -304,5 +395,50 @@ class LogService
         }
 
         return substr($host, 0, 255);
+    }
+
+    public function getLogAidSearchParams(
+        array $aidParams,
+        int $resultsCount,
+        ?string $source = null,
+        ?string $query = null
+    ): array
+    {
+        // le user actuellement connecté
+        $user = $this->userService->getUserLogged();
+        // la query
+        $queryParsed = parse_url($this->requestStack->getCurrentRequest()->getRequestUri(), PHP_URL_QUERY) ?? null;
+        // Log recherche
+        $logParams = [
+            'organizationTypes' => (isset($aidParams['organizationType'])) ? [$aidParams['organizationType']] : null,
+            'resultsCount' => $resultsCount,
+            'host' => $this->requestStack->getCurrentRequest()->getHost(),
+            'perimeter' => $aidParams['perimeterFrom'] ?? null,
+            'search' => $aidParams['keyword'] ?? null,
+            'organization' => ($user instanceof User && $user->getDefaultOrganization())
+                ? $user->getDefaultOrganization()
+                : null,
+            'backers' => $aidParams['backers'] ?? null,
+            'categories' => $aidParams['categories'] ?? null,
+            'programs' => $aidParams['programs'] ?? null,
+            'user' => $user ?? null,
+        ];
+        if ($source) {
+            $logParams['source'] = $source;
+        }
+        $logParams['querystring'] = $query ?? $queryParsed;
+
+        /** @var ArrayCollection<int, CategoryTheme> $themes */
+        $themes = new ArrayCollection();
+        if (isset($aidParams['categories']) && is_array($aidParams['categories'])) {
+            foreach ($aidParams['categories'] as $category) {
+                if (!$themes->contains($category->getCategoryTheme())) {
+                    $themes->add($category->getCategoryTheme());
+                }
+            }
+        }
+        $logParams['themes'] = $themes->toArray();
+
+        return $logParams;
     }
 }

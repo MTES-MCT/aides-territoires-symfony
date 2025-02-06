@@ -117,7 +117,7 @@ var NB_RESULTS = {{ myPager.getNbResults() }};
 	{% if highlightedWords is defined and highlightedWords|length > 0 %}
 		{% cspscript %}
 		<script>
-			const highlightedWords = [];{% for word in highlightedWords %}highlightedWords.push('{{ word }}');{% endfor %}
+			var highlightedWords = [];{% for word in highlightedWords %}highlightedWords.push('{{ word }}');{% endfor %}
 		</script>
 		{% endcspscript %}
 	{% endif %}

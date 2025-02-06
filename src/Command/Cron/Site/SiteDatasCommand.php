@@ -66,7 +66,7 @@ class SiteDatasCommand extends Command
 
         $io = new SymfonyStyle($input, $output);
 
-        // // Les projets référents
+        // Les projets référents
         $this->projectReferences();
 
         // // // comptage des porteurs par département

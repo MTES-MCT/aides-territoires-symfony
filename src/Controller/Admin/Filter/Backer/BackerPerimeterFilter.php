@@ -48,7 +48,7 @@ class BackerPerimeterFilter implements FilterInterface
         if ('eq' === $comparison) {
             $queryBuilder->andWhere('perimeterFilter.id IN (:ids)')
                 ->setParameter('ids', $ids);
-        } else if ('eq_strict' === $comparison) {
+        } elseif ('eq_strict' === $comparison) {
             $queryBuilder->andWhere('perimeterFilter.id = :id')
                 ->setParameter('id', $filterDataDto->getValue());
         } else {
