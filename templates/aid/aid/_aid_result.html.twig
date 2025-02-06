@@ -55,7 +55,7 @@
 						<span class="fr-icon-flashlight-line fr-icon--sm" aria-hidden="true"></span>Spécifique PVD</span>
 				{% endif %}
 
-				<a class="fr-card__link highlightable" href="{{ path('app_aid_aid_details', aidUrlParams) }}" title="Voir l'aide">
+				<a class="fr-card__link highlightable" href="{{ path('app_aid_aid_details', aidUrlParams) }}" title="Voir l'aide" data-turbo="false">
 					{% if aid.europeanAid %}
 						<span title="aide européenne" aria-hidden="true">🇪🇺
 						</span>
@@ -171,7 +171,7 @@
 
 				{% if aid.eligibilityTest %}
 					<div class="eligibility-badge fr-btn">
-						<a href="{{ path('app_aid_aid_details', aidUrlParams) }}" title="Voir l'aide">
+						<a href="{{ path('app_aid_aid_details', aidUrlParams) }}" data-turbo="false" title="Voir l'aide">
 							Test d’éligibilité disponible
 						</a>
 					</div>

@@ -25,7 +25,11 @@
 								{% endif %}
 								<tr>
 									<td class="highlightable badge-container">
-										<a href="{{ path('app_aid_aid_details', {'slug': aid.slug}) }}{% if integration is defined %}?integration=integration{% endif %}">
+										{% include 'aid/aid/_favorite_button_icon.html.twig' with {
+											aid: aid,
+											isFavorite: isAidInUserFavorites(app.user, aid)
+										} %}
+										<a href="{{ path('app_aid_aid_details', {'slug': aid.slug}) }}{% if integration is defined %}?integration=integration{% endif %}" data-turbo="false">
 											{{ aid.name }}
 											{% if app.user and app.user and isUserGranted(app.user, constant('App\\Entity\\User\\User::ROLE_ADMIN')) %}(st:
 												{{ aid.scoreTotal}}, so:
