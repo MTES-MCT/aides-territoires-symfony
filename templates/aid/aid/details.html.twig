@@ -956,7 +956,7 @@
     {% if highlightedWords is defined and highlightedWords|length > 0 %}
         {% cspscript %}
         <script>
-            const highlightedWords = [];
+            var highlightedWords = [];
             {% for word in highlightedWords %}
                 highlightedWords.push('{{ word }}');
             {% endfor %}
