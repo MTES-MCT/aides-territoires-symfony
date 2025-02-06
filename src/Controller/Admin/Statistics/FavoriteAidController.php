@@ -51,19 +51,12 @@ class FavoriteAidController extends AbstractController
             'dateMax' => $dateMax,
         ]);
 
-        // top source de favoris
-        $topSources = $favoriteAidRepository->countTopSources([
-            'dateMin' => $dateMin,
-            'dateMax' => $dateMax,
-        ]);
-
         // rendu template
         return $this->render('admin/statistics/favorite_aid/index.html.twig', [
             'formDateRange' => $formDateRange,
             'topFavoriteAids' => $topFavoriteAids,
             'nbFavoriteAidsByDay' => $nbFavoriteAidsByDay,
             'totalFavoriteAids' => $totalFavoriteAids,
-            'topSources' => $topSources
         ]);
     }
 }

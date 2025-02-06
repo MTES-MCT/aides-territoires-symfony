@@ -113,7 +113,7 @@ class FavoriteAidRepository extends ServiceEntityRepository
         return $qb->getQuery()->getSingleScalarResult();
     }
 
-    public function countTopSources(?array $params = null): array
+    public function countBySource(?array $params = null): array
     {
         $dateMin = $params['dateMin'] ?? null;
         $dateMax = $params['dateMax'] ?? null;
@@ -123,7 +123,6 @@ class FavoriteAidRepository extends ServiceEntityRepository
             ->innerJoin('fa.logAidSearch', 'las')
             ->groupBy('las.source')
             ->orderBy('nb', 'DESC')
-            ->setMaxResults(10)
         ;
 
         if ($dateMin instanceof \DateTime) {

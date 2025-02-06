@@ -93,6 +93,23 @@ class LogAidViewRepository extends ServiceEntityRepository
     }
 
     /**
+     * Nombre de vues par source
+     *
+     * @param array<string, mixed>|null $params
+     * @return array<int, array{nb: integer, source: string}>
+     */
+    public function countBySource(?array $params = null): array
+    {
+        $qb = $this->getQueryBuilder($params);
+
+        $qb->select('COUNT(lav.id) as nb, lav.source');
+        $qb->groupBy('lav.source');
+        $qb->orderBy('nb', 'DESC');
+
+        return $qb->getQuery()->getResult();
+    }
+
+    /**
      * @param array<string, mixed>|null $params
      * @return integer
      */
