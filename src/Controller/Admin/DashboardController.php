@@ -53,6 +53,7 @@ use App\Entity\Reference\ProjectReference;
 use App\Entity\Reference\ProjectReferenceCategory;
 use App\Entity\Reference\ProjectReferenceMissing;
 use App\Entity\Search\SearchPage;
+use App\Entity\Site\AbTest;
 use App\Entity\Site\UrlRedirect;
 use App\Entity\User\ApiTokenAsk;
 use App\Entity\User\User;
@@ -315,6 +316,7 @@ class DashboardController extends AbstractDashboardController
         ]);
 
         yield MenuItem::subMenu('Configuration système', 'fas fa-cogs')->setSubItems([
+            MenuItem::linkToCrud('AbTesting', 'fas fa-list', AbTest::class),
             MenuItem::linkToCrud('Urls de redirections', 'fas fa-list', UrlRedirect::class),
             MenuItem::linkToCrud('Exports de données', 'fas fa-list', DataExport::class),
             MenuItem::linkToCrud('Sources de données', 'fas fa-list', DataSource::class),

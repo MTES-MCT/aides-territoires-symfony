@@ -5,7 +5,9 @@ namespace App\Entity\Site;
 use App\Repository\Site\AbTestRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Mapping\Annotation as Gedmo;
 
 #[ORM\Entity(repositoryClass: AbTestRepository::class)]
 class AbTest
@@ -23,6 +25,16 @@ class AbTest
      */
     #[ORM\OneToMany(mappedBy: 'abTest', targetEntity: AbTestUser::class, orphanRemoval: true)]
     private Collection $abTestUsers;
+
+    #[ORM\Column(type: Types::DATE_MUTABLE)]
+    #[Gedmo\Timestampable(on: 'create')]
+    private ?\DateTimeInterface $dateCreate = null;
+
+    #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
+    private ?\DateTimeInterface $dateStart = null;
+
+    #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
+    private ?\DateTimeInterface $dateEnd = null;
 
     public function __construct()
     {
@@ -72,6 +84,42 @@ class AbTest
                 $abTestUser->setAbTest(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getDateCreate(): ?\DateTimeInterface
+    {
+        return $this->dateCreate;
+    }
+
+    public function setDateCreate(\DateTimeInterface $dateCreate): static
+    {
+        $this->dateCreate = $dateCreate;
+
+        return $this;
+    }
+
+    public function getDateStart(): ?\DateTimeInterface
+    {
+        return $this->dateStart;
+    }
+
+    public function setDateStart(?\DateTimeInterface $dateStart): static
+    {
+        $this->dateStart = $dateStart;
+
+        return $this;
+    }
+
+    public function getDateEnd(): ?\DateTimeInterface
+    {
+        return $this->dateEnd;
+    }
+
+    public function setDateEnd(?\DateTimeInterface $dateEnd): static
+    {
+        $this->dateEnd = $dateEnd;
 
         return $this;
     }

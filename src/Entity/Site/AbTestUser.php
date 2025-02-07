@@ -7,6 +7,7 @@ use App\Repository\Site\AbTestUserRepository;
 use App\Service\Doctrine\DoctrineConstants;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Mapping\Annotation as Gedmo;
 
 #[ORM\Entity(repositoryClass: AbTestUserRepository::class)]
 #[ORM\Index(columns: ['version'], name: 'version_ab_test_user')]
@@ -27,6 +28,7 @@ class AbTestUser
     private ?User $user = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE)]
+    #[Gedmo\Timestampable(on: 'create')]
     private ?\DateTimeInterface $dateCreate = null;
 
     #[ORM\Column(length: 50)]

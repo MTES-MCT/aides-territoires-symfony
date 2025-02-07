@@ -11,7 +11,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class AbTestService
 {
-    private const SEARCH_FORM_TEST = 'search_form_test';
+    private const SEARCH_FORM_TEST = 'vapp_test';
     private const TEST_RATIO = 0.1; // 10% du trafic
 
     public function __construct(
@@ -41,7 +41,11 @@ class AbTestService
             $abTestUser->setAbTest($abTest);
             $abTestUser->setVersion($isTest ? 'vapp' : 'at');
             $abTestUser->setUser($this->userService->getUserLogged());
+
+            $this->managerRegistry->getManager()->persist($abTestUser);
+            $this->managerRegistry->getManager()->flush();
         }
+        
         
         return $isTest;
     }
