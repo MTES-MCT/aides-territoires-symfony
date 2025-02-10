@@ -957,6 +957,18 @@ class AidSearchFormService
         */
 
 
+        /**
+         * < VappDescription
+        */
+        if (isset($queryParams['vapp_description'])) {
+            $aidSearchClass->setVappDescription($queryParams['vapp_description']);
+        }
+
+        /**
+         * > VappDescription
+        */
+
+
         return $aidSearchClass;
     }
     /**

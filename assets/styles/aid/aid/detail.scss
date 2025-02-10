@@ -11,10 +11,32 @@
     background-color: #E5FCF7;
 
     .fr-icon-thumb-up-fill{
+        &:before{
+            width: 40px;
+            height: 40px;
+        }
         color: #58b77d;
     }
     .fr-icon-thumb-down-fill{
+        &:before{
+            width: 40px;
+            height: 40px;
+        }
         color: #e1000f;
+    }
+
+    button.btn-vote{
+        display: flex;
+        align-items: center;
+        padding: 0.5rem;
+
+        &.active{
+            border: 1px solid #58b77d;
+            border-radius: 5px;
+        }
+        span{
+            margin: 0 10px 0 0;
+        }
     }
 }
 .deadline.fr-tag {

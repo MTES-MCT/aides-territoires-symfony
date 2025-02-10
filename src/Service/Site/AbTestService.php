@@ -11,21 +11,22 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class AbTestService
 {
-    private const SEARCH_FORM_TEST = 'vapp_test';
+    public const SEARCH_FORM_TEST = 'vapp_test';
     private const TEST_RATIO = 0.1; // 10% du trafic
 
     public function __construct(
         private RequestStack $requestStack,
         private ManagerRegistry $managerRegistry,
         private AbTestRepository $abTestRepository,
-        private UserService $userService
+        private UserService $userService,
     ) {
     }
 
     public function shouldShowTestVersion(): bool
     {
         $session = $this->requestStack->getSession();
-return true;
+
+        return true;
         // Si déjà défini en session, on garde la même version
         if ($session->has(self::SEARCH_FORM_TEST)) {
             return $session->get(self::SEARCH_FORM_TEST);
@@ -45,8 +46,7 @@ return true;
             $this->managerRegistry->getManager()->persist($abTestUser);
             $this->managerRegistry->getManager()->flush();
         }
-        
-        
+
         return $isTest;
     }
 }

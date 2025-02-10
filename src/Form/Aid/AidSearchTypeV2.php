@@ -70,7 +70,7 @@ class AidSearchTypeV2 extends AbstractType
         // Builder
         $builder
             ->add(AidSearchFormService::QUERYSTRING_KEY_ORGANIZATION_TYPE_SLUG, EntityType::class, [
-                'required' => false,
+                'required' => $abTestVapp ? true : false,
                 'label' => 'Vous cherchez pour…',
                 'class' => OrganizationType::class,
                 'choice_label' => 'name',
@@ -93,7 +93,7 @@ class AidSearchTypeV2 extends AbstractType
                 'placeholder' => 'Tous types de structures',
             ])
             ->add(AidSearchFormService::QUERYSTRING_KEY_SEARCH_PERIMETER, PerimeterAutocompleteType::class, [
-                'required' => false,
+                'required' => $abTestVapp ? true : false,
                 'label' => 'Votre territoire',
                 'label_attr' => [
                     'id' => 'label-perimeter-search',
@@ -324,8 +324,8 @@ class AidSearchTypeV2 extends AbstractType
                 'label' => 'Description de votre projet',
                 'required' => true,
                 'attr' => [
-                    'placeholder' => 'Exemple: Assistance à maitrise d’ouvrage pour l’Installation de panneaux photovoltaiques sur le toit de l’école municipale.'
-                ]
+                    'placeholder' => 'Exemple: Assistance à maitrise d’ouvrage pour l’Installation de panneaux photovoltaiques sur le toit de l’école municipale.',
+                ],
             ]);
         }
     }

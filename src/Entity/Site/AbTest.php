@@ -10,6 +10,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
 
 #[ORM\Entity(repositoryClass: AbTestRepository::class)]
+#[ORM\Index(columns: ['name'], name: 'name_ab_test')]
 class AbTest
 {
     #[ORM\Id]
@@ -36,9 +37,16 @@ class AbTest
     #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $dateEnd = null;
 
+    /**
+     * @var Collection<int, AbTestVote>
+     */
+    #[ORM\OneToMany(mappedBy: 'abTest', targetEntity: AbTestVote::class, orphanRemoval: true)]
+    private Collection $abTestVotes;
+
     public function __construct()
     {
         $this->abTestUsers = new ArrayCollection();
+        $this->abTestVotes = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -120,6 +128,36 @@ class AbTest
     public function setDateEnd(?\DateTimeInterface $dateEnd): static
     {
         $this->dateEnd = $dateEnd;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, AbTestVote>
+     */
+    public function getAbTestVotes(): Collection
+    {
+        return $this->abTestVotes;
+    }
+
+    public function addAbTestVote(AbTestVote $abTestVote): static
+    {
+        if (!$this->abTestVotes->contains($abTestVote)) {
+            $this->abTestVotes->add($abTestVote);
+            $abTestVote->setAbTest($this);
+        }
+
+        return $this;
+    }
+
+    public function removeAbTestVote(AbTestVote $abTestVote): static
+    {
+        if ($this->abTestVotes->removeElement($abTestVote)) {
+            // set the owning side to null (unless already changed)
+            if ($abTestVote->getAbTest() === $this) {
+                $abTestVote->setAbTest(null);
+            }
+        }
 
         return $this;
     }
