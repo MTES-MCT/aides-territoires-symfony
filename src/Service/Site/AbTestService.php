@@ -25,7 +25,7 @@ class AbTestService
     public function shouldShowTestVersion(): bool
     {
         $session = $this->requestStack->getSession();
-
+return true;
         // Si déjà défini en session, on garde la même version
         if ($session->has(self::SEARCH_FORM_TEST)) {
             return $session->get(self::SEARCH_FORM_TEST);

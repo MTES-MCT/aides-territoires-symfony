@@ -7,6 +7,16 @@
 @use '../../form/label';
 @use '../../component/at-deadline.scss';
 
+.vapp-test{
+    background-color: #E5FCF7;
+
+    .fr-icon-thumb-up-fill{
+        color: #58b77d;
+    }
+    .fr-icon-thumb-down-fill{
+        color: #e1000f;
+    }
+}
 .deadline.fr-tag {
     display: block;
     float: right;

@@ -60,6 +60,19 @@
 									</div>
 								</div>
 
+								{% if formAidSearch.vapp_description is defined %}
+								<div class="fr-alert fr-alert--info fr-my-3w">
+									<p>
+										<strong>Nouveau ! Nous testons une nouvelle fonctionnalité utilisant l’IA pour vous fournir des recommandations plus pertinentes. Décrivez votre projet en quelques lignes.</strong>
+									</p>
+								</div>
+								<div class="fr-grid-row fr-grid-row--gutters fr-grid-row--center">
+									<div class="fr-col-12">
+										{{ form_row(formAidSearch.vapp_description)}}
+									</div>
+								</div>
+								{% endif %}
+								
 								<div class="fr-mt-2w">
 									{% if noAdvanceFilters is not defined %}
 										<ul class="fr-btns-group fr-btns-group--center fr-btns-group--inline">

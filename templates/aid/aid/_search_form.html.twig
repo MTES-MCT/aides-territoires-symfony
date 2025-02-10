@@ -92,6 +92,16 @@
 								</li>
 							</ul>
 						{% endif %}
+
+
+						{% if formAidSearch.vapp_description is defined %}
+							<div class="fr-grid-row fr-grid-row--gutters fr-grid-row--center fr-mb-2w">
+								<div class="fr-col-12">
+									{{ form_row(formAidSearch.vapp_description)}}
+								</div>
+							</div>
+						{% endif %}
+
 						<ul class="fr-btns-group fr-btns-group--center fr-btns-group--inline">
 							{% if noNewSearch is not defined %}
 								<li>

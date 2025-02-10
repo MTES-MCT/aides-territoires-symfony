@@ -21,6 +21,7 @@ use App\Form\Type\PerimeterAutocompleteType;
 use App\Repository\Backer\BackerGroupRepository;
 use App\Service\Aid\AidSearchClass;
 use App\Service\Aid\AidSearchFormService;
+use App\Service\Site\AbTestService;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
@@ -29,6 +30,7 @@ use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -39,11 +41,15 @@ class AidSearchTypeV2 extends AbstractType
     public function __construct(
         private ManagerRegistry $managerRegistry,
         private RouterInterface $routerInterface,
+        private AbTestService $abTestService,
     ) {
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        // ab test vapp
+        $abTestVapp = $this->abTestService->shouldShowTestVersion();
+
         // les catégories
         $categoryThemes = $this->managerRegistry->getRepository(CategoryTheme::class)->findBy(
             [],
@@ -311,6 +317,16 @@ class AidSearchTypeV2 extends AbstractType
                     $builder->remove($remove);
                 }
             }
+        }
+
+        if ($abTestVapp) {
+            $builder->add('vapp_description', TextareaType::class, [
+                'label' => 'Description de votre projet',
+                'required' => true,
+                'attr' => [
+                    'placeholder' => 'Exemple: Assistance à maitrise d’ouvrage pour l’Installation de panneaux photovoltaiques sur le toit de l’école municipale.'
+                ]
+            ]);
         }
     }
 
