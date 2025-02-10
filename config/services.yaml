@@ -105,10 +105,6 @@ services:
 
     Nelmio\SecurityBundle\EventListener\ContentSecurityPolicyListener: '@nelmio_security.csp_listener'
 
-    App\EventListener\SentryListener:
-        tags:
-            - { name: kernel.event_listener, event: kernel.exception, method: onKernelException }
-
     Symfony\Component\HttpFoundation\Session\Storage\Handler\RedisSessionHandler:
         arguments: ['@snc_redis.session']
 
