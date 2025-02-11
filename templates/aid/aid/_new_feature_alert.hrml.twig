@@ -1,4 +1,4 @@
-{% if shouldShowTestVersion() %}
+{% if shouldShowTestVersion(constant('App\\Service\\Site\\AbTestService::VAPP_FORMULAIRE')) %}
 <div class="fr-alert fr-alert--info fr-my-3w">
     <p>
         <strong>Nos algorithmes travaillent pour identifier les aides pertinentes pour votre projet. Cela peut prendre 1 ou 2 minutes.</strong>

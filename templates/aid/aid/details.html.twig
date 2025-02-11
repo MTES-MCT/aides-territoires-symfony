@@ -628,7 +628,7 @@
 		<div class="aid-details highlightable fr-col-12 fr-col-md-8 fr-pb-3w fr-px-3w">
 			<div class="fr-grid-row fr-grid-row--top fr-mb-5w">
 
-				{% if shouldShowTestVersion() %}
+				{% if shouldShowTestVersion(constant('App\\Service\\Site\\AbTestService::VAPP_ACTIVATION')) %}
 				<div class="fr-col-12">
 					<div class="vapp-test fr-p-2w fr-mb-5w">
 						<div class="fr-grid-row fr-grid-row--middle">

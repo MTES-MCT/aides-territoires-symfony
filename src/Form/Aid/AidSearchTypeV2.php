@@ -47,8 +47,11 @@ class AidSearchTypeV2 extends AbstractType
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        // ab test vapp
-        $abTestVapp = $this->abTestService->shouldShowTestVersion();
+        // ab test vapp_activation
+        $abTestVappActivation = $this->abTestService->shouldShowTestVersion(AbTestService::VAPP_ACTIVATION);
+        if ($abTestVappActivation) {
+            $abTestVappFormulaire = $this->abTestService->shouldShowTestVersion(AbTestService::VAPP_FORMULAIRE);
+        }
 
         // les catégories
         $categoryThemes = $this->managerRegistry->getRepository(CategoryTheme::class)->findBy(
@@ -70,7 +73,7 @@ class AidSearchTypeV2 extends AbstractType
         // Builder
         $builder
             ->add(AidSearchFormService::QUERYSTRING_KEY_ORGANIZATION_TYPE_SLUG, EntityType::class, [
-                'required' => $abTestVapp ? true : false,
+                'required' => $abTestVappFormulaire ? true : false,
                 'label' => 'Vous cherchez pour…',
                 'class' => OrganizationType::class,
                 'choice_label' => 'name',
@@ -93,7 +96,7 @@ class AidSearchTypeV2 extends AbstractType
                 'placeholder' => 'Tous types de structures',
             ])
             ->add(AidSearchFormService::QUERYSTRING_KEY_SEARCH_PERIMETER, PerimeterAutocompleteType::class, [
-                'required' => $abTestVapp ? true : false,
+                'required' => $abTestVappFormulaire ? true : false,
                 'label' => 'Votre territoire',
                 'label_attr' => [
                     'id' => 'label-perimeter-search',
@@ -319,7 +322,7 @@ class AidSearchTypeV2 extends AbstractType
             }
         }
 
-        if ($abTestVapp) {
+        if ($abTestVappFormulaire) {
             $builder->add('vapp_description', TextareaType::class, [
                 'label' => 'Description de votre projet',
                 'required' => true,

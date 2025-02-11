@@ -11,7 +11,9 @@ use Doctrine\ORM\Mapping\JoinColumn;
 use Gedmo\Mapping\Annotation as Gedmo;
 
 #[ORM\Entity(repositoryClass: AbTestVoteRepository::class)]
+#[ORM\Index(columns: ['variation'], name: 'variation_ab_test_vote')]
 #[ORM\Index(columns: ['date_create'], name: 'date_create_ab_test_vote')]
+#[ORM\Index(columns: ['php_session_id'], name: 'php_session_id_ab_test_vote')]
 class AbTestVote
 {
     #[ORM\Id]
@@ -28,6 +30,12 @@ class AbTestVote
 
     #[ORM\Column(length: 255)]
     private ?string $phpSessionId = null;
+
+    #[ORM\Column(length: 255)]
+    private ?string $variation = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $data = null;
 
     #[ORM\ManyToOne]
     #[JoinColumn(onDelete: DoctrineConstants::SET_NULL)]
@@ -98,6 +106,30 @@ class AbTestVote
     public function setDateCreate(\DateTimeInterface $dateCreate): static
     {
         $this->dateCreate = $dateCreate;
+
+        return $this;
+    }
+
+    public function getVariation(): ?string
+    {
+        return $this->variation;
+    }
+
+    public function setVariation(string $variation): static
+    {
+        $this->variation = $variation;
+
+        return $this;
+    }
+
+    public function getData(): ?string
+    {
+        return $this->data;
+    }
+
+    public function setData(?string $data): static
+    {
+        $this->data = $data;
 
         return $this;
     }

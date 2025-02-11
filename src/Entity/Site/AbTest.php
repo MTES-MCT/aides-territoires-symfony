@@ -21,21 +21,30 @@ class AbTest
     #[ORM\Column(length: 255)]
     private ?string $name = null;
 
-    /**
-     * @var Collection<int, AbTestUser>
-     */
-    #[ORM\OneToMany(mappedBy: 'abTest', targetEntity: AbTestUser::class, orphanRemoval: true)]
-    private Collection $abTestUsers;
-
-    #[ORM\Column(type: Types::DATE_MUTABLE)]
-    #[Gedmo\Timestampable(on: 'create')]
-    private ?\DateTimeInterface $dateCreate = null;
+    #[ORM\Column]
+    private ?int $ratio = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $dateStart = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $dateEnd = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?int $hourStart = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?int $hourEnd = null;
+
+    #[ORM\Column(type: Types::DATE_MUTABLE)]
+    #[Gedmo\Timestampable(on: 'create')]
+    private ?\DateTimeInterface $dateCreate = null;
+
+    /**
+     * @var Collection<int, AbTestUser>
+     */
+    #[ORM\OneToMany(mappedBy: 'abTest', targetEntity: AbTestUser::class, orphanRemoval: true)]
+    private Collection $abTestUsers;
 
     /**
      * @var Collection<int, AbTestVote>
@@ -158,6 +167,42 @@ class AbTest
                 $abTestVote->setAbTest(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getHourStart(): ?int
+    {
+        return $this->hourStart;
+    }
+
+    public function setHourStart(?int $hourStart): static
+    {
+        $this->hourStart = $hourStart;
+
+        return $this;
+    }
+
+    public function getHourEnd(): ?int
+    {
+        return $this->hourEnd;
+    }
+
+    public function setHourEnd(?int $hourEnd): static
+    {
+        $this->hourEnd = $hourEnd;
+
+        return $this;
+    }
+
+    public function getRatio(): ?int
+    {
+        return $this->ratio;
+    }
+
+    public function setRatio(int $ratio): static
+    {
+        $this->ratio = $ratio;
 
         return $this;
     }

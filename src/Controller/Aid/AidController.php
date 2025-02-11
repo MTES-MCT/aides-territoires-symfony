@@ -68,13 +68,9 @@ class AidController extends FrontController
         AidService $aidService,
         LogService $logService,
         ReferenceService $referenceService,
-        BlogPromotionPostService $blogPromotionPostService,
-        AbTestService $abTestService,
+        BlogPromotionPostService $blogPromotionPostService
     ): Response {
         $timeStart = microtime(true);
-
-        // ab test vapp
-        $abTestVapp = $abTestService->shouldShowTestVersion();
 
         $requestStack
             ->getCurrentRequest()

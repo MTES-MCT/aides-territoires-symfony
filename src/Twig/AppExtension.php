@@ -75,8 +75,7 @@ class AppExtension extends AbstractExtension // NOSONAR too much methods
             new TwigFilter('aidStatusDisplay', [$this, 'aidStatusDisplay']),
             new TwigFilter('alertFrequencyDisplay', [$this, 'alertFrequencyDisplay']),
             new TwigFilter('projectStepDisplay', [$this, 'projectStepDisplay']),
-            new TwigFilter('secondsToMinutes', [$this, 'secondsToMinutes']),
-            new TwigFilter('shouldShowTestVersion', [$this, 'shouldShowTestVersion']),
+            new TwigFilter('secondsToMinutes', [$this, 'secondsToMinutes'])
         ];
     }
 
@@ -541,8 +540,8 @@ class AppExtension extends AbstractExtension // NOSONAR too much methods
         return $this->aidService->isAidInUserFavorites($user, $aid);
     }
 
-    public function shouldShowTestVersion(): bool
+    public function shouldShowTestVersion(string $abTestName): bool
     {
-        return $this->abTestService->shouldShowTestVersion();
+        return $this->abTestService->shouldShowTestVersion($abTestName);
     }
 }

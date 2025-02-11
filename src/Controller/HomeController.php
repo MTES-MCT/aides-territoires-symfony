@@ -36,6 +36,7 @@ class HomeController extends FrontController
         LogEventRepository $logEventRepository,
         ParamService $paramService,
     ): Response {
+        dump($requestStack->getCurrentRequest()->cookies->all());
         $formAidSearch = $this->createForm(
             AidSearchTypeV2::class,
             $aidSearchFormService->getAidSearchClass(),
