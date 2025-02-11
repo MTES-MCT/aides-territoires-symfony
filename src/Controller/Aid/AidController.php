@@ -422,7 +422,7 @@ class AidController extends FrontController
         ]);
         $formAddToProject->handleRequest($requestStack->getCurrentRequest());
         if ($formAddToProject->isSubmitted()) {
-            if (!$user->getDefaultOrganization()) {
+            if ($user && !$user->getDefaultOrganization()) {
                 $this->addFlash(
                     FrontController::FLASH_ERROR,
                     'Vous devez renseigner les informations de votre structure ou accepter une invitation '
