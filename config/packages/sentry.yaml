@@ -4,6 +4,7 @@ when@prod:
         options:
             ignore_exceptions:
                 - Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+                - App\Exception\NotFoundException\PageNotFoundException
         tracing:
             enabled: false
         register_error_listener: false
