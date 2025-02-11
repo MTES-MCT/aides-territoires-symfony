@@ -2,10 +2,9 @@
 
 namespace App\Controller\User;
 
-use App\Entity\User\User;
 use App\Entity\User\FavoriteAid;
+use App\Entity\User\User;
 use App\Repository\Aid\AidRepository;
-use App\Repository\Log\LogAidSearchRepository;
 use App\Repository\Log\LogAidSearchTempRepository;
 use App\Service\Log\LogService;
 use Doctrine\ORM\EntityManagerInterface;
@@ -13,7 +12,6 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\UX\Turbo\TurboBundle;
 
 class FavoriteAidController extends AbstractController
 {
@@ -23,7 +21,7 @@ class FavoriteAidController extends AbstractController
         Request $request,
         AidRepository $aidRepository,
         LogAidSearchTempRepository $logAidSearchTempRepository,
-        EntityManagerInterface $entityManager
+        EntityManagerInterface $entityManager,
     ): Response {
         $this->denyAccessUnlessGranted('ROLE_USER');
 
@@ -33,11 +31,11 @@ class FavoriteAidController extends AbstractController
             throw $this->createNotFoundException('Aide non trouvée');
         }
 
-        /** @var User $user */
+        /** @var User $user */
         $user = $this->getUser();
         $favoriteAid = $entityManager->getRepository(FavoriteAid::class)->findOneBy([
             'user' => $user,
-            'aid' => $aid
+            'aid' => $aid,
         ]);
 
         if ($favoriteAid) {
@@ -51,7 +49,10 @@ class FavoriteAidController extends AbstractController
             // on regarde si on a self::LAST_LOG_AID_SEARCH_ID en session
             $loadLogAidSearchId = $request->getSession()->get(LogService::LAST_LOG_AID_SEARCH_ID, null);
             if ($loadLogAidSearchId) {
-                $favoriteAid->setLogAidSearchTemp($logAidSearchTempRepository->find($loadLogAidSearchId));
+                $logAidSearchTemp = $logAidSearchTempRepository->find($loadLogAidSearchId);
+                if ($logAidSearchTemp) {
+                    $favoriteAid->setLogAidSearchTemp($logAidSearchTemp);
+                }
             }
             $entityManager->persist($favoriteAid);
             $isFavorite = true;
@@ -60,14 +61,14 @@ class FavoriteAidController extends AbstractController
         $entityManager->flush();
 
         // Déterminer quel template utiliser
-        $template = $request->query->get('display', 'default') === 'icon'
+        $template = 'icon' === $request->query->get('display', 'default')
             ? 'aid/aid/_favorite_button_icon.html.twig'
             : 'aid/aid/_favorite_button.html.twig';
 
         // Création du contenu du bouton
         $buttonHtml = $this->renderView($template, [
             'aid' => $aid,
-            'isFavorite' => $isFavorite
+            'isFavorite' => $isFavorite,
         ]);
 
         // Retourne une réponse Turbo Stream
