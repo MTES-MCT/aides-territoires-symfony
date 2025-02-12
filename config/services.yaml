@@ -82,6 +82,11 @@ services:
         tags:
             - { name: 'kernel.event_listener', event: 'scheb_two_factor.authentication.success', method: 'onTwoFactorAuthenticationSuccess' }
 
+    App\EventListener\SubDomainListener:
+        tags:
+            # Priority 33 so it runs before routing
+            - {name: kernel.event_listener, event: kernel.request, priority: 33}
+
     App\EventListener\RouteListener:
         tags:
             - {name: kernel.event_listener, event: kernel.exception}
