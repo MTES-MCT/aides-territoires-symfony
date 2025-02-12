@@ -2226,4 +2226,26 @@ class AidRepository extends ServiceEntityRepository
             ->setHint(\Doctrine\ORM\Query::HINT_REFRESH, true)
             ->getResult();
     }
+
+    /**
+     * Charge une liste d'aides avec les datas pour Vapp à partir d'un tableau d'ids
+     *
+     * @param array $ids
+     * @return array<int, Aid>
+     */
+    public function findVappAidsByIds(array $ids): array
+    {
+        $qb = $this->createQueryBuilder('a')
+        ->select('a.id, a.name, a.description')
+        ->where('a.id IN (:ids)')
+        ->orderBy(sprintf('FIELD(a.id, %s)', implode(',', $ids)))
+        ->setParameter('ids', $ids)
+        ;
+
+        // Forcer le chargement complet
+        return $qb
+            ->getQuery()
+            ->setHint(\Doctrine\ORM\Query::HINT_REFRESH, true)
+            ->getResult();
+    }
 }

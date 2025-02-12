@@ -21,6 +21,7 @@ use App\Repository\Project\ProjectRepository;
 use App\Service\Aid\AidSearchClass;
 use App\Service\Aid\AidSearchFormService;
 use App\Service\Aid\AidService;
+use App\Service\Api\VappApiService;
 use App\Service\Blog\BlogPromotionPostService;
 use App\Service\Email\EmailService;
 use App\Service\Export\SpreadsheetExporterService;
@@ -68,7 +69,8 @@ class AidController extends FrontController
         AidService $aidService,
         LogService $logService,
         ReferenceService $referenceService,
-        BlogPromotionPostService $blogPromotionPostService
+        BlogPromotionPostService $blogPromotionPostService,
+        VappApiService $vappApiService
     ): Response {
         $timeStart = microtime(true);
 
@@ -110,6 +112,46 @@ class AidController extends FrontController
         // le paginateur
         $timeAidStart = microtime(true);
         $aids = $aidService->searchAidsV3($aidParams);
+
+        $scoreComp = [];
+        foreach ($aids as $aid) {
+            $scoreComp[$aid->getId()] = [
+                'id' => $aid->getid(),
+                'score_total' => $aid->getScoreTotal(),
+            ];
+        }
+        
+        //************************************* */
+        // on fait un nouveau tableau des aides par paquet de 20 pour envoyer à Vapp en plusieur fois
+        $aidsChunks = array_chunk($aids, 20);
+
+        $vappApiService->createProject(
+            description: $aidSearchClass->getVappDescription(),
+            porteur: $aidSearchClass->getOrganizationTypeSlug(),
+            zonesGeographiques: [
+                [
+                    'type' => Perimeter::SCALES_FOR_SEARCH[$aidSearchClass->getPerimeterId()->getScale()]['name'],
+                    'code' => $aidSearchClass->getPerimeterId()->getZipCodes()[0] ?? ''
+                ]
+            ]
+        );
+
+        foreach ($aidsChunks as $aidsChunk) {
+            $aidsToScore = $aidService->hydrateLightAidsForVapp(
+                lightAids: $aidsChunk,
+            );
+            // dd($aidsToScore);
+            $vappScores = $vappApiService->scoreAids($aidsToScore);
+
+            foreach ($vappScores as $vappScore) {
+                $scoreComp[$vappScore['id']]['score_vapp'] = $vappScore['scoreCompatibilite'];
+            }
+            dd($scoreComp);
+        }
+
+
+        //************************************* */
+        
         $timeAidEnd = microtime(true);
         $executionTimeAid = $timeAidEnd - $timeAidStart;
         try {

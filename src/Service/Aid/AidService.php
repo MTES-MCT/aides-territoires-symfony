@@ -24,6 +24,7 @@ use App\Service\Various\StringService;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Persistence\ManagerRegistry;
+use League\HTMLToMarkdown\HtmlConverter;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -1059,6 +1060,40 @@ class AidService // NOSONAR too complex
                     }
                 }
             }
+        }
+
+        return $aids;
+    }
+
+    /**
+     * Recupère les données des aides pour Vapp à partir des ids et du score total.
+     *
+     * @param array<int, mixed> $lightAids
+     * @param array<string, mixed> $aidParams
+     * @return array<int, Aid>
+     */
+    public function hydrateLightAidsForVapp(array $lightAids): array
+    {
+        if (empty($lightAids)) {
+            return [];
+        }
+        // faits les tableaux d'ids et de scores
+        $ids = array_map(fn ($aid) => $aid->getId(), $lightAids);
+        $scoreTotalById = array_combine(
+            array_map(fn ($aid) => $aid->getId(), $lightAids),
+            array_map(fn ($aid) => $aid->getScoreTotal(), $lightAids)
+        );
+
+        /** @var AidRepository $aidRepository */
+        $aidRepository = $this->managerRegistry->getRepository(Aid::class);
+
+        // récupère les aides
+        $aids = $aidRepository->findVappAidsByIds($ids);
+        $converter = new HtmlConverter();
+        foreach ($aids as $key => $aid) {
+            // on remet les scores
+            $aids[$key]['scoreTotal'] = $scoreTotalById[$aid['id']];
+            $aids[$key]['description'] = $converter->convert($aid['description']);
         }
 
         return $aids;
