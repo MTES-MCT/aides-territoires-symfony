@@ -8,7 +8,6 @@ use App\Entity\Page\Page;
 use App\Entity\Site\UrlRedirect;
 use App\Entity\User\User;
 use App\Repository\Page\PageRepository;
-use App\Repository\Search\SearchPageRepository;
 use App\Service\Notification\NotificationService;
 use App\Service\Various\ParamService;
 use Doctrine\ORM\EntityManagerInterface;
@@ -24,7 +23,6 @@ final class RouteListener
     public function __construct(
         private EntityManagerInterface $entityManagerInterface,
         private PageRepository $pageRepository,
-        private SearchPageRepository $searchPageRepository,
         private RouterInterface $routerInterface,
         private ParamService $paramService,
         private Packages $packages,
