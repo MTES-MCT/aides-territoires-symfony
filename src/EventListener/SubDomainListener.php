@@ -10,7 +10,6 @@ use App\Service\Notification\NotificationService;
 use App\Service\Various\ParamService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
@@ -26,8 +25,9 @@ final class SubDomainListener
     ) {
     }
 
-    public function onKernelException(ExceptionEvent $event): void
-    {
+    public function onKernelRequest(
+        RequestEvent $event,
+    ): void {
         // Si ce n'est pas la requête principale, ne fait rien
         if (!$event->isMainRequest()) {
             return;
@@ -118,7 +118,7 @@ final class SubDomainListener
                     $this->notificationService->addNotification(
                         $admin,
                         'Erreur redirection portail',
-                        'Portail : ' . $searchPage->getName()
+                        'Portail : '.$searchPage->getName()
                     );
                 }
             } else {
