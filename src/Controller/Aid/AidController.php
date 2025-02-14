@@ -9,6 +9,7 @@ use App\Entity\Aid\AidSuggestedAidProject;
 use App\Entity\Alert\Alert;
 use App\Entity\Perimeter\Perimeter;
 use App\Entity\Project\Project;
+use App\Entity\Reference\ProjectReference;
 use App\Entity\User\User;
 use App\Exception\NotFoundException\AidNotFoundException;
 use App\Form\Aid\AidSearchTypeV2;
@@ -18,6 +19,7 @@ use App\Form\Project\AddAidToProjectType;
 use App\Repository\Aid\AidRepository;
 use App\Repository\Blog\BlogPromotionPostRepository;
 use App\Repository\Project\ProjectRepository;
+use App\Repository\Reference\ProjectReferenceRepository;
 use App\Service\Aid\AidSearchClass;
 use App\Service\Aid\AidSearchFormService;
 use App\Service\Aid\AidService;
@@ -76,6 +78,9 @@ class AidController extends FrontController
     ): Response {
         $timeStart = microtime(true);
 
+        // la session
+        $session = $requestStack->getCurrentRequest()->getSession();
+        
         // est ce que l'ab test vapp est activé
         $isVappFormulaire = $abTestService->shouldShowTestVersion(AbTestService::VAPP_FORMULAIRE);
 
@@ -113,6 +118,10 @@ class AidController extends FrontController
         ];
 
         $aidParams = array_merge($aidParams, $aidSearchFormService->convertAidSearchClassToAidParams($aidSearchClass));
+        if (isset($aidParams['projectReference']) && $aidParams['projectReference'] instanceof ProjectReference) {
+            $session->set('aidParamsPrId', $aidParams['projectReference']->getId());
+        }
+        
         $query = parse_url($requestStack->getCurrentRequest()->getRequestUri(), PHP_URL_QUERY) ?? null;
 
         // le paginateur
@@ -123,7 +132,6 @@ class AidController extends FrontController
         // TEST VAPP
         if ($isVappFormulaire) {
             // réinitialise la page courange
-            $session = $requestStack->getCurrentRequest()->getSession();
             $session->set(VappApiService::SESSION_CURRENT_PAGE_SCORE_VAPP, 0);
 
             $vappAidsById = [];
@@ -147,7 +155,8 @@ class AidController extends FrontController
                         // 'code' => (int) $aidSearchClass->getPerimeterId()->getZipCodes()[0] ?? ''
                         'code' => 69266,
                     ],
-                ]
+                ],
+                force: true
             );
         }
         // ************************************* */
@@ -324,6 +333,7 @@ class AidController extends FrontController
         RequestStack $requestStack,
         VappApiService $vappApiService,
         AidService $aidService,
+        ProjectReferenceRepository $projectReferenceRepository,
     ) {
         $session = $requestStack->getCurrentRequest()->getSession();
 
@@ -394,6 +404,7 @@ class AidController extends FrontController
         AidRepository $aidRepository,
         AidService $aidService,
         UserService $userService,
+        ProjectReferenceRepository $projectReferenceRepository,
     ) {
         try {
             // verifie id aide
@@ -414,6 +425,20 @@ class AidController extends FrontController
             $user = $userService->getUserLogged();
             if (!$aidService->userCanSee($aid, $user)) {
                 throw new \Exception('Aide non trouvée');
+            }
+
+            // essaye de recuperer les aidParams si disponibles
+            $session = $requestStack->getCurrentRequest()->getSession();
+            $aidParamsPrId = $session->get('aidParamsPrId', null);
+            if ($aidParamsPrId) {
+                $projectRefence = $projectReferenceRepository->find($aidParamsPrId);
+                if ($projectRefence instanceof ProjectReference) {
+                    foreach ($aid->getProjectReferences() as $projectReferenceAid) {
+                        if ($projectReferenceAid->getId() == $projectRefence->getId()) {
+                            $aid->addProjectReferenceSearched($projectRefence);
+                        }
+                    }
+                }
             }
 
             // rendu template

@@ -42,9 +42,10 @@ class VappApiService
         string $description,
         string $porteur,
         array $zonesGeographiques,
+        bool $force = false
     ): string {
         $session = $this->requestStack->getCurrentRequest()->getSession();
-        $uuid = $this->getProjectUuidInSession();
+        $uuid = $force ? '' : $this->getProjectUuidInSession();
         if (!$uuid || '' == trim($uuid)) {
             $uuid = $this->createProject(
                 description: $description,
