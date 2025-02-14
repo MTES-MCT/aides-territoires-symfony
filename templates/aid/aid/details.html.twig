@@ -52,6 +52,24 @@
 		<section class="aid-content fr-grid-row fr-mt-5w">
 			<div class="sidebar fr-col-12 fr-col-md-4 fr-p-3w fr-background-alt fr-mb-3w fr-mb-md-0">
 
+				{% set scoreVappInSession = getVappAidScoresInSession(aid) %}
+				{% set scoreVapp = scoreVappInSession.score_vapp ?? null %}
+
+				{% if scoreVapp is defined and scoreVapp is not null %}
+					<div class="fr-mb-4w fr-grid-row">
+						<div class="fr-col-1">
+							<span class="fr-icon-star-fill ri-xl" aria-hidden="true"></span>
+						</div>
+						<div class="fr-col-11">
+							<h2 class="fr-text--md fr-text--normal fr-mb-0 fr-ml-1w">
+								<strong>Compatibilité estimée :</strong>
+							</h2>
+							<p class="fr-mb-0 fr-ml-1w">{{ vappScoreToText(scoreVapp) }}</p>
+						</div>
+					</div>
+
+				{% endif %}
+
 				{% if aid.isCharged %}
 					<div class="fr-mb-4w fr-grid-row">
 						<div class="fr-col-1">

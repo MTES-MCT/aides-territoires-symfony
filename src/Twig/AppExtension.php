@@ -27,6 +27,7 @@ use App\Repository\Organization\OrganizationTypeRepository;
 use App\Repository\Program\ProgramRepository;
 use App\Repository\Reference\ProjectReferenceRepository;
 use App\Service\Aid\AidService;
+use App\Service\Api\VappApiService;
 use App\Service\Category\CategoryService;
 use App\Service\Category\CategoryTheme;
 use App\Service\Matomo\MatomoService;
@@ -58,6 +59,7 @@ class AppExtension extends AbstractExtension // NOSONAR too much methods
         private KeywordReferenceService $keywordReferenceService,
         private AidService $aidService,
         private AbTestService $abTestService,
+        private VappApiService $vappApiService,
     ) {
     }
 
@@ -181,6 +183,7 @@ class AppExtension extends AbstractExtension // NOSONAR too much methods
             new TwigFunction('isAidInUserFavorites', [$this, 'isAidInUserFavorites']),
             new TwigFunction('shouldShowTestVersion', [$this, 'shouldShowTestVersion']),
             new TwigFunction('vappScoreToText', [$this, 'vappScoreToText']),
+            new TwigFunction('getVappAidScoresInSession', [$this, 'getVappAidScoresInSession']),
         ];
     }
 
@@ -561,5 +564,10 @@ class AppExtension extends AbstractExtension // NOSONAR too much methods
         }
         
         return $text;
+    }
+
+    public function getVappAidScoresInSession(Aid $aid): array
+    {
+        return $this->vappApiService->getAidScoresInSession($aid);
     }
 }

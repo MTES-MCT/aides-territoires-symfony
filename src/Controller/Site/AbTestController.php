@@ -9,6 +9,7 @@ use App\Exception\BusinessException\Site\AbTestException;
 use App\Exception\BusinessException\Site\AbTestVoteException;
 use App\Repository\Aid\AidRepository;
 use App\Repository\Site\AbTestRepository;
+use App\Repository\Site\AbTestUserRepository;
 use App\Repository\Site\AbTestVoteRepository;
 use App\Security\Voter\InternalRequestVoter;
 use App\Service\Api\VappApiService;
@@ -27,6 +28,7 @@ class AbTestController extends FrontController
         RequestStack $requestStack,
         AbTestRepository $abTestRepository,
         AbTestVoteRepository $abTestVoteRepository,
+        AbTestUserRepository $abTestUserRepository,
         AidRepository $aidRepository,
         ManagerRegistry $managerRegistry,
         AbTestService $abTestService,
@@ -61,6 +63,17 @@ class AbTestController extends FrontController
                 throw new AbTestVoteException('Aid not found');
             }
 
+            // on charge utilisateur du test
+            $abTestUser = null;
+            $cookieName = 'abtest_' . $abTest->getName() . '_userId';
+            $cookieId = $requestStack->getCurrentRequest()->cookies->get($cookieName, null);
+            if ($cookieId) {
+                $abTestUser = $abTestUserRepository->findOneBy([
+                    'abTest' => $abTest,
+                    'cookieId' => $cookieId,
+                ]);
+            }
+
             // vérification si vote déjà effectué sur cette aide
             $abTestVote = $abTestVoteRepository->findOneBy([
                 'abTest' => $abTest,
@@ -78,6 +91,9 @@ class AbTestController extends FrontController
                         ? 'vapp'
                         : 'at'
                 );
+                if ($abTestUser) {
+                    $abTestVote->setAbTestUser($abTestUser);
+                }
             }
 
             $scores = $vappApiService->getAidScoresInSession($aid);
