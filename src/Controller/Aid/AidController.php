@@ -96,6 +96,7 @@ class AidController extends FrontController
         $formAidSearchParams = [
             'method' => 'GET',
             'extended' => true,
+            'isPageAid' => true
         ];
 
         // formulaire recherche aides
@@ -314,7 +315,7 @@ class AidController extends FrontController
             'memoryUsage' => round(memory_get_peak_usage() / 1024 / 1024),
             'executionTimeAid' => round($executionTimeAid * 1000),
             'pageResults' => $pageResults,
-            'isVappFormulaire' => $isVappFormulaire
+            'isVappFormulaire' => $isVappFormulaire,
         ]);
     }
 

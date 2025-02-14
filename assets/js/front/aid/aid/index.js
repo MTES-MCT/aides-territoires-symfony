@@ -175,6 +175,9 @@ function renderAidCard(aidId, scoreVapp)
             if (!inserted) {
                 $wrapper.append($newCard);
             }
+
+            // effet de highlight
+            $newCard.find('.fr-card').addClass('card-highlight');
         }
     })
 }

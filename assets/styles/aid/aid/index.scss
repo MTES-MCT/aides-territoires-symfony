@@ -19,3 +19,16 @@
 .badges-wrapper{
     padding: 0 0 1rem 0;
 }
+
+@keyframes highlightCard {
+    0% {
+        background-color: rgba(0, 145, 255, 0.2);
+    }
+    100% {
+        background-color: transparent;
+    }
+}
+
+.card-highlight {
+    animation: highlightCard 2s ease-out;
+}

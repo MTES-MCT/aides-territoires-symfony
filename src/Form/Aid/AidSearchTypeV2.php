@@ -49,9 +49,12 @@ class AidSearchTypeV2 extends AbstractType
     {
         // ab test vapp_activation
         $abTestVappFormulaire = false;
-        $abTestVappActivation = $this->abTestService->shouldShowTestVersion(AbTestService::VAPP_ACTIVATION);
-        if ($abTestVappActivation) {
-            $abTestVappFormulaire = $this->abTestService->shouldShowTestVersion(AbTestService::VAPP_FORMULAIRE);
+        $abTestVappActivation = false;
+        if ($options['isPageAid'] || $options['isPageHome']) {
+            $abTestVappActivation = $this->abTestService->shouldShowTestVersion(AbTestService::VAPP_ACTIVATION);
+            if ($abTestVappActivation) {
+                $abTestVappFormulaire = $this->abTestService->shouldShowTestVersion(AbTestService::VAPP_FORMULAIRE);
+            }
         }
 
         // les catégories
@@ -323,7 +326,7 @@ class AidSearchTypeV2 extends AbstractType
             }
         }
 
-        if ($abTestVappFormulaire) {
+        if ($abTestVappFormulaire && ($options['isPageAid'] || $options['isPageHome'])) {
             $builder->add('vapp_description', TextareaType::class, [
                 'label' => 'Description de votre projet',
                 'required' => true,
@@ -345,6 +348,8 @@ class AidSearchTypeV2 extends AbstractType
             'extended' => false,
             'removes' => [],
             'searchPage' => null,
+            'isPageAid' => false,
+            'isPageHome' => false,
         ]);
     }
 

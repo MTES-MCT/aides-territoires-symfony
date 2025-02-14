@@ -45,6 +45,10 @@ class AbTestVote
     #[Gedmo\Timestampable(on: 'create')]
     private ?\DateTimeInterface $dateCreate = null;
 
+    #[ORM\ManyToOne(inversedBy: 'abTestVotes')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?AbTestUser $abTestUser = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -130,6 +134,18 @@ class AbTestVote
     public function setData(?string $data): static
     {
         $this->data = $data;
+
+        return $this;
+    }
+
+    public function getAbTestUser(): ?AbTestUser
+    {
+        return $this->abTestUser;
+    }
+
+    public function setAbTestUser(?AbTestUser $abTestUser): static
+    {
+        $this->abTestUser = $abTestUser;
 
         return $this;
     }

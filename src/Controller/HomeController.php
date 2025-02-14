@@ -43,6 +43,7 @@ class HomeController extends FrontController
             [
                 'action' => $this->generateUrl('app_aid_aid'),
                 'method' => 'GET',
+                'isPageHome' => true,
             ]
         );
 

@@ -5,6 +5,8 @@ namespace App\Entity\Site;
 use App\Entity\User\User;
 use App\Repository\Site\AbTestUserRepository;
 use App\Service\Doctrine\DoctrineConstants;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
@@ -33,6 +35,20 @@ class AbTestUser
     #[ORM\Column(type: Types::DATE_MUTABLE)]
     #[Gedmo\Timestampable(on: 'create')]
     private ?\DateTimeInterface $dateCreate = null;
+
+    #[ORM\Column(length: 255)]
+    private ?string $cookieId = null;
+
+    /**
+     * @var Collection<int, AbTestVote>
+     */
+    #[ORM\OneToMany(mappedBy: 'abTestUser', targetEntity: AbTestVote::class, orphanRemoval: true)]
+    private Collection $abTestVotes;
+
+    public function __construct()
+    {
+        $this->abTestVotes = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -83,6 +99,48 @@ class AbTestUser
     public function setVariation(string $variation): static
     {
         $this->variation = $variation;
+
+        return $this;
+    }
+
+    public function getCookieId(): ?string
+    {
+        return $this->cookieId;
+    }
+
+    public function setCookieId(string $cookieId): static
+    {
+        $this->cookieId = $cookieId;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, AbTestVote>
+     */
+    public function getAbTestVotes(): Collection
+    {
+        return $this->abTestVotes;
+    }
+
+    public function addAbTestVote(AbTestVote $abTestVote): static
+    {
+        if (!$this->abTestVotes->contains($abTestVote)) {
+            $this->abTestVotes->add($abTestVote);
+            $abTestVote->setAbTestUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeAbTestVote(AbTestVote $abTestVote): static
+    {
+        if ($this->abTestVotes->removeElement($abTestVote)) {
+            // set the owning side to null (unless already changed)
+            if ($abTestVote->getAbTestUser() === $this) {
+                $abTestVote->setAbTestUser(null);
+            }
+        }
 
         return $this;
     }
