@@ -331,7 +331,8 @@ class AidSearchTypeV2 extends AbstractType
                 'label' => 'Description de votre projet',
                 'required' => true,
                 'attr' => [
-                    'placeholder' => 'Exemple: Assistance à maitrise d’ouvrage pour l’Installation de panneaux photovoltaiques sur le toit de l’école municipale.',
+                    'placeholder' => 'Exemple: Assistance à maitrise d’ouvrage pour l’Installation de panneaux '
+                        . 'photovoltaiques sur le toit de l’école municipale.',
                 ],
             ]);
         }

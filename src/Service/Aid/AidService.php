@@ -1082,12 +1082,12 @@ class AidService // NOSONAR too complex
         }
         // faits les tableaux d'ids et de scores
         $ids = array_map(fn ($aid) => $aid['id'], $lightAids);
-        // $scoreTotalById = array_combine(
-        //     array_map(fn ($aid) => $aid['id'], $lightAids),
-        //     array_map(fn ($aid) => $aid['score_total'], $lightAids)
-        // );
 
-        $scoreTotalById = $this->requestStack->getCurrentRequest()->getSession()->get(VappApiService::SESSION_AIDS_SCORES, []);
+        // recupere les scores en session
+        $scoreTotalById = $this->requestStack->getCurrentRequest()->getSession()->get(
+            VappApiService::SESSION_AIDS_SCORES,
+            []
+        );
 
         /** @var AidRepository $aidRepository */
         $aidRepository = $this->managerRegistry->getRepository(Aid::class);
@@ -1118,7 +1118,6 @@ class AidService // NOSONAR too complex
      * Recupère les données des aides pour Vapp à partir des ids et du score total.
      *
      * @param array<int, mixed> $lightAids
-     * @param array<string, mixed> $aidParams
      * @return array<int, Aid>
      */
     public function hydrateLightAidsForVapp(array $lightAids): array

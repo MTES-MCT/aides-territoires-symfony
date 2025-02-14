@@ -2,18 +2,17 @@
 
 namespace App\Controller\User;
 
-use App\Entity\User\User;
 use App\Entity\User\FavoriteAid;
+use App\Entity\User\User;
 use App\Repository\Aid\AidRepository;
-use App\Repository\Log\LogAidSearchRepository;
 use App\Repository\Log\LogAidSearchTempRepository;
 use App\Service\Log\LogService;
+use App\Service\User\UserService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\UX\Turbo\TurboBundle;
 
 class FavoriteAidController extends AbstractController
 {
@@ -23,7 +22,8 @@ class FavoriteAidController extends AbstractController
         Request $request,
         AidRepository $aidRepository,
         LogAidSearchTempRepository $logAidSearchTempRepository,
-        EntityManagerInterface $entityManager
+        EntityManagerInterface $entityManager,
+        UserService $userService
     ): Response {
         $this->denyAccessUnlessGranted('ROLE_USER');
 
@@ -33,8 +33,8 @@ class FavoriteAidController extends AbstractController
             throw $this->createNotFoundException('Aide non trouvée');
         }
 
-        /** @var User $user */
-        $user = $this->getUser();
+        /** @var User $user */
+        $user = $userService->getUserLogged();
         $favoriteAid = $entityManager->getRepository(FavoriteAid::class)->findOneBy([
             'user' => $user,
             'aid' => $aid

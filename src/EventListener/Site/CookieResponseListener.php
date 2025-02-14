@@ -10,8 +10,7 @@ class CookieResponseListener
 {
     public function __construct(
         private RequestStack $requestStack
-    )
-    {
+    ) {
     }
 
     public function onKernelResponse(ResponseEvent $event): void

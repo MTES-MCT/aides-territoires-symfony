@@ -38,6 +38,13 @@ class VappApiService
         ]);
     }
 
+    /**
+     * @param string $description
+     * @param string $porteur
+     * @param array<string, mixed> $zonesGeographiques
+     * @param boolean $force
+     * @return string
+     */
     public function getProjectUuid(
         string $description,
         string $porteur,
@@ -66,6 +73,12 @@ class VappApiService
         return $session->get(self::SESSION_PROJECT_UUID, '');
     }
 
+    /**
+     * @param string $description
+     * @param string $porteur
+     * @param array<string, mixed> $zonesGeographiques
+     * @return string
+     */
     private function createProject(
         string $description,
         string $porteur,
@@ -96,9 +109,13 @@ class VappApiService
         }
     }
 
+    /**
+     * @param array<int, mixed> $aids
+     * @return array<string, mixed>
+     */
     public function scoreAids(array $aids): array
     {
-        $folder = 'projets/'.$this->getProjectUuidInSession().'/aides/scoring';
+        $folder = 'projets/' . $this->getProjectUuidInSession() . '/aides/scoring';
         $method = 'POST';
         $datas = [
             'data' => [],

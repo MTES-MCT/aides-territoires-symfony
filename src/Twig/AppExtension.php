@@ -294,7 +294,7 @@ class AppExtension extends AbstractExtension // NOSONAR too much methods
             // Vérifie si le href est une adresse e-mail
             if (preg_match('/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/', $href)) {
                 // Ajoute mailto: au début du href
-                $node->setAttribute('href', 'mailto:'.$href);
+                $node->setAttribute('href', 'mailto:' . $href);
             }
         }
 
@@ -336,7 +336,7 @@ class AppExtension extends AbstractExtension // NOSONAR too much methods
             // Ajouter les nouvelles classes
             $classesToAdd = implode(' ', $classesToAdd);
             if ('' !== $currentClass) {
-                $newClass = $currentClass.' '.$classesToAdd;
+                $newClass = $currentClass . ' ' . $classesToAdd;
             } else {
                 $newClass = $classesToAdd;
             }
@@ -548,11 +548,11 @@ class AppExtension extends AbstractExtension // NOSONAR too much methods
     {
         return $this->abTestService->shouldShowTestVersion($abTestName);
     }
-    
+
     public function vappScoreToText(float $vappScore): string
     {
         $text = 'Très faible ☹️';
-    
+
         if ($vappScore > 85) {
             $text = 'Très élevé 😃';
         } elseif ($vappScore > 70) {
@@ -562,10 +562,14 @@ class AppExtension extends AbstractExtension // NOSONAR too much methods
         } elseif ($vappScore > 30) {
             $text = 'Faible 😕';
         }
-        
+
         return $text;
     }
 
+    /**
+     * @param Aid $aid
+     * @return array<string, mixed>
+     */
     public function getVappAidScoresInSession(Aid $aid): array
     {
         return $this->vappApiService->getAidScoresInSession($aid);

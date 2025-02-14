@@ -70,7 +70,7 @@ class SourceController extends AbstractController
             'dateMin' => $dateMin,
             'dateMax' => $dateMax,
         ]);
-        
+
 
         return $this->render('admin/statistics/source/index.html.twig', [
             'formDateRange' => $formDateRange,

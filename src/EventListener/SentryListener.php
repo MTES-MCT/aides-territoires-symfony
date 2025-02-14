@@ -35,7 +35,5 @@ class SentryListener
             $scope->setTag('user_ip', $request->getClientIp());
             $scope->setExtra('referer', $request->headers->get('referer'));
         });
-
-
     }
 }

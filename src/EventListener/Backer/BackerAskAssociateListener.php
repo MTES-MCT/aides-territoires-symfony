@@ -49,16 +49,16 @@ class BackerAskAssociateListener
                             $this->notificationService->addNotification(
                                 $beneficiairy,
                                 'Association de la structure '
-                                    .$entity->getOrganization()->getName()
-                                    .' avec le porteur d\'aides '
-                                    .$entity->getBacker()->getName(),
+                                    . $entity->getOrganization()->getName()
+                                    . ' avec le porteur d\'aides '
+                                    . $entity->getBacker()->getName(),
                                 'La fiche du porteur d\'aides '
-                                    .$entity->getBacker()->getName()
-                                    .' a été associée avec la structure '
-                                    .$entity->getOrganization()->getName()
-                                    .'. Vous pouvez la consulter en cliquant sur <a href="'
-                                    .$backerUrl
-                                    .'" title="Voir la fiche du porteur d\'aides">ce lien</a>.',
+                                    . $entity->getBacker()->getName()
+                                    . ' a été associée avec la structure '
+                                    . $entity->getOrganization()->getName()
+                                    . '. Vous pouvez la consulter en cliquant sur <a href="'
+                                    . $backerUrl
+                                    . '" title="Voir la fiche du porteur d\'aides">ce lien</a>.',
                             );
                         }
                     }
@@ -73,9 +73,9 @@ class BackerAskAssociateListener
                         $this->notificationService->addNotification(
                             $beneficiairy,
                             'Refus de l\'association de la structure '
-                                .$entity->getOrganization()->getName()
-                                .' avec le porteur d\'aides '
-                                .$entity->getBacker()->getName(),
+                                . $entity->getOrganization()->getName()
+                                . ' avec le porteur d\'aides '
+                                . $entity->getBacker()->getName(),
                             $messageRefus
                         );
                     }

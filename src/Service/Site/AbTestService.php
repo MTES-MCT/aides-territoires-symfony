@@ -33,7 +33,7 @@ class AbTestService
             }
 
             // Vérifie d'abord si un cookie existe
-            $cookieName = 'abtest_'.$abTestName;
+            $cookieName = 'abtest_' . $abTestName;
             if ($this->requestStack->getCurrentRequest()->cookies->has($cookieName)) {
                 return 'true' === $this->requestStack->getCurrentRequest()->cookies->get($cookieName);
             }
@@ -47,11 +47,14 @@ class AbTestService
             if ($abTest instanceof AbTest) {
                 // on regarde si on enregistre le user dans la table
                 $abTestUser = null;
-                $userCookieID = $this->requestStack->getCurrentRequest()->cookies->get($cookieName.'_userId', null);
+                $userCookieID = $this->requestStack->getCurrentRequest()->cookies->get($cookieName . '_userId', null);
 
                 // si pas des les cookies on vérifie dans la session
                 if (!$userCookieID) {
-                    $userCookieID = $this->requestStack->getCurrentRequest()->getSession()->get($cookieName.'_userId', null);
+                    $userCookieID = $this->requestStack->getCurrentRequest()->getSession()->get(
+                        $cookieName . '_userId',
+                        null
+                    );
                 }
                 if ($userCookieID) {
                     $abTestUser = $this->managerRegistry->getRepository(AbTestUser::class)->findOneBy([
@@ -62,14 +65,17 @@ class AbTestService
                 if (!$abTestUser) {
                     $abTestUser = new AbTestUser();
                     $abTestUser->setAbTest($abTest);
-                    $abTestUser->setVariation($userInTest ? 1 : 0);
+                    $abTestUser->setVariation($userInTest ? '1' : '0');
                     $abTestUser->setUser($this->userService->getUserLogged());
                     $abTestUser->setCookieId(bin2hex(random_bytes(16)));
 
                     // on stocke l'id dans les cookies
-                    $this->cookieService->setCookie($cookieName.'_userId', $abTestUser->getCookieId());
+                    $this->cookieService->setCookie($cookieName . '_userId', $abTestUser->getCookieId());
                     // on stocke également l'id dans la session pour éviter les doublons
-                    $this->requestStack->getCurrentRequest()->getSession()->set($cookieName.'_userId', $abTestUser->getCookieId());
+                    $this->requestStack->getCurrentRequest()->getSession()->set(
+                        $cookieName . '_userId',
+                        $abTestUser->getCookieId()
+                    );
 
                     // sauvegarde en base
                     $this->managerRegistry->getManager()->persist($abTestUser);

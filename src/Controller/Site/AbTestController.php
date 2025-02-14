@@ -134,7 +134,7 @@ class AbTestController extends FrontController
         AbTestRepository $abTestRepository,
         CookieService $cookieService,
         RequestStack $requestStack
-    ) : Response{
+    ): Response {
         $abTests = [
             AbTestService::VAPP_ACTIVATION,
             AbTestService::VAPP_FORMULAIRE,
@@ -147,7 +147,7 @@ class AbTestController extends FrontController
             }
 
             // Vérifie d'abord si un cookie existe
-            $cookieName = 'abtest_'.$abTestName;
+            $cookieName = 'abtest_' . $abTestName;
 
             // Créer un cookie
             $cookieService->setCookie($cookieName, 'false');

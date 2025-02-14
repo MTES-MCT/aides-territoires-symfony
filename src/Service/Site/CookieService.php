@@ -8,8 +8,7 @@ class CookieService
 {
     public function __construct(
         private RequestStack $requestStack
-    )
-    {
+    ) {
     }
 
 

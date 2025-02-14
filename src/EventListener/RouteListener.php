@@ -75,7 +75,7 @@ final class RouteListener
 
         // 404 static Django
         $this->handleDjangoStatic($event);
-        
+
         // url de redirections
         $this->handleRedirect($event);
 
