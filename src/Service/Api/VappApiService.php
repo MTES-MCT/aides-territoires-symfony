@@ -2,6 +2,7 @@
 
 namespace App\Service\Api;
 
+use App\Entity\Aid\Aid;
 use App\Service\Various\ParamService;
 use GuzzleHttp\Client;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -12,12 +13,13 @@ class VappApiService
     private string $baseUrl;
     private Client $client;
     private const SESSION_PROJECT_UUID = 'vapp_project_uuid';
+    public const SESSION_AIDS_SCORES = 'vapp_aids_scores';
+    public const SESSION_CURRENT_PAGE_SCORE_VAPP = 'currentPageScoreVapp';
 
     public function __construct(
         private ParamService $paramService,
-        private RequestStack $requestStack
-    )
-    {
+        private RequestStack $requestStack,
+    ) {
         $this->baseUrl = $this->paramService->get('vapp_base_url');
         $this->apiKey = $this->paramService->get('vapp_api_key');
         $this->client = $this->createClient();
@@ -36,39 +38,69 @@ class VappApiService
         ]);
     }
 
-    public function createProject(
+    public function getProjectUuid(
         string $description,
         string $porteur,
-        array $zonesGeographiques
-    ): void
+        array $zonesGeographiques,
+    ): string {
+        $session = $this->requestStack->getCurrentRequest()->getSession();
+        $uuid = $this->getProjectUuidInSession();
+        if (!$uuid || '' == trim($uuid)) {
+            $uuid = $this->createProject(
+                description: $description,
+                porteur: $porteur,
+                zonesGeographiques: $zonesGeographiques
+            );
+
+            $session->set(self::SESSION_PROJECT_UUID, $uuid);
+        }
+
+        return $uuid;
+    }
+
+    private function getProjectUuidInSession(): string
     {
+        $session = $this->requestStack->getCurrentRequest()->getSession();
+
+        return $session->get(self::SESSION_PROJECT_UUID, '');
+    }
+
+    private function createProject(
+        string $description,
+        string $porteur,
+        array $zonesGeographiques,
+    ): string {
         try {
             $folder = 'projets';
             $method = 'POST';
+            $uuid = $this->generateUuid();
 
             $datas = [
                 'data' => [
-                    'id' => $this->getProjectUuid(),
+                    'id' => $uuid,
                     'description' => $description,
                     'porteur' => $porteur,
                     'zonesGeographiques' => $zonesGeographiques,
-                    'etatAvancement' => 'IDEE'
-                ]
+                    'etatAvancement' => 'IDEE',
+                ],
             ];
 
             $this->client->request($method, $folder, [
                 'json' => $datas,
             ]);
+
+            return $uuid;
         } catch (\Exception $e) {
+            return '';
         }
     }
 
     public function scoreAids(array $aids): array
     {
-        $folder = 'projets/' . $this->getProjectUuid() . '/aides/scoring';
+        $folder = 'projets/'.$this->getProjectUuidInSession().'/aides/scoring';
         $method = 'POST';
         $datas = [
-            'data' => []
+            'data' => [],
         ];
 
         foreach ($aids as $aid) {
@@ -76,7 +108,7 @@ class VappApiService
                 'id' => (string) $aid['id'],
                 'nom' => (string) $aid['name'],
                 'description' => (string) $aid['description'],
-                'fournisseurDonnees' => 'aides-territoires'
+                'fournisseurDonnees' => 'aides-territoires',
             ];
         }
 
@@ -85,33 +117,42 @@ class VappApiService
         ]);
 
         $datas = json_decode($response->getBody()->getContents(), true);
+
         return $datas['data'] ?? [];
-    }
-
-    private function getProjectUuid(): string
-    {
-        $session = $this->requestStack->getCurrentRequest()->getSession();
-        $uuid = $session->get(self::SESSION_PROJECT_UUID, null);
-        if (!$uuid) {
-            $uuid = $this->generateUuid();
-            $session->set(self::SESSION_PROJECT_UUID, $uuid);
-        }
-
-        return $uuid;
     }
 
     private function generateUuid(): string
     {
         return sprintf(
             '%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
-            mt_rand(0, 0xffff),
-            mt_rand(0, 0xffff),
-            mt_rand(0, 0xffff),
-            mt_rand(0, 0x0fff) | 0x4000,
-            mt_rand(0, 0x3fff) | 0x8000,
-            mt_rand(0, 0xffff),
-            mt_rand(0, 0xffff),
-            mt_rand(0, 0xffff)
+            mt_rand(0, 0xFFFF),
+            mt_rand(0, 0xFFFF),
+            mt_rand(0, 0xFFFF),
+            mt_rand(0, 0x0FFF) | 0x4000,
+            mt_rand(0, 0x3FFF) | 0x8000,
+            mt_rand(0, 0xFFFF),
+            mt_rand(0, 0xFFFF),
+            mt_rand(0, 0xFFFF)
         );
+    }
+
+    /**
+     * @return array<string, int|null>
+     */
+    public function getAidScoresInSession(Aid $aid): array
+    {
+        $session = $this->requestStack->getCurrentRequest()->getSession();
+        $scores = $session->get(self::SESSION_AIDS_SCORES, []);
+        if (!isset($scores[$aid->getId()])) {
+            return [
+                'score_total' => null,
+                'score_vapp' => null,
+            ];
+        } else {
+            return [
+                'score_total' => $scores[$aid->getId()]['score_total'] ?? null,
+                'score_vapp' => $scores[$aid->getId()]['score_vapp'] ?? null,
+            ];
+        }
     }
 }

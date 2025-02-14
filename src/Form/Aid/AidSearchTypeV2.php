@@ -48,6 +48,7 @@ class AidSearchTypeV2 extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         // ab test vapp_activation
+        $abTestVappFormulaire = false;
         $abTestVappActivation = $this->abTestService->shouldShowTestVersion(AbTestService::VAPP_ACTIVATION);
         if ($abTestVappActivation) {
             $abTestVappFormulaire = $this->abTestService->shouldShowTestVersion(AbTestService::VAPP_FORMULAIRE);

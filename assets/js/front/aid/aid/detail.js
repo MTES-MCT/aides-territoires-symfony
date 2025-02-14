@@ -81,5 +81,4 @@ $(function(){
 
     // Make sure all links contained in aid description open in a new tab.
     $('article#aid div.aid-details a').attr('target', '_blank');
-    
-})
+});

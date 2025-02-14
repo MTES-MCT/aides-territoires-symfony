@@ -1,3 +1,4 @@
+import Routing from 'fos-router';
 import '../../log/log-register-from-next-page-warning.js';
 import '../../log/log-promotion-blog-post-click.js';
 import '../../log/log-aid-search.js';
@@ -15,6 +16,8 @@ function escapeHtml(text) {
 }
 
 $(function(){
+    callVapp();
+
     $(document).on({
         click: function (e) {
             var thisElt = $(this);
@@ -111,4 +114,67 @@ function showFormExtended()
     var newBtnText = '<span class="fr-icon-subtract-line" aria-hidden="true"></span> Masquer les critères avancés';
     $('button#search-form-more-options').html(newBtnText);
 
+}
+
+function callVapp()
+{
+    $.ajax({
+        url: Routing.generate('app_aid_ajax_call_vapp'),
+        type: 'POST',
+        data: {
+        },
+        success: function(data) {
+            if (data.status === 'success') {
+                if (typeof data.aidsChunksToScore !== 'undefined') {
+                    Object.entries(data.aidsChunksToScore).forEach(([id, aid]) => {
+                        renderAidCard(id, aid.score_vapp);
+                    });
+
+                    let nbTreated = parseInt($('#vapp-nb-treated').text()) + Object.keys(data.aidsChunksToScore).length;
+                    $('#vapp-nb-treated').text(nbTreated);
+                    callVapp();
+                }
+            } else if (data.status === 'done') {
+                $('.fa-spinner').remove();
+            }
+        },
+        error: function() {
+            $('#new-feature-alert').after('<div class="alert alert-danger" role="alert">Une erreur est survenue lors de l\'analyse.</div>');
+        }
+    })
+}
+
+function renderAidCard(aidId, scoreVapp)
+{
+    $.ajax({
+        url: Routing.generate('app_aid_ajax_render_aid_card'),
+        type: 'POST',
+        data: {
+            aidId: aidId,
+            scoreVapp: scoreVapp
+        },
+        success: function(data) {
+            const $wrapper = $('#aids-as-card');
+            // Enveloppe le HTML de la carte dans un div avec les classes col
+            const $newCard = $('<div class="fr-col-xs-12 fr-col-md-4 fr-p-3w"></div>').html(data.cardHtml);
+            const newScore = parseFloat($newCard.find('.fr-card').data('score-vapp'));
+            
+            
+            // Trouve la position d'insertion
+            let inserted = false;
+            $wrapper.children('.fr-col-xs-12').each(function() {
+                const currentScore = parseFloat($(this).find('.fr-card').data('score-vapp'));
+                if (newScore > currentScore) {
+                    $(this).before($newCard);
+                    inserted = true;
+                    return false; // Sort de la boucle each
+                }
+            });
+            
+            // Si aucune insertion n'a été faite (score le plus bas), ajoute à la fin
+            if (!inserted) {
+                $wrapper.append($newCard);
+            }
+        }
+    })
 }

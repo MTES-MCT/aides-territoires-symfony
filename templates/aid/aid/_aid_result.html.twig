@@ -3,7 +3,7 @@
 	{% set aidUrlParams = aidUrlParams|merge({'integration': 'integration'}) %}
 {% endif %}
 
-<div class="fr-card fr-enlarge-link  fr-card--grey">
+<div class="fr-card fr-enlarge-link  fr-card--grey" data-score-vapp="{{ scoreVapp ?? 0 }}">
 	<div class="favorite-button-wrapper">
         {% include 'aid/aid/_favorite_button_icon.html.twig' with {
             aid: aid,
@@ -146,6 +146,16 @@
 					</h3>
 					<ul class="fr-p-0">
 						<li class="fr-list__none">{{ aid.aidRecurrence.name }}</li>
+					</ul>
+				{% endif %}
+
+				{% if scoreVapp is defined and scoreVapp is not null %}
+					<h3 class="fr-mb-1w fr-mt-3w fr-text--lg at-text--bold at-uppercase">
+						<span class="fr-icon-star-fill ri-xl at-color--blue at-icon-align--sub fr-mr-1w" aria-hidden="true"></span>
+						Compatibilité estimée
+					</h3>
+					<ul class="fr-p-0">
+						{{ vappScoreToText(scoreVapp) }} ({{ scoreVapp }})
 					</ul>
 				{% endif %}
 

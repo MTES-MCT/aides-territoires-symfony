@@ -16,6 +16,7 @@ use App\Entity\Search\SearchPage;
 use App\Entity\User\User;
 use App\Repository\Aid\AidRepository;
 use App\Repository\Reference\KeywordReferenceRepository;
+use App\Service\Api\VappApiService;
 use App\Service\Log\LogAidApplicationUrlClickService;
 use App\Service\Log\LogAidOriginUrlClickService;
 use App\Service\Log\LogAidViewService;
@@ -27,6 +28,7 @@ use Doctrine\Persistence\ManagerRegistry;
 use League\HTMLToMarkdown\HtmlConverter;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -42,7 +44,8 @@ class AidService // NOSONAR too complex
         private RouterInterface $routerInterface,
         private ManagerRegistry $managerRegistry,
         private LoggerInterface $loggerInterface,
-        private TagAwareCacheInterface $cache
+        private TagAwareCacheInterface $cache,
+        private RequestStack $requestStack
     ) {
     }
 
@@ -1065,6 +1068,52 @@ class AidService // NOSONAR too complex
         return $aids;
     }
 
+        /**
+     * Recupère les données des aides à partir des ids et du score total.
+     *
+     * @param array<int, mixed> $lightAids
+     * @param array<string, mixed> $aidParams
+     * @return array<int, Aid>
+     */
+    public function hydrateLightAidsFromVapp(array $lightAids, array $aidParams): array
+    {
+        if (empty($lightAids)) {
+            return [];
+        }
+        // faits les tableaux d'ids et de scores
+        $ids = array_map(fn ($aid) => $aid['id'], $lightAids);
+        // $scoreTotalById = array_combine(
+        //     array_map(fn ($aid) => $aid['id'], $lightAids),
+        //     array_map(fn ($aid) => $aid['score_total'], $lightAids)
+        // );
+
+        $scoreTotalById = $this->requestStack->getCurrentRequest()->getSession()->get(VappApiService::SESSION_AIDS_SCORES, []);
+
+        /** @var AidRepository $aidRepository */
+        $aidRepository = $this->managerRegistry->getRepository(Aid::class);
+
+        // récupère les aides
+        $aids = $aidRepository->findCompleteAidsByIds($ids);
+
+        foreach ($aids as $key => $aid) {
+            // on remet les scores
+            $aids[$key]->setScoreTotal($scoreTotalById[$aid->getId()]['score_total']);
+
+            // on met le score vapp
+            $aids[$key]->setScoreVapp($scoreTotalById[$aid->getId()]['score_vapp']);
+            // on met en highlight les projets référents recherchés
+            if (isset($aidParams['projectReference']) && $aidParams['projectReference'] instanceof ProjectReference) {
+                foreach ($aid->getProjectReferences() as $projectReference) {
+                    if ($projectReference->getId() == $aidParams['projectReference']->getId()) {
+                        $aid->addProjectReferenceSearched($aidParams['projectReference']);
+                    }
+                }
+            }
+        }
+
+        return $aids;
+    }
+
     /**
      * Recupère les données des aides pour Vapp à partir des ids et du score total.
      *
@@ -1078,10 +1127,10 @@ class AidService // NOSONAR too complex
             return [];
         }
         // faits les tableaux d'ids et de scores
-        $ids = array_map(fn ($aid) => $aid->getId(), $lightAids);
+        $ids = array_map(fn ($aid) => $aid['id'], $lightAids);
         $scoreTotalById = array_combine(
-            array_map(fn ($aid) => $aid->getId(), $lightAids),
-            array_map(fn ($aid) => $aid->getScoreTotal(), $lightAids)
+            array_map(fn ($aid) => $aid['id'], $lightAids),
+            array_map(fn ($aid) => $aid['score_total'], $lightAids)
         );
 
         /** @var AidRepository $aidRepository */

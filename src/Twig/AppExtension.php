@@ -180,6 +180,7 @@ class AppExtension extends AbstractExtension // NOSONAR too much methods
             new TwigFunction('orderAidInstructorByBackerName', [$this, 'orderAidInstructorByBackerName']),
             new TwigFunction('isAidInUserFavorites', [$this, 'isAidInUserFavorites']),
             new TwigFunction('shouldShowTestVersion', [$this, 'shouldShowTestVersion']),
+            new TwigFunction('vappScoreToText', [$this, 'vappScoreToText']),
         ];
     }
 
@@ -543,5 +544,22 @@ class AppExtension extends AbstractExtension // NOSONAR too much methods
     public function shouldShowTestVersion(string $abTestName): bool
     {
         return $this->abTestService->shouldShowTestVersion($abTestName);
+    }
+    
+    public function vappScoreToText(float $vappScore): string
+    {
+        $text = 'Très faible ☹️';
+    
+        if ($vappScore > 85) {
+            $text = 'Très élevé 😃';
+        } elseif ($vappScore > 70) {
+            $text = 'Elevé 😃';
+        } elseif ($vappScore > 50) {
+            $text = 'Moyenne 🙂';
+        } elseif ($vappScore > 30) {
+            $text = 'Faible 😕';
+        }
+        
+        return $text;
     }
 }
