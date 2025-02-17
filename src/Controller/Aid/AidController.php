@@ -192,12 +192,20 @@ class AidController extends FrontController
         }
 
         // Log recherche
+        $logAidSearchParams = $logService->getLogAidSearchParams(
+            aidParams: $aidParams,
+            resultsCount: $pagerfanta->getNbResults(),
+        );
+        // ************************************* */
+        // TEST VAPP
+        if ($isVappFormulaire) {
+            $logAidSearchParams['source'] = 'vapp';
+        }
+        // ************************************* */
+
         $logService->log(
             type: LogService::AID_SEARCH,
-            params: $logService->getLogAidSearchParams(
-                aidParams: $aidParams,
-                resultsCount: $pagerfanta->getNbResults(),
-            ),
+            params: $logAidSearchParams
         );
 
         // promotions posts
@@ -564,6 +572,7 @@ class AidController extends FrontController
         ProjectRepository $projectRepository,
         LogService $logService,
         NotificationService $notificationService,
+        AbTestService $abTestService
     ): Response {
         // le user si dispo
         $user = $userService->getUserLogged();
@@ -837,7 +846,7 @@ class AidController extends FrontController
             'aidDetailPage' => true,
             'openModalSuggest' => $openModalSuggest ?? false,
             'highlightedWords' => $requestStack->getCurrentRequest()->getSession()->get('highlightedWords', []),
-            'adminEditUrl' => $adminEditUrl,
+            'adminEditUrl' => $adminEditUrl
         ]);
     }
 }
