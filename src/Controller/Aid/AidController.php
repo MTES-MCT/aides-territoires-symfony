@@ -367,7 +367,7 @@ class AidController extends FrontController
         $nbToScore = 10;
 
         // la page courante
-        $firstCallVapp = trim($requestStack->getCurrentRequest()->get('firstCallVap', true));
+        $firstCallVapp = trim($requestStack->getCurrentRequest()->get('firstCallVap', 'true'));
         $firstCallVapp === 'true' ? $firstCallVapp = true : $firstCallVapp = false;
         $currentPageScoreVapp = $firstCallVapp
             ? 0
