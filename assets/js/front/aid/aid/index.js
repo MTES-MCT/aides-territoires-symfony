@@ -15,6 +15,9 @@ function escapeHtml(text) {
    return text.replace(/[&<>"']/g, function(m) { return map[m]; });
 }
 
+// Déclaration globale avec window
+window.firstCallVapp = true;
+
 $(function(){
     callVapp();
 
@@ -124,7 +127,8 @@ function callVapp()
         url: Routing.generate('app_aid_ajax_call_vapp'),
         type: 'POST',
         data: {
-            _token: csrfToken
+            _token: csrfToken,
+            firstCallVap: window.firstCallVapp
         },
         success: function(data) {
             if (data.status === 'success') {
@@ -135,6 +139,7 @@ function callVapp()
 
                     let nbTreated = parseInt($('#vapp-nb-treated').text()) + Object.keys(data.aidsChunksToScore).length;
                     $('#vapp-nb-treated').text(nbTreated);
+                    window.firstCallVapp = false;
                     callVapp();
                 }
             } else if (data.status === 'done') {

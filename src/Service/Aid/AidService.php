@@ -1084,9 +1084,12 @@ class AidService // NOSONAR too complex
         $ids = array_map(fn ($aid) => $aid['id'], $lightAids);
 
         // recupere les scores en session
-        $scoreTotalById = $this->requestStack->getCurrentRequest()->getSession()->get(
-            VappApiService::SESSION_AIDS_SCORES,
-            []
+        $scoreTotalById = json_decode(
+            $this->requestStack->getCurrentRequest()->getSession()->get(
+                VappApiService::SESSION_AIDS_SCORES,
+                '{}'
+            ),
+            true
         );
 
         /** @var AidRepository $aidRepository */

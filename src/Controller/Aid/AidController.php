@@ -129,22 +129,33 @@ class AidController extends FrontController
         $timeAidStart = microtime(true);
         $aids = $aidService->searchAidsV3($aidParams);
 
+        // gestion si c'est une nouvelle recherche ou non
+        $aidParamsSignature =  hash('xxh128', json_encode($aidParams));
+        $aidParamsSignatureInSession = $session->get('aidParamsSignature', null);
+        $newSearch = $aidParamsSignature != $aidParamsSignatureInSession;
+        $session->set('aidParamsSignature', $aidParamsSignature);
+        
         // ************************************* */
         // TEST VAPP
         if ($isVappFormulaire) {
             // réinitialise la page courange
             $session->set(VappApiService::SESSION_CURRENT_PAGE_SCORE_VAPP, 0);
 
-            $vappAidsById = [];
-            foreach ($aids as $aid) {
-                $vappAidsById[$aid->getId()] = [
-                    'id' => $aid->getId(),
-                    'score_total' => $aid->getScoreTotal(),
-                ];
+            $vappAidsById = $session->get(VappApiService::SESSION_AIDS_SCORES, []);
+            if ($newSearch || empty($vappAidsById)) {
+                $vappAidsById = [];
+                foreach ($aids as $aid) {
+                    $vappAidsById[$aid->getId()] = [
+                        'id' => $aid->getId(),
+                        'score_total' => $aid->getScoreTotal(),
+                    ];
+                }
+
+                // on met $vappAidsById dans la session
+                $requestStack->getCurrentRequest()->getSession()->set(VappApiService::SESSION_AIDS_SCORES, json_encode($vappAidsById));
             }
 
-            // on met $vappAidsById dans la session
-            $requestStack->getCurrentRequest()->getSession()->set(VappApiService::SESSION_AIDS_SCORES, $vappAidsById);
+
 
             // créar un nouveau projet si besoin
             $vappApiService->getProjectUuid(
@@ -350,22 +361,25 @@ class AidController extends FrontController
             throw $this->createAccessDeniedException(InternalRequestVoter::MESSAGE_ERROR);
         }
 
-        $session = $requestStack->getCurrentRequest()->getSession();
+        $session = $requestStack->getSession();
 
         //  le nombre d'aides qu'on va score à chaque appel
         $nbToScore = 10;
 
-        // la page courante depuis la session
-        $currentPageScoreVapp = $session->get(VappApiService::SESSION_CURRENT_PAGE_SCORE_VAPP, 0);
-
-        if (null === $currentPageScoreVapp) {
-            // si non trouvé on le met en session
-            $currentPageScoreVapp = 0;
-        }
+        // la page courante
+        $firstCallVapp = trim($requestStack->getCurrentRequest()->get('firstCallVap', true));
+        $firstCallVapp === 'true' ? $firstCallVapp = true : $firstCallVapp = false;
+        $currentPageScoreVapp = $firstCallVapp
+            ? 0
+            : $session->get(VappApiService::SESSION_CURRENT_PAGE_SCORE_VAPP, 0)
+        ;
 
         // recupère le résultat de la recherche en session
-        $vappAidsById = $session->get(VappApiService::SESSION_AIDS_SCORES, []);
-
+        $vappAidsById = json_decode(
+            $session->get(VappApiService::SESSION_AIDS_SCORES, '{}'),
+            true
+        );
+        
         // on fait un nouveau tableau des aides par paquet pour envoyer à Vapp en plusieur fois
         $aidsChunks = array_chunk($vappAidsById, $nbToScore, true);
 
@@ -375,29 +389,41 @@ class AidController extends FrontController
             return new JsonResponse(['status' => 'done']);
         }
 
-        // recupere les infos pour vapp
-        $aidsToScore = $aidService->hydrateLightAidsForVapp(
-            lightAids: $aidsChunksToScore
+        // on vérifie si on a pas déjà des score vapp dans la session
+        $aidsChunksToScoreToSend = array_filter(
+            $aidsChunksToScore,
+            fn ($aid) => !isset($aid['score_vapp'])
         );
 
-        // on score les aides
-        $vappScores = $vappApiService->scoreAids($aidsToScore);
+        if (!empty($aidsChunksToScoreToSend)) {
+            // recupere les infos pour vapp
+            $aidsToScore = $aidService->hydrateLightAidsForVapp(
+                lightAids: $aidsChunksToScoreToSend
+            );
 
-        // Transformation du tableau
-        $scores = array_combine(
-            array_column($vappScores, 'id'),
-            array_column($vappScores, 'scoreCompatibilite')
-        );
+            // on score les aides
+            $vappScores = $vappApiService->scoreAids($aidsToScore);
 
-        // on met à jour le tableau en session
-        $vappAidsById = $session->get(VappApiService::SESSION_AIDS_SCORES, []);
-        foreach ($scores as $id => $score) {
-            if (isset($vappAidsById[$id])) {
-                $vappAidsById[$id]['score_vapp'] = $score;
+            // Transformation du tableau
+            $scores = array_combine(
+                array_column($vappScores, 'id'),
+                array_column($vappScores, 'scoreCompatibilite')
+            );
+
+            // on rajoute le $scores a $aidsChunksToScore
+            foreach ($aidsChunksToScore as $id => $aid) {
+                $aidsChunksToScore[$id]['score_vapp'] = $scores[$id] ?? 0;
             }
         }
-        $session->set(VappApiService::SESSION_AIDS_SCORES, $vappAidsById);
 
+        // on met à jour le tableau en session
+        foreach ($aidsChunksToScore as $id => $aid) {
+            if (isset($vappAidsById[$id])) {
+                $vappAidsById[$id]['score_vapp'] = $aid['score_vapp'];
+            }
+        }
+        $session->set(VappApiService::SESSION_AIDS_SCORES, json_encode($vappAidsById));
+        
         // on met le numero de page suivante en session
         $session->set(VappApiService::SESSION_CURRENT_PAGE_SCORE_VAPP, $currentPageScoreVapp + 1);
 

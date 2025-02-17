@@ -160,7 +160,7 @@ class VappApiService
     public function getAidScoresInSession(Aid $aid): array
     {
         $session = $this->requestStack->getCurrentRequest()->getSession();
-        $scores = $session->get(self::SESSION_AIDS_SCORES, []);
+        $scores = json_decode($session->get(self::SESSION_AIDS_SCORES, '{}'), true);
         if (!isset($scores[$aid->getId()])) {
             return [
                 'score_total' => null,
