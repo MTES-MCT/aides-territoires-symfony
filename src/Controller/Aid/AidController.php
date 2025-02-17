@@ -155,8 +155,8 @@ class AidController extends FrontController
                         'type' => ucfirst(
                             Perimeter::SCALES_FOR_SEARCH[$aidSearchClass->getPerimeterId()->getScale()]['name']
                         ),
-                        // 'code' => (int) $aidSearchClass->getPerimeterId()->getZipCodes()[0] ?? ''
-                        'code' => 69266,
+                        'code' => (int) $aidSearchClass->getPerimeterId()->getInsee() ?? 69266
+                        // 'code' => 69266,
                     ],
                 ],
                 force: true
