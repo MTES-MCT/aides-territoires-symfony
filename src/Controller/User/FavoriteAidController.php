@@ -22,8 +22,8 @@ class FavoriteAidController extends AbstractController
         Request $request,
         AidRepository $aidRepository,
         LogAidSearchTempRepository $logAidSearchTempRepository,
-        EntityManagerInterface $entityManager,,
-        UserService $userService
+        EntityManagerInterface $entityManager,
+        UserService $userService,
     ): Response {
         $this->denyAccessUnlessGranted('ROLE_USER');
 
