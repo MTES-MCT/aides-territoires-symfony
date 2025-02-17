@@ -118,10 +118,13 @@ function showFormExtended()
 
 function callVapp()
 {
+    let csrfToken = typeof csrfTokenInternal !== 'undefined' ? csrfTokenInternal : '';
+
     $.ajax({
         url: Routing.generate('app_aid_ajax_call_vapp'),
         type: 'POST',
         data: {
+            _token: csrfToken
         },
         success: function(data) {
             if (data.status === 'success') {
@@ -146,12 +149,15 @@ function callVapp()
 
 function renderAidCard(aidId, scoreVapp)
 {
+    let csrfToken = typeof csrfTokenInternal !== 'undefined' ? csrfTokenInternal : '';
+
     $.ajax({
         url: Routing.generate('app_aid_ajax_render_aid_card'),
         type: 'POST',
         data: {
             aidId: aidId,
-            scoreVapp: scoreVapp
+            scoreVapp: scoreVapp,
+            _token: csrfToken
         },
         success: function(data) {
             const $wrapper = $('#aids-as-card');

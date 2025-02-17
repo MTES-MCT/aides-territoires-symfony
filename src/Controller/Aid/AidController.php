@@ -20,6 +20,7 @@ use App\Repository\Aid\AidRepository;
 use App\Repository\Blog\BlogPromotionPostRepository;
 use App\Repository\Project\ProjectRepository;
 use App\Repository\Reference\ProjectReferenceRepository;
+use App\Security\Voter\InternalRequestVoter;
 use App\Service\Aid\AidSearchClass;
 use App\Service\Aid\AidSearchFormService;
 use App\Service\Aid\AidService;
@@ -101,7 +102,7 @@ class AidController extends FrontController
         $formAidSearchParams = [
             'method' => 'GET',
             'extended' => true,
-            'isPageAid' => true
+            'isPageAid' => true,
         ];
 
         // formulaire recherche aides
@@ -183,7 +184,7 @@ class AidController extends FrontController
             );
             $newUrl = preg_replace(
                 '/(page=)[^\&]+/',
-                'page=' . $pagerfanta->getNbPages(),
+                'page='.$pagerfanta->getNbPages(),
                 $requestStack->getCurrentRequest()->getRequestUri()
             );
 
@@ -204,21 +205,21 @@ class AidController extends FrontController
         $blogPromotionPosts = $blogPromotionPostService->handleRequires($blogPromotionPosts, $aidParams);
 
         // page title
-        $pageTitle = $pagerfanta->getNbResults() . ' résultat';
+        $pageTitle = $pagerfanta->getNbResults().' résultat';
         if ($pagerfanta->getNbResults() > 1) {
             $pageTitle .= 's';
         }
         $pageTitle .= ' de recherche : ';
         if ($formAidSearch->get(AidSearchFormService::QUERYSTRING_KEY_ORGANIZATION_TYPE_SLUG)->getData()) {
             $pageTitle .= ' Structure : '
-                . $formAidSearch->get(AidSearchFormService::QUERYSTRING_KEY_ORGANIZATION_TYPE_SLUG)
+                .$formAidSearch->get(AidSearchFormService::QUERYSTRING_KEY_ORGANIZATION_TYPE_SLUG)
                     ->getData()->getName()
-                . ' ';
+                .' ';
         }
         if ($formAidSearch->get(AidSearchFormService::QUERYSTRING_KEY_SEARCH_PERIMETER)->getData()) {
             $pageTitle .= ' - Périmètre : '
-                . $formAidSearch->get(AidSearchFormService::QUERYSTRING_KEY_SEARCH_PERIMETER)->getData()->getName()
-                . ' ';
+                .$formAidSearch->get(AidSearchFormService::QUERYSTRING_KEY_SEARCH_PERIMETER)->getData()->getName()
+                .' ';
         }
 
         /** @var AidSearchClass $data */
@@ -226,7 +227,7 @@ class AidController extends FrontController
         $nbCriteria = $aidSearchFormService->countNbCriteriaFromAidSearchClass($data);
 
         if ($nbCriteria > 0) {
-            $pageTitle .= ' - ' . $nbCriteria . ' autre';
+            $pageTitle .= ' - '.$nbCriteria.' autre';
             if ($nbCriteria > 1) {
                 $pageTitle .= 's';
             }
@@ -334,8 +335,13 @@ class AidController extends FrontController
     public function ajaxCallVapp(
         RequestStack $requestStack,
         VappApiService $vappApiService,
-        AidService $aidService
+        AidService $aidService,
     ): JsonResponse {
+        // verification requête interne
+        if (!$this->isGranted(InternalRequestVoter::IDENTIFIER)) {
+            throw $this->createAccessDeniedException(InternalRequestVoter::MESSAGE_ERROR);
+        }
+
         $session = $requestStack->getCurrentRequest()->getSession();
 
         //  le nombre d'aides qu'on va score à chaque appel
@@ -408,6 +414,11 @@ class AidController extends FrontController
         ProjectReferenceRepository $projectReferenceRepository,
     ): JsonResponse {
         try {
+            // verification requête interne
+            if (!$this->isGranted(InternalRequestVoter::IDENTIFIER)) {
+                throw $this->createAccessDeniedException(InternalRequestVoter::MESSAGE_ERROR);
+            }
+
             // verifie id aide
             $aidId = $requestStack->getCurrentRequest()->get('aidId', null);
             $scoreVapp = $requestStack->getCurrentRequest()->get('scoreVapp', 0);
@@ -489,7 +500,7 @@ class AidController extends FrontController
             return $spreadsheetExporterService->getXlsxFromArray(
                 $aids,
                 Aid::class,
-                'export_recherche_aides_' . date('Y-m-d')
+                'export_recherche_aides_'.date('Y-m-d')
             );
         });
     }
@@ -612,7 +623,7 @@ class AidController extends FrontController
                 $this->addFlash(
                     FrontController::FLASH_ERROR,
                     'Vous devez renseigner les informations de votre structure ou accepter une invitation '
-                        . 'avant de pouvoir accéder à cette page.'
+                        .'avant de pouvoir accéder à cette page.'
                 );
             } else {
                 if ($formAddToProject->isValid()) {
@@ -637,17 +648,17 @@ class AidController extends FrontController
                                         $beneficiary,
                                         'Nouvelle aide ajoutée à un projet',
                                         '<p>
-                                        ' . $user->getFirstname()
-                                        . ' '
-                                        . $user->getLastname()
-                                        . ' a ajouté une aide au projet
+                                        '.$user->getFirstname()
+                                        .' '
+                                        .$user->getLastname()
+                                        .' a ajouté une aide au projet
                                         <a href="'
-                                        . $this->generateUrl(
+                                        .$this->generateUrl(
                                             'app_user_project_details_fiche_projet',
                                             ['id' => $project->getId(), 'slug' => $project->getSlug()],
                                             UrlGeneratorInterface::ABSOLUTE_URL
                                         )
-                                            . '">' . $project->getName() . '</a>.
+                                            .'">'.$project->getName().'</a>.
                                         </p>'
                                     );
                                 }
@@ -657,11 +668,11 @@ class AidController extends FrontController
                             $this->addFlash(
                                 FrontController::FLASH_SUCCESS,
                                 'L’aide a bien été associée au projet <a href="'
-                                . $this->generateUrl(
+                                .$this->generateUrl(
                                     'app_user_project_details_fiche_projet',
                                     ['id' => $project->getId(), 'slug' => $project->getSlug()]
                                 )
-                                . '">' . $project->getName() . '</a>.'
+                                .'">'.$project->getName().'</a>.'
                             );
                         }
 
@@ -687,11 +698,11 @@ class AidController extends FrontController
                         $this->addFlash(
                             FrontController::FLASH_SUCCESS,
                             'L’aide a bien été associée au nouveau projet <a href="'
-                            . $this->generateUrl(
+                            .$this->generateUrl(
                                 'app_user_project_details_fiche_projet',
                                 ['id' => $project->getId(), 'slug' => $project->getSlug()]
                             )
-                            . '">' . $project->getName() . '</a>.'
+                            .'">'.$project->getName().'</a>.'
                         );
                     }
 
@@ -725,25 +736,25 @@ class AidController extends FrontController
                     $message = $stringService->cleanString((string) $formSuggestToProject->get('message')->getData());
 
                     // notification
-                    $message = '<p>' . $message . '</p>
+                    $message = '<p>'.$message.'</p>
                     <ul>
-                        <li><a href="' . $aidService->getUrl($aid) . '>"' . $aid->getName() . '</a></li>
+                        <li><a href="'.$aidService->getUrl($aid).'>"'.$aid->getName().'</a></li>
                     </ul>
-                    <p>' . $user->getNotificationSignature() . '</p>
+                    <p>'.$user->getNotificationSignature().'</p>
                     <p>
                         <a class="fr-btn" href="'
-                            . $this->generateUrl(
+                            .$this->generateUrl(
                                 'app_project_project_public_details',
                                 ['id' => $project->getId(), 'slug' => $project->getSlug()],
                                 UrlGeneratorInterface::ABSOLUTE_URL
                             )
-                            . '">
+                            .'">
                             Accepter ou rejeter cette recommandation
                         </a>
                     </p>';
                     $notificationService->addNotification(
                         $project->getAuthor(),
-                        'Suggestion d’une aide pour votre projet « ' . $project->getName() . ' »',
+                        'Suggestion d’une aide pour votre projet « '.$project->getName().' »',
                         $message
                     );
 
@@ -754,7 +765,7 @@ class AidController extends FrontController
                     }
                     $emailService->sendEmailViaApi(
                         $project->getAuthor()->getEmail(),
-                        'Suggestion d’une aide pour votre projet « ' . $project->getName() . ' »',
+                        'Suggestion d’une aide pour votre projet « '.$project->getName().' »',
                         (int) $paramService->get('sib_new_suggested_aid_template_id'),
                         [
                             'PROJECT_AUTHOR_NAME' => $project->getAuthor()->getFullName(),
@@ -814,8 +825,8 @@ class AidController extends FrontController
             [],
             UrlGeneratorInterface::ABSOLUTE_URL
         )
-        . '?crudAction=edit&crudControllerFqcn=App%5CController%5CAdmin%5CAid%5CAidCrudController&entityId='
-        . $aid->getId();
+        .'?crudAction=edit&crudControllerFqcn=App%5CController%5CAdmin%5CAid%5CAidCrudController&entityId='
+        .$aid->getId();
 
         return $this->render('aid/aid/details.html.twig', [
             'aid' => $aid,
