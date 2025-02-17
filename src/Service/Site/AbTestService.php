@@ -92,6 +92,8 @@ class AbTestService
     // fonction pour déterminer si le user va faire partir du test à partir du ratio
     private function isUserInTest(AbTest $abTest): bool
     {
-        return (random_int(1, 100) / 100) <= $abTest->getRatio();
+        // On divise le ratio par 100 pour obtenir un pourcentage
+        // Par exemple : 20 devient 0.2 (20%)
+        return (random_int(1, 100)) <= $abTest->getRatio();
     }
 }
