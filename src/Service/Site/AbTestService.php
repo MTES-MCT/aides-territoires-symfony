@@ -32,6 +32,23 @@ class AbTestService
                 throw new AbTestException('A/B test not found');
             }
 
+            // on vérifie les dates du test
+            if ($abTest->getDateStart() && $abTest->getDateEnd()) {
+                $now = new \DateTime();
+                if ($now < $abTest->getDateStart() || $now > $abTest->getDateEnd()) {
+                    return false;
+                }
+            }
+
+            // on vérifie ensuite les heures du test
+            if ($abTest->getHourStart() && $abTest->getHourEnd()) {
+                $now = (int) (new \DateTime())->format('H');
+                if ($now < $abTest->getHourStart() || $now > $abTest->getHourEnd()) {
+                    return false;
+                }
+            }
+
+
             // Vérifie d'abord si un cookie existe
             $cookieName = 'abtest_' . $abTestName;
             if ($this->requestStack->getCurrentRequest()->cookies->has($cookieName)) {
