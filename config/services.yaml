@@ -88,6 +88,11 @@ services:
         tags:
             - { name: 'kernel.event_listener', event: 'scheb_two_factor.authentication.success', method: 'onTwoFactorAuthenticationSuccess' }
 
+    App\EventListener\SubDomainListener:
+        tags:
+            # Priority 33 so it runs before routing
+            - {name: kernel.event_listener, event: kernel.request, priority: 33}
+
     App\EventListener\RouteListener:
         tags:
             - {name: kernel.event_listener, event: kernel.exception}
@@ -110,10 +115,6 @@ services:
                 use_path_style_endpoint: true
 
     Nelmio\SecurityBundle\EventListener\ContentSecurityPolicyListener: '@nelmio_security.csp_listener'
-
-    App\EventListener\SentryListener:
-        tags:
-            - { name: kernel.event_listener, event: kernel.exception, method: onKernelException }
 
     Symfony\Component\HttpFoundation\Session\Storage\Handler\RedisSessionHandler:
         arguments: ['@snc_redis.session']

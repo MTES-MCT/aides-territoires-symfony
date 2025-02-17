@@ -3,7 +3,7 @@
 namespace App\Controller\User;
 
 use App\Entity\User\User;
-use App\Exception\NotFoundException\ResetPasswordNotFoundException;
+use App\Exception\BusinessException\ResetPasswordNotFoundException;
 use App\Form\User\ChangePasswordFormType;
 use App\Form\User\ResetPasswordRequestFormType;
 use App\Service\Email\EmailService;
@@ -42,7 +42,7 @@ class ResetPasswordController extends AbstractController
         Request $request,
         EmailService $emailService,
         TranslatorInterface $translator,
-        RouterInterface $routerInterface
+        RouterInterface $routerInterface,
     ): Response {
         $form = $this->createForm(ResetPasswordRequestFormType::class);
         $form->handleRequest($request);
@@ -58,7 +58,7 @@ class ResetPasswordController extends AbstractController
 
         return $this->render('user/reset_password/request.html.twig', [
             'requestForm' => $form->createView(),
-            'no_breadcrumb' => true
+            'no_breadcrumb' => true,
         ]);
     }
 
@@ -76,7 +76,7 @@ class ResetPasswordController extends AbstractController
 
         return $this->render('user/reset_password/check_email.html.twig', [
             'resetToken' => $resetToken,
-            'no_breadcrumb' => true
+            'no_breadcrumb' => true,
         ]);
     }
 
@@ -91,7 +91,7 @@ class ResetPasswordController extends AbstractController
         Request $request,
         UserPasswordHasherInterface $passwordHasher,
         TranslatorInterface $translator,
-        string $token = null
+        ?string $token = null,
     ): Response {
         if ($token) {
             // We store the token in session and remove it from the URL, to avoid the URL being
@@ -155,7 +155,7 @@ class ResetPasswordController extends AbstractController
         string $emailFormData,
         EmailService $emailService,
         TranslatorInterface $translator,
-        RouterInterface $routerInterface
+        RouterInterface $routerInterface,
     ): RedirectResponse {
         $user = $this->entityManager->getRepository(User::class)->findOneBy([
             'email' => $emailFormData,
@@ -173,7 +173,7 @@ class ResetPasswordController extends AbstractController
         }
 
         // donne le contexte au router pour generer l'url beta ou prod
-        $host = $_ENV["APP_ENV"] == FileService::ENV_DEV
+        $host = FileService::ENV_DEV == $_ENV['APP_ENV']
             ? 'aides-terr-php.osc-fr1.scalingo.io'
             : 'aides-territoires.beta.gouv.fr'
         ;

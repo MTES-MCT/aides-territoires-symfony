@@ -11,7 +11,7 @@ use App\Entity\Perimeter\Perimeter;
 use App\Entity\Project\Project;
 use App\Entity\Reference\ProjectReference;
 use App\Entity\User\User;
-use App\Exception\NotFoundException\AidNotFoundException;
+use App\Exception\BusinessException\AidNotFoundException;
 use App\Form\Aid\AidSearchTypeV2;
 use App\Form\Aid\SuggestToProjectType;
 use App\Form\Alert\AlertCreateType;
@@ -619,7 +619,7 @@ class AidController extends FrontController
         ]);
         $formAddToProject->handleRequest($requestStack->getCurrentRequest());
         if ($formAddToProject->isSubmitted()) {
-            if (!$user->getDefaultOrganization()) {
+            if ($user && !$user->getDefaultOrganization()) {
                 $this->addFlash(
                     FrontController::FLASH_ERROR,
                     'Vous devez renseigner les informations de votre structure ou accepter une invitation '

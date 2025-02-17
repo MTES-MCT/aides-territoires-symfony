@@ -7,7 +7,7 @@ use App\Entity\Aid\Aid;
 use App\Entity\Aid\AidFinancer;
 use App\Entity\Aid\AidInstructor;
 use App\Entity\User\User;
-use App\Exception\NotFoundException\AidNotFoundException;
+use App\Exception\BusinessException\AidNotFoundException;
 use App\Form\Aid\AidDeleteType;
 use App\Form\Aid\AidEditType;
 use App\Form\User\Aid\AidExportType;
@@ -104,14 +104,14 @@ class AidController extends FrontController
                 $this->tAddFlash(
                     FrontController::FLASH_SUCCESS,
                     'Votre aide a été créée. '
-                    . 'Vous pouvez poursuivre l’édition ou <a href="'
-                    . $this->generateUrl(
+                    .'Vous pouvez poursuivre l’édition ou <a href="'
+                    .$this->generateUrl(
                         'app_aid_aid_details',
                         ['slug' => $aid->getSlug()],
                         UrlGeneratorInterface::ABSOLUTE_URL
                     )
-                    . '" target="_blank">la prévisualiser <span class="fr-sr-only">'
-                    . 'Ouvre une nouvelle fenêtre</span></a>.'
+                    .'" target="_blank">la prévisualiser <span class="fr-sr-only">'
+                    .'Ouvre une nouvelle fenêtre</span></a>.'
                 );
 
                 // redirection
@@ -120,8 +120,8 @@ class AidController extends FrontController
                 $this->addFlash(
                     FrontController::FLASH_ERROR,
                     'Nous n’avons pas pu traiter votre formulaire car les données saisies sont invalides '
-                    . 'et / ou incomplètes. '
-                    . 'Merci de bien vouloir vérifier votre saisie et corriger les erreurs avant de réessayer. '
+                    .'et / ou incomplètes. '
+                    .'Merci de bien vouloir vérifier votre saisie et corriger les erreurs avant de réessayer. '
                 );
             }
         }
@@ -267,8 +267,8 @@ class AidController extends FrontController
                     $this->addFlash(
                         FrontController::FLASH_SUCCESS,
                         'Votre export est trop volumineux, '
-                        . 'il sera lancé par une tâche automatique '
-                        . 'et vous recevrez un mail avec le document en pièce jointe.'
+                        .'il sera lancé par une tâche automatique '
+                        .'et vous recevrez un mail avec le document en pièce jointe.'
                     );
                 } else {
                     // Sinon téléchargement direct du fichier
@@ -281,8 +281,8 @@ class AidController extends FrontController
                 $this->addFlash(
                     FrontController::FLASH_ERROR,
                     'Nous n’avons pas pu traiter votre formulaire car les données saisies sont invalides '
-                    . 'et / ou incomplètes. '
-                    . 'Merci de bien vouloir vérifier votre saisie et corriger les erreurs avant de réessayer. '
+                    .'et / ou incomplètes. '
+                    .'Merci de bien vouloir vérifier votre saisie et corriger les erreurs avant de réessayer. '
                 );
             }
         }
@@ -335,6 +335,7 @@ class AidController extends FrontController
         // verifie que l'aide soit éditable par l'utilisateur
         if (!$aidService->userCanEdit($aid, $user)) {
             $this->addFlash(FrontController::FLASH_ERROR, 'Vous n\'avez pas accès à cette page');
+
             return $this->redirectToRoute('app_user_aid_publications');
         }
 
@@ -411,8 +412,8 @@ class AidController extends FrontController
                 $this->addFlash(
                     FrontController::FLASH_ERROR,
                     'Nous n’avons pas pu traiter votre formulaire car les données saisies sont invalides '
-                    . 'et / ou incomplètes. '
-                    . 'Merci de bien vouloir vérifier votre saisie et corriger les erreurs avant de réessayer. '
+                    .'et / ou incomplètes. '
+                    .'Merci de bien vouloir vérifier votre saisie et corriger les erreurs avant de réessayer. '
                 );
             }
         }
@@ -441,7 +442,7 @@ class AidController extends FrontController
             'aidDuplicates' => $aidDuplicates,
             'organizationBackersNotComplete' => $organizationBackersNotComplete,
             'isLocked' => $aidService->isLocked($aid),
-            'lock' => $aidService->getLock($aid)
+            'lock' => $aidService->getLock($aid),
         ]);
     }
 
@@ -519,7 +520,7 @@ class AidController extends FrontController
             ? $stringService->getSLug($user->getDefaultOrganization()->getName())
             : ''
         ;
-        $filename = 'Aides-territoires-' . $today->format('d_m_Y') . '-' . $organizationName;
+        $filename = 'Aides-territoires-'.$today->format('d_m_Y').'-'.$organizationName;
 
         // alimente la réponse
         if ('pdf' == $format) {
@@ -543,7 +544,7 @@ class AidController extends FrontController
             $dompdf->render();
 
             // Output the generated PDF to Browser (inline view)
-            $dompdf->stream($filename . '.pdf', [
+            $dompdf->stream($filename.'.pdf', [
                 'Attachment' => false,
             ]);
             // exit pour eviter les erreur sur le retour null
@@ -561,7 +562,7 @@ class AidController extends FrontController
                     $writer = new \OpenSpout\Writer\XLSX\Writer();
                 }
 
-                $writer->openToBrowser('export_' . $filename . '.' . $format);
+                $writer->openToBrowser('export_'.$filename.'.'.$format);
 
                 if (FileService::FORMAT_XLSX == $format && isset($sheetView)) {
                     $writer->getCurrentSheet()->setSheetView($sheetView);
@@ -639,10 +640,10 @@ class AidController extends FrontController
 
                     $subventionRatesString = '';
                     if ($aid->getSubventionRateMin()) {
-                        $subventionRatesString .= 'Min : ' . $aid->getSubventionRateMin() . ' ';
+                        $subventionRatesString .= 'Min : '.$aid->getSubventionRateMin().' ';
                     }
                     if ($aid->getSubventionRateMax()) {
-                        $subventionRatesString .= 'Max : ' . $aid->getSubventionRateMax();
+                        $subventionRatesString .= 'Max : '.$aid->getSubventionRateMax();
                     }
 
                     $categoriesString = '';
@@ -799,7 +800,7 @@ class AidController extends FrontController
 
         // Définissez le type de contenu et le nom du fichier dans les en-têtes HTTP
         $response->headers->set('Content-Type', 'application/pdf');
-        $response->headers->set('Content-Disposition', 'inline; filename="' . $aid->getSlug() . '.pdf"');
+        $response->headers->set('Content-Disposition', 'inline; filename="'.$aid->getSlug().'.pdf"');
 
         return $response;
     }
@@ -843,8 +844,8 @@ class AidController extends FrontController
         $this->tAddFlash(
             FrontController::FLASH_SUCCESS,
             'La nouvelle aide a été créée. '
-            . 'Vous pouvez poursuivre l’édition. Et retrouvez l’aide dupliquée sur <a href="'
-            . $this->generateUrl('app_user_aid_publications') . '">votre portefeuille d’aides</a>.'
+            .'Vous pouvez poursuivre l’édition. Et retrouvez l’aide dupliquée sur <a href="'
+            .$this->generateUrl('app_user_aid_publications').'">votre portefeuille d’aides</a>.'
         );
 
         // redirecition
@@ -963,7 +964,7 @@ class AidController extends FrontController
             $this->generateUrl('app_user_aid_publications')
         );
         $this->breadcrumb->add(
-            'Statistiques de l’aide « ' . $aid->getName() . ' »',
+            'Statistiques de l’aide « '.$aid->getName().' »',
             $this->generateUrl('app_user_aid_publications')
         );
 
@@ -1011,10 +1012,10 @@ class AidController extends FrontController
             // nom de fichier
             $filename =
                 'AT_statistiques_aides_'
-                . $dateMin->format('d_m_Y')
-                . '_au_'
-                . $dateMax->format('d_m_Y')
-                . '.xlsx'
+                .$dateMin->format('d_m_Y')
+                .'_au_'
+                .$dateMax->format('d_m_Y')
+                .'.xlsx'
             ;
 
             $response->setCallback(function () use (
@@ -1051,7 +1052,7 @@ class AidController extends FrontController
                 'Content-Type',
                 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
             );
-            $response->headers->set('Content-Disposition', 'attachment;filename="' . $filename . '"');
+            $response->headers->set('Content-Disposition', 'attachment;filename="'.$filename.'"');
             $response->headers->set('Cache-Control', 'max-age=0');
 
             return $response;
@@ -1122,10 +1123,10 @@ class AidController extends FrontController
                 // nom de fichier
                 $filename =
                     'AT_statistiques_aide_'
-                    . $dateMin->format('d_m_Y')
-                    . '_au_'
-                    . $dateMax->format('d_m_Y')
-                    . '.xlsx'
+                    .$dateMin->format('d_m_Y')
+                    .'_au_'
+                    .$dateMax->format('d_m_Y')
+                    .'.xlsx'
                 ;
 
                 // Le fichier xslx
