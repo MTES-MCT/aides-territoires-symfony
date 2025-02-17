@@ -65,7 +65,7 @@ class AbTestService
                 if (!$abTestUser) {
                     $abTestUser = new AbTestUser();
                     $abTestUser->setAbTest($abTest);
-                    $abTestUser->setVariation($userInTest ? '1' : '0');
+                    $abTestUser->setVariation($userInTest ? 'vapp' : 'at');
                     $abTestUser->setUser($this->userService->getUserLogged());
                     $abTestUser->setCookieId(bin2hex(random_bytes(16)));
 
