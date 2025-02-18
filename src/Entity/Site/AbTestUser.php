@@ -45,6 +45,9 @@ class AbTestUser
     #[ORM\OneToMany(mappedBy: 'abTestUser', targetEntity: AbTestVote::class, orphanRemoval: true)]
     private Collection $abTestVotes;
 
+    #[ORM\Column]
+    private ?bool $refused = false;
+
     public function __construct()
     {
         $this->abTestVotes = new ArrayCollection();
@@ -141,6 +144,18 @@ class AbTestUser
                 $abTestVote->setAbTestUser(null);
             }
         }
+
+        return $this;
+    }
+
+    public function isRefused(): ?bool
+    {
+        return $this->refused;
+    }
+
+    public function setRefused(bool $refused): static
+    {
+        $this->refused = $refused;
 
         return $this;
     }

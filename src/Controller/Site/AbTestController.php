@@ -133,35 +133,58 @@ class AbTestController extends FrontController
     public function noVappTest(
         AbTestRepository $abTestRepository,
         CookieService $cookieService,
-        RequestStack $requestStack
+        RequestStack $requestStack,
+        AbTestUserRepository $abTestUserRepository,
+        ManagerRegistry $managerRegistry,
     ): Response {
-        $abTests = [
-            AbTestService::VAPP_ACTIVATION,
-            AbTestService::VAPP_FORMULAIRE,
-        ];
+        try {
+            $abTests = [
+                AbTestService::VAPP_ACTIVATION,
+                AbTestService::VAPP_FORMULAIRE,
+            ];
+    
+            foreach ($abTests as $abTestName) {
+                $abTest = $abTestRepository->findOneBy(['name' => $abTestName]);
+                if (!$abTest) {
+                    throw new AbTestException('A/B test not found');
+                }
+    
+                // Vérifie d'abord si un cookie existe
+                $cookieName = 'abtest_' . $abTestName;
+    
+                // Créer un cookie
+                $cookieService->setCookie($cookieName, 'false');
 
-        foreach ($abTests as $abTestName) {
-            $abTest = $abTestRepository->findOneBy(['name' => $abTestName]);
-            if (!$abTest) {
-                throw new AbTestException('A/B test not found');
+                // on regarde si on a l'utilisateur pour notifier le refus en base
+                $cookieName = 'abtest_' . $abTest->getName() . '_userId';
+                $cookieId = $requestStack->getCurrentRequest()->cookies->get($cookieName, null);
+                if ($cookieId) {
+                    $abTestUser = $abTestUserRepository->findOneBy([
+                        'abTest' => $abTest,
+                        'cookieId' => $cookieId,
+                    ]);
+                    if ($abTestUser) {
+                        $abTestUser->setRefused(true);
+                        $managerRegistry->getManager()->persist($abTestUser);
+                    }
+                }
             }
+    
+            // Sauvegarde
+            $managerRegistry->getManager()->flush();
 
-            // Vérifie d'abord si un cookie existe
-            $cookieName = 'abtest_' . $abTestName;
-
-            // Créer un cookie
-            $cookieService->setCookie($cookieName, 'false');
-        }
-
-        // Récupérer le referer (page précédente)
-        $referer = $requestStack->getCurrentRequest()->headers->get('referer');
-
-        // Si pas de referer, retour à la home
-        if (!$referer) {
+            // Récupérer le referer (page précédente)
+            $referer = $requestStack->getCurrentRequest()->headers->get('referer');
+    
+            // Si pas de referer, retour à la home
+            if (!$referer) {
+                return $this->redirectToRoute('app_home');
+            }
+    
+            // Redirection vers la page précédente
+            return $this->redirect($referer);
+        } catch (AbTestException $e) {
             return $this->redirectToRoute('app_home');
         }
-
-        // Redirection vers la page précédente
-        return $this->redirect($referer);
     }
 }
