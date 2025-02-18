@@ -357,7 +357,7 @@ class AidController extends FrontController
         AidService $aidService,
     ): JsonResponse {
         ini_set('max_execution_time', 300);
-        
+
         // verification requête interne
         if (!$this->isGranted(InternalRequestVoter::IDENTIFIER)) {
             throw $this->createAccessDeniedException(InternalRequestVoter::MESSAGE_ERROR);
@@ -411,28 +411,23 @@ class AidController extends FrontController
                 array_column($vappScores, 'id'),
                 array_column($vappScores, 'scoreCompatibilite')
             );
-
-            // on rajoute le $scores a $aidsChunksToScore
-            foreach ($aidsChunksToScore as $id => $aid) {
-                $aidsChunksToScore[$id]['score_vapp'] = $scores[$id] ?? 0;
-            }
         }
 
         // on met à jour le tableau en session
         foreach ($aidsChunksToScore as $id => $aid) {
-            if (isset($vappAidsById[$id])) {
-                $vappAidsById[$id]['score_vapp'] = $aid['score_vapp'];
+            if (isset($scores) && isset($scores[$id])) {
+                $aidsChunksToScore[$id]['score_vapp'] = $scores[$id];
+
+                if (isset($vappAidsById[$id])) {
+                    $vappAidsById[$id]['score_vapp'] = $scores[$id];
+                }
             }
         }
+        
         $session->set(VappApiService::SESSION_AIDS_SCORES, json_encode($vappAidsById));
         
         // on met le numero de page suivante en session
         $session->set(VappApiService::SESSION_CURRENT_PAGE_SCORE_VAPP, $currentPageScoreVapp + 1);
-
-        // on complete aidsChunksToScore avec le score Vapp
-        foreach ($aidsChunksToScore as $key => $aid) {
-            $aidsChunksToScore[$key]['score_vapp'] = $scores[$aid['id']] ?? 0;
-        }
 
         // retjour json des aides
         return new JsonResponse([
