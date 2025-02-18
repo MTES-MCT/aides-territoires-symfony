@@ -3,8 +3,6 @@
 namespace App\Service\Api;
 
 use App\Entity\Aid\Aid;
-use App\Entity\Perimeter\Perimeter;
-use App\Service\Aid\AidSearchClass;
 use App\Service\Various\ParamService;
 use GuzzleHttp\Client;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -42,17 +40,13 @@ class VappApiService
     }
 
     /**
-     * @param string $description
-     * @param string $porteur
      * @param array<string, mixed> $zonesGeographiques
-     * @param boolean $force
-     * @return string
      */
     public function getProjectUuid(
         string $description,
         string $porteur,
         array $zonesGeographiques,
-        bool $force = false
+        bool $force = false,
     ): string {
         $session = $this->requestStack->getCurrentRequest()->getSession();
         $uuid = $force ? '' : $this->getProjectUuidInSession();
@@ -77,10 +71,7 @@ class VappApiService
     }
 
     /**
-     * @param string $description
-     * @param string $porteur
      * @param array<string, mixed> $zonesGeographiques
-     * @return string
      */
     private function createProject(
         string $description,
@@ -114,37 +105,41 @@ class VappApiService
 
     /**
      * @param array<int, mixed> $aids
+     *
      * @return array<string, mixed>
      */
     public function scoreAids(array $aids): array
     {
         try {
-            $folder = 'projets/' . $this->getProjectUuidInSession() . '/aides/scoring';
+            $folder = 'projets/'.$this->getProjectUuidInSession().'/aides/scoring';
             $method = 'POST';
             $datas = [
                 'data' => [],
             ];
-    
+
             foreach ($aids as $aid) {
+                $description = (string) $aid['description'];
+                if (strlen($description) > 1000) {
+                    $description = substr($description, 0, 997).'...';
+                }
+
                 $datas['data'][] = [
                     'id' => (string) $aid['id'],
                     'nom' => (string) $aid['name'],
-                    'description' => (string) $aid['description'],
+                    'description' => $description,
                     'fournisseurDonnees' => 'aides-territoires',
                 ];
             }
 
             $response = $this->client->request($method, $folder, [
                 'json' => $datas,
-                'timeout' => 30,
-                // 'connect_timeout' => 5
+                'timeout' => 60,
             ]);
 
             $datas = json_decode($response->getBody()->getContents(), true);
 
             return $datas['data'] ?? [];
         } catch (\Exception $e) {
-            dd($e);
             return [];
         }
     }
@@ -185,7 +180,6 @@ class VappApiService
 
     /**
      * @param array<int, array<string, mixed>> $vappAidsById
-     * @return void
      */
     public function setAidsScoresInSession(array $vappAidsById): void
     {

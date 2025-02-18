@@ -133,7 +133,7 @@ class AidController extends FrontController
         // TEST VAPP
 
         // gestion si c'est une nouvelle recherche ou non
-        $aidParamsSignature =  hash('xxh128', json_encode($this->cleanParamsForSignature($aidParams)));
+        $aidParamsSignature = hash('xxh128', json_encode($this->cleanParamsForSignature($aidParams)));
         $aidParamsSignatureInSession = $session->get('aidParamsSignature', null);
         $newSearch = $aidParamsSignature != $aidParamsSignatureInSession;
         $session->set('aidParamsSignature', $aidParamsSignature);
@@ -144,7 +144,7 @@ class AidController extends FrontController
 
             // réinitialise la page courange
             $session->set(VappApiService::SESSION_CURRENT_PAGE_SCORE_VAPP, 0);
-        
+
             if ($newSearch || empty($vappAidsById)) {
                 $vappAidsById = [];
                 foreach ($aids as $aid) {
@@ -167,7 +167,7 @@ class AidController extends FrontController
                         'type' => ucfirst(
                             Perimeter::SCALES_FOR_SEARCH[$aidSearchClass->getPerimeterId()->getScale()]['name']
                         ),
-                        'code' => (int) $aidSearchClass->getPerimeterId()->getInsee() ?? 69266
+                        'code' => (int) $aidSearchClass->getPerimeterId()->getInsee() ?? 69266,
                         // 'code' => 69266,
                     ],
                 ],
@@ -359,9 +359,9 @@ class AidController extends FrontController
                 // Pour tout objet ayant getId()
                 if (method_exists($value, 'getId')) {
                     $cleanParams[$key] = [
-                        'id' => $value->getId()
+                        'id' => $value->getId(),
                     ];
-                    
+
                     // Ajoute le slug si disponible
                     if (method_exists($value, 'getSlug')) {
                         $cleanParams[$key]['slug'] = $value->getSlug();
@@ -371,6 +371,7 @@ class AidController extends FrontController
                 $cleanParams[$key] = $value;
             }
         }
+
         return $cleanParams;
     }
 
@@ -394,7 +395,7 @@ class AidController extends FrontController
 
         // la page courante
         $firstCallVapp = trim($requestStack->getCurrentRequest()->get('firstCallVap', 'true'));
-        $firstCallVapp === 'true' ? $firstCallVapp = true : $firstCallVapp = false;
+        'true' === $firstCallVapp ? $firstCallVapp = true : $firstCallVapp = false;
         $currentPageScoreVapp = $firstCallVapp
             ? 0
             : $session->get(VappApiService::SESSION_CURRENT_PAGE_SCORE_VAPP, 0)
@@ -402,7 +403,7 @@ class AidController extends FrontController
 
         // recupère le résultat de la recherche en session
         $vappAidsById = $vappApiService->getAidsScoresInSession();
-        
+
         // on fait un nouveau tableau des aides par paquet pour envoyer à Vapp en plusieurs fois
         $aidsChunks = array_chunk($vappAidsById, $nbToScore, true);
 
@@ -444,10 +445,10 @@ class AidController extends FrontController
                 }
             }
         }
-        
+
         // on met les scores mis à jour en session
         $vappApiService->setAidsScoresInSession($vappAidsById);
-        
+
         // on met le numero de page suivante en session
         $session->set(VappApiService::SESSION_CURRENT_PAGE_SCORE_VAPP, $currentPageScoreVapp + 1);
 
@@ -619,7 +620,7 @@ class AidController extends FrontController
         ProjectRepository $projectRepository,
         LogService $logService,
         NotificationService $notificationService,
-        AbTestService $abTestService
+        AbTestService $abTestService,
     ): Response {
         // le user si dispo
         $user = $userService->getUserLogged();
@@ -893,7 +894,7 @@ class AidController extends FrontController
             'aidDetailPage' => true,
             'openModalSuggest' => $openModalSuggest ?? false,
             'highlightedWords' => $requestStack->getCurrentRequest()->getSession()->get('highlightedWords', []),
-            'adminEditUrl' => $adminEditUrl
+            'adminEditUrl' => $adminEditUrl,
         ]);
     }
 }
