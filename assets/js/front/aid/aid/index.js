@@ -147,7 +147,7 @@ function callVapp()
             }
         },
         error: function() {
-            $('#new-feature-alert').after('<div class="alert alert-danger" role="alert">Une erreur est survenue lors de l\'analyse.</div>');
+            $('#new-feature-alert').after('<div class="fr-alert fr-alert--error">Une erreur est survenue lors de l\'analyse.</div>');
         }
     })
 }
