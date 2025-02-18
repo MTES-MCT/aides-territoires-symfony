@@ -118,15 +118,10 @@ class VappApiService
             ];
 
             foreach ($aids as $aid) {
-                $description = (string) $aid['description'];
-                if (strlen($description) > 1000) {
-                    $description = substr($description, 0, 997).'...';
-                }
-
                 $datas['data'][] = [
                     'id' => (string) $aid['id'],
                     'nom' => (string) $aid['name'],
-                    'description' => $description,
+                    'description' => (string) $aid['description'],
                     'fournisseurDonnees' => 'aides-territoires',
                 ];
             }
