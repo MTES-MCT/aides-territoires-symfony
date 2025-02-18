@@ -3,6 +3,8 @@
 namespace App\Service\Api;
 
 use App\Entity\Aid\Aid;
+use App\Entity\Perimeter\Perimeter;
+use App\Service\Aid\AidSearchClass;
 use App\Service\Various\ParamService;
 use GuzzleHttp\Client;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -15,6 +17,7 @@ class VappApiService
     private const SESSION_PROJECT_UUID = 'vapp_project_uuid';
     public const SESSION_AIDS_SCORES = 'vapp_aids_scores';
     public const SESSION_CURRENT_PAGE_SCORE_VAPP = 'currentPageScoreVapp';
+    public const SESSION_CREATE_PROJECT_PARAMS_SIGNATURE = 'createProjectParamsSignature';
 
     public function __construct(
         private ParamService $paramService,
@@ -115,28 +118,35 @@ class VappApiService
      */
     public function scoreAids(array $aids): array
     {
-        $folder = 'projets/' . $this->getProjectUuidInSession() . '/aides/scoring';
-        $method = 'POST';
-        $datas = [
-            'data' => [],
-        ];
-
-        foreach ($aids as $aid) {
-            $datas['data'][] = [
-                'id' => (string) $aid['id'],
-                'nom' => (string) $aid['name'],
-                'description' => (string) $aid['description'],
-                'fournisseurDonnees' => 'aides-territoires',
+        try {
+            $folder = 'projets/' . $this->getProjectUuidInSession() . '/aides/scoring';
+            $method = 'POST';
+            $datas = [
+                'data' => [],
             ];
+    
+            foreach ($aids as $aid) {
+                $datas['data'][] = [
+                    'id' => (string) $aid['id'],
+                    'nom' => (string) $aid['name'],
+                    'description' => (string) $aid['description'],
+                    'fournisseurDonnees' => 'aides-territoires',
+                ];
+            }
+
+            $response = $this->client->request($method, $folder, [
+                'json' => $datas,
+                'timeout' => 30,
+                // 'connect_timeout' => 5
+            ]);
+
+            $datas = json_decode($response->getBody()->getContents(), true);
+
+            return $datas['data'] ?? [];
+        } catch (\Exception $e) {
+            dd($e);
+            return [];
         }
-
-        $response = $this->client->request($method, $folder, [
-            'json' => $datas,
-        ]);
-
-        $datas = json_decode($response->getBody()->getContents(), true);
-
-        return $datas['data'] ?? [];
     }
 
     private function generateUuid(): string
@@ -159,8 +169,7 @@ class VappApiService
      */
     public function getAidScoresInSession(Aid $aid): array
     {
-        $session = $this->requestStack->getCurrentRequest()->getSession();
-        $scores = json_decode($session->get(self::SESSION_AIDS_SCORES, '{}'), true);
+        $scores = $this->getAidsScoresInSession();
         if (!isset($scores[$aid->getId()])) {
             return [
                 'score_total' => null,
@@ -172,5 +181,25 @@ class VappApiService
                 'score_vapp' => $scores[$aid->getId()]['score_vapp'] ?? null,
             ];
         }
+    }
+
+    /**
+     * @param array<int, array<string, mixed>> $vappAidsById
+     * @return void
+     */
+    public function setAidsScoresInSession(array $vappAidsById): void
+    {
+        $session = $this->requestStack->getCurrentRequest()->getSession();
+        $session->set(self::SESSION_AIDS_SCORES, $vappAidsById);
+    }
+
+    /**
+     * @return array<int, array<string, mixed>>
+     */
+    public function getAidsScoresInSession(): array
+    {
+        $session = $this->requestStack->getCurrentRequest()->getSession();
+
+        return $session->get(self::SESSION_AIDS_SCORES, []);
     }
 }

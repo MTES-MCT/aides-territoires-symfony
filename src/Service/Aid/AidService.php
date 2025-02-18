@@ -45,7 +45,8 @@ class AidService // NOSONAR too complex
         private ManagerRegistry $managerRegistry,
         private LoggerInterface $loggerInterface,
         private TagAwareCacheInterface $cache,
-        private RequestStack $requestStack
+        private RequestStack $requestStack,
+        private VappApiService $vappApiService
     ) {
     }
 
@@ -1084,13 +1085,7 @@ class AidService // NOSONAR too complex
         $ids = array_map(fn ($aid) => $aid['id'], $lightAids);
 
         // recupere les scores en session
-        $scoreTotalById = json_decode(
-            $this->requestStack->getCurrentRequest()->getSession()->get(
-                VappApiService::SESSION_AIDS_SCORES,
-                '{}'
-            ),
-            true
-        );
+        $scoreTotalById = $this->vappApiService->getAidsScoresInSession();
 
         /** @var AidRepository $aidRepository */
         $aidRepository = $this->managerRegistry->getRepository(Aid::class);
