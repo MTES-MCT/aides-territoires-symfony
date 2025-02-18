@@ -356,6 +356,8 @@ class AidController extends FrontController
         VappApiService $vappApiService,
         AidService $aidService,
     ): JsonResponse {
+        ini_set('max_execution_time', 300);
+        
         // verification requête interne
         if (!$this->isGranted(InternalRequestVoter::IDENTIFIER)) {
             throw $this->createAccessDeniedException(InternalRequestVoter::MESSAGE_ERROR);
