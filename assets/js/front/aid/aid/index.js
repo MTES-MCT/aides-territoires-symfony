@@ -152,10 +152,10 @@ function callVapp()
             }
         },
         error: function() {
-            $('#new-feature-alert').after('<div id="call-vapp-error" class="fr-alert fr-alert--error">Une erreur est survenue lors de l\'analyse. Nouvel essai dans cinq secondes.</div>');
+            $('#new-feature-alert').after('<div id="call-vapp-error" class="fr-alert fr-alert--error fr-mb-2w">Une erreur est survenue lors de l\'analyse. Nouvel essai dans cinq secondes.</div>');
             window.vappCurrentRetry++;
             if (window.vappCurrentRetry > window.vappMaxRetry) {
-                $('#call-vapp-error').after('<div class="fr-alert fr-alert--error">Le nombre maximum de tentatives a été atteint. Veuillez réessayer plus tard.</div>');
+                $('#call-vapp-error').after('<div class="fr-alert fr-alert--error fr-mb-2w">Le nombre maximum de tentatives a été atteint. Veuillez réessayer plus tard.</div>');
                 $('.fa-spinner').remove();
             } else {
                 setTimeout(function() {
