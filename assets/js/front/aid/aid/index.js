@@ -17,6 +17,8 @@ function escapeHtml(text) {
 
 // Déclaration globale avec window
 window.firstCallVapp = true;
+window.vappMaxRetry = 5;
+window.vappCurrentRetry = 0;
 
 $(function(){
     callVapp();
@@ -123,6 +125,9 @@ function callVapp()
 {
     let csrfToken = typeof csrfTokenInternal !== 'undefined' ? csrfTokenInternal : '';
 
+    // on cache le message d'erreur s'il existe
+    $('#call-vapp-error').remove();
+
     $.ajax({
         url: Routing.generate('app_aid_ajax_call_vapp'),
         type: 'POST',
@@ -147,7 +152,16 @@ function callVapp()
             }
         },
         error: function() {
-            $('#new-feature-alert').after('<div class="fr-alert fr-alert--error">Une erreur est survenue lors de l\'analyse.</div>');
+            $('#new-feature-alert').after('<div id="call-vapp-error" class="fr-alert fr-alert--error">Une erreur est survenue lors de l\'analyse. Nouvel essai dans cinq secondes.</div>');
+            window.vappCurrentRetry++;
+            if (window.vappCurrentRetry > window.vappMaxRetry) {
+                $('#call-vapp-error').after('<div class="fr-alert fr-alert--error">Le nombre maximum de tentatives a été atteint. Veuillez réessayer plus tard.</div>');
+                $('.fa-spinner').remove();
+            } else {
+                setTimeout(function() {
+                    callVapp();
+                }, 5000);
+            }
         }
     })
 }
