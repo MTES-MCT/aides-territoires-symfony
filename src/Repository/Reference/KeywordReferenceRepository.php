@@ -35,6 +35,9 @@ class KeywordReferenceRepository extends ServiceEntityRepository
         $originalName = $this->stringService->sanitizeBooleanSearch($originalName);
         foreach ($keywords as $key => $keyword) {
             $keywords[$key] = $this->stringService->sanitizeBooleanSearch($keyword);
+            if ($keywords[$key] === '') {
+                unset($keywords[$key]);
+            }
         }
 
         $qb = $this->createQueryBuilder('kr');
@@ -45,18 +48,20 @@ class KeywordReferenceRepository extends ServiceEntityRepository
             ->andWhere('kr.active = 1')
         ;
 
-        $sqlOr = '';
-        $i = 0;
-        foreach ($keywords as $keyword) {
-            if ($i > 0) {
-                $sqlOr .= ' OR ';
+        if (!empty($keywords)) {
+            $sqlOr = '';
+            $i = 0;
+            foreach ($keywords as $keyword) {
+                if ($i > 0) {
+                    $sqlOr .= ' OR ';
+                }
+                $sqlOr .= 'kr.name LIKE :keyword' . $i;
+                $qb->setParameter('keyword' . $i, '%' . $keyword . '%');
+                $i++;
             }
-            $sqlOr .= 'kr.name LIKE :keyword' . $i;
-            $qb->setParameter('keyword' . $i, '%' . $keyword . '%');
-            $i++;
+            $qb->andWhere($sqlOr);
         }
-        $qb->andWhere($sqlOr);
-
+        
         return $qb->getQuery()->getResult();
     }
 
