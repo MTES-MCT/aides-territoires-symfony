@@ -12,7 +12,19 @@ class StringService
      */
     public function sanitizeBooleanSearch(string $string): string
     {
-        return trim(preg_replace('/[+<>\(\)~*@]/', ' ', $string));
+        // Limite la longueur de la chaîne
+        $string = substr($string, 0, 255);
+
+        // Supprime les caractères dangereux pour SQL
+        $string = str_replace(['=', '<>', '>=', '<=', 'SELECT', 'INSERT', 'UPDATE', 'DELETE', 'DROP', ';', '--'], ' ', $string);
+
+        // Conserve certains caractères spéciaux légitimes mais retire ceux qui pourraient être dangereux
+        $string = preg_replace('/[^\p{L}\p{N}\s\-\+\@\.\,\']/u', ' ', $string);
+
+        // Supprime les espaces multiples
+        $string = preg_replace('/\s+/', ' ', $string);
+
+        return trim($string);
     }
 
     /**
