@@ -4,6 +4,7 @@ namespace App\Controller\Aid;
 
 use App\Controller\FrontController;
 use App\Entity\Aid\Aid;
+use App\Entity\Aid\AidNotFoundError;
 use App\Entity\Aid\AidProject;
 use App\Entity\Aid\AidSuggestedAidProject;
 use App\Entity\Alert\Alert;
@@ -368,6 +369,7 @@ class AidController extends FrontController
         LogService $logService,
         NotificationService $notificationService,
     ): Response {
+        try {
         // le user si dispo
         $user = $userService->getUserLogged();
 
@@ -389,11 +391,11 @@ class AidController extends FrontController
             ]
         );
         if (!$aid) {
-            throw new AidNotFoundException('Cette aide n\'existe pas');
+            throw new AidNotFoundException('Cette aide n\'existe pas dans notre base de données ou a été supprimée.');
         }
         // regarde si aide publié et utilisateur = auteur ou utilisateur = admin
         if (!$aidService->userCanSee($aid, $user)) {
-            throw new AidNotFoundException('Cette aide n\'existe pas');
+            throw new AidNotFoundException('Cette aide n\'est pas encore publiée.');
         }
 
         // log seulement si l'aide à le statut publiée
@@ -642,5 +644,22 @@ class AidController extends FrontController
             'highlightedWords' => $requestStack->getCurrentRequest()->getSession()->get('highlightedWords', []),
             'adminEditUrl' => $adminEditUrl,
         ]);
+        } catch (AidNotFoundException $e) {
+            // Log l'erreur
+            $error = new AidNotFoundError();
+            $error->setUrl($request->getUri());
+            $error->setIp($request->getClientIp());
+            $error->setUserAgent($request->headers->get('User-Agent'));
+            $error->setReferer($request->headers->get('referer'));
+            $error->setReason($e->getMessage());
+            
+            $this->managerRegistry->getManager()->persist($error);
+            $this->managerRegistry->getManager()->flush();
+
+            // Rendu template erreur avec code 404
+            return $this->render('aid/aid/error404.html.twig', [
+                'message' => $e->getMessage()
+            ], new Response('', Response::HTTP_NOT_FOUND));
+        }
     }
 }
