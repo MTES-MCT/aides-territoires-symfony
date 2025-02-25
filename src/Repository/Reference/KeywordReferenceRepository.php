@@ -32,30 +32,50 @@ class KeywordReferenceRepository extends ServiceEntityRepository
      */
     public function findFromKewyordsOrOriginalName(array $keywords, string $originalName): array
     {
+        // Nettoyage des entrées
         $originalName = $this->stringService->sanitizeBooleanSearch($originalName);
         foreach ($keywords as $key => $keyword) {
             $keywords[$key] = $this->stringService->sanitizeBooleanSearch($keyword);
+            if ($keywords[$key] === '') {
+                unset($keywords[$key]);
+            }
+        }
+
+        // Si toutes les entrées sont vides après nettoyage
+        if (empty($keywords) && empty($originalName)) {
+            return [];
         }
 
         $qb = $this->createQueryBuilder('kr');
         $qb->orderBy('kr.name', 'ASC');
-        $qb->andWhere('kr.name IN (:keywords) OR MATCH_AGAINST(kr.name) AGAINST(:originalName IN BOOLEAN MODE) > 10')
-            ->setParameter('keywords', $keywords)
-            ->setParameter('originalName', $originalName)
-            ->andWhere('kr.active = 1')
-        ;
-
-        $sqlOr = '';
-        $i = 0;
-        foreach ($keywords as $keyword) {
-            if ($i > 0) {
-                $sqlOr .= ' OR ';
-            }
-            $sqlOr .= 'kr.name LIKE :keyword' . $i;
-            $qb->setParameter('keyword' . $i, '%' . $keyword . '%');
-            $i++;
+    
+        // Construction des conditions avec les paramètres bindés
+        $conditions = [];
+        
+        // Condition pour MATCH AGAINST
+        if (!empty($originalName)) {
+            $conditions[] = 'MATCH_AGAINST(kr.name) AGAINST(:originalName IN BOOLEAN MODE) > 10';
+            $qb->setParameter('originalName', $originalName);
         }
-        $qb->andWhere($sqlOr);
+    
+        // Condition pour IN et LIKE
+        if (!empty($keywords)) {
+            $conditions[] = 'kr.name IN (:keywords)';
+            $qb->setParameter('keywords', $keywords);
+            
+            // Ajout des conditions LIKE
+            foreach ($keywords as $i => $keyword) {
+                $conditions[] = 'kr.name LIKE :keyword' . $i;
+                $qb->setParameter('keyword' . $i, '%' . $keyword . '%');
+            }
+        }
+    
+        // Assemblage des conditions avec OR
+        if (!empty($conditions)) {
+            $qb->andWhere(implode(' OR ', $conditions));
+        }
+    
+        $qb->andWhere('kr.active = 1');
 
         return $qb->getQuery()->getResult();
     }
