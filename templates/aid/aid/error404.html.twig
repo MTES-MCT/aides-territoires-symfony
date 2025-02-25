@@ -1,0 +1,58 @@
+{# filepath: /home/remi/Documents/www/aides-territoires-symfony/templates/aid/aid/error404.html.twig #}
+{% extends 'base.html.twig' %}
+
+{% block meta_title %}
+    {% if message matches '/n\'existe pas/' %}
+        Cette aide n'existe pas | {{ parent() }}
+    {% else %}
+        Aide non publiée | {{ parent() }}
+    {% endif %}
+{% endblock %}
+
+{% block meta_description %}
+    {% if message matches '/n\'existe pas/' %}
+        Cette aide n'existe pas ou n'est plus disponible.
+    {% else %}
+        Cette aide n'est pas encore publiée.
+    {% endif %}
+{% endblock %}
+
+{% block body %}
+    <main>
+        <div id="main-content" class="main-content">
+            <div class="fr-container fr-mb-5w fr-pb-5w">
+                <div class="fr-grid-row fr-grid-row--center">
+                    <div class="fr-col-md-9">
+                        <h1>
+                            {% if message matches '/n\'existe pas/' %}
+                                Cette aide n'existe plus
+                            {% else %}
+                                Aide non publiée
+                            {% endif %}
+                        </h1>
+
+                        <div class="fr-alert fr-alert--error fr-alert--sm fr-mb-2w fr-mt-5w">
+                            <p>
+                                <strong>{{ message }}</strong>
+                            </p>
+                            <p>
+                                Vous pouvez <a href="{{ path('app_aid_aid') }}">rechercher d'autres aides disponibles</a> 
+                                ou <a href="{{ path('app_home') }}">retourner à l'accueil</a>.
+                            </p>
+                        </div>
+
+                        {% if message matches '/n\'existe pas/' %}
+                            <div class="fr-alert fr-alert--info fr-alert--sm fr-mb-2w fr-mt-5w">
+                                <p>
+                                    Si vous pensez qu'il s'agit d'une erreur, vous pouvez
+                                    <a href="{{ path('app_contact_contact') }}">nous contacter</a>
+                                    en précisant l'URL de la page.
+                                </p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+{% endblock %}

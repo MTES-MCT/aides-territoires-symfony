@@ -10,6 +10,7 @@ use App\Controller\Admin\Project\ProjectCrudController;
 use App\Controller\Admin\User\ApiTokenAskCrudController;
 use App\Entity\Aid\Aid;
 use App\Entity\Aid\AidDestination;
+use App\Entity\Aid\AidNotFoundError;
 use App\Entity\Aid\AidProject;
 use App\Entity\Aid\AidRecurrence;
 use App\Entity\Aid\AidStep;
@@ -251,6 +252,7 @@ class DashboardController extends AbstractDashboardController
             MenuItem::linkToCrud('[caractéristique] Récurrences', 'fas fa-list', AidRecurrence::class),
             MenuItem::linkToCrud('[caractéristique] Types d\'aides', 'fas fa-list', AidType::class),
             MenuItem::linkToCrud('[caractéristique] Groupes de types d\'aides', 'fas fa-list', AidTypeGroup::class),
+            MenuItem::linkToCrud('Aides non trouvée', 'fas fa-list', AidNotFoundError::class),
         ]);
 
         yield MenuItem::subMenu('Catégories', 'fas fa-table')->setSubItems([
