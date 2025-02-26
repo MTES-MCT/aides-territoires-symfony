@@ -21,6 +21,7 @@ use App\Form\Type\PerimeterAutocompleteType;
 use App\Repository\Backer\BackerGroupRepository;
 use App\Service\Aid\AidSearchClass;
 use App\Service\Aid\AidSearchFormService;
+use App\Service\Site\AbTestService;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
@@ -29,6 +30,7 @@ use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -39,11 +41,22 @@ class AidSearchTypeV2 extends AbstractType
     public function __construct(
         private ManagerRegistry $managerRegistry,
         private RouterInterface $routerInterface,
+        private AbTestService $abTestService,
     ) {
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        // ab test vapp_activation
+        $abTestVappFormulaire = false;
+        $abTestVappActivation = false;
+        if ($options['isPageAid'] || $options['isPageHome']) {
+            $abTestVappActivation = $this->abTestService->shouldShowTestVersion(AbTestService::VAPP_ACTIVATION);
+            if ($abTestVappActivation) {
+                $abTestVappFormulaire = $this->abTestService->shouldShowTestVersion(AbTestService::VAPP_FORMULAIRE);
+            }
+        }
+
         // les catégories
         $categoryThemes = $this->managerRegistry->getRepository(CategoryTheme::class)->findBy(
             [],
@@ -64,7 +77,7 @@ class AidSearchTypeV2 extends AbstractType
         // Builder
         $builder
             ->add(AidSearchFormService::QUERYSTRING_KEY_ORGANIZATION_TYPE_SLUG, EntityType::class, [
-                'required' => false,
+                'required' => $abTestVappFormulaire ? true : false,
                 'label' => 'Vous cherchez pour…',
                 'class' => OrganizationType::class,
                 'choice_label' => 'name',
@@ -87,7 +100,7 @@ class AidSearchTypeV2 extends AbstractType
                 'placeholder' => 'Tous types de structures',
             ])
             ->add(AidSearchFormService::QUERYSTRING_KEY_SEARCH_PERIMETER, PerimeterAutocompleteType::class, [
-                'required' => false,
+                'required' => $abTestVappFormulaire ? true : false,
                 'label' => 'Votre territoire',
                 'label_attr' => [
                     'id' => 'label-perimeter-search',
@@ -312,6 +325,17 @@ class AidSearchTypeV2 extends AbstractType
                 }
             }
         }
+
+        if ($abTestVappFormulaire && ($options['isPageAid'] || $options['isPageHome'])) {
+            $builder->add('vapp_description', TextareaType::class, [
+                'label' => 'Description de votre projet',
+                'required' => true,
+                'attr' => [
+                    'placeholder' => 'Exemple: Assistance à maitrise d’ouvrage pour l’Installation de panneaux '
+                        . 'photovoltaiques sur le toit de l’école municipale.',
+                ],
+            ]);
+        }
     }
 
     public function configureOptions(OptionsResolver $resolver): void
@@ -325,6 +349,8 @@ class AidSearchTypeV2 extends AbstractType
             'extended' => false,
             'removes' => [],
             'searchPage' => null,
+            'isPageAid' => false,
+            'isPageHome' => false,
         ]);
     }
 

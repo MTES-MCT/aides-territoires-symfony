@@ -1,8 +1,9 @@
-<div class="fr-alert fr-alert--info fr-mb-3w">
-    <h3 class="fr-alert__title">Nouvelle fonctionnalité</h3>
-    <p>Vous pouvez désormais ajouter des aides à vos favoris pour les retrouver facilement dans <a href="{{ path('app_user_aid_favorites') }}">votre espace personnel</a>. 
-    {% if not app.user %}
-        <a href="{{ path('app_login') }}" class="fr-link">Connectez-vous</a> pour en profiter !
-    {% endif %}
+{% if shouldShowTestVersion(constant('App\\Service\\Site\\AbTestService::VAPP_FORMULAIRE')) %}
+<div id="new-feature-alert" class="fr-alert fr-alert--info fr-my-3w">
+    <p>
+        <i class="fas fa-spinner fa-spin"></i> <strong>Nos algorithmes travaillent pour identifier les aides pertinentes pour votre projet. Cela peut prendre 1 ou 2 minutes.</strong>
     </p>
+    <p><span id="vapp-nb-treated">0</span> aides traitées{% if myPager is defined %} sur <span id="vapp-nb-total">{{ myPager.getNbResults() }}</span>{% endif %}</p>
+    <p><a href="{{ path('app_abtest_no_vapp') }}">Utilisez plutôt la recherche normale.</a></p>
 </div>
+{% endif %}

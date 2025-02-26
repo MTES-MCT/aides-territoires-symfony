@@ -27,10 +27,13 @@ use App\Repository\Organization\OrganizationTypeRepository;
 use App\Repository\Program\ProgramRepository;
 use App\Repository\Reference\ProjectReferenceRepository;
 use App\Service\Aid\AidService;
+use App\Service\Api\VappApiService;
 use App\Service\Category\CategoryService;
+use App\Service\Category\CategoryTheme;
 use App\Service\Matomo\MatomoService;
 use App\Service\Perimeter\PerimeterService;
 use App\Service\Reference\KeywordReferenceService;
+use App\Service\Site\AbTestService;
 use App\Service\User\UserService;
 use App\Service\Various\Breadcrumb;
 use App\Service\Various\ParamService;
@@ -41,7 +44,6 @@ use Doctrine\Persistence\ManagerRegistry;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;
 use Twig\TwigFunction;
-use App\Service\Category\CategoryTheme;
 
 class AppExtension extends AbstractExtension // NOSONAR too much methods
 {
@@ -55,7 +57,9 @@ class AppExtension extends AbstractExtension // NOSONAR too much methods
         private StringService $stringService,
         private MatomoService $matomoService,
         private KeywordReferenceService $keywordReferenceService,
-        private AidService $aidService
+        private AidService $aidService,
+        private AbTestService $abTestService,
+        private VappApiService $vappApiService,
     ) {
     }
 
@@ -73,7 +77,7 @@ class AppExtension extends AbstractExtension // NOSONAR too much methods
             new TwigFilter('aidStatusDisplay', [$this, 'aidStatusDisplay']),
             new TwigFilter('alertFrequencyDisplay', [$this, 'alertFrequencyDisplay']),
             new TwigFilter('projectStepDisplay', [$this, 'projectStepDisplay']),
-            new TwigFilter('secondsToMinutes', [$this, 'secondsToMinutes']),
+            new TwigFilter('secondsToMinutes', [$this, 'secondsToMinutes'])
         ];
     }
 
@@ -177,6 +181,9 @@ class AppExtension extends AbstractExtension // NOSONAR too much methods
             new TwigFunction('orderAidFinancerByBackerName', [$this, 'orderAidFinancerByBackerName']),
             new TwigFunction('orderAidInstructorByBackerName', [$this, 'orderAidInstructorByBackerName']),
             new TwigFunction('isAidInUserFavorites', [$this, 'isAidInUserFavorites']),
+            new TwigFunction('shouldShowTestVersion', [$this, 'shouldShowTestVersion']),
+            new TwigFunction('vappScoreToText', [$this, 'vappScoreToText']),
+            new TwigFunction('getVappAidScoresInSession', [$this, 'getVappAidScoresInSession']),
         ];
     }
 
@@ -220,16 +227,13 @@ class AppExtension extends AbstractExtension // NOSONAR too much methods
      * on va encapsuler les tables qui ne le sont pas déjà dans
      * <div class="fr-table fr-table--no-scroll">
      *      <div class="fr-table__wrapper">
-*              <div class="fr-table__container">
-*                  <div class="fr-table__content">
-*                  </div>
-*              </div>
+     *              <div class="fr-table__container">
+     *                  <div class="fr-table__content">
+     *                  </div>
+     *              </div>
      *      </div>
      * </div>
-     * Pour coller au style DSFR
-     *
-     * @param string $html
-     * @return string
+     * Pour coller au style DSFR.
      */
     public function encapsulateTables(string $html): string
     {
@@ -394,6 +398,7 @@ class AppExtension extends AbstractExtension // NOSONAR too much methods
 
     /**
      * @param ArrayCollection<int, Category>|array<int, Category> $categories
+     *
      * @return array<int, array{
      *     categoryTheme: \App\Entity\Category\CategoryTheme,
      *     categories: array<int, \App\Entity\Category\Category>
@@ -498,6 +503,7 @@ class AppExtension extends AbstractExtension // NOSONAR too much methods
 
     /**
      * @param Collection<int, AidFinancer> $aidFinancers
+     *
      * @return Collection<int, AidFinancer>
      */
     public function orderAidFinancerByBackerName(Collection $aidFinancers): Collection
@@ -516,12 +522,12 @@ class AppExtension extends AbstractExtension // NOSONAR too much methods
 
     /**
      * @param Collection<int, AidInstructor> $aidInstructors
+     *
      * @return Collection<int, AidInstructor>
      */
     public function orderAidInstructorByBackerName(Collection $aidInstructors): Collection
     {
         $aidInstructors = $aidInstructors->toArray();
-
 
         usort($aidInstructors, function (AidInstructor $a, AidInstructor $b) {
             $nameA = $this->stringService->normalizeString($a->getBacker()->getName());
@@ -536,5 +542,36 @@ class AppExtension extends AbstractExtension // NOSONAR too much methods
     public function isAidInUserFavorites(?User $user, ?Aid $aid): bool
     {
         return $this->aidService->isAidInUserFavorites($user, $aid);
+    }
+
+    public function shouldShowTestVersion(string $abTestName): bool
+    {
+        return $this->abTestService->shouldShowTestVersion($abTestName);
+    }
+
+    public function vappScoreToText(float $vappScore): string
+    {
+        $text = 'Très faible ☹️';
+
+        if ($vappScore > 85) {
+            $text = 'Très élevé 😃';
+        } elseif ($vappScore > 70) {
+            $text = 'Elevé 😃';
+        } elseif ($vappScore > 50) {
+            $text = 'Moyenne 🙂';
+        } elseif ($vappScore > 30) {
+            $text = 'Faible 😕';
+        }
+
+        return $text;
+    }
+
+    /**
+     * @param Aid $aid
+     * @return array<string, mixed>
+     */
+    public function getVappAidScoresInSession(Aid $aid): array
+    {
+        return $this->vappApiService->getAidScoresInSession($aid);
     }
 }

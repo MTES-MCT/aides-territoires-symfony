@@ -19,7 +19,6 @@ use App\Entity\Reference\ProjectReference;
 use App\Entity\User\User;
 use App\Repository\Perimeter\PerimeterRepository;
 use App\Repository\Reference\KeywordReferenceRepository;
-use App\Service\Aid\AidService;
 use App\Service\Reference\ReferenceService;
 use App\Service\Various\StringService;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
@@ -45,7 +44,6 @@ class AidRepository extends ServiceEntityRepository
         private ReferenceService $referenceService,
         private StringService $stringService,
         private TagAwareCacheInterface $cache,
-        private AidService $aidService
     ) {
         parent::__construct($registry, Aid::class);
     }
@@ -2192,6 +2190,8 @@ class AidRepository extends ServiceEntityRepository
                     /** @var Aid $aid */
                     $aid = $result[0];
                     $aid->setScoreTotal($result['score_total'] ?? null);
+                } else {
+                    $aid = null;
                 }
 
                 return $aid;
@@ -2209,12 +2209,34 @@ class AidRepository extends ServiceEntityRepository
     /**
      * Charge une liste d'aides avec toutes les datas à partir d'un tableau d'ids
      *
-     * @param array $ids
+     * @param array<int, int> $ids
      * @return array<int, Aid>
      */
     public function findCompleteAidsByIds(array $ids): array
     {
         $qb = $this->createQueryBuilder('a')
+        ->where('a.id IN (:ids)')
+        ->orderBy(sprintf('FIELD(a.id, %s)', implode(',', $ids)))
+        ->setParameter('ids', $ids)
+        ;
+
+        // Forcer le chargement complet
+        return $qb
+            ->getQuery()
+            ->setHint(\Doctrine\ORM\Query::HINT_REFRESH, true)
+            ->getResult();
+    }
+
+    /**
+     * Charge une liste d'aides avec les datas pour Vapp à partir d'un tableau d'ids
+     *
+     * @param array<int, int> $ids
+     * @return array<int, Aid>
+     */
+    public function findVappAidsByIds(array $ids): array
+    {
+        $qb = $this->createQueryBuilder('a')
+        ->select('a.id, a.name, a.description')
         ->where('a.id IN (:ids)')
         ->orderBy(sprintf('FIELD(a.id, %s)', implode(',', $ids)))
         ->setParameter('ids', $ids)

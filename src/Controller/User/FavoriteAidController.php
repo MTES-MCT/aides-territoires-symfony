@@ -7,6 +7,7 @@ use App\Entity\User\User;
 use App\Repository\Aid\AidRepository;
 use App\Repository\Log\LogAidSearchTempRepository;
 use App\Service\Log\LogService;
+use App\Service\User\UserService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -22,6 +23,7 @@ class FavoriteAidController extends AbstractController
         AidRepository $aidRepository,
         LogAidSearchTempRepository $logAidSearchTempRepository,
         EntityManagerInterface $entityManager,
+        UserService $userService,
     ): Response {
         $this->denyAccessUnlessGranted('ROLE_USER');
 
@@ -32,7 +34,7 @@ class FavoriteAidController extends AbstractController
         }
 
         /** @var User $user */
-        $user = $this->getUser();
+        $user = $userService->getUserLogged();
         $favoriteAid = $entityManager->getRepository(FavoriteAid::class)->findOneBy([
             'user' => $user,
             'aid' => $aid,

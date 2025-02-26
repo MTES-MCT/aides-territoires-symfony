@@ -864,6 +864,8 @@ class Aid // NOSONAR too much methods
     #[ORM\OneToMany(mappedBy: 'aid', targetEntity: FavoriteAid::class, orphanRemoval: true)]
     private Collection $favoriteAids;
 
+    private float $scoreVapp = 0.0;
+
     public function __construct()
     {
         $this->aidAudiences = new ArrayCollection();
@@ -3084,6 +3086,18 @@ class Aid // NOSONAR too much methods
                 $favoriteAid->setAid(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getScoreVapp(): float
+    {
+        return $this->scoreVapp;
+    }
+
+    public function setScoreVapp(float $scoreVapp): static
+    {
+        $this->scoreVapp = $scoreVapp;
 
         return $this;
     }

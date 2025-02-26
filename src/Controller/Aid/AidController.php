@@ -10,6 +10,7 @@ use App\Entity\Aid\AidSuggestedAidProject;
 use App\Entity\Alert\Alert;
 use App\Entity\Perimeter\Perimeter;
 use App\Entity\Project\Project;
+use App\Entity\Reference\ProjectReference;
 use App\Entity\User\User;
 use App\Exception\BusinessException\AidNotFoundException;
 use App\Form\Aid\AidSearchTypeV2;
@@ -19,9 +20,12 @@ use App\Form\Project\AddAidToProjectType;
 use App\Repository\Aid\AidRepository;
 use App\Repository\Blog\BlogPromotionPostRepository;
 use App\Repository\Project\ProjectRepository;
+use App\Repository\Reference\ProjectReferenceRepository;
+use App\Security\Voter\InternalRequestVoter;
 use App\Service\Aid\AidSearchClass;
 use App\Service\Aid\AidSearchFormService;
 use App\Service\Aid\AidService;
+use App\Service\Api\VappApiService;
 use App\Service\Blog\BlogPromotionPostService;
 use App\Service\Email\EmailService;
 use App\Service\Export\SpreadsheetExporterService;
@@ -29,6 +33,7 @@ use App\Service\Log\LogService;
 use App\Service\Matomo\MatomoService;
 use App\Service\Notification\NotificationService;
 use App\Service\Reference\ReferenceService;
+use App\Service\Site\AbTestService;
 use App\Service\User\UserService;
 use App\Service\Various\Breadcrumb;
 use App\Service\Various\ParamService;
@@ -37,6 +42,7 @@ use Doctrine\Persistence\ManagerRegistry;
 use Pagerfanta\Adapter\ArrayAdapter;
 use Pagerfanta\Exception\OutOfRangeCurrentPageException;
 use Pagerfanta\Pagerfanta;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -69,8 +75,16 @@ class AidController extends FrontController
         LogService $logService,
         ReferenceService $referenceService,
         BlogPromotionPostService $blogPromotionPostService,
+        VappApiService $vappApiService,
+        AbTestService $abTestService,
     ): Response {
         $timeStart = microtime(true);
+
+        // la session
+        $session = $requestStack->getCurrentRequest()->getSession();
+
+        // est ce que l'ab test vapp est activé
+        $isVappFormulaire = $abTestService->shouldShowTestVersion(AbTestService::VAPP_FORMULAIRE);
 
         $requestStack
             ->getCurrentRequest()
@@ -89,6 +103,7 @@ class AidController extends FrontController
         $formAidSearchParams = [
             'method' => 'GET',
             'extended' => true,
+            'isPageAid' => true,
         ];
 
         // formulaire recherche aides
@@ -105,11 +120,63 @@ class AidController extends FrontController
         ];
 
         $aidParams = array_merge($aidParams, $aidSearchFormService->convertAidSearchClassToAidParams($aidSearchClass));
+        if (isset($aidParams['projectReference']) && $aidParams['projectReference'] instanceof ProjectReference) {
+            $session->set('aidParamsPrId', $aidParams['projectReference']->getId());
+        }
+
         $query = parse_url($requestStack->getCurrentRequest()->getRequestUri(), PHP_URL_QUERY) ?? null;
 
         // le paginateur
         $timeAidStart = microtime(true);
         $aids = $aidService->searchAidsV3($aidParams);
+
+        // ************************************* */
+        // TEST VAPP
+
+        // gestion si c'est une nouvelle recherche ou non
+        $aidParamsSignature = hash('xxh128', json_encode($this->cleanParamsForSignature($aidParams)));
+        $aidParamsSignatureInSession = $session->get('aidParamsSignature', null);
+        $newSearch = $aidParamsSignature != $aidParamsSignatureInSession;
+        $session->set('aidParamsSignature', $aidParamsSignature);
+
+        if ($isVappFormulaire) {
+            // les scores en session
+            $vappAidsById = $vappApiService->getAidsScoresInSession();
+
+            // réinitialise la page courange
+            $session->set(VappApiService::SESSION_CURRENT_PAGE_SCORE_VAPP, 0);
+
+            if ($newSearch || empty($vappAidsById)) {
+                $vappAidsById = [];
+                foreach ($aids as $aid) {
+                    $vappAidsById[$aid->getId()] = [
+                        'id' => $aid->getId(),
+                        'score_total' => $aid->getScoreTotal(),
+                    ];
+                }
+
+                // on met $vappAidsById dans la session
+                $vappApiService->setAidsScoresInSession($vappAidsById);
+            }
+
+            // créar un nouveau projet si besoin
+            $vappApiService->getProjectUuid(
+                description: $aidSearchClass->getVappDescription(),
+                porteur: strtolower($aidSearchClass->getOrganizationTypeSlug()),
+                zonesGeographiques: [
+                    [
+                        'type' => ucfirst(
+                            Perimeter::SCALES_FOR_SEARCH[$aidSearchClass->getPerimeterId()->getScale()]['name']
+                        ),
+                        'code' => (int) $aidSearchClass->getPerimeterId()->getInsee() ?? 69266,
+                        // 'code' => 69266,
+                    ],
+                ],
+                force: true
+            );
+        }
+        // ************************************* */
+
         $timeAidEnd = microtime(true);
         $executionTimeAid = $timeAidEnd - $timeAidStart;
         try {
@@ -138,12 +205,20 @@ class AidController extends FrontController
         }
 
         // Log recherche
+        $logAidSearchParams = $logService->getLogAidSearchParams(
+            aidParams: $aidParams,
+            resultsCount: $pagerfanta->getNbResults(),
+        );
+        // ************************************* */
+        // TEST VAPP
+        if ($isVappFormulaire) {
+            $logAidSearchParams['source'] = 'vapp';
+        }
+        // ************************************* */
+
         $logService->log(
             type: LogService::AID_SEARCH,
-            params: $logService->getLogAidSearchParams(
-                aidParams: $aidParams,
-                resultsCount: $pagerfanta->getNbResults(),
-            ),
+            params: $logAidSearchParams
         );
 
         // promotions posts
@@ -273,7 +348,185 @@ class AidController extends FrontController
             'memoryUsage' => round(memory_get_peak_usage() / 1024 / 1024),
             'executionTimeAid' => round($executionTimeAid * 1000),
             'pageResults' => $pageResults,
+            'isVappFormulaire' => $isVappFormulaire,
         ]);
+    }
+
+    private function cleanParamsForSignature(array $params): array
+    {
+        $cleanParams = [];
+        foreach ($params as $key => $value) {
+            if (is_object($value)) {
+                // Pour tout objet ayant getId()
+                if (method_exists($value, 'getId')) {
+                    $cleanParams[$key] = [
+                        'id' => $value->getId(),
+                    ];
+
+                    // Ajoute le slug si disponible
+                    if (method_exists($value, 'getSlug')) {
+                        $cleanParams[$key]['slug'] = $value->getSlug();
+                    }
+                }
+            } else {
+                $cleanParams[$key] = $value;
+            }
+        }
+
+        return $cleanParams;
+    }
+
+    #[Route('/aides/ajax-call-vapp/', name: 'app_aid_ajax_call_vapp', options: ['expose' => true])]
+    public function ajaxCallVapp(
+        RequestStack $requestStack,
+        VappApiService $vappApiService,
+        AidService $aidService,
+    ): JsonResponse {
+        ini_set('max_execution_time', 300);
+        $timeStart = microtime(true);
+        // verification requête interne
+        if (!$this->isGranted(InternalRequestVoter::IDENTIFIER)) {
+            throw $this->createAccessDeniedException(InternalRequestVoter::MESSAGE_ERROR);
+        }
+
+        $session = $requestStack->getSession();
+
+        //  le nombre d'aides qu'on va score à chaque appel
+        $nbToScore = 10;
+
+        // la page courante
+        $firstCallVapp = trim($requestStack->getCurrentRequest()->get('firstCallVap', 'true'));
+        'true' === $firstCallVapp ? $firstCallVapp = true : $firstCallVapp = false;
+        $currentPageScoreVapp = $firstCallVapp
+            ? 0
+            : $session->get(VappApiService::SESSION_CURRENT_PAGE_SCORE_VAPP, 0)
+        ;
+
+        // recupère le résultat de la recherche en session
+        $vappAidsById = $vappApiService->getAidsScoresInSession();
+
+        // on fait un nouveau tableau des aides par paquet pour envoyer à Vapp en plusieurs fois
+        $aidsChunks = array_chunk($vappAidsById, $nbToScore, true);
+
+        $aidsChunksToScore = $aidsChunks[$currentPageScoreVapp] ?? null;
+        if (!$aidsChunksToScore) {
+            // il n'y a plus d'aides à score
+            return new JsonResponse(['status' => 'done']);
+        }
+
+        // on vérifie si on a pas déjà des score vapp dans la session
+        $aidsChunksToScoreToSend = array_filter(
+            $aidsChunksToScore,
+            fn ($aid) => !isset($aid['score_vapp'])
+        );
+
+        if (!empty($aidsChunksToScoreToSend)) {
+            // recupere les infos pour vapp
+            $aidsToScore = $aidService->hydrateLightAidsForVapp(
+                lightAids: $aidsChunksToScoreToSend
+            );
+
+            // on score les aides
+            $vappScores = $vappApiService->scoreAids($aidsToScore);
+
+            // Transformation du tableau
+            $scores = array_combine(
+                array_column($vappScores, 'id'),
+                array_column($vappScores, 'scoreCompatibilite')
+            );
+        }
+
+        // on met à jour le tableau en session
+        foreach ($aidsChunksToScore as $id => $aid) {
+            if (isset($scores) && isset($scores[$id])) {
+                $aidsChunksToScore[$id]['score_vapp'] = $scores[$id];
+
+                if (isset($vappAidsById[$id])) {
+                    $vappAidsById[$id]['score_vapp'] = $scores[$id];
+                }
+            }
+        }
+
+        // on met les scores mis à jour en session
+        $vappApiService->setAidsScoresInSession($vappAidsById);
+
+        // on met le numero de page suivante en session
+        $session->set(VappApiService::SESSION_CURRENT_PAGE_SCORE_VAPP, $currentPageScoreVapp + 1);
+
+        // retjour json des aides
+        return new JsonResponse([
+            'status' => 'success',
+            'aidsChunksToScore' => $aidsChunksToScore,
+            'time' => round(microtime(true) - $timeStart) * 1000,
+            'maxMemory' => round(memory_get_peak_usage() / 1024 / 1024),
+        ]);
+    }
+
+    #[Route('/aides/ajax-render-aid-card/', name: 'app_aid_ajax_render_aid_card', options: ['expose' => true])]
+    public function ajaxRenderAidCard(
+        RequestStack $requestStack,
+        AidRepository $aidRepository,
+        AidService $aidService,
+        UserService $userService,
+        ProjectReferenceRepository $projectReferenceRepository,
+    ): JsonResponse {
+        try {
+            // verification requête interne
+            if (!$this->isGranted(InternalRequestVoter::IDENTIFIER)) {
+                throw $this->createAccessDeniedException(InternalRequestVoter::MESSAGE_ERROR);
+            }
+
+            // verifie id aide
+            $aidId = $requestStack->getCurrentRequest()->get('aidId', null);
+            $scoreVapp = $requestStack->getCurrentRequest()->get('scoreVapp', 0);
+
+            if (!$aidId) {
+                throw new \Exception('Id Aide manquant');
+            }
+
+            // charge aide
+            $aid = $aidRepository->find($aidId);
+            if (!$aid) {
+                throw new \Exception('Aide non trouvée');
+            }
+
+            // regarde si aide consultable
+            $user = $userService->getUserLogged();
+            if (!$aidService->userCanSee($aid, $user)) {
+                throw new \Exception('Aide non trouvée');
+            }
+
+            // essaye de recuperer les aidParams si disponibles
+            $session = $requestStack->getCurrentRequest()->getSession();
+            $aidParamsPrId = $session->get('aidParamsPrId', null);
+            if ($aidParamsPrId) {
+                $projectRefence = $projectReferenceRepository->find($aidParamsPrId);
+                if ($projectRefence instanceof ProjectReference) {
+                    foreach ($aid->getProjectReferences() as $projectReferenceAid) {
+                        if ($projectReferenceAid->getId() == $projectRefence->getId()) {
+                            $aid->addProjectReferenceSearched($projectRefence);
+                        }
+                    }
+                }
+            }
+
+            // rendu template
+            $cardHtml = $this->renderView('aid/aid/_aid_result.html.twig', [
+                'aid' => $aid,
+                'scoreVapp' => $scoreVapp,
+                'dsDatas' => $aidService->getDatasFromDs($aid, $user, $user ? $user->getDefaultOrganization() : null),
+            ]);
+
+            return new JsonResponse([
+                'status' => 'success',
+                'cardHtml' => $cardHtml,
+            ]);
+        } catch (\Exception $e) {
+            return new JsonResponse([
+                'status' => 'error',
+                'message' => $e->getMessage(),
+            ]);
+        }
     }
 
     #[Route('/aides/exporter/', name: 'app_aid_export')]
@@ -368,6 +621,7 @@ class AidController extends FrontController
         ProjectRepository $projectRepository,
         LogService $logService,
         NotificationService $notificationService,
+        AbTestService $abTestService,
     ): Response {
         try {
         // le user si dispo

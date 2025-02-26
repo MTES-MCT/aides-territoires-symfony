@@ -1,18 +1,42 @@
+import Routing from 'fos-router';
 import '../../log/log-aid-details.js';
 import 'jquery-highlight/jquery.highlight.js';
 
-
-$(document).ready(function () {
-
+$(function(){
     if (typeof highlightedWords !== 'undefined') {
         $('.highlightable').highlight(highlightedWords);
     }
 
+    $(document).on({
+        click: function(e) {
+            e.stopPropagation();
+            e.preventDefault();
+
+            let thisElt = $(this);
+            let vote = parseInt($(this).data('vote'));
+            let thisAidId = typeof aidId !== 'undefined' ? aidId : 0;
+            let csrfToken = typeof csrfTokenInternal !== 'undefined' ? csrfTokenInternal : '';
+            
+            $.ajax({
+                url: Routing.generate('app_abtest_ajax_vote'),
+                type: 'POST',
+                data: {
+                    vote: vote,
+                    aidId: thisAidId,
+                    _token: csrfToken
+                },
+                success: function(data) {
+                    if (data.success) {
+                        $('.btn-vote').removeClass('active');
+                        thisElt.addClass('active');
+                    }
+                }
+            });
+        }
+    }, '.btn-vote');
+
     $("#clipboard-btn").on("click", function () {
-        input_url = $("#currentUrl");
-        input_url.focus();
-        input_url.select();
-        navigator.clipboard.writeText(input_url.val());
+        navigator.clipboard.writeText($("#currentUrl").val());
     });
 
 
@@ -57,5 +81,4 @@ $(document).ready(function () {
 
     // Make sure all links contained in aid description open in a new tab.
     $('article#aid div.aid-details a').attr('target', '_blank');
-    
-})
+});

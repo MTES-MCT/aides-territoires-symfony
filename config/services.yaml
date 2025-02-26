@@ -48,6 +48,8 @@ parameters:
     proconnect_client_id: '%env(resolve:PROCONNECT_CLIENT_ID)%'
     proconnect_client_secret: '%env(resolve:PROCONNECT_CLIENT_SECRET)%'
     id_program_fond_vert: '%env(resolve:ID_PROGRAM_FOND_VERT)%'
+    vapp_base_url: '%env(resolve:VAPP_BASE_URL)%'
+    vapp_api_key: '%env(resolve:VAPP_API_KEY)%'
 
 services:
     # default configuration for services in *this* file
@@ -66,6 +68,10 @@ services:
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
+
+    App\EventListener\Site\CookieResponseListener:
+        tags:
+            - { name: kernel.event_listener, event: kernel.response }
 
     # Register the LogoutListener service
     App\EventListener\MyCustomLogoutListener:

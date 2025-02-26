@@ -4,6 +4,7 @@ namespace App\Service\Log;
 
 use App\Entity\Aid\Aid;
 use App\Entity\Blog\BlogPromotionPost;
+use App\Entity\Category\CategoryTheme;
 use App\Entity\Log\LogAccountRegisterFromNextPageWarningClickEvent;
 use App\Entity\Log\LogAidApplicationUrlClick;
 use App\Entity\Log\LogAidCreatedsFolder;
@@ -64,7 +65,7 @@ class LogService
                             if ('_token' == $key) { // pas besoin de stocker le tocken
                                 continue;
                             }
-                            $querystring .= $key.'='.$param.'&';
+                            $querystring .= $key . '=' . $param . '&';
                         }
                         $querystring = substr($querystring, 0, -1); // on enlève le dernier & (qui est en trop)
                     }
@@ -279,9 +280,8 @@ class LogService
                 $this->managerRegistry->getManager()->persist($log);
                 $this->managerRegistry->getManager()->flush();
 
-                if ($type == self::AID_SEARCH) {
+                if ($type == self::AID_SEARCH && isset($querystring)) {
                     $this->setLogAidSearchTempIdInSession($log, $querystring);
-
                 }
             }
         } catch (\Exception $exception) {
@@ -293,7 +293,10 @@ class LogService
 
     private function getLogAidSearchSourceInSession(): ?string
     {
-        $logAidSearchTempId = $this->requestStack->getCurrentRequest()->getSession()->get(self::LAST_LOG_AID_SEARCH_ID, null);
+        $logAidSearchTempId = $this->requestStack->getCurrentRequest()->getSession()->get(
+            self::LAST_LOG_AID_SEARCH_ID,
+            null
+        );
         if (!$logAidSearchTempId) {
             return null;
         }
@@ -313,7 +316,10 @@ class LogService
         }
 
         // on regarde si il y a un id en session
-        $lastLogAidSearchId = $this->requestStack->getCurrentRequest()->getSession()->get(self::LAST_LOG_AID_SEARCH_ID, null);
+        $lastLogAidSearchId = $this->requestStack->getCurrentRequest()->getSession()->get(
+            self::LAST_LOG_AID_SEARCH_ID,
+            null
+        );
         if ($lastLogAidSearchId) {
             // on récupère le dernier log de recherche
             $lastLog = $this->managerRegistry->getRepository(LogAidSearchTemp::class)->find($lastLogAidSearchId);
@@ -324,11 +330,17 @@ class LogService
                     != $this->removePageFromQuerystring($querystring)
             ) {
                 // on stock l'id de la recherche dans la session pour le notififer dans l'ajout aux favoris
-                $this->requestStack->getCurrentRequest()->getSession()->set(self::LAST_LOG_AID_SEARCH_ID, $log->getId());
+                $this->requestStack->getCurrentRequest()->getSession()->set(
+                    self::LAST_LOG_AID_SEARCH_ID,
+                    $log->getId()
+                );
             }
         } else {
             // on stock l'id de la recherche dans la session pour le notififer dans l'ajout aux favoris
-            $this->requestStack->getCurrentRequest()->getSession()->set(self::LAST_LOG_AID_SEARCH_ID, $log->getId());
+            $this->requestStack->getCurrentRequest()->getSession()->set(
+                self::LAST_LOG_AID_SEARCH_ID,
+                $log->getId()
+            );
         }
     }
 
@@ -336,11 +348,11 @@ class LogService
     {
         // Convertir la querystring en tableau de paramètres
         parse_str($querystring, $params);
-        
+
         // Supprimer les paramètres non désirés
         unset($params['_token']);
         unset($params['newIntegration']);
-        
+
         // Reconstruire la querystring proprement
         return http_build_query($params);
     }
@@ -349,10 +361,10 @@ class LogService
     {
         // Convertir la querystring en tableau de paramètres
         parse_str($querystring, $params);
-        
+
         // Supprimer les paramètres non désirés
         unset($params['page']);
-        
+
         // Reconstruire la querystring proprement
         return http_build_query($params);
     }
@@ -397,13 +409,19 @@ class LogService
         return substr($host, 0, 255);
     }
 
+    /**
+     * @param array<string, mixed> $aidParams
+     * @param integer $resultsCount
+     * @param string|null $source
+     * @param string|null $query
+     * @return array<string, mixed>
+     */
     public function getLogAidSearchParams(
         array $aidParams,
         int $resultsCount,
         ?string $source = null,
         ?string $query = null
-    ): array
-    {
+    ): array {
         // le user actuellement connecté
         $user = $this->userService->getUserLogged();
         // la query

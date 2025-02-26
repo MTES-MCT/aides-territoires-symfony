@@ -63,6 +63,8 @@ class AidSearchClass // NOSONAR too much methods
     private ?ProjectReference $projectReference;
     private ?AidRecurrence $aidRecurrence;
 
+    private ?string $vapp_description;
+
     public function __construct()
     {
         $this->organization_type_slug = null;
@@ -85,6 +87,7 @@ class AidSearchClass // NOSONAR too much methods
         $this->call_for_projects_only = null;
         $this->projectReference = null;
         $this->aidRecurrence = null;
+        $this->vapp_description = null;
     }
 
     public function getOrganizationTypeSlug(): ?OrganizationType
@@ -418,5 +421,15 @@ class AidSearchClass // NOSONAR too much methods
     public function setAidRecurrence(?AidRecurrence $aidRecurrence): void
     {
         $this->aidRecurrence = $aidRecurrence;
+    }
+
+    public function getVappDescription(): ?string
+    {
+        return $this->vapp_description;
+    }
+
+    public function setVappDescription(?string $vappDescription): void
+    {
+        $this->vapp_description = $vappDescription;
     }
 }

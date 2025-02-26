@@ -113,6 +113,10 @@ class FavoriteAidRepository extends ServiceEntityRepository
         return $qb->getQuery()->getSingleScalarResult();
     }
 
+    /**
+     * @param array<string, mixed>|null $params
+     * @return array<int, mixed>
+     */
     public function countBySource(?array $params = null): array
     {
         $dateMin = $params['dateMin'] ?? null;

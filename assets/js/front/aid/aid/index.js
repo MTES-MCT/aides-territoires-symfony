@@ -1,3 +1,4 @@
+import Routing from 'fos-router';
 import '../../log/log-register-from-next-page-warning.js';
 import '../../log/log-promotion-blog-post-click.js';
 import '../../log/log-aid-search.js';
@@ -14,7 +15,14 @@ function escapeHtml(text) {
    return text.replace(/[&<>"']/g, function(m) { return map[m]; });
 }
 
+// Déclaration globale avec window
+window.firstCallVapp = true;
+window.vappMaxRetry = 5;
+window.vappCurrentRetry = 0;
+
 $(function(){
+    callVapp();
+
     $(document).on({
         click: function (e) {
             var thisElt = $(this);
@@ -111,4 +119,90 @@ function showFormExtended()
     var newBtnText = '<span class="fr-icon-subtract-line" aria-hidden="true"></span> Masquer les critères avancés';
     $('button#search-form-more-options').html(newBtnText);
 
+}
+
+function callVapp()
+{
+    let csrfToken = typeof csrfTokenInternal !== 'undefined' ? csrfTokenInternal : '';
+
+    // on cache le message d'erreur s'il existe
+    $('#call-vapp-error').remove();
+
+    $.ajax({
+        url: Routing.generate('app_aid_ajax_call_vapp'),
+        type: 'POST',
+        data: {
+            _token: csrfToken,
+            firstCallVap: window.firstCallVapp
+        },
+        success: function(data) {
+            if (data.status === 'success') {
+                if (typeof data.aidsChunksToScore !== 'undefined') {
+                    Object.entries(data.aidsChunksToScore).forEach(([id, aid]) => {
+                        renderAidCard(id, aid.score_vapp);
+                    });
+
+                    let nbTreated = parseInt($('#vapp-nb-treated').text()) + Object.keys(data.aidsChunksToScore).length;
+                    $('#vapp-nb-treated').text(nbTreated);
+                    window.firstCallVapp = false;
+                    callVapp();
+                }
+            } else if (data.status === 'done') {
+                $('.fa-spinner').remove();
+            }
+        },
+        error: function() {
+            $('#new-feature-alert').after('<div id="call-vapp-error" class="fr-alert fr-alert--error fr-mb-2w">Une erreur est survenue lors de l\'analyse. Nouvel essai dans cinq secondes.</div>');
+            window.vappCurrentRetry++;
+            if (window.vappCurrentRetry > window.vappMaxRetry) {
+                $('#call-vapp-error').after('<div class="fr-alert fr-alert--error fr-mb-2w">Le nombre maximum de tentatives a été atteint. Veuillez réessayer plus tard.</div>');
+                $('.fa-spinner').remove();
+            } else {
+                setTimeout(function() {
+                    callVapp();
+                }, 5000);
+            }
+        }
+    })
+}
+
+function renderAidCard(aidId, scoreVapp)
+{
+    let csrfToken = typeof csrfTokenInternal !== 'undefined' ? csrfTokenInternal : '';
+
+    $.ajax({
+        url: Routing.generate('app_aid_ajax_render_aid_card'),
+        type: 'POST',
+        data: {
+            aidId: aidId,
+            scoreVapp: scoreVapp,
+            _token: csrfToken
+        },
+        success: function(data) {
+            const $wrapper = $('#aids-as-card');
+            // Enveloppe le HTML de la carte dans un div avec les classes col
+            const $newCard = $('<div class="fr-col-xs-12 fr-col-md-4 fr-p-3w"></div>').html(data.cardHtml);
+            const newScore = parseFloat($newCard.find('.fr-card').data('score-vapp'));
+            
+            
+            // Trouve la position d'insertion
+            let inserted = false;
+            $wrapper.children('.fr-col-xs-12').each(function() {
+                const currentScore = parseFloat($(this).find('.fr-card').data('score-vapp'));
+                if (newScore > currentScore) {
+                    $(this).before($newCard);
+                    inserted = true;
+                    return false; // Sort de la boucle each
+                }
+            });
+            
+            // Si aucune insertion n'a été faite (score le plus bas), ajoute à la fin
+            if (!inserted) {
+                $wrapper.append($newCard);
+            }
+
+            // effet de highlight
+            $newCard.find('.fr-card').addClass('card-highlight');
+        }
+    })
 }

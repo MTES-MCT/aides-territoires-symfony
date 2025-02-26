@@ -4,7 +4,6 @@ namespace App\Controller\Api\Aid;
 
 use App\Controller\Api\ApiController;
 use App\Entity\Aid\Aid;
-use App\Entity\Category\CategoryTheme;
 use App\Entity\Log\LogAidSearch;
 use App\Entity\Perimeter\Perimeter;
 use App\Entity\User\User;
@@ -13,13 +12,11 @@ use App\Service\Aid\AidSearchFormService;
 use App\Service\Aid\AidService;
 use App\Service\Log\LogService;
 use App\Service\User\UserService;
-use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Attribute\AsController;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Symfony\Contracts\Cache\ItemInterface;
 
 #[AsController]
 class AidController extends ApiController
@@ -326,12 +323,10 @@ class AidController extends ApiController
                 $typesFull[] = [
                     'id' => $aidType->getId(),
                     'name' => $aidType->getName(),
-                    'group' => $aidType->getAidTypeGroup()
-                        ? [
-                            'id' => $aidType->getAidTypeGroup()->getId(),
-                            'name' => $aidType->getAidTypeGroup()->getName()
-                        ]
-                        : null
+                    'group' => [
+                        'id' => $aidType->getAidTypeGroup()->getId(),
+                        'name' => $aidType->getAidTypeGroup()->getName()
+                    ]
                 ];
             }
 

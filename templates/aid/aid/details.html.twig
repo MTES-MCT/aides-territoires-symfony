@@ -49,10 +49,26 @@
 			</div>
 		{% endif %}
 
-		{% include 'aid/aid/_new_feature_alert.hrml.twig' %}
-
 		<section class="aid-content fr-grid-row fr-mt-5w">
 			<div class="sidebar fr-col-12 fr-col-md-4 fr-p-3w fr-background-alt fr-mb-3w fr-mb-md-0">
+
+				{% set scoreVappInSession = getVappAidScoresInSession(aid) %}
+				{% set scoreVapp = scoreVappInSession.score_vapp ?? null %}
+
+				{% if scoreVapp is defined and scoreVapp is not null %}
+					<div class="fr-mb-4w fr-grid-row">
+						<div class="fr-col-1">
+							<span class="fr-icon-star-fill ri-xl" aria-hidden="true"></span>
+						</div>
+						<div class="fr-col-11">
+							<h2 class="fr-text--md fr-text--normal fr-mb-0 fr-ml-1w">
+								<strong>Compatibilité estimée :</strong>
+							</h2>
+							<p class="fr-mb-0 fr-ml-1w">{{ vappScoreToText(scoreVapp) }}</p>
+						</div>
+					</div>
+
+				{% endif %}
 
 				{% if aid.isCharged %}
 					<div class="fr-mb-4w fr-grid-row">
@@ -627,6 +643,30 @@
 
 		<div class="aid-details highlightable fr-col-12 fr-col-md-8 fr-pb-3w fr-px-3w">
 			<div class="fr-grid-row fr-grid-row--top fr-mb-5w">
+
+				{% if shouldShowTestVersion(constant('App\\Service\\Site\\AbTestService::VAPP_ACTIVATION')) %}
+				<div class="fr-col-12">
+					<div class="vapp-test fr-p-2w fr-mb-5w">
+						<div class="fr-grid-row fr-grid-row--middle">
+							<div class="fr-col-12 fr-col-md-8">
+								<p>Aidez nous à améliorer Aides-Territoires</p>
+								<strong>Cette aide est elle pertinente pour votre projet ?</strong>
+							</div>
+							<div class="fr-col-12 fr-col-md-4">
+								<div class="fr-grid-row fr-grid-row--middle">
+									<div class="fr-col-6">
+										<button class="btn-vote" data-vote="1"><span class="fr-icon-thumb-up-fill" aria-hidden="true"></span> <strong>Oui</strong></button>
+									</div>
+									<div class="fr-col-6">
+										<button class="btn-vote" data-vote="0""><span class="fr-icon-thumb-down-fill" aria-hidden="true"></span> <strong>Non</strong></button>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				{% endif %}
+
 				<div class="fr-col-12 fr-col-md">
 					<p class="at-color--blue">
 						<strong>
@@ -972,6 +1012,7 @@
 	{% cspscript %}
 		<script>
 			var csrfTokenInternal = '{{ csrf_token(constant('App\\Security\\Voter\\InternalRequestVoter::CSRF_TOKEN_NAME')) }}';
+			const aidId = {{ aid.id }};
 		</script>
 	{% endcspscript %}
 {% endblock %}
