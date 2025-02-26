@@ -21,7 +21,9 @@ window.vappMaxRetry = 5;
 window.vappCurrentRetry = 0;
 
 $(function(){
-    callVapp();
+    if (typeof isVappFormulaire !== 'undefined' && isVappFormulaire == 1) {
+        callVapp();
+    }
 
     $(document).on({
         click: function (e) {
