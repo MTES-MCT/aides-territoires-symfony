@@ -1139,7 +1139,7 @@ class AidService // NOSONAR too complex
         foreach ($aids as $key => $aid) {
             // on remet les scores
             $aids[$key]['scoreTotal'] = $scoreTotalById[$aid['id']];
-            $aids[$key]['description'] = $converter->convert($aid['description']);
+            $aids[$key]['description'] = $converter->convert((string) $aid['description']);
         }
 
         return $aids;
