@@ -62,7 +62,7 @@ class VappController extends AbstractController
 
         // Nombre de recherches par source
         $logAidSearchs = $logAidSearchRepository->countBySource([
-            'dateStart' => $dateStart,
+            'dateMin' => $dateStart,
             'sources' => ['vapp', 'aides-territoires', 'localhost'],
         ]);
         $logAidSearchBySource = [];
@@ -72,7 +72,7 @@ class VappController extends AbstractController
 
         // Nombre d'affichage par source
         $logAidViews = $logAidViewRepository->countBySource([
-            'dateStart' => $dateStart,
+            'dateMin' => $dateStart,
             'sources' => ['vapp', 'aides-territoires', 'localhost'],
         ]);
         $logAidViewsBySource = [];
@@ -82,7 +82,7 @@ class VappController extends AbstractController
 
         // Nombre plus infos par source
         $logAidOrigins = $logAidOriginUrlClickRepository->countBySource([
-            'dateStart' => $dateStart,
+            'dateMin' => $dateStart,
             'sources' => ['vapp', 'aides-territoires', 'localhost'],
         ]);
         $logAidOriginsBySource = [];
@@ -92,7 +92,7 @@ class VappController extends AbstractController
 
         // Nombre candidater par sources
         $logAidApplications = $logAidApplicationUrlClickRepository->countBySource([
-            'dateStart' => $dateStart,
+            'dateMin' => $dateStart,
             'sources' => ['vapp', 'aides-territoires', 'localhost'],
         ]);
         $logAidApplicationsBySource = [];
