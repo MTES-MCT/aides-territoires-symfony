@@ -2,7 +2,6 @@
 
 namespace App\Controller\Admin\Statistics;
 
-use App\Form\Admin\Filter\DateRangeType;
 use App\Repository\Log\LogAidApplicationUrlClickRepository;
 use App\Repository\Log\LogAidOriginUrlClickRepository;
 use App\Repository\Log\LogAidSearchRepository;
@@ -10,13 +9,10 @@ use App\Repository\Log\LogAidViewRepository;
 use App\Repository\Site\AbTestRepository;
 use App\Repository\Site\AbTestUserRepository;
 use App\Repository\Site\AbTestVoteRepository;
-use App\Repository\User\FavoriteAidRepository;
-use App\Service\Api\VappApiService;
 use App\Service\Site\AbTestService;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\Routing\Attribute\Route;
@@ -35,17 +31,8 @@ class VappController extends AbstractController
     ): Response {
         $dateStart = new \DateTime(date('2025-02-26'));
 
-        $vappActivation = $abTestRepository->findOneBy([
-            'name' => AbTestService::VAPP_ACTIVATION
-        ]);
-
         $vappFormulaire = $abTestRepository->findOneBy([
             'name' => AbTestService::VAPP_FORMULAIRE
-        ]);
- 
-        // Nombre de participants
-        $nbUsers = $abTestUserRepository->count([
-            'abTest' => $vappFormulaire,
         ]);
 
         // Nombre de participants at
@@ -63,17 +50,17 @@ class VappController extends AbstractController
         // Nombre de recherches par source
         $logAidSearchs = $logAidSearchRepository->countBySource([
             'dateMin' => $dateStart,
-            'sources' => ['vapp', 'aides-territoires', 'localhost'],
+            'sources' => ['vapp', 'aides-territoires'],
         ]);
-        $logAidSearchBySource = [];
+        $logAidSearchsBySource = [];
         foreach ($logAidSearchs as $logAidSearch) {
-            $logAidSearchBySource[$logAidSearch['source']] = $logAidSearch['nb'];
+            $logAidSearchsBySource[$logAidSearch['source']] = $logAidSearch['nb'];
         }
 
         // Nombre d'affichage par source
         $logAidViews = $logAidViewRepository->countBySource([
             'dateMin' => $dateStart,
-            'sources' => ['vapp', 'aides-territoires', 'localhost'],
+            'sources' => ['vapp', 'aides-territoires'],
         ]);
         $logAidViewsBySource = [];
         foreach ($logAidViews as $logAidView) {
@@ -83,7 +70,7 @@ class VappController extends AbstractController
         // Nombre plus infos par source
         $logAidOrigins = $logAidOriginUrlClickRepository->countBySource([
             'dateMin' => $dateStart,
-            'sources' => ['vapp', 'aides-territoires', 'localhost'],
+            'sources' => ['vapp', 'aides-territoires'],
         ]);
         $logAidOriginsBySource = [];
         foreach ($logAidOrigins as $logAidOrigin) {
@@ -93,7 +80,7 @@ class VappController extends AbstractController
         // Nombre candidater par sources
         $logAidApplications = $logAidApplicationUrlClickRepository->countBySource([
             'dateMin' => $dateStart,
-            'sources' => ['vapp', 'aides-territoires', 'localhost'],
+            'sources' => ['vapp', 'aides-territoires'],
         ]);
         $logAidApplicationsBySource = [];
         foreach ($logAidApplications as $logAidApplication) {
@@ -158,10 +145,10 @@ class VappController extends AbstractController
         // Ajout des données
         $cells = [
             ['Nombre de participants', $nbUsersAt, $nbUsersVapp],
-            ['Nombre de recherches', $logAidSearchs['vapp'] ?? 0, $logAidSearchs['aides-territoires'] ?? 0],
-            ['Nombre d\'affichages', $logAidViews['vapp'] ?? 0, $logAidViews['aides-territoires'] ?? 0],
-            ['Nombre de plus d\'infos', $logAidOrigins['vapp'] ?? 0, $logAidOrigins['aides-territoires'] ?? 0],
-            ['Nombre de candidatures', $logAidApplications['vapp'] ?? 0, $logAidApplications['aides-territoires'] ?? 0],
+            ['Nombre de recherches', $logAidSearchsBySource['vapp'] ?? 0, $logAidSearchsBySource['aides-territoires'] ?? 0],
+            ['Nombre d\'affichages', $logAidViewsBySource['vapp'] ?? 0, $logAidViewsBySource['aides-territoires'] ?? 0],
+            ['Nombre de plus d\'infos', $logAidOriginsBySource['vapp'] ?? 0, $logAidOriginsBySource['aides-territoires'] ?? 0],
+            ['Nombre de candidatures', $logAidApplicationsBySource['vapp'] ?? 0, $logAidApplicationsBySource['aides-territoires'] ?? 0],
             ['Nombre de votes positifs', $upvotesAt, $upvotesVapp],
             ['Nombre de votes positifs valides', '', $upvotesVappValid],
             ['Nombre de votes négatifs', $downvotesAt, $downvotesVapp],
