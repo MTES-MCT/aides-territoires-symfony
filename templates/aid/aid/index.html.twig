@@ -146,6 +146,12 @@
 			var csrfTokenInternal = '{{ csrf_token(constant('App\\Security\\Voter\\InternalRequestVoter::CSRF_TOKEN_NAME')) }}';
 		</script>
 	{% endcspscript %}
+
+	{% cspscript %}
+	<script>
+		var isVappFormulaire = {% if isVappFormulaire is defined and isVappFormulaire %}1{% else %}0{% endif %};
+	</script>
+	{% endcspscript %}
 {% endblock %}
 
 {% block modal %}

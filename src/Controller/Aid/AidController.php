@@ -140,6 +140,14 @@ class AidController extends FrontController
         $session->set('aidParamsSignature', $aidParamsSignature);
 
         if ($isVappFormulaire) {
+            // verification champ description
+            $vappDescription = trim((string) $aidSearchClass->getVappDescription());
+            if ($vappDescription === '') {
+                // si formulaire mal rempli (bot) on retire du test
+                return $this->redirectToRoute('app_abtest_no_vapp');
+            }
+
+
             // les scores en session
             $vappAidsById = $vappApiService->getAidsScoresInSession();
 
@@ -159,14 +167,15 @@ class AidController extends FrontController
                 $vappApiService->setAidsScoresInSession($vappAidsById);
             }
 
-            // créar un nouveau projet si besoin
+            // créer un nouveau projet si besoin
+            $scale = $aidSearchClass->getPerimeterId() ? $aidSearchClass->getPerimeterId()->getScale() : Perimeter::SCALE_COMMUNE;
             $vappApiService->getProjectUuid(
-                description: $aidSearchClass->getVappDescription(),
-                porteur: strtolower($aidSearchClass->getOrganizationTypeSlug()),
+                description: (string) $aidSearchClass->getVappDescription(),
+                porteur: strtolower((string) $aidSearchClass->getOrganizationTypeSlug()),
                 zonesGeographiques: [
                     [
                         'type' => ucfirst(
-                            Perimeter::SCALES_FOR_SEARCH[$aidSearchClass->getPerimeterId()->getScale()]['name']
+                            Perimeter::SCALES_FOR_SEARCH[$scale]['name']
                         ),
                         'code' => (int) $aidSearchClass->getPerimeterId()->getInsee() ?? 69266,
                         // 'code' => 69266,
@@ -624,109 +633,139 @@ class AidController extends FrontController
         AbTestService $abTestService,
     ): Response {
         try {
-        // le user si dispo
-        $user = $userService->getUserLogged();
+            // le user si dispo
+            $user = $userService->getUserLogged();
 
-        if (!$user) {
-            $requestStack
-                ->getCurrentRequest()
-                ->getSession()
-                ->set(
-                    '_security.main.target_path',
-                    $requestStack->getCurrentRequest()->getRequestUri()
-                )
-            ;
-        }
-
-        // charge l'aide
-        $aid = $aidRepository->findOneBy(
-            [
-                'slug' => $slug,
-            ]
-        );
-        if (!$aid) {
-            throw new AidNotFoundException('Cette aide n\'existe pas dans notre base de données ou a été supprimée.');
-        }
-        // regarde si aide publié et utilisateur = auteur ou utilisateur = admin
-        if (!$aidService->userCanSee($aid, $user)) {
-            throw new AidNotFoundException('Cette aide n\'est pas encore publiée.');
-        }
-
-        // log seulement si l'aide à le statut publiée
-        if (Aid::STATUS_PUBLISHED == $aid->getStatus()) {
-            $logService->log(
-                type: LogService::AID_VIEW,
-                params: [
-                    'querystring' => parse_url(
-                        $requestStack->getCurrentRequest()->getRequestUri(),
-                        PHP_URL_QUERY
+            if (!$user) {
+                $requestStack
+                    ->getCurrentRequest()
+                    ->getSession()
+                    ->set(
+                        '_security.main.target_path',
+                        $requestStack->getCurrentRequest()->getRequestUri()
                     )
-                        ?? null,
-                    'host' => $requestStack->getCurrentRequest()->getHost(),
-                    'aid' => $aid,
-                    'organization' => ($user instanceof User && $user->getDefaultOrganization())
-                            ? $user->getDefaultOrganization()
-                            : null,
-                    'user' => ($user instanceof User) ? $user : null,
+                ;
+            }
+
+            // charge l'aide
+            $aid = $aidRepository->findOneBy(
+                [
+                    'slug' => $slug,
                 ]
             );
-        }
+            if (!$aid) {
+                throw new AidNotFoundException('Cette aide n\'existe pas dans notre base de données ou a été supprimée.');
+            }
+            // regarde si aide publié et utilisateur = auteur ou utilisateur = admin
+            if (!$aidService->userCanSee($aid, $user)) {
+                throw new AidNotFoundException('Cette aide n\'est pas encore publiée.');
+            }
 
-        // formulaire ajouter aux projets
-        $formAddToProject = $this->createForm(AddAidToProjectType::class, null, [
-            'currentAid' => $aid,
-        ]);
-        $formAddToProject->handleRequest($requestStack->getCurrentRequest());
-        if ($formAddToProject->isSubmitted()) {
-            if ($user && !$user->getDefaultOrganization()) {
-                $this->addFlash(
-                    FrontController::FLASH_ERROR,
-                    'Vous devez renseigner les informations de votre structure ou accepter une invitation '
-                        .'avant de pouvoir accéder à cette page.'
+            // log seulement si l'aide à le statut publiée
+            if (Aid::STATUS_PUBLISHED == $aid->getStatus()) {
+                $logService->log(
+                    type: LogService::AID_VIEW,
+                    params: [
+                        'querystring' => parse_url(
+                            $requestStack->getCurrentRequest()->getRequestUri(),
+                            PHP_URL_QUERY
+                        )
+                            ?? null,
+                        'host' => $requestStack->getCurrentRequest()->getHost(),
+                        'aid' => $aid,
+                        'organization' => ($user instanceof User && $user->getDefaultOrganization())
+                                ? $user->getDefaultOrganization()
+                                : null,
+                        'user' => ($user instanceof User) ? $user : null,
+                    ]
                 );
-            } else {
-                if ($formAddToProject->isValid()) {
-                    // association projects existants
-                    if ($formAddToProject->has('projects')) {
-                        $projects = $formAddToProject->get('projects')->getData();
-                        /** @var Project $project */
-                        foreach ($projects as $project) {
+            }
+
+            // formulaire ajouter aux projets
+            $formAddToProject = $this->createForm(AddAidToProjectType::class, null, [
+                'currentAid' => $aid,
+            ]);
+            $formAddToProject->handleRequest($requestStack->getCurrentRequest());
+            if ($formAddToProject->isSubmitted()) {
+                if ($user && !$user->getDefaultOrganization()) {
+                    $this->addFlash(
+                        FrontController::FLASH_ERROR,
+                        'Vous devez renseigner les informations de votre structure ou accepter une invitation '
+                            .'avant de pouvoir accéder à cette page.'
+                    );
+                } else {
+                    if ($formAddToProject->isValid()) {
+                        // association projects existants
+                        if ($formAddToProject->has('projects')) {
+                            $projects = $formAddToProject->get('projects')->getData();
+                            /** @var Project $project */
+                            foreach ($projects as $project) {
+                                $aidProject = new AidProject();
+                                $aidProject->setAid($aid);
+                                $aidProject->setCreator($user);
+                                $project->addAidProject($aidProject);
+                                $this->managerRegistry->getManager()->persist($aidProject);
+
+                                // envoi notification à tous les autres membres de l'oganisation
+                                if ($project->getOrganization()) {
+                                    foreach ($project->getOrganization()->getBeneficiairies() as $beneficiary) {
+                                        if ($beneficiary->getId() == $user->getId()) {
+                                            continue;
+                                        }
+                                        $notificationService->addNotification(
+                                            $beneficiary,
+                                            'Nouvelle aide ajoutée à un projet',
+                                            '<p>
+                                        '.$user->getFirstname()
+                                            .' '
+                                            .$user->getLastname()
+                                            .' a ajouté une aide au projet
+                                        <a href="'
+                                            .$this->generateUrl(
+                                                'app_user_project_details_fiche_projet',
+                                                ['id' => $project->getId(), 'slug' => $project->getSlug()],
+                                                UrlGeneratorInterface::ABSOLUTE_URL
+                                            )
+                                                .'">'.$project->getName().'</a>.
+                                        </p>'
+                                        );
+                                    }
+                                }
+
+                                // message
+                                $this->addFlash(
+                                    FrontController::FLASH_SUCCESS,
+                                    'L’aide a bien été associée au projet <a href="'
+                                    .$this->generateUrl(
+                                        'app_user_project_details_fiche_projet',
+                                        ['id' => $project->getId(), 'slug' => $project->getSlug()]
+                                    )
+                                    .'">'.$project->getName().'</a>.'
+                                );
+                            }
+
+                            $this->managerRegistry->getManager()->flush();
+                        }
+
+                        $newProject = $formAddToProject->get('newProject')->getData();
+                        if ($newProject) {
+                            $project = new Project();
+                            $project->setName($newProject);
+                            $project->setAuthor($user);
+                            $project->setStatus(Project::STATUS_DRAFT);
+                            $project->setOrganization($user->getDefaultOrganization());
+
                             $aidProject = new AidProject();
                             $aidProject->setAid($aid);
                             $aidProject->setCreator($user);
                             $project->addAidProject($aidProject);
-                            $this->managerRegistry->getManager()->persist($aidProject);
 
-                            // envoi notification à tous les autres membres de l'oganisation
-                            if ($project->getOrganization()) {
-                                foreach ($project->getOrganization()->getBeneficiairies() as $beneficiary) {
-                                    if ($beneficiary->getId() == $user->getId()) {
-                                        continue;
-                                    }
-                                    $notificationService->addNotification(
-                                        $beneficiary,
-                                        'Nouvelle aide ajoutée à un projet',
-                                        '<p>
-                                        '.$user->getFirstname()
-                                        .' '
-                                        .$user->getLastname()
-                                        .' a ajouté une aide au projet
-                                        <a href="'
-                                        .$this->generateUrl(
-                                            'app_user_project_details_fiche_projet',
-                                            ['id' => $project->getId(), 'slug' => $project->getSlug()],
-                                            UrlGeneratorInterface::ABSOLUTE_URL
-                                        )
-                                            .'">'.$project->getName().'</a>.
-                                        </p>'
-                                    );
-                                }
-                            }
+                            $this->managerRegistry->getManager()->persist($project);
+                            $this->managerRegistry->getManager()->flush();
 
-                            // message
                             $this->addFlash(
                                 FrontController::FLASH_SUCCESS,
-                                'L’aide a bien été associée au projet <a href="'
+                                'L’aide a bien été associée au nouveau projet <a href="'
                                 .$this->generateUrl(
                                     'app_user_project_details_fiche_projet',
                                     ['id' => $project->getId(), 'slug' => $project->getSlug()]
@@ -735,169 +774,139 @@ class AidController extends FrontController
                             );
                         }
 
-                        $this->managerRegistry->getManager()->flush();
-                    }
-
-                    $newProject = $formAddToProject->get('newProject')->getData();
-                    if ($newProject) {
-                        $project = new Project();
-                        $project->setName($newProject);
-                        $project->setAuthor($user);
-                        $project->setStatus(Project::STATUS_DRAFT);
-                        $project->setOrganization($user->getDefaultOrganization());
-
-                        $aidProject = new AidProject();
-                        $aidProject->setAid($aid);
-                        $aidProject->setCreator($user);
-                        $project->addAidProject($aidProject);
-
-                        $this->managerRegistry->getManager()->persist($project);
-                        $this->managerRegistry->getManager()->flush();
-
+                        // redirection page mes projets
+                        return $this->redirect($requestStack->getCurrentRequest()->getUri());
+                    } else {
                         $this->addFlash(
-                            FrontController::FLASH_SUCCESS,
-                            'L’aide a bien été associée au nouveau projet <a href="'
-                            .$this->generateUrl(
-                                'app_user_project_details_fiche_projet',
-                                ['id' => $project->getId(), 'slug' => $project->getSlug()]
-                            )
-                            .'">'.$project->getName().'</a>.'
+                            FrontController::FLASH_ERROR,
+                            'Une erreur est survenue lors de l\'association de l\'aide au projet'
                         );
                     }
-
-                    // redirection page mes projets
-                    return $this->redirect($requestStack->getCurrentRequest()->getUri());
-                } else {
-                    $this->addFlash(
-                        FrontController::FLASH_ERROR,
-                        'Une erreur est survenue lors de l\'association de l\'aide au projet'
-                    );
                 }
             }
-        }
 
-        // formulaire suggérer cette aide à un projet
-        $formSuggestToProject = $this->createForm(SuggestToProjectType::class);
-        $formSuggestToProject->handleRequest($requestStack->getCurrentRequest());
-        if ($formSuggestToProject->isSubmitted()) {
-            if ($formSuggestToProject->isValid()) {
-                $projects = $formSuggestToProject->get('projectFavorites')->getData();
-                foreach ($projects as $projectId) {
-                    $project = $projectRepository->find($projectId);
-                    if (!$project instanceof Project) {
-                        continue;
-                    }
-                    $aidSuggestedAidProject = new AidSuggestedAidProject();
-                    $aidSuggestedAidProject->setAid($aid);
-                    $aidSuggestedAidProject->setProject($project);
-                    $aidSuggestedAidProject->setCreator($user);
-                    $this->managerRegistry->getManager()->persist($aidSuggestedAidProject);
-                    $message = $stringService->cleanString((string) $formSuggestToProject->get('message')->getData());
+            // formulaire suggérer cette aide à un projet
+            $formSuggestToProject = $this->createForm(SuggestToProjectType::class);
+            $formSuggestToProject->handleRequest($requestStack->getCurrentRequest());
+            if ($formSuggestToProject->isSubmitted()) {
+                if ($formSuggestToProject->isValid()) {
+                    $projects = $formSuggestToProject->get('projectFavorites')->getData();
+                    foreach ($projects as $projectId) {
+                        $project = $projectRepository->find($projectId);
+                        if (!$project instanceof Project) {
+                            continue;
+                        }
+                        $aidSuggestedAidProject = new AidSuggestedAidProject();
+                        $aidSuggestedAidProject->setAid($aid);
+                        $aidSuggestedAidProject->setProject($project);
+                        $aidSuggestedAidProject->setCreator($user);
+                        $this->managerRegistry->getManager()->persist($aidSuggestedAidProject);
+                        $message = $stringService->cleanString((string) $formSuggestToProject->get('message')->getData());
 
-                    // notification
-                    $message = '<p>'.$message.'</p>
+                        // notification
+                        $message = '<p>'.$message.'</p>
                     <ul>
                         <li><a href="'.$aidService->getUrl($aid).'>"'.$aid->getName().'</a></li>
                     </ul>
                     <p>'.$user->getNotificationSignature().'</p>
                     <p>
                         <a class="fr-btn" href="'
-                            .$this->generateUrl(
-                                'app_project_project_public_details',
-                                ['id' => $project->getId(), 'slug' => $project->getSlug()],
-                                UrlGeneratorInterface::ABSOLUTE_URL
-                            )
-                            .'">
+                                .$this->generateUrl(
+                                    'app_project_project_public_details',
+                                    ['id' => $project->getId(), 'slug' => $project->getSlug()],
+                                    UrlGeneratorInterface::ABSOLUTE_URL
+                                )
+                                .'">
                             Accepter ou rejeter cette recommandation
                         </a>
                     </p>';
-                    $notificationService->addNotification(
-                        $project->getAuthor(),
-                        'Suggestion d’une aide pour votre projet « '.$project->getName().' »',
-                        $message
-                    );
+                        $notificationService->addNotification(
+                            $project->getAuthor(),
+                            'Suggestion d’une aide pour votre projet « '.$project->getName().' »',
+                            $message
+                        );
 
-                    // envoi mail
-                    $suggestedAidFinancerName = '';
-                    if (!$aid->getAidFinancers()->isEmpty()) {
-                        $suggestedAidFinancerName = $aid->getAidFinancers()[0]->getBacker()->getName() ?? '';
+                        // envoi mail
+                        $suggestedAidFinancerName = '';
+                        if (!$aid->getAidFinancers()->isEmpty()) {
+                            $suggestedAidFinancerName = $aid->getAidFinancers()[0]->getBacker()->getName() ?? '';
+                        }
+                        $emailService->sendEmailViaApi(
+                            $project->getAuthor()->getEmail(),
+                            'Suggestion d’une aide pour votre projet « '.$project->getName().' »',
+                            (int) $paramService->get('sib_new_suggested_aid_template_id'),
+                            [
+                                'PROJECT_AUTHOR_NAME' => $project->getAuthor()->getFullName(),
+                                'SUGGESTER_USER_NAME' => $user->getFullName(),
+                                'SUGGESTER_ORGANIZATION_NAME' => $user->getDefaultOrganization() ?
+                                    $user->getDefaultOrganization()->getName()
+                                    : '',
+                                'PROJECT_NAME' => $project->getName(),
+                                'SUGGESTED_AID_NAME' => $aid->getName(),
+                                'SUGGESTED_AID_FINANCER_NAME' => $suggestedAidFinancerName,
+                                'SUGGESTED_AID_RECURRENCE' => $aid->getAidRecurrence()
+                                    ? $aid->getAidRecurrence()->getName()
+                                    : '',
+                                'FULL_ACCOUNT_URL' => $this->generateUrl(
+                                    'app_user_dashboard',
+                                    [],
+                                    UrlGeneratorInterface::ABSOLUTE_URL
+                                ),
+                                'FULL_PROJECT_URL' => $this->generateUrl(
+                                    'app_project_project_public_details',
+                                    ['id' => $project->getId(), 'slug' => $project->getSlug()],
+                                    UrlGeneratorInterface::ABSOLUTE_URL
+                                ),
+                            ],
+                            [],
+                            ['aide suggérée', $this->getParameter('kernel.environment')],
+                        );
+
+                        // track goal
+                        $matomoService->trackGoal((int) $paramService->get('goal_register_id'));
                     }
-                    $emailService->sendEmailViaApi(
-                        $project->getAuthor()->getEmail(),
-                        'Suggestion d’une aide pour votre projet « '.$project->getName().' »',
-                        (int) $paramService->get('sib_new_suggested_aid_template_id'),
-                        [
-                            'PROJECT_AUTHOR_NAME' => $project->getAuthor()->getFullName(),
-                            'SUGGESTER_USER_NAME' => $user->getFullName(),
-                            'SUGGESTER_ORGANIZATION_NAME' => $user->getDefaultOrganization() ?
-                                $user->getDefaultOrganization()->getName()
-                                : '',
-                            'PROJECT_NAME' => $project->getName(),
-                            'SUGGESTED_AID_NAME' => $aid->getName(),
-                            'SUGGESTED_AID_FINANCER_NAME' => $suggestedAidFinancerName,
-                            'SUGGESTED_AID_RECURRENCE' => $aid->getAidRecurrence()
-                                ? $aid->getAidRecurrence()->getName()
-                                : '',
-                            'FULL_ACCOUNT_URL' => $this->generateUrl(
-                                'app_user_dashboard',
-                                [],
-                                UrlGeneratorInterface::ABSOLUTE_URL
-                            ),
-                            'FULL_PROJECT_URL' => $this->generateUrl(
-                                'app_project_project_public_details',
-                                ['id' => $project->getId(), 'slug' => $project->getSlug()],
-                                UrlGeneratorInterface::ABSOLUTE_URL
-                            ),
-                        ],
-                        [],
-                        ['aide suggérée', $this->getParameter('kernel.environment')],
+                    $this->managerRegistry->getManager()->flush();
+
+                    $this->addFlash(
+                        FrontController::FLASH_SUCCESS,
+                        'L’aide a bien été suggérée à la collectivité, merci pour elle !'
                     );
 
-                    // track goal
-                    $matomoService->trackGoal((int) $paramService->get('goal_register_id'));
+                    return $this->redirectToRoute('app_aid_aid_details', ['slug' => $aid->getSlug()]);
+                } else {
+                    $openModalSuggest = true;
                 }
-                $this->managerRegistry->getManager()->flush();
-
-                $this->addFlash(
-                    FrontController::FLASH_SUCCESS,
-                    'L’aide a bien été suggérée à la collectivité, merci pour elle !'
-                );
-
-                return $this->redirectToRoute('app_aid_aid_details', ['slug' => $aid->getSlug()]);
-            } else {
-                $openModalSuggest = true;
             }
-        }
 
-        // fil arianne
-        $this->breadcrumb->add(
-            'Trouver des aides',
-            $this->generateUrl('app_aid_aid')
-        );
-        $this->breadcrumb->add(
-            'Détail de l’aide',
-            null,
-        );
+            // fil arianne
+            $this->breadcrumb->add(
+                'Trouver des aides',
+                $this->generateUrl('app_aid_aid')
+            );
+            $this->breadcrumb->add(
+                'Détail de l’aide',
+                null,
+            );
 
-        $adminEditUrl = $this->generateUrl(
-            'admin',
-            [],
-            UrlGeneratorInterface::ABSOLUTE_URL
-        )
-        .'?crudAction=edit&crudControllerFqcn=App%5CController%5CAdmin%5CAid%5CAidCrudController&entityId='
-        .$aid->getId();
+            $adminEditUrl = $this->generateUrl(
+                'admin',
+                [],
+                UrlGeneratorInterface::ABSOLUTE_URL
+            )
+            .'?crudAction=edit&crudControllerFqcn=App%5CController%5CAdmin%5CAid%5CAidCrudController&entityId='
+            .$aid->getId();
 
-        return $this->render('aid/aid/details.html.twig', [
-            'aid' => $aid,
-            'open_modal' => $request->query->get('open_modal', null),
-            'dsDatas' => $aidService->getDatasFromDs($aid, $user, $user ? $user->getDefaultOrganization() : null),
-            'formAddToProject' => $formAddToProject->createView(),
-            'formSuggestToProject' => $formSuggestToProject->createView(),
-            'aidDetailPage' => true,
-            'openModalSuggest' => $openModalSuggest ?? false,
-            'highlightedWords' => $requestStack->getCurrentRequest()->getSession()->get('highlightedWords', []),
-            'adminEditUrl' => $adminEditUrl,
-        ]);
+            return $this->render('aid/aid/details.html.twig', [
+                'aid' => $aid,
+                'open_modal' => $request->query->get('open_modal', null),
+                'dsDatas' => $aidService->getDatasFromDs($aid, $user, $user ? $user->getDefaultOrganization() : null),
+                'formAddToProject' => $formAddToProject->createView(),
+                'formSuggestToProject' => $formSuggestToProject->createView(),
+                'aidDetailPage' => true,
+                'openModalSuggest' => $openModalSuggest ?? false,
+                'highlightedWords' => $requestStack->getCurrentRequest()->getSession()->get('highlightedWords', []),
+                'adminEditUrl' => $adminEditUrl,
+            ]);
         } catch (AidNotFoundException $e) {
             // Log l'erreur
             $error = new AidNotFoundError();
@@ -906,13 +915,13 @@ class AidController extends FrontController
             $error->setUserAgent($request->headers->get('User-Agent'));
             $error->setReferer($request->headers->get('referer'));
             $error->setReason($e->getMessage());
-            
+
             $this->managerRegistry->getManager()->persist($error);
             $this->managerRegistry->getManager()->flush();
 
             // Rendu template erreur avec code 404
             return $this->render('aid/aid/error404.html.twig', [
-                'message' => $e->getMessage()
+                'message' => $e->getMessage(),
             ], new Response('', Response::HTTP_NOT_FOUND));
         }
     }
