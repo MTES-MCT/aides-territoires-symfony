@@ -150,9 +150,9 @@ class VappController extends AbstractController
             ['Nombre de plus d\'infos', $logAidOriginsBySource['aides-territoires'] ?? 0, $logAidOriginsBySource['vapp'] ?? 0],
             ['Nombre de candidatures', $logAidApplicationsBySource['aides-territoires'] ?? 0, $logAidApplicationsBySource['vapp'] ?? 0],
             ['Nombre de votes positifs', $upvotesAt, $upvotesVapp],
-            ['Nombre de votes positifs valides', '', $upvotesVappValid],
+            ['Nombre de votes positifs corrigés', '', $upvotesVappValid],
             ['Nombre de votes négatifs', $downvotesAt, $downvotesVapp],
-            ['Nombre de votes négatifs valides', '', $downvotesVappValid],
+            ['Nombre de votes négatifs corrigés', '', $downvotesVappValid],
         ];
         $sheet = $spreadsheet->getActiveSheet();
         $sheet->fromArray($cells, null, 'A' . $row);
