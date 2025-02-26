@@ -303,15 +303,23 @@ class LogAidViewRepository extends ServiceEntityRepository
         $aid = $params['aid'] ?? null;
         $aidIds = $params['aidIds'] ?? null;
         $excludeSources = $params['excludeSources'] ?? null;
+        $sources = $params['sources'] ?? null;
         $notSource = $params['notSource'] ?? null;
         $maxResults = $params['maxResults'] ?? null;
 
         $qb = $this->createQueryBuilder('lav');
 
-        if (is_array($excludeSources) && count($excludeSources) > 0) {
+        if (is_array($excludeSources) && !empty($excludeSources)) {
             $qb
                 ->andWhere('lav.source NOT IN (:excludeSources)')
                 ->setParameter('excludeSources', $excludeSources)
+            ;
+        }
+
+        if (is_array($sources) && !empty($sources)) {
+            $qb
+                ->andWhere('lav.source IN (:sources)')
+                ->setParameter('sources', $sources)
             ;
         }
 

@@ -139,6 +139,7 @@ class LogAidSearchRepository extends ServiceEntityRepository
         $dateCreateMax = $params['dateCreateMax'] ?? null;
         $hasSearch = $params['hasSearch'] ?? null;
         $source = $params['source'] ?? null;
+        $sources = $params['sources'] ?? null;
         $resultsCountMax = $params['resultsCountMax'] ?? null;
         $orderBy =
             (isset($params['orderBy'])
@@ -173,6 +174,13 @@ class LogAidSearchRepository extends ServiceEntityRepository
             $qb
                 ->andWhere('l.source = :source')
                 ->setParameter('source', $source)
+            ;
+        }
+
+        if (is_array($sources) && !empty($sources)) {
+            $qb
+                ->andWhere('l.source IN (:sources)')
+                ->setParameter('sources', $sources)
             ;
         }
 

@@ -118,9 +118,17 @@ class LogAidApplicationUrlClickRepository extends ServiceEntityRepository
         $author = $params['author'] ?? null;
         $aid = $params['aid'] ?? null;
         $aidIds = $params['aidIds'] ?? null;
+        $sources = $params['sources'] ?? null;
 
         $qb = $this->createQueryBuilder('laau');
 
+        if (is_array($sources) && !empty($sources)) {
+            $qb
+                ->andWhere('laau.source IN (:sources)')
+                ->setParameter('sources', $sources)
+            ;
+        }
+        
         if ($author instanceof User && $author->getId()) {
             $qb
                 ->innerJoin('laau.aid', 'aid')
