@@ -145,14 +145,14 @@ class VappController extends AbstractController
         // Ajout des données
         $cells = [
             ['Nombre de participants', $nbUsersAt, $nbUsersVapp],
-            ['Nombre de recherches', $logAidSearchsBySource['vapp'] ?? 0, $logAidSearchsBySource['aides-territoires'] ?? 0],
-            ['Nombre d\'affichages', $logAidViewsBySource['vapp'] ?? 0, $logAidViewsBySource['aides-territoires'] ?? 0],
-            ['Nombre de plus d\'infos', $logAidOriginsBySource['vapp'] ?? 0, $logAidOriginsBySource['aides-territoires'] ?? 0],
-            ['Nombre de candidatures', $logAidApplicationsBySource['vapp'] ?? 0, $logAidApplicationsBySource['aides-territoires'] ?? 0],
+            ['Nombre de recherches', $logAidSearchsBySource['aides-territoires'] ?? 0, $logAidSearchsBySource['vapp'] ?? 0],
+            ['Nombre d\'affichages', $logAidViewsBySource['aides-territoires'] ?? 0, $logAidViewsBySource['vapp'] ?? 0],
+            ['Nombre de plus d\'infos', $logAidOriginsBySource['aides-territoires'] ?? 0, $logAidOriginsBySource['vapp'] ?? 0],
+            ['Nombre de candidatures', $logAidApplicationsBySource['aides-territoires'] ?? 0, $logAidApplicationsBySource['vapp'] ?? 0],
             ['Nombre de votes positifs', $upvotesAt, $upvotesVapp],
-            ['Nombre de votes positifs valides', '', $upvotesVappValid],
+            ['Nombre de votes positifs corrigés', '', $upvotesVappValid],
             ['Nombre de votes négatifs', $downvotesAt, $downvotesVapp],
-            ['Nombre de votes négatifs valides', '', $downvotesVappValid],
+            ['Nombre de votes négatifs corrigés', '', $downvotesVappValid],
         ];
         $sheet = $spreadsheet->getActiveSheet();
         $sheet->fromArray($cells, null, 'A' . $row);
