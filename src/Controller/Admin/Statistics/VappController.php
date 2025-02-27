@@ -54,7 +54,7 @@ class VappController extends AbstractController
 
         // Nombre de recherches par source
         $logAidSearchs = $logAidSearchRepository->countBySource([
-            'dateMin' => $dateStart,
+            'dateCreateMin' => $dateStart,
             'sources' => $sources,
             'noPageInQuery' => true
         ]);
@@ -66,7 +66,7 @@ class VappController extends AbstractController
 
         // on ajoute les logs temporaires pour avoir du live
         $logAidSearchTemps = $logAidSearchTempRepository->countBySource([
-            'dateMin' => $dateStart,
+            'dateCreateMin' => $dateStart,
             'sources' => $sources,
             'noPageInQuery' => true
         ]);
