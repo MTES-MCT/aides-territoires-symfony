@@ -12,7 +12,7 @@ class CookieService
     }
 
 
-    public function setCookie(string $name, string $value, int $expire = 3600): void
+    public function setCookie(string $name, string $value, int $expire = 2592000): void
     {
         $cookieData = [
             'name' => $name,
