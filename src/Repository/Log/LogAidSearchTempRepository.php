@@ -33,12 +33,33 @@ class LogAidSearchTempRepository extends ServiceEntityRepository
     }
 
     /**
+     * Nombre de recherche par source
+     *
+     * @param array<string, mixed>|null $params
+     * @return array<int, array{nb: integer, source: string}>
+     */
+    public function countBySource(?array $params = null): array
+    {
+        $qb = $this->getQueryBuilder($params);
+
+        $qb->select('COUNT(l.id) as nb, l.source');
+        $qb->groupBy('l.source');
+        $qb->orderBy('nb', 'DESC');
+
+        return $qb->getQuery()->getResult();
+    }
+
+    /**
      * @param array<string, mixed>|null $params
      * @return QueryBuilder
      */
     public function getQueryBuilder(?array $params = null): QueryBuilder
     {
         $dateCreate = $params['dateCreate'] ?? null;
+        $dateCreateMin = $params['dateCreateMin'] ?? null;
+        $dateCreateMax = $params['dateCreateMax'] ?? null;
+        $sources = $params['sources'] ?? null;
+        $noPageInQuery = $params['noPageInQuery'] ?? false;
 
         $qb = $this->createQueryBuilder('l');
 
@@ -46,6 +67,31 @@ class LogAidSearchTempRepository extends ServiceEntityRepository
             $qb
                 ->andWhere('l.dateCreate = :dateCreate')
                 ->setParameter('dateCreate', $dateCreate)
+            ;
+        }
+
+        if ($noPageInQuery) {
+            $qb->andWhere('l.querystring NOT LIKE \'%page%\'');
+        }
+
+        if ($dateCreateMin instanceof \DateTime) {
+            $qb
+                ->andWhere('l.dateCreate >= :dateCreateMin')
+                ->setParameter('dateCreateMin', $dateCreateMin)
+            ;
+        }
+
+        if ($dateCreateMax instanceof \DateTime) {
+            $qb
+                ->andWhere('l.dateCreate <= :dateCreateMax')
+                ->setParameter('dateCreateMax', $dateCreateMax)
+            ;
+        }
+
+        if (is_array($sources) && !empty($sources)) {
+            $qb
+                ->andWhere('l.source IN (:sources)')
+                ->setParameter('sources', $sources)
             ;
         }
 

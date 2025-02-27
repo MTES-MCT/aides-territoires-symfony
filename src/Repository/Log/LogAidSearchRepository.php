@@ -141,6 +141,8 @@ class LogAidSearchRepository extends ServiceEntityRepository
         $source = $params['source'] ?? null;
         $sources = $params['sources'] ?? null;
         $resultsCountMax = $params['resultsCountMax'] ?? null;
+        $noPageInQuery = $params['noPageInQuery'] ?? false;
+
         $orderBy =
             (isset($params['orderBy'])
             && isset($params['orderBy']['sort'])
@@ -150,6 +152,10 @@ class LogAidSearchRepository extends ServiceEntityRepository
         ;
 
         $qb = $this->createQueryBuilder('l');
+
+        if ($noPageInQuery) {
+            $qb->andWhere('l.querystring NOT LIKE \'%page%\'');
+        }
 
         if ($dateCreateMin instanceof \DateTime) {
             $qb
