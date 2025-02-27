@@ -5,7 +5,9 @@ namespace App\Controller\Admin\Statistics;
 use App\Repository\Log\LogAidApplicationUrlClickRepository;
 use App\Repository\Log\LogAidOriginUrlClickRepository;
 use App\Repository\Log\LogAidSearchRepository;
+use App\Repository\Log\LogAidSearchTempRepository;
 use App\Repository\Log\LogAidViewRepository;
+use App\Repository\Log\LogAidViewTempRepository;
 use App\Repository\Site\AbTestRepository;
 use App\Repository\Site\AbTestUserRepository;
 use App\Repository\Site\AbTestVoteRepository;
@@ -25,11 +27,14 @@ class VappController extends AbstractController
         AbTestUserRepository $abTestUserRepository,
         AbTestVoteRepository $abTestVoteRepository,
         LogAidSearchRepository $logAidSearchRepository,
+        LogAidSearchTempRepository $logAidSearchTempRepository,
         LogAidViewRepository $logAidViewRepository,
+        LogAidViewTempRepository $logAidViewTempRepository,
         LogAidOriginUrlClickRepository $logAidOriginUrlClickRepository,
         LogAidApplicationUrlClickRepository $logAidApplicationUrlClickRepository,
     ): Response {
         $dateStart = new \DateTime(date('2025-02-26'));
+        $sources = ['vapp', 'aides-territoires'];
 
         $vappFormulaire = $abTestRepository->findOneBy([
             'name' => AbTestService::VAPP_FORMULAIRE
@@ -50,27 +55,56 @@ class VappController extends AbstractController
         // Nombre de recherches par source
         $logAidSearchs = $logAidSearchRepository->countBySource([
             'dateCreateMin' => $dateStart,
-            'sources' => ['vapp', 'aides-territoires'],
+            'sources' => $sources,
+            'noPageInQuery' => true
         ]);
+
         $logAidSearchsBySource = [];
         foreach ($logAidSearchs as $logAidSearch) {
             $logAidSearchsBySource[$logAidSearch['source']] = $logAidSearch['nb'];
         }
 
+        // on ajoute les logs temporaires pour avoir du live
+        $logAidSearchTemps = $logAidSearchTempRepository->countBySource([
+            'dateCreateMin' => $dateStart,
+            'sources' => $sources,
+            'noPageInQuery' => true
+        ]);
+
+        foreach ($logAidSearchTemps as $logAidSearchTemp) {
+            if (isset($logAidSearchsBySource[$logAidSearchTemp['source']])) {
+                $logAidSearchsBySource[$logAidSearchTemp['source']] += $logAidSearchTemp['nb'];
+            } else {
+                $logAidSearchsBySource[$logAidSearchTemp['source']] = $logAidSearchTemp['nb'];
+            }
+        }
+
         // Nombre d'affichage par source
         $logAidViews = $logAidViewRepository->countBySource([
             'dateMin' => $dateStart,
-            'sources' => ['vapp', 'aides-territoires'],
+            'sources' => $sources,
         ]);
         $logAidViewsBySource = [];
         foreach ($logAidViews as $logAidView) {
             $logAidViewsBySource[$logAidView['source']] = $logAidView['nb'];
         }
+        // on ajoute les logs temporaires pour avoir du live
+        $logAidViewsTemps = $logAidViewTempRepository->countBySource([
+            'dateMin' => $dateStart,
+            'sources' => $sources,
+        ]);
+        foreach ($logAidViewsTemps as $logAidViewTemp) {
+            if (isset($logAidViewsBySource[$logAidViewTemp['source']])) {
+                $logAidViewsBySource[$logAidViewTemp['source']] += $logAidViewTemp['nb'];
+            } else {
+                $logAidViewsBySource[$logAidViewTemp['source']] = $logAidViewTemp['nb'];
+            }
+        }
 
         // Nombre plus infos par source
         $logAidOrigins = $logAidOriginUrlClickRepository->countBySource([
             'dateMin' => $dateStart,
-            'sources' => ['vapp', 'aides-territoires'],
+            'sources' => $sources,
         ]);
         $logAidOriginsBySource = [];
         foreach ($logAidOrigins as $logAidOrigin) {
@@ -80,7 +114,7 @@ class VappController extends AbstractController
         // Nombre candidater par sources
         $logAidApplications = $logAidApplicationUrlClickRepository->countBySource([
             'dateMin' => $dateStart,
-            'sources' => ['vapp', 'aides-territoires'],
+            'sources' => $sources,
         ]);
         $logAidApplicationsBySource = [];
         foreach ($logAidApplications as $logAidApplication) {
