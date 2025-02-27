@@ -49,7 +49,7 @@ class VappController extends AbstractController
 
         // Nombre de recherches par source
         $logAidSearchs = $logAidSearchRepository->countBySource([
-            'dateMin' => $dateStart,
+            'dateCreateMin' => $dateStart,
             'sources' => ['vapp', 'aides-territoires'],
         ]);
         $logAidSearchsBySource = [];
