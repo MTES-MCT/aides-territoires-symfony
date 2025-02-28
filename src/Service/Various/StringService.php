@@ -5,31 +5,34 @@ namespace App\Service\Various;
 class StringService
 {
     /**
-     * Nettoie une chaine de caractères pour une recherche booléenne (MATCH_AGAINST)
-     *
-     * @param string $string
-     * @return string
+     * Nettoie une chaine de caractères pour une recherche booléenne (MATCH_AGAINST).
      */
     public function sanitizeBooleanSearch(string $string): string
     {
-    // Limite la longueur de la chaîne
-    $string = substr($string, 0, 255);
+        // Limite la longueur de la chaîne
+        $string = substr($string, 0, 255);
 
-    // Retire :
-    // - les caractères de la syntaxe booléenne MySQL : + < > ( ) ~ * @
-    // - les caractères d'injection SQL : ' " = ; --
-    return trim(preg_replace('/[+<>\(\)~*@\'\"=;-]/', ' ', $string));
+        // Retire :
+        // - les caractères de la syntaxe booléenne MySQL : + < > ( ) ~ * @
+        // - les caractères d'injection SQL : ' " = ; --
+        return trim(preg_replace('/[+<>\(\)~*@\'\"=;-]/', ' ', $string));
     }
 
     /**
-     * Nettoie une chaine de caractères
-     *
-     * @param string $string
-     * @return string
+     * Nettoie une chaine de caractères.
      */
     public function cleanString(string $string): string
     {
         return trim(strip_tags($string));
+    }
+
+    public function truncateOrNull(?string $text, int $lenght): ?string
+    {
+        if (null === $text) {
+            return null;
+        }
+
+        return $this->truncate($text, $lenght);
     }
 
     public function truncate(string $text, int $length): string
@@ -48,14 +51,14 @@ class StringService
 
         $return = implode(array_slice($parts, 0, $last_part));
         if (strlen($text) > $length) {
-            $return = substr($return, 0, $length - 3) . '...';
+            $return = substr($return, 0, $length - 3).'...';
         }
 
         return $return;
     }
 
     /**
-     * Fonction qui retourne un nom nettoyé (sans accent, espace, etc...)
+     * Fonction qui retourne un nom nettoyé (sans accent, espace, etc...).
      */
     public function getSlug(string $string, string $replacement = '-'): string
     {
@@ -66,7 +69,7 @@ class StringService
 
         $string = preg_replace($pattern, $replacement, $string);
 
-        while (substr($string, -1) == '-') {
+        while ('-' == substr($string, -1)) {
             $string = substr($string, 0, strlen($string) - 1);
         }
         $string = preg_replace($pattern, $replacement, $string);
@@ -78,9 +81,10 @@ class StringService
     }
 
     /**
-     * Fonction qui retire les accents
-     * @param String $string, chaine à nettoyer
-     * @return String
+     * Fonction qui retire les accents.
+     *
+     * @param string $string, chaine à nettoyer
+     *
      * @author RB 2012_05
      */
     public function getNoAccent(string $string): string
@@ -296,7 +300,7 @@ class StringService
             'Ǽ',
             'ǽ',
             'Ǿ',
-            'ǿ'
+            'ǿ',
         ];
         $b = [
             'A',
@@ -509,17 +513,15 @@ class StringService
             'AE',
             'ae',
             'O',
-            'o'
+            'o',
         ];
         $string = strtr($string, array_combine($a, $b));
+
         return $string;
     }
 
     /**
-     * Normalize a string for comparison
-     *
-     * @param string $string
-     * @return string
+     * Normalize a string for comparison.
      */
     public function normalizeString(string $string): string
     {
@@ -553,7 +555,7 @@ class StringService
             'ü' => 'u',
             'ý' => 'y',
             'ÿ' => 'y',
-            'œ' => 'oe'
+            'œ' => 'oe',
         ];
         $string = strtr($string, $unwanted_array);
 
@@ -568,6 +570,7 @@ class StringService
      * Force les éléments à être des entiers et retire les éléments égaux à 0.
      *
      * @param array<int|string> $array Le tableau à traiter
+     *
      * @return array<int> Le tableau filtré et forcé à être des entiers
      */
     public function forceElementsToInt(array $array): array
@@ -581,7 +584,7 @@ class StringService
             }
 
             // Retirer les éléments invalides ou égaux à 0
-            return $id !== false && $id !== 0 ? $id : null;
+            return false !== $id && 0 !== $id ? $id : null;
         }, $array));
     }
 
@@ -590,6 +593,7 @@ class StringService
      * Retire les éléments invalides ou vides.
      *
      * @param array<int|string> $array Le tableau à traiter
+     *
      * @return array<string> Le tableau avec les éléments forcés en chaîne de caractères
      */
     public function forceElementsToString(array $array): array

@@ -79,6 +79,7 @@ class MsgLogAidSearchTempTransfertHandler
                     'logAidSearchTemp' => $logAidSearchTemp
                 ]);
                 foreach ($favoriteAids as $favoriteAid) {
+                    $favoriteAid->setLogAidSearchTemp(null);
                     $favoriteAid->setLogAidSearch($logAidSearch);
                     $entityManager->persist($favoriteAid);
                 }
