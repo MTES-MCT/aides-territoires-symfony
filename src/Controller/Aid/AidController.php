@@ -142,11 +142,10 @@ class AidController extends FrontController
         if ($isVappFormulaire) {
             // verification champ description
             $vappDescription = trim((string) $aidSearchClass->getVappDescription());
-            if ($vappDescription === '') {
+            if ('' === $vappDescription) {
                 // si formulaire mal rempli (bot) on retire du test
                 return $this->redirectToRoute('app_abtest_no_vapp');
             }
-
 
             // les scores en session
             $vappAidsById = $vappApiService->getAidsScoresInSession();
@@ -910,11 +909,11 @@ class AidController extends FrontController
         } catch (AidNotFoundException $e) {
             // Log l'erreur
             $error = new AidNotFoundError();
-            $error->setUrl($request->getUri());
-            $error->setIp($request->getClientIp());
-            $error->setUserAgent($request->headers->get('User-Agent'));
-            $error->setReferer($request->headers->get('referer'));
-            $error->setReason($e->getMessage());
+            $error->setUrl($stringService->truncateOrNull($request->getUri(), 255));
+            $error->setIp($stringService->truncateOrNull($request->getClientIp(), 255));
+            $error->setUserAgent($stringService->truncateOrNull($request->headers->get('User-Agent'), 255));
+            $error->setReferer($stringService->truncateOrNull($request->headers->get('referer'), 255));
+            $error->setReason($stringService->truncateOrNull($e->getMessage(), 255));
 
             $this->managerRegistry->getManager()->persist($error);
             $this->managerRegistry->getManager()->flush();
