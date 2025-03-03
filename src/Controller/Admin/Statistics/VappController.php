@@ -52,6 +52,12 @@ class VappController extends AbstractController
             'variation' => 'vapp',
         ]);
 
+        // nombre d'utilisateur qui ont demandé la version normale
+        $nbUsersNormal = $abTestUserRepository->count([
+            'abTest' => $vappFormulaire,
+            'refused' => true,
+        ]);
+
         // Nombre de recherches par source
         $logAidSearchs = $logAidSearchRepository->countBySource([
             'dateCreateMin' => $dateStart,
@@ -179,6 +185,7 @@ class VappController extends AbstractController
         // Ajout des données
         $cells = [
             ['Nombre de participants', $nbUsersAt, $nbUsersVapp],
+            ['Nombre de participants ayant refusé', $nbUsersNormal, ''],
             ['Nombre de recherches', $logAidSearchsBySource['aides-territoires'] ?? 0, $logAidSearchsBySource['vapp'] ?? 0],
             ['Nombre d\'affichages', $logAidViewsBySource['aides-territoires'] ?? 0, $logAidViewsBySource['vapp'] ?? 0],
             ['Nombre de plus d\'infos', $logAidOriginsBySource['aides-territoires'] ?? 0, $logAidOriginsBySource['vapp'] ?? 0],
