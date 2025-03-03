@@ -34,7 +34,7 @@ class VappController extends AbstractController
         LogAidApplicationUrlClickRepository $logAidApplicationUrlClickRepository,
     ): Response {
         $dateStart = new \DateTime(date('2025-02-26'));
-        $sources = ['vapp', 'aides-territoires'];
+        $sources = ['vapp', 'at_test'];
 
         $vappFormulaire = $abTestRepository->findOneBy([
             'name' => AbTestService::VAPP_FORMULAIRE
@@ -50,6 +50,12 @@ class VappController extends AbstractController
         $nbUsersVapp = $abTestUserRepository->count([
             'abTest' => $vappFormulaire,
             'variation' => 'vapp',
+        ]);
+
+        // nombre d'utilisateur qui ont demandé la version normale
+        $nbUsersNormal = $abTestUserRepository->count([
+            'abTest' => $vappFormulaire,
+            'refused' => true,
         ]);
 
         // Nombre de recherches par source
@@ -179,6 +185,7 @@ class VappController extends AbstractController
         // Ajout des données
         $cells = [
             ['Nombre de participants', $nbUsersAt, $nbUsersVapp],
+            ['Nombre de participants ayant refusé', $nbUsersNormal, ''],
             ['Nombre de recherches', $logAidSearchsBySource['aides-territoires'] ?? 0, $logAidSearchsBySource['vapp'] ?? 0],
             ['Nombre d\'affichages', $logAidViewsBySource['aides-territoires'] ?? 0, $logAidViewsBySource['vapp'] ?? 0],
             ['Nombre de plus d\'infos', $logAidOriginsBySource['aides-territoires'] ?? 0, $logAidOriginsBySource['vapp'] ?? 0],
