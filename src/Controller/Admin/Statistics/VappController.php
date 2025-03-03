@@ -33,7 +33,7 @@ class VappController extends AbstractController
         LogAidOriginUrlClickRepository $logAidOriginUrlClickRepository,
         LogAidApplicationUrlClickRepository $logAidApplicationUrlClickRepository,
     ): Response {
-        $dateStart = new \DateTime(date('2025-02-26'));
+        $dateStart = new \DateTime(date('2025-03-03'));
         $sources = ['vapp', 'at_test'];
 
         $vappFormulaire = $abTestRepository->findOneBy([
@@ -41,21 +41,24 @@ class VappController extends AbstractController
         ]);
 
         // Nombre de participants at
-        $nbUsersAt = $abTestUserRepository->count([
+        $nbUsersAt = $abTestUserRepository->countCustom([
             'abTest' => $vappFormulaire,
             'variation' => 'at',
+            'dateCreateMin' => $dateStart,
         ]);
 
         // Nombre de participants Vapp
-        $nbUsersVapp = $abTestUserRepository->count([
+        $nbUsersVapp = $abTestUserRepository->countCustom([
             'abTest' => $vappFormulaire,
             'variation' => 'vapp',
+            'dateCreateMin' => $dateStart,
         ]);
 
         // nombre d'utilisateur qui ont demandé la version normale
-        $nbUsersNormal = $abTestUserRepository->count([
+        $nbUsersNormal = $abTestUserRepository->countCustom([
             'abTest' => $vappFormulaire,
             'refused' => true,
+            'dateCreateMin' => $dateStart,
         ]);
 
         // Nombre de recherches par source
@@ -186,10 +189,10 @@ class VappController extends AbstractController
         $cells = [
             ['Nombre de participants', $nbUsersAt, $nbUsersVapp],
             ['Nombre de participants ayant refusé', $nbUsersNormal, ''],
-            ['Nombre de recherches', $logAidSearchsBySource['aides-territoires'] ?? 0, $logAidSearchsBySource['vapp'] ?? 0],
-            ['Nombre d\'affichages', $logAidViewsBySource['aides-territoires'] ?? 0, $logAidViewsBySource['vapp'] ?? 0],
-            ['Nombre de plus d\'infos', $logAidOriginsBySource['aides-territoires'] ?? 0, $logAidOriginsBySource['vapp'] ?? 0],
-            ['Nombre de candidatures', $logAidApplicationsBySource['aides-territoires'] ?? 0, $logAidApplicationsBySource['vapp'] ?? 0],
+            ['Nombre de recherches', $logAidSearchsBySource['at_test'] ?? 0, $logAidSearchsBySource['vapp'] ?? 0],
+            ['Nombre d\'affichages', $logAidViewsBySource['at_test'] ?? 0, $logAidViewsBySource['vapp'] ?? 0],
+            ['Nombre de plus d\'infos', $logAidOriginsBySource['at_test'] ?? 0, $logAidOriginsBySource['vapp'] ?? 0],
+            ['Nombre de candidatures', $logAidApplicationsBySource['at_test'] ?? 0, $logAidApplicationsBySource['vapp'] ?? 0],
             ['Nombre de votes positifs', $upvotesAt, $upvotesVapp],
             ['Nombre de votes positifs corrigés', '', $upvotesVappValid],
             ['Nombre de votes négatifs', $downvotesAt, $downvotesVapp],
