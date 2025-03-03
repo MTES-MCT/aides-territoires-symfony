@@ -15,9 +15,25 @@ class CookieResponseListener
 
     public function onKernelResponse(ResponseEvent $event): void
     {
+        $request = $this->requestStack->getCurrentRequest();
+        
+        // Vérifier si le request existe et si la route est stateless
+        if (!$request || $request->attributes->get('_stateless') === true) {
+            return;
+        }
+        
+        // Vérifier si la session existe et est démarrée avant d'y accéder
+        if (!$request->hasSession() || !$request->getSession()->isStarted()) {
+            return;
+        }
+        
         $response = $event->getResponse();
-        $session = $this->requestStack->getCurrentRequest()->getSession();
+        $session = $request->getSession();
         $cookies = $session->get('pending_cookies', []);
+
+        if (empty($cookies)) {
+            return;
+        }
 
         foreach ($cookies as $cookieData) {
             $cookie = new Cookie(
