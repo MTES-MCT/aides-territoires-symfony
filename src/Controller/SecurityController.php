@@ -149,16 +149,22 @@ class SecurityController extends FrontController
 
     // Url pour la connexion à l'API
     #[Route(path: '/api/connexion/', name: 'app_login_api')]
-    public function loginApi(AuthenticationUtils $authenticationUtils, RequestStack $requestStack): JsonResponse
+    public function loginApi(RequestStack $requestStack): JsonResponse
     {
-        if ('POST' !== $requestStack->getMainRequest()->getMethod()) {
-            return new JsonResponse('Cette page doit être appellée en POST', 405);
+        $response = null;
+        $request = $requestStack->getCurrentRequest();
+        
+        if (!$request) {
+            $response = new JsonResponse('Requête invalide', 400);
+        } elseif ('POST' !== $request->getMethod()) {
+            $response = new JsonResponse('Cette page doit être appellée en POST', 405);
+        } elseif (!$request->headers->get('X-AUTH-TOKEN')) {
+            $response = new JsonResponse('Veuillez ajouter votre X-AUTH-TOKEN dans les HEADERS', 401);
+        } else {
+            $response = new JsonResponse('Vous êtes connecté', 200);
         }
-        if (!$requestStack->getMainRequest()->headers->get('X-AUTH-TOKEN')) {
-            return new JsonResponse('Veuillez ajouter votre X-AUTH-TOKEN dans les HEADERS', 401);
-        }
-
-        return new JsonResponse('Vous êtes connecté', 200);
+        
+        return $response;
     }
 
     #[Route(path: '/logout', name: 'app_logout')]
