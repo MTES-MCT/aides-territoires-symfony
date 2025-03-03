@@ -41,21 +41,24 @@ class VappController extends AbstractController
         ]);
 
         // Nombre de participants at
-        $nbUsersAt = $abTestUserRepository->count([
+        $nbUsersAt = $abTestUserRepository->countCustom([
             'abTest' => $vappFormulaire,
             'variation' => 'at',
+            'dateCreateMin' => $dateStart,
         ]);
 
         // Nombre de participants Vapp
-        $nbUsersVapp = $abTestUserRepository->count([
+        $nbUsersVapp = $abTestUserRepository->countCustom([
             'abTest' => $vappFormulaire,
             'variation' => 'vapp',
+            'dateCreateMin' => $dateStart,
         ]);
 
         // nombre d'utilisateur qui ont demandé la version normale
-        $nbUsersNormal = $abTestUserRepository->count([
+        $nbUsersNormal = $abTestUserRepository->countCustom([
             'abTest' => $vappFormulaire,
             'refused' => true,
+            'dateCreateMin' => $dateStart,
         ]);
 
         // Nombre de recherches par source
