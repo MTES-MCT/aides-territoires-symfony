@@ -34,7 +34,7 @@ class VappController extends AbstractController
         LogAidApplicationUrlClickRepository $logAidApplicationUrlClickRepository,
     ): Response {
         $dateStart = new \DateTime(date('2025-02-26'));
-        $sources = ['vapp', 'aides-territoires'];
+        $sources = ['vapp', 'at_test'];
 
         $vappFormulaire = $abTestRepository->findOneBy([
             'name' => AbTestService::VAPP_FORMULAIRE

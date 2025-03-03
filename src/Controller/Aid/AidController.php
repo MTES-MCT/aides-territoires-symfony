@@ -84,6 +84,7 @@ class AidController extends FrontController
         $session = $requestStack->getCurrentRequest()->getSession();
 
         // est ce que l'ab test vapp est activé
+        $isVappActivation = $abTestService->shouldShowTestVersion(AbTestService::VAPP_ACTIVATION);
         $isVappFormulaire = $abTestService->shouldShowTestVersion(AbTestService::VAPP_FORMULAIRE);
 
         $requestStack
@@ -219,8 +220,11 @@ class AidController extends FrontController
         );
         // ************************************* */
         // TEST VAPP
-        if ($isVappFormulaire) {
-            $logAidSearchParams['source'] = 'vapp';
+        if ($isVappActivation) {
+            $logAidSearchParams['source'] = 'at_test';
+            if ($isVappFormulaire) {
+                $logAidSearchParams['source'] = 'vapp';
+            }
         }
         // ************************************* */
 
