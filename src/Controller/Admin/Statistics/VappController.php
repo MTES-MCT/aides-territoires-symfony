@@ -130,9 +130,10 @@ class VappController extends AbstractController
             $logAidApplicationsBySource[$logAidApplication['source']] = $logAidApplication['nb'];
         }
 
-        // On charge tous les votes
-        $abTestVotes = $abTestVoteRepository->findBy([
+        // On charge les votes
+        $abTestVotes = $abTestVoteRepository->findCustom([
             'abTest' => $vappFormulaire,
+            'dateCreateMin' => $dateStart,
         ]);
         $upvotesAt = 0;
         $upvotesVapp = 0;
